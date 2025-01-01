@@ -1,0 +1,111 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Examples", "Src\FastData.Examples\FastData.Examples.csproj", "{0AE2A47D-4C5C-4705-B29F-8D17C540A78D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Items", "_Items", "{DDA48CE4-1478-47F9-B44B-B117606FBDFC}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE.txt = LICENSE.txt
+		README.md = README.md
+		.editorconfig = .editorconfig
+		.globalconfig = .globalconfig
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Imports", "_Imports", "{95BF9A68-FE1B-4106-91C8-CB881106BFD4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Tests", "Src\FastData.Tests\FastData.Tests.csproj", "{4D10B7BE-6DEA-4B79-B2BB-43B7FA1F5E10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Benchmarks", "Src\FastData.Benchmarks\FastData.Benchmarks.csproj", "{91DB5D99-0C88-40E8-A0A0-3EDF292AA240}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Github", "_Github", "{B774BCA8-4D2D-44E7-903F-0FFC349FCC85}"
+	ProjectSection(SolutionItems) = preProject
+		.github\FUNDING.yml = .github\FUNDING.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IssueTemplates", "IssueTemplates", "{24810DE3-EAFF-4FA9-8813-209C15AC75EC}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug_report.md = .github\ISSUE_TEMPLATE\bug_report.md
+		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{49B11A05-65BA-4C41-A886-D07726F77EEC}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\generic-build.yml = .github\workflows\generic-build.yml
+		.github\workflows\nuget-release.yml = .github\workflows\nuget-release.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Local", "Local", "{2D71B425-3F70-414A-9044-5F483C57AA7A}"
+	ProjectSection(SolutionItems) = preProject
+		Locals\Directory.Build.props = Locals\Directory.Build.props
+		Locals\Directory.Packages.props = Locals\Directory.Packages.props
+		Locals\Library.props = Locals\Library.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Managed", "Managed", "{8678F082-EBA8-4718-AD4E-55BAD7EE853F}"
+	ProjectSection(SolutionItems) = preProject
+		Src\Directory.Build.props = Src\Directory.Build.props
+		Src\Directory.Build.targets = Src\Directory.Build.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Packages", "Packages", "{FE42A5C5-BF6D-4162-82D9-9423BA81437D}"
+	ProjectSection(SolutionItems) = preProject
+		Src\Directory.Packages.props = Src\Directory.Packages.props
+		Src\Directory.Packages.Analyzers.props = Src\Directory.Packages.Analyzers.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project", "Project", "{26DCE90B-7C0D-4805-9BF6-C8A0CF0CB49E}"
+	ProjectSection(SolutionItems) = preProject
+		Imports\Benchmarks.props = Imports\Benchmarks.props
+		Imports\Console.props = Imports\Console.props
+		Imports\Examples.props = Imports\Examples.props
+		Imports\Library.props = Imports\Library.props
+		Imports\Tests.props = Imports\Tests.props
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.InternalShared", "Src\FastData.InternalShared\FastData.InternalShared.csproj", "{2FA7C61A-60C0-40E6-AAD2-573B1A8DADCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData", "Src\FastData\FastData.csproj", "{24CACF84-1F4D-4473-9388-9CC18432B0B5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0AE2A47D-4C5C-4705-B29F-8D17C540A78D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AE2A47D-4C5C-4705-B29F-8D17C540A78D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AE2A47D-4C5C-4705-B29F-8D17C540A78D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AE2A47D-4C5C-4705-B29F-8D17C540A78D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D10B7BE-6DEA-4B79-B2BB-43B7FA1F5E10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D10B7BE-6DEA-4B79-B2BB-43B7FA1F5E10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D10B7BE-6DEA-4B79-B2BB-43B7FA1F5E10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D10B7BE-6DEA-4B79-B2BB-43B7FA1F5E10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91DB5D99-0C88-40E8-A0A0-3EDF292AA240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91DB5D99-0C88-40E8-A0A0-3EDF292AA240}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91DB5D99-0C88-40E8-A0A0-3EDF292AA240}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91DB5D99-0C88-40E8-A0A0-3EDF292AA240}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FA7C61A-60C0-40E6-AAD2-573B1A8DADCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FA7C61A-60C0-40E6-AAD2-573B1A8DADCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FA7C61A-60C0-40E6-AAD2-573B1A8DADCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FA7C61A-60C0-40E6-AAD2-573B1A8DADCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24CACF84-1F4D-4473-9388-9CC18432B0B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24CACF84-1F4D-4473-9388-9CC18432B0B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24CACF84-1F4D-4473-9388-9CC18432B0B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24CACF84-1F4D-4473-9388-9CC18432B0B5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{24810DE3-EAFF-4FA9-8813-209C15AC75EC} = {B774BCA8-4D2D-44E7-903F-0FFC349FCC85}
+		{49B11A05-65BA-4C41-A886-D07726F77EEC} = {B774BCA8-4D2D-44E7-903F-0FFC349FCC85}
+		{2D71B425-3F70-414A-9044-5F483C57AA7A} = {95BF9A68-FE1B-4106-91C8-CB881106BFD4}
+		{8678F082-EBA8-4718-AD4E-55BAD7EE853F} = {95BF9A68-FE1B-4106-91C8-CB881106BFD4}
+		{FE42A5C5-BF6D-4162-82D9-9423BA81437D} = {8678F082-EBA8-4718-AD4E-55BAD7EE853F}
+		{26DCE90B-7C0D-4805-9BF6-C8A0CF0CB49E} = {8678F082-EBA8-4718-AD4E-55BAD7EE853F}
+	EndGlobalSection
+EndGlobal

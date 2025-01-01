@@ -1,0 +1,7 @@
+﻿// [assembly: FastData<string>("ArraySet", new[] { "item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10" }, StorageMode.Array)]
+// [assembly: FastData<string>("MphfSet", new[] { "item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10" }, StorageMode.Mphf)]
+// [assembly: FastData<string>("SwitchSet", new[] { "item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10" }, StorageMode.Switch)]
+// [assembly: FastData<string>("SwitchHashCodeSet", new[] { "item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10" }, StorageMode.SwitchHashCode)]
+// [assembly: FastData<string>("SwitchTreeSet", new[] { "item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10" }, StorageMode.SwitchTree)]
+// [assembly: FastData<string>("BinarySearchSet", new[] { "item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10" }, StorageMode.BinarySearch)]
+// [assembly: FastData<string>("HashSetSet", new[] { "item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10" }, StorageMode.HashSet)]
