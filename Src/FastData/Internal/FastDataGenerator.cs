@@ -31,8 +31,8 @@ internal class FastDataGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         IncrementalValueProvider<ImmutableArray<FastDataSpec>> p = context.CompilationProvider
-                                                                            .SelectMany(Transform)
-                                                                            .Collect();
+                                                                          .SelectMany(Transform)
+                                                                          .Collect();
 
         context.RegisterSourceOutput(p, (spc, specs) =>
         {

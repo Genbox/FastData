@@ -1,4 +1,5 @@
-﻿// ReSharper disable RedundantNameQualifier
+﻿// ReSharper disable All
+
 using Genbox.FastData.Enums;
 
 namespace Genbox.FastData;
@@ -19,9 +20,8 @@ public sealed class FastDataAttribute<T> : global::System.Attribute
     public ClassType ClassType { get; set; }
 
 #if INTERNAL_BUILD
-    public
+    public StorageMode StorageMode { get; set; }
 #else
-    internal
+    internal StorageMode StorageMode { get; set; }
 #endif
-        StorageMode StorageMode { get; set; }
 }
