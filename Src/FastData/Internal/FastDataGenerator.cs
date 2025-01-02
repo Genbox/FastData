@@ -244,13 +244,21 @@ internal class FastDataGenerator : IIncrementalGenerator
 
     private static void AppendFooter(StringBuilder sb, FastDataSpec spec)
     {
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
-
-        sb.Append($$"""
+        sb.Append($"""
 
 
-                        public{{staticStr}} int Length => {{spec.Data.Length}};
-                    }
-                    """);
+                       public const int ItemCount = {spec.Data.Length};
+                   """);
+
+        if (spec.ClassType == ClassType.Instance)
+        {
+            sb.Append($"""
+
+                           public int Length => {spec.Data.Length};
+                       """);
+        }
+
+        sb.AppendLine();
+        sb.Append('}');
     }
 }

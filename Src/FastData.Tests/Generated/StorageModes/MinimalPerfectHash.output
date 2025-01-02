@@ -50,5 +50,5 @@ internal static class ImmutableSet
         public uint HashCode;
     }
 
-    public static int Length => 10;
+    public const int ItemCount = 10;
 }

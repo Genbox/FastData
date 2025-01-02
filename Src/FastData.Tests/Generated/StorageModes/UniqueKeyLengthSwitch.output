@@ -45,5 +45,5 @@ internal static class ImmutableSet
         }
     }
 
-    public static int Length => 10;
+    public const int ItemCount = 10;
 }

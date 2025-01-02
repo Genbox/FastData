@@ -33,5 +33,5 @@ internal static class ImmutableSet
         return value.Equals(_entries[value.Length - 1]);
     }
 
-    public static int Length => 10;
+    public const int ItemCount = 10;
 }
