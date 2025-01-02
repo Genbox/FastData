@@ -7,7 +7,7 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Internal;
 using Genbox.FastData.InternalShared;
 
-namespace Genbox.FastData.Benchmarks.Benchmarks.HighLevel;
+namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 /// <summary>
 /// The idea here is to ensure that Auto is nearly-always the fastest implementation. It should exploit properties of the

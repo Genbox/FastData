@@ -14,7 +14,7 @@ internal static class Program
                                      .AddJob(new Job(new RunMode
                                      {
                                          LaunchCount = 1,
-                                         WarmupCount = 3,
+                                         WarmupCount = 1,
                                          MinIterationCount = 3,
                                          MaxIterationCount = 10
                                      }, Job.InProcess))

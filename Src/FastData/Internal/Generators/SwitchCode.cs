@@ -13,13 +13,13 @@ internal static class SwitchCode
 
         sb.Append($$"""
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataType}} value)
                         {
                     {{GetEarlyExits("value", earlyExitSpecs)}}
 
                             switch (value)
                             {
-                    {{GenerateSwitch(spec.Data)}}
+                    {{GenerateSwitch(spec.DataType, spec.Data)}}
                                     return true;
                                 default:
                                     return false;
@@ -28,7 +28,7 @@ internal static class SwitchCode
                     """);
     }
 
-    private static string GenerateSwitch(string[] values)
+    private static string GenerateSwitch(string dataType, string[] values)
     {
         StringBuilder sb = new StringBuilder();
 

@@ -1,18 +1,18 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Order;
-using Genbox.FastHash;
 using Genbox.FastData.Benchmarks.Code;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Helpers;
+using Genbox.FastHash;
 
-namespace Genbox.FastData.Benchmarks.Benchmarks.HighLevel;
+namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-public class ConstructionBenchmarks
+public class MinimalPerfectHashBenchmarks
 {
     private uint[] _data = null!;
 

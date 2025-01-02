@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Configs;
 using Genbox.FastData.InternalShared.Optimal;
 
-namespace Genbox.FastData.Benchmarks.Benchmarks.DataStructures;
+namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory, BenchmarkLogicalGroupRule.ByParams)]
 public class OptimalStructureBenchmarks
