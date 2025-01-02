@@ -10,8 +10,7 @@ public class FunctionalityTests
     [Fact]
     public void OutputIsUniq()
     {
-        IFastSet set = CodeGenerator.DynamicCreateSet<FastDataGenerator>(["item", "item"], StorageMode.Array, false);
-        Assert.Equal(1, set.Length);
+        Assert.Throws<InvalidOperationException>(() => CodeGenerator.DynamicCreateSet<FastDataGenerator>(["item", "item"], StorageMode.Array, false));
     }
 
     [Theory, MemberData(nameof(GetImpl))]

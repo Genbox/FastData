@@ -153,15 +153,16 @@ internal class FastDataGenerator : IIncrementalGenerator
 
             TypedConstant values = ad.ConstructorArguments[1];
 
-            //We can always unique the values
-            HashSet<string> uniqueValues = new HashSet<string>(StringComparer.Ordinal);
+            //We uniq the values and throw on duplicates
+            HashSet<object> uniqueValues = new HashSet<object>();
 
             foreach (TypedConstant value in values.Values)
             {
                 if (value.Value == null)
                     continue;
 
-                uniqueValues.Add(value.Value.ToString());
+                if (!uniqueValues.Add(value.Value))
+                    throw new InvalidOperationException("Duplicate value: " + value.Value);
             }
 
             FastDataSpec spec = TypeHelper.MapData<FastDataSpec>(ad.NamedArguments);
