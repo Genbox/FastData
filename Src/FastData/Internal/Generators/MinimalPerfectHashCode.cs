@@ -26,11 +26,11 @@ internal static class MinimalPerfectHashCode
             return span.TotalSeconds > 60;
         }).First();
 
-        (string, uint)[] data = new (string, uint)[length];
+        (object, uint)[] data = new (object, uint)[length];
 
         for (int i = 0; i < length; i++)
         {
-            string value = spec.Data[i];
+            object value = spec.Data[i];
 
             uint hash = (uint)HashHelper.Hash(value, seed);
             uint index = hash % length;
@@ -38,12 +38,12 @@ internal static class MinimalPerfectHashCode
         }
 
         sb.Append($$"""
-                        private{{staticStr}} Entry[] _entries = new[] {
+                        private{{staticStr}} Entry[] _entries = new Entry[] {
                     {{GenerateList(data)}}
                         };
 
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
                     {{GetEarlyExits("value", earlyExitSpecs)}}
 
@@ -57,26 +57,26 @@ internal static class MinimalPerfectHashCode
                         [StructLayout(LayoutKind.Auto)]
                         private struct Entry
                         {
-                            public Entry(string value, uint hashCode)
+                            public Entry({{spec.DataTypeName}} value, uint hashCode)
                             {
                                 Value = value;
                                 HashCode = hashCode;
                             }
 
-                            public string Value;
+                            public {{spec.DataTypeName}} Value;
                             public uint HashCode;
                         }
                     """);
     }
 
-    private static string GenerateList((string, uint)[] data)
+    private static string GenerateList((object, uint)[] data)
     {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < data.Length; i++)
         {
-            (string value, uint hash) = data[i];
-            sb.Append("        new Entry(").Append('"').Append(value).Append("\", ").Append(hash).Append("u)");
+            (object value, uint hash) = data[i];
+            sb.Append("        new Entry(").Append(ToValueLabel(value)).Append(", ").Append(hash).Append("u)");
 
             if (i != data.Length - 1)
                 sb.AppendLine(",");

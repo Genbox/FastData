@@ -1,0 +1,38 @@
+    private static Entry[] _entries = new Entry[] {
+        new Entry(1, 2900454430u),
+        new Entry(8, 2422710621u),
+        new Entry(4, 2297461802u),
+        new Entry(6, 2148859883u),
+        new Entry(7, 617145854u),
+        new Entry(10, 1441501565u),
+        new Entry(5, 2102954096u),
+        new Entry(9, 2796760547u),
+        new Entry(3, 566421058u),
+        new Entry(2, 1911982409u)
+    };
+
+    
+    public static bool Contains(int value)
+    {
+        if (value < 1 || value > 10)
+           return false;
+
+        uint hash = unchecked((uint)HashHelper.Hash(value, 2570));
+        uint index = MathHelper.FastMod(hash, 10, 1844674407370955162);
+        ref Entry entry = ref _entries[index];
+
+        return hash == entry.HashCode && value.Equals(entry.Value);
+    }
+
+    [StructLayout(LayoutKind.Auto)]
+    private struct Entry
+    {
+        public Entry(int value, uint hashCode)
+        {
+            Value = value;
+            HashCode = hashCode;
+        }
+
+        public int Value;
+        public uint HashCode;
+    }

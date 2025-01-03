@@ -19,7 +19,7 @@ internal static class HashSetCode
 
         for (int i = 0; i < length; i++)
         {
-            string value = spec.Data[i];
+            object value = spec.Data[i];
 
             uint hashCode = (uint)HashHelper.Hash(value);
             ref int bucket = ref buckets[hashCode % length];
@@ -38,7 +38,7 @@ internal static class HashSetCode
                     {{GenerateEntries(entries, staticStr)}}
 
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
                     {{GetEarlyExits("value", earlyExitSpecs)}}
 
@@ -64,9 +64,9 @@ internal static class HashSetCode
                         {
                             public uint HashCode;
                             public {{(small ? "short" : "int")}} Next;
-                            public string Value;
+                            public {{spec.DataTypeName}} Value;
 
-                            public Entry(uint hashCode, {{(small ? "short" : "int")}} next, string value)
+                            public Entry(uint hashCode, {{(small ? "short" : "int")}} next, {{spec.DataTypeName}} value)
                             {
                                 HashCode = hashCode;
                                 Next = next;
@@ -101,7 +101,7 @@ internal static class HashSetCode
         for (int i = 0; i < data.Length; i++)
         {
             ref Entry entry = ref data[i];
-            sb.Append("        new Entry(").Append(entry.HashCode).Append(", ").Append(entry.Next).Append(", \"").Append(entry.Value).Append("\")");
+            sb.Append("        new Entry(").Append(entry.HashCode).Append(", ").Append(entry.Next).Append(", ").Append(ToValueLabel(entry.Value)).Append(')');
 
             if (i != data.Length - 1)
                 sb.Append(',');
@@ -118,6 +118,6 @@ internal static class HashSetCode
     {
         public uint HashCode;
         public int Next;
-        public string Value;
+        public object Value;
     }
 }

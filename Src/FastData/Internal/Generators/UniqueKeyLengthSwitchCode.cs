@@ -11,6 +11,7 @@ internal static class UniqueKeyLengthSwitchCode
     {
         string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
 
+#if DEBUG
         //Sanity check on inputs
         HashSet<int> uniqLen = new HashSet<int>();
 
@@ -19,10 +20,11 @@ internal static class UniqueKeyLengthSwitchCode
             if (!uniqLen.Add(value.Length))
                 throw new InvalidOperationException("Not able to generate a unique length index as the data does not have unique lengths");
         }
+#endif
 
         sb.Append($$"""
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
                     {{GetEarlyExits("value", earlyExitSpecs)}}
 
@@ -36,7 +38,7 @@ internal static class UniqueKeyLengthSwitchCode
                     """);
     }
 
-    private static string GenerateSwitch(string[] values)
+    private static string GenerateSwitch(object[] values)
     {
         StringBuilder sb = new StringBuilder();
 
@@ -44,7 +46,7 @@ internal static class UniqueKeyLengthSwitchCode
         {
             sb.AppendLine($"""
                                        case {value.Length}:
-                                           return {GetEqualFunction("value", $"\"{value}\"")};
+                                           return {GetEqualFunction("value", ToValueLabel(value))};
                            """);
         }
 

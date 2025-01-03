@@ -1,5 +1,7 @@
 using System.Text;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Enums;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
@@ -8,6 +10,11 @@ internal static class SingleValueCode
 {
     public static void Generate(StringBuilder sb, FastDataSpec spec)
     {
+        //We don't support early exits in this generator.
+        // - Strings: Length is checked in the equals function
+        // - Integers: Only need an equals function (x == y)
+        // - Others: They fall back to a simple equals as well
+
         string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
         uint length = (uint)spec.Data.Length;
 
@@ -18,12 +25,9 @@ internal static class SingleValueCode
 
         sb.Append($$"""
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
-                            if (value.Length != {{spec.Data[0].Length}})
-                                return false;
-
-                            return {{GetEqualFunction("value", $"\"{spec.Data[0]}\"")}};
+                            return {{GetEqualFunction("value", ToValueLabel(spec.Data[0]))}};
                         }
                     """);
     }

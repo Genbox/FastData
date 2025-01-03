@@ -17,19 +17,36 @@ internal static class CodeSnip
 
         foreach (IEarlyExitSpec spec in specs)
         {
-            if (spec is MinMaxLengthEarlyExitSpec minMaxLen)
+            if (spec is MinMaxLengthEarlyExitSpec(var minLength, var maxLength))
             {
-                if (minMaxLen.MinStrLength == minMaxLen.MaxStrLength) //same length
+                if (minLength == maxLength) //same length
                 {
                     sb.Append($"""
-                                      if ({variable}.Length != {minMaxLen.MaxStrLength})
+                                      if ({variable}.Length != {maxLength})
                                           return false;
                                """);
                 }
                 else
                 {
                     sb.Append($"""
-                                       if ({variable}.Length < {minMaxLen.MinStrLength} || {variable}.Length > {minMaxLen.MaxStrLength})
+                                       if ({variable}.Length < {minLength} || {variable}.Length > {maxLength})
+                                          return false;
+                               """);
+                }
+            }
+            else if (spec is MinMaxValueEarlyExitSpec(var minValue, var maxValue))
+            {
+                if (minValue == maxValue) //same value
+                {
+                    sb.Append($"""
+                                      if ({variable} != {maxValue.ToString(NumberFormatInfo.InvariantInfo)})
+                                          return false;
+                               """);
+                }
+                else
+                {
+                    sb.Append($"""
+                                       if ({variable} < {minValue.ToString(CultureInfo.InvariantCulture)} || {variable} > {maxValue.ToString(NumberFormatInfo.InvariantInfo)})
                                           return false;
                                """);
                 }
@@ -71,5 +88,17 @@ internal static class CodeSnip
     public static string? GetMethodAttributes()
     {
         return GlobalOptions.DisableInlining ? "[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]" : null;
+    }
+
+    public static string ToValueLabel(object value)
+    {
+        return value switch
+        {
+            string val => $"\"{val}\"",
+            char val => $"'{val}'",
+            bool val => val.ToString().ToLowerInvariant(),
+            IFormattable val => val.ToString(null, CultureInfo.InvariantCulture),
+            _ => value.ToString()
+        };
     }
 }

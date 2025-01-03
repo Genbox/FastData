@@ -6,92 +6,7 @@ internal static class Analyzer
 {
     private const byte _analysisMaxLength = 255;
 
-    /// <summary>
-    /// Analyze a set of strings and return properties about the strings which can be used to determine the optimal way to compare the strings.
-    /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
-    public static AnalysisResult Analyze(string[] data)
-    {
-        if (data.Length == 0)
-            throw new InvalidOperationException("This method will produce invalid results given an empty array");
-
-        StringProperties strProps = GetProperties(data);
-
-        byte longestLeft = 0;
-
-        if (data.Length > 1)
-            longestLeft = LongestLeft(data);
-
-        byte longestRight = 0;
-
-        if (data.Length > 2)
-            longestRight = LongestRight(data);
-
-        return new AnalysisResult(strProps, data.Length, longestLeft, longestRight);
-    }
-
-    /// <summary>
-    /// Finds the longest left-aligned common substring length in a set of strings
-    /// </summary>
-    /// <param name="data">The strings to compare</param>
-    /// <returns>Returns the length of the longest common left-aligned substring. Returns 0 if all the string are different.</returns>
-    internal static byte LongestLeft(string[] data)
-    {
-        Debug.Assert(data.Length > 1);
-
-        string reference = data[0];
-        byte length = (byte)reference.Length;
-
-        for (int i = 1; i < data.Length; i++)
-        {
-            byte currentLength = 0;
-            int minLength = Math.Min(length, data[i].Length);
-            for (int j = 0; j < minLength; j++)
-            {
-                if (reference[j] == data[i][j])
-                    currentLength++;
-                else
-                    break;
-            }
-            length = currentLength;
-        }
-
-        return length;
-    }
-
-    /// <summary>
-    /// Finds the longest right-aligned common substring length in a set of strings
-    /// </summary>
-    /// <param name="data">The strings to compare</param>
-    /// <returns>Returns the length of the longest common right-aligned substring. Returns 0 if all the string are different.</returns>
-    internal static byte LongestRight(string[] data)
-    {
-        Debug.Assert(data.Length > 1);
-
-        string reference = data[0];
-        byte length = (byte)reference.Length;
-
-        for (int i = 1; i < data.Length; i++)
-        {
-            byte currentLength = 0;
-            int minLength = Math.Min(length, data[i].Length);
-            for (int j = 0; j < minLength; j++)
-            {
-                if (reference[reference.Length - 1 - j] == data[i][data[i].Length - 1 - j])
-                    currentLength++;
-                else
-                    break;
-            }
-            length = currentLength;
-        }
-
-        return length;
-    }
-
-    /// <summary>
-    /// Gets a few generic properties of a set of strings.
-    /// </summary>
-    internal static StringProperties GetProperties(string[] data)
+    internal static StringProperties GetStringProperties(IEnumerable<string> data)
     {
         uint minStrLen = uint.MaxValue;
         uint maxStrLen = 0;
@@ -99,32 +14,116 @@ internal static class Analyzer
         ushort minChar = ushort.MaxValue;
         ushort maxChar = 0;
 
-        bool[] lengths = new bool[_analysisMaxLength];
-        bool uniqLength = true;
+        bool[] lengthIndex = new bool[_analysisMaxLength];
 
-        foreach (string val in data)
+        using IEnumerator<string> enumerator = data.GetEnumerator();
+        enumerator.MoveNext();
+
+        string reference = enumerator.Current!;
+        byte longestLeft = (byte)reference.Length;
+        byte longestRight = (byte)reference.Length;
+
+        uint len = (uint)reference.Length;
+
+        SetMinMax(len, ref minStrLen, ref maxStrLen);
+        SetLengthIndex(len, lengthIndex);
+
+        (ushort minCharVal, ushort maxCharVal) = GetCharMinMax(reference);
+        minChar = Math.Min(minCharVal, minChar);
+        maxChar = Math.Max(maxCharVal, maxChar);
+
+        while (enumerator.MoveNext())
         {
-            uint len = (uint)val.Length;
+            string val = enumerator.Current!;
+
+            len = (uint)val.Length;
 
             if (len == 0)
                 continue;
 
-            GetStrMinMax(len, ref minStrLen, ref maxStrLen);
-            GetStrUniq(len, lengths, ref uniqLength);
+            SetMinMax(len, ref minStrLen, ref maxStrLen);
+            SetLengthIndex(len, lengthIndex);
 
-            (ushort minCharVal, ushort maxCharVal) = GetCharMinMax(val);
+            (minCharVal, maxCharVal) = GetCharMinMax(val);
             minChar = Math.Min(minCharVal, minChar);
             maxChar = Math.Max(maxCharVal, maxChar);
+
+            byte currentLength = 0;
+            int minLength = Math.Min(longestLeft, val.Length);
+            for (int j = 0; j < minLength; j++)
+            {
+                if (reference[j] == val[j])
+                    currentLength++;
+                else
+                    break;
+            }
+            longestLeft = currentLength;
+
+            currentLength = 0;
+            minLength = Math.Min(longestRight, val.Length);
+            for (int j = 0; j < minLength; j++)
+            {
+                if (reference[reference.Length - 1 - j] == val[val.Length - 1 - j])
+                    currentLength++;
+                else
+                    break;
+            }
+            longestRight = currentLength;
         }
 
-        return new StringProperties(minStrLen, maxStrLen, minChar, maxChar, uniqLength);
+        return new StringProperties(minStrLen, maxStrLen, minChar, maxChar, longestLeft, longestRight, (uint)lengthIndex.Count(x => x));
+    }
+
+    internal static IntegerProperties GetIntegerProperties(IEnumerable<int> data)
+    {
+        int min = int.MaxValue;
+        int max = int.MinValue;
+
+        using IEnumerator<int> enumerator = data.GetEnumerator();
+        enumerator.MoveNext();
+        int lastValue = enumerator.Current;
+
+        min = Math.Min(min, lastValue);
+        max = Math.Max(max, lastValue);
+
+        bool consecutive = true;
+        while (enumerator.MoveNext())
+        {
+            int val = enumerator.Current;
+
+            if (consecutive && lastValue + 1 != val)
+                consecutive = false;
+
+            min = Math.Min(min, val);
+            max = Math.Max(max, val);
+            lastValue = val;
+        }
+
+        return new IntegerProperties(min, max, consecutive);
+    }
+
+    internal static ArrayProperties GetArrayProperties(IEnumerable<Array> data)
+    {
+        uint minLen = uint.MaxValue;
+        uint maxLen = 0;
+        bool[] lengthIndex = new bool[_analysisMaxLength];
+
+        foreach (Array arr in data)
+        {
+            uint len = (uint)arr.Length;
+
+            SetMinMax(len, ref minLen, ref maxLen);
+            SetLengthIndex(len, lengthIndex);
+        }
+
+        return new ArrayProperties(minLen, maxLen, (uint)lengthIndex.Count(x => x));
     }
 
     /// <summary>
-    /// Given a string length, it is compared <paramref name="minStrLen"/> and <paramref name="maxStrLen"/>.
+    /// Updates the minimum and maximum length.
     /// It is built using refs to support incremental updates.
     /// </summary>
-    internal static void GetStrMinMax(uint strLen, ref uint minStrLen, ref uint maxStrLen)
+    internal static void SetMinMax(uint strLen, ref uint minStrLen, ref uint maxStrLen)
     {
         minStrLen = Math.Min(minStrLen, strLen);
         maxStrLen = Math.Max(maxStrLen, strLen);
@@ -133,17 +132,12 @@ internal static class Analyzer
     /// <summary>
     /// Updates an index with lengths and report back if the length collided with a previous length. Can be called incrementally.
     /// </summary>
-    internal static void GetStrUniq(uint strLen, bool[] lengthIndex, ref bool uniqLength)
+    internal static void SetLengthIndex(uint strLen, bool[] lengthIndex)
     {
         Debug.Assert(strLen > 0);
 
-        if (uniqLength && strLen <= _analysisMaxLength)
-        {
-            if (lengthIndex[strLen - 1])
-                uniqLength = false;
-
+        if (strLen <= _analysisMaxLength)
             lengthIndex[strLen - 1] = true;
-        }
     }
 
     /// <summary>

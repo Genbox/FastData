@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
@@ -12,17 +13,17 @@ internal static class BinarySearchCode
         string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
 
         sb.Append($$"""
-                        private{{staticStr}} string[] _entries = new[] {
+                        private{{staticStr}} {{spec.DataTypeName}}[] _entries = new {{spec.DataTypeName}}[] {
                     {{GenerateList(spec.Data)}}
                         };
 
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
                     {{GetEarlyExits("value", earlyExitSpecs)}}
 
                             int lo = 0;
-                            int hi = _entries.Length - 1;
+                            int hi = {{(spec.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
                             while (lo <= hi)
                             {
                                 int i = lo + ((hi - lo) >> 1);
@@ -41,7 +42,7 @@ internal static class BinarySearchCode
                     """);
     }
 
-    private static string GenerateList(string[] data)
+    private static string GenerateList(object[] data)
     {
         Array.Sort(data, StringComparer.Ordinal);
 
@@ -49,7 +50,7 @@ internal static class BinarySearchCode
 
         for (int i = 0; i < data.Length; i++)
         {
-            sb.Append("        \"").Append(data[i]).Append('"');
+            sb.Append("        ").Append(ToValueLabel(data[i]));
 
             if (i != data.Length - 1)
                 sb.AppendLine(", ");

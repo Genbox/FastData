@@ -19,7 +19,7 @@ internal static class KeyLengthCode
         string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
 
         //Calculate the maximum length
-        int maxLen = spec.Data.Max(x => x.Length);
+        int maxLen = spec.Data.Cast<string>().Max(x => x.Length);
 
         //We don't have to use HashSets to deduplicate within a bucket as all items are unique
         List<string>?[] lengths = new List<string>?[maxLen + 1]; //We need a place for zero
@@ -32,21 +32,21 @@ internal static class KeyLengthCode
         }
 
         sb.Append($$"""
-                        private{{staticStr}} readonly string?[]?[] _entries = [
+                        private{{staticStr}} readonly {{spec.DataTypeName}}[]?[] _entries = [
                     {{GenerateList(lengths)}}
                         ];
 
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
                     {{GetEarlyExits("value", earlyExitSpecs, true)}}
 
-                            string?[]? bucket = _entries[value.Length];
+                            {{spec.DataTypeName}}[]? bucket = _entries[value.Length];
 
                             if (bucket == null)
                                 return false;
 
-                            foreach (string str in bucket)
+                            foreach ({{spec.DataTypeName}} str in bucket)
                             {
                                 if ({{GetEqualFunction("value", "str")}})
                                     return true;

@@ -7,16 +7,18 @@ namespace Genbox.FastData.Internal.Optimization;
 
 internal static class Optimizer
 {
-    public static IStringSpec GetOptimalSpec(AnalysisResult results)
+    public static IEnumerable<IEarlyExitSpec> GetEarlyExits(StringProperties prop)
     {
-        return new FullStringSpec();
+        yield return new MinMaxLengthEarlyExitSpec(prop.MinStrLen, prop.MaxStrLen);
     }
 
-    public static IEnumerable<IEarlyExitSpec> GetEarlyExitSpecs(AnalysisResult results)
+    public static IEnumerable<IEarlyExitSpec> GetEarlyExits(ArrayProperties prop)
     {
-        StringProperties prop = results.StringProperties;
+        yield return new MinMaxLengthEarlyExitSpec(prop.MinLength, prop.MaxLength);
+    }
 
-        //We handle the fact that min and max can be the same value in the code generator
-        yield return new MinMaxLengthEarlyExitSpec(prop.MinStrLen, prop.MaxStrLen);
+    public static IEnumerable<IEarlyExitSpec> GetEarlyExits(IntegerProperties prop)
+    {
+        yield return new MinMaxValueEarlyExitSpec(prop.MinValue, prop.MaxValue);
     }
 }

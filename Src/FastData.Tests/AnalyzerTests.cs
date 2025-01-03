@@ -8,12 +8,40 @@ public class AnalyzerTests
     public void PropertiesTest()
     {
         string[] data = ["a", "aa", "aaa", "aaaa"];
-        StringProperties props = Analyzer.GetProperties(data);
-        Assert.True(props.UniqLength);
+        StringProperties props = Analyzer.GetStringProperties(data);
+        Assert.Equal(4u, props.NumLengths);
         Assert.Equal(1u, props.MinStrLen);
         Assert.Equal(4u, props.MaxStrLen);
         Assert.Equal('a', props.MinChar);
         Assert.Equal('a', props.MaxChar);
+    }
+
+    [Theory]
+    [InlineData(new[] { "aaa", "bbb" }, 0)]
+    [InlineData(new[] { "aaa", "abb" }, 1)]
+    [InlineData(new[] { "aaa", "aab" }, 2)]
+    [InlineData(new[] { "aaa", "aaa" }, 3)]
+    [InlineData(new[] { "aaa", "aaaa" }, 3)] //test smaller a than b
+    [InlineData(new[] { "aaaa", "aaa" }, 3)] //test smaller b than a
+    [InlineData(new[] { "basicincome", "basicflying", "basicmetal", "basichammer", "basicmicrowave" }, 5)]
+    public void LongestLeftTest(string[] data, byte expectedLength)
+    {
+        StringProperties val = Analyzer.GetStringProperties(data);
+        Assert.Equal(expectedLength, val.LongestLeft);
+    }
+
+    [Theory]
+    [InlineData(new[] { "aaa", "bbb" }, 0)]
+    [InlineData(new[] { "aaa", "bba" }, 1)]
+    [InlineData(new[] { "aaa", "baa" }, 2)]
+    [InlineData(new[] { "aaa", "aaa" }, 3)]
+    [InlineData(new[] { "aaa", "aaaa" }, 3)] //test smaller a than b
+    [InlineData(new[] { "aaaa", "aaa" }, 3)] //test smaller b than a
+    [InlineData(new[] { "incomebasic", "flyingbasic", "waterbasic", "metalbasic", "hammerbasic", "microwavebasic" }, 5)]
+    public void LongestRightTest(string[] data, byte expectedLength)
+    {
+        StringProperties val = Analyzer.GetStringProperties(data);
+        Assert.Equal(expectedLength, val.LongestRight);
     }
 
     [Theory]
@@ -38,54 +66,23 @@ public class AnalyzerTests
         uint max = 0;
 
         foreach (uint length in lengths)
-            Analyzer.GetStrMinMax(length, ref min, ref max);
+            Analyzer.SetMinMax(length, ref min, ref max);
 
         Assert.Equal(expectedMin, min);
         Assert.Equal(expectedMax, max);
     }
 
     [Theory]
-    [InlineData(new[] { 1u, 2u, 3u }, new[] { true, true, true })]
-    [InlineData(new[] { 1u, 1u, 1u }, new[] { true, false, false })]
-    [InlineData(new[] { 1u, 1u, 2u }, new[] { true, false, false })]
-    public void GetStrUniqTest(uint[] lengths, bool[] expected)
+    [InlineData(new[] { 1u, 2u, 3u }, 3)]
+    [InlineData(new[] { 1u, 1u, 1u }, 1)]
+    [InlineData(new[] { 1u, 1u, 2u }, 2)]
+    public void SetLengthIndexTest(uint[] lengths, byte expected) // expected is the number of lengths
     {
         bool[] lengthIndex = [false, false, false];
 
-        bool uniqFlag = true;
-
         for (int i = 0; i < lengths.Length; i++)
-        {
-            Analyzer.GetStrUniq(lengths[i], lengthIndex, ref uniqFlag);
-            Assert.Equal(expected[i], uniqFlag);
-        }
-    }
+            Analyzer.SetLengthIndex(lengths[i], lengthIndex);
 
-    [Theory]
-    [InlineData(new[] { "aaa", "bbb" }, 0)]
-    [InlineData(new[] { "aaa", "abb" }, 1)]
-    [InlineData(new[] { "aaa", "aab" }, 2)]
-    [InlineData(new[] { "aaa", "aaa" }, 3)]
-    [InlineData(new[] { "aaa", "aaaa" }, 3)] //test smaller a than b
-    [InlineData(new[] { "aaaa", "aaa" }, 3)] //test smaller b than a
-    [InlineData(new[] { "basicincome", "basicflying", "basicmetal", "basichammer", "basicmicrowave" }, 5)]
-    public void LongestLeftTest(string[] data, short expectedLength)
-    {
-        short val = Analyzer.LongestLeft(data);
-        Assert.Equal(expectedLength, val);
-    }
-
-    [Theory]
-    [InlineData(new[] { "aaa", "bbb" }, 0)]
-    [InlineData(new[] { "aaa", "bba" }, 1)]
-    [InlineData(new[] { "aaa", "baa" }, 2)]
-    [InlineData(new[] { "aaa", "aaa" }, 3)]
-    [InlineData(new[] { "aaa", "aaaa" }, 3)] //test smaller a than b
-    [InlineData(new[] { "aaaa", "aaa" }, 3)] //test smaller b than a
-    [InlineData(new[] { "incomebasic", "flyingbasic", "waterbasic", "metalbasic", "hammerbasic", "microwavebasic" }, 5)]
-    public void LongestRightTest(string[] data, short expectedLength)
-    {
-        short val = Analyzer.LongestRight(data);
-        Assert.Equal(expectedLength, val);
+        Assert.Equal(expected, lengthIndex.Count(x => x));
     }
 }

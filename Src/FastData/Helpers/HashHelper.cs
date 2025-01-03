@@ -13,6 +13,28 @@ public static class HashHelper
     private const int StripeSize = 4 * sizeof(ulong);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ulong Hash(object data, uint seed = 0)
+    {
+        //We don't want randomized hash codes, so we handle string as a special case
+        if (data is string str)
+            return Hash(str, seed);
+
+        int code = data.GetHashCode();
+        return Murmur_64((ulong)code + seed); //we need bits in both low and high bits
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong Murmur_64(ulong h)
+    {
+        h ^= h >> 33;
+        h *= 0xff51afd7ed558ccd;
+        h ^= h >> 33;
+        h *= 0xc4ceb9fe1a85ec53;
+        h ^= h >> 33;
+        return h;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ulong Hash(string data, uint seed = 0)
     {
         ReadOnlySpan<byte> bytes = MemoryMarshal.AsBytes(data.AsSpan());

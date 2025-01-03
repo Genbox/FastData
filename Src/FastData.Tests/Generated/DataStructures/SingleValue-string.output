@@ -1,0 +1,5 @@
+    
+    public static bool Contains(string value)
+    {
+        return value.Equals("item0");
+    }

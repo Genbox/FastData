@@ -1,0 +1,29 @@
+    
+    public static bool Contains(int value)
+    {
+        switch (unchecked((uint)HashHelper.Hash(value, 0)))
+        {
+
+            case 885181228:
+                 return value.Equals(1);
+            case 1694925799:
+                 return value.Equals(2);
+            case 167303374:
+                 return value.Equals(3);
+            case 2834307189:
+                 return value.Equals(4);
+            case 3578549621:
+                 return value.Equals(5);
+            case 3346810227:
+                 return value.Equals(6);
+            case 3832074717:
+                 return value.Equals(7);
+            case 2476983943:
+                 return value.Equals(8);
+            case 4160025045:
+                 return value.Equals(9);
+            case 625529613:
+                 return value.Equals(10);
+        }
+        return false;
+    }

@@ -13,11 +13,11 @@ internal static class SwitchHashCode
         string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
         uint length = (uint)spec.Data.Length;
 
-        (uint, string)[] hashCodes = new (uint, string)[length];
+        (uint, object)[] hashCodes = new (uint, object)[length];
 
         for (int i = 0; i < spec.Data.Length; i++)
         {
-            string value = spec.Data[i];
+            object value = spec.Data[i];
             uint hash = (uint)HashHelper.Hash(value);
 
             hashCodes[i] = (hash, value);
@@ -25,7 +25,7 @@ internal static class SwitchHashCode
 
         sb.Append($$"""
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
                             switch ({{GetHashFunction("value", 0)}})
                             {
@@ -36,16 +36,16 @@ internal static class SwitchHashCode
                     """);
     }
 
-    private static string GenerateSwitch((uint, string)[] data)
+    private static string GenerateSwitch((uint, object)[] data)
     {
         StringBuilder sb = new StringBuilder();
 
-        foreach ((uint, string) pair in data)
+        foreach ((uint, object) pair in data)
         {
             sb.Append($"""
 
                                    case {pair.Item1.ToString(NumberFormatInfo.InvariantInfo)}:
-                                        return {GetEqualFunction("value", $"\"{pair.Item2}\"")};
+                                        return {GetEqualFunction("value", ToValueLabel(pair.Item2))};
                        """);
         }
 

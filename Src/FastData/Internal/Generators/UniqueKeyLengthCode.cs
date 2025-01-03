@@ -48,12 +48,12 @@ internal static class UniqueKeyLengthCode
         //TODO: Remove gaps in array by reducing the index via a map (if (idx > 10) return 4) where 4 is the number to subtract from the index
 
         sb.Append($$"""
-                        private{{staticStr}} readonly string[] _entries = new[] {
+                        private{{staticStr}} readonly {{spec.DataTypeName}}[] _entries = new {{spec.DataTypeName}}[] {
                     {{GenerateList(lengths, lowerBound)}}
                         };
 
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
                     {{GetEarlyExits("value", earlyExitSpecs, true)}}
 
@@ -73,7 +73,7 @@ internal static class UniqueKeyLengthCode
             if (value == null)
                 sb.Append("        null");
             else
-                sb.Append("        \"").Append(value).Append('"');
+                sb.Append("        ").Append(ToValueLabel(value));
 
             if (i != data.Length - 1)
                 sb.AppendLine(", ");

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
@@ -13,7 +14,7 @@ internal static class ConditionalCode
 
         sb.Append($$"""
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
                     {{GetEarlyExits("value", earlyExitSpecs)}}
 
@@ -25,13 +26,13 @@ internal static class ConditionalCode
                     """);
     }
 
-    private static string GenerateConditional(string variable1, string[] values)
+    private static string GenerateConditional(string variable1, object[] values)
     {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < values.Length; i++)
         {
-            sb.Append(GetEqualFunction(variable1, $"\"{values[i]}\""));
+            sb.Append(GetEqualFunction(variable1, ToValueLabel(values[i])));
 
             if (i != values.Length - 1)
                 sb.Append(" || ");

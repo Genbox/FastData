@@ -14,17 +14,17 @@ internal static class EytzingerSearchCode
 
         Array.Sort(spec.Data);
 
-        string[] output = new string[length];
+        object[] output = new object[length];
         int index = 0;
         EytzingerOrder(spec.Data, output, ref index);
 
         sb.Append($$"""
-                        private{{staticStr}} string[] _entries = new[] {
+                        private{{staticStr}} {{spec.DataTypeName}}[] _entries = new {{spec.DataTypeName}}[] {
                     {{GenerateList(output)}}
                         };
 
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
                     {{GetEarlyExits("value", earlyExitSpecs)}}
 
@@ -47,13 +47,13 @@ internal static class EytzingerSearchCode
                     """);
     }
 
-    private static string GenerateList(string[] data)
+    private static string GenerateList(object[] data)
     {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < data.Length; i++)
         {
-            sb.Append("        \"").Append(data[i]).Append('"');
+            sb.Append("        ").Append(ToValueLabel(data[i]));
 
             if (i != data.Length - 1)
                 sb.AppendLine(", ");
@@ -62,7 +62,7 @@ internal static class EytzingerSearchCode
         return sb.ToString();
     }
 
-    private static void EytzingerOrder(string[] input, string[] output, ref int arrIdx, int eytIdx = 0)
+    private static void EytzingerOrder(object[] input, object[] output, ref int arrIdx, int eytIdx = 0)
     {
         if (eytIdx < input.Length)
         {

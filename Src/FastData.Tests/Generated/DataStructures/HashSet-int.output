@@ -1,0 +1,52 @@
+    private static readonly int[] _buckets = { 0, 5, 0, 10, 3, 9, 0, 7, 1, 4 };
+
+    private static readonly Entry[] _entries = { 
+        new Entry(885181228, -1, 1),
+        new Entry(1694925799, -1, 2),
+        new Entry(167303374, -1, 3),
+        new Entry(2834307189, 1, 4),
+        new Entry(3578549621, -1, 5),
+        new Entry(3346810227, -1, 6),
+        new Entry(3832074717, 5, 7),
+        new Entry(2476983943, -1, 8),
+        new Entry(4160025045, -1, 9),
+        new Entry(625529613, 7, 10)
+    };
+
+    
+    public static bool Contains(int value)
+    {
+        if (value < 1 || value > 10)
+           return false;
+
+        uint hashCode = unchecked((uint)HashHelper.Hash(value, 0));
+        uint index = MathHelper.FastMod(hashCode, 10, 1844674407370955162);
+        int i = _buckets[index] - 1;
+
+        while (i >= 0)
+        {
+            ref Entry entry = ref _entries[i];
+
+            if (entry.HashCode == hashCode && entry.Value.Equals(value))
+                return true;
+
+            i = entry.Next;
+        }
+
+        return false;
+    }
+
+    [StructLayout(LayoutKind.Auto)]
+    private struct Entry
+    {
+        public uint HashCode;
+        public short Next;
+        public int Value;
+
+        public Entry(uint hashCode, short next, int value)
+        {
+            HashCode = hashCode;
+            Next = next;
+            Value = value;
+        }
+    }

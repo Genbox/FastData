@@ -1,0 +1,5 @@
+    
+    public static bool Contains(int value)
+    {
+        return value.Equals(42);
+    }

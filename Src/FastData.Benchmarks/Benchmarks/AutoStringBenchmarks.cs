@@ -85,7 +85,7 @@ public class AutoStringBenchmarks
         for (int i = 0; i < size; i++)
             items[i] = new string('a', i + 1);
 
-        foreach (StorageMode mode in GetModes(size))
+        foreach (StorageMode mode in Enum.GetValues<StorageMode>())
         {
             IFastSet set = CodeGenerator.DynamicCreateSet<FastDataGenerator>(items, mode, true);
             yield return [set, mode, size];
@@ -93,18 +93,5 @@ public class AutoStringBenchmarks
 
         yield return [new UnoptimizedArray(items), nameof(UnoptimizedArray), size];
         yield return [new UnoptimizedHashSet(items), nameof(UnoptimizedHashSet), size];
-    }
-
-    private static IEnumerable<StorageMode> GetModes(int size)
-    {
-        IEnumerable<StorageMode> modes = Enum.GetValues<StorageMode>();
-
-        if (size > 1)
-            modes = modes.Where(x => x != StorageMode.SingleValue);
-
-        if (size >= 20)
-            modes = modes.Where(x => x != StorageMode.MinimalPerfectHash);
-
-        return modes;
     }
 }

@@ -14,12 +14,12 @@ internal static class ArrayCode
         uint length = (uint)spec.Data.Length;
 
         sb.Append($$"""
-                        private{{staticStr}} string[] _entries = new[] {
+                        private{{staticStr}} {{spec.DataTypeName}}[] _entries = new {{spec.DataTypeName}}[] {
                     {{GenerateList(spec.Data)}}
                         };
 
                         {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains(string value)
+                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
                     {{GetEarlyExits("value", earlyExitSpecs)}}
 
@@ -33,13 +33,13 @@ internal static class ArrayCode
                     """);
     }
 
-    private static string GenerateList(string[] data)
+    private static string GenerateList(object[] data)
     {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < data.Length; i++)
         {
-            sb.Append("        \"").Append(data[i]).Append('"');
+            sb.Append("        ").Append(ToValueLabel(data[i]));
 
             if (i != data.Length - 1)
                 sb.AppendLine(", ");

@@ -18,6 +18,8 @@ public static class CodeGenerator
     {
         string wrapped = $$"""
                            using System;
+                           using Genbox.FastData.Helpers;
+                           using System.Runtime.InteropServices;
 
                            public static class Wrapper
                            {
@@ -140,12 +142,6 @@ public static class CodeGenerator
         byte[] symbolsBytes = symStream.ToArray();
         assembly = Assembly.Load(assemblyBytes, symbolsBytes);
         return true;
-    }
-
-    public static bool TryGetAssembly(string source, bool release, [NotNullWhen(true)]out Assembly? assembly, out Diagnostic[] compilerDiagnostics)
-    {
-        CSharpCompilation compilation = CreateCompilation(source, release);
-        return TryGetAssembly(compilation, out assembly, out compilerDiagnostics);
     }
 
     public static CSharpCompilation CreateCompilation(string source, bool release, params Type[] types)

@@ -1,0 +1,35 @@
+    private static int[] _entries = new int[] {
+        7, 
+        4, 
+        9, 
+        2, 
+        6, 
+        8, 
+        10, 
+        1, 
+        3, 
+        5
+    };
+
+    
+    public static bool Contains(int value)
+    {
+        if (value < 1 || value > 10)
+           return false;
+
+        int i = 0;
+        while (i < _entries.Length)
+        {
+            int comparison = _entries[i].CompareTo(value);
+
+            if (comparison == 0)
+                return true;
+
+            if (comparison < 0)
+                i = 2 * i + 2;
+            else
+                i = 2 * i + 1;
+        }
+
+        return false;
+    }

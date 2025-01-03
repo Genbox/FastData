@@ -1,0 +1,11 @@
+    
+    public static bool Contains(int value)
+    {
+        if (value < 1 || value > 10)
+           return false;
+
+        if (value.Equals(1) || value.Equals(2) || value.Equals(3) || value.Equals(4) || value.Equals(5) || value.Equals(6) || value.Equals(7) || value.Equals(8) || value.Equals(9) || value.Equals(10))
+            return true;
+
+        return false;
+    }
