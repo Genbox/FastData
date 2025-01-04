@@ -102,23 +102,6 @@ internal static class Analyzer
         return new IntegerProperties(min, max, consecutive);
     }
 
-    internal static ArrayProperties GetArrayProperties(IEnumerable<Array> data)
-    {
-        uint minLen = uint.MaxValue;
-        uint maxLen = 0;
-        bool[] lengthIndex = new bool[_analysisMaxLength];
-
-        foreach (Array arr in data)
-        {
-            uint len = (uint)arr.Length;
-
-            SetMinMax(len, ref minLen, ref maxLen);
-            SetLengthIndex(len, lengthIndex);
-        }
-
-        return new ArrayProperties(minLen, maxLen, (uint)lengthIndex.Count(x => x));
-    }
-
     /// <summary>
     /// Updates the minimum and maximum length.
     /// It is built using refs to support incremental updates.

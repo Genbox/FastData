@@ -1,54 +1,56 @@
 using System.Globalization;
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Helpers;
+using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal static class SwitchHashCode
+internal sealed class SwitchHashCode(FastDataSpec Spec) : ICode
 {
-    public static void Generate(StringBuilder sb, FastDataSpec spec)
+    private (uint, object)[] _hashCodes;
+
+    public bool IsAppropriate(DataProperties dataProps) => true;
+
+    public bool TryPrepare()
     {
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
-        uint length = (uint)spec.Data.Length;
+        (uint, object)[] hashCodes = new (uint, object)[Spec.Data.Length];
 
-        (uint, object)[] hashCodes = new (uint, object)[length];
-
-        for (int i = 0; i < spec.Data.Length; i++)
+        for (int i = 0; i < Spec.Data.Length; i++)
         {
-            object value = spec.Data[i];
+            object value = Spec.Data[i];
             uint hash = HashHelper.HashObject(value);
 
             hashCodes[i] = (hash, value);
         }
 
-        sb.Append($$"""
-                        {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
-                        {
-                            switch ({{GetHashFunction32(spec.KnownDataType, "value")}})
-                            {
-                    {{GenerateSwitch(hashCodes)}}
-                            }
-                            return false;
-                        }
-                    """);
+        _hashCodes = hashCodes;
+        return true;
     }
 
-    private static string GenerateSwitch((uint, object)[] data)
+    public string Generate(IEnumerable<IEarlyExit> ee)
     {
-        StringBuilder sb = new StringBuilder();
+        return $$"""
+                     {{GetMethodAttributes()}}
+                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+                     {
+                 {{GetEarlyExits("value", ee)}}
 
-        foreach ((uint, object) pair in data)
+                         switch ({{GetHashFunction32(Spec.KnownDataType, "value")}})
+                         {
+                 {{JoinValues(_hashCodes, Render, "\n")}}
+                         }
+                         return false;
+                     }
+                 """;
+
+        void Render(StringBuilder sb, (uint, object) obj)
         {
             sb.Append($"""
-
-                                   case {pair.Item1.ToString(NumberFormatInfo.InvariantInfo)}:
-                                        return {GetEqualFunction("value", ToValueLabel(pair.Item2))};
+                                   case {obj.Item1.ToString(NumberFormatInfo.InvariantInfo)}:
+                                        return {GetEqualFunction("value", ToValueLabel(obj.Item2))};
                        """);
         }
-
-        return sb.ToString();
     }
 }

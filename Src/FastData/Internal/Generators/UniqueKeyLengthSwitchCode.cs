@@ -1,42 +1,32 @@
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Enums;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal static class UniqueKeyLengthSwitchCode
+internal sealed class UniqueKeyLengthSwitchCode(FastDataSpec Spec) : ICode
 {
-    public static void Generate(StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExitSpec> earlyExitSpecs)
-    {
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
+    public bool IsAppropriate(DataProperties dataProps) => Spec.KnownDataType == KnownDataType.String && dataProps.StringProps.NumLengths == Spec.Data.Length;
 
-#if DEBUG
-        //Sanity check on inputs
-        HashSet<int> uniqLen = new HashSet<int>();
+    public bool TryPrepare() => true;
 
-        foreach (string value in spec.Data)
-        {
-            if (!uniqLen.Add(value.Length))
-                throw new InvalidOperationException("Not able to generate a unique length index as the data does not have unique lengths");
-        }
-#endif
+    public string Generate(IEnumerable<IEarlyExit> earlyExits)
+        => $$"""
+                 {{GetMethodAttributes()}}
+                 public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+                 {
+             {{GetEarlyExits("value", earlyExits)}}
 
-        sb.Append($$"""
-                        {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
-                        {
-                    {{GetEarlyExits("value", earlyExitSpecs)}}
-
-                            switch (value.Length)
-                            {
-                    {{GenerateSwitch(spec.Data)}}
-                                default:
-                                    return false;
-                            }
-                        }
-                    """);
-    }
+                     switch (value.Length)
+                     {
+             {{GenerateSwitch(Spec.Data)}}
+                         default:
+                             return false;
+                     }
+                 }
+             """;
 
     private static string GenerateSwitch(object[] values)
     {

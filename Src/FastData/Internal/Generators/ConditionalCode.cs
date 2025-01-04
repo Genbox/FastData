@@ -1,43 +1,31 @@
-using System.Globalization;
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal static class ConditionalCode
+internal sealed class ConditionalCode(FastDataSpec Spec) : ICode
 {
-    public static void Generate(StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExitSpec> earlyExitSpecs)
+    public bool IsAppropriate(DataProperties dataProps) => true;
+
+    public bool TryPrepare() => true;
+
+    public string Generate(IEnumerable<IEarlyExit> ee)
     {
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
+        return $$"""
+                     {{GetMethodAttributes()}}
+                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+                     {
+                 {{GetEarlyExits("value", ee)}}
 
-        sb.Append($$"""
-                        {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
-                        {
-                    {{GetEarlyExits("value", earlyExitSpecs)}}
+                         if ({{JoinValues(Spec.Data, Render, " || ")}})
+                             return true;
 
-                            if ({{GenerateConditional("value", spec.Data)}})
-                                return true;
+                         return false;
+                     }
+                 """;
 
-                            return false;
-                        }
-                    """);
-    }
-
-    private static string GenerateConditional(string variable1, object[] values)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < values.Length; i++)
-        {
-            sb.Append(GetEqualFunction(variable1, ToValueLabel(values[i])));
-
-            if (i != values.Length - 1)
-                sb.Append(" || ");
-        }
-
-        return sb.ToString();
+        static void Render(StringBuilder sb, object obj) => sb.Append(GetEqualFunction("value", ToValueLabel(obj)));
     }
 }

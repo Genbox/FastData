@@ -1,50 +1,38 @@
 using System.Globalization;
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal static class ArrayCode
+internal sealed class ArrayCode(FastDataSpec Spec) : ICode
 {
-    public static void Generate(StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExitSpec> earlyExitSpecs)
+    public bool IsAppropriate(DataProperties dataProps) => true;
+
+    public bool TryPrepare() => true;
+
+    public string Generate(IEnumerable<IEarlyExit> ee)
     {
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
-        uint length = (uint)spec.Data.Length;
+        return $$"""
+                     private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
+                 {{JoinValues(Spec.Data, Render, ",\n")}}
+                     };
 
-        sb.Append($$"""
-                        private{{staticStr}} {{spec.DataTypeName}}[] _entries = new {{spec.DataTypeName}}[] {
-                    {{GenerateList(spec.Data)}}
-                        };
+                     {{GetMethodAttributes()}}
+                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+                     {
+                 {{GetEarlyExits("value", ee)}}
 
-                        {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
-                        {
-                    {{GetEarlyExits("value", earlyExitSpecs)}}
+                         for (int i = 0; i < {{Spec.Data.Length.ToString(NumberFormatInfo.InvariantInfo)}}; i++)
+                         {
+                             if ({{GetEqualFunction("value", "_entries[i]")}})
+                                return true;
+                         }
+                         return false;
+                     }
+                 """;
 
-                            for (int i = 0; i < {{length.ToString(NumberFormatInfo.InvariantInfo)}}; i++)
-                            {
-                                if ({{GetEqualFunction("value", "_entries[i]")}})
-                                   return true;
-                            }
-                            return false;
-                        }
-                    """);
-    }
-
-    private static string GenerateList(object[] data)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < data.Length; i++)
-        {
-            sb.Append("        ").Append(ToValueLabel(data[i]));
-
-            if (i != data.Length - 1)
-                sb.AppendLine(", ");
-        }
-
-        return sb.ToString();
+        static void Render(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));
     }
 }

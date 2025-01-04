@@ -12,8 +12,8 @@ using System;
 internal static class ImmutableSet 
 {
     private static sbyte[] _entries = new sbyte[] {
-        -1, 
-        0, 
+        -1,
+        0,
         1
     };
 

@@ -12,8 +12,8 @@ using System;
 internal static class ImmutableSet 
 {
     private static char[] _entries = new char[] {
-        'a', 
-        'b', 
+        'a',
+        'b',
         'c'
     };
 

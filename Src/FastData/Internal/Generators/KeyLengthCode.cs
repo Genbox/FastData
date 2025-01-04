@@ -1,13 +1,18 @@
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Enums;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal static class KeyLengthCode
+internal sealed class KeyLengthCode(FastDataSpec Spec) : ICode
 {
-    public static void Generate(StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExitSpec> earlyExitSpecs)
+    private List<string>?[] _lengths;
+
+    public bool IsAppropriate(DataProperties dataProps) => Spec.KnownDataType == KnownDataType.String;
+
+    public bool TryPrepare()
     {
         //This implementation is the same as AutoUniqueLength, but takes duplicates into consideration
 
@@ -16,64 +21,56 @@ internal static class KeyLengthCode
         //idx 2: null
         //idx 3: "aaa", "bbb"
 
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
-
         //Calculate the maximum length
-        int maxLen = spec.Data.Cast<string>().Max(x => x.Length);
+        int maxLen = Spec.Data.Cast<string>().Max(x => x.Length);
 
         //We don't have to use HashSets to deduplicate within a bucket as all items are unique
         List<string>?[] lengths = new List<string>?[maxLen + 1]; //We need a place for zero
 
-        foreach (string value in spec.Data)
+        foreach (string value in Spec.Data)
         {
             ref List<string>? item = ref lengths[value.Length];
             item ??= new List<string>();
             item.Add(value);
         }
 
-        sb.Append($$"""
-                        private{{staticStr}} readonly {{spec.DataTypeName}}[]?[] _entries = [
-                    {{GenerateList(lengths)}}
-                        ];
-
-                        {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
-                        {
-                    {{GetEarlyExits("value", earlyExitSpecs, true)}}
-
-                            {{spec.DataTypeName}}[]? bucket = _entries[value.Length];
-
-                            if (bucket == null)
-                                return false;
-
-                            foreach ({{spec.DataTypeName}} str in bucket)
-                            {
-                                if ({{GetEqualFunction("value", "str")}})
-                                    return true;
-                            }
-
-                            return false;
-                        }
-                    """);
+        _lengths = lengths;
+        return true;
     }
 
-    private static string GenerateList(List<string>?[] data)
+    public string Generate(IEnumerable<IEarlyExit> ee)
     {
-        StringBuilder sb = new StringBuilder();
+        return $$"""
+                     private{{GetModifier(Spec.ClassType)}} readonly {{Spec.DataTypeName}}[]?[] _entries = [
+                 {{JoinValues(_lengths, RenderEntry, ",\n")}}
+                     ];
 
-        for (int i = 0; i < data.Length; i++)
+                     {{GetMethodAttributes()}}
+                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+                     {
+                 {{GetEarlyExits("value", ee, true)}}
+
+                         {{Spec.DataTypeName}}[]? bucket = _entries[value.Length];
+
+                         if (bucket == null)
+                             return false;
+
+                         foreach ({{Spec.DataTypeName}} str in bucket)
+                         {
+                             if ({{GetEqualFunction("value", "str")}})
+                                 return true;
+                         }
+
+                         return false;
+                     }
+                 """;
+
+        static void RenderEntry(StringBuilder sb, List<string>? obj)
         {
-            List<string>? values = data[i];
-
-            if (values == null)
+            if (obj == null)
                 sb.Append("        null");
             else
-                sb.Append("        [").Append(string.Join(",", values.Select(x => "\"" + x + "\""))).Append(']');
-
-            if (i != data.Length - 1)
-                sb.AppendLine(", ");
+                sb.Append("        [").Append(string.Join(",", obj.Select(x => "\"" + x + "\""))).Append(']');
         }
-
-        return sb.ToString();
     }
 }

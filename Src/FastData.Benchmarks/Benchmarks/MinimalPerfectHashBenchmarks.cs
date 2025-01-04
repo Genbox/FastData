@@ -32,7 +32,7 @@ public class MinimalPerfectHashBenchmarks
     [ArgumentsSource(nameof(GetFunctions))]
     public uint[] TimeToConstruct(MixSpec spec)
     {
-        return MinimalPerfectHash.Generate(_data, (hash, seed) => spec.Function(hash, seed), MaxCandidates, uint.MaxValue, (uint)(_data.Length * 2)).ToArray();
+        return MinimalPerfectHash.Generate(_data, (hash, seed) => spec.Function(hash, seed), MaxCandidates, uint.MaxValue, _data.Length * 2).ToArray();
     }
 
     [Benchmark]

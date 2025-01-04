@@ -16,7 +16,6 @@
             case "item8":
             case "item9":
             case "item10":
-
                 return true;
             default:
                 return false;

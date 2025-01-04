@@ -1,9 +1,11 @@
     
     public static bool Contains(string value)
     {
+        if (value.Length < 5 || value.Length > 6)
+           return false;
+
         switch (HashHelper.HashString(value))
         {
-
             case 2011983611:
                  return value.Equals("item1");
             case 3578067552:

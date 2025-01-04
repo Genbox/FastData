@@ -12,8 +12,8 @@ using System;
 internal static class ImmutableSet 
 {
     private static short[] _entries = new short[] {
-        -1, 
-        0, 
+        -1,
+        0,
         1
     };
 

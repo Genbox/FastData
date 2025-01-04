@@ -1,61 +1,52 @@
 using System.Globalization;
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal static class BinarySearchCode
+internal sealed class BinarySearchCode(FastDataSpec Spec) : ICode
 {
-    public static void Generate(StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExitSpec> earlyExitSpecs)
+    public bool IsAppropriate(DataProperties dataPropsc) => true;
+
+    public bool TryPrepare()
     {
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
-
-        sb.Append($$"""
-                        private{{staticStr}} {{spec.DataTypeName}}[] _entries = new {{spec.DataTypeName}}[] {
-                    {{GenerateList(spec.Data)}}
-                        };
-
-                        {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
-                        {
-                    {{GetEarlyExits("value", earlyExitSpecs)}}
-
-                            int lo = 0;
-                            int hi = {{(spec.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
-                            while (lo <= hi)
-                            {
-                                int i = lo + ((hi - lo) >> 1);
-                                int order = {{GetCompareFunction("_entries[i]", "value")}};
-
-                                if (order == 0)
-                                    return true;
-                                if (order < 0)
-                                    lo = i + 1;
-                                else
-                                    hi = i - 1;
-                            }
-
-                            return ((~lo) >= 0);
-                        }
-                    """);
+        Array.Sort(Spec.Data, StringComparer.Ordinal);
+        return true;
     }
 
-    private static string GenerateList(object[] data)
+    public string Generate(IEnumerable<IEarlyExit> ee)
     {
-        Array.Sort(data, StringComparer.Ordinal);
+        return $$"""
+                     private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
+                 {{JoinValues(Spec.Data, Render, ",\n")}}
+                     };
 
-        StringBuilder sb = new StringBuilder();
+                     {{GetMethodAttributes()}}
+                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+                     {
+                 {{GetEarlyExits("value", ee)}}
 
-        for (int i = 0; i < data.Length; i++)
-        {
-            sb.Append("        ").Append(ToValueLabel(data[i]));
+                         int lo = 0;
+                         int hi = {{(Spec.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
+                         while (lo <= hi)
+                         {
+                             int i = lo + ((hi - lo) >> 1);
+                             int order = {{GetCompareFunction("_entries[i]", "value")}};
 
-            if (i != data.Length - 1)
-                sb.AppendLine(", ");
-        }
+                             if (order == 0)
+                                 return true;
+                             if (order < 0)
+                                 lo = i + 1;
+                             else
+                                 hi = i - 1;
+                         }
 
-        return sb.ToString();
+                         return ((~lo) >= 0);
+                     }
+                 """;
+
+        static void Render(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));
     }
 }

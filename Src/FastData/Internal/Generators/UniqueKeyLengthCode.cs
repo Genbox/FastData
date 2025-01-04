@@ -1,14 +1,20 @@
 using System.Globalization;
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Enums;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal static class UniqueKeyLengthCode
+internal sealed class UniqueKeyLengthCode(FastDataSpec Spec) : ICode
 {
-    public static void Generate(StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExitSpec> earlyExitSpecs)
+    private string?[] _lengths;
+    private int _lowerBound;
+
+    public bool IsAppropriate(DataProperties dataProps) => Spec.KnownDataType == KnownDataType.String && dataProps.StringProps.NumLengths == Spec.Data.Length;
+
+    public bool TryPrepare()
     {
         //The idea here is to fit the strings into an array indexed on length. For example:
         //idx 0: ""
@@ -16,24 +22,13 @@ internal static class UniqueKeyLengthCode
         //idx 2: null
         //idx 3: "aaa"
 
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
-
-        //Sanity check on inputs
-        HashSet<int> uniqLen = new HashSet<int>();
-
-        foreach (string value in spec.Data)
-        {
-            if (!uniqLen.Add(value.Length))
-                throw new InvalidOperationException("Not able to generate a unique length index as the data does not have unique lengths");
-        }
-
         //It is efficient since we don't need a hash function to lookup the element, but if there is a big gap in the lengths,
         //we will store a lot of empty elements.
-        string?[] lengths = new string?[spec.Data.Length + 1];
+        string?[] lengths = new string?[Spec.Data.Length + 1];
 
         int lowerBound = int.MaxValue;
 
-        foreach (string? value in spec.Data)
+        foreach (string? value in Spec.Data)
         {
             ref string? item = ref lengths[value.Length];
 
@@ -45,40 +40,35 @@ internal static class UniqueKeyLengthCode
             item = value;
         }
 
-        //TODO: Remove gaps in array by reducing the index via a map (if (idx > 10) return 4) where 4 is the number to subtract from the index
-
-        sb.Append($$"""
-                        private{{staticStr}} readonly {{spec.DataTypeName}}[] _entries = new {{spec.DataTypeName}}[] {
-                    {{GenerateList(lengths, lowerBound)}}
-                        };
-
-                        {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
-                        {
-                    {{GetEarlyExits("value", earlyExitSpecs, true)}}
-
-                            return {{GetEqualFunction("value", $"_entries[value.Length - {lowerBound.ToString(NumberFormatInfo.InvariantInfo)}]")}};
-                        }
-                    """);
+        _lengths = lengths;
+        _lowerBound = lowerBound;
+        return true;
     }
 
-    private static string GenerateList(string?[] data, int lowerBound)
+    //TODO: Remove gaps in array by reducing the index via a map (if (idx > 10) return 4) where 4 is the number to subtract from the index
+
+    public string Generate(IEnumerable<IEarlyExit> ee)
     {
-        StringBuilder sb = new StringBuilder();
+        return $$"""
+                     private{{GetModifier(Spec.ClassType)}} readonly {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
+                 {{JoinValues(_lengths.AsSpan(_lowerBound), Render, ",\n")}}
+                     };
 
-        for (int i = lowerBound; i < data.Length; i++)
+                     {{GetMethodAttributes()}}
+                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+                     {
+                 {{GetEarlyExits("value", ee, true)}}
+
+                         return {{GetEqualFunction("value", $"_entries[value.Length - {_lowerBound.ToString(NumberFormatInfo.InvariantInfo)}]")}};
+                     }
+                 """;
+
+        static void Render(StringBuilder sb, string? obj)
         {
-            string? value = data[i];
-
-            if (value == null)
+            if (obj == null)
                 sb.Append("        null");
             else
-                sb.Append("        ").Append(ToValueLabel(value));
-
-            if (i != data.Length - 1)
-                sb.AppendLine(", ");
+                sb.Append("        ").Append(ToValueLabel(obj));
         }
-
-        return sb.ToString();
     }
 }

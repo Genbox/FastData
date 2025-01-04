@@ -16,7 +16,6 @@
             case 8:
             case 9:
             case 10:
-
                 return true;
             default:
                 return false;

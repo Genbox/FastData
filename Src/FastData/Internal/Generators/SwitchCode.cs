@@ -1,40 +1,34 @@
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal static class SwitchCode
+internal sealed class SwitchCode(FastDataSpec Spec) : ICode
 {
-    public static void Generate(StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExitSpec> earlyExitSpecs)
+    public bool IsAppropriate(DataProperties dataProps) => true;
+
+    public bool TryPrepare() => true;
+
+    public string Generate(IEnumerable<IEarlyExit> ee)
     {
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
+        return $$"""
+                     {{GetMethodAttributes()}}
+                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+                     {
+                 {{GetEarlyExits("value", ee)}}
 
-        sb.Append($$"""
-                        {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
-                        {
-                    {{GetEarlyExits("value", earlyExitSpecs)}}
+                         switch (value)
+                         {
+                 {{JoinValues(Spec.Data, Render, "\n")}}
+                                 return true;
+                             default:
+                                 return false;
+                         }
+                     }
+                 """;
 
-                            switch (value)
-                            {
-                    {{GenerateSwitch(spec.Data)}}
-                                    return true;
-                                default:
-                                    return false;
-                            }
-                        }
-                    """);
-    }
-
-    private static string GenerateSwitch(object[] values)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        foreach (object value in values)
-            sb.AppendLine($"            case {ToValueLabel(value)}:");
-
-        return sb.ToString();
+        static void Render(StringBuilder sb, object obj) => sb.Append($"            case {ToValueLabel(obj)}:");
     }
 }

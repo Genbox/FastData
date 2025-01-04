@@ -6,7 +6,6 @@ namespace Genbox.FastData.Internal;
 internal sealed class FastDataSpec
 {
     public string DataTypeName { get; set; } = null!;
-    public bool IsArray { get; set; }
     public KnownDataType KnownDataType { get; set; }
     public string Name { get; set; } = null!;
     public object[] Data { get; set; } = null!;

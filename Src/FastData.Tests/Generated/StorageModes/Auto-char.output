@@ -21,7 +21,6 @@ internal static class ImmutableSet
             case 'a':
             case 'b':
             case 'c':
-
                 return true;
             default:
                 return false;

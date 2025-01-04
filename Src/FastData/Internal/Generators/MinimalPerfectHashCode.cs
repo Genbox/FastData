@@ -1,87 +1,85 @@
 using System.Diagnostics;
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal static class MinimalPerfectHashCode
+internal sealed class MinimalPerfectHashCode(FastDataSpec Spec) : ICode
 {
-    public static void Generate(StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExitSpec> earlyExitSpecs)
+    private (object, uint)[] _data;
+    private uint _seed;
+
+    public bool IsAppropriate(DataProperties dataProps)
     {
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
-        uint length = (uint)spec.Data.Length;
+        return Spec.Data.Length < 20; //We can only generate a MPF for 20 items
+    }
 
-        if (length >= 20)
-            throw new InvalidOperationException("Not able to generate a MPF for more than 20 items");
-
+    public bool TryPrepare()
+    {
         long timestamp = Stopwatch.GetTimestamp();
 
         //Find the proper seeds
-        uint seed = MinimalPerfectHash.Generate(spec.Data, static (x, y) => HashHelper.HashObjectSeed(x, y, true), 1, uint.MaxValue, length, () =>
+        uint[] seed = MinimalPerfectHash.Generate(Spec.Data, static (x, y) => HashHelper.HashObjectSeed(x, y, true), 1, uint.MaxValue, Spec.Data.Length, () =>
         {
             TimeSpan span = new TimeSpan(Stopwatch.GetTimestamp() - timestamp);
             return span.TotalSeconds > 60;
-        }).First();
+        }).ToArray(); //We call .ToArray() as FirstOrDefault() would return 0 (in the default case), which is a valid seed.
 
-        (object, uint)[] data = new (object, uint)[length];
+        (object, uint)[] data = new (object, uint)[Spec.Data.Length];
 
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < Spec.Data.Length; i++)
         {
-            object value = spec.Data[i];
+            object value = Spec.Data[i];
 
-            uint hash = HashHelper.HashObjectSeed(value, seed, true);
-            uint index = hash % length;
+            uint hash = HashHelper.HashObjectSeed(value, seed[0], true);
+            uint index = (uint)(hash % Spec.Data.Length);
             data[index] = (value, hash);
         }
 
-        sb.Append($$"""
-                        private{{staticStr}} Entry[] _entries = new Entry[] {
-                    {{GenerateList(data)}}
-                        };
-
-                        {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
-                        {
-                    {{GetEarlyExits("value", earlyExitSpecs)}}
-
-                            uint hash = {{GetSeededHashFunction32(spec.KnownDataType, "value", seed, true)}};
-                            uint index = {{GetModFunction("hash", length)}};
-                            ref Entry entry = ref _entries[index];
-
-                            return hash == entry.HashCode && {{GetEqualFunction("value", "entry.Value")}};
-                        }
-
-                        [StructLayout(LayoutKind.Auto)]
-                        private struct Entry
-                        {
-                            public Entry({{spec.DataTypeName}} value, uint hashCode)
-                            {
-                                Value = value;
-                                HashCode = hashCode;
-                            }
-
-                            public {{spec.DataTypeName}} Value;
-                            public uint HashCode;
-                        }
-                    """);
+        _seed = seed[0];
+        _data = data;
+        return true;
     }
 
-    private static string GenerateList((object, uint)[] data)
+    public string Generate(IEnumerable<IEarlyExit> ee)
     {
-        StringBuilder sb = new StringBuilder();
+        return $$"""
+                     private{{GetModifier(Spec.ClassType)}} Entry[] _entries = new Entry[] {
+                 {{JoinValues(_data, Render, ",\n")}}
+                     };
 
-        for (int i = 0; i < data.Length; i++)
+                     {{GetMethodAttributes()}}
+                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+                     {
+                 {{GetEarlyExits("value", ee)}}
+
+                         uint hash = {{GetSeededHashFunction32(Spec.KnownDataType, "value", _seed, true)}};
+                         uint index = {{GetModFunction("hash", (uint)_data.Length)}};
+                         ref Entry entry = ref _entries[index];
+
+                         return hash == entry.HashCode && {{GetEqualFunction("value", "entry.Value")}};
+                     }
+
+                     [StructLayout(LayoutKind.Auto)]
+                     private struct Entry
+                     {
+                         public Entry({{Spec.DataTypeName}} value, uint hashCode)
+                         {
+                             Value = value;
+                             HashCode = hashCode;
+                         }
+
+                         public {{Spec.DataTypeName}} Value;
+                         public uint HashCode;
+                     }
+                 """;
+
+        static void Render(StringBuilder sb, (object, uint) obj)
         {
-            (object value, uint hash) = data[i];
-            sb.Append("        new Entry(").Append(ToValueLabel(value)).Append(", ").Append(hash).Append("u)");
-
-            if (i != data.Length - 1)
-                sb.AppendLine(",");
+            sb.Append("        new Entry(").Append(ToValueLabel(obj.Item1)).Append(", ").Append(obj.Item2).Append("u)");
         }
-
-        return sb.ToString();
     }
 }

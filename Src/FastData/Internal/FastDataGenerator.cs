@@ -77,7 +77,7 @@ internal class FastDataGenerator : IIncrementalGenerator
 
     private static void AppendDataStructure(StringBuilder sb, FastDataSpec spec)
     {
-        IEnumerable<IEarlyExitSpec> early = [];
+        IEarlyExit[] early = [];
 
         //No matter the StorageMode, if there is only a single item, we will use the same data structure
         if (spec.Data.Length == 1)
@@ -86,79 +86,62 @@ internal class FastDataGenerator : IIncrementalGenerator
             return;
         }
 
-        // If we know the data type, we might be able to get specialized early exits
-        if (spec.KnownDataType == KnownDataType.String)
+        DataProperties dataProps = new DataProperties();
+
+        if (spec.KnownDataType == KnownDataType.Int32)
         {
-            StringProperties props = Analyzer.GetStringProperties(spec.Data.Cast<string>());
-            early = Optimizer.GetEarlyExits(props);
+            dataProps.IntProps = Analyzer.GetIntegerProperties(spec.Data.Cast<int>());
+            early = Optimizer.GetEarlyExits(dataProps.IntProps).ToArray();
         }
-        else if (spec.KnownDataType == KnownDataType.Int32)
+        else if (spec.KnownDataType == KnownDataType.String)
         {
-            IntegerProperties props = Analyzer.GetIntegerProperties(spec.Data.Cast<int>());
-            early = Optimizer.GetEarlyExits(props);
+            dataProps.StringProps = Analyzer.GetStringProperties(spec.Data.Cast<string>());
+            early = Optimizer.GetEarlyExits(dataProps.StringProps).ToArray();
         }
 
+        foreach (ICode candidate in GetDataStructureCandidates(spec))
+        {
+            if (candidate.IsAppropriate(dataProps) && candidate.TryPrepare())
+            {
+                sb.Append(candidate.Generate(early));
+                break;
+            }
+        }
+    }
+
+    private static IEnumerable<ICode> GetDataStructureCandidates(FastDataSpec spec)
+    {
         switch (spec.StorageMode)
         {
             case StorageMode.Auto:
 
-                // If the type is array, we prefer to use lenght indexes if possible
-                if (spec.IsArray)
-                {
-                    ArrayProperties props = Analyzer.GetArrayProperties(spec.Data.Cast<Array>());
+                // For small amounts of data, logic is the fastest, so we try that first
+                yield return new SwitchCode(spec);
 
-                    // We use both the early exits from arrays (if any) and the ones from the known data types.
-                    // The array ones should come first as they are more specific. TODO: correct?
-                    IEnumerable<IEarlyExitSpec> combined = Optimizer.GetEarlyExits(props).Concat(early);
+                // We try (unique) key lengths
+                yield return new UniqueKeyLengthCode(spec);
+                yield return new KeyLengthCode(spec);
 
-                    //TODO: Calculate fragmentation factor. If it is too high, and user wants to optimize for memory, use a slower data structure
+                if (spec.StorageOptions.HasFlag(StorageOption.OptimizeForMemory) && spec.StorageOptions.HasFlag(StorageOption.OptimizeForSpeed))
+                    yield return new MinimalPerfectHashCode(spec);
 
-                    if (props.NumLengths == spec.Data.Length) //If the lengths are all unique, we use a special data structure
-                        Generate(DataStructure.UniqueKeyLength, sb, spec, combined);
-                    else
-                        Generate(DataStructure.KeyLength, sb, spec, combined);
-                }
+                if (spec.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
+                    yield return new BinarySearchCode(spec);
                 else
-                {
-                    //TODO: Add support for length indexed structures for strings
-
-                    // For small amounts of data, switch is the fastest
-                    if (spec.Data.Length <= 64)
-                        Generate(DataStructure.Switch, sb, spec, early);
-                    else // more than 64 items
-                    {
-                        if (spec.StorageOptions.HasFlag(StorageOption.OptimizeForMemory) && spec.StorageOptions.HasFlag(StorageOption.OptimizeForSpeed))
-                        {
-                            //TODO: Minimal perfect hash
-                            //TODO: Set timeout for minimal perfect hash according to aggressiveness
-                            break;
-                        }
-
-                        if (spec.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
-                        {
-                            Generate(DataStructure.EytzingerSearch, sb, spec, early);
-                            break;
-                        }
-
-                        Generate(DataStructure.HashSet, sb, spec, early);
-                    }
-                }
+                    yield return new HashSetCode(spec);
 
                 break;
             case StorageMode.Linear:
-                Generate(DataStructure.Array, sb, spec, early);
+                yield return new ArrayCode(spec);
                 break;
             case StorageMode.Logic:
-                Generate(DataStructure.Switch, sb, spec, early);
+                yield return new SwitchCode(spec);
                 break;
             case StorageMode.Tree:
-                if (spec.StorageOptions.HasFlag(StorageOption.AggressiveOptimization))
-                    Generate(DataStructure.EytzingerSearch, sb, spec, early);
-                else
-                    Generate(DataStructure.BinarySearch, sb, spec, early);
+                yield return new BinarySearchCode(spec);
                 break;
             case StorageMode.Indexed:
-                Generate(DataStructure.HashSet, sb, spec, early);
+                yield return new HashSetCode(spec);
                 break;
 
             default:
@@ -166,52 +149,28 @@ internal class FastDataGenerator : IIncrementalGenerator
         }
     }
 
-    /// <summary>
-    /// This method is used by tests as well
-    /// </summary>
-    internal static void Generate(DataStructure ds, StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExitSpec> earlyExitSpecs)
+    /// <summary>This method is used by tests</summary>
+    internal static void Generate(DataStructure ds, StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExit> earlyExits)
     {
-        switch (ds)
+        ICode instance = ds switch
         {
-            case DataStructure.Array:
-                ArrayCode.Generate(sb, spec, earlyExitSpecs);
-                break;
-            case DataStructure.BinarySearch:
-                BinarySearchCode.Generate(sb, spec, earlyExitSpecs);
-                break;
-            case DataStructure.EytzingerSearch:
-                EytzingerSearchCode.Generate(sb, spec, earlyExitSpecs);
-                break;
-            case DataStructure.Switch:
-                SwitchCode.Generate(sb, spec, earlyExitSpecs);
-                break;
-            case DataStructure.SwitchHashCode:
-                SwitchHashCode.Generate(sb, spec);
-                break;
-            case DataStructure.MinimalPerfectHash:
-                MinimalPerfectHashCode.Generate(sb, spec, earlyExitSpecs);
-                break;
-            case DataStructure.HashSet:
-                HashSetCode.Generate(sb, spec, earlyExitSpecs);
-                break;
-            case DataStructure.UniqueKeyLength:
-                UniqueKeyLengthCode.Generate(sb, spec, earlyExitSpecs);
-                break;
-            case DataStructure.UniqueKeyLengthSwitch:
-                UniqueKeyLengthSwitchCode.Generate(sb, spec, earlyExitSpecs);
-                break;
-            case DataStructure.KeyLength:
-                KeyLengthCode.Generate(sb, spec, earlyExitSpecs);
-                break;
-            case DataStructure.SingleValue:
-                SingleValueCode.Generate(sb, spec);
-                break;
-            case DataStructure.Conditional:
-                ConditionalCode.Generate(sb, spec, earlyExitSpecs);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(ds), ds, null);
-        }
+            DataStructure.Array => new ArrayCode(spec),
+            DataStructure.BinarySearch => new BinarySearchCode(spec),
+            DataStructure.EytzingerSearch => new EytzingerSearchCode(spec),
+            DataStructure.Switch => new SwitchCode(spec),
+            DataStructure.SwitchHashCode => new SwitchHashCode(spec),
+            DataStructure.MinimalPerfectHash => new MinimalPerfectHashCode(spec),
+            DataStructure.HashSet => new HashSetCode(spec),
+            DataStructure.UniqueKeyLength => new UniqueKeyLengthCode(spec),
+            DataStructure.UniqueKeyLengthSwitch => new UniqueKeyLengthSwitchCode(spec),
+            DataStructure.KeyLength => new KeyLengthCode(spec),
+            DataStructure.SingleValue => new SingleValueCode(spec),
+            DataStructure.Conditional => new ConditionalCode(spec),
+            _ => throw new ArgumentOutOfRangeException(nameof(ds), ds, null)
+        };
+
+        if (instance.TryPrepare())
+            sb.Append(instance.Generate(earlyExits));
     }
 
     private static IEnumerable<object> Transform(Compilation c, CancellationToken token)
@@ -280,7 +239,6 @@ internal class FastDataGenerator : IIncrementalGenerator
             //Overwrite the values with the unique version
             spec.Name = name;
             spec.Data = ctorArg1.Values.Select(x => x.Value).ToArray()!;
-            spec.IsArray = ctorArg1.Values[0].Type!.TypeKind == TypeKind.Array;
             spec.KnownDataType = dataType;
             spec.DataTypeName = genericArg.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
 

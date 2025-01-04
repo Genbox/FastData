@@ -13,7 +13,7 @@ internal static class ImmutableSet
 {
     private static readonly int[] _buckets = { 3, 2, 1 };
 
-    private static readonly Entry[] _entries = { 
+    private static readonly Entry[] _entries = {
         new Entry(6357089, -1, 'a'),
         new Entry(6422626, -1, 'b'),
         new Entry(6488163, -1, 'c')

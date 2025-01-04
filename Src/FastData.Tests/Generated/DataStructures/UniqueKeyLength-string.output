@@ -1,13 +1,13 @@
     private static readonly string[] _entries = new string[] {
-        "a", 
-        "aa", 
-        "aaa", 
-        "aaaa", 
-        "aaaaa", 
-        "aaaaaa", 
-        "aaaaaaa", 
-        "aaaaaaaa", 
-        "aaaaaaaaa", 
+        "a",
+        "aa",
+        "aaa",
+        "aaaa",
+        "aaaaa",
+        "aaaaaa",
+        "aaaaaaa",
+        "aaaaaaaa",
+        "aaaaaaaaa",
         "aaaaaaaaaa"
     };
 

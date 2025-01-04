@@ -1,6 +1,6 @@
     private static readonly int[] _buckets = { 10, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-    private static readonly Entry[] _entries = { 
+    private static readonly Entry[] _entries = {
         new Entry(1, -1, 1),
         new Entry(2, -1, 2),
         new Entry(3, -1, 3),

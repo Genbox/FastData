@@ -29,14 +29,14 @@ public class DataStructureTests
         spec.DataTypeName = type;
         spec.KnownDataType = kt;
 
-        IEnumerable<IEarlyExitSpec> early = new List<IEarlyExitSpec>();
+        IEnumerable<IEarlyExit> early = new List<IEarlyExit>();
 
-        if (type == "string")
+        if (kt == KnownDataType.String)
         {
             StringProperties props = Analyzer.GetStringProperties(data.Cast<string>());
             early = Optimizer.GetEarlyExits(props);
         }
-        else if (type == "int")
+        else if (kt == KnownDataType.Int32)
         {
             IntegerProperties props = Analyzer.GetIntegerProperties(data.Cast<int>());
             early = Optimizer.GetEarlyExits(props);
@@ -46,17 +46,17 @@ public class DataStructureTests
         FastDataGenerator.Generate(ds, sb, spec, early);
 
         string source = sb.ToString();
+        Assert.NotEmpty(source);
 
         File.WriteAllText($@"..\..\..\Generated\DataStructures\{ds}-{type}.output", source);
 
-        if (type == "string")
+        if (kt == KnownDataType.String)
         {
             Func<string, bool> func = CodeGenerator.GetDelegate<Func<string, bool>>(source, true);
             Assert.True(func((string)data[0]));
             Assert.False(func("dontexist"));
         }
-
-        if (type == "int")
+        else if (kt == KnownDataType.Int32)
         {
             Func<int, bool> func = CodeGenerator.GetDelegate<Func<int, bool>>(source, true);
             Assert.True(func((int)data[0]));

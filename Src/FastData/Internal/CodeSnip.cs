@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Enums;
@@ -9,16 +10,16 @@ namespace Genbox.FastData.Internal;
 
 internal static class CodeSnip
 {
-    public static string GetEarlyExits(string variable, IEnumerable<IEarlyExitSpec> specs, bool forceOverride = false)
+    public static string GetEarlyExits(string variable, IEnumerable<IEarlyExit> specs, bool forceOverride = false)
     {
         if (!forceOverride && !GlobalOptions.GenerateEarlyCondition)
             return string.Empty;
 
         StringBuilder sb = new StringBuilder();
 
-        foreach (IEarlyExitSpec spec in specs)
+        foreach (IEarlyExit spec in specs)
         {
-            if (spec is MinMaxLengthEarlyExitSpec(var minLength, var maxLength))
+            if (spec is MinMaxLengthEarlyExit(var minLength, var maxLength))
             {
                 if (minLength == maxLength) //same length
                 {
@@ -35,7 +36,7 @@ internal static class CodeSnip
                                """);
                 }
             }
-            else if (spec is MinMaxValueEarlyExitSpec(var minValue, var maxValue))
+            else if (spec is MinMaxValueEarlyExit(var minValue, var maxValue))
             {
                 if (minValue == maxValue) //same value
                 {
@@ -134,5 +135,30 @@ internal static class CodeSnip
             IFormattable val => val.ToString(null, CultureInfo.InvariantCulture),
             _ => value.ToString()
         };
+    }
+
+    public static string GetModifier(ClassType ct) => ct == ClassType.Static ? " static" : "";
+
+    public static string JoinValues<T>(T[] data, Action<StringBuilder, T> render, string delim = ", ")
+    {
+        return JoinValues(data.AsSpan(), render, delim);
+    }
+
+    public static string JoinValues<T>(Span<T> data, Action<StringBuilder, T> render, string delim = ", ")
+    {
+        StringBuilder sb = new StringBuilder();
+
+        int i = 0;
+        foreach (T obj in data)
+        {
+            render(sb, obj);
+
+            if (i != data.Length - 1)
+                sb.Append(delim);
+
+            i++;
+        }
+
+        return sb.ToString();
     }
 }

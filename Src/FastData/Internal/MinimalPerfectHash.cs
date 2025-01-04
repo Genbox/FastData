@@ -6,10 +6,10 @@ namespace Genbox.FastData.Internal;
 
 internal static class MinimalPerfectHash
 {
-    public static IEnumerable<uint> Generate<T>(T[] data, Func<T, uint, uint> hashFunc, uint maxCandidates = uint.MaxValue, uint maxAttempts = uint.MaxValue, uint length = 0, Func<bool>? condition = null)
+    public static IEnumerable<uint> Generate<T>(T[] data, Func<T, uint, uint> hashFunc, uint maxCandidates = uint.MaxValue, uint maxAttempts = uint.MaxValue, int length = 0, Func<bool>? condition = null)
     {
         if (length == 0)
-            length = (uint)data.Length;
+            length = data.Length;
 
         if (length == 1)
         {
@@ -19,7 +19,7 @@ internal static class MinimalPerfectHash
 
         bool[] bArray = new bool[length];
 #if FASTMOD
-        ulong fastMod = MathHelper.GetFastModMultiplier(length);
+        ulong fastMod = MathHelper.GetFastModMultiplier((uint)length);
 #endif
         int numFound = 0;
         uint seed;
@@ -33,7 +33,7 @@ internal static class MinimalPerfectHash
             for (int k = 0; k < data.Length; k++)
             {
 #if FASTMOD
-                uint offset = MathHelper.FastMod((uint)hashFunc(data[k], seed), length, fastMod);
+                uint offset = MathHelper.FastMod(hashFunc(data[k], seed), (uint)length, fastMod);
 #else
                 uint offset = hashFunc(data[k], seed) % length;
 #endif

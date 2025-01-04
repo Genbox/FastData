@@ -3,26 +3,29 @@ using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal static class HashSetCode
+internal sealed class HashSetCode(FastDataSpec Spec) : ICode
 {
-    public static void Generate(StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExitSpec> earlyExitSpecs)
+    private int[] _buckets;
+    private Entry[] _entries;
+
+    public bool IsAppropriate(DataProperties dataProps) => true;
+
+    public bool TryPrepare()
     {
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
-        uint length = (uint)spec.Data.Length;
+        int[] buckets = new int[Spec.Data.Length];
+        Entry[] entries = new Entry[Spec.Data.Length];
 
-        int[] buckets = new int[length];
-        Entry[] entries = new Entry[length];
-
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < Spec.Data.Length; i++)
         {
-            object value = spec.Data[i];
+            object value = Spec.Data[i];
 
             uint hashCode = HashHelper.HashObject(value);
-            ref int bucket = ref buckets[hashCode % length];
+            ref int bucket = ref buckets[hashCode % Spec.Data.Length];
 
             ref Entry entry = ref entries[i];
             entry.HashCode = hashCode;
@@ -31,86 +34,61 @@ internal static class HashSetCode
             bucket = i + 1;
         }
 
-        bool small = length <= short.MaxValue;
-
-        sb.Append($$"""
-                    {{GenerateBuckets(buckets, staticStr)}}
-                    {{GenerateEntries(entries, staticStr)}}
-
-                        {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
-                        {
-                    {{GetEarlyExits("value", earlyExitSpecs)}}
-
-                            uint hashCode = {{GetHashFunction32(spec.KnownDataType, "value")}};
-                            uint index = {{GetModFunction("hashCode", (uint)buckets.Length)}};
-                            int i = _buckets[index] - 1;
-
-                            while (i >= 0)
-                            {
-                                ref Entry entry = ref _entries[i];
-
-                                if (entry.HashCode == hashCode && {{GetEqualFunction("entry.Value", "value")}})
-                                    return true;
-
-                                i = entry.Next;
-                            }
-
-                            return false;
-                        }
-
-                        [StructLayout(LayoutKind.Auto)]
-                        private struct Entry
-                        {
-                            public uint HashCode;
-                            public {{(small ? "short" : "int")}} Next;
-                            public {{spec.DataTypeName}} Value;
-
-                            public Entry(uint hashCode, {{(small ? "short" : "int")}} next, {{spec.DataTypeName}} value)
-                            {
-                                HashCode = hashCode;
-                                Next = next;
-                                Value = value;
-                            }
-                        }
-                    """);
+        _buckets = buckets;
+        _entries = entries;
+        return true;
     }
 
-    private static string GenerateBuckets(int[] data, string? staticStr)
+    public string Generate(IEnumerable<IEarlyExit> ee)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.Append($"    private{staticStr} readonly int[] _buckets = {{ ");
+        return $$"""
+                     private{{GetModifier(Spec.ClassType)}} readonly int[] _buckets = { {{JoinValues(_buckets, RenderBucket)}} };
 
-        for (int i = 0; i < data.Length; i++)
-        {
-            sb.Append(data[i]);
+                     private{{GetModifier(Spec.ClassType)}} readonly Entry[] _entries = {
+                 {{JoinValues(_entries, RenderEntry, ",\n")}}
+                     };
 
-            if (i != data.Length - 1)
-                sb.Append(", ");
-        }
+                     {{GetMethodAttributes()}}
+                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+                     {
+                 {{GetEarlyExits("value", ee)}}
 
-        sb.AppendLine(" };");
-        return sb.ToString();
-    }
+                         uint hashCode = {{GetHashFunction32(Spec.KnownDataType, "value")}};
+                         uint index = {{GetModFunction("hashCode", (uint)_buckets.Length)}};
+                         int i = _buckets[index] - 1;
 
-    private static string GenerateEntries(Entry[] data, string? staticStr)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine($"    private{staticStr} readonly Entry[] _entries = {{ ");
+                         while (i >= 0)
+                         {
+                             ref Entry entry = ref _entries[i];
 
-        for (int i = 0; i < data.Length; i++)
-        {
-            ref Entry entry = ref data[i];
-            sb.Append("        new Entry(").Append(entry.HashCode).Append(", ").Append(entry.Next).Append(", ").Append(ToValueLabel(entry.Value)).Append(')');
+                             if (entry.HashCode == hashCode && {{GetEqualFunction("entry.Value", "value")}})
+                                 return true;
 
-            if (i != data.Length - 1)
-                sb.Append(',');
+                             i = entry.Next;
+                         }
 
-            sb.AppendLine();
-        }
+                         return false;
+                     }
 
-        sb.Append("    };");
-        return sb.ToString();
+                     [StructLayout(LayoutKind.Auto)]
+                     private struct Entry
+                     {
+                         public uint HashCode;
+                         public {{(Spec.Data.Length <= short.MaxValue ? "short" : "int")}} Next;
+                         public {{Spec.DataTypeName}} Value;
+
+                         public Entry(uint hashCode, {{(Spec.Data.Length <= short.MaxValue ? "short" : "int")}} next, {{Spec.DataTypeName}} value)
+                         {
+                             HashCode = hashCode;
+                             Next = next;
+                             Value = value;
+                         }
+                     }
+                 """;
+
+        static void RenderBucket(StringBuilder sb, int obj) => sb.Append(obj);
+
+        static void RenderEntry(StringBuilder sb, Entry obj) => sb.Append("        new Entry(").Append(obj.HashCode).Append(", ").Append(obj.Next).Append(", ").Append(ToValueLabel(obj.Value)).Append(')');
     }
 
     [StructLayout(LayoutKind.Auto)]

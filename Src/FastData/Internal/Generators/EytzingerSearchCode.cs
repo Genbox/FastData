@@ -1,74 +1,66 @@
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal static class EytzingerSearchCode
+internal sealed class EytzingerSearchCode(FastDataSpec Spec) : ICode
 {
-    public static void Generate(StringBuilder sb, FastDataSpec spec, IEnumerable<IEarlyExitSpec> earlyExitSpecs)
+    public bool IsAppropriate(DataProperties dataProps) => true;
+
+    public bool TryPrepare()
     {
-        string? staticStr = spec.ClassType == ClassType.Static ? " static" : null;
-        uint length = (uint)spec.Data.Length;
+        Array.Sort(Spec.Data, StringComparer.Ordinal);
 
-        Array.Sort(spec.Data);
-
-        object[] output = new object[length];
+        object[] output = new object[Spec.Data.Length];
         int index = 0;
-        EytzingerOrder(spec.Data, output, ref index);
+        EytzingerOrder(ref index);
 
-        sb.Append($$"""
-                        private{{staticStr}} {{spec.DataTypeName}}[] _entries = new {{spec.DataTypeName}}[] {
-                    {{GenerateList(output)}}
-                        };
+        Spec.Data = output;
+        return true;
 
-                        {{GetMethodAttributes()}}
-                        public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
-                        {
-                    {{GetEarlyExits("value", earlyExitSpecs)}}
-
-                            int i = 0;
-                            while (i < _entries.Length)
-                            {
-                                int comparison = {{GetCompareFunction("_entries[i]", "value")}};
-
-                                if (comparison == 0)
-                                    return true;
-
-                                if (comparison < 0)
-                                    i = 2 * i + 2;
-                                else
-                                    i = 2 * i + 1;
-                            }
-
-                            return false;
-                        }
-                    """);
+        void EytzingerOrder(ref int arrIdx, int eytIdx = 0)
+        {
+            if (eytIdx < Spec.Data.Length)
+            {
+                EytzingerOrder(ref arrIdx, (2 * eytIdx) + 1);
+                output[eytIdx] = Spec.Data[arrIdx++];
+                EytzingerOrder(ref arrIdx, (2 * eytIdx) + 2);
+            }
+        }
     }
 
-    private static string GenerateList(object[] data)
+    public string Generate(IEnumerable<IEarlyExit> ee)
     {
-        StringBuilder sb = new StringBuilder();
+        return $$"""
+                     private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
+                 {{JoinValues(Spec.Data, Render, ",\n")}}
+                     };
 
-        for (int i = 0; i < data.Length; i++)
-        {
-            sb.Append("        ").Append(ToValueLabel(data[i]));
+                     {{GetMethodAttributes()}}
+                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+                     {
+                 {{GetEarlyExits("value", ee)}}
 
-            if (i != data.Length - 1)
-                sb.AppendLine(", ");
-        }
+                         int i = 0;
+                         while (i < _entries.Length)
+                         {
+                             int comparison = {{GetCompareFunction("_entries[i]", "value")}};
 
-        return sb.ToString();
-    }
+                             if (comparison == 0)
+                                 return true;
 
-    private static void EytzingerOrder(object[] input, object[] output, ref int arrIdx, int eytIdx = 0)
-    {
-        if (eytIdx < input.Length)
-        {
-            EytzingerOrder(input, output, ref arrIdx, (2 * eytIdx) + 1);
-            output[eytIdx] = input[arrIdx++];
-            EytzingerOrder(input, output, ref arrIdx, (2 * eytIdx) + 2);
-        }
+                             if (comparison < 0)
+                                 i = 2 * i + 2;
+                             else
+                                 i = 2 * i + 1;
+                         }
+
+                         return false;
+                     }
+                 """;
+
+        static void Render(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));
     }
 }
