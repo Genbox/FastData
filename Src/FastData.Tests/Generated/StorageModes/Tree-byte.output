@@ -20,7 +20,8 @@ internal static class ImmutableSet
     
     public static bool Contains(byte value)
     {
-
+        if (value < 0 || value > 2)
+           return false;
 
         int lo = 0;
         int hi = 2;

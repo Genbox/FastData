@@ -6,6 +6,48 @@ internal static class Analyzer
 {
     private const byte _analysisMaxLength = 255;
 
+    internal static FloatProperties GetFloatProperties(IEnumerable<float> data)
+    {
+        float min = float.MaxValue;
+        float max = float.MinValue;
+
+        foreach (float c in data)
+        {
+            min = c < min ? c : min;
+            max = c > max ? c : max;
+        }
+
+        return new FloatProperties(min, max);
+    }
+
+    internal static FloatProperties GetFloatProperties(IEnumerable<double> data)
+    {
+        double min = double.MaxValue;
+        double max = double.MinValue;
+
+        foreach (double c in data)
+        {
+            min = c < min ? c : min;
+            max = c > max ? c : max;
+        }
+
+        return new FloatProperties(min, max);
+    }
+
+    internal static CharProperties GetCharProperties(IEnumerable<char> data)
+    {
+        char min = char.MaxValue;
+        char max = char.MinValue;
+
+        foreach (char c in data)
+        {
+            min = c < min ? c : min;
+            max = c > max ? c : max;
+        }
+
+        return new CharProperties(min, max);
+    }
+
     internal static StringProperties GetStringProperties(IEnumerable<string> data)
     {
         uint minStrLen = uint.MaxValue;
@@ -74,12 +116,124 @@ internal static class Analyzer
         return new StringProperties(minStrLen, maxStrLen, minChar, maxChar, longestLeft, longestRight, (uint)lengthIndex.Count(x => x));
     }
 
+    internal static UnsignedIntegerProperties GetUnsignedIntegerProperties(IEnumerable<byte> data)
+    {
+        byte min = byte.MaxValue;
+        byte max = byte.MinValue;
+
+        using var enumerator = data.GetEnumerator();
+        enumerator.MoveNext();
+        byte lastValue = enumerator.Current;
+
+        min = Math.Min(min, lastValue);
+        max = Math.Max(max, lastValue);
+
+        bool consecutive = true;
+        while (enumerator.MoveNext())
+        {
+            byte val = enumerator.Current;
+
+            if (consecutive && lastValue + 1 != val)
+                consecutive = false;
+
+            min = Math.Min(min, val);
+            max = Math.Max(max, val);
+            lastValue = val;
+        }
+
+        return new UnsignedIntegerProperties(min, max, consecutive);
+    }
+
+    internal static IntegerProperties GetIntegerProperties(IEnumerable<sbyte> data)
+    {
+        sbyte min = sbyte.MaxValue;
+        sbyte max = sbyte.MinValue;
+
+        using var enumerator = data.GetEnumerator();
+        enumerator.MoveNext();
+        sbyte lastValue = enumerator.Current;
+
+        min = Math.Min(min, lastValue);
+        max = Math.Max(max, lastValue);
+
+        bool consecutive = true;
+        while (enumerator.MoveNext())
+        {
+            sbyte val = enumerator.Current;
+
+            if (consecutive && lastValue + 1 != val)
+                consecutive = false;
+
+            min = Math.Min(min, val);
+            max = Math.Max(max, val);
+            lastValue = val;
+        }
+
+        return new IntegerProperties(min, max, consecutive);
+    }
+
+    internal static IntegerProperties GetIntegerProperties(IEnumerable<short> data)
+    {
+        short min = short.MaxValue;
+        short max = short.MinValue;
+
+        using var enumerator = data.GetEnumerator();
+        enumerator.MoveNext();
+        short lastValue = enumerator.Current;
+
+        min = Math.Min(min, lastValue);
+        max = Math.Max(max, lastValue);
+
+        bool consecutive = true;
+        while (enumerator.MoveNext())
+        {
+            short val = enumerator.Current;
+
+            if (consecutive && lastValue + 1 != val)
+                consecutive = false;
+
+            min = Math.Min(min, val);
+            max = Math.Max(max, val);
+            lastValue = val;
+        }
+
+        return new IntegerProperties(min, max, consecutive);
+    }
+
+    internal static UnsignedIntegerProperties GetUnsignedIntegerProperties(IEnumerable<ushort> data)
+    {
+        ushort min = ushort.MaxValue;
+        ushort max = ushort.MinValue;
+
+        using var enumerator = data.GetEnumerator();
+        enumerator.MoveNext();
+        ushort lastValue = enumerator.Current;
+
+        min = Math.Min(min, lastValue);
+        max = Math.Max(max, lastValue);
+
+        bool consecutive = true;
+        while (enumerator.MoveNext())
+        {
+            ushort val = enumerator.Current;
+
+            if (consecutive && lastValue + 1 != val)
+                consecutive = false;
+
+            min = Math.Min(min, val);
+            max = Math.Max(max, val);
+            lastValue = val;
+        }
+
+        return new UnsignedIntegerProperties(min, max, consecutive);
+    }
+
     internal static IntegerProperties GetIntegerProperties(IEnumerable<int> data)
     {
         int min = int.MaxValue;
         int max = int.MinValue;
 
-        using IEnumerator<int> enumerator = data.GetEnumerator();
+        using var enumerator = data.GetEnumerator();
         enumerator.MoveNext();
         int lastValue = enumerator.Current;
 
@@ -100,6 +254,90 @@ internal static class Analyzer
         }
 
         return new IntegerProperties(min, max, consecutive);
+    }
+
+    internal static UnsignedIntegerProperties GetUnsignedIntegerProperties(IEnumerable<uint> data)
+    {
+        uint min = uint.MaxValue;
+        uint max = uint.MinValue;
+
+        using var enumerator = data.GetEnumerator();
+        enumerator.MoveNext();
+        uint lastValue = enumerator.Current;
+
+        min = Math.Min(min, lastValue);
+        max = Math.Max(max, lastValue);
+
+        bool consecutive = true;
+        while (enumerator.MoveNext())
+        {
+            uint val = enumerator.Current;
+
+            if (consecutive && lastValue + 1 != val)
+                consecutive = false;
+
+            min = Math.Min(min, val);
+            max = Math.Max(max, val);
+            lastValue = val;
+        }
+
+        return new UnsignedIntegerProperties(min, max, consecutive);
+    }
+
+    internal static IntegerProperties GetIntegerProperties(IEnumerable<long> data)
+    {
+        long min = long.MaxValue;
+        long max = long.MinValue;
+
+        using var enumerator = data.GetEnumerator();
+        enumerator.MoveNext();
+        long lastValue = enumerator.Current;
+
+        min = Math.Min(min, lastValue);
+        max = Math.Max(max, lastValue);
+
+        bool consecutive = true;
+        while (enumerator.MoveNext())
+        {
+            long val = enumerator.Current;
+
+            if (consecutive && lastValue + 1 != val)
+                consecutive = false;
+
+            min = Math.Min(min, val);
+            max = Math.Max(max, val);
+            lastValue = val;
+        }
+
+        return new IntegerProperties(min, max, consecutive);
+    }
+
+    internal static UnsignedIntegerProperties GetUnsignedIntegerProperties(IEnumerable<ulong> data)
+    {
+        ulong min = ulong.MaxValue;
+        ulong max = ulong.MinValue;
+
+        using var enumerator = data.GetEnumerator();
+        enumerator.MoveNext();
+        ulong lastValue = enumerator.Current;
+
+        min = Math.Min(min, lastValue);
+        max = Math.Max(max, lastValue);
+
+        bool consecutive = true;
+        while (enumerator.MoveNext())
+        {
+            ulong val = enumerator.Current;
+
+            if (consecutive && lastValue + 1 != val)
+                consecutive = false;
+
+            min = Math.Min(min, val);
+            max = Math.Max(max, val);
+            lastValue = val;
+        }
+
+        return new UnsignedIntegerProperties(min, max, consecutive);
     }
 
     /// <summary>

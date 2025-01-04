@@ -14,7 +14,8 @@ internal static class ImmutableSet
     
     public static bool Contains(char value)
     {
-
+        if (value < 97 || value > 99)
+           return false;
 
         switch (value)
         {

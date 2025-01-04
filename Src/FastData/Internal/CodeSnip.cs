@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using Genbox.FastData.Enums;
@@ -10,6 +11,8 @@ namespace Genbox.FastData.Internal;
 
 internal static class CodeSnip
 {
+    [SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality")]
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public static string GetEarlyExits(string variable, IEnumerable<IEarlyExit> specs, bool forceOverride = false)
     {
         if (!forceOverride && !GlobalOptions.GenerateEarlyCondition)
@@ -20,43 +23,30 @@ internal static class CodeSnip
         foreach (IEarlyExit spec in specs)
         {
             if (spec is MinMaxLengthEarlyExit(var minLength, var maxLength))
-            {
-                if (minLength == maxLength) //same length
-                {
-                    sb.Append($"""
-                                      if ({variable}.Length != {maxLength})
-                                          return false;
-                               """);
-                }
-                else
-                {
-                    sb.Append($"""
-                                       if ({variable}.Length < {minLength} || {variable}.Length > {maxLength})
-                                          return false;
-                               """);
-                }
-            }
+                sb.Append(GetValueEarlyExits(variable, minLength, maxLength, true));
             else if (spec is MinMaxValueEarlyExit(var minValue, var maxValue))
-            {
-                if (minValue == maxValue) //same value
-                {
-                    sb.Append($"""
-                                      if ({variable} != {maxValue.ToString(NumberFormatInfo.InvariantInfo)})
-                                          return false;
-                               """);
-                }
-                else
-                {
-                    sb.Append($"""
-                                       if ({variable} < {minValue.ToString(CultureInfo.InvariantCulture)} || {variable} > {maxValue.ToString(NumberFormatInfo.InvariantInfo)})
-                                          return false;
-                               """);
-                }
-            }
+                sb.Append(GetValueEarlyExits(variable, minValue, maxValue, false));
+            else if (spec is MinMaxUnsignedValueEarlyExit(var minUValue, var maxUValue))
+                sb.Append(GetValueEarlyExits(variable, minUValue, maxUValue, false));
+            else if (spec is MinMaxFloatValueEarlyExit(var minFloatValue, var maxFloatValue))
+                sb.Append(GetValueEarlyExits(variable, minFloatValue, maxFloatValue, false));
+            else
+                throw new InvalidOperationException("Unknown early exit type: " + spec.GetType().Name);
         }
 
         return sb.ToString();
     }
+
+    private static string GetValueEarlyExits<T>(string variable, T min, T max, bool length) where T : IFormattable
+        => min.Equals(max)
+            ? $"""
+                      if ({variable}{(length ? ".Length" : "")} != {max})
+                          return false;
+               """
+            : $"""
+                       if ({variable}{(length ? ".Length" : "")} < {min} || {variable}{(length ? ".Length" : "")} > {max})
+                          return false;
+               """;
 
     public static string GetEqualFunction(string variable1, string variable2)
     {

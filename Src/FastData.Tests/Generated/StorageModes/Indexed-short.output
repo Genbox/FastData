@@ -22,7 +22,8 @@ internal static class ImmutableSet
     
     public static bool Contains(short value)
     {
-
+        if (value < -1 || value > 1)
+           return false;
 
         uint hashCode = unchecked((uint)value);
         uint index = MathHelper.FastMod(hashCode, 3, 6148914691236517206);

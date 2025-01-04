@@ -10,8 +10,8 @@ public class AnalyzerTests
         string[] data = ["a", "aa", "aaa", "aaaa"];
         StringProperties props = Analyzer.GetStringProperties(data);
         Assert.Equal(4u, props.NumLengths);
-        Assert.Equal(1u, props.MinStrLen);
-        Assert.Equal(4u, props.MaxStrLen);
+        Assert.Equal(1u, props.MinLen);
+        Assert.Equal(4u, props.MaxLen);
         Assert.Equal('a', props.MinChar);
         Assert.Equal('a', props.MaxChar);
     }

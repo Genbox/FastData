@@ -88,16 +88,63 @@ internal class FastDataGenerator : IIncrementalGenerator
 
         DataProperties dataProps = new DataProperties();
 
-        if (spec.KnownDataType == KnownDataType.Int32)
+        switch (spec.KnownDataType)
         {
-            dataProps.IntProps = Analyzer.GetIntegerProperties(spec.Data.Cast<int>());
-            early = Optimizer.GetEarlyExits(dataProps.IntProps).ToArray();
+            case KnownDataType.SByte:
+                dataProps.IntProps = Analyzer.GetIntegerProperties(spec.Data.Cast<sbyte>());
+                break;
+            case KnownDataType.Int16:
+                dataProps.IntProps = Analyzer.GetIntegerProperties(spec.Data.Cast<short>());
+                break;
+            case KnownDataType.Int32:
+                dataProps.IntProps = Analyzer.GetIntegerProperties(spec.Data.Cast<int>());
+                break;
+            case KnownDataType.Int64:
+                dataProps.IntProps = Analyzer.GetIntegerProperties(spec.Data.Cast<long>());
+                break;
+            case KnownDataType.Byte:
+                dataProps.UIntProps = Analyzer.GetUnsignedIntegerProperties(spec.Data.Cast<byte>());
+                break;
+            case KnownDataType.UInt16:
+                dataProps.UIntProps = Analyzer.GetUnsignedIntegerProperties(spec.Data.Cast<ushort>());
+                break;
+            case KnownDataType.UInt32:
+                dataProps.UIntProps = Analyzer.GetUnsignedIntegerProperties(spec.Data.Cast<uint>());
+                break;
+            case KnownDataType.UInt64:
+                dataProps.UIntProps = Analyzer.GetUnsignedIntegerProperties(spec.Data.Cast<ulong>());
+                break;
+            case KnownDataType.String:
+                dataProps.StringProps = Analyzer.GetStringProperties(spec.Data.Cast<string>());
+                break;
+            case KnownDataType.Boolean:
+                break;
+            case KnownDataType.Char:
+                dataProps.CharProps = Analyzer.GetCharProperties(spec.Data.Cast<char>());
+                break;
+            case KnownDataType.Single:
+                dataProps.FloatProps = Analyzer.GetFloatProperties(spec.Data.Cast<float>());
+                break;
+            case KnownDataType.Double:
+                dataProps.FloatProps = Analyzer.GetFloatProperties(spec.Data.Cast<double>());
+                break;
+            case KnownDataType.Unknown:
+                //Do nothing
+                break;
+            default:
+                throw new InvalidOperationException("Unknown data type: " + spec.KnownDataType);
         }
-        else if (spec.KnownDataType == KnownDataType.String)
-        {
-            dataProps.StringProps = Analyzer.GetStringProperties(spec.Data.Cast<string>());
-            early = Optimizer.GetEarlyExits(dataProps.StringProps).ToArray();
-        }
+
+        if (dataProps.StringProps.HasValue)
+            early = Optimizer.GetEarlyExits(dataProps.StringProps.Value).ToArray();
+        else if (dataProps.IntProps.HasValue)
+            early = Optimizer.GetEarlyExits(dataProps.IntProps.Value).ToArray();
+        else if (dataProps.UIntProps.HasValue)
+            early = Optimizer.GetEarlyExits(dataProps.UIntProps.Value).ToArray();
+        else if (dataProps.CharProps.HasValue)
+            early = Optimizer.GetEarlyExits(dataProps.CharProps.Value).ToArray();
+        else if (dataProps.FloatProps.HasValue)
+            early = Optimizer.GetEarlyExits(dataProps.FloatProps.Value).ToArray();
 
         foreach (ICode candidate in GetDataStructureCandidates(spec))
         {
