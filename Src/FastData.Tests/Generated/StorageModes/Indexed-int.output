@@ -14,17 +14,18 @@ internal static class ImmutableSet
     private static readonly int[] _buckets = { 2, 3, 0 };
 
     private static readonly Entry[] _entries = { 
-        new Entry(1266835233, -1, -1),
+        new Entry(4294967295, -1, -1),
         new Entry(0, 0, 0),
-        new Entry(885181228, -1, 1)
+        new Entry(1, -1, 1)
     };
 
     
     public static bool Contains(int value)
     {
+        if (value < -1 || value > 1)
+           return false;
 
-
-        uint hashCode = unchecked((uint)HashHelper.Hash(value, 0));
+        uint hashCode = unchecked((uint)value);
         uint index = MathHelper.FastMod(hashCode, 3, 6148914691236517206);
         int i = _buckets[index] - 1;
 

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Enums;
 using Genbox.FastData.Internal.Optimization.EarlyExitSpecs;
 
 namespace Genbox.FastData.Internal;
@@ -66,9 +67,42 @@ internal static class CodeSnip
         return $"{variable1}.CompareTo({variable2})";
     }
 
-    public static string GetHashFunction(string variable, uint seed)
+    public static string GetSeededHashFunction32(KnownDataType type, string variable, uint seed, bool mix)
     {
-        return $"unchecked((uint)HashHelper.Hash({variable}, {seed}))";
+        if (type == KnownDataType.String)
+            return $"HashHelper.HashStringSeed({variable}, {seed})";
+
+        //For these types, we can use identity hashing
+        return type switch
+        {
+            KnownDataType.Char
+                or KnownDataType.SByte
+                or KnownDataType.Byte
+                or KnownDataType.Int16
+                or KnownDataType.UInt16
+                or KnownDataType.Int32
+                or KnownDataType.UInt32 => mix ? $"HashHelper.Mix(unchecked((uint){variable} + {seed}))" : $"unchecked((uint){variable})",
+            _ => mix ? $"HashHelper.Mix(unchecked((uint){variable}.GetHashCode() + {seed}))" : $"unchecked((uint){variable}.GetHashCode())"
+        };
+    }
+
+    public static string GetHashFunction32(KnownDataType type, string variable)
+    {
+        if (type == KnownDataType.String)
+            return $"HashHelper.HashString({variable})";
+
+        //For these types, we can use identity hashing
+        return type switch
+        {
+            KnownDataType.Char
+                or KnownDataType.SByte
+                or KnownDataType.Byte
+                or KnownDataType.Int16
+                or KnownDataType.UInt16
+                or KnownDataType.Int32
+                or KnownDataType.UInt32 => $"unchecked((uint){variable})",
+            _ => $"unchecked((uint){variable}.GetHashCode())"
+        };
     }
 
     public static string GetModFunction(string variable, uint length)

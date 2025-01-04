@@ -18,7 +18,7 @@ internal static class SwitchHashCode
         for (int i = 0; i < spec.Data.Length; i++)
         {
             object value = spec.Data[i];
-            uint hash = (uint)HashHelper.Hash(value);
+            uint hash = HashHelper.HashObject(value);
 
             hashCodes[i] = (hash, value);
         }
@@ -27,7 +27,7 @@ internal static class SwitchHashCode
                         {{GetMethodAttributes()}}
                         public{{staticStr}} bool Contains({{spec.DataTypeName}} value)
                         {
-                            switch ({{GetHashFunction("value", 0)}})
+                            switch ({{GetHashFunction32(spec.KnownDataType, "value")}})
                             {
                     {{GenerateSwitch(hashCodes)}}
                             }

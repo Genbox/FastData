@@ -21,7 +21,7 @@ internal static class HashSetCode
         {
             object value = spec.Data[i];
 
-            uint hashCode = (uint)HashHelper.Hash(value);
+            uint hashCode = HashHelper.HashObject(value);
             ref int bucket = ref buckets[hashCode % length];
 
             ref Entry entry = ref entries[i];
@@ -42,7 +42,7 @@ internal static class HashSetCode
                         {
                     {{GetEarlyExits("value", earlyExitSpecs)}}
 
-                            uint hashCode = {{GetHashFunction("value", 0)}};
+                            uint hashCode = {{GetHashFunction32(spec.KnownDataType, "value")}};
                             uint index = {{GetModFunction("hashCode", (uint)buckets.Length)}};
                             int i = _buckets[index] - 1;
 

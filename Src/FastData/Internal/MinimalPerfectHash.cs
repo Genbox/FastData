@@ -6,7 +6,7 @@ namespace Genbox.FastData.Internal;
 
 internal static class MinimalPerfectHash
 {
-    public static IEnumerable<uint> Generate<T>(T[] data, Func<T, uint, ulong> hashFunc, uint maxCandidates = uint.MaxValue, ulong maxAttempts = uint.MaxValue, uint length = 0, Func<bool>? condition = null)
+    public static IEnumerable<uint> Generate<T>(T[] data, Func<T, uint, uint> hashFunc, uint maxCandidates = uint.MaxValue, uint maxAttempts = uint.MaxValue, uint length = 0, Func<bool>? condition = null)
     {
         if (length == 0)
             length = (uint)data.Length;

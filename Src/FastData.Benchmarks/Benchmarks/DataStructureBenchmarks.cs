@@ -8,19 +8,21 @@ using Genbox.FastData;
 using Genbox.FastData.Enums;
 using Genbox.FastFilter;
 
-[assembly: FastData<string>("StaticLinear", ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "100"], StorageMode = StorageMode.Linear)]
-[assembly: FastData<string>("StaticLogic", ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "100"], StorageMode = StorageMode.Logic)]
-[assembly: FastData<string>("StaticTree", ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "100"], StorageMode = StorageMode.Tree)]
-[assembly: FastData<string>("StaticIndex", ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "100"], StorageMode = StorageMode.Indexed)]
+[assembly: FastData<string>("StaticLinear", ["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10", "item11", "item12", "item13", "item14", "item15", "item16", "item17", "item18", "item19", "item20", "item21", "item22", "item23", "item24", "item25", "item26", "item27", "item28", "item29", "item30", "item31", "item32", "item33", "item34", "item35", "item36", "item37", "item38", "item39", "item40", "item41", "item42", "item43", "item44", "item45", "item46", "item47", "item48", "item49", "item50", "item51", "item52", "item53", "item54", "item55", "item56", "item57", "item58", "item59", "item60", "item61", "item62", "item63", "item64", "item65", "item66", "item67", "item68", "item69", "item70", "item71", "item72", "item73", "item74", "item75", "item76", "item77", "item78", "item79", "item80", "item81", "item82", "item83", "item84", "item85", "item86", "item87", "item88", "item89", "item90", "item91", "item92", "item93", "item94", "item95", "item96", "item97", "item98", "item99", "item100"], StorageMode = StorageMode.Linear)]
+[assembly: FastData<string>("StaticLogic", ["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10", "item11", "item12", "item13", "item14", "item15", "item16", "item17", "item18", "item19", "item20", "item21", "item22", "item23", "item24", "item25", "item26", "item27", "item28", "item29", "item30", "item31", "item32", "item33", "item34", "item35", "item36", "item37", "item38", "item39", "item40", "item41", "item42", "item43", "item44", "item45", "item46", "item47", "item48", "item49", "item50", "item51", "item52", "item53", "item54", "item55", "item56", "item57", "item58", "item59", "item60", "item61", "item62", "item63", "item64", "item65", "item66", "item67", "item68", "item69", "item70", "item71", "item72", "item73", "item74", "item75", "item76", "item77", "item78", "item79", "item80", "item81", "item82", "item83", "item84", "item85", "item86", "item87", "item88", "item89", "item90", "item91", "item92", "item93", "item94", "item95", "item96", "item97", "item98", "item99", "item100"], StorageMode = StorageMode.Logic)]
+[assembly: FastData<string>("StaticTree", ["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10", "item11", "item12", "item13", "item14", "item15", "item16", "item17", "item18", "item19", "item20", "item21", "item22", "item23", "item24", "item25", "item26", "item27", "item28", "item29", "item30", "item31", "item32", "item33", "item34", "item35", "item36", "item37", "item38", "item39", "item40", "item41", "item42", "item43", "item44", "item45", "item46", "item47", "item48", "item49", "item50", "item51", "item52", "item53", "item54", "item55", "item56", "item57", "item58", "item59", "item60", "item61", "item62", "item63", "item64", "item65", "item66", "item67", "item68", "item69", "item70", "item71", "item72", "item73", "item74", "item75", "item76", "item77", "item78", "item79", "item80", "item81", "item82", "item83", "item84", "item85", "item86", "item87", "item88", "item89", "item90", "item91", "item92", "item93", "item94", "item95", "item96", "item97", "item98", "item99", "item100"], StorageMode = StorageMode.Tree)]
+[assembly: FastData<string>("StaticIndex", ["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10", "item11", "item12", "item13", "item14", "item15", "item16", "item17", "item18", "item19", "item20", "item21", "item22", "item23", "item24", "item25", "item26", "item27", "item28", "item29", "item30", "item31", "item32", "item33", "item34", "item35", "item36", "item37", "item38", "item39", "item40", "item41", "item42", "item43", "item44", "item45", "item46", "item47", "item48", "item49", "item50", "item51", "item52", "item53", "item54", "item55", "item56", "item57", "item58", "item59", "item60", "item61", "item62", "item63", "item64", "item65", "item66", "item67", "item68", "item69", "item70", "item71", "item72", "item73", "item74", "item75", "item76", "item77", "item78", "item79", "item80", "item81", "item82", "item83", "item84", "item85", "item86", "item87", "item88", "item89", "item90", "item91", "item92", "item93", "item94", "item95", "item96", "item97", "item98", "item99", "item100"], StorageMode = StorageMode.Indexed)]
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [MemoryDiagnoser(false)]
-[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory, BenchmarkLogicalGroupRule.ByParams)]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class DataStructureBenchmarks
 {
+    private const int DataSize = 100;
+
     private string[] _queries = null!;
     private string[] _array = null!;
 
@@ -33,10 +35,7 @@ public class DataStructureBenchmarks
     private BlockedBloomFilter<string> _blockedBloom = null!;
     private BinaryFuse8Filter<string> _binaryFuse8 = null!;
 
-    [Params(100)]
-    public int DataSize { get; set; }
-
-    [Params(1_000)]
+    [Params(1_000, 10_000, 100_000)]
     public int QuerySize { get; set; }
 
     private void SetupQueries()
@@ -46,11 +45,11 @@ public class DataStructureBenchmarks
         //Half the queries are within the set
         int i;
         for (i = 0; i < QuerySize / 2; i++)
-            _queries[i] = Random.Shared.Next(1, DataSize + 1).ToString(CultureInfo.InvariantCulture);
+            _queries[i] = "item" + Random.Shared.Next(1, DataSize + 1).ToString(NumberFormatInfo.InvariantInfo);
 
         //Half the queries are outside the set
         for (; i < QuerySize; i++)
-            _queries[i] = Random.Shared.Next(DataSize + 1, int.MaxValue).ToString(NumberFormatInfo.InvariantInfo);
+            _queries[i] = "item" + Random.Shared.Next(DataSize + 1, int.MaxValue).ToString(NumberFormatInfo.InvariantInfo);
     }
 
     [GlobalSetup(Target = nameof(QueryArray))]
@@ -186,17 +185,17 @@ public class DataStructureBenchmarks
     {
         string[] arr = new string[DataSize];
 
-        for (int i = 0; i < arr.Length; i++)
-            arr[i] = i.ToString(NumberFormatInfo.InvariantInfo);
+        for (uint i = 0; i < arr.Length; i++)
+            arr[i] = "item" + (i + 1);
 
         return arr;
     }
 
-    private HashSet<string> CreateHashSet() => new HashSet<string>(CreateArray());
-    private FrozenSet<string> CreateFrozenSet() => new HashSet<string>(CreateArray()).ToFrozenSet();
-    private Dictionary<string, int> CreateDictionary() => new Dictionary<string, int>(CreateArray().Select(x => new KeyValuePair<string, int>(x, 42)));
+    private HashSet<string> CreateHashSet() => new HashSet<string>(CreateArray(), StringComparer.Ordinal);
+    private FrozenSet<string> CreateFrozenSet() => CreateHashSet().ToFrozenSet();
+    private Dictionary<string, int> CreateDictionary() => new Dictionary<string, int>(CreateArray().Select(x => new KeyValuePair<string, int>(x, 42)), StringComparer.Ordinal);
     private FrozenDictionary<string, int> CreateFrozenDictionary() => CreateDictionary().ToFrozenDictionary();
-    private ConcurrentDictionary<string, int> CreateConcurrentDictionary() => new ConcurrentDictionary<string, int>(CreateArray().Select(x => new KeyValuePair<string, int>(x, 42)));
+    private ConcurrentDictionary<string, int> CreateConcurrentDictionary() => new ConcurrentDictionary<string, int>(CreateArray().Select(x => new KeyValuePair<string, int>(x, 42)), StringComparer.Ordinal);
     private BloomFilter<string> CreateBloomFilter() => new BloomFilter<string>(CreateArray());
     private BlockedBloomFilter<string> CreateBlockedBloomFilter() => new BlockedBloomFilter<string>(CreateArray());
     private BinaryFuse8Filter<string> CreateBinaryFuse8Filter() => new BinaryFuse8Filter<string>(CreateArray());

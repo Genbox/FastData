@@ -1,7 +1,6 @@
-﻿using System.Buffers.Binary;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using static Genbox.FastData.Internal.Compat.BitOperations;
 
 namespace Genbox.FastData.Helpers;
 
@@ -10,175 +9,140 @@ namespace Genbox.FastData.Helpers;
 /// </summary>
 public static class HashHelper
 {
-    private const int StripeSize = 4 * sizeof(ulong);
+    private const uint Accumulator = (5381 << 16) + 5381;
+    private const uint Factor = 1_566_083_941;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ulong Hash(object data, uint seed = 0)
+    public static uint HashObject(object data)
     {
         //We don't want randomized hash codes, so we handle string as a special case
         if (data is string str)
-            return Hash(str, seed);
+            return HashString(str.AsSpan());
 
-        int code = data.GetHashCode();
-        return Murmur_64((ulong)code + seed); //we need bits in both low and high bits
+        return (uint)data.GetHashCode();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong Murmur_64(ulong h)
+    public static uint HashObjectSeed(object data, uint seed, bool strongMixing)
     {
-        h ^= h >> 33;
-        h *= 0xff51afd7ed558ccd;
-        h ^= h >> 33;
-        h *= 0xc4ceb9fe1a85ec53;
-        h ^= h >> 33;
+        //We don't want randomized hash codes, so we handle string as a special case
+        if (data is string str)
+            return HashStringSeed(str.AsSpan(), seed);
+
+        uint code = (uint)data.GetHashCode();
+        return strongMixing ? Mix(code + seed) : code + seed;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe uint HashString(ReadOnlySpan<char> data)
+    {
+        int length = data.Length;
+        fixed (char* src = &MemoryMarshal.GetReference(data))
+        {
+            uint hash1, hash2;
+            switch (length)
+            {
+                case 1:
+                    hash2 = (RotateLeft(Accumulator, 5) + Accumulator) ^ src[0];
+                    return Accumulator + (hash2 * Factor);
+
+                case 2:
+                    hash2 = (RotateLeft(Accumulator, 5) + Accumulator) ^ src[0];
+                    hash2 = (RotateLeft(hash2, 5) + hash2) ^ src[1];
+                    return Accumulator + (hash2 * Factor);
+
+                case 3:
+                    hash2 = (RotateLeft(Accumulator, 5) + Accumulator) ^ src[0];
+                    hash2 = (RotateLeft(hash2, 5) + hash2) ^ src[1];
+                    hash2 = (RotateLeft(hash2, 5) + hash2) ^ src[2];
+                    return Accumulator + (hash2 * Factor);
+
+                case 4:
+                    hash1 = (RotateLeft(Accumulator, 5) + Accumulator) ^ ((uint*)src)[0];
+                    hash2 = (RotateLeft(Accumulator, 5) + Accumulator) ^ ((uint*)src)[1];
+                    return hash1 + (hash2 * Factor);
+
+                default:
+                    hash1 = Accumulator;
+                    hash2 = hash1;
+
+                    uint* ptrUInt32 = (uint*)src;
+                    while (length >= 4)
+                    {
+                        hash1 = (RotateLeft(hash1, 5) + hash1) ^ ptrUInt32[0];
+                        hash2 = (RotateLeft(hash2, 5) + hash2) ^ ptrUInt32[1];
+                        ptrUInt32 += 2;
+                        length -= 4;
+                    }
+
+                    char* ptrChar = (char*)ptrUInt32;
+                    while (length-- > 0)
+                        hash2 = (RotateLeft(hash2, 5) + hash2) ^ *ptrChar++;
+
+                    return hash1 + (hash2 * Factor);
+            }
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe uint HashStringSeed(ReadOnlySpan<char> data, uint seed)
+    {
+        int length = data.Length;
+        fixed (char* src = &MemoryMarshal.GetReference(data))
+        {
+            uint hash1, hash2;
+            switch (length)
+            {
+                case 1:
+                    hash2 = (RotateLeft(Accumulator + seed, 5) + Accumulator + seed) ^ src[0];
+                    return Accumulator + seed + (hash2 * Factor);
+
+                case 2:
+                    hash2 = (RotateLeft(Accumulator + seed, 5) + Accumulator + seed) ^ src[0];
+                    hash2 = (RotateLeft(hash2, 5) + hash2) ^ src[1];
+                    return Accumulator + seed + (hash2 * Factor);
+
+                case 3:
+                    hash2 = (RotateLeft(Accumulator + seed, 5) + Accumulator + seed) ^ src[0];
+                    hash2 = (RotateLeft(hash2, 5) + hash2) ^ src[1];
+                    hash2 = (RotateLeft(hash2, 5) + hash2) ^ src[2];
+                    return Accumulator + seed + (hash2 * Factor);
+
+                case 4:
+                    hash1 = (RotateLeft(Accumulator + seed, 5) + Accumulator + seed) ^ ((uint*)src)[0];
+                    hash2 = (RotateLeft(Accumulator + seed, 5) + Accumulator + seed) ^ ((uint*)src)[1];
+                    return hash1 + (hash2 * Factor);
+
+                default:
+                    hash1 = Accumulator + seed;
+                    hash2 = hash1;
+
+                    uint* ptrUInt32 = (uint*)src;
+                    while (length >= 4)
+                    {
+                        hash1 = (RotateLeft(hash1, 5) + hash1) ^ ptrUInt32[0];
+                        hash2 = (RotateLeft(hash2, 5) + hash2) ^ ptrUInt32[1];
+                        ptrUInt32 += 2;
+                        length -= 4;
+                    }
+
+                    char* ptrChar = (char*)ptrUInt32;
+                    while (length-- > 0)
+                        hash2 = (RotateLeft(hash2, 5) + hash2) ^ *ptrChar++;
+
+                    return hash1 + (hash2 * Factor);
+            }
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint Mix(uint h)
+    {
+        h ^= h >> 16;
+        h *= 0x85ebca6b;
+        h ^= h >> 13;
+        h *= 0xc2b2ae35;
+        h ^= h >> 16;
         return h;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ulong Hash(string data, uint seed = 0)
-    {
-        ReadOnlySpan<byte> bytes = MemoryMarshal.AsBytes(data.AsSpan());
-        State state = new State(seed);
-
-        while (bytes.Length >= StripeSize)
-        {
-            state.ProcessStripe(bytes);
-            bytes = bytes.Slice(StripeSize);
-        }
-
-        return state.Complete((uint)bytes.Length, bytes);
-    }
-
-    [StructLayout(LayoutKind.Auto)]
-    private struct State
-    {
-        private const ulong Prime64_1 = 0x9E3779B185EBCA87UL;
-        private const ulong Prime64_2 = 0xC2B2AE3D27D4EB4FUL;
-        private const ulong Prime64_3 = 0x165667B19E3779F9UL;
-        private const ulong Prime64_4 = 0x85EBCA77C2B2AE63UL;
-        private const ulong Prime64_5 = 0x27D4EB2F165667C5UL;
-
-        private ulong _acc1;
-        private ulong _acc2;
-        private ulong _acc3;
-        private ulong _acc4;
-        private readonly ulong _smallAcc;
-        private bool _hadFullStripe;
-
-        internal State(ulong seed)
-        {
-            _acc1 = seed + unchecked(Prime64_1 + Prime64_2);
-            _acc2 = seed + Prime64_2;
-            _acc3 = seed;
-            _acc4 = seed - Prime64_1;
-
-            _smallAcc = seed + Prime64_5;
-            _hadFullStripe = false;
-        }
-
-        internal void ProcessStripe(ReadOnlySpan<byte> source)
-        {
-            Debug.Assert(source.Length >= StripeSize);
-            source = source.Slice(0, StripeSize);
-
-            _acc1 = ApplyRound(_acc1, source);
-            _acc2 = ApplyRound(_acc2, source.Slice(sizeof(ulong)));
-            _acc3 = ApplyRound(_acc3, source.Slice(2 * sizeof(ulong)));
-            _acc4 = ApplyRound(_acc4, source.Slice(3 * sizeof(ulong)));
-
-            _hadFullStripe = true;
-        }
-
-        private static ulong MergeAccumulator(ulong acc, ulong accN)
-        {
-            acc ^= ApplyRound(0, accN);
-            acc *= Prime64_1;
-            acc += Prime64_4;
-
-            return acc;
-        }
-
-        private readonly ulong Converge()
-        {
-            ulong acc = RotateLeft(_acc1, 1) +
-                        RotateLeft(_acc2, 7) +
-                        RotateLeft(_acc3, 12) +
-                        RotateLeft(_acc4, 18);
-
-            acc = MergeAccumulator(acc, _acc1);
-            acc = MergeAccumulator(acc, _acc2);
-            acc = MergeAccumulator(acc, _acc3);
-            acc = MergeAccumulator(acc, _acc4);
-
-            return acc;
-        }
-
-        private static ulong ApplyRound(ulong acc, ReadOnlySpan<byte> lane)
-        {
-            return ApplyRound(acc, BinaryPrimitives.ReadUInt64LittleEndian(lane));
-        }
-
-        private static ulong ApplyRound(ulong acc, ulong lane)
-        {
-            acc += lane * Prime64_2;
-            acc = RotateLeft(acc, 31);
-            acc *= Prime64_1;
-
-            return acc;
-        }
-
-        internal readonly ulong Complete(long length, ReadOnlySpan<byte> remaining)
-        {
-            ulong acc = _hadFullStripe ? Converge() : _smallAcc;
-
-            acc += (ulong)length;
-
-            while (remaining.Length >= sizeof(ulong))
-            {
-                ulong lane = BinaryPrimitives.ReadUInt64LittleEndian(remaining);
-                acc ^= ApplyRound(0, lane);
-                acc = RotateLeft(acc, 27);
-                acc *= Prime64_1;
-                acc += Prime64_4;
-
-                remaining = remaining.Slice(sizeof(ulong));
-            }
-
-            // Doesn't need to be a while since it can occur at most once.
-            if (remaining.Length >= sizeof(uint))
-            {
-                ulong lane = BinaryPrimitives.ReadUInt32LittleEndian(remaining);
-                acc ^= lane * Prime64_1;
-                acc = RotateLeft(acc, 23);
-                acc *= Prime64_2;
-                acc += Prime64_3;
-
-                remaining = remaining.Slice(sizeof(uint));
-            }
-
-            for (int i = 0; i < remaining.Length; i++)
-            {
-                ulong lane = remaining[i];
-                acc ^= lane * Prime64_5;
-                acc = RotateLeft(acc, 11);
-                acc *= Prime64_1;
-            }
-
-            return Avalanche(acc);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ulong Avalanche(ulong hash)
-        {
-            hash ^= hash >> 33;
-            hash *= Prime64_2;
-            hash ^= hash >> 29;
-            hash *= Prime64_3;
-            hash ^= hash >> 32;
-            return hash;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ulong RotateLeft(ulong value, int offset) => (value << offset) | (value >> (64 - offset));
     }
 }

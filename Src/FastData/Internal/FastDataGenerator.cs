@@ -257,7 +257,7 @@ internal class FastDataGenerator : IIncrementalGenerator
 
             ITypeSymbol genericArg = ad.AttributeClass.TypeArguments[0];
 
-            if (!IsSupported(genericArg))
+            if (!Enums.Enums.KnownDataType.TryParse(genericArg.Name, out KnownDataType dataType))
                 throw new InvalidOperationException($"FastData does not support '{genericArg.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}' as generic argument for '{name}'");
 
             //We uniq the values and throw on duplicates
@@ -281,36 +281,11 @@ internal class FastDataGenerator : IIncrementalGenerator
             spec.Name = name;
             spec.Data = ctorArg1.Values.Select(x => x.Value).ToArray()!;
             spec.IsArray = ctorArg1.Values[0].Type!.TypeKind == TypeKind.Array;
-
+            spec.KnownDataType = dataType;
             spec.DataTypeName = genericArg.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-
-            //If we know the type, set it. Otherwise, it defaults to unknown.
-            if (Enums.Enums.KnownDataType.TryParse(genericArg.Name, out KnownDataType dataType))
-                spec.KnownDataType = dataType;
 
             yield return spec;
         }
-    }
-
-    private static bool IsSupported(ITypeSymbol typeSymbol)
-    {
-        return typeSymbol.SpecialType switch
-        {
-            SpecialType.System_Boolean => true,
-            SpecialType.System_SByte => true,
-            SpecialType.System_Byte => true,
-            SpecialType.System_Int16 => true,
-            SpecialType.System_UInt16 => true,
-            SpecialType.System_Int32 => true,
-            SpecialType.System_UInt32 => true,
-            SpecialType.System_Int64 => true,
-            SpecialType.System_UInt64 => true,
-            SpecialType.System_Single => true,
-            SpecialType.System_Double => true,
-            SpecialType.System_Char => true,
-            SpecialType.System_String => true,
-            _ => false
-        };
     }
 
     private static bool AreEqualSymbols(ISymbol a, ISymbol b)

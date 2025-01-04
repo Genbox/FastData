@@ -1,28 +1,28 @@
     
     public static bool Contains(string value)
     {
-        switch (unchecked((uint)HashHelper.Hash(value, 0)))
+        switch (HashHelper.HashString(value))
         {
 
-            case 1547457659:
+            case 2011983611:
                  return value.Equals("item1");
-            case 3756450423:
+            case 3578067552:
                  return value.Equals("item2");
-            case 731309710:
+            case 849184197:
                  return value.Equals("item3");
-            case 111896862:
+            case 2415268138:
                  return value.Equals("item4");
-            case 120110704:
+            case 3981352079:
                  return value.Equals("item5");
-            case 236029066:
+            case 1252468724:
                  return value.Equals("item6");
-            case 3119466618:
+            case 2818552665:
                  return value.Equals("item7");
-            case 1860819585:
+            case 802130030:
                  return value.Equals("item8");
-            case 968102074:
+            case 2368213971:
                  return value.Equals("item9");
-            case 1975224761:
+            case 1309368076:
                  return value.Equals("item10");
         }
         return false;

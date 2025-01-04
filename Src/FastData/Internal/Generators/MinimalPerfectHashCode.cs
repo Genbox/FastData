@@ -20,7 +20,7 @@ internal static class MinimalPerfectHashCode
         long timestamp = Stopwatch.GetTimestamp();
 
         //Find the proper seeds
-        uint seed = MinimalPerfectHash.Generate(spec.Data, HashHelper.Hash, 1, ulong.MaxValue, length, () =>
+        uint seed = MinimalPerfectHash.Generate(spec.Data, static (x, y) => HashHelper.HashObjectSeed(x, y, true), 1, uint.MaxValue, length, () =>
         {
             TimeSpan span = new TimeSpan(Stopwatch.GetTimestamp() - timestamp);
             return span.TotalSeconds > 60;
@@ -32,7 +32,7 @@ internal static class MinimalPerfectHashCode
         {
             object value = spec.Data[i];
 
-            uint hash = (uint)HashHelper.Hash(value, seed);
+            uint hash = HashHelper.HashObjectSeed(value, seed, true);
             uint index = hash % length;
             data[index] = (value, hash);
         }
@@ -47,7 +47,7 @@ internal static class MinimalPerfectHashCode
                         {
                     {{GetEarlyExits("value", earlyExitSpecs)}}
 
-                            uint hash = {{GetHashFunction("value", seed)}};
+                            uint hash = {{GetSeededHashFunction32(spec.KnownDataType, "value", seed, true)}};
                             uint index = {{GetModFunction("hash", length)}};
                             ref Entry entry = ref _entries[index];
 

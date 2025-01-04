@@ -22,7 +22,8 @@ internal static class ImmutableSet
     
     public static bool Contains(string value)
     {
-
+       if (value.Length != 1)
+           return false;
 
         int lo = 0;
         int hi = 4;

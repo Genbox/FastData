@@ -11,12 +11,12 @@ using System;
 
 internal static class ImmutableSet 
 {
-    private static readonly int[] _buckets = { 0, 0, 3 };
+    private static readonly int[] _buckets = { 3, 2, 1 };
 
     private static readonly Entry[] _entries = { 
-        new Entry(3994739714, -1, 'a'),
-        new Entry(1530942113, 0, 'b'),
-        new Entry(1351125911, 1, 'c')
+        new Entry(6357089, -1, 'a'),
+        new Entry(6422626, -1, 'b'),
+        new Entry(6488163, -1, 'c')
     };
 
     
@@ -24,7 +24,7 @@ internal static class ImmutableSet
     {
 
 
-        uint hashCode = unchecked((uint)HashHelper.Hash(value, 0));
+        uint hashCode = unchecked((uint)value);
         uint index = MathHelper.FastMod(hashCode, 3, 6148914691236517206);
         int i = _buckets[index] - 1;
 
