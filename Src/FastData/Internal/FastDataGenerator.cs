@@ -266,7 +266,10 @@ internal class FastDataGenerator : IIncrementalGenerator
             foreach (TypedConstant value in ctorArg1.Values)
             {
                 if (value.Value == null)
-                    continue;
+                    throw new InvalidOperationException("Null value in dataset");
+
+                if (value.Value is string str && str.Length == 0)
+                    throw new InvalidOperationException("Empty string values are not supported");
 
                 if (!uniqueValues.Add(value.Value))
                     throw new InvalidOperationException($"Duplicate value: {value.Value}");
