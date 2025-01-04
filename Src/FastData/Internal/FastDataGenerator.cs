@@ -282,7 +282,7 @@ internal class FastDataGenerator : IIncrementalGenerator
             spec.DataTypeName = genericArg.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
 
             //If we know the type, set it. Otherwise, it defaults to unknown.
-            if (!Enums.Enums.KnownDataType.TryParse(genericArg.Name, out KnownDataType dataType))
+            if (Enums.Enums.KnownDataType.TryParse(genericArg.Name, out KnownDataType dataType))
                 spec.KnownDataType = dataType;
 
             yield return spec;
