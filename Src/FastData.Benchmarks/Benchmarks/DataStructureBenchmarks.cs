@@ -25,6 +25,7 @@ public class DataStructureBenchmarks
     private string[] _array = null!;
 
     private HashSet<string> _hashSet = null!;
+    private FrozenSet<string> _frozenSet = null!;
     private Dictionary<string, int> _dictionary = null!;
     private FrozenDictionary<string, int> _frozenDictionary = null!;
     private ConcurrentDictionary<string, int> _concurrentDictionary = null!;
@@ -64,6 +65,13 @@ public class DataStructureBenchmarks
     {
         SetupQueries();
         _hashSet = CreateHashSet();
+    }
+
+    [GlobalSetup(Target = nameof(QueryFrozenSet))]
+    public void SetupFrozenSet()
+    {
+        SetupQueries();
+        _frozenSet = CreateFrozenSet();
     }
 
     [GlobalSetup(Target = nameof(QueryDictionary))]
@@ -142,6 +150,9 @@ public class DataStructureBenchmarks
     public void QueryHashSet() => DoQuery(_hashSet.Contains);
 
     [Benchmark, BenchmarkCategory("Query")]
+    public void QueryFrozenSet() => DoQuery(_frozenSet.Contains);
+
+    [Benchmark, BenchmarkCategory("Query")]
     public void QueryDictionary() => DoQuery(_dictionary.ContainsKey);
 
     [Benchmark, BenchmarkCategory("Query")]
@@ -182,6 +193,7 @@ public class DataStructureBenchmarks
     }
 
     private HashSet<string> CreateHashSet() => new HashSet<string>(CreateArray());
+    private FrozenSet<string> CreateFrozenSet() => new HashSet<string>(CreateArray()).ToFrozenSet();
     private Dictionary<string, int> CreateDictionary() => new Dictionary<string, int>(CreateArray().Select(x => new KeyValuePair<string, int>(x, 42)));
     private FrozenDictionary<string, int> CreateFrozenDictionary() => CreateDictionary().ToFrozenDictionary();
     private ConcurrentDictionary<string, int> CreateConcurrentDictionary() => new ConcurrentDictionary<string, int>(CreateArray().Select(x => new KeyValuePair<string, int>(x, 42)));
