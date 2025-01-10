@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Frozen;
+﻿using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using BenchmarkDotNet.Configs;
@@ -28,9 +27,6 @@ public class DataStructureBenchmarks
 
     private HashSet<string> _hashSet = null!;
     private FrozenSet<string> _frozenSet = null!;
-    private Dictionary<string, int> _dictionary = null!;
-    private FrozenDictionary<string, int> _frozenDictionary = null!;
-    private ConcurrentDictionary<string, int> _concurrentDictionary = null!;
     private BloomFilter<string> _bloom = null!;
     private BlockedBloomFilter<string> _blockedBloom = null!;
     private BinaryFuse8Filter<string> _binaryFuse8 = null!;
@@ -73,27 +69,6 @@ public class DataStructureBenchmarks
         _frozenSet = CreateFrozenSet();
     }
 
-    [GlobalSetup(Target = nameof(QueryDictionary))]
-    public void SetupDictionary()
-    {
-        SetupQueries();
-        _dictionary = CreateDictionary();
-    }
-
-    [GlobalSetup(Target = nameof(QueryFrozenDictionary))]
-    public void SetupFrozenDictionary()
-    {
-        SetupQueries();
-        _frozenDictionary = CreateFrozenDictionary();
-    }
-
-    [GlobalSetup(Target = nameof(QueryConcurrentDictionary))]
-    public void SetupConcurrentDictionary()
-    {
-        SetupQueries();
-        _concurrentDictionary = CreateConcurrentDictionary();
-    }
-
     [GlobalSetup(Target = nameof(QueryBloom))]
     public void SetupBloomFilter()
     {
@@ -125,15 +100,6 @@ public class DataStructureBenchmarks
     public void ConstructHashSet() => CreateHashSet();
 
     [Benchmark, BenchmarkCategory("Construction")]
-    public void ConstructDictionary() => CreateDictionary();
-
-    [Benchmark, BenchmarkCategory("Construction")]
-    public void ConstructFrozenDictionary() => CreateFrozenDictionary();
-
-    [Benchmark, BenchmarkCategory("Construction")]
-    public void ConstructConcurrentDictionary() => CreateConcurrentDictionary();
-
-    [Benchmark, BenchmarkCategory("Construction")]
     public void ConstructBloom() => CreateBloomFilter();
 
     [Benchmark, BenchmarkCategory("Construction")]
@@ -150,15 +116,6 @@ public class DataStructureBenchmarks
 
     [Benchmark, BenchmarkCategory("Query")]
     public void QueryFrozenSet() => DoQuery(_frozenSet.Contains);
-
-    [Benchmark, BenchmarkCategory("Query")]
-    public void QueryDictionary() => DoQuery(_dictionary.ContainsKey);
-
-    [Benchmark, BenchmarkCategory("Query")]
-    public void QueryFrozenDictionary() => DoQuery(_frozenDictionary.ContainsKey);
-
-    [Benchmark, BenchmarkCategory("Query")]
-    public void QueryConcurrentDictionary() => DoQuery(_concurrentDictionary.ContainsKey);
 
     [Benchmark, BenchmarkCategory("Query")]
     public void QueryBloom() => DoQuery(_bloom.Contains);
@@ -193,9 +150,6 @@ public class DataStructureBenchmarks
 
     private HashSet<string> CreateHashSet() => new HashSet<string>(CreateArray(), StringComparer.Ordinal);
     private FrozenSet<string> CreateFrozenSet() => CreateHashSet().ToFrozenSet();
-    private Dictionary<string, int> CreateDictionary() => new Dictionary<string, int>(CreateArray().Select(x => new KeyValuePair<string, int>(x, 42)), StringComparer.Ordinal);
-    private FrozenDictionary<string, int> CreateFrozenDictionary() => CreateDictionary().ToFrozenDictionary();
-    private ConcurrentDictionary<string, int> CreateConcurrentDictionary() => new ConcurrentDictionary<string, int>(CreateArray().Select(x => new KeyValuePair<string, int>(x, 42)), StringComparer.Ordinal);
     private BloomFilter<string> CreateBloomFilter() => new BloomFilter<string>(CreateArray());
     private BlockedBloomFilter<string> CreateBlockedBloomFilter() => new BlockedBloomFilter<string>(CreateArray());
     private BinaryFuse8Filter<string> CreateBinaryFuse8Filter() => new BinaryFuse8Filter<string>(CreateArray());
