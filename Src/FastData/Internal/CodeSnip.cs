@@ -30,12 +30,20 @@ internal static class CodeSnip
                 sb.Append(GetValueEarlyExits(variable, minUValue, maxUValue, false));
             else if (spec is MinMaxFloatValueEarlyExit(var minFloatValue, var maxFloatValue))
                 sb.Append(GetValueEarlyExits(variable, minFloatValue, maxFloatValue, false));
+            else if (spec is LengthBitSetEarlyExit(var bitSet))
+                sb.Append(GetMaskEarlyExit(variable, bitSet));
             else
                 throw new InvalidOperationException("Unknown early exit type: " + spec.GetType().Name);
         }
 
         return sb.ToString();
     }
+
+    private static string GetMaskEarlyExit(string variable, ulong bitSet)
+        => $"""
+                   if (({bitSet}UL & 1UL << ({variable}.Length -1) & 63) == 0)
+                       return false;
+            """;
 
     private static string GetValueEarlyExits<T>(string variable, T min, T max, bool length) where T : IFormattable
         => min.Equals(max)

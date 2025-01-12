@@ -1,0 +1,6 @@
+// This is a test of a length bitset early exit. It is very important the lengths are non-consecutive,
+// else the optimizer will replace it with a range check
+
+using Genbox.FastData;
+using Genbox.FastData.Enums;
+[assembly: FastData<string>("ImmutableSet", ["a", "aaa", "aaaaa", "aaaaaaa"])]

@@ -6,25 +6,26 @@ namespace Genbox.FastData.Internal.Analysis;
 [StructLayout(LayoutKind.Auto)]
 internal struct IntegerBitSet
 {
-    private ulong _bitset;
+    internal ulong BitSet;
 
-    public uint Count => BitOperations.PopCount(_bitset);
-    public uint MinValue => BitOperations.TrailingZeroCount(_bitset) + 1;
-    public uint MaxValue => 64 - BitOperations.LeadingZeroCount(_bitset);
+    internal readonly uint Count => BitOperations.PopCount(BitSet);
+    internal readonly uint MinValue => BitOperations.TrailingZeroCount(BitSet) + 1;
+    internal readonly uint MaxValue => 64 - BitOperations.LeadingZeroCount(BitSet);
+    internal readonly bool Consecutive => BitOperations.AreBitsConsecutive(BitSet);
 
-    public bool Contains(int val)
+    internal readonly bool Contains(int val)
     {
         if (val >= 64)
             return false;
 
-        return (_bitset & (1UL << (val - 1) % 64)) > 0;
+        return (BitSet & (1UL << (val - 1) % 64)) > 0;
     }
 
-    public void Set(int val)
+    internal void Set(int val)
     {
         if (val >= 64)
             return;
 
-        _bitset |= 1UL << ((val - 1) % 64);
+        BitSet |= 1UL << ((val - 1) % 64);
     }
 }
