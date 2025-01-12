@@ -91,42 +91,42 @@ internal class FastDataGenerator : IIncrementalGenerator
         switch (spec.KnownDataType)
         {
             case KnownDataType.SByte:
-                dataProps.IntProps = Analyzer.GetIntegerProperties(spec.Data.Cast<sbyte>());
-                break;
-            case KnownDataType.Int16:
-                dataProps.IntProps = Analyzer.GetIntegerProperties(spec.Data.Cast<short>());
-                break;
-            case KnownDataType.Int32:
-                dataProps.IntProps = Analyzer.GetIntegerProperties(spec.Data.Cast<int>());
-                break;
-            case KnownDataType.Int64:
-                dataProps.IntProps = Analyzer.GetIntegerProperties(spec.Data.Cast<long>());
+                dataProps.IntProps = Analyzer.GetSByteProperties(spec.Data);
                 break;
             case KnownDataType.Byte:
-                dataProps.UIntProps = Analyzer.GetUnsignedIntegerProperties(spec.Data.Cast<byte>());
+                dataProps.UIntProps = Analyzer.GetByteProperties(spec.Data);
+                break;
+            case KnownDataType.Int16:
+                dataProps.IntProps = Analyzer.GetInt16Properties(spec.Data);
                 break;
             case KnownDataType.UInt16:
-                dataProps.UIntProps = Analyzer.GetUnsignedIntegerProperties(spec.Data.Cast<ushort>());
+                dataProps.UIntProps = Analyzer.GetUInt16Properties(spec.Data);
+                break;
+            case KnownDataType.Int32:
+                dataProps.IntProps = Analyzer.GetInt32Properties(spec.Data);
                 break;
             case KnownDataType.UInt32:
-                dataProps.UIntProps = Analyzer.GetUnsignedIntegerProperties(spec.Data.Cast<uint>());
+                dataProps.UIntProps = Analyzer.GetUInt32Properties(spec.Data);
+                break;
+            case KnownDataType.Int64:
+                dataProps.IntProps = Analyzer.GetInt64Properties(spec.Data);
                 break;
             case KnownDataType.UInt64:
-                dataProps.UIntProps = Analyzer.GetUnsignedIntegerProperties(spec.Data.Cast<ulong>());
+                dataProps.UIntProps = Analyzer.GetUInt64Properties(spec.Data);
                 break;
             case KnownDataType.String:
-                dataProps.StringProps = Analyzer.GetStringProperties(spec.Data.Cast<string>());
+                dataProps.StringProps = Analyzer.GetStringProperties(spec.Data);
                 break;
             case KnownDataType.Boolean:
                 break;
             case KnownDataType.Char:
-                dataProps.CharProps = Analyzer.GetCharProperties(spec.Data.Cast<char>());
+                dataProps.CharProps = Analyzer.GetCharProperties(spec.Data);
                 break;
             case KnownDataType.Single:
-                dataProps.FloatProps = Analyzer.GetFloatProperties(spec.Data.Cast<float>());
+                dataProps.FloatProps = Analyzer.GetSingleProperties(spec.Data);
                 break;
             case KnownDataType.Double:
-                dataProps.FloatProps = Analyzer.GetFloatProperties(spec.Data.Cast<double>());
+                dataProps.FloatProps = Analyzer.GetDoubleProperties(spec.Data);
                 break;
             case KnownDataType.Unknown:
                 //Do nothing

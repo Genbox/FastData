@@ -5,6 +5,7 @@ namespace Genbox.FastData.Internal.Enums;
 [FastEnum]
 public enum KnownDataType
 {
+    //The names in here must match the primitive names in C#
     Unknown = 0,
     String,
     Boolean,

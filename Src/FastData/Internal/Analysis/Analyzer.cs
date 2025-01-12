@@ -1,40 +1,62 @@
-using System.Diagnostics;
-
 namespace Genbox.FastData.Internal.Analysis;
 
 internal static class Analyzer
 {
-    private const byte _analysisMaxLength = 255;
-
-    internal static FloatProperties GetFloatProperties(IEnumerable<float> data)
+    internal static StringProperties GetStringProperties(object[] data)
     {
-        float min = float.MaxValue;
-        float max = float.MinValue;
+        IntegerBitSet lengthMap = new IntegerBitSet();
+        CharacterMap characterMap = new CharacterMap();
 
-        foreach (float c in data)
+        string maxStr = (string)data[0];
+
+        foreach (string val in data)
         {
-            min = c < min ? c : min;
-            max = c > max ? c : max;
+            if (val.Length > maxStr.Length)
+                maxStr = val;
+
+            lengthMap.Set(val.Length);
         }
 
-        return new FloatProperties(min, max);
-    }
+        int[] left = new int[maxStr.Length];
+        int[] right = new int[maxStr.Length];
+        bool flag = true;
 
-    internal static FloatProperties GetFloatProperties(IEnumerable<double> data)
-    {
-        double min = double.MaxValue;
-        double max = double.MinValue;
-
-        foreach (double c in data)
+        foreach (string val in data)
         {
-            min = c < min ? c : min;
-            max = c > max ? c : max;
+            for (int i = 0; i < val.Length; i++)
+            {
+                char c = val[i];
+                char rc = val[val.Length - 1 - i];
+
+                left[i] += flag ? c : -c;
+                right[i] += flag ? rc : -rc;
+
+                characterMap.Add(c);
+            }
+
+            flag = !flag;
         }
 
-        return new FloatProperties(min, max);
+        //Odd number of items. We need it to be even
+        //For best mixing, we take the longest string
+        if (data.Length % 2 != 0)
+        {
+            for (int i = 0; i < maxStr.Length; i++)
+            {
+                char c = maxStr[i];
+                char rc = maxStr[maxStr.Length - 1 - i];
+
+                left[i] += flag ? c : -c;
+                right[i] += flag ? rc : -rc;
+
+                //We do not add to characterMap here since it does not need the duplicate
+            }
+        }
+
+        return new StringProperties(lengthMap, new EntropyData(left, right), characterMap);
     }
 
-    internal static CharProperties GetCharProperties(IEnumerable<char> data)
+    internal static CharProperties GetCharProperties(object[] data)
     {
         char min = char.MaxValue;
         char max = char.MinValue;
@@ -48,91 +70,47 @@ internal static class Analyzer
         return new CharProperties(min, max);
     }
 
-    internal static StringProperties GetStringProperties(IEnumerable<string> data)
+    internal static FloatProperties GetSingleProperties(object[] data)
     {
-        uint minStrLen = uint.MaxValue;
-        uint maxStrLen = 0;
+        float min = float.MaxValue;
+        float max = float.MinValue;
 
-        ushort minChar = ushort.MaxValue;
-        ushort maxChar = 0;
-
-        bool[] lengthIndex = new bool[_analysisMaxLength];
-
-        using IEnumerator<string> enumerator = data.GetEnumerator();
-        enumerator.MoveNext();
-
-        string reference = enumerator.Current!;
-        byte longestLeft = (byte)reference.Length;
-        byte longestRight = (byte)reference.Length;
-
-        uint len = (uint)reference.Length;
-
-        SetMinMax(len, ref minStrLen, ref maxStrLen);
-        SetLengthIndex(len, lengthIndex);
-
-        (ushort minCharVal, ushort maxCharVal) = GetCharMinMax(reference);
-        minChar = Math.Min(minCharVal, minChar);
-        maxChar = Math.Max(maxCharVal, maxChar);
-
-        while (enumerator.MoveNext())
+        foreach (float c in data)
         {
-            string val = enumerator.Current!;
-
-            len = (uint)val.Length;
-
-            if (len == 0)
-                continue;
-
-            SetMinMax(len, ref minStrLen, ref maxStrLen);
-            SetLengthIndex(len, lengthIndex);
-
-            (minCharVal, maxCharVal) = GetCharMinMax(val);
-            minChar = Math.Min(minCharVal, minChar);
-            maxChar = Math.Max(maxCharVal, maxChar);
-
-            byte currentLength = 0;
-            int minLength = Math.Min(longestLeft, val.Length);
-            for (int j = 0; j < minLength; j++)
-            {
-                if (reference[j] == val[j])
-                    currentLength++;
-                else
-                    break;
-            }
-            longestLeft = currentLength;
-
-            currentLength = 0;
-            minLength = Math.Min(longestRight, val.Length);
-            for (int j = 0; j < minLength; j++)
-            {
-                if (reference[reference.Length - 1 - j] == val[val.Length - 1 - j])
-                    currentLength++;
-                else
-                    break;
-            }
-            longestRight = currentLength;
+            min = c < min ? c : min;
+            max = c > max ? c : max;
         }
 
-        return new StringProperties(minStrLen, maxStrLen, minChar, maxChar, longestLeft, longestRight, (uint)lengthIndex.Count(x => x));
+        return new FloatProperties(min, max);
     }
 
-    internal static UnsignedIntegerProperties GetUnsignedIntegerProperties(IEnumerable<byte> data)
+    internal static FloatProperties GetDoubleProperties(object[] data)
+    {
+        double min = double.MaxValue;
+        double max = double.MinValue;
+
+        foreach (double c in data)
+        {
+            min = c < min ? c : min;
+            max = c > max ? c : max;
+        }
+
+        return new FloatProperties(min, max);
+    }
+
+    internal static UnsignedIntegerProperties GetByteProperties(object[] data)
     {
         byte min = byte.MaxValue;
         byte max = byte.MinValue;
 
-        using var enumerator = data.GetEnumerator();
-        enumerator.MoveNext();
-        byte lastValue = enumerator.Current;
+        byte lastValue = (byte)data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
         bool consecutive = true;
-        while (enumerator.MoveNext())
+        foreach (byte val in data)
         {
-            byte val = enumerator.Current;
-
             if (consecutive && lastValue + 1 != val)
                 consecutive = false;
 
@@ -144,23 +122,19 @@ internal static class Analyzer
         return new UnsignedIntegerProperties(min, max, consecutive);
     }
 
-    internal static IntegerProperties GetIntegerProperties(IEnumerable<sbyte> data)
+    internal static IntegerProperties GetSByteProperties(object[] data)
     {
         sbyte min = sbyte.MaxValue;
         sbyte max = sbyte.MinValue;
 
-        using var enumerator = data.GetEnumerator();
-        enumerator.MoveNext();
-        sbyte lastValue = enumerator.Current;
+        sbyte lastValue = (sbyte)data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
         bool consecutive = true;
-        while (enumerator.MoveNext())
+        foreach (sbyte val in data)
         {
-            sbyte val = enumerator.Current;
-
             if (consecutive && lastValue + 1 != val)
                 consecutive = false;
 
@@ -172,23 +146,19 @@ internal static class Analyzer
         return new IntegerProperties(min, max, consecutive);
     }
 
-    internal static IntegerProperties GetIntegerProperties(IEnumerable<short> data)
+    internal static IntegerProperties GetInt16Properties(object[] data)
     {
         short min = short.MaxValue;
         short max = short.MinValue;
 
-        using var enumerator = data.GetEnumerator();
-        enumerator.MoveNext();
-        short lastValue = enumerator.Current;
+        short lastValue = (short)data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
         bool consecutive = true;
-        while (enumerator.MoveNext())
+        foreach (short val in data)
         {
-            short val = enumerator.Current;
-
             if (consecutive && lastValue + 1 != val)
                 consecutive = false;
 
@@ -200,23 +170,19 @@ internal static class Analyzer
         return new IntegerProperties(min, max, consecutive);
     }
 
-    internal static UnsignedIntegerProperties GetUnsignedIntegerProperties(IEnumerable<ushort> data)
+    internal static UnsignedIntegerProperties GetUInt16Properties(object[] data)
     {
         ushort min = ushort.MaxValue;
         ushort max = ushort.MinValue;
 
-        using var enumerator = data.GetEnumerator();
-        enumerator.MoveNext();
-        ushort lastValue = enumerator.Current;
+        ushort lastValue = (ushort)data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
         bool consecutive = true;
-        while (enumerator.MoveNext())
+        foreach (ushort val in data)
         {
-            ushort val = enumerator.Current;
-
             if (consecutive && lastValue + 1 != val)
                 consecutive = false;
 
@@ -228,23 +194,19 @@ internal static class Analyzer
         return new UnsignedIntegerProperties(min, max, consecutive);
     }
 
-    internal static IntegerProperties GetIntegerProperties(IEnumerable<int> data)
+    internal static IntegerProperties GetInt32Properties(object[] data)
     {
         int min = int.MaxValue;
         int max = int.MinValue;
 
-        using var enumerator = data.GetEnumerator();
-        enumerator.MoveNext();
-        int lastValue = enumerator.Current;
+        int lastValue = (int)data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
         bool consecutive = true;
-        while (enumerator.MoveNext())
+        foreach (int val in data)
         {
-            int val = enumerator.Current;
-
             if (consecutive && lastValue + 1 != val)
                 consecutive = false;
 
@@ -256,23 +218,19 @@ internal static class Analyzer
         return new IntegerProperties(min, max, consecutive);
     }
 
-    internal static UnsignedIntegerProperties GetUnsignedIntegerProperties(IEnumerable<uint> data)
+    internal static UnsignedIntegerProperties GetUInt32Properties(object[] data)
     {
         uint min = uint.MaxValue;
         uint max = uint.MinValue;
 
-        using var enumerator = data.GetEnumerator();
-        enumerator.MoveNext();
-        uint lastValue = enumerator.Current;
+        uint lastValue = (uint)data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
         bool consecutive = true;
-        while (enumerator.MoveNext())
+        foreach (uint val in data)
         {
-            uint val = enumerator.Current;
-
             if (consecutive && lastValue + 1 != val)
                 consecutive = false;
 
@@ -284,23 +242,19 @@ internal static class Analyzer
         return new UnsignedIntegerProperties(min, max, consecutive);
     }
 
-    internal static IntegerProperties GetIntegerProperties(IEnumerable<long> data)
+    internal static IntegerProperties GetInt64Properties(object[] data)
     {
         long min = long.MaxValue;
         long max = long.MinValue;
 
-        using var enumerator = data.GetEnumerator();
-        enumerator.MoveNext();
-        long lastValue = enumerator.Current;
+        long lastValue = (long)data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
         bool consecutive = true;
-        while (enumerator.MoveNext())
+        foreach (long val in data)
         {
-            long val = enumerator.Current;
-
             if (consecutive && lastValue + 1 != val)
                 consecutive = false;
 
@@ -312,23 +266,19 @@ internal static class Analyzer
         return new IntegerProperties(min, max, consecutive);
     }
 
-    internal static UnsignedIntegerProperties GetUnsignedIntegerProperties(IEnumerable<ulong> data)
+    internal static UnsignedIntegerProperties GetUInt64Properties(object[] data)
     {
         ulong min = ulong.MaxValue;
         ulong max = ulong.MinValue;
 
-        using var enumerator = data.GetEnumerator();
-        enumerator.MoveNext();
-        ulong lastValue = enumerator.Current;
+        ulong lastValue = (ulong)data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
         bool consecutive = true;
-        while (enumerator.MoveNext())
+        foreach (ulong val in data)
         {
-            ulong val = enumerator.Current;
-
             if (consecutive && lastValue + 1 != val)
                 consecutive = false;
 
@@ -338,43 +288,5 @@ internal static class Analyzer
         }
 
         return new UnsignedIntegerProperties(min, max, consecutive);
-    }
-
-    /// <summary>
-    /// Updates the minimum and maximum length.
-    /// It is built using refs to support incremental updates.
-    /// </summary>
-    internal static void SetMinMax(uint strLen, ref uint minStrLen, ref uint maxStrLen)
-    {
-        minStrLen = Math.Min(minStrLen, strLen);
-        maxStrLen = Math.Max(maxStrLen, strLen);
-    }
-
-    /// <summary>
-    /// Updates an index with lengths and report back if the length collided with a previous length. Can be called incrementally.
-    /// </summary>
-    internal static void SetLengthIndex(uint strLen, bool[] lengthIndex)
-    {
-        Debug.Assert(strLen > 0);
-
-        if (strLen <= _analysisMaxLength)
-            lengthIndex[strLen - 1] = true;
-    }
-
-    /// <summary>
-    /// Gets the minimum and maximum char value of the string.
-    /// </summary>
-    internal static (ushort minCharVal, ushort maxCharVal) GetCharMinMax(string val)
-    {
-        ushort minVal = ushort.MaxValue;
-        ushort maxVal = 0;
-
-        foreach (ushort c in val)
-        {
-            minVal = Math.Min(c, minVal);
-            maxVal = Math.Max(c, maxVal);
-        }
-
-        return (minVal, maxVal);
     }
 }

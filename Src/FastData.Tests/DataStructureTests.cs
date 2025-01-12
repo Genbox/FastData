@@ -33,12 +33,12 @@ public class DataStructureTests
 
         if (kt == KnownDataType.String)
         {
-            StringProperties props = Analyzer.GetStringProperties(data.Cast<string>());
+            StringProperties props = Analyzer.GetStringProperties(data);
             early = Optimizer.GetEarlyExits(props);
         }
         else if (kt == KnownDataType.Int32)
         {
-            IntegerProperties props = Analyzer.GetIntegerProperties(data.Cast<int>());
+            IntegerProperties props = Analyzer.GetInt32Properties(data);
             early = Optimizer.GetEarlyExits(props);
         }
 

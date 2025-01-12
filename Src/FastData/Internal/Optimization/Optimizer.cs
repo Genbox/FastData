@@ -8,7 +8,9 @@ internal static class Optimizer
 {
     public static IEnumerable<IEarlyExit> GetEarlyExits(StringProperties prop)
     {
-        yield return new MinMaxLengthEarlyExit(prop.MinLen, prop.MaxLen);
+        IntegerBitSet lengthMap = prop.LengthMap;
+
+        yield return new MinMaxLengthEarlyExit(lengthMap.MinValue, lengthMap.MaxValue);
     }
 
     public static IEnumerable<IEarlyExit> GetEarlyExits(IntegerProperties prop)
