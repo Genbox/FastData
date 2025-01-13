@@ -1,5 +1,6 @@
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Optimization.EarlyExitSpecs;
 
 namespace Genbox.FastData.Internal.Optimization;
@@ -13,7 +14,7 @@ internal static class Optimizer
         // - If lengths are consecutive (5, 6, 7, etc.) we do a range check (2 inst)
         // - If the lengths are non-consecutive (4, 9, 12, etc.) we use a small bitset (4 inst)
 
-        IntegerBitSet lengthMap = prop.LengthMap;
+        IntegerBitSet lengthMap = prop.LengthData.LengthMap;
 
         if (lengthMap.Consecutive)
             yield return new MinMaxLengthEarlyExit(lengthMap.MinValue, lengthMap.MaxValue); //Also handles same lengths

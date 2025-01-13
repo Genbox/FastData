@@ -1,25 +1,37 @@
+using Genbox.FastData.Internal.Analysis.Properties;
+
 namespace Genbox.FastData.Internal.Analysis;
 
-internal static class Analyzer
+internal static class DataAnalyzer
 {
     internal static StringProperties GetStringProperties(object[] data)
     {
+        //Contains a set of unique lengths between 1 an 64
         IntegerBitSet lengthMap = new IntegerBitSet();
+
+        //Contains a map of each character and their count within the ASCII space
         CharacterMap characterMap = new CharacterMap();
 
+        //We need to know the longest string for optimal mixing. Probably not 100% necessary.
         string maxStr = (string)data[0];
+        int minLength = int.MaxValue;
 
         foreach (string val in data)
         {
             if (val.Length > maxStr.Length)
                 maxStr = val;
 
+            minLength = Math.Min(minLength, val.Length); //Track the smallest string. It might be more than what lengthmap supports
             lengthMap.Set(val.Length);
         }
 
+        //Build a forward and reverse map of merged entropy
+        //We can derive common substrings from it, as well as high-entropy substring hash functions
         int[] left = new int[maxStr.Length];
         int[] right = new int[maxStr.Length];
+        uint[] counts = new uint[maxStr.Length]; //This is a heatmap offsets where there are characters
         bool flag = true;
+        bool allAscii = true;
 
         foreach (string val in data)
         {
@@ -30,19 +42,23 @@ internal static class Analyzer
 
                 left[i] += flag ? c : -c;
                 right[i] += flag ? rc : -rc;
+                counts[i]++;
 
                 characterMap.Add(c);
+
+                if (c > 255)
+                    allAscii = false;
             }
 
             flag = !flag;
         }
 
         //Odd number of items. We need it to be even
-        //For best mixing, we take the longest string
         if (data.Length % 2 != 0)
         {
             for (int i = 0; i < maxStr.Length; i++)
             {
+                //For best mixing, we take the longest string
                 char c = maxStr[i];
                 char rc = maxStr[maxStr.Length - 1 - i];
 
@@ -53,7 +69,7 @@ internal static class Analyzer
             }
         }
 
-        return new StringProperties(lengthMap, new EntropyData(left, right), characterMap);
+        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, lengthMap), new EntropyData(left, right), new CharacterData(allAscii, counts, characterMap));
     }
 
     internal static CharProperties GetCharProperties(object[] data)

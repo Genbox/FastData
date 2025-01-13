@@ -3,6 +3,7 @@ using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Enums;
 using Genbox.FastData.Internal.Generators;
 using Genbox.FastData.Internal.Helpers;
@@ -91,42 +92,42 @@ internal class FastDataGenerator : IIncrementalGenerator
         switch (spec.KnownDataType)
         {
             case KnownDataType.SByte:
-                dataProps.IntProps = Analyzer.GetSByteProperties(spec.Data);
+                dataProps.IntProps = DataAnalyzer.GetSByteProperties(spec.Data);
                 break;
             case KnownDataType.Byte:
-                dataProps.UIntProps = Analyzer.GetByteProperties(spec.Data);
+                dataProps.UIntProps = DataAnalyzer.GetByteProperties(spec.Data);
                 break;
             case KnownDataType.Int16:
-                dataProps.IntProps = Analyzer.GetInt16Properties(spec.Data);
+                dataProps.IntProps = DataAnalyzer.GetInt16Properties(spec.Data);
                 break;
             case KnownDataType.UInt16:
-                dataProps.UIntProps = Analyzer.GetUInt16Properties(spec.Data);
+                dataProps.UIntProps = DataAnalyzer.GetUInt16Properties(spec.Data);
                 break;
             case KnownDataType.Int32:
-                dataProps.IntProps = Analyzer.GetInt32Properties(spec.Data);
+                dataProps.IntProps = DataAnalyzer.GetInt32Properties(spec.Data);
                 break;
             case KnownDataType.UInt32:
-                dataProps.UIntProps = Analyzer.GetUInt32Properties(spec.Data);
+                dataProps.UIntProps = DataAnalyzer.GetUInt32Properties(spec.Data);
                 break;
             case KnownDataType.Int64:
-                dataProps.IntProps = Analyzer.GetInt64Properties(spec.Data);
+                dataProps.IntProps = DataAnalyzer.GetInt64Properties(spec.Data);
                 break;
             case KnownDataType.UInt64:
-                dataProps.UIntProps = Analyzer.GetUInt64Properties(spec.Data);
+                dataProps.UIntProps = DataAnalyzer.GetUInt64Properties(spec.Data);
                 break;
             case KnownDataType.String:
-                dataProps.StringProps = Analyzer.GetStringProperties(spec.Data);
+                dataProps.StringProps = DataAnalyzer.GetStringProperties(spec.Data);
                 break;
             case KnownDataType.Boolean:
                 break;
             case KnownDataType.Char:
-                dataProps.CharProps = Analyzer.GetCharProperties(spec.Data);
+                dataProps.CharProps = DataAnalyzer.GetCharProperties(spec.Data);
                 break;
             case KnownDataType.Single:
-                dataProps.FloatProps = Analyzer.GetSingleProperties(spec.Data);
+                dataProps.FloatProps = DataAnalyzer.GetSingleProperties(spec.Data);
                 break;
             case KnownDataType.Double:
-                dataProps.FloatProps = Analyzer.GetDoubleProperties(spec.Data);
+                dataProps.FloatProps = DataAnalyzer.GetDoubleProperties(spec.Data);
                 break;
             case KnownDataType.Unknown:
                 //Do nothing

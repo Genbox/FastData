@@ -3,6 +3,7 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Enums;
 using Genbox.FastData.Internal.Optimization;
 using Genbox.FastData.InternalShared;
@@ -33,12 +34,12 @@ public class DataStructureTests
 
         if (kt == KnownDataType.String)
         {
-            StringProperties props = Analyzer.GetStringProperties(data);
+            StringProperties props = DataAnalyzer.GetStringProperties(data);
             early = Optimizer.GetEarlyExits(props);
         }
         else if (kt == KnownDataType.Int32)
         {
-            IntegerProperties props = Analyzer.GetInt32Properties(data);
+            IntegerProperties props = DataAnalyzer.GetInt32Properties(data);
             early = Optimizer.GetEarlyExits(props);
         }
 

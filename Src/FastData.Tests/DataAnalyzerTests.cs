@@ -1,21 +1,23 @@
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Tests;
 
-public class AnalyzerTests
+public class DataAnalyzerTests
 {
     [Fact]
     public void GetStringProperties_LengthMap_Test()
     {
         object[] data = ["a", "aa", "aaa", "azza"];
-        StringProperties res = Analyzer.GetStringProperties(data);
+        StringProperties res = DataAnalyzer.GetStringProperties(data);
+        IntegerBitSet map = res.LengthData.LengthMap;
 
-        Assert.Equal(4u, res.LengthMap.Count);
-        Assert.Equal(1u, res.LengthMap.MinValue);
-        Assert.Equal(4u, res.LengthMap.MaxValue);
+        Assert.Equal(4u, map.Count);
+        Assert.Equal(1u, map.MinValue);
+        Assert.Equal(4u, map.MaxValue);
 
         //Anything over 64 should fail (at least for now)
-        Assert.False(res.LengthMap.Contains(100));
+        Assert.False(map.Contains(100));
     }
 
     [Theory]
@@ -24,8 +26,8 @@ public class AnalyzerTests
     [InlineData(new[] { "a", "aa", "aaa", "aaaaa" }, true, 1)]
     public void GetStringProperties_EntropyData_Test(object[] data, bool left, int length)
     {
-        StringProperties res = Analyzer.GetStringProperties(data);
-        (bool Left, int Length) = res.EntropyData.GetJustify();
+        StringProperties res = DataAnalyzer.GetStringProperties(data);
+        (bool Left, _, int Length) = res.EntropyData.GetJustify();
         Assert.Equal(left, Left);
         Assert.Equal(length, Length);
     }
@@ -34,11 +36,13 @@ public class AnalyzerTests
     [InlineData(new[] { "item1", "item2", "item3", "item4" }, '1', 't')]
     public void GetStringProperties_CharacterMap_Test(object[] data, char minChar, char maxChar)
     {
-        StringProperties res = Analyzer.GetStringProperties(data);
-        Assert.True(res.CharacterMap.Contains(minChar));
-        Assert.True(res.CharacterMap.Contains(maxChar));
+        StringProperties res = DataAnalyzer.GetStringProperties(data);
+        CharacterMap map = res.CharacterData.CharacterMap;
 
-        Assert.Equal(minChar, res.CharacterMap.MinChar);
-        Assert.Equal(maxChar, res.CharacterMap.MaxChar);
+        Assert.True(map.Contains(minChar));
+        Assert.True(map.Contains(maxChar));
+
+        Assert.Equal(minChar, map.MinChar);
+        Assert.Equal(maxChar, map.MaxChar);
     }
 }

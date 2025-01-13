@@ -1,6 +1,7 @@
 using System.Text;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Enums;
 using static Genbox.FastData.Internal.CodeSnip;
 
@@ -8,7 +9,7 @@ namespace Genbox.FastData.Internal.Generators;
 
 internal sealed class UniqueKeyLengthSwitchCode(FastDataSpec Spec) : ICode
 {
-    public bool IsAppropriate(DataProperties dataProps) => Spec.KnownDataType == KnownDataType.String && dataProps.StringProps!.Value.LengthMap.Count == Spec.Data.Length;
+    public bool IsAppropriate(DataProperties dataProps) => Spec.KnownDataType == KnownDataType.String && dataProps.StringProps!.Value.LengthData.LengthMap.Count == Spec.Data.Length;
 
     public bool TryPrepare() => true;
 
