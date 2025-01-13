@@ -17,15 +17,16 @@ internal sealed class HashSetCode(FastDataSpec Spec) : ICode
 
     public bool TryPrepare()
     {
-        int[] buckets = new int[Spec.Data.Length];
-        Entry[] entries = new Entry[Spec.Data.Length];
+        int len = Spec.Data.Length;
 
-        for (int i = 0; i < Spec.Data.Length; i++)
+        int[] buckets = new int[len];
+        Entry[] entries = new Entry[len];
+
+        for (int i = 0; i < len; i++)
         {
             object value = Spec.Data[i];
-
             uint hashCode = HashHelper.HashObject(value);
-            ref int bucket = ref buckets[hashCode % Spec.Data.Length];
+            ref int bucket = ref buckets[hashCode % len];
 
             ref Entry entry = ref entries[i];
             entry.HashCode = hashCode;
