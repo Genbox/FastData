@@ -1,6 +1,5 @@
 using System.Text;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Enums;
 using static Genbox.FastData.Internal.CodeSnip;
