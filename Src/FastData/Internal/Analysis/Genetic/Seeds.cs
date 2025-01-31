@@ -6,7 +6,7 @@ internal static class Seeds
     // - Odd: Avoids getting the mixer stuck in a loop of 0.
     // - Large: Means we push a lot of the lower bits into higher bits. Gives better avalanche.
     // - Low bias: No correlation between input bits and output bits
-    internal static uint[] GoodSeeds =
+    internal static readonly uint[] GoodSeeds =
     [
         0x85EBCA6B, 0xC2B2AE35, //Murmur
         0x45D9F3B, // Degski

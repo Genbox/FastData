@@ -69,7 +69,7 @@ internal static class DataAnalyzer
             }
         }
 
-        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, lengthMap), new EntropyData(left, right), new CharacterData(allAscii, counts, characterMap));
+        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, lengthMap), new DeltaData(left, right), new CharacterData(allAscii, counts, characterMap));
     }
 
     internal static CharProperties GetCharProperties(object[] data)

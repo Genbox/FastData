@@ -21,15 +21,14 @@ public class DataAnalyzerTests
     }
 
     [Theory]
-    [InlineData(new[] { "item1", "item2", "item3", "item4" }, true, 4)]
-    [InlineData(new[] { "1item", "2item", "3item", "4item" }, false, 4)]
-    [InlineData(new[] { "a", "aa", "aaa", "aaaaa" }, true, 1)]
-    public void GetStringProperties_EntropyData_Test(object[] data, bool left, int length)
+    [InlineData(new[] { "item1", "item2", "item3", "item4" }, 4, 0)]
+    [InlineData(new[] { "1item", "2item", "3item", "4item" }, 0, 4)]
+    [InlineData(new[] { "a", "aa", "aaa", "aaaaa" }, 1, 1)]
+    public void GetStringProperties_EntropyData_Test(object[] data, int leftZero, int rightZero)
     {
         StringProperties res = DataAnalyzer.GetStringProperties(data);
-        (bool Left, _, int Length) = res.EntropyData.GetJustify();
-        Assert.Equal(left, Left);
-        Assert.Equal(length, Length);
+        Assert.Equal(res.DeltaData.LeftZeroCount, leftZero);
+        Assert.Equal(res.DeltaData.RightZeroCount, rightZero);
     }
 
     [Theory]

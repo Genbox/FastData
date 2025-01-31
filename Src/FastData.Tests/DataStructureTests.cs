@@ -23,7 +23,7 @@ public class DataStructureTests
     }
 
     [Theory, MemberData(nameof(GetDataStructures))]
-    public void GenerateDataStructure(string type, KnownDataType kt, DataStructure ds, object[] data)
+    internal void GenerateDataStructure(string type, KnownDataType kt, DataStructure ds, object[] data)
     {
         FastDataSpec spec = new FastDataSpec();
         spec.Data = (object[])data.Clone(); //We need to make a defensive clone to avoid the generator from manipulating with the data
@@ -65,7 +65,7 @@ public class DataStructureTests
         }
     }
 
-    public static TheoryData<string, KnownDataType, DataStructure, object[]> GetDataStructures()
+    internal static TheoryData<string, KnownDataType, DataStructure, object[]> GetDataStructures()
     {
         TheoryData<string, KnownDataType, DataStructure, object[]> data = new TheoryData<string, KnownDataType, DataStructure, object[]>();
 

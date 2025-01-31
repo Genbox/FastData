@@ -151,7 +151,7 @@ internal class GeneticAnalysis(GeneticSettings settings)
         b.Segments = a.Segments;
     }
 
-    internal void RunSimulation(string[] data, ref Candidate candidate)
+    private void RunSimulation(string[] data, ref Candidate candidate)
     {
         // Generate a hash function from the spec
         Func<string, uint> hashFunc = HashHelper.GetHashFunction(ref candidate.Spec);

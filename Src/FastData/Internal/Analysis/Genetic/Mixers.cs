@@ -1,4 +1,5 @@
 using System.Text;
+using Genbox.FastData.Internal.Compat;
 
 namespace Genbox.FastData.Internal.Analysis.Genetic;
 
@@ -13,63 +14,38 @@ internal static class Mixers
         },
         (x, y) =>
         {
-            y?.Append("MultMix1->");
+            y?.Append("AddMix->");
+            return x + Seeds.GoodSeeds[0];
+        },
+        (x, y) =>
+        {
+            y?.Append("MulMix->");
             return x * Seeds.GoodSeeds[0];
         },
         (x, y) =>
         {
-            y?.Append("MultMix2->");
-            return x * Seeds.GoodSeeds[1];
+            y?.Append("SquareMix->");
+            return (1u | x) + (x * x);
         },
         (x, y) =>
         {
-            y?.Append("XorShiftMix1->");
+            y?.Append("XorShiftMix->");
             return x ^ (x >> 16);
         },
         (x, y) =>
         {
-            y?.Append("XorShiftMix2->");
-            return x ^ (x >> 17);
+            y?.Append("ShiftAddXorMix->");
+            return ((x << 5) + x) ^ x;
         },
-
-        // DJB2Mix,
-        // MurmurMix1,
-        // MurmurMix2,
-        // MurmurMix3,
+        (x, y) =>
+        {
+            y?.Append("RotateRightMix->");
+            return BitOperations.RotateRight(x, 16);
+        },
+        (x, y) =>
+        {
+            y?.Append("RotateLeftMix->");
+            return BitOperations.RotateLeft(x, 16);
+        }
     ];
-
-    private static uint DJB2Mix(uint val, StringBuilder? y)
-    {
-        y?.Append("DJB2Mix->");
-        return 352654597U + (val * 1566083941U);
-    }
-
-    private static uint MurmurMix1(uint val, StringBuilder? y)
-    {
-        y?.Append("MurmurMix1->");
-        val ^= val >> 16;
-        val *= 0x85ebca6b;
-        return val;
-    }
-
-    private static uint MurmurMix2(uint val, StringBuilder? y)
-    {
-        y?.Append("MurmurMix2->");
-        val ^= val >> 16;
-        val *= 0x85ebca6b;
-        val ^= val >> 13;
-        val *= 0xc2b2ae35;
-        return val;
-    }
-
-    private static uint MurmurMix3(uint val, StringBuilder? y)
-    {
-        y?.Append("MurmurMix3->");
-        val ^= val >> 16;
-        val *= 0x85ebca6b;
-        val ^= val >> 13;
-        val *= 0xc2b2ae35;
-        val ^= val >> 16;
-        return val;
-    }
 }

@@ -3,6 +3,7 @@ using System.Text;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Helpers;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
@@ -22,7 +23,7 @@ internal sealed class MinimalPerfectHashCode(FastDataSpec Spec) : ICode
         long timestamp = Stopwatch.GetTimestamp();
 
         //Find the proper seeds
-        uint[] seed = MinimalPerfectHash.Generate(Spec.Data, static (x, y) => HashHelper.HashObjectSeed(x, y, true), 1, uint.MaxValue, Spec.Data.Length, () =>
+        uint[] seed = MPHHelper.Generate(Spec.Data, static (x, y) => HashHelper.HashObjectSeed(x, y, true), 1, uint.MaxValue, Spec.Data.Length, () =>
         {
             TimeSpan span = new TimeSpan(Stopwatch.GetTimestamp() - timestamp);
             return span.TotalSeconds > 60;

@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Internal.Analysis.Genetic;
 
-public class GeneticSettings
+internal class GeneticSettings
 {
     internal int PopulationSize { get; set; } = 10;
     internal int MaxEvolutions { get; set; } = 1000;

@@ -1,45 +1,77 @@
 using System.Globalization;
+using System.Numerics;
 using System.Text;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
 namespace Genbox.FastData.Examples;
 
 internal static class Program
 {
+    private static readonly Random _random = new Random();
+
     private static void Main()
+    {
+        string[] inputs = new string[100];
+
+        for (int i = 0; i < inputs.Length; i++)
+            inputs[i] = GenerateMixedEntropyString();
+
+        // Run the segment mapper that uses char delta map
+        DeltaGenerator gen = new DeltaGenerator();
+        StringProperties stringProps = DataAnalyzer.GetStringProperties(inputs);
+
+        foreach (StringSegment segment in gen.Generate(stringProps))
+        {
+            List<char> lst = inputs[0].ToList();
+            lst.Insert(segment.Offset, '[');
+            lst.Insert(segment.Offset + segment.Length + 1, ']');
+            Console.WriteLine(new string(lst.ToArray()));
+        }
+    }
+
+    private static string GenerateMixedEntropyString()
+    {
+        char[] result = new char[80];
+
+        for (int i = 0; i < 80; i++)
+        {
+            double noiseValue = PerlinNoise(i * 0.5);
+            if (noiseValue > 0.1)
+                result[i] = (char)_random.Next(65, 90); // A-Z
+            else
+                result[i] = '-';
+        }
+
+        return new string(result);
+    }
+
+    private static double PerlinNoise(double x)
+    {
+        int xi = (int)x;
+        double xf = x - xi;
+        double u = xf * xf * (3.0 - 2.0 * xf);
+        return Lerp(Noise(xi), Noise(xi + 1), u);
+    }
+
+    private static double Noise(int x)
+    {
+        x = (x << 13) ^ x;
+        return unchecked(1.0 - ((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
+    }
+
+    private static double Lerp(double a, double b, double t) => a + t * (b - a);
+
+    private static void RunGeneticAnalysis()
     {
         string[] data = Enumerable.Range(1, 1500).Select(x => "aaaa" + x /*StringHelper.GenerateRandomString(Random.Shared.Next(5, 23))*/).ToArray();
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
         GeneticAnalysis analyzer = new GeneticAnalysis(new GeneticSettings());
 
-        // Run a simulation that uses the default full-hash function. This is the one we have to beat.
-        Candidate target = new Candidate
-        {
-            //https://github.com/dotnet/runtime/blob/843f7985e470f5526799abacb81cbb245c7dec70/src/libraries/System.Collections.Immutable/src/System/Collections/Frozen/String/Hashing.cs#L22
-            Spec = new HashSpec
-            {
-                Seed = (5381 << 16) + 5381,
-                ExtractorSeed = 42,
-                MixerSeed = 42,
-                MixerIterations = 2,
-                AvalancheSeed = 42,
-                AvalancheIterations = 2,
-                Segments = [new StringSegment { Offset = 0 }]
-            }
-        };
-
-        // target.Spec.HashString = new StringBuilder();
-
-        // var f = HashHelper.GetHashFunction(ref target.Spec);
-        // Console.WriteLine(f("aaaaaaaa"));
-
-        analyzer.RunSimulation(data, ref target);
-
         Candidate top1 = analyzer.Run(data, props);
-        PrintCandidate(ref target);
         PrintCandidate(ref top1);
     }
 

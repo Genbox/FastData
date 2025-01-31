@@ -20,6 +20,12 @@ internal static class BitOperations
     internal static ulong RotateLeft(ulong value, int offset) => (value << offset) | (value >> (64 - offset));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint RotateRight(uint value, int offset) => (value >> offset) | (value << (32 - offset));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ulong RotateRight(ulong value, int offset) => (value >> offset) | (value << (64 - offset));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static uint PopCount(ulong value)
     {
         value -= (value >> 1) & 0x_55555555_55555555ul;
