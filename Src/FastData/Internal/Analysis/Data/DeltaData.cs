@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Genbox.FastData.Internal.Analysis;
+namespace Genbox.FastData.Internal.Analysis.Data;
 
 [StructLayout(LayoutKind.Auto)]
 internal readonly record struct DeltaData(int[] Left, int[] Right)

@@ -1,12 +1,15 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Transactions;
+using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Analysis.Genetic;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-internal class GeneticAnalysis(GeneticSettings settings)
+internal sealed class GeneticAnalysis(GeneticSettings settings, string[] data, StringProperties props)
 {
+    private readonly StringSegment[] _segments = SegmentManager.Generate(props, SegmentManager.GetGenerators()).ToArray();
     private static readonly Random _rng = new Random();
 
     /*
@@ -71,22 +74,22 @@ internal class GeneticAnalysis(GeneticSettings settings)
       of extra buckets (overhead) that we are willing to tolerate.
   */
 
-    internal Candidate Run(string[] data, StringProperties props)
+    internal Candidate Run()
     {
         int minLen = (int)props.LengthData.Min;
 
         // Create the initial population
         Candidate[] population = new Candidate[settings.PopulationSize];
         for (int i = 0; i < population.Length; i++)
-            population[i] = new Candidate(CreateSpec(minLen));
+            population[i] = new Candidate(CreateSpec());
 
         int evolution = 0;
         Candidate top1 = new Candidate { Fitness = double.MinValue };
-        double[] recent = new double[3];
+        double[] recent = new double[settings.StagnantTopResults];
 
         while (evolution++ < settings.MaxEvolutions)
         {
-            int bestIdx = RunPopulation(data, population);
+            int bestIdx = RunPopulation(population);
             ref Candidate popBest = ref population[bestIdx];
 
             Console.WriteLine($"Evolution {evolution}: {popBest.Fitness}");
@@ -113,14 +116,14 @@ internal class GeneticAnalysis(GeneticSettings settings)
         return top1;
     }
 
-    private static HashSpec CreateSpec(int minLen)
+    private HashSpec CreateSpec()
     {
         HashSpec spec = new HashSpec();
-        MutateSpec(ref spec, minLen);
+        MutateSpec(ref spec);
         return spec;
     }
 
-    private static void MutateSpec(ref HashSpec spec, int minLen)
+    private void MutateSpec(ref HashSpec spec)
     {
         // Length and offset is constrained:
         // - Offset must be within [0..MinLen] where MinLen is the length of the shortest string
@@ -128,16 +131,21 @@ internal class GeneticAnalysis(GeneticSettings settings)
 
         //TODO: when mixiterations is 0, no need to set mixlevel higher
 
-        int offset = _rng.Next(0, minLen);
-        int length = _rng.Next(1, Math.Max(1, minLen - offset));
-
         spec.ExtractorSeed = _rng.Next();
         spec.MixerSeed = _rng.Next();
         spec.MixerIterations = _rng.Next(0, 16);
         spec.AvalancheSeed = _rng.Next();
         spec.AvalancheIterations = _rng.Next(0, 16);
         spec.Seed = Seeds.GoodSeeds[_rng.Next(0, Seeds.GoodSeeds.Length)];
-        spec.Segments = [new StringSegment { Offset = offset, Length = length }]; //TODO: use entropy map on long string
+
+        int numSegments = _rng.Next(0, _segments.Length);
+
+        StringSegment[] segments = new StringSegment[numSegments];
+
+        for (int i = 0; i < numSegments; i++)
+            segments[i] = _segments[_rng.Next(0, _segments.Length)];
+
+        spec.Segments = segments;
     }
 
     private static void Cross(ref HashSpec a, ref HashSpec b)
@@ -151,13 +159,13 @@ internal class GeneticAnalysis(GeneticSettings settings)
         b.Segments = a.Segments;
     }
 
-    private void RunSimulation(string[] data, ref Candidate candidate)
+    private void RunSimulation(ref Candidate candidate)
     {
         // Generate a hash function from the spec
         Func<string, uint> hashFunc = HashHelper.GetHashFunction(ref candidate.Spec);
 
         long ticks = Stopwatch.GetTimestamp();
-        (int occupied, double minVariance, double maxVariance) = EmulateHashTable(data, hashFunc);
+        (int occupied, double minVariance, double maxVariance) = EmulateHashTable(hashFunc);
         ticks = Stopwatch.GetTimestamp() - ticks;
 
         double normOccu = (occupied / (data.Length * settings.CapacityFactor)) * settings.FillWeight;
@@ -167,13 +175,13 @@ internal class GeneticAnalysis(GeneticSettings settings)
         candidate.Metadata = [("Time/norm", ticks + "/" + normTime.ToString("N2")), ("Occupied/norm", occupied + "/" + normOccu.ToString("N2")), ("MinVariance", minVariance), ("MaxVariance", maxVariance)];
     }
 
-    private (int cccupied, double minVariance, double maxVariance) EmulateHashTable(string[] data, Func<string, uint> hashFunc)
+    private (int cccupied, double minVariance, double maxVariance) EmulateHashTable(Func<string, uint> hashFunc)
     {
         int len = data.Length;
         int[] buckets = new int[(int)(len * settings.CapacityFactor)];
 
         for (int i = 0; i < len; i++)
-            buckets[hashFunc(data[i]) % len]++;
+            buckets[hashFunc(data[i]) % buckets.Length]++;
 
         int occupied = 0;
         double minVariance = double.MaxValue;
@@ -193,7 +201,7 @@ internal class GeneticAnalysis(GeneticSettings settings)
         return (occupied, minVariance, maxVariance);
     }
 
-    private int RunPopulation(string[] data, Candidate[] population)
+    private int RunPopulation(Candidate[] population)
     {
         double maxFit = double.MinValue;
         int bestIdx = 0;
@@ -202,7 +210,7 @@ internal class GeneticAnalysis(GeneticSettings settings)
         {
             // We ref it to update fitness
             ref Candidate wrapper = ref population[i];
-            RunSimulation(data, ref wrapper);
+            RunSimulation(ref wrapper);
 
             // We keep a running max
             if (wrapper.Fitness > maxFit)
@@ -238,7 +246,7 @@ internal class GeneticAnalysis(GeneticSettings settings)
         for (int i = topCount; i < population.Length; i++)
         {
             ref Candidate item = ref population[indexes[i]];
-            MutateSpec(ref item.Spec, minLen);
+            MutateSpec(ref item.Spec);
         }
     }
 }

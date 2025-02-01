@@ -1,3 +1,5 @@
+using Genbox.FastData.Internal.Analysis.Data;
+using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Analysis;

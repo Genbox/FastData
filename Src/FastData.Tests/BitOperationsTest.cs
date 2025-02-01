@@ -27,7 +27,6 @@ public class BitOperationsTest
     [Fact]
     public void AreBitsConsecutiveTest()
     {
-        // Test cases with expected results
         Assert.True(AreBitsConsecutive(0b00011100UL)); // Consecutive bits (3rd, 4th, 5th)
         Assert.True(AreBitsConsecutive(0b1UL)); // Single bit set
         Assert.False(AreBitsConsecutive(0b01011000UL)); // Non-consecutive bits

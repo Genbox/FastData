@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal;
@@ -14,6 +15,7 @@ namespace Genbox.FastData.Tests;
 /// These tests are designed to ensure that every supported data structure can be generated with different types
 /// and that they are working as expected.
 /// </summary>
+[SuppressMessage("Usage", "xUnit1016:MemberData must reference a public member")]
 public class DataStructureTests
 {
     [Fact]

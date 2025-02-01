@@ -1,21 +1,32 @@
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Enums;
 
 namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
-internal class BruteForceGenerator : IMapGenerator
+/// <summary>Returns segments with offset [0..max-1] and length [1..max-1]</summary>
+internal class BruteForceGenerator : ISegmentGenerator
 {
-    public bool IsAppropriate(StringProperties stringProps) => true;
+    internal const int MaxLength = 8;
 
-    public IEnumerable<StringSegment> Generate(StringProperties stringProps)
+    public bool IsAppropriate(StringProperties props) => true;
+
+    public IEnumerable<StringSegment> Generate(StringProperties props)
     {
-        uint max = Math.Max(stringProps.LengthData.Max, 8);
+        int max = (int)Math.Min(props.LengthData.Min, MaxLength); //We cannot segment above the shortest string.
 
-        for (int i = 0; i < max - 1; i++)
+        for (int offset = 0; offset < max; offset++)
         {
-            for (int j = 1; j < max; j++)
-                yield return new StringSegment(i, j, Alignment.Unknown);
+            for (int length = 1; length <= max - offset; length++)
+                yield return new StringSegment(offset, length, Alignment.Left);
+        }
+
+        //TODO: Avoid overlap
+        for (int offset = 0; offset < max; offset++)
+        {
+            for (int length = 1; length <= max - offset; length++)
+                yield return new StringSegment(offset, length, Alignment.Right);
         }
     }
 }
