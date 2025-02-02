@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using Genbox.FastData.Internal.Analysis.Genetic.Operations;
 using Genbox.FastData.Internal.Analysis.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.Genetic;

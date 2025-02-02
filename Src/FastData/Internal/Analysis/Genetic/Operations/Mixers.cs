@@ -1,7 +1,7 @@
 using System.Text;
 using Genbox.FastData.Internal.Compat;
 
-namespace Genbox.FastData.Internal.Analysis.Genetic;
+namespace Genbox.FastData.Internal.Analysis.Genetic.Operations;
 
 internal static class Mixers
 {

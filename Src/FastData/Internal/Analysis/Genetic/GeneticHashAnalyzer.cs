@@ -1,13 +1,13 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Transactions;
+using Genbox.FastData.Internal.Analysis.Genetic.Operations;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Analysis.Genetic;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-internal sealed class GeneticAnalysis(GeneticSettings settings, string[] data, StringProperties props)
+internal sealed class GeneticHashAnalyzer(GeneticSettings settings, string[] data, StringProperties props)
 {
     private readonly StringSegment[] _segments = SegmentManager.Generate(props, SegmentManager.GetGenerators()).ToArray();
     private static readonly Random _rng = new Random();

@@ -46,10 +46,10 @@ internal static class DataAnalyzer
                 right[i] += flag ? rc : -rc;
                 counts[i]++;
 
-                characterMap.Add(c);
-
                 if (c > 255)
                     allAscii = false;
+                else
+                    characterMap.Add(c); //char map only supports up to 255
             }
 
             flag = !flag;

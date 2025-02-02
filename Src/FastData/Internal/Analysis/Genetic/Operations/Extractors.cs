@@ -1,7 +1,6 @@
 using System.Text;
-using static Genbox.FastData.Internal.Compat.BitOperations;
 
-namespace Genbox.FastData.Internal.Analysis.Genetic;
+namespace Genbox.FastData.Internal.Analysis.Genetic.Operations;
 
 internal static class Extractors
 {

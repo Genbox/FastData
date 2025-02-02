@@ -36,7 +36,7 @@ public static class StringHelper
         return new string(result);
     }
 
-    private static double PerlinNoise(double x)
+    public static double PerlinNoise(double x)
     {
         int xi = (int)x;
         double xf = x - xi;
