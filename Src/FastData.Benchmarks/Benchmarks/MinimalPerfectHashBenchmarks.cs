@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Order;
 using Genbox.FastData.Benchmarks.Code;
 using Genbox.FastData.Helpers;
-using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Helpers;

@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Genetic.Operations;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -7,7 +7,7 @@ using Genbox.FastData.Internal.Analysis.Properties;
 namespace Genbox.FastData.Internal.Analysis.Genetic;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-internal sealed class GeneticHashAnalyzer(GeneticSettings settings, string[] data, StringProperties props)
+internal sealed class GeneticHashAnalyzer(string[] data, StringProperties props, GeneticSettings settings) : IHashAnalyzer<GeneticHashSpec>
 {
     private readonly StringSegment[] _segments = SegmentManager.Generate(props, SegmentManager.GetGenerators()).ToArray();
     private static readonly Random _rng = new Random();
@@ -74,23 +74,21 @@ internal sealed class GeneticHashAnalyzer(GeneticSettings settings, string[] dat
       of extra buckets (overhead) that we are willing to tolerate.
   */
 
-    internal Candidate Run()
+    public Candidate<GeneticHashSpec> Run()
     {
-        int minLen = (int)props.LengthData.Min;
-
         // Create the initial population
-        Candidate[] population = new Candidate[settings.PopulationSize];
+        Candidate<GeneticHashSpec>[] population = new Candidate<GeneticHashSpec>[settings.PopulationSize];
         for (int i = 0; i < population.Length; i++)
-            population[i] = new Candidate(CreateSpec());
+            population[i] = new Candidate<GeneticHashSpec>(CreateSpec());
 
         int evolution = 0;
-        Candidate top1 = new Candidate { Fitness = double.MinValue };
+        Candidate<GeneticHashSpec> top1 = new Candidate<GeneticHashSpec> { Fitness = double.MinValue };
         double[] recent = new double[settings.StagnantTopResults];
 
         while (evolution++ < settings.MaxEvolutions)
         {
             int bestIdx = RunPopulation(population);
-            ref Candidate popBest = ref population[bestIdx];
+            ref Candidate<GeneticHashSpec> popBest = ref population[bestIdx];
 
             Console.WriteLine($"Evolution {evolution}: {popBest.Fitness}");
 
@@ -110,20 +108,20 @@ internal sealed class GeneticHashAnalyzer(GeneticSettings settings, string[] dat
             }
 
             recent[evolution % recent.Length] = popBest.Fitness;
-            SelectAndMutate(population, minLen);
+            SelectAndMutate(population);
         }
 
         return top1;
     }
 
-    private HashSpec CreateSpec()
+    private GeneticHashSpec CreateSpec()
     {
-        HashSpec spec = new HashSpec();
+        GeneticHashSpec spec = new GeneticHashSpec();
         MutateSpec(ref spec);
         return spec;
     }
 
-    private void MutateSpec(ref HashSpec spec)
+    private void MutateSpec(ref GeneticHashSpec spec)
     {
         // Length and offset is constrained:
         // - Offset must be within [0..MinLen] where MinLen is the length of the shortest string
@@ -148,7 +146,7 @@ internal sealed class GeneticHashAnalyzer(GeneticSettings settings, string[] dat
         spec.Segments = segments;
     }
 
-    private static void Cross(ref HashSpec a, ref HashSpec b)
+    private static void Cross(ref GeneticHashSpec a, ref GeneticHashSpec b)
     {
         b.ExtractorSeed = a.ExtractorSeed;
         b.MixerSeed = a.MixerSeed;
@@ -159,49 +157,7 @@ internal sealed class GeneticHashAnalyzer(GeneticSettings settings, string[] dat
         b.Segments = a.Segments;
     }
 
-    private void RunSimulation(ref Candidate candidate)
-    {
-        // Generate a hash function from the spec
-        Func<string, uint> hashFunc = HashHelper.GetHashFunction(ref candidate.Spec);
-
-        long ticks = Stopwatch.GetTimestamp();
-        (int occupied, double minVariance, double maxVariance) = EmulateHashTable(hashFunc);
-        ticks = Stopwatch.GetTimestamp() - ticks;
-
-        double normOccu = (occupied / (data.Length * settings.CapacityFactor)) * settings.FillWeight;
-        double normTime = (1.0 / (1.0 + ((double)ticks / data.Length))) * settings.TimeWeight;
-
-        candidate.Fitness = normOccu * normTime;
-        candidate.Metadata = [("Time/norm", ticks + "/" + normTime.ToString("N2")), ("Occupied/norm", occupied + "/" + normOccu.ToString("N2")), ("MinVariance", minVariance), ("MaxVariance", maxVariance)];
-    }
-
-    private (int cccupied, double minVariance, double maxVariance) EmulateHashTable(Func<string, uint> hashFunc)
-    {
-        int len = data.Length;
-        int[] buckets = new int[(int)(len * settings.CapacityFactor)];
-
-        for (int i = 0; i < len; i++)
-            buckets[hashFunc(data[i]) % buckets.Length]++;
-
-        int occupied = 0;
-        double minVariance = double.MaxValue;
-        double maxVariance = double.MinValue;
-
-        for (int i = 0; i < buckets.Length; i++)
-        {
-            int bucket = buckets[i];
-
-            if (bucket > 0)
-                occupied++;
-
-            minVariance = Math.Min(minVariance, bucket);
-            maxVariance = Math.Max(maxVariance, bucket);
-        }
-
-        return (occupied, minVariance, maxVariance);
-    }
-
-    private int RunPopulation(Candidate[] population)
+    private int RunPopulation(Candidate<GeneticHashSpec>[] population)
     {
         double maxFit = double.MinValue;
         int bestIdx = 0;
@@ -209,8 +165,8 @@ internal sealed class GeneticHashAnalyzer(GeneticSettings settings, string[] dat
         for (int i = 0; i < population.Length; i++)
         {
             // We ref it to update fitness
-            ref Candidate wrapper = ref population[i];
-            RunSimulation(ref wrapper);
+            ref Candidate<GeneticHashSpec> wrapper = ref population[i];
+            AnalysisHelper.RunSimulation(data, settings, ref wrapper);
 
             // We keep a running max
             if (wrapper.Fitness > maxFit)
@@ -223,7 +179,7 @@ internal sealed class GeneticHashAnalyzer(GeneticSettings settings, string[] dat
         return bestIdx;
     }
 
-    private void SelectAndMutate(Candidate[] population, int minLen)
+    private void SelectAndMutate(Candidate<GeneticHashSpec>[] population)
     {
         int[] indexes = new int[population.Length];
         for (int i = 0; i < indexes.Length; i++)
@@ -238,14 +194,14 @@ internal sealed class GeneticHashAnalyzer(GeneticSettings settings, string[] dat
         for (int i = 0; i < topCount; i++)
         {
             // Cross the elite with a random from population
-            ref Candidate a = ref population[indexes[i]];
-            ref Candidate b = ref population[indexes[_rng.Next(0, max)]];
+            ref Candidate<GeneticHashSpec> a = ref population[indexes[i]];
+            ref Candidate<GeneticHashSpec> b = ref population[indexes[_rng.Next(0, max)]];
             Cross(ref a.Spec, ref b.Spec);
         }
 
         for (int i = topCount; i < population.Length; i++)
         {
-            ref Candidate item = ref population[indexes[i]];
+            ref Candidate<GeneticHashSpec> item = ref population[indexes[i]];
             MutateSpec(ref item.Spec);
         }
     }

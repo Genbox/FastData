@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.BruteForce;
 using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
 
@@ -11,55 +12,29 @@ namespace Genbox.FastData.Examples;
 internal static class Program
 {
     private static readonly char[] LoEntropy = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
-    // private static readonly char[] HiEntropy = Enumerable.Range(0, ushort.MaxValue).Select(i => (char)i).ToArray();
+    private static readonly char[] HiEntropy = Enumerable.Range(0, ushort.MaxValue).Select(i => (char)i).ToArray();
+    private static readonly string[] Data = ["razzmatazz", "quizzified", "quizzifies", "zymeszymic", "buzzworthy", "vajazzling", "whizzingly", "jazzercise", "quizzeries", "quizziness", "squeezebox", "whizzbangs", "bumfuzzled", "dizzyingly", "showbizzes", "zizyphuses", "bumfuzzles", "buzzphrase", "schemozzle", "blizzardly", "kolkhoznik", "puzzlingly", "shemozzled", "zigzaggery", "zugzwanged", "belshazzar", "bemuzzling", "dazzlingly", "embezzling", "morbidezza", "pavonazzos", "puzzledoms", "schizziest", "schnozzles", "schnozzola", "shemozzles", "shimozzles", "shlemozzle", "zygomorphy", "bathmizvah", "bedazzling", "blizzarded", "chiffchaff", "embezzlers", "hazardizes", "mizzenmast", "passamezzo", "pizzicatos", "podzolized", "pozzolanic", "puzzlement", "schizotypy", "scuzzballs", "shockjocks", "sizzlingly", "unhouzzled", "zanthoxyls", "zigzagging", "blackjacks", "crackajack"];
 
     private static void Main()
     {
-        string[] nonRandom = ["razzmatazz", "quizzified", "quizzifies", "zymeszymic", "buzzworthy", "vajazzling", "whizzingly", "jazzercise", "quizzeries", "quizziness", "squeezebox", "whizzbangs", "bumfuzzled", "dizzyingly", "showbizzes", "zizyphuses", "bumfuzzles", "buzzphrase", "schemozzle", "blizzardly", "kolkhoznik", "puzzlingly", "shemozzled", "zigzaggery", "zugzwanged", "belshazzar", "bemuzzling", "dazzlingly", "embezzling", "morbidezza", "pavonazzos", "puzzledoms", "schizziest", "schnozzles", "schnozzola", "shemozzles", "shimozzles", "shlemozzle", "zygomorphy", "bathmizvah", "bedazzling", "blizzarded", "chiffchaff", "embezzlers", "hazardizes", "mizzenmast", "passamezzo", "pizzicatos", "podzolized", "pozzolanic", "puzzlement", "schizotypy", "scuzzballs", "shockjocks", "sizzlingly", "unhouzzled", "zanthoxyls", "zigzagging", "blackjacks", "crackajack"];
+        RunBruteForce(RunFunc(Data, 5, PrependString));
+    }
 
-        // string[] prepend100 = RunFunc(nonRandom, 1.0, PrependString);
-        // Print(prepend100);
+    private static void RunBruteForce(string[] data)
+    {
+        StringProperties props = DataAnalyzer.GetStringProperties(data);
 
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(data, props, new BruteForceSettings());
+        Candidate<BFHashSpec> top1 = analyzer.Run();
+        PrintCandidate(in top1);
+    }
 
-        // Print(nonRandom);
-        // string[] permute001 = RunFunc(nonRandom, 0.1, PermuteString);
-        // Print(permute001);
-        // string[] permute050 = RunFunc(nonRandom, 0.5, PermuteString);
-        // Print(permute050);
-        // string[] permute100 = RunFunc(nonRandom, 1.0, PermuteString);
-        // Print(permute100);
-        //
-        // string[] mutateLo001 = RunFunc(nonRandom, 0.1, (x, y) => MutateString(x, y, LoEntropy));
-        // Print(mutateLo001);
-        // string[] mutateLo050 = RunFunc(nonRandom, 0.5, (x, y) => MutateString(x, y, LoEntropy));
-        // Print(mutateLo050);
-        string[] mutateLo100 = RunFunc(nonRandom, 1.0, (x, y) => MutateString(x, y, LoEntropy));
-        RunGeneticAnalysis(mutateLo100);
-
-        // Print(mutateLo100);
-        //
-        // string[] mutateSinLo001 = RunFunc(nonRandom, 0.1, (x, y) => SineMutateString(x, y, LoEntropy));
-        // Print(mutateSinLo001);
-        // string[] mutateSinLo050 = RunFunc(nonRandom, 0.5, (x, y) => SineMutateString(x, y, LoEntropy));
-        // Print(mutateSinLo050);
-        // string[] mutateSinLo100 = RunFunc(nonRandom, 1.0, (x, y) => SineMutateString(x, y, LoEntropy));
-        // Print(mutateSinLo100);
-        //
-        // string[] mutateHi001 = RunFunc(nonRandom, 0.1, (x, y) => MutateString(x, y, HiEntropy));
-        // Print(mutateHi001);
-        // string[] mutateHi050 = RunFunc(nonRandom, 0.5, (x, y) => MutateString(x, y, HiEntropy));
-        // Print(mutateHi050);
-        // string[] mutateHi100 = RunFunc(nonRandom, 1.0, (x, y) => MutateString(x, y, HiEntropy));
-        // RunGeneticAnalysis(mutateHi100);
-
-        // Print(mutateHi100);
-        //
-        // string[] mutateSinHi001 = RunFunc(nonRandom, 0.1, (x, y) => SineMutateString(x, y, HiEntropy));
-        // Print(mutateSinHi001);
-        // string[] mutateSinHi050 = RunFunc(nonRandom, 0.5, (x, y) => SineMutateString(x, y, HiEntropy));
-        // Print(mutateSinHi050);
-        // string[] mutateSinHi100 = RunFunc(nonRandom, 1.0, (x, y) => SineMutateString(x, y, HiEntropy));
-        // Print(mutateSinHi100);
+    private static void GeneticAnalysis()
+    {
+        RunGeneticAnalysis(RunFunc(Data, 1.0, PrependString));
+        RunGeneticAnalysis(RunFunc(Data, 1.0, PermuteString));
+        RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
+        RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
     }
 
     private static void Print(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
@@ -68,21 +43,6 @@ internal static class Program
 
         for (int i = 0; i < data.Length; i++)
             Console.WriteLine(i + ". " + data[i]);
-    }
-
-    private static string SineMutateString(string str, double factor, char[] alphabet)
-    {
-        Debug.Assert(factor > 0 && factor <= 1);
-
-        char[] chars = str.ToCharArray();
-        int length = chars.Length;
-        for (int i = 0; i < length; i++)
-        {
-            double sineValue = (Math.Sin((double)i / length * Math.PI * 2) + 1) / 2;
-            if (Random.Shared.NextDouble() < sineValue * factor)
-                chars[i] = alphabet[Random.Shared.Next(alphabet.Length)];
-        }
-        return new string(chars);
     }
 
     private static string MutateString(string str, double factor, char[] alphabet)
@@ -116,10 +76,8 @@ internal static class Program
 
     private static string PrependString(string str, double factor)
     {
-        Debug.Assert(factor > 0 && factor <= 1);
-
-        int count = (int)(10 * (Random.Shared.NextDouble() * factor));
-        return new string('a', count) + str;
+        Debug.Assert(factor > 0 && factor <= 100);
+        return new string('a', (int)factor) + str;
     }
 
     private static string[] RunFunc(string[] str, double factor, Func<string, double, string> func)
@@ -136,31 +94,47 @@ internal static class Program
     {
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        GeneticHashAnalyzer analyzer = new GeneticHashAnalyzer(new GeneticSettings(), data, props);
-        Candidate top1 = analyzer.Run();
+        GeneticHashAnalyzer analyzer = new GeneticHashAnalyzer(data, props, new GeneticSettings());
+        Candidate<GeneticHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1, in props);
     }
 
-    private static void PrintCandidate(in Candidate candidate, in StringProperties props)
+    private static void PrintHeader<T>(in Candidate<T> candidate) where T : struct, IHashSpec
     {
         Console.WriteLine("###############");
         Console.WriteLine("Result:");
-        Console.WriteLine($"- {nameof(Candidate.Fitness)}: {candidate.Fitness}");
-        Console.WriteLine($"- {nameof(Candidate.Metadata)}: {string.Join(", ", candidate.Metadata.Select(x => x.ToString()))}");
+        Console.WriteLine($"- {nameof(candidate.Fitness)}: {candidate.Fitness}");
+        Console.WriteLine($"- {nameof(candidate.Metadata)}: {string.Join(", ", candidate.Metadata.Select(x => x.ToString()))}");
+    }
 
-        HashSpec spec = candidate.Spec;
+    private static void PrintCandidate(in Candidate<GeneticHashSpec> candidate, in StringProperties props)
+    {
+        PrintHeader(in candidate);
+
+        GeneticHashSpec spec = candidate.Spec;
         spec.HashString = new StringBuilder();
 
-        var f = HashHelper.GetHashFunction(ref spec);
+        //We call the hash function to build the hash string
+        Func<string, uint> f = spec.GetFunction();
         f(new string('a', (int)props.LengthData.Max)); //needs to be larger than the strings in the dataset
 
         Console.WriteLine("Hash:");
-        Console.WriteLine($"- {nameof(HashSpec.MixerSeed)}: {spec.MixerSeed}");
-        Console.WriteLine($"- {nameof(HashSpec.MixerIterations)}: {spec.MixerIterations}");
-        Console.WriteLine($"- {nameof(HashSpec.AvalancheSeed)}: {spec.AvalancheSeed}");
-        Console.WriteLine($"- {nameof(HashSpec.AvalancheIterations)}: {spec.AvalancheIterations}");
-        Console.WriteLine($"- {nameof(HashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(x => '[' + x.Offset.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Length.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Alignment + ']'))}");
-        Console.WriteLine($"- {nameof(HashSpec.Seed)}: {spec.Seed}");
+        Console.WriteLine($"- {nameof(GeneticHashSpec.MixerSeed)}: {spec.MixerSeed}");
+        Console.WriteLine($"- {nameof(GeneticHashSpec.MixerIterations)}: {spec.MixerIterations}");
+        Console.WriteLine($"- {nameof(GeneticHashSpec.AvalancheSeed)}: {spec.AvalancheSeed}");
+        Console.WriteLine($"- {nameof(GeneticHashSpec.AvalancheIterations)}: {spec.AvalancheIterations}");
+        Console.WriteLine($"- {nameof(GeneticHashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(x => '[' + x.Offset.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Length.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Alignment + ']'))}");
+        Console.WriteLine($"- {nameof(GeneticHashSpec.Seed)}: {spec.Seed}");
         Console.WriteLine($"- Func: {spec.HashString}");
+    }
+
+    private static void PrintCandidate(in Candidate<BFHashSpec> candidate)
+    {
+        PrintHeader(in candidate);
+
+        BFHashSpec spec = candidate.Spec;
+        Console.WriteLine("Hash:");
+        Console.WriteLine($"- {nameof(BFHashSpec.HashFunction)}: {spec.HashFunction}");
+        Console.WriteLine($"- {nameof(BFHashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(x => '[' + x.Offset.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Length.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Alignment + ']'))}");
     }
 }

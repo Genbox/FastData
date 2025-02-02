@@ -4,7 +4,6 @@ using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Analysis.SegmentGenerators;
-using Genbox.FastData.Internal.Enums;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.InternalShared.Helpers;
 
@@ -28,7 +27,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
 
             foreach (StringSegment segment in SegmentManager.Generate(props, [generator]))
             {
-                SegmentHelper.GetBounds(data[0], in segment, out int start, out int end);
+                SegmentHelper.ConvertToOffsets(data[0].Length, in segment, out int start, out int end);
 
                 for (int i = start; i < end; i++)
                     coverage[i]++;

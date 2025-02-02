@@ -5,35 +5,28 @@ namespace Genbox.FastData.Internal.Helpers;
 
 internal static class SegmentHelper
 {
-    /// <summary>Given a segment and a span, it returns a span containing the segment</summary>
-    internal static ReadOnlySpan<char> GetString(ReadOnlySpan<char> input, in StringSegment segment)
-    {
-        GetBounds(input, in segment, out int start, out int end);
-        return input.Slice(start, end);
-    }
-
     /// <summary>Inserts [ and ] around the segment of a string. Used for debugging</summary>
-    internal static string InsertSegmentBounds(ReadOnlySpan<char> input, in StringSegment segment)
+    internal static string InsertSegmentBounds(string input, in StringSegment segment)
     {
         List<char> lst = new List<char>(input.ToArray());
-        GetBounds(input, in segment, out int start, out int end);
+        ConvertToOffsets(input.Length, in segment, out int start, out int end);
 
         lst.Insert(start, '[');
         lst.Insert(end + 1, ']');
         return new string(lst.ToArray());
     }
 
-    internal static void GetBounds(ReadOnlySpan<char> input, in StringSegment segment, out int start, out int end)
+    internal static void ConvertToOffsets(int strLen, in StringSegment segment, out int offset1, out int offset2)
     {
         if (segment.Alignment == Alignment.Left)
         {
-            start = segment.Offset;
-            end = segment.Length == -1 ? input.Length : segment.Offset + segment.Length;
+            offset1 = segment.Offset;
+            offset2 = segment.Length == -1 ? strLen : segment.Offset + segment.Length;
         }
         else if (segment.Alignment == Alignment.Right)
         {
-            start = input.Length - segment.Offset - segment.Length;
-            end = segment.Length == -1 ? input.Length : input.Length - segment.Offset;
+            offset1 = strLen - segment.Offset - segment.Length;
+            offset2 = segment.Length == -1 ? strLen : strLen - segment.Offset;
         }
         else
             throw new InvalidOperationException("Invalid alignment");

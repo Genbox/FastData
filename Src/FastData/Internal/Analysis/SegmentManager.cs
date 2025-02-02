@@ -45,6 +45,6 @@ internal static class SegmentManager
         //         yield return (ISegmentGenerator)Activator.CreateInstance(type);
         // }
 
-        return [new BruteForceGenerator(), new EdgeGramGenerator(), new DeltaGenerator(), new OffsetGenerator()];
+        return [new BruteForceGenerator(), new EdgeGramGenerator(), /*new DeltaGenerator(),*/ new OffsetGenerator()];
     }
 }
