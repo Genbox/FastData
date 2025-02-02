@@ -1,18 +1,15 @@
 using System.Text;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Enums;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class KeyLengthCode(FastDataSpec Spec) : ICode
+internal sealed class KeyLengthCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
     private List<string>?[] _lengths;
 
-    public bool IsAppropriate(DataProperties dataProps) => Spec.KnownDataType == KnownDataType.String;
-
-    public bool TryPrepare()
+    public bool TryCreate()
     {
         //This implementation is the same as AutoUniqueLength, but takes duplicates into consideration
 
@@ -38,7 +35,7 @@ internal sealed class KeyLengthCode(FastDataSpec Spec) : ICode
         return true;
     }
 
-    public string Generate(IEnumerable<IEarlyExit> ee)
+    public string Generate()
     {
         return $$"""
                      private{{GetModifier(Spec.ClassType)}} readonly {{Spec.DataTypeName}}[]?[] _entries = [
@@ -48,7 +45,7 @@ internal sealed class KeyLengthCode(FastDataSpec Spec) : ICode
                      {{GetMethodAttributes()}}
                      public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
                      {
-                 {{GetEarlyExits("value", ee, true)}}
+                 {{GetEarlyExits("value", Context.GetEarlyExits(), true)}}
 
                          {{Spec.DataTypeName}}[]? bucket = _entries[value.Length];
 

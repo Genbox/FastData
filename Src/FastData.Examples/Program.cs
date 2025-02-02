@@ -6,6 +6,7 @@ using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.BruteForce;
 using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Generators;
 
 namespace Genbox.FastData.Examples;
 
@@ -24,7 +25,7 @@ internal static class Program
     {
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(data, props, new BruteForceSettings());
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(data, props, new BruteForceSettings(), HashSetCode.RunSimulation);
         Candidate<BFHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1);
     }
@@ -94,7 +95,7 @@ internal static class Program
     {
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        GeneticHashAnalyzer analyzer = new GeneticHashAnalyzer(data, props, new GeneticSettings());
+        GeneticHashAnalyzer analyzer = new GeneticHashAnalyzer(data, props, new GeneticSettings(), HashSetCode.RunSimulation);
         Candidate<GeneticHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1, in props);
     }

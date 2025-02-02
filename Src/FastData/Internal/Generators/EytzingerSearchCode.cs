@@ -5,11 +5,9 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class EytzingerSearchCode(FastDataSpec Spec) : ICode
+internal sealed class EytzingerSearchCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
-    public bool IsAppropriate(DataProperties dataProps) => true;
-
-    public bool TryPrepare()
+    public bool TryCreate()
     {
         Array.Sort(Spec.Data, StringComparer.Ordinal);
 
@@ -31,7 +29,7 @@ internal sealed class EytzingerSearchCode(FastDataSpec Spec) : ICode
         }
     }
 
-    public string Generate(IEnumerable<IEarlyExit> ee)
+    public string Generate()
     {
         return $$"""
                      private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
@@ -41,7 +39,7 @@ internal sealed class EytzingerSearchCode(FastDataSpec Spec) : ICode
                      {{GetMethodAttributes()}}
                      public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
                      {
-                 {{GetEarlyExits("value", ee)}}
+                 {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
                          int i = 0;
                          while (i < _entries.Length)

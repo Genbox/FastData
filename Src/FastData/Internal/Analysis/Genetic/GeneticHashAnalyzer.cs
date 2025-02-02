@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis.BruteForce;
 using Genbox.FastData.Internal.Analysis.Genetic.Operations;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -7,7 +8,7 @@ using Genbox.FastData.Internal.Analysis.Properties;
 namespace Genbox.FastData.Internal.Analysis.Genetic;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-internal sealed class GeneticHashAnalyzer(string[] data, StringProperties props, GeneticSettings settings) : IHashAnalyzer<GeneticHashSpec>
+internal sealed class GeneticHashAnalyzer(string[] data, StringProperties props, GeneticSettings settings, Simulation<GeneticSettings, GeneticHashSpec> simulation) : IHashAnalyzer<GeneticHashSpec>
 {
     private readonly StringSegment[] _segments = SegmentManager.Generate(props, SegmentManager.GetGenerators()).ToArray();
     private static readonly Random _rng = new Random();
@@ -90,13 +91,8 @@ internal sealed class GeneticHashAnalyzer(string[] data, StringProperties props,
             int bestIdx = RunPopulation(population);
             ref Candidate<GeneticHashSpec> popBest = ref population[bestIdx];
 
-            Console.WriteLine($"Evolution {evolution}: {popBest.Fitness}");
-
             if (popBest.Fitness > top1.Fitness)
-            {
-                Console.WriteLine("New best: " + popBest.Fitness);
                 top1 = popBest;
-            }
 
             //We early exit on stagnant improvements, but we got to have enough data to correctly determine it
             if (settings.StagnantTerminate && evolution > recent.Length)
@@ -166,7 +162,7 @@ internal sealed class GeneticHashAnalyzer(string[] data, StringProperties props,
         {
             // We ref it to update fitness
             ref Candidate<GeneticHashSpec> wrapper = ref population[i];
-            AnalysisHelper.RunSimulation(data, settings, ref wrapper);
+            simulation(data, settings, ref wrapper);
 
             // We keep a running max
             if (wrapper.Fitness > maxFit)

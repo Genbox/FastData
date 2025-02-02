@@ -32,21 +32,8 @@ public class DataStructureTests
         spec.DataTypeName = type;
         spec.KnownDataType = kt;
 
-        IEnumerable<IEarlyExit> early = new List<IEarlyExit>();
-
-        if (kt == KnownDataType.String)
-        {
-            StringProperties props = DataAnalyzer.GetStringProperties(data);
-            early = Optimizer.GetEarlyExits(props);
-        }
-        else if (kt == KnownDataType.Int32)
-        {
-            IntegerProperties props = DataAnalyzer.GetInt32Properties(data);
-            early = Optimizer.GetEarlyExits(props);
-        }
-
         StringBuilder sb = new StringBuilder();
-        FastDataGenerator.Generate(ds, sb, spec, early);
+        Generator.Generate(ds, sb, spec);
 
         string source = sb.ToString();
         Assert.NotEmpty(source);

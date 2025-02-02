@@ -8,17 +8,12 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class MinimalPerfectHashCode(FastDataSpec Spec) : ICode
+internal sealed class MinimalPerfectHashCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
     private (object, uint)[] _data;
     private uint _seed;
 
-    public bool IsAppropriate(DataProperties dataProps)
-    {
-        return Spec.Data.Length < 20; //We can only generate a MPF for 20 items
-    }
-
-    public bool TryPrepare()
+    public bool TryCreate()
     {
         long timestamp = Stopwatch.GetTimestamp();
 
@@ -45,7 +40,7 @@ internal sealed class MinimalPerfectHashCode(FastDataSpec Spec) : ICode
         return true;
     }
 
-    public string Generate(IEnumerable<IEarlyExit> ee)
+    public string Generate()
     {
         return $$"""
                      private{{GetModifier(Spec.ClassType)}} Entry[] _entries = new Entry[] {
@@ -55,7 +50,7 @@ internal sealed class MinimalPerfectHashCode(FastDataSpec Spec) : ICode
                      {{GetMethodAttributes()}}
                      public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
                      {
-                 {{GetEarlyExits("value", ee)}}
+                 {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
                          uint hash = {{GetSeededHashFunction32(Spec.KnownDataType, "value", _seed, true)}};
                          uint index = {{GetModFunction("hash", (uint)_data.Length)}};

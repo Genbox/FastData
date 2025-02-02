@@ -1,45 +1,63 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.BruteForce;
+using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Enums;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class HashSetCode(FastDataSpec Spec) : ICode
+internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
     private int[] _buckets;
     private Entry[] _entries;
 
-    public bool IsAppropriate(DataProperties dataProps) => true;
-
-    public bool TryPrepare()
+    public bool TryCreate()
     {
-        int len = Spec.Data.Length;
-
-        int[] buckets = new int[len];
-        Entry[] entries = new Entry[len];
-
-        for (int i = 0; i < len; i++)
+        if (Spec.KnownDataType == KnownDataType.String)
         {
-            object value = Spec.Data[i];
-            uint hashCode = HashHelper.HashObject(value);
-            ref int bucket = ref buckets[hashCode % len];
+            DataProperties props = Context.GetDataProperties();
 
-            ref Entry entry = ref entries[i];
-            entry.HashCode = hashCode;
-            entry.Next = bucket - 1; // Value in _buckets is 1-based
-            entry.Value = value;
-            bucket = i + 1;
+            BruteForceAnalyzer analyzer = new BruteForceAnalyzer(Spec.Data, props.StringProps.Value, new BruteForceSettings(), RunSimulation);
+            Candidate<BFHashSpec> candidate = analyzer.Run();
+
+            Func<string, uint> hashFunc = candidate.Spec.GetFunction();
+            Create(x => hashFunc((string)x));
         }
+        else
+            Create(HashHelper.HashObject);
 
-        _buckets = buckets;
-        _entries = entries;
         return true;
     }
 
-    public string Generate(IEnumerable<IEarlyExit> ee)
+    internal static void RunSimulation<T>(object[] data, CommonSettings settings, ref Candidate<T> candidate) where T : struct, IHashSpec
+    {
+        // Generate a hash function from the spec
+        Func<string, uint> hashFunc = candidate.Spec.GetFunction();
+
+        int capacity = (int)(data.Length * settings.CapacityFactor);
+        string first = (string)data[0];
+
+        long ticks = Stopwatch.GetTimestamp();
+        for (int i = 0; i < 1000; i++)
+            hashFunc(first);
+        ticks = Stopwatch.GetTimestamp() - ticks;
+
+        (int occupied, double minVariance, double maxVariance) = Emulate(data, capacity, hashFunc);
+
+        double normOccu = (occupied / (double)capacity) * settings.FillWeight;
+        double normTime = (1.0 / (1.0 + ((double)ticks / 1000))) * settings.TimeWeight;
+
+        candidate.Fitness = (normOccu + normTime) / 2;
+        candidate.Metadata = [("Time/norm", ticks + "/" + normTime.ToString("N2")), ("Occupied/norm", occupied + "/" + normOccu.ToString("N2")), ("MinVariance", minVariance), ("MaxVariance", maxVariance)];
+    }
+
+    public string Generate()
     {
         return $$"""
                      private{{GetModifier(Spec.ClassType)}} readonly int[] _buckets = { {{JoinValues(_buckets, RenderBucket)}} };
@@ -51,7 +69,7 @@ internal sealed class HashSetCode(FastDataSpec Spec) : ICode
                      {{GetMethodAttributes()}}
                      public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
                      {
-                 {{GetEarlyExits("value", ee)}}
+                 {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
                          uint hashCode = {{GetHashFunction32(Spec.KnownDataType, "value")}};
                          uint index = {{GetModFunction("hashCode", (uint)_buckets.Length)}};
@@ -89,6 +107,55 @@ internal sealed class HashSetCode(FastDataSpec Spec) : ICode
         static void RenderBucket(StringBuilder sb, int obj) => sb.Append(obj);
 
         static void RenderEntry(StringBuilder sb, Entry obj) => sb.Append("        new Entry(").Append(obj.HashCode).Append(", ").Append(obj.Next).Append(", ").Append(ToValueLabel(obj.Value)).Append(')');
+    }
+
+    private static (int cccupied, double minVariance, double maxVariance) Emulate(object[] data, int capacity, Func<string, uint> hashFunc)
+    {
+        int[] buckets = new int[capacity];
+
+        for (int i = 0; i < capacity; i++)
+            buckets[hashFunc((string)data[i]) % buckets.Length]++;
+
+        int occupied = 0;
+        double minVariance = double.MaxValue;
+        double maxVariance = double.MinValue;
+
+        for (int i = 0; i < buckets.Length; i++)
+        {
+            int bucket = buckets[i];
+
+            if (bucket > 0)
+                occupied++;
+
+            minVariance = Math.Min(minVariance, bucket);
+            maxVariance = Math.Max(maxVariance, bucket);
+        }
+
+        return (occupied, minVariance, maxVariance);
+    }
+
+    private void Create(Func<object, uint> hashFunc)
+    {
+        int len = Spec.Data.Length;
+
+        int[] buckets = new int[len];
+        Entry[] entries = new Entry[len];
+
+        for (int i = 0; i < len; i++)
+        {
+            object value = Spec.Data[i];
+            uint hashCode = hashFunc(value);
+            ref int bucket = ref buckets[hashCode % len];
+
+            ref Entry entry = ref entries[i];
+            entry.HashCode = hashCode;
+            entry.Next = bucket - 1; // Value in _buckets is 1-based
+            entry.Value = value;
+            bucket = i + 1;
+        }
+
+        _buckets = buckets;
+        _entries = entries;
     }
 
     [StructLayout(LayoutKind.Auto)]

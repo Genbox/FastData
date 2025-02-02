@@ -7,13 +7,11 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class SwitchHashCode(FastDataSpec Spec) : ICode
+internal sealed class SwitchHashCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
     private (uint, object)[] _hashCodes;
 
-    public bool IsAppropriate(DataProperties dataProps) => true;
-
-    public bool TryPrepare()
+    public bool TryCreate()
     {
         (uint, object)[] hashCodes = new (uint, object)[Spec.Data.Length];
 
@@ -29,13 +27,13 @@ internal sealed class SwitchHashCode(FastDataSpec Spec) : ICode
         return true;
     }
 
-    public string Generate(IEnumerable<IEarlyExit> ee)
+    public string Generate()
     {
         return $$"""
                      {{GetMethodAttributes()}}
                      public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
                      {
-                 {{GetEarlyExits("value", ee)}}
+                 {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
                          switch ({{GetHashFunction32(Spec.KnownDataType, "value")}})
                          {

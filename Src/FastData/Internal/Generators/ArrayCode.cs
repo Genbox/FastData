@@ -6,13 +6,11 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class ArrayCode(FastDataSpec Spec) : ICode
+internal sealed class ArrayCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
-    public bool IsAppropriate(DataProperties dataProps) => true;
+    public bool TryCreate() => true;
 
-    public bool TryPrepare() => true;
-
-    public string Generate(IEnumerable<IEarlyExit> ee)
+    public string Generate()
     {
         return $$"""
                      private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
@@ -22,7 +20,7 @@ internal sealed class ArrayCode(FastDataSpec Spec) : ICode
                      {{GetMethodAttributes()}}
                      public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
                      {
-                 {{GetEarlyExits("value", ee)}}
+                 {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
                          for (int i = 0; i < {{Spec.Data.Length.ToString(NumberFormatInfo.InvariantInfo)}}; i++)
                          {

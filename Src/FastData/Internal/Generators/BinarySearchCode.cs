@@ -6,17 +6,15 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class BinarySearchCode(FastDataSpec Spec) : ICode
+internal sealed class BinarySearchCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
-    public bool IsAppropriate(DataProperties dataPropsc) => true;
-
-    public bool TryPrepare()
+    public bool TryCreate()
     {
         Array.Sort(Spec.Data, StringComparer.Ordinal);
         return true;
     }
 
-    public string Generate(IEnumerable<IEarlyExit> ee)
+    public string Generate()
     {
         return $$"""
                      private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
@@ -26,7 +24,7 @@ internal sealed class BinarySearchCode(FastDataSpec Spec) : ICode
                      {{GetMethodAttributes()}}
                      public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
                      {
-                 {{GetEarlyExits("value", ee)}}
+                 {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
                          int lo = 0;
                          int hi = {{(Spec.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};

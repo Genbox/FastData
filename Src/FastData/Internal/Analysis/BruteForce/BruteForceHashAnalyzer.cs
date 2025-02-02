@@ -5,7 +5,7 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Analysis.BruteForce;
 
-internal class BruteForceAnalyzer(string[] data, StringProperties props, BruteForceSettings settings) : IHashAnalyzer<BFHashSpec>
+internal class BruteForceAnalyzer(object[] data, StringProperties props, BruteForceSettings settings, Simulation<BruteForceSettings, BFHashSpec> simulation) : IHashAnalyzer<BFHashSpec>
 {
     /*
      * This class brute-force all combinations of string segments with all avaliable hash functions.
@@ -26,15 +26,10 @@ internal class BruteForceAnalyzer(string[] data, StringProperties props, BruteFo
                     BFHashSpec spec = new BFHashSpec(func, [segment]);
 
                     Candidate<BFHashSpec> candidate = new Candidate<BFHashSpec>(spec);
-                    AnalysisHelper.RunSimulation(data, settings, ref candidate);
-
-                    Console.WriteLine(candidate.Fitness.ToString("N5") + "\t" + func + "\t" + segment);
+                    simulation(data, settings, ref candidate);
 
                     if (candidate.Fitness > best.Fitness)
-                    {
-                        Console.WriteLine("New best: " + candidate.Fitness.ToString("N5"));
                         best = candidate;
-                    }
                 }
             }
         }

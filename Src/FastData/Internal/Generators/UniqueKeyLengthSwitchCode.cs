@@ -1,23 +1,20 @@
 using System.Text;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Enums;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class UniqueKeyLengthSwitchCode(FastDataSpec Spec) : ICode
+internal sealed class UniqueKeyLengthSwitchCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
-    public bool IsAppropriate(DataProperties dataProps) => Spec.KnownDataType == KnownDataType.String && dataProps.StringProps!.Value.LengthData.LengthMap.Count == Spec.Data.Length;
+    public bool TryCreate() => true;
 
-    public bool TryPrepare() => true;
-
-    public string Generate(IEnumerable<IEarlyExit> earlyExits)
+    public string Generate()
         => $$"""
                  {{GetMethodAttributes()}}
                  public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
                  {
-             {{GetEarlyExits("value", earlyExits)}}
+             {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
                      switch (value.Length)
                      {
