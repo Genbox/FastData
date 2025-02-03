@@ -1,14 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.BruteForce;
-using Genbox.FastData.Internal.Analysis.Genetic.Operations;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Analysis.Genetic;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-internal sealed class GeneticHashAnalyzer(string[] data, StringProperties props, GeneticSettings settings, Simulation<GeneticSettings, GeneticHashSpec> simulation) : IHashAnalyzer<GeneticHashSpec>
+internal sealed class GeneticHashAnalyzer(object[] data, StringProperties props, GeneticSettings settings, Simulation<GeneticSettings, GeneticHashSpec> simulation) : IHashAnalyzer<GeneticHashSpec>
 {
     private readonly StringSegment[] _segments = SegmentManager.Generate(props, SegmentManager.GetGenerators()).ToArray();
     private static readonly Random _rng = new Random();
@@ -130,7 +129,7 @@ internal sealed class GeneticHashAnalyzer(string[] data, StringProperties props,
         spec.MixerIterations = _rng.Next(0, 16);
         spec.AvalancheSeed = _rng.Next();
         spec.AvalancheIterations = _rng.Next(0, 16);
-        spec.Seed = Seeds.GoodSeeds[_rng.Next(0, Seeds.GoodSeeds.Length)];
+        // spec.Seed = Seeds[_rng.Next(0, Seeds.Length)];
 
         int numSegments = _rng.Next(0, _segments.Length);
 

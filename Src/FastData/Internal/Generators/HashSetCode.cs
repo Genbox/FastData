@@ -16,6 +16,7 @@ internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context) :
 {
     private int[] _buckets;
     private Entry[] _entries;
+    private IHashSpec? _hashSpec;
 
     public bool TryCreate()
     {
@@ -27,6 +28,7 @@ internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context) :
             Candidate<BFHashSpec> candidate = analyzer.Run();
 
             Func<string, uint> hashFunc = candidate.Spec.GetFunction();
+            _hashSpec = candidate.Spec;
             Create(x => hashFunc((string)x));
         }
         else
@@ -44,6 +46,9 @@ internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context) :
         string first = (string)data[0];
 
         long ticks = Stopwatch.GetTimestamp();
+        //Set power plan to high performance
+        //Pin process to 1 core
+        //Set process priority to above normal
         for (int i = 0; i < 1000; i++)
             hashFunc(first);
         ticks = Stopwatch.GetTimestamp() - ticks;
@@ -71,7 +76,7 @@ internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context) :
                      {
                  {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
-                         uint hashCode = {{GetHashFunction32(Spec.KnownDataType, "value")}};
+                         uint hashCode = {{(_hashSpec != null ? "Hash(value)" : GetHashFunction32(Spec.KnownDataType, "value"))}};
                          uint index = {{GetModFunction("hashCode", (uint)_buckets.Length)}};
                          int i = _buckets[index] - 1;
 
@@ -87,6 +92,8 @@ internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context) :
 
                          return false;
                      }
+
+                 {{(_hashSpec != null ? _hashSpec.Construct() : "")}}
 
                      [StructLayout(LayoutKind.Auto)]
                      private struct Entry

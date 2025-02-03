@@ -27,7 +27,7 @@ internal static class ImmutableSet
        if (value.Length != 1)
            return false;
 
-        uint hashCode = HashHelper.HashString(value);
+        uint hashCode = Hash(value);
         uint index = MathHelper.FastMod(hashCode, 5, 3689348814741910324);
         int i = _buckets[index] - 1;
 
@@ -42,6 +42,11 @@ internal static class ImmutableSet
         }
 
         return false;
+    }
+
+    public static uint Hash(ReadOnlySpan<char> str)
+    {
+        return Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions.FrozenHash.ComputeHash(str);
     }
 
     [StructLayout(LayoutKind.Auto)]

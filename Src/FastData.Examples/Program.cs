@@ -18,7 +18,15 @@ internal static class Program
 
     private static void Main()
     {
-        RunBruteForce(RunFunc(Data, 5, PrependString));
+        GeneticHashSpec spec = new GeneticHashSpec();
+        spec.MixerIterations = 4;
+        spec.MixerSeed = 500;
+        spec.Seed = 42;
+
+        var mixer = spec.GetMixer();
+        Console.WriteLine(mixer);
+
+        // RunBruteForce(RunFunc(Data, 5, PrependString));
     }
 
     private static void RunBruteForce(string[] data)
@@ -113,7 +121,6 @@ internal static class Program
         PrintHeader(in candidate);
 
         GeneticHashSpec spec = candidate.Spec;
-        spec.HashString = new StringBuilder();
 
         //We call the hash function to build the hash string
         Func<string, uint> f = spec.GetFunction();
@@ -126,7 +133,8 @@ internal static class Program
         Console.WriteLine($"- {nameof(GeneticHashSpec.AvalancheIterations)}: {spec.AvalancheIterations}");
         Console.WriteLine($"- {nameof(GeneticHashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(x => '[' + x.Offset.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Length.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Alignment + ']'))}");
         Console.WriteLine($"- {nameof(GeneticHashSpec.Seed)}: {spec.Seed}");
-        Console.WriteLine($"- Func: {spec.HashString}");
+
+        // Console.WriteLine($"- Func: {spec.HashString}");
     }
 
     private static void PrintCandidate(in Candidate<BFHashSpec> candidate)

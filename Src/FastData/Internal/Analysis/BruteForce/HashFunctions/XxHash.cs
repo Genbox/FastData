@@ -106,15 +106,4 @@ public static class XxHash
         acc = (acc * PRIME64_1) + PRIME64_4;
         return acc;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong YC_xmxmx_XXH2_64(ulong h)
-    {
-        h ^= h >> 33;
-        h *= 0xC2B2AE3D27D4EB4F;
-        h ^= h >> 29;
-        h *= 0x165667B19E3779F9;
-        h ^= h >> 32;
-        return h;
-    }
 }

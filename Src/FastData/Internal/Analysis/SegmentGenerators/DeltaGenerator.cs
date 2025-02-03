@@ -90,6 +90,8 @@ internal class DeltaGenerator : ISegmentGenerator
 
         foreach (StringSegment segment in segments)
         {
+            //TODO: Return merged segments if they are close
+
             for (int i = 1; i <= segment.Length; i++)
                 yield return segment with { Length = i };
         }

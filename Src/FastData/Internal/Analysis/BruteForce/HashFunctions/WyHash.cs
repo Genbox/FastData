@@ -5,7 +5,7 @@ namespace Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
 
 public static class WyHash
 {
-    internal static readonly ulong[] DefaultSecret = [0xa0761d6478bd642ful, 0xe7037ed1a0b428dbul, 0x8ebc6af09c88c6e3ul, 0x589965cc75374cc3ul];
+    private static readonly ulong[] DefaultSecret = [0xa0761d6478bd642ful, 0xe7037ed1a0b428dbul, 0x8ebc6af09c88c6e3ul, 0x589965cc75374cc3ul];
 
     public static unsafe uint ComputeHash(ReadOnlySpan<char> s)
     {

@@ -22,11 +22,13 @@ internal class BruteForceGenerator : ISegmentGenerator
                 yield return new StringSegment(offset, length, Alignment.Left);
         }
 
-        //TODO: Avoid overlap
-        for (int offset = 0; offset < max; offset++)
+        if (props.LengthData.Min > MaxLength)
         {
-            for (int length = 1; length <= max - offset; length++)
-                yield return new StringSegment(offset, length, Alignment.Right);
+            for (int offset = 0; offset < max; offset++)
+            {
+                for (int length = 1; length <= max - offset; length++)
+                    yield return new StringSegment(offset, length, Alignment.Right);
+            }
         }
     }
 }

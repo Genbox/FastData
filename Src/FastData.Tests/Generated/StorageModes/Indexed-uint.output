@@ -42,6 +42,8 @@ internal static class ImmutableSet
         return false;
     }
 
+
+
     [StructLayout(LayoutKind.Auto)]
     private struct Entry
     {

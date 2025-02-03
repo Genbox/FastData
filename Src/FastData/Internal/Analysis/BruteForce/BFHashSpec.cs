@@ -16,22 +16,19 @@ internal readonly record struct BFHashSpec(HashFunction HashFunction, StringSegm
 
         return HashFunction switch
         {
-            HashFunction.Frozen => s => FrozenHash.ComputeHash(seg.GetSpan(s)),
+            HashFunction.FrozenHash => s => FrozenHash.ComputeHash(seg.GetSpan(s)),
             HashFunction.WyHash => s => WyHash.ComputeHash(seg.GetSpan(s)),
             HashFunction.XxHash => s => XxHash.ComputeHash(seg.GetSpan(s)),
             _ => throw new InvalidOperationException("Unsupported hash function " + HashFunction)
         };
     }
 
-    public string Construct()
-    {
-        return $$"""
-                 public static int Hash(ReadOnlySpan<char> str)
-                 {
-                     return {{HashFunction}}.ComputeHash({{GetSlice(Segments[0])}});
-                 }
-                 """;
-    }
+    public string Construct() => $$"""
+                                       public static uint Hash(ReadOnlySpan<char> str)
+                                       {
+                                           return Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions.{{HashFunction}}.ComputeHash({{GetSlice(Segments[0])}});
+                                       }
+                                   """;
 
     private static string GetSlice(StringSegment segment)
     {
@@ -39,7 +36,7 @@ internal readonly record struct BFHashSpec(HashFunction HashFunction, StringSegm
         {
             if (segment.Offset == 0 && segment.Length == -1)
                 return "str";
-            if (segment.Offset != 0 && segment.Length != -1)
+            if (segment.Offset != 0 && segment.Length == -1)
                 return $"str.Slice({segment.Offset.ToString(NumberFormatInfo.InvariantInfo)})";
 
             return $"str.Slice({segment.Offset}, {segment.Length})";
@@ -49,8 +46,8 @@ internal readonly record struct BFHashSpec(HashFunction HashFunction, StringSegm
         {
             if (segment.Offset == 0 && segment.Length == -1)
                 return "str";
-            if (segment.Offset != 0 && segment.Length != -1)
-                return $"str.Slice(str.Length - {segment.Offset.ToString(NumberFormatInfo.InvariantInfo)})";
+            if (segment.Offset != 0 && segment.Length == -1)
+                return $"str.Slice(0, str.Length - {segment.Offset} - {segment.Length})";
 
             return $"str.Slice(str.Length - {segment.Offset} - {segment.Length}, {segment.Length})";
         }
