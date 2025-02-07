@@ -19,8 +19,6 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
 
         for (int len = 1; len < maxLen; len++)
         {
-            o.WriteLine("Length: " + len);
-
             string[] data = GenerateStrings(len, 1);
             StringProperties props = DataAnalyzer.GetStringProperties(data);
             int[] coverage = new int[len]; // Track how many times each index is covered
@@ -45,15 +43,15 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         // The generator should provide n*n number of results for strings up to length 8
         BruteForceGenerator gen = new BruteForceGenerator();
 
-        for (int i = 2; i <= 10; i++)
+        byte[] counts = [1, 3, 6, 10, 15, 21, 28, 36, 72, 72];
+
+        for (int i = 1; i <= 10; i++)
         {
             string[] data = GenerateStrings(i, 1);
 
             StringProperties props = DataAnalyzer.GetStringProperties(data);
             Assert.True(gen.IsAppropriate(props));
-
-            int max = Math.Min(i * i + i, 72); // Should not generate more than 72
-            Assert.Equal(max, gen.Generate(props).Count());
+            Assert.Equal(counts[i - 1], gen.Generate(props).Count());
         }
     }
 
@@ -63,7 +61,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         // The generator should provide n*n number of results for strings up to length 8
         EdgeGramGenerator gen = new EdgeGramGenerator();
 
-        for (int i = 2; i <= 10; i++)
+        for (int i = 1; i <= 10; i++)
         {
             string[] data = GenerateStrings(i, 1);
 
