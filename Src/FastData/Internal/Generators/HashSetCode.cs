@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
@@ -22,18 +23,27 @@ internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context) :
     {
         if (Spec.KnownDataType == KnownDataType.String)
         {
-            DataProperties props = Context.GetDataProperties();
+            if (Spec.Analyzer == Analyzer.BruteForce)
+            {
+                DataProperties props = Context.GetDataProperties();
+                BruteForceAnalyzer analyzer = new BruteForceAnalyzer(Spec.Data, props.StringProps.Value, new BruteForceSettings(), RunSimulation);
+                _hashSpec = analyzer.Run().Spec;
+                Func<string, uint> hashFunc = _hashSpec.GetFunction();
+                Create(x => hashFunc((string)x));
+                return true;
+            }
 
-            BruteForceAnalyzer analyzer = new BruteForceAnalyzer(Spec.Data, props.StringProps.Value, new BruteForceSettings(), RunSimulation);
-            Candidate<BruteForceHashSpec> candidate = analyzer.Run();
-
-            Func<string, uint> hashFunc = candidate.Spec.GetFunction();
-            _hashSpec = candidate.Spec;
-            Create(x => hashFunc((string)x));
+            if (Spec.Analyzer == Analyzer.Genetic)
+            {
+                DataProperties props = Context.GetDataProperties();
+                GeneticAnalyzer analyzer = new GeneticAnalyzer(Spec.Data, props.StringProps.Value, new GeneticSettings(), RunSimulation);
+                _hashSpec = analyzer.Run().Spec;
+                Func<string, uint> hashFunc = _hashSpec.GetFunction();
+                Create(x => hashFunc((string)x));
+            }
         }
-        else
-            Create(HashHelper.HashObject);
 
+        Create(HashHelper.HashObject);
         return true;
     }
 
@@ -46,6 +56,7 @@ internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context) :
         string first = (string)data[0];
 
         long ticks = Stopwatch.GetTimestamp();
+
         //Set power plan to high performance
         //Pin process to 1 core
         //Set process priority to above normal

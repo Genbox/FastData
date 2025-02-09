@@ -22,99 +22,99 @@ internal struct GeneticHashSpec(int mixerSeed, int mixerIterations, int avalanch
 
     public readonly string GetSource()
         => $$"""
-             public static uint Hash(string str)
-             {
-                 ref byte ptr = ref Unsafe.As<char, byte>(ref MemoryMarshal.GetReference(str.AsSpan()));
-                 int length = str.Length * 2;
-                 ulong acc = 42;
-
-                 if (length >= 32)
+                 public static uint Hash(string str)
                  {
-                     ref byte limit = ref Unsafe.Add(ref ptr, length - 31);
+                     ref byte ptr = ref Unsafe.As<char, byte>(ref MemoryMarshal.GetReference(str.AsSpan()));
+                     int length = str.Length * 2;
+                     ulong acc = 42;
 
-                     ulong acc0 = 0; //TODO: Seed correctly
-                     ulong acc1 = 0;
-                     ulong acc2 = 0;
-                     ulong acc3 = 0;
-
-                     do
+                     if (length >= 32)
                      {
-                         acc0 = Mixer(acc0, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                         ptr = ref Unsafe.Add(ref ptr, 8);
+                         ref byte limit = ref Unsafe.Add(ref ptr, length - 31);
 
-                         acc1 = Mixer(acc1, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                         ptr = ref Unsafe.Add(ref ptr, 8);
+                         ulong acc0 = 0; //TODO: Seed correctly
+                         ulong acc1 = 0;
+                         ulong acc2 = 0;
+                         ulong acc3 = 0;
 
-                         acc2 = Mixer(acc2, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                         ptr = ref Unsafe.Add(ref ptr, 8);
+                         do
+                         {
+                             acc0 = Mixer(acc0, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                             ptr = ref Unsafe.Add(ref ptr, 8);
 
-                         acc3 = Mixer(acc3, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                         ptr = ref Unsafe.Add(ref ptr, 8);
-                     } while (Unsafe.IsAddressLessThan(ref ptr, ref limit));
+                             acc1 = Mixer(acc1, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                             ptr = ref Unsafe.Add(ref ptr, 8);
 
-                     acc = Mixer(acc, acc0);
-                     acc = Mixer(acc, acc1);
-                     acc = Mixer(acc, acc2);
-                     acc = Mixer(acc, acc3);
+                             acc2 = Mixer(acc2, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                             ptr = ref Unsafe.Add(ref ptr, 8);
 
-                     //TODO: acc += length;
-                     length &= 31;
-                 }
+                             acc3 = Mixer(acc3, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                             ptr = ref Unsafe.Add(ref ptr, 8);
+                         } while (Unsafe.IsAddressLessThan(ref ptr, ref limit));
 
-                 if (length >= 16)
-                 {
-                     ref byte limit = ref Unsafe.Add(ref ptr, length - 15);
+                         acc = Mixer(acc, acc0);
+                         acc = Mixer(acc, acc1);
+                         acc = Mixer(acc, acc2);
+                         acc = Mixer(acc, acc3);
 
-                     ulong acc0 = 0; //TODO: Seed correctly
-                     ulong acc1 = 0;
+                         //TODO: acc += length;
+                         length &= 31;
+                     }
 
-                     do
+                     if (length >= 16)
                      {
-                         acc0 = Mixer(acc0, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                         ref byte limit = ref Unsafe.Add(ref ptr, length - 15);
+
+                         ulong acc0 = 0; //TODO: Seed correctly
+                         ulong acc1 = 0;
+
+                         do
+                         {
+                             acc0 = Mixer(acc0, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                             ptr = ref Unsafe.Add(ref ptr, 8);
+
+                             acc1 = Mixer(acc1, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                             ptr = ref Unsafe.Add(ref ptr, 8);
+                         } while (Unsafe.IsAddressLessThan(ref ptr, ref limit));
+
+                         acc = Mixer(acc, acc0);
+                         acc = Mixer(acc, acc1);
+
+                         //TODO: acc += length;
+                         length &= 15;
+                     }
+
+                     while (length >= 8)
+                     {
+                         acc = Mixer(acc, Unsafe.ReadUnaligned<ulong>(ref ptr));
                          ptr = ref Unsafe.Add(ref ptr, 8);
+                         length -= 8;
+                     }
 
-                         acc1 = Mixer(acc1, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                         ptr = ref Unsafe.Add(ref ptr, 8);
-                     } while (Unsafe.IsAddressLessThan(ref ptr, ref limit));
+                     if (length >= 4)
+                     {
+                         acc = Mixer(acc, Unsafe.ReadUnaligned<uint>(ref ptr));
+                         ptr = ref Unsafe.Add(ref ptr, 4);
+                         length -= 4;
+                     }
 
-                     acc = Mixer(acc, acc0);
-                     acc = Mixer(acc, acc1);
+                     while (length > 0)
+                     {
+                         acc = Mixer(acc, Unsafe.ReadUnaligned<byte>(ref ptr));
+                         ptr = ref Unsafe.Add(ref ptr, 1);
+                         length--;
+                     }
 
-                     //TODO: acc += length;
-                     length &= 15;
+                     var accParam = acc;
+                     {{ExpressionConverter.Instance.GetCode(GetAvalanche())}}
+                     return (uint)acc;
                  }
 
-                 while (length >= 8)
+                 public static ulong Mixer(ulong accParam, ulong inputParam)
                  {
-                     acc = Mixer(acc, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                     ptr = ref Unsafe.Add(ref ptr, 8);
-                     length -= 8;
+                     ulong {{ExpressionConverter.Instance.GetCode(GetMixer())}}
+                     return acc;
                  }
-
-                 if (length >= 4)
-                 {
-                     acc = Mixer(acc, Unsafe.ReadUnaligned<uint>(ref ptr));
-                     ptr = ref Unsafe.Add(ref ptr, 4);
-                     length -= 4;
-                 }
-
-                 while (length > 0)
-                 {
-                     acc = Mixer(acc, Unsafe.ReadUnaligned<byte>(ref ptr));
-                     ptr = ref Unsafe.Add(ref ptr, 1);
-                     length--;
-                 }
-
-                 var accParam = acc;
-                 {{ExpressionConverter.Instance.GetCode(GetAvalanche())}}
-                 return (uint)acc;
-             }
-
-             public static ulong Mixer(ulong accParam, ulong inputParam)
-             {
-                 ulong {{ExpressionConverter.Instance.GetCode(GetMixer())}}
-                 return acc;
-             }
              """;
 
     private readonly uint Hash(string str)

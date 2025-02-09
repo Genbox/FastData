@@ -19,4 +19,7 @@ public sealed class FastDataAttribute<T> : global::System.Attribute
     public string? Namespace { get; set; }
     public ClassVisibility ClassVisibility { get; set; }
     public ClassType ClassType { get; set; }
+    public Analyzer Analyzer { get; set; }
+    public StorageOption StorageOptions { get; set; }
+
 }

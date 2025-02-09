@@ -1,0 +1,5 @@
+
+using Genbox.FastData;
+using Genbox.FastData.Enums;
+
+[assembly: FastData<string>("ImmutableSet", ["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10"], StorageMode = StorageMode.Indexed, Analyzer = Analyzer.Genetic)]
