@@ -1,192 +1,265 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using Genbox.FastData.Internal.Analysis.Misc;
-using Genbox.FastData.Internal.Compat;
 
 namespace Genbox.FastData.Internal.Analysis.Genetic;
 
 [StructLayout(LayoutKind.Auto)]
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
 [SuppressMessage("Major Code Smell", "S125:Sections of code should not be commented out")]
-internal struct GeneticHashSpec : IHashSpec
+internal struct GeneticHashSpec(int mixerSeed, int mixerIterations, int avalancheSeed, int avalancheIterations, StringSegment[] segments) : IHashSpec
 {
-    internal int ExtractorSeed;
-    internal int MixerSeed;
-    internal int MixerIterations;
-    internal int AvalancheSeed;
-    internal int AvalancheIterations;
-    internal uint Seed;
-    internal StringSegment[] Segments;
+    internal int MixerSeed = mixerSeed;
+    internal int MixerIterations = mixerIterations;
+    internal int AvalancheSeed = avalancheSeed;
+    internal int AvalancheIterations = avalancheIterations;
+    internal StringSegment[] Segments = segments;
 
-    public Func<string, uint> GetFunction()
+    public readonly Func<string, uint> GetFunction() => Hash;
+
+    public readonly string GetSource()
+        => $$"""
+             public static uint Hash(string str)
+             {
+                 ref byte ptr = ref Unsafe.As<char, byte>(ref MemoryMarshal.GetReference(str.AsSpan()));
+                 int length = str.Length * 2;
+                 ulong acc = 42;
+
+                 if (length >= 32)
+                 {
+                     ref byte limit = ref Unsafe.Add(ref ptr, length - 31);
+
+                     ulong acc0 = 0; //TODO: Seed correctly
+                     ulong acc1 = 0;
+                     ulong acc2 = 0;
+                     ulong acc3 = 0;
+
+                     do
+                     {
+                         acc0 = Mixer(acc0, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                         ptr = ref Unsafe.Add(ref ptr, 8);
+
+                         acc1 = Mixer(acc1, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                         ptr = ref Unsafe.Add(ref ptr, 8);
+
+                         acc2 = Mixer(acc2, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                         ptr = ref Unsafe.Add(ref ptr, 8);
+
+                         acc3 = Mixer(acc3, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                         ptr = ref Unsafe.Add(ref ptr, 8);
+                     } while (Unsafe.IsAddressLessThan(ref ptr, ref limit));
+
+                     acc = Mixer(acc, acc0);
+                     acc = Mixer(acc, acc1);
+                     acc = Mixer(acc, acc2);
+                     acc = Mixer(acc, acc3);
+
+                     //TODO: acc += length;
+                     length &= 31;
+                 }
+
+                 if (length >= 16)
+                 {
+                     ref byte limit = ref Unsafe.Add(ref ptr, length - 15);
+
+                     ulong acc0 = 0; //TODO: Seed correctly
+                     ulong acc1 = 0;
+
+                     do
+                     {
+                         acc0 = Mixer(acc0, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                         ptr = ref Unsafe.Add(ref ptr, 8);
+
+                         acc1 = Mixer(acc1, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                         ptr = ref Unsafe.Add(ref ptr, 8);
+                     } while (Unsafe.IsAddressLessThan(ref ptr, ref limit));
+
+                     acc = Mixer(acc, acc0);
+                     acc = Mixer(acc, acc1);
+
+                     //TODO: acc += length;
+                     length &= 15;
+                 }
+
+                 while (length >= 8)
+                 {
+                     acc = Mixer(acc, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                     ptr = ref Unsafe.Add(ref ptr, 8);
+                     length -= 8;
+                 }
+
+                 if (length >= 4)
+                 {
+                     acc = Mixer(acc, Unsafe.ReadUnaligned<uint>(ref ptr));
+                     ptr = ref Unsafe.Add(ref ptr, 4);
+                     length -= 4;
+                 }
+
+                 while (length > 0)
+                 {
+                     acc = Mixer(acc, Unsafe.ReadUnaligned<byte>(ref ptr));
+                     ptr = ref Unsafe.Add(ref ptr, 1);
+                     length--;
+                 }
+
+                 var accParam = acc;
+                 {{ExpressionConverter.Instance.GetCode(GetAvalanche())}}
+                 return (uint)acc;
+             }
+
+             public static ulong Mixer(ulong accParam, ulong inputParam)
+             {
+                 ulong {{ExpressionConverter.Instance.GetCode(GetMixer())}}
+                 return acc;
+             }
+             """;
+
+    private readonly uint Hash(string str)
     {
-        // We create a hash function dynamically. Which functions that are run are determined on two seeds.
+        ref byte ptr = ref Unsafe.As<char, byte>(ref MemoryMarshal.GetReference(str.AsSpan()));
+        int length = str.Length * 2;
+        ulong acc = 42;
 
-        // First, we build the mixer
+        //TODO: move out for perf
+        Func<ulong, ulong, ulong> mixer = GetMixer().Compile();
+        Func<ulong, ulong> avalanche = GetAvalanche().Compile();
 
-        return null!;
+        if (length >= 32)
+        {
+            ref byte limit = ref Unsafe.Add(ref ptr, length - 31);
+
+            ulong acc0 = 0; //TODO: Seed correctly
+            ulong acc1 = 0;
+            ulong acc2 = 0;
+            ulong acc3 = 0;
+
+            do
+            {
+                acc0 = mixer(acc0, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                ptr = ref Unsafe.Add(ref ptr, 8);
+
+                acc1 = mixer(acc1, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                ptr = ref Unsafe.Add(ref ptr, 8);
+
+                acc2 = mixer(acc2, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                ptr = ref Unsafe.Add(ref ptr, 8);
+
+                acc3 = mixer(acc3, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                ptr = ref Unsafe.Add(ref ptr, 8);
+            } while (Unsafe.IsAddressLessThan(ref ptr, ref limit));
+
+            acc = mixer(acc, acc0);
+            acc = mixer(acc, acc1);
+            acc = mixer(acc, acc2);
+            acc = mixer(acc, acc3);
+
+            //TODO: acc += length;
+            length &= 31;
+        }
+
+        if (length >= 16)
+        {
+            ref byte limit = ref Unsafe.Add(ref ptr, length - 15);
+
+            ulong acc0 = 0; //TODO: Seed correctly
+            ulong acc1 = 0;
+
+            do
+            {
+                acc0 = mixer(acc0, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                ptr = ref Unsafe.Add(ref ptr, 8);
+
+                acc1 = mixer(acc1, Unsafe.ReadUnaligned<ulong>(ref ptr));
+                ptr = ref Unsafe.Add(ref ptr, 8);
+            } while (Unsafe.IsAddressLessThan(ref ptr, ref limit));
+
+            acc = mixer(acc, acc0);
+            acc = mixer(acc, acc1);
+
+            //TODO: acc += length;
+            length &= 15;
+        }
+
+        while (length >= 8)
+        {
+            acc = mixer(acc, Unsafe.ReadUnaligned<ulong>(ref ptr));
+            ptr = ref Unsafe.Add(ref ptr, 8);
+            length -= 8;
+        }
+
+        if (length >= 4)
+        {
+            acc = mixer(acc, Unsafe.ReadUnaligned<uint>(ref ptr));
+            ptr = ref Unsafe.Add(ref ptr, 4);
+            length -= 4;
+        }
+
+        while (length > 0)
+        {
+            acc = mixer(acc, Unsafe.ReadUnaligned<byte>(ref ptr));
+            ptr = ref Unsafe.Add(ref ptr, 1);
+            length--;
+        }
+
+        return (uint)avalanche(acc);
     }
 
-    public Expression<Func<ulong, ulong>> GetMixer()
+    internal readonly Expression<Func<ulong, ulong, ulong>> GetMixer()
     {
-        // We create a hash function dynamically. Which functions that are run are determined on two seeds.
+        ParameterExpression accParam = Expression.Parameter(typeof(ulong), "accParam");
+        ParameterExpression inputParam = Expression.Parameter(typeof(ulong), "inputParam");
+        ParameterExpression acc = Expression.Parameter(typeof(ulong), "acc");
 
-        // First, we build the mixer
-        Random mixerRng = new Random(MixerSeed);
-        var mixer = CreateMixer(MixerIterations, mixerRng);
+        IEnumerable<Expression> expressions = CreateMixer(MixerIterations, new Random(MixerSeed), acc);
 
-        return mixer;
+        BinaryExpression initLocalAcc = Expression.Assign(acc, Expression.Add(accParam, Expression.Multiply(inputParam, Expression.Constant((ulong)Seeds[0]))));
+        BlockExpression block = Expression.Block([acc], expressions.Prepend(initLocalAcc));
+        return Expression.Lambda<Func<ulong, ulong, ulong>>(block, accParam, inputParam);
     }
 
-    private static Expression<Func<ulong, ulong>> CreateMixer(int iterations, Random rng)
+    internal readonly Expression<Func<ulong, ulong>> GetAvalanche()
     {
-        Expression body = Expression.Parameter(typeof(ulong), "acc");
+        ParameterExpression accParam = Expression.Parameter(typeof(ulong), "accParam");
+        ParameterExpression acc = Expression.Parameter(typeof(ulong), "acc");
 
+        IEnumerable<Expression> expressions = CreateMixer(AvalancheIterations, new Random(AvalancheSeed), acc);
+
+        BinaryExpression initLocalAcc = Expression.Assign(acc, accParam);
+        BlockExpression block = Expression.Block([acc], expressions.Prepend(initLocalAcc));
+        return Expression.Lambda<Func<ulong, ulong>>(block, accParam);
+    }
+
+    private static IEnumerable<Expression> CreateMixer(int iterations, Random rng, ParameterExpression acc)
+    {
         for (int i = 0; i < iterations; i++)
         {
-            int choice = rng.Next(1, 6);
+            int choice = rng.Next(1, 7);
 
+            Expression body = acc;
             body = choice switch
             {
                 1 => Add(body, Seeds[rng.Next(0, Seeds.Length)]),
                 2 => Multiply(body, Seeds[rng.Next(0, Seeds.Length)]),
-                3 => RotateLeft(body, 31),
-                4 => RotateRight(body, 31),
-                5 => XorShift(body, 31),
-                _ => throw new InvalidOperationException("Value out of range"),
+                3 => RotateLeft(body, rng.Next(1, 64)),
+                4 => RotateRight(body, rng.Next(1, 64)),
+                5 => XorShift(body, rng.Next(1, 64)),
+                6 => Square(body),
+                _ => throw new InvalidOperationException("Value out of range")
             };
+
+            yield return Expression.Assign(acc, body);
         }
-
-        return Expression.Lambda<Func<ulong, ulong>>(body, Expression.Parameter(typeof(ulong), "acc"));
     }
 
-    private static Expression Add(Expression value, ulong amount)
-    {
-        // value + amount
-        return Expression.Add(value, Expression.Constant(amount));
-    }
-
-    private static Expression Multiply(Expression value, ulong amount)
-    {
-        // value * amount
-        return Expression.Multiply(value, Expression.Constant(amount));
-    }
-
-    private static Expression Xor(Expression value, byte amount)
-    {
-        // value ^ amount
-        return Expression.ExclusiveOr(value, Expression.Constant(amount));
-    }
-
-    private static Expression RotateLeft(Expression value, int offset)
-    {
-        // (value << offset) | (value >> (64 - offset));
-        return Expression.Or(Expression.LeftShift(value, Expression.Constant(offset)), Expression.RightShift(value, Expression.Constant(64 - offset)));
-    }
-
-    private static Expression RotateRight(Expression value, int offset)
-    {
-        // (value >> offset) | (value << (64 - offset));
-        return Expression.Or(Expression.RightShift(value, Expression.Constant(offset)), Expression.LeftShift(value, Expression.Constant(64 - offset)));
-    }
-
-    private static Expression XorShift(Expression value, int amount)
-    {
-        // value ^= (value >> amount)
-        return Expression.ExclusiveOr(value, Expression.RightShift(value, Expression.Constant(amount)));
-    }
-
-    // private static ulong Round(ulong acc, ulong input)
-    // {
-    //     acc += input * PRIME64_2;
-    //     acc = RotateLeft(acc, 31);
-    //     acc *= PRIME64_1;
-    //     return acc;
-    // }
-    //
-    // private static ulong MergeRound(ulong acc, ulong val)
-    // {
-    //     val = Round(0, val);
-    //     acc ^= val;
-    //     acc = (acc * PRIME64_1) + PRIME64_4;
-    //     return acc;
-    // }
-    //
-    // public static unsafe uint ComputeHash(ReadOnlySpan<char> s, int length)
-    // {
-    //     fixed (char* cPtr = s)
-    //     {
-    //         byte* data = (byte*)cPtr;
-    //
-    //         ulong h64;
-    //         if (length >= 32)
-    //         {
-    //             byte* bEnd = data + length;
-    //             byte* limit = bEnd - 31;
-    //
-    //             ulong v1 = unchecked(PRIME64_1 + PRIME64_2);
-    //             ulong v2 = PRIME64_2;
-    //             ulong v3 = 0;
-    //             ulong v4 = PRIME64_1;
-    //
-    //             do
-    //             {
-    //                 v1 = Round(v1, Read64(data));
-    //                 data += 8;
-    //                 v2 = Round(v2, Read64(data));
-    //                 data += 8;
-    //                 v3 = Round(v3, Read64(data));
-    //                 data += 8;
-    //                 v4 = Round(v4, Read64(data));
-    //                 data += 8;
-    //             } while (data < limit);
-    //
-    //             h64 = RotateLeft(v1, 1) + RotateLeft(v2, 7) + RotateLeft(v3, 12) + RotateLeft(v4, 18);
-    //             h64 = MergeRound(h64, v1);
-    //             h64 = MergeRound(h64, v2);
-    //             h64 = MergeRound(h64, v3);
-    //             h64 = MergeRound(h64, v4);
-    //         }
-    //         else
-    //             h64 = PRIME64_5;
-    //
-    //         h64 += (uint)length;
-    //
-    //         length &= 31;
-    //         while (length >= 8)
-    //         {
-    //             ulong k1 = Round(0, Read64(data));
-    //             data += 8;
-    //             h64 ^= k1;
-    //             h64 = (RotateLeft(h64, 27) * PRIME64_1) + PRIME64_4;
-    //             length -= 8;
-    //         }
-    //
-    //         if (length >= 4)
-    //         {
-    //             h64 ^= Read32(data) * PRIME64_1;
-    //             data += 4;
-    //             h64 = (RotateLeft(h64, 23) * PRIME64_2) + PRIME64_3;
-    //             length -= 4;
-    //         }
-    //
-    //         while (length > 0)
-    //         {
-    //             h64 ^= Read8(data) * PRIME64_5;
-    //             data++;
-    //             h64 = RotateLeft(h64, 11) * PRIME64_1;
-    //             length--;
-    //         }
-    //
-    //         h64 ^= h64 >> 33;
-    //         h64 *= PRIME64_2;
-    //         h64 ^= h64 >> 29;
-    //         h64 *= PRIME64_3;
-    //         h64 ^= h64 >> 32;
-    //         return (uint)h64;
-    //     }
-    // }
+    private static BinaryExpression Add(Expression e, ulong x) => Expression.Add(e, Expression.Constant(x));
+    private static BinaryExpression Multiply(Expression e, ulong x) => Expression.Multiply(e, Expression.Constant(x));
+    private static BinaryExpression RotateLeft(Expression e, int x) => Expression.Or(Expression.LeftShift(e, Expression.Constant(x)), Expression.RightShift(e, Expression.Constant(64 - x)));
+    private static BinaryExpression RotateRight(Expression e, int x) => Expression.Or(Expression.RightShift(e, Expression.Constant(x)), Expression.LeftShift(e, Expression.Constant(64 - x)));
+    private static BinaryExpression XorShift(Expression e, int x) => Expression.ExclusiveOr(e, Expression.RightShift(e, Expression.Constant(x)));
+    private static BinaryExpression Square(Expression e) => Expression.Add(Expression.Or(Expression.Constant(1UL), e), Expression.Multiply(e, e));
 
     // A good seed has the following properties:
     // - Odd: Avoids getting the mixer stuck in a loop of 0.
@@ -202,24 +275,80 @@ internal struct GeneticHashSpec : IHashSpec
         0x85EBCA77, 0xC2B2AE3D, // XXHash2
     ];
 
-    // private static readonly Expression<Func<uint, uint>>[] Mixers =
-    // [
-    //     static x => x,
-    //     static x => x + Seeds[0],
-    //     static x => (1u | x) + (x * x),
-    //     static x => x ^ (x >> 16),
-    //     static x => ((x << 5) + x) ^ x,
-    //     static x => BitOperations.RotateRight(x, 16),
-    //     static x => BitOperations.RotateLeft(x, 16)
-    // ];
-
-    public string Construct()
+    public sealed class ExpressionConverter : ExpressionVisitor
     {
-        return $$"""
-                 public static uint Hash(ReadOnlySpan<char> str)
-                 {
+        private readonly StringBuilder _sb = new StringBuilder();
 
-                 }
-                 """;
+        private ExpressionConverter() {}
+        internal static ExpressionConverter Instance => new ExpressionConverter();
+
+        public string GetCode(Expression expression)
+        {
+            _sb.Clear();
+            Visit(expression);
+            return _sb.ToString();
+        }
+
+        protected override Expression VisitBinary(BinaryExpression node)
+        {
+            if (node.NodeType == ExpressionType.Assign)
+            {
+                Visit(node.Left);
+                _sb.Append(" = ");
+                Visit(node.Right);
+            }
+            else
+            {
+                _sb.Append('(');
+                Visit(node.Left);
+                _sb.Append(GetBinaryOperator(node.NodeType));
+                Visit(node.Right);
+                _sb.Append(')');
+            }
+
+            return node;
+        }
+
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            _sb.Append(node.Value);
+            return node;
+        }
+
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            _sb.Append(node.Name);
+            return node;
+        }
+
+        protected override Expression VisitBlock(BlockExpression node)
+        {
+            foreach (var expression in node.Expressions)
+            {
+                Visit(expression);
+                _sb.AppendLine(";");
+            }
+            return node;
+        }
+
+        protected override Expression VisitLambda<T>(Expression<T> node)
+        {
+            Visit(node.Body);
+            return node;
+        }
+
+        private static string GetBinaryOperator(ExpressionType type)
+        {
+            return type switch
+            {
+                ExpressionType.Add => " + ",
+                ExpressionType.Multiply => " * ",
+                ExpressionType.ExclusiveOr => " ^ ",
+                ExpressionType.LeftShift => " << ",
+                ExpressionType.RightShift => " >> ",
+                ExpressionType.Or => " | ",
+                _ => throw new NotSupportedException($"Operator {type} is not supported.")
+            };
+        }
     }
 }

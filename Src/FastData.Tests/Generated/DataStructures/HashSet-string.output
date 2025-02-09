@@ -36,9 +36,9 @@
         return false;
     }
 
-    public static uint Hash(ReadOnlySpan<char> str)
+    public static uint Hash(string str)
     {
-        return Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions.FrozenHash.ComputeHash(str.Slice(4));
+        return Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions.DJB2Hash.ComputeHash(str.AsSpan(4));
     }
 
     [StructLayout(LayoutKind.Auto)]

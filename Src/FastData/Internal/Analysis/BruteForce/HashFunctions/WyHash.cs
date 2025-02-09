@@ -5,29 +5,29 @@ namespace Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
 
 public static class WyHash
 {
-    private static readonly ulong[] DefaultSecret = [0xa0761d6478bd642ful, 0xe7037ed1a0b428dbul, 0x8ebc6af09c88c6e3ul, 0x589965cc75374cc3ul];
+    private const ulong PRIME64_1 = 0xa0761d6478bd642ful;
+    private const ulong PRIME64_2 = 0xe7037ed1a0b428dbul;
 
     public static unsafe uint ComputeHash(ReadOnlySpan<char> s)
     {
-        ulong seed = DefaultSecret[0];
+        ulong seed = PRIME64_1;
+        int len = s.Length;
 
         fixed (char* cPtr = s)
-        fixed (ulong* secret = DefaultSecret)
         {
-            byte* data = (byte*)cPtr;
-            uint len = (uint)s.Length;
             ulong a, b;
 
+            uint* uPtr32 = (uint*)cPtr;
             if (len <= 16)
             {
                 if (len >= 4)
                 {
-                    a = ((ulong)Read32(data) << 32) | Read32(data + ((len >> 3) << 2));
-                    b = ((ulong)Read32(data + (len - 4)) << 32) | Read32(data + (len - 4 - ((len >> 3) << 2)));
+                    a = ((ulong)uPtr32[0] << 32) | uPtr32[(len >> 3) << 2];
+                    b = ((ulong)uPtr32[len - 4] << 32) | uPtr32[len - 4 - ((len >> 3) << 2)];
                 }
                 else if (len > 0)
                 {
-                    a = _wyr3(data, len);
+                    a = ((ulong)cPtr[0] << 16) | ((ulong)cPtr[len >> 1] << 8) | cPtr[len - 1];
                     b = 0;
                 }
                 else
@@ -38,55 +38,28 @@ public static class WyHash
             }
             else
             {
-                uint i = len;
+                int rem = len;
+                uint* uPtr64 = (uint*)cPtr;
 
-                if (i > 48)
+                while (rem > 16)
                 {
-                    ulong see1 = seed, see2 = seed;
-                    do
-                    {
-                        seed = _wymix(Read64(data) ^ secret[1], Read64(data + 8) ^ seed);
-                        see1 = _wymix(Read64(data + 16) ^ secret[2], Read64(data + 24) ^ see1);
-                        see2 = _wymix(Read64(data + 32) ^ secret[3], Read64(data + 40) ^ see2);
-                        data += 48;
-                        i -= 48;
-                    } while (i > 48);
-                    seed ^= see1 ^ see2;
+                    seed = Mix(uPtr64[0] ^ PRIME64_2, uPtr64[1] ^ seed);
+                    rem -= 16;
+                    uPtr64 += 2;
                 }
-                while (i > 16)
-                {
-                    seed = _wymix(Read64(data) ^ secret[1], Read64(data + 8) ^ seed);
-                    i -= 16;
-                    data += 16;
-                }
-                a = Read64(data + i - 16);
-                b = Read64(data + i - 8);
+
+                a = uPtr64[rem - 16];
+                b = uPtr64[rem - 8];
             }
-            return (uint)_wymix(secret[1] ^ len, _wymix(a ^ secret[1], b ^ seed));
+
+            return (uint)Mix(PRIME64_2 ^ (ulong)len, Mix(a ^ PRIME64_2, b ^ seed));
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe ulong _wyr3(byte* data, uint offset = 0) => ((ulong)data[0] << 16) | ((ulong)data[offset >> 1] << 8) | data[offset - 1];
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe void _wymum(ulong* A, ulong* B)
+    private static ulong Mix(ulong A, ulong B)
     {
-        ulong high = BigMul(*A, *B, out ulong low);
-
-#if WYHASH_CONDOM
-        *A ^= low;
-        *B ^= high;
-#else
-        *A = low;
-        *B = high;
-#endif
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe ulong _wymix(ulong A, ulong B)
-    {
-        _wymum(&A, &B);
-        return A ^ B;
+        ulong high = BigMul(A, B, out ulong low);
+        return low ^ high;
     }
 }

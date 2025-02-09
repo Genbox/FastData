@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
 
@@ -31,58 +30,4 @@ public static class Shared
         }
 #endif
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static ulong Read64(ReadOnlySpan<byte> data)
-    {
-        ref byte ptr = ref MemoryMarshal.GetReference(data);
-        return Unsafe.ReadUnaligned<ulong>(ref ptr);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static ulong Read64(ReadOnlySpan<byte> data, uint offset)
-    {
-        ref byte ptr = ref MemoryMarshal.GetReference(data);
-        return Unsafe.ReadUnaligned<ulong>(ref Unsafe.Add(ref ptr, (IntPtr)offset));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static ulong Read64(ReadOnlySpan<byte> data, int offset)
-    {
-        ref byte ptr = ref MemoryMarshal.GetReference(data);
-        return Unsafe.ReadUnaligned<ulong>(ref Unsafe.Add(ref ptr, offset));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static uint Read32(ReadOnlySpan<byte> data)
-    {
-        ref byte ptr = ref MemoryMarshal.GetReference(data);
-        return Unsafe.ReadUnaligned<uint>(ref ptr);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static uint Read32(ReadOnlySpan<byte> data, uint offset)
-    {
-        ref byte ptr = ref MemoryMarshal.GetReference(data);
-        return Unsafe.ReadUnaligned<uint>(ref Unsafe.Add(ref ptr, (IntPtr)offset));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static uint Read32(ReadOnlySpan<byte> data, int offset)
-    {
-        ref byte ptr = ref MemoryMarshal.GetReference(data);
-        return Unsafe.ReadUnaligned<uint>(ref Unsafe.Add(ref ptr, offset));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static unsafe uint Read8(byte* ptr) => *ptr;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static unsafe ushort Read16(byte* ptr) => *(ushort*)ptr;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static unsafe uint Read32(byte* ptr) => *(uint*)ptr;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static unsafe ulong Read64(byte* ptr) => *(ulong*)ptr;
 }

@@ -7,9 +7,9 @@ using Genbox.FastData.Internal.Analysis.Properties;
 namespace Genbox.FastData.Internal.Analysis.Genetic;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-internal sealed class GeneticHashAnalyzer(object[] data, StringProperties props, GeneticSettings settings, Simulation<GeneticSettings, GeneticHashSpec> simulation) : IHashAnalyzer<GeneticHashSpec>
+internal sealed class GeneticAnalyzer(object[] data, StringProperties props, GeneticSettings settings, Simulation<GeneticSettings, GeneticHashSpec> simulation) : IHashAnalyzer<GeneticHashSpec>
 {
-    private readonly StringSegment[] _segments = SegmentManager.Generate(props, SegmentManager.GetGenerators()).ToArray();
+    private readonly StringSegment[] _segments = SegmentManager.Generate(props).ToArray();
     private static readonly Random _rng = new Random();
 
     /*
@@ -79,7 +79,11 @@ internal sealed class GeneticHashAnalyzer(object[] data, StringProperties props,
         // Create the initial population
         Candidate<GeneticHashSpec>[] population = new Candidate<GeneticHashSpec>[settings.PopulationSize];
         for (int i = 0; i < population.Length; i++)
-            population[i] = new Candidate<GeneticHashSpec>(CreateSpec());
+        {
+            GeneticHashSpec spec = new GeneticHashSpec();
+            MutateSpec(ref spec);
+            population[i] = new Candidate<GeneticHashSpec>(spec);
+        }
 
         int evolution = 0;
         Candidate<GeneticHashSpec> top1 = new Candidate<GeneticHashSpec> { Fitness = double.MinValue };
@@ -109,27 +113,16 @@ internal sealed class GeneticHashAnalyzer(object[] data, StringProperties props,
         return top1;
     }
 
-    private GeneticHashSpec CreateSpec()
-    {
-        GeneticHashSpec spec = new GeneticHashSpec();
-        MutateSpec(ref spec);
-        return spec;
-    }
-
     private void MutateSpec(ref GeneticHashSpec spec)
     {
         // Length and offset is constrained:
         // - Offset must be within [0..MinLen] where MinLen is the length of the shortest string
         // - Length must be within the remainder of the string. If MinLen is 5, offset is 2, then Length must be within [1..2]
 
-        //TODO: when mixiterations is 0, no need to set mixlevel higher
-
-        spec.ExtractorSeed = _rng.Next();
         spec.MixerSeed = _rng.Next();
         spec.MixerIterations = _rng.Next(0, 16);
         spec.AvalancheSeed = _rng.Next();
         spec.AvalancheIterations = _rng.Next(0, 16);
-        // spec.Seed = Seeds[_rng.Next(0, Seeds.Length)];
 
         int numSegments = _rng.Next(0, _segments.Length);
 
@@ -143,12 +136,10 @@ internal sealed class GeneticHashAnalyzer(object[] data, StringProperties props,
 
     private static void Cross(ref GeneticHashSpec a, ref GeneticHashSpec b)
     {
-        b.ExtractorSeed = a.ExtractorSeed;
         b.MixerSeed = a.MixerSeed;
         b.MixerIterations = a.MixerIterations;
         b.AvalancheSeed = a.AvalancheSeed;
         b.AvalancheIterations = a.AvalancheIterations;
-        b.Seed = a.Seed;
         b.Segments = a.Segments;
     }
 

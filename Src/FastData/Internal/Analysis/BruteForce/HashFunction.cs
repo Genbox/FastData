@@ -2,7 +2,7 @@ namespace Genbox.FastData.Internal.Analysis.BruteForce;
 
 internal enum HashFunction
 {
-    FrozenHash,
+    DJB2Hash,
     WyHash,
     XxHash,
 }

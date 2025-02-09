@@ -44,9 +44,9 @@ internal static class ImmutableSet
         return false;
     }
 
-    public static uint Hash(ReadOnlySpan<char> str)
+    public static uint Hash(string str)
     {
-        return Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions.FrozenHash.ComputeHash(str);
+        return Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions.DJB2Hash.ComputeHash(str);
     }
 
     [StructLayout(LayoutKind.Auto)]

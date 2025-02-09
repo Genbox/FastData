@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Text;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Helpers;
 using static Genbox.FastData.Internal.CodeSnip;
 

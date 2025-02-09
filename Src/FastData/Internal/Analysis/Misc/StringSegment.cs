@@ -13,7 +13,7 @@ internal readonly record struct StringSegment(int Offset, int Length, Alignment 
 {
     internal ReadOnlySpan<char> GetSpan(string s)
     {
-        SegmentHelper.ConvertToOffsets(s.Length, this, out int offset1, out int offset2);
-        return s.AsSpan(offset1, offset2 - offset1);
+        SegmentHelper.ConvertToOffsets(s.Length, this, out int start, out int end);
+        return s.AsSpan(start, end - start);
     }
 }

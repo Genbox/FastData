@@ -1,13 +1,7 @@
 using System.Collections.Immutable;
 using System.Text;
-using Genbox.FastData.Enums;
-using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Enums;
-using Genbox.FastData.Internal.Generators;
 using Genbox.FastData.Internal.Helpers;
-using Genbox.FastData.Internal.Optimization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 

@@ -23,7 +23,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
             StringProperties props = DataAnalyzer.GetStringProperties(data);
             int[] coverage = new int[len]; // Track how many times each index is covered
 
-            foreach (StringSegment segment in SegmentManager.Generate(props, [generator]))
+            foreach (StringSegment segment in generator.Generate(props))
             {
                 SegmentHelper.ConvertToOffsets(data[0].Length, in segment, out int start, out int end);
 
@@ -85,7 +85,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
 
             StringProperties props = DataAnalyzer.GetStringProperties(data);
             Assert.True(gen.IsAppropriate(props));
-            Assert.True(gen.Generate(props).Any());
+            Assert.NotEmpty(gen.Generate(props));
         }
     }
 

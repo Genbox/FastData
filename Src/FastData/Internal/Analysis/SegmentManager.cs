@@ -8,11 +8,11 @@ namespace Genbox.FastData.Internal.Analysis;
 
 internal static class SegmentManager
 {
-    internal static IEnumerable<StringSegment> Generate(StringProperties props, IEnumerable<ISegmentGenerator> generators)
+    internal static IEnumerable<StringSegment> Generate(StringProperties props)
     {
         HashSet<StringSegment> uniq = new HashSet<StringSegment>();
 
-        foreach (ISegmentGenerator generator in generators)
+        foreach (ISegmentGenerator generator in GetGenerators())
         {
             // if (!generator.IsAppropriate(props))
             // continue;
@@ -28,23 +28,5 @@ internal static class SegmentManager
         }
     }
 
-    internal static IEnumerable<ISegmentGenerator> GetGenerators()
-    {
-        //TODO: Crashes due to code analysis assembly
-
-        // Find all segment generators with reflection
-        // foreach (Type type in typeof(SegmentManager).Assembly.GetTypes())
-        // {
-        //     if (!type.IsClass)
-        //         continue;
-        //
-        //     if (type.IsAbstract)
-        //         continue;
-        //
-        //     if (type.BaseType == typeof(ISegmentGenerator))
-        //         yield return (ISegmentGenerator)Activator.CreateInstance(type);
-        // }
-
-        return [new BruteForceGenerator(), new EdgeGramGenerator(), /*new DeltaGenerator(),*/ new OffsetGenerator()];
-    }
+    private static IEnumerable<ISegmentGenerator> GetGenerators() => [new BruteForceGenerator(), new EdgeGramGenerator(), new DeltaGenerator(), new OffsetGenerator()];
 }

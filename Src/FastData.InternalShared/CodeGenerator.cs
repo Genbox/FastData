@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
 using System.Text;
 using Genbox.FastData.Abstracts;
@@ -19,7 +20,8 @@ public static class CodeGenerator
         string wrapped = $$"""
                            using System;
                            using Genbox.FastData.Helpers;
-                           using System.Runtime.InteropServices;
+                           using System.Runtime.InteropServices;  // MethodImpl
+                           using System.Runtime.CompilerServices; // Unsafe
 
                            public static class Wrapper
                            {

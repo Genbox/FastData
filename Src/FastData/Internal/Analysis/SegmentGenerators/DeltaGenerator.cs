@@ -72,40 +72,43 @@ internal class DeltaGenerator : ISegmentGenerator
     public IEnumerable<StringSegment> Generate(StringProperties props)
     {
         // We start from the left, which is faster due to not having to do right-align checks
-        foreach (StringSegment stringSegment in CalculateSegments(props, props.DeltaData.Left))
-            yield return stringSegment with { Alignment = Alignment.Left };
-
-        foreach (StringSegment stringSegment in CalculateSegments(props, props.DeltaData.Right))
-            yield return stringSegment with { Alignment = Alignment.Right };
-    }
-
-    /// <summary>Returns segments with increasing length. It starts with the highest variance segment first and then continues to lower ones</summary>
-    private static IEnumerable<StringSegment> CalculateSegments(StringProperties stringProps, int[] data)
-    {
-        StringSegment[] segments = GetSegments(data).ToArray();
-        Debug.Assert(segments.Length > 0); // We should always have at least one segment
-
-        // We sort the segments in order of variance
-        Array.Sort(segments, (a, b) => ComputeVariance(b, stringProps, data).CompareTo(ComputeVariance(a, stringProps, data)));
-
-        foreach (StringSegment segment in segments)
+        foreach (StringSegment segment in CalculateSegments(props.DeltaData.Left))
         {
-            //TODO: Return merged segments if they are close
+            // Left Alignment:  offset + length <= Min
+            int maxLength = (int)(props.LengthData.Min - segment.Offset);
+            int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
+            yield return new StringSegment(segment.Offset, length, Alignment.Left);
+        }
 
-            for (int i = 1; i <= segment.Length; i++)
-                yield return segment with { Length = i };
+        // Process right-aligned segments
+        foreach (StringSegment segment in CalculateSegments(props.DeltaData.Right))
+        {
+            // Right Alignment: offset + length <= Min
+            int maxLength = (int)(props.LengthData.Min - segment.Offset);
+            int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
+            yield return new StringSegment(segment.Offset, length, Alignment.Right);
         }
     }
 
-    /// <summary>Computes the highest variance (difference between min and max of delta)</summary>
-    private static int ComputeVariance(StringSegment segment, StringProperties stringProps, int[] data)
+    /// <summary>Returns segments with increasing length. It starts with the highest variance segment first and then continues to lower ones</summary>
+    private static IEnumerable<StringSegment> CalculateSegments(int[] deltaMap)
     {
-        if (segment.Offset > stringProps.LengthData.Min)
+        // Use the delta map to generate segments.
+        IEnumerable<StringSegment> segments = GetSegments(deltaMap).ToList();
+
+        // We sort the segments in order of variance
+        return segments.OrderByDescending(segment => ComputeVariance(segment, deltaMap));
+    }
+
+    /// <summary>Computes the highest variance (difference between min and max of delta)</summary>
+    private static int ComputeVariance(StringSegment segment, int[] data)
+    {
+        if (segment.Offset > data.Length)
             return 0;
 
         int min = int.MaxValue;
         int max = int.MinValue;
-        for (int i = segment.Offset; i < Math.Min(stringProps.LengthData.Min, segment.Offset + segment.Length); i++)
+        for (int i = segment.Offset; i < Math.Min(data.Length, segment.Offset + segment.Length); i++)
         {
             min = Math.Min(data[i], min);
             max = Math.Max(data[i], max);
@@ -122,6 +125,8 @@ internal class DeltaGenerator : ISegmentGenerator
     /// <summary>Finds segments in the strings using a delta map</summary>
     private static IEnumerable<StringSegment> GetSegments(int[] arr)
     {
+        // We reuse the StringSegment struct here, but set the alignment to unknown
+        // We need to keep track if we already returned data to avoid duplications
         int offset = 0;
         while (offset < arr.Length)
         {
@@ -138,8 +143,7 @@ internal class DeltaGenerator : ISegmentGenerator
             yield return new StringSegment(start, offset - start, Alignment.Unknown);
         }
 
-        // There were no zeroes in the delta map. Return the entire string.
-        if (offset == arr.Length)
-            yield return new StringSegment(0, arr.Length, Alignment.Left);
+        if (arr.Length > 0)
+            yield return new StringSegment(0, -1, Alignment.Unknown);
     }
 }

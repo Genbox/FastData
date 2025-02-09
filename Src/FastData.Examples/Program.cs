@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Genbox.FastData.Internal.Analysis;
@@ -18,41 +19,37 @@ internal static class Program
 
     private static void Main()
     {
-        GeneticHashSpec spec = new GeneticHashSpec();
-        spec.MixerIterations = 4;
-        spec.MixerSeed = 500;
-        spec.Seed = 42;
-
-        var mixer = spec.GetMixer();
-        Console.WriteLine(mixer);
-
-        // RunBruteForce(RunFunc(Data, 5, PrependString));
+        GeneticAnalysis();
     }
 
-    private static void RunBruteForce(string[] data)
+    private static void BruteForce()
     {
+        RunBruteForce(RunFunc(Data, 5.0, PrependString));
+        RunBruteForce(RunFunc(Data, 1.0, PermuteString));
+        RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
+        RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
+    }
+
+    private static void RunBruteForce(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
+    {
+        Console.WriteLine("###############");
+        Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
         BruteForceAnalyzer analyzer = new BruteForceAnalyzer(data, props, new BruteForceSettings(), HashSetCode.RunSimulation);
-        Candidate<BFHashSpec> top1 = analyzer.Run();
+        Candidate<BruteForceHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1);
     }
 
     private static void GeneticAnalysis()
     {
-        RunGeneticAnalysis(RunFunc(Data, 1.0, PrependString));
+        RunGeneticAnalysis(RunFunc(Data, 5.0, PrependString));
         RunGeneticAnalysis(RunFunc(Data, 1.0, PermuteString));
         RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
         RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
     }
 
-    private static void Print(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
-    {
-        Console.WriteLine(source);
-
-        for (int i = 0; i < data.Length; i++)
-            Console.WriteLine(i + ". " + data[i]);
-    }
+    private static void Print(string[] data, string? source) => Console.WriteLine(source + ": " + string.Join(", ", data.Take(5)));
 
     private static string MutateString(string str, double factor, char[] alphabet)
     {
@@ -99,18 +96,19 @@ internal static class Program
         return res;
     }
 
-    private static void RunGeneticAnalysis(string[] data)
+    private static void RunGeneticAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
     {
+        Console.WriteLine("###############");
+        Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        GeneticHashAnalyzer analyzer = new GeneticHashAnalyzer(data, props, new GeneticSettings(), HashSetCode.RunSimulation);
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(data, props, new GeneticSettings(), HashSetCode.RunSimulation);
         Candidate<GeneticHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1, in props);
     }
 
     private static void PrintHeader<T>(in Candidate<T> candidate) where T : struct, IHashSpec
     {
-        Console.WriteLine("###############");
         Console.WriteLine("Result:");
         Console.WriteLine($"- {nameof(candidate.Fitness)}: {candidate.Fitness}");
         Console.WriteLine($"- {nameof(candidate.Metadata)}: {string.Join(", ", candidate.Metadata.Select(x => x.ToString()))}");
@@ -132,18 +130,17 @@ internal static class Program
         Console.WriteLine($"- {nameof(GeneticHashSpec.AvalancheSeed)}: {spec.AvalancheSeed}");
         Console.WriteLine($"- {nameof(GeneticHashSpec.AvalancheIterations)}: {spec.AvalancheIterations}");
         Console.WriteLine($"- {nameof(GeneticHashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(x => '[' + x.Offset.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Length.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Alignment + ']'))}");
-        Console.WriteLine($"- {nameof(GeneticHashSpec.Seed)}: {spec.Seed}");
-
-        // Console.WriteLine($"- Func: {spec.HashString}");
+        Console.WriteLine($"- Mixer: {GeneticHashSpec.ExpressionConverter.Instance.GetCode(spec.GetMixer())}");
+        Console.WriteLine($"- Avalanche: {GeneticHashSpec.ExpressionConverter.Instance.GetCode(spec.GetAvalanche())}");
     }
 
-    private static void PrintCandidate(in Candidate<BFHashSpec> candidate)
+    private static void PrintCandidate(in Candidate<BruteForceHashSpec> candidate)
     {
         PrintHeader(in candidate);
 
-        BFHashSpec spec = candidate.Spec;
+        BruteForceHashSpec spec = candidate.Spec;
         Console.WriteLine("Hash:");
-        Console.WriteLine($"- {nameof(BFHashSpec.HashFunction)}: {spec.HashFunction}");
-        Console.WriteLine($"- {nameof(BFHashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(x => '[' + x.Offset.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Length.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Alignment + ']'))}");
+        Console.WriteLine($"- {nameof(BruteForceHashSpec.HashFunction)}: {spec.HashFunction}");
+        Console.WriteLine($"- {nameof(BruteForceHashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(x => '[' + x.Offset.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Length.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Alignment + ']'))}");
     }
 }

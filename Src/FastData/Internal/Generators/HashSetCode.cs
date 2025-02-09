@@ -25,7 +25,7 @@ internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context) :
             DataProperties props = Context.GetDataProperties();
 
             BruteForceAnalyzer analyzer = new BruteForceAnalyzer(Spec.Data, props.StringProps.Value, new BruteForceSettings(), RunSimulation);
-            Candidate<BFHashSpec> candidate = analyzer.Run();
+            Candidate<BruteForceHashSpec> candidate = analyzer.Run();
 
             Func<string, uint> hashFunc = candidate.Spec.GetFunction();
             _hashSpec = candidate.Spec;
@@ -93,7 +93,7 @@ internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context) :
                          return false;
                      }
 
-                 {{(_hashSpec != null ? _hashSpec.Construct() : "")}}
+                 {{(_hashSpec != null ? _hashSpec.GetSource() : "")}}
 
                      [StructLayout(LayoutKind.Auto)]
                      private struct Entry
