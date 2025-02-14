@@ -25,6 +25,7 @@ internal readonly record struct BruteForceHashSpec(HashFunction HashFunction, St
 
     public string GetSource()
         => $$"""
+                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                  public static uint Hash(string str)
                  {
                      return Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions.{{HashFunction}}.ComputeHash({{GetSlice(Segments[0])}});

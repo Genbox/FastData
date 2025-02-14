@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
 using static Genbox.FastData.Internal.Compat.BitOperations;
 
 namespace Genbox.FastData.Helpers;
@@ -34,55 +35,7 @@ public static class HashHelper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static unsafe uint HashString(ReadOnlySpan<char> data)
-    {
-        int length = data.Length;
-        fixed (char* src = &MemoryMarshal.GetReference(data))
-        {
-            uint hash1, hash2;
-            switch (length)
-            {
-                case 1:
-                    hash2 = (RotateLeft(Accumulator, 5) + Accumulator) ^ src[0];
-                    return Accumulator + (hash2 * Factor);
-
-                case 2:
-                    hash2 = (RotateLeft(Accumulator, 5) + Accumulator) ^ src[0];
-                    hash2 = (RotateLeft(hash2, 5) + hash2) ^ src[1];
-                    return Accumulator + (hash2 * Factor);
-
-                case 3:
-                    hash2 = (RotateLeft(Accumulator, 5) + Accumulator) ^ src[0];
-                    hash2 = (RotateLeft(hash2, 5) + hash2) ^ src[1];
-                    hash2 = (RotateLeft(hash2, 5) + hash2) ^ src[2];
-                    return Accumulator + (hash2 * Factor);
-
-                case 4:
-                    hash1 = (RotateLeft(Accumulator, 5) + Accumulator) ^ ((uint*)src)[0];
-                    hash2 = (RotateLeft(Accumulator, 5) + Accumulator) ^ ((uint*)src)[1];
-                    return hash1 + (hash2 * Factor);
-
-                default:
-                    hash1 = Accumulator;
-                    hash2 = hash1;
-
-                    uint* ptrUInt32 = (uint*)src;
-                    while (length >= 4)
-                    {
-                        hash1 = (RotateLeft(hash1, 5) + hash1) ^ ptrUInt32[0];
-                        hash2 = (RotateLeft(hash2, 5) + hash2) ^ ptrUInt32[1];
-                        ptrUInt32 += 2;
-                        length -= 4;
-                    }
-
-                    char* ptrChar = (char*)ptrUInt32;
-                    while (length-- > 0)
-                        hash2 = (RotateLeft(hash2, 5) + hash2) ^ *ptrChar++;
-
-                    return hash1 + (hash2 * Factor);
-            }
-        }
-    }
+    public static uint HashString(ReadOnlySpan<char> data) => DJB2Hash.ComputeHash(data);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static unsafe uint HashStringSeed(ReadOnlySpan<char> data, uint seed)
@@ -136,7 +89,7 @@ public static class HashHelper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Mix(uint h)
+    private static uint Mix(uint h)
     {
         h ^= h >> 16;
         h *= 0x85ebca6b;

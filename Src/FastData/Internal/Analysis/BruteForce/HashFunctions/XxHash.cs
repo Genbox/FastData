@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using static Genbox.FastData.Internal.Compat.BitOperations;
 
 namespace Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
@@ -11,36 +12,38 @@ public static class XxHash
     private const ulong PRIME64_4 = 9650029242287828579UL;
     private const ulong PRIME64_5 = 2870177450012600261UL;
 
-    public static unsafe uint ComputeHash(ReadOnlySpan<char> s)
+    public static uint ComputeHash(ReadOnlySpan<char> s)
     {
-        int length = s.Length;
-        fixed (char* src = s)
+        return ComputeHash(ref MemoryMarshal.GetReference(s), s.Length);
+    }
+
+    public static uint ComputeHash(ref char ptr, int length)
+    {
+        ulong hash1 = PRIME64_5 + (ulong)length;
+
+        ref ulong ptr64 = ref Unsafe.As<char, ulong>(ref ptr);
+        while (length >= 4)
         {
-            ulong hash1 = PRIME64_5 + (ulong)length;
-
-            ulong* ptrUInt64 = (ulong*)src;
-            while (length >= 4)
-            {
-                hash1 ^= Round(0, ptrUInt64[0]);
-                hash1 = (RotateLeft(hash1, 27) * PRIME64_1) + PRIME64_4;
-                ptrUInt64++;
-                length -= 4;
-            }
-
-            char* ptrChar = (char*)ptrUInt64;
-            while (length-- > 0)
-            {
-                hash1 ^= ptrChar[0] * PRIME64_5;
-                hash1 = RotateLeft(hash1, 11) * PRIME64_1;
-            }
-
-            hash1 ^= hash1 >> 33;
-            hash1 *= PRIME64_2;
-            hash1 ^= hash1 >> 29;
-            hash1 *= PRIME64_3;
-            hash1 ^= hash1 >> 32;
-            return (uint)hash1;
+            hash1 ^= Round(0, ptr64);
+            hash1 = (RotateLeft(hash1, 27) * PRIME64_1) + PRIME64_4;
+            ptr64 = ref Unsafe.Add(ref ptr64, 1);
+            length -= 4;
         }
+
+        ref ushort ptr16 = ref Unsafe.As<ulong, ushort>(ref ptr64);
+        while (length-- > 0)
+        {
+            hash1 ^= ptr16 * PRIME64_5;
+            hash1 = RotateLeft(hash1, 11) * PRIME64_1;
+            ptr16 = ref Unsafe.Add(ref ptr16, 1);
+        }
+
+        hash1 ^= hash1 >> 33;
+        hash1 *= PRIME64_2;
+        hash1 ^= hash1 >> 29;
+        hash1 *= PRIME64_3;
+        hash1 ^= hash1 >> 32;
+        return unchecked((uint)hash1);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
