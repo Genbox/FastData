@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices;
+using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis.Genetic;
 
-namespace Genbox.FastData.Internal.Analysis.Genetic;
+namespace Genbox.FastData.Internal.Analysis;
 
 [StructLayout(LayoutKind.Auto)]
 internal struct Candidate<T>(in T spec) where T : struct, IHashSpec

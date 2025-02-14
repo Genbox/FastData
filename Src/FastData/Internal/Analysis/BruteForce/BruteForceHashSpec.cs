@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
+using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
 using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Misc;
@@ -17,7 +18,6 @@ internal readonly record struct BruteForceHashSpec(HashFunction HashFunction, St
         return HashFunction switch
         {
             HashFunction.DJB2Hash => s => DJB2Hash.ComputeHash(seg.GetSpan(s)),
-            HashFunction.WyHash => s => WyHash.ComputeHash(seg.GetSpan(s)),
             HashFunction.XxHash => s => XxHash.ComputeHash(seg.GetSpan(s)),
             _ => throw new InvalidOperationException("Unsupported hash function " + HashFunction)
         };

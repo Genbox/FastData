@@ -8,23 +8,23 @@ internal sealed class UniqueKeyLengthSwitchCode(FastDataSpec Spec, GeneratorCont
 {
     public bool TryCreate() => true;
 
-    public string Generate()
-        => $$"""
-                 {{GetMethodAttributes()}}
-                 public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
-                 {
-             {{GetEarlyExits("value", Context.GetEarlyExits())}}
+    public string Generate() =>
+        $$"""
+              {{GetMethodAttributes()}}
+              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              {
+          {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
-                     switch (value.Length)
-                     {
-             {{GenerateSwitch(Spec.Data)}}
-                         default:
-                             return false;
-                     }
-                 }
-             """;
+                  switch (value.Length)
+                  {
+          {{GenerateSwitch(Spec.Data)}}
+                      default:
+                          return false;
+                  }
+              }
+          """;
 
-    private static string GenerateSwitch(object[] values)
+    private string GenerateSwitch(object[] values)
     {
         StringBuilder sb = new StringBuilder();
 
@@ -32,7 +32,7 @@ internal sealed class UniqueKeyLengthSwitchCode(FastDataSpec Spec, GeneratorCont
         {
             sb.AppendLine($"""
                                        case {value.Length}:
-                                           return {GetEqualFunction("value", ToValueLabel(value))};
+                                           return {GetEqualFunction(Spec.KnownDataType, "value", ToValueLabel(value))};
                            """);
         }
 

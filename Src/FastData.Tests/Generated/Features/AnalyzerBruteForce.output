@@ -40,7 +40,7 @@ internal static class ImmutableSet
         {
             ref Entry entry = ref _entries[i];
 
-            if (entry.HashCode == hashCode && entry.Value.Equals(value))
+            if (entry.HashCode == hashCode && StringComparer.Ordinal.Equals(entry.Value, value))
                 return true;
 
             i = entry.Next;
@@ -49,6 +49,7 @@ internal static class ImmutableSet
         return false;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint Hash(string str)
     {
         return Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions.DJB2Hash.ComputeHash(str.AsSpan(4));

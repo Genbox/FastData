@@ -6,20 +6,22 @@ namespace Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
 
 public static class XxHash
 {
-    private const ulong PRIME64_1 = 11400714785074694791UL;
-    private const ulong PRIME64_2 = 14029467366897019727UL;
-    private const ulong PRIME64_3 = 1609587929392839161UL;
-    private const ulong PRIME64_4 = 9650029242287828579UL;
-    private const ulong PRIME64_5 = 2870177450012600261UL;
+    private const ulong PRIME64_1 = 0x9E3779B185EBCA87UL;
+    private const ulong PRIME64_2 = 0xC2B2AE3D27D4EB4FUL;
+    private const ulong PRIME64_3 = 0x165667B19E3779F9UL;
+    private const ulong PRIME64_4 = 0x85EBCA77C2B2AE63UL;
+    private const ulong PRIME64_5 = 0x27D4EB2F165667C5UL;
 
-    public static uint ComputeHash(ReadOnlySpan<char> s)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint ComputeHash(ReadOnlySpan<char> s, ulong seed = PRIME64_5)
     {
-        return ComputeHash(ref MemoryMarshal.GetReference(s), s.Length);
+        return ComputeHash(ref MemoryMarshal.GetReference(s), s.Length, seed);
     }
 
-    public static uint ComputeHash(ref char ptr, int length)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint ComputeHash(ref char ptr, int length, ulong seed = PRIME64_5)
     {
-        ulong hash1 = PRIME64_5 + (ulong)length;
+        ulong hash1 = seed + (ulong)length;
 
         ref ulong ptr64 = ref Unsafe.As<char, ulong>(ref ptr);
         while (length >= 4)

@@ -7,46 +7,48 @@ namespace Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
 public static class DJB2Hash
 {
     private const uint Seed = (5381 << 16) + 5381;
-    private const uint Factor = 1_566_083_941;
+    private const uint Factor = 0x5D588B65;
 
-    public static uint ComputeHash(ReadOnlySpan<char> span)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint ComputeHash(ReadOnlySpan<char> span, uint seed = Seed)
     {
         ref char ptr = ref MemoryMarshal.GetReference(span);
-        return ComputeHash(ref ptr, span.Length);
+        return ComputeHash(ref ptr, span.Length, seed);
     }
 
-    public static uint ComputeHash(ref char ptr, int length)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint ComputeHash(ref char ptr, int length, uint seed = Seed)
     {
         uint hash1, hash2;
         switch (length)
         {
             case 1:
-                hash2 = (RotateLeft(Seed, 5) + Seed) ^ ptr;
-                return Seed + (hash2 * Factor);
+                hash2 = (RotateLeft(seed, 5) + seed) ^ ptr;
+                return seed + (hash2 * Factor);
 
             case 2:
-                hash2 = (RotateLeft(Seed, 5) + Seed) ^ ptr;
+                hash2 = (RotateLeft(seed, 5) + seed) ^ ptr;
                 hash2 = (RotateLeft(hash2, 5) + hash2) ^ Unsafe.Add(ref ptr, 1);
-                return Seed + (hash2 * Factor);
+                return seed + (hash2 * Factor);
 
             case 3:
-                hash2 = (RotateLeft(Seed, 5) + Seed) ^ ptr;
+                hash2 = (RotateLeft(seed, 5) + seed) ^ ptr;
                 hash2 = (RotateLeft(hash2, 5) + hash2) ^ Unsafe.Add(ref ptr, 1);
                 hash2 = (RotateLeft(hash2, 5) + hash2) ^ Unsafe.Add(ref ptr, 2);
-                return Seed + (hash2 * Factor);
+                return seed + (hash2 * Factor);
 
             case 4:
             {
                 ref uint ptr32 = ref Unsafe.As<char, uint>(ref ptr);
 
-                hash1 = (RotateLeft(Seed, 5) + Seed) ^ ptr32;
-                hash2 = (RotateLeft(Seed, 5) + Seed) ^ Unsafe.Add(ref ptr32, 1);
+                hash1 = (RotateLeft(seed, 5) + seed) ^ ptr32;
+                hash2 = (RotateLeft(seed, 5) + seed) ^ Unsafe.Add(ref ptr32, 1);
                 return hash1 + (hash2 * Factor);
             }
             default:
             {
-                hash1 = Seed;
-                hash2 = hash1;
+                hash1 = seed;
+                hash2 = seed;
 
                 ref uint ptr32 = ref Unsafe.As<char, uint>(ref ptr);
 

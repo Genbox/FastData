@@ -19,7 +19,7 @@
 
         for (int i = 0; i < 10; i++)
         {
-            if (value.Equals(_entries[i]))
+            if (StringComparer.Ordinal.Equals(value, _entries[i]))
                return true;
         }
         return false;

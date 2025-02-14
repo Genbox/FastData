@@ -28,36 +28,34 @@ internal sealed class EytzingerSearchCode(FastDataSpec Spec, GeneratorContext Co
         }
     }
 
-    public string Generate()
-    {
-        return $$"""
-                     private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
-                 {{JoinValues(Spec.Data, Render, ",\n")}}
-                     };
+    public string Generate() =>
+        $$"""
+              private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
+          {{JoinValues(Spec.Data, Render, ",\n")}}
+              };
 
-                     {{GetMethodAttributes()}}
-                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
-                     {
-                 {{GetEarlyExits("value", Context.GetEarlyExits())}}
+              {{GetMethodAttributes()}}
+              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              {
+          {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
-                         int i = 0;
-                         while (i < _entries.Length)
-                         {
-                             int comparison = {{GetCompareFunction("_entries[i]", "value")}};
+                  int i = 0;
+                  while (i < _entries.Length)
+                  {
+                      int comparison = {{GetCompareFunction("_entries[i]", "value")}};
 
-                             if (comparison == 0)
-                                 return true;
+                      if (comparison == 0)
+                          return true;
 
-                             if (comparison < 0)
-                                 i = 2 * i + 2;
-                             else
-                                 i = 2 * i + 1;
-                         }
+                      if (comparison < 0)
+                          i = 2 * i + 2;
+                      else
+                          i = 2 * i + 1;
+                  }
 
-                         return false;
-                     }
-                 """;
+                  return false;
+              }
+          """;
 
-        static void Render(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));
-    }
+    private static void Render(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));
 }

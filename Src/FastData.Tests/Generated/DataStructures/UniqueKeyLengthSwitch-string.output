@@ -7,25 +7,25 @@
         switch (value.Length)
         {
             case 1:
-                return value.Equals("a");
+                return StringComparer.Ordinal.Equals(value, "a");
             case 2:
-                return value.Equals("aa");
+                return StringComparer.Ordinal.Equals(value, "aa");
             case 3:
-                return value.Equals("aaa");
+                return StringComparer.Ordinal.Equals(value, "aaa");
             case 4:
-                return value.Equals("aaaa");
+                return StringComparer.Ordinal.Equals(value, "aaaa");
             case 5:
-                return value.Equals("aaaaa");
+                return StringComparer.Ordinal.Equals(value, "aaaaa");
             case 6:
-                return value.Equals("aaaaaa");
+                return StringComparer.Ordinal.Equals(value, "aaaaaa");
             case 7:
-                return value.Equals("aaaaaaa");
+                return StringComparer.Ordinal.Equals(value, "aaaaaaa");
             case 8:
-                return value.Equals("aaaaaaaa");
+                return StringComparer.Ordinal.Equals(value, "aaaaaaaa");
             case 9:
-                return value.Equals("aaaaaaaaa");
+                return StringComparer.Ordinal.Equals(value, "aaaaaaaaa");
             case 10:
-                return value.Equals("aaaaaaaaaa");
+                return StringComparer.Ordinal.Equals(value, "aaaaaaaaaa");
 
             default:
                 return false;

@@ -31,17 +31,6 @@ public class HashBenchmarks
     }
 
     [Benchmark]
-    public ulong WyHashTest()
-    {
-        ulong value = 0;
-
-        foreach (string s in _array)
-            value += WyHash.ComputeHash(s);
-
-        return value;
-    }
-
-    [Benchmark]
     public ulong XXHashTest()
     {
         ulong value = 0;

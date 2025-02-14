@@ -8,21 +8,19 @@ internal sealed class ConditionalCode(FastDataSpec Spec, GeneratorContext Contex
 {
     public bool TryCreate() => true;
 
-    public string Generate()
-    {
-        return $$"""
-                     {{GetMethodAttributes()}}
-                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
-                     {
-                 {{GetEarlyExits("value", Context.GetEarlyExits())}}
+    public string Generate() =>
+        $$"""
+              {{GetMethodAttributes()}}
+              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              {
+          {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
-                         if ({{JoinValues(Spec.Data, Render, " || ")}})
-                             return true;
+                  if ({{JoinValues(Spec.Data, Render, " || ")}})
+                      return true;
 
-                         return false;
-                     }
-                 """;
+                  return false;
+              }
+          """;
 
-        static void Render(StringBuilder sb, object obj) => sb.Append(GetEqualFunction("value", ToValueLabel(obj)));
-    }
+    private void Render(StringBuilder sb, object obj) => sb.Append(GetEqualFunction(Spec.KnownDataType, "value", ToValueLabel(obj)));
 }

@@ -99,7 +99,7 @@ internal static class Generator
                 if (spec.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
                     yield return new BinarySearchCode(spec, context);
                 else
-                    yield return new HashSetCode(spec, context);
+                    yield return new HashSetCode(spec, context, HashSetCode.HashSetType.Chain);
 
                 break;
             case StorageMode.Linear:
@@ -112,7 +112,7 @@ internal static class Generator
                 yield return new BinarySearchCode(spec, context);
                 break;
             case StorageMode.Indexed:
-                yield return new HashSetCode(spec, context);
+                yield return new HashSetCode(spec, context, HashSetCode.HashSetType.Chain);
                 break;
 
             default:
@@ -153,7 +153,8 @@ internal static class Generator
             DataStructure.Switch => new SwitchCode(spec, context),
             DataStructure.SwitchHashCode => new SwitchHashCode(spec, context),
             DataStructure.MinimalPerfectHash => new MinimalPerfectHashCode(spec, context),
-            DataStructure.HashSet => new HashSetCode(spec, context),
+            DataStructure.HashSetChain => new HashSetCode(spec, context, HashSetCode.HashSetType.Chain),
+            DataStructure.HashSetLinear => new HashSetCode(spec, context, HashSetCode.HashSetType.Linear),
             DataStructure.UniqueKeyLength => new UniqueKeyLengthCode(spec, context),
             DataStructure.UniqueKeyLengthSwitch => new UniqueKeyLengthSwitchCode(spec, context),
             DataStructure.KeyLength => new KeyLengthCode(spec, context),

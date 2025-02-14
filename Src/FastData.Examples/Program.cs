@@ -1,8 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using System.Text;
+using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.BruteForce;
 using Genbox.FastData.Internal.Analysis.Genetic;
@@ -19,7 +18,6 @@ internal static class Program
 
     private static void Main()
     {
-        GeneticAnalysis();
     }
 
     private static void BruteForce()

@@ -1,14 +1,14 @@
     private static Entry[] _entries = new Entry[] {
-        new Entry(6, 912853230u),
-        new Entry(10, 2861009921u),
-        new Entry(9, 1858290192u),
-        new Entry(7, 2548655613u),
-        new Entry(8, 2737821194u),
-        new Entry(2, 374509275u),
-        new Entry(1, 1220815836u),
-        new Entry(3, 1768738647u),
-        new Entry(5, 1443092418u),
-        new Entry(4, 1098639589u)
+        new Entry(1, 2018242870u),
+        new Entry(8, 1257683291u),
+        new Entry(10, 787152282u),
+        new Entry(9, 3913170893u),
+        new Entry(6, 3637550824u),
+        new Entry(2, 3927073125u),
+        new Entry(4, 3790689556u),
+        new Entry(3, 3528132897u),
+        new Entry(7, 1428509628u),
+        new Entry(5, 3590607639u)
     };
 
     
@@ -17,11 +17,22 @@
         if (value < 1 || value > 10)
            return false;
 
-        uint hash = HashHelper.Mix(unchecked((uint)value + 9037));
+        uint hash = Mix(unchecked((uint)(value ^ 23)));
         uint index = MathHelper.FastMod(hash, 10, 1844674407370955162);
         ref Entry entry = ref _entries[index];
 
         return hash == entry.HashCode && value.Equals(entry.Value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static uint Mix(uint h)
+    {
+        h ^= h >> 16;
+        h *= 0x85ebca6b;
+        h ^= h >> 13;
+        h *= 0xc2b2ae35;
+        h ^= h >> 16;
+        return h;
     }
 
     [StructLayout(LayoutKind.Auto)]

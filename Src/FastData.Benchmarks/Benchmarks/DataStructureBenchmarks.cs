@@ -31,7 +31,7 @@ public class DataStructureBenchmarks
     private BlockedBloomFilter<string> _blockedBloom = null!;
     private BinaryFuse8Filter<string> _binaryFuse8 = null!;
 
-    [Params(1_000, 10_000, 100_000)]
+    [Params(1_000, 10_000)]
     public int QuerySize { get; set; }
 
     private void SetupQueries()

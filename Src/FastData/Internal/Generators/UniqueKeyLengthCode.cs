@@ -43,28 +43,26 @@ internal sealed class UniqueKeyLengthCode(FastDataSpec Spec, GeneratorContext Co
 
     //TODO: Remove gaps in array by reducing the index via a map (if (idx > 10) return 4) where 4 is the number to subtract from the index
 
-    public string Generate()
+    public string Generate() =>
+        $$"""
+              private{{GetModifier(Spec.ClassType)}} readonly {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
+          {{JoinValues(_lengths.AsSpan(_lowerBound), Render, ",\n")}}
+              };
+
+              {{GetMethodAttributes()}}
+              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              {
+          {{GetEarlyExits("value", Context.GetEarlyExits(), true)}}
+
+                  return {{GetEqualFunction(Spec.KnownDataType, "value", $"_entries[value.Length - {_lowerBound.ToString(NumberFormatInfo.InvariantInfo)}]")}};
+              }
+          """;
+
+    private static void Render(StringBuilder sb, string? obj)
     {
-        return $$"""
-                     private{{GetModifier(Spec.ClassType)}} readonly {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
-                 {{JoinValues(_lengths.AsSpan(_lowerBound), Render, ",\n")}}
-                     };
-
-                     {{GetMethodAttributes()}}
-                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
-                     {
-                 {{GetEarlyExits("value", Context.GetEarlyExits(), true)}}
-
-                         return {{GetEqualFunction("value", $"_entries[value.Length - {_lowerBound.ToString(NumberFormatInfo.InvariantInfo)}]")}};
-                     }
-                 """;
-
-        static void Render(StringBuilder sb, string? obj)
-        {
-            if (obj == null)
-                sb.Append("        null");
-            else
-                sb.Append("        ").Append(ToValueLabel(obj));
-        }
+        if (obj == null)
+            sb.Append("        null");
+        else
+            sb.Append("        ").Append(ToValueLabel(obj));
     }
 }

@@ -26,28 +26,26 @@ internal sealed class SwitchHashCode(FastDataSpec Spec, GeneratorContext Context
         return true;
     }
 
-    public string Generate()
+    public string Generate() =>
+        $$"""
+              {{GetMethodAttributes()}}
+              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              {
+          {{GetEarlyExits("value", Context.GetEarlyExits())}}
+
+                  switch ({{GetHashFunction32(Spec.KnownDataType, "value")}})
+                  {
+          {{JoinValues(_hashCodes, Render, "\n")}}
+                  }
+                  return false;
+              }
+          """;
+
+    private void Render(StringBuilder sb, (uint, object) obj)
     {
-        return $$"""
-                     {{GetMethodAttributes()}}
-                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
-                     {
-                 {{GetEarlyExits("value", Context.GetEarlyExits())}}
-
-                         switch ({{GetHashFunction32(Spec.KnownDataType, "value")}})
-                         {
-                 {{JoinValues(_hashCodes, Render, "\n")}}
-                         }
-                         return false;
-                     }
-                 """;
-
-        void Render(StringBuilder sb, (uint, object) obj)
-        {
-            sb.Append($"""
-                                   case {obj.Item1.ToString(NumberFormatInfo.InvariantInfo)}:
-                                        return {GetEqualFunction("value", ToValueLabel(obj.Item2))};
-                       """);
-        }
+        sb.Append($"""
+                               case {obj.Item1.ToString(NumberFormatInfo.InvariantInfo)}:
+                                    return {GetEqualFunction(Spec.KnownDataType, "value", ToValueLabel(obj.Item2))};
+                   """);
     }
 }

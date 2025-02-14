@@ -34,39 +34,37 @@ internal sealed class KeyLengthCode(FastDataSpec Spec, GeneratorContext Context)
         return true;
     }
 
-    public string Generate()
+    public string Generate() =>
+        $$"""
+              private{{GetModifier(Spec.ClassType)}} readonly {{Spec.DataTypeName}}[]?[] _entries = [
+          {{JoinValues(_lengths, RenderEntry, ",\n")}}
+              ];
+
+              {{GetMethodAttributes()}}
+              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              {
+          {{GetEarlyExits("value", Context.GetEarlyExits(), true)}}
+
+                  {{Spec.DataTypeName}}[]? bucket = _entries[value.Length];
+
+                  if (bucket == null)
+                      return false;
+
+                  foreach ({{Spec.DataTypeName}} str in bucket)
+                  {
+                      if ({{GetEqualFunction(Spec.KnownDataType, "value", "str")}})
+                          return true;
+                  }
+
+                  return false;
+              }
+          """;
+
+    private static void RenderEntry(StringBuilder sb, List<string>? obj)
     {
-        return $$"""
-                     private{{GetModifier(Spec.ClassType)}} readonly {{Spec.DataTypeName}}[]?[] _entries = [
-                 {{JoinValues(_lengths, RenderEntry, ",\n")}}
-                     ];
-
-                     {{GetMethodAttributes()}}
-                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
-                     {
-                 {{GetEarlyExits("value", Context.GetEarlyExits(), true)}}
-
-                         {{Spec.DataTypeName}}[]? bucket = _entries[value.Length];
-
-                         if (bucket == null)
-                             return false;
-
-                         foreach ({{Spec.DataTypeName}} str in bucket)
-                         {
-                             if ({{GetEqualFunction("value", "str")}})
-                                 return true;
-                         }
-
-                         return false;
-                     }
-                 """;
-
-        static void RenderEntry(StringBuilder sb, List<string>? obj)
-        {
-            if (obj == null)
-                sb.Append("        null");
-            else
-                sb.Append("        [").Append(string.Join(",", obj.Select(x => "\"" + x + "\""))).Append(']');
-        }
+        if (obj == null)
+            sb.Append("        null");
+        else
+            sb.Append("        [").Append(string.Join(",", obj.Select(x => "\"" + x + "\""))).Append(']');
     }
 }

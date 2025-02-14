@@ -7,25 +7,25 @@
         switch (HashHelper.HashString(value))
         {
             case 2011983611:
-                 return value.Equals("item1");
+                 return StringComparer.Ordinal.Equals(value, "item1");
             case 3578067552:
-                 return value.Equals("item2");
+                 return StringComparer.Ordinal.Equals(value, "item2");
             case 849184197:
-                 return value.Equals("item3");
+                 return StringComparer.Ordinal.Equals(value, "item3");
             case 2415268138:
-                 return value.Equals("item4");
+                 return StringComparer.Ordinal.Equals(value, "item4");
             case 3981352079:
-                 return value.Equals("item5");
+                 return StringComparer.Ordinal.Equals(value, "item5");
             case 1252468724:
-                 return value.Equals("item6");
+                 return StringComparer.Ordinal.Equals(value, "item6");
             case 2818552665:
-                 return value.Equals("item7");
+                 return StringComparer.Ordinal.Equals(value, "item7");
             case 802130030:
-                 return value.Equals("item8");
+                 return StringComparer.Ordinal.Equals(value, "item8");
             case 2368213971:
-                 return value.Equals("item9");
+                 return StringComparer.Ordinal.Equals(value, "item9");
             case 1309368076:
-                 return value.Equals("item10");
+                 return StringComparer.Ordinal.Equals(value, "item10");
         }
         return false;
     }

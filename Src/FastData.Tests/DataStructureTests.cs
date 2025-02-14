@@ -68,7 +68,8 @@ public class DataStructureTests
         data.Add("string", KnownDataType.String, DataStructure.Switch, normal1);
         data.Add("string", KnownDataType.String, DataStructure.SwitchHashCode, normal1);
         data.Add("string", KnownDataType.String, DataStructure.MinimalPerfectHash, normal1);
-        data.Add("string", KnownDataType.String, DataStructure.HashSet, normal1);
+        data.Add("string", KnownDataType.String, DataStructure.HashSetChain, normal1);
+        data.Add("string", KnownDataType.String, DataStructure.HashSetLinear, normal1);
         data.Add("string", KnownDataType.String, DataStructure.UniqueKeyLength, uniqueLength1);
         data.Add("string", KnownDataType.String, DataStructure.UniqueKeyLengthSwitch, uniqueLength1);
         data.Add("string", KnownDataType.String, DataStructure.KeyLength, normal1);
@@ -89,7 +90,8 @@ public class DataStructureTests
         data.Add("int", KnownDataType.Int32, DataStructure.Switch, normal2);
         data.Add("int", KnownDataType.Int32, DataStructure.SwitchHashCode, normal2);
         data.Add("int", KnownDataType.Int32, DataStructure.MinimalPerfectHash, normal2);
-        data.Add("int", KnownDataType.Int32, DataStructure.HashSet, normal2);
+        data.Add("int", KnownDataType.Int32, DataStructure.HashSetChain, normal2);
+        data.Add("int", KnownDataType.Int32, DataStructure.HashSetLinear, normal2);
         data.Add("int", KnownDataType.Int32, DataStructure.SingleValue, single2);
         data.Add("int", KnownDataType.Int32, DataStructure.Conditional, normal2);
 

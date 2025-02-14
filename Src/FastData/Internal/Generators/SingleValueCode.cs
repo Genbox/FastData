@@ -12,12 +12,12 @@ internal sealed class SingleValueCode(FastDataSpec Spec, GeneratorContext Contex
     // - Integers: Only need an equals function (x == y)
     // - Others: They fall back to a simple equals as well
 
-    public string Generate()
-        => $$"""
-                 {{GetMethodAttributes()}}
-                 public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
-                 {
-                     return {{GetEqualFunction("value", ToValueLabel(Spec.Data[0]))}};
-                 }
-             """;
+    public string Generate() =>
+        $$"""
+              {{GetMethodAttributes()}}
+              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              {
+                  return {{GetEqualFunction(Spec.KnownDataType, "value", ToValueLabel(Spec.Data[0]))}};
+              }
+          """;
 }

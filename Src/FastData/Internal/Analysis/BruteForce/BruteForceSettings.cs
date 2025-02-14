@@ -1,6 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Genbox.FastData.Internal.Analysis.BruteForce;
 
-internal class BruteForceSettings : CommonSettings
-{
-    internal int Nothing { get; set; }
-}
+[SuppressMessage("Minor Code Smell", "S2094:Classes should not be empty")]
+internal class BruteForceSettings : CommonSettings;

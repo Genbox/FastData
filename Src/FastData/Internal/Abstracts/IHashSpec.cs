@@ -1,4 +1,4 @@
-namespace Genbox.FastData.Internal.Analysis.Genetic;
+namespace Genbox.FastData.Internal.Abstracts;
 
 internal interface IHashSpec
 {

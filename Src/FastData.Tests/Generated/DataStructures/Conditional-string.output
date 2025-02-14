@@ -4,7 +4,7 @@
         if (value.Length < 5 || value.Length > 6)
            return false;
 
-        if (value.Equals("item1") || value.Equals("item2") || value.Equals("item3") || value.Equals("item4") || value.Equals("item5") || value.Equals("item6") || value.Equals("item7") || value.Equals("item8") || value.Equals("item9") || value.Equals("item10"))
+        if (StringComparer.Ordinal.Equals(value, "item1") || StringComparer.Ordinal.Equals(value, "item2") || StringComparer.Ordinal.Equals(value, "item3") || StringComparer.Ordinal.Equals(value, "item4") || StringComparer.Ordinal.Equals(value, "item5") || StringComparer.Ordinal.Equals(value, "item6") || StringComparer.Ordinal.Equals(value, "item7") || StringComparer.Ordinal.Equals(value, "item8") || StringComparer.Ordinal.Equals(value, "item9") || StringComparer.Ordinal.Equals(value, "item10"))
             return true;
 
         return false;

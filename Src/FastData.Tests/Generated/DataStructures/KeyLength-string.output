@@ -21,7 +21,7 @@
 
         foreach (string str in bucket)
         {
-            if (value.Equals(str))
+            if (StringComparer.Ordinal.Equals(value, str))
                 return true;
         }
 

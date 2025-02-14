@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.Genetic;

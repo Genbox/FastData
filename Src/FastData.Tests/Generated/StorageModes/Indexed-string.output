@@ -35,7 +35,7 @@ internal static class ImmutableSet
         {
             ref Entry entry = ref _entries[i];
 
-            if (entry.HashCode == hashCode && entry.Value.Equals(value))
+            if (entry.HashCode == hashCode && StringComparer.Ordinal.Equals(entry.Value, value))
                 return true;
 
             i = entry.Next;

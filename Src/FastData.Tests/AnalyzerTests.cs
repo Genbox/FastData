@@ -27,8 +27,7 @@ public class AnalyzerTests
 
     [Theory]
     [InlineData(HashFunction.DJB2Hash, 1853903583)]
-    [InlineData(HashFunction.WyHash, 4223215734)]
-    [InlineData(HashFunction.XxHash, 136972111)]
+    [InlineData(HashFunction.XxHash, 1713611331)]
     internal void BFHashSpecTest(HashFunction function, uint vector)
     {
         BruteForceHashSpec spec = new BruteForceHashSpec(function, [new StringSegment(0, -1, Alignment.Left)]);
