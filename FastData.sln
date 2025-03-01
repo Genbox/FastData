@@ -70,6 +70,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.InternalShared", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData", "Src\FastData\FastData.csproj", "{24CACF84-1F4D-4473-9388-9CC18432B0B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Testbed", "Src\FastData.Testbed\FastData.Testbed.csproj", "{3B0C2ED7-1056-42A6-B2CD-2DA992B9F726}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +101,10 @@ Global
 		{24CACF84-1F4D-4473-9388-9CC18432B0B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24CACF84-1F4D-4473-9388-9CC18432B0B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24CACF84-1F4D-4473-9388-9CC18432B0B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B0C2ED7-1056-42A6-B2CD-2DA992B9F726}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B0C2ED7-1056-42A6-B2CD-2DA992B9F726}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B0C2ED7-1056-42A6-B2CD-2DA992B9F726}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B0C2ED7-1056-42A6-B2CD-2DA992B9F726}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{24810DE3-EAFF-4FA9-8813-209C15AC75EC} = {B774BCA8-4D2D-44E7-903F-0FFC349FCC85}
