@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Genbox.FastData.Internal.Analysis;
+namespace Genbox.FastData.Internal.Analysis.Misc;
 
 [StructLayout(LayoutKind.Auto)]
 internal readonly record struct CharacterMap

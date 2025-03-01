@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal;
@@ -14,6 +15,7 @@ namespace Genbox.FastData.Tests;
 /// These tests are designed to ensure that every supported data structure can be generated with different types
 /// and that they are working as expected.
 /// </summary>
+[SuppressMessage("Usage", "xUnit1016:MemberData must reference a public member")]
 public class DataStructureTests
 {
     [Fact]
@@ -23,28 +25,15 @@ public class DataStructureTests
     }
 
     [Theory, MemberData(nameof(GetDataStructures))]
-    public void GenerateDataStructure(string type, KnownDataType kt, DataStructure ds, object[] data)
+    internal void GenerateDataStructure(string type, KnownDataType kt, DataStructure ds, object[] data)
     {
         FastDataSpec spec = new FastDataSpec();
         spec.Data = (object[])data.Clone(); //We need to make a defensive clone to avoid the generator from manipulating with the data
         spec.DataTypeName = type;
         spec.KnownDataType = kt;
 
-        IEnumerable<IEarlyExit> early = new List<IEarlyExit>();
-
-        if (kt == KnownDataType.String)
-        {
-            StringProperties props = DataAnalyzer.GetStringProperties(data);
-            early = Optimizer.GetEarlyExits(props);
-        }
-        else if (kt == KnownDataType.Int32)
-        {
-            IntegerProperties props = DataAnalyzer.GetInt32Properties(data);
-            early = Optimizer.GetEarlyExits(props);
-        }
-
         StringBuilder sb = new StringBuilder();
-        FastDataGenerator.Generate(ds, sb, spec, early);
+        Generator.Generate(ds, sb, spec);
 
         string source = sb.ToString();
         Assert.NotEmpty(source);
@@ -65,7 +54,7 @@ public class DataStructureTests
         }
     }
 
-    public static TheoryData<string, KnownDataType, DataStructure, object[]> GetDataStructures()
+    internal static TheoryData<string, KnownDataType, DataStructure, object[]> GetDataStructures()
     {
         TheoryData<string, KnownDataType, DataStructure, object[]> data = new TheoryData<string, KnownDataType, DataStructure, object[]>();
 
@@ -79,7 +68,8 @@ public class DataStructureTests
         data.Add("string", KnownDataType.String, DataStructure.Switch, normal1);
         data.Add("string", KnownDataType.String, DataStructure.SwitchHashCode, normal1);
         data.Add("string", KnownDataType.String, DataStructure.MinimalPerfectHash, normal1);
-        data.Add("string", KnownDataType.String, DataStructure.HashSet, normal1);
+        data.Add("string", KnownDataType.String, DataStructure.HashSetChain, normal1);
+        data.Add("string", KnownDataType.String, DataStructure.HashSetLinear, normal1);
         data.Add("string", KnownDataType.String, DataStructure.UniqueKeyLength, uniqueLength1);
         data.Add("string", KnownDataType.String, DataStructure.UniqueKeyLengthSwitch, uniqueLength1);
         data.Add("string", KnownDataType.String, DataStructure.KeyLength, normal1);
@@ -100,7 +90,8 @@ public class DataStructureTests
         data.Add("int", KnownDataType.Int32, DataStructure.Switch, normal2);
         data.Add("int", KnownDataType.Int32, DataStructure.SwitchHashCode, normal2);
         data.Add("int", KnownDataType.Int32, DataStructure.MinimalPerfectHash, normal2);
-        data.Add("int", KnownDataType.Int32, DataStructure.HashSet, normal2);
+        data.Add("int", KnownDataType.Int32, DataStructure.HashSetChain, normal2);
+        data.Add("int", KnownDataType.Int32, DataStructure.HashSetLinear, normal2);
         data.Add("int", KnownDataType.Int32, DataStructure.SingleValue, single2);
         data.Add("int", KnownDataType.Int32, DataStructure.Conditional, normal2);
 

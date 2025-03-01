@@ -1,19 +1,14 @@
 using System.Text;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Enums;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class KeyLengthCode(FastDataSpec Spec) : ICode
+internal sealed class KeyLengthCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
     private List<string>?[] _lengths;
 
-    public bool IsAppropriate(DataProperties dataProps) => Spec.KnownDataType == KnownDataType.String;
-
-    public bool TryPrepare()
+    public bool TryCreate()
     {
         //This implementation is the same as AutoUniqueLength, but takes duplicates into consideration
 
@@ -39,39 +34,37 @@ internal sealed class KeyLengthCode(FastDataSpec Spec) : ICode
         return true;
     }
 
-    public string Generate(IEnumerable<IEarlyExit> ee)
+    public string Generate() =>
+        $$"""
+              private{{GetModifier(Spec.ClassType)}} readonly {{Spec.DataTypeName}}[]?[] _entries = [
+          {{JoinValues(_lengths, RenderEntry, ",\n")}}
+              ];
+
+              {{GetMethodAttributes()}}
+              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              {
+          {{GetEarlyExits("value", Context.GetEarlyExits(), true)}}
+
+                  {{Spec.DataTypeName}}[]? bucket = _entries[value.Length];
+
+                  if (bucket == null)
+                      return false;
+
+                  foreach ({{Spec.DataTypeName}} str in bucket)
+                  {
+                      if ({{GetEqualFunction(Spec.KnownDataType, "value", "str")}})
+                          return true;
+                  }
+
+                  return false;
+              }
+          """;
+
+    private static void RenderEntry(StringBuilder sb, List<string>? obj)
     {
-        return $$"""
-                     private{{GetModifier(Spec.ClassType)}} readonly {{Spec.DataTypeName}}[]?[] _entries = [
-                 {{JoinValues(_lengths, RenderEntry, ",\n")}}
-                     ];
-
-                     {{GetMethodAttributes()}}
-                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
-                     {
-                 {{GetEarlyExits("value", ee, true)}}
-
-                         {{Spec.DataTypeName}}[]? bucket = _entries[value.Length];
-
-                         if (bucket == null)
-                             return false;
-
-                         foreach ({{Spec.DataTypeName}} str in bucket)
-                         {
-                             if ({{GetEqualFunction("value", "str")}})
-                                 return true;
-                         }
-
-                         return false;
-                     }
-                 """;
-
-        static void RenderEntry(StringBuilder sb, List<string>? obj)
-        {
-            if (obj == null)
-                sb.Append("        null");
-            else
-                sb.Append("        [").Append(string.Join(",", obj.Select(x => "\"" + x + "\""))).Append(']');
-        }
+        if (obj == null)
+            sb.Append("        null");
+        else
+            sb.Append("        [").Append(string.Join(",", obj.Select(x => "\"" + x + "\""))).Append(']');
     }
 }

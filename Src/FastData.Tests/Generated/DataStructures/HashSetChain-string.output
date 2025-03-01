@@ -27,7 +27,7 @@
         {
             ref Entry entry = ref _entries[i];
 
-            if (entry.HashCode == hashCode && entry.Value.Equals(value))
+            if (entry.HashCode == hashCode && StringComparer.Ordinal.Equals(entry.Value, value))
                 return true;
 
             i = entry.Next;
@@ -35,6 +35,8 @@
 
         return false;
     }
+
+
 
     [StructLayout(LayoutKind.Auto)]
     private struct Entry

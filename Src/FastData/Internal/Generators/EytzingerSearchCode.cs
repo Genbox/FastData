@@ -1,16 +1,12 @@
 using System.Text;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.Properties;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class EytzingerSearchCode(FastDataSpec Spec) : ICode
+internal sealed class EytzingerSearchCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
-    public bool IsAppropriate(DataProperties dataProps) => true;
-
-    public bool TryPrepare()
+    public bool TryCreate()
     {
         Array.Sort(Spec.Data, StringComparer.Ordinal);
 
@@ -32,36 +28,34 @@ internal sealed class EytzingerSearchCode(FastDataSpec Spec) : ICode
         }
     }
 
-    public string Generate(IEnumerable<IEarlyExit> ee)
-    {
-        return $$"""
-                     private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
-                 {{JoinValues(Spec.Data, Render, ",\n")}}
-                     };
+    public string Generate() =>
+        $$"""
+              private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
+          {{JoinValues(Spec.Data, Render, ",\n")}}
+              };
 
-                     {{GetMethodAttributes()}}
-                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
-                     {
-                 {{GetEarlyExits("value", ee)}}
+              {{GetMethodAttributes()}}
+              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              {
+          {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
-                         int i = 0;
-                         while (i < _entries.Length)
-                         {
-                             int comparison = {{GetCompareFunction("_entries[i]", "value")}};
+                  int i = 0;
+                  while (i < _entries.Length)
+                  {
+                      int comparison = {{GetCompareFunction("_entries[i]", "value")}};
 
-                             if (comparison == 0)
-                                 return true;
+                      if (comparison == 0)
+                          return true;
 
-                             if (comparison < 0)
-                                 i = 2 * i + 2;
-                             else
-                                 i = 2 * i + 1;
-                         }
+                      if (comparison < 0)
+                          i = 2 * i + 2;
+                      else
+                          i = 2 * i + 1;
+                  }
 
-                         return false;
-                     }
-                 """;
+                  return false;
+              }
+          """;
 
-        static void Render(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));
-    }
+    private static void Render(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));
 }

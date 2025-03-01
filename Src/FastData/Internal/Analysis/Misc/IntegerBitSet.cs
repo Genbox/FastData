@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Genbox.FastData.Internal.Compat;
 
-namespace Genbox.FastData.Internal.Analysis;
+namespace Genbox.FastData.Internal.Analysis.Misc;
 
 [StructLayout(LayoutKind.Auto)]
 internal struct IntegerBitSet

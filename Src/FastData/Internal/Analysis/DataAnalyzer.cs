@@ -1,3 +1,5 @@
+using Genbox.FastData.Internal.Analysis.Data;
+using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Analysis;
@@ -44,10 +46,10 @@ internal static class DataAnalyzer
                 right[i] += flag ? rc : -rc;
                 counts[i]++;
 
-                characterMap.Add(c);
-
                 if (c > 255)
                     allAscii = false;
+                else
+                    characterMap.Add(c); //char map only supports up to 255
             }
 
             flag = !flag;
@@ -69,7 +71,7 @@ internal static class DataAnalyzer
             }
         }
 
-        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, lengthMap), new EntropyData(left, right), new CharacterData(allAscii, counts, characterMap));
+        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, lengthMap), new DeltaData(left, right), new CharacterData(allAscii, counts, characterMap));
     }
 
     internal static CharProperties GetCharProperties(object[] data)

@@ -1,32 +1,26 @@
 using System.Text;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.Properties;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class ConditionalCode(FastDataSpec Spec) : ICode
+internal sealed class ConditionalCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
-    public bool IsAppropriate(DataProperties dataProps) => true;
+    public bool TryCreate() => true;
 
-    public bool TryPrepare() => true;
+    public string Generate() =>
+        $$"""
+              {{GetMethodAttributes()}}
+              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              {
+          {{GetEarlyExits("value", Context.GetEarlyExits())}}
 
-    public string Generate(IEnumerable<IEarlyExit> ee)
-    {
-        return $$"""
-                     {{GetMethodAttributes()}}
-                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
-                     {
-                 {{GetEarlyExits("value", ee)}}
+                  if ({{JoinValues(Spec.Data, Render, " || ")}})
+                      return true;
 
-                         if ({{JoinValues(Spec.Data, Render, " || ")}})
-                             return true;
+                  return false;
+              }
+          """;
 
-                         return false;
-                     }
-                 """;
-
-        static void Render(StringBuilder sb, object obj) => sb.Append(GetEqualFunction("value", ToValueLabel(obj)));
-    }
+    private void Render(StringBuilder sb, object obj) => sb.Append(GetEqualFunction(Spec.KnownDataType, "value", ToValueLabel(obj)));
 }

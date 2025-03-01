@@ -2,19 +2,15 @@ using System.Globalization;
 using System.Text;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.Properties;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class SwitchHashCode(FastDataSpec Spec) : ICode
+internal sealed class SwitchHashCode(FastDataSpec Spec, GeneratorContext Context) : ICode
 {
     private (uint, object)[] _hashCodes;
 
-    public bool IsAppropriate(DataProperties dataProps) => true;
-
-    public bool TryPrepare()
+    public bool TryCreate()
     {
         (uint, object)[] hashCodes = new (uint, object)[Spec.Data.Length];
 
@@ -30,28 +26,26 @@ internal sealed class SwitchHashCode(FastDataSpec Spec) : ICode
         return true;
     }
 
-    public string Generate(IEnumerable<IEarlyExit> ee)
+    public string Generate() =>
+        $$"""
+              {{GetMethodAttributes()}}
+              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              {
+          {{GetEarlyExits("value", Context.GetEarlyExits())}}
+
+                  switch ({{GetHashFunction32(Spec.KnownDataType, "value")}})
+                  {
+          {{JoinValues(_hashCodes, Render, "\n")}}
+                  }
+                  return false;
+              }
+          """;
+
+    private void Render(StringBuilder sb, (uint, object) obj)
     {
-        return $$"""
-                     {{GetMethodAttributes()}}
-                     public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
-                     {
-                 {{GetEarlyExits("value", ee)}}
-
-                         switch ({{GetHashFunction32(Spec.KnownDataType, "value")}})
-                         {
-                 {{JoinValues(_hashCodes, Render, "\n")}}
-                         }
-                         return false;
-                     }
-                 """;
-
-        void Render(StringBuilder sb, (uint, object) obj)
-        {
-            sb.Append($"""
-                                   case {obj.Item1.ToString(NumberFormatInfo.InvariantInfo)}:
-                                        return {GetEqualFunction("value", ToValueLabel(obj.Item2))};
-                       """);
-        }
+        sb.Append($"""
+                               case {obj.Item1.ToString(NumberFormatInfo.InvariantInfo)}:
+                                    return {GetEqualFunction(Spec.KnownDataType, "value", ToValueLabel(obj.Item2))};
+                   """);
     }
 }

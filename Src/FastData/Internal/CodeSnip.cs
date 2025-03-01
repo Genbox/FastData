@@ -56,8 +56,11 @@ internal static class CodeSnip
                           return false;
                """;
 
-    public static string GetEqualFunction(string variable1, string variable2)
+    public static string GetEqualFunction(KnownDataType type, string variable1, string variable2)
     {
+        if (type == KnownDataType.String)
+            return $"StringComparer.Ordinal.Equals({variable1}, {variable2})";
+
         return $"{variable1}.Equals({variable2})";
     }
 
@@ -66,7 +69,7 @@ internal static class CodeSnip
         return $"{variable1}.CompareTo({variable2})";
     }
 
-    public static string GetSeededHashFunction32(KnownDataType type, string variable, uint seed, bool mix)
+    public static string GetSeededHashFunction32(KnownDataType type, string variable, uint seed)
     {
         if (type == KnownDataType.String)
             return $"HashHelper.HashStringSeed({variable}, {seed})";
@@ -80,8 +83,8 @@ internal static class CodeSnip
                 or KnownDataType.Int16
                 or KnownDataType.UInt16
                 or KnownDataType.Int32
-                or KnownDataType.UInt32 => mix ? $"HashHelper.Mix(unchecked((uint){variable} + {seed}))" : $"unchecked((uint){variable})",
-            _ => mix ? $"HashHelper.Mix(unchecked((uint){variable}.GetHashCode() + {seed}))" : $"unchecked((uint){variable}.GetHashCode())"
+                or KnownDataType.UInt32 => $"unchecked((uint)({variable} ^ {seed}))",
+            _ => $"unchecked((uint)({variable}.GetHashCode() ^ {seed}))"
         };
     }
 

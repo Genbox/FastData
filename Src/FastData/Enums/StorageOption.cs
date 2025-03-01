@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Enums;
 
-internal enum StorageOption
+public enum StorageOption
 {
     None = 0,
     OptimizeForMemory = 1,

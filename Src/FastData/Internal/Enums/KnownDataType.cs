@@ -3,7 +3,7 @@ using Genbox.FastEnum;
 namespace Genbox.FastData.Internal.Enums;
 
 [FastEnum]
-public enum KnownDataType
+internal enum KnownDataType
 {
     //The names in here must match the primitive names in C#
     Unknown = 0,
