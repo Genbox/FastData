@@ -1,11 +1,10 @@
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Analysis.BruteForce;
 
-internal class BruteForceAnalyzer(object[] data, StringProperties props, BruteForceSettings settings, Simulation<BruteForceSettings, BruteForceHashSpec> simulation) : IHashAnalyzer<BruteForceHashSpec>
+internal class BruteForceAnalyzer(object[] data, StringProperties props, BruteForceAnalyzerConfig analyzerConfig, Simulation<BruteForceAnalyzerConfig, BruteForceHashSpec> simulation) : IHashAnalyzer<BruteForceHashSpec>
 {
     /*
      * This class brute-force all combinations of string segments with all avaliable hash functions.
@@ -24,7 +23,7 @@ internal class BruteForceAnalyzer(object[] data, StringProperties props, BruteFo
                 BruteForceHashSpec spec = new BruteForceHashSpec(func, [segment]);
 
                 Candidate<BruteForceHashSpec> candidate = new Candidate<BruteForceHashSpec>(spec);
-                simulation(data, settings, ref candidate);
+                simulation(data, analyzerConfig, ref candidate);
 
                 if (candidate.Fitness > best.Fitness)
                     best = candidate;

@@ -1,0 +1,21 @@
+    private static readonly String[] _entries = new String[] {
+        "a",
+        "aa",
+        "aaa",
+        "aaaa",
+        "aaaaa",
+        "aaaaaa",
+        "aaaaaaa",
+        "aaaaaaaa",
+        "aaaaaaaaa",
+        "aaaaaaaaaa"
+    };
+
+    
+    public static bool Contains(String value)
+    {
+        if (value.Length < 1 || value.Length > 10)
+           return false;
+
+        return StringComparer.Ordinal.Equals(value, _entries[value.Length - 1]);
+    }

@@ -1,5 +1,0 @@
-    
-    public static bool Contains(string value)
-    {
-        return StringComparer.Ordinal.Equals(value, "item0");
-    }

@@ -11,5 +11,5 @@
   <ItemGroup>
     <PackageReference Include="Genbox.FastHash" />
   </ItemGroup>
-  
+
 </Project>

@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis.Genetic;
 
 namespace Genbox.FastData.Internal.Analysis;
 

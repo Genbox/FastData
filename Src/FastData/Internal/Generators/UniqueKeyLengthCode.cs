@@ -5,7 +5,7 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class UniqueKeyLengthCode(FastDataSpec Spec, GeneratorContext Context) : ICode
+internal sealed class UniqueKeyLengthCode(FastDataConfig config, GeneratorContext context) : ICode
 {
     private string?[] _lengths;
     private int _lowerBound;
@@ -20,11 +20,11 @@ internal sealed class UniqueKeyLengthCode(FastDataSpec Spec, GeneratorContext Co
 
         //It is efficient since we don't need a hash function to lookup the element, but if there is a big gap in the lengths,
         //we will store a lot of empty elements.
-        string?[] lengths = new string?[Spec.Data.Length + 1];
+        string?[] lengths = new string?[config.Data.Length + 1];
 
         int lowerBound = int.MaxValue;
 
-        foreach (string? value in Spec.Data)
+        foreach (string? value in config.Data)
         {
             ref string? item = ref lengths[value.Length];
 
@@ -45,16 +45,16 @@ internal sealed class UniqueKeyLengthCode(FastDataSpec Spec, GeneratorContext Co
 
     public string Generate() =>
         $$"""
-              private{{GetModifier(Spec.ClassType)}} readonly {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
+              private{{GetModifier(config.ClassType)}} readonly {{config.DataType}}[] _entries = new {{config.DataType}}[] {
           {{JoinValues(_lengths.AsSpan(_lowerBound), Render, ",\n")}}
               };
 
               {{GetMethodAttributes()}}
-              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              public{{GetModifier(config.ClassType)}} bool Contains({{config.DataType}} value)
               {
-          {{GetEarlyExits("value", Context.GetEarlyExits(), true)}}
+          {{GetEarlyExits("value", context.GetEarlyExits(), true)}}
 
-                  return {{GetEqualFunction(Spec.KnownDataType, "value", $"_entries[value.Length - {_lowerBound.ToString(NumberFormatInfo.InvariantInfo)}]")}};
+                  return {{GetEqualFunction(config.DataType, "value", $"_entries[value.Length - {_lowerBound.ToString(NumberFormatInfo.InvariantInfo)}]")}};
               }
           """;
 

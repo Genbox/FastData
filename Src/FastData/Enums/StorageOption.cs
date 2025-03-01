@@ -4,6 +4,5 @@ public enum StorageOption
 {
     None = 0,
     OptimizeForMemory = 1,
-    OptimizeForSpeed = 2,
-    AggressiveOptimization = 3
+    OptimizeForSpeed = 2
 }

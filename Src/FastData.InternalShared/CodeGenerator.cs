@@ -2,11 +2,9 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
 using System.Text;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Enums;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -15,7 +13,7 @@ namespace Genbox.FastData.InternalShared;
 
 public static class CodeGenerator
 {
-    public static T GetDelegate<T>(string source, bool release) where T : Delegate
+    public static T GetDelegate<T>(string source, bool release, bool addWrapper) where T : Delegate
     {
         string wrapped = $$"""
                            using System;
@@ -29,7 +27,7 @@ public static class CodeGenerator
                            }
                            """;
 
-        CSharpCompilation compilation = CreateCompilation(wrapped, release, typeof(T), typeof(DisplayAttribute));
+        CSharpCompilation compilation = CreateCompilation(addWrapper ? wrapped : source, release, typeof(T), typeof(DisplayAttribute));
 
         if (!TryGetAssembly(compilation, out Assembly? assembly, out Diagnostic[] diagnostics))
             throw new InvalidOperationException("Unable to compile delegate. Errors: " + string.Join('\n', diagnostics.Select(x => x.ToString())));
@@ -44,30 +42,17 @@ public static class CodeGenerator
         return me.CreateDelegate<T>();
     }
 
-    public static IFastSet DynamicCreateSet<T>(IEnumerable<string> items, StorageMode mode, bool release) where T : IIncrementalGenerator, new()
+    public static IFastSet DynamicCreateSet(FastDataConfig config, bool release)
     {
         StringBuilder sb = new StringBuilder();
+        FastDataGenerator.Generate(sb, config);
 
-        foreach (string item in items)
-        {
-            sb.Append('"').Append(item).Append("\",");
-        }
+        CSharpCompilation compilation = CreateCompilation(sb.ToString(), release);
 
-        string attr = $$"""
-                        using Genbox.FastData;
-                        using Genbox.FastData.Enums;
-                        [assembly: FastData<string>("{{mode}}", new[] { {{sb}} }, StorageMode = StorageMode.{{mode}}, ClassType = ClassType.Instance)]
-                        """;
+        ImmutableArray<Diagnostic> diag = compilation.GetDiagnostics();
 
-        RunSourceGenerator<T>(attr, release, out Diagnostic[] sourceGenDiag, out Compilation compilation);
-
-        ImmutableArray<Diagnostic> compilerDiag = compilation.GetDiagnostics();
-
-        if (compilerDiag.Length > 0)
-            throw new InvalidOperationException("C# compiler reported errors: " + string.Join('\n', compilerDiag.Select(x => x.ToString())));
-
-        if (sourceGenDiag.Length > 0)
-            throw new InvalidOperationException("Unable to generate source. Errors: " + string.Join('\n', sourceGenDiag.Select(x => x.ToString())));
+        if (diag.Length > 0)
+            throw new InvalidOperationException("C# compiler reported errors: " + string.Join('\n', diag.Select(x => x.ToString())));
 
         if (!TryGetAssembly(compilation, out Assembly? assembly, out Diagnostic[] errors))
             throw new InvalidOperationException("Unable to compile set. Errors: " + string.Join('\n', errors.Select(x => x.ToString())));

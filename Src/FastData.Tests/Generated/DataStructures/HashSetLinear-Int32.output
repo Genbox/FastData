@@ -1,0 +1,78 @@
+    private static readonly Bucket[] _buckets = {
+        new Bucket(0, 0),
+        new Bucket(0, 0),
+        new Bucket(1, 1),
+        new Bucket(2, 2),
+        new Bucket(3, 3),
+        new Bucket(4, 4),
+        new Bucket(5, 5),
+        new Bucket(6, 6),
+        new Bucket(7, 7),
+        new Bucket(8, 8),
+        new Bucket(9, 9),
+        new Bucket(0, 0),
+        new Bucket(0, 0),
+        new Bucket(0, 0),
+        new Bucket(0, 0),
+        new Bucket(0, 0),
+        new Bucket(0, 0),
+        new Bucket(0, 0),
+        new Bucket(0, 0),
+        new Bucket(0, 0),
+        new Bucket(0, 0),
+        new Bucket(0, 0),
+        new Bucket(0, 0)
+    };
+
+    private static readonly Int32[] _items = {
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+    };
+
+    private static readonly uint[] _hashCodes = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+    
+    public static bool Contains(Int32 value)
+    {
+        if (value < 1 || value > 10)
+           return false;
+
+        uint hashCode = unchecked((uint)value);
+        ref Bucket b = ref _buckets[MathHelper.FastMod(hashCode, 23, 802032351030850071)];
+
+        int index = b.StartIndex;
+        int endIndex = b.EndIndex;
+
+        while (index <= endIndex)
+        {
+            if (hashCode == _hashCodes[index] && value.Equals(_items[index]))
+                return true;
+
+            index++;
+        }
+
+        return false;
+    }
+
+
+
+    [StructLayout(LayoutKind.Auto)]
+    private struct Bucket
+    {
+        internal Bucket(int startIndex, int endIndex)
+        {
+            StartIndex = startIndex;
+            EndIndex = endIndex;
+        }
+
+        internal int StartIndex;
+        internal int EndIndex;
+    }

@@ -1,6 +1,5 @@
-using Genbox.FastData;
-
-[assembly: FastData<string>("StaticData", ["item1", "item2", "item3"])]
+using System.Text;
+using Genbox.FastData.Enums;
 
 namespace Genbox.FastData.Examples;
 
@@ -8,7 +7,12 @@ internal static class Program
 {
     private static void Main()
     {
-        Console.WriteLine(StaticData.Contains("item1"));
-        Console.WriteLine(StaticData.Contains("notthere"));
+        FastDataConfig config = new FastDataConfig("MyData", ["item1", "item2"]);
+        config.StorageMode = StorageMode.Auto;
+
+        StringBuilder sb = new StringBuilder();
+        FastDataGenerator.Generate(sb, config);
+
+        Console.WriteLine(sb.ToString());
     }
 }

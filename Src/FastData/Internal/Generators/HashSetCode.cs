@@ -6,31 +6,30 @@ using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.BruteForce;
 using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Enums;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context, HashSetCode.HashSetType HashSetType) : ICode
+internal sealed class HashSetCode(FastDataConfig config, GeneratorContext context, HashSetCode.HashSetType hashSetType) : ICode
 {
     private IHashSpec? _hashSpec;
-    private readonly IHashSetBase _impl = HashSetType == HashSetType.Chain ? new HashSetChain(Spec, Context) : new HashSetLinear(Spec, Context);
+    private readonly IHashSetBase _impl = hashSetType == HashSetType.Chain ? new HashSetChain(config, context) : new HashSetLinear(config, context);
 
     public bool TryCreate()
     {
-        if (Spec.KnownDataType == KnownDataType.String)
+        if (config.DataType == KnownDataType.String)
         {
-            if (Spec.Analyzer == Analyzer.BruteForce)
+            if (config.AnalyzerConfig is BruteForceAnalyzerConfig bfCfg)
             {
-                DataProperties props = Context.GetDataProperties();
-                BruteForceAnalyzer analyzer = new BruteForceAnalyzer(Spec.Data, props.StringProps.Value, new BruteForceSettings(), RunSimulation);
+                DataProperties props = context.GetDataProperties();
+                BruteForceAnalyzer analyzer = new BruteForceAnalyzer(config.Data, props.StringProps.Value, bfCfg, RunSimulation);
                 _hashSpec = analyzer.Run().Spec;
                 _impl.Create(x => _hashSpec.GetFunction()((string)x));
                 return true;
             }
-            if (Spec.Analyzer == Analyzer.Genetic)
+            if (config.AnalyzerConfig is GeneticAnalyzerConfig gaCfg)
             {
-                DataProperties props = Context.GetDataProperties();
-                GeneticAnalyzer analyzer = new GeneticAnalyzer(Spec.Data, props.StringProps.Value, new GeneticSettings(), RunSimulation);
+                DataProperties props = context.GetDataProperties();
+                GeneticAnalyzer analyzer = new GeneticAnalyzer(config.Data, props.StringProps.Value, gaCfg, RunSimulation);
                 _hashSpec = analyzer.Run().Spec;
                 _impl.Create(x => _hashSpec.GetFunction()((string)x));
                 return true;
@@ -43,12 +42,12 @@ internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context, H
 
     public string Generate() => _impl.Generate(_hashSpec);
 
-    internal static void RunSimulation<T>(object[] data, CommonSettings settings, ref Candidate<T> candidate) where T : struct, IHashSpec
+    internal static void RunSimulation<T>(object[] data, AnalyzerConfig config, ref Candidate<T> candidate) where T : struct, IHashSpec
     {
         // Generate a hash function from the spec
         Func<string, uint> hashFunc = candidate.Spec.GetFunction();
 
-        int capacity = (int)(data.Length * settings.CapacityFactor);
+        int capacity = (int)(data.Length * config.CapacityFactor);
         string first = (string)data[0];
 
         long ticks = Stopwatch.GetTimestamp();
@@ -62,8 +61,8 @@ internal sealed class HashSetCode(FastDataSpec Spec, GeneratorContext Context, H
 
         (int occupied, double minVariance, double maxVariance) = Emulate(data, capacity, hashFunc);
 
-        double normOccu = (occupied / (double)capacity) * settings.FillWeight;
-        double normTime = (1.0 / (1.0 + ((double)ticks / 1000))) * settings.TimeWeight;
+        double normOccu = (occupied / (double)capacity) * config.FillWeight;
+        double normTime = (1.0 / (1.0 + ((double)ticks / 1000))) * config.TimeWeight;
 
         candidate.Fitness = (normOccu + normTime) / 2;
         candidate.Metadata = [("Time/norm", ticks + "/" + normTime.ToString("N2")), ("Occupied/norm", occupied + "/" + normOccu.ToString("N2")), ("MinVariance", minVariance), ("MaxVariance", maxVariance)];

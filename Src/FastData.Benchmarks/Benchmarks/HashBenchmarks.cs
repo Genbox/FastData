@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Runtime.InteropServices;
 using BenchmarkDotNet.Order;
 using Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
 

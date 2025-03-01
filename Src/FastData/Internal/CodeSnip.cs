@@ -4,7 +4,6 @@ using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Enums;
 using Genbox.FastData.Internal.Optimization.EarlyExitSpecs;
 
 namespace Genbox.FastData.Internal;

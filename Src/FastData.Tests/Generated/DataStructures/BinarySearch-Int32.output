@@ -1,0 +1,36 @@
+    private static Int32[] _entries = new Int32[] {
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+    };
+
+    
+    public static bool Contains(Int32 value)
+    {
+        if (value < 1 || value > 10)
+           return false;
+
+        int lo = 0;
+        int hi = 9;
+        while (lo <= hi)
+        {
+            int i = lo + ((hi - lo) >> 1);
+            int order = _entries[i].CompareTo(value);
+
+            if (order == 0)
+                return true;
+            if (order < 0)
+                lo = i + 1;
+            else
+                hi = i - 1;
+        }
+
+        return ((~lo) >= 0);
+    }

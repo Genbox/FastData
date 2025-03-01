@@ -5,27 +5,27 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class BinarySearchCode(FastDataSpec Spec, GeneratorContext Context) : ICode
+internal sealed class BinarySearchCode(FastDataConfig config, GeneratorContext context) : ICode
 {
     public bool TryCreate()
     {
-        Array.Sort(Spec.Data, StringComparer.Ordinal);
+        Array.Sort(config.Data, StringComparer.Ordinal);
         return true;
     }
 
     public string Generate() =>
         $$"""
-              private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
-          {{JoinValues(Spec.Data, Render, ",\n")}}
+              private{{GetModifier(config.ClassType)}} {{config.DataType}}[] _entries = new {{config.DataType}}[] {
+          {{JoinValues(config.Data, Render, ",\n")}}
               };
 
               {{GetMethodAttributes()}}
-              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              public{{GetModifier(config.ClassType)}} bool Contains({{config.DataType}} value)
               {
-          {{GetEarlyExits("value", Context.GetEarlyExits())}}
+          {{GetEarlyExits("value", context.GetEarlyExits())}}
 
                   int lo = 0;
-                  int hi = {{(Spec.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
+                  int hi = {{(config.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
                   while (lo <= hi)
                   {
                       int i = lo + ((hi - lo) >> 1);

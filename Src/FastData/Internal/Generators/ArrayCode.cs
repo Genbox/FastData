@@ -5,24 +5,24 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class ArrayCode(FastDataSpec Spec, GeneratorContext Context) : ICode
+internal sealed class ArrayCode(FastDataConfig config, GeneratorContext context) : ICode
 {
     public bool TryCreate() => true;
 
     public string Generate() =>
         $$"""
-              private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
-          {{JoinValues(Spec.Data, Render, ",\n")}}
+              private{{GetModifier(config.ClassType)}} {{config.DataType}}[] _entries = new {{config.DataType}}[] {
+          {{JoinValues(config.Data, Render, ",\n")}}
               };
 
               {{GetMethodAttributes()}}
-              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              public{{GetModifier(config.ClassType)}} bool Contains({{config.DataType}} value)
               {
-          {{GetEarlyExits("value", Context.GetEarlyExits())}}
+          {{GetEarlyExits("value", context.GetEarlyExits())}}
 
-                  for (int i = 0; i < {{Spec.Data.Length.ToString(NumberFormatInfo.InvariantInfo)}}; i++)
+                  for (int i = 0; i < {{config.Data.Length.ToString(NumberFormatInfo.InvariantInfo)}}; i++)
                   {
-                      if ({{GetEqualFunction(Spec.KnownDataType, "value", "_entries[i]")}})
+                      if ({{GetEqualFunction(config.DataType, "value", "_entries[i]")}})
                          return true;
                   }
                   return false;

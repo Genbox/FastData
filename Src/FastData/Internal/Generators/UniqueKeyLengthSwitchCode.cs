@@ -4,20 +4,20 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class UniqueKeyLengthSwitchCode(FastDataSpec Spec, GeneratorContext Context) : ICode
+internal sealed class UniqueKeyLengthSwitchCode(FastDataConfig config, GeneratorContext context) : ICode
 {
     public bool TryCreate() => true;
 
     public string Generate() =>
         $$"""
               {{GetMethodAttributes()}}
-              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              public{{GetModifier(config.ClassType)}} bool Contains({{config.DataType}} value)
               {
-          {{GetEarlyExits("value", Context.GetEarlyExits())}}
+          {{GetEarlyExits("value", context.GetEarlyExits())}}
 
                   switch (value.Length)
                   {
-          {{GenerateSwitch(Spec.Data)}}
+          {{GenerateSwitch(config.Data)}}
                       default:
                           return false;
                   }
@@ -32,7 +32,7 @@ internal sealed class UniqueKeyLengthSwitchCode(FastDataSpec Spec, GeneratorCont
         {
             sb.AppendLine($"""
                                        case {value.Length}:
-                                           return {GetEqualFunction(Spec.KnownDataType, "value", ToValueLabel(value))};
+                                           return {GetEqualFunction(config.DataType, "value", ToValueLabel(value))};
                            """);
         }
 

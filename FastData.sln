@@ -72,6 +72,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData", "Src\FastData\Fa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Testbed", "Src\FastData.Testbed\FastData.Testbed.csproj", "{3B0C2ED7-1056-42A6-B2CD-2DA992B9F726}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.SourceGenerator", "Src\FastData.SourceGenerator\FastData.SourceGenerator.csproj", "{3EF7DF2F-5F6C-4673-87CE-45AEFDD6478B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.SourceGenerator.Examples", "Src\FastData.SourceGenerator.Examples\FastData.SourceGenerator.Examples.csproj", "{D0DDAB70-AD6C-41F6-A73C-775824E30654}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.SourceGenerator.Tests", "Src\FastData.SourceGenerator.Tests\FastData.SourceGenerator.Tests.csproj", "{757F6252-E31A-4CEF-B76F-24B34798BA59}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +111,18 @@ Global
 		{3B0C2ED7-1056-42A6-B2CD-2DA992B9F726}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B0C2ED7-1056-42A6-B2CD-2DA992B9F726}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B0C2ED7-1056-42A6-B2CD-2DA992B9F726}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EF7DF2F-5F6C-4673-87CE-45AEFDD6478B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EF7DF2F-5F6C-4673-87CE-45AEFDD6478B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EF7DF2F-5F6C-4673-87CE-45AEFDD6478B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EF7DF2F-5F6C-4673-87CE-45AEFDD6478B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0DDAB70-AD6C-41F6-A73C-775824E30654}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0DDAB70-AD6C-41F6-A73C-775824E30654}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0DDAB70-AD6C-41F6-A73C-775824E30654}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0DDAB70-AD6C-41F6-A73C-775824E30654}.Release|Any CPU.Build.0 = Release|Any CPU
+		{757F6252-E31A-4CEF-B76F-24B34798BA59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{757F6252-E31A-4CEF-B76F-24B34798BA59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{757F6252-E31A-4CEF-B76F-24B34798BA59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{757F6252-E31A-4CEF-B76F-24B34798BA59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{24810DE3-EAFF-4FA9-8813-209C15AC75EC} = {B774BCA8-4D2D-44E7-903F-0FFC349FCC85}

@@ -1,0 +1,26 @@
+    private static String[] _entries = new String[] {
+        "item1",
+        "item2",
+        "item3",
+        "item4",
+        "item5",
+        "item6",
+        "item7",
+        "item8",
+        "item9",
+        "item10"
+    };
+
+    
+    public static bool Contains(String value)
+    {
+        if (value.Length < 5 || value.Length > 6)
+           return false;
+
+        for (int i = 0; i < 10; i++)
+        {
+            if (StringComparer.Ordinal.Equals(value, _entries[i]))
+               return true;
+        }
+        return false;
+    }

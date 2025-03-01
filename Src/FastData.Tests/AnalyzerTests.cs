@@ -16,13 +16,13 @@ public class AnalyzerTests
     public void BruteForceAnalyzerTest()
     {
         StringProperties props = DataAnalyzer.GetStringProperties(_data);
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(_data, props, new BruteForceSettings(), Simulation);
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(_data, props, new BruteForceAnalyzerConfig(), Simulation);
 
         Candidate<BruteForceHashSpec> top = analyzer.Run();
         Assert.Equal(1, top.Fitness);
         return;
 
-        void Simulation(object[] data, BruteForceSettings settings, ref Candidate<BruteForceHashSpec> candidate) => candidate.Fitness = 1;
+        void Simulation(object[] data, BruteForceAnalyzerConfig config, ref Candidate<BruteForceHashSpec> candidate) => candidate.Fitness = 1;
     }
 
     [Theory]
@@ -36,7 +36,7 @@ public class AnalyzerTests
 
         //The source code must give the same result
         string source = spec.GetSource();
-        Func<string, uint> func2 = CodeGenerator.GetDelegate<Func<string, uint>>(source, true);
+        Func<string, uint> func2 = CodeGenerator.GetDelegate<Func<string, uint>>(source, false, true);
         Assert.Equal(vector, func2("hello world"));
     }
 
@@ -44,13 +44,13 @@ public class AnalyzerTests
     public void GeneticAnalyzerTest()
     {
         StringProperties props = DataAnalyzer.GetStringProperties(_data);
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(_data, props, new GeneticSettings(), Simulation);
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(_data, props, new GeneticAnalyzerConfig(), Simulation);
 
         Candidate<GeneticHashSpec> top = analyzer.Run();
         Assert.Equal(1, top.Fitness);
         return;
 
-        void Simulation(object[] data, GeneticSettings settings, ref Candidate<GeneticHashSpec> candidate) => candidate.Fitness = 1;
+        void Simulation(object[] data, GeneticAnalyzerConfig config, ref Candidate<GeneticHashSpec> candidate) => candidate.Fitness = 1;
     }
 
     [Theory]
@@ -64,7 +64,7 @@ public class AnalyzerTests
 
         //The source code must give the same result
         string source = spec.GetSource();
-        Func<string, uint> func2 = CodeGenerator.GetDelegate<Func<string, uint>>(source, true);
+        Func<string, uint> func2 = CodeGenerator.GetDelegate<Func<string, uint>>(source, false, true);
         Assert.Equal(vector, func2("hello world"));
     }
 }

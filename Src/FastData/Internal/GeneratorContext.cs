@@ -1,13 +1,12 @@
+using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Enums;
 using Genbox.FastData.Internal.Optimization;
 
 namespace Genbox.FastData.Internal;
 
-internal class GeneratorContext(FastDataSpec spec)
+internal class GeneratorContext(FastDataConfig config)
 {
     private IHashSpec? _hashSpec;
     private IEarlyExit[]? _earlyExits;
@@ -19,51 +18,51 @@ internal class GeneratorContext(FastDataSpec spec)
         {
             _dataProperties = new DataProperties();
 
-            switch (spec.KnownDataType)
+            switch (config.DataType)
             {
                 case KnownDataType.SByte:
-                    _dataProperties.IntProps = DataAnalyzer.GetSByteProperties(spec.Data);
+                    _dataProperties.IntProps = DataAnalyzer.GetSByteProperties(config.Data);
                     break;
                 case KnownDataType.Byte:
-                    _dataProperties.UIntProps = DataAnalyzer.GetByteProperties(spec.Data);
+                    _dataProperties.UIntProps = DataAnalyzer.GetByteProperties(config.Data);
                     break;
                 case KnownDataType.Int16:
-                    _dataProperties.IntProps = DataAnalyzer.GetInt16Properties(spec.Data);
+                    _dataProperties.IntProps = DataAnalyzer.GetInt16Properties(config.Data);
                     break;
                 case KnownDataType.UInt16:
-                    _dataProperties.UIntProps = DataAnalyzer.GetUInt16Properties(spec.Data);
+                    _dataProperties.UIntProps = DataAnalyzer.GetUInt16Properties(config.Data);
                     break;
                 case KnownDataType.Int32:
-                    _dataProperties.IntProps = DataAnalyzer.GetInt32Properties(spec.Data);
+                    _dataProperties.IntProps = DataAnalyzer.GetInt32Properties(config.Data);
                     break;
                 case KnownDataType.UInt32:
-                    _dataProperties.UIntProps = DataAnalyzer.GetUInt32Properties(spec.Data);
+                    _dataProperties.UIntProps = DataAnalyzer.GetUInt32Properties(config.Data);
                     break;
                 case KnownDataType.Int64:
-                    _dataProperties.IntProps = DataAnalyzer.GetInt64Properties(spec.Data);
+                    _dataProperties.IntProps = DataAnalyzer.GetInt64Properties(config.Data);
                     break;
                 case KnownDataType.UInt64:
-                    _dataProperties.UIntProps = DataAnalyzer.GetUInt64Properties(spec.Data);
+                    _dataProperties.UIntProps = DataAnalyzer.GetUInt64Properties(config.Data);
                     break;
                 case KnownDataType.String:
-                    _dataProperties.StringProps = DataAnalyzer.GetStringProperties(spec.Data);
+                    _dataProperties.StringProps = DataAnalyzer.GetStringProperties(config.Data);
                     break;
                 case KnownDataType.Boolean:
                     break;
                 case KnownDataType.Char:
-                    _dataProperties.CharProps = DataAnalyzer.GetCharProperties(spec.Data);
+                    _dataProperties.CharProps = DataAnalyzer.GetCharProperties(config.Data);
                     break;
                 case KnownDataType.Single:
-                    _dataProperties.FloatProps = DataAnalyzer.GetSingleProperties(spec.Data);
+                    _dataProperties.FloatProps = DataAnalyzer.GetSingleProperties(config.Data);
                     break;
                 case KnownDataType.Double:
-                    _dataProperties.FloatProps = DataAnalyzer.GetDoubleProperties(spec.Data);
+                    _dataProperties.FloatProps = DataAnalyzer.GetDoubleProperties(config.Data);
                     break;
                 case KnownDataType.Unknown:
                     //Do nothing
                     break;
                 default:
-                    throw new InvalidOperationException("Unknown data type: " + spec.KnownDataType);
+                    throw new InvalidOperationException($"Unknown data type: {config.DataType}");
             }
         }
 

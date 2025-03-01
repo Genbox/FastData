@@ -4,7 +4,6 @@ using BenchmarkDotNet.Order;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Benchmarks.Code;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Internal;
 using Genbox.FastData.InternalShared;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
@@ -80,18 +79,20 @@ public class AutoStringBenchmarks
 
     private static IEnumerable<object[]> GetForSize(int size)
     {
-        string[] items = new string[size];
+        string[] data = new string[size];
 
         for (int i = 0; i < size; i++)
-            items[i] = new string('a', i + 1);
+            data[i] = new string('a', i + 1);
 
         foreach (StorageMode mode in Enum.GetValues<StorageMode>())
         {
-            IFastSet set = CodeGenerator.DynamicCreateSet<FastDataGenerator>(items, mode, true);
-            yield return [set, mode, size];
+            FastDataConfig config = new FastDataConfig("MyData", data);
+            config.StorageMode = mode;
+
+            yield return [CodeGenerator.DynamicCreateSet(config, true), mode, size];
         }
 
-        yield return [new UnoptimizedArray(items), nameof(UnoptimizedArray), size];
-        yield return [new UnoptimizedHashSet(items), nameof(UnoptimizedHashSet), size];
+        yield return [new UnoptimizedArray(data), nameof(UnoptimizedArray), size];
+        yield return [new UnoptimizedHashSet(data), nameof(UnoptimizedHashSet), size];
     }
 }

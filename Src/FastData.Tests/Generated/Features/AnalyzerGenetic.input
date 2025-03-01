@@ -1,5 +1,64 @@
-
-using Genbox.FastData;
-using Genbox.FastData.Enums;
-
-[assembly: FastData<string>("ImmutableSet", ["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10"], StorageMode = StorageMode.Indexed, Analyzer = Analyzer.Genetic)]
+{
+  "Name": "MyData",
+  "Data": [
+    {
+      "$type": "String",
+      "$value": "Item1"
+    },
+    {
+      "$type": "String",
+      "$value": "Item2"
+    },
+    {
+      "$type": "String",
+      "$value": "Item3"
+    },
+    {
+      "$type": "String",
+      "$value": "Item4"
+    },
+    {
+      "$type": "String",
+      "$value": "Item5"
+    },
+    {
+      "$type": "String",
+      "$value": "Item6"
+    },
+    {
+      "$type": "String",
+      "$value": "Item7"
+    },
+    {
+      "$type": "String",
+      "$value": "Item8"
+    },
+    {
+      "$type": "String",
+      "$value": "Item9"
+    },
+    {
+      "$type": "String",
+      "$value": "Item10"
+    }
+  ],
+  "DataType": 1,
+  "StorageMode": 4,
+  "StorageOptions": 0,
+  "AnalyzerConfig": {
+    "$type": "GeneticAnalyzerConfig",
+    "PopulationSize": 10,
+    "MaxEvolutions": 1000,
+    "CrossEliteOnly": true,
+    "CrossPercent": 0.25,
+    "StagnantTerminate": true,
+    "StagnantTopResults": 3,
+    "StagnantPercent": 0.0001,
+    "CapacityFactor": 1,
+    "TimeWeight": 1,
+    "FillWeight": 1
+  },
+  "Namespace": null,
+  "ClassVisibility": 0,
+  "ClassType": 0
+}

@@ -9,30 +9,30 @@ using System.Text;
 using System;
 
 
-internal static class ImmutableSet 
+internal static class MyData 
 {
-    private static readonly int[] _buckets = { 3, 0, 1, 8, 9, 6, 10, 4, 5, 2 };
+    private static readonly int[] _buckets = { 4, 5, 8, 9, 2, 0, 6, 7, 10, 3 };
 
     private static readonly Entry[] _entries = {
-        new Entry(1213449352, -1, "item1"),
-        new Entry(3460271859, -1, "item2"),
-        new Entry(1412127070, -1, "item3"),
-        new Entry(3658949577, -1, "item4"),
-        new Entry(1610804788, -1, "item5"),
-        new Entry(3857627295, -1, "item6"),
-        new Entry(1809482506, -1, "item7"),
-        new Entry(4056305013, -1, "item8"),
-        new Entry(2008160224, -1, "item9"),
-        new Entry(1013171336, 6, "item10")
+        new Entry(2011983643, -1, "Item1"),
+        new Entry(3578067584, -1, "Item2"),
+        new Entry(849184229, -1, "Item3"),
+        new Entry(2415268170, -1, "Item4"),
+        new Entry(3981352111, -1, "Item5"),
+        new Entry(1252468756, -1, "Item6"),
+        new Entry(2818552697, -1, "Item7"),
+        new Entry(802130062, -1, "Item8"),
+        new Entry(2368214003, 0, "Item9"),
+        new Entry(1309368108, -1, "Item10")
     };
 
     
-    public static bool Contains(string value)
+    public static bool Contains(String value)
     {
         if (value.Length < 5 || value.Length > 6)
            return false;
 
-        uint hashCode = Hash(value);
+        uint hashCode = HashHelper.HashString(value);
         uint index = MathHelper.FastMod(hashCode, 10, 1844674407370955162);
         int i = _buckets[index] - 1;
 
@@ -49,110 +49,16 @@ internal static class ImmutableSet
         return false;
     }
 
-    public static uint Hash(string str)
-    {
-        ref byte ptr = ref Unsafe.As<char, byte>(ref MemoryMarshal.GetReference(str.AsSpan()));
-        int length = str.Length * 2;
-        ulong acc = 42;
 
-        if (length >= 32)
-        {
-            ref byte limit = ref Unsafe.Add(ref ptr, length - 31);
-
-            ulong acc0 = 0; //TODO: Seed correctly
-            ulong acc1 = 0;
-            ulong acc2 = 0;
-            ulong acc3 = 0;
-
-            do
-            {
-                acc0 = Mixer(acc0, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                ptr = ref Unsafe.Add(ref ptr, 8);
-
-                acc1 = Mixer(acc1, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                ptr = ref Unsafe.Add(ref ptr, 8);
-
-                acc2 = Mixer(acc2, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                ptr = ref Unsafe.Add(ref ptr, 8);
-
-                acc3 = Mixer(acc3, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                ptr = ref Unsafe.Add(ref ptr, 8);
-            } while (Unsafe.IsAddressLessThan(ref ptr, ref limit));
-
-            acc = Mixer(acc, acc0);
-            acc = Mixer(acc, acc1);
-            acc = Mixer(acc, acc2);
-            acc = Mixer(acc, acc3);
-
-            //TODO: acc += length;
-            length &= 31;
-        }
-
-        if (length >= 16)
-        {
-            ref byte limit = ref Unsafe.Add(ref ptr, length - 15);
-
-            ulong acc0 = 0; //TODO: Seed correctly
-            ulong acc1 = 0;
-
-            do
-            {
-                acc0 = Mixer(acc0, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                ptr = ref Unsafe.Add(ref ptr, 8);
-
-                acc1 = Mixer(acc1, Unsafe.ReadUnaligned<ulong>(ref ptr));
-                ptr = ref Unsafe.Add(ref ptr, 8);
-            } while (Unsafe.IsAddressLessThan(ref ptr, ref limit));
-
-            acc = Mixer(acc, acc0);
-            acc = Mixer(acc, acc1);
-
-            //TODO: acc += length;
-            length &= 15;
-        }
-
-        while (length >= 8)
-        {
-            acc = Mixer(acc, Unsafe.ReadUnaligned<ulong>(ref ptr));
-            ptr = ref Unsafe.Add(ref ptr, 8);
-            length -= 8;
-        }
-
-        if (length >= 4)
-        {
-            acc = Mixer(acc, Unsafe.ReadUnaligned<uint>(ref ptr));
-            ptr = ref Unsafe.Add(ref ptr, 4);
-            length -= 4;
-        }
-
-        while (length > 0)
-        {
-            acc = Mixer(acc, Unsafe.ReadUnaligned<byte>(ref ptr));
-            ptr = ref Unsafe.Add(ref ptr, 1);
-            length--;
-        }
-
-        var accParam = acc;
-        acc = accParam;
-
-        return (uint)acc;
-    }
-
-    public static ulong Mixer(ulong accParam, ulong inputParam)
-    {
-        ulong acc = (accParam + (inputParam * 2246822507));
-
-        return acc;
-    }
 
     [StructLayout(LayoutKind.Auto)]
     private struct Entry
     {
         public uint HashCode;
         public short Next;
-        public string Value;
+        public String Value;
 
-        public Entry(uint hashCode, short next, string value)
+        public Entry(uint hashCode, short next, String value)
         {
             HashCode = hashCode;
             Next = next;

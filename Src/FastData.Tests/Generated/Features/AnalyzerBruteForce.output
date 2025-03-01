@@ -9,30 +9,30 @@ using System.Text;
 using System;
 
 
-internal static class ImmutableSet 
+internal static class MyData 
 {
-    private static readonly int[] _buckets = { 4, 3, 8, 7, 6, 10, 2, 9, 0, 5 };
+    private static readonly int[] _buckets = { 4, 5, 8, 9, 2, 0, 6, 7, 10, 3 };
 
     private static readonly Entry[] _entries = {
-        new Entry(3109563187, -1, "item1"),
-        new Entry(1543479246, -1, "item2"),
-        new Entry(4272362601, -1, "item3"),
-        new Entry(2706278660, -1, "item4"),
-        new Entry(1140194719, -1, "item5"),
-        new Entry(3869078074, -1, "item6"),
-        new Entry(2302994133, -1, "item7"),
-        new Entry(24449472, -1, "item8"),
-        new Entry(2753332827, 0, "item9"),
-        new Entry(1942893905, -1, "item10")
+        new Entry(2011983643, -1, "Item1"),
+        new Entry(3578067584, -1, "Item2"),
+        new Entry(849184229, -1, "Item3"),
+        new Entry(2415268170, -1, "Item4"),
+        new Entry(3981352111, -1, "Item5"),
+        new Entry(1252468756, -1, "Item6"),
+        new Entry(2818552697, -1, "Item7"),
+        new Entry(802130062, -1, "Item8"),
+        new Entry(2368214003, 0, "Item9"),
+        new Entry(1309368108, -1, "Item10")
     };
 
     
-    public static bool Contains(string value)
+    public static bool Contains(String value)
     {
         if (value.Length < 5 || value.Length > 6)
            return false;
 
-        uint hashCode = Hash(value);
+        uint hashCode = HashHelper.HashString(value);
         uint index = MathHelper.FastMod(hashCode, 10, 1844674407370955162);
         int i = _buckets[index] - 1;
 
@@ -49,20 +49,16 @@ internal static class ImmutableSet
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(string str)
-    {
-        return Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions.DJB2Hash.ComputeHash(str.AsSpan(4));
-    }
+
 
     [StructLayout(LayoutKind.Auto)]
     private struct Entry
     {
         public uint HashCode;
         public short Next;
-        public string Value;
+        public String Value;
 
-        public Entry(uint hashCode, short next, string value)
+        public Entry(uint hashCode, short next, String value)
         {
             HashCode = hashCode;
             Next = next;

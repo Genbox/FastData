@@ -8,5 +8,6 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
     <PackageVersion Include="System.IO.Hashing" Version="9.0.0" />
     <PackageVersion Include="Genbox.FastEnum" Version="1.0.0-alpha.14" />
+    <PackageVersion Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
 </Project>

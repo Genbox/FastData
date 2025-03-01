@@ -6,17 +6,17 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class SwitchHashCode(FastDataSpec Spec, GeneratorContext Context) : ICode
+internal sealed class SwitchHashCode(FastDataConfig config, GeneratorContext context) : ICode
 {
     private (uint, object)[] _hashCodes;
 
     public bool TryCreate()
     {
-        (uint, object)[] hashCodes = new (uint, object)[Spec.Data.Length];
+        (uint, object)[] hashCodes = new (uint, object)[config.Data.Length];
 
-        for (int i = 0; i < Spec.Data.Length; i++)
+        for (int i = 0; i < config.Data.Length; i++)
         {
-            object value = Spec.Data[i];
+            object value = config.Data[i];
             uint hash = HashHelper.HashObject(value);
 
             hashCodes[i] = (hash, value);
@@ -29,11 +29,11 @@ internal sealed class SwitchHashCode(FastDataSpec Spec, GeneratorContext Context
     public string Generate() =>
         $$"""
               {{GetMethodAttributes()}}
-              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              public{{GetModifier(config.ClassType)}} bool Contains({{config.DataType}} value)
               {
-          {{GetEarlyExits("value", Context.GetEarlyExits())}}
+          {{GetEarlyExits("value", context.GetEarlyExits())}}
 
-                  switch ({{GetHashFunction32(Spec.KnownDataType, "value")}})
+                  switch ({{GetHashFunction32(config.DataType, "value")}})
                   {
           {{JoinValues(_hashCodes, Render, "\n")}}
                   }
@@ -45,7 +45,7 @@ internal sealed class SwitchHashCode(FastDataSpec Spec, GeneratorContext Context
     {
         sb.Append($"""
                                case {obj.Item1.ToString(NumberFormatInfo.InvariantInfo)}:
-                                    return {GetEqualFunction(Spec.KnownDataType, "value", ToValueLabel(obj.Item2))};
+                                    return {GetEqualFunction(config.DataType, "value", ToValueLabel(obj.Item2))};
                    """);
     }
 }

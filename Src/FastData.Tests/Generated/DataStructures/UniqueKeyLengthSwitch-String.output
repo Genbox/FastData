@@ -1,0 +1,33 @@
+    
+    public static bool Contains(String value)
+    {
+        if (value.Length < 1 || value.Length > 10)
+           return false;
+
+        switch (value.Length)
+        {
+            case 1:
+                return StringComparer.Ordinal.Equals(value, "a");
+            case 2:
+                return StringComparer.Ordinal.Equals(value, "aa");
+            case 3:
+                return StringComparer.Ordinal.Equals(value, "aaa");
+            case 4:
+                return StringComparer.Ordinal.Equals(value, "aaaa");
+            case 5:
+                return StringComparer.Ordinal.Equals(value, "aaaaa");
+            case 6:
+                return StringComparer.Ordinal.Equals(value, "aaaaaa");
+            case 7:
+                return StringComparer.Ordinal.Equals(value, "aaaaaaa");
+            case 8:
+                return StringComparer.Ordinal.Equals(value, "aaaaaaaa");
+            case 9:
+                return StringComparer.Ordinal.Equals(value, "aaaaaaaaa");
+            case 10:
+                return StringComparer.Ordinal.Equals(value, "aaaaaaaaaa");
+
+            default:
+                return false;
+        }
+    }

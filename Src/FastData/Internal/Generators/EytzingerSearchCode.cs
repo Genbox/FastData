@@ -4,25 +4,25 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class EytzingerSearchCode(FastDataSpec Spec, GeneratorContext Context) : ICode
+internal sealed class EytzingerSearchCode(FastDataConfig config, GeneratorContext context) : ICode
 {
     public bool TryCreate()
     {
-        Array.Sort(Spec.Data, StringComparer.Ordinal);
+        Array.Sort(config.Data, StringComparer.Ordinal);
 
-        object[] output = new object[Spec.Data.Length];
+        object[] output = new object[config.Data.Length];
         int index = 0;
         EytzingerOrder(ref index);
 
-        Spec.Data = output;
+        config.Data = output;
         return true;
 
         void EytzingerOrder(ref int arrIdx, int eytIdx = 0)
         {
-            if (eytIdx < Spec.Data.Length)
+            if (eytIdx < config.Data.Length)
             {
                 EytzingerOrder(ref arrIdx, (2 * eytIdx) + 1);
-                output[eytIdx] = Spec.Data[arrIdx++];
+                output[eytIdx] = config.Data[arrIdx++];
                 EytzingerOrder(ref arrIdx, (2 * eytIdx) + 2);
             }
         }
@@ -30,14 +30,14 @@ internal sealed class EytzingerSearchCode(FastDataSpec Spec, GeneratorContext Co
 
     public string Generate() =>
         $$"""
-              private{{GetModifier(Spec.ClassType)}} {{Spec.DataTypeName}}[] _entries = new {{Spec.DataTypeName}}[] {
-          {{JoinValues(Spec.Data, Render, ",\n")}}
+              private{{GetModifier(config.ClassType)}} {{config.DataType}}[] _entries = new {{config.DataType}}[] {
+          {{JoinValues(config.Data, Render, ",\n")}}
               };
 
               {{GetMethodAttributes()}}
-              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              public{{GetModifier(config.ClassType)}} bool Contains({{config.DataType}} value)
               {
-          {{GetEarlyExits("value", Context.GetEarlyExits())}}
+          {{GetEarlyExits("value", context.GetEarlyExits())}}
 
                   int i = 0;
                   while (i < _entries.Length)

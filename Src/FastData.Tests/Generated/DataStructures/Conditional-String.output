@@ -1,0 +1,11 @@
+    
+    public static bool Contains(String value)
+    {
+        if (value.Length < 5 || value.Length > 6)
+           return false;
+
+        if (StringComparer.Ordinal.Equals(value, "item1") || StringComparer.Ordinal.Equals(value, "item2") || StringComparer.Ordinal.Equals(value, "item3") || StringComparer.Ordinal.Equals(value, "item4") || StringComparer.Ordinal.Equals(value, "item5") || StringComparer.Ordinal.Equals(value, "item6") || StringComparer.Ordinal.Equals(value, "item7") || StringComparer.Ordinal.Equals(value, "item8") || StringComparer.Ordinal.Equals(value, "item9") || StringComparer.Ordinal.Equals(value, "item10"))
+            return true;
+
+        return false;
+    }

@@ -3,7 +3,7 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class SingleValueCode(FastDataSpec Spec, GeneratorContext Context) : ICode
+internal sealed class SingleValueCode(FastDataConfig config, GeneratorContext context) : ICode
 {
     public bool TryCreate() => true;
 
@@ -15,9 +15,9 @@ internal sealed class SingleValueCode(FastDataSpec Spec, GeneratorContext Contex
     public string Generate() =>
         $$"""
               {{GetMethodAttributes()}}
-              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              public{{GetModifier(config.ClassType)}} bool Contains({{config.DataType}} value)
               {
-                  return {{GetEqualFunction(Spec.KnownDataType, "value", ToValueLabel(Spec.Data[0]))}};
+                  return {{GetEqualFunction(config.DataType, "value", ToValueLabel(config.Data[0]))}};
               }
           """;
 }

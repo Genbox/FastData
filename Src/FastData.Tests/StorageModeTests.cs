@@ -1,7 +1,5 @@
+using System.Text;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Internal;
-using Genbox.FastData.InternalShared;
-using Microsoft.CodeAnalysis;
 
 namespace Genbox.FastData.Tests;
 
@@ -12,61 +10,38 @@ namespace Genbox.FastData.Tests;
 public class StorageModeTests
 {
     [Theory, MemberData(nameof(GetStorageModes))]
-    public void GenerateStorageMode(StorageMode mode, string type, string data)
+    public void GenerateStorageMode(StorageMode mode, object[] data)
     {
-        string source = $"""
-                         using Genbox.FastData;
-                         using Genbox.FastData.Enums;
-                         [assembly: FastData<{type}>("ImmutableSet", [ {data} ], StorageMode = StorageMode.{mode})]
-                         """;
+        FastDataConfig config = new FastDataConfig("MyData", data);
 
-        string generated = GetGeneratedOutput(source);
+        StringBuilder sb = new StringBuilder();
+        FastDataGenerator.Generate(sb, config);
 
-        File.WriteAllText($@"..\..\..\Generated\StorageModes\{mode}-{type}.output", generated);
+        File.WriteAllText($@"..\..\..\Generated\StorageModes\{mode}-{config.DataType}.output", sb.ToString());
     }
 
-    private static string GetGeneratedOutput(string source)
+    public static TheoryData<StorageMode, object[]> GetStorageModes()
     {
-        const string headers = """
-                               using Genbox.FastData;
-                               using Genbox.FastData.Enums;
-
-                               """;
-
-        source = headers + source;
-        string result = CodeGenerator.RunSourceGenerator<FastDataGenerator>(source, false, out Diagnostic[] compilerDiag, out Diagnostic[] codeGenDiag);
-        Assert.Empty(compilerDiag);
-        Assert.Empty(codeGenDiag);
-        Assert.NotEmpty(result);
-
-        return result;
-    }
-
-    public static TheoryData<StorageMode, string, string> GetStorageModes()
-    {
-        TheoryData<StorageMode, string, string> data = new TheoryData<StorageMode, string, string>();
+        TheoryData<StorageMode, object[]> data = new TheoryData<StorageMode, object[]>();
 
         // C# attributes are limited constants of the types included in .NET runtime.
         // For details, see https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/attributes#2224-attribute-parameter-types
 
         foreach (StorageMode mode in Enum.GetValues<StorageMode>())
         {
-            data.Add(mode, "bool", "true, false");
-            data.Add(mode, "sbyte", "-1, 0, 1");
-            data.Add(mode, "byte", "0, 1, 2");
-            data.Add(mode, "char", "'a', 'b', 'c'");
-            data.Add(mode, "double", "0.0, 1.0, 2.0");
-            data.Add(mode, "float", "0f, 1f, 2f");
-            data.Add(mode, "short", "-1, 0, 1");
-            data.Add(mode, "ushort", "0, 1, 2");
-            data.Add(mode, "int", "-1, 0, 1");
-            data.Add(mode, "uint", "0, 1, 2");
-            data.Add(mode, "long", "-1, 0, 1");
-            data.Add(mode, "ulong", "0, 1, 2");
-
-            data.Add(mode, "string", """
-                                     "1", "2", "3", "4", "5"
-                                     """);
+            data.Add(mode, [true, false]);
+            data.Add(mode, [(sbyte)-1, (sbyte)0, (sbyte)1]);
+            data.Add(mode, [(byte)0, (byte)1, (byte)2]);
+            data.Add(mode, ['a', 'b', 'c']);
+            data.Add(mode, [0.0, 1.0, 2.0]);
+            data.Add(mode, [0f, 1f, 2f]);
+            data.Add(mode, [(short)-1, (short)0, (short)1]);
+            data.Add(mode, [(ushort)0, (ushort)1, (ushort)2]);
+            data.Add(mode, [-1, 0, 1]);
+            data.Add(mode, [0U, 1U, 2U]);
+            data.Add(mode, [-1L, 0L, 1L]);
+            data.Add(mode, [0UL, 1UL, 2UL]);
+            data.Add(mode, ["1", "2", "3", "4", "5"]);
         }
 
         return data;

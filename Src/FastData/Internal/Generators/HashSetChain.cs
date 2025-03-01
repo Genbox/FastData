@@ -1,27 +1,25 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.Genetic;
 using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class HashSetChain(FastDataSpec Spec, GeneratorContext Context) : HashSetCode.IHashSetBase
+internal sealed class HashSetChain(FastDataConfig config, GeneratorContext context) : HashSetCode.IHashSetBase
 {
     private int[] _buckets;
     private Entry[] _entries;
 
     public void Create(Func<object, uint> hashFunc)
     {
-        int len = Spec.Data.Length;
+        int len = config.Data.Length;
 
         int[] buckets = new int[len];
         Entry[] entries = new Entry[len];
 
         for (int i = 0; i < len; i++)
         {
-            object value = Spec.Data[i];
+            object value = config.Data[i];
             uint hashCode = hashFunc(value);
             ref int bucket = ref buckets[hashCode % len];
 
@@ -38,18 +36,18 @@ internal sealed class HashSetChain(FastDataSpec Spec, GeneratorContext Context) 
 
     public string Generate(IHashSpec? spec) =>
         $$"""
-              private{{GetModifier(Spec.ClassType)}} readonly int[] _buckets = { {{JoinValues(_buckets, RenderBucket)}} };
+              private{{GetModifier(config.ClassType)}} readonly int[] _buckets = { {{JoinValues(_buckets, RenderBucket)}} };
 
-              private{{GetModifier(Spec.ClassType)}} readonly Entry[] _entries = {
+              private{{GetModifier(config.ClassType)}} readonly Entry[] _entries = {
           {{JoinValues(_entries, RenderEntry, ",\n")}}
               };
 
               {{GetMethodAttributes()}}
-              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              public{{GetModifier(config.ClassType)}} bool Contains({{config.DataType}} value)
               {
-          {{GetEarlyExits("value", Context.GetEarlyExits())}}
+          {{GetEarlyExits("value", context.GetEarlyExits())}}
 
-                  uint hashCode = {{(spec != null ? "Hash(value)" : GetHashFunction32(Spec.KnownDataType, "value"))}};
+                  uint hashCode = {{(spec != null ? "Hash(value)" : GetHashFunction32(config.DataType, "value"))}};
                   uint index = {{GetModFunction("hashCode", (uint)_buckets.Length)}};
                   int i = _buckets[index] - 1;
 
@@ -57,7 +55,7 @@ internal sealed class HashSetChain(FastDataSpec Spec, GeneratorContext Context) 
                   {
                       ref Entry entry = ref _entries[i];
 
-                      if (entry.HashCode == hashCode && {{GetEqualFunction(Spec.KnownDataType, "entry.Value", "value")}})
+                      if (entry.HashCode == hashCode && {{GetEqualFunction(config.DataType, "entry.Value", "value")}})
                           return true;
 
                       i = entry.Next;
@@ -72,10 +70,10 @@ internal sealed class HashSetChain(FastDataSpec Spec, GeneratorContext Context) 
               private struct Entry
               {
                   public uint HashCode;
-                  public {{(Spec.Data.Length <= short.MaxValue ? "short" : "int")}} Next;
-                  public {{Spec.DataTypeName}} Value;
+                  public {{(config.Data.Length <= short.MaxValue ? "short" : "int")}} Next;
+                  public {{config.DataType}} Value;
 
-                  public Entry(uint hashCode, {{(Spec.Data.Length <= short.MaxValue ? "short" : "int")}} next, {{Spec.DataTypeName}} value)
+                  public Entry(uint hashCode, {{(config.Data.Length <= short.MaxValue ? "short" : "int")}} next, {{config.DataType}} value)
                   {
                       HashCode = hashCode;
                       Next = next;

@@ -4,7 +4,7 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class KeyLengthCode(FastDataSpec Spec, GeneratorContext Context) : ICode
+internal sealed class KeyLengthCode(FastDataConfig config, GeneratorContext context) : ICode
 {
     private List<string>?[] _lengths;
 
@@ -18,12 +18,12 @@ internal sealed class KeyLengthCode(FastDataSpec Spec, GeneratorContext Context)
         //idx 3: "aaa", "bbb"
 
         //Calculate the maximum length
-        int maxLen = Spec.Data.Cast<string>().Max(x => x.Length);
+        int maxLen = config.Data.Cast<string>().Max(x => x.Length);
 
         //We don't have to use HashSets to deduplicate within a bucket as all items are unique
         List<string>?[] lengths = new List<string>?[maxLen + 1]; //We need a place for zero
 
-        foreach (string value in Spec.Data)
+        foreach (string value in config.Data)
         {
             ref List<string>? item = ref lengths[value.Length];
             item ??= new List<string>();
@@ -36,23 +36,23 @@ internal sealed class KeyLengthCode(FastDataSpec Spec, GeneratorContext Context)
 
     public string Generate() =>
         $$"""
-              private{{GetModifier(Spec.ClassType)}} readonly {{Spec.DataTypeName}}[]?[] _entries = [
+              private{{GetModifier(config.ClassType)}} readonly {{config.DataType}}[]?[] _entries = [
           {{JoinValues(_lengths, RenderEntry, ",\n")}}
               ];
 
               {{GetMethodAttributes()}}
-              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              public{{GetModifier(config.ClassType)}} bool Contains({{config.DataType}} value)
               {
-          {{GetEarlyExits("value", Context.GetEarlyExits(), true)}}
+          {{GetEarlyExits("value", context.GetEarlyExits(), true)}}
 
-                  {{Spec.DataTypeName}}[]? bucket = _entries[value.Length];
+                  {{config.DataType}}[]? bucket = _entries[value.Length];
 
                   if (bucket == null)
                       return false;
 
-                  foreach ({{Spec.DataTypeName}} str in bucket)
+                  foreach ({{config.DataType}} str in bucket)
                   {
-                      if ({{GetEqualFunction(Spec.KnownDataType, "value", "str")}})
+                      if ({{GetEqualFunction(config.DataType, "value", "str")}})
                           return true;
                   }
 

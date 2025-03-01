@@ -6,9 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--    <ProjectReference Remove="..\FastData\FastData.csproj" />-->
-    <!--    <ProjectReference Include="..\FastData\FastData.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />-->
-
     <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
   </ItemGroup>
 

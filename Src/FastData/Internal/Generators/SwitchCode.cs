@@ -4,20 +4,20 @@ using static Genbox.FastData.Internal.CodeSnip;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class SwitchCode(FastDataSpec Spec, GeneratorContext Context) : ICode
+internal sealed class SwitchCode(FastDataConfig config, GeneratorContext context) : ICode
 {
     public bool TryCreate() => true;
 
     public string Generate() =>
         $$"""
               {{GetMethodAttributes()}}
-              public{{GetModifier(Spec.ClassType)}} bool Contains({{Spec.DataTypeName}} value)
+              public{{GetModifier(config.ClassType)}} bool Contains({{config.DataType}} value)
               {
-          {{GetEarlyExits("value", Context.GetEarlyExits())}}
+          {{GetEarlyExits("value", context.GetEarlyExits())}}
 
                   switch (value)
                   {
-          {{JoinValues(Spec.Data, Render, "\n")}}
+          {{JoinValues(config.Data, Render, "\n")}}
                           return true;
                       default:
                           return false;

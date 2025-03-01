@@ -35,7 +35,7 @@ internal static class Program
         Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(data, props, new BruteForceSettings(), HashSetCode.RunSimulation);
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(data, props, new BruteForceAnalyzerConfig(), HashSetCode.RunSimulation);
         Candidate<BruteForceHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1);
     }
@@ -101,7 +101,7 @@ internal static class Program
         Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(data, props, new GeneticSettings(), HashSetCode.RunSimulation);
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(data, props, new GeneticAnalyzerConfig(), HashSetCode.RunSimulation);
         Candidate<GeneticHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1, in props);
     }
