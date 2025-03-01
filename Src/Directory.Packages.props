@@ -1,12 +1,12 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <Import Project="../Locals/Directory.Packages.props" Condition="Exists('../Locals/Directory.Packages.props')" />
   <Import Project="Directory.Packages.Analyzers.props" />
 
   <ItemGroup>
     <!--test packages-->
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
     <!--dev packages-->
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
