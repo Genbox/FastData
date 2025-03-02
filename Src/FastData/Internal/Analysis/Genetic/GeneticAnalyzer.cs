@@ -7,7 +7,7 @@ using Genbox.FastData.Internal.Analysis.Properties;
 namespace Genbox.FastData.Internal.Analysis.Genetic;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-internal sealed class GeneticAnalyzer(object[] data, StringProperties props, GeneticAnalyzerConfig analyzerConfig, Simulation<GeneticAnalyzerConfig, GeneticHashSpec> simulation) : IHashAnalyzer<GeneticHashSpec>
+internal sealed class GeneticAnalyzer(object[] data, StringProperties props, GeneticAnalyzerConfig config, Simulation<GeneticAnalyzerConfig, GeneticHashSpec> simulation) : IHashAnalyzer<GeneticHashSpec>
 {
     private readonly StringSegment[] _segments = SegmentManager.Generate(props).ToArray();
     private static readonly Random _rng = new Random();
@@ -77,7 +77,7 @@ internal sealed class GeneticAnalyzer(object[] data, StringProperties props, Gen
     public Candidate<GeneticHashSpec> Run()
     {
         // Create the initial population
-        Candidate<GeneticHashSpec>[] population = new Candidate<GeneticHashSpec>[analyzerConfig.PopulationSize];
+        Candidate<GeneticHashSpec>[] population = new Candidate<GeneticHashSpec>[config.PopulationSize];
         for (int i = 0; i < population.Length; i++)
         {
             GeneticHashSpec spec = new GeneticHashSpec();
@@ -85,32 +85,40 @@ internal sealed class GeneticAnalyzer(object[] data, StringProperties props, Gen
             population[i] = new Candidate<GeneticHashSpec>(spec);
         }
 
-        int evolution = 0;
+        int generation = 0;
         Candidate<GeneticHashSpec> top1 = new Candidate<GeneticHashSpec> { Fitness = double.MinValue };
-        double[] recent = new double[analyzerConfig.StagnantTopResults];
 
-        while (evolution++ < analyzerConfig.MaxEvolutions)
+        do
         {
             int bestIdx = RunPopulation(population);
             ref Candidate<GeneticHashSpec> popBest = ref population[bestIdx];
 
             if (popBest.Fitness > top1.Fitness)
-                top1 = popBest;
+                top1 = popBest; //This creates a copy, which is what we want
 
-            //We early exit on stagnant improvements, but we got to have enough data to correctly determine it
-            if (analyzerConfig.StagnantTerminate && evolution > recent.Length)
-            {
-                double avg = recent.Average();
+            //Selection is about picking ones that must survive. It starts with the entire population.
+            //A selection process can return the same parent multiple times.
+            IEnumerable<int> selected = config.Selection.Select(generation, population); //TODO: Selection policy
 
-                if (Math.Abs(popBest.Fitness - avg) <= analyzerConfig.StagnantPercent)
-                    break;
-            }
+            //We then cross parents to combine their properties
+            var children = config.CrossOver.Cross(population, selected);
 
-            recent[evolution % recent.Length] = popBest.Fitness;
-            SelectAndMutate(population);
-        }
+            //We add mutations to the children
+            config.Mutation.Mutate(population, children);
+
+            //We would want some of the parents to compete with their children
+            config.Reinsertion.Reinsert(population, parents);
+
+            //For the part of the population that wasn't touched, we generate new candidates
+            // Repopulate(population, parents, ref parentCount, children, ref childCount);
+        } while (config.Termination.ShouldTerminate(generation++, top1.Fitness));
 
         return top1;
+    }
+
+    private static void Repopulate(Candidate<GeneticHashSpec>[] population, ushort[] parents, ref int parentCount, ushort[] children, ref int childCount)
+    {
+        //
     }
 
     private void MutateSpec(ref GeneticHashSpec spec)
@@ -152,7 +160,7 @@ internal sealed class GeneticAnalyzer(object[] data, StringProperties props, Gen
         {
             // We ref it to update fitness
             ref Candidate<GeneticHashSpec> wrapper = ref population[i];
-            simulation(data, analyzerConfig, ref wrapper);
+            simulation(data, config, ref wrapper);
 
             // We keep a running max
             if (wrapper.Fitness > maxFit)
@@ -174,8 +182,8 @@ internal sealed class GeneticAnalyzer(object[] data, StringProperties props, Gen
         int Comparer(int a, int b) => population[b].Fitness.CompareTo(population[a].Fitness);
         Array.Sort(indexes, 0, indexes.Length, Comparer<int>.Create(Comparer));
 
-        int topCount = (int)(analyzerConfig.PopulationSize * analyzerConfig.CrossPercent);
-        int max = analyzerConfig.CrossEliteOnly ? topCount : indexes.Length;
+        int topCount = (int)(config.PopulationSize * config.CrossPercent);
+        int max = config.CrossEliteOnly ? topCount : indexes.Length;
 
         for (int i = 0; i < topCount; i++)
         {
