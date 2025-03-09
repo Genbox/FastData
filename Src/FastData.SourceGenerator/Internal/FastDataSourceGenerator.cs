@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
 using System.Text;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.CSharp;
+using Genbox.FastData.Generator.CSharp.Enums;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
@@ -44,19 +46,18 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
             try
             {
-                StringBuilder sb = new StringBuilder();
-
                 foreach (object obj in specs)
                 {
                     if (obj is Exception ex)
                         throw ex;
 
-                    if (obj is FastDataConfig spec)
+                    if (obj is CombinedConfig combinedConfig)
                     {
-                        sb.Clear();
-                        FastData.FastDataGenerator.Generate(sb, spec);
-                        spc.AddSource(spec.Name + ".g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
+                        string source = FastDataGenerator.Generate(combinedConfig.FastDataConfig, new CSharpCodeGenerator(combinedConfig.CSharpGeneratorConfig));
+                        spc.AddSource(combinedConfig.FastDataConfig.Name + ".g.cs", SourceText.From(source, Encoding.UTF8));
                     }
+                    else
+                        throw new InvalidOperationException("Unknown object type: " + obj.GetType().Name);
                 }
             }
             catch (Exception e)
@@ -141,11 +142,14 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
             FastDataConfig config = new FastDataConfig(name, data);
             config.StorageMode = GetValueOrDefault<StorageMode>(nameof(config.StorageMode), ad.NamedArguments);
-            config.Namespace = GetValueOrDefault<string>(nameof(config.Namespace), ad.NamedArguments);
-            config.ClassVisibility = GetValueOrDefault<ClassVisibility>(nameof(config.ClassVisibility), ad.NamedArguments);
-            config.ClassType = GetValueOrDefault<ClassType>(nameof(config.ClassType), ad.NamedArguments);
             config.StorageOptions = GetValueOrDefault<StorageOption>(nameof(config.StorageOptions), ad.NamedArguments);
-            yield return config;
+
+            CSharpGeneratorConfig config2 = new CSharpGeneratorConfig();
+            config2.Namespace = GetValueOrDefault<string>(nameof(config2.Namespace), ad.NamedArguments);
+            config2.ClassVisibility = GetValueOrDefault<ClassVisibility>(nameof(config2.ClassVisibility), ad.NamedArguments);
+            config2.ClassType = GetValueOrDefault<ClassType>(nameof(config2.ClassType), ad.NamedArguments);
+
+            yield return new CombinedConfig(config, config2);
         }
     }
 

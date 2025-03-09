@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using Genbox.FastData.Abstracts;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Misc;
 
@@ -324,7 +325,7 @@ internal struct GeneticHashSpec(int mixerSeed, int mixerIterations, int avalanch
 
         protected override Expression VisitBlock(BlockExpression node)
         {
-            foreach (var expression in node.Expressions)
+            foreach (Expression? expression in node.Expressions)
             {
                 Visit(expression);
                 _sb.AppendLine(";");

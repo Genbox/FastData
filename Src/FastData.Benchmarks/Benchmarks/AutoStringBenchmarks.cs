@@ -1,9 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
-using Genbox.FastData.Abstracts;
 using Genbox.FastData.Benchmarks.Code;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.CSharp;
+using Genbox.FastData.Generator.CSharp.Abstracts;
+using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.InternalShared;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
@@ -47,21 +49,21 @@ public class AutoStringBenchmarks
     */
 
     [Benchmark, ArgumentsSource(nameof(SingleData))]
-    public bool Single(IFastSet set, string mode, int size) => DoCheck(set);
+    public bool Single(IFastSet<string> set, string mode, int size) => DoCheck(set);
 
     [Benchmark, ArgumentsSource(nameof(TinyData))]
-    public bool Tiny(IFastSet set, string mode, int size) => DoCheck(set);
+    public bool Tiny(IFastSet<string> set, string mode, int size) => DoCheck(set);
 
     [Benchmark, ArgumentsSource(nameof(SmallData))]
-    public bool Small(IFastSet set, string mode, int size) => DoCheck(set);
+    public bool Small(IFastSet<string> set, string mode, int size) => DoCheck(set);
 
     [Benchmark, ArgumentsSource(nameof(MediumData))]
-    public bool Medium(IFastSet set, string mode, int size) => DoCheck(set);
+    public bool Medium(IFastSet<string> set, string mode, int size) => DoCheck(set);
 
     [Benchmark, ArgumentsSource(nameof(LargeData))]
-    public bool Large(IFastSet set, string mode, int size) => DoCheck(set);
+    public bool Large(IFastSet<string> set, string mode, int size) => DoCheck(set);
 
-    private static bool DoCheck(IFastSet set)
+    private static bool DoCheck(IFastSet<string> set)
     {
         bool a = true;
 
@@ -79,20 +81,27 @@ public class AutoStringBenchmarks
 
     private static IEnumerable<object[]> GetForSize(int size)
     {
-        string[] data = new string[size];
+        object[] data = new object[size];
 
         for (int i = 0; i < size; i++)
             data[i] = new string('a', i + 1);
 
         foreach (StorageMode mode in Enum.GetValues<StorageMode>())
         {
-            FastDataConfig config = new FastDataConfig("MyData", data);
-            config.StorageMode = mode;
+            FastDataConfig cfg = new FastDataConfig("MyData", data);
+            cfg.StorageMode = mode;
 
-            yield return [CodeGenerator.DynamicCreateSet(config, true), mode, size];
+            CSharpGeneratorConfig genCfg = new CSharpGeneratorConfig();
+            genCfg.ClassType = ClassType.Instance;
+
+            string code = FastDataGenerator.Generate(cfg, new CSharpCodeGenerator(genCfg));
+            yield return [CodeGenerator.CreateFastSet<string>(code, true), mode, size];
         }
 
-        yield return [new UnoptimizedArray(data), nameof(UnoptimizedArray), size];
-        yield return [new UnoptimizedHashSet(data), nameof(UnoptimizedHashSet), size];
+        //We have to do this as the source generator only works on object[], but these work on string[]
+        string[] strData = data.Cast<string>().ToArray();
+
+        yield return [new UnoptimizedArray(strData), nameof(UnoptimizedArray), size];
+        yield return [new UnoptimizedHashSet(strData), nameof(UnoptimizedHashSet), size];
     }
 }

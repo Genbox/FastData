@@ -4,4 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FastData.Generator.CSharp\FastData.Generator.CSharp.csproj" />
+  </ItemGroup>
+
 </Project>

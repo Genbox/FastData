@@ -1,6 +1,7 @@
 ﻿// ReSharper disable All
 
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.CSharp.Enums;
 
 namespace Genbox.FastData;
 

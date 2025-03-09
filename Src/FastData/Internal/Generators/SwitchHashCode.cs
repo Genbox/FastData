@@ -1,51 +1,23 @@
-using System.Globalization;
-using System.Text;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
-using static Genbox.FastData.Internal.CodeSnip;
+using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Internal.Generators;
 
-internal sealed class SwitchHashCode(FastDataConfig config, GeneratorContext context) : ICode
+internal sealed class SwitchHashCode : IStructure
 {
-    private (uint, object)[] _hashCodes;
-
-    public bool TryCreate()
+    public IContext Create(object[] data)
     {
-        (uint, object)[] hashCodes = new (uint, object)[config.Data.Length];
+        KeyValuePair<uint, object>[] hashCodes = new KeyValuePair<uint, object>[data.Length];
 
-        for (int i = 0; i < config.Data.Length; i++)
+        for (int i = 0; i < data.Length; i++)
         {
-            object value = config.Data[i];
+            object value = data[i];
             uint hash = HashHelper.HashObject(value);
 
-            hashCodes[i] = (hash, value);
+            hashCodes[i] = new KeyValuePair<uint, object>(hash, value);
         }
 
-        _hashCodes = hashCodes;
-        return true;
-    }
-
-    public string Generate() =>
-        $$"""
-              {{GetMethodAttributes()}}
-              public{{GetModifier(config.ClassType)}} bool Contains({{config.DataType}} value)
-              {
-          {{GetEarlyExits("value", context.GetEarlyExits())}}
-
-                  switch ({{GetHashFunction32(config.DataType, "value")}})
-                  {
-          {{JoinValues(_hashCodes, Render, "\n")}}
-                  }
-                  return false;
-              }
-          """;
-
-    private void Render(StringBuilder sb, (uint, object) obj)
-    {
-        sb.Append($"""
-                               case {obj.Item1.ToString(NumberFormatInfo.InvariantInfo)}:
-                                    return {GetEqualFunction(config.DataType, "value", ToValueLabel(obj.Item2))};
-                   """);
+        return new SwitchHashContext(data, hashCodes);
     }
 }

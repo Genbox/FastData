@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.CSharp;
+using Genbox.FastData.Generator.CSharp.Abstracts;
+using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.InternalShared;
 
 namespace Genbox.FastData.Tests;
@@ -16,7 +18,7 @@ public class DataStructureTests
     public void OutputIsUniq()
     {
         FastDataConfig config = new FastDataConfig("MyData", ["item", "item"]);
-        Assert.Throws<InvalidOperationException>(() => CodeGenerator.DynamicCreateSet(config, false));
+        Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate(config, new CSharpCodeGenerator(new CSharpGeneratorConfig())));
     }
 
     [Theory, MemberData(nameof(GetDataStructures))]
@@ -25,25 +27,28 @@ public class DataStructureTests
         //We need to make a defensive clone to avoid the generator from manipulating with the data
         FastDataConfig config = new FastDataConfig("MyData", (object[])data.Clone());
 
-        StringBuilder sb = new StringBuilder();
-        FastDataGenerator.Generate(ds, sb, config);
+        string source = FastDataGenerator.Generate(ds, config, new CSharpCodeGenerator(new CSharpGeneratorConfig()
+        {
+            ClassType = ClassType.Instance
+        }));
 
-        string source = sb.ToString();
         Assert.NotEmpty(source);
 
-        File.WriteAllText($@"..\..\..\Generated\DataStructures\{ds}-{config.DataType}.output", source);
+        KnownDataType dataType = config.GetDataType();
 
-        if (config.DataType == KnownDataType.String)
+        File.WriteAllText($@"..\..\..\Generated\DataStructures\{ds}-{dataType}.output", source);
+
+        if (dataType == KnownDataType.String)
         {
-            Func<string, bool> func = CodeGenerator.GetDelegate<Func<string, bool>>(source, false, true);
-            Assert.True(func((string)data[0]));
-            Assert.False(func("dontexist"));
+            IFastSet<string> set = CodeGenerator.CreateFastSet<string>(source, false);
+            Assert.True(set.Contains((string)data[0]));
+            Assert.False(set.Contains("dontexist"));
         }
-        else if (config.DataType == KnownDataType.Int32)
+        else if (dataType == KnownDataType.Int32)
         {
-            Func<int, bool> func = CodeGenerator.GetDelegate<Func<int, bool>>(source, false, true);
-            Assert.True(func((int)data[0]));
-            Assert.False(func(100));
+            IFastSet<int> set = CodeGenerator.CreateFastSet<int>(source, false);
+            Assert.True(set.Contains((int)data[0]));
+            Assert.False(set.Contains(100));
         }
     }
 

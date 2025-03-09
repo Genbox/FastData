@@ -1,5 +1,5 @@
-using System.Text;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.CSharp;
 
 namespace Genbox.FastData.Tests;
 
@@ -13,11 +13,10 @@ public class StorageModeTests
     public void GenerateStorageMode(StorageMode mode, object[] data)
     {
         FastDataConfig config = new FastDataConfig("MyData", data);
+        config.StorageMode = mode;
 
-        StringBuilder sb = new StringBuilder();
-        FastDataGenerator.Generate(sb, config);
-
-        File.WriteAllText($@"..\..\..\Generated\StorageModes\{mode}-{config.DataType}.output", sb.ToString());
+        string source = FastDataGenerator.Generate(config, new CSharpCodeGenerator(new CSharpGeneratorConfig()));
+        File.WriteAllText($@"..\..\..\Generated\StorageModes\{mode}-{config.GetDataType()}.output", source);
     }
 
     public static TheoryData<StorageMode, object[]> GetStorageModes()

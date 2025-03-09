@@ -28,4 +28,12 @@
     <Compile Remove="..\FastData\Properties\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\FastData.Generator.CSharp\**\*.cs">
+      <Link>FastDataGen\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Remove="..\FastData.Generator.CSharp\obj\**" />
+    <Compile Remove="..\FastData.Generator.CSharp\Properties\**" />
+  </ItemGroup>
+
 </Project>

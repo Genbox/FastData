@@ -3,8 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
-using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.CSharp;
+using Genbox.FastData.Generator.CSharp.Abstracts;
+using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.InternalShared;
 using Genbox.FastFilter;
 
@@ -16,7 +18,7 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class DataStructureBenchmarks
 {
-    private readonly string[] _data = ["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10", "item11", "item12", "item13", "item14", "item15", "item16", "item17", "item18", "item19", "item20", "item21", "item22", "item23", "item24", "item25", "item26", "item27", "item28", "item29", "item30", "item31", "item32", "item33", "item34", "item35", "item36", "item37", "item38", "item39", "item40", "item41", "item42", "item43", "item44", "item45", "item46", "item47", "item48", "item49", "item50", "item51", "item52", "item53", "item54", "item55", "item56", "item57", "item58", "item59", "item60", "item61", "item62", "item63", "item64", "item65", "item66", "item67", "item68", "item69", "item70", "item71", "item72", "item73", "item74", "item75", "item76", "item77", "item78", "item79", "item80", "item81", "item82", "item83", "item84", "item85", "item86", "item87", "item88", "item89", "item90", "item91", "item92", "item93", "item94", "item95", "item96", "item97", "item98", "item99", "item100"];
+    private readonly string[] _data = ["a", "aa", "bbb", "cccc", "aaaaa", "cccccc", "ddddddd", "00000000", "uuuuuuuuu", "aaaaaaaaaa"];
     private string[] _queries = null!;
 
     private string[] _array = null!;
@@ -26,20 +28,34 @@ public class DataStructureBenchmarks
     private BlockedBloomFilter<string> _blockedBloom = null!;
     private BinaryFuse8Filter<string> _binaryFuse8 = null!;
 
-    private IFastSet _linear = null!;
-    private IFastSet _logic = null!;
-    private IFastSet _tree = null!;
-    private IFastSet _index = null!;
+    private IFastSet<string> _fastArray = null!;
+    private IFastSet<string> _fastBinarySearch = null!;
+    private IFastSet<string> _fastEytzingerSearch = null!;
+    private IFastSet<string> _fastSwitch = null!;
+    private IFastSet<string> _fastSwitchHashCode = null!;
+    private IFastSet<string> _fastMinimalPerfectHash = null!;
+    private IFastSet<string> _fastHashSetLinear = null!;
+    private IFastSet<string> _fastHashSetChain = null!;
+    private IFastSet<string> _fastUniqueKeyLength = null!;
+    private IFastSet<string> _fastUniqueKeyLengthSwitch = null!;
+    private IFastSet<string> _fastKeyLength = null!;
+
+    // private IFastSet<string> _fastSingleValue = null!;
+    private IFastSet<string> _fastConditional = null!;
 
     [Params(1_000, 10_000)]
     public int QuerySize { get; set; }
 
-    private IFastSet CreateFastData(StorageMode mode)
+    private IFastSet<string> CreateFastData(DataStructure ds)
     {
-        FastDataConfig config = new FastDataConfig(mode.ToString(), _data);
-        config.StorageMode = mode;
+        FastDataConfig config = new FastDataConfig(ds.ToString(), _data.Cast<object>().ToArray()); //We have to convert to object[]
 
-        return CodeGenerator.DynamicCreateSet(config, true);
+        string code = FastDataGenerator.Generate(ds, config, new CSharpCodeGenerator(new CSharpGeneratorConfig
+        {
+            ClassType = ClassType.Instance
+        }));
+
+        return CodeGenerator.CreateFastSet<string>(code, true);
     }
 
     private void SetupQueries()
@@ -98,36 +114,89 @@ public class DataStructureBenchmarks
         _binaryFuse8 = CreateBinaryFuse8Filter();
     }
 
-    [GlobalSetup(Target = nameof(QueryStaticLinear))]
-    public void SetupStaticLinear()
+    [GlobalSetup(Target = nameof(QueryStaticArray))]
+    public void SetupStaticArray()
     {
         SetupQueries();
-        _linear = CreateFastData(StorageMode.Linear);
+        _fastArray = CreateFastData(DataStructure.Array);
     }
 
-    [GlobalSetup(Target = nameof(QueryStaticLogic))]
-    public void SetupStaticLogic()
+    [GlobalSetup(Target = nameof(QueryStaticBinarySearch))]
+    public void SetupStaticBinarySearch()
     {
         SetupQueries();
-        _logic = CreateFastData(StorageMode.Logic);
+        _fastBinarySearch = CreateFastData(DataStructure.BinarySearch);
     }
 
-    [GlobalSetup(Target = nameof(QueryStaticTree))]
-    public void SetupStaticTree()
+    [GlobalSetup(Target = nameof(QueryStaticEytzingerSearch))]
+    public void SetupStaticEytzingerSearch()
     {
         SetupQueries();
-        _tree = CreateFastData(StorageMode.Tree);
+        _fastEytzingerSearch = CreateFastData(DataStructure.EytzingerSearch);
     }
 
-    [GlobalSetup(Target = nameof(QueryStaticIndex))]
-    public void SetupStaticIndex()
+    [GlobalSetup(Target = nameof(QueryStaticSwitch))]
+    public void SetupStaticSwitch()
     {
         SetupQueries();
-        _index = CreateFastData(StorageMode.Indexed);
+        _fastSwitch = CreateFastData(DataStructure.Switch);
     }
 
-    [GlobalSetup(Targets = [nameof(QueryStaticLinear), nameof(QueryStaticLogic), nameof(QueryStaticTree), nameof(QueryStaticIndex)])]
-    public void SetupOthers() => SetupQueries();
+    [GlobalSetup(Target = nameof(QueryStaticSwitchHashCode))]
+    public void SetupStaticSwitchHashCode()
+    {
+        SetupQueries();
+        _fastSwitchHashCode = CreateFastData(DataStructure.SwitchHashCode);
+    }
+
+    [GlobalSetup(Target = nameof(QueryStaticMinimalPerfectHash))]
+    public void SetupStaticSwitchMinimalPerfectHash()
+    {
+        SetupQueries();
+        _fastMinimalPerfectHash = CreateFastData(DataStructure.MinimalPerfectHash);
+    }
+
+    [GlobalSetup(Target = nameof(QueryStaticHashSetLinear))]
+    public void SetupStaticSwitchHashSetLinear()
+    {
+        SetupQueries();
+        _fastHashSetLinear = CreateFastData(DataStructure.HashSetLinear);
+    }
+
+    [GlobalSetup(Target = nameof(QueryStaticHashSetChain))]
+    public void SetupStaticHashSetChain()
+    {
+        SetupQueries();
+        _fastHashSetChain = CreateFastData(DataStructure.HashSetChain);
+    }
+
+    [GlobalSetup(Target = nameof(QueryStaticUniqueKeyLength))]
+    public void SetupStaticUniqueKeyLength()
+    {
+        SetupQueries();
+        _fastUniqueKeyLength = CreateFastData(DataStructure.UniqueKeyLength);
+    }
+
+    [GlobalSetup(Target = nameof(QueryStaticUniqueKeyLengthSwitch))]
+    public void SetupStaticUniqueKeyLengthSwitch()
+    {
+        SetupQueries();
+        _fastUniqueKeyLengthSwitch = CreateFastData(DataStructure.UniqueKeyLengthSwitch);
+    }
+
+    [GlobalSetup(Target = nameof(QueryStaticKeyLength))]
+    public void SetupStaticKeyLength()
+    {
+        SetupQueries();
+        _fastKeyLength = CreateFastData(DataStructure.KeyLength);
+    }
+
+    [GlobalSetup(Target = nameof(QueryStaticConditional))]
+    public void SetupStaticConditional()
+    {
+        SetupQueries();
+        _fastConditional = CreateFastData(DataStructure.Conditional);
+    }
 
     [Benchmark, BenchmarkCategory("Construction")]
     public void ConstructHashSet() => CreateHashSet();
@@ -160,16 +229,40 @@ public class DataStructureBenchmarks
     public void QueryBinaryFuse8() => DoQuery(_binaryFuse8.Contains);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticLinear() => DoQuery(_linear.Contains);
+    public void QueryStaticArray() => DoQuery(_fastArray.Contains);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticLogic() => DoQuery(_logic.Contains);
+    public void QueryStaticBinarySearch() => DoQuery(_fastBinarySearch.Contains);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticTree() => DoQuery(_tree.Contains);
+    public void QueryStaticEytzingerSearch() => DoQuery(_fastEytzingerSearch.Contains);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticIndex() => DoQuery(_index.Contains);
+    public void QueryStaticSwitch() => DoQuery(_fastSwitch.Contains);
+
+    [Benchmark, BenchmarkCategory("Query")]
+    public void QueryStaticSwitchHashCode() => DoQuery(_fastSwitchHashCode.Contains);
+
+    [Benchmark, BenchmarkCategory("Query")]
+    public void QueryStaticMinimalPerfectHash() => DoQuery(_fastMinimalPerfectHash.Contains);
+
+    [Benchmark, BenchmarkCategory("Query")]
+    public void QueryStaticHashSetLinear() => DoQuery(_fastHashSetLinear.Contains);
+
+    [Benchmark, BenchmarkCategory("Query")]
+    public void QueryStaticHashSetChain() => DoQuery(_fastHashSetChain.Contains);
+
+    [Benchmark, BenchmarkCategory("Query")]
+    public void QueryStaticUniqueKeyLength() => DoQuery(_fastUniqueKeyLength.Contains);
+
+    [Benchmark, BenchmarkCategory("Query")]
+    public void QueryStaticUniqueKeyLengthSwitch() => DoQuery(_fastUniqueKeyLengthSwitch.Contains);
+
+    [Benchmark, BenchmarkCategory("Query")]
+    public void QueryStaticKeyLength() => DoQuery(_fastKeyLength.Contains);
+
+    [Benchmark, BenchmarkCategory("Query")]
+    public void QueryStaticConditional() => DoQuery(_fastConditional.Contains);
 
     private HashSet<string> CreateHashSet() => new HashSet<string>(_data, StringComparer.Ordinal);
     private FrozenSet<string> CreateFrozenSet() => CreateHashSet().ToFrozenSet();

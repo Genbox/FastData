@@ -19,7 +19,7 @@ public class SourceGeneratorTests
         Assert.Empty(codeGenDiagnostics);
 
         //Compile the output to code and test
-        Func<string, bool> func = CodeGenerator.GetDelegate<Func<string, bool>>(source, false, false);
+        Func<string, bool> func = CodeGenerator.GetDelegate<Func<string, bool>>(source, false, true);
         Assert.True(func("item1"));
         Assert.False(func("dontexist"));
     }

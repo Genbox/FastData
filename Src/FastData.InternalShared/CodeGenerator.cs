@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
-using Genbox.FastData.Abstracts;
+using Genbox.FastData.Generator.CSharp.Abstracts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -13,7 +13,8 @@ namespace Genbox.FastData.InternalShared;
 
 public static class CodeGenerator
 {
-    public static T GetDelegate<T>(string source, bool release, bool addWrapper) where T : Delegate
+    /// <summary>This is used to wrap a hash function and get it as a delegate</summary>
+    public static T GetDelegate<T>(string source, bool release, bool disableWrapper = false) where T : Delegate
     {
         string wrapped = $$"""
                            using System;
@@ -27,7 +28,7 @@ public static class CodeGenerator
                            }
                            """;
 
-        CSharpCompilation compilation = CreateCompilation(addWrapper ? wrapped : source, release, typeof(T), typeof(DisplayAttribute));
+        CSharpCompilation compilation = CreateCompilation(disableWrapper ? source : wrapped, release, typeof(T), typeof(DisplayAttribute));
 
         if (!TryGetAssembly(compilation, out Assembly? assembly, out Diagnostic[] diagnostics))
             throw new InvalidOperationException("Unable to compile delegate. Errors: " + string.Join('\n', diagnostics.Select(x => x.ToString())));
@@ -42,13 +43,10 @@ public static class CodeGenerator
         return me.CreateDelegate<T>();
     }
 
-    public static IFastSet DynamicCreateSet(FastDataConfig config, bool release)
+    /// <summary>This is used to compile a FastData and get it as an IFastSet instance</summary>
+    public static IFastSet<T> CreateFastSet<T>(string source, bool release)
     {
-        StringBuilder sb = new StringBuilder();
-        FastDataGenerator.Generate(sb, config);
-
-        CSharpCompilation compilation = CreateCompilation(sb.ToString(), release);
-
+        CSharpCompilation compilation = CreateCompilation(source, release);
         ImmutableArray<Diagnostic> diag = compilation.GetDiagnostics();
 
         if (diag.Length > 0)
@@ -58,26 +56,12 @@ public static class CodeGenerator
             throw new InvalidOperationException("Unable to compile set. Errors: " + string.Join('\n', errors.Select(x => x.ToString())));
 
         Type[] types = assembly.GetTypes();
-        Type? type = null;
-
-        if (types.Length == 1)
-            type = types[0];
-        else
-        {
-            foreach (Type t in types)
-            {
-                if (t.GetInterface(nameof(IFastSet)) != null)
-                {
-                    type = t;
-                    break;
-                }
-            }
-        }
+        Type? type = types[0];
 
         if (type == null)
             throw new InvalidOperationException("Unable to find type");
 
-        IFastSet? set = (IFastSet?)Activator.CreateInstance(type);
+        IFastSet<T>? set = (IFastSet<T>?)Activator.CreateInstance(type);
 
         if (set == null)
             throw new InvalidOperationException("Instance was null");

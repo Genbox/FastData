@@ -1,7 +1,7 @@
-using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Abstracts;
+using Genbox.FastData.EarlyExitSpecs;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Optimization.EarlyExitSpecs;
 
 namespace Genbox.FastData.Internal.Optimization;
 

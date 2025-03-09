@@ -2,23 +2,14 @@
 
 namespace Genbox.FastData;
 
-public sealed class FastDataConfig
+public class FastDataConfig(string name, object[] data)
 {
-    public FastDataConfig(string name, object[] data)
-    {
-        Name = name;
-        Data = data;
-        DataType = (KnownDataType)Enum.Parse(typeof(KnownDataType), data[0].GetType().Name);
-    }
+    public string Name { get; set; } = name;
+    public object[] Data { get; set; } = data;
 
-    public string Name { get; set; }
-    public object[] Data { get; set; }
-
-    public KnownDataType DataType { get; }
     public StorageMode StorageMode { get; set; }
     public StorageOption StorageOptions { get; set; }
     public AnalyzerConfig? AnalyzerConfig { get; set; }
-    public string? Namespace { get; set; }
-    public ClassVisibility ClassVisibility { get; set; }
-    public ClassType ClassType { get; set; }
+
+    public KnownDataType GetDataType() => (KnownDataType)Enum.Parse(typeof(KnownDataType), Data[0].GetType().Name);
 }

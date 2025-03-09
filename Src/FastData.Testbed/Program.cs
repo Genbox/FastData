@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Genbox.FastData.Abstracts;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.BruteForce;
@@ -35,7 +36,8 @@ internal static class Program
         Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(data, props, new BruteForceAnalyzerConfig(), HashSetCode.RunSimulation);
+        HashSetChainCode hashset = new HashSetChainCode();
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(data, props, new BruteForceAnalyzerConfig(), hashset.RunSimulation);
         Candidate<BruteForceHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1);
     }
@@ -101,7 +103,8 @@ internal static class Program
         Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(data, props, new GeneticAnalyzerConfig(), HashSetCode.RunSimulation);
+        HashSetChainCode hashset = new HashSetChainCode();
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(data, props, new GeneticAnalyzerConfig(), hashset.RunSimulation);
         Candidate<GeneticHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1, in props);
     }

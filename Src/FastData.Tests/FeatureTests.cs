@@ -1,7 +1,7 @@
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Genbox.FastData.Generator.CSharp;
 
 namespace Genbox.FastData.Tests;
 
@@ -20,13 +20,11 @@ public class FeatureTests
     {
         string input = File.ReadAllText(inputFile);
 
-        FastDataConfig? spec = JsonSerializer.Deserialize<FastDataConfig>(input, GetOptions());
-        Assert.NotNull(spec);
+        FastDataConfig? config = JsonSerializer.Deserialize<FastDataConfig>(input, GetOptions());
+        Assert.NotNull(config);
 
-        StringBuilder sb = new StringBuilder();
-        FastDataGenerator.Generate(sb, spec);
-
-        File.WriteAllText($@"..\..\..\Generated\Features\{Path.GetFileNameWithoutExtension(inputFile)}.output", sb.ToString());
+        string source = FastDataGenerator.Generate(config, new CSharpCodeGenerator(new CSharpGeneratorConfig()));
+        File.WriteAllText($@"..\..\..\Generated\Features\{Path.GetFileNameWithoutExtension(inputFile)}.output", source);
     }
 
     public static TheoryData<string> GetInputs()
