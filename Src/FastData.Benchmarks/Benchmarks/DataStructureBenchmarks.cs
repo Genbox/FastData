@@ -32,7 +32,6 @@ public class DataStructureBenchmarks
     private IFastSet<string> _fastBinarySearch = null!;
     private IFastSet<string> _fastEytzingerSearch = null!;
     private IFastSet<string> _fastSwitch = null!;
-    private IFastSet<string> _fastSwitchHashCode = null!;
     private IFastSet<string> _fastMinimalPerfectHash = null!;
     private IFastSet<string> _fastHashSetLinear = null!;
     private IFastSet<string> _fastHashSetChain = null!;
@@ -142,22 +141,15 @@ public class DataStructureBenchmarks
         _fastSwitch = CreateFastData(DataStructure.Switch);
     }
 
-    [GlobalSetup(Target = nameof(QueryStaticSwitchHashCode))]
-    public void SetupStaticSwitchHashCode()
-    {
-        SetupQueries();
-        _fastSwitchHashCode = CreateFastData(DataStructure.SwitchHashCode);
-    }
-
     [GlobalSetup(Target = nameof(QueryStaticMinimalPerfectHash))]
-    public void SetupStaticSwitchMinimalPerfectHash()
+    public void SetupStaticMinimalPerfectHash()
     {
         SetupQueries();
         _fastMinimalPerfectHash = CreateFastData(DataStructure.MinimalPerfectHash);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticHashSetLinear))]
-    public void SetupStaticSwitchHashSetLinear()
+    public void SetupStaticHashSetLinear()
     {
         SetupQueries();
         _fastHashSetLinear = CreateFastData(DataStructure.HashSetLinear);
@@ -239,9 +231,6 @@ public class DataStructureBenchmarks
 
     [Benchmark, BenchmarkCategory("Query")]
     public void QueryStaticSwitch() => DoQuery(_fastSwitch.Contains);
-
-    [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticSwitchHashCode() => DoQuery(_fastSwitchHashCode.Contains);
 
     [Benchmark, BenchmarkCategory("Query")]
     public void QueryStaticMinimalPerfectHash() => DoQuery(_fastMinimalPerfectHash.Contains);

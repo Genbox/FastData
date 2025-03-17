@@ -6,7 +6,6 @@ public enum DataStructure : byte
     BinarySearch,
     EytzingerSearch,
     Switch,
-    SwitchHashCode,
     MinimalPerfectHash,
     HashSetLinear,
     HashSetChain,

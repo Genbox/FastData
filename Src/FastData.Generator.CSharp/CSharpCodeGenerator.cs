@@ -27,7 +27,6 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
             MinimalPerfectHashContext c2 => new MinimalPerfectHashCode(genCfg, userCfg, c2).Generate(),
             SingleValueContext c2 => new SingleValueCode(genCfg, userCfg, c2).Generate(),
             SwitchContext c2 => new SwitchCode(genCfg, userCfg, c2).Generate(),
-            SwitchHashContext c2 => new SwitchHashCode(genCfg, userCfg, c2).Generate(),
             UniqueKeyLengthContext c2 => new UniqueKeyLengthCode(genCfg, userCfg, c2).Generate(),
             UniqueKeyLengthSwitchContext c2 => new UniqueKeyLengthSwitchCode(genCfg, userCfg, c2).Generate(),
             _ => throw new NotSupportedException("The context type is not supported: " + context.GetType().Name)

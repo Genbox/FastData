@@ -114,7 +114,6 @@ public static class FastDataGenerator
             DataStructure.BinarySearch => new BinarySearchCode(),
             DataStructure.EytzingerSearch => new EytzingerSearchCode(),
             DataStructure.Switch => new SwitchCode(),
-            DataStructure.SwitchHashCode => new SwitchHashCode(),
             DataStructure.MinimalPerfectHash => new MinimalPerfectHashCode(),
             DataStructure.HashSetChain => new HashSetChainCode(),
             DataStructure.HashSetLinear => new HashSetLinearCode(),

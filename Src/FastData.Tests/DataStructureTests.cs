@@ -64,7 +64,6 @@ public class DataStructureTests
         data.Add(DataStructure.BinarySearch, normal1);
         data.Add(DataStructure.EytzingerSearch, normal1);
         data.Add(DataStructure.Switch, normal1);
-        data.Add(DataStructure.SwitchHashCode, normal1);
         data.Add(DataStructure.MinimalPerfectHash, normal1);
         data.Add(DataStructure.HashSetChain, normal1);
         data.Add(DataStructure.HashSetLinear, normal1);
@@ -86,7 +85,6 @@ public class DataStructureTests
         data.Add(DataStructure.BinarySearch, normal2);
         data.Add(DataStructure.EytzingerSearch, normal2);
         data.Add(DataStructure.Switch, normal2);
-        data.Add(DataStructure.SwitchHashCode, normal2);
         data.Add(DataStructure.MinimalPerfectHash, normal2);
         data.Add(DataStructure.HashSetChain, normal2);
         data.Add(DataStructure.HashSetLinear, normal2);
