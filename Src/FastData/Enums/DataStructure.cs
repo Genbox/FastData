@@ -8,7 +8,6 @@ public enum DataStructure : byte
     // O(n) data structures
     Array,
     Conditional,
-    Switch,
 
     // O(log(n)) data structures
     BinarySearch,
@@ -16,11 +15,10 @@ public enum DataStructure : byte
 
     // O(1) data structures
     MinimalPerfectHash,
-    HashSetLinear,
     HashSetChain,
+    HashSetLinear,
 
     // Edge-cases
     KeyLength,
-    UniqueKeyLength,
-    UniqueKeyLengthSwitch,
+    UniqueKeyLength
 }

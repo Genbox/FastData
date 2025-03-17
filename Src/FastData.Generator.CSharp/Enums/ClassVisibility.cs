@@ -2,7 +2,8 @@ namespace Genbox.FastData.Generator.CSharp.Enums;
 
 public enum ClassVisibility : byte
 {
-    Internal = 0,
+    Unknown = 0,
+    Internal,
     Private,
     Public
 }

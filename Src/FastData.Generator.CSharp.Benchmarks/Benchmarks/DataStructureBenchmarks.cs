@@ -138,7 +138,7 @@ public class DataStructureBenchmarks
     public void SetupStaticSwitch()
     {
         SetupQueries();
-        _fastSwitch = CreateFastData(DataStructure.Switch);
+        _fastSwitch = CreateFastData(DataStructure.Conditional, config => config.ConditionalBranchType = BranchType.Switch);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticMinimalPerfectHash))]

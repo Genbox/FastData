@@ -4,5 +4,5 @@ public enum BranchType : byte
 {
     Unknown = 0,
     Switch,
-    Conditional
+    If
 }

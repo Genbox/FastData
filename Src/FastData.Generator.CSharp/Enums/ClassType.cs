@@ -2,7 +2,8 @@ namespace Genbox.FastData.Generator.CSharp.Enums;
 
 public enum ClassType
 {
-    Static = 0,
+    Unknown = 0,
+    Static,
     Instance,
     Struct
 }

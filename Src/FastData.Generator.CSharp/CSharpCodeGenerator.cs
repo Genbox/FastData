@@ -17,18 +17,16 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
 
         _sb.Append(context switch
         {
+            SingleValueContext c2 => new SingleValueCode(genCfg, userCfg, c2).Generate(),
             ArrayContext c1 => new ArrayCode(genCfg, userCfg, c1).Generate(),
             BinarySearchContext c2 => new BinarySearchCode(genCfg, userCfg, c2).Generate(),
             ConditionalContext c2 => new ConditionalCode(genCfg, userCfg, c2).Generate(),
             EytzingerSearchContext c2 => new EytzingerSearchCode(genCfg, userCfg, c2).Generate(),
+            MinimalPerfectHashContext c2 => new MinimalPerfectHashCode(genCfg, userCfg, c2).Generate(),
             HashSetChainContext c2 => new HashSetChainCode(genCfg, userCfg, c2).Generate(),
             HashSetLinearContext c2 => new HashSetLinearCode(genCfg, userCfg, c2).Generate(),
             KeyLengthContext c2 => new KeyLengthCode(genCfg, userCfg, c2).Generate(),
-            MinimalPerfectHashContext c2 => new MinimalPerfectHashCode(genCfg, userCfg, c2).Generate(),
-            SingleValueContext c2 => new SingleValueCode(genCfg, userCfg, c2).Generate(),
-            SwitchContext c2 => new SwitchCode(genCfg, userCfg, c2).Generate(),
             UniqueKeyLengthContext c2 => new UniqueKeyLengthCode(genCfg, userCfg, c2).Generate(),
-            UniqueKeyLengthSwitchContext c2 => new UniqueKeyLengthSwitchCode(genCfg, userCfg, c2).Generate(),
             _ => throw new NotSupportedException("The context type is not supported: " + context.GetType().Name)
         });
 

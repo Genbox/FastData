@@ -66,7 +66,7 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpGeneratorC
         _ => "uint"
     };
 
-    private static void RenderBucket(StringBuilder sb, Bucket obj) => sb.Append("        new Bucket(").Append(obj.StartIndex).Append(", ").Append(obj.EndIndex).Append(')');
+    private static void RenderBucket(StringBuilder sb, HashSetBucket obj) => sb.Append("        new Bucket(").Append(obj.StartIndex).Append(", ").Append(obj.EndIndex).Append(')');
     private static void RenderItem(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));
     private static void RenderHashCode(StringBuilder sb, uint obj) => sb.Append(obj);
 }

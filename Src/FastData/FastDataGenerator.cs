@@ -70,7 +70,7 @@ public static class FastDataGenerator
                 case StorageMode.Auto:
 
                     // For small amounts of data, logic is the fastest, so we try that first
-                    yield return new SwitchCode();
+                    yield return new ConditionalCode();
 
                     // We try (unique) key lengths
                     yield return new UniqueKeyLengthCode();
@@ -89,7 +89,7 @@ public static class FastDataGenerator
                     yield return new ArrayCode();
                     break;
                 case StorageMode.Logic:
-                    yield return new SwitchCode();
+                    yield return new ConditionalCode();
                     break;
                 case StorageMode.Tree:
                     yield return new BinarySearchCode();
@@ -111,18 +111,16 @@ public static class FastDataGenerator
 
         object candidate = ds switch
         {
+            DataStructure.SingleValue => new SingleValueCode(),
             DataStructure.Array => new ArrayCode(),
+            DataStructure.Conditional => new ConditionalCode(),
             DataStructure.BinarySearch => new BinarySearchCode(),
             DataStructure.EytzingerSearch => new EytzingerSearchCode(),
-            DataStructure.Switch => new SwitchCode(),
             DataStructure.MinimalPerfectHash => new MinimalPerfectHashCode(),
             DataStructure.HashSetChain => new HashSetChainCode(),
             DataStructure.HashSetLinear => new HashSetLinearCode(),
-            DataStructure.UniqueKeyLength => new UniqueKeyLengthCode(),
-            DataStructure.UniqueKeyLengthSwitch => new UniqueKeyLengthSwitchCode(),
             DataStructure.KeyLength => new KeyLengthCode(),
-            DataStructure.SingleValue => new SingleValueCode(),
-            DataStructure.Conditional => new ConditionalCode(),
+            DataStructure.UniqueKeyLength => new UniqueKeyLengthCode(),
             _ => throw new ArgumentOutOfRangeException(nameof(ds), ds, null)
         };
 

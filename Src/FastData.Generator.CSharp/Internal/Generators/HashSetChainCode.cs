@@ -66,5 +66,5 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
     };
 
     private static void RenderBucket(StringBuilder sb, int obj) => sb.Append(obj);
-    private static void RenderEntry(StringBuilder sb, Entry obj) => sb.Append("        new Entry(").Append(obj.HashCode).Append(", ").Append(obj.Next).Append(", ").Append(ToValueLabel(obj.Value)).Append(')');
+    private static void RenderEntry(StringBuilder sb, HashSetEntry obj) => sb.Append("        new Entry(").Append(obj.Hash).Append(", ").Append(obj.Next).Append(", ").Append(ToValueLabel(obj.Value)).Append(')');
 }

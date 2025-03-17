@@ -14,7 +14,7 @@ internal sealed class HashSetChainCode : IHashStructure
         int len = data.Length;
 
         int[] buckets = new int[len];
-        Entry[] entries = new Entry[len];
+        HashSetEntry[] entries = new HashSetEntry[len];
 
         for (int i = 0; i < len; i++)
         {
@@ -22,8 +22,8 @@ internal sealed class HashSetChainCode : IHashStructure
             uint hashCode = hash(value);
             ref int bucket = ref buckets[hashCode % len];
 
-            ref Entry entry = ref entries[i];
-            entry.HashCode = hashCode;
+            ref HashSetEntry entry = ref entries[i];
+            entry.Hash = hashCode;
             entry.Next = bucket - 1; // Value in _buckets is 1-based
             entry.Value = value;
             bucket = i + 1;

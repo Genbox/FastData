@@ -37,7 +37,7 @@ internal sealed class HashSetLinearCode : IHashStructure
         }
 
         uint[] finalCodes = new uint[hashCodes.Length];
-        Bucket[] finalBuckets = new Bucket[bucketStarts.Length];
+        HashSetBucket[] finalBuckets = new HashSetBucket[bucketStarts.Length];
         int count = 0;
         for (int bucketNum = 0; bucketNum < finalBuckets.Length; bucketNum++)
         {
@@ -59,7 +59,7 @@ internal sealed class HashSetLinearCode : IHashStructure
                 index = nexts[index];
             }
 
-            finalBuckets[bucketNum] = new Bucket(bucketStart, (bucketStart + bucketCount) - 1);
+            finalBuckets[bucketNum] = new HashSetBucket(bucketStart, (bucketStart + bucketCount) - 1);
         }
 
         object[] newData = new object[data.Length];
