@@ -1,12 +1,10 @@
-﻿// ReSharper disable All
-
-using Genbox.FastData.Enums;
+﻿using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Enums;
 
-namespace Genbox.FastData;
+namespace Genbox.FastData.SourceGenerator;
 
-[global::System.AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-public class FastDataAttribute<T> : global::System.Attribute
+[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+public class FastDataAttribute<T> : Attribute
 {
     public FastDataAttribute(string name, T[] data)
     {

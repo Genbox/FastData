@@ -5,7 +5,6 @@ using Genbox.FastData.Benchmarks.Code;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.InternalShared;
-using Genbox.FastData.InternalShared.Helpers;
 using Genbox.FastHash;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;

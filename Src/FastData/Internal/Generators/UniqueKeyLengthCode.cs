@@ -15,7 +15,7 @@ internal sealed class UniqueKeyLengthCode : IStructure
         //idx 2: null
         //idx 3: "aaa"
 
-        //It is efficient since we don't need a hash function to lookup the element, but if there is a big gap in the lengths,
+        //It is efficient since we don't need a hash function to look up the element, but if there is a big gap in the lengths,
         //we will store a lot of empty elements.
         string?[] lengths = new string?[data.Length + 1];
 

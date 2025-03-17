@@ -1,6 +1,6 @@
-using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
+using static Genbox.FastData.Internal.Analysis.DataAnalyzer;
 
 namespace Genbox.FastData.Tests;
 
@@ -10,7 +10,7 @@ public class DataAnalyzerTests
     public void GetStringProperties_LengthMap_Test()
     {
         object[] data = ["a", "aa", "aaa", "azza"];
-        StringProperties res = DataAnalyzer.GetStringProperties(data);
+        StringProperties res = GetStringProperties(data);
         IntegerBitSet map = res.LengthData.LengthMap;
 
         Assert.Equal(4u, map.Count);
@@ -27,7 +27,7 @@ public class DataAnalyzerTests
     [InlineData(new[] { "a", "aa", "aaa", "aaaaa" }, 1, 1)]
     public void GetStringProperties_EntropyData_Test(object[] data, int leftZero, int rightZero)
     {
-        StringProperties res = DataAnalyzer.GetStringProperties(data);
+        StringProperties res = GetStringProperties(data);
         Assert.Equal(res.DeltaData.LeftZeroCount, leftZero);
         Assert.Equal(res.DeltaData.RightZeroCount, rightZero);
     }
@@ -36,7 +36,7 @@ public class DataAnalyzerTests
     [InlineData(new[] { "item1", "item2", "item3", "item4" }, '1', 't')]
     public void GetStringProperties_CharacterMap_Test(object[] data, char minChar, char maxChar)
     {
-        StringProperties res = DataAnalyzer.GetStringProperties(data);
+        StringProperties res = GetStringProperties(data);
         CharacterMap map = res.CharacterData.CharacterMap;
 
         Assert.True(map.Contains(minChar));

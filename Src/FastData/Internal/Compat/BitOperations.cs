@@ -1,7 +1,8 @@
+#if !NETCOREAPP3_0_OR_GREATER
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Genbox.FastData.Internal.Compat;
+namespace System.Numerics;
 
 internal static class BitOperations
 {
@@ -26,17 +27,17 @@ internal static class BitOperations
     public static ulong RotateRight(ulong value, int offset) => (value >> offset) | (value << (64 - offset));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static uint PopCount(ulong value)
+    internal static int PopCount(ulong value)
     {
         value -= (value >> 1) & 0x_55555555_55555555ul;
         value = (value & 0x_33333333_33333333ul) + ((value >> 2) & 0x_33333333_33333333ul);
         value = (((value + (value >> 4)) & 0x_0F0F0F0F_0F0F0F0Ful) * 0x_01010101_01010101ul) >> 56;
 
-        return (uint)value;
+        return (int)value;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static uint LeadingZeroCount(ulong value)
+    internal static int LeadingZeroCount(ulong value)
     {
         if (value == 0)
             return 64;
@@ -56,11 +57,11 @@ internal static class BitOperations
         value += value >> 16;
         value += value >> 32;
 
-        return 64 - (uint)(value & 0x0000007f);
+        return 64 - (int)(value & 0x0000007f);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static uint TrailingZeroCount(ulong value)
+    internal static int TrailingZeroCount(ulong value)
     {
         uint lo = (uint)value;
 
@@ -71,20 +72,7 @@ internal static class BitOperations
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static bool AreBitsConsecutive(ulong x)
-    {
-        if (x == 0)
-            return false;
-
-        if (x == ulong.MaxValue)
-            return true;
-
-        x /= x & ~(x - 1);
-        return (x & (x + 1)) == 0;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static uint TrailingZeroCount(uint value)
+    private static int TrailingZeroCount(uint value)
     {
         if (value == 0)
             return 32;
@@ -94,3 +82,4 @@ internal static class BitOperations
             (IntPtr)(int)(((value & (uint)-(int)value) * 0x077CB531u) >> 27));
     }
 }
+#endif

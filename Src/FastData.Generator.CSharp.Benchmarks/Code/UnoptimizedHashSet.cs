@@ -1,6 +1,6 @@
 ﻿using Genbox.FastData.Generator.CSharp.Abstracts;
 
-namespace Genbox.FastData.Benchmarks.Code;
+namespace Genbox.FastData.Generator.CSharp.Benchmarks.Code;
 
 public class UnoptimizedHashSet(string[] data) : IFastSet<string>
 {

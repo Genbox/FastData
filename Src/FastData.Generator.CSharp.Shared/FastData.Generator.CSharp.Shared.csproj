@@ -1,10 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../../Imports/Library.props" />
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FastData.Generator.CSharp\FastData.Generator.CSharp.csproj" />
     <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
   </ItemGroup>
 

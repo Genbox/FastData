@@ -1,10 +1,9 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Helpers;
-using Genbox.FastData.Internal.Abstracts;
 
-namespace Genbox.FastData;
+namespace Genbox.FastData.Internal;
 
-public sealed class DefaultHashSpec : IHashSpec
+internal sealed class DefaultHashSpec : IHashSpec
 {
     private DefaultHashSpec() {}
     public static DefaultHashSpec Instance { get; } = new DefaultHashSpec();

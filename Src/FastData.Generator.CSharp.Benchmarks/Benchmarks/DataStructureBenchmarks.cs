@@ -4,13 +4,12 @@ using System.Globalization;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 using Genbox.FastData.Generator.CSharp.Enums;
-using Genbox.FastData.InternalShared;
+using Genbox.FastData.Generator.CSharp.Shared;
 using Genbox.FastFilter;
 
-namespace Genbox.FastData.Benchmarks.Benchmarks;
+namespace Genbox.FastData.Generator.CSharp.Benchmarks.Benchmarks;
 
 [MemoryDiagnoser(false)]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory, BenchmarkLogicalGroupRule.ByParams)]
@@ -45,14 +44,15 @@ public class DataStructureBenchmarks
     [Params(1_000, 10_000)]
     public int QuerySize { get; set; }
 
-    private IFastSet<string> CreateFastData(DataStructure ds)
+    private IFastSet<string> CreateFastData(DataStructure ds, Action<CSharpGeneratorConfig>? configure = null)
     {
         FastDataConfig config = new FastDataConfig(ds.ToString(), _data.Cast<object>().ToArray()); //We have to convert to object[]
 
-        string code = FastDataGenerator.Generate(ds, config, new CSharpCodeGenerator(new CSharpGeneratorConfig
-        {
-            ClassType = ClassType.Instance
-        }));
+        CSharpGeneratorConfig generatorConfig = new CSharpGeneratorConfig();
+        generatorConfig.ClassType = ClassType.Instance;
+        configure?.Invoke(generatorConfig);
+
+        string code = FastDataGenerator.Generate(ds, config, new CSharpCodeGenerator(generatorConfig));
 
         return CodeGenerator.CreateFastSet<string>(code, true);
     }
@@ -173,7 +173,7 @@ public class DataStructureBenchmarks
     public void SetupStaticUniqueKeyLengthSwitch()
     {
         SetupQueries();
-        _fastUniqueKeyLengthSwitch = CreateFastData(DataStructure.UniqueKeyLengthSwitch);
+        _fastUniqueKeyLengthSwitch = CreateFastData(DataStructure.UniqueKeyLength, config => config.UniqueLengthBranchType = BranchType.Switch);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticKeyLength))]

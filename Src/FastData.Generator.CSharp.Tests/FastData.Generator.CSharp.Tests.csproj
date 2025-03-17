@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
+    <ProjectReference Include="..\FastData.Generator.CSharp.Shared\FastData.Generator.CSharp.Shared.csproj" />
   </ItemGroup>
 
 </Project>

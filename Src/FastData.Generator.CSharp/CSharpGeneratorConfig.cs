@@ -8,4 +8,5 @@ public sealed class CSharpGeneratorConfig
     public ClassVisibility ClassVisibility { get; set; }
     public ClassType ClassType { get; set; }
     public CSharpOptions GeneratorOptions { get; set; }
+    public BranchType UniqueLengthBranchType { get; set; }
 }

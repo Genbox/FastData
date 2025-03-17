@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
-using Genbox.FastData.Internal.Compat;
+using Genbox.FastData.Internal.Helpers;
+using static System.Numerics.BitOperations;
 
 namespace Genbox.FastData.Internal.Analysis.Misc;
 
@@ -8,10 +9,10 @@ internal struct IntegerBitSet
 {
     internal ulong BitSet;
 
-    internal readonly uint Count => BitOperations.PopCount(BitSet);
-    internal readonly uint MinValue => BitOperations.TrailingZeroCount(BitSet) + 1;
-    internal readonly uint MaxValue => 64 - BitOperations.LeadingZeroCount(BitSet);
-    internal readonly bool Consecutive => BitOperations.AreBitsConsecutive(BitSet);
+    internal readonly uint Count => (uint)PopCount(BitSet);
+    internal readonly uint MinValue => (uint)(TrailingZeroCount(BitSet) + 1);
+    internal readonly uint MaxValue => (uint)(64 - LeadingZeroCount(BitSet));
+    internal readonly bool Consecutive => BitHelper.AreBitsConsecutive(BitSet);
 
     internal readonly bool Contains(int val)
     {

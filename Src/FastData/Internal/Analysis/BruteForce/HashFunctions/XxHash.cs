@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using static Genbox.FastData.Internal.Compat.BitOperations;
+using static System.Numerics.BitOperations;
 
 namespace Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
 

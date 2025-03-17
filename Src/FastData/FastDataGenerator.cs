@@ -1,6 +1,7 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Helpers;
+using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.BruteForce;
@@ -104,7 +105,7 @@ public static class FastDataGenerator
     }
 
     /// <summary>This method is used by tests</summary>
-    internal static string Generate(DataStructure ds, FastDataConfig config, IGenerator generator)
+    public static string Generate(DataStructure ds, FastDataConfig config, IGenerator generator)
     {
         PreProcess(config, out KnownDataType dataType, out DataProperties props, out IEarlyExit[] exits);
 

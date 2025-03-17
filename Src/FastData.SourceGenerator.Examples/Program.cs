@@ -1,4 +1,4 @@
-using Genbox.FastData;
+using Genbox.FastData.SourceGenerator;
 
 [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"])]
 

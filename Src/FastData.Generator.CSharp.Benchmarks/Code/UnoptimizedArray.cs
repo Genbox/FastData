@@ -1,6 +1,6 @@
 ﻿using Genbox.FastData.Generator.CSharp.Abstracts;
 
-namespace Genbox.FastData.Benchmarks.Code;
+namespace Genbox.FastData.Generator.CSharp.Benchmarks.Code;
 
 public class UnoptimizedArray(string[] data) : IFastSet<string>
 {

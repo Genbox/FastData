@@ -1,14 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
-using Genbox.FastData.Benchmarks.Code;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.Generator.CSharp.Abstracts;
+using Genbox.FastData.Generator.CSharp.Benchmarks.Code;
 using Genbox.FastData.Generator.CSharp.Enums;
-using Genbox.FastData.InternalShared;
+using Genbox.FastData.Generator.CSharp.Shared;
 
-namespace Genbox.FastData.Benchmarks.Benchmarks;
+namespace Genbox.FastData.Generator.CSharp.Benchmarks.Benchmarks;
 
 /// <summary>
 /// The idea here is to ensure that Auto is nearly-always the fastest implementation. It should exploit properties of the

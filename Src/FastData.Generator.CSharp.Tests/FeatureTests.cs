@@ -1,9 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using Genbox.FastData.Generator.CSharp;
 
-namespace Genbox.FastData.Tests;
+namespace Genbox.FastData.Generator.CSharp.Tests;
 
 public class FeatureTests
 {

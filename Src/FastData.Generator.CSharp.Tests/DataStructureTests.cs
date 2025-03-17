@@ -1,11 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 using Genbox.FastData.Generator.CSharp.Enums;
-using Genbox.FastData.InternalShared;
+using Genbox.FastData.Generator.CSharp.Shared;
 
-namespace Genbox.FastData.Tests;
+namespace Genbox.FastData.Generator.CSharp.Tests;
 
 /// <summary>
 /// These tests are designed to ensure that every supported data structure can be generated with different types

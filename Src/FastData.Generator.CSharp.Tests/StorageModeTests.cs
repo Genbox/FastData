@@ -1,7 +1,6 @@
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.CSharp;
 
-namespace Genbox.FastData.Tests;
+namespace Genbox.FastData.Generator.CSharp.Tests;
 
 /// <summary>
 /// These tests are designed to ensure that every supported storage mode can be generated. They function as end-to-end tests that mimics the

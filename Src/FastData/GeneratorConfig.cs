@@ -1,6 +1,5 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData;
 

@@ -36,7 +36,7 @@ public class AnalyzerTests
 
         //The source code must give the same result
         string source = spec.GetSource();
-        Func<string, uint> func2 = CodeGenerator.GetDelegate<Func<string, uint>>(source, false);
+        Func<string, uint> func2 = CompilationHelper.GetDelegate<Func<string, uint>>(source, false);
         Assert.Equal(vector, func2("hello world"));
     }
 
@@ -64,7 +64,7 @@ public class AnalyzerTests
 
         //The source code must give the same result
         string source = spec.GetSource();
-        Func<string, uint> func2 = CodeGenerator.GetDelegate<Func<string, uint>>(source, false);
+        Func<string, uint> func2 = CompilationHelper.GetDelegate<Func<string, uint>>(source, false);
         Assert.Equal(vector, func2("hello world"));
     }
 }
