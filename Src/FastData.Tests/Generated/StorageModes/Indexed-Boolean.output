@@ -12,7 +12,7 @@ using System;
 
 internal static class MyData 
 {
-    private static readonly int[] _buckets = { 2, 1 };
+    private static readonly sbyte[] _buckets = { 2, 1 };
 
     private static readonly Entry[] _entries = {
         new Entry(1, -1, true),
@@ -26,7 +26,7 @@ internal static class MyData
 
         uint hashCode = Hash(value);
         uint index = hashCode & 1;
-        int i = _buckets[index] - 1;
+        sbyte i = (sbyte)(_buckets[index] - 1);
 
         while (i >= 0)
         {
@@ -48,10 +48,10 @@ internal static class MyData
     private struct Entry
     {
         public uint HashCode;
-        public short Next;
+        public sbyte Next;
         public Boolean Value;
 
-        public Entry(uint hashCode, short next, Boolean value)
+        public Entry(uint hashCode, sbyte next, Boolean value)
         {
             HashCode = hashCode;
             Next = next;

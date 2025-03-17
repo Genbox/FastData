@@ -11,7 +11,7 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
 {
     public string Generate() =>
         $$"""
-              private{{cfg.GetModifier()}} readonly int[] _buckets = { {{JoinValues(ctx.Buckets, RenderBucket)}} };
+              private{{cfg.GetModifier()}} readonly {{GetIndexType(ctx.Data.Length)}}[] _buckets = { {{JoinValues(ctx.Buckets, RenderBucket)}} };
 
               private{{cfg.GetModifier()}} readonly Entry[] _entries = {
           {{JoinValues(ctx.Entries, RenderEntry, ",\n")}}
@@ -24,7 +24,7 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
 
                   uint hashCode = Hash(value);
                   uint index = {{cfg.GetModFunction("hashCode", (uint)ctx.Buckets.Length)}};
-                  int i = _buckets[index] - 1;
+                  {{GetIndexType(ctx.Data.Length)}} i = ({{GetIndexType(ctx.Data.Length)}})(_buckets[index] - 1);
 
                   while (i >= 0)
                   {
@@ -45,10 +45,10 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
               private struct Entry
               {
                   public uint HashCode;
-                  public {{(ctx.Data.Length <= short.MaxValue ? "short" : "int")}} Next;
+                  public {{GetIndexType(ctx.Data.Length)}} Next;
                   public {{genCfg.DataType}} Value;
 
-                  public Entry(uint hashCode, {{(ctx.Data.Length <= short.MaxValue ? "short" : "int")}} next, {{genCfg.DataType}} value)
+                  public Entry(uint hashCode, {{GetIndexType(ctx.Data.Length)}} next, {{genCfg.DataType}} value)
                   {
                       HashCode = hashCode;
                       Next = next;
@@ -56,6 +56,14 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
                   }
               }
           """;
+
+    private static string GetIndexType(int itemCount) => itemCount switch
+    {
+        // We have to use signed types because -1 means unmapped
+        <= sbyte.MaxValue => "sbyte",
+        <= short.MaxValue => "short",
+        _ => "int"
+    };
 
     private static void RenderBucket(StringBuilder sb, int obj) => sb.Append(obj);
     private static void RenderEntry(StringBuilder sb, Entry obj) => sb.Append("        new Entry(").Append(obj.HashCode).Append(", ").Append(obj.Next).Append(", ").Append(ToValueLabel(obj.Value)).Append(')');

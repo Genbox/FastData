@@ -10,7 +10,6 @@ namespace Genbox.FastData.Internal.Generators;
 
 internal sealed class HashSetLinearCode : IHashStructure
 {
-    //TODO: Start and End index can be smaller if there are fewer items
     //TODO: Either implement a bitmap for seen buckets everywhere or don't use bitmaps for simplicity
 
     public IContext Create(object[] data, Func<object, uint> hash)
@@ -115,8 +114,7 @@ internal sealed class HashSetLinearCode : IHashStructure
             maxNumBuckets = primes[maxPrimeIndexExclusive - 1];
         }
 
-        const int BitsPerInt32 = 32;
-        int[] seenBuckets = new int[(maxNumBuckets / BitsPerInt32) + 1];
+        int[] seenBuckets = new int[(maxNumBuckets / 32) + 1];
 
         uint bestNumBuckets = maxNumBuckets;
         uint bestNumCollisions = uniqueCodesCount;
@@ -149,14 +147,14 @@ internal sealed class HashSetLinearCode : IHashStructure
         bool IsBucketFirstVisit(uint code)
         {
             uint bucketNum = code % numBuckets;
-            if ((seenBuckets[bucketNum / BitsPerInt32] & (1 << (int)bucketNum)) != 0)
+            if ((seenBuckets[bucketNum / 32] & (1 << (int)bucketNum)) != 0)
             {
                 numCollisions++;
                 if (numCollisions >= bestNumCollisions)
                     return false;
             }
             else
-                seenBuckets[bucketNum / BitsPerInt32] |= 1 << (int)bucketNum;
+                seenBuckets[bucketNum / 32] |= 1 << (int)bucketNum;
 
             return true;
         }

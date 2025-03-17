@@ -29,8 +29,8 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpGeneratorC
                   uint hashCode = Hash(value);
                   ref Bucket b = ref _buckets[{{cfg.GetModFunction("hashCode", (uint)ctx.Buckets.Length)}}];
 
-                  int index = b.StartIndex;
-                  int endIndex = b.EndIndex;
+                  {{GetIndexType(ctx.Data.Length)}} index = b.StartIndex;
+                  {{GetIndexType(ctx.Data.Length)}} endIndex = b.EndIndex;
 
                   while (index <= endIndex)
                   {
@@ -48,19 +48,23 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpGeneratorC
               [StructLayout(LayoutKind.Auto)]
               private struct Bucket
               {
-                  internal Bucket(int startIndex, int endIndex)
+                  internal Bucket({{GetIndexType(ctx.Data.Length)}} startIndex, {{GetIndexType(ctx.Data.Length)}} endIndex)
                   {
                       StartIndex = startIndex;
                       EndIndex = endIndex;
                   }
 
-                  internal int StartIndex;
-                  internal int EndIndex;
+                  internal {{GetIndexType(ctx.Data.Length)}} StartIndex;
+                  internal {{GetIndexType(ctx.Data.Length)}} EndIndex;
               }
           """;
 
-    //TODO: Start and End index can be smaller if there are fewer items
-    //TODO: Either implement a bitmap for seen buckets everywhere or don't use bitmaps for simplicity
+    private static string GetIndexType(int itemCount) => itemCount switch
+    {
+        <= byte.MaxValue => "byte",
+        <= ushort.MaxValue => "ushort",
+        _ => "uint"
+    };
 
     private static void RenderBucket(StringBuilder sb, Bucket obj) => sb.Append("        new Bucket(").Append(obj.StartIndex).Append(", ").Append(obj.EndIndex).Append(')');
     private static void RenderItem(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));

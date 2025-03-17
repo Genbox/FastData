@@ -86,8 +86,8 @@ internal partial class MyData  : IFastSet<String>
         uint hashCode = Hash(value);
         ref Bucket b = ref _buckets[MathHelper.FastMod(hashCode, 47, 392483916461905354)];
 
-        int index = b.StartIndex;
-        int endIndex = b.EndIndex;
+        byte index = b.StartIndex;
+        byte endIndex = b.EndIndex;
 
         while (index <= endIndex)
         {
@@ -106,14 +106,14 @@ internal partial class MyData  : IFastSet<String>
     [StructLayout(LayoutKind.Auto)]
     private struct Bucket
     {
-        internal Bucket(int startIndex, int endIndex)
+        internal Bucket(byte startIndex, byte endIndex)
         {
             StartIndex = startIndex;
             EndIndex = endIndex;
         }
 
-        internal int StartIndex;
-        internal int EndIndex;
+        internal byte StartIndex;
+        internal byte EndIndex;
     }
 
     public const int ItemCount = 10;
