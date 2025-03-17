@@ -26,7 +26,6 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
             HashSetChainContext c2 => new HashSetChainCode(genCfg, userCfg, c2).Generate(),
             HashSetLinearContext c2 => new HashSetLinearCode(genCfg, userCfg, c2).Generate(),
             KeyLengthContext c2 => new KeyLengthCode(genCfg, userCfg, c2).Generate(),
-            UniqueKeyLengthContext c2 => new UniqueKeyLengthCode(genCfg, userCfg, c2).Generate(),
             _ => throw new NotSupportedException("The context type is not supported: " + context.GetType().Name)
         });
 

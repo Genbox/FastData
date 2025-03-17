@@ -24,7 +24,7 @@ public class MinimalPerfectHashBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        _data = StringHelper.GetIntegers(TestData.Words.OrderBy(_ => Random.Shared.Next()).Take(Length));
+        _data = TestHelper.GetIntegers(TestData.Words.OrderBy(_ => Random.Shared.Next()).Take(Length));
     }
 
     [Benchmark]

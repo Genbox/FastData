@@ -1,8 +1,10 @@
 using System.Diagnostics;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Models;
 using Genbox.FastData.Models.Misc;
 
@@ -12,7 +14,7 @@ internal sealed class HashSetLinearCode : IHashStructure
 {
     //TODO: Either implement a bitmap for seen buckets everywhere or don't use bitmaps for simplicity
 
-    public IContext Create(object[] data, Func<object, uint> hash)
+    public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, Func<object, uint> hash, out IContext? context)
     {
         uint[] hashCodes = new uint[data.Length];
         for (int i = 0; i < data.Length; i++)
@@ -70,7 +72,8 @@ internal sealed class HashSetLinearCode : IHashStructure
             newData[destIndex] = data[srcIndex];
         }
 
-        return new HashSetLinearContext(newData, finalBuckets, finalCodes);
+        context = new HashSetLinearContext(newData, finalBuckets, finalCodes);
+        return true;
     }
 
     public void RunSimulation<T>(object[] data, AnalyzerConfig config, ref Candidate<T> candidate) where T : struct, IHashSpec {}

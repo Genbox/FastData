@@ -19,6 +19,5 @@ public enum DataStructure : byte
     HashSetLinear,
 
     // Edge-cases
-    KeyLength,
-    UniqueKeyLength
+    KeyLength
 }

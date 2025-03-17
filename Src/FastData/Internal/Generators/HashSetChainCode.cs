@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Models;
 using Genbox.FastData.Models.Misc;
 
@@ -9,27 +11,26 @@ namespace Genbox.FastData.Internal.Generators;
 
 internal sealed class HashSetChainCode : IHashStructure
 {
-    public IContext Create(object[] data, Func<object, uint> hash)
+    public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, Func<object, uint> hash, out IContext? context)
     {
-        int len = data.Length;
+        int[] buckets = new int[data.Length];
+        HashSetEntry[] entries = new HashSetEntry[data.Length];
 
-        int[] buckets = new int[len];
-        HashSetEntry[] entries = new HashSetEntry[len];
-
-        for (int i = 0; i < len; i++)
+        for (int i = 0; i < data.Length; i++)
         {
             object value = data[i];
             uint hashCode = hash(value);
-            ref int bucket = ref buckets[hashCode % len];
+            ref int bucket = ref buckets[hashCode % data.Length];
 
             ref HashSetEntry entry = ref entries[i];
             entry.Hash = hashCode;
-            entry.Next = bucket - 1; // Value in _buckets is 1-based
+            entry.Next = bucket - 1; // Value in buckets is 1-based
             entry.Value = value;
             bucket = i + 1;
         }
 
-        return new HashSetChainContext(data, buckets, entries);
+        context = new HashSetChainContext(data, buckets, entries);
+        return true;
     }
 
     public void RunSimulation<T>(object[] data, AnalyzerConfig config, ref Candidate<T> candidate) where T : struct, IHashSpec

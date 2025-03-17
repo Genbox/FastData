@@ -94,7 +94,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         string[] res = new string[count];
 
         for (int i = 0; i < count; i++)
-            res[i] = StringHelper.GenerateRandomString(len);
+            res[i] = TestHelper.GenerateRandomString(len);
 
         return res;
     }

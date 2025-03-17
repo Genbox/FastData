@@ -1,3 +1,5 @@
+using Genbox.FastData.Abstracts;
+
 namespace Genbox.FastData.Models;
 
 public class MinimalPerfectHashContext(KeyValuePair<object, uint>[] data, uint seed) : IContext

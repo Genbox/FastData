@@ -56,9 +56,11 @@ public class DataStructureTests
     {
         TheoryData<DataStructure, object[], Func<CSharpGeneratorConfig, string>?> data = new TheoryData<DataStructure, object[], Func<CSharpGeneratorConfig, string>?>();
 
-        object[] normal1 = ["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10"];
-        object[] uniqueLength1 = ["a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"];
         object[] single1 = ["item0"];
+        object[] normal1 = ["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10"];
+
+        //We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
+        object[] uniqueLength1 = ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"];
 
         data.Add(DataStructure.SingleValue, single1, null);
         data.Add(DataStructure.Array, normal1, null);
@@ -77,17 +79,17 @@ public class DataStructureTests
         data.Add(DataStructure.MinimalPerfectHash, normal1, null);
         data.Add(DataStructure.HashSetChain, normal1, null);
         data.Add(DataStructure.HashSetLinear, normal1, null);
-        data.Add(DataStructure.UniqueKeyLength, uniqueLength1, c =>
-        {
-            c.ConditionalBranchType = BranchType.If;
-            return "If";
-        });
-        data.Add(DataStructure.UniqueKeyLength, uniqueLength1, c =>
-        {
-            c.UniqueLengthBranchType = BranchType.Switch;
-            return "Switch";
-        });
         data.Add(DataStructure.KeyLength, normal1, null);
+        data.Add(DataStructure.KeyLength, uniqueLength1, c =>
+        {
+            c.KeyLengthUniqBranchType = BranchType.If;
+            return "UniqIf";
+        });
+        data.Add(DataStructure.KeyLength, uniqueLength1, c =>
+        {
+            c.KeyLengthUniqBranchType = BranchType.Switch;
+            return "UniqSwitch";
+        });
 
         object[] normal2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         object[] single2 = [42];

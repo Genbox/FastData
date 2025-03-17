@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+// ReSharper disable once CheckNamespace
 namespace System.Numerics;
 
 internal static class BitOperations

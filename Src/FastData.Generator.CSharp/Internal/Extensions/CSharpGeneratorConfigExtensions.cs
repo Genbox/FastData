@@ -63,7 +63,7 @@ internal static class CSharpGeneratorConfigExtensions
 
     internal static string? GetModifier(this CSharpGeneratorConfig config) => config.ClassType == ClassType.Static ? " static" : null;
 
-    private static string GetMaskEarlyExit(string variable, ulong bitSet)
+    internal static string GetMaskEarlyExit(string variable, ulong bitSet)
         => $"""
                    if (({bitSet}UL & 1UL << ({variable}.Length -1) & 63) == 0)
                        return false;

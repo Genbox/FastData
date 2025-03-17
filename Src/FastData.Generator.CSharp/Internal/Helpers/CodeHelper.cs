@@ -17,26 +17,33 @@ internal static class CodeHelper
         };
     }
 
-    internal static string JoinValues<T>(T[] data, Action<StringBuilder, T> render, string delim = ", ")
-    {
-        return JoinValues(data.AsSpan(), render, delim);
-    }
-
     internal static string JoinValues<T>(Span<T> data, Action<StringBuilder, T> render, string delim = ", ")
     {
+        Span<T>.Enumerator enumerator = data.GetEnumerator();
         StringBuilder sb = new StringBuilder();
 
-        int i = 0;
-        foreach (T obj in data)
+        while (enumerator.MoveNext())
         {
-            render(sb, obj);
-
-            if (i != data.Length - 1)
-                sb.Append(delim);
-
-            i++;
+            render(sb, enumerator.Current);
+            sb.Append(delim);
         }
 
+        sb.Remove(sb.Length - delim.Length, delim.Length);
+        return sb.ToString();
+    }
+
+    internal static string JoinValues<T>(IEnumerable<T> data, Action<StringBuilder, T> render, string delim = ", ")
+    {
+        using IEnumerator<T> enumerator = data.GetEnumerator();
+        StringBuilder sb = new StringBuilder();
+
+        while (enumerator.MoveNext())
+        {
+            render(sb, enumerator.Current);
+            sb.Append(delim);
+        }
+
+        sb.Remove(sb.Length - delim.Length, delim.Length);
         return sb.ToString();
     }
 }

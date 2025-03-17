@@ -2,14 +2,14 @@
 using System.Runtime.CompilerServices;
 using Genbox.FastData.InternalShared;
 using static Genbox.FastData.Internal.Helpers.MPHHelper;
-using static Genbox.FastData.InternalShared.StringHelper;
+using static Genbox.FastData.InternalShared.TestHelper;
 
 namespace Genbox.FastData.Tests;
 
 public class MPHHelperTests
 {
     private long _time;
-    private const int _numSeconds = 10;
+    private const int _numSeconds = 3;
 
     [Fact]
     public void MinimalPerfectHashTest()

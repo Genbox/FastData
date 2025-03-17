@@ -21,7 +21,7 @@ public static class FastDataGenerator
         foreach (object candidate in GetDataStructureCandidates(config))
         {
             if (TryProcessCandidate(candidate, props, exits, dataType, generator, config, out string? code))
-                return code;
+                return code!;
         }
 
         throw new InvalidOperationException("This should not happen");
@@ -72,8 +72,7 @@ public static class FastDataGenerator
                     // For small amounts of data, logic is the fastest, so we try that first
                     yield return new ConditionalCode();
 
-                    // We try (unique) key lengths
-                    yield return new UniqueKeyLengthCode();
+                    // We try key lengths
                     yield return new KeyLengthCode();
 
                     if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory) && config.StorageOptions.HasFlag(StorageOption.OptimizeForSpeed))
@@ -120,14 +119,13 @@ public static class FastDataGenerator
             DataStructure.HashSetChain => new HashSetChainCode(),
             DataStructure.HashSetLinear => new HashSetLinearCode(),
             DataStructure.KeyLength => new KeyLengthCode(),
-            DataStructure.UniqueKeyLength => new UniqueKeyLengthCode(),
             _ => throw new ArgumentOutOfRangeException(nameof(ds), ds, null)
         };
 
         if (!TryProcessCandidate(candidate, props, exits, dataType, generator, config, out string? code))
             throw new InvalidOperationException("This should not happen");
 
-        return code;
+        return code!;
     }
 
     private static DataProperties GetDataProperties(object[] data, KnownDataType dataType)
@@ -206,13 +204,25 @@ public static class FastDataGenerator
             else
                 spec = DefaultHashSpec.Instance;
 
-            code = generator.Generate(new GeneratorConfig(dataType, exits, spec), config, hs.Create(config.Data, HashHelper.HashObject));
+            if (!hs.TryCreate(config.Data, dataType, props, config, HashHelper.HashObject, out IContext? context))
+            {
+                code = null;
+                return false;
+            }
+
+            code = generator.Generate(new GeneratorConfig(dataType, exits, spec), config, context!);
             return true;
         }
 
         if (candidate is IStructure s)
         {
-            code = generator.Generate(new GeneratorConfig(dataType, exits, null), config, s.Create(config.Data));
+            if (!s.TryCreate(config.Data, dataType, props, config, out IContext? context))
+            {
+                code = null;
+                return false;
+            }
+
+            code = generator.Generate(new GeneratorConfig(dataType, exits, null), config, context!);
             return true;
         }
 

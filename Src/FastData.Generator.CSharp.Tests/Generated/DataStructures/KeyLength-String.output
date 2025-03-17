@@ -13,11 +13,6 @@ using System;
 internal partial class MyData  : IFastSet<String>
 {
     private readonly String[]?[] _entries = [
-        null,
-        null,
-        null,
-        null,
-        null,
         ["item1","item2","item3","item4","item5","item6","item7","item8","item9"],
         ["item10"]
     ];
@@ -27,7 +22,7 @@ internal partial class MyData  : IFastSet<String>
     {
         if (value.Length < 5 || value.Length > 6)
            return false;
-        String[]? bucket = _entries[value.Length];
+        String[]? bucket = _entries[value.Length - 5];
 
         if (bucket == null)
             return false;

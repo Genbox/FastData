@@ -15,19 +15,13 @@ internal partial class MyData  : IFastSet<String>
     
     public bool Contains(String value)
     {
-        if (value.Length < 1 || value.Length > 10)
+       if ((1012UL & 1UL << (value.Length -1) & 63) == 0)
            return false;
 
         switch (value.Length)
         {
-            case 1:
-                return StringComparer.Ordinal.Equals(value, "a");
-            case 2:
-                return StringComparer.Ordinal.Equals(value, "aa");
             case 3:
                 return StringComparer.Ordinal.Equals(value, "aaa");
-            case 4:
-                return StringComparer.Ordinal.Equals(value, "aaaa");
             case 5:
                 return StringComparer.Ordinal.Equals(value, "aaaaa");
             case 6:
@@ -46,6 +40,6 @@ internal partial class MyData  : IFastSet<String>
         }
     }
 
-    public const int ItemCount = 10;
-    public int Length => 10;
+    public const int ItemCount = 7;
+    public int Length => 7;
 }

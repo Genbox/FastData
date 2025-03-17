@@ -2,7 +2,7 @@
 
 namespace Genbox.FastData.InternalShared;
 
-public static class StringHelper
+public static class TestHelper
 {
     private const string _alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 

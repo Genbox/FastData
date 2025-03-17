@@ -10,6 +10,7 @@ public class FastDataConfig(string name, object[] data)
     public StorageMode StorageMode { get; set; }
     public StorageOption StorageOptions { get; set; }
     public AnalyzerConfig? AnalyzerConfig { get; set; }
+    public StringComparison StringComparison { get; set; } = StringComparison.Ordinal;
 
     public KnownDataType GetDataType() => (KnownDataType)Enum.Parse(typeof(KnownDataType), Data[0].GetType().Name);
 }
