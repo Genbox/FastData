@@ -34,7 +34,7 @@ internal partial class MyData  : IFastSet<String>
         int i = 0;
         while (i < _entries.Length)
         {
-            int comparison = _entries[i].CompareTo(value);
+            int comparison = StringComparer.Ordinal.Compare(_entries[i], value);
 
             if (comparison == 0)
                 return true;

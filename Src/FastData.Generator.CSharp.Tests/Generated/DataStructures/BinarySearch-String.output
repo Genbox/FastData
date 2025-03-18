@@ -36,7 +36,7 @@ internal partial class MyData  : IFastSet<String>
         while (lo <= hi)
         {
             int i = lo + ((hi - lo) >> 1);
-            int order = _entries[i].CompareTo(value);
+            int order = StringComparer.Ordinal.Compare(_entries[i], value);
 
             if (order == 0)
                 return true;

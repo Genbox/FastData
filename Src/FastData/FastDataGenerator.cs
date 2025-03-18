@@ -210,7 +210,7 @@ public static class FastDataGenerator
                 return false;
             }
 
-            code = generator.Generate(new GeneratorConfig(dataType, exits, spec), config, context!);
+            code = generator.Generate(new GeneratorConfig(dataType, exits, spec, config.StringComparison), config, context!);
             return true;
         }
 
@@ -222,7 +222,7 @@ public static class FastDataGenerator
                 return false;
             }
 
-            code = generator.Generate(new GeneratorConfig(dataType, exits, null), config, context!);
+            code = generator.Generate(new GeneratorConfig(dataType, exits, null, config.StringComparison), config, context!);
             return true;
         }
 
