@@ -1,7 +1,7 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
 
-namespace Genbox.FastData;
+namespace Genbox.FastData.Configs;
 
 public class GeneratorConfig(KnownDataType dataType, IEarlyExit[] earlyExits, IHashSpec? hashSpec, StringComparison? stringComparison)
 {

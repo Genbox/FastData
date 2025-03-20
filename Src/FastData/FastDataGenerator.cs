@@ -1,12 +1,13 @@
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.BruteForce;
 using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Analysis.Techniques.BruteForce;
 using Genbox.FastData.Internal.Generators;
 using Genbox.FastData.Internal.Optimization;
 

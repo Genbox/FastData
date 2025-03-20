@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
+using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 using Genbox.FastData.Generator.CSharp.Enums;

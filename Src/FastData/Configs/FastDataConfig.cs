@@ -1,6 +1,6 @@
 ﻿using Genbox.FastData.Enums;
 
-namespace Genbox.FastData;
+namespace Genbox.FastData.Configs;
 
 public class FastDataConfig(string name, object[] data)
 {

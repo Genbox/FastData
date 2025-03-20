@@ -1,4 +1,4 @@
-namespace Genbox.FastData;
+namespace Genbox.FastData.Configs;
 
 public sealed class GeneticAnalyzerConfig : AnalyzerConfig
 {

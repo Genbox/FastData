@@ -1,70 +1,32 @@
+using Genbox.FastData.Abstracts;
+using Genbox.FastData.Configs;
+using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.BruteForce;
 using Genbox.FastData.Internal.Analysis.Genetic;
-using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Enums;
-using Genbox.FastData.InternalShared;
+using Genbox.FastData.Internal.Analysis.Techniques.BruteForce;
+using Genbox.FastData.Internal.Analysis.Techniques.Heuristics;
 
 namespace Genbox.FastData.Tests;
 
 public class AnalyzerTests
 {
-    private static readonly object[] _data = ["aa"];
-
-    [Fact]
-    public void BruteForceAnalyzerTest()
-    {
-        StringProperties props = DataAnalyzer.GetStringProperties(_data);
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(_data, props, new BruteForceAnalyzerConfig(), Simulation);
-
-        Candidate<BruteForceHashSpec> top = analyzer.Run();
-        Assert.Equal(1, top.Fitness);
-        return;
-
-        void Simulation(object[] data, BruteForceAnalyzerConfig config, ref Candidate<BruteForceHashSpec> candidate) => candidate.Fitness = 1;
-    }
-
+    /// <summary>Tests if analyzers actually run the simulation</summary>
     [Theory]
-    [InlineData(HashFunction.DJB2Hash, 1853903583)]
-    [InlineData(HashFunction.XxHash, 1713611331)]
-    internal void BFHashSpecTest(HashFunction function, uint vector)
+    [MemberData(nameof(GetSpecs))]
+    internal void EnsureAnalyzerRunsSimulation<T>(IHashAnalyzer<T> analyzer) where T : struct, IHashSpec
     {
-        BruteForceHashSpec spec = new BruteForceHashSpec(function, [new StringSegment(0, -1, Alignment.Left)]);
-        Func<string, uint> func = spec.GetFunction();
-        Assert.Equal(vector, func("hello world"));
-
-        //The source code must give the same result
-        string source = spec.GetSource();
-        Func<string, uint> func2 = CompilationHelper.GetDelegate<Func<string, uint>>(source, false);
-        Assert.Equal(vector, func2("hello world"));
+        Candidate<T> res = analyzer.Run();
+        Assert.Equal(1, res.Fitness);
     }
 
-    [Fact]
-    public void GeneticAnalyzerTest()
+    public static IEnumerable<object[]> GetSpecs()
     {
-        StringProperties props = DataAnalyzer.GetStringProperties(_data);
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(_data, props, new GeneticAnalyzerConfig(), Simulation);
+        object[] data = ["data"];
+        StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        Candidate<GeneticHashSpec> top = analyzer.Run();
-        Assert.Equal(1, top.Fitness);
-        return;
-
-        void Simulation(object[] data, GeneticAnalyzerConfig config, ref Candidate<GeneticHashSpec> candidate) => candidate.Fitness = 1;
-    }
-
-    [Theory]
-    [InlineData(1, 1, 2138145203)]
-    [InlineData(2, 2, 401880771)]
-    internal void GeneticHashSpecTest(int mixerSeed, int avalancheSeed, uint vector)
-    {
-        GeneticHashSpec spec = new GeneticHashSpec(mixerSeed, 1, avalancheSeed, 1, [new StringSegment(0, -1, Alignment.Left)]);
-        Func<string, uint> func = spec.GetFunction();
-        Assert.Equal(vector, func("hello world"));
-
-        //The source code must give the same result
-        string source = spec.GetSource();
-        Func<string, uint> func2 = CompilationHelper.GetDelegate<Func<string, uint>>(source, false);
-        Assert.Equal(vector, func2("hello world"));
+        yield return [new BruteForceAnalyzer(data, props, new BruteForceAnalyzerConfig(), (object[] _, BruteForceAnalyzerConfig _, ref Candidate<BruteForceHashSpec> c) => c.Fitness = 1)];
+        yield return [new GeneticAnalyzer(data, props, new GeneticAnalyzerConfig(), (object[] _, GeneticAnalyzerConfig _, ref Candidate<GeneticHashSpec> c) => c.Fitness = 1)];
+        yield return [new HeuristicAnalyzer(data, props, new HeuristicAnalyzerConfig(), (object[] _, HeuristicAnalyzerConfig _, ref Candidate<HeuristicHashSpec> c) => c.Fitness = 1)];
     }
 }

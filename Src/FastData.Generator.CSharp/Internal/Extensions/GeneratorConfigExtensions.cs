@@ -1,3 +1,4 @@
+using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Extensions;

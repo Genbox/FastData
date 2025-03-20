@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
+namespace Genbox.FastData.Internal.Analysis.Techniques.BruteForce.HashFunctions;
 
 public static class Shared
 {

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 using Genbox.FastData.Generator.CSharp.Enums;

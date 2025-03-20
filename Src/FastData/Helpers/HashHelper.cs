@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using Genbox.FastData.Internal.Analysis.BruteForce.HashFunctions;
+using Genbox.FastData.Internal.Analysis.Techniques.BruteForce.HashFunctions;
 
 namespace Genbox.FastData.Helpers;
 

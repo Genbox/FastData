@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;

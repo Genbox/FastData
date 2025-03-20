@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis.BruteForce;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 

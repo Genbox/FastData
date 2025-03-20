@@ -1,5 +1,6 @@
 using System.Text;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Configs;
 using Genbox.FastData.Generator.CSharp.Internal.Extensions;
 using Genbox.FastData.Models;
 using Genbox.FastData.Models.Misc;
