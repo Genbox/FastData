@@ -2,9 +2,9 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Analysis.Techniques.BruteForce;
+using Genbox.FastData.Internal.Analysis.Techniques.Genetic;
 using Genbox.FastData.Internal.Analysis.Techniques.Heuristics;
 
 namespace Genbox.FastData.Tests;

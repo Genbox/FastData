@@ -2,7 +2,6 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Internal.Abstracts;
 

@@ -5,11 +5,11 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Analysis.Techniques.BruteForce;
-using Genbox.FastData.Internal.Generators;
+using Genbox.FastData.Internal.Analysis.Techniques.Genetic;
 using Genbox.FastData.Internal.Optimization;
+using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData;
 
@@ -63,7 +63,7 @@ public static class FastDataGenerator
     {
         //No matter the StorageMode, if there is only a single item, we will use the same data structure
         if (config.Data.Length == 1)
-            yield return new SingleValueCode();
+            yield return new SingleValueStructure();
         else
         {
             switch (config.StorageMode)
@@ -71,31 +71,31 @@ public static class FastDataGenerator
                 case StorageMode.Auto:
 
                     // For small amounts of data, logic is the fastest, so we try that first
-                    yield return new ConditionalCode();
+                    yield return new ConditionalStructure();
 
                     // We try key lengths
-                    yield return new KeyLengthCode();
+                    yield return new KeyLengthStructure();
 
                     if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory) && config.StorageOptions.HasFlag(StorageOption.OptimizeForSpeed))
-                        yield return new MinimalPerfectHashCode();
+                        yield return new MinimalPerfectHashStructure();
 
                     if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
-                        yield return new BinarySearchCode();
+                        yield return new BinarySearchStructure();
                     else
-                        yield return new HashSetChainCode();
+                        yield return new HashSetChainStructure();
 
                     break;
                 case StorageMode.Linear:
-                    yield return new ArrayCode();
+                    yield return new ArrayStructure();
                     break;
                 case StorageMode.Logic:
-                    yield return new ConditionalCode();
+                    yield return new ConditionalStructure();
                     break;
                 case StorageMode.Tree:
-                    yield return new BinarySearchCode();
+                    yield return new BinarySearchStructure();
                     break;
                 case StorageMode.Indexed:
-                    yield return new HashSetChainCode();
+                    yield return new HashSetChainStructure();
                     break;
 
                 default:
@@ -111,15 +111,15 @@ public static class FastDataGenerator
 
         object candidate = ds switch
         {
-            DataStructure.SingleValue => new SingleValueCode(),
-            DataStructure.Array => new ArrayCode(),
-            DataStructure.Conditional => new ConditionalCode(),
-            DataStructure.BinarySearch => new BinarySearchCode(),
-            DataStructure.EytzingerSearch => new EytzingerSearchCode(),
-            DataStructure.MinimalPerfectHash => new MinimalPerfectHashCode(),
-            DataStructure.HashSetChain => new HashSetChainCode(),
-            DataStructure.HashSetLinear => new HashSetLinearCode(),
-            DataStructure.KeyLength => new KeyLengthCode(),
+            DataStructure.SingleValue => new SingleValueStructure(),
+            DataStructure.Array => new ArrayStructure(),
+            DataStructure.Conditional => new ConditionalStructure(),
+            DataStructure.BinarySearch => new BinarySearchStructure(),
+            DataStructure.EytzingerSearch => new EytzingerSearchStructure(),
+            DataStructure.MinimalPerfectHash => new MinimalPerfectHashStructure(),
+            DataStructure.HashSetChain => new HashSetChainStructure(),
+            DataStructure.HashSetLinear => new HashSetLinearStructure(),
+            DataStructure.KeyLength => new KeyLengthStructure(),
             _ => throw new ArgumentOutOfRangeException(nameof(ds), ds, null)
         };
 

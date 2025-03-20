@@ -5,19 +5,19 @@ using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Models;
 
-namespace Genbox.FastData.Internal.Generators;
+namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class SingleValueCode : IStructure
+internal sealed class ConditionalStructure : IStructure
 {
     public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
     {
-        if (data.Length != 1)
+        if (data.Length > ushort.MaxValue)
         {
             context = null;
             return false;
         }
 
-        context = new SingleValueContext(data[0]);
+        context = new ConditionalContext(data);
         return true;
     }
 }

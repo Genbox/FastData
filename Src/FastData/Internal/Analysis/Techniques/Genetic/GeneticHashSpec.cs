@@ -6,7 +6,7 @@ using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Internal.Analysis.Misc;
 
-namespace Genbox.FastData.Internal.Analysis.Genetic;
+namespace Genbox.FastData.Internal.Analysis.Techniques.Genetic;
 
 [StructLayout(LayoutKind.Auto)]
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]

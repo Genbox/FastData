@@ -6,9 +6,9 @@ using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Models;
 
-namespace Genbox.FastData.Internal.Generators;
+namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class EytzingerSearchCode : IStructure
+internal sealed class EytzingerSearchStructure : IStructure
 {
     public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
     {

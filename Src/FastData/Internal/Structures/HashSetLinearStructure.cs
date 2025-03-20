@@ -9,9 +9,9 @@ using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Models;
 using Genbox.FastData.Models.Misc;
 
-namespace Genbox.FastData.Internal.Generators;
+namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashSetLinearCode : IHashStructure
+internal sealed class HashSetLinearStructure : IHashStructure
 {
     //TODO: Either implement a bitmap for seen buckets everywhere or don't use bitmaps for simplicity
 
@@ -77,7 +77,10 @@ internal sealed class HashSetLinearCode : IHashStructure
         return true;
     }
 
-    public void RunSimulation<T>(object[] data, AnalyzerConfig config, ref Candidate<T> candidate) where T : struct, IHashSpec {}
+    public void RunSimulation<T>(object[] data, AnalyzerConfig config, ref Candidate<T> candidate) where T : struct, IHashSpec
+    {
+        throw new NotSupportedException("Not yet supported.");
+    }
 
     private static uint CalcNumBuckets(ReadOnlySpan<uint> hashCodes)
     {

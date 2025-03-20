@@ -8,9 +8,9 @@ using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Models;
 
-namespace Genbox.FastData.Internal.Generators;
+namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class MinimalPerfectHashCode : IStructure
+internal sealed class MinimalPerfectHashStructure : IStructure
 {
     public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
     {

@@ -1,5 +1,4 @@
 using Genbox.FastData.Configs;
-using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Abstracts;
 

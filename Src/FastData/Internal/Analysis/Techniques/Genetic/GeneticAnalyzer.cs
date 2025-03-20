@@ -4,7 +4,7 @@ using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 
-namespace Genbox.FastData.Internal.Analysis.Genetic;
+namespace Genbox.FastData.Internal.Analysis.Techniques.Genetic;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
 internal sealed class GeneticAnalyzer(object[] data, StringProperties props, GeneticAnalyzerConfig analyzerConfig, Simulation<GeneticAnalyzerConfig, GeneticHashSpec> simulation) : IHashAnalyzer<GeneticHashSpec>

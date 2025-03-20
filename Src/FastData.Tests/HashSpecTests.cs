@@ -1,7 +1,7 @@
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Internal.Analysis.Genetic;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Techniques.BruteForce;
+using Genbox.FastData.Internal.Analysis.Techniques.Genetic;
 using Genbox.FastData.Internal.Analysis.Techniques.Heuristics;
 using Genbox.FastData.Internal.Enums;
 using Genbox.FastData.InternalShared;
@@ -31,5 +31,8 @@ public class HashSpecTests
 
         yield return [new GeneticHashSpec(1, 1, 1, 1, [new StringSegment(0, -1, Alignment.Left)]), 2138145203];
         yield return [new GeneticHashSpec(2, 1, 2, 1, [new StringSegment(0, -1, Alignment.Left)]), 401880771];
+
+        yield return [new HeuristicHashSpec([1]), 2138145203];
+        yield return [new HeuristicHashSpec([1, 2]), 401880771];
     }
 }
