@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static System.Numerics.BitOperations;
 
-namespace Genbox.FastData.Internal.Analysis.Techniques.BruteForce.HashFunctions;
+namespace Genbox.FastData.HashFunctions;
 
 public static class DJB2Hash
 {

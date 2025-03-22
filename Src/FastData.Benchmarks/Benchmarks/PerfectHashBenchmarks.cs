@@ -11,7 +11,7 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-public class MinimalPerfectHashBenchmarks
+public class PerfectHashBenchmarks
 {
     private uint[] _data = null!;
 
@@ -31,14 +31,14 @@ public class MinimalPerfectHashBenchmarks
     [ArgumentsSource(nameof(GetFunctions))]
     public uint[] TimeToConstruct(MixSpec spec)
     {
-        return MPHHelper.Generate(_data, (hash, seed) => spec.Function(hash, seed), MaxCandidates, uint.MaxValue, _data.Length * 2).ToArray();
+        return PerfectHashHelper.Generate(_data, (hash, seed) => spec.Function(hash, seed), MaxCandidates, uint.MaxValue, _data.Length * 2).ToArray();
     }
 
     [Benchmark]
     [ArgumentsSource(nameof(GetFunctions))]
     public uint[] TimeToConstructMinimal(MixSpec spec)
     {
-        return MPHHelper.Generate(_data, (hash, seed) => spec.Function(hash, seed), MaxCandidates).ToArray();
+        return PerfectHashHelper.Generate(_data, (hash, seed) => spec.Function(hash, seed), MaxCandidates).ToArray();
     }
 
     public static IEnumerable<MixSpec> GetFunctions()

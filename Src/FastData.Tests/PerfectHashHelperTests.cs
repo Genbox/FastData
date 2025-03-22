@@ -1,12 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Genbox.FastData.InternalShared;
-using static Genbox.FastData.Internal.Helpers.MPHHelper;
+using static Genbox.FastData.Internal.Helpers.PerfectHashHelper;
 using static Genbox.FastData.InternalShared.TestHelper;
 
 namespace Genbox.FastData.Tests;
 
-public class MPHHelperTests
+public class PerfectHashHelperTests
 {
     private long _time;
     private const int _numSeconds = 3;

@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.HashFunctions;
 using Genbox.FastData.Internal.Analysis.Misc;
-using Genbox.FastData.Internal.Analysis.Techniques.BruteForce.HashFunctions;
 using Genbox.FastData.Internal.Enums;
 
 namespace Genbox.FastData.Internal.Analysis.Techniques.BruteForce;
@@ -22,12 +22,14 @@ internal readonly record struct BruteForceHashSpec(HashFunction HashFunction, St
         };
     }
 
+    public Func<string, string, bool> GetEqualFunction() => (s, s1) => true;
+
     public string GetSource()
         => $$"""
                  [MethodImpl(MethodImplOptions.AggressiveInlining)]
                  public static uint Hash(string str)
                  {
-                     return Genbox.FastData.Internal.Analysis.Techniques.BruteForce.HashFunctions.{{HashFunction}}.ComputeHash({{GetSlice(Segments[0])}});
+                     return Genbox.FastData.HashFunctions.{{HashFunction}}.ComputeHash({{GetSlice(Segments[0])}});
                  }
              """;
 

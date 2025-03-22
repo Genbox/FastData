@@ -12,37 +12,36 @@ namespace Genbox.FastData.Internal.Analysis.Techniques.Heuristics;
 /// </summary>
 internal class HeuristicAnalyzer(object[] data, StringProperties props, HeuristicAnalyzerConfig config, Simulation<HeuristicAnalyzerConfig, HeuristicHashSpec> simulation) : IHashAnalyzer<HeuristicHashSpec>
 {
+    private const int MAX_KEY_POS = 255;
+
     public Candidate<HeuristicHashSpec> Run()
     {
         // Stage 1: Find all positions that are mandatory. If two items are the same length, but differ only on one character, then we must include that character.
-        GetMandatory(out HashSet<int> mandatory, out double currentFitness);
-        Print("Stage1", currentFitness, mandatory);
+        HashSet<int> mandatory = GetMandatory();
+        Print("Stage1", mandatory);
 
-        int max = (int)props.LengthData.Max - 1;
+        int max = (int)(props.LengthData.Max - 1 < MAX_KEY_POS - 1 ? props.LengthData.Max - 1 : MAX_KEY_POS - 1);
 
         // Stage 2: Attempt using just the mandatory positions first, then add positions as long as it decrease the collision count
-        HashSet<int> currentSet = new HashSet<int>(mandatory);
-        AddUntilBetter(max, ref currentSet, ref currentFitness);
-        Print("Stage2", currentFitness, currentSet);
+        HashSet<int> current = new HashSet<int>(mandatory);
+        double currentFitness = CalculateFitness(current);
+        AddWhileBetter(max, ref current, ref currentFitness);
+        Print("Stage2", current);
 
         // Stage 3: Remove positions, as long as this doesn't increase the collision count.
-        RemoveSinglePositions(max, mandatory, ref currentSet, ref currentFitness);
-        Print("Stage3", currentFitness, currentSet);
+        RemoveSinglePositions(max, mandatory, ref current, ref currentFitness);
+        Print("Stage3", current);
 
         // Stage 4: Replace two positions by one, as long as this doesn't increase the collision count.
-        RemoveDualPositions(max, mandatory, ref currentSet, ref currentFitness);
-        Print("Stage4", currentFitness, currentSet);
+        MergePositions(max, mandatory, ref current, ref currentFitness);
+        Print("Stage4", current);
 
-        //TODO: refactor - it is duplicate of CalculateFitness. We can use just one candidate and pass it around
-        HeuristicHashSpec spec = new HeuristicHashSpec(currentSet);
-        Candidate<HeuristicHashSpec> candidate = new Candidate<HeuristicHashSpec>(spec);
-        simulation(data, config, ref candidate);
-        return candidate;
+        return CalculateFitnessInternal(current);
     }
 
-    private void GetMandatory(out HashSet<int> mandatory, out double currentFitness)
+    private HashSet<int> GetMandatory()
     {
-        mandatory = new HashSet<int>();
+        HashSet<int> mandatory = new HashSet<int>();
 
         for (int i1 = 0; i1 < data.Length - 1; i1++)
         {
@@ -74,41 +73,41 @@ internal class HeuristicAnalyzer(object[] data, StringProperties props, Heuristi
             }
         }
 
-        currentFitness = CalculateFitness(data, mandatory);
+        return mandatory;
     }
 
-    private void AddUntilBetter(int max, ref HashSet<int> currentSet, ref double currentFitness)
+    private void AddWhileBetter(int max, ref HashSet<int> currentSet, ref double currentFitness)
     {
         while (true)
         {
-            HashSet<int>? best = null;
-            double bestFitness = double.MinValue;
+            HashSet<int>? bestSet = null;
+            double bestFitness = double.MaxValue;
 
             for (int i = max; i >= -1; i--)
             {
                 if (!currentSet.Contains(i))
                 {
-                    HashSet<int> attempt = new HashSet<int>(currentSet);
-                    attempt.Add(i);
-                    double attemptFitness = CalculateFitness(data, attempt);
+                    HashSet<int> attemptSet = new HashSet<int>(currentSet);
+                    attemptSet.Add(i);
+                    double attemptFitness = CalculateFitness(attemptSet);
 
-                    if (attemptFitness > bestFitness || (Math.Abs(attemptFitness - bestFitness) < double.Epsilon && i >= 0))
+                    if (attemptFitness < bestFitness || (Math.Abs(attemptFitness - bestFitness) < double.Epsilon && i >= 0))
                     {
-                        best = attempt;
+                        bestSet = attemptSet;
                         bestFitness = attemptFitness;
                     }
                 }
             }
 
             // Stop adding positions when it gives no improvement.
-            if (bestFitness <= currentFitness)
+            if (bestFitness >= currentFitness)
                 break;
 
-            if (best != null)
+            if (bestSet != null)
             {
-                currentSet = best;
+                currentSet = bestSet;
                 currentFitness = bestFitness;
-                Print(" - new best", currentFitness, currentSet);
+                Print("- new best", currentSet);
             }
         }
     }
@@ -117,45 +116,45 @@ internal class HeuristicAnalyzer(object[] data, StringProperties props, Heuristi
     {
         while (true)
         {
-            HashSet<int>? best = null;
-            double bestFitness = double.MinValue;
+            HashSet<int>? bestSet = null;
+            double bestFitness = double.MaxValue;
 
             for (int i = max; i >= -1; i--)
             {
                 if (currentSet.Contains(i) && !mandatory.Contains(i))
                 {
-                    HashSet<int> attempt = new HashSet<int>(currentSet);
-                    attempt.Remove(i);
-                    double attemptFitness = CalculateFitness(data, attempt);
+                    HashSet<int> attemptSet = new HashSet<int>(currentSet);
+                    attemptSet.Remove(i);
+                    double attemptFitness = CalculateFitness(attemptSet);
 
                     // If the number of collisions are the same, we prefer our new attempt, as it has one instruction less, but produce the same number of collisions
-                    if (attemptFitness > bestFitness || (Math.Abs(attemptFitness - bestFitness) < double.Epsilon && i == -1))
+                    if (attemptFitness < bestFitness || (Math.Abs(attemptFitness - bestFitness) < double.Epsilon && i == -1))
                     {
-                        best = attempt;
+                        bestSet = attemptSet;
                         bestFitness = attemptFitness;
                     }
                 }
             }
 
             // Stop removing positions when it gives no improvement.
-            if (bestFitness < currentFitness)
+            if (bestFitness > currentFitness)
                 break;
 
-            if (best != null)
+            if (bestSet != null)
             {
-                currentSet = best;
+                currentSet = bestSet;
                 currentFitness = bestFitness;
-                Print(" - new best", currentFitness, currentSet);
+                Print("- new best", currentSet);
             }
         }
     }
 
-    private void RemoveDualPositions(int max, HashSet<int> mandatory, ref HashSet<int> currentSet, ref double currentFitness)
+    private void MergePositions(int max, HashSet<int> mandatory, ref HashSet<int> currentSet, ref double currentFitness)
     {
         while (true)
         {
-            HashSet<int>? best = null;
-            double bestFitness = double.MinValue;
+            HashSet<int>? bestSet = null;
+            double bestFitness = double.MaxValue;
 
             for (int i1 = max; i1 >= -1; i1--)
             {
@@ -169,17 +168,17 @@ internal class HeuristicAnalyzer(object[] data, StringProperties props, Heuristi
                             {
                                 if (!currentSet.Contains(i3))
                                 {
-                                    HashSet<int> attempt = new HashSet<int>(currentSet);
-                                    attempt.Remove(i1);
-                                    attempt.Remove(i2);
-                                    attempt.Add(i3);
+                                    HashSet<int> attemptSet = new HashSet<int>(currentSet);
+                                    attemptSet.Remove(i1);
+                                    attemptSet.Remove(i2);
+                                    attemptSet.Add(i3);
 
-                                    double attemptFitness = CalculateFitness(data, attempt);
+                                    double attemptFitness = CalculateFitness(attemptSet);
 
                                     // If the number of collisions are the same, we prefer our new attempt, as it has two instructions less, but produce the same number of collisions
-                                    if (attemptFitness > bestFitness || (Math.Abs(attemptFitness - bestFitness) < double.Epsilon && (i1 == -1 || i2 == -1 || i3 != 0))) //IQV: I changed the i3 condition since it was always true
+                                    if (attemptFitness < bestFitness || (Math.Abs(attemptFitness - bestFitness) < double.Epsilon && (i1 == -1 || i2 == -1 || i3 >= 0)))
                                     {
-                                        best = attempt;
+                                        bestSet = attemptSet;
                                         bestFitness = attemptFitness;
                                     }
                                 }
@@ -190,26 +189,54 @@ internal class HeuristicAnalyzer(object[] data, StringProperties props, Heuristi
             }
 
             // Stop removing positions when it gives no improvement.
-            if (bestFitness < currentFitness)
+            if (bestFitness > currentFitness)
                 break;
 
-            if (best != null)
+            if (bestSet != null)
             {
-                currentSet = best;
+                currentSet = bestSet;
                 currentFitness = bestFitness;
-                Print(" - new best", currentFitness, currentSet);
+                Print("- new best", currentSet);
             }
         }
     }
 
-    private double CalculateFitness(object[] objects, HashSet<int> set)
+    private double CalculateFitness(HashSet<int> set) => CalculateFitnessInternal(set).Fitness * -1; //The algorithm here works with less fitness = better. At least for now.
+
+    private Candidate<HeuristicHashSpec> CalculateFitnessInternal(HashSet<int> set)
     {
-        HeuristicHashSpec spec = new HeuristicHashSpec(set);
-        Candidate<HeuristicHashSpec> candidate = new Candidate<HeuristicHashSpec>(spec);
-        simulation(objects, config, ref candidate);
-        return candidate.Fitness;
+        Candidate<HeuristicHashSpec> cand = new Candidate<HeuristicHashSpec>(new HeuristicHashSpec(set.OrderBy(x => x).ToArray()));
+        simulation(data, config, ref cand);
+        return cand;
     }
 
     [Conditional("DebugOutput")]
-    private static void Print(string stage, double fitness, HashSet<int> set) => Console.WriteLine($"{stage}: ({fitness:N4}) {string.Join(",", set.OrderBy(i => i).ToArray())}");
+    private void Print(string stage, HashSet<int> set)
+    {
+        Candidate<HeuristicHashSpec> cand = CalculateFitnessInternal(set);
+
+        Console.Write($"{stage} ({cand.Metadata["Collisions"]}): ");
+        bool lastChar = false;
+        bool first = true;
+        foreach (int i in set.OrderBy(x => x))
+        {
+            if (!first)
+                Console.Write(", ");
+            if (i == -1)
+                lastChar = true;
+            else
+            {
+                Console.Write(i);
+                first = false;
+            }
+        }
+
+        if (lastChar)
+        {
+            if (!first)
+                Console.Write(", ");
+            Console.Write("$");
+        }
+        Console.WriteLine();
+    }
 }

@@ -36,14 +36,15 @@ public class DataStructureBenchmarks
     private IFastSet<string> _fastEytzingerSearch = null!;
     private IFastSet<string> _fastConditionalIf = null!;
     private IFastSet<string> _fastConditionalSwitch = null!;
-    private IFastSet<string> _fastMinimalPerfectHash = null!;
+    private IFastSet<string> _fastPerfectHashGPerf = null!;
+    private IFastSet<string> _fastPerfectHashBruteForce = null!;
     private IFastSet<string> _fastHashSetLinear = null!;
     private IFastSet<string> _fastHashSetChain = null!;
     private IFastSet<string> _fastKeyLength = null!;
     private IFastSet<string> _fastKeyLengthUniqIf = null!;
     private IFastSet<string> _fastKeyLengthUniqSwitch = null!;
 
-    [Params(1_000, 10_000)]
+    [Params(10_000)]
     public int QuerySize { get; set; }
 
     private IFastSet<string> CreateFastData(DataStructure ds, object[] data, Action<CSharpGeneratorConfig>? configure = null)
@@ -150,11 +151,18 @@ public class DataStructureBenchmarks
         _fastConditionalSwitch = CreateFastData(DataStructure.Conditional, _data, config => config.ConditionalBranchType = BranchType.Switch);
     }
 
-    [GlobalSetup(Target = nameof(QueryStaticMinimalPerfectHash))]
-    public void SetupStaticMinimalPerfectHash()
+    [GlobalSetup(Target = nameof(QueryStaticPerfectHashGPerf))]
+    public void SetupStaticPerfectHashGPerf()
     {
         SetupQueries();
-        _fastMinimalPerfectHash = CreateFastData(DataStructure.MinimalPerfectHash, _data);
+        _fastPerfectHashGPerf = CreateFastData(DataStructure.PerfectHashGPerf, _data);
+    }
+
+    [GlobalSetup(Target = nameof(QueryStaticPerfectHashBruteforce))]
+    public void SetupStaticPerfectHashBruteForce()
+    {
+        SetupQueries();
+        _fastPerfectHashBruteForce = CreateFastData(DataStructure.PerfectHashBruteForce, _data);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticHashSetLinear))]
@@ -238,7 +246,10 @@ public class DataStructureBenchmarks
     public void QueryStaticConditionalSwitch() => DoQuery(_fastConditionalSwitch.Contains);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticMinimalPerfectHash() => DoQuery(_fastMinimalPerfectHash.Contains);
+    public void QueryStaticPerfectHashGPerf() => DoQuery(_fastPerfectHashGPerf.Contains);
+
+    [Benchmark, BenchmarkCategory("Query")]
+    public void QueryStaticPerfectHashBruteforce() => DoQuery(_fastPerfectHashBruteForce.Contains);
 
     [Benchmark, BenchmarkCategory("Query")]
     public void QueryStaticHashSetLinear() => DoQuery(_fastHashSetLinear.Contains);

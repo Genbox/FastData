@@ -14,7 +14,8 @@ public enum DataStructure : byte
     EytzingerSearch,
 
     // O(1) data structures
-    MinimalPerfectHash,
+    PerfectHashGPerf,
+    PerfectHashBruteForce,
     HashSetChain,
     HashSetLinear,
 

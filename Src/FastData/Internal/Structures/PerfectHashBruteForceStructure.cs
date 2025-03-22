@@ -10,14 +10,14 @@ using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class MinimalPerfectHashStructure : IStructure
+internal sealed class PerfectHashBruteForceStructure : IStructure
 {
     public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
     {
         long timestamp = Stopwatch.GetTimestamp();
 
         //Find the proper seeds
-        uint[] seed = MPHHelper.Generate(data, HashHelper.HashObjectSeed, 1, uint.MaxValue, data.Length, () =>
+        uint[] seed = PerfectHashHelper.Generate(data, HashHelper.HashObjectSeed, 1, uint.MaxValue, data.Length, () =>
         {
             TimeSpan span = new TimeSpan(Stopwatch.GetTimestamp() - timestamp);
             return span.TotalSeconds > 10;
@@ -41,7 +41,7 @@ internal sealed class MinimalPerfectHashStructure : IStructure
             pairs[index] = new KeyValuePair<object, uint>(value, hash);
         }
 
-        context = new MinimalPerfectHashContext(pairs, seed[0]);
+        context = new PerfectHashBruteForceContext(pairs, seed[0]);
         return true;
     }
 }

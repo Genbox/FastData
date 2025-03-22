@@ -42,13 +42,20 @@ public class DataStructureTests
         if (dataType == KnownDataType.String)
         {
             IFastSet<string> set = CodeGenerator.CreateFastSet<string>(source, false);
-            Assert.True(set.Contains((string)data[0]));
+
+            foreach (string str in data)
+                Assert.True(set.Contains(str));
+
             Assert.False(set.Contains("dontexist"));
+            Assert.False(set.Contains("item11"));
         }
         else if (dataType == KnownDataType.Int32)
         {
             IFastSet<int> set = CodeGenerator.CreateFastSet<int>(source, false);
-            Assert.True(set.Contains((int)data[0]));
+
+            foreach (int str in data)
+                Assert.True(set.Contains(str));
+
             Assert.False(set.Contains(100));
         }
     }
@@ -77,7 +84,8 @@ public class DataStructureTests
             c.ConditionalBranchType = BranchType.Switch;
             return "Switch";
         });
-        data.Add(DataStructure.MinimalPerfectHash, normal1, null);
+        data.Add(DataStructure.PerfectHashGPerf, normal1, null);
+        data.Add(DataStructure.PerfectHashBruteForce, normal1, null);
         data.Add(DataStructure.HashSetChain, normal1, null);
         data.Add(DataStructure.HashSetLinear, normal1, null);
         data.Add(DataStructure.KeyLength, normal1, null);
@@ -114,7 +122,7 @@ public class DataStructureTests
             c.ConditionalBranchType = BranchType.Switch;
             return "Switch";
         });
-        data.Add(DataStructure.MinimalPerfectHash, normal2, null);
+        data.Add(DataStructure.PerfectHashBruteForce, normal2, null);
         data.Add(DataStructure.HashSetChain, normal2, null);
         data.Add(DataStructure.HashSetLinear, normal2, null);
 

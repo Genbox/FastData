@@ -77,7 +77,7 @@ public static class FastDataGenerator
                     yield return new KeyLengthStructure();
 
                     if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory) && config.StorageOptions.HasFlag(StorageOption.OptimizeForSpeed))
-                        yield return new MinimalPerfectHashStructure();
+                        yield return new PerfectHashBruteForceStructure();
 
                     if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
                         yield return new BinarySearchStructure();
@@ -116,7 +116,8 @@ public static class FastDataGenerator
             DataStructure.Conditional => new ConditionalStructure(),
             DataStructure.BinarySearch => new BinarySearchStructure(),
             DataStructure.EytzingerSearch => new EytzingerSearchStructure(),
-            DataStructure.MinimalPerfectHash => new MinimalPerfectHashStructure(),
+            DataStructure.PerfectHashGPerf => new PerfectHashGPerfStructure(),
+            DataStructure.PerfectHashBruteForce => new PerfectHashBruteForceStructure(),
             DataStructure.HashSetChain => new HashSetChainStructure(),
             DataStructure.HashSetLinear => new HashSetLinearStructure(),
             DataStructure.KeyLength => new KeyLengthStructure(),

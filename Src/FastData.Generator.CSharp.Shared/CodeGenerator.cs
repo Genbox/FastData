@@ -1,13 +1,9 @@
 using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.Loader;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 using Genbox.FastData.InternalShared;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Emit;
 
 namespace Genbox.FastData.Generator.CSharp.Shared;
 

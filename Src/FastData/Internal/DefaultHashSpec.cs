@@ -9,6 +9,7 @@ internal sealed class DefaultHashSpec : IHashSpec
     public static DefaultHashSpec Instance { get; } = new DefaultHashSpec();
 
     public Func<string, uint> GetFunction() => HashHelper.HashObject;
+    public Func<string, string, bool> GetEqualFunction() => (s, s1) => true;
 
     public string GetSource() => "HashHelper.HashObject(value)";
 }

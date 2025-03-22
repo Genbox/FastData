@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using Genbox.FastData.Internal.Analysis.Techniques.BruteForce.HashFunctions;
+using Genbox.FastData.HashFunctions;
 
 namespace Genbox.FastData.Tests;
 

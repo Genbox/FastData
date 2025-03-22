@@ -20,6 +20,7 @@ internal struct GeneticHashSpec(int mixerSeed, int mixerIterations, int avalanch
     internal StringSegment[] Segments = segments;
 
     public readonly Func<string, uint> GetFunction() => Hash;
+    public Func<string, string, bool> GetEqualFunction() => (s, s1) => true;
 
     public readonly string GetSource()
         => $$"""

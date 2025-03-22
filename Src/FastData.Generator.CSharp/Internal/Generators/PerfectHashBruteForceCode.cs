@@ -7,7 +7,7 @@ using static Genbox.FastData.Generator.CSharp.Internal.Helpers.CodeHelper;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class MinimalPerfectHashCode(GeneratorConfig genCfg, CSharpGeneratorConfig cfg, MinimalPerfectHashContext ctx) : IOutputWriter
+internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpGeneratorConfig cfg, PerfectHashBruteForceContext ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""
