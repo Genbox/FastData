@@ -6,16 +6,23 @@ namespace Genbox.FastData.Tests;
 
 public class DataAnalyzerTests
 {
-    [Fact]
-    public void GetStringProperties_LengthMap_Test()
+    [Theory]
+    [InlineData((object)new object[] { "a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa" })]
+    [InlineData((object)new object[] { "aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa" })] //Test inputs that don't start with 1
+    [InlineData((object)new object[] { "a", "aaa", "aaaa" })] //Test when there is gaps
+    [InlineData((object)new object[] { "a" })] //Test when there is only one item
+    [InlineData((object)new object[] { "a", "a", "aaa", "aaa" })] //Test duplicates
+    public void GetStringProperties_LengthMap_Test(object[] data)
     {
-        object[] data = ["a", "aa", "aaa", "azza"];
         StringProperties res = GetStringProperties(data);
         IntegerBitSet map = res.LengthData.LengthMap;
+        Assert.Equal((uint)data.Distinct().Count(), map.Count);
 
-        Assert.Equal(4u, map.Count);
-        Assert.Equal(1u, map.MinValue);
-        Assert.Equal(4u, map.MaxValue);
+        foreach (string str in data)
+            Assert.True(map.Contains(str.Length));
+
+        Assert.Equal((uint)data.Min(x => ((string)x).Length), map.MinValue);
+        Assert.Equal((uint)data.Max(x => ((string)x).Length), map.MaxValue);
 
         //Anything over 64 should fail (at least for now)
         Assert.False(map.Contains(100));

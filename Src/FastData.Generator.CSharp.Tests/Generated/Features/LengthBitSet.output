@@ -24,7 +24,7 @@ internal static class MyData
     
     public static bool Contains(String value)
     {
-       if ((85UL & 1UL << (value.Length -1) & 63) == 0)
+       if ((85UL & (1UL << (value.Length - 1) % 64)) == 0)
            return false;
 
         uint hashCode = Hash(value);

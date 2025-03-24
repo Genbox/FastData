@@ -26,7 +26,7 @@ internal partial class MyData  : IFastSet<String>
     
     public bool Contains(String value)
     {
-       if ((1012UL & 1UL << (value.Length -1) & 63) == 0)
+       if ((1012UL & (1UL << (value.Length - 1) % 64)) == 0)
            return false;
 
         return StringComparer.Ordinal.Equals(value, _entries[value.Length - 3]);

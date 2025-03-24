@@ -66,7 +66,7 @@ internal static class CSharpGeneratorConfigExtensions
 
     internal static string GetMaskEarlyExit(string variable, ulong bitSet)
         => $"""
-                   if (({bitSet}UL & 1UL << ({variable}.Length -1) & 63) == 0)
+                   if (({bitSet}UL & (1UL << ({variable}.Length - 1) % 64)) == 0)
                        return false;
             """;
 
