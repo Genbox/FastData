@@ -62,7 +62,7 @@ internal partial class MyData  : IFastSet<String>
         new Bucket(0, 0)
     };
 
-    private readonly String[] _items = {
+    private readonly string[] _items = {
         "item10",
         "item9",
         "item8",
@@ -78,7 +78,7 @@ internal partial class MyData  : IFastSet<String>
     private readonly uint[] _hashCodes = { 1309368076, 2368213971, 802130030, 2818552665, 3981352079, 1252468724, 2415268138, 3578067552, 849184197, 2011983611 };
 
     
-    public bool Contains(String value)
+    public bool Contains(string value)
     {
         if (value.Length < 5 || value.Length > 6)
            return false;

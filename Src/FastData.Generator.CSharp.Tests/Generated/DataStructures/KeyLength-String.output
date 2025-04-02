@@ -12,22 +12,22 @@ using System;
 
 internal partial class MyData  : IFastSet<String>
 {
-    private readonly String[]?[] _entries = [
+    private readonly string[]?[] _entries = [
         ["item1","item2","item3","item4","item5","item6","item7","item8","item9"],
         ["item10"]
     ];
 
     
-    public bool Contains(String value)
+    public bool Contains(string value)
     {
         if (value.Length < 5 || value.Length > 6)
            return false;
-        String[]? bucket = _entries[value.Length - 5];
+        string[]? bucket = _entries[value.Length - 5];
 
         if (bucket == null)
             return false;
 
-        foreach (String str in bucket)
+        foreach (string str in bucket)
         {
             if (StringComparer.Ordinal.Equals(value, str))
                 return true;

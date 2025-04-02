@@ -13,7 +13,7 @@ using System;
 internal partial class MyData  : IFastSet<String>
 {
     
-    public bool Contains(String value)
+    public bool Contains(string value)
     {
        if ((1012UL & (1UL << (value.Length - 1) % 64)) == 0)
            return false;

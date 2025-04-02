@@ -12,14 +12,14 @@ using System;
 
 internal static class MyData 
 {
-    private static Int64[] _entries = new Int64[] {
+    private static long[] _entries = new long[] {
         -1,
         0,
         1
     };
 
     
-    public static bool Contains(Int64 value)
+    public static bool Contains(long value)
     {
         if (value < -1 || value > 1)
            return false;

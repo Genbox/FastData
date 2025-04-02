@@ -5,6 +5,24 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Extensions;
 
 internal static class GeneratorConfigExtensions
 {
+    internal static string GetTypeName(this GeneratorConfig config) => config.DataType switch
+    {
+        KnownDataType.String => "string",
+        KnownDataType.Boolean => "bool",
+        KnownDataType.SByte => "sbyte",
+        KnownDataType.Byte => "byte",
+        KnownDataType.Char => "char",
+        KnownDataType.Int16 => "short",
+        KnownDataType.UInt16 => "ushort",
+        KnownDataType.Int32 => "int",
+        KnownDataType.UInt32 => "uint",
+        KnownDataType.Int64 => "long",
+        KnownDataType.UInt64 => "ulong",
+        KnownDataType.Single => "float",
+        KnownDataType.Double => "double",
+        _ => throw new InvalidOperationException("Invalid type " + config.DataType)
+    };
+
     internal static string GetEqualFunction(this GeneratorConfig config, string variable1, string variable2)
     {
         if (config.DataType == KnownDataType.String)

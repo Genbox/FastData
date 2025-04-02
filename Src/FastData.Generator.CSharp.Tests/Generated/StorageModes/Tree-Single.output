@@ -12,14 +12,14 @@ using System;
 
 internal static class MyData 
 {
-    private static Single[] _entries = new Single[] {
+    private static float[] _entries = new float[] {
         0,
         1,
         2
     };
 
     
-    public static bool Contains(Single value)
+    public static bool Contains(float value)
     {
         if (value < 0 || value > 2)
            return false;

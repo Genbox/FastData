@@ -12,14 +12,14 @@ using System;
 
 internal static class MyData 
 {
-    private static Byte[] _entries = new Byte[] {
+    private static byte[] _entries = new byte[] {
         0,
         1,
         2
     };
 
     
-    public static bool Contains(Byte value)
+    public static bool Contains(byte value)
     {
         if (value < 0 || value > 2)
            return false;

@@ -12,14 +12,14 @@ using System;
 
 internal static class MyData 
 {
-    private static UInt64[] _entries = new UInt64[] {
+    private static ulong[] _entries = new ulong[] {
         0,
         1,
         2
     };
 
     
-    public static bool Contains(UInt64 value)
+    public static bool Contains(ulong value)
     {
         if (value < 0 || value > 2)
            return false;

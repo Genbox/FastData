@@ -16,7 +16,7 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpGe
               };
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.DataType}} value)
+              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg, "value")}}
 
@@ -32,13 +32,13 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpGe
               [StructLayout(LayoutKind.Auto)]
               private struct Entry
               {
-                  public Entry({{genCfg.DataType}} value, uint hashCode)
+                  public Entry({{genCfg.GetTypeName()}} value, uint hashCode)
                   {
                       Value = value;
                       HashCode = hashCode;
                   }
 
-                  public {{genCfg.DataType}} Value;
+                  public {{genCfg.GetTypeName()}} Value;
                   public uint HashCode;
               }
           """;

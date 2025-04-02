@@ -21,7 +21,7 @@ internal static class MyData
     };
 
     
-    public static bool Contains(Double value)
+    public static bool Contains(double value)
     {
         if (value < 0 || value > 2)
            return false;
@@ -51,9 +51,9 @@ internal static class MyData
     {
         public uint HashCode;
         public sbyte Next;
-        public Double Value;
+        public double Value;
 
-        public Entry(uint hashCode, sbyte next, Double value)
+        public Entry(uint hashCode, sbyte next, double value)
         {
             HashCode = hashCode;
             Next = next;

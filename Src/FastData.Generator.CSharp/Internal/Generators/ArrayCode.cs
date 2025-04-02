@@ -12,12 +12,12 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CSharpGeneratorConfig cf
 {
     public string Generate() =>
         $$"""
-              private{{cfg.GetModifier()}} {{genCfg.DataType}}[] _entries = new {{genCfg.DataType}}[] {
+              private{{cfg.GetModifier()}} {{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
           {{JoinValues(ctx.Data, Render, ",\n")}}
               };
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.DataType}} value)
+              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg, "value")}}
 

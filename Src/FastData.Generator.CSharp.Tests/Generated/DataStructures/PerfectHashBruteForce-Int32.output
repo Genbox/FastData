@@ -26,7 +26,7 @@ internal partial class MyData  : IFastSet<Int32>
     };
 
     
-    public bool Contains(Int32 value)
+    public bool Contains(int value)
     {
         if (value < 1 || value > 10)
            return false;
@@ -44,13 +44,13 @@ internal partial class MyData  : IFastSet<Int32>
     [StructLayout(LayoutKind.Auto)]
     private struct Entry
     {
-        public Entry(Int32 value, uint hashCode)
+        public Entry(int value, uint hashCode)
         {
             Value = value;
             HashCode = hashCode;
         }
 
-        public Int32 Value;
+        public int Value;
         public uint HashCode;
     }
 

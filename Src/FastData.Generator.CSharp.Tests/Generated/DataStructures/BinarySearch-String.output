@@ -12,7 +12,7 @@ using System;
 
 internal partial class MyData  : IFastSet<String>
 {
-    private String[] _entries = new String[] {
+    private string[] _entries = new string[] {
         "item1",
         "item10",
         "item2",
@@ -26,7 +26,7 @@ internal partial class MyData  : IFastSet<String>
     };
 
     
-    public bool Contains(String value)
+    public bool Contains(string value)
     {
         if (value.Length < 5 || value.Length > 6)
            return false;

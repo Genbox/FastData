@@ -12,13 +12,13 @@ using System;
 
 internal static class MyData 
 {
-    private static Boolean[] _entries = new Boolean[] {
+    private static bool[] _entries = new bool[] {
         false,
         true
     };
 
     
-    public static bool Contains(Boolean value)
+    public static bool Contains(bool value)
     {
 
 

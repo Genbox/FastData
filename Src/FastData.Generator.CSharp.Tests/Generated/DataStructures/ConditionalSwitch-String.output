@@ -13,7 +13,7 @@ using System;
 internal partial class MyData  : IFastSet<String>
 {
     
-    public bool Contains(String value)
+    public bool Contains(string value)
     {
         if (value.Length < 5 || value.Length > 6)
            return false;

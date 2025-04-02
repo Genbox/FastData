@@ -13,7 +13,7 @@ using System;
 internal static class MyData 
 {
     
-    public static bool Contains(UInt32 value)
+    public static bool Contains(uint value)
     {
         if (value < 0 || value > 2)
            return false;

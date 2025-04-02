@@ -12,14 +12,14 @@ using System;
 
 internal static class MyData 
 {
-    private static UInt16[] _entries = new UInt16[] {
+    private static ushort[] _entries = new ushort[] {
         0,
         1,
         2
     };
 
     
-    public static bool Contains(UInt16 value)
+    public static bool Contains(ushort value)
     {
         if (value < 0 || value > 2)
            return false;

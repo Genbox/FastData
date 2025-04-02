@@ -19,7 +19,7 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
               };
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.DataType}} value)
+              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg, "value")}}
 
@@ -47,9 +47,9 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
               {
                   public uint HashCode;
                   public {{GetIndexType(ctx.Data.Length)}} Next;
-                  public {{genCfg.DataType}} Value;
+                  public {{genCfg.GetTypeName()}} Value;
 
-                  public Entry(uint hashCode, {{GetIndexType(ctx.Data.Length)}} next, {{genCfg.DataType}} value)
+                  public Entry(uint hashCode, {{GetIndexType(ctx.Data.Length)}} next, {{genCfg.GetTypeName()}} value)
                   {
                       HashCode = hashCode;
                       Next = next;

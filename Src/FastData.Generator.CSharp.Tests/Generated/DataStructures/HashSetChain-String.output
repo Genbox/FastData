@@ -28,7 +28,7 @@ internal partial class MyData  : IFastSet<String>
     };
 
     
-    public bool Contains(String value)
+    public bool Contains(string value)
     {
         if (value.Length < 5 || value.Length > 6)
            return false;
@@ -58,9 +58,9 @@ internal partial class MyData  : IFastSet<String>
     {
         public uint HashCode;
         public sbyte Next;
-        public String Value;
+        public string Value;
 
-        public Entry(uint hashCode, sbyte next, String value)
+        public Entry(uint hashCode, sbyte next, string value)
         {
             HashCode = hashCode;
             Next = next;

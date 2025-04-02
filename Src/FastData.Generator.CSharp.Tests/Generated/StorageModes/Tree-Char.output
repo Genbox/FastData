@@ -12,14 +12,14 @@ using System;
 
 internal static class MyData 
 {
-    private static Char[] _entries = new Char[] {
+    private static char[] _entries = new char[] {
         'a',
         'b',
         'c'
     };
 
     
-    public static bool Contains(Char value)
+    public static bool Contains(char value)
     {
         if (value < 97 || value > 99)
            return false;

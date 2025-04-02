@@ -28,7 +28,7 @@ internal static class MyData
     };
 
     
-    public static bool Contains(String value)
+    public static bool Contains(string value)
     {
         if (value.Length < 5 || value.Length > 6)
            return false;
@@ -58,9 +58,9 @@ internal static class MyData
     {
         public uint HashCode;
         public sbyte Next;
-        public String Value;
+        public string Value;
 
-        public Entry(uint hashCode, sbyte next, String value)
+        public Entry(uint hashCode, sbyte next, string value)
         {
             HashCode = hashCode;
             Next = next;

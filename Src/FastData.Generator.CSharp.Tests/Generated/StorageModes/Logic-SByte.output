@@ -13,7 +13,7 @@ using System;
 internal static class MyData 
 {
     
-    public static bool Contains(SByte value)
+    public static bool Contains(sbyte value)
     {
         if (value < -1 || value > 1)
            return false;

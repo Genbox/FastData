@@ -32,12 +32,12 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
 
     private string GenerateUniqIf() =>
         $$"""
-              private{{cfg.GetModifier()}} readonly {{genCfg.DataType}}[] _entries = new {{genCfg.DataType}}[] {
+              private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
           {{JoinValues(ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()), RenderOne, ",\n")}}
               };
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.DataType}} value)
+              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{GetEarlyExit(genCfg.EarlyExits)}}
 
@@ -48,7 +48,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
     private string GenerateUniqSwitch() =>
         $$"""
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.DataType}} value)
+              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg, "value")}}
 
@@ -63,20 +63,20 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
 
     private string GenerateNormal() =>
         $$"""
-              private{{cfg.GetModifier()}} readonly {{genCfg.DataType}}[]?[] _entries = [
+              private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[]?[] _entries = [
           {{JoinValues(ctx.Lengths.Skip((int)ctx.MinLength).Take((int)(ctx.MaxLength - ctx.MinLength + 1)), RenderMany, ",\n")}}
               ];
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.DataType}} value)
+              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{GetEarlyExit(genCfg.EarlyExits)}}
-                  {{genCfg.DataType}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];
+                  {{genCfg.GetTypeName()}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];
 
                   if (bucket == null)
                       return false;
 
-                  foreach ({{genCfg.DataType}} str in bucket)
+                  foreach ({{genCfg.GetTypeName()}} str in bucket)
                   {
                       if ({{genCfg.GetEqualFunction("value", "str")}})
                           return true;

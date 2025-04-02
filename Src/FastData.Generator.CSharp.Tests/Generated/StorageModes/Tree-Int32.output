@@ -12,14 +12,14 @@ using System;
 
 internal static class MyData 
 {
-    private static Int32[] _entries = new Int32[] {
+    private static int[] _entries = new int[] {
         -1,
         0,
         1
     };
 
     
-    public static bool Contains(Int32 value)
+    public static bool Contains(int value)
     {
         if (value < -1 || value > 1)
            return false;

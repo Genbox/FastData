@@ -16,14 +16,14 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpGeneratorC
           {{JoinValues(ctx.Buckets, RenderBucket, ",\n")}}
               };
 
-              private{{cfg.GetModifier()}} readonly {{genCfg.DataType}}[] _items = {
+              private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[] _items = {
           {{JoinValues(ctx.Data, RenderItem, ",\n")}}
               };
 
               private{{cfg.GetModifier()}} readonly uint[] _hashCodes = { {{JoinValues(ctx.HashCodes, RenderHashCode)}} };
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.DataType}} value)
+              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg, "value")}}
 

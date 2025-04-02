@@ -12,14 +12,14 @@ using System;
 
 internal static class MyData 
 {
-    private static SByte[] _entries = new SByte[] {
+    private static sbyte[] _entries = new sbyte[] {
         -1,
         0,
         1
     };
 
     
-    public static bool Contains(SByte value)
+    public static bool Contains(sbyte value)
     {
         if (value < -1 || value > 1)
            return false;

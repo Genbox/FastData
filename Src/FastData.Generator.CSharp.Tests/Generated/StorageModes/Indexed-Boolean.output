@@ -20,7 +20,7 @@ internal static class MyData
     };
 
     
-    public static bool Contains(Boolean value)
+    public static bool Contains(bool value)
     {
 
 
@@ -49,9 +49,9 @@ internal static class MyData
     {
         public uint HashCode;
         public sbyte Next;
-        public Boolean Value;
+        public bool Value;
 
-        public Entry(uint hashCode, sbyte next, Boolean value)
+        public Entry(uint hashCode, sbyte next, bool value)
         {
             HashCode = hashCode;
             Next = next;

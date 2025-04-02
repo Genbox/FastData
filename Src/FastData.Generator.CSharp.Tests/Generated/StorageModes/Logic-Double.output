@@ -13,7 +13,7 @@ using System;
 internal static class MyData 
 {
     
-    public static bool Contains(Double value)
+    public static bool Contains(double value)
     {
         if (value < 0 || value > 2)
            return false;

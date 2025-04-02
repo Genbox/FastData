@@ -21,7 +21,7 @@ internal static class MyData
     };
 
     
-    public static bool Contains(UInt32 value)
+    public static bool Contains(uint value)
     {
         if (value < 0 || value > 2)
            return false;
@@ -51,9 +51,9 @@ internal static class MyData
     {
         public uint HashCode;
         public sbyte Next;
-        public UInt32 Value;
+        public uint Value;
 
-        public Entry(uint hashCode, sbyte next, UInt32 value)
+        public Entry(uint hashCode, sbyte next, uint value)
         {
             HashCode = hashCode;
             Next = next;
