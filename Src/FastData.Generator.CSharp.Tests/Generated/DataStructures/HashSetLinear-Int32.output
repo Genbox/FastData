@@ -12,46 +12,19 @@ using System;
 
 internal partial class MyData  : IFastSet<Int32>
 {
-    private readonly Bucket[] _buckets = {
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(1, 1),
-        new Bucket(2, 2),
-        new Bucket(3, 3),
-        new Bucket(4, 4),
-        new Bucket(5, 5),
-        new Bucket(6, 6),
-        new Bucket(7, 7),
-        new Bucket(8, 8),
-        new Bucket(9, 9),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0)
+    private readonly B[] _buckets = {
+        new B(0, 0), new B(0, 0), new B(1, 1), new B(2, 2), new B(3, 3), new B(4, 4), new B(5, 5), new B(6, 6), new B(7, 7), new B(8, 8), 
+        new B(9, 9), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), 
+        new B(0, 0), new B(0, 0), new B(0, 0)
     };
 
-    private readonly int[] _items = {
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
+    private readonly int[] _items = new int[] {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
     };
 
-    private readonly uint[] _hashCodes = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    private readonly uint[] _hashCodes = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    };
 
     
     public bool Contains(int value)
@@ -60,7 +33,7 @@ internal partial class MyData  : IFastSet<Int32>
            return false;
 
         uint hashCode = Hash(value);
-        ref Bucket b = ref _buckets[MathHelper.FastMod(hashCode, 23, 802032351030850071)];
+        ref B b = ref _buckets[MathHelper.FastMod(hashCode, 23, 802032351030850071)];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
@@ -80,9 +53,9 @@ internal partial class MyData  : IFastSet<Int32>
     public static uint Hash(Int32 value) => unchecked((uint)value);
 
     [StructLayout(LayoutKind.Auto)]
-    private struct Bucket
+    private struct B
     {
-        internal Bucket(byte startIndex, byte endIndex)
+        internal B(byte startIndex, byte endIndex)
         {
             StartIndex = startIndex;
             EndIndex = endIndex;

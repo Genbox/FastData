@@ -13,7 +13,7 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CSharpGeneratorCo
     public string Generate() =>
         $$"""
               private{{cfg.GetModifier()}} {{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
-          {{JoinValues(ctx.Data, Render, ",\n")}}
+          {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -39,6 +39,4 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CSharpGeneratorCo
                   return ((~lo) >= 0);
               }
           """;
-
-    private static void Render(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));
 }

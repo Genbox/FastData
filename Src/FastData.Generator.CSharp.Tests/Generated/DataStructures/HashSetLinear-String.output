@@ -12,70 +12,21 @@ using System;
 
 internal partial class MyData  : IFastSet<String>
 {
-    private readonly Bucket[] _buckets = {
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(1, 1),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(2, 2),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(3, 3),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(4, 4),
-        new Bucket(5, 5),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(6, 6),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(7, 7),
-        new Bucket(8, 8),
-        new Bucket(0, 0),
-        new Bucket(0, 0),
-        new Bucket(9, 9),
-        new Bucket(0, 0),
-        new Bucket(0, 0)
+    private readonly B[] _buckets = {
+        new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), 
+        new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(1, 1), new B(0, 0), new B(0, 0), new B(0, 0), new B(2, 2), new B(0, 0), 
+        new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), 
+        new B(3, 3), new B(0, 0), new B(0, 0), new B(4, 4), new B(5, 5), new B(0, 0), new B(0, 0), new B(6, 6), new B(0, 0), new B(0, 0), 
+        new B(7, 7), new B(8, 8), new B(0, 0), new B(0, 0), new B(9, 9), new B(0, 0), new B(0, 0)
     };
 
-    private readonly string[] _items = {
-        "item10",
-        "item9",
-        "item8",
-        "item7",
-        "item5",
-        "item6",
-        "item4",
-        "item2",
-        "item3",
-        "item1"
+    private readonly string[] _items = new string[] {
+        "item10", "item9", "item8", "item7", "item5", "item6", "item4", "item2", "item3", "item1"
     };
 
-    private readonly uint[] _hashCodes = { 1309368076, 2368213971, 802130030, 2818552665, 3981352079, 1252468724, 2415268138, 3578067552, 849184197, 2011983611 };
+    private readonly uint[] _hashCodes = {
+        1309368076, 2368213971, 802130030, 2818552665, 3981352079, 1252468724, 2415268138, 3578067552, 849184197, 2011983611
+    };
 
     
     public bool Contains(string value)
@@ -84,7 +35,7 @@ internal partial class MyData  : IFastSet<String>
            return false;
 
         uint hashCode = Hash(value);
-        ref Bucket b = ref _buckets[MathHelper.FastMod(hashCode, 47, 392483916461905354)];
+        ref B b = ref _buckets[MathHelper.FastMod(hashCode, 47, 392483916461905354)];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
@@ -104,9 +55,9 @@ internal partial class MyData  : IFastSet<String>
     public static uint Hash(String value) => HashHelper.HashString(value);
 
     [StructLayout(LayoutKind.Auto)]
-    private struct Bucket
+    private struct B
     {
-        internal Bucket(byte startIndex, byte endIndex)
+        internal B(byte startIndex, byte endIndex)
         {
             StartIndex = startIndex;
             EndIndex = endIndex;

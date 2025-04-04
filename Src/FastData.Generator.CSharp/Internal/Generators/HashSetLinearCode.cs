@@ -12,15 +12,17 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpGeneratorC
 {
     public string Generate() =>
         $$"""
-              private{{cfg.GetModifier()}} readonly Bucket[] _buckets = {
-          {{JoinValues(ctx.Buckets, RenderBucket, ",\n")}}
+              private{{cfg.GetModifier()}} readonly B[] _buckets = {
+          {{FormatColumns(ctx.Buckets, RenderBucket)}}
               };
 
-              private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[] _items = {
-          {{JoinValues(ctx.Data, RenderItem, ",\n")}}
+              private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[] _items = new {{genCfg.GetTypeName()}}[] {
+          {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
-              private{{cfg.GetModifier()}} readonly uint[] _hashCodes = { {{JoinValues(ctx.HashCodes, RenderHashCode)}} };
+              private{{cfg.GetModifier()}} readonly uint[] _hashCodes = {
+          {{FormatColumns(ctx.HashCodes, static (sb, obj) => sb.Append(obj))}}
+              };
 
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
@@ -28,10 +30,10 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpGeneratorC
           {{cfg.GetEarlyExits(genCfg, "value")}}
 
                   uint hashCode = Hash(value);
-                  ref Bucket b = ref _buckets[{{cfg.GetModFunction("hashCode", (uint)ctx.Buckets.Length)}}];
+                  ref B b = ref _buckets[{{cfg.GetModFunction("hashCode", (uint)ctx.Buckets.Length)}}];
 
-                  {{GetIndexType(ctx.Data.Length)}} index = b.StartIndex;
-                  {{GetIndexType(ctx.Data.Length)}} endIndex = b.EndIndex;
+                  {{GetSmallestUnsignedType(ctx.Data.Length)}} index = b.StartIndex;
+                  {{GetSmallestUnsignedType(ctx.Data.Length)}} endIndex = b.EndIndex;
 
                   while (index <= endIndex)
                   {
@@ -47,27 +49,18 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpGeneratorC
           {{genCfg.GetHashSource(false)}}
 
               [StructLayout(LayoutKind.Auto)]
-              private struct Bucket
+              private struct B
               {
-                  internal Bucket({{GetIndexType(ctx.Data.Length)}} startIndex, {{GetIndexType(ctx.Data.Length)}} endIndex)
+                  internal B({{GetSmallestUnsignedType(ctx.Data.Length)}} startIndex, {{GetSmallestUnsignedType(ctx.Data.Length)}} endIndex)
                   {
                       StartIndex = startIndex;
                       EndIndex = endIndex;
                   }
 
-                  internal {{GetIndexType(ctx.Data.Length)}} StartIndex;
-                  internal {{GetIndexType(ctx.Data.Length)}} EndIndex;
+                  internal {{GetSmallestUnsignedType(ctx.Data.Length)}} StartIndex;
+                  internal {{GetSmallestUnsignedType(ctx.Data.Length)}} EndIndex;
               }
           """;
 
-    private static string GetIndexType(int itemCount) => itemCount switch
-    {
-        <= byte.MaxValue => "byte",
-        <= ushort.MaxValue => "ushort",
-        _ => "uint"
-    };
-
-    private static void RenderBucket(StringBuilder sb, HashSetBucket obj) => sb.Append("        new Bucket(").Append(obj.StartIndex).Append(", ").Append(obj.EndIndex).Append(')');
-    private static void RenderItem(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));
-    private static void RenderHashCode(StringBuilder sb, uint obj) => sb.Append(obj);
+    private static void RenderBucket(StringBuilder sb, HashSetBucket x) => sb.Append("new B(").Append(x.StartIndex).Append(", ").Append(x.EndIndex).Append(')');
 }

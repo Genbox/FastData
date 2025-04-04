@@ -13,8 +13,7 @@ using System;
 internal static class MyData 
 {
     private static bool[] _entries = new bool[] {
-        true,
-        false
+        true, false
     };
 
     

@@ -12,10 +12,10 @@ using System;
 
 internal partial class MyData  : IFastSet<String>
 {
-    private readonly string[]?[] _entries = [
-        ["item1","item2","item3","item4","item5","item6","item7","item8","item9"],
-        ["item10"]
-    ];
+    private readonly string[]?[] _entries = new string[]?[] {
+        new [] {"item1","item2","item3","item4","item5","item6","item7","item8","item9"},
+        new [] {"item10"}
+    };
 
     
     public bool Contains(string value)

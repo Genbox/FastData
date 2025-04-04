@@ -12,17 +12,8 @@ using System;
 
 internal partial class MyData  : IFastSet<String>
 {
-    private Entry[] _entries = new Entry[] {
-        new Entry("item6", 859875200u),
-        new Entry("item5", 2425959141u),
-        new Entry("item4", 3992043082u),
-        new Entry("item1", 100360313u),
-        new Entry("item8", 1310213894u),
-        new Entry("item7", 3588758555u),
-        new Entry("item10", 2477118126u),
-        new Entry("item3", 1263159727u),
-        new Entry("item2", 2829243668u),
-        new Entry("item9", 4039097249u)
+    private E[] _entries = {
+        new E("item6", 859875200), new E("item5", 2425959141), new E("item4", 3992043082), new E("item1", 100360313), new E("item8", 1310213894), new E("item7", 3588758555), new E("item10", 2477118126), new E("item3", 1263159727), new E("item2", 2829243668), new E("item9", 4039097249)
     };
 
     
@@ -33,7 +24,7 @@ internal partial class MyData  : IFastSet<String>
 
         uint hash = Hash(value, 2);
         uint index = MathHelper.FastMod(hash, 10, 1844674407370955162);
-        ref Entry entry = ref _entries[index];
+        ref E entry = ref _entries[index];
 
         return hash == entry.HashCode && StringComparer.Ordinal.Equals(value, entry.Value);
     }
@@ -42,16 +33,16 @@ internal partial class MyData  : IFastSet<String>
     public static uint Hash(String value, uint seed) => HashHelper.HashStringSeed(value, seed);
 
     [StructLayout(LayoutKind.Auto)]
-    private struct Entry
+    private struct E
     {
-        public Entry(string value, uint hashCode)
+        internal E(string value, uint hashCode)
         {
             Value = value;
             HashCode = hashCode;
         }
 
-        public string Value;
-        public uint HashCode;
+        internal string Value;
+        internal uint HashCode;
     }
 
     public const int ItemCount = 10;

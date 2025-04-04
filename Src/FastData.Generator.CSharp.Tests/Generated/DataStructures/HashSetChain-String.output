@@ -12,19 +12,12 @@ using System;
 
 internal partial class MyData  : IFastSet<String>
 {
-    private readonly sbyte[] _buckets = { 8, 9, 2, 0, 6, 7, 10, 3, 4, 5 };
+    private readonly sbyte[] _buckets = new sbyte[] {
+        8, 9, 2, 0, 6, 7, 10, 3, 4, 5
+     };
 
-    private readonly Entry[] _entries = {
-        new Entry(2011983611, -1, "item1"),
-        new Entry(3578067552, -1, "item2"),
-        new Entry(849184197, -1, "item3"),
-        new Entry(2415268138, -1, "item4"),
-        new Entry(3981352079, -1, "item5"),
-        new Entry(1252468724, -1, "item6"),
-        new Entry(2818552665, -1, "item7"),
-        new Entry(802130030, -1, "item8"),
-        new Entry(2368213971, 0, "item9"),
-        new Entry(1309368076, -1, "item10")
+    private readonly E[] _entries = {
+        new E(2011983611, -1, "item1"), new E(3578067552, -1, "item2"), new E(849184197, -1, "item3"), new E(2415268138, -1, "item4"), new E(3981352079, -1, "item5"), new E(1252468724, -1, "item6"), new E(2818552665, -1, "item7"), new E(802130030, -1, "item8"), new E(2368213971, 0, "item9"), new E(1309368076, -1, "item10")
     };
 
     
@@ -39,7 +32,7 @@ internal partial class MyData  : IFastSet<String>
 
         while (i >= 0)
         {
-            ref Entry entry = ref _entries[i];
+            ref E entry = ref _entries[i];
 
             if (entry.HashCode == hashCode && StringComparer.Ordinal.Equals(entry.Value, value))
                 return true;
@@ -54,13 +47,13 @@ internal partial class MyData  : IFastSet<String>
     public static uint Hash(String value) => HashHelper.HashString(value);
 
     [StructLayout(LayoutKind.Auto)]
-    private struct Entry
+    private struct E
     {
-        public uint HashCode;
-        public sbyte Next;
-        public string Value;
+        internal uint HashCode;
+        internal sbyte Next;
+        internal string Value;
 
-        public Entry(uint hashCode, sbyte next, string value)
+        internal E(uint hashCode, sbyte next, string value)
         {
             HashCode = hashCode;
             Next = next;

@@ -13,9 +13,7 @@ using System;
 internal static class MyData 
 {
     private static char[] _entries = new char[] {
-        'a',
-        'b',
-        'c'
+        'a', 'b', 'c'
     };
 
     

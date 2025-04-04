@@ -12,10 +12,12 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
 {
     public string Generate() =>
         $$"""
-              private{{cfg.GetModifier()}} readonly {{GetIndexType(ctx.Data.Length)}}[] _buckets = { {{JoinValues(ctx.Buckets, RenderBucket)}} };
+              private{{cfg.GetModifier()}} readonly {{GetSmallestSignedType(ctx.Data.Length)}}[] _buckets = new {{GetSmallestSignedType(ctx.Data.Length)}}[] {
+          {{FormatColumns(ctx.Buckets, static (sb, x) => sb.Append(x))}}
+               };
 
-              private{{cfg.GetModifier()}} readonly Entry[] _entries = {
-          {{JoinValues(ctx.Entries, RenderEntry, ",\n")}}
+              private{{cfg.GetModifier()}} readonly E[] _entries = {
+          {{FormatColumns(ctx.Entries, RenderEntry)}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -25,11 +27,11 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
 
                   uint hashCode = Hash(value);
                   uint index = {{cfg.GetModFunction("hashCode", (uint)ctx.Buckets.Length)}};
-                  {{GetIndexType(ctx.Data.Length)}} i = ({{GetIndexType(ctx.Data.Length)}})(_buckets[index] - 1);
+                  {{GetSmallestSignedType(ctx.Data.Length)}} i = ({{GetSmallestSignedType(ctx.Data.Length)}})(_buckets[index] - 1);
 
                   while (i >= 0)
                   {
-                      ref Entry entry = ref _entries[i];
+                      ref E entry = ref _entries[i];
 
                       if (entry.HashCode == hashCode && {{genCfg.GetEqualFunction("entry.Value", "value")}})
                           return true;
@@ -43,13 +45,13 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
           {{genCfg.GetHashSource(false)}}
 
               [StructLayout(LayoutKind.Auto)]
-              private struct Entry
+              private struct E
               {
-                  public uint HashCode;
-                  public {{GetIndexType(ctx.Data.Length)}} Next;
-                  public {{genCfg.GetTypeName()}} Value;
+                  internal uint HashCode;
+                  internal {{GetSmallestSignedType(ctx.Data.Length)}} Next;
+                  internal {{genCfg.GetTypeName()}} Value;
 
-                  public Entry(uint hashCode, {{GetIndexType(ctx.Data.Length)}} next, {{genCfg.GetTypeName()}} value)
+                  internal E(uint hashCode, {{GetSmallestSignedType(ctx.Data.Length)}} next, {{genCfg.GetTypeName()}} value)
                   {
                       HashCode = hashCode;
                       Next = next;
@@ -58,14 +60,5 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
               }
           """;
 
-    private static string GetIndexType(int itemCount) => itemCount switch
-    {
-        // We have to use signed types because -1 means unmapped
-        <= sbyte.MaxValue => "sbyte",
-        <= short.MaxValue => "short",
-        _ => "int"
-    };
-
-    private static void RenderBucket(StringBuilder sb, int obj) => sb.Append(obj);
-    private static void RenderEntry(StringBuilder sb, HashSetEntry obj) => sb.Append("        new Entry(").Append(obj.Hash).Append(", ").Append(obj.Next).Append(", ").Append(ToValueLabel(obj.Value)).Append(')');
+    private static void RenderEntry(StringBuilder sb, HashSetEntry x) => sb.Append("new E(").Append(x.Hash).Append(", ").Append(x.Next).Append(", ").Append(ToValueLabel(x.Value)).Append(')');
 }

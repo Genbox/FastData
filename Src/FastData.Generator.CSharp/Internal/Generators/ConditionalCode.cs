@@ -24,7 +24,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorCon
               {
           {{cfg.GetEarlyExits(genCfg, "value")}}
 
-                  if ({{JoinValues(ctx.Data, (x, y) => Render(genCfg, x, y), " || ")}})
+                  if ({{FormatList(ctx.Data, (x, y) => Render(genCfg, x, y), " || ")}})
                       return true;
 
                   return false;
@@ -40,7 +40,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorCon
 
                   switch (value)
                   {
-          {{JoinValues(ctx.Data, Render, "\n")}}
+          {{FormatList(ctx.Data, Render, "\n")}}
                           return true;
                       default:
                           return false;

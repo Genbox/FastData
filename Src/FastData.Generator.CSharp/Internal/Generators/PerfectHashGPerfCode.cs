@@ -12,12 +12,12 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
 {
     public string Generate() =>
         $$"""
-              private{{cfg.GetModifier()}} {{SmallestType(ctx.MaxHash + 1)}}[] _assoValues = new {{SmallestType(ctx.MaxHash + 1)}}[] {
-          {{JoinValues(ctx.AssociationValues, RenderAsso)}}
+              private{{cfg.GetModifier()}} {{GetSmallestSignedType(ctx.MaxHash + 1)}}[] _asso = new {{GetSmallestSignedType(ctx.MaxHash + 1)}}[] {
+          {{FormatColumns(ctx.AssociationValues, RenderAsso, 8)}}
               };
 
-              private{{cfg.GetModifier()}} string[] _wordlist = new string[] {
-          {{RenderWords(ctx.Items)}}
+              private{{cfg.GetModifier()}} string[] _items = {
+          {{FormatColumns(WrapWords(ctx.Items), (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -25,19 +25,17 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
               {
           {{cfg.GetEarlyExits(genCfg, "value")}}
                   uint key = hash(value);
-                  return _wordlist[key] == value;
+                  return {{genCfg.GetEqualFunction("_items[key]", "value")}};
               }
 
               public uint hash(string str)
               {
-                  return (uint)({{JoinValues(ctx.Positions, RenderPositions, "&&")}});
+                  return (uint)({{FormatList(ctx.Positions, RenderPositions, "&&")}});
               }
           """;
 
-    private static string RenderWords(KeyValuePair<string, uint>[] items)
+    private static IEnumerable<string?> WrapWords(KeyValuePair<string, uint>[] items)
     {
-        StringBuilder sb = new StringBuilder();
-
         uint index = 0;
         foreach (KeyValuePair<string, uint> pair in items)
         {
@@ -46,16 +44,14 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
                 uint count = pair.Value - index;
 
                 while (count-- != 0)
-                    sb.Append("\"\",");
+                    yield return null;
 
                 index = pair.Value;
             }
 
-            sb.Append($"\"{pair.Key}\",");
-
+            yield return pair.Key;
             index++;
         }
-        return sb.ToString();
     }
 
     private static void RenderAsso(StringBuilder sb, int value) => sb.Append(value.ToString(NumberFormatInfo.InvariantInfo));
@@ -63,13 +59,8 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
     private static void RenderPositions(StringBuilder sb, int position)
     {
         if (position == -1)
-            sb.Append("_assoValues[str[str.Length -1]]");
+            sb.Append("_asso[str[str.Length -1]]");
         else
-            sb.Append("_assoValues[str[" + position + "]]");
+            sb.Append("_asso[str[" + position + "]]");
     }
-
-    private static string SmallestType(int max) => max switch
-    {
-        _ => "int"
-    };
 }

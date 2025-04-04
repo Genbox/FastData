@@ -13,9 +13,7 @@ using System;
 internal static class MyData 
 {
     private static int[] _entries = new int[] {
-        -1,
-        0,
-        1
+        -1, 0, 1
     };
 
     

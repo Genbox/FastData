@@ -13,9 +13,7 @@ using System;
 internal static class MyData 
 {
     private static short[] _entries = new short[] {
-        -1,
-        0,
-        1
+        -1, 0, 1
     };
 
     

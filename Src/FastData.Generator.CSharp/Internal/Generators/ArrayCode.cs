@@ -13,7 +13,7 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CSharpGeneratorConfig cf
     public string Generate() =>
         $$"""
               private{{cfg.GetModifier()}} {{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
-          {{JoinValues(ctx.Data, Render, ",\n")}}
+          {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -29,6 +29,4 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CSharpGeneratorConfig cf
                   return false;
               }
           """;
-
-    private static void Render(StringBuilder sb, object obj) => sb.Append("        ").Append(ToValueLabel(obj));
 }

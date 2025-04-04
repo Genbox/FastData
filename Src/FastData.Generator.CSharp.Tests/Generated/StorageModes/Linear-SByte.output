@@ -13,9 +13,7 @@ using System;
 internal static class MyData 
 {
     private static sbyte[] _entries = new sbyte[] {
-        -1,
-        0,
-        1
+        -1, 0, 1
     };
 
     

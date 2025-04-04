@@ -12,12 +12,12 @@ using System;
 
 internal static class MyData 
 {
-    private static readonly sbyte[] _buckets = { 2, 3, 0 };
+    private static readonly sbyte[] _buckets = new sbyte[] {
+        2, 3, 0
+     };
 
-    private static readonly Entry[] _entries = {
-        new Entry(0, -1, 0),
-        new Entry(1072693248, 0, 1),
-        new Entry(1073741824, -1, 2)
+    private static readonly E[] _entries = {
+        new E(0, -1, 0), new E(1072693248, 0, 1), new E(1073741824, -1, 2)
     };
 
     
@@ -32,7 +32,7 @@ internal static class MyData
 
         while (i >= 0)
         {
-            ref Entry entry = ref _entries[i];
+            ref E entry = ref _entries[i];
 
             if (entry.HashCode == hashCode && entry.Value.Equals(value))
                 return true;
@@ -47,13 +47,13 @@ internal static class MyData
     public static uint Hash(Double value) => unchecked((uint)(value.GetHashCode()));
 
     [StructLayout(LayoutKind.Auto)]
-    private struct Entry
+    private struct E
     {
-        public uint HashCode;
-        public sbyte Next;
-        public double Value;
+        internal uint HashCode;
+        internal sbyte Next;
+        internal double Value;
 
-        public Entry(uint hashCode, sbyte next, double value)
+        internal E(uint hashCode, sbyte next, double value)
         {
             HashCode = hashCode;
             Next = next;

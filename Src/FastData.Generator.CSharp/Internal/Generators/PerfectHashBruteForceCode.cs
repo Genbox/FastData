@@ -11,8 +11,8 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpGe
 {
     public string Generate() =>
         $$"""
-              private{{cfg.GetModifier()}} Entry[] _entries = new Entry[] {
-          {{JoinValues(ctx.Data, Render, ",\n")}}
+              private{{cfg.GetModifier()}} E[] _entries = {
+          {{FormatColumns(ctx.Data, Render)}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -22,7 +22,7 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpGe
 
                   uint hash = Hash(value, {{ctx.Seed}});
                   uint index = {{cfg.GetModFunction("hash", (uint)ctx.Data.Length)}};
-                  ref Entry entry = ref _entries[index];
+                  ref E entry = ref _entries[index];
 
                   return hash == entry.HashCode && {{genCfg.GetEqualFunction("value", "entry.Value")}};
               }
@@ -30,18 +30,18 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpGe
           {{genCfg.GetHashSource(true)}}
 
               [StructLayout(LayoutKind.Auto)]
-              private struct Entry
+              private struct E
               {
-                  public Entry({{genCfg.GetTypeName()}} value, uint hashCode)
+                  internal E({{genCfg.GetTypeName()}} value, uint hashCode)
                   {
                       Value = value;
                       HashCode = hashCode;
                   }
 
-                  public {{genCfg.GetTypeName()}} Value;
-                  public uint HashCode;
+                  internal {{genCfg.GetTypeName()}} Value;
+                  internal uint HashCode;
               }
           """;
 
-    private static void Render(StringBuilder sb, KeyValuePair<object, uint> obj) => sb.Append("        new Entry(").Append(ToValueLabel(obj.Key)).Append(", ").Append(obj.Value).Append("u)");
+    private static void Render(StringBuilder sb, KeyValuePair<object, uint> obj) => sb.Append("new E(").Append(ToValueLabel(obj.Key)).Append(", ").Append(ToValueLabel(obj.Value)).Append(')');
 }

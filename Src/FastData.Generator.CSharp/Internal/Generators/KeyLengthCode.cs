@@ -33,7 +33,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
     private string GenerateUniqIf() =>
         $$"""
               private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
-          {{JoinValues(ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()), RenderOne, ",\n")}}
+          {{FormatColumns(ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()), RenderOne)}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -63,9 +63,9 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
 
     private string GenerateNormal() =>
         $$"""
-              private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[]?[] _entries = [
-          {{JoinValues(ctx.Lengths.Skip((int)ctx.MinLength).Take((int)(ctx.MaxLength - ctx.MinLength + 1)), RenderMany, ",\n")}}
-              ];
+              private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[]?[] _entries = new {{genCfg.GetTypeName()}}[]?[] {
+          {{FormatList(ctx.Lengths.Skip((int)ctx.MinLength).Take((int)(ctx.MaxLength - ctx.MinLength + 1)), RenderMany, ",\n")}}
+              };
 
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
@@ -119,19 +119,13 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
         throw new InvalidOperationException("No early exits were found. They are required for UniqueKeyLength");
     }
 
-    private static void RenderOne(StringBuilder sb, string? obj)
-    {
-        if (obj == null)
-            sb.Append("        null");
-        else
-            sb.Append("        ").Append(ToValueLabel(obj));
-    }
+    private static void RenderOne(StringBuilder sb, string? x) => sb.Append(ToValueLabel(x));
 
-    private static void RenderMany(StringBuilder sb, List<string>? obj)
+    private static void RenderMany(StringBuilder sb, List<string>? x)
     {
-        if (obj == null)
+        if (x == null)
             sb.Append("        null");
         else
-            sb.Append("        [").Append(string.Join(",", obj.Select(ToValueLabel))).Append(']');
+            sb.Append("        new [] {").Append(string.Join(",", x.Select(ToValueLabel))).Append('}');
     }
 }

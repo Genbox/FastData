@@ -13,16 +13,7 @@ using System;
 internal partial class MyData  : IFastSet<String>
 {
     private string[] _entries = new string[] {
-        "item6",
-        "item3",
-        "item8",
-        "item10",
-        "item5",
-        "item7",
-        "item9",
-        "item1",
-        "item2",
-        "item4"
+        "item6", "item3", "item8", "item10", "item5", "item7", "item9", "item1", "item2", "item4"
     };
 
     

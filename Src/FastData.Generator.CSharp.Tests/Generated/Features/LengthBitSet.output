@@ -12,13 +12,12 @@ using System;
 
 internal static class MyData 
 {
-    private static readonly sbyte[] _buckets = { 4, 0, 0, 3 };
+    private static readonly sbyte[] _buckets = new sbyte[] {
+        4, 0, 0, 3
+     };
 
-    private static readonly Entry[] _entries = {
-        new Entry(972181027, -1, "a"),
-        new Entry(3645924380, -1, "aaa"),
-        new Entry(3844005527, 0, "aaaaa"),
-        new Entry(3612615712, 1, "aaaaaaa")
+    private static readonly E[] _entries = {
+        new E(972181027, -1, "a"), new E(3645924380, -1, "aaa"), new E(3844005527, 0, "aaaaa"), new E(3612615712, 1, "aaaaaaa")
     };
 
     
@@ -33,7 +32,7 @@ internal static class MyData
 
         while (i >= 0)
         {
-            ref Entry entry = ref _entries[i];
+            ref E entry = ref _entries[i];
 
             if (entry.HashCode == hashCode && StringComparer.Ordinal.Equals(entry.Value, value))
                 return true;
@@ -48,13 +47,13 @@ internal static class MyData
     public static uint Hash(String value) => HashHelper.HashString(value);
 
     [StructLayout(LayoutKind.Auto)]
-    private struct Entry
+    private struct E
     {
-        public uint HashCode;
-        public sbyte Next;
-        public string Value;
+        internal uint HashCode;
+        internal sbyte Next;
+        internal string Value;
 
-        public Entry(uint hashCode, sbyte next, string value)
+        internal E(uint hashCode, sbyte next, string value)
         {
             HashCode = hashCode;
             Next = next;
