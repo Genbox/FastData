@@ -1,4 +1,5 @@
 using Genbox.FastData.Generator.CSharp.Enums;
+using Genbox.FastData.Generator.Enums;
 
 namespace Genbox.FastData.Generator.CSharp;
 

@@ -2,6 +2,8 @@ namespace Genbox.FastData.Enums;
 
 public enum DataStructure : byte
 {
+    Auto = 0,
+
     // We always need something to represent a single value
     SingleValue,
 

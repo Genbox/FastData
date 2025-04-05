@@ -8,6 +8,7 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.CSharp.Shared;
+using Genbox.FastData.Generator.Enums;
 using Genbox.FastFilter;
 
 namespace Genbox.FastData.Generator.CSharp.Benchmarks.Benchmarks;
@@ -47,17 +48,18 @@ public class DataStructureBenchmarks
     [Params(10_000)]
     public int QuerySize { get; set; }
 
-    private IFastSet<string> CreateFastData(DataStructure ds, object[] data, Action<CSharpGeneratorConfig>? configure = null)
+    private static IFastSet<string> CreateFastData(DataStructure ds, object[] data, Action<CSharpGeneratorConfig>? configure = null)
     {
-        FastDataConfig config = new FastDataConfig(ds.ToString(), data);
+        FastDataConfig config = new FastDataConfig(ds.ToString(), data, ds);
 
         CSharpGeneratorConfig generatorConfig = new CSharpGeneratorConfig();
         generatorConfig.ClassType = ClassType.Instance;
         configure?.Invoke(generatorConfig);
 
-        string code = FastDataGenerator.Generate(ds, config, new CSharpCodeGenerator(generatorConfig));
+        if (!FastDataGenerator.TryGenerate(config, new CSharpCodeGenerator(generatorConfig), out string? source))
+            throw new InvalidOperationException("Unable to create data structure: " + ds);
 
-        return CodeGenerator.CreateFastSet<string>(code, true);
+        return CodeGenerator.CreateFastSet<string>(source, true);
     }
 
     private void SetupQueries()

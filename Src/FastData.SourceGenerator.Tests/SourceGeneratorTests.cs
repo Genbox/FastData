@@ -4,6 +4,9 @@ namespace Genbox.FastData.SourceGenerator.Tests;
 
 public class SourceGeneratorTests
 {
+    // C# attributes are limited constants of the types included in .NET runtime.
+    // For details, see https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/attributes#2224-attribute-parameter-types
+
     [Fact]
     public void GenericTest()
     {

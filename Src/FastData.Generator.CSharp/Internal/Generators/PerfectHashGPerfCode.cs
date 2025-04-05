@@ -4,7 +4,6 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Generator.CSharp.Internal.Extensions;
 using Genbox.FastData.Models;
-using static Genbox.FastData.Generator.CSharp.Internal.Helpers.CodeHelper;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
@@ -17,21 +16,23 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
               };
 
               private{{cfg.GetModifier()}} string[] _items = {
-          {{FormatColumns(WrapWords(ctx.Items), (sb, x) => sb.Append(ToValueLabel(x)))}}
+          {{FormatColumns(WrapWords(ctx.Items), static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg, "value")}}
-                  uint key = hash(value);
+
+                  uint key = Hash(value);
+
+                  if (key > {{ctx.MaxHash.ToString(NumberFormatInfo.InvariantInfo)}})
+                      return false;
+
                   return {{genCfg.GetEqualFunction("_items[key]", "value")}};
               }
 
-              public uint hash(string str)
-              {
-                  return (uint)({{FormatList(ctx.Positions, RenderPositions, "&&")}});
-              }
+              private {{cfg.GetModifier()}} uint Hash(string str) => (uint)({{FormatList(ctx.Positions, RenderPositions, " + ")}});
           """;
 
     private static IEnumerable<string?> WrapWords(KeyValuePair<string, uint>[] items)
@@ -59,8 +60,8 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
     private static void RenderPositions(StringBuilder sb, int position)
     {
         if (position == -1)
-            sb.Append("_asso[str[str.Length -1]]");
+            sb.Append("_asso[str[str.Length - 1]]");
         else
-            sb.Append("_asso[str[" + position + "]]");
+            sb.Append("_asso[str[").Append(position).Append("]]");
     }
 }

@@ -1,8 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
 using Genbox.FastData.Configs;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 using Genbox.FastData.Generator.CSharp.Benchmarks.Code;
 using Genbox.FastData.Generator.CSharp.Enums;
@@ -17,8 +15,6 @@ namespace Genbox.FastData.Generator.CSharp.Benchmarks.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByMethod)]
 [HideColumns("set", "Method")]
-[SuppressMessage("Performance", "CA1822:Mark members as static")]
-[SuppressMessage("Maintainability", "CA1515:Consider making public types internal")]
 public class AutoStringBenchmarks
 {
     /* ## Test cases ##
@@ -86,17 +82,11 @@ public class AutoStringBenchmarks
         for (int i = 0; i < size; i++)
             data[i] = new string('a', i + 1);
 
-        foreach (StorageMode mode in Enum.GetValues<StorageMode>())
-        {
-            FastDataConfig cfg = new FastDataConfig("MyData", data);
-            cfg.StorageMode = mode;
+        CSharpGeneratorConfig genCfg = new CSharpGeneratorConfig();
+        genCfg.ClassType = ClassType.Instance;
 
-            CSharpGeneratorConfig genCfg = new CSharpGeneratorConfig();
-            genCfg.ClassType = ClassType.Instance;
-
-            string code = FastDataGenerator.Generate(cfg, new CSharpCodeGenerator(genCfg));
-            yield return [CodeGenerator.CreateFastSet<string>(code, true), mode, size];
-        }
+        FastDataGenerator.TryGenerate(new FastDataConfig("MyData", data), new CSharpCodeGenerator(genCfg), out string? source);
+        yield return [CodeGenerator.CreateFastSet<string>(source, true), "Auto", size];
 
         //We have to do this as the source generator only works on object[], but these work on string[]
         string[] strData = data.Cast<string>().ToArray();

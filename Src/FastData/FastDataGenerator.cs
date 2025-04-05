@@ -15,17 +15,18 @@ namespace Genbox.FastData;
 
 public static class FastDataGenerator
 {
-    public static string Generate(FastDataConfig config, IGenerator generator)
+    public static bool TryGenerate(FastDataConfig config, IGenerator generator, out string? source)
     {
         PreProcess(config, out KnownDataType dataType, out DataProperties props, out IEarlyExit[] exits);
 
         foreach (object candidate in GetDataStructureCandidates(config))
         {
-            if (TryProcessCandidate(candidate, props, exits, dataType, generator, config, out string? code))
-                return code!;
+            if (TryProcessCandidate(candidate, props, exits, dataType, generator, config, out source))
+                return true;
         }
 
-        throw new InvalidOperationException("This should not happen");
+        source = null;
+        return false;
     }
 
     private static void PreProcess(FastDataConfig config, out KnownDataType dataType, out DataProperties props, out IEarlyExit[] exits)
@@ -61,73 +62,51 @@ public static class FastDataGenerator
 
     private static IEnumerable<object> GetDataStructureCandidates(FastDataConfig config)
     {
-        //No matter the StorageMode, if there is only a single item, we will use the same data structure
-        if (config.Data.Length == 1)
-            yield return new SingleValueStructure();
-        else
+        DataStructure ds = config.DataStructure;
+
+        if (ds == DataStructure.Auto)
         {
-            switch (config.StorageMode)
+            if (config.Data.Length == 1)
+                yield return new SingleValueStructure();
+            else
             {
-                case StorageMode.Auto:
+                // For small amounts of data, logic is the fastest, so we try that first
+                yield return new ConditionalStructure();
 
-                    // For small amounts of data, logic is the fastest, so we try that first
-                    yield return new ConditionalStructure();
+                // We try key lengths
+                yield return new KeyLengthStructure();
 
-                    // We try key lengths
-                    yield return new KeyLengthStructure();
+                if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory) && config.StorageOptions.HasFlag(StorageOption.OptimizeForSpeed))
+                    yield return new PerfectHashBruteForceStructure();
 
-                    if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory) && config.StorageOptions.HasFlag(StorageOption.OptimizeForSpeed))
-                        yield return new PerfectHashBruteForceStructure();
-
-                    if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
-                        yield return new BinarySearchStructure();
-                    else
-                        yield return new HashSetChainStructure();
-
-                    break;
-                case StorageMode.Linear:
-                    yield return new ArrayStructure();
-                    break;
-                case StorageMode.Logic:
-                    yield return new ConditionalStructure();
-                    break;
-                case StorageMode.Tree:
+                if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
                     yield return new BinarySearchStructure();
-                    break;
-                case StorageMode.Indexed:
+                else
                     yield return new HashSetChainStructure();
-                    break;
-
-                default:
-                    throw new InvalidOperationException($"Unsupported StorageMode {config.StorageMode}");
             }
         }
-    }
-
-    /// <summary>This method is used by tests</summary>
-    public static string Generate(DataStructure ds, FastDataConfig config, IGenerator generator)
-    {
-        PreProcess(config, out KnownDataType dataType, out DataProperties props, out IEarlyExit[] exits);
-
-        object candidate = ds switch
-        {
-            DataStructure.SingleValue => new SingleValueStructure(),
-            DataStructure.Array => new ArrayStructure(),
-            DataStructure.Conditional => new ConditionalStructure(),
-            DataStructure.BinarySearch => new BinarySearchStructure(),
-            DataStructure.EytzingerSearch => new EytzingerSearchStructure(),
-            DataStructure.PerfectHashGPerf => new PerfectHashGPerfStructure(),
-            DataStructure.PerfectHashBruteForce => new PerfectHashBruteForceStructure(),
-            DataStructure.HashSetChain => new HashSetChainStructure(),
-            DataStructure.HashSetLinear => new HashSetLinearStructure(),
-            DataStructure.KeyLength => new KeyLengthStructure(),
-            _ => throw new ArgumentOutOfRangeException(nameof(ds), ds, null)
-        };
-
-        if (!TryProcessCandidate(candidate, props, exits, dataType, generator, config, out string? code))
-            throw new InvalidOperationException("This should not happen");
-
-        return code!;
+        else if (ds == DataStructure.SingleValue)
+            yield return new SingleValueStructure();
+        else if (ds == DataStructure.Array)
+            yield return new ArrayStructure();
+        else if (ds == DataStructure.Conditional)
+            yield return new ConditionalStructure();
+        else if (ds == DataStructure.BinarySearch)
+            yield return new BinarySearchStructure();
+        else if (ds == DataStructure.EytzingerSearch)
+            yield return new EytzingerSearchStructure();
+        else if (ds == DataStructure.PerfectHashGPerf)
+            yield return new PerfectHashGPerfStructure();
+        else if (ds == DataStructure.PerfectHashBruteForce)
+            yield return new PerfectHashBruteForceStructure();
+        else if (ds == DataStructure.HashSetChain)
+            yield return new HashSetChainStructure();
+        else if (ds == DataStructure.HashSetLinear)
+            yield return new HashSetLinearStructure();
+        else if (ds == DataStructure.KeyLength)
+            yield return new KeyLengthStructure();
+        else
+            throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
 
     private static DataProperties GetDataProperties(object[] data, KnownDataType dataType)

@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FastData\FastData.csproj" />
+    <ProjectReference Include="..\FastData.Generator\FastData.Generator.csproj" />
   </ItemGroup>
 
 </Project>

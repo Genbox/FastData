@@ -9,10 +9,10 @@ internal static class Program
     private static void Main()
     {
         FastDataConfig config = new FastDataConfig("MyData", ["item1", "item2"]);
-        string code = FastDataGenerator.Generate(config, new CSharpCodeGenerator(new CSharpGeneratorConfig
-        {
-            ClassType = ClassType.Static
-        }));
-        Console.WriteLine(code);
+
+        if (!FastDataGenerator.TryGenerate(config, new CSharpCodeGenerator(new CSharpGeneratorConfig()), out string? source))
+            Console.WriteLine("Failed to generate source code");
+
+        Console.WriteLine(source);
     }
 }
