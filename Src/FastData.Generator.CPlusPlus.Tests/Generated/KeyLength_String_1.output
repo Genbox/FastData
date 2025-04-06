@@ -1,0 +1,21 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class KeyLength_String_1
+{
+    inline static const std::array<std::string, 1> entries = {
+        "value"
+    };
+
+public:
+    static bool contains(const std::string& value)
+    {
+       if (const size_t len = value.length(); len != 5)
+           return false;
+
+        return value == entries[value.length() - 5];
+    }
+
+    static constexpr int item_count = 1;
+};

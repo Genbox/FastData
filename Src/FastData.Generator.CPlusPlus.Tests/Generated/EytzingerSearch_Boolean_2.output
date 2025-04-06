@@ -1,0 +1,34 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class EytzingerSearch_Boolean_2
+{
+    inline static const std::array<bool, 2> entries = {
+        true, false
+    };
+
+public:
+    static bool contains(const bool& value)
+    {
+
+
+        unsigned int i = 0;
+        while (i < entries.size())
+        {
+            const int comparison = entries[i].compare(value);
+
+            if (comparison == 0)
+                return true;
+
+            if (comparison < 0)
+                i = 2 * i + 2;
+            else
+                i = 2 * i + 1;
+        }
+
+        return false;
+    }
+
+    static constexpr int item_count = 2;
+};

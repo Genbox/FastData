@@ -1,0 +1,36 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class BinarySearch_SByte_3
+{
+    inline static const std::array<int8_t, 3> entries = {
+        -1, 0, 1
+    };
+
+public:
+    static bool contains(const int8_t& value)
+    {
+        if (const size_t len = value.length(); len < -1 || len > 1)
+            return false;
+
+        int lo = 0;
+        int hi = 2;
+        while (lo <= hi)
+        {
+            const int i = lo + ((hi - lo) >> 1);
+            const int order = entries[i].compare(value);
+
+            if (order == 0)
+                return true;
+            if (order < 0)
+                lo = i + 1;
+            else
+                hi = i - 1;
+        }
+
+        return ((~lo) >= 0);
+    }
+
+    static constexpr int item_count = 3;
+};

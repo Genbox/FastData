@@ -1,0 +1,19 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class Conditional_Boolean_2
+{
+public:
+    static bool contains(const bool& value)
+    {
+
+
+        if (value == true || value == false)
+            return true;
+
+        return false;
+    }
+
+    static constexpr int item_count = 2;
+};

@@ -1,0 +1,26 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class Array_UInt16_3
+{
+    inline static const std::array<uint16_t, 3> entries = {
+        0, 1, 2
+    };
+
+public:
+    static bool contains(const uint16_t& value)
+    {
+        if (const size_t len = value.length(); len < 0 || len > 2)
+            return false;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (value == entries[i])
+               return true;
+        }
+        return false;
+    }
+
+    static constexpr int item_count = 3;
+};

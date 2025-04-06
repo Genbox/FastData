@@ -1,0 +1,14 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class SingleValue_Double_1
+{
+public:
+    static bool contains(const double& value)
+    {
+        return value == 1;
+    }
+
+    static constexpr int item_count = 1;
+};

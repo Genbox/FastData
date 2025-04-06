@@ -1,0 +1,14 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class SingleValue_Int64_1
+{
+public:
+    static bool contains(const int64_t& value)
+    {
+        return value == 1;
+    }
+
+    static constexpr int item_count = 1;
+};

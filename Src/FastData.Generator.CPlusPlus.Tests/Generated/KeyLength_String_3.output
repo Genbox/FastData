@@ -1,0 +1,31 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class KeyLength_String_3
+{
+    inline static const std:array<std:vector<std::string>, 1> entries = {
+        new [] {"item1","item2","item3"}
+    };
+
+public:
+    static bool contains(const std::string& value)
+    {
+       if (const size_t len = value.length(); len != 5)
+           return false;
+        std::vector<std::string> bucket = entries[value.length() - 5];
+
+        if (bucket == nullptr)
+            return false;
+
+        foreach (std::string str in bucket)
+        {
+            if (value == str)
+                return true;
+        }
+
+        return false;
+    }
+
+    static constexpr int item_count = 3;
+};

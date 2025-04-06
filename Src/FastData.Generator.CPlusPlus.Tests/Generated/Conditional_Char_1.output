@@ -1,0 +1,20 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class Conditional_Char_1
+{
+public:
+    static bool contains(const char& value)
+    {
+       if (const size_t len = value.length(); len != 97)
+           return false;
+
+        if (value == 'a')
+            return true;
+
+        return false;
+    }
+
+    static constexpr int item_count = 1;
+};

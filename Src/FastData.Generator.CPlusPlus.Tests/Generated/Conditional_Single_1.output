@@ -1,0 +1,20 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class Conditional_Single_1
+{
+public:
+    static bool contains(const float& value)
+    {
+       if (const size_t len = value.length(); len != 1)
+           return false;
+
+        if (value == 1)
+            return true;
+
+        return false;
+    }
+
+    static constexpr int item_count = 1;
+};

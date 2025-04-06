@@ -1,0 +1,36 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class BinarySearch_Int64_1
+{
+    inline static const std::array<int64_t, 1> entries = {
+        1
+    };
+
+public:
+    static bool contains(const int64_t& value)
+    {
+       if (const size_t len = value.length(); len != 1)
+           return false;
+
+        int lo = 0;
+        int hi = 0;
+        while (lo <= hi)
+        {
+            const int i = lo + ((hi - lo) >> 1);
+            const int order = entries[i].compare(value);
+
+            if (order == 0)
+                return true;
+            if (order < 0)
+                lo = i + 1;
+            else
+                hi = i - 1;
+        }
+
+        return ((~lo) >= 0);
+    }
+
+    static constexpr int item_count = 1;
+};

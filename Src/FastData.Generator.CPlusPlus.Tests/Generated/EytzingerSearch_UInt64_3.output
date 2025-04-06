@@ -1,0 +1,35 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class EytzingerSearch_UInt64_3
+{
+    inline static const std::array<uint64_t, 3> entries = {
+        1, 0, 2
+    };
+
+public:
+    static bool contains(const uint64_t& value)
+    {
+        if (const size_t len = value.length(); len < 0 || len > 2)
+            return false;
+
+        unsigned int i = 0;
+        while (i < entries.size())
+        {
+            const int comparison = entries[i].compare(value);
+
+            if (comparison == 0)
+                return true;
+
+            if (comparison < 0)
+                i = 2 * i + 2;
+            else
+                i = 2 * i + 1;
+        }
+
+        return false;
+    }
+
+    static constexpr int item_count = 3;
+};

@@ -1,0 +1,20 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class Conditional_UInt32_3
+{
+public:
+    static bool contains(const uint32_t& value)
+    {
+        if (const size_t len = value.length(); len < 0 || len > 2)
+            return false;
+
+        if (value == 0 || value == 1 || value == 2)
+            return true;
+
+        return false;
+    }
+
+    static constexpr int item_count = 3;
+};

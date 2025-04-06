@@ -1,0 +1,25 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class Array_Boolean_2
+{
+    inline static const std::array<bool, 2> entries = {
+        true, false
+    };
+
+public:
+    static bool contains(const bool& value)
+    {
+
+
+        for (int i = 0; i < 2; i++)
+        {
+            if (value == entries[i])
+               return true;
+        }
+        return false;
+    }
+
+    static constexpr int item_count = 2;
+};

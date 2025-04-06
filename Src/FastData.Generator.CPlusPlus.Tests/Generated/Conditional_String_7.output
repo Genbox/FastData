@@ -1,0 +1,20 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class Conditional_String_7
+{
+public:
+    static bool contains(const std::string& value)
+    {
+       if ((1012ULL & (1ULL << (value.length() - 1) % 64)) == 0)
+           return false;
+
+        if (value == "aaa" || value == "aaaaa" || value == "aaaaaa" || value == "aaaaaaa" || value == "aaaaaaaa" || value == "aaaaaaaaa" || value == "aaaaaaaaaa")
+            return true;
+
+        return false;
+    }
+
+    static constexpr int item_count = 7;
+};

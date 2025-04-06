@@ -1,0 +1,61 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class PerfectHashGPerf_String_3
+{
+    inline static const std::array<int8_t, 256> asso = {
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 
+        1, 0, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3
+    };
+
+    inline static const std::array<std::string, 3> items = {
+        "item3", "item2", "item1"
+    };
+
+public:
+    static bool contains(const std::string& value)
+    {
+       if (const size_t len = value.length(); len != 5)
+           return false;
+
+        const uint32_t hash = get_hash(value);
+
+        if (hash > 2)
+            return false;
+
+        return value == items[hash];
+    }
+
+    static uint32_t get_hash(const std::string& str)
+    {
+        return static_cast<uint32_t>(asso[str[4]]);
+    }
+
+
+    static constexpr int item_count = 3;
+};

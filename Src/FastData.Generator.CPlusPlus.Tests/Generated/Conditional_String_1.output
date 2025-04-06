@@ -1,0 +1,20 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class Conditional_String_1
+{
+public:
+    static bool contains(const std::string& value)
+    {
+       if (const size_t len = value.length(); len != 5)
+           return false;
+
+        if (value == "value")
+            return true;
+
+        return false;
+    }
+
+    static constexpr int item_count = 1;
+};

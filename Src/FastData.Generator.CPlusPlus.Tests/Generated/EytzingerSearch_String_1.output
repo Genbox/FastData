@@ -1,0 +1,35 @@
+#include <string>
+#include <array>
+#include <cstdint>
+
+class EytzingerSearch_String_1
+{
+    inline static const std::array<std::string, 1> entries = {
+        "value"
+    };
+
+public:
+    static bool contains(const std::string& value)
+    {
+       if (const size_t len = value.length(); len != 5)
+           return false;
+
+        unsigned int i = 0;
+        while (i < entries.size())
+        {
+            const int comparison = entries[i].compare(value);
+
+            if (comparison == 0)
+                return true;
+
+            if (comparison < 0)
+                i = 2 * i + 2;
+            else
+                i = 2 * i + 1;
+        }
+
+        return false;
+    }
+
+    static constexpr int item_count = 1;
+};
