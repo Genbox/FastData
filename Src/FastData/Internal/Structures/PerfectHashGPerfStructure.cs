@@ -1,4 +1,3 @@
-//#define DebugPrint
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
@@ -11,43 +10,57 @@ using static Genbox.FastData.Internal.Structures.DebugHelper;
 
 namespace Genbox.FastData.Internal.Structures;
 
+/*
+  This is the core algorithm behind GPerf. It takes inspiration from Cichelli's Minimal Perfect Hash function, but also supports
+  generating nearly-perfect hash functions, and thus works with larger datasets.
+
+  I've only focused on the core algorithm, and not all the other application features such as switch-generation, length-table support, etc.
+  as they overlap with many of the features in this application.
+
+  From a purely algorithmic perspective, this implementation does not support:
+  - Case-sensitivity (alpha_unify)
+  - Predefined key positions
+  - Length hashing
+  - 7-Bit ASCII
+  - Duplicates (it fails on duplicates)
+  - Multiple iterations (decreases the generated table size)
+  - Setting initial_asso or jump_value
+  - Random associated values tables
+ */
+
 //TODO: Convert to a IHashStructure
 
 internal sealed class PerfectHashGPerfStructure : IStructure
 {
     public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
     {
+        context = null;
+
         // It won't work with zero or one item. The case where we get 1 item should be handled by SingleItem anyway.
         if (data.Length < 2)
-        {
-            context = null;
             return false;
-        }
 
         // GPerf only works on strings
         if (dataType != KnownDataType.String)
-        {
-            context = null;
             return false;
-        }
+
+        // We cannot work on empty strings
+        if (props.StringProps!.Value.LengthData.Min == 0)
+            return false;
 
         // Step 1: Finding good positions
         HashSetChainStructure chainHash = new HashSetChainStructure();
-        HeuristicAnalyzer analyzer = new HeuristicAnalyzer(data, props.StringProps!.Value, new HeuristicAnalyzerConfig(), chainHash.RunSimulation);
+        HeuristicAnalyzer analyzer = new HeuristicAnalyzer(data, props.StringProps.Value, new HeuristicAnalyzerConfig(), chainHash.RunSimulation);
         Candidate<HeuristicHashSpec> candidate = analyzer.Run();
 
         // If we didn't get any positions, we don't want to move any further
         if (candidate.Spec.Positions.Length == 0)
-        {
-            context = null;
             return false;
-        }
 
-        // Most places needs the positions in order, so we do it once here
         int[] positions = candidate.Spec.Positions;
         int maxLen = (int)props.StringProps.Value.LengthData.Max;
 
-        // For now, we keep regenerating state within Keyword. In the future, I hope to do this more efficiently
+        // TODO: For now, we keep regenerating state within Keyword. In the future, I hope to do this more efficiently
         List<Keyword> keywords = new List<Keyword>(data.Length);
         keywords.AddRange(data.Select(x => new Keyword((string)x)));
 
@@ -72,8 +85,6 @@ internal sealed class PerfectHashGPerfStructure : IStructure
             // This shouldn't happen. proj1, proj2, proj3 must have been computed to be injective on the given keyword set.
             if (table.CollisionDetector.SetBit(hashcode))
             {
-                Print("Internal error, unexpected duplicate hash code");
-
                 // We throw here instead of returning false, as if the check fails, it is because of buggy code
                 throw new InvalidOperationException("Internal error, unexpected duplicate hash code");
             }
@@ -85,6 +96,8 @@ internal sealed class PerfectHashGPerfStructure : IStructure
         // Set unused asso[c] to maxHash + 1.
         // This is not absolutely necessary, but speeds up the lookup function in many cases of lookup failure:
         // no string comparison is needed once the hash value of a string is larger than the hash value of any keyword.
+        table.MaxHash = keywords[keywords.Count - 1].HashValue;
+
         for (int i = 0; i < alphaSize; i++)
             if (table.Occurrences[i] == 0)
                 table.Values[i] = table.MaxHash + 1;
@@ -93,7 +106,7 @@ internal sealed class PerfectHashGPerfStructure : IStructure
         Print("\ndumping occurrence and associated values tables");
 
         for (int i = 0; i < alphaSize; i++)
-            if (table.Occurrences[i] > 0)
+            if (table.Occurrences[i] != 0)
                 Print($"asso_values[{(char)i}] = {table.Values[i],6}, occurrences[{(char)i}] = {table.Occurrences[i],6}");
 
         Print("end table dumping");
@@ -105,15 +118,16 @@ internal sealed class PerfectHashGPerfStructure : IStructure
               $"maximum key length = {maxLen}");
 
         Print("\nList contents are:\n(hash value, key length, index, selchars, keyword):");
+        int field_width = keywords.Max(x => x.SelChars.Length);
 
         foreach (Keyword keyword in keywords)
-            Print($"{keyword.HashValue,11},{keyword.AllChars.Length,11},{keyword.FinalIndex,6}, {keyword.SelChars}, {keyword.AllChars}");
+            Print($"{keyword.HashValue,11},{keyword.AllChars.Length,11},{keyword.FinalIndex,6}, {keyword.SelChars.PadLeft(field_width)}, {keyword.AllChars}");
 
         Print("End dumping list.\n");
 #endif
 
         // We convert keywords to KeyValuePair to keep Keyword internal
-        context = new PerfectHashGPerfContext(table.Values, keywords.Select(x => new KeyValuePair<string, uint>(x.AllChars, (uint)x.HashValue)).ToArray(), positions, table.MaxHash);
+        context = new PerfectHashGPerfContext(table.Values, alphaInc, keywords.Select(x => new KeyValuePair<string, uint>(x.AllChars, (uint)x.HashValue)).ToArray(), positions.OrderByDescending(x => x).ToArray(), table.MaxHash);
         return true;
     }
 
@@ -133,7 +147,7 @@ internal sealed class PerfectHashGPerfStructure : IStructure
 
             foreach (int keyPos in positions.OrderByDescending(x => x))
             {
-                if (keyPos >= maxKeyLen && keyPos != -1)
+                if (keyPos >= maxKeyLen || keyPos == -1)
                     continue;
 
                 indices.Add(keyPos);

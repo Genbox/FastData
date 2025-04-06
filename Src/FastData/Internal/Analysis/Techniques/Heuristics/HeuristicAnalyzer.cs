@@ -1,4 +1,3 @@
-// #define DebugOutput
 using System.Diagnostics;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
@@ -6,21 +5,50 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Analysis.Techniques.Heuristics;
 
-/// <summary>
-/// Finds the least number of positions in a string that hashes to a unique value for all inputs.
-/// It is assumed that all inputs are unique - if not, a solution might not exist.
-/// </summary>
+/*
+   This is the algorithm for finding positions that results in a good hash from GPerf. See find_positions().
+
+   It tries to find positions in input strings that gives as few collisions as possible. In the event it finds a function with 0 collisions,
+   the hash is a perfect hash.
+
+   Input:
+   - cat
+   - dog
+   - horse
+   - pig
+   - cow
+
+   Algorithm example:
+   1. If all strings are the same length, find where they differ. This is a mandatory position to hash.
+      - result: [nothing]
+   2. Attempt to add each character in the strings and rehash. If we get fewer collisions, we add the new position to the set.
+      - result: 0, 1
+   3. Attempt to remove each character from the set. If we get the same number of collisions with a smaller set, we keep the smaller set.
+      - result: 0, 1
+   4. Attempt to merge two positions into one. If we get the same number of collisions, we keep the smaller set.
+      - result: 0, 1
+
+   It has been reimplemented with the following properties:
+   - Uses HashSet for fast lookups. It is a tradeoff as results needs to be sorted. Either we have the overhead of sorting, or we have the overhead of traversing.
+     For very large sets, this implementation should be faster)
+   - Uses a generic fitness parameter to align with other analyzers in the library
+   - Added additional logging to ensure complete feature parity with GPerf
+   - Has the ability to set the max number of characters to check via configuration
+
+   This implementation does not support:
+   - Case-sensitivity (alpha_unify)
+ */
+
+/// <summary>Finds the least number of positions in a string that hashes to a unique value for all inputs.</summary>
 internal class HeuristicAnalyzer(object[] data, StringProperties props, HeuristicAnalyzerConfig config, Simulation<HeuristicAnalyzerConfig, HeuristicHashSpec> simulation) : IHashAnalyzer<HeuristicHashSpec>
 {
-    private const int MAX_KEY_POS = 255;
-
     public Candidate<HeuristicHashSpec> Run()
     {
         // Stage 1: Find all positions that are mandatory. If two items are the same length, but differ only on one character, then we must include that character.
         HashSet<int> mandatory = GetMandatory();
         Print("Stage1", mandatory);
 
-        int max = (int)(props.LengthData.Max - 1 < MAX_KEY_POS - 1 ? props.LengthData.Max - 1 : MAX_KEY_POS - 1);
+        int max = (int)(props.LengthData.Max - 1 < config.MaxPositions - 1 ? props.LengthData.Max - 1 : config.MaxPositions - 1);
 
         // Stage 2: Attempt using just the mandatory positions first, then add positions as long as it decrease the collision count
         HashSet<int> current = new HashSet<int>(mandatory);
@@ -210,7 +238,7 @@ internal class HeuristicAnalyzer(object[] data, StringProperties props, Heuristi
         return cand;
     }
 
-    [Conditional("DebugOutput")]
+    [Conditional("DebugPrint")]
     private void Print(string stage, HashSet<int> set)
     {
         Candidate<HeuristicHashSpec> cand = CalculateFitnessInternal(set);

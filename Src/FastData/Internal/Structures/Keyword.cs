@@ -1,33 +1,27 @@
 namespace Genbox.FastData.Internal.Structures;
 
-internal class Keyword
+internal class Keyword(string allChars)
 {
-    public Keyword(string allChars)
-    {
-        AllChars = allChars;
-    }
-
-    public string AllChars { get; set; }
-    public string SelChars { get; set; }
+    public string AllChars { get; } = allChars;
+    public string SelChars { get; private set; }
     public int HashValue { get; set; }
-    public int FinalIndex { get; set; } = -1;
 
     internal void InitSelCharsMultiset(int[] positions, int[] alpha_inc)
     {
-        char[] selchars = init_selchars_low(positions, alpha_inc);
-
-        // Sort the selchars elements alphabetically.
-        Array.Sort(selchars);
-
-        SelChars = new string(selchars);
+        char[] chars = InitSelCharsLow(positions, alpha_inc);
+        Array.Sort(chars);
+        SelChars = new string(chars);
     }
 
-    internal void InitSelCharsTuple(int[] positions) => init_selchars_low(positions);
-
-    private char[] init_selchars_low(int[] positions, int[]? alpha_inc = null)
+    internal void InitSelCharsTuple(int[] positions)
     {
-        // Iterate through the list of positions, initializing selchars (via ptr).
-        char[] key_set = new char[positions.Length];
+        char[] chars = InitSelCharsLow(positions);
+        SelChars = new string(chars);
+    }
+
+    private char[] InitSelCharsLow(int[] positions, int[]? alpha_inc = null)
+    {
+        Span<char> keySet = stackalloc char[positions.Length];
 
         int ptr = 0;
         foreach (int i in positions.OrderBy(x => x))
@@ -49,10 +43,9 @@ internal class Keyword
             else
                 continue;
 
-            key_set[ptr++] = (char)c;
+            keySet[ptr++] = (char)c;
         }
 
-        SelChars = new string(key_set);
-        return key_set;
+        return keySet.Slice(0, ptr).ToArray();
     }
 }

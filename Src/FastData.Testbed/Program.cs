@@ -9,7 +9,6 @@ namespace Genbox.FastData.Testbed;
 
 internal static class Program
 {
-    // private static readonly object[] Data =  ["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10"];
     private static readonly Random _random = new Random(42);
 
     private const string _alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -27,7 +26,7 @@ internal static class Program
     private static void Main()
     {
         // MakeTestFiles();
-        ProduceOutputs();
+        // ProduceOutputs();
     }
 
     private static void ProduceOutputs()
@@ -36,11 +35,6 @@ internal static class Program
         {
             if (!file.EndsWith(".txt", StringComparison.Ordinal))
                 continue;
-
-            Console.Error.WriteLine(file);
-
-            // if (!file.EndsWith("477.10.txt"))
-                // continue;
 
             var options = new FileStreamOptions();
             options.Access = FileAccess.Write;
@@ -70,22 +64,19 @@ internal static class Program
     {
         for (int i = 2; i <= 255; i++) //number of items
         {
-            for (int j = 1; j <= 5; j++) //length of items
-            {
-                string filename = i + "." + j + ".txt";
+            string filename = i + ".txt";
 
-                string[] elements = new string[i];
+            string[] elements = new string[i];
 
-                for (int k = 0; k < i; k++)
-                    elements[k] = GetString(j);
+            for (int k = 0; k < i; k++)
+                elements[k] = GetString(_random.Next(1, 10));
 
-                using FileStream fs = File.OpenWrite(Path.Combine(_outPath, filename));
-                using StreamWriter tw = new StreamWriter(fs);
-                tw.NewLine = "\n";
+            using FileStream fs = File.OpenWrite(Path.Combine(_outPath, filename));
+            using StreamWriter tw = new StreamWriter(fs);
+            tw.NewLine = "\n";
 
-                foreach (string s in elements)
-                    tw.WriteLine(s);
-            }
+            foreach (string s in elements)
+                tw.WriteLine(s);
         }
     }
 }

@@ -13,39 +13,39 @@ using System;
 internal partial class PerfectHashGPerf_String_7  : IFastSet<String>
 {
     private sbyte[] _asso = new sbyte[] {
-        5, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 0, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
-        43, 43, 43, 43, 43, 43
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 5, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 
+        31, 31, 31, 31, 31, 31
     };
 
     private string[] _items = {
-        "aaaaaaaaaa", null, null, null, null, "aaaaaaaaa", null, null, null, null, 
-        "aaaaaaaa", null, null, null, null, "aaaaaaa", null, null, null, null, 
-        "aaaaaa", null, null, null, null, "aaaaa", null, null, null, null, 
-        "aaa"
+        "aaa", null, null, null, null, "aaaaa", null, null, null, null, 
+        "aaaaaa", null, null, null, null, "aaaaaaa", null, null, null, null, 
+        "aaaaaaaa", null, null, null, null, "aaaaaaaaa", null, null, null, null, 
+        "aaaaaaaaaa"
     };
 
     
@@ -56,13 +56,44 @@ internal partial class PerfectHashGPerf_String_7  : IFastSet<String>
 
         uint key = Hash(value);
 
-        if (key > 42)
+        if (key > 30)
             return false;
 
         return StringComparer.Ordinal.Equals(_items[key], value);
     }
 
-    private  uint Hash(string str) => (uint)(_asso[str[3]] + _asso[str[5]] + _asso[str[6]] + _asso[str[7]] + _asso[str[8]] + _asso[str[9]]);
+    private uint Hash(string str)
+    {
+        uint hash = 0;
+        switch (str.Length)
+        {
+            default:
+                hash += (uint)_asso[str[9]];
+                goto case 9;
+            case 9:
+                hash += (uint)_asso[str[8]];
+                goto case 8;
+            case 8:
+                hash += (uint)_asso[str[7]];
+                goto case 7;
+            case 7:
+                hash += (uint)_asso[str[6]];
+                goto case 6;
+            case 6:
+                hash += (uint)_asso[str[5]];
+                goto case 5;
+            case 5:
+                goto case 4;
+            case 4:
+                hash += (uint)_asso[str[3]];
+                goto case 3;
+            case 3:
+                break;
+}
+
+return hash;
+    }
+
 
     public const int ItemCount = 7;
     public int Length => 7;

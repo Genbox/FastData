@@ -13,61 +13,63 @@ using System;
 internal partial class PerfectHashGPerf_String_100  : IFastSet<String>
 {
     private short[] _asso = new short[] {
-        70, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 76, 51, 
-        1, 74, 4, 27, 2, 120, 45, 20, 97, 42, 
-        37, 125, 15, 10, 5, 0, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-        255, 255, 255, 255
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 223, 178, 
+        173, 127, 122, 110, 105, 60, 55, 5, 39, 4, 
+        12, 2, 45, 35, 25, 15, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269, 269, 269, 269, 269, 269, 269, 
+        269, 269, 269, 269
     };
 
     private string[] _items = {
-        null, "92", "96", null, "94", null, "82", "86", null, "84", 
-        null, "72", "76", null, "74", null, "62", "66", null, "64", 
-        "99", "12", "16", null, "14", "89", null, "95", null, null, 
-        "79", null, "85", null, null, "69", null, "75", "42", "46", 
-        "19", "44", "65", "32", "36", "98", "34", "15", null, null, 
-        "88", "91", null, null, null, "78", "81", "49", null, null, 
-        "68", "71", "39", null, "45", "18", "61", null, null, "35", 
-        "9", "11", null, null, "93", "8", "90", null, null, "83", 
-        "7", "80", "48", null, "73", "6", "70", "38", "41", "63", 
-        "1", "60", null, "31", "13", null, "10", null, "22", "26", 
-        null, "24", null, null, null, null, null, "4", null, null, 
-        null, "43", "3", "40", null, "0", "33", "29", "30", null, 
-        "97", null, null, null, "25", "87", "52", "56", null, "54", 
-        "77", null, null, null, null, "67", null, null, null, null, 
-        "17", null, "28", null, null, "59", null, null, "21", null, 
-        null, null, "55", null, null, null, null, "47", null, null, 
-        null, null, "37", null, null, null, null, "2", null, null, 
-        "58", "23", null, "20", null, null, "51", null, null, null, 
-        null, null, null, null, null, null, null, null, null, null, 
-        null, null, null, null, null, "5", null, null, null, "53", 
-        null, "50", null, null, null, null, null, null, null, null, 
-        null, null, null, null, null, null, null, "27", null, null, 
-        null, null, null, null, null, null, null, null, null, null, 
-        null, null, null, null, null, null, null, null, null, null, 
-        null, null, null, null, null, "57"
+        null, null, "5", null, "3", "1", null, "59", null, "39", 
+        "19", null, "4", null, null, "9", null, "49", null, null, 
+        "99", null, null, null, null, "8", null, null, null, null, 
+        "89", null, null, null, null, "7", null, null, null, "2", 
+        "79", null, null, null, "29", "6", null, null, null, null, 
+        "69", null, null, null, null, "0", null, "58", null, "38", 
+        "18", null, "57", null, "37", "17", null, "48", null, null, 
+        "98", null, "47", null, null, "97", null, null, null, null, 
+        "88", null, null, null, null, "87", null, null, null, null, 
+        "78", null, null, null, "28", "77", null, null, null, "27", 
+        "68", null, null, null, null, "67", null, "56", null, "36", 
+        "16", null, "55", null, "35", "15", null, "46", null, null, 
+        "96", null, "45", null, "54", "95", "34", "14", null, "53", 
+        "86", "33", "13", null, "44", "85", null, "94", null, "43", 
+        "76", null, "93", null, "26", "75", null, "84", null, "25", 
+        "66", null, "83", null, null, "65", null, "74", null, null, 
+        null, "24", "73", null, null, null, "23", "64", null, null, 
+        null, null, "63", null, null, "52", null, "32", "12", null, 
+        "51", null, "31", "11", null, "42", null, null, "92", null, 
+        "41", null, null, "91", null, null, null, null, "82", null, 
+        null, null, null, "81", null, null, null, null, "72", null, 
+        null, null, "22", "71", null, null, null, "21", "62", null, 
+        null, null, null, "61", null, "50", null, "30", "10", null, 
+        null, null, null, null, null, "40", null, null, "90", null, 
+        null, null, null, null, null, null, null, null, "80", null, 
+        null, null, null, null, null, null, null, null, "70", null, 
+        null, null, "20", null, null, null, null, null, "60"
     };
 
     
@@ -78,13 +80,28 @@ internal partial class PerfectHashGPerf_String_100  : IFastSet<String>
 
         uint key = Hash(value);
 
-        if (key > 254)
+        if (key > 268)
             return false;
 
         return StringComparer.Ordinal.Equals(_items[key], value);
     }
 
-    private  uint Hash(string str) => (uint)(_asso[str[0]] + _asso[str[1]]);
+    private uint Hash(string str)
+    {
+        uint hash = 0;
+        switch (str.Length)
+        {
+            default:
+                hash += (uint)_asso[str[1]];
+                goto case 1;
+            case 1:
+                hash += (uint)_asso[str[0]+8];
+                break;
+}
+
+return hash;
+    }
+
 
     public const int ItemCount = 100;
     public int Length => 100;

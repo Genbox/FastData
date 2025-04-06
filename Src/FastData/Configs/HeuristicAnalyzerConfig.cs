@@ -6,4 +6,6 @@ namespace Genbox.FastData.Configs;
 public sealed class HeuristicAnalyzerConfig : AnalyzerConfig
 {
     public HeuristicAnalyzerConfig() => TimeWeight = 0;
+
+    public uint MaxPositions { get; set; } = 255;
 }

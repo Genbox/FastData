@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0; net5.0</TargetFrameworks>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <!--<DefineConstants>DebugPrint</DefineConstants>-->
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,3 @@
-//#define DebugPrint
 namespace Genbox.FastData.Internal.Structures;
 
 internal ref struct AssociationTable
@@ -16,6 +15,7 @@ internal ref struct AssociationTable
 
         // Compute the maximum SelChars.Length over all keywords.
         int maxSelCharsLength = keywords.Max(x => x.SelChars.Length);
+        // Console.WriteLine("_max_selchars_length: " + maxSelCharsLength);
 
         int totalDuplicates = 0;
 
@@ -72,9 +72,10 @@ internal ref struct AssociationTable
         Console.WriteLine("\ndumping the keyword list without duplicates");
         Console.WriteLine("keyword #, keysig, keyword");
 
+        int field_width = keywords.Max(x => x.SelChars.Length);
         int i = 0;
         foreach (Keyword keyword in keywords)
-            Console.WriteLine($"{++i,9}, {keyword.SelChars}, {keyword.AllChars}");
+            Console.WriteLine($"{++i,9}, {keyword.SelChars.PadLeft(field_width)}, {keyword.AllChars}");
 #endif
 
         FindAssoValues(keywords, assoValueMax, 5, maxSelCharsLength, alphaSize);
@@ -96,6 +97,9 @@ internal ref struct AssociationTable
         {
             // Compute the partition that needs to be refined.
             EquivalenceClass partition = ComputePartition(keywords, undetermined);
+
+            // Console.WriteLine("_cardinality: " + partition.Cardinality);
+            // Console.WriteLine("_undetermined_chars_length: " + partition.UndeterminedCharsLength);
 
             /* Determine the main character to be chosen in this step.
                Choosing such a character c has the effect of splitting every equivalence class (according to the frequency of occurrence of c).
@@ -129,8 +133,8 @@ internal ref struct AssociationTable
             undetermined[bestC] = true;
             partition = ComputePartition(keywords, undetermined);
 
-            // Console.WriteLine("_cardinality: " + partition._cardinality);
-            // Console.WriteLine("_undetermined_chars_length: " + partition._undetermined_chars_length);
+            // Console.WriteLine("_cardinality: " + partition.Cardinality);
+            // Console.WriteLine("chosen_possible_collisions: " + bestPossibleCollisions);
 
             /* Now determine which other characters should be determined in this step, because they will not change the equivalence classes at
                this point.  It is the set of all c which, for all equivalence classes, have the same frequency of occurrence in every keyword
@@ -359,6 +363,7 @@ internal ref struct AssociationTable
                 equClass.UndeterminedChars = undeterminedChars;
                 equClass.UndeterminedCharsLength = undeterminedCharsLength;
 
+                // Console.WriteLine("un " + undeterminedCharsLength);
                 if (partition != null)
                     partitionLast.Next = equClass;
                 else
@@ -368,7 +373,11 @@ internal ref struct AssociationTable
             }
 
             // Add the keyword to the equivalence class.
-            equClass.Keywords.Add(keyword);
+            if (equClass.Keywords == null)
+                equClass.Keywords = new List<Keyword> { keyword };
+            else
+                equClass.Keywords.Add(keyword);
+
             equClass.Cardinality++;
         }
 

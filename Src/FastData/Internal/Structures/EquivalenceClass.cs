@@ -3,7 +3,7 @@ namespace Genbox.FastData.Internal.Structures;
 internal class EquivalenceClass
 {
     // The keywords in this equivalence class.
-    public readonly List<Keyword> Keywords = new List<Keyword>();
+    public List<Keyword>? Keywords;
 
     // The number of keywords in this equivalence class.
     public uint Cardinality;

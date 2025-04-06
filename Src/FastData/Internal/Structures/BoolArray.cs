@@ -15,7 +15,10 @@ internal sealed class BoolArray
     public BoolArray(int size)
     {
         _storageArray = new uint[size];
+
+#if DebugPrint
         Console.WriteLine($"\nbool array size = {size}, total bytes = {size * sizeof(uint)}");
+#endif
     }
 
     public bool SetBit(int index)
