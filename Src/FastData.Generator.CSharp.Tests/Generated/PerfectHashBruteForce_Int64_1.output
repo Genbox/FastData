@@ -23,7 +23,7 @@ internal partial class PerfectHashBruteForce_Int64_1  : IFastSet<Int64>
            return false;
 
         uint hash = Hash(value, 1);
-        uint index = hash & 0;
+        uint index = 0;
         ref E entry = ref _entries[index];
 
         return hash == entry.HashCode && value.Equals(entry.Value);

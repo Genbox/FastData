@@ -34,21 +34,6 @@ public static class FormatHelper
         return sb.ToString();
     }
 
-    public static string FormatList<T>(Span<T> data, Action<StringBuilder, T> render, string delim = ", ")
-    {
-        Span<T>.Enumerator enumerator = data.GetEnumerator();
-        StringBuilder sb = new StringBuilder();
-
-        while (enumerator.MoveNext())
-        {
-            render(sb, enumerator.Current);
-            sb.Append(delim);
-        }
-
-        sb.Remove(sb.Length - delim.Length, delim.Length);
-        return sb.ToString();
-    }
-
     public static string FormatList<T>(IEnumerable<T> data, Action<StringBuilder, T> render, string delim = ", ")
     {
         using IEnumerator<T> enumerator = data.GetEnumerator();

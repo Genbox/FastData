@@ -11,7 +11,7 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
 {
     public string Generate() =>
         $$"""
-              private{{cfg.GetModifier()}} readonly {{GetSmallestSignedType(ctx.Data.Length)}}[] _buckets = new {{GetSmallestSignedType(ctx.Data.Length)}}[] {
+              private{{cfg.GetModifier()}} readonly {{GetSmallestSignedType(ctx.Buckets.Length)}}[] _buckets = new {{GetSmallestSignedType(ctx.Buckets.Length)}}[] {
           {{FormatColumns(ctx.Buckets, static (sb, x) => sb.Append(x))}}
                };
 
@@ -22,17 +22,17 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg, "value")}}
+          {{cfg.GetEarlyExits(genCfg)}}
 
-                  uint hashCode = Hash(value);
-                  uint index = {{cfg.GetModFunction("hashCode", (uint)ctx.Buckets.Length)}};
-                  {{GetSmallestSignedType(ctx.Data.Length)}} i = ({{GetSmallestSignedType(ctx.Data.Length)}})(_buckets[index] - 1);
+                  uint hash = Hash(value);
+                  uint index = {{cfg.GetModFunction(ctx.Buckets.Length)}};
+                  {{GetSmallestSignedType(ctx.Buckets.Length)}} i = ({{GetSmallestSignedType(ctx.Buckets.Length)}})(_buckets[index] - 1);
 
                   while (i >= 0)
                   {
                       ref E entry = ref _entries[i];
 
-                      if (entry.HashCode == hashCode && {{genCfg.GetEqualFunction("entry.Value", "value")}})
+                      if (entry.HashCode == hash && {{genCfg.GetEqualFunction("entry.Value")}})
                           return true;
 
                       i = entry.Next;
@@ -47,10 +47,10 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
               private struct E
               {
                   internal uint HashCode;
-                  internal {{GetSmallestSignedType(ctx.Data.Length)}} Next;
+                  internal {{GetSmallestSignedType(ctx.Buckets.Length)}} Next;
                   internal {{genCfg.GetTypeName()}} Value;
 
-                  internal E(uint hashCode, {{GetSmallestSignedType(ctx.Data.Length)}} next, {{genCfg.GetTypeName()}} value)
+                  internal E(uint hashCode, {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{genCfg.GetTypeName()}} value)
                   {
                       HashCode = hashCode;
                       Next = next;

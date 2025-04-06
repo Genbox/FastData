@@ -22,14 +22,14 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg, "value")}}
+          {{cfg.GetEarlyExits(genCfg)}}
 
-                  uint key = Hash(value);
+                  uint hash = Hash(value);
 
-                  if (key > {{ctx.MaxHash.ToString(NumberFormatInfo.InvariantInfo)}})
+                  if (hash > {{ctx.MaxHash.ToString(NumberFormatInfo.InvariantInfo)}})
                       return false;
 
-                  return {{genCfg.GetEqualFunction("_items[key]", "value")}};
+                  return {{genCfg.GetEqualFunction("_items[hash]")}};
               }
 
               private{{cfg.GetModifier()}} uint Hash(string str)

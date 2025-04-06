@@ -17,14 +17,14 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CSharpGeneratorCo
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg, "value")}}
+          {{cfg.GetEarlyExits(genCfg)}}
 
                   int lo = 0;
                   int hi = {{(ctx.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
                   while (lo <= hi)
                   {
                       int i = lo + ((hi - lo) >> 1);
-                      int order = {{genCfg.GetCompareFunction("_entries[i]", "value")}};
+                      int order = {{genCfg.GetCompareFunction("_entries[i]")}};
 
                       if (order == 0)
                           return true;

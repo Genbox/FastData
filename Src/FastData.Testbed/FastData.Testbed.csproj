@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
     <ProjectReference Include="..\FastData\FastData.csproj" />
   </ItemGroup>
 

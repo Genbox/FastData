@@ -16,12 +16,12 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, CSharpGenerato
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg, "value")}}
+          {{cfg.GetEarlyExits(genCfg)}}
 
                   int i = 0;
                   while (i < _entries.Length)
                   {
-                      int comparison = {{genCfg.GetCompareFunction("_entries[i]", "value")}};
+                      int comparison = {{genCfg.GetCompareFunction("_entries[i]")}};
 
                       if (comparison == 0)
                           return true;

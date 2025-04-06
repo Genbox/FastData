@@ -17,13 +17,13 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpGe
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg, "value")}}
+          {{cfg.GetEarlyExits(genCfg)}}
 
                   uint hash = Hash(value, {{ctx.Seed}});
-                  uint index = {{cfg.GetModFunction("hash", (uint)ctx.Data.Length)}};
+                  uint index = {{cfg.GetModFunction(ctx.Data.Length)}};
                   ref E entry = ref _entries[index];
 
-                  return hash == entry.HashCode && {{genCfg.GetEqualFunction("value", "entry.Value")}};
+                  return hash == entry.HashCode && {{genCfg.GetEqualFunction("entry.Value")}};
               }
 
           {{genCfg.GetHashSource(true)}}

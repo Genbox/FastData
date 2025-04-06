@@ -3,7 +3,6 @@ using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.EarlyExitSpecs;
-using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.CSharp.Internal.Extensions;
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Models;
@@ -23,7 +22,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
             {
                 BranchType.If => GenerateUniqIf(),
                 BranchType.Switch => GenerateUniqSwitch(),
-                _ => throw new InvalidOperationException("Invalid branch type: " + cfg.ConditionalBranchType)
+                _ => throw new InvalidOperationException("Invalid branch type: " + cfg.KeyLengthUniqBranchType)
             };
         }
 
@@ -41,7 +40,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
               {
           {{GetEarlyExit(genCfg.EarlyExits)}}
 
-                  return {{genCfg.GetEqualFunction("value", $"_entries[value.Length - {ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}]")}};
+                  return {{genCfg.GetEqualFunction($"_entries[value.Length - {ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}]")}};
               }
           """;
 
@@ -50,7 +49,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg, "value")}}
+          {{cfg.GetEarlyExits(genCfg)}}
 
                   switch (value.Length)
                   {
@@ -78,7 +77,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
 
                   foreach ({{genCfg.GetTypeName()}} str in bucket)
                   {
-                      if ({{genCfg.GetEqualFunction("value", "str")}})
+                      if ({{genCfg.GetEqualFunction("str")}})
                           return true;
                   }
 
@@ -94,7 +93,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
         {
             sb.AppendLine($"""
                                        case {value.Length}:
-                                           return {genCfg.GetEqualFunction("value", ToValueLabel(value))};
+                                           return {genCfg.GetEqualFunction(ToValueLabel(value))};
                            """);
         }
 
@@ -106,15 +105,15 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
         //We do this to force an early exit for this data structure. Otherwise, we will get an IndexOutOfRangeException
         MinMaxLengthEarlyExit? exit1 = (MinMaxLengthEarlyExit?)Array.Find(exits, x => x is MinMaxLengthEarlyExit);
         if (exit1 != null)
-            return CSharpGeneratorConfigExtensions.GetValueEarlyExits("value", exit1.MinValue, exit1.MaxValue, true);
+            return CSharpGeneratorConfigExtensions.GetValueEarlyExits(exit1.MinValue, exit1.MaxValue, true);
 
         MinMaxValueEarlyExit? exit2 = (MinMaxValueEarlyExit?)Array.Find(exits, x => x is MinMaxValueEarlyExit);
         if (exit2 != null)
-            return CSharpGeneratorConfigExtensions.GetValueEarlyExits("value", exit2.MinValue, exit2.MaxValue, false);
+            return CSharpGeneratorConfigExtensions.GetValueEarlyExits(exit2.MinValue, exit2.MaxValue, false);
 
         LengthBitSetEarlyExit? exit3 = (LengthBitSetEarlyExit?)Array.Find(exits, x => x is LengthBitSetEarlyExit);
         if (exit3 != null)
-            return CSharpGeneratorConfigExtensions.GetMaskEarlyExit("value", exit3.BitSet);
+            return CSharpGeneratorConfigExtensions.GetMaskEarlyExit(exit3.BitSet);
 
         throw new InvalidOperationException("No early exits were found. They are required for UniqueKeyLength");
     }

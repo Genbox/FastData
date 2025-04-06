@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Helpers;
 
@@ -23,16 +22,13 @@ internal static class CodeHelper
         _ => "long"
     };
 
-    internal static string ToValueLabel(object? value)
+    internal static string ToValueLabel(object? value) => value switch
     {
-        return value switch
-        {
-            null => "null",
-            string val => $"\"{val}\"",
-            char val => $"'{val}'",
-            bool val => val.ToString().ToLowerInvariant(),
-            IFormattable val => val.ToString(null, CultureInfo.InvariantCulture),
-            _ => value.ToString()
-        };
-    }
+        null => "null",
+        string val => $"\"{val}\"",
+        char val => $"'{val}'",
+        bool val => val.ToString().ToLowerInvariant(),
+        IFormattable val => val.ToString(null, CultureInfo.InvariantCulture),
+        _ => value.ToString()
+    };
 }

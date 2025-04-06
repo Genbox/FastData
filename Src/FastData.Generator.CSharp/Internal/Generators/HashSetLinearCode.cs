@@ -26,17 +26,17 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpGeneratorC
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg, "value")}}
+          {{cfg.GetEarlyExits(genCfg)}}
 
-                  uint hashCode = Hash(value);
-                  ref B b = ref _buckets[{{cfg.GetModFunction("hashCode", (uint)ctx.Buckets.Length)}}];
+                  uint hash = Hash(value);
+                  ref B b = ref _buckets[{{cfg.GetModFunction(ctx.Buckets.Length)}}];
 
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} index = b.StartIndex;
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} endIndex = b.EndIndex;
 
                   while (index <= endIndex)
                   {
-                      if (hashCode == _hashCodes[index] && {{genCfg.GetEqualFunction("value", "_items[index]")}})
+                      if (_hashCodes[index] == hash && {{genCfg.GetEqualFunction("_items[index]")}})
                           return true;
 
                       index++;

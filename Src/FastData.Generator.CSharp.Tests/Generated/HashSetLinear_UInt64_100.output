@@ -71,15 +71,15 @@ internal partial class HashSetLinear_UInt64_100  : IFastSet<UInt64>
         if (value < 0 || value > 99)
            return false;
 
-        uint hashCode = Hash(value);
-        ref B b = ref _buckets[MathHelper.FastMod(hashCode, 239, 77183029597111095)];
+        uint hash = Hash(value);
+        ref B b = ref _buckets[MathHelper.FastMod(hash, 239, 77183029597111095)];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
 
         while (index <= endIndex)
         {
-            if (hashCode == _hashCodes[index] && value.Equals(_items[index]))
+            if (_hashCodes[index] == hash && value.Equals(_items[index]))
                 return true;
 
             index++;

@@ -17,7 +17,7 @@ internal sealed class SingleValueCode(GeneratorConfig genCfg, CSharpGeneratorCon
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
-                  return {{genCfg.GetEqualFunction("value", ToValueLabel(ctx.Item))}};
+                  return {{genCfg.GetEqualFunction(ToValueLabel(ctx.Item))}};
               }
           """;
 }

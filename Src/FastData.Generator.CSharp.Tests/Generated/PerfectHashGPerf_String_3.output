@@ -51,12 +51,12 @@ internal partial class PerfectHashGPerf_String_3  : IFastSet<String>
        if (value.Length != 5)
            return false;
 
-        uint key = Hash(value);
+        uint hash = Hash(value);
 
-        if (key > 2)
+        if (hash > 2)
             return false;
 
-        return StringComparer.Ordinal.Equals(_items[key], value);
+        return StringComparer.Ordinal.Equals(value, _items[hash]);
     }
 
     private uint Hash(string str)

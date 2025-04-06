@@ -53,8 +53,8 @@ public class GeneratorTests
     {
         TheoryData<DataStructure, object[]> res = new TheoryData<DataStructure, object[]>();
 
-        foreach (DataStructure structure in Enum.GetValues<DataStructure>())
-            foreach (object[] data in TestHelper.GetDataSets())
+        foreach (DataStructure structure in Enum.GetValues<DataStructure>().Where(x => x != DataStructure.Auto))
+            foreach (object[] data in TestHelper.GetAllSets())
                 res.Add(structure, data);
 
         return res;

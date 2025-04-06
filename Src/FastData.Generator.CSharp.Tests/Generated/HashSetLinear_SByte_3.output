@@ -30,15 +30,15 @@ internal partial class HashSetLinear_SByte_3  : IFastSet<SByte>
         if (value < -1 || value > 1)
            return false;
 
-        uint hashCode = Hash(value);
-        ref B b = ref _buckets[MathHelper.FastMod(hashCode, 7, 2635249153387078803)];
+        uint hash = Hash(value);
+        ref B b = ref _buckets[MathHelper.FastMod(hash, 7, 2635249153387078803)];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
 
         while (index <= endIndex)
         {
-            if (hashCode == _hashCodes[index] && value.Equals(_items[index]))
+            if (_hashCodes[index] == hash && value.Equals(_items[index]))
                 return true;
 
             index++;

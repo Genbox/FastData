@@ -23,7 +23,7 @@ internal partial class PerfectHashBruteForce_UInt32_1  : IFastSet<UInt32>
            return false;
 
         uint hash = Hash(value, 1);
-        uint index = hash & 0;
+        uint index = 0;
         ref E entry = ref _entries[index];
 
         return hash == entry.HashCode && value.Equals(entry.Value);

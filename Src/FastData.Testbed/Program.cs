@@ -4,6 +4,7 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Structures;
+using Genbox.FastData.InternalShared;
 
 namespace Genbox.FastData.Testbed;
 
@@ -11,17 +12,7 @@ internal static class Program
 {
     private static readonly Random _random = new Random(42);
 
-    private const string _alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private const string _outPath = @"C:\Temp\gperf-tests\";
-
-    private static string GetString(int length)
-    {
-        char[] chars = new char[length];
-        for (int i = 0; i < length; i++)
-            chars[i] = _alphabet[_random.Next(_alphabet.Length)];
-
-        return new string(chars);
-    }
 
     private static void Main()
     {
@@ -69,7 +60,7 @@ internal static class Program
             string[] elements = new string[i];
 
             for (int k = 0; k < i; k++)
-                elements[k] = GetString(_random.Next(1, 10));
+                elements[k] = TestHelper.GenerateRandomString(_random.Next(1, 10));
 
             using FileStream fs = File.OpenWrite(Path.Combine(_outPath, filename));
             using StreamWriter tw = new StreamWriter(fs);

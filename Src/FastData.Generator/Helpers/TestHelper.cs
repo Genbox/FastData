@@ -23,7 +23,7 @@ public static class TestHelper
         return false;
     }
 
-    public static IEnumerable<object[]> GetDataSets()
+    public static IEnumerable<object[]> GetSingleSets()
     {
         // We want to test a single value too of each type. It should result in a special SingleValue structure.
         yield return [true];
@@ -39,8 +39,11 @@ public static class TestHelper
         yield return [1L];
         yield return [1UL];
         yield return ["value"];
+    }
 
-        // We send all the different types of data. For signed types, we send negative values.
+    public static IEnumerable<object[]> GetEdgeCaseSets()
+    {
+        // We want to test edge values
         yield return [true, false];
         yield return [(sbyte)-1, (sbyte)0, (sbyte)1];
         yield return [(byte)0, (byte)1, (byte)2];
@@ -54,11 +57,17 @@ public static class TestHelper
         yield return [-1L, 0L, 1L];
         yield return [0UL, 1UL, 2UL];
         yield return ["item1", "item2", "item3"];
+    }
 
+    public static IEnumerable<object[]> GetUniqueLengthSets()
+    {
         // We want to attempt strings with unique lengths
         // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
         yield return ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"];
+    }
 
+    public static IEnumerable<object[]> GetLargeSets()
+    {
         // We want to test large inputs too
         yield return Enumerable.Range(0, 100).Select(x => (sbyte)x).Cast<object>().ToArray();
         yield return Enumerable.Range(0, 100).Select(x => (byte)x).Cast<object>().ToArray();
@@ -72,4 +81,9 @@ public static class TestHelper
         yield return Enumerable.Range(0, 100).Select(x => (double)x).Cast<object>().ToArray();
         yield return Enumerable.Range(0, 100).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).Cast<object>().ToArray();
     }
+
+    public static IEnumerable<object[]> GetAllSets() => GetSingleSets()
+                                                        .Concat(GetEdgeCaseSets())
+                                                        .Concat(GetUniqueLengthSets())
+                                                        .Concat(GetLargeSets());
 }

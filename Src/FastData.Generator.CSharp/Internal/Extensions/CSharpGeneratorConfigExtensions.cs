@@ -13,7 +13,7 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Extensions;
 [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
 internal static class CSharpGeneratorConfigExtensions
 {
-    internal static string GetEarlyExits(this CSharpGeneratorConfig cfg, GeneratorConfig genCfg, string variable)
+    internal static string GetEarlyExits(this CSharpGeneratorConfig cfg, GeneratorConfig genCfg)
     {
         if (cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableEarlyExits))
             return string.Empty;
@@ -23,15 +23,15 @@ internal static class CSharpGeneratorConfigExtensions
         foreach (IEarlyExit spec in genCfg.EarlyExits)
         {
             if (spec is MinMaxLengthEarlyExit(var minLength, var maxLength))
-                sb.Append(GetValueEarlyExits(variable, minLength, maxLength, true));
+                sb.Append(GetValueEarlyExits(minLength, maxLength, true));
             else if (spec is MinMaxValueEarlyExit(var minValue, var maxValue))
-                sb.Append(GetValueEarlyExits(variable, minValue, maxValue, false));
+                sb.Append(GetValueEarlyExits(minValue, maxValue, false));
             else if (spec is MinMaxUnsignedValueEarlyExit(var minUValue, var maxUValue))
-                sb.Append(GetValueEarlyExits(variable, minUValue, maxUValue, false));
+                sb.Append(GetValueEarlyExits(minUValue, maxUValue, false));
             else if (spec is MinMaxFloatValueEarlyExit(var minFloatValue, var maxFloatValue))
-                sb.Append(GetValueEarlyExits(variable, minFloatValue, maxFloatValue, false));
+                sb.Append(GetValueEarlyExits(minFloatValue, maxFloatValue, false));
             else if (spec is LengthBitSetEarlyExit(var bitSet))
-                sb.Append(GetMaskEarlyExit(variable, bitSet));
+                sb.Append(GetMaskEarlyExit(bitSet));
             else
                 throw new InvalidOperationException("Unknown early exit type: " + spec.GetType().Name);
         }
@@ -39,16 +39,23 @@ internal static class CSharpGeneratorConfigExtensions
         return sb.ToString();
     }
 
-    internal static string GetModFunction(this CSharpGeneratorConfig config, string variable, uint length)
+    internal static string GetModFunction(this CSharpGeneratorConfig config, int length)
     {
+        if (length == 0)
+            throw new ArgumentOutOfRangeException(nameof(length), "A length of 0 is not valid in a modulus operation");
+
+        // x % 1 = 0
+        if (length == 1)
+            return "0";
+
         if (config.GeneratorOptions.HasFlag(CSharpOptions.DisableModulusOptimization))
-            return $"{variable} % {length.ToString(NumberFormatInfo.InvariantInfo)}";
+            return $"hash % {length.ToString(NumberFormatInfo.InvariantInfo)}";
 
-        if (MathHelper.IsPowerOfTwo(length))
-            return $"{variable} & {(length - 1).ToString(NumberFormatInfo.InvariantInfo)}";
+        if (MathHelper.IsPowerOfTwo((uint)length))
+            return $"hash & {(length - 1).ToString(NumberFormatInfo.InvariantInfo)}";
 
-        ulong modMultiplier = MathHelper.GetFastModMultiplier(length);
-        return $"MathHelper.FastMod({variable}, {length.ToString(NumberFormatInfo.InvariantInfo)}, {modMultiplier.ToString(NumberFormatInfo.InvariantInfo)})";
+        ulong modMultiplier = MathHelper.GetFastModMultiplier((uint)length);
+        return $"MathHelper.FastMod(hash, {length.ToString(NumberFormatInfo.InvariantInfo)}, {modMultiplier.ToString(NumberFormatInfo.InvariantInfo)})";
     }
 
     internal static string? GetMethodAttributes(this CSharpGeneratorConfig config)
@@ -64,20 +71,20 @@ internal static class CSharpGeneratorConfigExtensions
 
     internal static string? GetModifier(this CSharpGeneratorConfig config) => config.ClassType == ClassType.Static ? " static" : null;
 
-    internal static string GetMaskEarlyExit(string variable, ulong bitSet)
+    internal static string GetMaskEarlyExit(ulong bitSet)
         => $"""
-                   if (({bitSet}UL & (1UL << ({variable}.Length - 1) % 64)) == 0)
+                   if (({bitSet}UL & (1UL << (value.Length - 1) % 64)) == 0)
                        return false;
             """;
 
-    internal static string GetValueEarlyExits<T>(string variable, T min, T max, bool length) where T : IFormattable
+    internal static string GetValueEarlyExits<T>(T min, T max, bool length) where T : IFormattable
         => min.Equals(max)
             ? $"""
-                      if ({variable}{(length ? ".Length" : "")} != {max})
+                      if (value{(length ? ".Length" : "")} != {max})
                           return false;
                """
             : $"""
-                       if ({variable}{(length ? ".Length" : "")} < {min} || {variable}{(length ? ".Length" : "")} > {max})
+                       if (value{(length ? ".Length" : "")} < {min} || value{(length ? ".Length" : "")} > {max})
                           return false;
                """;
 }

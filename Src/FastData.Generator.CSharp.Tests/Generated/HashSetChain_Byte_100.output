@@ -44,15 +44,15 @@ internal partial class HashSetChain_Byte_100  : IFastSet<Byte>
         if (value < 0 || value > 99)
            return false;
 
-        uint hashCode = Hash(value);
-        uint index = MathHelper.FastMod(hashCode, 100, 184467440737095517);
+        uint hash = Hash(value);
+        uint index = MathHelper.FastMod(hash, 100, 184467440737095517);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
         while (i >= 0)
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hashCode && entry.Value.Equals(value))
+            if (entry.HashCode == hash && value.Equals(entry.Value))
                 return true;
 
             i = entry.Next;

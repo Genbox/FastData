@@ -17,11 +17,11 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CSharpGeneratorConfig cf
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg, "value")}}
+          {{cfg.GetEarlyExits(genCfg)}}
 
                   for (int i = 0; i < {{ctx.Data.Length.ToString(NumberFormatInfo.InvariantInfo)}}; i++)
                   {
-                      if ({{genCfg.GetEqualFunction("value", "_entries[i]")}})
+                      if ({{genCfg.GetEqualFunction("_entries[i]")}})
                          return true;
                   }
                   return false;

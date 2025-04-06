@@ -1,7 +1,6 @@
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
-using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.CSharp.Internal.Extensions;
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Models;
@@ -22,7 +21,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorCon
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg, "value")}}
+          {{cfg.GetEarlyExits(genCfg)}}
 
                   if ({{FormatList(ctx.Data, (x, y) => Render(genCfg, x, y), " || ")}})
                       return true;
@@ -36,7 +35,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorCon
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg, "value")}}
+          {{cfg.GetEarlyExits(genCfg)}}
 
                   switch (value)
                   {
@@ -49,5 +48,5 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorCon
           """;
 
     private static void Render(StringBuilder sb, object obj) => sb.Append($"            case {ToValueLabel(obj)}:");
-    private static void Render(GeneratorConfig genCfg, StringBuilder sb, object obj) => sb.Append(genCfg.GetEqualFunction("value", ToValueLabel(obj)));
+    private static void Render(GeneratorConfig genCfg, StringBuilder sb, object obj) => sb.Append(genCfg.GetEqualFunction(ToValueLabel(obj)));
 }

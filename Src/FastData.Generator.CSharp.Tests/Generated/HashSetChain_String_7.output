@@ -26,15 +26,15 @@ internal partial class HashSetChain_String_7  : IFastSet<String>
        if ((1012UL & (1UL << (value.Length - 1) % 64)) == 0)
            return false;
 
-        uint hashCode = Hash(value);
-        uint index = MathHelper.FastMod(hashCode, 7, 2635249153387078803);
+        uint hash = Hash(value);
+        uint index = MathHelper.FastMod(hash, 7, 2635249153387078803);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
         while (i >= 0)
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hashCode && StringComparer.Ordinal.Equals(entry.Value, value))
+            if (entry.HashCode == hash && StringComparer.Ordinal.Equals(value, entry.Value))
                 return true;
 
             i = entry.Next;

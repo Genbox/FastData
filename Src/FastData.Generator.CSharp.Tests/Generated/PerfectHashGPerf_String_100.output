@@ -78,12 +78,12 @@ internal partial class PerfectHashGPerf_String_100  : IFastSet<String>
         if (value.Length < 1 || value.Length > 2)
            return false;
 
-        uint key = Hash(value);
+        uint hash = Hash(value);
 
-        if (key > 268)
+        if (hash > 268)
             return false;
 
-        return StringComparer.Ordinal.Equals(_items[key], value);
+        return StringComparer.Ordinal.Equals(value, _items[hash]);
     }
 
     private uint Hash(string str)

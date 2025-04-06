@@ -23,26 +23,26 @@ internal static class GeneratorConfigExtensions
         _ => throw new InvalidOperationException("Invalid type " + config.DataType)
     };
 
-    internal static string GetEqualFunction(this GeneratorConfig config, string variable1, string variable2)
+    internal static string GetEqualFunction(this GeneratorConfig config, string variable)
     {
         if (config.DataType == KnownDataType.String)
-            return $"StringComparer.{config.StringComparison}.Equals({variable1}, {variable2})";
+            return $"StringComparer.{config.StringComparison}.Equals(value, {variable})";
 
-        return $"{variable1}.Equals({variable2})";
+        return $"value.Equals({variable})";
     }
 
-    internal static string GetCompareFunction(this GeneratorConfig config, string variable1, string variable2)
+    internal static string GetCompareFunction(this GeneratorConfig config, string variable)
     {
         if (config.DataType == KnownDataType.String)
-            return $"StringComparer.{config.StringComparison}.Compare({variable1}, {variable2})";
+            return $"StringComparer.{config.StringComparison}.Compare({variable}, value)";
 
-        return $"{variable1}.CompareTo({variable2})";
+        return $"{variable}.CompareTo(value)";
     }
 
     internal static string GetHashSource(this GeneratorConfig config, bool seeded) =>
         $"""
              [MethodImpl(MethodImplOptions.AggressiveInlining)]
-             public static uint Hash({config.DataType} value{(seeded ? ", uint seed" : "")}) => {GetHash(config.DataType, seeded)};
+             public static uint Hash({config.GetTypeName()} value{(seeded ? ", uint seed" : "")}) => {GetHash(config.DataType, seeded)};
          """;
 
     private static string GetHash(KnownDataType dataType, bool seeded)

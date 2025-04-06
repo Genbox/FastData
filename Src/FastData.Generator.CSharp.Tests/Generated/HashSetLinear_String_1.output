@@ -30,15 +30,15 @@ internal partial class HashSetLinear_String_1  : IFastSet<String>
        if (value.Length != 5)
            return false;
 
-        uint hashCode = Hash(value);
-        ref B b = ref _buckets[MathHelper.FastMod(hashCode, 3, 6148914691236517206)];
+        uint hash = Hash(value);
+        ref B b = ref _buckets[MathHelper.FastMod(hash, 3, 6148914691236517206)];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
 
         while (index <= endIndex)
         {
-            if (hashCode == _hashCodes[index] && StringComparer.Ordinal.Equals(value, _items[index]))
+            if (_hashCodes[index] == hash && StringComparer.Ordinal.Equals(value, _items[index]))
                 return true;
 
             index++;
