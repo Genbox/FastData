@@ -56,7 +56,14 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                     if (obj is CombinedConfig combinedCfg)
                     {
                         if (!FastDataGenerator.TryGenerate(combinedCfg.FastDataConfig, new CSharpCodeGenerator(combinedCfg.CSharpGeneratorConfig), out string? source))
-                            throw new InvalidOperationException("Failed to generate code");
+                        {
+                            DataStructure ds = combinedCfg.FastDataConfig.DataStructure;
+
+                            if (ds != DataStructure.Auto)
+                                throw new InvalidOperationException($"Failed to generate code with '{ds}'. Try setting DataStructure to Auto.");
+
+                            throw new InvalidOperationException("Failed to generate code.");
+                        }
 
                         spc.AddSource(combinedCfg.FastDataConfig.Name + ".g.cs", SourceText.From(source, Encoding.UTF8));
                     }
