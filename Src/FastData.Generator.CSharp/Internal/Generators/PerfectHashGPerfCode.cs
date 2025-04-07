@@ -89,9 +89,9 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
 
         sb.Append("""
                                   break;
-                  }
+                              }
 
-                  return hash
+                              return hash
                   """);
 
         if (key == -1)
