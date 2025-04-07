@@ -89,7 +89,7 @@ internal partial class HashSetLinear_Single_100  : IFastSet<Single>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Single value) => unchecked((uint)(value.GetHashCode()));
+    public static uint Hash(float value) => unchecked((uint)(value.GetHashCode()));
 
     [StructLayout(LayoutKind.Auto)]
     private struct B

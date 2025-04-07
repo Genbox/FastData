@@ -44,7 +44,7 @@ internal partial class HashSetChain_Char_1  : IFastSet<Char>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Char value) => unchecked((uint)value);
+    public static uint Hash(char value) => unchecked((uint)value);
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

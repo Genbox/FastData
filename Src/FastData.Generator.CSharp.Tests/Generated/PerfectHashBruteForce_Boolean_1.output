@@ -29,7 +29,7 @@ internal partial class PerfectHashBruteForce_Boolean_1  : IFastSet<Boolean>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Boolean value, uint seed) => unchecked((uint)(value.GetHashCode() ^ seed));
+    public static uint Hash(bool value, uint seed) => unchecked((uint)(value.GetHashCode() ^ seed));
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

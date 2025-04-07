@@ -62,7 +62,7 @@ internal partial class HashSetChain_UInt64_100  : IFastSet<UInt64>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(UInt64 value) => unchecked((uint)(value.GetHashCode()));
+    public static uint Hash(ulong value) => unchecked((uint)(value.GetHashCode()));
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

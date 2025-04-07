@@ -48,7 +48,7 @@ internal partial class HashSetLinear_Double_3  : IFastSet<Double>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Double value) => unchecked((uint)(value.GetHashCode()));
+    public static uint Hash(double value) => unchecked((uint)(value.GetHashCode()));
 
     [StructLayout(LayoutKind.Auto)]
     private struct B

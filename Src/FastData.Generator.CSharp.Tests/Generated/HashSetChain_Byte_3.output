@@ -44,7 +44,7 @@ internal partial class HashSetChain_Byte_3  : IFastSet<Byte>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Byte value) => unchecked((uint)value);
+    public static uint Hash(byte value) => unchecked((uint)value);
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

@@ -48,7 +48,7 @@ internal partial class HashSetLinear_Int16_3  : IFastSet<Int16>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Int16 value) => unchecked((uint)value);
+    public static uint Hash(short value) => unchecked((uint)value);
 
     [StructLayout(LayoutKind.Auto)]
     private struct B

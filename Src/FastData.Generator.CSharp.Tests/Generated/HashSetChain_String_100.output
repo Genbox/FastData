@@ -62,7 +62,7 @@ internal partial class HashSetChain_String_100  : IFastSet<String>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(String value) => HashHelper.HashString(value);
+    public static uint Hash(string value) => HashHelper.HashString(value);
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

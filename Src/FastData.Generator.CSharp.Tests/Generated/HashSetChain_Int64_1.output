@@ -44,7 +44,7 @@ internal partial class HashSetChain_Int64_1  : IFastSet<Int64>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Int64 value) => unchecked((uint)(value.GetHashCode()));
+    public static uint Hash(long value) => unchecked((uint)(value.GetHashCode()));
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

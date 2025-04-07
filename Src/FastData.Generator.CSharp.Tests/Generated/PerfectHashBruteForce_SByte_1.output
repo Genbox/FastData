@@ -30,7 +30,7 @@ internal partial class PerfectHashBruteForce_SByte_1  : IFastSet<SByte>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(SByte value, uint seed) => unchecked((uint)(value ^ seed));
+    public static uint Hash(sbyte value, uint seed) => unchecked((uint)(value ^ seed));
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

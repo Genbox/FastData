@@ -89,7 +89,7 @@ internal partial class HashSetLinear_Int64_100  : IFastSet<Int64>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Int64 value) => unchecked((uint)(value.GetHashCode()));
+    public static uint Hash(long value) => unchecked((uint)(value.GetHashCode()));
 
     [StructLayout(LayoutKind.Auto)]
     private struct B

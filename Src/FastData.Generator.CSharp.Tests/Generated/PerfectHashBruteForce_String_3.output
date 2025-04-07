@@ -30,7 +30,7 @@ internal partial class PerfectHashBruteForce_String_3  : IFastSet<String>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(String value, uint seed) => HashHelper.HashStringSeed(value, seed);
+    public static uint Hash(string value, uint seed) => HashHelper.HashStringSeed(value, seed);
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

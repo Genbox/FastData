@@ -62,7 +62,7 @@ internal partial class HashSetChain_SByte_100  : IFastSet<SByte>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(SByte value) => unchecked((uint)value);
+    public static uint Hash(sbyte value) => unchecked((uint)value);
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

@@ -89,9 +89,9 @@ internal partial class PerfectHashGPerf_String_7  : IFastSet<String>
                 goto case 3;
             case 3:
                 break;
-}
+            }
 
-return hash;
+            return hash;
     }
 
 

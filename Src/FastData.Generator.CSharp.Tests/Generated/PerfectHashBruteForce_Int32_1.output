@@ -30,7 +30,7 @@ internal partial class PerfectHashBruteForce_Int32_1  : IFastSet<Int32>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Int32 value, uint seed) => unchecked((uint)(value ^ seed));
+    public static uint Hash(int value, uint seed) => unchecked((uint)(value ^ seed));
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

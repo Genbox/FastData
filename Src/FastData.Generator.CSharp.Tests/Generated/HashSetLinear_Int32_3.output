@@ -48,7 +48,7 @@ internal partial class HashSetLinear_Int32_3  : IFastSet<Int32>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Int32 value) => unchecked((uint)value);
+    public static uint Hash(int value) => unchecked((uint)value);
 
     [StructLayout(LayoutKind.Auto)]
     private struct B

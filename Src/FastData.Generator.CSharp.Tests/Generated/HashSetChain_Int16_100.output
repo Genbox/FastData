@@ -62,7 +62,7 @@ internal partial class HashSetChain_Int16_100  : IFastSet<Int16>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Int16 value) => unchecked((uint)value);
+    public static uint Hash(short value) => unchecked((uint)value);
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

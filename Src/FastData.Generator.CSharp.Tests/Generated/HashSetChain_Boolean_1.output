@@ -43,7 +43,7 @@ internal partial class HashSetChain_Boolean_1  : IFastSet<Boolean>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Boolean value) => unchecked((uint)(value.GetHashCode()));
+    public static uint Hash(bool value) => unchecked((uint)(value.GetHashCode()));
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

@@ -39,7 +39,7 @@ internal partial class PerfectHashBruteForce_Int16_100  : IFastSet<Int16>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(Int16 value, uint seed) => unchecked((uint)(value ^ seed));
+    public static uint Hash(short value, uint seed) => unchecked((uint)(value ^ seed));
 
     [StructLayout(LayoutKind.Auto)]
     private struct E
