@@ -19,9 +19,40 @@ public static class FastDataGenerator
     {
         PreProcess(config, out KnownDataType dataType, out DataProperties props, out IEarlyExit[] exits);
 
+        Constants constants = new Constants((uint)config.Data.Length);
+
+        if (props.StringProps.HasValue)
+        {
+            constants.MinValue = props.StringProps.Value.LengthData.Min;
+            constants.MaxValue = props.StringProps.Value.LengthData.Max;
+        }
+        else if (props.IntProps.HasValue)
+        {
+            constants.MinValue = props.IntProps.Value.MinValue;
+            constants.MaxValue = props.IntProps.Value.MaxValue;
+        }
+        else if (props.UIntProps.HasValue)
+        {
+            constants.MinValue = props.UIntProps.Value.MinValue;
+            constants.MaxValue = props.UIntProps.Value.MaxValue;
+        }
+        else if (props.FloatProps.HasValue)
+        {
+            constants.MinValue = props.FloatProps.Value.MinValue;
+            constants.MaxValue = props.FloatProps.Value.MaxValue;
+        }
+        else if (props.CharProps.HasValue)
+        {
+            constants.MinValue = props.CharProps.Value.MinValue;
+            constants.MaxValue = props.CharProps.Value.MaxValue;
+        }
+
+        Metadata metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.Now);
+        GeneratorConfig genCfg = new GeneratorConfig(dataType, exits, null, config.StringComparison, constants, metadata);
+
         foreach (object candidate in GetDataStructureCandidates(config))
         {
-            if (TryProcessCandidate(candidate, props, exits, dataType, generator, config, out source))
+            if (TryProcessCandidate(candidate, props, genCfg, dataType, generator, config, out source))
                 return true;
         }
 
@@ -159,31 +190,28 @@ public static class FastDataGenerator
             default:
                 throw new InvalidOperationException($"Unknown data type: {dataType}");
         }
-
         return props;
     }
 
-    private static bool TryProcessCandidate(object candidate, DataProperties props, IEarlyExit[] exits, KnownDataType dataType, IGenerator generator, FastDataConfig config, out string? code)
+    private static bool TryProcessCandidate(object candidate, DataProperties props, GeneratorConfig genCfg, KnownDataType dataType, IGenerator generator, FastDataConfig config, out string? code)
     {
         if (candidate is IHashStructure hs)
         {
-            IHashSpec? spec = null;
-
             if (props.StringProps != null)
             {
                 if (config.AnalyzerConfig is BruteForceAnalyzerConfig bfCfg)
                 {
                     BruteForceAnalyzer analyzer = new BruteForceAnalyzer(config.Data, props.StringProps.Value, bfCfg, hs.RunSimulation);
-                    spec = analyzer.Run().Spec;
+                    genCfg.HashSpec = analyzer.Run().Spec;
                 }
                 if (config.AnalyzerConfig is GeneticAnalyzerConfig gaCfg)
                 {
                     GeneticAnalyzer analyzer = new GeneticAnalyzer(config.Data, props.StringProps.Value, gaCfg, hs.RunSimulation);
-                    spec = analyzer.Run().Spec;
+                    genCfg.HashSpec = analyzer.Run().Spec;
                 }
             }
             else
-                spec = DefaultHashSpec.Instance;
+                genCfg.HashSpec = DefaultHashSpec.Instance;
 
             if (!hs.TryCreate(config.Data, dataType, props, config, HashHelper.HashObject, out IContext? context))
             {
@@ -191,7 +219,7 @@ public static class FastDataGenerator
                 return false;
             }
 
-            code = generator.Generate(new GeneratorConfig(dataType, exits, spec, config.StringComparison), config, context!);
+            code = generator.Generate(genCfg, config, context!);
             return true;
         }
 
@@ -203,7 +231,7 @@ public static class FastDataGenerator
                 return false;
             }
 
-            code = generator.Generate(new GeneratorConfig(dataType, exits, null, config.StringComparison), config, context!);
+            code = generator.Generate(genCfg, config, context!);
             return true;
         }
 
