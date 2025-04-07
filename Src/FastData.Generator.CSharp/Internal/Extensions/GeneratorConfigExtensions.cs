@@ -20,7 +20,7 @@ internal static class GeneratorConfigExtensions
         KnownDataType.UInt64 => "ulong",
         KnownDataType.Single => "float",
         KnownDataType.Double => "double",
-        _ => throw new InvalidOperationException("Invalid type " + config.DataType)
+        _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
     };
 
     internal static string GetEqualFunction(this GeneratorConfig config, string variable)

@@ -46,7 +46,7 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
             ClassType.Static => " static class",
             ClassType.Instance => " class",
             ClassType.Struct => " struct",
-            _ => throw new InvalidOperationException("Invalid type: " + userCfg.ClassType)
+            _ => throw new InvalidOperationException("Invalid ClassType: " + userCfg.ClassType)
         };
 
         string? attr = userCfg.ClassType == ClassType.Struct ? "[StructLayout(LayoutKind.Auto)]" : null;
@@ -87,7 +87,7 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
                         public const int ItemCount = {fastCfg.Data.Length};
                     """);
 
-        if (userCfg.ClassType == ClassType.Instance)
+        if (userCfg.ClassType is ClassType.Instance or ClassType.Struct)
         {
             _sb.Append($"""
 
