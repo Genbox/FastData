@@ -24,14 +24,25 @@
     <Compile Include="..\FastData\**\*.cs">
       <Link>FastData\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
+    <Compile Remove="..\FastData\bin\**" />
     <Compile Remove="..\FastData\obj\**" />
     <Compile Remove="..\FastData\Properties\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\FastData.Generator.CSharp\**\*.cs">
+    <Compile Include="..\FastData.Generator\**\*.cs">
       <Link>FastDataGen\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
+    <Compile Remove="..\FastData.Generator\bin\**" />
+    <Compile Remove="..\FastData.Generator\obj\**" />
+    <Compile Remove="..\FastData.Generator\Properties\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\FastData.Generator.CSharp\**\*.cs">
+      <Link>FastDataGenCSharp\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Remove="..\FastData.Generator.CSharp\bin\**" />
     <Compile Remove="..\FastData.Generator.CSharp\obj\**" />
     <Compile Remove="..\FastData.Generator.CSharp\Properties\**" />
   </ItemGroup>

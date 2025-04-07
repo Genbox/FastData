@@ -1,8 +1,10 @@
 using System.Collections.Immutable;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
+using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp;
-using Genbox.FastData.Generator.CSharp.Enums;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
@@ -51,10 +53,12 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                     if (obj is Exception ex)
                         throw ex;
 
-                    if (obj is CombinedConfig combinedConfig)
+                    if (obj is CombinedConfig combinedCfg)
                     {
-                        string source = FastDataGenerator.Generate(combinedConfig.FastDataConfig, new CSharpCodeGenerator(combinedConfig.CSharpGeneratorConfig));
-                        spc.AddSource(combinedConfig.FastDataConfig.Name + ".g.cs", SourceText.From(source, Encoding.UTF8));
+                        if (!FastDataGenerator.TryGenerate(combinedCfg.FastDataConfig, new CSharpCodeGenerator(combinedCfg.CSharpGeneratorConfig), out string? source))
+                            throw new InvalidOperationException("Failed to generate code");
+
+                        spc.AddSource(combinedCfg.FastDataConfig.Name + ".g.cs", SourceText.From(source, Encoding.UTF8));
                     }
                     else
                         throw new InvalidOperationException("Unknown object type: " + obj.GetType().Name);
@@ -141,32 +145,38 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             }
 
             FastDataConfig config = new FastDataConfig(name, data);
-            config.StorageMode = GetValueOrDefault<StorageMode>(nameof(config.StorageMode), ad.NamedArguments);
-            config.StorageOptions = GetValueOrDefault<StorageOption>(nameof(config.StorageOptions), ad.NamedArguments);
+            BindValue(() => config.DataStructure, ad.NamedArguments);
+            BindValue(() => config.StorageOptions, ad.NamedArguments);
 
             CSharpGeneratorConfig config2 = new CSharpGeneratorConfig();
-            config2.Namespace = GetValueOrDefault<string>(nameof(config2.Namespace), ad.NamedArguments);
-            config2.ClassVisibility = GetValueOrDefault<ClassVisibility>(nameof(config2.ClassVisibility), ad.NamedArguments);
-            config2.ClassType = GetValueOrDefault<ClassType>(nameof(config2.ClassType), ad.NamedArguments);
+            BindValue(() => config2.Namespace, ad.NamedArguments);
+            BindValue(() => config2.ClassVisibility, ad.NamedArguments);
+            BindValue(() => config2.ClassType, ad.NamedArguments);
 
             yield return new CombinedConfig(config, config2);
         }
     }
 
-    private static T? GetValueOrDefault<T>(string name, ImmutableArray<KeyValuePair<string, TypedConstant>> args)
+    private static void BindValue<T>(Expression<Func<T?>> property, ImmutableArray<KeyValuePair<string, TypedConstant>> namedArgs)
     {
-        foreach (KeyValuePair<string, TypedConstant> pair in args)
-        {
-            if (pair.Key == name)
-            {
-                if (pair.Value.Value == null)
-                    throw new InvalidOperationException($"Unable to read {name}");
+        MemberExpression memberExpr = (MemberExpression)property.Body;
+        MemberExpression? fieldInfo = memberExpr.Expression as MemberExpression;
+        ConstantExpression? constExpr = fieldInfo?.Expression as ConstantExpression;
+        PropertyInfo prop = (PropertyInfo)memberExpr.Member;
 
-                return (T?)pair.Value.Value;
+        foreach (KeyValuePair<string, TypedConstant> pair in namedArgs)
+        {
+            if (pair.Key == prop.Name)
+            {
+                if (pair.Value.Kind == TypedConstantKind.Error)
+                    throw new InvalidOperationException($"Unable to map value on '{prop.Name}' due to invalid value");
+
+                object target = fieldInfo?.Member is FieldInfo fi ? fi.GetValue(constExpr?.Value) : throw new InvalidOperationException("Cannot find target for: " + prop.Name);
+
+                prop.SetValue(target, pair.Value.Value);
+                break;
             }
         }
-
-        return default;
     }
 
     private static bool AreEqualSymbols(ISymbol a, ISymbol b)
