@@ -4,9 +4,10 @@ using System.Runtime.CompilerServices;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Analyzers;
+using Genbox.FastData.Internal.Analysis.Analyzers.BruteForce;
+using Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Analysis.Techniques.BruteForce;
-using Genbox.FastData.Internal.Analysis.Techniques.Genetic;
 using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Testbed;
@@ -31,8 +32,8 @@ public static class Analysis
         Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        HashSetChainStructure hashset = new HashSetChainStructure();
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(data, props, new BruteForceAnalyzerConfig(), hashset.RunSimulation);
+        Simulator sim = new Simulator(new SimulatorConfig(), data, HashSetChainStructure.EmulateInternal);
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), sim);
         Candidate<BruteForceHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1);
     }
@@ -98,8 +99,8 @@ public static class Analysis
         Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        HashSetChainStructure hashset = new HashSetChainStructure();
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(data, props, new GeneticAnalyzerConfig(), hashset.RunSimulation);
+        Simulator sim = new Simulator(new SimulatorConfig(), data, HashSetChainStructure.EmulateInternal);
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(new GeneticAnalyzerConfig(), sim);
         Candidate<GeneticHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1, in props);
     }
@@ -118,7 +119,7 @@ public static class Analysis
         GeneticHashSpec spec = candidate.Spec;
 
         //We call the hash function to build the hash string
-        Func<string, uint> f = spec.GetFunction();
+        HashFunc f = spec.GetHashFunction();
         f(new string('a', (int)props.LengthData.Max)); //needs to be larger than the strings in the dataset
 
         Console.WriteLine("Hash:");

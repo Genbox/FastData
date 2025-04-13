@@ -9,7 +9,8 @@ public class FastDataConfig(string name, object[] data, DataStructure dataStruct
 
     public DataStructure DataStructure { get; set; } = dataStructure;
     public StorageOption StorageOptions { get; set; }
-    public AnalyzerConfig? AnalyzerConfig { get; set; }
+    public SimulatorConfig? SimulatorConfig { get; set; }
+    public IAnalyzerConfig? AnalyzerConfig { get; set; }
     public StringComparison StringComparison { get; set; } = StringComparison.Ordinal;
 
     public KnownDataType GetDataType() => (KnownDataType)Enum.Parse(typeof(KnownDataType), Data[0].GetType().Name);

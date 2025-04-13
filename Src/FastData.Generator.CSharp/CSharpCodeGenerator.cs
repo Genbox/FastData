@@ -6,7 +6,6 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Extensions;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.CSharp.Internal.Generators;
-using Genbox.FastData.Generator.CSharp.Internal.Helpers;
 using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Generator.CSharp;

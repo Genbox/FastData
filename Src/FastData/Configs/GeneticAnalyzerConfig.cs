@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Configs;
 
-public sealed class GeneticAnalyzerConfig : AnalyzerConfig
+public sealed class GeneticAnalyzerConfig : IAnalyzerConfig
 {
     public int PopulationSize { get; set; } = 10;
     public int MaxEvolutions { get; set; } = 1000;

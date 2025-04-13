@@ -5,9 +5,10 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Analyzers;
+using Genbox.FastData.Internal.Analysis.Analyzers.BruteForce;
+using Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Analysis.Techniques.BruteForce;
-using Genbox.FastData.Internal.Analysis.Techniques.Genetic;
 using Genbox.FastData.Internal.Optimization;
 using Genbox.FastData.Internal.Structures;
 
@@ -199,14 +200,16 @@ public static class FastDataGenerator
         {
             if (props.StringProps != null)
             {
+                Simulator simulator = new Simulator(new SimulatorConfig(), config.Data, hs.Emulate);
+
                 if (config.AnalyzerConfig is BruteForceAnalyzerConfig bfCfg)
                 {
-                    BruteForceAnalyzer analyzer = new BruteForceAnalyzer(config.Data, props.StringProps.Value, bfCfg, hs.RunSimulation);
+                    BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props.StringProps.Value, bfCfg, simulator);
                     genCfg.HashSpec = analyzer.Run().Spec;
                 }
                 if (config.AnalyzerConfig is GeneticAnalyzerConfig gaCfg)
                 {
-                    GeneticAnalyzer analyzer = new GeneticAnalyzer(config.Data, props.StringProps.Value, gaCfg, hs.RunSimulation);
+                    GeneticAnalyzer analyzer = new GeneticAnalyzer(gaCfg, simulator);
                     genCfg.HashSpec = analyzer.Run().Spec;
                 }
             }

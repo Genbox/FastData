@@ -4,7 +4,6 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.EarlyExitSpecs;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
-using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
