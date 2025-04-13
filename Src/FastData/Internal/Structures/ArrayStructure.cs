@@ -9,7 +9,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class ArrayStructure : IStructure
 {
-    public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
+    public bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
     {
         context = new ArrayContext(data);
         return true;

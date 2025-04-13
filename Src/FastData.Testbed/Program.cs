@@ -42,7 +42,7 @@ internal static class Program
             PerfectHashGPerfStructure code = new PerfectHashGPerfStructure();
             try
             {
-                code.TryCreate(data, KnownDataType.String, new DataProperties { StringProps = props }, new FastDataConfig("name", data), out _);
+                code.TryCreate(data, DataType.String, new DataProperties { StringProps = props }, new FastDataConfig("name", data), out _);
             }
             catch
             {

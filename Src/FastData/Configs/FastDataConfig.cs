@@ -2,15 +2,13 @@
 
 namespace Genbox.FastData.Configs;
 
-public class FastDataConfig(string name, object[] data, DataStructure dataStructure = DataStructure.Auto)
+public class FastDataConfig(string name, object[] data, StructureType structureType = StructureType.Auto)
 {
     public string Name { get; set; } = name;
     public object[] Data { get; set; } = data;
 
-    public DataStructure DataStructure { get; set; } = dataStructure;
+    public StructureType StructureType { get; set; } = structureType;
     public StorageOption StorageOptions { get; set; }
     public AnalyzerConfig? AnalyzerConfig { get; set; }
     public StringComparison StringComparison { get; set; } = StringComparison.Ordinal;
-
-    public KnownDataType GetDataType() => (KnownDataType)Enum.Parse(typeof(KnownDataType), Data[0].GetType().Name);
 }

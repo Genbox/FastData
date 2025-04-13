@@ -12,7 +12,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class HashSetChainStructure : IHashStructure
 {
-    public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, Func<object, uint> hash, out IContext? context)
+    public bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, Func<object, uint> hash, out IContext? context)
     {
         int[] buckets = new int[data.Length];
         HashSetEntry[] entries = new HashSetEntry[data.Length];

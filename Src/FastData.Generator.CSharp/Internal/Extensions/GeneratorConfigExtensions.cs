@@ -7,25 +7,25 @@ internal static class GeneratorConfigExtensions
 {
     internal static string GetTypeName(this GeneratorConfig config) => config.DataType switch
     {
-        KnownDataType.String => "string",
-        KnownDataType.Boolean => "bool",
-        KnownDataType.SByte => "sbyte",
-        KnownDataType.Byte => "byte",
-        KnownDataType.Char => "char",
-        KnownDataType.Int16 => "short",
-        KnownDataType.UInt16 => "ushort",
-        KnownDataType.Int32 => "int",
-        KnownDataType.UInt32 => "uint",
-        KnownDataType.Int64 => "long",
-        KnownDataType.UInt64 => "ulong",
-        KnownDataType.Single => "float",
-        KnownDataType.Double => "double",
+        DataType.String => "string",
+        DataType.Boolean => "bool",
+        DataType.SByte => "sbyte",
+        DataType.Byte => "byte",
+        DataType.Char => "char",
+        DataType.Int16 => "short",
+        DataType.UInt16 => "ushort",
+        DataType.Int32 => "int",
+        DataType.UInt32 => "uint",
+        DataType.Int64 => "long",
+        DataType.UInt64 => "ulong",
+        DataType.Single => "float",
+        DataType.Double => "double",
         _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
     };
 
     internal static string GetEqualFunction(this GeneratorConfig config, string variable)
     {
-        if (config.DataType == KnownDataType.String)
+        if (config.DataType == DataType.String)
             return $"StringComparer.{config.StringComparison}.Equals(value, {variable})";
 
         return $"value.Equals({variable})";
@@ -33,7 +33,7 @@ internal static class GeneratorConfigExtensions
 
     internal static string GetCompareFunction(this GeneratorConfig config, string variable)
     {
-        if (config.DataType == KnownDataType.String)
+        if (config.DataType == DataType.String)
             return $"StringComparer.{config.StringComparison}.Compare({variable}, value)";
 
         return $"{variable}.CompareTo(value)";
@@ -45,21 +45,21 @@ internal static class GeneratorConfigExtensions
              public static uint Hash({config.GetTypeName()} value{(seeded ? ", uint seed" : "")}) => {GetHash(config.DataType, seeded)};
          """;
 
-    private static string GetHash(KnownDataType dataType, bool seeded)
+    private static string GetHash(DataType dataType, bool seeded)
     {
-        if (dataType == KnownDataType.String)
+        if (dataType == DataType.String)
             return seeded ? "HashHelper.HashStringSeed(value, seed)" : "HashHelper.HashString(value)";
 
         //For these types, we can use identity hashing
         return dataType switch
         {
-            KnownDataType.Char
-                or KnownDataType.SByte
-                or KnownDataType.Byte
-                or KnownDataType.Int16
-                or KnownDataType.UInt16
-                or KnownDataType.Int32
-                or KnownDataType.UInt32 => seeded ? "unchecked((uint)(value ^ seed))" : "unchecked((uint)value)",
+            DataType.Char
+                or DataType.SByte
+                or DataType.Byte
+                or DataType.Int16
+                or DataType.UInt16
+                or DataType.Int32
+                or DataType.UInt32 => seeded ? "unchecked((uint)(value ^ seed))" : "unchecked((uint)value)",
             _ => seeded ? "unchecked((uint)(value.GetHashCode() ^ seed))" : "unchecked((uint)(value.GetHashCode()))"
         };
     }

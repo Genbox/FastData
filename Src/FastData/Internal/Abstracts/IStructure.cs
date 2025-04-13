@@ -7,5 +7,5 @@ namespace Genbox.FastData.Internal.Abstracts;
 
 internal interface IStructure
 {
-    bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, out IContext? context);
+    bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, out IContext? context);
 }

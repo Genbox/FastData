@@ -8,6 +8,6 @@ namespace Genbox.FastData.Internal.Abstracts;
 
 internal interface IHashStructure
 {
-    bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, Func<object, uint> hash, out IContext? context);
+    bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, Func<object, uint> hash, out IContext? context);
     void RunSimulation<T>(object[] data, AnalyzerConfig config, ref Candidate<T> candidate) where T : struct, IHashSpec;
 }

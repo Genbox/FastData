@@ -9,10 +9,10 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class KeyLengthStructure : IStructure
 {
-    public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
+    public bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
     {
         // This data structure is only appropriate for strings
-        if (dataType != KnownDataType.String)
+        if (dataType != DataType.String)
         {
             context = null;
             return false;

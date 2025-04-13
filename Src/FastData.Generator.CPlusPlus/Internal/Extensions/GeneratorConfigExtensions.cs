@@ -7,19 +7,19 @@ internal static class GeneratorConfigExtensions
 {
     internal static string GetTypeName(this GeneratorConfig config) => config.DataType switch
     {
-        KnownDataType.String => "std::string",
-        KnownDataType.Boolean => "bool",
-        KnownDataType.SByte => "int8_t",
-        KnownDataType.Byte => "uint8_t",
-        KnownDataType.Char => "char",
-        KnownDataType.Int16 => "int16_t",
-        KnownDataType.UInt16 => "uint16_t",
-        KnownDataType.Int32 => "int32_t",
-        KnownDataType.UInt32 => "uint32_t",
-        KnownDataType.Int64 => "int64_t",
-        KnownDataType.UInt64 => "uint64_t",
-        KnownDataType.Single => "float",
-        KnownDataType.Double => "double",
+        DataType.String => "std::string",
+        DataType.Boolean => "bool",
+        DataType.SByte => "int8_t",
+        DataType.Byte => "uint8_t",
+        DataType.Char => "char",
+        DataType.Int16 => "int16_t",
+        DataType.UInt16 => "uint16_t",
+        DataType.Int32 => "int32_t",
+        DataType.UInt32 => "uint32_t",
+        DataType.Int64 => "int64_t",
+        DataType.UInt64 => "uint64_t",
+        DataType.Single => "float",
+        DataType.Double => "double",
         _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
     };
 
@@ -91,18 +91,18 @@ internal static class GeneratorConfigExtensions
                """;
     }
 
-    private static string GetHash(KnownDataType dataType, bool seeded)
+    private static string GetHash(DataType dataType, bool seeded)
     {
         //For these types, we can use identity hashing
         return dataType switch
         {
-            KnownDataType.Char
-                or KnownDataType.SByte
-                or KnownDataType.Byte
-                or KnownDataType.Int16
-                or KnownDataType.UInt16
-                or KnownDataType.Int32
-                or KnownDataType.UInt32 => seeded ? "unchecked((uint)(value ^ seed))" : "unchecked((uint)value)",
+            DataType.Char
+                or DataType.SByte
+                or DataType.Byte
+                or DataType.Int16
+                or DataType.UInt16
+                or DataType.Int32
+                or DataType.UInt32 => seeded ? "unchecked((uint)(value ^ seed))" : "unchecked((uint)value)",
             _ => seeded ? "unchecked((uint)(value.GetHashCode() ^ seed))" : "unchecked((uint)(value.GetHashCode()))"
         };
     }

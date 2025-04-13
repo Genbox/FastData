@@ -32,7 +32,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class PerfectHashGPerfStructure : IStructure
 {
-    public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
+    public bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
     {
         context = null;
 
@@ -41,7 +41,7 @@ internal sealed class PerfectHashGPerfStructure : IStructure
             return false;
 
         // GPerf only works on strings
-        if (dataType != KnownDataType.String)
+        if (dataType != DataType.String)
             return false;
 
         // We cannot work on empty strings

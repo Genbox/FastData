@@ -9,7 +9,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class SingleValueStructure : IStructure
 {
-    public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
+    public bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
     {
         if (data.Length != 1)
         {
