@@ -98,6 +98,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.CPlusPlu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.CPlusPlus.Tests", "Src\FastData.Generator.CPlusPlus.Tests\FastData.Generator.CPlusPlus.Tests.csproj", "{BB90472C-EDB4-4096-BBF1-31155DF4ECBF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Cli", "Src\FastData.Cli\FastData.Cli.csproj", "{8E43F76D-2D1C-49FC-84DF-45E0B73E80F1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cli", "Cli", "{929CD776-13A7-47E7-884B-A9B3A02BC4F1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PowerShell", "PowerShell", "{E3F10FE2-903B-4DCD-98A8-A18E1589C3BE}"
+	ProjectSection(SolutionItems) = preProject
+		Misc\PowerShell\FastData.psd1 = Misc\PowerShell\FastData.psd1
+		Misc\PowerShell\FastData.psm1 = Misc\PowerShell\FastData.psm1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Scripts", "_Scripts", "{6257D463-0651-404E-8440-BD7AD4EC89F4}"
+	ProjectSection(SolutionItems) = preProject
+		Publish.ps1 = Publish.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -175,6 +190,10 @@ Global
 		{BB90472C-EDB4-4096-BBF1-31155DF4ECBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB90472C-EDB4-4096-BBF1-31155DF4ECBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB90472C-EDB4-4096-BBF1-31155DF4ECBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E43F76D-2D1C-49FC-84DF-45E0B73E80F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E43F76D-2D1C-49FC-84DF-45E0B73E80F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E43F76D-2D1C-49FC-84DF-45E0B73E80F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E43F76D-2D1C-49FC-84DF-45E0B73E80F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{24810DE3-EAFF-4FA9-8813-209C15AC75EC} = {B774BCA8-4D2D-44E7-903F-0FFC349FCC85}
@@ -194,5 +213,7 @@ Global
 		{C47D3500-3446-4B24-A267-318886F36A47} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
 		{42582813-5EEB-40BF-AD39-7779AB5CB49F} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
 		{BB90472C-EDB4-4096-BBF1-31155DF4ECBF} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
+		{8E43F76D-2D1C-49FC-84DF-45E0B73E80F1} = {929CD776-13A7-47E7-884B-A9B3A02BC4F1}
+		{E3F10FE2-903B-4DCD-98A8-A18E1589C3BE} = {929CD776-13A7-47E7-884B-A9B3A02BC4F1}
 	EndGlobalSection
 EndGlobal
