@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Enums;
 
-public enum DataStructure : byte
+public enum StructureType : byte
 {
     Auto = 0,
 

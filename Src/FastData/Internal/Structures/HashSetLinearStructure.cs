@@ -15,7 +15,7 @@ internal sealed class HashSetLinearStructure : IHashStructure
 {
     //TODO: Either implement a bitmap for seen buckets everywhere or don't use bitmaps for simplicity
 
-    public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, Func<object, uint> hash, out IContext? context)
+    public bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, Func<object, uint> hash, out IContext? context)
     {
         uint[] hashCodes = new uint[data.Length];
         for (int i = 0; i < data.Length; i++)

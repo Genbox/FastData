@@ -48,7 +48,7 @@ public class DataStructureBenchmarks
     [Params(10_000)]
     public int QuerySize { get; set; }
 
-    private static IFastSet<string> CreateFastData(DataStructure ds, object[] data, Action<CSharpGeneratorConfig>? configure = null)
+    private static IFastSet<string> CreateFastData(StructureType ds, object[] data, Action<CSharpGeneratorConfig>? configure = null)
     {
         FastDataConfig config = new FastDataConfig(ds.ToString(), data, ds);
 
@@ -122,84 +122,84 @@ public class DataStructureBenchmarks
     public void SetupStaticArray()
     {
         SetupQueries();
-        _fastArray = CreateFastData(DataStructure.Array, _data);
+        _fastArray = CreateFastData(StructureType.Array, _data);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticBinarySearch))]
     public void SetupStaticBinarySearch()
     {
         SetupQueries();
-        _fastBinarySearch = CreateFastData(DataStructure.BinarySearch, _data);
+        _fastBinarySearch = CreateFastData(StructureType.BinarySearch, _data);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticEytzingerSearch))]
     public void SetupStaticEytzingerSearch()
     {
         SetupQueries();
-        _fastEytzingerSearch = CreateFastData(DataStructure.EytzingerSearch, _data);
+        _fastEytzingerSearch = CreateFastData(StructureType.EytzingerSearch, _data);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticConditionalIf))]
     public void SetupStaticConditionalIf()
     {
         SetupQueries();
-        _fastConditionalIf = CreateFastData(DataStructure.Conditional, _data, config => config.ConditionalBranchType = BranchType.If);
+        _fastConditionalIf = CreateFastData(StructureType.Conditional, _data, config => config.ConditionalBranchType = BranchType.If);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticConditionalSwitch))]
     public void SetupStaticConditionalSwitch()
     {
         SetupQueries();
-        _fastConditionalSwitch = CreateFastData(DataStructure.Conditional, _data, config => config.ConditionalBranchType = BranchType.Switch);
+        _fastConditionalSwitch = CreateFastData(StructureType.Conditional, _data, config => config.ConditionalBranchType = BranchType.Switch);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticPerfectHashGPerf))]
     public void SetupStaticPerfectHashGPerf()
     {
         SetupQueries();
-        _fastPerfectHashGPerf = CreateFastData(DataStructure.PerfectHashGPerf, _data);
+        _fastPerfectHashGPerf = CreateFastData(StructureType.PerfectHashGPerf, _data);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticPerfectHashBruteforce))]
     public void SetupStaticPerfectHashBruteForce()
     {
         SetupQueries();
-        _fastPerfectHashBruteForce = CreateFastData(DataStructure.PerfectHashBruteForce, _data);
+        _fastPerfectHashBruteForce = CreateFastData(StructureType.PerfectHashBruteForce, _data);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticHashSetLinear))]
     public void SetupStaticHashSetLinear()
     {
         SetupQueries();
-        _fastHashSetLinear = CreateFastData(DataStructure.HashSetLinear, _data);
+        _fastHashSetLinear = CreateFastData(StructureType.HashSetLinear, _data);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticHashSetChain))]
     public void SetupStaticHashSetChain()
     {
         SetupQueries();
-        _fastHashSetChain = CreateFastData(DataStructure.HashSetChain, _data);
+        _fastHashSetChain = CreateFastData(StructureType.HashSetChain, _data);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticKeyLengthUniqIf))]
     public void SetupStaticKeyLengthUniqIf()
     {
         SetupQueries();
-        _fastKeyLengthUniqIf = CreateFastData(DataStructure.KeyLength, _dataUniqLen, c => c.KeyLengthUniqBranchType = BranchType.If);
+        _fastKeyLengthUniqIf = CreateFastData(StructureType.KeyLength, _dataUniqLen, c => c.KeyLengthUniqBranchType = BranchType.If);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticKeyLengthUniqSwitch))]
     public void SetupStaticKeyLengthUniqSwitch()
     {
         SetupQueries();
-        _fastKeyLengthUniqSwitch = CreateFastData(DataStructure.KeyLength, _dataUniqLen, c => c.KeyLengthUniqBranchType = BranchType.Switch);
+        _fastKeyLengthUniqSwitch = CreateFastData(StructureType.KeyLength, _dataUniqLen, c => c.KeyLengthUniqBranchType = BranchType.Switch);
     }
 
     [GlobalSetup(Target = nameof(QueryStaticKeyLength))]
     public void SetupStaticKeyLength()
     {
         SetupQueries();
-        _fastKeyLength = CreateFastData(DataStructure.KeyLength, _data);
+        _fastKeyLength = CreateFastData(StructureType.KeyLength, _data);
     }
 
     [Benchmark, BenchmarkCategory("Construction")]

@@ -18,7 +18,7 @@ public static class FastDataGenerator
 {
     public static bool TryGenerate(FastDataConfig config, IGenerator generator, out string? source)
     {
-        PreProcess(config, out KnownDataType dataType, out DataProperties props, out IEarlyExit[] exits);
+        PreProcess(config, out DataType dataType, out DataProperties props, out IEarlyExit[] exits);
 
         Constants constants = new Constants((uint)config.Data.Length);
 
@@ -61,7 +61,7 @@ public static class FastDataGenerator
         return false;
     }
 
-    private static void PreProcess(FastDataConfig config, out KnownDataType dataType, out DataProperties props, out IEarlyExit[] exits)
+    private static void PreProcess(FastDataConfig config, out DataType dataType, out DataProperties props, out IEarlyExit[] exits)
     {
         //Validate that we only have unique data
         HashSet<object> uniq = new HashSet<object>();
@@ -72,7 +72,7 @@ public static class FastDataGenerator
                 throw new InvalidOperationException("Duplicate data detected: " + o);
         }
 
-        dataType = config.GetDataType();
+        dataType = (DataType)Enum.Parse(typeof(DataType), config.Data[0].GetType().Name);
         props = GetDataProperties(config.Data, dataType);
         exits = GetEarlyExits(props);
     }
@@ -94,9 +94,9 @@ public static class FastDataGenerator
 
     private static IEnumerable<object> GetDataStructureCandidates(FastDataConfig config)
     {
-        DataStructure ds = config.DataStructure;
+        StructureType ds = config.StructureType;
 
-        if (ds == DataStructure.Auto)
+        if (ds == StructureType.Auto)
         {
             if (config.Data.Length == 1)
                 yield return new SingleValueStructure();
@@ -117,75 +117,75 @@ public static class FastDataGenerator
                     yield return new HashSetChainStructure();
             }
         }
-        else if (ds == DataStructure.SingleValue)
+        else if (ds == StructureType.SingleValue)
             yield return new SingleValueStructure();
-        else if (ds == DataStructure.Array)
+        else if (ds == StructureType.Array)
             yield return new ArrayStructure();
-        else if (ds == DataStructure.Conditional)
+        else if (ds == StructureType.Conditional)
             yield return new ConditionalStructure();
-        else if (ds == DataStructure.BinarySearch)
+        else if (ds == StructureType.BinarySearch)
             yield return new BinarySearchStructure();
-        else if (ds == DataStructure.EytzingerSearch)
+        else if (ds == StructureType.EytzingerSearch)
             yield return new EytzingerSearchStructure();
-        else if (ds == DataStructure.PerfectHashGPerf)
+        else if (ds == StructureType.PerfectHashGPerf)
             yield return new PerfectHashGPerfStructure();
-        else if (ds == DataStructure.PerfectHashBruteForce)
+        else if (ds == StructureType.PerfectHashBruteForce)
             yield return new PerfectHashBruteForceStructure();
-        else if (ds == DataStructure.HashSetChain)
+        else if (ds == StructureType.HashSetChain)
             yield return new HashSetChainStructure();
-        else if (ds == DataStructure.HashSetLinear)
+        else if (ds == StructureType.HashSetLinear)
             yield return new HashSetLinearStructure();
-        else if (ds == DataStructure.KeyLength)
+        else if (ds == StructureType.KeyLength)
             yield return new KeyLengthStructure();
         else
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
 
-    private static DataProperties GetDataProperties(object[] data, KnownDataType dataType)
+    private static DataProperties GetDataProperties(object[] data, DataType dataType)
     {
         DataProperties props = new DataProperties();
 
         switch (dataType)
         {
-            case KnownDataType.SByte:
+            case DataType.SByte:
                 props.IntProps = DataAnalyzer.GetSByteProperties(data);
                 break;
-            case KnownDataType.Byte:
+            case DataType.Byte:
                 props.UIntProps = DataAnalyzer.GetByteProperties(data);
                 break;
-            case KnownDataType.Int16:
+            case DataType.Int16:
                 props.IntProps = DataAnalyzer.GetInt16Properties(data);
                 break;
-            case KnownDataType.UInt16:
+            case DataType.UInt16:
                 props.UIntProps = DataAnalyzer.GetUInt16Properties(data);
                 break;
-            case KnownDataType.Int32:
+            case DataType.Int32:
                 props.IntProps = DataAnalyzer.GetInt32Properties(data);
                 break;
-            case KnownDataType.UInt32:
+            case DataType.UInt32:
                 props.UIntProps = DataAnalyzer.GetUInt32Properties(data);
                 break;
-            case KnownDataType.Int64:
+            case DataType.Int64:
                 props.IntProps = DataAnalyzer.GetInt64Properties(data);
                 break;
-            case KnownDataType.UInt64:
+            case DataType.UInt64:
                 props.UIntProps = DataAnalyzer.GetUInt64Properties(data);
                 break;
-            case KnownDataType.String:
+            case DataType.String:
                 props.StringProps = DataAnalyzer.GetStringProperties(data);
                 break;
-            case KnownDataType.Boolean:
+            case DataType.Boolean:
                 break;
-            case KnownDataType.Char:
+            case DataType.Char:
                 props.CharProps = DataAnalyzer.GetCharProperties(data);
                 break;
-            case KnownDataType.Single:
+            case DataType.Single:
                 props.FloatProps = DataAnalyzer.GetSingleProperties(data);
                 break;
-            case KnownDataType.Double:
+            case DataType.Double:
                 props.FloatProps = DataAnalyzer.GetDoubleProperties(data);
                 break;
-            case KnownDataType.Unknown:
+            case DataType.Unknown:
                 //Do nothing
                 break;
             default:
@@ -194,7 +194,7 @@ public static class FastDataGenerator
         return props;
     }
 
-    private static bool TryProcessCandidate(object candidate, DataProperties props, GeneratorConfig genCfg, KnownDataType dataType, IGenerator generator, FastDataConfig config, out string? code)
+    private static bool TryProcessCandidate(object candidate, DataProperties props, GeneratorConfig genCfg, DataType dataType, IGenerator generator, FastDataConfig config, out string? code)
     {
         if (candidate is IHashStructure hs)
         {

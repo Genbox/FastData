@@ -9,9 +9,9 @@ public class GeneratorTests
 
     [Theory]
     [MemberData(nameof(GetDataStructures))]
-    internal void GenerateDataStructure(DataStructure dataStructure, object[] data)
+    internal void GenerateDataStructure(StructureType structureType, object[] data)
     {
-        if (!TestHelper.TryGenerateDataStructure(_generator, dataStructure, data, out GeneratorSpec spec))
+        if (!TestHelper.TryGenerateDataStructure(_generator, structureType, data, out GeneratorSpec spec))
             return;
 
         Assert.NotEmpty(spec.Source);
@@ -19,11 +19,11 @@ public class GeneratorTests
         File.WriteAllText($@"..\..\..\Generated\{spec.Identifier}.output", spec.Source);
     }
 
-    public static TheoryData<DataStructure, object[]> GetDataStructures()
+    public static TheoryData<StructureType, object[]> GetDataStructures()
     {
-        TheoryData<DataStructure, object[]> res = new TheoryData<DataStructure, object[]>();
+        TheoryData<StructureType, object[]> res = new TheoryData<StructureType, object[]>();
 
-        foreach (DataStructure structure in Enum.GetValues<DataStructure>().Where(x => x != DataStructure.Auto))
+        foreach (StructureType structure in Enum.GetValues<StructureType>().Where(x => x != StructureType.Auto))
             foreach (object[] data in TestHelper.GetAllSets())
                 res.Add(structure, data);
 

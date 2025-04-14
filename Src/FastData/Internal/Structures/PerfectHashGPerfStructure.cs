@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
@@ -32,7 +33,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class PerfectHashGPerfStructure : IStructure
 {
-    public bool TryCreate(object[] data, KnownDataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
+    [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
+    public bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
     {
         context = null;
 
@@ -41,7 +43,7 @@ internal sealed class PerfectHashGPerfStructure : IStructure
             return false;
 
         // GPerf only works on strings
-        if (dataType != KnownDataType.String)
+        if (dataType != DataType.String)
             return false;
 
         // We cannot work on empty strings
@@ -130,6 +132,7 @@ internal sealed class PerfectHashGPerfStructure : IStructure
         return true;
     }
 
+    [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
     private static int[] FindAlphaIncrements(List<Keyword> keywords, int maxKeyLen, int[] positions)
     {
         uint duplicatesGoal = CountDuplicates(keywords, positions);
