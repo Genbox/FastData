@@ -28,3 +28,6 @@
 
 # FodyWeavers used for IL injection
 *FodyWeavers.*
+
+# Others
+Publish/
