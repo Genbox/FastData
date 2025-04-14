@@ -4,7 +4,7 @@ using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Models;
 using Genbox.FastData.Models.Misc;
@@ -77,10 +77,7 @@ internal sealed class HashSetLinearStructure : IHashStructure
         return true;
     }
 
-    public void RunSimulation<T>(object[] data, AnalyzerConfig config, ref Candidate<T> candidate) where T : struct, IHashSpec
-    {
-        throw new NotSupportedException("Not yet supported.");
-    }
+    public double[] Emulate(object[] data, uint capacity, HashFunc hashFunc, EqualFunc equalFunc) => HashSetChainStructure.EmulateInternal(data, capacity, hashFunc, equalFunc);
 
     private static uint CalcNumBuckets(ReadOnlySpan<uint> hashCodes)
     {

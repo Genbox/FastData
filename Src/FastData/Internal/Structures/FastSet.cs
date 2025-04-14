@@ -1,8 +1,9 @@
 using System.Runtime.InteropServices;
+using Genbox.FastData.Internal.Analysis.Analyzers;
 
 namespace Genbox.FastData.Internal.Structures;
 
-public ref struct FastSet(uint capacity, Func<string, uint> hashFunc, Func<string, string, bool> equalFunc)
+public ref struct FastSet(uint capacity, HashFunc hashFunc, EqualFunc equalFunc)
 {
     private readonly int[] _buckets = new int[capacity];
     private readonly Entry[] _entries = new Entry[capacity];

@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Helpers;
 

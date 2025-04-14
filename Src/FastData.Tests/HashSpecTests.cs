@@ -1,8 +1,9 @@
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Internal.Analysis.Analyzers;
+using Genbox.FastData.Internal.Analysis.Analyzers.BruteForce;
+using Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
+using Genbox.FastData.Internal.Analysis.Analyzers.Heuristics;
 using Genbox.FastData.Internal.Analysis.Misc;
-using Genbox.FastData.Internal.Analysis.Techniques.BruteForce;
-using Genbox.FastData.Internal.Analysis.Techniques.Genetic;
-using Genbox.FastData.Internal.Analysis.Techniques.Heuristics;
 using Genbox.FastData.Internal.Enums;
 using Genbox.FastData.InternalShared;
 
@@ -15,7 +16,7 @@ public class HashSpecTests
     [MemberData(nameof(GetSpecs))]
     internal void HashSpecEqualityTest(IHashSpec spec, uint vector)
     {
-        Func<string, uint> func = spec.GetFunction();
+        HashFunc func = spec.GetHashFunction();
         Assert.Equal(vector, func("hello world"));
 
         //The source code must give the same result

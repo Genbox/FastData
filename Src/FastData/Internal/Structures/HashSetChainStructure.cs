@@ -1,9 +1,8 @@
-using System.Diagnostics;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Models;
 using Genbox.FastData.Models.Misc;
@@ -34,32 +33,9 @@ internal sealed class HashSetChainStructure : IHashStructure
         return true;
     }
 
-    public void RunSimulation<T>(object[] data, AnalyzerConfig config, ref Candidate<T> cand) where T : struct, IHashSpec
-    {
-        // Generate a hash function from the spec
-        Func<string, uint> hashFunc = cand.Spec.GetFunction();
-        Func<string, string, bool> equalFunc = cand.Spec.GetEqualFunction();
-        uint capacity = (uint)(data.Length * config.CapacityFactor);
+    public double[] Emulate(object[] data, uint capacity, HashFunc hashFunc, EqualFunc equalFunc) => EmulateInternal(data, capacity, hashFunc, equalFunc);
 
-        long ticks = Stopwatch.GetTimestamp();
-        (int collisions, int minVariance, int maxVariance) = Emulate(data, capacity, hashFunc, equalFunc);
-        ticks = Stopwatch.GetTimestamp() - ticks;
-
-        double normColl = (1.0 - ((double)collisions / capacity)) * config.FillWeight;
-        double normTime = (1.0 / (1.0 + ((double)ticks / 1000))) * config.TimeWeight;
-
-        //TODO: Implement variance
-        cand.Fitness = (normColl + normTime) / 2;
-
-        cand.Metadata["Time"] = ticks;
-        cand.Metadata["TimeNormalized"] = normTime;
-        cand.Metadata["Collisions"] = collisions;
-        cand.Metadata["CollisionsNormalized"] = normColl;
-        cand.Metadata["MinVariance"] = minVariance;
-        cand.Metadata["MaxVariance"] = maxVariance;
-    }
-
-    private static (int cccupied, int minVariance, int maxVariance) Emulate(object[] data, uint capacity, Func<string, uint> hashFunc, Func<string, string, bool> equalFunc)
+    internal static double[] EmulateInternal(object[] data, uint capacity, HashFunc hashFunc, EqualFunc equalFunc)
     {
         //Note: FastSet does not call equals on elements
         FastSet set = new FastSet(capacity, hashFunc, equalFunc);
@@ -71,6 +47,7 @@ internal sealed class HashSetChainStructure : IHashStructure
                 collisions++;
         }
 
-        return (collisions, set.MinVariance, set.MaxVariance);
+        //TODO: set.MinVariance, set.MaxVariance
+        return [capacity / (double)collisions];
     }
 }

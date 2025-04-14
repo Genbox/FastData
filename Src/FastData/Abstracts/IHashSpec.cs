@@ -1,8 +1,10 @@
+using Genbox.FastData.Internal.Analysis.Analyzers;
+
 namespace Genbox.FastData.Abstracts;
 
 public interface IHashSpec
 {
-    Func<string, uint> GetFunction();
-    Func<string, string, bool> GetEqualFunction();
+    HashFunc GetHashFunction();
+    EqualFunc GetEqualFunction();
     string GetSource();
 }

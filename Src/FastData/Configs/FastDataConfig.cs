@@ -9,6 +9,7 @@ public class FastDataConfig(string name, object[] data, StructureType structureT
 
     public StructureType StructureType { get; set; } = structureType;
     public StorageOption StorageOptions { get; set; }
-    public AnalyzerConfig? AnalyzerConfig { get; set; }
+    public SimulatorConfig? SimulatorConfig { get; set; }
+    public IAnalyzerConfig? AnalyzerConfig { get; set; }
     public StringComparison StringComparison { get; set; } = StringComparison.Ordinal;
 }

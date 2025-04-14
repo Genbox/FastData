@@ -4,8 +4,8 @@ using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Analyzers.Heuristics;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Analysis.Techniques.Heuristics;
 using Genbox.FastData.Models;
 using static Genbox.FastData.Internal.Structures.DebugHelper;
 
@@ -51,8 +51,7 @@ internal sealed class PerfectHashGPerfStructure : IStructure
             return false;
 
         // Step 1: Finding good positions
-        HashSetChainStructure chainHash = new HashSetChainStructure();
-        HeuristicAnalyzer analyzer = new HeuristicAnalyzer(data, props.StringProps.Value, new HeuristicAnalyzerConfig(), chainHash.RunSimulation);
+        HeuristicAnalyzer analyzer = new HeuristicAnalyzer(data, props.StringProps.Value, new HeuristicAnalyzerConfig(), null); //TODO
         Candidate<HeuristicHashSpec> candidate = analyzer.Run();
 
         // If we didn't get any positions, we don't want to move any further
