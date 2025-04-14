@@ -4,6 +4,7 @@ using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Analyzers.Heuristics;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Models;
@@ -31,9 +32,9 @@ namespace Genbox.FastData.Internal.Structures;
 
 //TODO: Convert to a IHashStructure
 
+[SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
 internal sealed class PerfectHashGPerfStructure : IStructure
 {
-    [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
     public bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
     {
         context = null;
@@ -51,7 +52,8 @@ internal sealed class PerfectHashGPerfStructure : IStructure
             return false;
 
         // Step 1: Finding good positions
-        HeuristicAnalyzer analyzer = new HeuristicAnalyzer(data, props.StringProps.Value, new HeuristicAnalyzerConfig(), null); //TODO
+        Simulator sim = new Simulator(new SimulatorConfig { TimeWeight = 0 }, data, HashSetChainStructure.EmulateInternal);
+        HeuristicAnalyzer analyzer = new HeuristicAnalyzer(data, props.StringProps.Value, new HeuristicAnalyzerConfig(), sim);
         Candidate<HeuristicHashSpec> candidate = analyzer.Run();
 
         // If we didn't get any positions, we don't want to move any further
@@ -132,7 +134,6 @@ internal sealed class PerfectHashGPerfStructure : IStructure
         return true;
     }
 
-    [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
     private static int[] FindAlphaIncrements(List<Keyword> keywords, int maxKeyLen, int[] positions)
     {
         uint duplicatesGoal = CountDuplicates(keywords, positions);

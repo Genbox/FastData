@@ -41,6 +41,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers.Heuristics;
  */
 
 /// <summary>Finds the least number of positions in a string that hashes to a unique value for all inputs.</summary>
+[SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
 internal class HeuristicAnalyzer(object[] data, StringProperties props, HeuristicAnalyzerConfig config, Simulator simulator) : IHashAnalyzer<HeuristicHashSpec>
 {
     public Candidate<HeuristicHashSpec> Run()
@@ -232,7 +233,6 @@ internal class HeuristicAnalyzer(object[] data, StringProperties props, Heuristi
 
     private double CalculateFitness(HashSet<int> set) => CalculateFitnessInternal(set).Fitness * -1; //The algorithm here works with less fitness = better. At least for now.
 
-    [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
     private Candidate<HeuristicHashSpec> CalculateFitnessInternal(HashSet<int> set)
     {
         Candidate<HeuristicHashSpec> cand = new Candidate<HeuristicHashSpec>(new HeuristicHashSpec(set.OrderBy(x => x).ToArray()));
@@ -241,7 +241,6 @@ internal class HeuristicAnalyzer(object[] data, StringProperties props, Heuristi
     }
 
     [Conditional("DebugPrint")]
-    [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
     private void Print(string stage, HashSet<int> set)
     {
         Candidate<HeuristicHashSpec> cand = CalculateFitnessInternal(set);
