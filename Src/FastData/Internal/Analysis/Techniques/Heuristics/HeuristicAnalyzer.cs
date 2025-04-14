@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -231,6 +232,7 @@ internal class HeuristicAnalyzer(object[] data, StringProperties props, Heuristi
 
     private double CalculateFitness(HashSet<int> set) => CalculateFitnessInternal(set).Fitness * -1; //The algorithm here works with less fitness = better. At least for now.
 
+    [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
     private Candidate<HeuristicHashSpec> CalculateFitnessInternal(HashSet<int> set)
     {
         Candidate<HeuristicHashSpec> cand = new Candidate<HeuristicHashSpec>(new HeuristicHashSpec(set.OrderBy(x => x).ToArray()));
@@ -239,6 +241,7 @@ internal class HeuristicAnalyzer(object[] data, StringProperties props, Heuristi
     }
 
     [Conditional("DebugPrint")]
+    [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
     private void Print(string stage, HashSet<int> set)
     {
         Candidate<HeuristicHashSpec> cand = CalculateFitnessInternal(set);

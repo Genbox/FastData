@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using Genbox.FastData.Abstracts;
@@ -120,6 +121,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
 
     private static void RenderOne(StringBuilder sb, string? x) => sb.Append(ToValueLabel(x));
 
+    [SuppressMessage("Roslynator", "RCS1197:Optimize StringBuilder.Append/AppendLine call")]
     private static void RenderMany(StringBuilder sb, List<string>? x)
     {
         if (x == null)

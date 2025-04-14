@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Genbox.FastData.Internal.Structures;
 
 internal class Keyword(string allChars)
@@ -19,6 +21,7 @@ internal class Keyword(string allChars)
         SelChars = new string(chars);
     }
 
+    [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
     private char[] InitSelCharsLow(int[] positions, int[]? alpha_inc = null)
     {
         Span<char> keySet = stackalloc char[positions.Length];
