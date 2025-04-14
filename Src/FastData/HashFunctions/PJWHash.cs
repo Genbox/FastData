@@ -2,8 +2,6 @@ using System.Text;
 
 namespace Genbox.FastData.HashFunctions;
 
-//TODO: This is a very bad implementation right now. It is going away soon.
-
 public static class PJWHash
 {
     public static string GetString(string input, int[] positions)

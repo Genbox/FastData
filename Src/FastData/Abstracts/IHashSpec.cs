@@ -6,5 +6,4 @@ public interface IHashSpec
 {
     HashFunc GetHashFunction();
     EqualFunc GetEqualFunction();
-    string GetSource();
 }

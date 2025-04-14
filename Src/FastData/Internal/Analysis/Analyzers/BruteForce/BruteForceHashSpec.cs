@@ -22,16 +22,7 @@ internal readonly record struct BruteForceHashSpec(HashFunction HashFunction, St
         };
     }
 
-    public EqualFunc GetEqualFunction() => (a, b) => a.Equals(b, StringComparison.Ordinal);
-
-    public string GetSource()
-        => $$"""
-                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                 public static uint Hash(string str)
-                 {
-                     return Genbox.FastData.HashFunctions.{{HashFunction}}.ComputeHash({{GetSlice(Segments[0])}});
-                 }
-             """;
+    public EqualFunc GetEqualFunction() => static (a, b) => a.Equals(b, StringComparison.Ordinal);
 
     private static string GetSlice(StringSegment segment)
     {

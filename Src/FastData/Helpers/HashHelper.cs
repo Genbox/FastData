@@ -30,6 +30,9 @@ public static class HashHelper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint HashString(string data) => DJB2Hash.ComputeHash(data.AsSpan());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint HashString(ReadOnlySpan<char> data) => DJB2Hash.ComputeHash(data);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -5,24 +5,17 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
 using Genbox.FastData.Internal.Analysis.Analyzers.Heuristics;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Enums;
-using Genbox.FastData.InternalShared;
 
 namespace Genbox.FastData.Tests;
 
 public class HashSpecTests
 {
-    /// <summary>Tests if GetFunction() and GetSource() returns the same values for the same inputs</summary>
     [Theory]
     [MemberData(nameof(GetSpecs))]
     internal void HashSpecEqualityTest(IHashSpec spec, uint vector)
     {
         HashFunc func = spec.GetHashFunction();
         Assert.Equal(vector, func("hello world"));
-
-        //The source code must give the same result
-        string source = spec.GetSource();
-        Func<string, uint> func2 = CompilationHelper.GetDelegate<Func<string, uint>>(source, false);
-        Assert.Equal(vector, func2("hello world"));
     }
 
     public static IEnumerable<object[]> GetSpecs()

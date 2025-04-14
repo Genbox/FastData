@@ -9,8 +9,6 @@ internal sealed class DefaultHashSpec : IHashSpec
     private DefaultHashSpec() {}
     public static DefaultHashSpec Instance { get; } = new DefaultHashSpec();
 
-    public HashFunc GetHashFunction() => HashHelper.HashObject;
-    public EqualFunc GetEqualFunction() => (a, b) => a.Equals(b, StringComparison.Ordinal);
-
-    public string GetSource() => "HashHelper.HashObject(value)";
+    public HashFunc GetHashFunction() => HashHelper.HashString;
+    public EqualFunc GetEqualFunction() => static (a, b) => a.Equals(b, StringComparison.Ordinal);
 }

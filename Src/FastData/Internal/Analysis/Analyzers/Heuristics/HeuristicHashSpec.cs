@@ -18,14 +18,4 @@ internal readonly record struct HeuristicHashSpec(int[] Positions) : IHashSpec
         int[] localPos = Positions;
         return (a, b) => PJWHash.GetString(a, localPos) == PJWHash.GetString(b, localPos);
     }
-
-    public string GetSource()
-        => $$"""
-                 private static int[] _positions = { {{string.Join(", ", Positions)}} };
-
-                 public static uint Hash(string str)
-                 {
-                     return Genbox.FastData.HashFunctions.PJWHash.Hash(str, _positions);
-                 }
-             """;
 }
