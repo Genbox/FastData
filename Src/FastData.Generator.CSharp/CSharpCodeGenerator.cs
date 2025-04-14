@@ -67,13 +67,13 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
         _sb.AppendLine("""
                        #nullable enable
                        using System;
+                       using System.Runtime.CompilerServices;
+                       using System.Runtime.InteropServices;
+                       using Genbox.FastData.Helpers;
                        """);
 
         if (iface != null)
-            _sb.AppendLine("using System.Runtime.CompilerServices;");
-
-        if (attr != null)
-            _sb.AppendLine("using System.Runtime.InteropServices;");
+            _sb.AppendLine("using Genbox.FastData.Generator.CSharp.Abstracts;");
 
         _sb.AppendLine($$"""
 

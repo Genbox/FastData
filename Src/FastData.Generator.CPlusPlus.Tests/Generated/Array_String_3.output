@@ -1,3 +1,5 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: Array
 #include <string>
 #include <array>
 #include <cstdint>
@@ -23,4 +25,6 @@ public:
     }
 
     static constexpr int item_count = 3;
+    static constexpr int min_length = 5;
+    static constexpr int max_length = 5;
 };

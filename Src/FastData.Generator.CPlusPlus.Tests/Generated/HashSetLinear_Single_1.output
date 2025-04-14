@@ -1,4 +1,5 @@
-#include <string>
+// This file is auto-generated. Do not edit manually.
+// Structure: HashSetLinear
 #include <array>
 #include <cstdint>
 
@@ -73,4 +74,6 @@ public:
     }
 
     static constexpr int item_count = 1;
+    static constexpr int8_t min_value = 1;
+    static constexpr int8_t max_value = 1;
 };
