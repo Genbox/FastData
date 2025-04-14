@@ -8,11 +8,12 @@ using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Analyzers.BruteForce;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Analysis.Techniques.Genetic;
 using Genbox.FastData.Internal.Structures;
 
-namespace Genbox.FastData.Testbed;
+namespace Genbox.FastData.Testbed.Tests;
 
-public static class Analysis
+public static class AnalysisTest
 {
     private static readonly char[] LoEntropy = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
     private static readonly char[] HiEntropy = Enumerable.Range(0, ushort.MaxValue).Select(i => (char)i).ToArray();
@@ -128,8 +129,8 @@ public static class Analysis
         Console.WriteLine($"- {nameof(GeneticHashSpec.AvalancheSeed)}: {spec.AvalancheSeed}");
         Console.WriteLine($"- {nameof(GeneticHashSpec.AvalancheIterations)}: {spec.AvalancheIterations}");
         Console.WriteLine($"- {nameof(GeneticHashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(x => '[' + x.Offset.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Length.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Alignment + ']'))}");
-        Console.WriteLine($"- Mixer: {GeneticHashSpec.ExpressionConverter.Instance.GetCode(spec.GetMixer())}");
-        Console.WriteLine($"- Avalanche: {GeneticHashSpec.ExpressionConverter.Instance.GetCode(spec.GetAvalanche())}");
+        Console.WriteLine($"- Mixer: {ExpressionConverter.Instance.GetCode(spec.GetMixer())}");
+        Console.WriteLine($"- Avalanche: {ExpressionConverter.Instance.GetCode(spec.GetAvalanche())}");
     }
 
     private static void PrintCandidate(in Candidate<BruteForceHashSpec> candidate)

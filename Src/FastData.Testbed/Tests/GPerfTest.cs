@@ -6,7 +6,7 @@ using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared;
 
-namespace Genbox.FastData.Testbed;
+namespace Genbox.FastData.Testbed.Tests;
 
 /// <summary>
 /// This code enables verification of FastData against GPerf.
@@ -38,7 +38,7 @@ public static class GPerfTest
             PerfectHashGPerfStructure code = new PerfectHashGPerfStructure();
             try
             {
-                code.TryCreate(data, KnownDataType.String, new DataProperties { StringProps = props }, new FastDataConfig("name", data), out _);
+                code.TryCreate(data, DataType.String, new DataProperties { StringProps = props }, new FastDataConfig("name", data), out _);
             }
             catch
             {
