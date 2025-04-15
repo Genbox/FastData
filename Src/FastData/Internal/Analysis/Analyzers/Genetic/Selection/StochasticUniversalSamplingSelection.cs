@@ -5,7 +5,8 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 
 /// <summary>
-/// Stochastic Universal Sampling (SUS) is a selection method that improves upon Roulette Wheel Selection by ensuring a more even distribution of selected individuals. Instead of selecting parents one-by-one probabilistically, SUS selects multiple individuals at fixed intervals along the cumulative probability distribution.
+/// Stochastic Universal Sampling (SUS) is a selection method that improves upon Roulette Wheel Selection by ensuring a more even distribution of selected individuals. Instead of selecting parents one-by-one probabilistically, SUS selects multiple individuals at fixed intervals along the cumulative
+/// probability distribution.
 /// </summary>
 internal sealed class StochasticUniversalSamplingSelection(IRandom random) : ISelection
 {

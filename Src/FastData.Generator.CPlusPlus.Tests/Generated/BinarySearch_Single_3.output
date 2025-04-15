@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class BinarySearch_Single_3
+class MyData
 {
     inline static const std::array<float, 3> entries = {
         -1, 0, 1

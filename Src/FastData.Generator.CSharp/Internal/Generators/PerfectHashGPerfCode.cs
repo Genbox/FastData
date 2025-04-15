@@ -2,8 +2,8 @@ using System.Globalization;
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Contexts;
 using Genbox.FastData.Generator.CSharp.Internal.Extensions;
-using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
@@ -14,24 +14,24 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
               private{{cfg.GetModifier()}} {{GetSmallestSignedType(ctx.MaxHash + 1)}}[] _asso = new {{GetSmallestSignedType(ctx.MaxHash + 1)}}[] {
           {{FormatColumns(ctx.AssociationValues, RenderAssociativeValue)}}
               };
-
+          
               private{{cfg.GetModifier()}} string[] _items = {
           {{FormatColumns(WrapWords(ctx.Items), static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
-
+          
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-
+          
                   uint hash = Hash(value);
-
+          
                   if (hash > {{ctx.MaxHash.ToString(NumberFormatInfo.InvariantInfo)}})
                       return false;
-
+          
                   return {{genCfg.GetEqualFunction("_items[hash]")}};
               }
-
+          
               private{{cfg.GetModifier()}} uint Hash(string str)
               {
           {{RenderHashFunction()}}
@@ -90,7 +90,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
         sb.Append("""
                                   break;
                               }
-
+                  
                               return hash
                   """);
 

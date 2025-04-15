@@ -11,6 +11,9 @@ public sealed class StaticArray<T>(int capacity) : IEnumerable<T> where T : stru
 
     internal ref T this[int index] => ref _array[index];
 
+    public IEnumerator<T> GetEnumerator() => _array.AsEnumerable().GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
     internal void Add(T item) => _array[Count++] = item;
     internal void Add(ref T item) => _array[Count++] = item;
 
@@ -19,7 +22,4 @@ public sealed class StaticArray<T>(int capacity) : IEnumerable<T> where T : stru
         Array.Clear(_array, 0, Count);
         Count = 0;
     }
-
-    public IEnumerator<T> GetEnumerator() => _array.AsEnumerable().GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

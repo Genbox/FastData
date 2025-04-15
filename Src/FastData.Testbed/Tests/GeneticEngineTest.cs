@@ -15,7 +15,7 @@ internal static class GeneticEngineTest
         GeneticEngine engine = new GeneticEngine(new GeneticEngineConfig(), [
             new IntGene("test", -1, -1000, 1000),
             new IntGene("test2", 42, -1000, 1000),
-            new IntGene("test2", 99, -1000, 1000),
+            new IntGene("test2", 99, -1000, 1000)
         ]);
 
         DefaultRandom random = new DefaultRandom();

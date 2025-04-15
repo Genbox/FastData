@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class EytzingerSearch_SByte_1 : IFastSet<SByte>
+internal partial class MyData : IFastSet<SByte>
 {
     private sbyte[] _entries = new sbyte[] {
         1

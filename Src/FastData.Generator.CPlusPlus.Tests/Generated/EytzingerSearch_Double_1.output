@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class EytzingerSearch_Double_1
+class MyData
 {
     inline static const std::array<double, 1> entries = {
         1

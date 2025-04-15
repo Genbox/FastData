@@ -1,6 +1,6 @@
 using System.Globalization;
 using BenchmarkDotNet.Order;
-using Genbox.FastData.HashFunctions;
+using Genbox.FastData.Internal.Hashes;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 

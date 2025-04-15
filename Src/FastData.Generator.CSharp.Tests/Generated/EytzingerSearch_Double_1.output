@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class EytzingerSearch_Double_1 : IFastSet<Double>
+internal partial class MyData : IFastSet<Double>
 {
     private double[] _entries = new double[] {
         1

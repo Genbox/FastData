@@ -1,25 +1,27 @@
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Configs;
+using Genbox.FastData.Contexts;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Models;
+using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class EytzingerSearchStructure : IStructure
+internal sealed class EytzingerSearchStructure(StructureConfig config) : IStructure
 {
-    public bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
+    public bool TryCreate(object[] data, out IContext? context)
     {
-        if (dataType == DataType.String)
-            Array.Sort(data, StringHelper.GetStringComparer(config.StringComparison));
-        else
-            Array.Sort(data);
+        //We make a copy to avoid altering the original data
+        object[] copy = new object[data.Length];
+        data.CopyTo(copy, 0);
 
-        object[] output = new object[data.Length];
+        if (config.DataProperties.DataType == DataType.String)
+            Array.Sort(copy, config.GetStringComparer());
+        else
+            Array.Sort(copy);
+
+        object[] output = new object[copy.Length];
         int index = 0;
-        EytzingerOrder(ref index, data, output);
+        EytzingerOrder(ref index, copy, output);
 
         context = new EytzingerSearchContext(output);
         return true;

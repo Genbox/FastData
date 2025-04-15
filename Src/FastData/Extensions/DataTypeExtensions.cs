@@ -8,7 +8,6 @@ public static class DataTypeExtensions
     {
         DataType.SByte or DataType.Int16 or DataType.Int32 or DataType.Int64 or DataType.Single or DataType.Double => false,
         DataType.UInt32 or DataType.UInt16 or DataType.UInt64 or DataType.Byte or DataType.Char => true,
-        DataType.Unknown or DataType.String or DataType.Boolean => throw new ArgumentOutOfRangeException(nameof(type), type, null),
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
 

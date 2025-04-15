@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class Conditional_Boolean_1
+class MyData
 {
 public:
     static bool contains(const bool& value)

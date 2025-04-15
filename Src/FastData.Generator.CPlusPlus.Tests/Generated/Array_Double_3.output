@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class Array_Double_3
+class MyData
 {
     inline static const std::array<double, 3> entries = {
         -1, 0, 1

@@ -7,8 +7,5 @@ internal sealed class TimeBasedTermination(TimeSpan maxDuration) : ITermination
 {
     private readonly long _startTime = Stopwatch.GetTimestamp();
 
-    public bool Process(int evolutions, double fitness)
-    {
-        return new TimeSpan((Stopwatch.GetTimestamp() - _startTime) * Stopwatch.Frequency) >= maxDuration;
-    }
+    public bool Process(int evolutions, double fitness) => new TimeSpan((Stopwatch.GetTimestamp() - _startTime) * Stopwatch.Frequency) >= maxDuration;
 }

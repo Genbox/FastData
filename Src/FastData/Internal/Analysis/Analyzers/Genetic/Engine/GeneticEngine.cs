@@ -3,6 +3,7 @@ using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Abstracts;
 using Genbox.FastData.Internal.Extensions;
+using static Genbox.FastData.Internal.Helpers.DebugHelper;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
 
@@ -38,7 +39,8 @@ internal sealed class GeneticEngine(GeneticEngineConfig config, IGene[] genes)
 
         do
         {
-            Console.WriteLine("Generation: " + generation);
+            Print("Generation: " + generation);
+
             int bestIdx = RunPopulation(population, simulation);
             ref Entity popBest = ref population[bestIdx];
 

@@ -4,7 +4,7 @@
 #include <array>
 #include <cstdint>
 
-class HashSetLinear_String_1
+class MyData
 {
     struct B
     {

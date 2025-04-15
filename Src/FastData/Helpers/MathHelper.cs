@@ -24,34 +24,31 @@ public static class MathHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsPowerOfTwo(ulong x) => x != 0 && (x & (x - 1)) == 0;
 
-    public static int GetPrime(int min)
+    public static uint GetPrime(uint min)
     {
-        if (min < 0)
-            throw new ArgumentOutOfRangeException(nameof(min), "Value must be greater than or equal to zero.");
-
-        foreach (int prime in Primes)
+        foreach (uint prime in Primes)
         {
             if (prime >= min)
                 return prime;
         }
 
         // Outside of our predefined table. Compute the hard way.
-        for (int i = (min | 1); i < int.MaxValue; i += 2)
+        for (uint i = min | 1; i < int.MaxValue; i += 2)
         {
-            if (IsPrime(i) && ((i - 1) % HashPrime != 0))
+            if (IsPrime(i) && (i - 1) % HashPrime != 0)
                 return i;
         }
         return min;
     }
 
-    public static bool IsPrime(int candidate)
+    private static bool IsPrime(uint candidate)
     {
         if ((candidate & 1) != 0)
         {
             int limit = (int)Math.Sqrt(candidate);
             for (int divisor = 3; divisor <= limit; divisor += 2)
             {
-                if ((candidate % divisor) == 0)
+                if (candidate % divisor == 0)
                     return false;
             }
             return true;

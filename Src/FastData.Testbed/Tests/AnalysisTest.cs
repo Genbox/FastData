@@ -3,17 +3,15 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Generator.CSharp.Internal;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
-using Genbox.FastData.Internal.Analysis.Analyzers.BruteForce;
-using Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Analysis.Techniques.Genetic;
-using Genbox.FastData.Internal.Structures;
+using Genbox.FastData.Specs.Hash;
 
 namespace Genbox.FastData.Testbed.Tests;
 
-public static class AnalysisTest
+internal static class AnalysisTest
 {
     private static readonly char[] LoEntropy = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
     private static readonly char[] HiEntropy = Enumerable.Range(0, ushort.MaxValue).Select(i => (char)i).ToArray();
@@ -27,13 +25,13 @@ public static class AnalysisTest
         RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
     }
 
-    private static void RunBruteForce(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
+    private static void RunBruteForce(object[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
     {
         Console.WriteLine("###############");
         Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        Simulator sim = new Simulator(new SimulatorConfig(), data, HashSetChainStructure.EmulateInternal);
+        Simulator sim = new Simulator(data, new SimulatorConfig());
         BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), sim);
         Candidate<BruteForceHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1);
@@ -47,7 +45,7 @@ public static class AnalysisTest
         RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
     }
 
-    private static void Print(string[] data, string? source) => Console.WriteLine(source + ": " + string.Join(", ", data.Take(5)));
+    private static void Print(object[] data, string? source) => Console.WriteLine(source + ": " + string.Join(", ", data.Take(5)));
 
     private static string MutateString(string str, double factor, char[] alphabet)
     {
@@ -84,7 +82,7 @@ public static class AnalysisTest
         return new string('a', (int)factor) + str;
     }
 
-    private static string[] RunFunc(string[] str, double factor, Func<string, double, string> func)
+    private static object[] RunFunc(string[] str, double factor, Func<string, double, string> func)
     {
         string[] res = new string[str.Length];
 
@@ -94,13 +92,13 @@ public static class AnalysisTest
         return res;
     }
 
-    private static void RunGeneticAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
+    private static void RunGeneticAnalysis(object[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
     {
         Console.WriteLine("###############");
         Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        Simulator sim = new Simulator(new SimulatorConfig(), data, HashSetChainStructure.EmulateInternal);
+        Simulator sim = new Simulator(data, new SimulatorConfig());
         GeneticAnalyzer analyzer = new GeneticAnalyzer(new GeneticAnalyzerConfig(), sim);
         Candidate<GeneticHashSpec> top1 = analyzer.Run();
         PrintCandidate(in top1, in props);
@@ -118,10 +116,6 @@ public static class AnalysisTest
         PrintHeader(in candidate);
 
         GeneticHashSpec spec = candidate.Spec;
-
-        //We call the hash function to build the hash string
-        HashFunc f = spec.GetHashFunction();
-        f(new string('a', (int)props.LengthData.Max)); //needs to be larger than the strings in the dataset
 
         Console.WriteLine("Hash:");
         Console.WriteLine($"- {nameof(GeneticHashSpec.MixerSeed)}: {spec.MixerSeed}");

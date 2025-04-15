@@ -1,3 +1,5 @@
+using Genbox.FastData.Abstracts;
+
 namespace Genbox.FastData.Configs;
 
 public sealed class GeneticAnalyzerConfig : IAnalyzerConfig

@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class Conditional_Boolean_1 : IFastSet<Boolean>
+internal partial class MyData : IFastSet<Boolean>
 {
     
     public bool Contains(bool value)

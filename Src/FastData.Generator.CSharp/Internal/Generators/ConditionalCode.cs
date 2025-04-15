@@ -1,9 +1,9 @@
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Contexts;
 using Genbox.FastData.Generator.CSharp.Internal.Extensions;
 using Genbox.FastData.Generator.Enums;
-using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
@@ -22,10 +22,10 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorCon
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-
+          
                   if ({{FormatList(ctx.Data, (x, y) => Render(genCfg, x, y), " || ")}})
                       return true;
-
+          
                   return false;
               }
           """;
@@ -36,7 +36,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorCon
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-
+          
                   switch (value)
                   {
           {{FormatList(ctx.Data, Render, "\n")}}

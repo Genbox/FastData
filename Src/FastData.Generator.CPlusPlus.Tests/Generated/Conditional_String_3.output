@@ -4,7 +4,7 @@
 #include <array>
 #include <cstdint>
 
-class Conditional_String_3
+class MyData
 {
 public:
     static bool contains(const std::string& value)

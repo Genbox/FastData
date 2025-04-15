@@ -1,13 +1,11 @@
 using System.Diagnostics;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Configs;
-using Genbox.FastData.Enums;
+using Genbox.FastData.Contexts;
+using Genbox.FastData.Contexts.Misc;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers;
-using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Models;
-using Genbox.FastData.Models.Misc;
+using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Internal.Structures;
 
@@ -15,7 +13,7 @@ internal sealed class HashSetLinearStructure : IHashStructure
 {
     //TODO: Either implement a bitmap for seen buckets everywhere or don't use bitmaps for simplicity
 
-    public bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, Func<object, uint> hash, out IContext? context)
+    public bool TryCreate(object[] data, HashFunc hash, out IContext? context)
     {
         uint[] hashCodes = new uint[data.Length];
         for (int i = 0; i < data.Length; i++)
@@ -77,8 +75,6 @@ internal sealed class HashSetLinearStructure : IHashStructure
         return true;
     }
 
-    public double[] Emulate(object[] data, uint capacity, HashFunc hashFunc, EqualFunc equalFunc) => HashSetChainStructure.EmulateInternal(data, capacity, hashFunc, equalFunc);
-
     private static uint CalcNumBuckets(ReadOnlySpan<uint> hashCodes)
     {
         //Note: this code starts with a sane capacity factor for how many buckets are needed.
@@ -104,7 +100,7 @@ internal sealed class HashSetLinearStructure : IHashStructure
             minPrimeIndexInclusive++;
 
         if (minPrimeIndexInclusive >= primes.Length)
-            return (uint)MathHelper.GetPrime((int)uniqueCodesCount);
+            return MathHelper.GetPrime(uniqueCodesCount);
 
         uint maxNumBuckets = uniqueCodesCount * (uniqueCodesCount >= LargeInputSizeThreshold ? MaxLargeBucketTableMultiplier : MaxSmallBucketTableMultiplier);
 
@@ -132,8 +128,10 @@ internal sealed class HashSetLinearStructure : IHashStructure
             numCollisions = 0;
 
             foreach (uint code in codes)
+            {
                 if (!IsBucketFirstVisit(code))
                     break;
+            }
 
             if (numCollisions < bestNumCollisions)
             {

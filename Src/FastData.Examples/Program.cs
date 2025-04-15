@@ -7,9 +7,7 @@ internal static class Program
 {
     private static void Main()
     {
-        FastDataConfig config = new FastDataConfig("MyData", ["item1", "item2"]);
-
-        if (!FastDataGenerator.TryGenerate(config, new CSharpCodeGenerator(new CSharpGeneratorConfig()), out string? source))
+        if (!FastDataGenerator.TryGenerate(["item1", "item2"], new FastDataConfig(), new CSharpCodeGenerator(new CSharpGeneratorConfig("MyData")), out string? source))
             Console.WriteLine("Failed to generate source code");
 
         Console.WriteLine(source);

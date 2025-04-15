@@ -19,7 +19,7 @@ internal struct IntegerBitSet
         if (val >= 64)
             return false;
 
-        return (BitSet & (1UL << (val - 1) % 64)) > 0;
+        return (BitSet & (1UL << ((val - 1) % 64))) > 0;
     }
 
     internal void Set(int val)

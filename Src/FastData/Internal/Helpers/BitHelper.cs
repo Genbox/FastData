@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace Genbox.FastData.Internal.Helpers;
 
-public static class BitHelper
+internal static class BitHelper
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool AreBitsConsecutive(ulong x)

@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class Conditional_Int32_1
+class MyData
 {
 public:
     static bool contains(const int32_t& value)

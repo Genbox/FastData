@@ -4,7 +4,7 @@
 #include <array>
 #include <cstdint>
 
-class EytzingerSearch_String_3
+class MyData
 {
     inline static const std::array<std::string, 3> entries = {
         "item2", "item1", "item3"

@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class Conditional_Single_100
+class MyData
 {
 public:
     static bool contains(const float& value)

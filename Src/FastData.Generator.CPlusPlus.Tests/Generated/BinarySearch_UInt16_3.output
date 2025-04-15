@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class BinarySearch_UInt16_3
+class MyData
 {
     inline static const std::array<uint16_t, 3> entries = {
         0, 1, 2

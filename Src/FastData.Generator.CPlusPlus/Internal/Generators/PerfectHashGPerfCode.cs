@@ -2,8 +2,8 @@ using System.Globalization;
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Contexts;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
-using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
@@ -17,7 +17,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
                      {{cfg.GetFieldModifier()}} std::array<{{GetSmallestSignedType(ctx.MaxHash + 1)}}, {{ctx.AssociationValues.Length}}> asso = {
                  {{FormatColumns(ctx.AssociationValues, RenderAssociativeValue)}}
                      };
-
+                 
                      {{cfg.GetFieldModifier()}} std::array<std::string, {{items.Length}}> items = {
                  {{FormatColumns(items, static (sb, x) => sb.Append(ToValueLabel(x)))}}
                      };
@@ -26,15 +26,15 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
                      {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
                      {
                  {{cfg.GetEarlyExits(genCfg)}}
-
+                 
                          const uint32_t hash = get_hash(value);
-
+                 
                          if (hash > {{ctx.MaxHash.ToString(NumberFormatInfo.InvariantInfo)}})
                              return false;
-
+                 
                          return {{genCfg.GetEqualFunction("items[hash]")}};
                      }
-
+                 
                      {{cfg.GetMethodModifier()}} uint32_t get_hash(const std::string& str)
                      {
                  {{RenderHashFunction()}}
@@ -90,7 +90,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
         sb.Append("""
                                   break;
                           }
-
+                  
                           return hash
                   """);
 

@@ -14,5 +14,5 @@ internal enum DataType
     Int64,
     UInt64,
     Single,
-    Double,
+    Double
 }

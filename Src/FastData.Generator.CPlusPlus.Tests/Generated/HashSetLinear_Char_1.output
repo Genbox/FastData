@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class HashSetLinear_Char_1
+class MyData
 {
     struct B
     {
@@ -23,7 +23,7 @@ class HashSetLinear_Char_1
     };
 
     inline static const std::array<uint32_t, 1> hash_codes = {
-        6357089
+        97
     };
 
     static uint32_t get_hash(const std::string& str)

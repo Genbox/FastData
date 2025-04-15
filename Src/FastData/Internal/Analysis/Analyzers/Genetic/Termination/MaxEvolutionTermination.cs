@@ -4,8 +4,8 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Termination;
 
 internal sealed class StagnationTermination(int maxGenerations) : ITermination
 {
-    private int _stagnentGens;
     private double _bestFitness;
+    private int _stagnentGens;
 
     public bool Process(int evolutions, double fitness)
     {

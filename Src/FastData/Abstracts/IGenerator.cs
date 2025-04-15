@@ -4,5 +4,5 @@ namespace Genbox.FastData.Abstracts;
 
 public interface IGenerator
 {
-    string Generate(GeneratorConfig genCfg, FastDataConfig fastCfg, IContext context);
+    string Generate(GeneratorConfig genCfg, IContext context);
 }

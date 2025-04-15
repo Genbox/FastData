@@ -5,7 +5,7 @@ namespace Genbox.FastData.Generator.CPlusPlus.Tests;
 
 public class GeneratorTests
 {
-    private readonly CPlusPlusCodeGenerator _generator = new CPlusPlusCodeGenerator(new CPlusPlusGeneratorConfig());
+    private readonly CPlusPlusCodeGenerator _generator = new CPlusPlusCodeGenerator(new CPlusPlusGeneratorConfig("MyData"));
 
     [Theory]
     [MemberData(nameof(GetDataStructures))]
@@ -24,8 +24,10 @@ public class GeneratorTests
         TheoryData<StructureType, object[]> res = new TheoryData<StructureType, object[]>();
 
         foreach (StructureType structure in Enum.GetValues<StructureType>().Where(x => x != StructureType.Auto))
+        {
             foreach (object[] data in TestHelper.GetAllSets())
                 res.Add(structure, data);
+        }
 
         return res;
     }

@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class Conditional_Byte_3 : IFastSet<Byte>
+internal partial class MyData : IFastSet<Byte>
 {
     
     public bool Contains(byte value)

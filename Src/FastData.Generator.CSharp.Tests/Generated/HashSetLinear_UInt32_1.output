@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class HashSetLinear_UInt32_1 : IFastSet<UInt32>
+internal partial class MyData : IFastSet<UInt32>
 {
     private readonly B[] _buckets = {
         new B(0, 0), new B(0, 0), new B(0, 0)
@@ -46,7 +46,10 @@ internal partial class HashSetLinear_UInt32_1 : IFastSet<UInt32>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(uint value) => unchecked((uint)value);
+    public static uint Hash(uint value)
+    {
+        return unchecked((uint)value);
+    }
 
     [StructLayout(LayoutKind.Auto)]
     private struct B

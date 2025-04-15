@@ -18,28 +18,28 @@ internal static class Program
     private static async Task<int> Main(string[] args)
     {
         //Common options
-        Option<FileInfo?> outputFileOpt = new Option<FileInfo?>(name: "--output-file", description: "The file to write the generated code to.");
+        Option<FileInfo?> outputFileOpt = new Option<FileInfo?>("--output-file", "The file to write the generated code to.");
         outputFileOpt.AddAlias("-o");
 
-        Option<DataType> dataTypeOpt = new Option<DataType>(name: "--data-type", description: "The type of data in the input file.", getDefaultValue: () => DataType.String);
+        Option<DataType> dataTypeOpt = new Option<DataType>("--data-type", description: "The type of data in the input file.", getDefaultValue: () => DataType.String);
         dataTypeOpt.AddAlias("-d");
 
-        Option<string> nameOpt = new Option<string>(name: "--name", description: "The name of the final data structure.", getDefaultValue: () => "MyData");
+        Option<string> nameOpt = new Option<string>("--name", description: "The name of the final data structure.", getDefaultValue: () => "MyData");
         nameOpt.AddAlias("-n");
 
-        Option<StructureType> structureType = new Option<StructureType>(name: "--structure-type", description: "The type of data structure to produce.", getDefaultValue: () => StructureType.Auto);
-        structureType.AddAlias("-s");
+        Option<StructureType> structureTypeOpt = new Option<StructureType>("--structure-type", description: "The type of data structure to produce.", getDefaultValue: () => StructureType.Auto);
+        structureTypeOpt.AddAlias("-s");
 
-        Argument<FileInfo> inputFileArg = new Argument<FileInfo>(name: "input-file", description: "The file to read data from");
+        Argument<FileInfo> inputFileArg = new Argument<FileInfo>("input-file", "The file to read data from");
 
         //CSharp section
-        Option<string> namespaceOpt = new Option<string?>(name: "--namespace", description: "The namespace the generated class resides in.");
+        Option<string?> namespaceOpt = new Option<string?>("--namespace", "The namespace the generated class resides in.");
         namespaceOpt.AddAlias("-ns");
 
-        Option<ClassVisibility> classVisibilityOpt = new Option<ClassVisibility>(name: "--class-visibility", description: "The visibility of the generated class.", getDefaultValue: () => ClassVisibility.Internal);
+        Option<ClassVisibility> classVisibilityOpt = new Option<ClassVisibility>("--class-visibility", description: "The visibility of the generated class.", getDefaultValue: () => ClassVisibility.Internal);
         classVisibilityOpt.AddAlias("-cv");
 
-        Option<ClassType> classTypeOpt = new Option<ClassType>(name: "--class-type", description: "The type of the generated class.", getDefaultValue: () => ClassType.Static);
+        Option<ClassType> classTypeOpt = new Option<ClassType>("--class-type", description: "The type of the generated class.", getDefaultValue: () => ClassType.Static);
         classTypeOpt.AddAlias("-ct");
 
         Command csharpCmd = new Command("csharp", "Generate a C# data structure")
@@ -59,44 +59,48 @@ internal static class Program
         RootCommand rootCmd = new RootCommand("FastData")
         {
             csharpCmd,
-            cppCmd,
+            cppCmd
         };
 
         rootCmd.AddGlobalOption(outputFileOpt);
         rootCmd.AddGlobalOption(dataTypeOpt);
         rootCmd.AddGlobalOption(nameOpt);
-        rootCmd.AddGlobalOption(structureType);
+        rootCmd.AddGlobalOption(structureTypeOpt);
 
-        csharpCmd.SetHandler(async (outputFile, dataType, name, dataStructure, inputFile, ns, cv, ct) =>
+        csharpCmd.SetHandler(async (outputFile, dataType, name, structureType, inputFile, ns, cv, ct) =>
         {
-            CSharpGeneratorConfig genCfg = new CSharpGeneratorConfig();
+            CSharpGeneratorConfig genCfg = new CSharpGeneratorConfig(name);
             genCfg.Namespace = ns;
             genCfg.ClassVisibility = cv;
             genCfg.ClassType = ct;
 
             CSharpCodeGenerator generator = new CSharpCodeGenerator(genCfg);
-            FastDataConfig config = await GetConfigAsync(inputFile, name, dataType, dataStructure);
 
-            await GenerateAsync(config, generator, outputFile);
-        }, outputFileOpt, dataTypeOpt, nameOpt, structureType, inputFileArg, namespaceOpt, classVisibilityOpt, classTypeOpt);
+            object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
+            FastDataConfig config = new FastDataConfig(structureType);
 
-        cppCmd.SetHandler(async (outputFile, dataType, name, dataStructure, inputFile) =>
+            await GenerateAsync(data, config, generator, outputFile);
+        }, outputFileOpt, dataTypeOpt, nameOpt, structureTypeOpt, inputFileArg, namespaceOpt, classVisibilityOpt, classTypeOpt);
+
+        cppCmd.SetHandler(async (outputFile, dataType, name, structureType, inputFile) =>
         {
-            CPlusPlusGeneratorConfig genCfg = new CPlusPlusGeneratorConfig();
+            CPlusPlusGeneratorConfig genCfg = new CPlusPlusGeneratorConfig(name);
             CPlusPlusCodeGenerator generator = new CPlusPlusCodeGenerator(genCfg);
-            FastDataConfig config = await GetConfigAsync(inputFile, name, dataType, dataStructure);
 
-            await GenerateAsync(config, generator, outputFile);
-        }, outputFileOpt, dataTypeOpt, nameOpt, structureType, inputFileArg);
+            object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
+            FastDataConfig config = new FastDataConfig(structureType);
+
+            await GenerateAsync(data, config, generator, outputFile);
+        }, outputFileOpt, dataTypeOpt, nameOpt, structureTypeOpt, inputFileArg);
 
         Parser parser = new CommandLineBuilder(rootCmd)
                         .UseDefaults()
                         .UseHelp(ctx =>
                         {
                             //Manual help output to avoid printing Unknown from the enums
-                            ctx.HelpBuilder.CustomizeSymbol(classVisibilityOpt, firstColumnText: "-cv, --class-visibility <public|internal>");
-                            ctx.HelpBuilder.CustomizeSymbol(classTypeOpt, firstColumnText: "-ct, --class-type <instance|static|struct>");
-                            ctx.HelpBuilder.CustomizeSymbol(dataTypeOpt, firstColumnText: "-d, --data-type <bool|char|double|int16|int32|int64|int8|single|string|uint16|uint32|uint64|uint8>");
+                            ctx.HelpBuilder.CustomizeSymbol(classVisibilityOpt, "-cv, --class-visibility <public|internal>");
+                            ctx.HelpBuilder.CustomizeSymbol(classTypeOpt, "-ct, --class-type <instance|static|struct>");
+                            ctx.HelpBuilder.CustomizeSymbol(dataTypeOpt, "-d, --data-type <bool|char|double|int16|int32|int64|int8|single|string|uint16|uint32|uint64|uint8>");
                             ctx.HelpBuilder.CustomizeLayout(
                                 _ => HelpBuilder.Default
                                                 .GetLayout()
@@ -108,21 +112,15 @@ internal static class Program
         return await parser.InvokeAsync(args);
     }
 
-    private static async Task GenerateAsync(FastDataConfig config, IGenerator generator, FileInfo? outputFile)
+    private static async Task GenerateAsync(object[] data, FastDataConfig config, IGenerator generator, FileInfo? outputFile)
     {
-        if (!FastDataGenerator.TryGenerate(config, generator, out string? source))
+        if (!FastDataGenerator.TryGenerate(data, config, generator, out string? source))
             throw new InvalidOperationException("Unable to generate code");
 
         if (outputFile == null)
             Console.WriteLine(source);
         else
             await File.WriteAllTextAsync(outputFile.FullName, source);
-    }
-
-    private static async Task<FastDataConfig> GetConfigAsync(FileInfo inputFile, string name, DataType dataType, StructureType structureType)
-    {
-        object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
-        return new FastDataConfig(name, data, structureType);
     }
 
     private static async IAsyncEnumerable<object> ReadFile(string file, DataType dataType)

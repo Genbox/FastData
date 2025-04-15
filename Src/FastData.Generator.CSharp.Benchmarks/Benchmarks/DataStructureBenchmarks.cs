@@ -50,13 +50,11 @@ public class DataStructureBenchmarks
 
     private static IFastSet<string> CreateFastData(StructureType ds, object[] data, Action<CSharpGeneratorConfig>? configure = null)
     {
-        FastDataConfig config = new FastDataConfig(ds.ToString(), data, ds);
-
-        CSharpGeneratorConfig generatorConfig = new CSharpGeneratorConfig();
+        CSharpGeneratorConfig generatorConfig = new CSharpGeneratorConfig(ds.ToString());
         generatorConfig.ClassType = ClassType.Instance;
         configure?.Invoke(generatorConfig);
 
-        if (!FastDataGenerator.TryGenerate(config, new CSharpCodeGenerator(generatorConfig), out string? source))
+        if (!FastDataGenerator.TryGenerate(data, new FastDataConfig(ds), new CSharpCodeGenerator(generatorConfig), out string? source))
             throw new InvalidOperationException("Unable to create data structure: " + ds);
 
         return CodeGenerator.CreateFastSet<string>(source, true);

@@ -1,4 +1,3 @@
-
 namespace Genbox.FastData.Enums;
 
 public enum DataType
@@ -17,5 +16,5 @@ public enum DataType
     Int64,
     UInt64,
     Single,
-    Double,
+    Double
 }

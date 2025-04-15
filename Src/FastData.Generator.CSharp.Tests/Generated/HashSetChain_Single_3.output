@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class HashSetChain_Single_3 : IFastSet<Single>
+internal partial class MyData : IFastSet<Single>
 {
     private readonly sbyte[] _buckets = new sbyte[] {
         2, 1, 3
@@ -42,7 +42,10 @@ internal partial class HashSetChain_Single_3 : IFastSet<Single>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(float value) => unchecked((uint)(value.GetHashCode()));
+    public static uint Hash(float value)
+    {
+        return unchecked((uint)(value.GetHashCode()));
+    }
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

@@ -14,13 +14,13 @@ public class OnePointCrossOverTests
             new Entity([
                 new TestGene("1"),
                 new TestGene("2"),
-                new TestGene("3"),
+                new TestGene("3")
             ]),
             new Entity([
                 new TestGene("a"),
                 new TestGene("b"),
-                new TestGene("c"),
-            ]),
+                new TestGene("c")
+            ])
         };
 
         StaticArray<Entity> newPopulation = new StaticArray<Entity>(2);

@@ -1,15 +1,13 @@
-﻿using Genbox.FastData.Enums;
+﻿using Genbox.FastData.Abstracts;
+using Genbox.FastData.Enums;
 
 namespace Genbox.FastData.Configs;
 
-public class FastDataConfig(string name, object[] data, StructureType structureType = StructureType.Auto)
+public class FastDataConfig(StructureType structureType = StructureType.Auto)
 {
-    public string Name { get; set; } = name;
-    public object[] Data { get; set; } = data;
-
     public StructureType StructureType { get; set; } = structureType;
     public StorageOption StorageOptions { get; set; }
-    public SimulatorConfig? SimulatorConfig { get; set; }
+    public SimulatorConfig SimulatorConfig { get; set; } = new SimulatorConfig();
     public IAnalyzerConfig? AnalyzerConfig { get; set; }
     public StringComparison StringComparison { get; set; } = StringComparison.Ordinal;
 }

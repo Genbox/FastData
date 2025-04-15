@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class HashSetLinear_Char_3
+class MyData
 {
     struct B
     {
@@ -15,7 +15,7 @@ class HashSetLinear_Char_3
     };
 
     inline static const std::array<B, 7> buckets = {
-        B(0, 0), B(0, 0), B(0, 0), B(1, 1), B(2, 2), B(0, 0), B(0, 0)
+        B(0, 0), B(1, 1), B(0, 0), B(0, 0), B(0, 0), B(0, 0), B(2, 2)
     };
 
     inline static const std::array<char, 3> items = {
@@ -23,7 +23,7 @@ class HashSetLinear_Char_3
     };
 
     inline static const std::array<uint32_t, 3> hash_codes = {
-        6422626, 6488163, 6357089
+        98, 99, 97
     };
 
     static uint32_t get_hash(const std::string& str)

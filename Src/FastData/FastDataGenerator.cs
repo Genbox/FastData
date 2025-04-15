@@ -1,104 +1,52 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Helpers;
-using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
-using Genbox.FastData.Internal.Analysis.Analyzers.BruteForce;
-using Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Optimization;
+using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
+using Genbox.FastData.Specs.Hash;
 
 namespace Genbox.FastData;
 
 public static class FastDataGenerator
 {
-    public static bool TryGenerate(FastDataConfig config, IGenerator generator, out string? source)
+    public static bool TryGenerate(object[] data, FastDataConfig fdCfg, IGenerator generator, out string? source)
     {
-        PreProcess(config, out DataType dataType, out DataProperties props, out IEarlyExit[] exits);
+        //Validate that we only have unique data
+        HashSet<object> uniq = new HashSet<object>();
 
-        Constants constants = new Constants((uint)config.Data.Length);
-
-        if (props.StringProps.HasValue)
+        foreach (object o in data)
         {
-            constants.MinValue = props.StringProps.Value.LengthData.Min;
-            constants.MaxValue = props.StringProps.Value.LengthData.Max;
-        }
-        else if (props.IntProps.HasValue)
-        {
-            constants.MinValue = props.IntProps.Value.MinValue;
-            constants.MaxValue = props.IntProps.Value.MaxValue;
-        }
-        else if (props.UIntProps.HasValue)
-        {
-            constants.MinValue = props.UIntProps.Value.MinValue;
-            constants.MaxValue = props.UIntProps.Value.MaxValue;
-        }
-        else if (props.FloatProps.HasValue)
-        {
-            constants.MinValue = props.FloatProps.Value.MinValue;
-            constants.MaxValue = props.FloatProps.Value.MaxValue;
-        }
-        else if (props.CharProps.HasValue)
-        {
-            constants.MinValue = props.CharProps.Value.MinValue;
-            constants.MaxValue = props.CharProps.Value.MaxValue;
+            if (!uniq.Add(o))
+                throw new InvalidOperationException("Duplicate data found: " + o);
         }
 
-        Metadata metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.Now);
-        GeneratorConfig genCfg = new GeneratorConfig(dataType, exits, null, config.StringComparison, constants, metadata);
+        DataProperties props = new DataProperties(data);
+        StructureConfig strCfg = new StructureConfig(props, fdCfg.StringComparison);
 
-        foreach (object candidate in GetDataStructureCandidates(config))
+        foreach (object candidate in GetDataStructureCandidates(data, fdCfg, strCfg))
         {
-            if (TryProcessCandidate(candidate, props, genCfg, dataType, generator, config, out source))
+            if (TryCreateStructure(candidate, data, props, fdCfg, out IHashSpec? hashSpec, out IContext? context))
+            {
+                GeneratorConfig genCfg = new GeneratorConfig(fdCfg.StructureType, fdCfg.StringComparison, props, hashSpec ?? DefaultHashSpec.Instance);
+                source = generator.Generate(genCfg, context!);
                 return true;
+            }
         }
 
         source = null;
         return false;
     }
 
-    private static void PreProcess(FastDataConfig config, out DataType dataType, out DataProperties props, out IEarlyExit[] exits)
-    {
-        //Validate that we only have unique data
-        HashSet<object> uniq = new HashSet<object>();
-
-        foreach (object o in config.Data)
-        {
-            if (!uniq.Add(o))
-                throw new InvalidOperationException("Duplicate data detected: " + o);
-        }
-
-        dataType = (DataType)Enum.Parse(typeof(DataType), config.Data[0].GetType().Name);
-        props = GetDataProperties(config.Data, dataType);
-        exits = GetEarlyExits(props);
-    }
-
-    private static IEarlyExit[] GetEarlyExits(DataProperties props)
-    {
-        if (props.StringProps.HasValue)
-            return Optimizer.GetEarlyExits(props.StringProps.Value).ToArray();
-        if (props.IntProps.HasValue)
-            return Optimizer.GetEarlyExits(props.IntProps.Value).ToArray();
-        if (props.UIntProps.HasValue)
-            return Optimizer.GetEarlyExits(props.UIntProps.Value).ToArray();
-        if (props.CharProps.HasValue)
-            return Optimizer.GetEarlyExits(props.CharProps.Value).ToArray();
-        if (props.FloatProps.HasValue)
-            return Optimizer.GetEarlyExits(props.FloatProps.Value).ToArray();
-        return [];
-    }
-
-    private static IEnumerable<object> GetDataStructureCandidates(FastDataConfig config)
+    private static IEnumerable<object> GetDataStructureCandidates(object[] data, FastDataConfig config, StructureConfig cfg)
     {
         StructureType ds = config.StructureType;
 
         if (ds == StructureType.Auto)
         {
-            if (config.Data.Length == 1)
+            if (data.Length == 1)
                 yield return new SingleValueStructure();
             else
             {
@@ -106,13 +54,13 @@ public static class FastDataGenerator
                 yield return new ConditionalStructure();
 
                 // We try key lengths
-                yield return new KeyLengthStructure();
+                yield return new KeyLengthStructure(cfg);
 
                 if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory) && config.StorageOptions.HasFlag(StorageOption.OptimizeForSpeed))
                     yield return new PerfectHashBruteForceStructure();
 
                 if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
-                    yield return new BinarySearchStructure();
+                    yield return new BinarySearchStructure(cfg);
                 else
                     yield return new HashSetChainStructure();
             }
@@ -124,11 +72,11 @@ public static class FastDataGenerator
         else if (ds == StructureType.Conditional)
             yield return new ConditionalStructure();
         else if (ds == StructureType.BinarySearch)
-            yield return new BinarySearchStructure();
+            yield return new BinarySearchStructure(cfg);
         else if (ds == StructureType.EytzingerSearch)
-            yield return new EytzingerSearchStructure();
+            yield return new EytzingerSearchStructure(cfg);
         else if (ds == StructureType.PerfectHashGPerf)
-            yield return new PerfectHashGPerfStructure();
+            yield return new PerfectHashGPerfStructure(cfg);
         else if (ds == StructureType.PerfectHashBruteForce)
             yield return new PerfectHashBruteForceStructure();
         else if (ds == StructureType.HashSetChain)
@@ -136,109 +84,36 @@ public static class FastDataGenerator
         else if (ds == StructureType.HashSetLinear)
             yield return new HashSetLinearStructure();
         else if (ds == StructureType.KeyLength)
-            yield return new KeyLengthStructure();
+            yield return new KeyLengthStructure(cfg);
         else
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
 
-    private static DataProperties GetDataProperties(object[] data, DataType dataType)
-    {
-        DataProperties props = new DataProperties();
-
-        switch (dataType)
-        {
-            case DataType.SByte:
-                props.IntProps = DataAnalyzer.GetSByteProperties(data);
-                break;
-            case DataType.Byte:
-                props.UIntProps = DataAnalyzer.GetByteProperties(data);
-                break;
-            case DataType.Int16:
-                props.IntProps = DataAnalyzer.GetInt16Properties(data);
-                break;
-            case DataType.UInt16:
-                props.UIntProps = DataAnalyzer.GetUInt16Properties(data);
-                break;
-            case DataType.Int32:
-                props.IntProps = DataAnalyzer.GetInt32Properties(data);
-                break;
-            case DataType.UInt32:
-                props.UIntProps = DataAnalyzer.GetUInt32Properties(data);
-                break;
-            case DataType.Int64:
-                props.IntProps = DataAnalyzer.GetInt64Properties(data);
-                break;
-            case DataType.UInt64:
-                props.UIntProps = DataAnalyzer.GetUInt64Properties(data);
-                break;
-            case DataType.String:
-                props.StringProps = DataAnalyzer.GetStringProperties(data);
-                break;
-            case DataType.Boolean:
-                break;
-            case DataType.Char:
-                props.CharProps = DataAnalyzer.GetCharProperties(data);
-                break;
-            case DataType.Single:
-                props.FloatProps = DataAnalyzer.GetSingleProperties(data);
-                break;
-            case DataType.Double:
-                props.FloatProps = DataAnalyzer.GetDoubleProperties(data);
-                break;
-            case DataType.Unknown:
-                //Do nothing
-                break;
-            default:
-                throw new InvalidOperationException($"Unknown data type: {dataType}");
-        }
-        return props;
-    }
-
-    private static bool TryProcessCandidate(object candidate, DataProperties props, GeneratorConfig genCfg, DataType dataType, IGenerator generator, FastDataConfig config, out string? code)
+    private static bool TryCreateStructure(object candidate, object[] data, DataProperties props, FastDataConfig fdCfg, out IHashSpec? hashSpec, out IContext? context)
     {
         if (candidate is IHashStructure hs)
         {
+            hashSpec = DefaultHashSpec.Instance;
+
             if (props.StringProps != null)
             {
-                Simulator simulator = new Simulator(new SimulatorConfig(), config.Data, hs.Emulate);
+                Simulator simulator = new Simulator(data, fdCfg.SimulatorConfig);
 
-                if (config.AnalyzerConfig is BruteForceAnalyzerConfig bfCfg)
-                {
-                    BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props.StringProps.Value, bfCfg, simulator);
-                    genCfg.HashSpec = analyzer.Run().Spec;
-                }
-                if (config.AnalyzerConfig is GeneticAnalyzerConfig gaCfg)
-                {
-                    GeneticAnalyzer analyzer = new GeneticAnalyzer(gaCfg, simulator);
-                    genCfg.HashSpec = analyzer.Run().Spec;
-                }
-            }
-            else
-                genCfg.HashSpec = DefaultHashSpec.Instance;
-
-            if (!hs.TryCreate(config.Data, dataType, props, config, HashHelper.HashObject, out IContext? context))
-            {
-                code = null;
-                return false;
+                if (fdCfg.AnalyzerConfig is BruteForceAnalyzerConfig bfCfg)
+                    hashSpec = new BruteForceAnalyzer(props.StringProps.Value, bfCfg, simulator).Run().Spec;
+                else if (fdCfg.AnalyzerConfig is GeneticAnalyzerConfig gaCfg)
+                    hashSpec = new GeneticAnalyzer(gaCfg, simulator).Run().Spec;
             }
 
-            code = generator.Generate(genCfg, config, context!);
-            return true;
+            return hs.TryCreate(data, hashSpec.GetHashFunction(), out context);
         }
+
+        hashSpec = null;
 
         if (candidate is IStructure s)
-        {
-            if (!s.TryCreate(config.Data, dataType, props, config, out IContext? context))
-            {
-                code = null;
-                return false;
-            }
+            return s.TryCreate(data, out context);
 
-            code = generator.Generate(genCfg, config, context!);
-            return true;
-        }
-
-        code = null;
+        context = null;
         return false;
     }
 }

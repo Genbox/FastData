@@ -1,8 +1,8 @@
 using System.Globalization;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Contexts;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
-using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
@@ -18,14 +18,14 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusGenerato
               {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-
+          
                   int lo = 0;
                   int hi = {{(ctx.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
                   while (lo <= hi)
                   {
                       const int i = lo + ((hi - lo) >> 1);
                       const int order = {{genCfg.GetCompareFunction("entries[i]")}};
-
+          
                       if (order == 0)
                           return true;
                       if (order < 0)
@@ -33,7 +33,7 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusGenerato
                       else
                           hi = i - 1;
                   }
-
+          
                   return ((~lo) >= 0);
               }
           """;

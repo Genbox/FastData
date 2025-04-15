@@ -12,7 +12,7 @@ public class GeneratorTests
 
     public GeneratorTests()
     {
-        CSharpGeneratorConfig cfg = new CSharpGeneratorConfig();
+        CSharpGeneratorConfig cfg = new CSharpGeneratorConfig("MyData");
         cfg.ClassType = ClassType.Instance;
         _generator = new CSharpCodeGenerator(cfg);
     }
@@ -54,8 +54,10 @@ public class GeneratorTests
         TheoryData<StructureType, object[]> res = new TheoryData<StructureType, object[]>();
 
         foreach (StructureType structure in Enum.GetValues<StructureType>().Where(x => x != StructureType.Auto))
+        {
             foreach (object[] data in TestHelper.GetAllSets())
                 res.Add(structure, data);
+        }
 
         return res;
     }

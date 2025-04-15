@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class PerfectHashBruteForce_Char_3
+class MyData
 {
     struct E
     {
@@ -15,7 +15,7 @@ class PerfectHashBruteForce_Char_3
     };
 
     inline static const std::array<E, 3> entries = {
-        E('a', 6357093), E('c', 6488167), E('b', 6422630)
+        E('c', 96), E('b', 97), E('a', 98)
     };
 
     static uint32_t get_hash(const std::string& str, uint32_t seed)
@@ -48,7 +48,7 @@ public:
         if (const size_t len = value.length(); len < 97 || len > 99)
             return false;
 
-        const uint32_t hash = get_hash(value, 4);
+        const uint32_t hash = get_hash(value, 3);
         const uint32_t index = hash % 3;
         const E& entry = entries[index];
 

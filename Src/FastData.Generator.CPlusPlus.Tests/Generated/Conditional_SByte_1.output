@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class Conditional_SByte_1
+class MyData
 {
 public:
     static bool contains(const int8_t& value)

@@ -29,7 +29,7 @@ public class GenericSelectionTests
         {
             { 0, 0 },
             { 1, 0 },
-            { 2, 0 },
+            { 2, 0 }
         };
 
         foreach (int i in selected)
@@ -64,7 +64,7 @@ public class GenericSelectionTests
 
     private static void TestSeed(ISelection a, ISelection b, bool equal)
     {
-        var population = GeneticsHelper.GeneratePopulation(10, 0, 10);
+        StaticArray<Entity>? population = GeneticsHelper.GeneratePopulation(10, 0, 10);
 
         List<int> indexes1 = new List<int>();
         a.Process(population, indexes1, 10);
@@ -87,7 +87,7 @@ public class GenericSelectionTests
         new RankSelection(SharedRandom.Instance),
         new RouletteWheelSelection(SharedRandom.Instance),
         new StochasticUniversalSamplingSelection(SharedRandom.Instance),
-        new TournamentSelection(4, SharedRandom.Instance),
+        new TournamentSelection(4, SharedRandom.Instance)
     ];
 
     public static TheoryData<ISelection, ISelection> GetSeededSelections()
@@ -103,7 +103,7 @@ public class GenericSelectionTests
             { new RankSelection(rng1), new RankSelection(rng2) },
             { new RouletteWheelSelection(rng1), new RouletteWheelSelection(rng2) },
             { new StochasticUniversalSamplingSelection(rng1), new StochasticUniversalSamplingSelection(rng2) },
-            { new TournamentSelection(4, rng1), new TournamentSelection(4, rng2) },
+            { new TournamentSelection(4, rng1), new TournamentSelection(4, rng2) }
         };
     }
 
@@ -120,7 +120,7 @@ public class GenericSelectionTests
             { new RankSelection(rng1), new RankSelection(rng2) },
             { new RouletteWheelSelection(rng1), new RouletteWheelSelection(rng2) },
             { new StochasticUniversalSamplingSelection(rng1), new StochasticUniversalSamplingSelection(rng2) },
-            { new TournamentSelection(4, rng1), new TournamentSelection(4, rng2) },
+            { new TournamentSelection(4, rng1), new TournamentSelection(4, rng2) }
         };
     }
 
@@ -130,6 +130,6 @@ public class GenericSelectionTests
         new RankSelection(SharedRandom.Instance),
         new RouletteWheelSelection(SharedRandom.Instance),
         new StochasticUniversalSamplingSelection(SharedRandom.Instance),
-        new TournamentSelection(4, SharedRandom.Instance),
+        new TournamentSelection(4, SharedRandom.Instance)
     ];
 }

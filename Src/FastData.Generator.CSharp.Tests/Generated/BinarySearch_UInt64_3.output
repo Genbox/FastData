@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class BinarySearch_UInt64_3 : IFastSet<UInt64>
+internal partial class MyData : IFastSet<UInt64>
 {
     private ulong[] _entries = new ulong[] {
         0, 1, 2

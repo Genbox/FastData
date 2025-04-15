@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Genbox.FastData.Abstracts;
 
 namespace Genbox.FastData.Configs;
 

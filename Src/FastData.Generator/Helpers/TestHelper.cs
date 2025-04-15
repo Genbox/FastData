@@ -13,7 +13,7 @@ public static class TestHelper
 
         string identifier = $"{structureType}_{dataType}_{data.Length}";
 
-        if (FastDataGenerator.TryGenerate(new FastDataConfig(identifier, data, structureType), generator, out string? source))
+        if (FastDataGenerator.TryGenerate(data, new FastDataConfig(structureType), generator, out string? source))
         {
             spec = new GeneratorSpec(identifier, dataType, source);
             return true;
@@ -73,7 +73,7 @@ public static class TestHelper
         yield return Enumerable.Range(0, 100).Select(x => (byte)x).Cast<object>().ToArray();
         yield return Enumerable.Range(0, 100).Select(x => (short)x).Cast<object>().ToArray();
         yield return Enumerable.Range(0, 100).Select(x => (ushort)x).Cast<object>().ToArray();
-        yield return Enumerable.Range(0, 100).Select(x => (int)x).Cast<object>().ToArray();
+        yield return Enumerable.Range(0, 100).Select(x => x).Cast<object>().ToArray();
         yield return Enumerable.Range(0, 100).Select(x => (uint)x).Cast<object>().ToArray();
         yield return Enumerable.Range(0, 100).Select(x => (long)x).Cast<object>().ToArray();
         yield return Enumerable.Range(0, 100).Select(x => (ulong)x).Cast<object>().ToArray();

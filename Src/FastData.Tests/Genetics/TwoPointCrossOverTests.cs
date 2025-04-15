@@ -16,15 +16,15 @@ public class TwoPointCrossOverTests
                 new TestGene("2"),
                 new TestGene("3"),
                 new TestGene("4"),
-                new TestGene("5"),
+                new TestGene("5")
             ]),
             new Entity([
                 new TestGene("a"),
                 new TestGene("b"),
                 new TestGene("c"),
                 new TestGene("d"),
-                new TestGene("e"),
-            ]),
+                new TestGene("e")
+            ])
         };
 
         StaticArray<Entity> newPopulation = new StaticArray<Entity>(2);

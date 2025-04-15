@@ -4,7 +4,7 @@
 #include <array>
 #include <cstdint>
 
-class KeyLength_String_3
+class MyData
 {
     inline static const std:array<std:vector<std::string>, 1> entries = {
         new [] {"item1","item2","item3"}

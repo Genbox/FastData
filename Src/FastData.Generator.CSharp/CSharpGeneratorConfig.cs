@@ -3,8 +3,9 @@ using Genbox.FastData.Generator.Enums;
 
 namespace Genbox.FastData.Generator.CSharp;
 
-public sealed class CSharpGeneratorConfig
+public sealed class CSharpGeneratorConfig(string className)
 {
+    public string ClassName { get; set; } = className;
     public string? Namespace { get; set; }
     public ClassVisibility ClassVisibility { get; set; } = ClassVisibility.Internal;
     public ClassType ClassType { get; set; } = ClassType.Static;

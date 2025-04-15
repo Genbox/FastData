@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class PerfectHashBruteForce_Char_1
+class MyData
 {
     struct E
     {
@@ -15,7 +15,7 @@ class PerfectHashBruteForce_Char_1
     };
 
     inline static const std::array<E, 1> entries = {
-        E('a', 6357088)
+        E('a', 96)
     };
 
     static uint32_t get_hash(const std::string& str, uint32_t seed)

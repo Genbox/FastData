@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class Conditional_Double_3
+class MyData
 {
 public:
     static bool contains(const double& value)

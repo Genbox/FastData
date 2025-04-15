@@ -8,12 +8,12 @@ public class GenericTests
     [Fact]
     public void OutputIsUniq()
     {
-        FastDataConfig config = new FastDataConfig("MyData", ["item", "item"]);
-        Assert.Throws<InvalidOperationException>(() => FastDataGenerator.TryGenerate(config, new DummyGenerator(), out _));
+        FastDataConfig config = new FastDataConfig();
+        Assert.Throws<InvalidOperationException>(() => FastDataGenerator.TryGenerate(["item", "item"], config, new DummyGenerator(), out _));
     }
 
     private class DummyGenerator : IGenerator
     {
-        public string Generate(GeneratorConfig genCfg, FastDataConfig fastCfg, IContext context) => throw new NotSupportedException();
+        public string Generate(GeneratorConfig genCfg, IContext context) => throw new NotSupportedException();
     }
 }

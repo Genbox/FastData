@@ -1,23 +1,21 @@
 using System.Diagnostics;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Configs;
-using Genbox.FastData.Enums;
-using Genbox.FastData.Helpers;
+using Genbox.FastData.Contexts;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Helpers;
-using Genbox.FastData.Models;
+using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class PerfectHashBruteForceStructure : IStructure
+internal sealed class PerfectHashBruteForceStructure : IHashStructure
 {
-    public bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, out IContext? context)
+    public bool TryCreate(object[] data, HashFunc hashFunc, out IContext? context)
     {
         long timestamp = Stopwatch.GetTimestamp();
 
         //Find the proper seeds
-        uint[] seed = PerfectHashHelper.Generate(data, HashHelper.HashObjectSeed, 1, uint.MaxValue, data.Length, () =>
+        uint[] seed = PerfectHashHelper.Generate(data, hashFunc, 1, uint.MaxValue, data.Length, () =>
         {
             TimeSpan span = new TimeSpan(Stopwatch.GetTimestamp() - timestamp);
             return span.TotalSeconds > 10;
@@ -36,7 +34,7 @@ internal sealed class PerfectHashBruteForceStructure : IStructure
         {
             object value = data[i];
 
-            uint hash = HashHelper.HashObjectSeed(value, seed[0]);
+            uint hash = hashFunc(value, seed[0]);
             uint index = (uint)(hash % pairs.Length);
             pairs[index] = new KeyValuePair<object, uint>(value, hash);
         }

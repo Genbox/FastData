@@ -4,7 +4,7 @@
 #include <array>
 #include <cstdint>
 
-class PerfectHashGPerf_String_7
+class MyData
 {
     inline static const std::array<int8_t, 256> asso = {
         31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 

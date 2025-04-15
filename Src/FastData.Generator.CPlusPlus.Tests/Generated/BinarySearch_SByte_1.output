@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class BinarySearch_SByte_1
+class MyData
 {
     inline static const std::array<int8_t, 1> entries = {
         1

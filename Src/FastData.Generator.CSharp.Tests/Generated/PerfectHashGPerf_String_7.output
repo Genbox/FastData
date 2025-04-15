@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class PerfectHashGPerf_String_7 : IFastSet<String>
+internal partial class MyData : IFastSet<String>
 {
     private sbyte[] _asso = new sbyte[] {
         31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 

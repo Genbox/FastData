@@ -82,10 +82,10 @@ public class AutoStringBenchmarks
         for (int i = 0; i < size; i++)
             data[i] = new string('a', i + 1);
 
-        CSharpGeneratorConfig genCfg = new CSharpGeneratorConfig();
+        CSharpGeneratorConfig genCfg = new CSharpGeneratorConfig("MyData");
         genCfg.ClassType = ClassType.Instance;
 
-        FastDataGenerator.TryGenerate(new FastDataConfig("MyData", data), new CSharpCodeGenerator(genCfg), out string? source);
+        FastDataGenerator.TryGenerate(data, new FastDataConfig(), new CSharpCodeGenerator(genCfg), out string? source);
         yield return [CodeGenerator.CreateFastSet<string>(source, true), "Auto", size];
 
         //We have to do this as the source generator only works on object[], but these work on string[]

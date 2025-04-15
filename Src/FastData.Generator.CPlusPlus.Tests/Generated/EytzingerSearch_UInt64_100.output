@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class EytzingerSearch_UInt64_100
+class MyData
 {
     inline static const std::array<uint64_t, 100> entries = {
         63, 31, 84, 15, 47, 76, 92, 7, 23, 39, 

@@ -23,72 +23,65 @@ internal static class GeneratorConfigExtensions
         _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
     };
 
-    internal static string GetEqualFunction(this GeneratorConfig config, string variable)
-    {
-        return $"value == {variable}";
-    }
+    internal static string GetEqualFunction(this GeneratorConfig config, string variable) => $"value == {variable}";
 
-    internal static string GetCompareFunction(this GeneratorConfig config, string variable)
-    {
-        return $"{variable}.compare(value)";
-    }
+    internal static string GetCompareFunction(this GeneratorConfig config, string variable) => $"{variable}.compare(value)";
 
     internal static string GetHashSource(this GeneratorConfig config, bool seeded)
     {
-        if (seeded)
-        {
-            return """
-                       static uint32_t get_hash(const std::string& str, uint32_t seed)
-                       {
-                           uint32_t hash1 = seed;
-                           uint32_t hash2 = seed;
+        //TODO: Support other types
 
-                           const char* ptr = str.data();
-                           uint32_t length = static_cast<uint32_t>(str.size());
+        return seeded
+            ? """
+                  static uint32_t get_hash(const std::string& str, uint32_t seed)
+                  {
+                      uint32_t hash1 = seed;
+                      uint32_t hash2 = seed;
 
-                           auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
-                           while (length >= 4) {
-                               hash1 = (hash1 << 5 | hash1 >> (32 - 5)) + hash1 ^ ptr32[0];
-                               hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ ptr32[1];
-                               ptr32 += 2;
-                               length -= 4;
-                           }
+                      const char* ptr = str.data();
+                      uint32_t length = static_cast<uint32_t>(str.size());
 
-                           auto ptr_char = reinterpret_cast<const char*>(ptr32);
-                           while (length-- > 0) {
-                               hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
-                           }
+                      auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
+                      while (length >= 4) {
+                          hash1 = (hash1 << 5 | hash1 >> (32 - 5)) + hash1 ^ ptr32[0];
+                          hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ ptr32[1];
+                          ptr32 += 2;
+                          length -= 4;
+                      }
 
-                           return hash1 + (hash2 * 0x5D588B65);
-                       }
-                   """;
-        }
+                      auto ptr_char = reinterpret_cast<const char*>(ptr32);
+                      while (length-- > 0) {
+                          hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
+                      }
 
-        return """
-                   static uint32_t get_hash(const std::string& str)
-                   {
-                       uint32_t hash1 = (5381 << 16) + 5381;
-                       uint32_t hash2 = (5381 << 16) + 5381;
+                      return hash1 + (hash2 * 0x5D588B65);
+                  }
+              """
+            : """
+                  static uint32_t get_hash(const std::string& str)
+                  {
+                      uint32_t hash1 = (5381 << 16) + 5381;
+                      uint32_t hash2 = (5381 << 16) + 5381;
 
-                       const char* ptr = str.data();
-                       uint32_t length = static_cast<uint32_t>(str.size());
+                      const char* ptr = str.data();
+                      uint32_t length = static_cast<uint32_t>(str.size());
 
-                       auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
-                       while (length >= 4) {
-                           hash1 = (hash1 << 5 | hash1 >> (32 - 5)) + hash1 ^ ptr32[0];
-                           hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ ptr32[1];
-                           ptr32 += 2;
-                           length -= 4;
-                       }
+                      auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
+                      while (length >= 4) {
+                          hash1 = (hash1 << 5 | hash1 >> (32 - 5)) + hash1 ^ ptr32[0];
+                          hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ ptr32[1];
+                          ptr32 += 2;
+                          length -= 4;
+                      }
 
-                       auto ptr_char = reinterpret_cast<const char*>(ptr32);
-                       while (length-- > 0) {
-                           hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
-                       }
+                      auto ptr_char = reinterpret_cast<const char*>(ptr32);
+                      while (length-- > 0) {
+                          hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
+                      }
 
-                       return hash1 + (hash2 * 0x5D588B65);
-                   }
-               """;
+                      return hash1 + (hash2 * 0x5D588B65);
+                  }
+              """;
     }
 
     private static string GetHash(DataType dataType, bool seeded)

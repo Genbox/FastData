@@ -8,14 +8,14 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class HashSetChain_Char_3 : IFastSet<Char>
+internal partial class MyData : IFastSet<Char>
 {
     private readonly sbyte[] _buckets = new sbyte[] {
-        3, 2, 1
+        3, 1, 2
      };
 
     private readonly E[] _entries = {
-        new E(6357089, -1, 'a'), new E(6422626, -1, 'b'), new E(6488163, -1, 'c')
+        new E(97, -1, 'a'), new E(98, -1, 'b'), new E(99, -1, 'c')
     };
 
     
@@ -42,7 +42,10 @@ internal partial class HashSetChain_Char_3 : IFastSet<Char>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(char value) => unchecked((uint)value);
+    public static uint Hash(char value)
+    {
+        return unchecked((uint)value);
+    }
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

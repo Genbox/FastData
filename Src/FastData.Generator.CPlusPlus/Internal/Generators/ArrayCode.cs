@@ -1,8 +1,8 @@
 using System.Globalization;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Contexts;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
-using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
@@ -18,7 +18,7 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CPlusPlusGeneratorConfig
               {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-
+          
                   for (int i = 0; i < {{ctx.Data.Length.ToString(NumberFormatInfo.InvariantInfo)}}; i++)
                   {
                       if ({{genCfg.GetEqualFunction("entries[i]")}})

@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class Conditional_Int16_100
+class MyData
 {
 public:
     static bool contains(const int16_t& value)

@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class KeyLength_String_1 : IFastSet<String>
+internal partial class MyData : IFastSet<String>
 {
     private readonly string[] _entries = new string[] {
         "value"

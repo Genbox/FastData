@@ -1,8 +1,8 @@
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Contexts;
 using Genbox.FastData.Generator.CSharp.Internal.Extensions;
-using Genbox.FastData.Models;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
@@ -13,21 +13,21 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpGe
               private{{cfg.GetModifier()}} E[] _entries = {
           {{FormatColumns(ctx.Data, Render)}}
               };
-
+          
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-
+          
                   uint hash = Hash(value, {{ctx.Seed}});
                   uint index = {{cfg.GetModFunction(ctx.Data.Length)}};
                   ref E entry = ref _entries[index];
-
+          
                   return hash == entry.HashCode && {{genCfg.GetEqualFunction("entry.Value")}};
               }
 
           {{genCfg.GetHashSource(true)}}
-
+          
               [StructLayout(LayoutKind.Auto)]
               private struct E
               {
@@ -36,7 +36,7 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpGe
                       Value = value;
                       HashCode = hashCode;
                   }
-
+          
                   internal {{genCfg.GetTypeName()}} Value;
                   internal uint HashCode;
               }

@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class HashSetLinear_Int32_100
+class MyData
 {
     struct B
     {

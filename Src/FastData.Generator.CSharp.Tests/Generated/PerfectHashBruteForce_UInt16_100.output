@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class PerfectHashBruteForce_UInt16_100 : IFastSet<UInt16>
+internal partial class MyData : IFastSet<UInt16>
 {
     private E[] _entries = {
         new E(1, 0), new E(0, 1), new E(3, 2), new E(2, 3), new E(5, 4), new E(4, 5), new E(7, 6), new E(6, 7), new E(9, 8), new E(8, 9), 
@@ -37,7 +37,10 @@ internal partial class PerfectHashBruteForce_UInt16_100 : IFastSet<UInt16>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(ushort value, uint seed) => unchecked((uint)(value ^ seed));
+    public static uint Hash(ushort value, uint seed)
+    {
+        return unchecked((uint)(value ^ seed));
+    }
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

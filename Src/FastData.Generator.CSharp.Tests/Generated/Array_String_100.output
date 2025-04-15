@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class Array_String_100 : IFastSet<String>
+internal partial class MyData : IFastSet<String>
 {
     private string[] _entries = new string[] {
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 

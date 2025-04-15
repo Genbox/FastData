@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class HashSetChain_Char_1
+class MyData
 {
     struct E
     {
@@ -20,7 +20,7 @@ class HashSetChain_Char_1
      };
 
     inline static const std::array<E, 1> entries = {
-        E(6357089, -1, 'a')
+        E(97, -1, 'a')
     };
 
     static uint32_t get_hash(const std::string& str)

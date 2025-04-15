@@ -16,7 +16,7 @@ internal sealed class RankSelection(IRandom random) : ISelection
         int[] indices = GeneHelper.GetSortedByFitness(population);
 
         int count = population.Count;
-        float totalRank = count * (count + 1) / 2f;
+        float totalRank = (count * (count + 1)) / 2f;
 
         double[] rankWheel = new double[count];
         double cumulative = 0.0;

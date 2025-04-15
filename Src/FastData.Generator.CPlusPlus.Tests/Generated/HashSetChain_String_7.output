@@ -4,7 +4,7 @@
 #include <array>
 #include <cstdint>
 
-class HashSetChain_String_7
+class MyData
 {
     struct E
     {

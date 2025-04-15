@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class HashSetChain_Single_1
+class MyData
 {
     struct E
     {

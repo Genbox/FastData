@@ -4,7 +4,7 @@
 #include <array>
 #include <cstdint>
 
-class BinarySearch_String_100
+class MyData
 {
     inline static const std::array<std::string, 100> entries = {
         "0", "1", "10", "11", "12", "13", "14", "15", "16", "17", 

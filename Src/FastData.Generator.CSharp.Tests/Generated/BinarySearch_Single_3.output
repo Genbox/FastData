@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class BinarySearch_Single_3 : IFastSet<Single>
+internal partial class MyData : IFastSet<Single>
 {
     private float[] _entries = new float[] {
         -1, 0, 1

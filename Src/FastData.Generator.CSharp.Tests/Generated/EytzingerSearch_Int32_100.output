@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class EytzingerSearch_Int32_100 : IFastSet<Int32>
+internal partial class MyData : IFastSet<Int32>
 {
     private int[] _entries = new int[] {
         63, 31, 84, 15, 47, 76, 92, 7, 23, 39, 

@@ -3,9 +3,9 @@ using System.Globalization;
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
-using Genbox.FastData.EarlyExitSpecs;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Helpers;
+using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Extensions;
 

@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class SingleValue_Int64_1
+class MyData
 {
 public:
     static bool contains(const int64_t& value)

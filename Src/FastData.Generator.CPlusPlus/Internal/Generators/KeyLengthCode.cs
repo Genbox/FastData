@@ -3,9 +3,9 @@ using System.Globalization;
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
-using Genbox.FastData.EarlyExitSpecs;
+using Genbox.FastData.Contexts;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
-using Genbox.FastData.Models;
+using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
@@ -26,7 +26,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorCo
                      {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
-
+                 
                          return {{genCfg.GetEqualFunction($"entries[value.length() - {ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}]")}};
                      }
                  """;
@@ -34,7 +34,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorCo
 
     private string GenerateNormal()
     {
-        List<string>?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Take((int)(ctx.MaxLength - ctx.MinLength + 1)).ToArray();
+        List<string>?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Take((int)((ctx.MaxLength - ctx.MinLength) + 1)).ToArray();
 
         return $$"""
                      {{cfg.GetFieldModifier()}} std:array<std:vector<{{genCfg.GetTypeName()}}>, {{lengths.Length}}> entries = {
@@ -46,16 +46,16 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorCo
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
                          std::vector<{{genCfg.GetTypeName()}}> bucket = entries[value.length() - {{ctx.MinLength}}];
-
+                 
                          if (bucket == nullptr)
                              return false;
-
+                 
                          foreach ({{genCfg.GetTypeName()}} str in bucket)
                          {
                              if ({{genCfg.GetEqualFunction("str")}})
                                  return true;
                          }
-
+                 
                          return false;
                      }
                  """;

@@ -14,8 +14,10 @@ internal readonly record struct CharacterMap
         get
         {
             for (int i = 0; i < _map.Length; i++)
+            {
                 if (_map[i] != 0)
                     return (char)i;
+            }
 
             return '\0';
         }
@@ -26,8 +28,10 @@ internal readonly record struct CharacterMap
         get
         {
             for (int i = _map.Length - 1; i >= 0; i--)
+            {
                 if (_map[i] != 0)
                     return (char)i;
+            }
 
             return '\0';
         }

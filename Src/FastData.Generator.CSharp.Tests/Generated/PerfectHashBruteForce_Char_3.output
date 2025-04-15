@@ -8,10 +8,10 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class PerfectHashBruteForce_Char_3 : IFastSet<Char>
+internal partial class MyData : IFastSet<Char>
 {
     private E[] _entries = {
-        new E('a', 6357093), new E('c', 6488167), new E('b', 6422630)
+        new E('c', 96), new E('b', 97), new E('a', 98)
     };
 
     
@@ -20,7 +20,7 @@ internal partial class PerfectHashBruteForce_Char_3 : IFastSet<Char>
         if (value < 97 || value > 99)
            return false;
 
-        uint hash = Hash(value, 4);
+        uint hash = Hash(value, 3);
         uint index = MathHelper.FastMod(hash, 3, 6148914691236517206);
         ref E entry = ref _entries[index];
 
@@ -28,7 +28,10 @@ internal partial class PerfectHashBruteForce_Char_3 : IFastSet<Char>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(char value, uint seed) => unchecked((uint)(value ^ seed));
+    public static uint Hash(char value, uint seed)
+    {
+        return unchecked((uint)(value ^ seed));
+    }
 
     [StructLayout(LayoutKind.Auto)]
     private struct E

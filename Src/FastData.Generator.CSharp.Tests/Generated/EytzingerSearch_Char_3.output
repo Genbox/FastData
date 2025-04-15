@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class EytzingerSearch_Char_3 : IFastSet<Char>
+internal partial class MyData : IFastSet<Char>
 {
     private char[] _entries = new char[] {
         'b', 'a', 'c'

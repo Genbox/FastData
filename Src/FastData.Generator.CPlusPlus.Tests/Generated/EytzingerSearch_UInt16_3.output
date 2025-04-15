@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class EytzingerSearch_UInt16_3
+class MyData
 {
     inline static const std::array<uint16_t, 3> entries = {
         1, 0, 2

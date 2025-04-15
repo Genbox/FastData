@@ -1,6 +1,8 @@
-﻿namespace Genbox.FastData.Benchmarks.Code;
+﻿using Genbox.FastData.Specs;
 
-public readonly record struct MixSpec(string Name, Func<uint, uint, uint> Function)
+namespace Genbox.FastData.Benchmarks.Code;
+
+public readonly record struct MixSpec(string Name, HashFunc Function)
 {
     public override string ToString() => Name;
 }

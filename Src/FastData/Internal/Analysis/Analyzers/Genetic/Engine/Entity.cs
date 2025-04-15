@@ -15,6 +15,7 @@ public struct Entity
 
     internal double Fitness { get; set; }
     internal IGene[] Genes { get; }
+    internal Dictionary<string, object> Metadata { get; set; }
 
     internal readonly void ForceMutate(IRandom random)
     {

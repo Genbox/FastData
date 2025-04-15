@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class PerfectHashBruteForce_UInt16_1
+class MyData
 {
     struct E
     {

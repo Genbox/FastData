@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class EytzingerSearch_Char_3
+class MyData
 {
     inline static const std::array<char, 3> entries = {
         'b', 'a', 'c'

@@ -8,7 +8,7 @@ using Genbox.FastData.Helpers;
 using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class SingleValue_Double_1 : IFastSet<Double>
+internal partial class MyData : IFastSet<Double>
 {
     
     public bool Contains(double value)

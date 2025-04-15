@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class BinarySearch_Char_3
+class MyData
 {
     inline static const std::array<char, 3> entries = {
         'a', 'b', 'c'

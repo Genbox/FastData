@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Genbox.FastHash" />
     <PackageReference Include="Genbox.FastFilter" />
   </ItemGroup>
 

@@ -1,8 +1,6 @@
 using System.Text;
-using Genbox.FastData.Configs;
-using Genbox.FastData.Enums;
-using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared;
 
@@ -12,7 +10,7 @@ namespace Genbox.FastData.Testbed.Tests;
 /// This code enables verification of FastData against GPerf.
 /// When DebugPrint is enabled and a special version of GPerf is run on the same files, it should give the same console text
 /// </summary>
-public static class GPerfTest
+internal static class GPerfTest
 {
     private static readonly Random _random = new Random(42);
 
@@ -23,7 +21,7 @@ public static class GPerfTest
             if (!file.EndsWith(".txt", StringComparison.Ordinal))
                 continue;
 
-            var options = new FileStreamOptions();
+            FileStreamOptions options = new FileStreamOptions();
             options.Access = FileAccess.Write;
             options.Mode = FileMode.Create;
 
@@ -34,11 +32,12 @@ public static class GPerfTest
 
             object[] data = File.ReadAllLines(file).Cast<object>().ToArray();
 
-            StringProperties props = DataAnalyzer.GetStringProperties(data);
-            PerfectHashGPerfStructure code = new PerfectHashGPerfStructure();
+            StructureConfig cfg = new StructureConfig(new DataProperties(data));
+            PerfectHashGPerfStructure code = new PerfectHashGPerfStructure(cfg);
+
             try
             {
-                code.TryCreate(data, DataType.String, new DataProperties { StringProps = props }, new FastDataConfig("name", data), out _);
+                code.TryCreate(data, out _);
             }
             catch
             {

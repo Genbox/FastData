@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-class Array_SByte_100
+class MyData
 {
     inline static const std::array<int8_t, 100> entries = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 

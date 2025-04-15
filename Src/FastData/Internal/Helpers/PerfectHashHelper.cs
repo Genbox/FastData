@@ -1,10 +1,12 @@
 using Genbox.FastData.Helpers;
+using Genbox.FastData.Internal.Analysis.Analyzers;
+using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Internal.Helpers;
 
 internal static class PerfectHashHelper
 {
-    internal static IEnumerable<uint> Generate<T>(T[] data, Func<T, uint, uint> hashFunc, uint maxCandidates = uint.MaxValue, uint maxAttempts = uint.MaxValue, int length = 0, Func<bool>? condition = null)
+    internal static IEnumerable<uint> Generate<T>(T[] data, HashFunc hashFunc, uint maxCandidates = uint.MaxValue, uint maxAttempts = uint.MaxValue, int length = 0, Func<bool>? condition = null)
     {
         if (length == 0)
             length = data.Length;

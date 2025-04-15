@@ -1,7 +1,6 @@
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Enums;
+using Genbox.FastData.Specs.Hash;
 
 namespace Genbox.FastData.Internal.Analysis.Segments;
 

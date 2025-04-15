@@ -1,6 +1,5 @@
 using System.Text;
-using Genbox.FastData.Internal.Analysis.Misc;
-using Genbox.FastData.Internal.Enums;
+using Genbox.FastData.Specs.Hash;
 
 namespace Genbox.FastData.Internal.Helpers;
 
@@ -31,5 +30,11 @@ internal static class SegmentHelper
         }
         else
             throw new InvalidOperationException("Invalid alignment");
+    }
+
+    internal static ReadOnlySpan<char> GetSpan(in StringSegment segment, string input)
+    {
+        ConvertToOffsets(input.Length, segment, out int start, out int end);
+        return input.AsSpan(start, end - start);
     }
 }

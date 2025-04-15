@@ -1,13 +1,10 @@
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Configs;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Analysis.Analyzers;
-using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Internal.Abstracts;
 
 internal interface IHashStructure
 {
-    bool TryCreate(object[] data, DataType dataType, DataProperties props, FastDataConfig config, Func<object, uint> hash, out IContext? context);
-    double[] Emulate(object[] data, uint capacity, HashFunc hashFunc, EqualFunc equalFunc);
+    bool TryCreate(object[] data, HashFunc hash, out IContext? context);
 }
