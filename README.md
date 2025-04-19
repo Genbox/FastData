@@ -3,80 +3,186 @@
 [![NuGet](https://img.shields.io/nuget/v/Genbox.ReplaceMe.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.ReplaceMe/)
 [![License](https://img.shields.io/github/license/Genbox/ReplaceMe)](https://github.com/Genbox/ReplaceMe/blob/master/LICENSE.txt)
 
-### Description
-This project is a .NET source generator to create read-only lookup-datastructures of immutable data.
+## Description
 
-### Use case
-Let's say you create a game with a resource system. Resources are named "character01", "health_texture01", etc. You need to quickly check if a resource is present, so you add all your resources to an array and call `Contains()` on it like so:
+FastData is a source generator that analyzes your data and creates high-performance, read-only lookup data structures for static data.
+
+## Use case
+
+Imagine a scenario where you have a predefined list of words (e.g., dog breeds) and need to check whether a specific dog breed exists in the set.
+Usually you create an array and look up the value. However, this is far from optimal and is missing a few optimizations.
 
 ```csharp
-string[] resources = [ "character01", "health_texture01", ... ];
+string[] breeds = ["Labrador", "German Shepherd", "Golden Retriever"];
 
-if (resources.Contains("player01"))
+if (breeds.Contains("Beagle"))
+    Console.WriteLine("It contains Beagle");
+```
+
+We can do better by analyzing the dataset and generating a data structure optimized for the data.
+
+1. Create a file `Dogs.txt` with the following contents:
+
+```
+Labrador
+German Shepherd
+Golden Retriever
+```
+
+2. Run `FastData csharp Dogs.txt`. It produces the output:
+
+```csharp
+internal static class Dogs
 {
-    // Do something
+    public static bool Contains(string value)
+    {
+        if ((49280UL & (1UL << (value.Length - 1) % 64)) == 0)
+           return false;
+
+        switch (value)
+        {
+            case "Labrador":
+            case "German Shepherd":
+            case "Golden Retriever":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public const int ItemCount = 3;
+    public const int MinLength = 8;
+    public const int MaxLength = 16;
 }
 ```
-This works just fine while you are developing the game, but once it starts having a lot more resources, the `Contains()` check will start to slow down the game considerably due to its O(n) complexity.
-It is easy to fix by changing to a `HashSet<string>` and benchmarking to ensure that it performs better, but you'll have to constantly track all the sets of resources you have and change the implementation when adding/removing large amounts of resources.
 
-With this source generator, you don't have to think about it. It will dynamically change the underlying data structure to match your data. It ensures optimal query time and low memory usage.
-There is only one requirement, and that is that all the values in your set is known up front and it never changes.
+Benefits of the generated code:
 
-### Features
+- **Fast Early Exit:** A bitmap of string lengths allows early termination for out-of-range values.
+- **Efficient Lookups:** A switch-based data structure. It uses more advanced structures for larger data sets.
+- **Additional Metadata:** Provides item count and minimum/maximum string length.
 
-* Data analysis to utilize the properties of your data to gain even more benefits. See the Data Analysis section for details.
-* Support for several indexing structures:
-   * Array with linear search
-   * Array with binary search
-   * Array with Eytzinger layout (and binary search)
-   * Array indexed with string length
-   * Array indexed with hash codes
-   * Array indexed with a minimal perfect hash function
-* Supports `StringComparison` so you can choose how items are compared. Defaults to Ordinal.
-* Zero runtime overhead. All the data structures are generated at compile time.
+A benchmark of the array versus our generated structure really illustrates the difference. It is 13x faster.
 
-### Example
+| Method    |      Mean |     Error |    StdDev | Ratio |
+|-----------|----------:|----------:|----------:|------:|
+| Generated | 0.5311 ns | 0.0170 ns | 0.0026 ns |  0.08 |
+| Array     | 6.9286 ns | 0.1541 ns | 0.0684 ns |  1.00 |
+
+## Features
+
+- **Data Analysis:** Optimizes the structure based on the inherent properties of the dataset.
+- **Multiple Indexing Structures:** Choose the best structure for your data size and use case:
+    - Array (linear search)
+    - Array (binary search)
+    - Array (Eytzinger search)
+    - Length indexed
+    - Minimal Perfect Hashing
+    - Hash tables/sets
+
+It supports several output programming languages:
+
+* C#
+* C++
+
+## Getting started
+
+There are several ways of running FastData. See the sections below for details.
+
+### Using the executable
+
+1. Download the FastData executable
+2. Create a file with an item pr. line
+3. Run `FastData csharp File.txt`
+
+### Using it in a C# application
+
+1. Add the `Genbox.FastData.Generator.CSharp` package to your project
+2. Use the `FastDataGenerator.TryGenerate()` method. Give it your data as an array.
 
 ```csharp
-static async Task Main()
+internal static class Program
 {
-    //CODE HERE
+    private static void Main()
+    {
+        FastDataConfig config = new FastDataConfig();
+        config.StringComparison = StringComparison.OrdinalIgnoreCase;
+
+        CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpGeneratorConfig("Dogs"));
+
+        if (!FastDataGenerator.TryGenerate(["Labrador", "German Shepherd", "Golden Retriever"], config, generator, out string? source))
+            Console.WriteLine("Failed to generate source code");
+
+        Console.WriteLine(source);
+    }
 }
 ```
 
-Output:
+### Using it as a .NET Source Generator
 
-```
-//OUTPUT HERE
-```
-
-### How does it work?
-The idea behind the project is to generate a data-dependent optimized data structure for read-only access/lookup. When data is known beforehand, the algorithm can select from a set of different data structures, indexing and comparison methods that are tailor built for the data.
-Let's say you have a set of names. You put them in an array and users can lookup if their name is in the array.
+1. Add the `Genbox.FastData.SourceGenerator` package to your project
+2. Add `FastDataAttribute` as an assembly level attribute.
 
 ```csharp
-var names = { "john", "chris", "mike", "ruben", "jack" };
-var input = "...";
+using Genbox.FastData.SourceGenerator;
 
-Console.WriteLine("Name is in the list: " + name.Contains(input));
+[assembly: FastData<string>("Dogs", ["Labrador", "German Shepherd", "Golden Retriever"])]
+
+internal static class Program
+{
+    private static void Main()
+    {
+        Console.WriteLine(Dogs.Contains("Labrador"));
+        Console.WriteLine(Dogs.Contains("Beagle"));
+    }
+}
 ```
-Seems simple, but what happens if the set grows to 1000 names? or 1 mio. names? Is the latency of the lookup going to keep being consistent?
-Let's benchmark 1 mio. names using a `string[]` and a `HashSet<string>` in C#:
 
-| Method  | Mean           |
-|-------- |---------------:|
-| HashSet |       132.7 ns |
-| Array   | 1,782,259.4 ns |
+Whenever you change the array, it automatically generates the new source code and includes in your project.
 
-We can see that HashSet is 13,501 times faster.
-This is a challenge in a lot of applications. For example in compilers (language keywords), games (asset keys), and routed systems (route keys).
+## How does it work?
 
-## Supported data structures
-A data structure is the layout of the data itself. Usually you might just want to store the data in an array, but that might not be the best layout depending on the size of the array.
-Instead it might be prudent to store it in a hash table or perhaps even in a tree structure. There are several data structures supported:
-* Array - O(n)
-* Sorted Array - O(n log n)
-* Eytzinger Array - O(n log n)
-* Dictionary - O(1)
-* Conditional (switch-case) - O(n)
+The idea behind the project is to generate a data-dependent optimized data structure for read-only lookup. When data is known beforehand, the algorithm can select from a set
+of different data structures, indexing, and comparison methods that are tailor built for the data.
+
+### Compile-time generation
+
+There are many benefits gained from generating data structures at compile time:
+
+* Enables us to analyze the data
+* Zero runtime overhead
+* No defensive copying of data (takes time and needs double the memory)
+* No virtual dispatching (Virtual method calls & inheritance)
+* Data as code means you can compile the data into your assembly
+
+### Data analysis
+
+FastData uses advanced data analysis techniques to generate optimized data structures. Analysis consists of:
+
+* Length bitmaps
+* Entropy mapping
+* Character mapping
+* Encoding analysis
+
+#### Hash function generators
+
+Hash functions come in many flavors. Some are designed for low latency, some for throughput, others for low collision rate.
+Programming language runtimes come with a hash function that is a tradeoff between these parameters. FastData builds a hash function specifically tailored to the dataset.
+It does so using one of four techniques:
+
+1. **Default:** If no technique is selected, FastData uses a hash function by Daniel Bernstein (DJB2)
+2. **Brute force:** It spends some time on trying increasingly stronger hash functions
+3. **Heuristic:** It tries to build a hash function that selects for entropy in strings
+4. **Genetic algorithm:** It uses machine learning to evolve a hash function from scratch that matches the data effectively
+
+## Best practices
+
+* Put the most often queried items first in the input data. It can speed up query speed for some data structures.
+
+## FAQ
+
+* Q: Why not use System.Collections.Frozen?
+* A: There are several reasons:
+  * Frozen comes with considerable runtime overhead
+  * Frozen is only available in .NET 8.0+
+  * Frozen only provides af ew of the optimizations provided in FastData
