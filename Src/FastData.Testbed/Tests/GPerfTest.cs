@@ -16,6 +16,8 @@ internal static class GPerfTest
 
     public static void ProduceOutputs(string path)
     {
+        TextWriter org = Console.Out;
+
         foreach (string file in Directory.GetFiles(path))
         {
             if (!file.EndsWith(".txt", StringComparison.Ordinal))
@@ -44,6 +46,8 @@ internal static class GPerfTest
                 // Console.WriteLine("Error");
             }
         }
+
+        Console.SetOut(org);
     }
 
     public static void MakeTestFiles(string path)
