@@ -37,7 +37,7 @@ public class SourceGeneratorTests
                          using Genbox.FastData.SourceGenerator;
                          using Genbox.FastData.Enums;
 
-                         [assembly: FastData<string>("StaticData", ["item1"], DataStructure = DataStructure.{ds})]
+                         [assembly: FastData<string>("StaticData", ["item1"], StructureType = StructureType.{ds})]
                          """;
 
         string output = RunGenerator(source);
@@ -61,7 +61,7 @@ public class SourceGeneratorTests
                          using Genbox.FastData.SourceGenerator;
                          using Genbox.FastData.Enums;
 
-                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], DataStructure = DataStructure.{ds})]
+                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], StructureType = StructureType.{ds})]
                          """;
 
         string output = RunGenerator(source);
