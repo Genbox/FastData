@@ -24,13 +24,13 @@ class MyData
         E(3645924380, -1, "aaa"), E(3844005527, -1, "aaaaa"), E(2517435613, 0, "aaaaaa"), E(3612615712, -1, "aaaaaaa"), E(1489999822, -1, "aaaaaaaa"), E(1495121428, 4, "aaaaaaaaa"), E(3989733254, 5, "aaaaaaaaaa")
     };
 
-    static uint32_t get_hash(const std::string& str)
+    static uint32_t get_hash(const std::string& value)
     {
         uint32_t hash1 = (5381 << 16) + 5381;
         uint32_t hash2 = (5381 << 16) + 5381;
 
-        const char* ptr = str.data();
-        uint32_t length = static_cast<uint32_t>(str.size());
+        const char* ptr = value.data();
+        uint32_t length = static_cast<uint32_t>(value.size());
 
         auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
         while (length >= 4) {

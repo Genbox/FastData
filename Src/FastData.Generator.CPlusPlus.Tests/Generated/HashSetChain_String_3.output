@@ -24,13 +24,13 @@ class MyData
         E(2011983611, -1, "item1"), E(3578067552, -1, "item2"), E(849184197, 1, "item3")
     };
 
-    static uint32_t get_hash(const std::string& str)
+    static uint32_t get_hash(const std::string& value)
     {
         uint32_t hash1 = (5381 << 16) + 5381;
         uint32_t hash2 = (5381 << 16) + 5381;
 
-        const char* ptr = str.data();
-        uint32_t length = static_cast<uint32_t>(str.size());
+        const char* ptr = value.data();
+        uint32_t length = static_cast<uint32_t>(value.size());
 
         auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
         while (length >= 4) {

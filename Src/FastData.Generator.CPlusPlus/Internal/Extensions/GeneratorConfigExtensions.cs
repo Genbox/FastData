@@ -29,74 +29,40 @@ internal static class GeneratorConfigExtensions
 
     internal static string GetHashSource(this GeneratorConfig config, bool seeded)
     {
-        //TODO: Support other types
-
-        return seeded
-            ? """
-                  static uint32_t get_hash(const std::string& str, uint32_t seed)
-                  {
-                      uint32_t hash1 = seed;
-                      uint32_t hash2 = seed;
-
-                      const char* ptr = str.data();
-                      uint32_t length = static_cast<uint32_t>(str.size());
-
-                      auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
-                      while (length >= 4) {
-                          hash1 = (hash1 << 5 | hash1 >> (32 - 5)) + hash1 ^ ptr32[0];
-                          hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ ptr32[1];
-                          ptr32 += 2;
-                          length -= 4;
-                      }
-
-                      auto ptr_char = reinterpret_cast<const char*>(ptr32);
-                      while (length-- > 0) {
-                          hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
-                      }
-
-                      return hash1 + (hash2 * 0x5D588B65);
-                  }
-              """
-            : """
-                  static uint32_t get_hash(const std::string& str)
-                  {
-                      uint32_t hash1 = (5381 << 16) + 5381;
-                      uint32_t hash2 = (5381 << 16) + 5381;
-
-                      const char* ptr = str.data();
-                      uint32_t length = static_cast<uint32_t>(str.size());
-
-                      auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
-                      while (length >= 4) {
-                          hash1 = (hash1 << 5 | hash1 >> (32 - 5)) + hash1 ^ ptr32[0];
-                          hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ ptr32[1];
-                          ptr32 += 2;
-                          length -= 4;
-                      }
-
-                      auto ptr_char = reinterpret_cast<const char*>(ptr32);
-                      while (length-- > 0) {
-                          hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
-                      }
-
-                      return hash1 + (hash2 * 0x5D588B65);
-                  }
-              """;
-    }
-
-    private static string GetHash(DataType dataType, bool seeded)
-    {
-        //For these types, we can use identity hashing
-        return dataType switch
+        if (config.DataType == DataType.String)
         {
-            DataType.Char
-                or DataType.SByte
-                or DataType.Byte
-                or DataType.Int16
-                or DataType.UInt16
-                or DataType.Int32
-                or DataType.UInt32 => seeded ? "unchecked((uint)(value ^ seed))" : "unchecked((uint)value)",
-            _ => seeded ? "unchecked((uint)(value.GetHashCode() ^ seed))" : "unchecked((uint)(value.GetHashCode()))"
-        };
+            return $$"""
+                         static uint32_t get_hash(const std::string& value{{(seeded ? ", uint32_t seed," : "")}})
+                         {
+                             uint32_t hash1 = {{(seeded ? "seed" : "(5381 << 16) + 5381")}};
+                             uint32_t hash2 = {{(seeded ? "seed" : "(5381 << 16) + 5381")}};
+
+                             const char* ptr = value.data();
+                             uint32_t length = static_cast<uint32_t>(value.size());
+
+                             auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
+                             while (length >= 4) {
+                                 hash1 = (hash1 << 5 | hash1 >> (32 - 5)) + hash1 ^ ptr32[0];
+                                 hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ ptr32[1];
+                                 ptr32 += 2;
+                                 length -= 4;
+                             }
+
+                             auto ptr_char = reinterpret_cast<const char*>(ptr32);
+                             while (length-- > 0) {
+                                 hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
+                             }
+
+                             return hash1 + (hash2 * 0x5D588B65);
+                         }
+                     """;
+        }
+
+        return $$"""
+                     static uint32_t get_hash(const {{config.GetTypeName()}} value{{(seeded ? ", uint32_t seed," : "")}})
+                     {
+                         return {{(seeded ? "reinterpret_cast<uint32_t>(value ^ seed)" : "reinterpret_cast<uint32_t>(value)")}};
+                     }
+                 """;
     }
 }
