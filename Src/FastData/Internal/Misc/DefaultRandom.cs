@@ -4,7 +4,7 @@ namespace Genbox.FastData.Internal.Misc;
 
 internal sealed class DefaultRandom(int seed = 0) : IRandom
 {
-    private readonly Random _random = new Random(seed == 0 ? Environment.TickCount : seed);
+    private readonly Random _random = seed == 0 ? new Random() : new Random(seed);
 
     public double NextDouble() => _random.NextDouble();
     public int Next() => _random.Next();

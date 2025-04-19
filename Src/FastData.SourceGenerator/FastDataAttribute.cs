@@ -14,7 +14,7 @@ public class FastDataAttribute<T> : Attribute
 
     public string Name { get; }
     public T[] Data { get; }
-    public DataStructure DataStructure { get; set; }
+    public StructureType StructureType { get; set; }
     public string? Namespace { get; set; }
     public ClassVisibility ClassVisibility { get; set; }
     public ClassType ClassType { get; set; }

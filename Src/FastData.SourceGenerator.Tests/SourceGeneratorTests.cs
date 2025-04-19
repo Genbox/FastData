@@ -30,8 +30,8 @@ public class SourceGeneratorTests
     }
 
     [Theory]
-    [InlineData(DataStructure.SingleValue)]
-    public void DataStructureSingleTest(DataStructure ds)
+    [InlineData(StructureType.SingleValue)]
+    public void DataStructureSingleTest(StructureType ds)
     {
         string source = $"""
                          using Genbox.FastData.SourceGenerator;
@@ -46,16 +46,16 @@ public class SourceGeneratorTests
     }
 
     [Theory]
-    [InlineData(DataStructure.Array)]
-    [InlineData(DataStructure.Conditional)]
-    [InlineData(DataStructure.BinarySearch)]
-    [InlineData(DataStructure.EytzingerSearch)]
-    [InlineData(DataStructure.PerfectHashGPerf)]
-    [InlineData(DataStructure.PerfectHashBruteForce)]
-    [InlineData(DataStructure.HashSetChain)]
-    [InlineData(DataStructure.HashSetLinear)]
-    [InlineData(DataStructure.KeyLength)]
-    public void DataStructureTest(DataStructure ds)
+    [InlineData(StructureType.Array)]
+    [InlineData(StructureType.Conditional)]
+    [InlineData(StructureType.BinarySearch)]
+    [InlineData(StructureType.EytzingerSearch)]
+    [InlineData(StructureType.PerfectHashGPerf)]
+    [InlineData(StructureType.PerfectHashBruteForce)]
+    [InlineData(StructureType.HashSetChain)]
+    [InlineData(StructureType.HashSetLinear)]
+    [InlineData(StructureType.KeyLength)]
+    public void DataStructureTest(StructureType ds)
     {
         string source = $"""
                          using Genbox.FastData.SourceGenerator;

@@ -55,17 +55,17 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
                     if (obj is CombinedConfig combinedCfg)
                     {
-                        if (!FastDataGenerator.TryGenerate(combinedCfg.FastDataConfig, new CSharpCodeGenerator(combinedCfg.CSharpGeneratorConfig), out string? source))
+                        if (!FastDataGenerator.TryGenerate(combinedCfg.Data, combinedCfg.FastDataConfig, new CSharpCodeGenerator(combinedCfg.CSharpGeneratorConfig), out string? source))
                         {
-                            DataStructure ds = combinedCfg.FastDataConfig.DataStructure;
+                            StructureType ds = combinedCfg.FastDataConfig.StructureType;
 
-                            if (ds != DataStructure.Auto)
+                            if (ds != StructureType.Auto)
                                 throw new InvalidOperationException($"Failed to generate code with '{ds}'. Try setting DataStructure to Auto.");
 
                             throw new InvalidOperationException("Failed to generate code.");
                         }
 
-                        spc.AddSource(combinedCfg.FastDataConfig.Name + ".g.cs", SourceText.From(source, Encoding.UTF8));
+                        spc.AddSource(combinedCfg.CSharpGeneratorConfig.ClassName + ".g.cs", SourceText.From(source, Encoding.UTF8));
                     }
                     else
                         throw new InvalidOperationException("Unknown object type: " + obj.GetType().Name);
@@ -121,7 +121,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
             ITypeSymbol genericArg = ad.AttributeClass.TypeArguments[0];
 
-            if (!Enum.TryParse<KnownDataType>(genericArg.Name, out _))
+            if (!Enum.TryParse<DataType>(genericArg.Name, out _))
                 throw new InvalidOperationException($"FastData does not support '{genericArg.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}' as generic argument for '{name}'");
 
             //We uniq the values and throw on duplicates
@@ -151,16 +151,16 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                 data[i] = value;
             }
 
-            FastDataConfig config = new FastDataConfig(name, data);
-            BindValue(() => config.DataStructure, ad.NamedArguments);
+            FastDataConfig config = new FastDataConfig();
+            BindValue(() => config.StructureType, ad.NamedArguments);
             BindValue(() => config.StorageOptions, ad.NamedArguments);
 
-            CSharpGeneratorConfig config2 = new CSharpGeneratorConfig();
+            CSharpGeneratorConfig config2 = new CSharpGeneratorConfig(name);
             BindValue(() => config2.Namespace, ad.NamedArguments);
             BindValue(() => config2.ClassVisibility, ad.NamedArguments);
             BindValue(() => config2.ClassType, ad.NamedArguments);
 
-            yield return new CombinedConfig(config, config2);
+            yield return new CombinedConfig(data, config, config2);
         }
     }
 
