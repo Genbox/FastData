@@ -19,7 +19,7 @@ class MyData
         E("a", 2150936925), E("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 119911210), E("item", 1699185842)
     };
 
-    static uint32_t get_hash(const std::string& value, uint32_t seed,)
+    static uint32_t get_hash(const std::string& value, const uint32_t seed)
     {
         uint32_t hash1 = seed;
         uint32_t hash2 = seed;

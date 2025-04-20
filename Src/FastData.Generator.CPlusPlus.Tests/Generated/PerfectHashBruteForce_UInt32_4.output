@@ -18,7 +18,7 @@ class MyData
         E(1, 0), E(0, 1), E(4294967295, 4294967294), E(2, 3)
     };
 
-    static uint32_t get_hash(const uint32_t value, uint32_t seed,)
+    static uint32_t get_hash(const uint32_t value, const uint32_t seed)
     {
         return reinterpret_cast<uint32_t>(value ^ seed);
     }

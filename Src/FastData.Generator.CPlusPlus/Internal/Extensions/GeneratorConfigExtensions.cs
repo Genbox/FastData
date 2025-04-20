@@ -32,7 +32,7 @@ internal static class GeneratorConfigExtensions
         if (config.DataType == DataType.String)
         {
             return $$"""
-                         static uint32_t get_hash(const std::string& value{{(seeded ? ", uint32_t seed," : "")}})
+                         static uint32_t get_hash(const std::string& value{{(seeded ? ", const uint32_t seed" : "")}})
                          {
                              uint32_t hash1 = {{(seeded ? "seed" : "(5381 << 16) + 5381")}};
                              uint32_t hash2 = {{(seeded ? "seed" : "(5381 << 16) + 5381")}};
@@ -59,7 +59,7 @@ internal static class GeneratorConfigExtensions
         }
 
         return $$"""
-                     static uint32_t get_hash(const {{config.GetTypeName()}} value{{(seeded ? ", uint32_t seed," : "")}})
+                     static uint32_t get_hash(const {{config.GetTypeName()}} value{{(seeded ? ", const uint32_t seed" : "")}})
                      {
                          return {{(seeded ? "reinterpret_cast<uint32_t>(value ^ seed)" : "reinterpret_cast<uint32_t>(value)")}};
                      }
