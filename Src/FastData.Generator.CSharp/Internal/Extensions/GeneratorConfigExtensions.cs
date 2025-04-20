@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Extensions;
@@ -50,12 +51,82 @@ internal static class GeneratorConfigExtensions
           {{config.HashSpec switch
           {
               DefaultHashSpec => GetDJBHash(config.DataType, seeded),
-              GeneticHashSpec ghs => GetGeneticHash(ghs, seeded),
               BruteForceHashSpec bfs => GetBruteForceHash(bfs, seeded),
+              HeuristicHashSpec hhs => GetHeuristicHash(hhs, config.Constants.MinValue, seeded),
+              GeneticHashSpec ghs => GetGeneticHash(ghs, seeded),
               _ => throw new NotSupportedException(config.HashSpec.GetType().Name + " is not supported")
           }}}
               }
           """;
+
+    private static string GetHeuristicHash(HeuristicHashSpec hac, object minStrLen, bool seeded)
+    {
+        //We need to know the shortest string
+        uint minLen = (uint)minStrLen;
+
+        //We start with the highest position.
+        int key = hac.Positions[0];
+
+        StringBuilder sb = new StringBuilder();
+
+        //If the position is the last char, or is less than the shortest string, we can write a simple expression
+        if (key == -1 || key < minLen)
+        {
+            sb.Append("        return ");
+
+            // Render each position. We should get "str[x] + str[y] + ..."
+            for (int i = 0; i < hac.Positions.Length; i++)
+            {
+                sb.Append(RenderPosition(hac.Positions[i]));
+
+                if (i < hac.Positions.Length - 1)
+                    sb.Append(" + ");
+            }
+
+            sb.Append(';');
+            return sb.ToString();
+        }
+
+        sb.Append($$"""
+                            uint hash = {{(seeded ? "seed" : "0")}};
+                            switch (value.Length)
+                            {
+                                default:
+                                   hash += {{RenderPosition(key)}};
+                                   goto case {{key}};
+                    """);
+
+        // Output all the other cases
+        do
+        {
+            sb.AppendLine($"            case {key}:");
+
+            if (hac.Positions.Contains(key - 1))
+                sb.Append("                hash += ").Append(RenderPosition(key - 1)).AppendLine(";");
+
+            if (key != minLen)
+                sb.AppendLine($"                goto case {key - 1};");
+        } while (--key > minLen);
+
+        if (key == minLen)
+            sb.Append("            case ").Append(minLen).AppendLine(":");
+
+        sb.Append("""
+                                  break;
+                              }
+
+                              return hash
+                  """);
+
+        if (key == -1)
+            sb.Append(" + ").Append(RenderPosition(-1));
+
+        sb.Append(';');
+
+        return sb.ToString();
+
+        static string RenderPosition(int pos) => pos == -1 ? "str[str.Length - 1]]" : $"str[{pos}]";
+    }
 
     private static string GetBruteForceHash(BruteForceHashSpec spec, bool seeded)
     {
