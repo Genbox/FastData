@@ -2,7 +2,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Generator.CSharp.Benchmarks.Code;
-using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.InternalShared;
 
 namespace Genbox.FastData.Generator.CSharp.Benchmarks.Benchmarks;
