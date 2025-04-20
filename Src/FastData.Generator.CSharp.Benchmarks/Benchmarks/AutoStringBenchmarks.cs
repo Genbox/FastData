@@ -88,7 +88,7 @@ public class AutoStringBenchmarks
         //We have to do this as the source generator only works on object[], but these work on string[]
         string[] strData = data.Cast<string>().ToArray();
 
-        yield return [new UnoptimizedArray(strData), nameof(UnoptimizedArray), size];
-        yield return [new UnoptimizedHashSet(strData), nameof(UnoptimizedHashSet), size];
+        yield return [(Func<string, bool>)new UnoptimizedArray(strData).Contains, nameof(UnoptimizedArray), size];
+        yield return [(Func<string, bool>)new UnoptimizedHashSet(strData).Contains, nameof(UnoptimizedHashSet), size];
     }
 }
