@@ -5,25 +5,24 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Helpers;
-using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class MyData : IFastSet<Byte>
+internal static class MyData 
 {
-    private readonly B[] _buckets = {
+    private static readonly B[] _buckets = {
         new B(0, 0), new B(1, 1), new B(0, 0), new B(2, 2), new B(0, 0), new B(0, 0), new B(0, 0)
     };
 
-    private readonly byte[] _items = new byte[] {
+    private static readonly byte[] _items = new byte[] {
         0, 1, 255
     };
 
-    private readonly uint[] _hashCodes = {
+    private static readonly uint[] _hashCodes = {
         0, 1, 255
     };
 
     
-    public bool Contains(byte value)
+    public static bool Contains(byte value)
     {
         if (value < 0 || value > 255)
             return false;
@@ -65,7 +64,6 @@ internal partial class MyData : IFastSet<Byte>
     }
 
     public const int ItemCount = 3;
-    public int Length => ItemCount;
     public const byte MinValue = 0;
     public const byte MaxValue = 255;
 }

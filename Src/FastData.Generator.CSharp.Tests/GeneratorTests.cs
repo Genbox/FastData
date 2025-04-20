@@ -1,7 +1,4 @@
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.CSharp.Abstracts;
-using Genbox.FastData.Generator.CSharp.Enums;
-using Genbox.FastData.Generator.CSharp.Shared;
 using Genbox.FastData.Generator.Helpers;
 using Genbox.FastData.InternalShared;
 using Microsoft.CodeAnalysis.CSharp;
@@ -16,7 +13,6 @@ public class GeneratorTests
     public GeneratorTests()
     {
         CSharpGeneratorConfig cfg = new CSharpGeneratorConfig("MyData");
-        cfg.ClassType = ClassType.Instance;
         _generator = new CSharpCodeGenerator(cfg);
     }
 
@@ -33,22 +29,22 @@ public class GeneratorTests
 
         if (spec.DataType == DataType.String)
         {
-            IFastSet<string> set = CodeGenerator.CreateFastSet<string>(spec.Source, false);
+            Func<string, bool> contains = CompilationHelper.GetDelegate<Func<string, bool>>(spec.Source, false);
 
             foreach (string str in data)
-                Assert.True(set.Contains(str));
+                Assert.True(contains(str));
 
-            Assert.False(set.Contains("dontexist"));
-            Assert.False(set.Contains("item11"));
+            Assert.False(contains("dontexist"));
+            Assert.False(contains("item11"));
         }
         else if (spec.DataType == DataType.Int32)
         {
-            IFastSet<int> set = CodeGenerator.CreateFastSet<int>(spec.Source, false);
+            Func<int, bool> contains = CompilationHelper.GetDelegate<Func<int, bool>>(spec.Source, false);
 
             foreach (int str in data)
-                Assert.True(set.Contains(str));
+                Assert.True(contains(str));
 
-            Assert.False(set.Contains(100));
+            Assert.False(contains(100));
         }
         else
         {

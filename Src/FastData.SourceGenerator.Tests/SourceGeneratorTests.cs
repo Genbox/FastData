@@ -22,7 +22,7 @@ public class SourceGeneratorTests
         Assert.Contains("StaticData", output, StringComparison.Ordinal); //It must contain the name we gave it
 
         //Compile the output to code and test
-        Func<string, bool> func = CompilationHelper.GetDelegate<Func<string, bool>>(output, false, true);
+        Func<string, bool> func = CompilationHelper.GetDelegate<Func<string, bool>>(output, false);
         Assert.True(func("item1")); //It must return true for the 3 items we gave
         Assert.True(func("item2"));
         Assert.True(func("item3"));

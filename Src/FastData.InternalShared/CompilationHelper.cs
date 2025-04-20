@@ -11,21 +11,9 @@ namespace Genbox.FastData.InternalShared;
 public static class CompilationHelper
 {
     /// <summary>This is used to wrap a hash function and get it as a delegate</summary>
-    public static T GetDelegate<T>(string source, bool release, bool disableWrapper = false) where T : Delegate
+    public static T GetDelegate<T>(string source, bool release) where T : Delegate
     {
-        string wrapped = $$"""
-                           using System;
-                           using Genbox.FastData.Helpers;
-                           using System.Runtime.InteropServices;  // MethodImpl
-                           using System.Runtime.CompilerServices; // Unsafe
-
-                           public static class Wrapper
-                           {
-                               {{source}}
-                           }
-                           """;
-
-        CSharpCompilation compilation = CreateCompilation(disableWrapper ? source : wrapped, release, typeof(T), typeof(DisplayAttribute));
+        CSharpCompilation compilation = CreateCompilation(source, release, typeof(T), typeof(DisplayAttribute));
 
         if (!TryGetAssembly(compilation, out Assembly? assembly, out Diagnostic[] diagnostics))
             throw new InvalidOperationException("Unable to compile delegate. Errors: " + string.Join('\n', diagnostics.Select(x => x.ToString())));

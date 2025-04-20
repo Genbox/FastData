@@ -5,10 +5,9 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.CSharp.Abstracts;
 using Genbox.FastData.Generator.CSharp.Enums;
-using Genbox.FastData.Generator.CSharp.Shared;
 using Genbox.FastData.Generator.Enums;
+using Genbox.FastData.InternalShared;
 using Genbox.FastFilter;
 
 namespace Genbox.FastData.Generator.CSharp.Benchmarks.Benchmarks;
@@ -32,32 +31,31 @@ public class DataStructureBenchmarks
     private BlockedBloomFilter<string> _blockedBloom = null!;
     private BinaryFuse8Filter<string> _binaryFuse8 = null!;
 
-    private IFastSet<string> _fastArray = null!;
-    private IFastSet<string> _fastBinarySearch = null!;
-    private IFastSet<string> _fastEytzingerSearch = null!;
-    private IFastSet<string> _fastConditionalIf = null!;
-    private IFastSet<string> _fastConditionalSwitch = null!;
-    private IFastSet<string> _fastPerfectHashGPerf = null!;
-    private IFastSet<string> _fastPerfectHashBruteForce = null!;
-    private IFastSet<string> _fastHashSetLinear = null!;
-    private IFastSet<string> _fastHashSetChain = null!;
-    private IFastSet<string> _fastKeyLength = null!;
-    private IFastSet<string> _fastKeyLengthUniqIf = null!;
-    private IFastSet<string> _fastKeyLengthUniqSwitch = null!;
+    private Func<string, bool> _fastArray = null!;
+    private Func<string, bool> _fastBinarySearch = null!;
+    private Func<string, bool> _fastEytzingerSearch = null!;
+    private Func<string, bool> _fastConditionalIf = null!;
+    private Func<string, bool> _fastConditionalSwitch = null!;
+    private Func<string, bool> _fastPerfectHashGPerf = null!;
+    private Func<string, bool> _fastPerfectHashBruteForce = null!;
+    private Func<string, bool> _fastHashSetLinear = null!;
+    private Func<string, bool> _fastHashSetChain = null!;
+    private Func<string, bool> _fastKeyLength = null!;
+    private Func<string, bool> _fastKeyLengthUniqIf = null!;
+    private Func<string, bool> _fastKeyLengthUniqSwitch = null!;
 
     [Params(10_000)]
     public int QuerySize { get; set; }
 
-    private static IFastSet<string> CreateFastData(StructureType ds, object[] data, Action<CSharpGeneratorConfig>? configure = null)
+    private static Func<string, bool> CreateFastData(StructureType ds, object[] data, Action<CSharpGeneratorConfig>? configure = null)
     {
-        CSharpGeneratorConfig generatorConfig = new CSharpGeneratorConfig(ds.ToString());
-        generatorConfig.ClassType = ClassType.Instance;
-        configure?.Invoke(generatorConfig);
+        CSharpGeneratorConfig usrCfg = new CSharpGeneratorConfig(ds.ToString());
+        configure?.Invoke(usrCfg);
 
-        if (!FastDataGenerator.TryGenerate(data, new FastDataConfig(ds), new CSharpCodeGenerator(generatorConfig), out string? source))
+        if (!FastDataGenerator.TryGenerate(data, new FastDataConfig(ds), new CSharpCodeGenerator(usrCfg), out string? source))
             throw new InvalidOperationException("Unable to create data structure: " + ds);
 
-        return CodeGenerator.CreateFastSet<string>(source, true);
+        return CompilationHelper.GetDelegate<Func<string, bool>>(source, true);
     }
 
     private void SetupQueries()
@@ -231,40 +229,40 @@ public class DataStructureBenchmarks
     public void QueryBinaryFuse8() => DoQuery(_binaryFuse8.Contains);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticArray() => DoQuery(_fastArray.Contains);
+    public void QueryStaticArray() => DoQuery(_fastArray);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticBinarySearch() => DoQuery(_fastBinarySearch.Contains);
+    public void QueryStaticBinarySearch() => DoQuery(_fastBinarySearch);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticEytzingerSearch() => DoQuery(_fastEytzingerSearch.Contains);
+    public void QueryStaticEytzingerSearch() => DoQuery(_fastEytzingerSearch);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticConditionalIf() => DoQuery(_fastConditionalIf.Contains);
+    public void QueryStaticConditionalIf() => DoQuery(_fastConditionalIf);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticConditionalSwitch() => DoQuery(_fastConditionalSwitch.Contains);
+    public void QueryStaticConditionalSwitch() => DoQuery(_fastConditionalSwitch);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticPerfectHashGPerf() => DoQuery(_fastPerfectHashGPerf.Contains);
+    public void QueryStaticPerfectHashGPerf() => DoQuery(_fastPerfectHashGPerf);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticPerfectHashBruteforce() => DoQuery(_fastPerfectHashBruteForce.Contains);
+    public void QueryStaticPerfectHashBruteforce() => DoQuery(_fastPerfectHashBruteForce);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticHashSetLinear() => DoQuery(_fastHashSetLinear.Contains);
+    public void QueryStaticHashSetLinear() => DoQuery(_fastHashSetLinear);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticHashSetChain() => DoQuery(_fastHashSetChain.Contains);
+    public void QueryStaticHashSetChain() => DoQuery(_fastHashSetChain);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticKeyLength() => DoQuery(_fastKeyLength.Contains);
+    public void QueryStaticKeyLength() => DoQuery(_fastKeyLength);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticKeyLengthUniqIf() => DoQuery(_fastKeyLengthUniqIf.Contains);
+    public void QueryStaticKeyLengthUniqIf() => DoQuery(_fastKeyLengthUniqIf);
 
     [Benchmark, BenchmarkCategory("Query")]
-    public void QueryStaticKeyLengthUniqSwitch() => DoQuery(_fastKeyLengthUniqSwitch.Contains);
+    public void QueryStaticKeyLengthUniqSwitch() => DoQuery(_fastKeyLengthUniqSwitch);
 
     private HashSet<string> CreateHashSet() => new HashSet<string>(_dataStr, StringComparer.Ordinal);
     private FrozenSet<string> CreateFrozenSet() => CreateHashSet().ToFrozenSet();

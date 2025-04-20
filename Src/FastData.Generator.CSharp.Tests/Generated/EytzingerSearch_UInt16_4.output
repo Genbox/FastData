@@ -5,17 +5,16 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Helpers;
-using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class MyData : IFastSet<UInt16>
+internal static class MyData 
 {
-    private ushort[] _entries = new ushort[] {
+    private static ushort[] _entries = new ushort[] {
         2, 1, 65535, 0
     };
 
     
-    public bool Contains(ushort value)
+    public static bool Contains(ushort value)
     {
         if (value < 0 || value > 65535)
             return false;
@@ -38,7 +37,6 @@ internal partial class MyData : IFastSet<UInt16>
     }
 
     public const int ItemCount = 4;
-    public int Length => ItemCount;
     public const ushort MinValue = 0;
     public const ushort MaxValue = 65535;
 }

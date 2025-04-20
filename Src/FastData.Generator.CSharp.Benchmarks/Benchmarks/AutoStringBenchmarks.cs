@@ -1,10 +1,9 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
 using Genbox.FastData.Configs;
-using Genbox.FastData.Generator.CSharp.Abstracts;
 using Genbox.FastData.Generator.CSharp.Benchmarks.Code;
 using Genbox.FastData.Generator.CSharp.Enums;
-using Genbox.FastData.Generator.CSharp.Shared;
+using Genbox.FastData.InternalShared;
 
 namespace Genbox.FastData.Generator.CSharp.Benchmarks.Benchmarks;
 
@@ -45,26 +44,26 @@ public class AutoStringBenchmarks
     */
 
     [Benchmark, ArgumentsSource(nameof(SingleData))]
-    public bool Single(IFastSet<string> set, string mode, int size) => DoCheck(set);
+    public bool Single(Func<string, bool> set, string mode, int size) => DoCheck(set);
 
     [Benchmark, ArgumentsSource(nameof(TinyData))]
-    public bool Tiny(IFastSet<string> set, string mode, int size) => DoCheck(set);
+    public bool Tiny(Func<string, bool> set, string mode, int size) => DoCheck(set);
 
     [Benchmark, ArgumentsSource(nameof(SmallData))]
-    public bool Small(IFastSet<string> set, string mode, int size) => DoCheck(set);
+    public bool Small(Func<string, bool> set, string mode, int size) => DoCheck(set);
 
     [Benchmark, ArgumentsSource(nameof(MediumData))]
-    public bool Medium(IFastSet<string> set, string mode, int size) => DoCheck(set);
+    public bool Medium(Func<string, bool> set, string mode, int size) => DoCheck(set);
 
     [Benchmark, ArgumentsSource(nameof(LargeData))]
-    public bool Large(IFastSet<string> set, string mode, int size) => DoCheck(set);
+    public bool Large(Func<string, bool> set, string mode, int size) => DoCheck(set);
 
-    private static bool DoCheck(IFastSet<string> set)
+    private static bool DoCheck(Func<string, bool> set)
     {
         bool a = true;
 
         for (int i = 1; i < 15; i++)
-            a &= set.Contains("item" + i);
+            a &= set("item" + i);
 
         return a;
     }
@@ -83,10 +82,8 @@ public class AutoStringBenchmarks
             data[i] = new string('a', i + 1);
 
         CSharpGeneratorConfig genCfg = new CSharpGeneratorConfig("MyData");
-        genCfg.ClassType = ClassType.Instance;
-
         FastDataGenerator.TryGenerate(data, new FastDataConfig(), new CSharpCodeGenerator(genCfg), out string? source);
-        yield return [CodeGenerator.CreateFastSet<string>(source, true), "Auto", size];
+        yield return [CompilationHelper.GetDelegate<Func<string, bool>>(source, true), "Auto", size];
 
         //We have to do this as the source generator only works on object[], but these work on string[]
         string[] strData = data.Cast<string>().ToArray();

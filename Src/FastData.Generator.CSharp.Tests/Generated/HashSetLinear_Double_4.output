@@ -5,26 +5,25 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Helpers;
-using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class MyData : IFastSet<Double>
+internal static class MyData 
 {
-    private readonly B[] _buckets = {
+    private static readonly B[] _buckets = {
         new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(1, 1), new B(0, 0), 
         new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(2, 2), new B(0, 0), new B(3, 3)
     };
 
-    private readonly double[] _items = new double[] {
+    private static readonly double[] _items = new double[] {
         0, 1.7976931348623157E+308, 1, -1.7976931348623157E+308
     };
 
-    private readonly uint[] _hashCodes = {
+    private static readonly uint[] _hashCodes = {
         0, 2148532224, 1072693248, 1048576
     };
 
     
-    public bool Contains(double value)
+    public static bool Contains(double value)
     {
         if (value < -1.7976931348623157E+308 || value > 1.7976931348623157E+308)
             return false;
@@ -66,7 +65,6 @@ internal partial class MyData : IFastSet<Double>
     }
 
     public const int ItemCount = 4;
-    public int Length => ItemCount;
     public const double MinValue = -1.7976931348623157E+308;
     public const double MaxValue = 1.7976931348623157E+308;
 }

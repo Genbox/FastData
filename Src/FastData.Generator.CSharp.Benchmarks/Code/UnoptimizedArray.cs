@@ -1,8 +1,6 @@
-﻿using Genbox.FastData.Generator.CSharp.Abstracts;
+﻿namespace Genbox.FastData.Generator.CSharp.Benchmarks.Code;
 
-namespace Genbox.FastData.Generator.CSharp.Benchmarks.Code;
-
-public class UnoptimizedArray(string[] data) : IFastSet<string>
+public class UnoptimizedArray(string[] data)
 {
     public bool Contains(string value)
     {
@@ -14,6 +12,4 @@ public class UnoptimizedArray(string[] data) : IFastSet<string>
 
         return false;
     }
-
-    public int Length => data.Length;
 }

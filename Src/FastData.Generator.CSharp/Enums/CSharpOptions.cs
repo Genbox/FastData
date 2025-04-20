@@ -1,4 +1,4 @@
-namespace Genbox.FastData.Generator.CSharp;
+namespace Genbox.FastData.Generator.CSharp.Enums;
 
 [Flags]
 public enum CSharpOptions
@@ -7,5 +7,6 @@ public enum CSharpOptions
     DisableEarlyExits = 1,
     DisableModulusOptimization = 2,
     DisableInlining = 4,
-    AggressiveInlining = 8
+    AggressiveInlining = 8,
+    GenerateInterface = 16
 }

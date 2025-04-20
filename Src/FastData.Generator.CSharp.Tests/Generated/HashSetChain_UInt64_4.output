@@ -5,21 +5,20 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Helpers;
-using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class MyData : IFastSet<UInt64>
+internal static class MyData 
 {
-    private readonly sbyte[] _buckets = new sbyte[] {
+    private static readonly sbyte[] _buckets = new sbyte[] {
         4, 2, 3, 0
      };
 
-    private readonly E[] _entries = {
+    private static readonly E[] _entries = {
         new E(0, -1, 0ul), new E(1, -1, 1ul), new E(2, -1, 2ul), new E(0, 0, 18446744073709551615ul)
     };
 
     
-    public bool Contains(ulong value)
+    public static bool Contains(ulong value)
     {
         if (value < 0ul || value > 18446744073709551615ul)
             return false;
@@ -63,7 +62,6 @@ internal partial class MyData : IFastSet<UInt64>
     }
 
     public const int ItemCount = 4;
-    public int Length => ItemCount;
     public const ulong MinValue = 0ul;
     public const ulong MaxValue = 18446744073709551615ul;
 }

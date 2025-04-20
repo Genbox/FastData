@@ -5,17 +5,16 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Helpers;
-using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class MyData : IFastSet<SByte>
+internal static class MyData 
 {
-    private E[] _entries = {
+    private static E[] _entries = {
         new E(1, 5u), new E(-1, 4294967291u), new E(-128, 4294967172u), new E(127, 123u), new E(0, 4u)
     };
 
     
-    public bool Contains(sbyte value)
+    public static bool Contains(sbyte value)
     {
         if (value < -128 || value > 127)
             return false;
@@ -47,7 +46,6 @@ internal partial class MyData : IFastSet<SByte>
     }
 
     public const int ItemCount = 5;
-    public int Length => ItemCount;
     public const sbyte MinValue = -128;
     public const sbyte MaxValue = 127;
 }

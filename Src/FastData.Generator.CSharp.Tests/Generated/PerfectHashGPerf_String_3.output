@@ -5,12 +5,11 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Helpers;
-using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class MyData : IFastSet<String>
+internal static class MyData 
 {
-    private sbyte[] _asso = new sbyte[] {
+    private static sbyte[] _asso = new sbyte[] {
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
@@ -39,12 +38,12 @@ internal partial class MyData : IFastSet<String>
         3, 3, 3, 3, 3, 3
     };
 
-    private string[] _items = {
+    private static string[] _items = {
         "a", "item", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     };
 
     
-    public bool Contains(string value)
+    public static bool Contains(string value)
     {
         if (value.Length < 1u || value.Length > 255u)
             return false;
@@ -57,7 +56,7 @@ internal partial class MyData : IFastSet<String>
         return StringComparer.Ordinal.Equals(value, _items[hash]);
     }
 
-    private uint Hash(string str)
+    private static uint Hash(string str)
     {
         uint hash = 0;
         switch (str.Length)
@@ -74,7 +73,6 @@ internal partial class MyData : IFastSet<String>
 
 
     public const int ItemCount = 3;
-    public int Length => ItemCount;
     public const int MinLength = 1;
     public const int MaxLength = 255;
 }

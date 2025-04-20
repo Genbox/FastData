@@ -5,19 +5,17 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Helpers;
-using Genbox.FastData.Generator.CSharp.Abstracts;
 
 
-internal partial class MyData : IFastSet<Int16>
+internal static class MyData 
 {
     
-    public bool Contains(short value)
+    public static bool Contains(short value)
     {
         return value.Equals(1);
     }
 
     public const int ItemCount = 1;
-    public int Length => ItemCount;
     public const short MinValue = 1;
     public const short MaxValue = 1;
 }
