@@ -1,11 +1,12 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: EytzingerSearch
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    inline static const std::array<double, 4> entries = {
+    static constexpr std::array<double, 4> entries = {
         1, 0, 1.7976931348623157E+308, -1.7976931348623157E+308
     };
 
@@ -18,7 +19,7 @@ public:
         unsigned int i = 0;
         while (i < entries.size())
         {
-            const int comparison = entries[i].compare(value);
+            const int comparison = (value > entries[i]) - (value < entries[i]);
 
             if (comparison == 0)
                 return true;
@@ -32,7 +33,7 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 4;
+    static constexpr unsigned int item_count = 4;
     static constexpr double min_value = -1.7976931348623157E+308;
     static constexpr double max_value = 1.7976931348623157E+308;
 };

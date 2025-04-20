@@ -1,27 +1,28 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: HashSetChain
+#pragma once
 #include <string>
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    struct E
+    struct e
     {
         uint32_t hash_code;
         int8_t next;
         std::string value;
 
-        E(const uint32_t hash_code, const int8_t next, const std::string& value)
+        e(const uint32_t hash_code, const int8_t next, const std::string& value)
            : hash_code(hash_code), next(next), value(value) {}
     };
 
-    inline static const std::array<int8_t, 3> buckets = {
+    static constexpr std::array<int8_t, 3> buckets = {
         0, 2, 3
      };
 
-    inline static const std::array<E, 3> entries = {
-        E(972181027, -1, "a"), E(1949155672, 0, "item"), E(2265191819, -1, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    static constexpr std::array<e, 3> entries = {
+        e(972181027, -1, "a"), e(1949155672, 0, "item"), e(2265191819, -1, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     };
 
     static uint32_t get_hash(const std::string& value)
@@ -45,13 +46,13 @@ class MyData
             hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
         }
 
-        return hash1 + (hash2 * 0x5D588B65);
+        return hash1 + hash2 * 0x5D588B65;
     }
 
 public:
     static bool contains(const std::string& value)
     {
-        if (const size_t len = value.length(); len < 1 || len > 255)
+        if (const size_t len = value.length(); len < 1u || len > 255u)
             return false;
 
         const uint32_t hash = get_hash(value);
@@ -60,18 +61,18 @@ public:
 
         while (i >= 0)
         {
-            const E& entry = entries[i];
+            const auto& [hash_code, next, value1] = entries[i];
 
-            if (entry.hash_code == hash && value == entry.value)
+            if (hash_code == hash && value == value1)
                 return true;
 
-            i = entry.next;
+            i = next;
         }
 
         return false;
     }
 
-    static constexpr int item_count = 3;
+    static constexpr unsigned int item_count = 3;
     static constexpr int min_length = 1;
     static constexpr int max_length = 255;
 };

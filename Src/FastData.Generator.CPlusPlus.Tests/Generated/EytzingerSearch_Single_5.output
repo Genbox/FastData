@@ -1,24 +1,25 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: EytzingerSearch
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    inline static const std::array<float, 5> entries = {
-        1f, -1f, 3.4028235E+38f, -3.4028235E+38f, 0f
+    static constexpr std::array<float, 5> entries = {
+        1.0f, -1.0f, 340282300000000000000000000000000000000.0f, -340282300000000000000000000000000000000.0f, 0.0f
     };
 
 public:
     static bool contains(const float& value)
     {
-        if (value < -3.4028234663852886E+38f || value > 3.4028234663852886E+38f)
+        if (value < -340282346638529000000000000000000000000.0f || value > 340282346638529000000000000000000000000.0f)
             return false;
 
         unsigned int i = 0;
         while (i < entries.size())
         {
-            const int comparison = entries[i].compare(value);
+            const int comparison = (value > entries[i]) - (value < entries[i]);
 
             if (comparison == 0)
                 return true;
@@ -32,7 +33,7 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 5;
-    static constexpr float min_value = -3.4028234663852886E+38f;
-    static constexpr float max_value = 3.4028234663852886E+38f;
+    static constexpr unsigned int item_count = 5;
+    static constexpr float min_value = -340282346638529000000000000000000000000.0f;
+    static constexpr float max_value = 340282346638529000000000000000000000000.0f;
 };

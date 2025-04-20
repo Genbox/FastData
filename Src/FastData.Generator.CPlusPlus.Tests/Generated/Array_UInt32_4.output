@@ -1,18 +1,19 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Array
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    inline static const std::array<uint32_t, 4> entries = {
-        0, 1, 2, 4294967295
+    static constexpr std::array<uint32_t, 4> entries = {
+        0u, 1u, 2u, 4294967295u
     };
 
 public:
     static bool contains(const uint32_t& value)
     {
-        if (value < 0 || value > 4294967295)
+        if (value < 0u || value > 4294967295u)
             return false;
 
         for (int i = 0; i < 4; i++)
@@ -23,7 +24,7 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 4;
-    static constexpr uint32_t min_value = 0;
-    static constexpr uint32_t max_value = 4294967295;
+    static constexpr unsigned int item_count = 4;
+    static constexpr uint32_t min_value = 0u;
+    static constexpr uint32_t max_value = 4294967295u;
 };

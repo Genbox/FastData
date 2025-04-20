@@ -1,9 +1,10 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Conditional
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
 public:
     static bool contains(const double& value)
@@ -17,7 +18,7 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 4;
+    static constexpr unsigned int item_count = 4;
     static constexpr double min_value = -1.7976931348623157E+308;
     static constexpr double max_value = 1.7976931348623157E+308;
 };

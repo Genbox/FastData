@@ -1,9 +1,10 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: SingleValue
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
 public:
     static bool contains(const int8_t& value)
@@ -11,7 +12,7 @@ public:
         return value == 1;
     }
 
-    static constexpr int item_count = 1;
+    static constexpr unsigned int item_count = 1;
     static constexpr int8_t min_value = 1;
     static constexpr int8_t max_value = 1;
 };

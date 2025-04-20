@@ -1,26 +1,27 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: HashSetChain
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    struct E
+    struct e
     {
         uint32_t hash_code;
         int8_t next;
         uint16_t value;
 
-        E(const uint32_t hash_code, const int8_t next, const uint16_t& value)
+        e(const uint32_t hash_code, const int8_t next, const uint16_t& value)
            : hash_code(hash_code), next(next), value(value) {}
     };
 
-    inline static const std::array<int8_t, 4> buckets = {
+    static constexpr std::array<int8_t, 4> buckets = {
         1, 2, 3, 4
      };
 
-    inline static const std::array<E, 4> entries = {
-        E(0, -1, 0), E(1, -1, 1), E(2, -1, 2), E(65535, -1, 65535)
+    static constexpr std::array<e, 4> entries = {
+        e(0, -1, 0), e(1, -1, 1), e(2, -1, 2), e(65535, -1, 65535)
     };
 
     static uint32_t get_hash(const uint16_t value)
@@ -40,18 +41,18 @@ public:
 
         while (i >= 0)
         {
-            const E& entry = entries[i];
+            const auto& [hash_code, next, value1] = entries[i];
 
-            if (entry.hash_code == hash && value == entry.value)
+            if (hash_code == hash && value == value1)
                 return true;
 
-            i = entry.next;
+            i = next;
         }
 
         return false;
     }
 
-    static constexpr int item_count = 4;
+    static constexpr unsigned int item_count = 4;
     static constexpr uint16_t min_value = 0;
     static constexpr uint16_t max_value = 65535;
 };

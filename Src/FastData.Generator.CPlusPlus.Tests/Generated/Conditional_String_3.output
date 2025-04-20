@@ -1,15 +1,16 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Conditional
+#pragma once
 #include <string>
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
 public:
     static bool contains(const std::string& value)
     {
-        if (const size_t len = value.length(); len < 1 || len > 255)
+        if (const size_t len = value.length(); len < 1u || len > 255u)
             return false;
 
         if (value == "a" || value == "item" || value == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
@@ -18,7 +19,7 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 3;
+    static constexpr unsigned int item_count = 3;
     static constexpr int min_length = 1;
     static constexpr int max_length = 255;
 };

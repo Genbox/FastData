@@ -1,17 +1,18 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: SingleValue
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
 public:
     static bool contains(const float& value)
     {
-        return value == 1f;
+        return value == 1.0f;
     }
 
-    static constexpr int item_count = 1;
-    static constexpr float min_value = 1f;
-    static constexpr float max_value = 1f;
+    static constexpr unsigned int item_count = 1;
+    static constexpr float min_value = 1.0f;
+    static constexpr float max_value = 1.0f;
 };

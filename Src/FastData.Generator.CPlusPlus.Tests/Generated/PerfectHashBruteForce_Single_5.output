@@ -1,21 +1,22 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: PerfectHashBruteForce
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    struct E
+    struct e
     {
         float value;
         uint32_t hash_code;
 
-        E(const float& value, const uint32_t hash_code)
+        e(const float& value, const uint32_t hash_code)
         : value(value), hash_code(hash_code) {}
     };
 
-    inline static const std::array<E, 5> entries = {
-        E(-1f, 3196059650), E(3.4028235E+38f, 2122317821), E(1f, 1048576002), E(0f, 16777218), E(-3.4028235E+38f, 4269801469)
+    static constexpr std::array<e, 5> entries = {
+        e(-1.0f, 3196059650u), e(340282300000000000000000000000000000000.0f, 2122317821u), e(1.0f, 1048576002u), e(0.0f, 16777218u), e(-340282300000000000000000000000000000000.0f, 4269801469u)
     };
 
     static uint32_t get_hash(const float value, const uint32_t seed)
@@ -26,17 +27,17 @@ class MyData
 public:
     static bool contains(const float& value)
     {
-        if (value < -3.4028234663852886E+38f || value > 3.4028234663852886E+38f)
+        if (value < -340282346638529000000000000000000000000.0f || value > 340282346638529000000000000000000000000.0f)
             return false;
 
         const uint32_t hash = get_hash(value, 16777218);
         const uint32_t index = hash % 5;
-        const E& entry = entries[index];
+        const e& entry = entries[index];
 
         return hash == entry.hash_code && value == entry.value;
     }
 
-    static constexpr int item_count = 5;
-    static constexpr float min_value = -3.4028234663852886E+38f;
-    static constexpr float max_value = 3.4028234663852886E+38f;
+    static constexpr unsigned int item_count = 5;
+    static constexpr float min_value = -340282346638529000000000000000000000000.0f;
+    static constexpr float max_value = 340282346638529000000000000000000000000.0f;
 };

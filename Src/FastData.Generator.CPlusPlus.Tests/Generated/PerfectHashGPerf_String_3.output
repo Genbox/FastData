@@ -1,12 +1,13 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: PerfectHashGPerf
+#pragma once
 #include <string>
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    inline static const std::array<int8_t, 256> asso = {
+    static constexpr std::array<int8_t, 256> asso = {
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
@@ -35,14 +36,14 @@ class MyData
         3, 3, 3, 3, 3, 3
     };
 
-    inline static const std::array<std::string, 3> items = {
+    static constexpr std::array<std::string, 3> items = {
         "a", "item", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     };
 
 public:
     static bool contains(const std::string& value)
     {
-        if (const size_t len = value.length(); len < 1 || len > 255)
+        if (const size_t len = value.length(); len < 1u || len > 255u)
             return false;
 
         const uint32_t hash = get_hash(value);
@@ -68,7 +69,7 @@ public:
     }
 
 
-    static constexpr int item_count = 3;
+    static constexpr unsigned int item_count = 3;
     static constexpr int min_length = 1;
     static constexpr int max_length = 255;
 };

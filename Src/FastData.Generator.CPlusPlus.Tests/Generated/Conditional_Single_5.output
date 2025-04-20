@@ -1,23 +1,24 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Conditional
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
 public:
     static bool contains(const float& value)
     {
-        if (value < -3.4028234663852886E+38f || value > 3.4028234663852886E+38f)
+        if (value < -340282346638529000000000000000000000000.0f || value > 340282346638529000000000000000000000000.0f)
             return false;
 
-        if (value == -3.4028235E+38f || value == -1f || value == 0f || value == 1f || value == 3.4028235E+38f)
+        if (value == -340282300000000000000000000000000000000.0f || value == -1.0f || value == 0.0f || value == 1.0f || value == 340282300000000000000000000000000000000.0f)
             return true;
 
         return false;
     }
 
-    static constexpr int item_count = 5;
-    static constexpr float min_value = -3.4028234663852886E+38f;
-    static constexpr float max_value = 3.4028234663852886E+38f;
+    static constexpr unsigned int item_count = 5;
+    static constexpr float min_value = -340282346638529000000000000000000000000.0f;
+    static constexpr float max_value = 340282346638529000000000000000000000000.0f;
 };

@@ -1,26 +1,27 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: HashSetChain
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    struct E
+    struct e
     {
         uint32_t hash_code;
         int8_t next;
         bool value;
 
-        E(const uint32_t hash_code, const int8_t next, const bool& value)
+        e(const uint32_t hash_code, const int8_t next, const bool& value)
            : hash_code(hash_code), next(next), value(value) {}
     };
 
-    inline static const std::array<int8_t, 2> buckets = {
+    static constexpr std::array<int8_t, 2> buckets = {
         2, 1
      };
 
-    inline static const std::array<E, 2> entries = {
-        E(1, -1, true), E(0, -1, false)
+    static constexpr std::array<e, 2> entries = {
+        e(1, -1, true), e(0, -1, false)
     };
 
     static uint32_t get_hash(const bool value)
@@ -39,16 +40,16 @@ public:
 
         while (i >= 0)
         {
-            const E& entry = entries[i];
+            const auto& [hash_code, next, value1] = entries[i];
 
-            if (entry.hash_code == hash && value == entry.value)
+            if (hash_code == hash && value == value1)
                 return true;
 
-            i = entry.next;
+            i = next;
         }
 
         return false;
     }
 
-    static constexpr int item_count = 2;
+    static constexpr unsigned int item_count = 2;
 };

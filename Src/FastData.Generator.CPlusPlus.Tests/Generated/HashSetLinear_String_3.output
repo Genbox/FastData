@@ -1,30 +1,31 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: HashSetLinear
+#pragma once
 #include <string>
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    struct B
+    struct b
     {
         uint8_t start_index;
         uint8_t end_index;
 
-        B(const uint8_t start_index, const uint8_t end_index)
+        b(const uint8_t start_index, const uint8_t end_index)
         : start_index(start_index), end_index(end_index) { }
     };
 
-    inline static const std::array<B, 11> buckets = {
-        B(0, 0), B(0, 0), B(1, 1), B(0, 0), B(2, 2), B(0, 0), B(0, 0), B(0, 0), B(0, 0), B(0, 0), 
-        B(0, 0)
+    static constexpr std::array<b, 11> buckets = {
+        b(0, 0), b(0, 0), b(1, 1), b(0, 0), b(2, 2), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), 
+        b(0, 0)
     };
 
-    inline static const std::array<std::string, 3> items = {
+    static constexpr std::array<std::string, 3> items = {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "item", "a"
     };
 
-    inline static const std::array<uint32_t, 3> hash_codes = {
+    static constexpr std::array<uint32_t, 3> hash_codes = {
         2265191819, 1949155672, 972181027
     };
 
@@ -49,20 +50,19 @@ class MyData
             hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
         }
 
-        return hash1 + (hash2 * 0x5D588B65);
+        return hash1 + hash2 * 0x5D588B65;
     }
 
 public:
     static bool contains(const std::string& value)
     {
-        if (const size_t len = value.length(); len < 1 || len > 255)
+        if (const size_t len = value.length(); len < 1u || len > 255u)
             return false;
 
         const uint32_t hash = get_hash(value);
-        const B& b = buckets[hash % 11];
+        const auto& [start_index, end_index]= buckets[hash % 11];
 
-        uint8_t index = b.start_index;
-        const uint8_t end_index = b.end_index;
+        uint8_t index = start_index;
 
         while (index <= end_index)
         {
@@ -75,7 +75,7 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 3;
+    static constexpr unsigned int item_count = 3;
     static constexpr int min_length = 1;
     static constexpr int max_length = 255;
 };

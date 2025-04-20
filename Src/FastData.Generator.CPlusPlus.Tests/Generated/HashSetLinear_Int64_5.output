@@ -1,28 +1,29 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: HashSetLinear
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    struct B
+    struct b
     {
         uint8_t start_index;
         uint8_t end_index;
 
-        B(const uint8_t start_index, const uint8_t end_index)
+        b(const uint8_t start_index, const uint8_t end_index)
         : start_index(start_index), end_index(end_index) { }
     };
 
-    inline static const std::array<B, 7> buckets = {
-        B(0, 1), B(2, 2), B(3, 4), B(0, 0), B(0, 0), B(0, 0), B(0, 0)
+    static constexpr std::array<b, 7> buckets = {
+        b(0, 1), b(2, 2), b(3, 4), b(0, 0), b(0, 0), b(0, 0), b(0, 0)
     };
 
-    inline static const std::array<int64_t, 5> items = {
+    static constexpr std::array<int64_t, 5> items = {
         0ll, -1ll, 1ll, 9223372036854775807ll, -9223372036854775808ll
     };
 
-    inline static const std::array<uint32_t, 5> hash_codes = {
+    static constexpr std::array<uint32_t, 5> hash_codes = {
         0, 0, 1, 2147483648, 2147483648
     };
 
@@ -38,10 +39,9 @@ public:
             return false;
 
         const uint32_t hash = get_hash(value);
-        const B& b = buckets[hash % 7];
+        const auto& [start_index, end_index]= buckets[hash % 7];
 
-        uint8_t index = b.start_index;
-        const uint8_t end_index = b.end_index;
+        uint8_t index = start_index;
 
         while (index <= end_index)
         {
@@ -54,7 +54,7 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 5;
+    static constexpr unsigned int item_count = 5;
     static constexpr int64_t min_value = -9223372036854775808ll;
     static constexpr int64_t max_value = 9223372036854775807ll;
 };

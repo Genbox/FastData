@@ -1,21 +1,22 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: PerfectHashBruteForce
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    struct E
+    struct e
     {
         uint8_t value;
         uint32_t hash_code;
 
-        E(const uint8_t& value, const uint32_t hash_code)
+        e(const uint8_t& value, const uint32_t hash_code)
         : value(value), hash_code(hash_code) {}
     };
 
-    inline static const std::array<E, 3> entries = {
-        E(1, 0), E(0, 1), E(255, 254)
+    static constexpr std::array<e, 3> entries = {
+        e(1, 0u), e(0, 1u), e(255, 254u)
     };
 
     static uint32_t get_hash(const uint8_t value, const uint32_t seed)
@@ -31,12 +32,12 @@ public:
 
         const uint32_t hash = get_hash(value, 1);
         const uint32_t index = hash % 3;
-        const E& entry = entries[index];
+        const e& entry = entries[index];
 
         return hash == entry.hash_code && value == entry.value;
     }
 
-    static constexpr int item_count = 3;
+    static constexpr unsigned int item_count = 3;
     static constexpr uint8_t min_value = 0;
     static constexpr uint8_t max_value = 255;
 };

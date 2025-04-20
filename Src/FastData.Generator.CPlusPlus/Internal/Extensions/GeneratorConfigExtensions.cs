@@ -1,6 +1,5 @@
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Extensions;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
 

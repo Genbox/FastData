@@ -1,11 +1,12 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Array
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    inline static const std::array<uint16_t, 4> entries = {
+    static constexpr std::array<uint16_t, 4> entries = {
         0, 1, 2, 65535
     };
 
@@ -23,7 +24,7 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 4;
+    static constexpr unsigned int item_count = 4;
     static constexpr uint16_t min_value = 0;
     static constexpr uint16_t max_value = 65535;
 };

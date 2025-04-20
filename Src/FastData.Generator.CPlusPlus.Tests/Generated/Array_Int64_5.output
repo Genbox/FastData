@@ -1,11 +1,12 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Array
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    inline static const std::array<int64_t, 5> entries = {
+    static constexpr std::array<int64_t, 5> entries = {
         -9223372036854775808ll, -1ll, 0ll, 1ll, 9223372036854775807ll
     };
 
@@ -23,7 +24,7 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 5;
+    static constexpr unsigned int item_count = 5;
     static constexpr int64_t min_value = -9223372036854775808ll;
     static constexpr int64_t max_value = 9223372036854775807ll;
 };

@@ -1,9 +1,10 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Conditional
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
 public:
     static bool contains(const uint8_t& value)
@@ -17,7 +18,7 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 3;
+    static constexpr unsigned int item_count = 3;
     static constexpr uint8_t min_value = 0;
     static constexpr uint8_t max_value = 255;
 };

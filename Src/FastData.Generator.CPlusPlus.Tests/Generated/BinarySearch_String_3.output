@@ -1,19 +1,20 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: BinarySearch
+#pragma once
 #include <string>
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    inline static const std::array<std::string, 3> entries = {
+    static constexpr std::array<std::string, 3> entries = {
         "a", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "item"
     };
 
 public:
     static bool contains(const std::string& value)
     {
-        if (const size_t len = value.length(); len < 1 || len > 255)
+        if (const size_t len = value.length(); len < 1u || len > 255u)
             return false;
 
         int lo = 0;
@@ -31,10 +32,10 @@ public:
                 hi = i - 1;
         }
 
-        return ((~lo) >= 0);
+        return ~lo >= 0;
     }
 
-    static constexpr int item_count = 3;
+    static constexpr unsigned int item_count = 3;
     static constexpr int min_length = 1;
     static constexpr int max_length = 255;
 };

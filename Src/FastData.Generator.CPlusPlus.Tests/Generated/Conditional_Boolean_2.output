@@ -1,9 +1,10 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Conditional
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
 public:
     static bool contains(const bool& value)
@@ -16,5 +17,5 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 2;
+    static constexpr unsigned int item_count = 2;
 };

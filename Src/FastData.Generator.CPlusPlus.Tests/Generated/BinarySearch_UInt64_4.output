@@ -1,11 +1,12 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: BinarySearch
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    inline static const std::array<uint64_t, 4> entries = {
+    static constexpr std::array<uint64_t, 4> entries = {
         0ull, 1ull, 2ull, 18446744073709551615ull
     };
 
@@ -20,7 +21,7 @@ public:
         while (lo <= hi)
         {
             const int i = lo + ((hi - lo) >> 1);
-            const int order = entries[i].compare(value);
+            const int order = (value > entries[i]) - (value < entries[i]);
 
             if (order == 0)
                 return true;
@@ -30,10 +31,10 @@ public:
                 hi = i - 1;
         }
 
-        return ((~lo) >= 0);
+        return ~lo >= 0;
     }
 
-    static constexpr int item_count = 4;
+    static constexpr unsigned int item_count = 4;
     static constexpr uint64_t min_value = 0ull;
     static constexpr uint64_t max_value = 18446744073709551615ull;
 };

@@ -1,11 +1,12 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Array
+#pragma once
 #include <array>
 #include <cstdint>
 
-class MyData
+class my_data
 {
-    inline static const std::array<bool, 2> entries = {
+    static constexpr std::array<bool, 2> entries = {
         true, false
     };
 
@@ -22,5 +23,5 @@ public:
         return false;
     }
 
-    static constexpr int item_count = 2;
+    static constexpr unsigned int item_count = 2;
 };
