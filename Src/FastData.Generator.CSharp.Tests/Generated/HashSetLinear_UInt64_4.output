@@ -15,7 +15,7 @@ internal partial class MyData : IFastSet<UInt64>
     };
 
     private readonly ulong[] _items = new ulong[] {
-        18446744073709551615, 0, 1, 2
+        18446744073709551615ul, 0ul, 1ul, 2ul
     };
 
     private readonly uint[] _hashCodes = {

@@ -11,13 +11,13 @@ using Genbox.FastData.Generator.CSharp.Abstracts;
 internal partial class MyData : IFastSet<Single>
 {
     private float[] _entries = new float[] {
-        -3.4028235E+38f, -1f, 0f, 1f, 3.4028235E+38f
+        -340282300000000000000000000000000000000.0f, -1.0f, 0.0f, 1.0f, 340282300000000000000000000000000000000.0f
     };
 
     
     public bool Contains(float value)
     {
-        if (value < -3.4028234663852886E+38f || value > 3.4028234663852886E+38f)
+        if (value < -340282346638529000000000000000000000000.0f || value > 340282346638529000000000000000000000000.0f)
             return false;
 
         for (int i = 0; i < 5; i++)
@@ -30,6 +30,6 @@ internal partial class MyData : IFastSet<Single>
 
     public const int ItemCount = 5;
     public int Length => ItemCount;
-    public const float MinValue = -3.4028234663852886E+38f;
-    public const float MaxValue = 3.4028234663852886E+38f;
+    public const float MinValue = -340282346638529000000000000000000000000.0f;
+    public const float MaxValue = 340282346638529000000000000000000000000.0f;
 }

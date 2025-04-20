@@ -15,7 +15,7 @@ internal partial class MyData : IFastSet<Int64>
     };
 
     private readonly long[] _items = new long[] {
-        0, -1, 1, 9223372036854775807, -9223372036854775808
+        0l, -1l, 1l, 9223372036854775807l, -9223372036854775808l
     };
 
     private readonly uint[] _hashCodes = {

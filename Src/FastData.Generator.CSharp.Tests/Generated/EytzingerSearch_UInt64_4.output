@@ -11,7 +11,7 @@ using Genbox.FastData.Generator.CSharp.Abstracts;
 internal partial class MyData : IFastSet<UInt64>
 {
     private ulong[] _entries = new ulong[] {
-        2, 1, 18446744073709551615, 0
+        2ul, 1ul, 18446744073709551615ul, 0ul
     };
 
     

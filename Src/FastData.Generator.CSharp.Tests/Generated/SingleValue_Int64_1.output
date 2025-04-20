@@ -13,7 +13,7 @@ internal partial class MyData : IFastSet<Int64>
     
     public bool Contains(long value)
     {
-        return value.Equals(1);
+        return value.Equals(1l);
     }
 
     public const int ItemCount = 1;

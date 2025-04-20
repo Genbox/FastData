@@ -15,7 +15,7 @@ internal partial class MyData : IFastSet<UInt64>
      };
 
     private readonly E[] _entries = {
-        new E(0, -1, 0), new E(1, -1, 1), new E(2, -1, 2), new E(0, 0, 18446744073709551615)
+        new E(0, -1, 0ul), new E(1, -1, 1ul), new E(2, -1, 2ul), new E(0, 0, 18446744073709551615ul)
     };
 
     

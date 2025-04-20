@@ -34,7 +34,7 @@ internal partial class MyData : IFastSet<Boolean>
                 hi = i - 1;
         }
 
-        return ((~lo) >= 0);
+        return ~lo >= 0;
     }
 
     public const int ItemCount = 2;

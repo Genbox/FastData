@@ -11,7 +11,7 @@ using Genbox.FastData.Generator.CSharp.Abstracts;
 internal partial class MyData : IFastSet<UInt64>
 {
     private ulong[] _entries = new ulong[] {
-        0, 1, 2, 18446744073709551615
+        0ul, 1ul, 2ul, 18446744073709551615ul
     };
 
     
@@ -35,7 +35,7 @@ internal partial class MyData : IFastSet<UInt64>
                 hi = i - 1;
         }
 
-        return ((~lo) >= 0);
+        return ~lo >= 0;
     }
 
     public const int ItemCount = 4;

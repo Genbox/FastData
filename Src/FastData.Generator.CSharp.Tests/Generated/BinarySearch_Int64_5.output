@@ -11,7 +11,7 @@ using Genbox.FastData.Generator.CSharp.Abstracts;
 internal partial class MyData : IFastSet<Int64>
 {
     private long[] _entries = new long[] {
-        -9223372036854775808, -1, 0, 1, 9223372036854775807
+        -9223372036854775808l, -1l, 0l, 1l, 9223372036854775807l
     };
 
     
@@ -35,7 +35,7 @@ internal partial class MyData : IFastSet<Int64>
                 hi = i - 1;
         }
 
-        return ((~lo) >= 0);
+        return ~lo >= 0;
     }
 
     public const int ItemCount = 5;

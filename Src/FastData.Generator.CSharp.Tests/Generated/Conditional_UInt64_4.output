@@ -18,10 +18,10 @@ internal partial class MyData : IFastSet<UInt64>
 
         switch (value)
         {
-            case 0:
-            case 1:
-            case 2:
-            case 18446744073709551615:
+            case 0ul:
+            case 1ul:
+            case 2ul:
+            case 18446744073709551615ul:
                 return true;
             default:
                 return false;

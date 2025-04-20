@@ -13,11 +13,11 @@ internal partial class MyData : IFastSet<Single>
     
     public bool Contains(float value)
     {
-        return value.Equals(1f);
+        return value.Equals(1.0f);
     }
 
     public const int ItemCount = 1;
     public int Length => ItemCount;
-    public const float MinValue = 1f;
-    public const float MaxValue = 1f;
+    public const float MinValue = 1.0f;
+    public const float MaxValue = 1.0f;
 }
