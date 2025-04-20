@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Specs.EarlyExit;
@@ -23,13 +24,9 @@ internal static class CSharpGeneratorConfigExtensions
         foreach (IEarlyExit spec in genCfg.EarlyExits)
         {
             if (spec is MinMaxLengthEarlyExit(var minLength, var maxLength))
-                sb.Append(GetValueEarlyExits(minLength, maxLength, true));
+                sb.Append(GetLengthEarlyExits(minLength, maxLength));
             else if (spec is MinMaxValueEarlyExit(var minValue, var maxValue))
-                sb.Append(GetValueEarlyExits(minValue, maxValue, false));
-            else if (spec is MinMaxUnsignedValueEarlyExit(var minUValue, var maxUValue))
-                sb.Append(GetValueEarlyExits(minUValue, maxUValue, false));
-            else if (spec is MinMaxFloatValueEarlyExit(var minFloatValue, var maxFloatValue))
-                sb.Append(GetValueEarlyExits(minFloatValue, maxFloatValue, false));
+                sb.Append(GetValueEarlyExits(minValue, maxValue, genCfg.DataType));
             else if (spec is LengthBitSetEarlyExit(var bitSet))
                 sb.Append(GetMaskEarlyExit(bitSet));
             else
@@ -71,20 +68,21 @@ internal static class CSharpGeneratorConfigExtensions
 
     internal static string? GetModifier(this CSharpGeneratorConfig config) => config.ClassType == ClassType.Static ? " static" : null;
 
-    internal static string GetMaskEarlyExit(ulong bitSet)
-        => $"""
-                   if (({bitSet}UL & (1UL << (value.Length - 1) % 64)) == 0)
-                       return false;
-            """;
+    internal static string GetMaskEarlyExit(ulong bitSet) =>
+        $"""
+                 if (({bitSet}UL & (1UL << (value.Length - 1) % 64)) == 0)
+                     return false;
+         """;
 
-    internal static string GetValueEarlyExits<T>(T min, T max, bool length) where T : IFormattable
-        => min.Equals(max)
-            ? $"""
-                      if (value{(length ? ".Length" : "")} != {max})
-                          return false;
-               """
-            : $"""
-                       if (value{(length ? ".Length" : "")} < {min} || value{(length ? ".Length" : "")} > {max})
-                          return false;
-               """;
+    internal static string GetValueEarlyExits(object min, object max, DataType dataType) =>
+        $"""
+                 if ({(min.Equals(max) ? $"value != {ToValueLabel(max, dataType)}" : $"value < {ToValueLabel(min, dataType)} || value > {ToValueLabel(max, dataType)}")})
+                     return false;
+         """;
+
+    internal static string GetLengthEarlyExits(uint min, uint max) =>
+        $"""
+                 if ({(min.Equals(max) ? $"value.Length != {ToValueLabel(max)}" : $"value.Length < {ToValueLabel(min)} || value.Length > {ToValueLabel(max)}")})
+                     return false;
+         """;
 }

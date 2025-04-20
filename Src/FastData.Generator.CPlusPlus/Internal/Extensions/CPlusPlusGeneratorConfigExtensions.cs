@@ -3,13 +3,15 @@ using System.Globalization;
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.CPlusPlus.Internal.Helpers;
 using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
 
 [SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality")]
 [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
-internal static class CSharpGeneratorConfigExtensions
+internal static class CPlusPlusGeneratorConfigExtensions
 {
     internal static string GetEarlyExits(this CPlusPlusGeneratorConfig cfg, GeneratorConfig genCfg)
     {
@@ -21,13 +23,9 @@ internal static class CSharpGeneratorConfigExtensions
         foreach (IEarlyExit spec in genCfg.EarlyExits)
         {
             if (spec is MinMaxLengthEarlyExit(var minLength, var maxLength))
-                sb.Append(GetValueEarlyExits(minLength, maxLength, true));
+                sb.Append(GetLengthEarlyExits(minLength, maxLength));
             else if (spec is MinMaxValueEarlyExit(var minValue, var maxValue))
-                sb.Append(GetValueEarlyExits(minValue, maxValue, false));
-            else if (spec is MinMaxUnsignedValueEarlyExit(var minUValue, var maxUValue))
-                sb.Append(GetValueEarlyExits(minUValue, maxUValue, false));
-            else if (spec is MinMaxFloatValueEarlyExit(var minFloatValue, var maxFloatValue))
-                sb.Append(GetValueEarlyExits(minFloatValue, maxFloatValue, false));
+                sb.Append(GetValueEarlyExits(minValue, maxValue, genCfg.DataType));
             else if (spec is LengthBitSetEarlyExit(var bitSet))
                 sb.Append(GetMaskEarlyExit(bitSet));
             else
@@ -46,20 +44,21 @@ internal static class CSharpGeneratorConfigExtensions
         return $"hash % {length.ToString(NumberFormatInfo.InvariantInfo)}";
     }
 
-    internal static string GetMaskEarlyExit(ulong bitSet)
-        => $"""
-                   if (({bitSet}ULL & (1ULL << (value.length() - 1) % 64)) == 0)
-                       return false;
-            """;
+    internal static string GetMaskEarlyExit(ulong bitSet) =>
+        $"""
+                 if (({bitSet}ULL & (1ULL << (value.length() - 1) % 64)) == 0)
+                     return false;
+         """;
 
-    internal static string GetValueEarlyExits<T>(T min, T max, bool length) where T : IFormattable
-        => min.Equals(max)
-            ? $"""
-                      if (const size_t len = value.length(); len != {max})
-                          return false;
-               """
-            : $"""
-                       if (const size_t len = value.length(); len < {min} || len > {max})
-                           return false;
-               """;
+    internal static string GetValueEarlyExits(object min, object max, DataType dataType) =>
+        $"""
+                 if ({(min.Equals(max) ? $"value != {ToValueLabel(max, dataType)}" : $"value < {ToValueLabel(min, dataType)} || value > {ToValueLabel(max, dataType)}")})
+                     return false;
+         """;
+
+    internal static string GetLengthEarlyExits(uint min, uint max) =>
+        $"""
+                 if (const size_t len = value.length(); {(min.Equals(max) ? $"len != {ToValueLabel(max)}" : $"len < {ToValueLabel(min)} || len > {ToValueLabel(max)}")})
+                     return false;
+         """;
 }

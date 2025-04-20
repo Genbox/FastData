@@ -20,7 +20,7 @@ class MyData
      };
 
     inline static const std::array<E, 5> entries = {
-        E(4286578687, -1, -3.4028235E+38), E(3212836864, -1, -1), E(0, -1, 0), E(1065353216, -1, 1), E(2139095039, 1, 3.4028235E+38)
+        E(4286578687, -1, -3.4028235E+38f), E(3212836864, -1, -1f), E(0, -1, 0f), E(1065353216, -1, 1f), E(2139095039, 1, 3.4028235E+38f)
     };
 
     static uint32_t get_hash(const float value)
@@ -31,7 +31,7 @@ class MyData
 public:
     static bool contains(const float& value)
     {
-        if (const size_t len = value.length(); len < -3.4028234663852886E+38 || len > 3.4028234663852886E+38)
+        if (value < -3.4028234663852886E+38f || value > 3.4028234663852886E+38f)
             return false;
 
         const uint32_t hash = get_hash(value);

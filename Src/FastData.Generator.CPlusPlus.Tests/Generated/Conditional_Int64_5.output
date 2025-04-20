@@ -8,16 +8,16 @@ class MyData
 public:
     static bool contains(const int64_t& value)
     {
-        if (const size_t len = value.length(); len < -9223372036854775808 || len > 9223372036854775807)
+        if (value < -9223372036854775808ll || value > 9223372036854775807ll)
             return false;
 
-        if (value == -9223372036854775808 || value == -1 || value == 0 || value == 1 || value == 9223372036854775807)
+        if (value == -9223372036854775808ll || value == -1ll || value == 0ll || value == 1ll || value == 9223372036854775807ll)
             return true;
 
         return false;
     }
 
     static constexpr int item_count = 5;
-    static constexpr int64_t min_value = -9223372036854775808;
-    static constexpr int64_t max_value = 9223372036854775807;
+    static constexpr int64_t min_value = -9223372036854775808ll;
+    static constexpr int64_t max_value = 9223372036854775807ll;
 };

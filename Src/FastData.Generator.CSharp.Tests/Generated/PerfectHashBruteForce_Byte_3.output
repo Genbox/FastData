@@ -18,7 +18,7 @@ internal partial class MyData : IFastSet<Byte>
     public bool Contains(byte value)
     {
         if (value < 0 || value > 255)
-           return false;
+            return false;
 
         uint hash = Hash(value, 1);
         uint index = MathHelper.FastMod(hash, 3, 6148914691236517206);

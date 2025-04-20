@@ -46,8 +46,8 @@ internal partial class MyData : IFastSet<String>
     
     public bool Contains(string value)
     {
-        if (value.Length < 1 || value.Length > 255)
-           return false;
+        if (value.Length < 1u || value.Length > 255u)
+            return false;
 
         uint hash = Hash(value);
 

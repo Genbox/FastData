@@ -34,7 +34,7 @@ class MyData
 public:
     static bool contains(const uint8_t& value)
     {
-        if (const size_t len = value.length(); len < 0 || len > 255)
+        if (value < 0 || value > 255)
             return false;
 
         const uint32_t hash = get_hash(value);
@@ -55,6 +55,6 @@ public:
     }
 
     static constexpr int item_count = 3;
-    static constexpr uint64_t min_value = 0;
-    static constexpr uint64_t max_value = 255;
+    static constexpr uint64_t min_value = 0ull;
+    static constexpr uint64_t max_value = 255ull;
 };

@@ -22,7 +22,7 @@ internal partial class MyData : IFastSet<UInt32>
     public bool Contains(uint value)
     {
         if (value < 0 || value > 4294967295)
-           return false;
+            return false;
 
         uint hash = Hash(value);
         uint index = hash & 3;

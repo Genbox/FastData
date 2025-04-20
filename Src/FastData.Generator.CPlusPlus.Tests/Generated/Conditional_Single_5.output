@@ -8,10 +8,10 @@ class MyData
 public:
     static bool contains(const float& value)
     {
-        if (const size_t len = value.length(); len < -3.4028234663852886E+38 || len > 3.4028234663852886E+38)
+        if (value < -3.4028234663852886E+38f || value > 3.4028234663852886E+38f)
             return false;
 
-        if (value == -3.4028235E+38 || value == -1 || value == 0 || value == 1 || value == 3.4028235E+38)
+        if (value == -3.4028235E+38f || value == -1f || value == 0f || value == 1f || value == 3.4028235E+38f)
             return true;
 
         return false;

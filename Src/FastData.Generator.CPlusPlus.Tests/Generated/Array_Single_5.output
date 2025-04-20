@@ -6,13 +6,13 @@
 class MyData
 {
     inline static const std::array<float, 5> entries = {
-        -3.4028235E+38, -1, 0, 1, 3.4028235E+38
+        -3.4028235E+38f, -1f, 0f, 1f, 3.4028235E+38f
     };
 
 public:
     static bool contains(const float& value)
     {
-        if (const size_t len = value.length(); len < -3.4028234663852886E+38 || len > 3.4028234663852886E+38)
+        if (value < -3.4028234663852886E+38f || value > 3.4028234663852886E+38f)
             return false;
 
         for (int i = 0; i < 5; i++)

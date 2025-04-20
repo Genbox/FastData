@@ -18,7 +18,7 @@ internal partial class MyData : IFastSet<Byte>
     public bool Contains(byte value)
     {
         if (value < 0 || value > 255)
-           return false;
+            return false;
 
         int lo = 0;
         int hi = 2;

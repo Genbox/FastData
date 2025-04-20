@@ -18,7 +18,7 @@ internal partial class MyData : IFastSet<Double>
     public bool Contains(double value)
     {
         if (value < -1.7976931348623157E+308 || value > 1.7976931348623157E+308)
-           return false;
+            return false;
 
         int lo = 0;
         int hi = 3;

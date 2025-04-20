@@ -6,13 +6,13 @@
 class MyData
 {
     inline static const std::array<uint64_t, 4> entries = {
-        0, 1, 2, 18446744073709551615
+        0ull, 1ull, 2ull, 18446744073709551615ull
     };
 
 public:
     static bool contains(const uint64_t& value)
     {
-        if (const size_t len = value.length(); len < 0 || len > 18446744073709551615)
+        if (value < 0ull || value > 18446744073709551615ull)
             return false;
 
         for (int i = 0; i < 4; i++)
@@ -24,6 +24,6 @@ public:
     }
 
     static constexpr int item_count = 4;
-    static constexpr uint64_t min_value = 0;
-    static constexpr uint64_t max_value = 18446744073709551615;
+    static constexpr uint64_t min_value = 0ull;
+    static constexpr uint64_t max_value = 18446744073709551615ull;
 };

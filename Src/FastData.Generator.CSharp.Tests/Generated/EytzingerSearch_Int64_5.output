@@ -17,8 +17,8 @@ internal partial class MyData : IFastSet<Int64>
     
     public bool Contains(long value)
     {
-        if (value < -9223372036854775808 || value > 9223372036854775807)
-           return false;
+        if (value < -9223372036854775808l || value > 9223372036854775807l)
+            return false;
 
         int i = 0;
         while (i < _entries.Length)

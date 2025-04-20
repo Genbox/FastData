@@ -26,7 +26,7 @@ internal static class Optimizer
 
     public static IEnumerable<IEarlyExit> GetEarlyExits(UnsignedIntegerProperties prop)
     {
-        yield return new MinMaxUnsignedValueEarlyExit(prop.MinValue, prop.MaxValue);
+        yield return new MinMaxValueEarlyExit(prop.MinValue, prop.MaxValue);
     }
 
     public static IEnumerable<IEarlyExit> GetEarlyExits(CharProperties prop)
@@ -36,6 +36,6 @@ internal static class Optimizer
 
     public static IEnumerable<IEarlyExit> GetEarlyExits(FloatProperties prop)
     {
-        yield return new MinMaxFloatValueEarlyExit(prop.MinValue, prop.MaxValue);
+        yield return new MinMaxValueEarlyExit(prop.MinValue, prop.MaxValue);
     }
 }

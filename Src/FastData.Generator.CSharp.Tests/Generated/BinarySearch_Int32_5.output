@@ -18,7 +18,7 @@ internal partial class MyData : IFastSet<Int32>
     public bool Contains(int value)
     {
         if (value < -2147483648 || value > 2147483647)
-           return false;
+            return false;
 
         int lo = 0;
         int hi = 4;

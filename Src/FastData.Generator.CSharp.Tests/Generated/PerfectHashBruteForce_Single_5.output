@@ -17,8 +17,8 @@ internal partial class MyData : IFastSet<Single>
     
     public bool Contains(float value)
     {
-        if (value < -3.4028234663852886E+38 || value > 3.4028234663852886E+38)
-           return false;
+        if (value < -3.4028234663852886E+38f || value > 3.4028234663852886E+38f)
+            return false;
 
         uint hash = Hash(value, 16777218);
         uint index = MathHelper.FastMod(hash, 5, 3689348814741910324);

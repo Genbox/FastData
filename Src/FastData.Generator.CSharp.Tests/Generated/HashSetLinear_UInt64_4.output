@@ -25,8 +25,8 @@ internal partial class MyData : IFastSet<UInt64>
     
     public bool Contains(ulong value)
     {
-        if (value < 0 || value > 18446744073709551615)
-           return false;
+        if (value < 0ul || value > 18446744073709551615ul)
+            return false;
 
         uint hash = Hash(value);
         ref B b = ref _buckets[MathHelper.FastMod(hash, 7, 2635249153387078803)];

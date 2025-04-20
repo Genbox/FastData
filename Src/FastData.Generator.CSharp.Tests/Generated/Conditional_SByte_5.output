@@ -14,7 +14,7 @@ internal partial class MyData : IFastSet<SByte>
     public bool Contains(sbyte value)
     {
         if (value < -128 || value > 127)
-           return false;
+            return false;
 
         switch (value)
         {

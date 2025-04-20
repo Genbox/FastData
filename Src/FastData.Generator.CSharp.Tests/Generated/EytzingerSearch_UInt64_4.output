@@ -17,8 +17,8 @@ internal partial class MyData : IFastSet<UInt64>
     
     public bool Contains(ulong value)
     {
-        if (value < 0 || value > 18446744073709551615)
-           return false;
+        if (value < 0ul || value > 18446744073709551615ul)
+            return false;
 
         int i = 0;
         while (i < _entries.Length)

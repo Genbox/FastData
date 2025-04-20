@@ -14,7 +14,7 @@ internal partial class MyData : IFastSet<UInt16>
     public bool Contains(ushort value)
     {
         if (value < 0 || value > 65535)
-           return false;
+            return false;
 
         switch (value)
         {

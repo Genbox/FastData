@@ -61,20 +61,20 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorCo
                  """;
     }
 
-    private static string GetEarlyExit(IEarlyExit[] exits)
+    private string GetEarlyExit(IEarlyExit[] exits)
     {
         //We do this to force an early exit for this data structure. Otherwise, we will get an IndexOutOfRangeException
         MinMaxLengthEarlyExit? exit1 = (MinMaxLengthEarlyExit?)Array.Find(exits, x => x is MinMaxLengthEarlyExit);
         if (exit1 != null)
-            return CSharpGeneratorConfigExtensions.GetValueEarlyExits(exit1.MinValue, exit1.MaxValue, true);
+            return CPlusPlusGeneratorConfigExtensions.GetLengthEarlyExits(exit1.MinValue, exit1.MaxValue);
 
         MinMaxValueEarlyExit? exit2 = (MinMaxValueEarlyExit?)Array.Find(exits, x => x is MinMaxValueEarlyExit);
         if (exit2 != null)
-            return CSharpGeneratorConfigExtensions.GetValueEarlyExits(exit2.MinValue, exit2.MaxValue, false);
+            return CPlusPlusGeneratorConfigExtensions.GetValueEarlyExits(exit2.MinValue, exit2.MaxValue, genCfg.DataType);
 
         LengthBitSetEarlyExit? exit3 = (LengthBitSetEarlyExit?)Array.Find(exits, x => x is LengthBitSetEarlyExit);
         if (exit3 != null)
-            return CSharpGeneratorConfigExtensions.GetMaskEarlyExit(exit3.BitSet);
+            return CPlusPlusGeneratorConfigExtensions.GetMaskEarlyExit(exit3.BitSet);
 
         throw new InvalidOperationException("No early exits were found. They are required for UniqueKeyLength");
     }

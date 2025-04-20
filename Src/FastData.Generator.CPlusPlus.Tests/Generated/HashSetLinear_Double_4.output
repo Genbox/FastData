@@ -35,7 +35,7 @@ class MyData
 public:
     static bool contains(const double& value)
     {
-        if (const size_t len = value.length(); len < -1.7976931348623157E+308 || len > 1.7976931348623157E+308)
+        if (value < -1.7976931348623157E+308 || value > 1.7976931348623157E+308)
             return false;
 
         const uint32_t hash = get_hash(value);

@@ -8,7 +8,7 @@ class MyData
 public:
     static bool contains(const float& value)
     {
-        return value == 1;
+        return value == 1f;
     }
 
     static constexpr int item_count = 1;

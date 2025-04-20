@@ -20,7 +20,7 @@ class MyData
      };
 
     inline static const std::array<E, 5> entries = {
-        E(2147483648, -1, -9223372036854775808), E(0, -1, -1), E(0, 1, 0), E(1, -1, 1), E(2147483648, 0, 9223372036854775807)
+        E(2147483648, -1, -9223372036854775808ll), E(0, -1, -1ll), E(0, 1, 0ll), E(1, -1, 1ll), E(2147483648, 0, 9223372036854775807ll)
     };
 
     static uint32_t get_hash(const int64_t value)
@@ -31,7 +31,7 @@ class MyData
 public:
     static bool contains(const int64_t& value)
     {
-        if (const size_t len = value.length(); len < -9223372036854775808 || len > 9223372036854775807)
+        if (value < -9223372036854775808ll || value > 9223372036854775807ll)
             return false;
 
         const uint32_t hash = get_hash(value);
@@ -52,6 +52,6 @@ public:
     }
 
     static constexpr int item_count = 5;
-    static constexpr int64_t min_value = -9223372036854775808;
-    static constexpr int64_t max_value = 9223372036854775807;
+    static constexpr int64_t min_value = -9223372036854775808ll;
+    static constexpr int64_t max_value = 9223372036854775807ll;
 };

@@ -26,8 +26,8 @@ internal partial class MyData : IFastSet<Single>
     
     public bool Contains(float value)
     {
-        if (value < -3.4028234663852886E+38 || value > 3.4028234663852886E+38)
-           return false;
+        if (value < -3.4028234663852886E+38f || value > 3.4028234663852886E+38f)
+            return false;
 
         uint hash = Hash(value);
         ref B b = ref _buckets[MathHelper.FastMod(hash, 17, 1085102592571150096)];

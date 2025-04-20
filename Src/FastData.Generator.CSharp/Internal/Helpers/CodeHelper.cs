@@ -1,4 +1,5 @@
 using System.Globalization;
+using Genbox.FastData.Enums;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Helpers;
 
@@ -22,7 +23,7 @@ internal static class CodeHelper
         _ => "long"
     };
 
-    internal static string ToValueLabel(object? value) => value switch
+    internal static string? ToValueLabel(object? value) => value switch
     {
         null => "null",
         string val => $"\"{val}\"",
@@ -31,6 +32,17 @@ internal static class CodeHelper
         float val => val + "f",
         uint val => val + "u",
         IFormattable val => val.ToString(null, CultureInfo.InvariantCulture),
+        _ => value.ToString()
+    };
+
+    internal static string ToValueLabel(object? value, DataType dataType) => dataType switch
+    {
+        DataType.String => $"\"{value}\"",
+        DataType.Char => $"'{value}'",
+        DataType.UInt64 => value + "ul",
+        DataType.Int64 => value + "l",
+        DataType.Single => value + "f",
+        DataType.Boolean => value.ToString().ToLowerInvariant(),
         _ => value.ToString()
     };
 }
