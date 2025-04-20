@@ -36,23 +36,23 @@ internal static class CSharpGeneratorConfigExtensions
         return sb.ToString();
     }
 
-    internal static string GetModFunction(this CSharpGeneratorConfig config, int length)
+    internal static string GetModFunction(this CSharpGeneratorConfig config, int value)
     {
-        if (length == 0)
-            throw new ArgumentOutOfRangeException(nameof(length), "A length of 0 is not valid in a modulus operation");
+        if (value == 0)
+            throw new ArgumentOutOfRangeException(nameof(value), "A length of 0 is not valid in a modulus operation");
 
         // x % 1 = 0
-        if (length == 1)
+        if (value == 1)
             return "0";
 
         if (config.GeneratorOptions.HasFlag(CSharpOptions.DisableModulusOptimization))
-            return $"hash % {length.ToString(NumberFormatInfo.InvariantInfo)}";
+            return $"hash % {value.ToString(NumberFormatInfo.InvariantInfo)}";
 
-        if (MathHelper.IsPowerOfTwo((uint)length))
-            return $"hash & {(length - 1).ToString(NumberFormatInfo.InvariantInfo)}";
+        if (MathHelper.IsPowerOfTwo((uint)value))
+            return $"hash & {(value - 1).ToString(NumberFormatInfo.InvariantInfo)}";
 
-        ulong modMultiplier = MathHelper.GetFastModMultiplier((uint)length);
-        return $"MathHelper.FastMod(hash, {length.ToString(NumberFormatInfo.InvariantInfo)}, {modMultiplier.ToString(NumberFormatInfo.InvariantInfo)})";
+        ulong multiplier = MathHelper.GetFastModMultiplier((uint)value);
+        return $"unchecked((uint)((((({multiplier}ul * hash) >> 32) + 1) * {value}) >> 32))";
     }
 
     internal static string? GetMethodAttributes(this CSharpGeneratorConfig config)

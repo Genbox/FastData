@@ -20,7 +20,7 @@ internal static class MyData
             return false;
 
         uint hash = Hash(value, 4);
-        uint index = MathHelper.FastMod(hash, 5, 3689348814741910324);
+        uint index = unchecked((uint)(((((3689348814741910324ul * hash) >> 32) + 1) * 5) >> 32));
         ref E entry = ref _entries[index];
 
         return hash == entry.HashCode && value.Equals(entry.Value);

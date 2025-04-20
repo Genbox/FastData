@@ -29,7 +29,7 @@ internal static class MyData
             return false;
 
         uint hash = Hash(value);
-        ref B b = ref _buckets[MathHelper.FastMod(hash, 17, 1085102592571150096)];
+        ref B b = ref _buckets[unchecked((uint)(((((1085102592571150096ul * hash) >> 32) + 1) * 17) >> 32))];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;

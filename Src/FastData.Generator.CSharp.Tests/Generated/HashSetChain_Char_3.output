@@ -24,7 +24,7 @@ internal static class MyData
             return false;
 
         uint hash = Hash(value);
-        uint index = MathHelper.FastMod(hash, 3, 6148914691236517206);
+        uint index = unchecked((uint)(((((6148914691236517206ul * hash) >> 32) + 1) * 3) >> 32));
         sbyte i = (sbyte)(_buckets[index] - 1);
 
         while (i >= 0)
