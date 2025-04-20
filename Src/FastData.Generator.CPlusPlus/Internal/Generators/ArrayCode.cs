@@ -18,7 +18,7 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CPlusPlusGeneratorConfig
               {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-          
+
                   for (int i = 0; i < {{ctx.Data.Length.ToString(NumberFormatInfo.InvariantInfo)}}; i++)
                   {
                       if ({{genCfg.GetEqualFunction("entries[i]")}})

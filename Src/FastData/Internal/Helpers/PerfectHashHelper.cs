@@ -1,5 +1,4 @@
 using Genbox.FastData.Helpers;
-using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Internal.Helpers;

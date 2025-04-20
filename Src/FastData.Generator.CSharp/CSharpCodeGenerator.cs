@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
@@ -7,7 +6,6 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Extensions;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.CSharp.Internal.Generators;
-using Genbox.FastData.Generator.CSharp.Internal.Helpers;
 
 namespace Genbox.FastData.Generator.CSharp;
 

@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using BenchmarkDotNet.Order;
@@ -26,32 +25,40 @@ public class StringVsByteArrayVsInteger
     public void String()
     {
         for (int i = 0; i < _query1.Length; i++)
+        {
             if (!_hashSet1.Contains(_query1[i]))
                 throw new InvalidOperationException();
+        }
     }
 
     [Benchmark]
     public void ByteArray()
     {
         for (int i = 0; i < _query2.Length; i++)
+        {
             if (!_hashSet2.Contains(_query2[i]))
                 throw new InvalidOperationException();
+        }
     }
 
     [Benchmark]
     public void ByteArrayUnsafe()
     {
         for (int i = 0; i < _query2.Length; i++)
+        {
             if (!_hashSet3.Contains(_query2[i]))
                 throw new InvalidOperationException();
+        }
     }
 
     [Benchmark]
     public void Integer()
     {
         for (int i = 0; i < _query3.Length; i++)
+        {
             if (!_hashSet4.Contains(_query3[i]))
                 throw new InvalidOperationException();
+        }
     }
 
     private sealed class ByteArrayComparer : IEqualityComparer<byte[]>
@@ -70,7 +77,7 @@ public class StringVsByteArrayVsInteger
             {
                 int hash = 17;
                 foreach (byte b in obj)
-                    hash = hash * 31 + b;
+                    hash = (hash * 31) + b;
                 return hash;
             }
         }
@@ -78,6 +85,9 @@ public class StringVsByteArrayVsInteger
 
     private sealed class UnsafeByteArrayComparer : IEqualityComparer<byte[]>
     {
+        private const uint FNV_OFFSET = 2166136261;
+        private const uint FNV_PRIME = 16777619;
+
         public bool Equals(byte[]? x, byte[]? y)
         {
             if (x == null || y == null || x.Length != y.Length)
@@ -85,9 +95,6 @@ public class StringVsByteArrayVsInteger
 
             return x.AsSpan().SequenceEqual(y);
         }
-
-        private const uint FNV_OFFSET = 2166136261;
-        private const uint FNV_PRIME = 16777619;
 
         public int GetHashCode(byte[] obj)
         {

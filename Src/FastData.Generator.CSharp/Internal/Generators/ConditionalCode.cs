@@ -22,10 +22,10 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorCon
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-          
+
                   if ({{FormatList(ctx.Data, (x, y) => Render(genCfg, x, y), " || ")}})
                       return true;
-          
+
                   return false;
               }
           """;
@@ -36,7 +36,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorCon
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-          
+
                   switch (value)
                   {
           {{FormatList(ctx.Data, Render, "\n")}}

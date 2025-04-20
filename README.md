@@ -183,6 +183,6 @@ It does so using one of four techniques:
 
 * Q: Why not use System.Collections.Frozen?
 * A: There are several reasons:
-  * Frozen comes with considerable runtime overhead
-  * Frozen is only available in .NET 8.0+
-  * Frozen only provides af ew of the optimizations provided in FastData
+    * Frozen comes with considerable runtime overhead
+    * Frozen is only available in .NET 8.0+
+    * Frozen only provides af ew of the optimizations provided in FastData

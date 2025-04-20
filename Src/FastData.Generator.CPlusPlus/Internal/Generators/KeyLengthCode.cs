@@ -26,7 +26,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorCo
                      {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
-                 
+
                          return {{genCfg.GetEqualFunction($"entries[value.length() - {ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}]")}};
                      }
                  """;
@@ -46,16 +46,16 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorCo
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
                          std::vector<{{genCfg.GetTypeName()}}> bucket = entries[value.length() - {{ctx.MinLength}}];
-                 
+
                          if (bucket == nullptr)
                              return false;
-                 
+
                          foreach ({{genCfg.GetTypeName()}} str in bucket)
                          {
                              if ({{genCfg.GetEqualFunction("str")}})
                                  return true;
                          }
-                 
+
                          return false;
                      }
                  """;

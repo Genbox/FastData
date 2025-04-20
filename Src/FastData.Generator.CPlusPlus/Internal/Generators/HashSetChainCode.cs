@@ -16,15 +16,15 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusGenerato
                   uint32_t hash_code;
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
                   {{genCfg.GetTypeName()}} value;
-          
+
                   E(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{genCfg.GetTypeName()}}& value)
                      : hash_code(hash_code), next(next), value(value) {}
               };
-          
+
               {{cfg.GetFieldModifier()}} std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length}}> buckets = {
           {{FormatColumns(ctx.Buckets, static (sb, x) => sb.Append(x))}}
                };
-          
+
               {{cfg.GetFieldModifier()}} std::array<E, {{ctx.Entries.Length}}> entries = {
           {{FormatColumns(ctx.Entries, RenderEntry)}}
               };
@@ -35,21 +35,21 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusGenerato
               {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-          
+
                   const uint32_t hash = get_hash(value);
                   const uint32_t index = {{cfg.GetModFunction(ctx.Buckets.Length)}};
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} i = static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(buckets[index] - 1);
-          
+
                   while (i >= 0)
                   {
                       const E& entry = entries[i];
-          
+
                       if (entry.hash_code == hash && {{genCfg.GetEqualFunction("entry.value")}})
                           return true;
-          
+
                       i = entry.next;
                   }
-          
+
                   return false;
               }
           """;

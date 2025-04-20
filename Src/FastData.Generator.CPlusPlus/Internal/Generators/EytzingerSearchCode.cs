@@ -17,21 +17,21 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, CPlusPlusGener
               {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-          
+
                   unsigned int i = 0;
                   while (i < entries.size())
                   {
                       const int comparison = {{genCfg.GetCompareFunction("entries[i]")}};
-          
+
                       if (comparison == 0)
                           return true;
-          
+
                       if (comparison < 0)
                           i = 2 * i + 2;
                       else
                           i = 2 * i + 1;
                   }
-          
+
                   return false;
               }
           """;

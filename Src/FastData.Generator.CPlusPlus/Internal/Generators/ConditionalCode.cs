@@ -14,10 +14,10 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CPlusPlusGenerator
                  {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
                  {
              {{cfg.GetEarlyExits(genCfg)}}
-             
+
                      if ({{FormatList(ctx.Data, (x, y) => Render(genCfg, x, y), " || ")}})
                          return true;
-             
+
                      return false;
                  }
              """;

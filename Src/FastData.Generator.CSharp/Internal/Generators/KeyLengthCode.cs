@@ -35,12 +35,12 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
               private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
           {{FormatColumns(ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()), RenderOne)}}
               };
-          
+
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{GetEarlyExit(genCfg.EarlyExits)}}
-          
+
                   return {{genCfg.GetEqualFunction($"_entries[value.Length - {ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}]")}};
               }
           """;
@@ -51,7 +51,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-          
+
                   switch (value.Length)
                   {
           {{GenerateSwitch(genCfg, ctx.Lengths.Where(x => x != null).Select(x => x![0]))}}
@@ -66,22 +66,22 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
               private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[]?[] _entries = new {{genCfg.GetTypeName()}}[]?[] {
           {{FormatList(ctx.Lengths.Skip((int)ctx.MinLength).Take((int)((ctx.MaxLength - ctx.MinLength) + 1)), RenderMany, ",\n")}}
               };
-          
+
               {{cfg.GetMethodAttributes()}}
               public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{GetEarlyExit(genCfg.EarlyExits)}}
                   {{genCfg.GetTypeName()}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];
-          
+
                   if (bucket == null)
                       return false;
-          
+
                   foreach ({{genCfg.GetTypeName()}} str in bucket)
                   {
                       if ({{genCfg.GetEqualFunction("str")}})
                           return true;
                   }
-          
+
                   return false;
               }
           """;
