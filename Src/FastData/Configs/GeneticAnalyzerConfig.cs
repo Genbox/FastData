@@ -2,15 +2,13 @@ using Genbox.FastData.Abstracts;
 
 namespace Genbox.FastData.Configs;
 
-public sealed class GeneticAnalyzerConfig : IAnalyzerConfig
+//Note: Internal for now
+internal sealed class GeneticAnalyzerConfig : IAnalyzerConfig
 {
-    public int PopulationSize { get; set; } = 10;
-    public int MaxEvolutions { get; set; } = 1000;
+    public bool ShuffleParents { get; set; }
 
-    public bool CrossEliteOnly { get; set; } = true;
-    public float CrossPercent { get; set; } = 0.25f;
+    public int PopulationSize { get; set; } = 100;
 
-    public bool StagnantTerminate { get; set; } = true;
-    public byte StagnantTopResults { get; set; } = 3;
-    public double StagnantPercent { get; set; } = 0.0001;
+    /// <summary>Set to 0 to use a new seed each run</summary>
+    public int RandomSeed { get; set; }
 }
