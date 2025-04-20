@@ -30,6 +30,6 @@ internal partial class MyData : IFastSet<Byte>
 
     public const int ItemCount = 3;
     public int Length => ItemCount;
-    public const ulong MinValue = 0;
-    public const ulong MaxValue = 255;
+    public const byte MinValue = 0;
+    public const byte MaxValue = 255;
 }

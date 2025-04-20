@@ -18,6 +18,6 @@ internal partial class MyData : IFastSet<Char>
 
     public const int ItemCount = 1;
     public int Length => ItemCount;
-    public const ulong MinValue = 'a';
-    public const ulong MaxValue = 'a';
+    public const char MinValue = 'a';
+    public const char MaxValue = 'a';
 }

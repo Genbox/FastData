@@ -33,6 +33,6 @@ public:
     }
 
     static constexpr int item_count = 5;
-    static constexpr double min_value = -3.4028234663852886E+38;
-    static constexpr double max_value = 3.4028234663852886E+38;
+    static constexpr float min_value = -3.4028234663852886E+38f;
+    static constexpr float max_value = 3.4028234663852886E+38f;
 };

@@ -31,6 +31,6 @@ internal partial class MyData : IFastSet<Int16>
 
     public const int ItemCount = 5;
     public int Length => ItemCount;
-    public const long MinValue = -32768;
-    public const long MaxValue = 32767;
+    public const short MinValue = -32768;
+    public const short MaxValue = 32767;
 }

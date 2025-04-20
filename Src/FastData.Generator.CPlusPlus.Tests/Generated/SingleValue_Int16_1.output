@@ -12,6 +12,6 @@ public:
     }
 
     static constexpr int item_count = 1;
-    static constexpr int64_t min_value = 1ll;
-    static constexpr int64_t max_value = 1ll;
+    static constexpr int16_t min_value = 1;
+    static constexpr int16_t max_value = 1;
 };

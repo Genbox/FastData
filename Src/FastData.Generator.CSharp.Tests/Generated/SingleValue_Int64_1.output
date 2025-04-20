@@ -18,6 +18,6 @@ internal partial class MyData : IFastSet<Int64>
 
     public const int ItemCount = 1;
     public int Length => ItemCount;
-    public const long MinValue = 1;
-    public const long MaxValue = 1;
+    public const long MinValue = 1l;
+    public const long MaxValue = 1l;
 }
