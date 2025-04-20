@@ -28,6 +28,8 @@ internal static class CodeHelper
         string val => $"\"{val}\"",
         char val => $"'{val}'",
         bool val => val.ToString().ToLowerInvariant(),
+        float val => val + "f",
+        uint val => val + "u",
         IFormattable val => val.ToString(null, CultureInfo.InvariantCulture),
         _ => value.ToString()
     };

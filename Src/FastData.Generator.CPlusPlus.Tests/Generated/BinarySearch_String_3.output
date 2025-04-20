@@ -7,14 +7,14 @@
 class MyData
 {
     inline static const std::array<std::string, 3> entries = {
-        "item1", "item2", "item3"
+        "a", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "item"
     };
 
 public:
     static bool contains(const std::string& value)
     {
-       if (const size_t len = value.length(); len != 5)
-           return false;
+        if (const size_t len = value.length(); len < 1 || len > 255)
+            return false;
 
         int lo = 0;
         int hi = 2;
@@ -35,6 +35,6 @@ public:
     }
 
     static constexpr int item_count = 3;
-    static constexpr int min_length = 5;
-    static constexpr int max_length = 5;
+    static constexpr int min_length = 1;
+    static constexpr int max_length = 255;
 };

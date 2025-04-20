@@ -16,11 +16,11 @@ class MyData
     };
 
     inline static const std::array<int8_t, 3> buckets = {
-        1, 2, 3
+        3, 2, 0
      };
 
     inline static const std::array<E, 3> entries = {
-        E(0, -1, 0), E(1, -1, 1), E(2, -1, 2)
+        E(0, -1, 0), E(1, -1, 1), E(255, 0, 255)
     };
 
     static uint32_t get_hash(const uint8_t value)
@@ -31,7 +31,7 @@ class MyData
 public:
     static bool contains(const uint8_t& value)
     {
-        if (const size_t len = value.length(); len < 0 || len > 2)
+        if (const size_t len = value.length(); len < 0 || len > 255)
             return false;
 
         const uint32_t hash = get_hash(value);
@@ -52,6 +52,6 @@ public:
     }
 
     static constexpr int item_count = 3;
-    static constexpr uint8_t min_value = 0;
-    static constexpr uint8_t max_value = 2;
+    static constexpr uint64_t min_value = 0;
+    static constexpr uint64_t max_value = 255;
 };

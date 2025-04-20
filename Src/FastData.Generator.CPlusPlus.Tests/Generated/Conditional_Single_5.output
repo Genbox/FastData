@@ -1,0 +1,23 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: Conditional
+#include <array>
+#include <cstdint>
+
+class MyData
+{
+public:
+    static bool contains(const float& value)
+    {
+        if (const size_t len = value.length(); len < -3.4028234663852886E+38 || len > 3.4028234663852886E+38)
+            return false;
+
+        if (value == -3.4028235E+38 || value == -1 || value == 0 || value == 1 || value == 3.4028235E+38)
+            return true;
+
+        return false;
+    }
+
+    static constexpr int item_count = 5;
+    static constexpr double min_value = -3.4028234663852886E+38;
+    static constexpr double max_value = 3.4028234663852886E+38;
+};

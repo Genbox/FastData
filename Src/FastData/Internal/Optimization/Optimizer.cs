@@ -14,12 +14,10 @@ internal static class Optimizer
         // - If lengths are consecutive (5, 6, 7, etc.) we do a range check (2 inst)
         // - If the lengths are non-consecutive (4, 9, 12, etc.) we use a small bitset (4 inst)
 
-        IntegerBitSet lengthMap = prop.LengthData.LengthMap;
-
-        if (lengthMap.Consecutive)
-            yield return new MinMaxLengthEarlyExit(lengthMap.MinValue, lengthMap.MaxValue); //Also handles same lengths
+        if (prop.LengthData.Max <= 64 && !prop.LengthData.LengthMap.Consecutive)
+            yield return new LengthBitSetEarlyExit(prop.LengthData.LengthMap.BitSet);
         else
-            yield return new LengthBitSetEarlyExit(lengthMap.BitSet);
+            yield return new MinMaxLengthEarlyExit(prop.LengthData.Min, prop.LengthData.Max); //Also handles same lengths
     }
 
     public static IEnumerable<IEarlyExit> GetEarlyExits(IntegerProperties prop)

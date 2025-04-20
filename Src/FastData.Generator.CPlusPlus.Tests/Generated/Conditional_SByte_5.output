@@ -1,0 +1,23 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: Conditional
+#include <array>
+#include <cstdint>
+
+class MyData
+{
+public:
+    static bool contains(const int8_t& value)
+    {
+        if (const size_t len = value.length(); len < -128 || len > 127)
+            return false;
+
+        if (value == -128 || value == -1 || value == 0 || value == 1 || value == 127)
+            return true;
+
+        return false;
+    }
+
+    static constexpr int item_count = 5;
+    static constexpr int64_t min_value = -128;
+    static constexpr int64_t max_value = 127;
+};

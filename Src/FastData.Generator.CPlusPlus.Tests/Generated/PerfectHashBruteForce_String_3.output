@@ -16,7 +16,7 @@ class MyData
     };
 
     inline static const std::array<E, 3> entries = {
-        E("item2", 2465848398), E("item3", 4031932339), E("item1", 2869132925)
+        E("a", 2150936925), E("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 119911210), E("item", 1699185842)
     };
 
     static uint32_t get_hash(const std::string& value, uint32_t seed,)
@@ -46,10 +46,10 @@ class MyData
 public:
     static bool contains(const std::string& value)
     {
-       if (const size_t len = value.length(); len != 5)
-           return false;
+        if (const size_t len = value.length(); len < 1 || len > 255)
+            return false;
 
-        const uint32_t hash = get_hash(value, 3);
+        const uint32_t hash = get_hash(value, 4);
         const uint32_t index = hash % 3;
         const E& entry = entries[index];
 
@@ -57,6 +57,6 @@ public:
     }
 
     static constexpr int item_count = 3;
-    static constexpr int min_length = 5;
-    static constexpr int max_length = 5;
+    static constexpr int min_length = 1;
+    static constexpr int max_length = 255;
 };

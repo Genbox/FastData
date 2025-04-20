@@ -1,0 +1,39 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#include <array>
+#include <cstdint>
+
+class MyData
+{
+    inline static const std::array<uint64_t, 4> entries = {
+        0, 1, 2, 18446744073709551615
+    };
+
+public:
+    static bool contains(const uint64_t& value)
+    {
+        if (const size_t len = value.length(); len < 0 || len > 18446744073709551615)
+            return false;
+
+        int lo = 0;
+        int hi = 3;
+        while (lo <= hi)
+        {
+            const int i = lo + ((hi - lo) >> 1);
+            const int order = entries[i].compare(value);
+
+            if (order == 0)
+                return true;
+            if (order < 0)
+                lo = i + 1;
+            else
+                hi = i - 1;
+        }
+
+        return ((~lo) >= 0);
+    }
+
+    static constexpr int item_count = 4;
+    static constexpr uint64_t min_value = 0;
+    static constexpr uint64_t max_value = 18446744073709551615;
+};

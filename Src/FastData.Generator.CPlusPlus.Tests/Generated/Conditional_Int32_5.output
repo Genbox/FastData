@@ -1,0 +1,23 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: Conditional
+#include <array>
+#include <cstdint>
+
+class MyData
+{
+public:
+    static bool contains(const int32_t& value)
+    {
+        if (const size_t len = value.length(); len < -2147483648 || len > 2147483647)
+            return false;
+
+        if (value == -2147483648 || value == -1 || value == 0 || value == 1 || value == 2147483647)
+            return true;
+
+        return false;
+    }
+
+    static constexpr int item_count = 5;
+    static constexpr int64_t min_value = -2147483648;
+    static constexpr int64_t max_value = 2147483647;
+};

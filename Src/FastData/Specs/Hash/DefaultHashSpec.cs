@@ -19,7 +19,8 @@ public sealed class DefaultHashSpec : IHashSpec
 
         uint hash = obj switch
         {
-            char or sbyte or byte or short or ushort or int or uint => (uint)Convert.ToInt32(obj, NumberFormatInfo.InvariantInfo),
+            char or sbyte or byte or short or ushort or int => (uint)Convert.ToInt32(obj, NumberFormatInfo.InvariantInfo),
+            uint u => u,
             _ => unchecked((uint)obj.GetHashCode())
         };
 

@@ -6,13 +6,13 @@
 class MyData
 {
     inline static const std::array<uint8_t, 3> entries = {
-        1, 0, 2
+        1, 0, 255
     };
 
 public:
     static bool contains(const uint8_t& value)
     {
-        if (const size_t len = value.length(); len < 0 || len > 2)
+        if (const size_t len = value.length(); len < 0 || len > 255)
             return false;
 
         unsigned int i = 0;
@@ -33,6 +33,6 @@ public:
     }
 
     static constexpr int item_count = 3;
-    static constexpr uint8_t min_value = 0;
-    static constexpr uint8_t max_value = 2;
+    static constexpr uint64_t min_value = 0;
+    static constexpr uint64_t max_value = 255;
 };

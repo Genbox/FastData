@@ -11,13 +11,13 @@ using Genbox.FastData.Generator.CSharp.Abstracts;
 internal partial class MyData : IFastSet<Byte>
 {
     private byte[] _entries = new byte[] {
-        0, 1, 2
+        0, 1, 255
     };
 
     
     public bool Contains(byte value)
     {
-        if (value < 0 || value > 2)
+        if (value < 0 || value > 255)
            return false;
 
         int lo = 0;
@@ -40,6 +40,6 @@ internal partial class MyData : IFastSet<Byte>
 
     public const int ItemCount = 3;
     public int Length => ItemCount;
-    public const uint MinValue = 0;
-    public const uint MaxValue = 2;
+    public const ulong MinValue = 0;
+    public const ulong MaxValue = 255;
 }

@@ -15,14 +15,14 @@ internal partial class MyData : IFastSet<String>
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 
-        1, 0, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
@@ -40,13 +40,13 @@ internal partial class MyData : IFastSet<String>
     };
 
     private string[] _items = {
-        "item3", "item2", "item1"
+        "a", "item", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     };
 
     
     public bool Contains(string value)
     {
-       if (value.Length != 5)
+        if (value.Length < 1 || value.Length > 255)
            return false;
 
         uint hash = Hash(value);
@@ -59,12 +59,22 @@ internal partial class MyData : IFastSet<String>
 
     private uint Hash(string str)
     {
-        return (uint)_asso[str[4]];
+        uint hash = 0;
+        switch (str.Length)
+        {
+            default:
+                hash += (uint)_asso[str[1]];
+                goto case 1;
+            case 1:
+                break;
+            }
+
+            return hash;
     }
 
 
     public const int ItemCount = 3;
     public int Length => ItemCount;
-    public const int MinLength = 5;
-    public const int MaxLength = 5;
+    public const int MinLength = 1;
+    public const int MaxLength = 255;
 }

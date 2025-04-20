@@ -18,6 +18,6 @@ internal partial class MyData : IFastSet<Byte>
 
     public const int ItemCount = 1;
     public int Length => ItemCount;
-    public const uint MinValue = 1;
-    public const uint MaxValue = 1;
+    public const ulong MinValue = 1;
+    public const ulong MaxValue = 1;
 }

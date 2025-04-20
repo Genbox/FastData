@@ -1,0 +1,38 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: EytzingerSearch
+#include <array>
+#include <cstdint>
+
+class MyData
+{
+    inline static const std::array<int64_t, 5> entries = {
+        1, -1, 9223372036854775807, -9223372036854775808, 0
+    };
+
+public:
+    static bool contains(const int64_t& value)
+    {
+        if (const size_t len = value.length(); len < -9223372036854775808 || len > 9223372036854775807)
+            return false;
+
+        unsigned int i = 0;
+        while (i < entries.size())
+        {
+            const int comparison = entries[i].compare(value);
+
+            if (comparison == 0)
+                return true;
+
+            if (comparison < 0)
+                i = 2 * i + 2;
+            else
+                i = 2 * i + 1;
+        }
+
+        return false;
+    }
+
+    static constexpr int item_count = 5;
+    static constexpr int64_t min_value = -9223372036854775808;
+    static constexpr int64_t max_value = 9223372036854775807;
+};

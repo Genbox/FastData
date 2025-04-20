@@ -7,6 +7,7 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Extensions;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.CSharp.Internal.Generators;
+using Genbox.FastData.Generator.CSharp.Internal.Helpers;
 
 namespace Genbox.FastData.Generator.CSharp;
 
@@ -107,17 +108,17 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
 
             if (genCfg.DataType.IsUnsigned())
             {
-                minType = GetSmallestUnsignedType(Convert.ToUInt64(genCfg.Constants.MinValue, NumberFormatInfo.InvariantInfo));
-                maxType = GetSmallestUnsignedType(Convert.ToUInt64(genCfg.Constants.MaxValue, NumberFormatInfo.InvariantInfo));
+                minType = GetSmallestUnsignedType(genCfg.Constants.MinValue);
+                maxType = GetSmallestUnsignedType(genCfg.Constants.MaxValue);
             }
             else
             {
-                minType = GetSmallestSignedType(Convert.ToInt64(genCfg.Constants.MinValue, NumberFormatInfo.InvariantInfo));
-                maxType = GetSmallestSignedType(Convert.ToInt64(genCfg.Constants.MaxValue, NumberFormatInfo.InvariantInfo));
+                minType = GetSmallestSignedType(genCfg.Constants.MinValue);
+                maxType = GetSmallestSignedType(genCfg.Constants.MaxValue);
             }
 
-            _sb.Append("    public const ").Append(minType).Append(" MinValue = ").Append(genCfg.Constants.MinValue).AppendLine(";");
-            _sb.Append("    public const ").Append(maxType).Append(" MaxValue = ").Append(genCfg.Constants.MaxValue).AppendLine(";");
+            _sb.Append("    public const ").Append(minType).Append(" MinValue = ").Append(ToValueLabel(genCfg.Constants.MinValue)).AppendLine(";");
+            _sb.Append("    public const ").Append(maxType).Append(" MaxValue = ").Append(ToValueLabel(genCfg.Constants.MaxValue)).AppendLine(";");
         }
         else if (genCfg.DataType == DataType.String)
         {
@@ -128,14 +129,20 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
         _sb.Append('}');
     }
 
-    private static string GetSmallestUnsignedType(ulong value) => value switch
+    private static string GetSmallestUnsignedType(object value) => value switch
     {
+        float f and >= ulong.MinValue and <= ulong.MaxValue => GetSmallestSignedType((ulong)f),
+        double d and >= ulong.MinValue and <= ulong.MaxValue => GetSmallestSignedType((ulong)d),
         <= uint.MaxValue => "uint",
         _ => "ulong"
     };
 
-    private static string GetSmallestSignedType(long value) => value switch
+    private static string GetSmallestSignedType(object value) => value switch
     {
+        float f and >= long.MinValue and <= long.MaxValue => GetSmallestSignedType((long)f),
+        float => "float",
+        double d and >= long.MinValue and <= long.MaxValue => GetSmallestSignedType((long)d),
+        double => "double",
         <= int.MaxValue => "int",
         _ => "long"
     };

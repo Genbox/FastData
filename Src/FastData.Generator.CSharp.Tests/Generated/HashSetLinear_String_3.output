@@ -11,26 +11,26 @@ using Genbox.FastData.Generator.CSharp.Abstracts;
 internal partial class MyData : IFastSet<String>
 {
     private readonly B[] _buckets = {
-        new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), 
-        new B(1, 1), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(2, 2), new B(0, 0)
+        new B(0, 0), new B(0, 0), new B(1, 1), new B(0, 0), new B(2, 2), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), 
+        new B(0, 0)
     };
 
     private readonly string[] _items = new string[] {
-        "item1", "item3", "item2"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "item", "a"
     };
 
     private readonly uint[] _hashCodes = {
-        2011983611, 849184197, 3578067552
+        2265191819, 1949155672, 972181027
     };
 
     
     public bool Contains(string value)
     {
-       if (value.Length != 5)
+        if (value.Length < 1 || value.Length > 255)
            return false;
 
         uint hash = Hash(value);
-        ref B b = ref _buckets[MathHelper.FastMod(hash, 17, 1085102592571150096)];
+        ref B b = ref _buckets[MathHelper.FastMod(hash, 11, 1676976733973595602)];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
@@ -90,6 +90,6 @@ internal partial class MyData : IFastSet<String>
 
     public const int ItemCount = 3;
     public int Length => ItemCount;
-    public const int MinLength = 5;
-    public const int MaxLength = 5;
+    public const int MinLength = 1;
+    public const int MaxLength = 255;
 }

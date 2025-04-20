@@ -3,6 +3,9 @@ using Genbox.FastData.Generator.CSharp.Abstracts;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.CSharp.Shared;
 using Genbox.FastData.Generator.Helpers;
+using Genbox.FastData.InternalShared;
+using Microsoft.CodeAnalysis.CSharp;
+using TestHelper = Genbox.FastData.Generator.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.CSharp.Tests;
 
@@ -47,17 +50,20 @@ public class GeneratorTests
 
             Assert.False(set.Contains(100));
         }
+        else
+        {
+            //Others we just compile and check for errors
+            CSharpCompilation compilation = CompilationHelper.CreateCompilation(spec.Source, false);
+            Assert.Empty(compilation.GetDiagnostics());
+        }
     }
 
     public static TheoryData<StructureType, object[]> GetDataStructures()
     {
         TheoryData<StructureType, object[]> res = new TheoryData<StructureType, object[]>();
 
-        foreach (StructureType structure in Enum.GetValues<StructureType>().Where(x => x != StructureType.Auto))
-        {
-            foreach (object[] data in TestHelper.GetAllSets())
-                res.Add(structure, data);
-        }
+        foreach ((StructureType type, object[] data) in TestHelper.GetTestData())
+            res.Add(type, data);
 
         return res;
     }

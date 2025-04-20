@@ -1,0 +1,42 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: PerfectHashBruteForce
+#include <array>
+#include <cstdint>
+
+class MyData
+{
+    struct E
+    {
+        float value;
+        uint32_t hash_code;
+
+        E(const float& value, const uint32_t hash_code)
+        : value(value), hash_code(hash_code) {}
+    };
+
+    inline static const std::array<E, 5> entries = {
+        E(-1, 3196059650), E(3.4028235E+38, 2122317821), E(1, 1048576002), E(0, 16777218), E(-3.4028235E+38, 4269801469)
+    };
+
+    static uint32_t get_hash(const float value, uint32_t seed,)
+    {
+        return reinterpret_cast<uint32_t>(value ^ seed);
+    }
+
+public:
+    static bool contains(const float& value)
+    {
+        if (const size_t len = value.length(); len < -3.4028234663852886E+38 || len > 3.4028234663852886E+38)
+            return false;
+
+        const uint32_t hash = get_hash(value, 16777218);
+        const uint32_t index = hash % 5;
+        const E& entry = entries[index];
+
+        return hash == entry.hash_code && value == entry.value;
+    }
+
+    static constexpr int item_count = 5;
+    static constexpr double min_value = -3.4028234663852886E+38;
+    static constexpr double max_value = 3.4028234663852886E+38;
+};

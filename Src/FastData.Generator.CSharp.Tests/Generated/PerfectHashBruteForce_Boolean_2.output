@@ -11,7 +11,7 @@ using Genbox.FastData.Generator.CSharp.Abstracts;
 internal partial class MyData : IFastSet<Boolean>
 {
     private E[] _entries = {
-        new E(true, 0), new E(false, 1)
+        new E(true, 0u), new E(false, 1u)
     };
 
     
@@ -29,7 +29,7 @@ internal partial class MyData : IFastSet<Boolean>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint Hash(bool value, uint seed)
     {
-        return unchecked((uint)(value.GetHashCode() ^ seed));
+        return unchecked((uint)(value.GetHashCode()^ seed));
     }
 
     [StructLayout(LayoutKind.Auto)]

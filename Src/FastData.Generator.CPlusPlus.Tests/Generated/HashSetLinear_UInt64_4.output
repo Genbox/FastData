@@ -1,0 +1,60 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: HashSetLinear
+#include <array>
+#include <cstdint>
+
+class MyData
+{
+    struct B
+    {
+        uint8_t start_index;
+        uint8_t end_index;
+
+        B(const uint8_t start_index, const uint8_t end_index)
+        : start_index(start_index), end_index(end_index) { }
+    };
+
+    inline static const std::array<B, 7> buckets = {
+        B(0, 1), B(2, 2), B(3, 3), B(0, 0), B(0, 0), B(0, 0), B(0, 0)
+    };
+
+    inline static const std::array<uint64_t, 4> items = {
+        18446744073709551615, 0, 1, 2
+    };
+
+    inline static const std::array<uint32_t, 4> hash_codes = {
+        0, 0, 1, 2
+    };
+
+    static uint32_t get_hash(const uint64_t value)
+    {
+        return reinterpret_cast<uint32_t>(value);
+    }
+
+public:
+    static bool contains(const uint64_t& value)
+    {
+        if (const size_t len = value.length(); len < 0 || len > 18446744073709551615)
+            return false;
+
+        const uint32_t hash = get_hash(value);
+        const B& b = buckets[hash % 7];
+
+        uint8_t index = b.start_index;
+        const uint8_t end_index = b.end_index;
+
+        while (index <= end_index)
+        {
+            if (hash_codes[index] == hash && value == items[index])
+                return true;
+
+            index++;
+        }
+
+        return false;
+    }
+
+    static constexpr int item_count = 4;
+    static constexpr uint64_t min_value = 0;
+    static constexpr uint64_t max_value = 18446744073709551615;
+};

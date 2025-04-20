@@ -1,0 +1,29 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#include <array>
+#include <cstdint>
+
+class MyData
+{
+    inline static const std::array<uint32_t, 4> entries = {
+        0, 1, 2, 4294967295
+    };
+
+public:
+    static bool contains(const uint32_t& value)
+    {
+        if (const size_t len = value.length(); len < 0 || len > 4294967295)
+            return false;
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (value == entries[i])
+               return true;
+        }
+        return false;
+    }
+
+    static constexpr int item_count = 4;
+    static constexpr uint64_t min_value = 0;
+    static constexpr uint64_t max_value = 4294967295;
+};

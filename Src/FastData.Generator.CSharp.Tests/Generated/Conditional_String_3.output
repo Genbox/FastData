@@ -13,14 +13,14 @@ internal partial class MyData : IFastSet<String>
     
     public bool Contains(string value)
     {
-       if (value.Length != 5)
+        if (value.Length < 1 || value.Length > 255)
            return false;
 
         switch (value)
         {
-            case "item1":
-            case "item2":
-            case "item3":
+            case "a":
+            case "item":
+            case "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa":
                 return true;
             default:
                 return false;
@@ -29,6 +29,6 @@ internal partial class MyData : IFastSet<String>
 
     public const int ItemCount = 3;
     public int Length => ItemCount;
-    public const int MinLength = 5;
-    public const int MaxLength = 5;
+    public const int MinLength = 1;
+    public const int MaxLength = 255;
 }

@@ -1,6 +1,7 @@
 using System.Globalization;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Extensions;
 using Genbox.FastData.Specs.Hash;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Extensions;
@@ -150,18 +151,7 @@ internal static class GeneratorConfigExtensions
                      """;
         }
 
-        //For these types, we can use identity hashing
-        return dataType switch
-        {
-            DataType.Char
-                or DataType.SByte
-                or DataType.Byte
-                or DataType.Int16
-                or DataType.UInt16
-                or DataType.Int32
-                or DataType.UInt32 => seeded ? "        return unchecked((uint)(value ^ seed));" : "        return unchecked((uint)value);",
-            _ => seeded ? "        return unchecked((uint)(value.GetHashCode() ^ seed));" : "        return unchecked((uint)(value.GetHashCode()));"
-        };
+        return $"        return unchecked((uint)(value{(dataType.IsIdentityHash() ? "" : ".GetHashCode()")}{(seeded ? "^ seed" : "")}));";
     }
 
     //TODO: Needed for analysis-based hashes

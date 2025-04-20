@@ -11,17 +11,17 @@ using Genbox.FastData.Generator.CSharp.Abstracts;
 internal partial class MyData : IFastSet<String>
 {
     private readonly sbyte[] _buckets = new sbyte[] {
-        3, 0, 1
+        0, 2, 3
      };
 
     private readonly E[] _entries = {
-        new E(2011983611, -1, "item1"), new E(3578067552, -1, "item2"), new E(849184197, 1, "item3")
+        new E(972181027, -1, "a"), new E(1949155672, 0, "item"), new E(2265191819, -1, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     };
 
     
     public bool Contains(string value)
     {
-       if (value.Length != 5)
+        if (value.Length < 1 || value.Length > 255)
            return false;
 
         uint hash = Hash(value);
@@ -87,6 +87,6 @@ internal partial class MyData : IFastSet<String>
 
     public const int ItemCount = 3;
     public int Length => ItemCount;
-    public const int MinLength = 5;
-    public const int MaxLength = 5;
+    public const int MinLength = 1;
+    public const int MaxLength = 255;
 }

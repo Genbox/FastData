@@ -1,0 +1,57 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: HashSetChain
+#include <array>
+#include <cstdint>
+
+class MyData
+{
+    struct E
+    {
+        uint32_t hash_code;
+        int8_t next;
+        double value;
+
+        E(const uint32_t hash_code, const int8_t next, const double& value)
+           : hash_code(hash_code), next(next), value(value) {}
+    };
+
+    inline static const std::array<int8_t, 4> buckets = {
+        4, 0, 0, 0
+     };
+
+    inline static const std::array<E, 4> entries = {
+        E(1048576, -1, -1.7976931348623157E+308), E(0, 0, 0), E(1072693248, 1, 1), E(2148532224, 2, 1.7976931348623157E+308)
+    };
+
+    static uint32_t get_hash(const double value)
+    {
+        return reinterpret_cast<uint32_t>(value);
+    }
+
+public:
+    static bool contains(const double& value)
+    {
+        if (const size_t len = value.length(); len < -1.7976931348623157E+308 || len > 1.7976931348623157E+308)
+            return false;
+
+        const uint32_t hash = get_hash(value);
+        const uint32_t index = hash % 4;
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
+
+        while (i >= 0)
+        {
+            const E& entry = entries[i];
+
+            if (entry.hash_code == hash && value == entry.value)
+                return true;
+
+            i = entry.next;
+        }
+
+        return false;
+    }
+
+    static constexpr int item_count = 4;
+    static constexpr double min_value = -1.7976931348623157E+308;
+    static constexpr double max_value = 1.7976931348623157E+308;
+};

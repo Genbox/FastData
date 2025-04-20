@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
@@ -77,17 +76,17 @@ public class CPlusPlusCodeGenerator(CPlusPlusGeneratorConfig userCfg) : IGenerat
 
             if (genCfg.DataType.IsUnsigned())
             {
-                minType = GetSmallestUnsignedType(Convert.ToUInt64(genCfg.Constants.MinValue, NumberFormatInfo.InvariantInfo));
-                maxType = GetSmallestUnsignedType(Convert.ToUInt64(genCfg.Constants.MaxValue, NumberFormatInfo.InvariantInfo));
+                minType = GetSmallestUnsignedType(genCfg.Constants.MinValue);
+                maxType = GetSmallestUnsignedType(genCfg.Constants.MaxValue);
             }
             else
             {
-                minType = GetSmallestSignedType(Convert.ToInt64(genCfg.Constants.MinValue, NumberFormatInfo.InvariantInfo));
-                maxType = GetSmallestSignedType(Convert.ToInt64(genCfg.Constants.MaxValue, NumberFormatInfo.InvariantInfo));
+                minType = GetSmallestSignedType(genCfg.Constants.MinValue);
+                maxType = GetSmallestSignedType(genCfg.Constants.MaxValue);
             }
 
-            _sb.Append("    static constexpr ").Append(minType).Append(" min_value = ").Append(genCfg.Constants.MinValue).AppendLine(";");
-            _sb.Append("    static constexpr ").Append(maxType).Append(" max_value = ").Append(genCfg.Constants.MaxValue).AppendLine(";");
+            _sb.Append("    static constexpr ").Append(minType).Append(" min_value = ").Append(ToValueLabel(genCfg.Constants.MinValue)).AppendLine(";");
+            _sb.Append("    static constexpr ").Append(maxType).Append(" max_value = ").Append(ToValueLabel(genCfg.Constants.MaxValue)).AppendLine(";");
         }
         else if (genCfg.DataType == DataType.String)
         {
@@ -97,4 +96,22 @@ public class CPlusPlusCodeGenerator(CPlusPlusGeneratorConfig userCfg) : IGenerat
 
         _sb.Append("};");
     }
+
+    private static string GetSmallestUnsignedType(object value) => value switch
+    {
+        float f and >= ulong.MinValue and <= ulong.MaxValue => GetSmallestSignedType((ulong)f),
+        double d and >= ulong.MinValue and <= ulong.MaxValue => GetSmallestSignedType((ulong)d),
+        <= uint.MaxValue => "uint32_t",
+        _ => "uint64_t"
+    };
+
+    private static string GetSmallestSignedType(object value) => value switch
+    {
+        float f and >= long.MinValue and <= long.MaxValue => GetSmallestSignedType((long)f),
+        float => "float",
+        double d and >= long.MinValue and <= long.MaxValue => GetSmallestSignedType((long)d),
+        double => "double",
+        <= int.MaxValue => "int32_t",
+        _ => "int64_t"
+    };
 }

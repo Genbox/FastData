@@ -11,14 +11,14 @@ class MyData
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 
-        1, 0, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+        3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
@@ -36,14 +36,14 @@ class MyData
     };
 
     inline static const std::array<std::string, 3> items = {
-        "item3", "item2", "item1"
+        "a", "item", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     };
 
 public:
     static bool contains(const std::string& value)
     {
-       if (const size_t len = value.length(); len != 5)
-           return false;
+        if (const size_t len = value.length(); len < 1 || len > 255)
+            return false;
 
         const uint32_t hash = get_hash(value);
 
@@ -55,11 +55,20 @@ public:
 
     static uint32_t get_hash(const std::string& str)
     {
-        return static_cast<uint32_t>(asso[str[4]]);
+        uint32_t hash = 0;
+        switch (str.length())
+        {
+            default:
+                hash += static_cast<uint32_t>(asso[str[1]]);
+            case 1:
+                break;
+        }
+
+        return hash;
     }
 
 
     static constexpr int item_count = 3;
-    static constexpr int min_length = 5;
-    static constexpr int max_length = 5;
+    static constexpr int min_length = 1;
+    static constexpr int max_length = 255;
 };

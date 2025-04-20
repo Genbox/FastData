@@ -1,0 +1,61 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: HashSetLinear
+#include <array>
+#include <cstdint>
+
+class MyData
+{
+    struct B
+    {
+        uint8_t start_index;
+        uint8_t end_index;
+
+        B(const uint8_t start_index, const uint8_t end_index)
+        : start_index(start_index), end_index(end_index) { }
+    };
+
+    inline static const std::array<B, 17> buckets = {
+        B(0, 0), B(0, 0), B(0, 0), B(0, 0), B(0, 0), B(0, 0), B(0, 0), B(0, 0), B(1, 1), B(0, 0), 
+        B(0, 0), B(0, 0), B(0, 0), B(0, 0), B(2, 2), B(0, 0), B(3, 3)
+    };
+
+    inline static const std::array<double, 4> items = {
+        0, 1.7976931348623157E+308, 1, -1.7976931348623157E+308
+    };
+
+    inline static const std::array<uint32_t, 4> hash_codes = {
+        0, 2148532224, 1072693248, 1048576
+    };
+
+    static uint32_t get_hash(const double value)
+    {
+        return reinterpret_cast<uint32_t>(value);
+    }
+
+public:
+    static bool contains(const double& value)
+    {
+        if (const size_t len = value.length(); len < -1.7976931348623157E+308 || len > 1.7976931348623157E+308)
+            return false;
+
+        const uint32_t hash = get_hash(value);
+        const B& b = buckets[hash % 17];
+
+        uint8_t index = b.start_index;
+        const uint8_t end_index = b.end_index;
+
+        while (index <= end_index)
+        {
+            if (hash_codes[index] == hash && value == items[index])
+                return true;
+
+            index++;
+        }
+
+        return false;
+    }
+
+    static constexpr int item_count = 4;
+    static constexpr double min_value = -1.7976931348623157E+308;
+    static constexpr double max_value = 1.7976931348623157E+308;
+};

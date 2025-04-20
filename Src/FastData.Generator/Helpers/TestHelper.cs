@@ -45,18 +45,18 @@ public static class TestHelper
     {
         // We want to test edge values
         yield return [true, false];
-        yield return [(sbyte)-1, (sbyte)0, (sbyte)1];
-        yield return [(byte)0, (byte)1, (byte)2];
-        yield return ['a', 'b', 'c'];
-        yield return [-1.0, 0.0, 1.0];
-        yield return [-1f, 0f, 1f];
-        yield return [(short)-1, (short)0, (short)1];
-        yield return [(ushort)0, (ushort)1, (ushort)2];
-        yield return [-1, 0, 1];
-        yield return [0U, 1U, 2U];
-        yield return [-1L, 0L, 1L];
-        yield return [0UL, 1UL, 2UL];
-        yield return ["item1", "item2", "item3"];
+        yield return [sbyte.MinValue, (sbyte)-1, (sbyte)0, (sbyte)1, sbyte.MaxValue];
+        yield return [(byte)0, (byte)1, byte.MaxValue];
+        yield return [char.MinValue, 'a', char.MaxValue];
+        yield return [double.MinValue, 0.0, 1.0, double.MaxValue];
+        yield return [float.MinValue, -1f, 0f, 1f, float.MaxValue];
+        yield return [short.MinValue, (short)-1, (short)0, (short)1, short.MaxValue];
+        yield return [(ushort)0, (ushort)1, (ushort)2, ushort.MaxValue];
+        yield return [int.MinValue, -1, 0, 1, int.MaxValue];
+        yield return [0U, 1U, 2U, uint.MaxValue];
+        yield return [long.MinValue, -1L, 0L, 1L, long.MaxValue];
+        yield return [0UL, 1UL, 2UL, ulong.MaxValue];
+        yield return ["a", "item", new string('a', 255)];
     }
 
     public static IEnumerable<object[]> GetUniqueLengthSets()
@@ -86,4 +86,29 @@ public static class TestHelper
                                                         .Concat(GetEdgeCaseSets())
                                                         .Concat(GetUniqueLengthSets())
                                                         .Concat(GetLargeSets());
+
+    public static IEnumerable<(StructureType, object[])> GetTestData()
+    {
+        foreach (StructureType type in Enum.GetValues(typeof(StructureType)))
+        {
+            if (type == StructureType.Auto) //We don't test auto. It is covered by the other tests
+                continue;
+
+            if (type == StructureType.KeyLength)
+            {
+                foreach (object[] data in GetUniqueLengthSets())
+                    yield return (type, data);
+            }
+            else if (type == StructureType.SingleValue)
+            {
+                foreach (object[] data in GetSingleSets())
+                    yield return (type, data);
+            }
+            else
+            {
+                foreach (object[] data in GetEdgeCaseSets())
+                    yield return (type, data);
+            }
+        }
+    }
 }
