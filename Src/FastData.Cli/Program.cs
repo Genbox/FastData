@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Parsing;
@@ -24,9 +24,6 @@ internal static class Program
         Option<DataType> dataTypeOpt = new Option<DataType>("--data-type", description: "The type of data in the input file.", getDefaultValue: () => DataType.String);
         dataTypeOpt.AddAlias("-d");
 
-        Option<string> nameOpt = new Option<string>("--name", description: "The name of the final data structure.", getDefaultValue: () => "MyData");
-        nameOpt.AddAlias("-n");
-
         Option<StructureType> structureTypeOpt = new Option<StructureType>("--structure-type", description: "The type of data structure to produce.", getDefaultValue: () => StructureType.Auto);
         structureTypeOpt.AddAlias("-s");
 
@@ -42,17 +39,23 @@ internal static class Program
         Option<ClassType> classTypeOpt = new Option<ClassType>("--class-type", description: "The type of the generated class.", getDefaultValue: () => ClassType.Static);
         classTypeOpt.AddAlias("-ct");
 
+        Option<string> classNameOpt = new Option<string>("--class-name", description: "The class name.", getDefaultValue: () => "MyData");
+        classNameOpt.AddAlias("-cn");
+
         Command csharpCmd = new Command("csharp", "Generate a C# data structure")
         {
             namespaceOpt,
             classVisibilityOpt,
             classTypeOpt,
+            classNameOpt,
 
             inputFileArg
         };
 
         Command cppCmd = new Command("cpp", "Generate a C++ data structure")
         {
+            classNameOpt,
+
             inputFileArg
         };
 
@@ -64,12 +67,11 @@ internal static class Program
 
         rootCmd.AddGlobalOption(outputFileOpt);
         rootCmd.AddGlobalOption(dataTypeOpt);
-        rootCmd.AddGlobalOption(nameOpt);
         rootCmd.AddGlobalOption(structureTypeOpt);
 
-        csharpCmd.SetHandler(async (outputFile, dataType, name, structureType, inputFile, ns, cv, ct) =>
+        csharpCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn, ns, cv, ct) =>
         {
-            CSharpGeneratorConfig genCfg = new CSharpGeneratorConfig(name);
+            CSharpGeneratorConfig genCfg = new CSharpGeneratorConfig(cn);
             genCfg.Namespace = ns;
             genCfg.ClassVisibility = cv;
             genCfg.ClassType = ct;
@@ -80,18 +82,18 @@ internal static class Program
             FastDataConfig config = new FastDataConfig(structureType);
 
             await GenerateAsync(data, config, generator, outputFile);
-        }, outputFileOpt, dataTypeOpt, nameOpt, structureTypeOpt, inputFileArg, namespaceOpt, classVisibilityOpt, classTypeOpt);
+        }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt, namespaceOpt, classVisibilityOpt, classTypeOpt);
 
-        cppCmd.SetHandler(async (outputFile, dataType, name, structureType, inputFile) =>
+        cppCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn) =>
         {
-            CPlusPlusGeneratorConfig genCfg = new CPlusPlusGeneratorConfig(name);
+            CPlusPlusGeneratorConfig genCfg = new CPlusPlusGeneratorConfig(cn);
             CPlusPlusCodeGenerator generator = new CPlusPlusCodeGenerator(genCfg);
 
             object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
             FastDataConfig config = new FastDataConfig(structureType);
 
             await GenerateAsync(data, config, generator, outputFile);
-        }, outputFileOpt, dataTypeOpt, nameOpt, structureTypeOpt, inputFileArg);
+        }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt);
 
         Parser parser = new CommandLineBuilder(rootCmd)
                         .UseDefaults()
