@@ -35,7 +35,7 @@ internal static class CPlusPlusGeneratorConfigExtensions
         return sb.ToString();
     }
 
-    public static string GetFieldModifier(this CPlusPlusGeneratorConfig config) => "inline static const";
+    public static string GetFieldModifier(this CPlusPlusGeneratorConfig config) => "static constexpr";
 
     public static string GetMethodModifier(this CPlusPlusGeneratorConfig config) => "static";
 
@@ -46,7 +46,7 @@ internal static class CPlusPlusGeneratorConfigExtensions
 
     internal static string GetMaskEarlyExit(ulong bitSet) =>
         $"""
-                 if (({bitSet}ULL & (1ULL << (value.length() - 1) % 64)) == 0)
+                 if (({bitSet}ULL & 1ULL << (value.length() - 1) % 64) == 0)
                      return false;
          """;
 

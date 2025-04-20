@@ -23,17 +23,18 @@ internal static class CodeHelper
         _ => "int64_t"
     };
 
-    internal static string? ToValueLabel(object? value) => value switch
+    internal static string ToValueLabel(object? value) => value switch
     {
         null => "\"\"",
         string val => $"\"{val}\"",
         char val => $"'{val}'",
         ulong val => val + "ull",
         long val => val + "ll",
-        float val => val + "f",
+        uint val => val + "u",
+        float val => val.ToString("0.0", NumberFormatInfo.InvariantInfo) + "f",
         bool val => val.ToString().ToLowerInvariant(),
         IFormattable val => val.ToString(null, CultureInfo.InvariantCulture),
-        _ => value.ToString()
+        _ => value.ToString()!
     };
 
     internal static string ToValueLabel(object? value, DataType dataType) => dataType switch
@@ -42,7 +43,8 @@ internal static class CodeHelper
         DataType.Char => $"'{value}'",
         DataType.UInt64 => value + "ull",
         DataType.Int64 => value + "ll",
-        DataType.Single => value + "f",
+        DataType.UInt32 => value + "u",
+        DataType.Single => ((double)value).ToString("0.0", NumberFormatInfo.InvariantInfo) + "f",
         DataType.Boolean => value.ToString().ToLowerInvariant(),
         _ => value.ToString()
     };

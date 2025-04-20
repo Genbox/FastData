@@ -11,13 +11,13 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusGenerato
 {
     public string Generate() =>
         $$"""
-              struct E
+              struct e
               {
                   uint32_t hash_code;
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
                   {{genCfg.GetTypeName()}} value;
 
-                  E(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{genCfg.GetTypeName()}}& value)
+                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{genCfg.GetTypeName()}}& value)
                      : hash_code(hash_code), next(next), value(value) {}
               };
 
@@ -25,7 +25,7 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusGenerato
           {{FormatColumns(ctx.Buckets, static (sb, x) => sb.Append(x))}}
                };
 
-              {{cfg.GetFieldModifier()}} std::array<E, {{ctx.Entries.Length}}> entries = {
+              {{cfg.GetFieldModifier()}} std::array<e, {{ctx.Entries.Length}}> entries = {
           {{FormatColumns(ctx.Entries, RenderEntry)}}
               };
 
@@ -42,17 +42,17 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusGenerato
 
                   while (i >= 0)
                   {
-                      const E& entry = entries[i];
+                      const auto& [hash_code, next, value1] = entries[i];
 
-                      if (entry.hash_code == hash && {{genCfg.GetEqualFunction("entry.value")}})
+                      if (hash_code == hash && {{genCfg.GetEqualFunction("value1")}})
                           return true;
 
-                      i = entry.next;
+                      i = next;
                   }
 
                   return false;
               }
           """;
 
-    private static void RenderEntry(StringBuilder sb, HashSetEntry x) => sb.Append("E(").Append(x.Hash).Append(", ").Append(x.Next).Append(", ").Append(ToValueLabel(x.Value)).Append(')');
+    private static void RenderEntry(StringBuilder sb, HashSetEntry x) => sb.Append("e(").Append(x.Hash).Append(", ").Append(x.Next).Append(", ").Append(ToValueLabel(x.Value)).Append(')');
 }

@@ -1,5 +1,6 @@
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Extensions;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
 
@@ -25,7 +26,13 @@ internal static class GeneratorConfigExtensions
 
     internal static string GetEqualFunction(this GeneratorConfig config, string variable) => $"value == {variable}";
 
-    internal static string GetCompareFunction(this GeneratorConfig config, string variable) => $"{variable}.compare(value)";
+    internal static string GetCompareFunction(this GeneratorConfig config, string variable)
+    {
+        if (config.DataType == DataType.String)
+            return $"{variable}.compare(value)";
+
+        return $"(value > {variable}) - (value < {variable})";
+    }
 
     internal static string GetHashSource(this GeneratorConfig config, bool seeded)
     {
@@ -53,7 +60,7 @@ internal static class GeneratorConfigExtensions
                                  hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
                              }
 
-                             return hash1 + (hash2 * 0x5D588B65);
+                             return hash1 + hash2 * 0x5D588B65;
                          }
                      """;
         }

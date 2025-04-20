@@ -11,16 +11,16 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusGenerat
 {
     public string Generate() =>
         $$"""
-              struct B
+              struct b
               {
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} start_index;
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} end_index;
 
-                  B(const {{GetSmallestUnsignedType(ctx.Data.Length)}} start_index, const {{GetSmallestUnsignedType(ctx.Data.Length)}} end_index)
+                  b(const {{GetSmallestUnsignedType(ctx.Data.Length)}} start_index, const {{GetSmallestUnsignedType(ctx.Data.Length)}} end_index)
                   : start_index(start_index), end_index(end_index) { }
               };
 
-              {{cfg.GetFieldModifier()}} std::array<B, {{ctx.Buckets.Length}}> buckets = {
+              {{cfg.GetFieldModifier()}} std::array<b, {{ctx.Buckets.Length}}> buckets = {
           {{FormatColumns(ctx.Buckets, RenderBucket)}}
               };
 
@@ -40,10 +40,9 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusGenerat
           {{cfg.GetEarlyExits(genCfg)}}
 
                   const uint32_t hash = get_hash(value);
-                  const B& b = buckets[{{cfg.GetModFunction(ctx.Buckets.Length)}}];
+                  const auto& [start_index, end_index]= buckets[{{cfg.GetModFunction(ctx.Buckets.Length)}}];
 
-                  {{GetSmallestUnsignedType(ctx.Data.Length)}} index = b.start_index;
-                  const {{GetSmallestUnsignedType(ctx.Data.Length)}} end_index = b.end_index;
+                  {{GetSmallestUnsignedType(ctx.Data.Length)}} index = start_index;
 
                   while (index <= end_index)
                   {
@@ -57,5 +56,5 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusGenerat
               }
           """;
 
-    private static void RenderBucket(StringBuilder sb, HashSetBucket x) => sb.Append("B(").Append(x.StartIndex).Append(", ").Append(x.EndIndex).Append(')');
+    private static void RenderBucket(StringBuilder sb, HashSetBucket x) => sb.Append("b(").Append(x.StartIndex).Append(", ").Append(x.EndIndex).Append(')');
 }

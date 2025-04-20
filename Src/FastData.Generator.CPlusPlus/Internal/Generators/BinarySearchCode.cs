@@ -34,7 +34,7 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusGenerato
                           hi = i - 1;
                   }
 
-                  return ((~lo) >= 0);
+                  return ~lo >= 0;
               }
           """;
 }
