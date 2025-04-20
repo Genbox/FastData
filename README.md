@@ -1,11 +1,12 @@
 # FastData
 
-[![NuGet](https://img.shields.io/nuget/v/Genbox.ReplaceMe.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.ReplaceMe/)
-[![License](https://img.shields.io/github/license/Genbox/ReplaceMe)](https://github.com/Genbox/ReplaceMe/blob/master/LICENSE.txt)
+[![NuGet](https://img.shields.io/nuget/v/Genbox.FastData.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.FastData/)
+[![License](https://img.shields.io/github/license/Genbox/FastData)](https://github.com/Genbox/FastData/blob/master/LICENSE.txt)
 
 ## Description
 
 FastData is a source generator that analyzes your data and creates high-performance, read-only lookup data structures for static data.
+It can be used as a standalone application, library, or .NET source generator.
 
 ## Use case
 
@@ -69,22 +70,6 @@ A benchmark of the array versus our generated structure really illustrates the d
 | Generated | 0.5311 ns | 0.0170 ns | 0.0026 ns |  0.08 |
 | Array     | 6.9286 ns | 0.1541 ns | 0.0684 ns |  1.00 |
 
-## Features
-
-- **Data Analysis:** Optimizes the structure based on the inherent properties of the dataset.
-- **Multiple Indexing Structures:** Choose the best structure for your data size and use case:
-    - Array (linear search)
-    - Array (binary search)
-    - Array (Eytzinger search)
-    - Length indexed
-    - Minimal Perfect Hashing
-    - Hash tables/sets
-
-It supports several output programming languages:
-
-* C#
-* C++
-
 ## Getting started
 
 There are several ways of running FastData. See the sections below for details.
@@ -92,7 +77,7 @@ There are several ways of running FastData. See the sections below for details.
 ### Using the executable
 
 1. Download the FastData executable
-2. Create a file with an item pr. line
+2. Create a file with an item per line
 3. Run `FastData csharp File.txt`
 
 ### Using it in a C# application
@@ -118,7 +103,7 @@ internal static class Program
 }
 ```
 
-### Using it as a .NET Source Generator
+### Using the .NET Source Generator
 
 1. Add the `Genbox.FastData.SourceGenerator` package to your project
 2. Add `FastDataAttribute` as an assembly level attribute.
@@ -138,12 +123,118 @@ internal static class Program
 }
 ```
 
-Whenever you change the array, it automatically generates the new source code and includes in your project.
+Whenever you change the array, it automatically generates the new source code and includes it in your project.
+
+## Features
+
+- **Data Analysis:** Optimizes the structure based on the inherent properties of the dataset.
+- **Multiple Indexing Structures:** FastData automatically chooses the best structure for your data.
+
+It supports several output programming languages.
+
+* C# output: `fastdata csharp <input-file>`
+* C++ output: `fastdata cplusplus <input-file>`
+
+Each output language has different settings. Type `fastdata <lang> --help` to see the options.
+
+### Data structures
+
+By default, FastData chooses the optimal data structure for your data, but you can also set it manually with `fastdata -s <type>`. See the details of each structure type below.
+
+#### SingleValue
+
+* Memory: Low
+* Latency: Low
+* Complexity: O(1)
+
+This data structure only supports a single value. It is much faster than an array with a single item and has no overhead associated with it.
+FastData always selects this data structure whenever your dataset only contains one item.
+
+#### Conditional
+
+* Memory: Low
+* Latency: Low
+* Complexity: O(n)
+
+This data structure relies on built-in logic in the programming language. It produces if/switch statements which ultimately become machine instructions on the CPU, rather than data
+that resides in memory.
+Latency is therefore incredibly low, but the higher number of CPU instructions can fill up the CPU cache, and at a certain point it becomes more efficient to have
+the data reside in memory instead.
+
+#### Array
+
+* Memory: Low
+* Latency: Low
+* Complexity: O(n)
+
+This data structure uses an array as the backing store. It is often faster than a normal array due to efficient early exits (value/length range checks).
+It works well for small amounts of data since the array is scanned linearly, but for larger datasets, the O(n) complexity hurts performance a lot.
+
+#### BinarySearch
+
+* Memory: Low
+* Latency: Medium
+* Complexity: O(log n)
+
+This data structure sorts your data and does a binary search on the content. Since data is sorted at compile time, there is no overhead at runtime. Each lookup
+has a higher latency than a simple array, but once the dataset gets to a few hundred items, it beats the array due to a lower complexity.
+
+#### EytzingerSearch
+
+* Memory: Low
+* Latency: Medium
+* Complexity: O(n*log(n))
+
+This data structure sorts data using an Eytzinger layout. It has better cache-locality than binary search. Under some circumstances it has better performance.
+
+#### KeyLength
+
+* Memory: Low
+* Latency: Low
+* Complexity: O(1)
+
+This data structure only works on strings, but it indexes them after their length, rather than a hash. In the case all the strings have unique lengths, the
+data structure further optimizes for latency.
+
+#### HashSetChain
+
+* Memory: Medium
+* Latency: Medium
+* Complexity: O(1)
+
+This data structure is based on a hash table with separate chaining collision resolution. It uses a separate array for buckets to stay cache coherent, but it also uses more
+memory since it needs to keep track of indices.
+
+#### HashSetLinear
+
+* Memory: Medium
+* Latency: Medium
+* Complexity: O(1)
+
+This data structure is also a hash table, but with linear collision resolution.
+
+#### PerfectHashBruteForce
+
+* Memory: Low
+* Latency: Low
+* Complexity: O(1)
+
+This data structure tries to create a perfect hash for the dataset. It does so by brute-forcing a seed for a simple hash function
+until it hits the right combination. If the dataset is small enough, it can even produce a minimal perfect hash.
+
+#### PerfectHashGPerf
+
+* Memory: Low
+* Latency: Low
+* Complexity: O(1)
+
+This data structure uses the same algorithm as gperf to derive a perfect hash. It uses Richard J. Cichelli's method for creating an associative table,
+which is augmented using alpha increments to resolve collisions. It only works on strings, but it is great for medium-sized datasets.
 
 ## How does it work?
 
 The idea behind the project is to generate a data-dependent optimized data structure for read-only lookup. When data is known beforehand, the algorithm can select from a set
-of different data structures, indexing, and comparison methods that are tailor built for the data.
+of different data structures, indexing, and comparison methods that are tailor-built for the data.
 
 ### Compile-time generation
 
@@ -163,6 +254,8 @@ FastData uses advanced data analysis techniques to generate optimized data struc
 * Entropy mapping
 * Character mapping
 * Encoding analysis
+
+It uses the analysis to create so-called early-exits, which are fast `O(1)` checks on your input before doing any `O(n)` checks on the actual dataset.
 
 #### Hash function generators
 
@@ -185,4 +278,4 @@ It does so using one of four techniques:
 * A: There are several reasons:
     * Frozen comes with considerable runtime overhead
     * Frozen is only available in .NET 8.0+
-    * Frozen only provides af ew of the optimizations provided in FastData
+    * Frozen only provides a few of the optimizations provided in FastData
