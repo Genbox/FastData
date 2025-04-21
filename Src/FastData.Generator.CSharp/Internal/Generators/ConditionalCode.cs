@@ -14,7 +14,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorCon
     private string GenerateIf() =>
         $$"""
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
 
@@ -28,7 +28,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorCon
     private string GenerateSwitch() =>
         $$"""
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
 

@@ -9,7 +9,7 @@ using Genbox.FastData.Helpers;
 
 internal static class MyData 
 {
-    private static uint[] _entries = new uint[] {
+    private static readonly uint[] _entries = new uint[] {
         0u, 1u, 2u, 4294967295u
     };
 

@@ -9,7 +9,7 @@ using Genbox.FastData.Helpers;
 
 internal static class MyData 
 {
-    private static byte[] _entries = new byte[] {
+    private static readonly byte[] _entries = new byte[] {
         0, 1, 255
     };
 

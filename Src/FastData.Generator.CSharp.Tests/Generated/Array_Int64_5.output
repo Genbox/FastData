@@ -9,7 +9,7 @@ using Genbox.FastData.Helpers;
 
 internal static class MyData 
 {
-    private static long[] _entries = new long[] {
+    private static readonly long[] _entries = new long[] {
         -9223372036854775808l, -1l, 0l, 1l, 9223372036854775807l
     };
 

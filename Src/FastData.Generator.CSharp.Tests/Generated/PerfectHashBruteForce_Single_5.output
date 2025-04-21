@@ -9,7 +9,7 @@ using Genbox.FastData.Helpers;
 
 internal static class MyData 
 {
-    private static E[] _entries = {
+    private static readonly E[] _entries = {
         new E(-1.0f, 3196059650u), new E(340282300000000000000000000000000000000.0f, 2122317821u), new E(1.0f, 1048576002u), new E(0.0f, 16777218u), new E(-340282300000000000000000000000000000000.0f, 4269801469u)
     };
 

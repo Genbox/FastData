@@ -26,12 +26,12 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
 
     private string GenerateUniqIf() =>
         $$"""
-              private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
+              {{cfg.GetFieldModifier()}}{{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
           {{FormatColumns(ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()), RenderOne)}}
               };
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{GetEarlyExit(genCfg.EarlyExits)}}
 
@@ -42,7 +42,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
     private string GenerateUniqSwitch() =>
         $$"""
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
 
@@ -57,12 +57,12 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfi
 
     private string GenerateNormal() =>
         $$"""
-              private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[]?[] _entries = new {{genCfg.GetTypeName()}}[]?[] {
+              {{cfg.GetFieldModifier()}}{{genCfg.GetTypeName()}}[]?[] _entries = new {{genCfg.GetTypeName()}}[]?[] {
           {{FormatList(ctx.Lengths.Skip((int)ctx.MinLength).Take((int)((ctx.MaxLength - ctx.MinLength) + 1)), RenderMany, ",\n")}}
               };
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{GetEarlyExit(genCfg.EarlyExits)}}
                   {{genCfg.GetTypeName()}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];

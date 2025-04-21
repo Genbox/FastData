@@ -6,16 +6,16 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
 {
     public string Generate() =>
         $$"""
-              private{{cfg.GetModifier()}} readonly {{GetSmallestSignedType(ctx.Buckets.Length)}}[] _buckets = new {{GetSmallestSignedType(ctx.Buckets.Length)}}[] {
+              {{cfg.GetFieldModifier()}}{{GetSmallestSignedType(ctx.Buckets.Length)}}[] _buckets = new {{GetSmallestSignedType(ctx.Buckets.Length)}}[] {
           {{FormatColumns(ctx.Buckets, static (sb, x) => sb.Append(x))}}
                };
 
-              private{{cfg.GetModifier()}} readonly E[] _entries = {
+              {{cfg.GetFieldModifier()}}E[] _entries = {
           {{FormatColumns(ctx.Entries, RenderEntry)}}
               };
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
 

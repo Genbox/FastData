@@ -9,7 +9,7 @@ using Genbox.FastData.Helpers;
 
 internal static class MyData 
 {
-    private static float[] _entries = new float[] {
+    private static readonly float[] _entries = new float[] {
         1.0f, -1.0f, 340282300000000000000000000000000000000.0f, -340282300000000000000000000000000000000.0f, 0.0f
     };
 

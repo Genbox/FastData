@@ -4,16 +4,16 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
 {
     public string Generate() =>
         $$"""
-              private{{cfg.GetModifier()}} {{GetSmallestSignedType(ctx.MaxHash + 1)}}[] _asso = new {{GetSmallestSignedType(ctx.MaxHash + 1)}}[] {
+              {{cfg.GetFieldModifier()}}{{GetSmallestSignedType(ctx.MaxHash + 1)}}[] _asso = new {{GetSmallestSignedType(ctx.MaxHash + 1)}}[] {
           {{FormatColumns(ctx.AssociationValues, RenderAssociativeValue)}}
               };
 
-              private{{cfg.GetModifier()}} string[] _items = {
+              {{cfg.GetFieldModifier()}}string[] _items = {
           {{FormatColumns(WrapWords(ctx.Items), static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
 
@@ -25,7 +25,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
                   return {{genCfg.GetEqualFunction("_items[hash]")}};
               }
 
-              private{{cfg.GetModifier()}} uint Hash(string str)
+              {{cfg.GetMethodModifier(true)}}uint Hash(string str)
               {
           {{RenderHashFunction()}}
               }

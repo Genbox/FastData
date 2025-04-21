@@ -6,20 +6,20 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpGeneratorC
 {
     public string Generate() =>
         $$"""
-              private{{cfg.GetModifier()}} readonly B[] _buckets = {
+              {{cfg.GetFieldModifier()}}B[] _buckets = {
           {{FormatColumns(ctx.Buckets, RenderBucket)}}
               };
 
-              private{{cfg.GetModifier()}} readonly {{genCfg.GetTypeName()}}[] _items = new {{genCfg.GetTypeName()}}[] {
+              {{cfg.GetFieldModifier()}}{{genCfg.GetTypeName()}}[] _items = new {{genCfg.GetTypeName()}}[] {
           {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
-              private{{cfg.GetModifier()}} readonly uint[] _hashCodes = {
+              {{cfg.GetFieldModifier()}}uint[] _hashCodes = {
           {{FormatColumns(ctx.HashCodes, static (sb, obj) => sb.Append(obj))}}
               };
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
 

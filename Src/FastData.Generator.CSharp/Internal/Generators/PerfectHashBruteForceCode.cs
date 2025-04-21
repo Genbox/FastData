@@ -4,12 +4,12 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpGe
 {
     public string Generate() =>
         $$"""
-              private{{cfg.GetModifier()}} E[] _entries = {
+              {{cfg.GetFieldModifier()}}E[] _entries = {
           {{FormatColumns(ctx.Data, Render)}}
               };
 
               {{cfg.GetMethodAttributes()}}
-              public{{cfg.GetModifier()}} bool Contains({{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
 

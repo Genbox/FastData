@@ -9,7 +9,7 @@ using Genbox.FastData.Helpers;
 
 internal static class MyData 
 {
-    private static sbyte[] _entries = new sbyte[] {
+    private static readonly sbyte[] _entries = new sbyte[] {
         -128, -1, 0, 1, 127
     };
 

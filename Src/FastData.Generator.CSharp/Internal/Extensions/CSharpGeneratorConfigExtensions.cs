@@ -61,7 +61,13 @@ internal static class CSharpGeneratorConfigExtensions
         return null;
     }
 
-    internal static string? GetModifier(this CSharpGeneratorConfig config) => config.ClassType == ClassType.Static ? " static" : null;
+    internal static string GetFieldModifier(this CSharpGeneratorConfig config) => config.ClassType == ClassType.Static ? "private static readonly " : "private readonly ";
+
+    internal static string GetMethodModifier(this CSharpGeneratorConfig config, bool forcePrivate = false)
+    {
+        string res = forcePrivate ? "private " : "public ";
+        return res + (config.ClassType == ClassType.Static ? "static " : "");
+    }
 
     internal static string GetMaskEarlyExit(ulong bitSet) =>
         $"""
