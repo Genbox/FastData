@@ -1,0 +1,22 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: KeyLength
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    const ENTRIES: [&str; 4] = [
+        "a", "", "aaa", "aaaa"
+    ];
+
+    pub fn contains(value: &str) -> bool {
+if 13u64 & (1u64 << ((value.len() - 1) % 64)) == 0 {
+    return false;
+}
+        return value == Self::ENTRIES[(value.len() - 1) as usize];
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_LENGTH: usize = 1;
+    pub const MAX_LENGTH: usize = 4;
+}

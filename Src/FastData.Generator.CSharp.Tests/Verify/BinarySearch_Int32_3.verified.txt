@@ -9,14 +9,14 @@ using Genbox.FastData.Helpers;
 
 internal static class MyData 
 {
-    private static readonly string[] _entries = new string[] {
-        "item1", "item2", "item3"
+    private static readonly int[] _entries = new int[] {
+        1, 2, 3
     };
 
     
-    public static bool Contains(string value)
+    public static bool Contains(int value)
     {
-        if (value.Length != 5u)
+        if (value < 1 || value > 3)
             return false;
 
         int lo = 0;
@@ -24,7 +24,7 @@ internal static class MyData
         while (lo <= hi)
         {
             int i = lo + ((hi - lo) >> 1);
-            int order = StringComparer.Ordinal.Compare(_entries[i], value);
+            int order = _entries[i].CompareTo(value);
 
             if (order == 0)
                 return true;
@@ -38,6 +38,6 @@ internal static class MyData
     }
 
     public const int ItemCount = 3;
-    public const int MinLength = 5;
-    public const int MaxLength = 5;
+    public const int MinValue = 1;
+    public const int MaxValue = 3;
 }

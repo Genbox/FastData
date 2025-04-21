@@ -6,7 +6,7 @@ pub struct MyData;
 
 impl MyData {
     const ENTRIES: [E; 3] = [
-        E { value: "a", hash_code: 2150936925 }, E { value: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", hash_code: 119911210 }, E { value: "item", hash_code: 1699185842 }
+        E { value: "item2", hash_code: 2465848398 }, E { value: "item3", hash_code: 4031932339 }, E { value: "item1", hash_code: 2869132925 }
     ];
 
     fn get_hash(value: &str, seed: u32) -> u32 {
@@ -32,11 +32,11 @@ impl MyData {
     }
 
     pub fn contains(value: &str) -> bool {
-        if value.len() < 1 || value.len() > 255 {
+        if value.len() != 5 {
             return false;
         }
 
-        let hash = Self::get_hash(value, 4);
+        let hash = Self::get_hash(value, 3);
         let index = (hash % 3) as usize;
         let entry = &Self::ENTRIES[index];
 
@@ -44,8 +44,8 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_LENGTH: usize = 1;
-    pub const MAX_LENGTH: usize = 255;
+    pub const MIN_LENGTH: usize = 5;
+    pub const MAX_LENGTH: usize = 5;
 }
 struct E {
     value: &'static str,

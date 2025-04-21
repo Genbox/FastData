@@ -5,17 +5,17 @@
 pub struct MyData;
 
 impl MyData {
-    const BUCKETS: [B; 11] = [
-        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 1, end_index: 1 }, B { start_index: 0, end_index: 0 }, B { start_index: 2, end_index: 2 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, 
-        B { start_index: 0, end_index: 0 }
+    const BUCKETS: [B; 17] = [
+        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, 
+        B { start_index: 1, end_index: 1 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 2, end_index: 2 }, B { start_index: 0, end_index: 0 }
     ];
 
     const ITEMS: [&'static str; 3] = [
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "item", "a"
+        "item1", "item3", "item2"
     ];
 
     const HASH_CODES: [u32; 3] = [
-        2265191819, 1949155672, 972181027
+        2011983611, 849184197, 3578067552
     ];
 
     fn get_hash(value: &str) -> u32 {
@@ -41,12 +41,12 @@ impl MyData {
     }
 
     pub fn contains(value: &'static str) -> bool {
-        if value.len() < 1 || value.len() > 255 {
+        if value.len() != 5 {
             return false;
         }
 
         let hash = Self::get_hash(value);
-        let bucket = &Self::BUCKETS[(hash % 11) as usize];
+        let bucket = &Self::BUCKETS[(hash % 17) as usize];
         let mut index: u8 = bucket.start_index;
         let end_index: u8 = bucket.end_index;
 
@@ -61,8 +61,8 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_LENGTH: usize = 1;
-    pub const MAX_LENGTH: usize = 255;
+    pub const MIN_LENGTH: usize = 5;
+    pub const MAX_LENGTH: usize = 5;
 }
 struct B {
     start_index: u8,

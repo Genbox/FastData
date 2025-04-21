@@ -59,13 +59,6 @@ public static class TestHelper
         yield return ["a", "item", new string('a', 255)];
     }
 
-    public static IEnumerable<object[]> GetUniqueLengthSets()
-    {
-        // We want to attempt strings with unique lengths
-        // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
-        yield return ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"];
-    }
-
     public static IEnumerable<object[]> GetLargeSets()
     {
         // We want to test large inputs too
@@ -82,11 +75,6 @@ public static class TestHelper
         yield return Enumerable.Range(0, 100).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).Cast<object>().ToArray();
     }
 
-    public static IEnumerable<object[]> GetAllSets() => GetSingleSets()
-                                                        .Concat(GetEdgeCaseSets())
-                                                        .Concat(GetUniqueLengthSets())
-                                                        .Concat(GetLargeSets());
-
     public static IEnumerable<(StructureType, object[])> GetTestData()
     {
         foreach (StructureType type in Enum.GetValues(typeof(StructureType)))
@@ -95,27 +83,18 @@ public static class TestHelper
                 continue;
 
             if (type == StructureType.KeyLength)
-            {
-                foreach (object[] data in GetUniqueLengthSets())
-                    yield return (type, data);
-            }
+                yield return (type, ["a", "aaa", "aaaa"]);
             else if (type == StructureType.SingleValue)
             {
-                foreach (object[] data in GetSingleSets())
-                    yield return (type, data);
+                yield return (type, ["value"]);
+                yield return (type, [1]);
             }
             else if (type == StructureType.PerfectHashGPerf)
-            {
-                //GPerf only supports strings
-                yield return (type, ["a", "b"]); //Minimum test case
-                yield return (type, ["aaaaaaaaaa", "bbbbbbbbbb", "cccccccccc"]); //Same length (and longer than 1)
-                yield return (type, ["item1", "item2", "item3", "item4"]); //Only differ on 1 char
-                yield return (type, ["1", "2", "a", "aa", "aaa", "item", new string('a', 255)]); //Test long strings
-            }
+                yield return (type, ["item1", "item2", "item3", "item4"]);
             else
             {
-                foreach (object[] data in GetEdgeCaseSets())
-                    yield return (type, data);
+                yield return (type, ["item1", "item2", "item3"]);
+                yield return (type, [1, 2, 3]);
             }
         }
     }
@@ -130,8 +109,8 @@ public static class TestHelper
                     continue;
 
                 case StructureType.KeyLength:
-                    foreach (object[] data in GetUniqueLengthSets())
-                        yield return (type, data);
+                    // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
+                    yield return (type, ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]);
                     break;
 
                 case StructureType.SingleValue:
@@ -154,6 +133,9 @@ public static class TestHelper
                 case StructureType.HashSetLinear:
                 case StructureType.Array:
                     foreach (object[] data in GetEdgeCaseSets())
+                        yield return (type, data);
+
+                    foreach (object[] data in GetLargeSets())
                         yield return (type, data);
                     break;
                 default:

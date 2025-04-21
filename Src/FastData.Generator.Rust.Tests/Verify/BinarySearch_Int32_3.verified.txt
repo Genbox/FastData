@@ -5,12 +5,12 @@
 pub struct MyData;
 
 impl MyData {
-    const ENTRIES: [&'static str; 3] = [
-        "item1", "item2", "item3"
+    const ENTRIES: [i32; 3] = [
+        1, 2, 3
     ];
 
-    pub fn contains(value: &str) -> bool {
-        if value.len() != 5 {
+    pub fn contains(value: i32) -> bool {
+        if value < 1 || value > 3 {
             return false;
         }
 
@@ -18,7 +18,7 @@ impl MyData {
         let mut hi: usize = 2;
         while lo <= hi {
             let i = lo + ((hi - lo) >> 1);
-            let order = Self::ENTRIES[i].cmp(value) as i32;
+            let order = if value > Self::ENTRIES[i] { 1 } else if value < Self::ENTRIES[i] { -1 } else { 0 };
 
             if order == 0 {
                 return true;
@@ -34,6 +34,6 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_LENGTH: usize = 5;
-    pub const MAX_LENGTH: usize = 5;
+    pub const MIN_VALUE: i32 = 1;
+    pub const MAX_VALUE: i32 = 3;
 }

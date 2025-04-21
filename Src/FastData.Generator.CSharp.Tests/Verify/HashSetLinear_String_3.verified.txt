@@ -10,26 +10,26 @@ using Genbox.FastData.Helpers;
 internal static class MyData 
 {
     private static readonly B[] _buckets = {
-        new B(0, 0), new B(0, 0), new B(1, 1), new B(0, 0), new B(2, 2), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), 
-        new B(0, 0)
+        new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), 
+        new B(1, 1), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(2, 2), new B(0, 0)
     };
 
     private static readonly string[] _items = new string[] {
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "item", "a"
+        "item1", "item3", "item2"
     };
 
     private static readonly uint[] _hashCodes = {
-        2265191819, 1949155672, 972181027
+        2011983611, 849184197, 3578067552
     };
 
     
     public static bool Contains(string value)
     {
-        if (value.Length < 1u || value.Length > 255u)
+        if (value.Length != 5u)
             return false;
 
         uint hash = Hash(value);
-        ref B b = ref _buckets[unchecked((uint)(((((1676976733973595602ul * hash) >> 32) + 1) * 11) >> 32))];
+        ref B b = ref _buckets[unchecked((uint)(((((1085102592571150096ul * hash) >> 32) + 1) * 17) >> 32))];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
@@ -88,6 +88,6 @@ internal static class MyData
     }
 
     public const int ItemCount = 3;
-    public const int MinLength = 1;
-    public const int MaxLength = 255;
+    public const int MinLength = 5;
+    public const int MaxLength = 5;
 }

@@ -5,12 +5,12 @@
 pub struct MyData;
 
 impl MyData {
-    const ENTRIES: [&str; 3] = [
-        "item1", "item2", "item3"
+    const ENTRIES: [i32; 3] = [
+        1, 2, 3
     ];
 
-    pub fn contains(value: &str) -> bool {
-        if value.len() != 5 {
+    pub fn contains(value: i32) -> bool {
+        if value < 1 || value > 3 {
             return false;
         }
 
@@ -23,6 +23,6 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_LENGTH: usize = 5;
-    pub const MAX_LENGTH: usize = 5;
+    pub const MIN_VALUE: i32 = 1;
+    pub const MAX_VALUE: i32 = 3;
 }

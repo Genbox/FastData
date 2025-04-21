@@ -6,11 +6,11 @@ pub struct MyData;
 
 impl MyData {
     const BUCKETS: [i8; 3] = [
-        0, 2, 3
+        3, 0, 1
     ];
 
     const ENTRIES: [E; 3] = [
-        E { hash_code: 972181027, next: -1, value: "a" }, E { hash_code: 1949155672, next: 0, value: "item" }, E { hash_code: 2265191819, next: -1, value: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+        E { hash_code: 2011983611, next: -1, value: "item1" }, E { hash_code: 3578067552, next: -1, value: "item2" }, E { hash_code: 849184197, next: 1, value: "item3" }
     ];
 
     fn get_hash(value: &str) -> u32 {
@@ -36,7 +36,7 @@ impl MyData {
     }
 
     pub fn contains(value: &str) -> bool {
-        if value.len() < 1 || value.len() > 255 {
+        if value.len() != 5 {
             return false;
         }
 
@@ -56,8 +56,8 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_LENGTH: usize = 1;
-    pub const MAX_LENGTH: usize = 255;
+    pub const MIN_LENGTH: usize = 5;
+    pub const MAX_LENGTH: usize = 5;
 }
 struct E {
     hash_code: u32,

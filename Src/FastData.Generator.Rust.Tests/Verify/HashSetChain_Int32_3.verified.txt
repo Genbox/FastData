@@ -1,0 +1,48 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashSetChain
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    const BUCKETS: [i8; 3] = [
+        3, 1, 2
+    ];
+
+    const ENTRIES: [E; 3] = [
+        E { hash_code: 1, next: -1, value: 1 }, E { hash_code: 2, next: -1, value: 2 }, E { hash_code: 3, next: -1, value: 3 }
+    ];
+
+    fn get_hash(value: i32) -> u32 {
+        (value as u32)
+    }
+
+    pub fn contains(value: i32) -> bool {
+        if value < 1 || value > 3 {
+            return false;
+        }
+
+        let hash = Self::get_hash(value);
+        let index = hash % 3;
+        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+
+        while i >= 0 {
+            let entry = &Self::ENTRIES[i as usize];
+            if entry.hash_code == hash && value == entry.value {
+                return true;
+            }
+            i = entry.next;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_VALUE: i32 = 1;
+    pub const MAX_VALUE: i32 = 3;
+}
+struct E {
+    hash_code: u32,
+    next: i8,
+    value: i32,
+}

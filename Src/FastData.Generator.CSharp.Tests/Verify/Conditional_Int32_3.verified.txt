@@ -10,16 +10,16 @@ using Genbox.FastData.Helpers;
 internal static class MyData 
 {
     
-    public static bool Contains(string value)
+    public static bool Contains(int value)
     {
-        if (value.Length != 5u)
+        if (value < 1 || value > 3)
             return false;
 
         switch (value)
         {
-            case "item1":
-            case "item2":
-            case "item3":
+            case 1:
+            case 2:
+            case 3:
                 return true;
             default:
                 return false;
@@ -27,6 +27,6 @@ internal static class MyData
     }
 
     public const int ItemCount = 3;
-    public const int MinLength = 5;
-    public const int MaxLength = 5;
+    public const int MinValue = 1;
+    public const int MaxValue = 3;
 }

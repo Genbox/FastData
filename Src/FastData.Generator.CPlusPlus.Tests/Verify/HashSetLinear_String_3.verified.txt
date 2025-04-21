@@ -16,17 +16,17 @@ class my_data
         : start_index(start_index), end_index(end_index) { }
     };
 
-    inline static const std::array<b, 11> buckets = {
-        b(0, 0), b(0, 0), b(1, 1), b(0, 0), b(2, 2), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), 
-        b(0, 0)
+    inline static const std::array<b, 17> buckets = {
+        b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), 
+        b(1, 1), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(2, 2), b(0, 0)
     };
 
     inline static const std::array<std::string, 3> items = {
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "item", "a"
+        "item1", "item3", "item2"
     };
 
     inline static const std::array<uint32_t, 3> hash_codes = {
-        2265191819, 1949155672, 972181027
+        2011983611, 849184197, 3578067552
     };
 
     static uint32_t get_hash(const std::string& value)
@@ -56,11 +56,11 @@ class my_data
 public:
     static bool contains(const std::string& value)
     {
-        if (const size_t len = value.length(); len < 1u || len > 255u)
+        if (const size_t len = value.length(); len != 5u)
             return false;
 
         const uint32_t hash = get_hash(value);
-        const auto& [start_index, end_index]= buckets[hash % 11];
+        const auto& [start_index, end_index]= buckets[hash % 17];
 
         uint8_t index = start_index;
 
@@ -76,6 +76,6 @@ public:
     }
 
     static constexpr unsigned int item_count = 3;
-    static constexpr int min_length = 1;
-    static constexpr int max_length = 255;
+    static constexpr int min_length = 5;
+    static constexpr int max_length = 5;
 };
