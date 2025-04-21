@@ -7,13 +7,13 @@ namespace Genbox.FastData.Generator.Helpers;
 
 public static class TestHelper
 {
-    public static bool TryGenerate(IGenerator generator, StructureType structureType, object[] data, out GeneratorSpec spec)
+    public static bool TryGenerate(Func<string, IGenerator> generatorFunc, StructureType structureType, object[] data, out GeneratorSpec spec)
     {
         DataType dataType = (DataType)Enum.Parse(typeof(DataType), data[0].GetType().Name);
 
         string identifier = $"{structureType}_{dataType}_{data.Length}";
 
-        if (FastDataGenerator.TryGenerate(data, new FastDataConfig(structureType), generator, out string? source))
+        if (FastDataGenerator.TryGenerate(data, new FastDataConfig(structureType), generatorFunc(identifier), out string? source))
         {
             spec = new GeneratorSpec(identifier, dataType, source);
             return true;

@@ -20,7 +20,7 @@ public class GeneratorTests
     [MemberData(nameof(GetStructureTypes))]
     internal async Task GenerateStructureType(StructureType structureType, object[] data)
     {
-        if (!TestHelper.TryGenerate(_generator, structureType, data, out GeneratorSpec spec))
+        if (!TestHelper.TryGenerate(_ => _generator, structureType, data, out GeneratorSpec spec))
             return;
 
         Assert.NotEmpty(spec.Source);
