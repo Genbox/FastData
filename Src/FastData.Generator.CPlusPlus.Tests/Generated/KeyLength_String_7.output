@@ -7,7 +7,7 @@
 
 class my_data
 {
-    static constexpr std::array<std::string, 8> entries = {
+    static constexpr std::array<std::string&, 8> entries = {
         "aaa", "", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"
     };
 

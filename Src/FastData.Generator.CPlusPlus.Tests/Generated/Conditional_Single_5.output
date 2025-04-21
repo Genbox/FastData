@@ -7,7 +7,7 @@
 class my_data
 {
 public:
-    static bool contains(const float& value)
+    static bool contains(const float value)
     {
         if (value < -340282346638529000000000000000000000000.0f || value > 340282346638529000000000000000000000000.0f)
             return false;

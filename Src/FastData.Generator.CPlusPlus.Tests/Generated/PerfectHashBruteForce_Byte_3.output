@@ -11,7 +11,7 @@ class my_data
         uint8_t value;
         uint32_t hash_code;
 
-        e(const uint8_t& value, const uint32_t hash_code)
+        e(const uint8_t value, const uint32_t hash_code)
         : value(value), hash_code(hash_code) {}
     };
 
@@ -25,7 +25,7 @@ class my_data
     }
 
 public:
-    static bool contains(const uint8_t& value)
+    static bool contains(const uint8_t value)
     {
         if (value < 0 || value > 255)
             return false;

@@ -7,7 +7,7 @@
 class my_data
 {
 public:
-    static bool contains(const float& value)
+    static bool contains(const float value)
     {
         return value == 1.0f;
     }

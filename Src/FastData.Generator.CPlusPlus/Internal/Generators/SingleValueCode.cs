@@ -10,7 +10,7 @@ internal sealed class SingleValueCode(GeneratorConfig genCfg, CPlusPlusGenerator
     public string Generate() =>
         $$"""
           public:
-              {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
+              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
               {
                   return {{genCfg.GetEqualFunction(ToValueLabel(ctx.Item))}};
               }

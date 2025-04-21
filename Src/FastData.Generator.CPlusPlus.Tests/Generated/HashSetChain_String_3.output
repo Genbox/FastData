@@ -11,9 +11,9 @@ class my_data
     {
         uint32_t hash_code;
         int8_t next;
-        std::string value;
+        std::string& value;
 
-        e(const uint32_t hash_code, const int8_t next, const std::string& value)
+        e(const uint32_t hash_code, const int8_t next, const std::string&& value)
            : hash_code(hash_code), next(next), value(value) {}
     };
 

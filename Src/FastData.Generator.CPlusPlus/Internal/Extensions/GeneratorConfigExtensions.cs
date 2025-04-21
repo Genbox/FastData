@@ -4,7 +4,7 @@ internal static class GeneratorConfigExtensions
 {
     internal static string GetTypeName(this GeneratorConfig config) => config.DataType switch
     {
-        DataType.String => "std::string",
+        DataType.String => "std::string&",
         DataType.Boolean => "bool",
         DataType.SByte => "int8_t",
         DataType.Byte => "uint8_t",

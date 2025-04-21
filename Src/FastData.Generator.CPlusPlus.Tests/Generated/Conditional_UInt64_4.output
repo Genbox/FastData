@@ -7,7 +7,7 @@
 class my_data
 {
 public:
-    static bool contains(const uint64_t& value)
+    static bool contains(const uint64_t value)
     {
         if (value < 0ull || value > 18446744073709551615ull)
             return false;

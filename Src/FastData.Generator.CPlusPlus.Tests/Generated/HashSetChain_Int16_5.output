@@ -30,7 +30,7 @@ class my_data
     }
 
 public:
-    static bool contains(const int16_t& value)
+    static bool contains(const int16_t value)
     {
         if (value < -32768 || value > 32767)
             return false;

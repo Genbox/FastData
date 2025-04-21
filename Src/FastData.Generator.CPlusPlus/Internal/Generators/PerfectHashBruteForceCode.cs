@@ -9,18 +9,18 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CPlusPlu
                   {{genCfg.GetTypeName()}} value;
                   uint32_t hash_code;
 
-                  e(const {{genCfg.GetTypeName()}}& value, const uint32_t hash_code)
+                  e(const {{genCfg.GetTypeName()}} value, const uint32_t hash_code)
                   : value(value), hash_code(hash_code) {}
               };
 
-              {{cfg.GetFieldModifier()}} std::array<e, {{ctx.Data.Length}}> entries = {
+              {{cfg.GetFieldModifier()}}std::array<e, {{ctx.Data.Length}}> entries = {
           {{FormatColumns(ctx.Data, Render)}}
               };
 
           {{genCfg.GetHashSource(true)}}
 
           public:
-              {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
+              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
 

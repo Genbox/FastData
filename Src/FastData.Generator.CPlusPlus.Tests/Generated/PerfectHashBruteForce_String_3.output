@@ -9,7 +9,7 @@ class my_data
 {
     struct e
     {
-        std::string value;
+        std::string& value;
         uint32_t hash_code;
 
         e(const std::string& value, const uint32_t hash_code)

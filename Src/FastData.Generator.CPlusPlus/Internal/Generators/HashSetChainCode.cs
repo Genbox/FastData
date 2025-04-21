@@ -16,18 +16,18 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusGenerato
                      : hash_code(hash_code), next(next), value(value) {}
               };
 
-              {{cfg.GetFieldModifier()}} std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length}}> buckets = {
+              {{cfg.GetFieldModifier()}}std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length}}> buckets = {
           {{FormatColumns(ctx.Buckets, static (sb, x) => sb.Append(x))}}
                };
 
-              {{cfg.GetFieldModifier()}} std::array<e, {{ctx.Entries.Length}}> entries = {
+              {{cfg.GetFieldModifier()}}std::array<e, {{ctx.Entries.Length}}> entries = {
           {{FormatColumns(ctx.Entries, RenderEntry)}}
               };
 
           {{genCfg.GetHashSource(false)}}
 
           public:
-              {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
+              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
 

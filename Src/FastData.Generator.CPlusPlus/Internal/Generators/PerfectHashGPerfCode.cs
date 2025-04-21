@@ -7,16 +7,16 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
         string?[] items = WrapWords(ctx.Items).ToArray();
 
         return $$"""
-                     {{cfg.GetFieldModifier()}} std::array<{{GetSmallestSignedType(ctx.MaxHash + 1)}}, {{ctx.AssociationValues.Length}}> asso = {
+                     {{cfg.GetFieldModifier()}}std::array<{{GetSmallestSignedType(ctx.MaxHash + 1)}}, {{ctx.AssociationValues.Length}}> asso = {
                  {{FormatColumns(ctx.AssociationValues, RenderAssociativeValue)}}
                      };
 
-                     {{cfg.GetFieldModifier()}} std::array<std::string, {{items.Length}}> items = {
+                     {{cfg.GetFieldModifier()}}std::array<std::string, {{items.Length}}> items = {
                  {{FormatColumns(items, static (sb, x) => sb.Append(ToValueLabel(x)))}}
                      };
 
                  public:
-                     {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
+                     {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
                      {
                  {{cfg.GetEarlyExits(genCfg)}}
 
@@ -28,7 +28,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
                          return {{genCfg.GetEqualFunction("items[hash]")}};
                      }
 
-                     {{cfg.GetMethodModifier()}} uint32_t get_hash(const std::string& str)
+                     {{cfg.GetMethodModifier()}}uint32_t get_hash(const std::string& str)
                      {
                  {{RenderHashFunction()}}
                      }
@@ -42,7 +42,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
         //IQ: We also assume that positions are listed in descending order
 
         //We need to know the shortest string
-        int minLen = ctx.Items.Min(x => x.Key.Length); //TODO: Make this kind of data available to generators again? or maybe special valus in context?
+        uint minLen = (uint)genCfg.Constants.MinValue;
 
         //We start with the highest position.
         int key = ctx.Positions[0];
@@ -51,18 +51,13 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
         if (key == -1 || key < minLen)
             return RenderExpression();
 
-        StringBuilder sb = new StringBuilder("""
-                                                     uint32_t hash = 0;
-                                                     switch (str.length())
-                                                     {
-                                                         default:
-
-                                             """);
-
-        // Output the default case
-        sb.Append("                hash += ");
-        RenderAsso(sb, key);
-        sb.AppendLine(";");
+        StringBuilder sb = new StringBuilder($$"""
+                                                       uint32_t hash = 0;
+                                                       switch (str.length())
+                                                       {
+                                                           default:
+                                                               hash += {{RenderAsso(key)}};
+                                               """);
 
         // Output all the other cases
         do
@@ -70,15 +65,11 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
             sb.AppendLine($"            case {key}:");
 
             if (ctx.Positions.Contains(key - 1))
-            {
-                sb.Append("                hash += ");
-                RenderAsso(sb, key - 1);
-                sb.AppendLine(";");
-            }
+                sb.AppendLine($"                hash += {RenderAsso(key - 1)};");
         } while (--key > minLen);
 
         if (key == minLen)
-            sb.Append("            case ").Append(minLen).AppendLine(":");
+            sb.AppendLine($"            case {minLen}:");
 
         sb.Append("""
                                   break;
@@ -88,10 +79,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
                   """);
 
         if (key == -1)
-        {
-            sb.Append(" + ");
-            RenderAsso(sb, -1);
-        }
+            sb.Append($" + {RenderAsso(-1)}");
 
         sb.Append(';');
 
@@ -105,7 +93,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
         // Render each position. We should get "asso[str[x]] + asso[str[y]] + ..."
         for (int i = 0; i < ctx.Positions.Length; i++)
         {
-            RenderAsso(sb, ctx.Positions[i]);
+            sb.Append(RenderAsso(ctx.Positions[i]));
 
             if (i < ctx.Positions.Length - 1)
                 sb.Append(" + ");
@@ -115,19 +103,13 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
         return sb.ToString();
     }
 
-    private void RenderAsso(StringBuilder sb, int pos)
+    private string RenderAsso(int pos)
     {
         if (pos == -1)
-            sb.Append("static_cast<uint32_t>(asso[str[str.length() - 1]])");
-        else
-        {
-            sb.Append("static_cast<uint32_t>(asso[str[").Append(pos).Append(']');
+            return "static_cast<uint32_t>(_asso[str[str.Length - 1]])";
 
-            if (ctx.AlphaIncrements[pos] != 0)
-                sb.Append('+').Append(ctx.AlphaIncrements[pos]);
-
-            sb.Append("])");
-        }
+        int inc = ctx.AlphaIncrements[pos];
+        return $"static_cast<uint32_t>(_asso[str[{pos}]{(inc != 0 ? $" + {inc}" : "")}])";
     }
 
     private static IEnumerable<string?> WrapWords(KeyValuePair<string, uint>[] items)

@@ -7,7 +7,7 @@
 class my_data
 {
 public:
-    static bool contains(const uint16_t& value)
+    static bool contains(const uint16_t value)
     {
         return value == 1;
     }

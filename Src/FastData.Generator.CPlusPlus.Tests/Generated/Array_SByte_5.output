@@ -11,7 +11,7 @@ class my_data
     };
 
 public:
-    static bool contains(const int8_t& value)
+    static bool contains(const int8_t value)
     {
         if (value < -128 || value > 127)
             return false;

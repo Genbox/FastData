@@ -11,7 +11,7 @@ class my_data
         int32_t value;
         uint32_t hash_code;
 
-        e(const int32_t& value, const uint32_t hash_code)
+        e(const int32_t value, const uint32_t hash_code)
         : value(value), hash_code(hash_code) {}
     };
 
@@ -25,7 +25,7 @@ class my_data
     }
 
 public:
-    static bool contains(const int32_t& value)
+    static bool contains(const int32_t value)
     {
         if (value < -2147483648 || value > 2147483647)
             return false;

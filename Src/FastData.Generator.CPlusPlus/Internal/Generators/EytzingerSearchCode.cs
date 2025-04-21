@@ -4,12 +4,12 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, CPlusPlusGener
 {
     public string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}} std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> entries = {
+              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> entries = {
           {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
           public:
-              {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
+              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
 

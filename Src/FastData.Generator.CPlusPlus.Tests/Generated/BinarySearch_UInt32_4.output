@@ -11,7 +11,7 @@ class my_data
     };
 
 public:
-    static bool contains(const uint32_t& value)
+    static bool contains(const uint32_t value)
     {
         if (value < 0u || value > 4294967295u)
             return false;

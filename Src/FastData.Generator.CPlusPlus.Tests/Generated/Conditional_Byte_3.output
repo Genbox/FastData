@@ -7,7 +7,7 @@
 class my_data
 {
 public:
-    static bool contains(const uint8_t& value)
+    static bool contains(const uint8_t value)
     {
         if (value < 0 || value > 255)
             return false;

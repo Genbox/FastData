@@ -7,7 +7,7 @@
 class my_data
 {
 public:
-    static bool contains(const int64_t& value)
+    static bool contains(const int64_t value)
     {
         return value == 1ll;
     }

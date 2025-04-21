@@ -7,7 +7,7 @@
 class my_data
 {
 public:
-    static bool contains(const bool& value)
+    static bool contains(const bool value)
     {
 
 

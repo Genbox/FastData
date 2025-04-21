@@ -5,7 +5,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CPlusPlusGenerator
     public string Generate()
         => $$"""
              public:
-                 {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
+                 {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
                  {
              {{cfg.GetEarlyExits(genCfg)}}
 

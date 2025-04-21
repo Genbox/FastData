@@ -12,12 +12,12 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorCo
         string?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()).ToArray();
 
         return $$"""
-                     {{cfg.GetFieldModifier()}} std::array<{{genCfg.GetTypeName()}}, {{lengths.Length}}> entries = {
+                     {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{lengths.Length}}> entries = {
                  {{FormatColumns(lengths, RenderOne)}}
                      };
 
                  public:
-                     {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
+                     {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
 
@@ -31,12 +31,12 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorCo
         List<string>?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Take((int)((ctx.MaxLength - ctx.MinLength) + 1)).ToArray();
 
         return $$"""
-                     {{cfg.GetFieldModifier()}} std:array<std:vector<{{genCfg.GetTypeName()}}>, {{lengths.Length}}> entries = {
+                     {{cfg.GetFieldModifier()}}std:array<std:vector<{{genCfg.GetTypeName()}}>, {{lengths.Length}}> entries = {
                  {{FormatList(lengths, RenderMany, ",\n")}}
                      };
 
                  public:
-                     {{cfg.GetMethodModifier()}} bool contains(const {{genCfg.GetTypeName()}}& value)
+                     {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}}& value)
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
                          std::vector<{{genCfg.GetTypeName()}}> bucket = entries[value.length() - {{ctx.MinLength}}];
