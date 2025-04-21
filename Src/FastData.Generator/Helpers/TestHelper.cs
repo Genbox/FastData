@@ -107,7 +107,10 @@ public static class TestHelper
             else if (type == StructureType.PerfectHashGPerf)
             {
                 //GPerf only supports strings
-                yield return (type, ["1", "2", "a", "aa", "aaa", "item", new string('a', 255)]);
+                yield return (type, ["a", "b"]); //Minimum test case
+                yield return (type, ["aaaaaaaaaa", "bbbbbbbbbb", "cccccccccc"]); //Same length (and longer than 1)
+                yield return (type, ["item1", "item2", "item3", "item4"]); //Only differ on 1 char
+                yield return (type, ["1", "2", "a", "aa", "aaa", "item", new string('a', 255)]); //Test long strings
             }
             else
             {

@@ -73,6 +73,7 @@ internal static class MyData
                 hash += (uint)_asso[str[1]];
                 goto case 1;
             case 1:
+                hash += (uint)_asso[str[0]];
                 break;
         }
 

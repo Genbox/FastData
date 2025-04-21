@@ -1,0 +1,66 @@
+// This file is auto-generated. Do not edit manually.
+// Structure: PerfectHashGPerf
+#pragma once
+#include <string>
+#include <array>
+#include <cstdint>
+
+class my_data
+{
+    static constexpr std::array<uint8_t, 256> asso = {
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 1, 0, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2
+    };
+
+    static constexpr std::array<std::string, 2> items = {
+        "b", "a"
+    };
+
+public:
+    static bool contains(const std::string& value)
+    {
+        if (const size_t len = value.length(); len != 1u)
+            return false;
+
+        const uint32_t hash = get_hash(value);
+
+        if (hash > 1)
+            return false;
+
+        return value == items[hash];
+    }
+
+    static uint32_t get_hash(const std::string& str)
+    {
+        return static_cast<uint32_t>(_asso[str[0]]);
+    }
+
+
+    static constexpr unsigned int item_count = 2;
+    static constexpr int min_length = 1;
+    static constexpr int max_length = 1;
+};

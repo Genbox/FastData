@@ -71,6 +71,9 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
         if (key == minLen)
             sb.AppendLine($"            case {minLen}:");
 
+        if (ctx.Positions.Contains(key))
+            sb.AppendLine($"                hash += {RenderAsso(key - 1)};");
+
         sb.Append("""
                                   break;
                           }

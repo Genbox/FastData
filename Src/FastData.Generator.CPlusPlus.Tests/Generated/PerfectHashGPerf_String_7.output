@@ -67,6 +67,7 @@ public:
             case 2:
                 hash += static_cast<uint32_t>(_asso[str[1]]);
             case 1:
+                hash += static_cast<uint32_t>(_asso[str[0]]);
                 break;
         }
 
