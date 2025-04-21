@@ -28,6 +28,8 @@ public sealed class SharedCode
         }
     }
 
+    public void Clear() => _cache.Clear();
+
     private readonly struct CodeKey : IEquatable<CodeKey>
     {
         public CodeKey(string id, CodeType type)

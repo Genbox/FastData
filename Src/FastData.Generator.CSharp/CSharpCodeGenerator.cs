@@ -11,6 +11,8 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
     public string Generate(GeneratorConfig genCfg, IContext context)
     {
         _sb.Clear();
+        SharedCode.Instance.Clear();
+
         AppendHeader(genCfg);
 
         _sb.Append(context switch
