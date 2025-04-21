@@ -17,10 +17,10 @@ public class GeneratorTests
     }
 
     [Theory]
-    [MemberData(nameof(GetDataStructures))]
-    internal void GenerateDataStructure(StructureType structureType, object[] data)
+    [MemberData(nameof(GetStructureTypes))]
+    internal void GenerateStructureType(StructureType structureType, object[] data)
     {
-        if (!TestHelper.TryGenerateDataStructure(_generator, structureType, data, out GeneratorSpec spec))
+        if (!TestHelper.TryGenerate(_generator, structureType, data, out GeneratorSpec spec))
             return;
 
         Assert.NotEmpty(spec.Source);
@@ -54,7 +54,7 @@ public class GeneratorTests
         }
     }
 
-    public static TheoryData<StructureType, object[]> GetDataStructures()
+    public static TheoryData<StructureType, object[]> GetStructureTypes()
     {
         TheoryData<StructureType, object[]> res = new TheoryData<StructureType, object[]>();
 
