@@ -4,5 +4,5 @@ namespace Genbox.FastData.Abstracts;
 
 public interface IGenerator
 {
-    string Generate(GeneratorConfig genCfg, IContext context);
+    bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source);
 }

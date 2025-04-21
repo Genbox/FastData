@@ -7,7 +7,7 @@ public class RustCodeGenerator(RustGeneratorConfig userCfg) : IGenerator
 {
     private readonly StringBuilder _sb = new StringBuilder();
 
-    public string Generate(GeneratorConfig genCfg, IContext context)
+    public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source)
     {
         _sb.Clear();
         SharedCode.Instance.Clear();
@@ -36,7 +36,8 @@ public class RustCodeGenerator(RustGeneratorConfig userCfg) : IGenerator
             _sb.AppendLine()
                .AppendLine(cls);
 
-        return _sb.ToString();
+        source = _sb.ToString();
+        return true;
     }
 
     private void AppendHeader(GeneratorConfig genCfg)

@@ -17,6 +17,6 @@ public class GenericTests
 
     private class DummyGenerator : IGenerator
     {
-        public string Generate(GeneratorConfig genCfg, IContext context) => throw new NotSupportedException();
+        public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source) => throw new NotSupportedException();
     }
 }

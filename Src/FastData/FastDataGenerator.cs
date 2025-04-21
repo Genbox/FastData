@@ -31,8 +31,7 @@ public static class FastDataGenerator
             if (TryCreateStructure(candidate, data, props, fdCfg, out IHashSpec? hashSpec, out IContext? context))
             {
                 GeneratorConfig genCfg = new GeneratorConfig(fdCfg.StructureType, fdCfg.StringComparison, props, hashSpec ?? DefaultHashSpec.Instance);
-                source = generator.Generate(genCfg, context!);
-                return true;
+                return generator.TryGenerate(genCfg, context, out source);
             }
         }
 

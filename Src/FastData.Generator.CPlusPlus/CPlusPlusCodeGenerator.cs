@@ -7,7 +7,7 @@ public class CPlusPlusCodeGenerator(CPlusPlusGeneratorConfig userCfg) : IGenerat
 {
     private readonly StringBuilder _sb = new StringBuilder();
 
-    public string Generate(GeneratorConfig genCfg, IContext context)
+    public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source)
     {
         _sb.Clear();
         AppendHeader(genCfg);
@@ -28,7 +28,8 @@ public class CPlusPlusCodeGenerator(CPlusPlusGeneratorConfig userCfg) : IGenerat
         });
 
         AppendFooter(genCfg);
-        return _sb.ToString();
+        source = _sb.ToString();
+        return true;
     }
 
     private void AppendHeader(GeneratorConfig genCfg)
