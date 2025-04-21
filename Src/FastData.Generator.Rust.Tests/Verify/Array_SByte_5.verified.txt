@@ -1,0 +1,28 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Array
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    const ENTRIES: [i8; 5] = [
+        -128, -1, 0, 1, 127
+    ];
+
+    pub fn contains(value: i8) -> bool {
+        if value < -128 || value > 127 {
+            return false;
+        }
+
+        for entry in Self::ENTRIES.iter() {
+            if value == *entry {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_VALUE: i8 = -128;
+    pub const MAX_VALUE: i8 = 127;
+}

@@ -1,0 +1,24 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Conditional
+#pragma once
+#include <array>
+#include <cstdint>
+
+class my_data
+{
+public:
+    static bool contains(const int64_t value)
+    {
+        if (value < -9223372036854775808ll || value > 9223372036854775807ll)
+            return false;
+
+        if (value == -9223372036854775808ll || value == -1ll || value == 0ll || value == 1ll || value == 9223372036854775807ll)
+            return true;
+
+        return false;
+    }
+
+    static constexpr unsigned int item_count = 5;
+    static constexpr int64_t min_value = -9223372036854775808ll;
+    static constexpr int64_t max_value = 9223372036854775807ll;
+};

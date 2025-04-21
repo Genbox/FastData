@@ -1,0 +1,23 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Conditional
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    pub fn contains(value: f32) -> bool {
+        if value < -340282346638529000000000000000000000000.0 || value > 340282346638529000000000000000000000000.0 {
+            return false;
+        }
+
+        if value == -340282300000000000000000000000000000000.0 || value == -1.0 || value == 0.0 || value == 1.0 || value == 340282300000000000000000000000000000000.0 {
+            return true;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_VALUE: f32 = -340282346638529000000000000000000000000.0;
+    pub const MAX_VALUE: f32 = 340282346638529000000000000000000000000.0;
+}

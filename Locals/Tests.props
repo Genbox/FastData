@@ -1,0 +1,8 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <ItemGroup>
+    <PackageReference Include="Verify.DiffPlex" PrivateAssets="All" />
+    <PackageReference Include="Verify.Xunit" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>

@@ -12,6 +12,9 @@ public class GenericTests
         Assert.Throws<InvalidOperationException>(() => FastDataGenerator.TryGenerate(["item", "item"], config, new DummyGenerator(), out _));
     }
 
+    [Fact]
+    public Task VerifyChecksTest() => VerifyChecks.Run();
+
     private class DummyGenerator : IGenerator
     {
         public string Generate(GeneratorConfig genCfg, IContext context) => throw new NotSupportedException();

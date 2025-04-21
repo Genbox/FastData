@@ -31,3 +31,5 @@
 
 # Others
 Publish/
+*.received.*
+*.received/

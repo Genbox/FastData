@@ -1,0 +1,40 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+
+class my_data
+{
+    static constexpr std::array<uint8_t, 3> entries = {
+        0, 1, 255
+    };
+
+public:
+    static bool contains(const uint8_t value)
+    {
+        if (value < 0 || value > 255)
+            return false;
+
+        int lo = 0;
+        int hi = 2;
+        while (lo <= hi)
+        {
+            const int i = lo + ((hi - lo) >> 1);
+            const int order = (value > entries[i]) - (value < entries[i]);
+
+            if (order == 0)
+                return true;
+            if (order < 0)
+                lo = i + 1;
+            else
+                hi = i - 1;
+        }
+
+        return ~lo >= 0;
+    }
+
+    static constexpr unsigned int item_count = 3;
+    static constexpr uint8_t min_value = 0;
+    static constexpr uint8_t max_value = 255;
+};

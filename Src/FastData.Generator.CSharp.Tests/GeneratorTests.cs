@@ -18,14 +18,17 @@ public class GeneratorTests
 
     [Theory]
     [MemberData(nameof(GetStructureTypes))]
-    internal void GenerateStructureType(StructureType structureType, object[] data)
+    internal async Task GenerateStructureType(StructureType structureType, object[] data)
     {
         if (!TestHelper.TryGenerate(_generator, structureType, data, out GeneratorSpec spec))
             return;
 
         Assert.NotEmpty(spec.Source);
 
-        File.WriteAllText($@"..\..\..\Generated\{spec.Identifier}.output", spec.Source);
+        await Verify(spec.Source)
+              .UseFileName(spec.Identifier)
+              .UseDirectory("Verify")
+              .DisableDiff();
 
         if (spec.DataType == DataType.String)
         {

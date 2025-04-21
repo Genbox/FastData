@@ -1,0 +1,15 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: SingleValue
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    pub fn contains(value: i8) -> bool {
+        return value == 1;
+    }
+
+    pub const ITEM_COUNT: usize = 1;
+    pub const MIN_VALUE: i8 = 1;
+    pub const MAX_VALUE: i8 = 1;
+}

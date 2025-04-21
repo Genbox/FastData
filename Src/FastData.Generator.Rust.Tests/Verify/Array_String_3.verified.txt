@@ -1,0 +1,28 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Array
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    const ENTRIES: [&str; 3] = [
+        "a", "item", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ];
+
+    pub fn contains(value: &str) -> bool {
+        if value.len() < 1 || value.len() > 255 {
+            return false;
+        }
+
+        for entry in Self::ENTRIES.iter() {
+            if value == *entry {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_LENGTH: usize = 1;
+    pub const MAX_LENGTH: usize = 255;
+}

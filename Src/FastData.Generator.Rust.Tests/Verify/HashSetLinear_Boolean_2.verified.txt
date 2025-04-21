@@ -1,0 +1,47 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashSetLinear
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    const BUCKETS: [B; 7] = [
+        B { start_index: 0, end_index: 0 }, B { start_index: 1, end_index: 1 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }
+    ];
+
+    const ITEMS: [bool; 2] = [
+        false, true
+    ];
+
+    const HASH_CODES: [u32; 2] = [
+        0, 1
+    ];
+
+    fn get_hash(value: bool) -> u32 {
+        (value as u32)
+    }
+
+    pub fn contains(value: bool) -> bool {
+
+
+        let hash = Self::get_hash(value);
+        let bucket = &Self::BUCKETS[(hash % 7) as usize];
+        let mut index: u8 = bucket.start_index;
+        let end_index: u8 = bucket.end_index;
+
+        while index <= end_index {
+            if Self::HASH_CODES[index as usize] == hash && value == Self::ITEMS[index as usize] {
+                return true;
+            }
+            index += 1;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 2;
+}
+struct B {
+    start_index: u8,
+    end_index: u8,
+}

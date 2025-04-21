@@ -1,0 +1,23 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Conditional
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    pub fn contains(value: u16) -> bool {
+        if value < 0 || value > 65535 {
+            return false;
+        }
+
+        if value == 0 || value == 1 || value == 2 || value == 65535 {
+            return true;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 4;
+    pub const MIN_VALUE: u16 = 0;
+    pub const MAX_VALUE: u16 = 65535;
+}

@@ -1,0 +1,23 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Conditional
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    pub fn contains(value: &str) -> bool {
+        if value.len() < 1 || value.len() > 255 {
+            return false;
+        }
+
+        if value == "a" || value == "item" || value == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" {
+            return true;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_LENGTH: usize = 1;
+    pub const MAX_LENGTH: usize = 255;
+}

@@ -1,0 +1,28 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Array
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    const ENTRIES: [u64; 4] = [
+        0, 1, 2, 18446744073709551615
+    ];
+
+    pub fn contains(value: u64) -> bool {
+        if value < 0 || value > 18446744073709551615 {
+            return false;
+        }
+
+        for entry in Self::ENTRIES.iter() {
+            if value == *entry {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 4;
+    pub const MIN_VALUE: u64 = 0;
+    pub const MAX_VALUE: u64 = 18446744073709551615;
+}

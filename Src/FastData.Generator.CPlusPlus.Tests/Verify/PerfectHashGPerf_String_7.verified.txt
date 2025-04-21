@@ -1,0 +1,81 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: PerfectHashGPerf
+#pragma once
+#include <string>
+#include <array>
+#include <cstdint>
+
+class my_data
+{
+    static constexpr std::array<uint8_t, 256> asso = {
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 7, 
+        2, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 5, 21, 21, 
+        21, 0, 21, 21, 21, 0, 21, 21, 21, 0, 
+        21, 21, 21, 21, 21, 21, 0, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
+        21, 21, 21, 21, 21, 21
+    };
+
+    static constexpr std::array<std::string, 21> items = {
+        "item", "", "2", "", "", "a", "", "1", "", "", 
+        "aa", "", "", "", "", "aaa", "", "", "", "", 
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    };
+
+public:
+    static bool contains(const std::string& value)
+    {
+        if (const size_t len = value.length(); len < 1u || len > 255u)
+            return false;
+
+        const uint32_t hash = get_hash(value);
+
+        if (hash > 20)
+            return false;
+
+        return value == items[hash];
+    }
+
+    static uint32_t get_hash(const std::string& str)
+    {
+        uint32_t hash = 0;
+        switch (str.length())
+        {
+            default:
+                hash += static_cast<uint32_t>(_asso[str[3]]);            case 3:
+                hash += static_cast<uint32_t>(_asso[str[2]]);
+            case 2:
+                hash += static_cast<uint32_t>(_asso[str[1]]);
+            case 1:
+                hash += static_cast<uint32_t>(_asso[str[0]]);
+                break;
+        }
+
+        return hash;
+    }
+
+
+    static constexpr unsigned int item_count = 7;
+    static constexpr int min_length = 1;
+    static constexpr int max_length = 255;
+};
