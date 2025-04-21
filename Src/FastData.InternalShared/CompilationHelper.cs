@@ -10,8 +10,13 @@ namespace Genbox.FastData.InternalShared;
 
 public static class CompilationHelper
 {
-    /// <summary>This is used to wrap a hash function and get it as a delegate</summary>
     public static T GetDelegate<T>(string source, bool release) where T : Delegate
+    {
+        return GetDelegate<T>(source, static types => types[0], release);
+    }
+
+    /// <summary>This is used to wrap a hash function and get it as a delegate</summary>
+    public static T GetDelegate<T>(string source, Func<Type[], Type> typeFilter, bool release) where T : Delegate
     {
         CSharpCompilation compilation = CreateCompilation(source, release, typeof(T), typeof(DisplayAttribute));
 
@@ -19,10 +24,7 @@ public static class CompilationHelper
             throw new InvalidOperationException("Unable to compile delegate. Errors: " + string.Join('\n', diagnostics.Select(x => x.ToString())));
 
         Type[] types = assembly.GetTypes();
-        Type? type = types[0]; //We should only have one type
-
-        if (type == null)
-            throw new InvalidOperationException("Unable to find type");
+        Type type = typeFilter(types);
 
         MethodInfo me = type.GetMethods()[0];
         return me.CreateDelegate<T>();

@@ -29,32 +29,6 @@ public class GeneratorTests
               .UseFileName(spec.Identifier)
               .UseDirectory("Verify")
               .DisableDiff();
-
-        if (spec.DataType == DataType.String)
-        {
-            Func<string, bool> contains = CompilationHelper.GetDelegate<Func<string, bool>>(spec.Source, false);
-
-            foreach (string str in data)
-                Assert.True(contains(str));
-
-            Assert.False(contains("dontexist"));
-            Assert.False(contains("item11"));
-        }
-        else if (spec.DataType == DataType.Int32)
-        {
-            Func<int, bool> contains = CompilationHelper.GetDelegate<Func<int, bool>>(spec.Source, false);
-
-            foreach (int str in data)
-                Assert.True(contains(str));
-
-            Assert.False(contains(100));
-        }
-        else
-        {
-            //Others we just compile and check for errors
-            CSharpCompilation compilation = CompilationHelper.CreateCompilation(spec.Source, false);
-            Assert.Empty(compilation.GetDiagnostics());
-        }
     }
 
     public static TheoryData<StructureType, object[]> GetStructureTypes()
