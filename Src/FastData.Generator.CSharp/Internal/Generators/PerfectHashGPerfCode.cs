@@ -38,7 +38,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
         //IQ: We also assume that positions are listed in descending order
 
         //We need to know the shortest string
-        int minLen = ctx.Items.Min(x => x.Key.Length); //TODO: Make this kind of data available to generators again? or maybe special valus in context?
+        uint minLen = (uint)genCfg.Constants.MinValue;
 
         //We start with the highest position.
         int key = ctx.Positions[0];
@@ -47,19 +47,15 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
         if (key == -1 || key < minLen)
             return RenderExpression();
 
-        StringBuilder sb = new StringBuilder("""
-                                                     uint hash = 0;
-                                                     switch (str.Length)
-                                                     {
-                                                         default:
+        StringBuilder sb = new StringBuilder($$"""
+                                                       uint hash = 0;
+                                                       switch (str.Length)
+                                                       {
+                                                           default:
+                                                               hash += {{RenderAsso(key)}};
+                                                               goto case {{key}};
 
-                                             """);
-
-        // Output the default case
-        sb.Append("                hash += ");
-        RenderAsso(sb, key);
-        sb.AppendLine(";");
-        sb.AppendLine($"                goto case {key};");
+                                               """);
 
         // Output all the other cases
         do
@@ -67,31 +63,24 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
             sb.AppendLine($"            case {key}:");
 
             if (ctx.Positions.Contains(key - 1))
-            {
-                sb.Append("                hash += ");
-                RenderAsso(sb, key - 1);
-                sb.AppendLine(";");
-            }
+                sb.AppendLine($"                hash += {RenderAsso(key - 1)};");
 
             if (key != minLen)
                 sb.AppendLine($"                goto case {key - 1};");
         } while (--key > minLen);
 
         if (key == minLen)
-            sb.Append("            case ").Append(minLen).AppendLine(":");
+            sb.AppendLine($"            case {minLen}:");
 
         sb.Append("""
                                   break;
-                              }
+                          }
 
-                              return hash
+                          return hash
                   """);
 
         if (key == -1)
-        {
-            sb.Append(" + ");
-            RenderAsso(sb, -1);
-        }
+            sb.Append($" + {RenderAsso(-1)}");
 
         sb.Append(';');
 
@@ -105,7 +94,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
         // Render each position. We should get "asso[str[x]] + asso[str[y]] + ..."
         for (int i = 0; i < ctx.Positions.Length; i++)
         {
-            RenderAsso(sb, ctx.Positions[i]);
+            sb.Append(RenderAsso(ctx.Positions[i]));
 
             if (i < ctx.Positions.Length - 1)
                 sb.Append(" + ");
@@ -115,19 +104,13 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
         return sb.ToString();
     }
 
-    private void RenderAsso(StringBuilder sb, int pos)
+    private string RenderAsso(int pos)
     {
         if (pos == -1)
-            sb.Append("(uint)_asso[str[str.Length - 1]]");
-        else
-        {
-            sb.Append("(uint)_asso[str[").Append(pos).Append(']');
+            return "(uint)_asso[str[str.Length - 1]]";
 
-            if (ctx.AlphaIncrements[pos] != 0)
-                sb.Append('+').Append(ctx.AlphaIncrements[pos]);
-
-            sb.Append(']');
-        }
+        int inc = ctx.AlphaIncrements[pos];
+        return $"(uint)_asso[str[{pos}]{(inc != 0 ? $" + {inc}" : "")}]";
     }
 
     private static IEnumerable<string?> WrapWords(KeyValuePair<string, uint>[] items)

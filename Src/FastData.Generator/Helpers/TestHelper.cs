@@ -104,6 +104,11 @@ public static class TestHelper
                 foreach (object[] data in GetSingleSets())
                     yield return (type, data);
             }
+            else if (type == StructureType.PerfectHashGPerf)
+            {
+                //GPerf only supports strings
+                yield return (type, ["1", "2", "a", "aa", "aaa", "item", new string('a', 255)]);
+            }
             else
             {
                 foreach (object[] data in GetEdgeCaseSets())
