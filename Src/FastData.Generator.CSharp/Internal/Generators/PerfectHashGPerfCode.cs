@@ -4,7 +4,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
 {
     public string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}{{GetSmallestSignedType(ctx.MaxHash + 1)}}[] _asso = new {{GetSmallestSignedType(ctx.MaxHash + 1)}}[] {
+              {{cfg.GetFieldModifier()}}{{GetSmallestUnsignedType(ctx.MaxHash + 1)}}[] _asso = new {{GetSmallestUnsignedType(ctx.MaxHash + 1)}}[] {
           {{FormatColumns(ctx.AssociationValues, RenderAssociativeValue)}}
               };
 

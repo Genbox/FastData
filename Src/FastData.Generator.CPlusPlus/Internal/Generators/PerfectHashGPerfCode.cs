@@ -7,7 +7,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
         string?[] items = WrapWords(ctx.Items).ToArray();
 
         return $$"""
-                     {{cfg.GetFieldModifier()}}std::array<{{GetSmallestSignedType(ctx.MaxHash + 1)}}, {{ctx.AssociationValues.Length}}> asso = {
+                     {{cfg.GetFieldModifier()}}std::array<{{GetSmallestUnsignedType(ctx.MaxHash + 1)}}, {{ctx.AssociationValues.Length}}> asso = {
                  {{FormatColumns(ctx.AssociationValues, RenderAssociativeValue)}}
                      };
 

@@ -7,7 +7,7 @@
 
 class my_data
 {
-    static constexpr std::array<int8_t, 256> asso = {
+    static constexpr std::array<uint8_t, 256> asso = {
         21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
         21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
         21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
