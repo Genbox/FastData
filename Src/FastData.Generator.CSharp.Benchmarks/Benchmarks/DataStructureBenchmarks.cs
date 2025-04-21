@@ -5,7 +5,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.InternalShared;
 using Genbox.FastFilter;

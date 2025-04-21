@@ -1,9 +1,6 @@
 using System.Collections.Immutable;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using Genbox.FastData.Configs;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;

@@ -1,6 +1,3 @@
-using System.Globalization;
-using Genbox.FastData.Enums;
-
 namespace Genbox.FastData.Generator.CSharp.Internal.Helpers;
 
 internal static class CodeHelper

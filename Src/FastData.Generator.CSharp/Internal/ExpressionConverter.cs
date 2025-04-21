@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using System.Text;
 
 namespace Genbox.FastData.Generator.CSharp.Internal;
 

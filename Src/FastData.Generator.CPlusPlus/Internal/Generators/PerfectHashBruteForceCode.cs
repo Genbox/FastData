@@ -1,9 +1,3 @@
-using System.Text;
-using Genbox.FastData.Abstracts;
-using Genbox.FastData.Configs;
-using Genbox.FastData.Contexts;
-using Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
-
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CPlusPlusGeneratorConfig cfg, PerfectHashBruteForceContext ctx) : IOutputWriter

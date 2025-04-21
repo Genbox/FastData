@@ -1,6 +1,3 @@
-using Genbox.FastData.Configs;
-using Genbox.FastData.Enums;
-
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
 
 internal static class GeneratorConfigExtensions
