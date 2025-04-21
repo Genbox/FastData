@@ -1,0 +1,70 @@
+//! This file is auto-generated. Do not edit manually.
+//! Structure: HashSetLinear
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    const BUCKETS: [B; 11] = [
+        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 1, end_index: 1 }, B { start_index: 0, end_index: 0 }, B { start_index: 2, end_index: 2 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, 
+        B { start_index: 0, end_index: 0 }
+    ];
+
+    const ITEMS: [&'static str; 3] = [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "item", "a"
+    ];
+
+    const HASH_CODES: [u32; 3] = [
+        2265191819, 1949155672, 972181027
+    ];
+
+    fn get_hash(value: &str) -> u32 {
+        let mut hash1: u32 = 5381;
+        let mut hash2: u32 = 5381;
+
+        for chunk in value.as_bytes().chunks(8) {
+            if chunk.len() >= 4 {
+                let part1 = u32::from_le_bytes(chunk[0..4].try_into().unwrap());
+                hash1 = hash1.rotate_left(5) ^ part1;
+            }
+            if chunk.len() == 8 {
+                let part2 = u32::from_le_bytes(chunk[4..8].try_into().unwrap());
+                hash2 = hash2.rotate_left(5) ^ part2;
+            }
+        }
+
+        for &b in value.as_bytes().iter().skip(value.len() / 8 * 8) {
+            hash2 = hash2.rotate_left(5) ^ b as u32;
+        }
+
+        hash1.wrapping_add(hash2.wrapping_mul(0x5D588B65))
+    }
+
+    pub fn contains(value: &'static str) -> bool {
+        if value.len() < 1 || value.len() > 255 {
+            return false;
+        }
+
+        let hash = Self::get_hash(value);
+        let bucket = &Self::BUCKETS[(hash % 11) as usize];
+        let mut index: u8 = bucket.start_index;
+        let end_index: u8 = bucket.end_index;
+
+        while index <= end_index {
+            if Self::HASH_CODES[index as usize] == hash && value == Self::ITEMS[index as usize] {
+                return true;
+            }
+            index += 1;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_LENGTH: usize = 1;
+    pub const MAX_LENGTH: usize = 255;
+}
+struct B {
+    start_index: u8,
+    end_index: u8,
+}

@@ -1,0 +1,19 @@
+//! This file is auto-generated. Do not edit manually.
+//! Structure: Conditional
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    pub fn contains(value: bool) -> bool {
+
+
+        if value == true || value == false {
+            return true;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 2;
+}

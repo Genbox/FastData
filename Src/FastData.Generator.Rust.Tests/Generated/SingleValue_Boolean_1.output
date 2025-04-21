@@ -1,0 +1,13 @@
+//! This file is auto-generated. Do not edit manually.
+//! Structure: SingleValue
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    pub fn contains(value: bool) -> bool {
+        return value == true;
+    }
+
+    pub const ITEM_COUNT: usize = 1;
+}

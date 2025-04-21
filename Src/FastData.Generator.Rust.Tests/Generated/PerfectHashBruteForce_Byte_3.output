@@ -1,0 +1,35 @@
+//! This file is auto-generated. Do not edit manually.
+//! Structure: PerfectHashBruteForce
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    const ENTRIES: [E; 3] = [
+        E { value: 1, hash_code: 0 }, E { value: 0, hash_code: 1 }, E { value: 255, hash_code: 254 }
+    ];
+
+    fn get_hash(value: u8, seed: u32) -> u32 {
+        (value as u32) ^ seed
+    }
+
+    pub fn contains(value: u8) -> bool {
+        if value < 0 || value > 255 {
+            return false;
+        }
+
+        let hash = Self::get_hash(value, 1);
+        let index = (hash % 3) as usize;
+        let entry = &Self::ENTRIES[index];
+
+        hash == entry.hash_code && value == entry.value
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_VALUE: u8 = 0;
+    pub const MAX_VALUE: u8 = 255;
+}
+struct E {
+    value: u8,
+    hash_code: u32,
+}

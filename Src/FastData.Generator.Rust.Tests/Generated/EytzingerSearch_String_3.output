@@ -1,0 +1,37 @@
+//! This file is auto-generated. Do not edit manually.
+//! Structure: EytzingerSearch
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    const ENTRIES: [&str; 3] = [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "a", "item"
+    ];
+
+    pub fn contains(value: &str) -> bool {
+        if value.len() < 1 || value.len() > 255 {
+            return false;
+        }
+
+        let mut i: usize = 0;
+        while i < Self::ENTRIES.len() {
+            let comparison = Self::ENTRIES[i].cmp(value) as i32;
+
+            if comparison == 0 {
+                return true;
+            }
+            if comparison < 0 {
+                i = 2 * i + 2;
+            } else {
+                i = 2 * i + 1;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_LENGTH: usize = 1;
+    pub const MAX_LENGTH: usize = 255;
+}

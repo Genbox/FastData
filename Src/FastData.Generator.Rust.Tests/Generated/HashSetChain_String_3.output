@@ -1,0 +1,66 @@
+//! This file is auto-generated. Do not edit manually.
+//! Structure: HashSetChain
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+pub struct MyData;
+
+impl MyData {
+    const BUCKETS: [i8; 3] = [
+        0, 2, 3
+    ];
+
+    const ENTRIES: [E; 3] = [
+        E { hash_code: 972181027, next: -1, value: "a" }, E { hash_code: 1949155672, next: 0, value: "item" }, E { hash_code: 2265191819, next: -1, value: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+    ];
+
+    fn get_hash(value: &str) -> u32 {
+        let mut hash1: u32 = 5381;
+        let mut hash2: u32 = 5381;
+
+        for chunk in value.as_bytes().chunks(8) {
+            if chunk.len() >= 4 {
+                let part1 = u32::from_le_bytes(chunk[0..4].try_into().unwrap());
+                hash1 = hash1.rotate_left(5) ^ part1;
+            }
+            if chunk.len() == 8 {
+                let part2 = u32::from_le_bytes(chunk[4..8].try_into().unwrap());
+                hash2 = hash2.rotate_left(5) ^ part2;
+            }
+        }
+
+        for &b in value.as_bytes().iter().skip(value.len() / 8 * 8) {
+            hash2 = hash2.rotate_left(5) ^ b as u32;
+        }
+
+        hash1.wrapping_add(hash2.wrapping_mul(0x5D588B65))
+    }
+
+    pub fn contains(value: &str) -> bool {
+        if value.len() < 1 || value.len() > 255 {
+            return false;
+        }
+
+        let hash = Self::get_hash(value);
+        let index = hash % 3;
+        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+
+        while i >= 0 {
+            let entry = &Self::ENTRIES[i as usize];
+            if entry.hash_code == hash && value == entry.value {
+                return true;
+            }
+            i = entry.next;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_LENGTH: usize = 1;
+    pub const MAX_LENGTH: usize = 255;
+}
+struct E {
+    hash_code: u32,
+    next: i8,
+    value: &'static str,
+}
