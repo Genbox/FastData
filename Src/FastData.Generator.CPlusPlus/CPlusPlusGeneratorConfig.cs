@@ -1,3 +1,5 @@
+using Genbox.FastData.Generator.CPlusPlus.Enums;
+
 namespace Genbox.FastData.Generator.CPlusPlus;
 
 public sealed class CPlusPlusGeneratorConfig(string className)
