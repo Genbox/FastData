@@ -12,7 +12,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorCo
         string?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()).ToArray();
 
         return $$"""
-                     {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{lengths.Length}}> entries = {
+                     {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName(false)}}, {{lengths.Length}}> entries = {
                  {{FormatColumns(lengths, RenderOne)}}
                      };
 
@@ -21,7 +21,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorCo
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
 
-                         return {{genCfg.GetEqualFunction($"entries[value.length() - {ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}]")}};
+                         return value == entries[value.length() - {{ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}}];
                      }
                  """;
     }
@@ -46,7 +46,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorCo
 
                          foreach ({{genCfg.GetTypeName()}} str in bucket)
                          {
-                             if ({{genCfg.GetEqualFunction("str")}})
+                             if (str == value)
                                  return true;
                          }
 

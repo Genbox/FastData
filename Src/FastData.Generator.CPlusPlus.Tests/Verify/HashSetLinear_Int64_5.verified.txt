@@ -8,28 +8,28 @@ class my_data
 {
     struct b
     {
-        uint8_t start_index;
-        uint8_t end_index;
+        const uint8_t start_index;
+        const uint8_t end_index;
 
         b(const uint8_t start_index, const uint8_t end_index)
         : start_index(start_index), end_index(end_index) { }
     };
 
-    static constexpr std::array<b, 7> buckets = {
+    inline static const std::array<b, 7> buckets = {
         b(0, 1), b(2, 2), b(3, 4), b(0, 0), b(0, 0), b(0, 0), b(0, 0)
     };
 
-    static constexpr std::array<int64_t, 5> items = {
+    inline static const std::array<int64_t, 5> items = {
         0ll, -1ll, 1ll, 9223372036854775807ll, -9223372036854775808ll
     };
 
-    static constexpr std::array<uint32_t, 5> hash_codes = {
+    inline static const std::array<uint32_t, 5> hash_codes = {
         0, 0, 1, 2147483648, 2147483648
     };
 
     static uint32_t get_hash(const int64_t value)
     {
-        return reinterpret_cast<uint32_t>(value);
+        return static_cast<uint32_t>(value);
     }
 
 public:
@@ -45,7 +45,7 @@ public:
 
         while (index <= end_index)
         {
-            if (hash_codes[index] == hash && value == items[index])
+            if (hash_codes[index] == hash && items[index] == value)
                 return true;
 
             index++;

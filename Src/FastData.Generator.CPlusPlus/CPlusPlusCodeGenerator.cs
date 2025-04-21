@@ -9,6 +9,12 @@ public class CPlusPlusCodeGenerator(CPlusPlusGeneratorConfig userCfg) : IGenerat
 
     public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source)
     {
+        source = null;
+
+        //C++ generator does not support chars outside ASCII
+        if (genCfg.DataType == DataType.Char && (char)genCfg.Constants.MaxValue > 127)
+            return false;
+
         _sb.Clear();
         AppendHeader(genCfg);
 

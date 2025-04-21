@@ -6,7 +6,7 @@
 
 class my_data
 {
-    static constexpr std::array<int64_t, 5> entries = {
+    inline static const std::array<int64_t, 5> entries = {
         -9223372036854775808ll, -1ll, 0ll, 1ll, 9223372036854775807ll
     };
 
@@ -18,7 +18,7 @@ public:
 
         for (int i = 0; i < 5; i++)
         {
-            if (value == entries[i])
+            if (entries[i] == value)
                return true;
         }
         return false;

@@ -8,20 +8,20 @@ class my_data
 {
     struct e
     {
-        uint16_t value;
-        uint32_t hash_code;
+        const uint16_t value;
+        const uint32_t hash_code;
 
         e(const uint16_t value, const uint32_t hash_code)
         : value(value), hash_code(hash_code) {}
     };
 
-    static constexpr std::array<e, 4> entries = {
+    inline static const std::array<e, 4> entries = {
         e(1, 0u), e(0, 1u), e(65535, 65534u), e(2, 3u)
     };
 
     static uint32_t get_hash(const uint16_t value, const uint32_t seed)
     {
-        return reinterpret_cast<uint32_t>(value ^ seed);
+        return static_cast<uint32_t>(value) ^ seed;
     }
 
 public:

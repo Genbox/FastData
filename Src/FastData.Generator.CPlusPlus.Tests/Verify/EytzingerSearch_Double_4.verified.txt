@@ -6,7 +6,7 @@
 
 class my_data
 {
-    static constexpr std::array<double, 4> entries = {
+    inline static const std::array<double, 4> entries = {
         1, 0, 1.7976931348623157E+308, -1.7976931348623157E+308
     };
 
@@ -19,12 +19,10 @@ public:
         unsigned int i = 0;
         while (i < entries.size())
         {
-            const int comparison = (value > entries[i]) - (value < entries[i]);
-
-            if (comparison == 0)
+            if (entries[i] == value)
                 return true;
 
-            if (comparison < 0)
+            if (entries[i] < value)
                 i = 2 * i + 2;
             else
                 i = 2 * i + 1;

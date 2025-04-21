@@ -4,7 +4,7 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, CPlusPlusGener
 {
     public string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> entries = {
+              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName(false)}}, {{ctx.Data.Length}}> entries = {
           {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
@@ -16,12 +16,10 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, CPlusPlusGener
                   unsigned int i = 0;
                   while (i < entries.size())
                   {
-                      const int comparison = {{genCfg.GetCompareFunction("entries[i]")}};
-
-                      if (comparison == 0)
+                      if (entries[i] == value)
                           return true;
 
-                      if (comparison < 0)
+                      if (entries[i] < value)
                           i = 2 * i + 2;
                       else
                           i = 2 * i + 1;

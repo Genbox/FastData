@@ -6,7 +6,7 @@
 
 class my_data
 {
-    static constexpr std::array<uint64_t, 4> entries = {
+    inline static const std::array<uint64_t, 4> entries = {
         0ull, 1ull, 2ull, 18446744073709551615ull
     };
 
@@ -20,18 +20,18 @@ public:
         int hi = 3;
         while (lo <= hi)
         {
-            const int i = lo + ((hi - lo) >> 1);
-            const int order = (value > entries[i]) - (value < entries[i]);
+            const int mid = lo + ((hi - lo) >> 1);
 
-            if (order == 0)
+            if (entries[mid] == value)
                 return true;
-            if (order < 0)
-                lo = i + 1;
+
+            if (entries[mid] < value)
+                lo = mid + 1;
             else
-                hi = i - 1;
+                hi = mid - 1;
         }
 
-        return ~lo >= 0;
+        return false;
     }
 
     static constexpr unsigned int item_count = 4;

@@ -9,7 +9,7 @@ class my_data
 public:
     static bool contains(const char value)
     {
-        return value == 'a';
+        return value == 97;
     }
 
     static constexpr unsigned int item_count = 1;

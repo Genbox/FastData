@@ -8,11 +8,11 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusGenerato
         $$"""
               struct e
               {
-                  uint32_t hash_code;
-                  {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
-                  {{genCfg.GetTypeName()}} value;
+                  const uint32_t hash_code;
+                  const {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
+                  const {{genCfg.GetTypeName()}} value;
 
-                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{genCfg.GetTypeName()}}& value)
+                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{genCfg.GetTypeName()}} value)
                      : hash_code(hash_code), next(next), value(value) {}
               };
 
@@ -39,7 +39,7 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusGenerato
                   {
                       const auto& [hash_code, next, value1] = entries[i];
 
-                      if (hash_code == hash && {{genCfg.GetEqualFunction("value1")}})
+                      if (hash_code == hash && value1 == value)
                           return true;
 
                       i = next;

@@ -25,7 +25,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
                          if (hash > {{ctx.MaxHash.ToString(NumberFormatInfo.InvariantInfo)}})
                              return false;
 
-                         return {{genCfg.GetEqualFunction("items[hash]")}};
+                         return items[hash] == value;
                      }
 
                      {{cfg.GetMethodModifier()}}uint32_t get_hash(const std::string& str)
@@ -109,10 +109,10 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
     private string RenderAsso(int pos)
     {
         if (pos == -1)
-            return "static_cast<uint32_t>(_asso[str[str.Length - 1]])";
+            return "static_cast<uint32_t>(asso[str[str.Length - 1]])";
 
         int inc = ctx.AlphaIncrements[pos];
-        return $"static_cast<uint32_t>(_asso[str[{pos}]{(inc != 0 ? $" + {inc}" : "")}])";
+        return $"static_cast<uint32_t>(asso[str[{pos}]{(inc != 0 ? $" + {inc}" : "")}])";
     }
 
     private static IEnumerable<string?> WrapWords(KeyValuePair<string, uint>[] items)

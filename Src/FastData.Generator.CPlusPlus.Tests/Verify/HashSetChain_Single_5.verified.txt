@@ -8,25 +8,25 @@ class my_data
 {
     struct e
     {
-        uint32_t hash_code;
-        int8_t next;
-        float value;
+        const uint32_t hash_code;
+        const int8_t next;
+        const float value;
 
-        e(const uint32_t hash_code, const int8_t next, const float& value)
+        e(const uint32_t hash_code, const int8_t next, const float value)
            : hash_code(hash_code), next(next), value(value) {}
     };
 
-    static constexpr std::array<int8_t, 5> buckets = {
+    inline static const std::array<int8_t, 5> buckets = {
         3, 4, 1, 0, 5
      };
 
-    static constexpr std::array<e, 5> entries = {
+    inline static const std::array<e, 5> entries = {
         e(4286578687, -1, -340282300000000000000000000000000000000.0f), e(3212836864, -1, -1.0f), e(0, -1, 0.0f), e(1065353216, -1, 1.0f), e(2139095039, 1, 340282300000000000000000000000000000000.0f)
     };
 
     static uint32_t get_hash(const float value)
     {
-        return reinterpret_cast<uint32_t>(value);
+        return static_cast<uint32_t>(value);
     }
 
 public:
@@ -43,7 +43,7 @@ public:
         {
             const auto& [hash_code, next, value1] = entries[i];
 
-            if (hash_code == hash && value == value1)
+            if (hash_code == hash && value1 == value)
                 return true;
 
             i = next;

@@ -7,7 +7,7 @@
 
 class my_data
 {
-    static constexpr std::array<uint8_t, 256> asso = {
+    inline static const std::array<uint8_t, 256> asso = {
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
@@ -36,7 +36,7 @@ class my_data
         3, 3, 3, 3, 3, 3
     };
 
-    static constexpr std::array<std::string, 3> items = {
+    inline static const std::array<std::string, 3> items = {
         "cccccccccc", "bbbbbbbbbb", "aaaaaaaaaa"
     };
 
@@ -51,12 +51,12 @@ public:
         if (hash > 2)
             return false;
 
-        return value == items[hash];
+        return items[hash] == value;
     }
 
     static uint32_t get_hash(const std::string& str)
     {
-        return static_cast<uint32_t>(_asso[str[0]]);
+        return static_cast<uint32_t>(asso[str[0]]);
     }
 
 

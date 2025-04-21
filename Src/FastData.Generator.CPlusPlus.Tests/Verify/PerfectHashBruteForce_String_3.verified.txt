@@ -9,14 +9,14 @@ class my_data
 {
     struct e
     {
-        std::string& value;
-        uint32_t hash_code;
+        const std::string& value;
+        const uint32_t hash_code;
 
         e(const std::string& value, const uint32_t hash_code)
         : value(value), hash_code(hash_code) {}
     };
 
-    static constexpr std::array<e, 3> entries = {
+    inline static const std::array<e, 3> entries = {
         e("a", 2150936925u), e("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 119911210u), e("item", 1699185842u)
     };
 
@@ -26,7 +26,7 @@ class my_data
         uint32_t hash2 = seed;
 
         const char* ptr = value.data();
-        uint32_t length = static_cast<uint32_t>(value.size());
+        uint32_t length = value.size();
 
         auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
         while (length >= 4) {

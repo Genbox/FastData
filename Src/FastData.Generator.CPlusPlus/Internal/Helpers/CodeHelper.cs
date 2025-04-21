@@ -24,7 +24,7 @@ internal static class CodeHelper
     {
         null => "\"\"",
         string val => $"\"{val}\"",
-        char val => $"'{val}'",
+        char val => ((byte)val).ToString(CultureInfo.InvariantCulture),
         ulong val => val + "ull",
         long val => val + "ll",
         uint val => val + "u",

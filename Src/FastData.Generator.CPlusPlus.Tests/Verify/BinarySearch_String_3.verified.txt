@@ -7,7 +7,7 @@
 
 class my_data
 {
-    static constexpr std::array<std::string&, 3> entries = {
+    inline static const std::array<std::string, 3> entries = {
         "a", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "item"
     };
 
@@ -21,18 +21,18 @@ public:
         int hi = 2;
         while (lo <= hi)
         {
-            const int i = lo + ((hi - lo) >> 1);
-            const int order = entries[i].compare(value);
+            const int mid = lo + ((hi - lo) >> 1);
 
-            if (order == 0)
+            if (entries[mid] == value)
                 return true;
-            if (order < 0)
-                lo = i + 1;
+
+            if (entries[mid] < value)
+                lo = mid + 1;
             else
-                hi = i - 1;
+                hi = mid - 1;
         }
 
-        return ~lo >= 0;
+        return false;
     }
 
     static constexpr unsigned int item_count = 3;

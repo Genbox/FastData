@@ -8,8 +8,8 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusGenerat
         $$"""
               struct b
               {
-                  {{GetSmallestUnsignedType(ctx.Data.Length)}} start_index;
-                  {{GetSmallestUnsignedType(ctx.Data.Length)}} end_index;
+                  const {{GetSmallestUnsignedType(ctx.Data.Length)}} start_index;
+                  const {{GetSmallestUnsignedType(ctx.Data.Length)}} end_index;
 
                   b(const {{GetSmallestUnsignedType(ctx.Data.Length)}} start_index, const {{GetSmallestUnsignedType(ctx.Data.Length)}} end_index)
                   : start_index(start_index), end_index(end_index) { }
@@ -19,7 +19,7 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusGenerat
           {{FormatColumns(ctx.Buckets, RenderBucket)}}
               };
 
-              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> items = {
+              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName(false)}}, {{ctx.Data.Length}}> items = {
           {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
@@ -41,7 +41,7 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusGenerat
 
                   while (index <= end_index)
                   {
-                      if (hash_codes[index] == hash && {{genCfg.GetEqualFunction("items[index]")}})
+                      if (hash_codes[index] == hash && items[index] == value)
                           return true;
 
                       index++;

@@ -4,7 +4,7 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusGenerato
 {
     public string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> entries = {
+              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName(false)}}, {{ctx.Data.Length}}> entries = {
           {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
@@ -17,18 +17,18 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusGenerato
                   int hi = {{(ctx.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
                   while (lo <= hi)
                   {
-                      const int i = lo + ((hi - lo) >> 1);
-                      const int order = {{genCfg.GetCompareFunction("entries[i]")}};
+                      const int mid = lo + ((hi - lo) >> 1);
 
-                      if (order == 0)
+                      if (entries[mid] == value)
                           return true;
-                      if (order < 0)
-                          lo = i + 1;
+
+                      if (entries[mid] < value)
+                          lo = mid + 1;
                       else
-                          hi = i - 1;
+                          hi = mid - 1;
                   }
 
-                  return ~lo >= 0;
+                  return false;
               }
           """;
 }

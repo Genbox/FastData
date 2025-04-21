@@ -4,7 +4,7 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CPlusPlusGeneratorConfig
 {
     public string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> entries = {
+              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName(false)}}, {{ctx.Data.Length}}> entries = {
           {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
@@ -15,7 +15,7 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CPlusPlusGeneratorConfig
 
                   for (int i = 0; i < {{ctx.Data.Length.ToString(NumberFormatInfo.InvariantInfo)}}; i++)
                   {
-                      if ({{genCfg.GetEqualFunction("entries[i]")}})
+                      if (entries[i] == value)
                          return true;
                   }
                   return false;

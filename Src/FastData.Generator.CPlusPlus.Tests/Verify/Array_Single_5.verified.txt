@@ -6,7 +6,7 @@
 
 class my_data
 {
-    static constexpr std::array<float, 5> entries = {
+    inline static const std::array<float, 5> entries = {
         -340282300000000000000000000000000000000.0f, -1.0f, 0.0f, 1.0f, 340282300000000000000000000000000000000.0f
     };
 
@@ -18,7 +18,7 @@ public:
 
         for (int i = 0; i < 5; i++)
         {
-            if (value == entries[i])
+            if (entries[i] == value)
                return true;
         }
         return false;

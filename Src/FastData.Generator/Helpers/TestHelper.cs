@@ -47,7 +47,7 @@ public static class TestHelper
         yield return [true, false];
         yield return [sbyte.MinValue, (sbyte)-1, (sbyte)0, (sbyte)1, sbyte.MaxValue];
         yield return [(byte)0, (byte)1, byte.MaxValue];
-        yield return [char.MinValue, 'a', char.MaxValue];
+        yield return ['\0', 'a', (char)127]; //We keep it within ASCII range as C#'s char does not translate to other languages
         yield return [double.MinValue, 0.0, 1.0, double.MaxValue];
         yield return [float.MinValue, -1f, 0f, 1f, float.MaxValue];
         yield return [short.MinValue, (short)-1, (short)0, (short)1, short.MaxValue];
@@ -116,6 +116,48 @@ public static class TestHelper
             {
                 foreach (object[] data in GetEdgeCaseSets())
                     yield return (type, data);
+            }
+        }
+    }
+
+    public static IEnumerable<(StructureType, object[])> GetTestVectors()
+    {
+        foreach (StructureType type in Enum.GetValues(typeof(StructureType)))
+        {
+            switch (type)
+            {
+                case StructureType.Auto: //No vectors for auto
+                    continue;
+
+                case StructureType.KeyLength:
+                    foreach (object[] data in GetUniqueLengthSets())
+                        yield return (type, data);
+                    break;
+
+                case StructureType.SingleValue:
+                    foreach (object[] data in GetSingleSets())
+                        yield return (type, data);
+                    break;
+
+                case StructureType.PerfectHashGPerf:
+                    yield return (type, ["a", "b"]); //Minimum test case
+                    yield return (type, ["aaaaaaaaaa", "bbbbbbbbbb", "cccccccccc"]); //Same length (and longer than 1)
+                    yield return (type, ["item1", "item2", "item3", "item4"]); //Only differ on 1 char
+                    yield return (type, ["1", "2", "a", "aa", "aaa", "item", new string('a', 255)]); //Test long strings
+                    break;
+
+                case StructureType.Conditional:
+                case StructureType.BinarySearch:
+                case StructureType.EytzingerSearch:
+                case StructureType.PerfectHashBruteForce:
+                case StructureType.HashSetChain:
+                case StructureType.HashSetLinear:
+                case StructureType.Array:
+                    foreach (object[] data in GetEdgeCaseSets())
+                        yield return (type, data);
+                    break;
+                default:
+                    throw new NotSupportedException("There are no test vectors for " + type);
             }
         }
     }

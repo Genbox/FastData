@@ -12,7 +12,7 @@ internal sealed class SingleValueCode(GeneratorConfig genCfg, CPlusPlusGenerator
           public:
               {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
               {
-                  return {{genCfg.GetEqualFunction(ToValueLabel(ctx.Item))}};
+                  return value == {{ToValueLabel(ctx.Item)}};
               }
           """;
 }

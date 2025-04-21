@@ -7,7 +7,7 @@
 
 class my_data
 {
-    static constexpr std::array<uint8_t, 256> asso = {
+    inline static const std::array<uint8_t, 256> asso = {
         21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
         21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
         21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
@@ -36,7 +36,7 @@ class my_data
         21, 21, 21, 21, 21, 21
     };
 
-    static constexpr std::array<std::string, 21> items = {
+    inline static const std::array<std::string, 21> items = {
         "item", "", "2", "", "", "a", "", "1", "", "", 
         "aa", "", "", "", "", "aaa", "", "", "", "", 
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -53,7 +53,7 @@ public:
         if (hash > 20)
             return false;
 
-        return value == items[hash];
+        return items[hash] == value;
     }
 
     static uint32_t get_hash(const std::string& str)
@@ -62,12 +62,12 @@ public:
         switch (str.length())
         {
             default:
-                hash += static_cast<uint32_t>(_asso[str[3]]);            case 3:
-                hash += static_cast<uint32_t>(_asso[str[2]]);
+                hash += static_cast<uint32_t>(asso[str[3]]);            case 3:
+                hash += static_cast<uint32_t>(asso[str[2]]);
             case 2:
-                hash += static_cast<uint32_t>(_asso[str[1]]);
+                hash += static_cast<uint32_t>(asso[str[1]]);
             case 1:
-                hash += static_cast<uint32_t>(_asso[str[0]]);
+                hash += static_cast<uint32_t>(asso[str[0]]);
                 break;
         }
 

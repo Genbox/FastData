@@ -2,9 +2,10 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
 
 internal static class GeneratorConfigExtensions
 {
-    internal static string GetTypeName(this GeneratorConfig config) => config.DataType switch
+    internal static string GetTypeName(this GeneratorConfig config, bool asReference = true) => config.DataType switch
     {
-        DataType.String => "std::string&",
+        DataType.String when asReference => "std::string&",
+        DataType.String => "std::string",
         DataType.Boolean => "bool",
         DataType.SByte => "int8_t",
         DataType.Byte => "uint8_t",
@@ -20,16 +21,6 @@ internal static class GeneratorConfigExtensions
         _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
     };
 
-    internal static string GetEqualFunction(this GeneratorConfig config, string variable) => $"value == {variable}";
-
-    internal static string GetCompareFunction(this GeneratorConfig config, string variable)
-    {
-        if (config.DataType == DataType.String)
-            return $"{variable}.compare(value)";
-
-        return $"(value > {variable}) - (value < {variable})";
-    }
-
     internal static string GetHashSource(this GeneratorConfig config, bool seeded)
     {
         if (config.DataType == DataType.String)
@@ -41,7 +32,7 @@ internal static class GeneratorConfigExtensions
                              uint32_t hash2 = {{(seeded ? "seed" : "(5381 << 16) + 5381")}};
 
                              const char* ptr = value.data();
-                             uint32_t length = static_cast<uint32_t>(value.size());
+                             uint32_t length = value.size();
 
                              auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
                              while (length >= 4) {
@@ -64,7 +55,7 @@ internal static class GeneratorConfigExtensions
         return $$"""
                      static uint32_t get_hash(const {{config.GetTypeName()}} value{{(seeded ? ", const uint32_t seed" : "")}})
                      {
-                         return {{(seeded ? "reinterpret_cast<uint32_t>(value ^ seed)" : "reinterpret_cast<uint32_t>(value)")}};
+                         return {{(seeded ? "static_cast<uint32_t>(value) ^ seed" : "static_cast<uint32_t>(value)")}};
                      }
                  """;
     }

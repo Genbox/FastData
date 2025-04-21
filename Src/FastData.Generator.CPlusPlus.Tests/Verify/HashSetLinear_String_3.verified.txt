@@ -9,23 +9,23 @@ class my_data
 {
     struct b
     {
-        uint8_t start_index;
-        uint8_t end_index;
+        const uint8_t start_index;
+        const uint8_t end_index;
 
         b(const uint8_t start_index, const uint8_t end_index)
         : start_index(start_index), end_index(end_index) { }
     };
 
-    static constexpr std::array<b, 11> buckets = {
+    inline static const std::array<b, 11> buckets = {
         b(0, 0), b(0, 0), b(1, 1), b(0, 0), b(2, 2), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), 
         b(0, 0)
     };
 
-    static constexpr std::array<std::string&, 3> items = {
+    inline static const std::array<std::string, 3> items = {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "item", "a"
     };
 
-    static constexpr std::array<uint32_t, 3> hash_codes = {
+    inline static const std::array<uint32_t, 3> hash_codes = {
         2265191819, 1949155672, 972181027
     };
 
@@ -35,7 +35,7 @@ class my_data
         uint32_t hash2 = (5381 << 16) + 5381;
 
         const char* ptr = value.data();
-        uint32_t length = static_cast<uint32_t>(value.size());
+        uint32_t length = value.size();
 
         auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
         while (length >= 4) {
@@ -66,7 +66,7 @@ public:
 
         while (index <= end_index)
         {
-            if (hash_codes[index] == hash && value == items[index])
+            if (hash_codes[index] == hash && items[index] == value)
                 return true;
 
             index++;

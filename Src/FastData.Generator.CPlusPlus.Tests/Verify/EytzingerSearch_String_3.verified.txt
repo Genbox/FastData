@@ -7,7 +7,7 @@
 
 class my_data
 {
-    static constexpr std::array<std::string&, 3> entries = {
+    inline static const std::array<std::string, 3> entries = {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "a", "item"
     };
 
@@ -20,12 +20,10 @@ public:
         unsigned int i = 0;
         while (i < entries.size())
         {
-            const int comparison = entries[i].compare(value);
-
-            if (comparison == 0)
+            if (entries[i] == value)
                 return true;
 
-            if (comparison < 0)
+            if (entries[i] < value)
                 i = 2 * i + 2;
             else
                 i = 2 * i + 1;
