@@ -28,7 +28,7 @@ internal static class CodeHelper
         ulong val => val + "ul",
         long val => val + "l",
         uint val => val + "u",
-        float val => val.ToString("0.0", NumberFormatInfo.InvariantInfo) + "f",
+        float val => val + "f",
         bool val => val.ToString().ToLowerInvariant(),
         IFormattable val => val.ToString(null, CultureInfo.InvariantCulture),
         _ => value.ToString()!
@@ -41,7 +41,7 @@ internal static class CodeHelper
         DataType.UInt64 => value + "ul",
         DataType.Int64 => value + "l",
         DataType.UInt32 => value + "u",
-        DataType.Single => ((double)value).ToString("0.0", NumberFormatInfo.InvariantInfo) + "f",
+        DataType.Single => (double)value + "f",
         DataType.Boolean => value.ToString().ToLowerInvariant(),
         _ => value.ToString()
     };

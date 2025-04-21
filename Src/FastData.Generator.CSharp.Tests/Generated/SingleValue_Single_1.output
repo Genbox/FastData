@@ -12,10 +12,10 @@ internal static class MyData
     
     public static bool Contains(float value)
     {
-        return value.Equals(1.0f);
+        return value.Equals(1f);
     }
 
     public const int ItemCount = 1;
-    public const float MinValue = 1.0f;
-    public const float MaxValue = 1.0f;
+    public const float MinValue = 1f;
+    public const float MaxValue = 1f;
 }

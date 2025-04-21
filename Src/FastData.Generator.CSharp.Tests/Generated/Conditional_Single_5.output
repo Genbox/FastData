@@ -12,16 +12,16 @@ internal static class MyData
     
     public static bool Contains(float value)
     {
-        if (value < -340282346638529000000000000000000000000.0f || value > 340282346638529000000000000000000000000.0f)
+        if (value < -3.4028234663852886E+38f || value > 3.4028234663852886E+38f)
             return false;
 
         switch (value)
         {
-            case -340282300000000000000000000000000000000.0f:
-            case -1.0f:
-            case 0.0f:
-            case 1.0f:
-            case 340282300000000000000000000000000000000.0f:
+            case -3.4028235E+38f:
+            case -1f:
+            case 0f:
+            case 1f:
+            case 3.4028235E+38f:
                 return true;
             default:
                 return false;
@@ -29,6 +29,6 @@ internal static class MyData
     }
 
     public const int ItemCount = 5;
-    public const float MinValue = -340282346638529000000000000000000000000.0f;
-    public const float MaxValue = 340282346638529000000000000000000000000.0f;
+    public const float MinValue = -3.4028234663852886E+38f;
+    public const float MaxValue = 3.4028234663852886E+38f;
 }
