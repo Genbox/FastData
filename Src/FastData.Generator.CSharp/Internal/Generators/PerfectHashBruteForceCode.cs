@@ -13,14 +13,28 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpGe
               {
           {{cfg.GetEarlyExits(genCfg)}}
 
-                  uint hash = Hash(value, {{ctx.Seed}});
+                  uint hash = Murmur_32(Hash(value) ^ {{ctx.Seed}});
                   uint index = {{cfg.GetModFunction(ctx.Data.Length)}};
                   ref E entry = ref _entries[index];
 
                   return hash == entry.HashCode && {{genCfg.GetEqualFunction("entry.Value")}};
               }
 
-          {{genCfg.GetHashSource(true)}}
+          {{genCfg.GetHashSource()}}
+
+              [MethodImpl(MethodImplOptions.AggressiveInlining)]
+              private static uint Murmur_32(uint h)
+              {
+                  unchecked
+                  {
+                      h ^= h >> 16;
+                      h *= 0x85EBCA6BU;
+                      h ^= h >> 13;
+                      h *= 0xC2B2AE35U;
+                      h ^= h >> 16;
+                      return h;
+                  }
+              }
 
               [StructLayout(LayoutKind.Auto)]
               private struct E

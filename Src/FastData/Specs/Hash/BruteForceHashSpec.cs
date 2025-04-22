@@ -16,8 +16,8 @@ public readonly record struct BruteForceHashSpec(HashFunction HashFunction, Stri
 
         return HashFunction switch
         {
-            HashFunction.DJB2Hash => (obj, seed) => DJB2Hash.ComputeHash(SegmentHelper.GetSpan(seg, (string)obj), seed != 0 ? seed : DJB2Hash.Seed),
-            HashFunction.XxHash => (obj, seed) => XxHash.ComputeHash(SegmentHelper.GetSpan(seg, (string)obj), seed != 0 ? seed : XxHash.PRIME64_5),
+            HashFunction.DJB2Hash => obj => DJB2Hash.ComputeHash(SegmentHelper.GetSpan(seg, (string)obj)),
+            HashFunction.XxHash => obj => XxHash.ComputeHash(SegmentHelper.GetSpan(seg, (string)obj)),
             _ => throw new InvalidOperationException("Unsupported hash function " + HashFunction)
         };
     }

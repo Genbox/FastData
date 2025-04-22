@@ -16,12 +16,22 @@ class my_data
     };
 
     inline static const std::array<e, 3> entries = {
-        e(3, 0u), e(2, 1u), e(1, 2u)
+        e(3, 3262916883u), e(1, 2476801540u), e(2, 1228498187u)
     };
 
-    static uint32_t get_hash(const int32_t value, const uint32_t seed)
+    static uint32_t get_hash(const int32_t value)
     {
-        return static_cast<uint32_t>(value) ^ seed;
+        return static_cast<uint32_t>(value);
+    }
+
+    static uint32_t murmur_32(uint32_t h)
+    {
+        h ^= h >> 16;
+        h *= 0x85EBCA6BU;
+        h ^= h >> 13;
+        h *= 0xC2B2AE35U;
+        h ^= h >> 16;
+        return h;
     }
 
 public:
@@ -29,8 +39,7 @@ public:
     {
         if (value < 1 || value > 3)
             return false;
-
-        const uint32_t hash = get_hash(value, 3);
+        const uint32_t hash = Murmur_32(get_hash(value) ^ 10);
         const uint32_t index = hash % 3;
         const e& entry = entries[index];
 

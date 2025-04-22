@@ -20,7 +20,8 @@ public struct GeneticHashSpec(int mixerSeed, int mixerIterations, int avalancheS
     {
         Func<uint, uint, uint> mixer = GetMixer().Compile();
         Func<uint, uint> avalanche = GetAvalanche().Compile();
-        return (str, seed) => Hash((string)str, seed, mixer, avalanche);
+        uint seed = (uint)MixerSeed;
+        return str => Hash((string)str, seed, mixer, avalanche);
     }
 
     private static uint Hash(string str, uint seed, Func<uint, uint, uint> mixer, Func<uint, uint> avalanche)

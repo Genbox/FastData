@@ -5,11 +5,10 @@ namespace Genbox.FastData.InternalShared;
 public static class Mixers
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Murmur_32_Seed(uint h, uint seed)
+    public static uint Murmur_32(uint h)
     {
         unchecked
         {
-            h += seed;
             h ^= h >> 16;
             h *= 0x85EBCA6BU;
             h ^= h >> 13;
@@ -20,11 +19,10 @@ public static class Mixers
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint XXH2_32_Seed(uint h, uint seed)
+    public static uint XXH2_32(uint h)
     {
         unchecked
         {
-            h += seed;
             h ^= h >> 15;
             h *= 0x85EBCA77U;
             h ^= h >> 13;

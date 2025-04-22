@@ -6,7 +6,7 @@ namespace Genbox.FastData.Internal.Hashes;
 
 internal static class DJB2Hash
 {
-    internal const uint Seed = (5381 << 16) + 5381;
+    private const uint Seed = (5381 << 16) + 5381;
     private const uint Factor = 0x5D588B65;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

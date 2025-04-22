@@ -14,8 +14,8 @@ impl MyData {
     ];
 
     fn get_hash(value: &str) -> u32 {
-        let mut hash1: u32 = 5381;
-        let mut hash2: u32 = 5381;
+        let mut hash1: u32 = (5381 << 16) + 5381;
+        let mut hash2: u32 = (5381 << 16) + 5381;
 
         for chunk in value.as_bytes().chunks(8) {
             if chunk.len() >= 4 {

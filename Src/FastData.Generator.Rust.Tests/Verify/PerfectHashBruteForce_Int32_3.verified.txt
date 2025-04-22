@@ -6,11 +6,20 @@ pub struct MyData;
 
 impl MyData {
     const ENTRIES: [E; 3] = [
-        E { value: 3, hash_code: 0 }, E { value: 2, hash_code: 1 }, E { value: 1, hash_code: 2 }
+        E { value: 3, hash_code: 3262916883 }, E { value: 1, hash_code: 2476801540 }, E { value: 2, hash_code: 1228498187 }
     ];
 
-    fn get_hash(value: i32, seed: u32) -> u32 {
-        (value as u32) ^ seed
+    fn get_hash(value: i32) -> u32 {
+        value as u32
+    }
+
+    fn murmur_32(mut h: u32) -> u32 {
+        h ^= h >> 16;
+        h = h.wrapping_mul(0x85EB_CA6B);
+        h ^= h >> 13;
+        h = h.wrapping_mul(0xC2B2_AE35);
+        h ^= h >> 16;
+        h
     }
 
     pub fn contains(value: i32) -> bool {
@@ -18,7 +27,7 @@ impl MyData {
             return false;
         }
 
-        let hash = Self::get_hash(value, 3);
+        let hash = murmur_32(Self::get_hash(value) ^ 10);
         let index = (hash % 3) as usize;
         let entry = &Self::ENTRIES[index];
 

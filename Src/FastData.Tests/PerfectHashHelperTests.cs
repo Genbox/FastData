@@ -15,8 +15,8 @@ public class PerfectHashHelperTests
     {
         uint[] data = GetIntegers(TestData.Words.Take(10));
 
-        uint seed = Generate(data, static (a, b) => Mixers.Murmur_32_Seed((uint)a, b), 1).First();
-        Assert.True(Validate(data, seed, static (a, b) => Mixers.Murmur_32_Seed(a, b), out byte[] _));
+        uint seed = Generate(data, static (obj, seed) => Mixers.Murmur_32((uint)obj ^ seed), 1).First();
+        Assert.True(Validate(data, seed, static (obj, seed) => Mixers.Murmur_32((uint)obj ^ seed), out byte[] _));
     }
 
     [Fact]
@@ -24,8 +24,8 @@ public class PerfectHashHelperTests
     {
         uint[] data = GetIntegers(TestData.Words.Take(10));
 
-        uint seed = Generate(data, static (a, b) => Mixers.Murmur_32_Seed((uint)a, b), 1, uint.MaxValue, 64).First();
-        Assert.True(Validate(data, seed, static (a, b) => Mixers.Murmur_32_Seed(a, b), out byte[] _, 64));
+        uint seed = Generate(data, static (obj, seed) => Mixers.Murmur_32((uint)obj ^ seed), 1, uint.MaxValue, 64).First();
+        Assert.True(Validate(data, seed, static (obj, seed) => Mixers.Murmur_32((uint)obj ^ seed), out byte[] _, 64));
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public class PerfectHashHelperTests
         uint[] data = GetIntegers(TestData.Words.Take(100));
 
         _time = Stopwatch.GetTimestamp();
-        uint[] seed = Generate(data, static (a, b) => Mixers.Murmur_32_Seed((uint)a, b), 1, uint.MaxValue, 0, Condition).ToArray();
+        uint[] seed = Generate(data, static (obj, seed) => Mixers.Murmur_32((uint)obj ^ seed), 1, uint.MaxValue, 0, Condition).ToArray();
 
         Assert.Empty(seed);
         Assert.Equal(_numSeconds, (int)Stopwatch.GetElapsedTime(_time).TotalSeconds);

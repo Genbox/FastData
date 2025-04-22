@@ -27,7 +27,7 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusGenerat
           {{FormatColumns(ctx.HashCodes, static (sb, obj) => sb.Append(obj))}}
               };
 
-          {{genCfg.GetHashSource(false)}}
+          {{genCfg.GetHashSource()}}
 
           public:
               {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)

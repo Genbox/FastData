@@ -26,7 +26,7 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, RustGeneratorCon
                  {{FormatColumns(ctx.HashCodes, static (sb, obj) => sb.Append(obj))}}
                      ];
 
-                 {{genCfg.GetHashSource(false)}}
+                 {{genCfg.GetHashSource()}}
 
                      {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName(true)}}) -> bool {
                  {{cfg.GetEarlyExits(genCfg)}}

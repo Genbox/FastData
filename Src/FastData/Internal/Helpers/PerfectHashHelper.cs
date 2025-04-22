@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Specs;
 
@@ -5,7 +6,7 @@ namespace Genbox.FastData.Internal.Helpers;
 
 internal static class PerfectHashHelper
 {
-    internal static IEnumerable<uint> Generate<T>(T[] data, HashFunc hashFunc, uint maxCandidates = uint.MaxValue, uint maxAttempts = uint.MaxValue, int length = 0, Func<bool>? condition = null)
+    internal static IEnumerable<uint> Generate<T>(T[] data, Func<object, uint, uint> hashFunc, uint maxCandidates = uint.MaxValue, uint maxAttempts = uint.MaxValue, int length = 0, Func<bool>? condition = null)
     {
         if (length == 0)
             length = data.Length;
@@ -20,7 +21,7 @@ internal static class PerfectHashHelper
         HashSet<uint> codes = new HashSet<uint>();
         foreach (T item in data)
         {
-            if (!codes.Add(hashFunc(item)))
+            if (!codes.Add(hashFunc(item, 0)))
                 yield break;
         }
 
@@ -62,7 +63,7 @@ internal static class PerfectHashHelper
         }
     }
 
-    internal static bool Validate<T>(T[] data, uint seed, Func<T, uint, ulong> hashFunc, out byte[] offsets, uint length = 0)
+    internal static bool Validate<T>(T[] data, uint seed, Func<object, uint, uint> hashFunc, out byte[] offsets, uint length = 0)
     {
         if (length == 0)
             length = (uint)data.Length;
@@ -72,7 +73,7 @@ internal static class PerfectHashHelper
         ulong fastMod = MathHelper.GetFastModMultiplier(length);
         for (uint i = 0; i < data.Length; i++)
         {
-            uint offset = MathHelper.FastMod((uint)hashFunc(data[i], seed), length, fastMod);
+            uint offset = MathHelper.FastMod(hashFunc(data[i], seed), length, fastMod);
             offsets[i] = (byte)offset;
 
             if (bArray[offset])

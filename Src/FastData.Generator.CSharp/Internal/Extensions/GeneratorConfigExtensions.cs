@@ -39,23 +39,23 @@ internal static class GeneratorConfigExtensions
         return $"{variable}.CompareTo(value)";
     }
 
-    internal static string GetHashSource(this GeneratorConfig config, bool seeded) =>
+    internal static string GetHashSource(this GeneratorConfig config) =>
         $$"""
               [MethodImpl(MethodImplOptions.AggressiveInlining)]
-              public static uint Hash({{config.GetTypeName()}} value{{(seeded ? ", uint seed" : "")}})
+              public static uint Hash({{config.GetTypeName()}} value)
               {
           {{config.HashSpec switch
           {
-              DefaultHashSpec => GetDJBHash(config.DataType, seeded),
-              BruteForceHashSpec bfs => GetBruteForceHash(bfs, seeded),
-              HeuristicHashSpec hhs => GetHeuristicHash(hhs, config.Constants.MinValue, seeded),
-              GeneticHashSpec ghs => GetGeneticHash(ghs, seeded),
+              DefaultHashSpec => GetDJBHash(config.DataType),
+              BruteForceHashSpec bfs => GetBruteForceHash(bfs),
+              HeuristicHashSpec hhs => GetHeuristicHash(hhs, config.Constants.MinValue),
+              GeneticHashSpec ghs => GetGeneticHash(ghs),
               _ => throw new NotSupportedException(config.HashSpec.GetType().Name + " is not supported")
           }}}
               }
           """;
 
-    private static string GetHeuristicHash(HeuristicHashSpec hac, object minStrLen, bool seeded)
+    private static string GetHeuristicHash(HeuristicHashSpec hac, object minStrLen)
     {
         //We need to know the shortest string
         uint minLen = (uint)minStrLen;
@@ -84,7 +84,7 @@ internal static class GeneratorConfigExtensions
         }
 
         sb.Append($$"""
-                            uint hash = {{(seeded ? "seed" : "0")}};
+                            uint hash = 0;
                             switch (value.Length)
                             {
                                 default:
@@ -124,13 +124,13 @@ internal static class GeneratorConfigExtensions
         static string RenderPosition(int pos) => pos == -1 ? "str[str.Length - 1]]" : $"str[{pos}]";
     }
 
-    private static string GetBruteForceHash(BruteForceHashSpec spec, bool seeded)
+    private static string GetBruteForceHash(BruteForceHashSpec spec)
     {
         return spec.HashFunction switch
         {
-            HashFunction.DJB2Hash => GetDJBHash(DataType.String, seeded),
+            HashFunction.DJB2Hash => GetDJBHash(DataType.String),
             HashFunction.XxHash => $$"""
-                                             ulong hash1 = {{(seeded ? "seed" : "0")}}; + (ulong)length;
+                                             ulong hash1 = (ulong)length;
 
                                              ref ulong ptr64 = ref Unsafe.As<char, ulong>(ref ptr);
                                              while (length >= 4)
@@ -164,9 +164,9 @@ internal static class GeneratorConfigExtensions
         };
     }
 
-    private static string GetGeneticHash(GeneticHashSpec spec, bool seeded) =>
+    private static string GetGeneticHash(GeneticHashSpec spec) =>
         $$"""
-                  uint acc = {{(seeded ? "seed" : "0")}};
+                  uint acc = 0;
 
                   for (int i = 0; i < str.Length; i++)
                       acc = mixer(acc, str[i]);
@@ -186,39 +186,39 @@ internal static class GeneratorConfigExtensions
                   }
           """;
 
-    private static string GetDJBHash(DataType dataType, bool seeded)
+    private static string GetDJBHash(DataType dataType)
     {
         if (dataType == DataType.String)
         {
-            return $$"""
-                             uint hash1 = {{(seeded ? "seed" : "(5381 << 16) + 5381")}};
-                             uint hash2 = {{(seeded ? "seed" : "(5381 << 16) + 5381")}};
-                             int length = value.Length;
-                             ReadOnlySpan<char> span = value.AsSpan();
-                             ref char ptr = ref MemoryMarshal.GetReference(span);
-                             ref uint ptr32 = ref Unsafe.As<char, uint>(ref ptr);
+            return """
+                           uint hash1 = (5381 << 16) + 5381;
+                           uint hash2 = (5381 << 16) + 5381;
+                           int length = value.Length;
+                           ReadOnlySpan<char> span = value.AsSpan();
+                           ref char ptr = ref MemoryMarshal.GetReference(span);
+                           ref uint ptr32 = ref Unsafe.As<char, uint>(ref ptr);
 
-                             while (length >= 4)
-                             {
-                                 hash1 = (((hash1 << 5) | (hash1 >> (32 - 5))) + hash1) ^ ptr32;
-                                 hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ Unsafe.Add(ref ptr32, 1);
+                           while (length >= 4)
+                           {
+                               hash1 = (((hash1 << 5) | (hash1 >> (32 - 5))) + hash1) ^ ptr32;
+                               hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ Unsafe.Add(ref ptr32, 1);
 
-                                 ptr32 = ref Unsafe.Add(ref ptr32, 2);
-                                 length -= 4;
-                             }
+                               ptr32 = ref Unsafe.Add(ref ptr32, 2);
+                               length -= 4;
+                           }
 
-                             ref char ptrChar = ref Unsafe.As<uint, char>(ref ptr32);
-                             while (length-- > 0)
-                             {
-                                 hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ ptrChar;
-                                 ptrChar = ref Unsafe.Add(ref ptrChar, 1);
-                             }
+                           ref char ptrChar = ref Unsafe.As<uint, char>(ref ptr32);
+                           while (length-- > 0)
+                           {
+                               hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ ptrChar;
+                               ptrChar = ref Unsafe.Add(ref ptrChar, 1);
+                           }
 
-                             return hash1 + (hash2 * 1566083941);
-                     """;
+                           return hash1 + (hash2 * 1566083941);
+                   """;
         }
 
-        return $"        return unchecked((uint)(value{(dataType.IsIdentityHash() ? "" : ".GetHashCode()")}{(seeded ? "^ seed" : "")}));";
+        return $"        return unchecked((uint)(value{(dataType.IsIdentityHash() ? "" : ".GetHashCode()")}));";
     }
 
     //TODO: Needed for analysis-based hashes

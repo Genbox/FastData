@@ -16,12 +16,21 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, RustGene
                  {{FormatColumns(ctx.Data, Render)}}
                      ];
 
-                 {{genCfg.GetHashSource(true)}}
+                 {{genCfg.GetHashSource()}}
+
+                     fn murmur_32(mut h: u32) -> u32 {
+                         h ^= h >> 16;
+                         h = h.wrapping_mul(0x85EB_CA6B);
+                         h ^= h >> 13;
+                         h = h.wrapping_mul(0xC2B2_AE35);
+                         h ^= h >> 16;
+                         h
+                     }
 
                      {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
                  {{cfg.GetEarlyExits(genCfg)}}
 
-                         let hash = Self::get_hash(value, {{ctx.Seed}});
+                         let hash = murmur_32(Self::get_hash(value) ^ {{ctx.Seed}});
                          let index = ({{cfg.GetModFunction(ctx.Data.Length)}}) as usize;
                          let entry = &Self::ENTRIES[index];
 

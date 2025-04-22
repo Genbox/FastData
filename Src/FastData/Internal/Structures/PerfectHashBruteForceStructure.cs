@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Contexts;
 using Genbox.FastData.Internal.Abstracts;
@@ -11,10 +12,12 @@ internal sealed class PerfectHashBruteForceStructure : IHashStructure
 {
     public bool TryCreate(object[] data, HashFunc hashFunc, out IContext? context)
     {
+        uint localHash(object obj, uint seed) => Murmur_32(hashFunc(obj) ^ seed);
+
         long timestamp = Stopwatch.GetTimestamp();
 
         //Find the proper seeds
-        uint[] seed = PerfectHashHelper.Generate(data, hashFunc, 1, uint.MaxValue, data.Length, () =>
+        uint[] seed = PerfectHashHelper.Generate(data, localHash, 1, uint.MaxValue, data.Length, () =>
         {
             TimeSpan span = new TimeSpan(Stopwatch.GetTimestamp() - timestamp);
             return span.TotalSeconds > 10;
@@ -33,12 +36,26 @@ internal sealed class PerfectHashBruteForceStructure : IHashStructure
         {
             object value = data[i];
 
-            uint hash = hashFunc(value, seed[0]);
+            uint hash = localHash(value, seed[0]);
             uint index = (uint)(hash % pairs.Length);
             pairs[index] = new KeyValuePair<object, uint>(value, hash);
         }
 
         context = new PerfectHashBruteForceContext(pairs, seed[0]);
         return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static uint Murmur_32(uint h)
+    {
+        unchecked
+        {
+            h ^= h >> 16;
+            h *= 0x85EBCA6BU;
+            h ^= h >> 13;
+            h *= 0xC2B2AE35U;
+            h ^= h >> 16;
+            return h;
+        }
     }
 }

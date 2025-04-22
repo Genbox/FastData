@@ -17,13 +17,13 @@ class my_data
     };
 
     inline static const std::array<e, 3> entries = {
-        e("item2", 2465848398u), e("item3", 4031932339u), e("item1", 2869132925u)
+        e("item3", 94714119u), e("item2", 1729332148u), e("item1", 2649680336u)
     };
 
-    static uint32_t get_hash(const std::string& value, const uint32_t seed)
+    static uint32_t get_hash(const std::string& value)
     {
-        uint32_t hash1 = seed;
-        uint32_t hash2 = seed;
+        uint32_t hash1 = (5381 << 16) + 5381;
+        uint32_t hash2 = (5381 << 16) + 5381;
 
         const char* ptr = value.data();
         uint32_t length = value.size();
@@ -44,13 +44,22 @@ class my_data
         return hash1 + hash2 * 0x5D588B65;
     }
 
+    static uint32_t murmur_32(uint32_t h)
+    {
+        h ^= h >> 16;
+        h *= 0x85EBCA6BU;
+        h ^= h >> 13;
+        h *= 0xC2B2AE35U;
+        h ^= h >> 16;
+        return h;
+    }
+
 public:
     static bool contains(const std::string& value)
     {
         if (const size_t len = value.length(); len != 5u)
             return false;
-
-        const uint32_t hash = get_hash(value, 3);
+        const uint32_t hash = Murmur_32(get_hash(value) ^ 13);
         const uint32_t index = hash % 3;
         const e& entry = entries[index];
 

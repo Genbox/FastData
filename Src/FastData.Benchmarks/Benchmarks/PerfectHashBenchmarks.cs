@@ -28,19 +28,19 @@ public class PerfectHashBenchmarks
     [ArgumentsSource(nameof(GetFunctions))]
     public uint[] TimeToConstruct(MixSpec spec)
     {
-        return PerfectHashHelper.Generate(_data, (hash, seed) => spec.Function(hash, seed), MaxCandidates, uint.MaxValue, _data.Length * 2).ToArray();
+        return PerfectHashHelper.Generate(_data, (obj, seed) => spec.Function(obj) ^ seed, MaxCandidates, uint.MaxValue, _data.Length * 2).ToArray();
     }
 
     [Benchmark]
     [ArgumentsSource(nameof(GetFunctions))]
     public uint[] TimeToConstructMinimal(MixSpec spec)
     {
-        return PerfectHashHelper.Generate(_data, (hash, seed) => spec.Function(hash, seed), MaxCandidates).ToArray();
+        return PerfectHashHelper.Generate(_data, (obj, seed) => spec.Function(obj) ^ seed, MaxCandidates).ToArray();
     }
 
     public static IEnumerable<MixSpec> GetFunctions()
     {
-        yield return new MixSpec(nameof(Mixers.Murmur_32_Seed), static (obj, seed) => Mixers.Murmur_32_Seed((uint)obj, seed));
-        yield return new MixSpec(nameof(Mixers.XXH2_32_Seed), static (obj, seed) => Mixers.Murmur_32_Seed((uint)obj, seed));
+        yield return new MixSpec(nameof(Mixers.Murmur_32), static obj => Mixers.Murmur_32((uint)obj));
+        yield return new MixSpec(nameof(Mixers.XXH2_32), static obj => Mixers.Murmur_32((uint)obj));
     }
 }

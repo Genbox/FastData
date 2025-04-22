@@ -14,7 +14,7 @@ impl MyData {
     ];
 
     fn get_hash(value: i32) -> u32 {
-        (value as u32)
+        value as u32
     }
 
     pub fn contains(value: i32) -> bool {

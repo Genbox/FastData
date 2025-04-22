@@ -40,7 +40,7 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpGeneratorC
                   return false;
               }
 
-          {{genCfg.GetHashSource(false)}}
+          {{genCfg.GetHashSource()}}
 
               [StructLayout(LayoutKind.Auto)]
               private struct B

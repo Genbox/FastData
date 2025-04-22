@@ -21,41 +21,41 @@ internal static class GeneratorConfigExtensions
         _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
     };
 
-    internal static string GetHashSource(this GeneratorConfig config, bool seeded)
+    internal static string GetHashSource(this GeneratorConfig config)
     {
         if (config.DataType == DataType.String)
         {
-            return $$"""
-                         static uint32_t get_hash(const std::string& value{{(seeded ? ", const uint32_t seed" : "")}})
-                         {
-                             uint32_t hash1 = {{(seeded ? "seed" : "(5381 << 16) + 5381")}};
-                             uint32_t hash2 = {{(seeded ? "seed" : "(5381 << 16) + 5381")}};
+            return """
+                       static uint32_t get_hash(const std::string& value)
+                       {
+                           uint32_t hash1 = (5381 << 16) + 5381;
+                           uint32_t hash2 = (5381 << 16) + 5381;
 
-                             const char* ptr = value.data();
-                             uint32_t length = value.size();
+                           const char* ptr = value.data();
+                           uint32_t length = value.size();
 
-                             auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
-                             while (length >= 4) {
-                                 hash1 = (hash1 << 5 | hash1 >> (32 - 5)) + hash1 ^ ptr32[0];
-                                 hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ ptr32[1];
-                                 ptr32 += 2;
-                                 length -= 4;
-                             }
+                           auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
+                           while (length >= 4) {
+                               hash1 = (hash1 << 5 | hash1 >> (32 - 5)) + hash1 ^ ptr32[0];
+                               hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ ptr32[1];
+                               ptr32 += 2;
+                               length -= 4;
+                           }
 
-                             auto ptr_char = reinterpret_cast<const char*>(ptr32);
-                             while (length-- > 0) {
-                                 hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
-                             }
+                           auto ptr_char = reinterpret_cast<const char*>(ptr32);
+                           while (length-- > 0) {
+                               hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
+                           }
 
-                             return hash1 + hash2 * 0x5D588B65;
-                         }
-                     """;
+                           return hash1 + hash2 * 0x5D588B65;
+                       }
+                   """;
         }
 
         return $$"""
-                     static uint32_t get_hash(const {{config.GetTypeName()}} value{{(seeded ? ", const uint32_t seed" : "")}})
+                     static uint32_t get_hash(const {{config.GetTypeName()}} value)
                      {
-                         return {{(seeded ? "static_cast<uint32_t>(value) ^ seed" : "static_cast<uint32_t>(value)")}};
+                         return static_cast<uint32_t>(value);
                      }
                  """;
     }

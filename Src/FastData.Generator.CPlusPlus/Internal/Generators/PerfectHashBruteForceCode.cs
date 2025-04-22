@@ -17,14 +17,23 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CPlusPlu
           {{FormatColumns(ctx.Data, Render)}}
               };
 
-          {{genCfg.GetHashSource(true)}}
+          {{genCfg.GetHashSource()}}
+
+              static uint32_t murmur_32(uint32_t h)
+              {
+                  h ^= h >> 16;
+                  h *= 0x85EBCA6BU;
+                  h ^= h >> 13;
+                  h *= 0xC2B2AE35U;
+                  h ^= h >> 16;
+                  return h;
+              }
 
           public:
               {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-
-                  const uint32_t hash = get_hash(value, {{ctx.Seed}});
+                  const uint32_t hash = Murmur_32(get_hash(value) ^ {{ctx.Seed}});
                   const uint32_t index = {{cfg.GetModFunction(ctx.Data.Length)}};
                   const e& entry = entries[index];
 

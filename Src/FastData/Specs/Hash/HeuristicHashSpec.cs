@@ -9,7 +9,7 @@ public readonly record struct HeuristicHashSpec(int[] Positions) : IHashSpec
     public HashFunc GetHashFunction()
     {
         int[] localPos = Positions;
-        return (str, seed) => Hash((string)str, localPos); //TODO: Support seed
+        return obj => Hash((string)obj, localPos);
     }
 
     public EqualFunc GetEqualFunction()

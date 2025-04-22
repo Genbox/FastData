@@ -6,12 +6,12 @@ pub struct MyData;
 
 impl MyData {
     const ENTRIES: [E; 3] = [
-        E { value: "item2", hash_code: 2465848398 }, E { value: "item3", hash_code: 4031932339 }, E { value: "item1", hash_code: 2869132925 }
+        E { value: "item3", hash_code: 94714119 }, E { value: "item2", hash_code: 1729332148 }, E { value: "item1", hash_code: 2649680336 }
     ];
 
-    fn get_hash(value: &str, seed: u32) -> u32 {
-        let mut hash1: u32 = seed;
-        let mut hash2: u32 = seed;
+    fn get_hash(value: &str) -> u32 {
+        let mut hash1: u32 = (5381 << 16) + 5381;
+        let mut hash2: u32 = (5381 << 16) + 5381;
 
         for chunk in value.as_bytes().chunks(8) {
             if chunk.len() >= 4 {
@@ -31,12 +31,21 @@ impl MyData {
         hash1.wrapping_add(hash2.wrapping_mul(0x5D588B65))
     }
 
+    fn murmur_32(mut h: u32) -> u32 {
+        h ^= h >> 16;
+        h = h.wrapping_mul(0x85EB_CA6B);
+        h ^= h >> 13;
+        h = h.wrapping_mul(0xC2B2_AE35);
+        h ^= h >> 16;
+        h
+    }
+
     pub fn contains(value: &str) -> bool {
         if value.len() != 5 {
             return false;
         }
 
-        let hash = Self::get_hash(value, 3);
+        let hash = murmur_32(Self::get_hash(value) ^ 13);
         let index = (hash % 3) as usize;
         let entry = &Self::ENTRIES[index];
 

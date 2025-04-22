@@ -23,7 +23,7 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, RustGeneratorConf
                  {{FormatColumns(ctx.Entries, RenderEntry)}}
                      ];
 
-                 {{genCfg.GetHashSource(false)}}
+                 {{genCfg.GetHashSource()}}
 
                      {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
                  {{cfg.GetEarlyExits(genCfg)}}

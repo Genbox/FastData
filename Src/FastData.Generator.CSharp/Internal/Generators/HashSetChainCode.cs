@@ -36,7 +36,7 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
                   return false;
               }
 
-          {{genCfg.GetHashSource(false)}}
+          {{genCfg.GetHashSource()}}
 
               [StructLayout(LayoutKind.Auto)]
               private struct E

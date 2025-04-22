@@ -31,14 +31,14 @@ internal static class GeneratorConfigExtensions
         return $"if value > {variable} {{ 1 }} else if value < {variable} {{ -1 }} else {{ 0 }}";
     }
 
-    internal static string GetHashSource(this GeneratorConfig config, bool seeded)
+    internal static string GetHashSource(this GeneratorConfig config)
     {
         if (config.DataType == DataType.String)
         {
             return $$"""
-                         fn get_hash(value: &str{{(seeded ? ", seed: u32" : "")}}) -> u32 {
-                             let mut hash1: u32 = {{(seeded ? "seed" : "5381")}};
-                             let mut hash2: u32 = {{(seeded ? "seed" : "5381")}};
+                         fn get_hash(value: &str) -> u32 {
+                             let mut hash1: u32 = (5381 << 16) + 5381;
+                             let mut hash2: u32 = (5381 << 16) + 5381;
 
                              for chunk in value.as_bytes().chunks(8) {
                                  if chunk.len() >= 4 {
@@ -61,8 +61,8 @@ internal static class GeneratorConfigExtensions
         }
 
         return $$"""
-                     fn get_hash(value: {{config.GetTypeName()}}{{(seeded ? ", seed: u32" : "")}}) -> u32 {
-                         (value as u32){{(seeded ? " ^ seed" : "")}}
+                     fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
+                         value as u32
                      }
                  """;
     }

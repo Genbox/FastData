@@ -10,7 +10,7 @@ internal static class XxHash
     private const ulong PRIME64_2 = 0xC2B2AE3D27D4EB4FUL;
     private const ulong PRIME64_3 = 0x165667B19E3779F9UL;
     private const ulong PRIME64_4 = 0x85EBCA77C2B2AE63UL;
-    internal const ulong PRIME64_5 = 0x27D4EB2F165667C5UL;
+    private const ulong PRIME64_5 = 0x27D4EB2F165667C5UL;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static uint ComputeHash(ReadOnlySpan<char> s, ulong seed = PRIME64_5) => ComputeHash(ref MemoryMarshal.GetReference(s), s.Length, seed);
