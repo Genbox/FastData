@@ -16,6 +16,14 @@ internal static class PerfectHashHelper
             yield break;
         }
 
+        //If there are duplicate hash codes, we might as well early exit as there exist no solution
+        HashSet<uint> codes = new HashSet<uint>();
+        foreach (T item in data)
+        {
+            if (!codes.Add(hashFunc(item)))
+                yield break;
+        }
+
         bool[] bArray = new bool[length];
         ulong fastMod = MathHelper.GetFastModMultiplier((uint)length);
         int numFound = 0;
