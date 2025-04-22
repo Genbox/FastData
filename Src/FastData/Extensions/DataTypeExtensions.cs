@@ -13,8 +13,8 @@ public static class DataTypeExtensions
 
     public static bool IsIdentityHash(this DataType type) => type switch
     {
-        DataType.Char or DataType.SByte or DataType.Byte or DataType.Int16 or DataType.UInt16 or DataType.Int32 or DataType.UInt32 or DataType.Int64 or DataType.UInt64 => true,
-        DataType.Boolean or DataType.String or DataType.Single or DataType.Double => false,
+        DataType.Char or DataType.SByte or DataType.Byte or DataType.Int16 or DataType.UInt16 or DataType.Int32 or DataType.UInt32 => true,
+        DataType.Boolean or DataType.String or DataType.Int64 or DataType.UInt64 or DataType.Single or DataType.Double => false,
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
 }
