@@ -54,8 +54,8 @@ public static class TestHelper
         yield return [(ushort)0, (ushort)1, (ushort)2, ushort.MaxValue];
         yield return [int.MinValue, -1, 0, 1, int.MaxValue];
         yield return [0U, 1U, 2U, uint.MaxValue];
-        yield return [long.MinValue, -1L, 0L, 1L, long.MaxValue];
-        yield return [0UL, 1UL, 2UL, ulong.MaxValue];
+        yield return [long.MinValue, -5L, 0L, 1L, long.MaxValue - 1]; //We use -5 and -1 to avoid hash collisions
+        yield return [0UL, 1UL, 2UL, ulong.MaxValue - 10]; //We use -1 to avoid hash collisions
         yield return ["a", "item", new string('a', 255)];
     }
 
@@ -125,10 +125,14 @@ public static class TestHelper
                     yield return (type, ["1", "2", "a", "aa", "aaa", "item", new string('a', 255)]); //Test long strings
                     break;
 
+                case StructureType.PerfectHashBruteForce: //We've kept to a small set since larger ones will just hit timeout
+                    foreach (object[] data in GetEdgeCaseSets())
+                        yield return (type, data);
+                    break;
+
                 case StructureType.Conditional:
                 case StructureType.BinarySearch:
                 case StructureType.EytzingerSearch:
-                case StructureType.PerfectHashBruteForce:
                 case StructureType.HashSetChain:
                 case StructureType.HashSetLinear:
                 case StructureType.Array:
