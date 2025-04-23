@@ -53,13 +53,14 @@ public class VectorTests
 
     public static TheoryData<StructureType, object[], string> GetTestData()
     {
+        //This is placed here to make sure it is only run once
         string root = Path.Combine(Path.GetTempPath(), "FastData", "CPlusPlus");
 
         //Create or empty the directory
         if (!Directory.Exists(root))
             Directory.CreateDirectory(root);
         else
-            EmptyDirectory(root);
+            TestHelper.EmptyDirectory(root);
 
         TheoryData<StructureType, object[], string> res = new TheoryData<StructureType, object[], string>();
 
@@ -68,14 +69,5 @@ public class VectorTests
             res.Add(type, data, root);
 
         return res;
-    }
-
-    private static void EmptyDirectory(string path)
-    {
-        foreach (string file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
-            File.Delete(file);
-
-        foreach (string dir in Directory.GetDirectories(path, "*", SearchOption.AllDirectories))
-            Directory.Delete(dir, true);
     }
 }

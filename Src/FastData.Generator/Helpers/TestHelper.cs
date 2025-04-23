@@ -147,4 +147,13 @@ public static class TestHelper
             }
         }
     }
+
+    public static void EmptyDirectory(string path)
+    {
+        foreach (string file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
+            File.Delete(file);
+
+        foreach (string dir in Directory.GetDirectories(path, "*", SearchOption.AllDirectories))
+            Directory.Delete(dir, true);
+    }
 }
