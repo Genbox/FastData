@@ -28,13 +28,13 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, RustGeneratorConf
                      {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
                  {{cfg.GetEarlyExits(genCfg)}}
 
-                         let hash = Self::get_hash(value);
+                         let hash = unsafe { Self::get_hash(value) };
                          let index = {{cfg.GetModFunction(ctx.Buckets.Length)}};
                          let mut i: {{GetSmallestSignedType(ctx.Buckets.Length)}} = (Self::BUCKETS[index as usize] as {{GetSmallestSignedType(ctx.Buckets.Length)}}) - 1;
 
                          while i >= 0 {
                              let entry = &Self::ENTRIES[i as usize];
-                             if entry.hash_code == hash && {{genCfg.GetEqualFunction("entry.value")}} {
+                             if entry.hash_code == hash && entry.value == value {
                                  return true;
                              }
                              i = entry.next;

@@ -13,19 +13,19 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, RustGeneratorC
 
                   let mut i: usize = 0;
                   while i < Self::ENTRIES.len() {
-                      let comparison = {{genCfg.GetCompareFunction("Self::ENTRIES[i]")}};
+                      let entry = Self::ENTRIES[i];
 
-                      if comparison == 0 {
+                      if entry == value {
                           return true;
                       }
-                      if comparison < 0 {
+                      if entry < value {
                           i = 2 * i + 2;
                       } else {
                           i = 2 * i + 1;
                       }
                   }
 
-                  false
+                  return false;
               }
           """;
 }

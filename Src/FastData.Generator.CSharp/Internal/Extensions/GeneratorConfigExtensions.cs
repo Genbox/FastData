@@ -129,37 +129,37 @@ internal static class GeneratorConfigExtensions
         return spec.HashFunction switch
         {
             HashFunction.DJB2Hash => GetDJBHash(DataType.String),
-            HashFunction.XxHash => $$"""
-                                             ulong hash1 = (ulong)length;
+            HashFunction.XxHash => """
+                                           ulong hash1 = (ulong)length;
 
-                                             ref ulong ptr64 = ref Unsafe.As<char, ulong>(ref ptr);
-                                             while (length >= 4)
-                                             {
-                                                 ulong acc = 0;
-                                                 acc += ptr64 * 0xC2B2AE3D27D4EB4FUL;
-                                                 acc = (acc << 31) | (acc >> (64 - 31));
-                                                 acc *= 0x9E3779B185EBCA87UL;
-                                                 hash1 ^= acc;
-                                                 hash1 = (((hash1 << 27) | (hash1 >> (64 - 27))) * 0x9E3779B185EBCA87UL) + 0x85EBCA77C2B2AE63UL;
-                                                 ptr64 = ref Unsafe.Add(ref ptr64, 1);
-                                                 length -= 4;
-                                             }
+                                           ref ulong ptr64 = ref Unsafe.As<char, ulong>(ref ptr);
+                                           while (length >= 4)
+                                           {
+                                               ulong acc = 0;
+                                               acc += ptr64 * 0xC2B2AE3D27D4EB4FUL;
+                                               acc = (acc << 31) | (acc >> (64 - 31));
+                                               acc *= 0x9E3779B185EBCA87UL;
+                                               hash1 ^= acc;
+                                               hash1 = (((hash1 << 27) | (hash1 >> (64 - 27))) * 0x9E3779B185EBCA87UL) + 0x85EBCA77C2B2AE63UL;
+                                               ptr64 = ref Unsafe.Add(ref ptr64, 1);
+                                               length -= 4;
+                                           }
 
-                                             ref ushort ptr16 = ref Unsafe.As<ulong, ushort>(ref ptr64);
-                                             while (length-- > 0)
-                                             {
-                                                 hash1 ^= ptr16 * 0x27D4EB2F165667C5UL;
-                                                 hash1 = ((hash1 << 11) | (hash1 >> (64 - 11))) * 0x9E3779B185EBCA87UL;
-                                                 ptr16 = ref Unsafe.Add(ref ptr16, 1);
-                                             }
+                                           ref ushort ptr16 = ref Unsafe.As<ulong, ushort>(ref ptr64);
+                                           while (length-- > 0)
+                                           {
+                                               hash1 ^= ptr16 * 0x27D4EB2F165667C5UL;
+                                               hash1 = ((hash1 << 11) | (hash1 >> (64 - 11))) * 0x9E3779B185EBCA87UL;
+                                               ptr16 = ref Unsafe.Add(ref ptr16, 1);
+                                           }
 
-                                             hash1 ^= hash1 >> 33;
-                                             hash1 *= 0xC2B2AE3D27D4EB4FUL;
-                                             hash1 ^= hash1 >> 29;
-                                             hash1 *= 0x165667B19E3779F9UL;
-                                             hash1 ^= hash1 >> 32;
-                                             return unchecked((uint)hash1);
-                                     """,
+                                           hash1 ^= hash1 >> 33;
+                                           hash1 *= 0xC2B2AE3D27D4EB4FUL;
+                                           hash1 ^= hash1 >> 29;
+                                           hash1 *= 0x165667B19E3779F9UL;
+                                           hash1 ^= hash1 >> 32;
+                                           return unchecked((uint)hash1);
+                                   """,
             _ => throw new ArgumentOutOfRangeException(nameof(spec), spec.HashFunction, "Invalid hash function")
         };
     }

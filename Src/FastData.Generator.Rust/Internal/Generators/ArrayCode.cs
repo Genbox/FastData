@@ -12,7 +12,7 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, RustGeneratorConfig cfg,
           {{cfg.GetEarlyExits(genCfg)}}
 
                   for entry in Self::ENTRIES.iter() {
-                      if {{genCfg.GetEqualFunction("entry", true)}} {
+                      if *entry == value {
                           return true;
                       }
                   }

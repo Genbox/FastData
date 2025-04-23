@@ -53,6 +53,9 @@ public class RustCodeGenerator(RustGeneratorConfig userCfg) : IGenerator
         _sb.Append($$"""
                      #![allow(unused_parens)]
                      #![allow(missing_docs)]
+                     #![allow(unused_imports)]
+                     use std::ptr;
+
                      pub struct {{userCfg.ClassName}};
 
                      impl {{userCfg.ClassName}} {

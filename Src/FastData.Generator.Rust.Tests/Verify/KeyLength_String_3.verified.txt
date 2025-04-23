@@ -2,6 +2,9 @@
 //! Structure: KeyLength
 #![allow(unused_parens)]
 #![allow(missing_docs)]
+#![allow(unused_imports)]
+use std::ptr;
+
 pub struct MyData;
 
 impl MyData {
@@ -13,7 +16,7 @@ impl MyData {
 if 13u64 & (1u64 << ((value.len() - 1) % 64)) == 0 {
     return false;
 }
-        return value == Self::ENTRIES[(value.len() - 1) as usize];
+        return Self::ENTRIES[(value.len() - 1) as usize] == value;
     }
 
     pub const ITEM_COUNT: usize = 3;

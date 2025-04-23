@@ -18,15 +18,15 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustGenerator
                      {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
                  {{cfg.GetEarlyExits(genCfg)}}
 
-                         let hash = Self::get_hash(value) as usize;
+                         let hash = unsafe { Self::get_hash(value) } as usize;
                          if hash > {{ctx.MaxHash}} {
                              return false;
                          }
 
-                         {{genCfg.GetEqualFunction("Self::ITEMS[hash]")}}
+                         return Self::ITEMS[hash] == value;
                      }
 
-                     {{cfg.GetMethodModifier()}}fn get_hash(str: &str) -> u32 {
+                     {{cfg.GetMethodModifier(true)}}fn get_hash(str: &str) -> u32 {
                  {{RenderHashFunction()}}
                      }
                  """;
@@ -46,18 +46,18 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustGenerator
 
         StringBuilder sb = new StringBuilder($"""
                                                       let bytes = str.as_bytes();
-                                                      let mut hash: u32 = {RenderAsso(key)};
+                                                      let mut hash: u32 = 0;
 
                                               """);
 
         // Output all the other cases
         do
         {
-            sb.Append($"        if bytes.len() > {key} {{");
+            sb.Append($"        if bytes.len() >= {key} {{");
 
             if (ctx.Positions.Contains(key - 1))
                 sb.AppendLine($" hash += {RenderAsso(key - 1)}; }}");
-        } while (--key > minLen);
+        } while (key-- > minLen);
 
         sb.Append("        return hash");
 
@@ -71,7 +71,10 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustGenerator
 
     private string RenderExpression()
     {
-        StringBuilder sb = new StringBuilder("        return ");
+        StringBuilder sb = new StringBuilder("""
+                                                     let bytes = str.as_bytes();
+                                                     return
+                                             """);
 
         for (int i = 0; i < ctx.Positions.Length; i++)
         {
@@ -88,10 +91,10 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustGenerator
     private string RenderAsso(int pos)
     {
         if (pos == -1)
-            return "Self::ASSO[bytes[bytes.len() - 1] as usize] as u32";
+            return " Self::ASSO[bytes[bytes.len() - 1] as usize] as u32";
 
         int inc = ctx.AlphaIncrements[pos];
-        return $"Self::ASSO[bytes[{pos}]{(inc != 0 ? $" + {inc}" : "")} as usize] as u32";
+        return $" Self::ASSO[bytes[{pos}]{(inc != 0 ? $" + {inc}" : "")} as usize] as u32";
     }
 
     private static IEnumerable<string?> WrapWords(KeyValuePair<string, uint>[] items)

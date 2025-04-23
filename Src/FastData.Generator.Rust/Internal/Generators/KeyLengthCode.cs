@@ -21,7 +21,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, RustGeneratorConfig 
 
                      {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
-                         return {{genCfg.GetEqualFunction($"Self::ENTRIES[(value.len() - {ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}) as usize]")}};
+                         return Self::ENTRIES[(value.len() - {{ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}}) as usize] == value;
                      }
                  """;
     }
@@ -48,7 +48,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, RustGeneratorConfig 
                          }
 
                          for item in bucket.iter() {
-                             if {{genCfg.GetEqualFunction("item")}} {
+                             if item == value {
                                  return true;
                              }
                          }

@@ -15,19 +15,19 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, RustGeneratorConf
                   let mut hi: usize = {{(ctx.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
                   while lo <= hi {
                       let i = lo + ((hi - lo) >> 1);
-                      let order = {{genCfg.GetCompareFunction("Self::ENTRIES[i]")}};
+                      let entry = Self::ENTRIES[i];
 
-                      if order == 0 {
+                      if entry == value {
                           return true;
                       }
-                      if order < 0 {
+                      if entry < value {
                           lo = i + 1;
                       } else {
                           hi = i - 1;
                       }
                   }
 
-                  return (!lo) >= 0;
+                  return false;
               }
           """;
 }

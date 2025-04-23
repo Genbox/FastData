@@ -1,3 +1,5 @@
+using Genbox.FastData.Extensions;
+
 namespace Genbox.FastData.Generator.Rust.Internal.Extensions;
 
 internal static class GeneratorConfigExtensions
@@ -21,49 +23,76 @@ internal static class GeneratorConfigExtensions
         _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
     };
 
-    internal static string GetEqualFunction(this GeneratorConfig config, string variable, bool asRef = false) => $"value == {(asRef ? "*" : "")}{variable}";
-
-    internal static string GetCompareFunction(this GeneratorConfig config, string variable)
-    {
-        if (config.DataType == DataType.String)
-            return $"{variable}.cmp(value) as i32";
-
-        return $"if value > {variable} {{ 1 }} else if value < {variable} {{ -1 }} else {{ 0 }}";
-    }
-
     internal static string GetHashSource(this GeneratorConfig config)
     {
         if (config.DataType == DataType.String)
         {
+            return """
+                       unsafe fn get_hash(value: &str) -> u32 {
+                           let hash1: u32 = (5381 << 16) + 5381;
+                           let mut hash2: u32 = (5381 << 16) + 5381;
+                           let vec: Vec<u16> = value.encode_utf16().collect();
+                           let mut ptr = vec.as_ptr();
+                           let mut len = vec.len();
+
+                           while len > 0 {
+                               let ch = *ptr;
+                               hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ ch as u32;
+                               ptr = ptr.add(1);
+                               len -= 1;
+                           }
+
+                           hash1.wrapping_add(hash2.wrapping_mul(1566083941))
+                        }
+                   """;
+        }
+
+        if (config.DataType.IsIdentityHash() || config.DataType == DataType.Boolean)
+        {
             return $$"""
-                         fn get_hash(value: &str) -> u32 {
-                             let mut hash1: u32 = (5381 << 16) + 5381;
-                             let mut hash2: u32 = (5381 << 16) + 5381;
-
-                             for chunk in value.as_bytes().chunks(8) {
-                                 if chunk.len() >= 4 {
-                                     let part1 = u32::from_le_bytes(chunk[0..4].try_into().unwrap());
-                                     hash1 = hash1.rotate_left(5) ^ part1;
-                                 }
-                                 if chunk.len() == 8 {
-                                     let part2 = u32::from_le_bytes(chunk[4..8].try_into().unwrap());
-                                     hash2 = hash2.rotate_left(5) ^ part2;
-                                 }
-                             }
-
-                             for &b in value.as_bytes().iter().skip(value.len() / 8 * 8) {
-                                 hash2 = hash2.rotate_left(5) ^ b as u32;
-                             }
-
-                             hash1.wrapping_add(hash2.wrapping_mul(0x5D588B65))
+                         fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
+                             value as u32
                          }
                      """;
         }
 
-        return $$"""
-                     fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
-                         value as u32
-                     }
-                 """;
+        if (config.DataType is DataType.Int64 or DataType.UInt64)
+        {
+            return $$"""
+                         fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
+                             return ((value as i32) ^ ((value >> 32) as i32)) as u32;
+                         }
+                     """;
+        }
+
+        if (config.DataType == DataType.Single)
+        {
+            return $$"""
+                         fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
+                             let mut bits = value.to_bits();
+
+                             if ((bits.wrapping_sub(1)) & !0x8000_0000) >= 0x7F80_0000 {
+                                 bits &= 0x7F80_0000;
+                             }
+                             bits
+                         }
+                     """;
+        }
+
+        if (config.DataType == DataType.Double)
+        {
+            return $$"""
+                         fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
+                             let mut bits = value.to_bits();
+
+                             if ((bits.wrapping_sub(1)) & !0x8000_0000_0000_0000) >= 0x7FF0_0000_0000_0000 {
+                                 bits &= 0x7FF0_0000_0000_0000;
+                             }
+                             (bits as u32) ^ ((bits >> 32) as u32)
+                         }
+                     """;
+        }
+
+        throw new InvalidOperationException("Unsupported data type: " + config.DataType);
     }
 }

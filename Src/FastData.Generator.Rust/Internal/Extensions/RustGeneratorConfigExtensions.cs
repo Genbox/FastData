@@ -32,7 +32,7 @@ internal static class RustGeneratorConfigExtensions
 
     public static string? GetFieldModifier(this RustGeneratorConfig config) => null;
 
-    public static string GetMethodModifier(this RustGeneratorConfig config) => "pub ";
+    public static string GetMethodModifier(this RustGeneratorConfig config, bool forcePrivate = false) => forcePrivate ? " " : "pub ";
 
     internal static string GetModFunction(this RustGeneratorConfig config, int length)
     {
@@ -48,15 +48,15 @@ internal static class RustGeneratorConfigExtensions
 
     internal static string GetValueEarlyExits(object min, object max, DataType dataType) =>
         $$"""
-                 if {{(min.Equals(max) ? $"value != {ToValueLabel(max, dataType)}" : $"value < {ToValueLabel(min, dataType)} || value > {ToValueLabel(max, dataType)}")}} {
-                     return false;
-                 }
-         """;
+                  if {{(min.Equals(max) ? $"value != {ToValueLabel(max, dataType)}" : $"value < {ToValueLabel(min, dataType)} || value > {ToValueLabel(max, dataType)}")}} {
+                      return false;
+                  }
+          """;
 
     internal static string GetLengthEarlyExits(uint min, uint max) =>
         $$"""
-                 if {{(min.Equals(max) ? $"value.len() != {ToValueLabel(max)}" : $"value.len() < {ToValueLabel(min)} || value.len() > {ToValueLabel(max)}")}} {
-                     return false;
-                 }
-         """;
+                  if {{(min.Equals(max) ? $"value.len() != {ToValueLabel(max)}" : $"value.len() < {ToValueLabel(min)} || value.len() > {ToValueLabel(max)}")}} {
+                      return false;
+                  }
+          """;
 }

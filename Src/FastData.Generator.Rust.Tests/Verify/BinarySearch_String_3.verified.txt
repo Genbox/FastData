@@ -2,6 +2,9 @@
 //! Structure: BinarySearch
 #![allow(unused_parens)]
 #![allow(missing_docs)]
+#![allow(unused_imports)]
+use std::ptr;
+
 pub struct MyData;
 
 impl MyData {
@@ -18,19 +21,19 @@ impl MyData {
         let mut hi: usize = 2;
         while lo <= hi {
             let i = lo + ((hi - lo) >> 1);
-            let order = Self::ENTRIES[i].cmp(value) as i32;
+            let entry = Self::ENTRIES[i];
 
-            if order == 0 {
+            if entry == value {
                 return true;
             }
-            if order < 0 {
+            if entry < value {
                 lo = i + 1;
             } else {
                 hi = i - 1;
             }
         }
 
-        return (!lo) >= 0;
+        return false;
     }
 
     pub const ITEM_COUNT: usize = 3;

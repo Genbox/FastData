@@ -7,7 +7,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, RustGeneratorConfi
                  {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
              {{cfg.GetEarlyExits(genCfg)}}
 
-                     if {{FormatList(ctx.Data, (x, y) => Render(genCfg, x, y), " || ")}} {
+                     if {{FormatList(ctx.Data, Render, " || ")}} {
                          return true;
                      }
 
@@ -15,5 +15,5 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, RustGeneratorConfi
                  }
              """;
 
-    private static void Render(GeneratorConfig genCfg, StringBuilder sb, object obj) => sb.Append(genCfg.GetEqualFunction(ToValueLabel(obj)));
+    private static void Render(StringBuilder sb, object obj) => sb.Append($"value == {ToValueLabel(obj)}");
 }

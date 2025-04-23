@@ -2,6 +2,9 @@
 //! Structure: EytzingerSearch
 #![allow(unused_parens)]
 #![allow(missing_docs)]
+#![allow(unused_imports)]
+use std::ptr;
+
 pub struct MyData;
 
 impl MyData {
@@ -16,19 +19,19 @@ impl MyData {
 
         let mut i: usize = 0;
         while i < Self::ENTRIES.len() {
-            let comparison = Self::ENTRIES[i].cmp(value) as i32;
+            let entry = Self::ENTRIES[i];
 
-            if comparison == 0 {
+            if entry == value {
                 return true;
             }
-            if comparison < 0 {
+            if entry < value {
                 i = 2 * i + 2;
             } else {
                 i = 2 * i + 1;
             }
         }
 
-        false
+        return false;
     }
 
     pub const ITEM_COUNT: usize = 3;

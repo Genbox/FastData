@@ -31,13 +31,13 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, RustGeneratorCon
                      {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName(true)}}) -> bool {
                  {{cfg.GetEarlyExits(genCfg)}}
 
-                         let hash = Self::get_hash(value);
+                         let hash = unsafe { Self::get_hash(value) };
                          let bucket = &Self::BUCKETS[({{cfg.GetModFunction(ctx.Buckets.Length)}}) as usize];
                          let mut index: {{GetSmallestUnsignedType(ctx.Data.Length)}} = bucket.start_index;
                          let end_index: {{GetSmallestUnsignedType(ctx.Data.Length)}} = bucket.end_index;
 
                          while index <= end_index {
-                             if Self::HASH_CODES[index as usize] == hash && {{genCfg.GetEqualFunction("Self::ITEMS[index as usize]")}} {
+                             if Self::HASH_CODES[index as usize] == hash && Self::ITEMS[index as usize] == value {
                                  return true;
                              }
                              index += 1;

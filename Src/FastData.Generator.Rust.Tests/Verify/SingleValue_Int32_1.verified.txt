@@ -2,11 +2,14 @@
 //! Structure: SingleValue
 #![allow(unused_parens)]
 #![allow(missing_docs)]
+#![allow(unused_imports)]
+use std::ptr;
+
 pub struct MyData;
 
 impl MyData {
     pub fn contains(value: i32) -> bool {
-        return value == 1;
+        return 1 == value;
     }
 
     pub const ITEM_COUNT: usize = 1;

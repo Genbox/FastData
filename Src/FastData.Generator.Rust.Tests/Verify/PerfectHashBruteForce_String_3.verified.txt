@@ -2,6 +2,9 @@
 //! Structure: PerfectHashBruteForce
 #![allow(unused_parens)]
 #![allow(missing_docs)]
+#![allow(unused_imports)]
+use std::ptr;
+
 pub struct MyData;
 
 impl MyData {
@@ -9,27 +12,22 @@ impl MyData {
         E { value: "item3", hash_code: 94714119 }, E { value: "item2", hash_code: 1729332148 }, E { value: "item1", hash_code: 2649680336 }
     ];
 
-    fn get_hash(value: &str) -> u32 {
-        let mut hash1: u32 = (5381 << 16) + 5381;
+    unsafe fn get_hash(value: &str) -> u32 {
+        let hash1: u32 = (5381 << 16) + 5381;
         let mut hash2: u32 = (5381 << 16) + 5381;
+        let vec: Vec<u16> = value.encode_utf16().collect();
+        let mut ptr = vec.as_ptr();
+        let mut len = vec.len();
 
-        for chunk in value.as_bytes().chunks(8) {
-            if chunk.len() >= 4 {
-                let part1 = u32::from_le_bytes(chunk[0..4].try_into().unwrap());
-                hash1 = hash1.rotate_left(5) ^ part1;
-            }
-            if chunk.len() == 8 {
-                let part2 = u32::from_le_bytes(chunk[4..8].try_into().unwrap());
-                hash2 = hash2.rotate_left(5) ^ part2;
-            }
+        while len > 0 {
+            let ch = *ptr;
+            hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ ch as u32;
+            ptr = ptr.add(1);
+            len -= 1;
         }
 
-        for &b in value.as_bytes().iter().skip(value.len() / 8 * 8) {
-            hash2 = hash2.rotate_left(5) ^ b as u32;
-        }
-
-        hash1.wrapping_add(hash2.wrapping_mul(0x5D588B65))
-    }
+        hash1.wrapping_add(hash2.wrapping_mul(1566083941))
+     }
 
     fn murmur_32(mut h: u32) -> u32 {
         h ^= h >> 16;
@@ -37,19 +35,18 @@ impl MyData {
         h ^= h >> 13;
         h = h.wrapping_mul(0xC2B2_AE35);
         h ^= h >> 16;
-        h
+        return h;
     }
 
     pub fn contains(value: &str) -> bool {
         if value.len() != 5 {
             return false;
         }
-
-        let hash = murmur_32(Self::get_hash(value) ^ 13);
+        let hash = Self::murmur_32(unsafe { Self::get_hash(value) } ^ 13);
         let index = (hash % 3) as usize;
         let entry = &Self::ENTRIES[index];
 
-        hash == entry.hash_code && value == entry.value
+        return hash == entry.hash_code && value == entry.value;
     }
 
     pub const ITEM_COUNT: usize = 3;
