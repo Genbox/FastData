@@ -39,11 +39,11 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorCo
           {{genCfg.GetHashSource()}}
 
               [StructLayout(LayoutKind.Auto)]
-              private struct E
+              private readonly struct E
               {
-                  internal uint HashCode;
-                  internal {{GetSmallestSignedType(ctx.Buckets.Length)}} Next;
-                  internal {{genCfg.GetTypeName()}} Value;
+                  internal readonly uint HashCode;
+                  internal readonly {{GetSmallestSignedType(ctx.Buckets.Length)}} Next;
+                  internal readonly {{genCfg.GetTypeName()}} Value;
 
                   internal E(uint hashCode, {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{genCfg.GetTypeName()}} value)
                   {

@@ -47,11 +47,11 @@ internal static class MyData
     }
 
     [StructLayout(LayoutKind.Auto)]
-    private struct E
+    private readonly struct E
     {
-        internal uint HashCode;
-        internal sbyte Next;
-        internal int Value;
+        internal readonly uint HashCode;
+        internal readonly sbyte Next;
+        internal readonly int Value;
 
         internal E(uint hashCode, sbyte next, int value)
         {

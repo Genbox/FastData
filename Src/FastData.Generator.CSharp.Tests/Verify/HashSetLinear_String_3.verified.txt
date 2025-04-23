@@ -51,8 +51,7 @@ internal static class MyData
         uint hash1 = (5381 << 16) + 5381;
         uint hash2 = (5381 << 16) + 5381;
         int length = value.Length;
-        ReadOnlySpan<char> span = value.AsSpan();
-        ref char ptr = ref MemoryMarshal.GetReference(span);
+        ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
         ref uint ptr32 = ref Unsafe.As<char, uint>(ref ptr);
 
         while (length >= 4)
@@ -75,16 +74,16 @@ internal static class MyData
     }
 
     [StructLayout(LayoutKind.Auto)]
-    private struct B
+    private readonly struct B
     {
+        internal readonly byte StartIndex;
+        internal readonly byte EndIndex;
+
         internal B(byte startIndex, byte endIndex)
         {
             StartIndex = startIndex;
             EndIndex = endIndex;
         }
-
-        internal byte StartIndex;
-        internal byte EndIndex;
     }
 
     public const int ItemCount = 3;

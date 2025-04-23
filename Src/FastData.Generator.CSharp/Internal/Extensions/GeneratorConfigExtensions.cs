@@ -194,8 +194,7 @@ internal static class GeneratorConfigExtensions
                            uint hash1 = (5381 << 16) + 5381;
                            uint hash2 = (5381 << 16) + 5381;
                            int length = value.Length;
-                           ReadOnlySpan<char> span = value.AsSpan();
-                           ref char ptr = ref MemoryMarshal.GetReference(span);
+                           ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
                            ref uint ptr32 = ref Unsafe.As<char, uint>(ref ptr);
 
                            while (length >= 4)

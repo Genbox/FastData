@@ -43,16 +43,16 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpGeneratorC
           {{genCfg.GetHashSource()}}
 
               [StructLayout(LayoutKind.Auto)]
-              private struct B
+              private readonly struct B
               {
+                  internal readonly {{GetSmallestUnsignedType(ctx.Data.Length)}} StartIndex;
+                  internal readonly {{GetSmallestUnsignedType(ctx.Data.Length)}} EndIndex;
+
                   internal B({{GetSmallestUnsignedType(ctx.Data.Length)}} startIndex, {{GetSmallestUnsignedType(ctx.Data.Length)}} endIndex)
                   {
                       StartIndex = startIndex;
                       EndIndex = endIndex;
                   }
-
-                  internal {{GetSmallestUnsignedType(ctx.Data.Length)}} StartIndex;
-                  internal {{GetSmallestUnsignedType(ctx.Data.Length)}} EndIndex;
               }
           """;
 

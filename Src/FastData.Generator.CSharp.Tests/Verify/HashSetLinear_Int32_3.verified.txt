@@ -51,16 +51,16 @@ internal static class MyData
     }
 
     [StructLayout(LayoutKind.Auto)]
-    private struct B
+    private readonly struct B
     {
+        internal readonly byte StartIndex;
+        internal readonly byte EndIndex;
+
         internal B(byte startIndex, byte endIndex)
         {
             StartIndex = startIndex;
             EndIndex = endIndex;
         }
-
-        internal byte StartIndex;
-        internal byte EndIndex;
     }
 
     public const int ItemCount = 3;
