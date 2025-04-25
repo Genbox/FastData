@@ -11,7 +11,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
                  {{FormatColumns(ctx.AssociationValues, RenderAssociativeValue)}}
                      };
 
-                     {{cfg.GetFieldModifier()}}std::array<std::string, {{items.Length}}> items = {
+                     {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName(false)}}, {{items.Length}}> items = {
                  {{FormatColumns(items, static (sb, x) => sb.Append(ToValueLabel(x)))}}
                      };
 
@@ -28,7 +28,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
                          return items[hash] == value;
                      }
 
-                     {{cfg.GetMethodModifier()}}uint32_t get_hash(const std::string& str)
+                     {{cfg.GetMethodModifier()}}uint32_t get_hash(const {{genCfg.GetTypeName()}} str)
                      {
                  {{RenderHashFunction()}}
                      }

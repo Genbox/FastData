@@ -8,11 +8,11 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusGenerato
         $$"""
               struct e
               {
-                  const uint32_t hash_code;
-                  const {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
-                  const {{genCfg.GetTypeName()}} value;
+                  uint32_t hash_code;
+                  {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
+                  {{genCfg.GetTypeName(false)}} value;
 
-                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{genCfg.GetTypeName()}} value)
+                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{genCfg.GetTypeName(false)}} value)
                      : hash_code(hash_code), next(next), value(value) {}
               };
 

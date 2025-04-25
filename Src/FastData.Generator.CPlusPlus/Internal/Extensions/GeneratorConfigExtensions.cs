@@ -1,11 +1,13 @@
+using Genbox.FastData.Extensions;
+
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
 
 internal static class GeneratorConfigExtensions
 {
     internal static string GetTypeName(this GeneratorConfig config, bool asReference = true) => config.DataType switch
     {
-        DataType.String when asReference => "std::string&",
-        DataType.String => "std::string",
+        DataType.String when asReference => "std::u16string&",
+        DataType.String => "std::u16string",
         DataType.Boolean => "bool",
         DataType.SByte => "int8_t",
         DataType.Byte => "uint8_t",
@@ -26,37 +28,72 @@ internal static class GeneratorConfigExtensions
         if (config.DataType == DataType.String)
         {
             return """
-                       static uint32_t get_hash(const std::string& value)
+                       static uint32_t get_hash(const std::u16string& value)
                        {
-                           uint32_t hash1 = (5381 << 16) + 5381;
+                           constexpr uint32_t hash1 = (5381 << 16) + 5381;
                            uint32_t hash2 = (5381 << 16) + 5381;
 
-                           const char* ptr = value.data();
-                           uint32_t length = value.size();
+                           const char16_t* ptr = value.data();
+                           size_t length = value.size();
 
-                           auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
-                           while (length >= 4) {
-                               hash1 = (hash1 << 5 | hash1 >> (32 - 5)) + hash1 ^ ptr32[0];
-                               hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ ptr32[1];
-                               ptr32 += 2;
-                               length -= 4;
-                           }
-
-                           auto ptr_char = reinterpret_cast<const char*>(ptr32);
                            while (length-- > 0) {
-                               hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
+                               uint32_t ch = *ptr++;
+                               hash2 = ((hash2 << 5 | hash2 >> (32 - 5)) + hash2) ^ ch;
                            }
 
-                           return hash1 + hash2 * 0x5D588B65;
+                           return hash1 + hash2 * 1566083941;
                        }
                    """;
         }
 
-        return $$"""
-                     static uint32_t get_hash(const {{config.GetTypeName()}} value)
-                     {
-                         return static_cast<uint32_t>(value);
-                     }
-                 """;
+        if (config.DataType.IsIdentityHash() || config.DataType == DataType.Boolean)
+        {
+            return $$"""
+                      static uint32_t get_hash({{config.GetTypeName()}} value)
+                      {
+                          return static_cast<uint32_t>(value);
+                      }
+                      """;
+        }
+
+        if (config.DataType is DataType.Int64 or DataType.UInt64)
+        {
+            return $$"""
+                   static uint32_t get_hash({{config.GetTypeName()}} value)
+                   {
+                       return static_cast<uint32_t>(static_cast<int32_t>(value) ^ static_cast<int32_t>(value >> 32));
+                   }
+                   """;
+        }
+
+        if (config.DataType == DataType.Single)
+        {
+            return $$"""
+                          static uint32_t get_hash({{config.GetTypeName()}} value)
+                          {
+                              uint32_t bits;
+                              std::memcpy(&bits, &value, sizeof(bits));
+                              if (((bits - 1) & ~0x80000000u) >= 0x7F800000u)
+                                  bits &= 0x7F800000u;
+                              return bits;
+                          }
+                      """;
+        }
+
+        if (config.DataType == DataType.Double)
+        {
+            return $$"""
+                          static uint32_t get_hash({{config.GetTypeName()}} value)
+                          {
+                              uint64_t bits;
+                              std::memcpy(&bits, &value, sizeof(bits));
+                              if (((bits - 1) & ~0x8000000000000000ull) >= 0x7FF0000000000000ull)
+                                  bits &= 0x7FF0000000000000ull;
+                              return static_cast<uint32_t>(bits) ^ static_cast<uint32_t>(bits >> 32);
+                          }
+                      """;
+        }
+
+        throw new InvalidOperationException("Unsupported data type: " + config.DataType);
     }
 }

@@ -4,16 +4,17 @@
 #include <string>
 #include <array>
 #include <cstdint>
+#include <limits>
 
 class my_data
 {
     struct e
     {
-        const uint32_t hash_code;
-        const int8_t next;
-        const std::string& value;
+        uint32_t hash_code;
+        int8_t next;
+        std::u16string value;
 
-        e(const uint32_t hash_code, const int8_t next, const std::string& value)
+        e(const uint32_t hash_code, const int8_t next, std::u16string value)
            : hash_code(hash_code), next(next), value(value) {}
     };
 
@@ -22,35 +23,27 @@ class my_data
      };
 
     inline static const std::array<e, 3> entries = {
-        e(2011983611, -1, "item1"), e(3578067552, -1, "item2"), e(849184197, 1, "item3")
+        e(2011983611, -1, u"item1"), e(3578067552, -1, u"item2"), e(849184197, 1, u"item3")
     };
 
-    static uint32_t get_hash(const std::string& value)
+    static uint32_t get_hash(const std::u16string& value)
     {
-        uint32_t hash1 = (5381 << 16) + 5381;
+        constexpr uint32_t hash1 = (5381 << 16) + 5381;
         uint32_t hash2 = (5381 << 16) + 5381;
 
-        const char* ptr = value.data();
-        uint32_t length = value.size();
+        const char16_t* ptr = value.data();
+        size_t length = value.size();
 
-        auto ptr32 = reinterpret_cast<const uint32_t*>(ptr);
-        while (length >= 4) {
-            hash1 = (hash1 << 5 | hash1 >> (32 - 5)) + hash1 ^ ptr32[0];
-            hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ ptr32[1];
-            ptr32 += 2;
-            length -= 4;
-        }
-
-        auto ptr_char = reinterpret_cast<const char*>(ptr32);
         while (length-- > 0) {
-            hash2 = (hash2 << 5 | hash2 >> (32 - 5)) + hash2 ^ *ptr_char++;
+            uint32_t ch = *ptr++;
+            hash2 = ((hash2 << 5 | hash2 >> (32 - 5)) + hash2) ^ ch;
         }
 
-        return hash1 + hash2 * 0x5D588B65;
+        return hash1 + hash2 * 1566083941;
     }
 
 public:
-    static bool contains(const std::string& value)
+    static bool contains(const std::u16string& value)
     {
         if (const size_t len = value.length(); len != 5u)
             return false;

@@ -8,8 +8,8 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusGenerat
         $$"""
               struct b
               {
-                  const {{GetSmallestUnsignedType(ctx.Data.Length)}} start_index;
-                  const {{GetSmallestUnsignedType(ctx.Data.Length)}} end_index;
+                  {{GetSmallestUnsignedType(ctx.Data.Length)}} start_index;
+                  {{GetSmallestUnsignedType(ctx.Data.Length)}} end_index;
 
                   b(const {{GetSmallestUnsignedType(ctx.Data.Length)}} start_index, const {{GetSmallestUnsignedType(ctx.Data.Length)}} end_index)
                   : start_index(start_index), end_index(end_index) { }

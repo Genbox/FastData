@@ -6,10 +6,10 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CPlusPlu
         $$"""
               struct e
               {
-                  const {{genCfg.GetTypeName()}} value;
-                  const uint32_t hash_code;
+                  {{genCfg.GetTypeName(false)}} value;
+                  uint32_t hash_code;
 
-                  e(const {{genCfg.GetTypeName()}} value, const uint32_t hash_code)
+                  e(const {{genCfg.GetTypeName(false)}} value, const uint32_t hash_code)
                   : value(value), hash_code(hash_code) {}
               };
 
@@ -33,7 +33,7 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CPlusPlu
               {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
               {
           {{cfg.GetEarlyExits(genCfg)}}
-                  const uint32_t hash = Murmur_32(get_hash(value) ^ {{ctx.Seed}});
+                  const uint32_t hash = murmur_32(get_hash(value) ^ {{ctx.Seed}});
                   const uint32_t index = {{cfg.GetModFunction(ctx.Data.Length)}};
                   const e& entry = entries[index];
 

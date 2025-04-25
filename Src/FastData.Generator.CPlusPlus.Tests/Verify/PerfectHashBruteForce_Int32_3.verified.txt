@@ -3,13 +3,14 @@
 #pragma once
 #include <array>
 #include <cstdint>
+#include <limits>
 
 class my_data
 {
     struct e
     {
-        const int32_t value;
-        const uint32_t hash_code;
+        int32_t value;
+        uint32_t hash_code;
 
         e(const int32_t value, const uint32_t hash_code)
         : value(value), hash_code(hash_code) {}
@@ -19,10 +20,10 @@ class my_data
         e(3, 3262916883u), e(1, 2476801540u), e(2, 1228498187u)
     };
 
-    static uint32_t get_hash(const int32_t value)
-    {
-        return static_cast<uint32_t>(value);
-    }
+static uint32_t get_hash(int32_t value)
+{
+    return static_cast<uint32_t>(value);
+}
 
     static uint32_t murmur_32(uint32_t h)
     {
@@ -39,7 +40,7 @@ public:
     {
         if (value < 1 || value > 3)
             return false;
-        const uint32_t hash = Murmur_32(get_hash(value) ^ 10);
+        const uint32_t hash = murmur_32(get_hash(value) ^ 10);
         const uint32_t index = hash % 3;
         const e& entry = entries[index];
 

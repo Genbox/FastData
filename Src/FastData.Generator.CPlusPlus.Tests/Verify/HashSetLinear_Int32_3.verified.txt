@@ -3,13 +3,14 @@
 #pragma once
 #include <array>
 #include <cstdint>
+#include <limits>
 
 class my_data
 {
     struct b
     {
-        const uint8_t start_index;
-        const uint8_t end_index;
+        uint8_t start_index;
+        uint8_t end_index;
 
         b(const uint8_t start_index, const uint8_t end_index)
         : start_index(start_index), end_index(end_index) { }
@@ -27,10 +28,10 @@ class my_data
         1, 2, 3
     };
 
-    static uint32_t get_hash(const int32_t value)
-    {
-        return static_cast<uint32_t>(value);
-    }
+static uint32_t get_hash(int32_t value)
+{
+    return static_cast<uint32_t>(value);
+}
 
 public:
     static bool contains(const int32_t value)

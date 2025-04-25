@@ -4,13 +4,14 @@
 #include <string>
 #include <array>
 #include <cstdint>
+#include <limits>
 
 class my_data
 {
 public:
-    static bool contains(const std::string& value)
+    static bool contains(const std::u16string& value)
     {
-        return value == "value";
+        return value == u"value";
     }
 
     static constexpr unsigned int item_count = 1;

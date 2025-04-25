@@ -4,15 +4,16 @@
 #include <string>
 #include <array>
 #include <cstdint>
+#include <limits>
 
 class my_data
 {
-    inline static const std::array<std::string, 4> entries = {
-        "a", "", "aaa", "aaaa"
+    inline static const std::array<std::u16string, 4> entries = {
+        u"a", u"", u"aaa", u"aaaa"
     };
 
 public:
-    static bool contains(const std::string& value)
+    static bool contains(const std::u16string& value)
     {
         if ((13ULL & 1ULL << (value.length() - 1) % 64) == 0)
             return false;

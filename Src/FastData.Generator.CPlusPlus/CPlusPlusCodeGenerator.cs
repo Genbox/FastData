@@ -55,6 +55,7 @@ public class CPlusPlusCodeGenerator(CPlusPlusGeneratorConfig userCfg) : IGenerat
         _sb.Append($$"""
                      #include <array>
                      #include <cstdint>
+                     #include <limits>
 
                      class {{userCfg.ClassName}}
                      {
@@ -74,8 +75,10 @@ public class CPlusPlusCodeGenerator(CPlusPlusGeneratorConfig userCfg) : IGenerat
 
         if (genCfg.DataType.IsInteger())
         {
-            _sb.Append("    static constexpr ").Append(genCfg.GetTypeName()).Append(" min_value = ").Append(ToValueLabel(genCfg.Constants.MinValue, genCfg.DataType)).AppendLine(";");
-            _sb.Append("    static constexpr ").Append(genCfg.GetTypeName()).Append(" max_value = ").Append(ToValueLabel(genCfg.Constants.MaxValue, genCfg.DataType)).AppendLine(";");
+            _sb.Append("    static constexpr ").Append(genCfg.GetTypeName()).Append(" min_value = ").Append(ToValueLabel(genCfg.Constants.MinValue, genCfg.DataType))
+               .AppendLine(";");
+            _sb.Append("    static constexpr ").Append(genCfg.GetTypeName()).Append(" max_value = ").Append(ToValueLabel(genCfg.Constants.MaxValue, genCfg.DataType))
+               .AppendLine(";");
         }
         else if (genCfg.DataType == DataType.String)
         {
