@@ -1,70 +1,38 @@
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Helpers;
-using Genbox.FastData.Generator.Rust.Internal.Helpers;
-using TestHelper = Genbox.FastData.Generator.Helpers.TestHelper;
+using Genbox.FastData.Generator.Rust.Shared;
+using Genbox.FastData.InternalShared;
+using static Genbox.FastData.Generator.Rust.Internal.Helpers.CodeHelper;
+using static Genbox.FastData.InternalShared.TestHelper;
 
 namespace Genbox.FastData.Generator.Rust.Tests;
 
-public class VectorTests
+public class VectorTests(VectorTests.RustContext context) : IClassFixture<VectorTests.RustContext>
 {
     [Theory]
-    [MemberData(nameof(GetTestData))]
-    public void Test(StructureType type, object[] data, string root)
+    [ClassData(typeof(TestVectorClass))]
+    public void Test(StructureType type, object[] data)
     {
-        Assert.True(TestHelper.TryGenerate(id => new RustCodeGenerator(new RustGeneratorConfig(id)), type, data, out GeneratorSpec spec));
-        Assert.NotEmpty(spec.Source);
+        Assert.True(TestVectorHelper.TryGenerate(id => new RustCodeGenerator(new RustGeneratorConfig(id)), type, data, out GeneratorSpec spec));
 
-        string file = Path.Combine(root, $"{spec.Identifier}.rs");
+        string executable = context.Compiler.Compile(spec.Identifier,
+            $$"""
+              #![allow(non_camel_case_types)]
+              {{spec.Source}}
 
-        File.WriteAllText(file, $$"""
-                                  #![allow(non_camel_case_types)]
-                                  {{spec.Source}}
+              fn main() {
+                  let result = if {{spec.Identifier}}::contains({{ToValueLabel(data[0])}}) { 1 } else { 0 };
+                  std::process::exit(result);
+              }
+              """);
 
-                                  fn main() {
-                                      let result = if {{spec.Identifier}}::contains({{CodeHelper.ToValueLabel(data[0])}}) { 1 } else { 0 };
-                                      std::process::exit(result);
-                                  }
-                                  """);
-
-        string output = Path.ChangeExtension(file, "exe");
-
-        //Compile it
-        ProcessStartInfo info = new ProcessStartInfo();
-        info.UseShellExecute = false;
-        info.CreateNoWindow = true;
-        info.FileName = @"C:\Users\Genbox\.cargo\bin\rustc.exe";
-        info.Arguments = $"{file} -o {output} -C debuginfo=0 -C link-args=/DEBUG:NONE";
-
-        Process? compile = Process.Start(info);
-        Assert.NotNull(compile);
-        compile.WaitForExit();
-
-        Assert.True(compile.ExitCode == 0, "Failed to compile. Exit code: " + compile.ExitCode);
-
-        //Run it
-        Process app = Process.Start(output);
-        app.WaitForExit();
-
-        Assert.Equal(1, app.ExitCode);
+        Assert.Equal(1, RunProcess(executable));
     }
 
-    public static TheoryData<StructureType, object[], string> GetTestData()
+    [SuppressMessage("Design", "CA1034:Nested types should not be visible")]
+    public sealed class RustContext
     {
-        //This is placed here to make sure it is only run once
-        string root = Path.Combine(Path.GetTempPath(), "FastData", "Rust");
-
-        //Create or empty the directory
-        if (!Directory.Exists(root))
-            Directory.CreateDirectory(root);
-        else
-            TestHelper.EmptyDirectory(root);
-
-        TheoryData<StructureType, object[], string> res = new TheoryData<StructureType, object[], string>();
-
-        foreach ((StructureType type, object[] data) in TestHelper.GetTestVectors())
-            res.Add(type, data, root);
-
-        return res;
+        public RustCompiler Compiler { get; } = new RustCompiler(false, Path.Combine(Path.GetTempPath(), "FastData", "Rust"));
     }
 }

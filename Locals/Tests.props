@@ -3,6 +3,7 @@
   <ItemGroup>
     <PackageReference Include="Verify.DiffPlex" PrivateAssets="All" />
     <PackageReference Include="Verify.Xunit" PrivateAssets="All" />
+    <PackageReference Include="xunit.extensibility.core" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

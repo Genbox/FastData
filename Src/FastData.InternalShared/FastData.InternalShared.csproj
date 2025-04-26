@@ -9,5 +9,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="xunit.extensibility.core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FastData.Generator\FastData.Generator.csproj" />
+    <ProjectReference Include="..\FastData\FastData.csproj" />
   </ItemGroup>
 </Project>

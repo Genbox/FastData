@@ -54,6 +54,7 @@ public class RustCodeGenerator(RustGeneratorConfig userCfg) : IGenerator
                      #![allow(unused_parens)]
                      #![allow(missing_docs)]
                      #![allow(unused_imports)]
+                     #![allow(unused_unsafe)]
                      use std::ptr;
 
                      pub struct {{userCfg.ClassName}};

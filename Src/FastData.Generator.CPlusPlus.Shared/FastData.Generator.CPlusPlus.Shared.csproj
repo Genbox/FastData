@@ -1,12 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../../Imports/Library.props" />
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FastData.Generator.Rust.Shared\FastData.Generator.Rust.Shared.csproj" />
     <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\*" />
+    <EmbeddedResource Include="Resources\*" />
   </ItemGroup>
 
 </Project>
