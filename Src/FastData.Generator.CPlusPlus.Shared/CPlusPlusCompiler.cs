@@ -95,7 +95,7 @@ public sealed class CPlusPlusCompiler
         string dstFile = Path.Combine(_rootPath, fileId + ".exe");
 
         //If the source hasn't changed, we skip compilation
-        if (TryWriteFile(dstFile, source))
+        if (TryWriteFile(srcFile, source) && File.Exists(dstFile))
             return dstFile;
 
         int ret = CompileMSVC(srcFile, dstFile);

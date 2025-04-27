@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FastData.Generator\FastData.Generator.csproj" />
-    <ProjectReference Include="..\FastData\FastData.csproj" />
+    <ProjectReference Include="..\FastData\FastData.csproj" PrivateAssets="All" />
   </ItemGroup>
+
 </Project>
