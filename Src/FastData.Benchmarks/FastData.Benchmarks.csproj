@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="BenchmarkDotNet.Attributes" />
+    <PackageReference Include="BenchmarkDotNet" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Genbox.FastFilter" />
   </ItemGroup>
 

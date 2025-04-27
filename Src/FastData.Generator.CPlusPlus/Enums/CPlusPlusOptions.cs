@@ -4,5 +4,5 @@ namespace Genbox.FastData.Generator.CPlusPlus.Enums;
 public enum CPlusPlusOptions
 {
     None = 0,
-    DisableEarlyExits = 1,
+    DisableEarlyExits = 1
 }

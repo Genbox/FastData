@@ -18,7 +18,9 @@ internal class BruteForceGenerator : ISegmentGenerator
         for (int offset = 0; offset < max; offset++)
         {
             for (int length = 1; length <= max - offset; length++)
+            {
                 yield return new StringSegment(offset, length, Alignment.Left);
+            }
         }
 
         if (props.LengthData.Min > MaxLength)
@@ -26,7 +28,9 @@ internal class BruteForceGenerator : ISegmentGenerator
             for (int offset = 0; offset < max; offset++)
             {
                 for (int length = 1; length <= max - offset; length++)
+                {
                     yield return new StringSegment(offset, length, Alignment.Right);
+                }
             }
         }
     }

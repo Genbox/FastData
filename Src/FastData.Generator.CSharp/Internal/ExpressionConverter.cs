@@ -6,7 +6,7 @@ internal sealed class ExpressionConverter : ExpressionVisitor
 {
     private readonly StringBuilder _sb = new StringBuilder();
 
-    private ExpressionConverter() {}
+    private ExpressionConverter() { }
     internal static ExpressionConverter Instance => new ExpressionConverter();
 
     public string GetCode(Expression expression)

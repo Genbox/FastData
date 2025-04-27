@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -17,7 +17,9 @@ public static class TestHelper
         char[] data = new char[length];
 
         for (int i = 0; i < length; i++)
+        {
             data[i] = _alphabet[_random.Next(0, _alphabet.Length)];
+        }
 
         return new string(data);
     }
@@ -44,7 +46,7 @@ public static class TestHelper
                 Arguments = args,
                 CreateNoWindow = true,
                 UseShellExecute = false,
-                WorkingDirectory = workingDir,
+                WorkingDirectory = workingDir
             }
         };
 
@@ -53,9 +55,7 @@ public static class TestHelper
         return process.ExitCode;
     }
 
-    /// <summary>
-    /// This function is here to help avoid write-fatigue
-    /// </summary>
+    /// <summary>This function is here to help avoid write-fatigue</summary>
     /// <returns>True if the file was written, false if it was skipped due to identical content</returns>
     public static bool TryWriteFile(string path, string content)
     {

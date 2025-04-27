@@ -7,7 +7,7 @@ internal readonly record struct CharacterMap
 {
     private readonly int[] _map = new int[255];
 
-    public CharacterMap() {}
+    public CharacterMap() { }
 
     public char MinChar
     {

@@ -7,8 +7,8 @@ using Genbox.FastData.InternalShared;
 namespace Genbox.FastData.Testbed.Tests;
 
 /// <summary>
-/// This code enables verification of FastData against GPerf.
-/// When DebugPrint is enabled and a special version of GPerf is run on the same files, it should give the same console text
+/// This code enables verification of FastData against GPerf. When DebugPrint is enabled and a special version of GPerf is run on the same files, it should give the same
+/// console text
 /// </summary>
 internal static class GPerfTest
 {
@@ -59,14 +59,18 @@ internal static class GPerfTest
             string[] elements = new string[i];
 
             for (int k = 0; k < i; k++)
+            {
                 elements[k] = TestHelper.GenerateRandomString(_random.Next(1, 10));
+            }
 
             using FileStream fs = File.OpenWrite(Path.Combine(path, filename));
             using StreamWriter tw = new StreamWriter(fs);
             tw.NewLine = "\n";
 
             foreach (string s in elements)
+            {
                 tw.WriteLine(s);
+            }
         }
     }
 }

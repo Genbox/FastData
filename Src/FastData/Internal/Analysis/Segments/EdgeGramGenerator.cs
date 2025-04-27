@@ -18,9 +18,13 @@ internal class EdgeGramGenerator : ISegmentGenerator
         int max = (int)Math.Min(props.LengthData.Min, MaxLength); //We cannot segment above the shortest string.
 
         for (len = 1; len <= max; len++)
+        {
             yield return new StringSegment(0, len, Alignment.Left);
+        }
 
         for (len = 1; len <= max; len++)
+        {
             yield return new StringSegment(0, len, Alignment.Right);
+        }
     }
 }

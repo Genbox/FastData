@@ -1,8 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.Helpers;
-using Genbox.FastData.Generator.Rust.Shared;
 using Genbox.FastData.InternalShared;
 using static Genbox.FastData.Generator.Rust.Internal.Helpers.CodeHelper;
 

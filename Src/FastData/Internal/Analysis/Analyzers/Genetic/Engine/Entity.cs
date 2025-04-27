@@ -10,7 +10,9 @@ public struct Entity
         Genes = new IGene[genes.Length];
 
         for (int i = 0; i < genes.Length; i++)
+        {
             Genes[i] = genes[i].Clone();
+        }
     }
 
     internal double Fitness { get; set; }
@@ -20,6 +22,8 @@ public struct Entity
     internal readonly void ForceMutate(IRandom random)
     {
         foreach (IGene gene in Genes)
+        {
             gene.Mutate(random);
+        }
     }
 }

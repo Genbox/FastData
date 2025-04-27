@@ -6,7 +6,9 @@ internal static class GeneHelper
     {
         int[] indices = new int[population.Count];
         for (int i = 0; i < indices.Length; i++)
+        {
             indices[i] = i;
+        }
 
         Array.Sort(indices, (a, b) => population[b].Fitness.CompareTo(population[a].Fitness));
 

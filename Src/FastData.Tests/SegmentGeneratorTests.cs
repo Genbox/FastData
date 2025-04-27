@@ -28,7 +28,9 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
                 SegmentHelper.ConvertToOffsets(data[0].Length, in segment, out int start, out int end);
 
                 for (int i = start; i < end; i++)
+                {
                     coverage[i]++;
+                }
 
                 o.WriteLine(segment.Alignment.ToString() + '\t' + SegmentHelper.InsertSegmentBounds(data[0], segment));
             }
@@ -94,7 +96,9 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         string[] res = new string[count];
 
         for (int i = 0; i < count; i++)
+        {
             res[i] = TestHelper.GenerateRandomString(len);
+        }
 
         return res;
     }

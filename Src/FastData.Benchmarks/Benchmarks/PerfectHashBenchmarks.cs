@@ -10,8 +10,6 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class PerfectHashBenchmarks
 {
-    private uint[] _data = null!;
-
     private static readonly string[] _words =
     [
         "Area", "Army", "Baby", "Back", "Ball", "Band", "Bank", "Base", "Bill", "Body", "Book", "Call", "Card",
@@ -26,6 +24,7 @@ public class PerfectHashBenchmarks
         "Town", "Tree", "Turn", "Type", "Unit", "User", "View", "Wall", "Week", "West", "Wife", "Will", "Wind",
         "Wine", "Wood", "Word", "Work", "Year"
     ];
+    private uint[] _data = null!;
 
     [Params(1)]
     public uint MaxCandidates { get; set; }

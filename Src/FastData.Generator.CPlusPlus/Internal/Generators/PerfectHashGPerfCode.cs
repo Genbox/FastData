@@ -125,7 +125,9 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusGene
                 uint count = pair.Value - index;
 
                 while (count-- != 0)
+                {
                     yield return null;
+                }
 
                 index = pair.Value;
             }

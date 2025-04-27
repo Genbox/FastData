@@ -1,20 +1,15 @@
 using System.Diagnostics;
 using System.IO.Compression;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
-using Genbox.FastData.InternalShared;
 using static Genbox.FastData.InternalShared.TestHelper;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Shared;
 
 public sealed class CPlusPlusCompiler
 {
-    private readonly bool _release;
-    private readonly string _rootPath;
     private readonly string _includesPath;
     private readonly string _libsPath;
+    private readonly bool _release;
+    private readonly string _rootPath;
     private string? _path;
 
     public CPlusPlusCompiler(bool release, string rootDir)

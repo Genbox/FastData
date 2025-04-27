@@ -44,11 +44,11 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustGenerator
         if (key == -1 || key < minLen)
             return RenderExpression();
 
-        StringBuilder sb = new StringBuilder($"""
-                                                      let bytes = str.as_bytes();
-                                                      let mut hash: u32 = 0;
+        StringBuilder sb = new StringBuilder("""
+                                                     let bytes = str.as_bytes();
+                                                     let mut hash: u32 = 0;
 
-                                              """);
+                                             """);
 
         // Output all the other cases
         do
@@ -94,19 +94,21 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustGenerator
             return " Self::ASSO[bytes[bytes.len() - 1] as usize] as u32";
 
         int inc = ctx.AlphaIncrements[pos];
-        return $" Self::ASSO[bytes[{pos}] as usize {(inc != 0 ? $" + {inc}" : "")}] as u32";
+        return $" Self::ASSO[bytes[{pos}] as usize{(inc != 0 ? $" + {inc}" : "")}] as u32";
     }
 
     private static IEnumerable<string?> WrapWords(KeyValuePair<string, uint>[] items)
     {
         uint index = 0;
-        foreach (var pair in items)
+        foreach (KeyValuePair<string, uint> pair in items)
         {
             if (index < pair.Value)
             {
                 uint count = pair.Value - index;
                 while (count-- != 0)
+                {
                     yield return null;
+                }
                 index = pair.Value;
             }
             yield return pair.Key;

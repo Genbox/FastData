@@ -30,26 +30,6 @@ public static class CompilationHelper
         return me.CreateDelegate<T>();
     }
 
-    public static bool TryGetAssembly(Compilation compilation, [NotNullWhen(true)]out Assembly? assembly, out Diagnostic[] compilerDiagnostics)
-    {
-        using MemoryStream asmStream = new MemoryStream();
-        using MemoryStream symStream = new MemoryStream();
-        EmitResult emitResult = compilation.Emit(asmStream, symStream);
-
-        compilerDiagnostics = emitResult.Diagnostics.ToArray();
-
-        if (!emitResult.Success)
-        {
-            assembly = null;
-            return false;
-        }
-
-        byte[] assemblyBytes = asmStream.ToArray();
-        byte[] symbolsBytes = symStream.ToArray();
-        assembly = Assembly.Load(assemblyBytes, symbolsBytes);
-        return true;
-    }
-
     public static CSharpCompilation CreateCompilation(string source, bool release, params Type[] types)
     {
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
@@ -57,7 +37,9 @@ public static class CompilationHelper
         HashSet<string> locations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (Type type in types)
+        {
             locations.Add(type.Assembly.Location);
+        }
 
         foreach (Assembly assembly in AssemblyLoadContext.Default.Assemblies)
         {
@@ -78,5 +60,25 @@ public static class CompilationHelper
             deterministic: true);
 
         return CSharpCompilation.Create("generator", [syntaxTree], locations.Select(x => MetadataReference.CreateFromFile(x)), options);
+    }
+
+    private static bool TryGetAssembly(Compilation compilation, [NotNullWhen(true)]out Assembly? assembly, out Diagnostic[] compilerDiagnostics)
+    {
+        using MemoryStream asmStream = new MemoryStream();
+        using MemoryStream symStream = new MemoryStream();
+        EmitResult emitResult = compilation.Emit(asmStream, symStream);
+
+        compilerDiagnostics = emitResult.Diagnostics.ToArray();
+
+        if (!emitResult.Success)
+        {
+            assembly = null;
+            return false;
+        }
+
+        byte[] assemblyBytes = asmStream.ToArray();
+        byte[] symbolsBytes = symStream.ToArray();
+        assembly = Assembly.Load(assemblyBytes, symbolsBytes);
+        return true;
     }
 }

@@ -224,12 +224,16 @@ internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStruc
         if (alphaInc == null)
         {
             foreach (Keyword keyword in keywords)
+            {
                 keyword.InitSelCharsTuple(positions);
+            }
         }
         else
         {
             foreach (Keyword keyword in keywords)
+            {
                 keyword.InitSelCharsMultiset(positions, alphaInc);
+            }
         }
 
         HashSet<string> set = new HashSet<string>(StringComparer.Ordinal);
@@ -274,7 +278,9 @@ internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStruc
         {
             // Initialize each keyword's SelChars array.
             foreach (Keyword keyword in keywords)
+            {
                 keyword.InitSelCharsMultiset(positions, alphaInc);
+            }
 
             // Compute the maximum SelChars.Length over all keywords.
             int maxSelCharsLength = keywords.Max(x => x.SelChars.Length);
@@ -305,7 +311,9 @@ internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStruc
             foreach (Keyword keyword in keywords)
             {
                 foreach (char c in keyword.SelChars)
+                {
                     Occurrences[c]++;
+                }
             }
 
             Values = new int[alphaSize];
@@ -357,7 +365,9 @@ internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStruc
 
             bool[] determined = new bool[alphaSize];
             for (uint c = 0; c < alphaSize; c++)
+            {
                 determined[c] = true;
+            }
 
             while (true)
             {
@@ -467,7 +477,9 @@ internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStruc
 
             // Initialize _asso_values[]. (The value given here matters only for those c which occur in all keywords with equal multiplicity.)
             for (uint c = 0; c < alphaSize; c++)
+            {
                 Values[c] = 0;
+            }
 
             uint stepNo = 0;
             for (Step? step = steps; step != null; step = step._next)
@@ -486,7 +498,9 @@ internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStruc
                 int[] iter = new int[k];
 
                 for (int i = 0; i < k; i++)
+                {
                     iter[i] = 0;
+                }
 
                 int ii = jump != 0 ? k - 1 : 0;
 
@@ -686,7 +700,9 @@ internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStruc
             for (EquivalenceClass? cls = partition; cls != null; cls = cls.Next)
             {
                 for (int i = 0; i <= maxSelCharsLength; i++)
+                {
                     split_cardinalities[i] = 0;
+                }
 
                 foreach (Keyword keyword in cls.Keywords)
                 {
@@ -702,7 +718,9 @@ internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStruc
 
                 sum += cls.Cardinality * cls.Cardinality;
                 for (int i = 0; i <= maxSelCharsLength; i++)
+                {
                     sum -= split_cardinalities[i] * split_cardinalities[i];
+                }
             }
             return sum;
         }
@@ -734,17 +752,13 @@ internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStruc
         }
     }
 
-    /// <summary>
-    /// An array based on Ullman set. It provides O(1) clearing.
-    /// </summary>
+    /// <summary>An array based on Ullman set. It provides O(1) clearing.</summary>
     private sealed class BoolArray
     {
         private readonly uint[] _storageArray;
         private uint _iterationNumber = 1;
 
-        /// <summary>
-        /// An array based on Ullman set. It provides O(1) clearing.
-        /// </summary>
+        /// <summary>An array based on Ullman set. It provides O(1) clearing.</summary>
         /// <param name="size">The initial size of the array</param>
         public BoolArray(int size)
         {

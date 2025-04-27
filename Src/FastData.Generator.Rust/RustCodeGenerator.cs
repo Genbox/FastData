@@ -33,8 +33,10 @@ public class RustCodeGenerator(RustGeneratorConfig userCfg) : IGenerator
 
         // Output any shared classes
         foreach (string cls in SharedCode.Instance.GetType(CodeType.Class))
+        {
             _sb.AppendLine()
                .AppendLine(cls);
+        }
 
         source = _sb.ToString();
         return true;

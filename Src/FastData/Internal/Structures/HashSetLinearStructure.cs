@@ -16,13 +16,17 @@ internal sealed class HashSetLinearStructure : IHashStructure
     {
         uint[] hashCodes = new uint[data.Length];
         for (int i = 0; i < data.Length; i++)
+        {
             hashCodes[i] = hash(data[i]);
+        }
 
         uint numBuckets = CalcNumBuckets(hashCodes);
         int[] bucketStarts = new int[numBuckets];
 
         for (int i = 0; i < bucketStarts.Length; i++)
+        {
             bucketStarts[i] = -1;
+        }
 
         int[] nexts = new int[hashCodes.Length];
 
@@ -88,7 +92,9 @@ internal sealed class HashSetLinearStructure : IHashStructure
         HashSet<uint> codes = new HashSet<uint>();
 
         foreach (uint hashCode in hashCodes)
+        {
             codes.Add(hashCode);
+        }
 
         uint uniqueCodesCount = (uint)codes.Count;
         uint minNumBuckets = uniqueCodesCount * 2;
@@ -96,7 +102,9 @@ internal sealed class HashSetLinearStructure : IHashStructure
         uint[] primes = MathHelper.Primes;
         uint minPrimeIndexInclusive = 0;
         while (minPrimeIndexInclusive < (uint)primes.Length && minNumBuckets > primes[minPrimeIndexInclusive])
+        {
             minPrimeIndexInclusive++;
+        }
 
         if (minPrimeIndexInclusive >= primes.Length)
             return MathHelper.GetPrime(uniqueCodesCount);
@@ -105,7 +113,9 @@ internal sealed class HashSetLinearStructure : IHashStructure
 
         uint maxPrimeIndexExclusive = minPrimeIndexInclusive;
         while (maxPrimeIndexExclusive < (uint)primes.Length && maxNumBuckets > primes[maxPrimeIndexExclusive])
+        {
             maxPrimeIndexExclusive++;
+        }
 
         if (maxPrimeIndexExclusive < primes.Length)
         {

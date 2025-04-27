@@ -16,9 +16,7 @@ public static class BenchmarkHelper
             res = TestHelper.RunProcess("bencher", $"run {bencherArgs} \"{program} {args}\"", workingDir);
         }
         else
-        {
             res = TestHelper.RunProcess(program, args, workingDir);
-        }
 
         if (res != 0)
             throw new InvalidOperationException($"Failed to run benchmarks. Return code: {res}");

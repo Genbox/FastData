@@ -3,7 +3,7 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 
-namespace Genbox.FastData.Generator.Helpers;
+namespace Genbox.FastData.InternalShared;
 
 public static class TestVectorHelper
 {
@@ -15,7 +15,7 @@ public static class TestVectorHelper
 
         if (FastDataGenerator.TryGenerate(data, new FastDataConfig(structureType), generatorFunc(identifier), out string? source))
         {
-            spec = new GeneratorSpec(identifier, dataType, source);
+            spec = new GeneratorSpec(identifier, source);
             return true;
         }
 
@@ -63,7 +63,9 @@ public static class TestVectorHelper
 
                 case StructureType.SingleValue:
                     foreach (object[] data in GetSingleSets())
+                    {
                         yield return (type, data);
+                    }
                     break;
 
                 case StructureType.PerfectHashGPerf:
@@ -75,7 +77,9 @@ public static class TestVectorHelper
 
                 case StructureType.PerfectHashBruteForce: //We've kept to a small set since larger ones will just hit timeout
                     foreach (object[] data in GetEdgeCaseSets())
+                    {
                         yield return (type, data);
+                    }
                     break;
 
                 case StructureType.Conditional:
@@ -85,10 +89,14 @@ public static class TestVectorHelper
                 case StructureType.HashSetLinear:
                 case StructureType.Array:
                     foreach (object[] data in GetEdgeCaseSets())
+                    {
                         yield return (type, data);
+                    }
 
                     foreach (object[] data in GetSetOfSize(100))
+                    {
                         yield return (type, data);
+                    }
                     break;
                 default:
                     throw new NotSupportedException("There are no test vectors for " + type);
@@ -119,7 +127,9 @@ public static class TestVectorHelper
 
                 case StructureType.PerfectHashBruteForce:
                     foreach (object[] data in GetSetOfSize(10))
+                    {
                         yield return (type, data);
+                    }
                     break;
 
                 case StructureType.Conditional:
@@ -129,7 +139,9 @@ public static class TestVectorHelper
                 case StructureType.HashSetLinear:
                 case StructureType.Array:
                     foreach (object[] data in GetSetOfSize(benchmarkSize))
+                    {
                         yield return (type, data);
+                    }
                     break;
                 default:
                     throw new NotSupportedException("There are no benchmark vectors for " + type);

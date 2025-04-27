@@ -2,7 +2,6 @@
 using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus.Shared;
-using Genbox.FastData.Generator.Helpers;
 using Genbox.FastData.InternalShared;
 using static Genbox.FastData.Generator.CPlusPlus.Internal.Helpers.CodeHelper;
 

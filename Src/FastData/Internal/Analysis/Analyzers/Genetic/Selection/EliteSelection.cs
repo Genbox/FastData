@@ -4,16 +4,12 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 
-/// <summary>
-/// Select from the top performers.
-/// </summary>
+/// <summary>Select from the top performers.</summary>
 internal sealed class EliteSelection : ISelection
 {
     private readonly double _topPercent;
 
-    /// <summary>
-    /// Select from the top performers.
-    /// </summary>
+    /// <summary>Select from the top performers.</summary>
     /// <param name="topPercent">The percent to take. Must be 0 to 1</param>
     public EliteSelection(double topPercent)
     {
@@ -32,6 +28,8 @@ internal sealed class EliteSelection : ISelection
         int number = Math.Min((int)(population.Count * _topPercent), maxParents);
 
         for (int i = 0; i < number; i++)
+        {
             parents.Add(indices[i]);
+        }
     }
 }

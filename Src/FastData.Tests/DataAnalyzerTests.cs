@@ -19,7 +19,9 @@ public class DataAnalyzerTests
         Assert.Equal((uint)data.Distinct().Count(), map.Count);
 
         foreach (string str in data)
+        {
             Assert.True(map.Contains(str.Length));
+        }
 
         Assert.Equal((uint)data.Min(x => ((string)x).Length), map.MinValue);
         Assert.Equal((uint)data.Max(x => ((string)x).Length), map.MaxValue);

@@ -8,9 +8,7 @@ internal class EliteReinsertion : IReinsertion
 {
     private readonly double _topPercent;
 
-    /// <summary>
-    /// Reinsert top performer parents into the new generation.
-    /// </summary>
+    /// <summary>Reinsert top performer parents into the new generation.</summary>
     /// <param name="topPercent">The percent to take. Must be 0 to 1</param>
     public EliteReinsertion(double topPercent)
     {
@@ -29,6 +27,8 @@ internal class EliteReinsertion : IReinsertion
         int number = (int)(population.Count * _topPercent);
 
         for (int i = 0; i < number; i++)
+        {
             newPopulation.Add(population[indices[i]]);
+        }
     }
 }

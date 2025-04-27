@@ -20,7 +20,7 @@ internal class Simulator(object[] data, SimulatorConfig config)
         ticks = Stopwatch.GetTimestamp() - ticks;
 
         double normEmu = results.Average() * config.EmulationWeight;
-        double normTime = (1.0 / (1.0 + ((double)ticks / 1000))) * config.TimeWeight;
+        double normTime = 1.0 / (1.0 + ((double)ticks / 1000)) * config.TimeWeight;
 
         int count = 0;
 

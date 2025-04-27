@@ -4,7 +4,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Genbox.FastData.Helpers;
 
 
 internal static class MyData 
@@ -38,7 +37,7 @@ internal static class MyData
         8, 8, 8, 8, 8, 8
     };
 
-    private static readonly string[] _items = {
+    private static readonly string?[] _items = {
         "item4", null, "item2", null, null, "item3", null, "item1"
     };
 

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Genbox.FastData.InternalShared;
 using static Genbox.FastData.Internal.Helpers.PerfectHashHelper;
 using static Genbox.FastData.InternalShared.TestHelper;
@@ -8,8 +8,8 @@ namespace Genbox.FastData.Tests;
 public class PerfectHashHelperTests
 {
     private const int _numSeconds = 3;
-    private long _time;
     private static readonly string[] _words = ["Area", "Army", "Baby", "Back", "Ball", "Band", "Bank", "Base", "Bill", "Body"];
+    private long _time;
 
     [Fact]
     public void MinimalPerfectHashTest()

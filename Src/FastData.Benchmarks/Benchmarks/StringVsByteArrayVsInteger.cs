@@ -5,9 +5,7 @@ using Genbox.FastData.InternalShared;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
-/// <summary>
-/// Benchmarks the difference between checking string/byte[]
-/// </summary>
+/// <summary>Benchmarks the difference between checking string/byte[]</summary>
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class StringVsByteArrayVsInteger
 {
@@ -77,7 +75,9 @@ public class StringVsByteArrayVsInteger
             {
                 int hash = 17;
                 foreach (byte b in obj)
-                    hash = (hash * 31) + b;
+                {
+                    hash = hash * 31 + b;
+                }
                 return hash;
             }
         }

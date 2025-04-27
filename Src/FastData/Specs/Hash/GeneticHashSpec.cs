@@ -29,7 +29,9 @@ public struct GeneticHashSpec(int mixerSeed, int mixerIterations, int avalancheS
         uint acc = seed;
 
         for (int i = 0; i < str.Length; i++)
+        {
             acc = mixer(acc, str[i]);
+        }
 
         return avalanche(acc);
     }

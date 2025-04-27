@@ -5,9 +5,7 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Abstracts;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Mutation;
 
-/// <summary>
-/// Mutates genes with a low chance of mutation
-/// </summary>
+/// <summary>Mutates genes with a low chance of mutation</summary>
 /// <param name="mutationRate">A number between 0 and 1. 0 means don't mutate. 1 means always mutate.</param>
 /// <param name="random">The rng to use</param>
 internal sealed class UniformMutation(double mutationRate, IRandom random) : IMutation

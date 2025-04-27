@@ -6,7 +6,7 @@ internal sealed class SharedRandom : IRandom
 {
     private readonly Random _random = new Random();
 
-    private SharedRandom() {}
+    private SharedRandom() { }
 
     internal static SharedRandom Instance { get; } = new SharedRandom();
 

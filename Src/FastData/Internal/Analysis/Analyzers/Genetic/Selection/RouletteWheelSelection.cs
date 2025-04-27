@@ -5,7 +5,8 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 
 /// <summary>
-/// Roulette Wheel Selection (also called Fitness-Proportionate Selection) is a probabilistic selection method in genetic algorithms where individuals are selected based on their fitness. Individuals with higher fitness values have a higher probability of being selected, similar to a weighted lottery.
+/// Roulette Wheel Selection (also called Fitness-Proportionate Selection) is a probabilistic selection method in genetic algorithms where individuals are selected based on
+/// their fitness. Individuals with higher fitness values have a higher probability of being selected, similar to a weighted lottery.
 /// </summary>
 internal sealed class RouletteWheelSelection(IRandom random) : ISelection
 {

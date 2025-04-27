@@ -22,7 +22,9 @@ public class GenericSelectionTests
         //We run the selection process 100 times to accumulate the selection pattern
         List<int> selected = new List<int>();
         for (int i = 0; i < 100; i++)
+        {
             selection.Process(population, selected, 3);
+        }
 
         //Setup the counters, starting with a value of 0
         Dictionary<int, int> counter = new Dictionary<int, int>
@@ -33,7 +35,9 @@ public class GenericSelectionTests
         };
 
         foreach (int i in selected)
+        {
             counter[i]++;
+        }
 
         //There should only be 3 groups: 0, 1 and 2, and c0 < c1 < c2 must be true
         Assert.Equal(3, counter.Count);
