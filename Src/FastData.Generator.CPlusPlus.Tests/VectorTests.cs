@@ -35,6 +35,13 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
     [SuppressMessage("Design", "CA1034:Nested types should not be visible")]
     public sealed class CPlusPlusContext
     {
-        public CPlusPlusCompiler Compiler { get; } = new CPlusPlusCompiler(false);
+        public CPlusPlusContext()
+        {
+            string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "CPlusPlus");
+            Directory.CreateDirectory(rootDir);
+            Compiler = new CPlusPlusCompiler(false, rootDir);
+        }
+
+        public CPlusPlusCompiler Compiler { get; }
     }
 }

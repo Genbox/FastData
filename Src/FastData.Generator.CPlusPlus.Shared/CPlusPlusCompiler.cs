@@ -11,23 +11,21 @@ namespace Genbox.FastData.Generator.CPlusPlus.Shared;
 
 public sealed class CPlusPlusCompiler
 {
-    private readonly Func<string, string, int> _compile;
     private readonly bool _release;
     private readonly string _rootPath;
     private readonly string _includesPath;
     private readonly string _libsPath;
     private string? _path;
 
-    public CPlusPlusCompiler(bool release)
+    public CPlusPlusCompiler(bool release, string rootDir)
     {
         _release = release;
-        _rootPath = Path.Combine(Path.GetTempPath(), "FastData", "CPlusPlus");
-        Directory.CreateDirectory(_rootPath);
+        _rootPath = rootDir;
 
         _includesPath = Path.Combine(_rootPath, "Includes");
         Directory.CreateDirectory(_includesPath);
 
-        var benchPath = Path.Combine(_includesPath, "benchmark");
+        string benchPath = Path.Combine(_includesPath, "benchmark");
         Directory.CreateDirectory(benchPath);
 
         CopyResource("benchmark.h", Path.Combine(benchPath, "benchmark.h"));
@@ -39,9 +37,7 @@ public sealed class CPlusPlusCompiler
         string variant = OperatingSystem.IsWindows() ? "win" : "lin";
         CopyResource($"benchmark-{variant}.lib", Path.Combine(_libsPath, "benchmark.lib"));
 
-        if (HasMSVC())
-            _compile = CompileMSVC;
-        else
+        if (!HasMSVC())
             throw new InvalidOperationException("No compiler found");
     }
 
@@ -51,7 +47,7 @@ public sealed class CPlusPlusCompiler
             return;
 
         const string ns = "Genbox.FastData.Generator.CPlusPlus.Shared.Resources.";
-        using Stream? stream = typeof(CPlusPlusCompiler).Assembly.GetManifestResourceStream(ns + name);
+        using Stream? stream = typeof(CPlusPlusCompiler).Assembly.GetManifestResourceStream(ns + name + ".gz");
 
         if (stream == null)
             throw new InvalidOperationException("Resource not found");
@@ -114,7 +110,7 @@ public sealed class CPlusPlusCompiler
         }
 
         File.WriteAllText(srcFile, source);
-        int ret = _compile(srcFile, dstFile);
+        int ret = CompileMSVC(srcFile, dstFile);
 
         if (ret != 0)
             throw new InvalidOperationException("Failed to compile. Exit code: " + ret);

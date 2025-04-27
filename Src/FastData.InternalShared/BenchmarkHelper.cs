@@ -2,7 +2,7 @@ namespace Genbox.FastData.InternalShared;
 
 public static class BenchmarkHelper
 {
-    public static void RunBenchmark(string program, string args, string? adapter = null, string? workingDir = null)
+    public static void RunBenchmark(string program, string? args = null, string? adapter = null, string? workingDir = null)
     {
         int res;
 

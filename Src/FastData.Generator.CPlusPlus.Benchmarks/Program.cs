@@ -1,4 +1,6 @@
-﻿using Genbox.FastData.Enums;
+﻿using System.Globalization;
+using System.Text;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus.Shared;
 using Genbox.FastData.Generator.Helpers;
 using Genbox.FastData.InternalShared;
@@ -10,20 +12,24 @@ internal static class Program
 {
     private static void Main()
     {
-        CPlusPlusCompiler compiler = new CPlusPlusCompiler(true);
+        string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "CPlusPlus");
+        Directory.CreateDirectory(rootDir);
+
+        CPlusPlusCompiler compiler = new CPlusPlusCompiler(true, rootDir);
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("""
+                      #include <benchmark/benchmark.h>
+                      using namespace benchmark;
+                      """);
 
         foreach ((StructureType type, object[] data) in TestVectorHelper.GetBenchmarkVectors())
         {
             if (!TestVectorHelper.TryGenerate(id => new CPlusPlusCodeGenerator(new CPlusPlusGeneratorConfig(id)), type, data, out GeneratorSpec spec))
                 throw new InvalidOperationException("Unable to build " + type);
 
-            string executable = compiler.Compile(spec.Identifier,
+            sb.AppendLine(CultureInfo.InvariantCulture,
                 $$"""
-                  #include <benchmark/benchmark.h>
-
                   {{spec.Source}}
-
-                  using namespace benchmark;
 
                   static void BM_{{spec.Identifier}}(State& state)
                   {
@@ -34,19 +40,12 @@ internal static class Program
                   }
 
                   BENCHMARK(BM_{{spec.Identifier}});
-
-                  int main(int argc, char* argv[])
-                  {
-                      Initialize(&argc, argv);
-                      RunSpecifiedBenchmarks();
-                      return 0;
-                  }
                   """);
 
-            int res = TestHelper.RunProcess(executable);
-
-            if (res != 0)
-                throw new InvalidOperationException("Failed to run executable. Return code: " + res);
         }
+        sb.AppendLine("BENCHMARK_MAIN();");
+
+        string executable = compiler.Compile("all_benchmarks", sb.ToString());
+        BenchmarkHelper.RunBenchmark(executable, "--benchmark_format=json", "cpp_google", rootDir);
     }
 }
