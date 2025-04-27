@@ -18,18 +18,18 @@ internal static class Program
         string benchPath = Path.Combine(rootPath, "benches");
         Directory.CreateDirectory(benchPath);
 
-        using Stream? stream = typeof(RustCompiler).Assembly.GetManifestResourceStream("Genbox.FastData.Generator.Rust.Shared.Resources.Cargo.toml");
-
-        if (stream == null)
-            throw new InvalidOperationException("Resource not found");
-
-        // using GZipStream gz = new GZipStream(stream, CompressionMode.Decompress);
-        using MemoryStream ms = new MemoryStream();
-        stream.CopyTo(ms);
-
         // Build the Cargo.toml file
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine(Encoding.UTF8.GetString(ms.ToArray()));
+        sb.AppendLine("""
+                      [package]
+                      name = "fast_data_benchmarks"
+                      version = "0.1.0"
+                      edition = "2024"
+
+                      [dev-dependencies]
+                      criterion = "0.5.1"
+
+                      """);
 
         foreach ((StructureType type, object[] data) in TestVectorHelper.GetBenchmarkVectors())
         {

@@ -10,9 +10,4 @@
     <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Resources\*" />
-    <EmbeddedResource Include="Resources\*" />
-  </ItemGroup>
-  
 </Project>
