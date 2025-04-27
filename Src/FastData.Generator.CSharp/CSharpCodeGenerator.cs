@@ -86,7 +86,6 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
                        using System;
                        using System.Runtime.CompilerServices;
                        using System.Runtime.InteropServices;
-                       using Genbox.FastData.Helpers;
                        """);
 
         if (iface != null)

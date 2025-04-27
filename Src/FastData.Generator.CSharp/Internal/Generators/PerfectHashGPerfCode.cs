@@ -8,7 +8,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpGenerat
           {{FormatColumns(ctx.AssociationValues, RenderAssociativeValue)}}
               };
 
-              {{cfg.GetFieldModifier()}}string[] _items = {
+              {{cfg.GetFieldModifier()}}string?[] _items = {
           {{FormatColumns(WrapWords(ctx.Items), static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 
