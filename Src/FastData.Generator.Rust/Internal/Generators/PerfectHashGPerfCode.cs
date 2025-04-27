@@ -94,7 +94,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustGenerator
             return " Self::ASSO[bytes[bytes.len() - 1] as usize] as u32";
 
         int inc = ctx.AlphaIncrements[pos];
-        return $" Self::ASSO[bytes[{pos}]{(inc != 0 ? $" + {inc}" : "")} as usize] as u32";
+        return $" Self::ASSO[bytes[{pos}] as usize {(inc != 0 ? $" + {inc}" : "")}] as u32";
     }
 
     private static IEnumerable<string?> WrapWords(KeyValuePair<string, uint>[] items)
