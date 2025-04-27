@@ -1,15 +1,15 @@
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, PerfectHashBruteForceContext ctx) : IOutputWriter
+internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, PerfectHashBruteForceContext ctx, SharedCode shared) : IOutputWriter
 {
     public string Generate()
     {
-        SharedCode.Instance.Add("ph-struct-" + genCfg.DataType, CodeType.Class, $$"""
-                                                                                  {{cfg.GetFieldModifier()}}struct E {
-                                                                                      value: {{genCfg.GetTypeName(true)}},
-                                                                                      hash_code: u32,
-                                                                                  }
-                                                                                  """);
+        shared.Add("ph-struct-" + genCfg.DataType, CodeType.Class, $$"""
+                                                                     {{cfg.GetFieldModifier()}}struct E {
+                                                                         value: {{genCfg.GetTypeName(true)}},
+                                                                         hash_code: u32,
+                                                                     }
+                                                                     """);
 
         return $$"""
                      {{cfg.GetFieldModifier()}}const ENTRIES: [E; {{ctx.Data.Length}}] = [

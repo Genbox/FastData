@@ -2,17 +2,17 @@ using Genbox.FastData.Contexts.Misc;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class HashSetChainCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, HashSetChainContext ctx) : IOutputWriter
+internal sealed class HashSetChainCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, HashSetChainContext ctx, SharedCode shared) : IOutputWriter
 {
     public string Generate()
     {
-        SharedCode.Instance.Add("chain-struct-" + genCfg.DataType, CodeType.Class, $$"""
-                                                                                     {{cfg.GetFieldModifier()}}struct E {
-                                                                                         hash_code: u32,
-                                                                                         next: {{GetSmallestSignedType(ctx.Buckets.Length)}},
-                                                                                         value: {{genCfg.GetTypeName(true)}},
-                                                                                     }
-                                                                                     """);
+        shared.Add("chain-struct-" + genCfg.DataType, CodeType.Class, $$"""
+                                                                        {{cfg.GetFieldModifier()}}struct E {
+                                                                            hash_code: u32,
+                                                                            next: {{GetSmallestSignedType(ctx.Buckets.Length)}},
+                                                                            value: {{genCfg.GetTypeName(true)}},
+                                                                        }
+                                                                        """);
 
         return $$"""
                      {{cfg.GetFieldModifier()}}const BUCKETS: [{{GetSmallestSignedType(ctx.Buckets.Length)}}; {{ctx.Buckets.Length}}] = [
@@ -45,5 +45,6 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, RustGeneratorConf
                  """;
     }
 
-    private static void RenderEntry(StringBuilder sb, HashSetEntry x) => sb.Append("E { hash_code: ").Append(x.Hash).Append(", next: ").Append(x.Next).Append(", value: ").Append(ToValueLabel(x.Value)).Append(" }");
+    private static void RenderEntry(StringBuilder sb, HashSetEntry x) =>
+        sb.Append("E { hash_code: ").Append(x.Hash).Append(", next: ").Append(x.Next).Append(", value: ").Append(ToValueLabel(x.Value)).Append(" }");
 }

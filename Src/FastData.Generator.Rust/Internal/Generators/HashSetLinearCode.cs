@@ -2,16 +2,16 @@ using Genbox.FastData.Contexts.Misc;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class HashSetLinearCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, HashSetLinearContext ctx) : IOutputWriter
+internal sealed class HashSetLinearCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, HashSetLinearContext ctx, SharedCode shared) : IOutputWriter
 {
     public string Generate()
     {
-        SharedCode.Instance.Add("linear-struct-" + genCfg.DataType, CodeType.Class, $$"""
-                                                                                      {{cfg.GetFieldModifier()}}struct B {
-                                                                                          start_index: {{GetSmallestUnsignedType(ctx.Data.Length)}},
-                                                                                          end_index: {{GetSmallestUnsignedType(ctx.Data.Length)}},
-                                                                                      }
-                                                                                      """);
+        shared.Add("linear-struct-" + genCfg.DataType, CodeType.Class, $$"""
+                                                                         {{cfg.GetFieldModifier()}}struct B {
+                                                                             start_index: {{GetSmallestUnsignedType(ctx.Data.Length)}},
+                                                                             end_index: {{GetSmallestUnsignedType(ctx.Data.Length)}},
+                                                                         }
+                                                                         """);
 
         return $$"""
                      {{cfg.GetFieldModifier()}}const BUCKETS: [B; {{ctx.Buckets.Length}}] = [
@@ -48,5 +48,6 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, RustGeneratorCon
                  """;
     }
 
-    private static void RenderBucket(StringBuilder sb, HashSetBucket x) => sb.Append("B { start_index: ").Append(x.StartIndex).Append(", end_index: ").Append(x.EndIndex).Append(" }");
+    private static void RenderBucket(StringBuilder sb, HashSetBucket x) =>
+        sb.Append("B { start_index: ").Append(x.StartIndex).Append(", end_index: ").Append(x.EndIndex).Append(" }");
 }

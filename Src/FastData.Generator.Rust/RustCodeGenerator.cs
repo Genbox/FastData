@@ -6,11 +6,12 @@ namespace Genbox.FastData.Generator.Rust;
 public class RustCodeGenerator(RustGeneratorConfig userCfg) : IGenerator
 {
     private readonly StringBuilder _sb = new StringBuilder();
+    private readonly SharedCode _shared = new SharedCode();
 
     public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source)
     {
         _sb.Clear();
-        SharedCode.Instance.Clear();
+        _shared.Clear();
 
         AppendHeader(genCfg);
 
@@ -21,10 +22,10 @@ public class RustCodeGenerator(RustGeneratorConfig userCfg) : IGenerator
             BinarySearchContext c2 => new BinarySearchCode(genCfg, userCfg, c2).Generate(),
             ConditionalContext c2 => new ConditionalCode(genCfg, userCfg, c2).Generate(),
             EytzingerSearchContext c2 => new EytzingerSearchCode(genCfg, userCfg, c2).Generate(),
-            PerfectHashBruteForceContext c2 => new PerfectHashBruteForceCode(genCfg, userCfg, c2).Generate(),
+            PerfectHashBruteForceContext c2 => new PerfectHashBruteForceCode(genCfg, userCfg, c2, _shared).Generate(),
             PerfectHashGPerfContext c2 => new PerfectHashGPerfCode(genCfg, userCfg, c2).Generate(),
-            HashSetChainContext c2 => new HashSetChainCode(genCfg, userCfg, c2).Generate(),
-            HashSetLinearContext c2 => new HashSetLinearCode(genCfg, userCfg, c2).Generate(),
+            HashSetChainContext c2 => new HashSetChainCode(genCfg, userCfg, c2, _shared).Generate(),
+            HashSetLinearContext c2 => new HashSetLinearCode(genCfg, userCfg, c2, _shared).Generate(),
             KeyLengthContext c2 => new KeyLengthCode(genCfg, userCfg, c2).Generate(),
             _ => throw new NotSupportedException("The context type is not supported: " + context.GetType().Name)
         });
@@ -32,7 +33,7 @@ public class RustCodeGenerator(RustGeneratorConfig userCfg) : IGenerator
         AppendFooter(genCfg);
 
         // Output any shared classes
-        foreach (string cls in SharedCode.Instance.GetType(CodeType.Class))
+        foreach (string cls in _shared.GetType(CodeType.Class))
         {
             _sb.AppendLine()
                .AppendLine(cls);

@@ -7,11 +7,12 @@ namespace Genbox.FastData.Generator.CSharp;
 public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
 {
     private readonly StringBuilder _sb = new StringBuilder();
+    private readonly SharedCode _shared = new SharedCode();
 
     public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source)
     {
         _sb.Clear();
-        SharedCode.Instance.Clear();
+        _shared.Clear();
 
         AppendHeader(genCfg);
 
@@ -33,7 +34,7 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
         AppendFooter(genCfg);
 
         // Output any shared classes
-        foreach (string cls in SharedCode.Instance.GetType(CodeType.Class))
+        foreach (string cls in _shared.GetType(CodeType.Class))
         {
             _sb.AppendLine()
                .AppendLine(cls);
@@ -64,13 +65,13 @@ public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
         {
             iface = $": IFastSet<{genCfg.GetTypeName()}>";
 
-            SharedCode.Instance.Add("IFastSet", CodeType.Class, """
-                                                                public interface IFastSet<in T>
-                                                                {
-                                                                    int Length { get; }
-                                                                    bool Contains(T value);
-                                                                }
-                                                                """);
+            _shared.Add("IFastSet", CodeType.Class, """
+                                                    public interface IFastSet<in T>
+                                                    {
+                                                        int Length { get; }
+                                                        bool Contains(T value);
+                                                    }
+                                                    """);
         }
 
         string? partial = userCfg.ClassType != ClassType.Static ? " partial" : null;

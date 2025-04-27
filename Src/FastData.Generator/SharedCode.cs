@@ -5,10 +5,6 @@ public sealed class SharedCode
 {
     private readonly Dictionary<CodeKey, string> _cache = new Dictionary<CodeKey, string>();
 
-    private SharedCode() {}
-
-    public static SharedCode Instance { get; } = new SharedCode();
-
     public void Add(string id, CodeType type, string value)
     {
         CodeKey key = new CodeKey(id, type);
@@ -30,19 +26,13 @@ public sealed class SharedCode
 
     public void Clear() => _cache.Clear();
 
-    private readonly struct CodeKey : IEquatable<CodeKey>
+    private readonly struct CodeKey(string id, CodeType type) : IEquatable<CodeKey>
     {
-        public CodeKey(string id, CodeType type)
-        {
-            Id = id;
-            Type = type;
-        }
-
         public bool Equals(CodeKey other) => Id == other.Id && Type == other.Type;
         public override bool Equals(object? obj) => obj is CodeKey other && Equals(other);
         public override int GetHashCode() => unchecked((Id.GetHashCode() * 397) ^ (int)Type);
 
-        public string Id { get; }
-        public CodeType Type { get; }
+        public string Id { get; } = id;
+        public CodeType Type { get; } = type;
     }
 }
