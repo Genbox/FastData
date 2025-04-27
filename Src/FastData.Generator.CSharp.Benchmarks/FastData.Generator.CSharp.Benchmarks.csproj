@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Genbox.FastFilter" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
   </ItemGroup>
 

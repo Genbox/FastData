@@ -100,16 +100,9 @@ public sealed class CPlusPlusCompiler
         string dstFile = Path.Combine(_rootPath, fileId + ".exe");
 
         //If the source hasn't changed, we skip compilation
-        if (File.Exists(srcFile) && File.Exists(dstFile))
-        {
-            byte[] oldHash = SHA1.HashData(File.ReadAllBytes(srcFile));
-            byte[] newHash = SHA1.HashData(Encoding.UTF8.GetBytes(source));
+        if (TryWriteFile(dstFile, source))
+            return dstFile;
 
-            if (oldHash.SequenceEqual(newHash))
-                return dstFile;
-        }
-
-        File.WriteAllText(srcFile, source);
         int ret = CompileMSVC(srcFile, dstFile);
 
         if (ret != 0)

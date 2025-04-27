@@ -46,6 +46,6 @@ internal static class Program
         sb.AppendLine("BENCHMARK_MAIN();");
 
         string executable = compiler.Compile("all_benchmarks", sb.ToString());
-        BenchmarkHelper.RunBenchmark(executable, "--benchmark_format=json", "cpp_google", rootDir);
+        BenchmarkHelper.RunBenchmark(executable, "--benchmark_format=json", rootDir, "--adapter cpp_google");
     }
 }

@@ -36,7 +36,7 @@ internal static class Program
             if (!TestVectorHelper.TryGenerate(id => new RustCodeGenerator(new RustGeneratorConfig(id)), type, data, out GeneratorSpec spec))
                 throw new InvalidOperationException("Unable to build " + type);
 
-            File.WriteAllText(Path.Combine(benchPath, spec.Identifier + ".rs"),
+            TestHelper.TryWriteFile(Path.Combine(benchPath, spec.Identifier + ".rs"),
                 $$"""
                   #![allow(non_camel_case_types)]
 
@@ -63,8 +63,8 @@ internal static class Program
                                                          """);
         }
 
-        File.WriteAllText(Path.Combine(rootPath, "Cargo.toml"), sb.ToString());
+        TestHelper.TryWriteFile(Path.Combine(rootPath, "Cargo.toml"), sb.ToString());
 
-        BenchmarkHelper.RunBenchmark("cargo", "bench", "rust_criterion", rootPath);
+        BenchmarkHelper.RunBenchmark("cargo", "bench", rootPath, "--adapter rust_criterion");
     }
 }

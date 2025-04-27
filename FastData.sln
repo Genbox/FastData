@@ -44,6 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Local", "Local", "{2D71B425
 		Locals\Directory.Packages.props = Locals\Directory.Packages.props
 		Locals\Library.props = Locals\Library.props
 		Locals\Tests.props = Locals\Tests.props
+		Locals\Benchmarks.props = Locals\Benchmarks.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Managed", "Managed", "{8678F082-EBA8-4718-AD4E-55BAD7EE853F}"
