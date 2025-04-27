@@ -30,7 +30,7 @@ internal static class Program
                 $$"""
                   {{spec.Source}}
 
-                  static void BM_{{spec.Identifier}}(State& state)
+                  static void CPlusPlus_{{spec.Identifier}}(State& state)
                   {
                       for (auto _ : state)
                       {
@@ -38,13 +38,13 @@ internal static class Program
                       }
                   }
 
-                  BENCHMARK(BM_{{spec.Identifier}});
+                  BENCHMARK(CPlusPlus_{{spec.Identifier}});
                   """);
 
         }
         sb.AppendLine("BENCHMARK_MAIN();");
 
         string executable = compiler.Compile("all_benchmarks", sb.ToString());
-        BenchmarkHelper.RunBenchmark(executable, "--benchmark_format=json", rootDir, "--adapter cpp_google");
+        BenchmarkHelper.RunBenchmark(executable, "--benchmark_format=json", rootDir, "--adapter cpp_google --testbed CPlusPlus");
     }
 }

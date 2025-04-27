@@ -36,7 +36,7 @@ internal static class Program
 
                       namespace CSharp;
 
-                      [JsonExporterAttribute.Brief]
+                      [JsonExporterAttribute.BriefCompressed]
                       [ShortRunJob]
                       [SuppressMessage("Performance", "CA1822:Mark members as static")]
                       public class Program
@@ -50,8 +50,8 @@ internal static class Program
 
             TestHelper.TryWriteFile(Path.Combine(rootDir, spec.Identifier + ".cs"), spec.Source);
 
-            sb.AppendLine(CultureInfo.InvariantCulture,
-                $"    [Benchmark] public bool BM_{spec.Identifier}() => {spec.Identifier}.Contains({ToValueLabel(data[0])});");
+            //CSharp duplicate in the name due to https://github.com/bencherdev/bencher/issues/605
+            sb.AppendLine(CultureInfo.InvariantCulture, $"    [Benchmark] public bool CSharp_{spec.Identifier}() => {spec.Identifier}.Contains({ToValueLabel(data[0])});");
         }
 
         sb.AppendLine("""
@@ -61,6 +61,6 @@ internal static class Program
                       """);
 
         TestHelper.TryWriteFile(Path.Combine(rootDir, "Program.cs"), sb.ToString());
-        BenchmarkHelper.RunBenchmark("dotnet", "run -c release", rootDir, @"--adapter c_sharp_dot_net --file BenchmarkDotNet.Artifacts\results\CSharp.Program-report-brief.json");
+        BenchmarkHelper.RunBenchmark("dotnet", "run -c release", rootDir, @"--adapter c_sharp_dot_net --file BenchmarkDotNet.Artifacts\results\CSharp.Program-report-brief-compressed.json --testbed CSharp");
     }
 }

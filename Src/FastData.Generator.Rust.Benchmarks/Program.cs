@@ -43,7 +43,7 @@ internal static class Program
                   use criterion::{criterion_group, criterion_main, Criterion};
 
                   fn bench_contains(c: &mut Criterion) {
-                      c.bench_function("{{spec.Identifier}}", |b| {
+                      c.bench_function("Rust_{{spec.Identifier}}", |b| {
                           b.iter(|| {
                               {{spec.Identifier}}::contains({{ToValueLabel(data[0])}})
                           });
@@ -63,6 +63,6 @@ internal static class Program
 
         TestHelper.TryWriteFile(Path.Combine(rootPath, "Cargo.toml"), sb.ToString());
 
-        BenchmarkHelper.RunBenchmark("cargo", "bench", rootPath, "--adapter rust_criterion");
+        BenchmarkHelper.RunBenchmark("cargo", "bench", rootPath, "--adapter rust_criterion --testbed Rust");
     }
 }
