@@ -22,20 +22,6 @@ public static class TestHelper
         return new string(data);
     }
 
-    public static void CreateOrEmpty(string path)
-    {
-        if (!Directory.Exists(path))
-            Directory.CreateDirectory(path);
-        else
-        {
-            foreach (string file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
-                File.Delete(file);
-
-            foreach (string dir in Directory.GetDirectories(path, "*", SearchOption.AllDirectories))
-                Directory.Delete(dir, true);
-        }
-    }
-
     public static bool TryRunProcess(string application, string args)
     {
         try
