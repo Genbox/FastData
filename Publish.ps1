@@ -10,6 +10,7 @@ Remove-Item -Path $PublishDir/* -Recurse -Force
 dotnet publish $PSScriptRoot/Src/FastData/FastData.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
 dotnet publish $PSScriptRoot/Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
 dotnet publish $PSScriptRoot/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
+dotnet publish $PSScriptRoot/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
 
 # Pack the PowerShell variant
 New-Item -ItemType Directory -Path $PublishDir/PowerShell | Out-Null

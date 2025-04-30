@@ -1,25 +1,22 @@
 function Invoke-FastData
 {
     param (
-        [Parameter(Mandatory = $true)][ValidateSet("csharp", "cpp")] [string]$Command,
+        [Parameter(Mandatory = $true)][ValidateSet("csharp", "cpp", "rust")] [string]$Command,
         [string]$OutputFile,
         [ValidateSet("bool", "char", "double", "int16", "int32", "int64", "int8", "single", "string", "uint16", "uint32", "uint64", "uint8")]
         [string]$DataType = "string",
-        [string]$Name = "MyData",
         [ValidateSet("Array", "Auto", "BinarySearch", "Conditional", "EytzingerSearch", "HashSetChain", "HashSetLinear", "KeyLength", "PerfectHashBruteForce", "PerfectHashGPerf", "SingleValue")]
         [string]$StructureType = "Auto",
         [Parameter(Mandatory = $true)] [string]$InputFile,
         [string]$Namespace,
-        [ValidateSet("Public", "Internal")]
-        [string]$ClassVisibility = "Internal",
-        [ValidateSet("Instance", "Static", "Struct")]
-        [string]$ClassType = "Static"
+        [string]$ClassName = "MyData"
     )
 
     Add-Type -Path "$PSScriptRoot\lib\Genbox.FastData.dll" -ErrorAction Stop
     Add-Type -Path "$PSScriptRoot\lib\Genbox.FastData.Generator.dll" -ErrorAction Stop
     Add-Type -Path "$PSScriptRoot\lib\Genbox.FastData.Generator.CSharp.dll" -ErrorAction Stop
     Add-Type -Path "$PSScriptRoot\lib\Genbox.FastData.Generator.CPlusPlus.dll" -ErrorAction Stop
+    Add-Type -Path "$PSScriptRoot\lib\Genbox.FastData.Generator.Rust.dll" -ErrorAction Stop
 
     function Get-TypeFunc
     {
@@ -73,24 +70,27 @@ function Invoke-FastData
 
     $typeFunc = Get-TypeFunc $DataType
     $data = Get-Content -Path $InputFile | ForEach-Object { & $typeFunc $_ }
-    $config = New-Object Genbox.FastData.Configs.FastDataConfig($Name, $data, [Genbox.FastData.Enums.StructureType]::$StructureType)
+    $config = New-Object Genbox.FastData.Configs.FastDataConfig([Genbox.FastData.Enums.StructureType]::$StructureType)
 
     if ($Command -eq "csharp")
     {
-        $cfg = New-Object Genbox.FastData.Generator.CSharp.CSharpGeneratorConfig
+        $cfg = New-Object Genbox.FastData.Generator.CSharp.CSharpGeneratorConfig($ClassName)
         $cfg.Namespace = $Namespace
-        $cfg.ClassVisibility = [Genbox.FastData.Generator.CSharp.Enums.ClassVisibility]::$ClassVisibility
-        $cfg.ClassType = [Genbox.FastData.Generator.CSharp.Enums.ClassType]::$ClassType
         $generator = New-Object Genbox.FastData.Generator.CSharp.CSharpCodeGenerator $cfg
     }
     elseif ($Command -eq "cpp")
     {
-        $cfg = New-Object Genbox.FastData.Generator.CPlusPlus.CPlusPlusGeneratorConfig
+        $cfg = New-Object Genbox.FastData.Generator.CPlusPlus.CPlusPlusGeneratorConfig($ClassName)
         $generator = New-Object Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator $cfg
+    }
+    elseif ($Command -eq "rust")
+    {
+        $cfg = New-Object Genbox.FastData.Generator.Rust.RustGeneratorConfig($ClassName)
+        $generator = New-Object Genbox.FastData.Generator.Rust.RustCodeGenerator $cfg
     }
 
     $source = [ref]''
-    $ok = [Genbox.FastData.FastDataGenerator]::TryGenerate($config, $generator, [ref]$source)
+    $ok = [Genbox.FastData.FastDataGenerator]::TryGenerate($data, $config, $generator, [ref]$source)
 
     if (-not $ok)
     {
