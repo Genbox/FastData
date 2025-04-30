@@ -87,10 +87,7 @@ internal static class Program
 
             CSharpCodeGenerator generator = new CSharpCodeGenerator(genCfg);
 
-            object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
-            FastDataConfig config = new FastDataConfig(structureType);
-
-            await GenerateAsync(data, config, generator, outputFile);
+            await GenerateAsync(inputFile, dataType, structureType, generator, outputFile);
         }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt, namespaceOpt, classVisibilityOpt, classTypeOpt);
 
         cppCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn) =>
@@ -98,10 +95,7 @@ internal static class Program
             CPlusPlusGeneratorConfig genCfg = new CPlusPlusGeneratorConfig(cn);
             CPlusPlusCodeGenerator generator = new CPlusPlusCodeGenerator(genCfg);
 
-            object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
-            FastDataConfig config = new FastDataConfig(structureType);
-
-            await GenerateAsync(data, config, generator, outputFile);
+            await GenerateAsync(inputFile, dataType, structureType, generator, outputFile);
         }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt);
 
         rustCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn) =>
@@ -109,10 +103,7 @@ internal static class Program
             RustGeneratorConfig genCfg = new RustGeneratorConfig(cn);
             RustCodeGenerator generator = new RustCodeGenerator(genCfg);
 
-            object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
-            FastDataConfig config = new FastDataConfig(structureType);
-
-            await GenerateAsync(data, config, generator, outputFile);
+            await GenerateAsync(inputFile, dataType, structureType, generator, outputFile);
         }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt);
 
         Parser parser = new CommandLineBuilder(rootCmd)
@@ -123,19 +114,21 @@ internal static class Program
                             ctx.HelpBuilder.CustomizeSymbol(classVisibilityOpt, "-cv, --class-visibility <public|internal>");
                             ctx.HelpBuilder.CustomizeSymbol(classTypeOpt, "-ct, --class-type <instance|static|struct>");
                             ctx.HelpBuilder.CustomizeSymbol(dataTypeOpt, "-d, --data-type <bool|char|double|int16|int32|int64|int8|single|string|uint16|uint32|uint64|uint8>");
-                            ctx.HelpBuilder.CustomizeLayout(
-                                _ => HelpBuilder.Default
-                                                .GetLayout()
-                                                .Skip(1) // Skip the default command description section.
-                                                .Prepend(_ => AnsiConsole.Write(new FigletText(rootCmd.Description!).Color(Color.Red1))));
+                            ctx.HelpBuilder.CustomizeLayout(_ => HelpBuilder.Default
+                                                                            .GetLayout()
+                                                                            .Skip(1) // Skip the default command description section.
+                                                                            .Prepend(_ => AnsiConsole.Write(new FigletText(rootCmd.Description!).Color(Color.Red1))));
                         })
                         .Build();
 
         return await parser.InvokeAsync(args);
     }
 
-    private static async Task GenerateAsync(object[] data, FastDataConfig config, IGenerator generator, FileInfo? outputFile)
+    private static async Task GenerateAsync(FileInfo inputFile, DataType dataType, StructureType structureType, IGenerator generator, FileInfo? outputFile)
     {
+        object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
+        FastDataConfig config = new FastDataConfig(structureType);
+
         if (!FastDataGenerator.TryGenerate(data, config, generator, out string? source))
             throw new InvalidOperationException("Unable to generate code");
 
