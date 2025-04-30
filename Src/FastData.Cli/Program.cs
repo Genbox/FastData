@@ -9,6 +9,7 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus;
 using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.Generator.CSharp.Enums;
+using Genbox.FastData.Generator.Rust;
 using Spectre.Console;
 
 namespace Genbox.FastData.Cli;
@@ -59,10 +60,18 @@ internal static class Program
             inputFileArg
         };
 
+        Command rustCmd = new Command("rust", "Generate a Rust data structure")
+        {
+            classNameOpt,
+
+            inputFileArg
+        };
+
         RootCommand rootCmd = new RootCommand("FastData")
         {
             csharpCmd,
-            cppCmd
+            cppCmd,
+            rustCmd
         };
 
         rootCmd.AddGlobalOption(outputFileOpt);
@@ -88,6 +97,17 @@ internal static class Program
         {
             CPlusPlusGeneratorConfig genCfg = new CPlusPlusGeneratorConfig(cn);
             CPlusPlusCodeGenerator generator = new CPlusPlusCodeGenerator(genCfg);
+
+            object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
+            FastDataConfig config = new FastDataConfig(structureType);
+
+            await GenerateAsync(data, config, generator, outputFile);
+        }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt);
+
+        rustCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn) =>
+        {
+            RustGeneratorConfig genCfg = new RustGeneratorConfig(cn);
+            RustCodeGenerator generator = new RustCodeGenerator(genCfg);
 
             object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
             FastDataConfig config = new FastDataConfig(structureType);

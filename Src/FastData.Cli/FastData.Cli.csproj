@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FastData.Generator.CPlusPlus\FastData.Generator.CPlusPlus.csproj" />
     <ProjectReference Include="..\FastData.Generator.CSharp\FastData.Generator.CSharp.csproj" />
+    <ProjectReference Include="..\FastData.Generator.Rust\FastData.Generator.Rust.csproj" />
   </ItemGroup>
 
 </Project>
