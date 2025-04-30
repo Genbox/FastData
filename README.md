@@ -5,8 +5,8 @@
 
 ## Description
 
-FastData is a source generator that analyzes your data and creates high-performance, read-only lookup data structures for static data.
-It can be used as a standalone application, library, or .NET source generator.
+FastData is a code generator that analyzes your data and creates high-performance, read-only lookup data structures for static data. It can output the data structures
+in many different languages (C#, C++, Rust, etc.), ready for inclusion in your project with zero dependencies.
 
 ## Use case
 
@@ -82,7 +82,7 @@ There are several ways of running FastData. See the sections below for details.
 
 ### Using it in a C# application
 
-1. Add the `Genbox.FastData.Generator.CSharp` package to your project
+1. Add the `Genbox.FastData.Generator.CSharp` nuget package to your project.
 2. Use the `FastDataGenerator.TryGenerate()` method. Give it your data as an array.
 
 ```csharp
@@ -134,6 +134,7 @@ It supports several output programming languages.
 
 * C# output: `fastdata csharp <input-file>`
 * C++ output: `fastdata cplusplus <input-file>`
+* Rust output: `fastdata rust <input-file>`
 
 Each output language has different settings. Type `fastdata <lang> --help` to see the options.
 
@@ -158,8 +159,8 @@ FastData always selects this data structure whenever your dataset only contains 
 
 This data structure relies on built-in logic in the programming language. It produces if/switch statements which ultimately become machine instructions on the CPU, rather than data
 that resides in memory.
-Latency is therefore incredibly low, but the higher number of CPU instructions can fill up the CPU cache, and at a certain point it becomes more efficient to have
-the data reside in memory instead.
+Latency is therefore incredibly low, but the higher number of instructions bloat the assembly, and at a certain point it becomes more efficient to have
+the data reside in memory.
 
 #### Array
 
@@ -176,7 +177,7 @@ It works well for small amounts of data since the array is scanned linearly, but
 * Latency: Medium
 * Complexity: O(log n)
 
-This data structure sorts your data and does a binary search on the content. Since data is sorted at compile time, there is no overhead at runtime. Each lookup
+This data structure sorts your data and does a binary search on it. Since data is sorted at compile time, there is no overhead at runtime. Each lookup
 has a higher latency than a simple array, but once the dataset gets to a few hundred items, it beats the array due to a lower complexity.
 
 #### EytzingerSearch
@@ -240,10 +241,10 @@ of different data structures, indexing, and comparison methods that are tailor-b
 
 There are many benefits gained from generating data structures at compile time:
 
-* Enables us to analyze the data
+* Enables analysis the data
 * Zero runtime overhead
 * No defensive copying of data (takes time and needs double the memory)
-* No virtual dispatching (Virtual method calls & inheritance)
+* No virtual dispatching (virtual method calls & inheritance)
 * Data as code means you can compile the data into your assembly
 
 ### Data analysis
@@ -261,12 +262,12 @@ It uses the analysis to create so-called early-exits, which are fast `O(1)` chec
 
 Hash functions come in many flavors. Some are designed for low latency, some for throughput, others for low collision rate.
 Programming language runtimes come with a hash function that is a tradeoff between these parameters. FastData builds a hash function specifically tailored to the dataset.
-It does so using one of four techniques:
+It has support for several techniques:
 
 1. **Default:** If no technique is selected, FastData uses a hash function by Daniel Bernstein (DJB2)
 2. **Brute force:** It spends some time on trying increasingly stronger hash functions
 3. **Heuristic:** It tries to build a hash function that selects for entropy in strings
-4. **Genetic algorithm:** It uses machine learning to evolve a hash function from scratch that matches the data effectively
+4. **Genetic algorithm:** It uses machine learning to evolve a hash function that matches the data effectively
 
 ## Best practices
 
@@ -279,3 +280,4 @@ It does so using one of four techniques:
     * Frozen comes with considerable runtime overhead
     * Frozen is only available in .NET 8.0+
     * Frozen only provides a few of the optimizations provided in FastData
+    * Frozen is only available in C#. FastData can produce data structures in many langauges.
