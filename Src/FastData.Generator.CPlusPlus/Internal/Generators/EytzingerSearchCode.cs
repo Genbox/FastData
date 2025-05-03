@@ -14,7 +14,7 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, CPlusPlusCodeG
               {
           {{cfg.GetEarlyExits(genCfg)}}
 
-                  unsigned int i = 0;
+                  size_t i = 0;
                   while (i < entries.size())
                   {
                       if (entries[i] == value)

@@ -35,7 +35,7 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CPlusPlu
               {
           {{cfg.GetEarlyExits(genCfg)}}
                   const uint32_t hash = murmur_32(get_hash(value) ^ {{ctx.Seed}});
-                  const uint32_t index = {{cfg.GetModFunction(ctx.Data.Length)}};
+                  const size_t index = {{cfg.GetModFunction(ctx.Data.Length)}};
                   const e& entry = entries[index];
 
                   return hash == entry.hash_code && value == entry.value;

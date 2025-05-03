@@ -53,7 +53,7 @@ public:
         if (const size_t len = value.length(); len != 5u)
             return false;
         const uint32_t hash = murmur_32(get_hash(value) ^ 3);
-        const uint32_t index = hash % 3;
+        const size_t index = hash % 3;
         const e& entry = entries[index];
 
         return hash == entry.hash_code && value == entry.value;

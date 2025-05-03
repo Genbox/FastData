@@ -49,8 +49,8 @@ public:
             return false;
 
         const uint32_t hash = get_hash(value);
-        const uint32_t index = hash % 3;
-        int8_t i = static_cast<int8_t>(buckets[index] - 1);
+        const size_t index = hash % 3;
+        int8_t i = buckets[index] - 1;
 
         while (i >= 0)
         {

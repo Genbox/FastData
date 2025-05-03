@@ -18,7 +18,7 @@ public:
         if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
             return false;
 
-        for (int i = 0; i < 3; i++)
+        for (size_t i = 0; i < 3; i++)
         {
             if (entries[i] == value)
                return true;

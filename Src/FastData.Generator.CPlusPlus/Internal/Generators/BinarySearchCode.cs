@@ -14,11 +14,11 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusCodeGene
               {
           {{cfg.GetEarlyExits(genCfg)}}
 
-                  int lo = 0;
-                  int hi = {{(ctx.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
+                  size_t lo = 0;
+                  size_t hi = {{(ctx.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
                   while (lo <= hi)
                   {
-                      const int mid = lo + ((hi - lo) >> 1);
+                      const size_t mid = lo + ((hi - lo) >> 1);
 
                       if (entries[mid] == value)
                           return true;

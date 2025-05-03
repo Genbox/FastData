@@ -18,11 +18,11 @@ public:
         if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
             return false;
 
-        int lo = 0;
-        int hi = 2;
+        size_t lo = 0;
+        size_t hi = 2;
         while (lo <= hi)
         {
-            const int mid = lo + ((hi - lo) >> 1);
+            const size_t mid = lo + ((hi - lo) >> 1);
 
             if (entries[mid] == value)
                 return true;

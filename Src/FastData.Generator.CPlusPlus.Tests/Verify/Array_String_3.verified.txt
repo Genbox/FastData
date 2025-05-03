@@ -19,7 +19,7 @@ public:
         if (const size_t len = value.length(); len != 5u)
             return false;
 
-        for (int i = 0; i < 3; i++)
+        for (size_t i = 0; i < 3; i++)
         {
             if (entries[i] == value)
                return true;

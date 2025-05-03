@@ -33,8 +33,8 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusCodeGene
           {{cfg.GetEarlyExits(genCfg)}}
 
                   const uint32_t hash = get_hash(value);
-                  const uint32_t index = {{cfg.GetModFunction(ctx.Buckets.Length)}};
-                  {{GetSmallestSignedType(ctx.Buckets.Length)}} i = static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(buckets[index] - 1);
+                  const size_t index = {{cfg.GetModFunction(ctx.Buckets.Length)}};
+                  {{GetSmallestSignedType(ctx.Buckets.Length)}} i = buckets[index] - 1;
 
                   while (i >= 0)
                   {
