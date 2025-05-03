@@ -59,7 +59,7 @@ public class CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig userCfg) : ICod
                      #include <cstdint>
                      #include <limits>
 
-                     class {{userCfg.ClassName}}
+                     class {{userCfg.ClassName}} final
                      {
 
                      """);
@@ -87,6 +87,16 @@ public class CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig userCfg) : ICod
             _sb.Append("    static constexpr int min_length = ").Append(genCfg.Constants.MinValue).AppendLine(";");
             _sb.Append("    static constexpr int max_length = ").Append(genCfg.Constants.MaxValue).AppendLine(";");
         }
+
+        _sb.AppendLine($"""
+
+                        public:
+                            {userCfg.ClassName}() = delete;
+                            {userCfg.ClassName}(const {userCfg.ClassName}&) = delete;
+                            {userCfg.ClassName}& operator=(const {userCfg.ClassName}&) = delete;
+                            {userCfg.ClassName}({userCfg.ClassName}&&) = delete;
+                            {userCfg.ClassName}& operator=({userCfg.ClassName}&&) = delete;
+                        """);
 
         _sb.Append("};");
     }

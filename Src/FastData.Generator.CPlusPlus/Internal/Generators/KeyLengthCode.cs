@@ -17,6 +17,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusCodeGenerat
                      };
 
                  public:
+                     [[nodiscard]]
                      {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
@@ -36,6 +37,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusCodeGenerat
                      };
 
                  public:
+                     [[nodiscard]]
                      {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}}& value) noexcept
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}

@@ -9,6 +9,7 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, CPlusPlusCodeG
               };
 
           public:
+              [[nodiscard]]
               {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
               {
           {{cfg.GetEarlyExits(genCfg)}}

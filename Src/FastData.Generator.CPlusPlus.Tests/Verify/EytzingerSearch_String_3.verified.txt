@@ -6,13 +6,14 @@
 #include <cstdint>
 #include <limits>
 
-class my_data
+class my_data final
 {
     static constexpr std::array<std::string_view, 3> entries = {
         "item2", "item1", "item3"
     };
 
 public:
+    [[nodiscard]]
     static bool contains(const std::string_view value) noexcept
     {
         if (const size_t len = value.length(); len != 5u)
@@ -36,4 +37,11 @@ public:
     static constexpr unsigned int item_count = 3;
     static constexpr int min_length = 5;
     static constexpr int max_length = 5;
+
+public:
+    my_data() = delete;
+    my_data(const my_data&) = delete;
+    my_data& operator=(const my_data&) = delete;
+    my_data(my_data&&) = delete;
+    my_data& operator=(my_data&&) = delete;
 };

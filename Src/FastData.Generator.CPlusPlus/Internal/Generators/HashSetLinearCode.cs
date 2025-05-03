@@ -30,6 +30,7 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusCodeGen
           {{genCfg.GetHashSource()}}
 
           public:
+              [[nodiscard]]
               {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
               {
           {{cfg.GetEarlyExits(genCfg)}}

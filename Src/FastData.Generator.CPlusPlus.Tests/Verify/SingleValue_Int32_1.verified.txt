@@ -5,9 +5,10 @@
 #include <cstdint>
 #include <limits>
 
-class my_data
+class my_data final
 {
 public:
+    [[nodiscard]]
     static constexpr bool contains(const int32_t value) noexcept
     {
         return value == std::numeric_limits<int32_t>::lowest();
@@ -16,4 +17,11 @@ public:
     static constexpr unsigned int item_count = 1;
     static constexpr int32_t min_value = std::numeric_limits<int32_t>::lowest();
     static constexpr int32_t max_value = std::numeric_limits<int32_t>::lowest();
+
+public:
+    my_data() = delete;
+    my_data(const my_data&) = delete;
+    my_data& operator=(const my_data&) = delete;
+    my_data(my_data&&) = delete;
+    my_data& operator=(my_data&&) = delete;
 };
