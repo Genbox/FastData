@@ -53,7 +53,7 @@ internal static class CPlusPlusGeneratorConfigExtensions
 
     internal static string GetLengthEarlyExits(uint min, uint max) =>
         $"""
-                 if (const size_t len = value.length(); {(min.Equals(max) ? $"len != {ToValueLabel(max)}" : $"len < {ToValueLabel(min)} || len > {ToValueLabel(max)}")})
+                 if ({(min.Equals(max) ? $"value.length() != {ToValueLabel(max)}" : $"const size_t len = value.length(); len < {ToValueLabel(min)} || len > {ToValueLabel(max)}")})
                      return false;
          """;
 }

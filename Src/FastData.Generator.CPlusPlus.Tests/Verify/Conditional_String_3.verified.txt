@@ -12,7 +12,7 @@ public:
     [[nodiscard]]
     static bool contains(const std::string_view value) noexcept
     {
-        if (const size_t len = value.length(); len != 5u)
+        if (value.length() != 5u)
             return false;
 
         if (value == "item1" || value == "item2" || value == "item3")

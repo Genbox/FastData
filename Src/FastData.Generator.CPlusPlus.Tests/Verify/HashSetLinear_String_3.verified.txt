@@ -48,7 +48,7 @@ public:
     [[nodiscard]]
     static bool contains(const std::string_view value) noexcept
     {
-        if (const size_t len = value.length(); len != 5u)
+        if (value.length() != 5u)
             return false;
 
         const uint32_t hash = get_hash(value);
