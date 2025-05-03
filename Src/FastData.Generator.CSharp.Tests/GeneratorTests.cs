@@ -11,8 +11,7 @@ public class GeneratorTests
     [ClassData(typeof(TestDataClass))]
     internal async Task GenerateStructureType(StructureType structureType, object[] data)
     {
-        if (!TestVectorHelper.TryGenerate(_ => _generator, structureType, data, out GeneratorSpec spec))
-            return;
+        Assert.True(TestVectorHelper.TryGenerate(_ => _generator, structureType, data, out GeneratorSpec spec));
 
         Assert.NotEmpty(spec.Source);
 

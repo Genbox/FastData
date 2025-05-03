@@ -41,6 +41,13 @@ public static class TestVectorHelper
             }
             else if (type == StructureType.PerfectHashGPerf)
                 yield return (type, ["item1", "item2", "item3", "item4"]);
+            else if (type == StructureType.PerfectHashBruteForce)
+            {
+                //We omit long types because it has duplicate hash codes for 0/max
+                yield return (type, ["item1", "item2", "item3"]);
+                yield return (type, [int.MinValue, 0, int.MaxValue]);
+                yield return (type, [double.MinValue, (double)0, double.MaxValue]);
+            }
             else
             {
                 yield return (type, ["item1", "item2", "item3"]);
