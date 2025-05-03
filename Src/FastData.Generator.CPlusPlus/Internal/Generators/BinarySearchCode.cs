@@ -9,7 +9,7 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusCodeGene
               };
 
           public:
-              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
               {
           {{cfg.GetEarlyExits(genCfg)}}
 

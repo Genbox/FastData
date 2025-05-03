@@ -16,7 +16,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusCode
                      };
 
                  public:
-                     {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
+                     {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
                      {
                  {{cfg.GetEarlyExits(genCfg)}}
 

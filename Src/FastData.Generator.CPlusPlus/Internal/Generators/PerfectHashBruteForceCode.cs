@@ -19,7 +19,7 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CPlusPlu
 
           {{genCfg.GetHashSource()}}
 
-              static uint32_t murmur_32(uint32_t h)
+              static uint32_t murmur_32(uint32_t h) noexcept
               {
                   h ^= h >> 16;
                   h *= 0x85EBCA6BU;
@@ -30,7 +30,7 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CPlusPlu
               }
 
           public:
-              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
               {
           {{cfg.GetEarlyExits(genCfg)}}
                   const uint32_t hash = murmur_32(get_hash(value) ^ {{ctx.Seed}});

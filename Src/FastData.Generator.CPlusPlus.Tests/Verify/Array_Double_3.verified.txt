@@ -12,7 +12,7 @@ class my_data
     };
 
 public:
-    static bool contains(const double value)
+    static bool contains(const double value) noexcept
     {
         if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
             return false;

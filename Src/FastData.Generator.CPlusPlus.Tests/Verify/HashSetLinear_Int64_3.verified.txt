@@ -28,13 +28,13 @@ class my_data
         0, 2147483648, 2147483648
     };
 
-    static uint32_t get_hash(const int64_t value)
+    static uint32_t get_hash(const int64_t value) noexcept
     {
         return static_cast<uint32_t>(static_cast<int32_t>(value) ^ static_cast<int32_t>(value >> 32));
     }
 
 public:
-    static bool contains(const int64_t value)
+    static bool contains(const int64_t value) noexcept
     {
         if (value < std::numeric_limits<int64_t>::lowest() || value > std::numeric_limits<int64_t>::max())
             return false;

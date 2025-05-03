@@ -17,7 +17,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusCodeGenerat
                      };
 
                  public:
-                     {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
+                     {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
 
@@ -36,7 +36,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusCodeGenerat
                      };
 
                  public:
-                     {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}}& value)
+                     {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}}& value) noexcept
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
                          std::vector<{{genCfg.GetTypeName()}}> bucket = entries[value.length() - {{ctx.MinLength}}];

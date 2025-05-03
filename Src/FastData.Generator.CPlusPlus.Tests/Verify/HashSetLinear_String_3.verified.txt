@@ -29,7 +29,7 @@ class my_data
         2391420970, 3957504911, 825337029
     };
 
-    static constexpr uint32_t get_hash(const std::string_view value)
+    static constexpr uint32_t get_hash(const std::string_view value) noexcept
     {
         uint32_t hash = 352654597;
 
@@ -45,7 +45,7 @@ class my_data
     }
 
 public:
-    static bool contains(const std::string_view value)
+    static bool contains(const std::string_view value) noexcept
     {
         if (const size_t len = value.length(); len != 5u)
             return false;

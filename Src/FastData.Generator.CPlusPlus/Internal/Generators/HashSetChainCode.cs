@@ -27,7 +27,7 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusCodeGene
           {{genCfg.GetHashSource()}}
 
           public:
-              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value)
+              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
               {
           {{cfg.GetEarlyExits(genCfg)}}
 

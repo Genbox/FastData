@@ -21,7 +21,7 @@ class my_data
         e("item2", 2874739758u), e("item3", 2030593309u), e("item1", 3482164928u)
     };
 
-    static constexpr uint32_t get_hash(const std::string_view value)
+    static constexpr uint32_t get_hash(const std::string_view value) noexcept
     {
         uint32_t hash = 352654597;
 
@@ -36,7 +36,7 @@ class my_data
         return 352654597 + (hash * 1566083941);
     }
 
-    static uint32_t murmur_32(uint32_t h)
+    static uint32_t murmur_32(uint32_t h) noexcept
     {
         h ^= h >> 16;
         h *= 0x85EBCA6BU;
@@ -47,7 +47,7 @@ class my_data
     }
 
 public:
-    static bool contains(const std::string_view value)
+    static bool contains(const std::string_view value) noexcept
     {
         if (const size_t len = value.length(); len != 5u)
             return false;

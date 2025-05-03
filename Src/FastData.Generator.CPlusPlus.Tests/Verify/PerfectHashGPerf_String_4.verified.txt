@@ -42,7 +42,7 @@ class my_data
     };
 
 public:
-    static bool contains(const std::string_view value)
+    static bool contains(const std::string_view value) noexcept
     {
         if (const size_t len = value.length(); len != 5u)
             return false;

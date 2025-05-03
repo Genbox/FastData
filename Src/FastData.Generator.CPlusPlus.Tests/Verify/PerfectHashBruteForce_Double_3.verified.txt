@@ -20,7 +20,7 @@ class my_data
         e(std::numeric_limits<double>::max(), 2066174499u), e(0.0, 1364076727u), e(std::numeric_limits<double>::lowest(), 2886815657u)
     };
 
-    static uint32_t get_hash(const double value)
+    static uint32_t get_hash(const double value) noexcept
     {
         uint64_t bits;
         std::memcpy(&bits, &value, sizeof(bits));
@@ -29,7 +29,7 @@ class my_data
         return static_cast<uint32_t>(bits) ^ static_cast<uint32_t>(bits >> 32);
     }
 
-    static uint32_t murmur_32(uint32_t h)
+    static uint32_t murmur_32(uint32_t h) noexcept
     {
         h ^= h >> 16;
         h *= 0x85EBCA6BU;
@@ -40,7 +40,7 @@ class my_data
     }
 
 public:
-    static bool contains(const double value)
+    static bool contains(const double value) noexcept
     {
         if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
             return false;

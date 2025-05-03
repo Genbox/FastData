@@ -8,7 +8,7 @@
 class my_data
 {
 public:
-    static bool contains(const int32_t value)
+    static bool contains(const int32_t value) noexcept
     {
         if (value < std::numeric_limits<int32_t>::lowest() || value > std::numeric_limits<int32_t>::max())
             return false;

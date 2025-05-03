@@ -28,7 +28,7 @@ class my_data
         0, 1048576, 2148532224
     };
 
-    static uint32_t get_hash(const double value)
+    static uint32_t get_hash(const double value) noexcept
     {
         uint64_t bits;
         std::memcpy(&bits, &value, sizeof(bits));
@@ -38,7 +38,7 @@ class my_data
     }
 
 public:
-    static bool contains(const double value)
+    static bool contains(const double value) noexcept
     {
         if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
             return false;

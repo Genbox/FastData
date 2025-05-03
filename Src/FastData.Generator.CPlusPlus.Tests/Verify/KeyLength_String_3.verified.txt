@@ -13,7 +13,7 @@ class my_data
     };
 
 public:
-    static bool contains(const std::string_view value)
+    static bool contains(const std::string_view value) noexcept
     {
         if ((13ULL & 1ULL << (value.length() - 1) % 64) == 0)
             return false;
