@@ -25,7 +25,7 @@ class my_data
         e(2147483648, -1, std::numeric_limits<int32_t>::lowest()), e(0, -1, 0ll), e(2147483647, -1, std::numeric_limits<int32_t>::max())
     };
 
-    static uint32_t get_hash(const int32_t value)
+    static constexpr uint32_t get_hash(const int32_t value)
     {
         return static_cast<uint32_t>(value);
     }

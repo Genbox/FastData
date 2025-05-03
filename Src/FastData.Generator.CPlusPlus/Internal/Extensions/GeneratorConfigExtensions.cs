@@ -22,13 +22,17 @@ internal static class GeneratorConfigExtensions
         _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
     };
 
-    internal static string GetHashSource(this GeneratorConfig config) =>
-        $$"""
-              static uint32_t get_hash(const {{config.GetTypeName()}} value)
-              {
-          {{GetHash(config.DataType)}}
-              }
-          """;
+    internal static string GetHashSource(this GeneratorConfig config)
+    {
+        bool norConst = config.DataType is DataType.Single or DataType.Double or DataType.Int64 or DataType.UInt64;
+
+        return $$"""
+                     static{{(norConst ? " " : " constexpr ")}}uint32_t get_hash(const {{config.GetTypeName()}} value)
+                     {
+                 {{GetHash(config.DataType)}}
+                     }
+                 """;
+    }
 
     private static string GetHash(DataType dataType)
     {
