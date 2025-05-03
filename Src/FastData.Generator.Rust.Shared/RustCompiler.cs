@@ -34,7 +34,10 @@ public sealed class RustCompiler
         int ret = _compile(srcFile, dstFile);
 
         if (ret != 0)
+        {
+            File.Delete(dstFile); // We need to delete the file on failure to avoid returning the cache on next run
             throw new InvalidOperationException("Failed to compile. Exit code: " + ret);
+        }
 
         return dstFile;
     }
