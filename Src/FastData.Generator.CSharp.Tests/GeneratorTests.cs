@@ -5,7 +5,7 @@ namespace Genbox.FastData.Generator.CSharp.Tests;
 
 public class GeneratorTests
 {
-    private readonly CSharpCodeGenerator _generator = new CSharpCodeGenerator(new CSharpGeneratorConfig("MyData"));
+    private readonly CSharpCodeGenerator _generator = new CSharpCodeGenerator(new CSharpCodeGeneratorConfig("MyData"));
 
     [Theory]
     [ClassData(typeof(TestDataClass))]

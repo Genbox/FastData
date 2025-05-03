@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Enums;
 
 namespace Genbox.FastData.Generator.CSharp;
 
-public sealed class CSharpGeneratorConfig(string className)
+public sealed class CSharpCodeGeneratorConfig(string className)
 {
     public string ClassName { get; set; } = className;
     public string? Namespace { get; set; }

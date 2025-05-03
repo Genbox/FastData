@@ -2,7 +2,7 @@ using Genbox.FastData.Contexts.Misc;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusGeneratorConfig cfg, HashSetLinearContext ctx) : IOutputWriter
+internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, HashSetLinearContext ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, CPlusPlusGeneratorConfig cfg, EytzingerSearchContext ctx) : IOutputWriter
+internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, EytzingerSearchContext ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

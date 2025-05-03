@@ -3,7 +3,7 @@ using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class KeyLengthCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, KeyLengthContext ctx) : IOutputWriter
+internal sealed class KeyLengthCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, KeyLengthContext ctx) : IOutputWriter
 {
     public string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
 

@@ -13,7 +13,7 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
     [ClassData(typeof(TestVectorClass))]
     public void Test(StructureType type, object[] data)
     {
-        Assert.True(TestVectorHelper.TryGenerate(id => new CPlusPlusCodeGenerator(new CPlusPlusGeneratorConfig(id)), type, data, out GeneratorSpec spec));
+        Assert.True(TestVectorHelper.TryGenerate(id => new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig(id)), type, data, out GeneratorSpec spec));
 
         string executable = context.Compiler.Compile(spec.Identifier,
             $$"""

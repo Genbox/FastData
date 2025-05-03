@@ -13,7 +13,7 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
     [ClassData(typeof(TestVectorClass))]
     public void Test(StructureType type, object[] data)
     {
-        Assert.True(TestVectorHelper.TryGenerate(id => new RustCodeGenerator(new RustGeneratorConfig(id)), type, data, out GeneratorSpec spec));
+        Assert.True(TestVectorHelper.TryGenerate(id => new RustCodeGenerator(new RustCodeGeneratorConfig(id)), type, data, out GeneratorSpec spec));
 
         string executable = context.Compiler.Compile(spec.Identifier,
             $$"""

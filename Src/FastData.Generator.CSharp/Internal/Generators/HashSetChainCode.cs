@@ -2,7 +2,7 @@ using Genbox.FastData.Contexts.Misc;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpGeneratorConfig cfg, HashSetChainContext ctx) : IOutputWriter
+internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpCodeGeneratorConfig cfg, HashSetChainContext ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

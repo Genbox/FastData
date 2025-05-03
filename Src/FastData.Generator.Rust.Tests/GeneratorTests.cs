@@ -5,7 +5,7 @@ namespace Genbox.FastData.Generator.Rust.Tests;
 
 public class GeneratorTests
 {
-    private readonly RustCodeGenerator _generator = new RustCodeGenerator(new RustGeneratorConfig("MyData"));
+    private readonly RustCodeGenerator _generator = new RustCodeGenerator(new RustCodeGeneratorConfig("MyData"));
 
     [Theory]
     [ClassData(typeof(TestDataClass))]

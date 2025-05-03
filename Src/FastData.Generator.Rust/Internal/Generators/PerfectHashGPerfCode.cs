@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, PerfectHashGPerfContext ctx) : IOutputWriter
+internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, PerfectHashGPerfContext ctx) : IOutputWriter
 {
     public string Generate()
     {

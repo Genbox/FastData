@@ -3,7 +3,7 @@ using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusGeneratorConfig cfg, KeyLengthContext ctx) : IOutputWriter
+internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, KeyLengthContext ctx) : IOutputWriter
 {
     public string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
 

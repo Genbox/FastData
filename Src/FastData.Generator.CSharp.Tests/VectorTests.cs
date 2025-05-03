@@ -10,7 +10,7 @@ public class VectorTests
     [ClassData(typeof(TestVectorClass))]
     public void Test(StructureType type, object[] data)
     {
-        Assert.True(TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpGeneratorConfig(id)), type, data, out GeneratorSpec spec));
+        Assert.True(TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), type, data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
 
         string wrapper = $$"""

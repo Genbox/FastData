@@ -4,7 +4,7 @@ using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpGeneratorConfig cfg, KeyLengthContext ctx) : IOutputWriter
+internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpCodeGeneratorConfig cfg, KeyLengthContext ctx) : IOutputWriter
 {
     //TODO: Remove gaps in array by reducing the index via a map (if (idx > 10) return 4) where 4 is the number to subtract from the index
 

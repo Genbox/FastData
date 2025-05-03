@@ -8,7 +8,7 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
 [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
 internal static class CPlusPlusGeneratorConfigExtensions
 {
-    internal static string GetEarlyExits(this CPlusPlusGeneratorConfig cfg, GeneratorConfig genCfg)
+    internal static string GetEarlyExits(this CPlusPlusCodeGeneratorConfig cfg, GeneratorConfig genCfg)
     {
         if (cfg.GeneratorOptions.HasFlag(CPlusPlusOptions.DisableEarlyExits))
             return string.Empty;
@@ -30,11 +30,11 @@ internal static class CPlusPlusGeneratorConfigExtensions
         return sb.ToString();
     }
 
-    public static string GetFieldModifier(this CPlusPlusGeneratorConfig config) => "inline static const ";
+    public static string GetFieldModifier(this CPlusPlusCodeGeneratorConfig config) => "inline static const ";
 
-    public static string GetMethodModifier(this CPlusPlusGeneratorConfig config) => "static ";
+    public static string GetMethodModifier(this CPlusPlusCodeGeneratorConfig config) => "static ";
 
-    internal static string GetModFunction(this CPlusPlusGeneratorConfig config, int length)
+    internal static string GetModFunction(this CPlusPlusCodeGeneratorConfig config, int length)
     {
         return $"hash % {length.ToString(NumberFormatInfo.InvariantInfo)}";
     }

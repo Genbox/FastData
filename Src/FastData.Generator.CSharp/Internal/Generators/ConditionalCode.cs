@@ -2,7 +2,7 @@ using Genbox.FastData.Generator.Enums;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpGeneratorConfig cfg, ConditionalContext ctx) : IOutputWriter
+internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpCodeGeneratorConfig cfg, ConditionalContext ctx) : IOutputWriter
 {
     public string Generate() => cfg.ConditionalBranchType switch
     {

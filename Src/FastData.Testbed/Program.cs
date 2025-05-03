@@ -8,7 +8,7 @@ internal static class Program
 {
     private static void Main()
     {
-        CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpGeneratorConfig("test"));
+        CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpCodeGeneratorConfig("test"));
 
         FastDataConfig cfg = new FastDataConfig(StructureType.HashSetChain);
         cfg.AnalyzerConfig = new GeneticAnalyzerConfig();

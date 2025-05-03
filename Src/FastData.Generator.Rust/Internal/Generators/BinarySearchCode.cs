@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class BinarySearchCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, BinarySearchContext ctx) : IOutputWriter
+internal sealed class BinarySearchCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, BinarySearchContext ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

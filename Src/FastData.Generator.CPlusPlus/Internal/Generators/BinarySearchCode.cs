@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusGeneratorConfig cfg, BinarySearchContext ctx) : IOutputWriter
+internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, BinarySearchContext ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class ArrayCode(GeneratorConfig genCfg, CPlusPlusGeneratorConfig cfg, ArrayContext ctx) : IOutputWriter
+internal sealed class ArrayCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, ArrayContext ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

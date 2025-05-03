@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class ConditionalCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, ConditionalContext ctx) : IOutputWriter
+internal sealed class ConditionalCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, ConditionalContext ctx) : IOutputWriter
 {
     public string Generate()
         => $$"""

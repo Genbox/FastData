@@ -31,7 +31,7 @@ internal static class Program
 
         foreach ((StructureType type, object[] data) in TestVectorHelper.GetBenchmarkVectors())
         {
-            if (!TestVectorHelper.TryGenerate(id => new RustCodeGenerator(new RustGeneratorConfig(id)), type, data, out GeneratorSpec spec))
+            if (!TestVectorHelper.TryGenerate(id => new RustCodeGenerator(new RustCodeGeneratorConfig(id)), type, data, out GeneratorSpec spec))
                 throw new InvalidOperationException("Unable to build " + type);
 
             TestHelper.TryWriteFile(Path.Combine(benchPath, spec.Identifier + ".rs"),

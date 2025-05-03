@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 namespace Genbox.FastData.Generator.CPlusPlus;
 
-public class CPlusPlusCodeGenerator(CPlusPlusGeneratorConfig userCfg) : ICodeGenerator
+public class CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig userCfg) : ICodeGenerator
 {
     private readonly StringBuilder _sb = new StringBuilder();
 

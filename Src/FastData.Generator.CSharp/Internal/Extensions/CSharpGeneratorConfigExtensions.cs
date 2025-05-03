@@ -9,7 +9,7 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Extensions;
 [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
 internal static class CSharpGeneratorConfigExtensions
 {
-    internal static string GetEarlyExits(this CSharpGeneratorConfig cfg, GeneratorConfig genCfg)
+    internal static string GetEarlyExits(this CSharpCodeGeneratorConfig cfg, GeneratorConfig genCfg)
     {
         if (cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableEarlyExits))
             return string.Empty;
@@ -31,7 +31,7 @@ internal static class CSharpGeneratorConfigExtensions
         return sb.ToString();
     }
 
-    internal static string GetModFunction(this CSharpGeneratorConfig config, int value)
+    internal static string GetModFunction(this CSharpCodeGeneratorConfig config, int value)
     {
         if (value == 0)
             throw new ArgumentOutOfRangeException(nameof(value), "A length of 0 is not valid in a modulus operation");
@@ -50,7 +50,7 @@ internal static class CSharpGeneratorConfigExtensions
         return $"unchecked((uint)((((({multiplier}ul * hash) >> 32) + 1) * {value}) >> 32))";
     }
 
-    internal static string? GetMethodAttributes(this CSharpGeneratorConfig config)
+    internal static string? GetMethodAttributes(this CSharpCodeGeneratorConfig config)
     {
         if (config.GeneratorOptions.HasFlag(CSharpOptions.DisableInlining))
             return "[MethodImpl(MethodImplOptions.NoInlining)]";
@@ -61,9 +61,9 @@ internal static class CSharpGeneratorConfigExtensions
         return null;
     }
 
-    internal static string GetFieldModifier(this CSharpGeneratorConfig config) => config.ClassType == ClassType.Static ? "private static readonly " : "private readonly ";
+    internal static string GetFieldModifier(this CSharpCodeGeneratorConfig config) => config.ClassType == ClassType.Static ? "private static readonly " : "private readonly ";
 
-    internal static string GetMethodModifier(this CSharpGeneratorConfig config, bool forcePrivate = false)
+    internal static string GetMethodModifier(this CSharpCodeGeneratorConfig config, bool forcePrivate = false)
     {
         string res = forcePrivate ? "private " : "public ";
         return res + (config.ClassType == ClassType.Static ? "static " : "");

@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, EytzingerSearchContext ctx) : IOutputWriter
+internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, EytzingerSearchContext ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

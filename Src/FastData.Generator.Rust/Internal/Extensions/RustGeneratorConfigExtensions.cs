@@ -8,7 +8,7 @@ namespace Genbox.FastData.Generator.Rust.Internal.Extensions;
 [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
 internal static class RustGeneratorConfigExtensions
 {
-    internal static string GetEarlyExits(this RustGeneratorConfig cfg, GeneratorConfig genCfg)
+    internal static string GetEarlyExits(this RustCodeGeneratorConfig cfg, GeneratorConfig genCfg)
     {
         if (cfg.GeneratorOptions.HasFlag(RustOptions.DisableEarlyExits))
             return string.Empty;
@@ -30,11 +30,11 @@ internal static class RustGeneratorConfigExtensions
         return sb.ToString();
     }
 
-    public static string? GetFieldModifier(this RustGeneratorConfig config) => null;
+    public static string? GetFieldModifier(this RustCodeGeneratorConfig config) => null;
 
-    public static string GetMethodModifier(this RustGeneratorConfig config, bool forcePrivate = false) => forcePrivate ? " " : "pub ";
+    public static string GetMethodModifier(this RustCodeGeneratorConfig config, bool forcePrivate = false) => forcePrivate ? " " : "pub ";
 
-    internal static string GetModFunction(this RustGeneratorConfig config, int length)
+    internal static string GetModFunction(this RustCodeGeneratorConfig config, int length)
     {
         return $"hash % {length.ToString(NumberFormatInfo.InvariantInfo)}";
     }

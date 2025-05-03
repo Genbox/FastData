@@ -23,7 +23,7 @@ internal static class Program
 
         foreach ((StructureType type, object[] data) in TestVectorHelper.GetBenchmarkVectors())
         {
-            if (!TestVectorHelper.TryGenerate(id => new CPlusPlusCodeGenerator(new CPlusPlusGeneratorConfig(id)), type, data, out GeneratorSpec spec))
+            if (!TestVectorHelper.TryGenerate(id => new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig(id)), type, data, out GeneratorSpec spec))
                 throw new InvalidOperationException("Unable to build " + type);
 
             sb.AppendLine(CultureInfo.InvariantCulture,

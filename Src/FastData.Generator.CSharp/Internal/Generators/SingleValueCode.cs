@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class SingleValueCode(GeneratorConfig genCfg, CSharpGeneratorConfig cfg, SingleValueContext ctx) : IOutputWriter
+internal sealed class SingleValueCode(GeneratorConfig genCfg, CSharpCodeGeneratorConfig cfg, SingleValueContext ctx) : IOutputWriter
 {
     //We don't support early exits in this generator.
     // - Strings: Length is checked in the equals function

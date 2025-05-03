@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class ArrayCode(GeneratorConfig genCfg, RustGeneratorConfig cfg, ArrayContext ctx) : IOutputWriter
+internal sealed class ArrayCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, ArrayContext ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

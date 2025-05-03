@@ -5,7 +5,7 @@ namespace Genbox.FastData.Generator.CPlusPlus.Tests;
 
 public class GeneratorTests
 {
-    private readonly CPlusPlusCodeGenerator _generator = new CPlusPlusCodeGenerator(new CPlusPlusGeneratorConfig("my_data"));
+    private readonly CPlusPlusCodeGenerator _generator = new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig("my_data"));
 
     [Theory]
     [ClassData(typeof(TestDataClass))]

@@ -45,7 +45,7 @@ internal static class Program
 
         foreach ((StructureType type, object[] data) in TestVectorHelper.GetBenchmarkVectors())
         {
-            if (!TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpGeneratorConfig(id)), type, data, out GeneratorSpec spec))
+            if (!TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), type, data, out GeneratorSpec spec))
                 throw new InvalidOperationException("Unable to build " + type);
 
             TestHelper.TryWriteFile(Path.Combine(rootDir, spec.Identifier + ".cs"), spec.Source);

@@ -80,7 +80,7 @@ internal static class Program
 
         csharpCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn, ns, cv, ct) =>
         {
-            CSharpGeneratorConfig genCfg = new CSharpGeneratorConfig(cn);
+            CSharpCodeGeneratorConfig genCfg = new CSharpCodeGeneratorConfig(cn);
             genCfg.Namespace = ns;
             genCfg.ClassVisibility = cv;
             genCfg.ClassType = ct;
@@ -92,7 +92,7 @@ internal static class Program
 
         cppCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn) =>
         {
-            CPlusPlusGeneratorConfig genCfg = new CPlusPlusGeneratorConfig(cn);
+            CPlusPlusCodeGeneratorConfig genCfg = new CPlusPlusCodeGeneratorConfig(cn);
             CPlusPlusCodeGenerator generator = new CPlusPlusCodeGenerator(genCfg);
 
             await GenerateAsync(inputFile, dataType, structureType, generator, outputFile);
@@ -100,7 +100,7 @@ internal static class Program
 
         rustCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn) =>
         {
-            RustGeneratorConfig genCfg = new RustGeneratorConfig(cn);
+            RustCodeGeneratorConfig genCfg = new RustCodeGeneratorConfig(cn);
             RustCodeGenerator generator = new RustCodeGenerator(genCfg);
 
             await GenerateAsync(inputFile, dataType, structureType, generator, outputFile);
