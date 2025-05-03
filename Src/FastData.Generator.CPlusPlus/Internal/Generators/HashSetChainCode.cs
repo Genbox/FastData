@@ -12,7 +12,7 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusCodeGene
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
                   {{genCfg.GetTypeName()}} value;
 
-                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{genCfg.GetTypeName()}} value)
+                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{genCfg.GetTypeName()}} value)
                      : hash_code(hash_code), next(next), value(value) {}
               };
 

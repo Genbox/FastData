@@ -14,7 +14,7 @@ class my_data
         int8_t next;
         std::string_view value;
 
-        e(const uint32_t hash_code, const int8_t next, std::string_view value)
+        e(const uint32_t hash_code, const int8_t next, const std::string_view value)
            : hash_code(hash_code), next(next), value(value) {}
     };
 

@@ -13,7 +13,7 @@ class my_data
         int8_t next;
         double value;
 
-        e(const uint32_t hash_code, const int8_t next, double value)
+        e(const uint32_t hash_code, const int8_t next, const double value)
            : hash_code(hash_code), next(next), value(value) {}
     };
 
