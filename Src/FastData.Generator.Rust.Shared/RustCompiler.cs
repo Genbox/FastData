@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using static Genbox.FastData.InternalShared.TestHelper;
 
 namespace Genbox.FastData.Generator.Rust.Shared;
@@ -30,16 +28,9 @@ public sealed class RustCompiler
         string dstFile = Path.Combine(_rootPath, fileId + ".exe");
 
         //If the source hasn't changed, we skip compilation
-        if (File.Exists(srcFile) && File.Exists(dstFile))
-        {
-            byte[] oldHash = SHA1.HashData(File.ReadAllBytes(srcFile));
-            byte[] newHash = SHA1.HashData(Encoding.UTF8.GetBytes(source));
+        if (!TryWriteFile(srcFile, source) && File.Exists(dstFile))
+            return dstFile;
 
-            if (oldHash.SequenceEqual(newHash))
-                return dstFile;
-        }
-
-        File.WriteAllText(srcFile, source);
         int ret = _compile(srcFile, dstFile);
 
         if (ret != 0)
