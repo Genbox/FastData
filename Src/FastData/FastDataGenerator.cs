@@ -12,7 +12,7 @@ namespace Genbox.FastData;
 
 public static class FastDataGenerator
 {
-    public static bool TryGenerate(object[] data, FastDataConfig fdCfg, IGenerator generator, out string? source)
+    public static bool TryGenerate(object[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source)
     {
         //Validate that we only have unique data
         HashSet<object> uniq = new HashSet<object>();

@@ -15,7 +15,7 @@ public class GenericTests
     [Fact]
     public Task VerifyChecksTest() => VerifyChecks.Run();
 
-    private class DummyGenerator : IGenerator
+    private class DummyGenerator : ICodeGenerator
     {
         public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source) => throw new NotSupportedException();
     }

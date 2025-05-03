@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Rust.Internal.Generators;
 
 namespace Genbox.FastData.Generator.Rust;
 
-public class RustCodeGenerator(RustGeneratorConfig userCfg) : IGenerator
+public class RustCodeGenerator(RustGeneratorConfig userCfg) : ICodeGenerator
 {
     private readonly StringBuilder _sb = new StringBuilder();
     private readonly SharedCode _shared = new SharedCode();

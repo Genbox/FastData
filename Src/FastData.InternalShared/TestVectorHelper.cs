@@ -7,7 +7,7 @@ namespace Genbox.FastData.InternalShared;
 
 public static class TestVectorHelper
 {
-    public static bool TryGenerate(Func<string, IGenerator> generatorFunc, StructureType structureType, object[] data, out GeneratorSpec spec)
+    public static bool TryGenerate(Func<string, ICodeGenerator> generatorFunc, StructureType structureType, object[] data, out GeneratorSpec spec)
     {
         DataType dataType = (DataType)Enum.Parse(typeof(DataType), data[0].GetType().Name);
 

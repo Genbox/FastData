@@ -4,7 +4,7 @@ using Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 namespace Genbox.FastData.Generator.CSharp;
 
-public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : IGenerator
+public class CSharpCodeGenerator(CSharpGeneratorConfig userCfg) : ICodeGenerator
 {
     private readonly StringBuilder _sb = new StringBuilder();
     private readonly SharedCode _shared = new SharedCode();

@@ -124,7 +124,7 @@ internal static class Program
         return await parser.InvokeAsync(args);
     }
 
-    private static async Task GenerateAsync(FileInfo inputFile, DataType dataType, StructureType structureType, IGenerator generator, FileInfo? outputFile)
+    private static async Task GenerateAsync(FileInfo inputFile, DataType dataType, StructureType structureType, ICodeGenerator generator, FileInfo? outputFile)
     {
         object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
         FastDataConfig config = new FastDataConfig(structureType);
