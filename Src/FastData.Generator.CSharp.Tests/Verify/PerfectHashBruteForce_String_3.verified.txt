@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 internal static class MyData 
 {
     private static readonly E[] _entries = {
-        new E("item3", 94714119u), new E("item2", 1729332148u), new E("item1", 2649680336u)
+        new E("item2", 2874739758u), new E("item3", 2030593309u), new E("item1", 3482164928u)
     };
 
     
@@ -18,7 +18,7 @@ internal static class MyData
         if (value.Length != 5u)
             return false;
 
-        uint hash = Murmur_32(Hash(value) ^ 13);
+        uint hash = Murmur_32(Hash(value) ^ 3);
         uint index = unchecked((uint)(((((6148914691236517206ul * hash) >> 32) + 1) * 3) >> 32));
         ref E entry = ref _entries[index];
 

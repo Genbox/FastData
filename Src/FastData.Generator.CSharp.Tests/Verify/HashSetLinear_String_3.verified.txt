@@ -9,16 +9,15 @@ using System.Runtime.InteropServices;
 internal static class MyData 
 {
     private static readonly B[] _buckets = {
-        new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), 
-        new B(1, 1), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(2, 2), new B(0, 0)
+        new B(0, 0), new B(0, 0), new B(0, 0), new B(1, 1), new B(0, 0), new B(0, 0), new B(2, 2)
     };
 
     private static readonly string[] _items = new string[] {
-        "item1", "item3", "item2"
+        "item2", "item1", "item3"
     };
 
     private static readonly uint[] _hashCodes = {
-        2011983611, 849184197, 3578067552
+        2391420970, 3957504911, 825337029
     };
 
     
@@ -28,7 +27,7 @@ internal static class MyData
             return false;
 
         uint hash = Hash(value);
-        ref B b = ref _buckets[unchecked((uint)(((((1085102592571150096ul * hash) >> 32) + 1) * 17) >> 32))];
+        ref B b = ref _buckets[unchecked((uint)(((((2635249153387078803ul * hash) >> 32) + 1) * 7) >> 32))];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;

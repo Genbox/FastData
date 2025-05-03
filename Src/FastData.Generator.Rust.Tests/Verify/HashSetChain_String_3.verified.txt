@@ -10,28 +10,27 @@ pub struct MyData;
 
 impl MyData {
     const BUCKETS: [i8; 3] = [
-        3, 0, 1
+        3, 2, 1
     ];
 
     const ENTRIES: [E; 3] = [
-        E { hash_code: 2011983611, next: -1, value: "item1" }, E { hash_code: 3578067552, next: -1, value: "item2" }, E { hash_code: 849184197, next: 1, value: "item3" }
+        E { hash_code: 3957504911, next: -1, value: "item1" }, E { hash_code: 2391420970, next: -1, value: "item2" }, E { hash_code: 825337029, next: -1, value: "item3" }
     ];
 
     unsafe fn get_hash(value: &str) -> u32 {
-        let hash1: u32 = 352654597;
-        let mut hash2: u32 = 352654597;
+        let mut hash: u32 = 352654597;
 
         let vec: Vec<u16> = value.encode_utf16().collect();
         let mut ptr = vec.as_ptr();
         let mut len = vec.len();
 
         while len > 0 {
-            hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ *ptr as u32;
+            hash = (((hash << 5) | (hash >> 27)) + hash) ^ *ptr as u32;
             ptr = ptr.add(1);
             len -= 1;
         }
 
-        hash1.wrapping_add(hash2.wrapping_mul(1566083941))
+        return 352654597 + hash2.wrapping_mul(1566083941)
      }
 
     pub fn contains(value: &str) -> bool {

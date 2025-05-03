@@ -6,7 +6,7 @@ namespace Genbox.FastData.Tests;
 public class HashTests
 {
     [Theory]
-    [InlineData("Hello world", 1853904575u)]
+    [InlineData("Hello world", 1638393291)]
     [InlineData("H", 757113168u)]
     public void DJBTest(string input, uint value)
     {

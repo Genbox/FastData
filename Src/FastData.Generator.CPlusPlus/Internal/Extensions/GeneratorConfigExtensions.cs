@@ -30,18 +30,17 @@ internal static class GeneratorConfigExtensions
             return """
                        static uint32_t get_hash(const std::u16string& value)
                        {
-                           constexpr uint32_t hash1 = 352654597;
-                           uint32_t hash2 = 352654597;
+                           uint32_t hash = 352654597;
 
                            const char16_t* ptr = value.data();
                            size_t len = value.size();
 
                            while (len-- > 0) {
-                               hash2 = ((hash2 << 5 | hash2 >> 27) + hash2) ^ *ptr;
+                               hash = (((hash << 5) | (hash >> 27)) + hash) ^ *ptr;
                                ptr++;
                            }
 
-                           return hash1 + (hash2 * 1566083941);
+                           return 352654597 + (hash * 1566083941);
                        }
                    """;
         }

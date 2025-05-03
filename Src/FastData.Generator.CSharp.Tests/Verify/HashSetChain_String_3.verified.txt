@@ -9,11 +9,11 @@ using System.Runtime.InteropServices;
 internal static class MyData 
 {
     private static readonly sbyte[] _buckets = new sbyte[] {
-        3, 0, 1
+        3, 2, 1
      };
 
     private static readonly E[] _entries = {
-        new E(2011983611, -1, "item1"), new E(3578067552, -1, "item2"), new E(849184197, 1, "item3")
+        new E(3957504911, -1, "item1"), new E(2391420970, -1, "item2"), new E(825337029, -1, "item3")
     };
 
     

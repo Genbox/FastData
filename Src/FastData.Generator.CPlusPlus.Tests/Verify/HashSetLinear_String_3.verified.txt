@@ -17,33 +17,31 @@ class my_data
         : start_index(start_index), end_index(end_index) { }
     };
 
-    inline static const std::array<b, 17> buckets = {
-        b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), 
-        b(1, 1), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(2, 2), b(0, 0)
+    inline static const std::array<b, 7> buckets = {
+        b(0, 0), b(0, 0), b(0, 0), b(1, 1), b(0, 0), b(0, 0), b(2, 2)
     };
 
     inline static const std::array<std::u16string, 3> items = {
-        u"item1", u"item3", u"item2"
+        u"item2", u"item1", u"item3"
     };
 
     inline static const std::array<uint32_t, 3> hash_codes = {
-        2011983611, 849184197, 3578067552
+        2391420970, 3957504911, 825337029
     };
 
     static uint32_t get_hash(const std::u16string& value)
     {
-        constexpr uint32_t hash1 = 352654597;
-        uint32_t hash2 = 352654597;
+        uint32_t hash = 352654597;
 
         const char16_t* ptr = value.data();
         size_t len = value.size();
 
         while (len-- > 0) {
-            hash2 = ((hash2 << 5 | hash2 >> 27) + hash2) ^ *ptr;
+            hash = (((hash << 5) | (hash >> 27)) + hash) ^ *ptr;
             ptr++;
         }
 
-        return hash1 + (hash2 * 1566083941);
+        return 352654597 + (hash * 1566083941);
     }
 
 public:
@@ -53,7 +51,7 @@ public:
             return false;
 
         const uint32_t hash = get_hash(value);
-        const auto& [start_index, end_index]= buckets[hash % 17];
+        const auto& [start_index, end_index]= buckets[hash % 7];
 
         uint8_t index = start_index;
 

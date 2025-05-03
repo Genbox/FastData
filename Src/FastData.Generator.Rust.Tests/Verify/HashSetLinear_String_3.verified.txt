@@ -9,34 +9,32 @@ use std::ptr;
 pub struct MyData;
 
 impl MyData {
-    const BUCKETS: [B; 17] = [
-        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, 
-        B { start_index: 1, end_index: 1 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 2, end_index: 2 }, B { start_index: 0, end_index: 0 }
+    const BUCKETS: [B; 7] = [
+        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 1, end_index: 1 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 2, end_index: 2 }
     ];
 
     const ITEMS: [&'static str; 3] = [
-        "item1", "item3", "item2"
+        "item2", "item1", "item3"
     ];
 
     const HASH_CODES: [u32; 3] = [
-        2011983611, 849184197, 3578067552
+        2391420970, 3957504911, 825337029
     ];
 
     unsafe fn get_hash(value: &str) -> u32 {
-        let hash1: u32 = 352654597;
-        let mut hash2: u32 = 352654597;
+        let mut hash: u32 = 352654597;
 
         let vec: Vec<u16> = value.encode_utf16().collect();
         let mut ptr = vec.as_ptr();
         let mut len = vec.len();
 
         while len > 0 {
-            hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ *ptr as u32;
+            hash = (((hash << 5) | (hash >> 27)) + hash) ^ *ptr as u32;
             ptr = ptr.add(1);
             len -= 1;
         }
 
-        hash1.wrapping_add(hash2.wrapping_mul(1566083941))
+        return 352654597 + hash2.wrapping_mul(1566083941)
      }
 
     pub fn contains(value: &'static str) -> bool {
@@ -45,7 +43,7 @@ impl MyData {
         }
 
         let hash = unsafe { Self::get_hash(value) };
-        let bucket = &Self::BUCKETS[(hash % 17) as usize];
+        let bucket = &Self::BUCKETS[(hash % 7) as usize];
         let mut index: u8 = bucket.start_index;
         let end_index: u8 = bucket.end_index;
 

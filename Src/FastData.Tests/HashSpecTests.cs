@@ -16,7 +16,7 @@ public class HashSpecTests
 
     public static IEnumerable<object[]> GetSpecs()
     {
-        yield return [new BruteForceHashSpec(HashFunction.DJB2Hash, [new StringSegment(0, -1, Alignment.Left)]), 1853903583];
+        yield return [new BruteForceHashSpec(HashFunction.DJB2Hash, [new StringSegment(0, -1, Alignment.Left)]), 2256193166];
         yield return [new BruteForceHashSpec(HashFunction.XxHash, [new StringSegment(0, -1, Alignment.Left)]), 1713611331];
 
         yield return [new GeneticHashSpec(1, 1, 1, 1, [new StringSegment(0, -1, Alignment.Left)]), 587415029];

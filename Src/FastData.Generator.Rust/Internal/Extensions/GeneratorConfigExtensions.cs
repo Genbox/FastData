@@ -29,20 +29,19 @@ internal static class GeneratorConfigExtensions
         {
             return """
                        unsafe fn get_hash(value: &str) -> u32 {
-                           let hash1: u32 = 352654597;
-                           let mut hash2: u32 = 352654597;
+                           let mut hash: u32 = 352654597;
 
                            let vec: Vec<u16> = value.encode_utf16().collect();
                            let mut ptr = vec.as_ptr();
                            let mut len = vec.len();
 
                            while len > 0 {
-                               hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ *ptr as u32;
+                               hash = (((hash << 5) | (hash >> 27)) + hash) ^ *ptr as u32;
                                ptr = ptr.add(1);
                                len -= 1;
                            }
 
-                           hash1.wrapping_add(hash2.wrapping_mul(1566083941))
+                           return 352654597 + hash2.wrapping_mul(1566083941)
                         }
                    """;
         }

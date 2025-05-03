@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Internal.Hashes;
 
@@ -12,7 +13,10 @@ public sealed class DefaultHashSpec : IHashSpec
     public HashFunc GetHashFunction() => static obj =>
     {
         if (obj is string str)
-            return DJB2Hash.ComputeHash(str.AsSpan());
+        {
+            ref char ptr = ref MemoryMarshal.GetReference(str.AsSpan());
+            return DJB2Hash.ComputeHash(ref ptr, str.Length);
+        }
 
         uint hash = obj switch
         {
