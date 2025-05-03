@@ -17,7 +17,7 @@ class my_data
            : hash_code(hash_code), next(next), value(value) {}
     };
 
-    inline static const std::array<int8_t, 3> buckets = {
+    static constexpr std::array<int8_t, 3> buckets = {
         3, 1, 0
      };
 

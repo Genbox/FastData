@@ -7,7 +7,7 @@
 
 class my_data
 {
-    inline static const std::array<double, 3> entries = {
+    static constexpr std::array<double, 3> entries = {
         0.0, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max()
     };
 

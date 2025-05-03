@@ -1,7 +1,7 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: Conditional
 #pragma once
-#include <string>
+#include <string_view>
 #include <array>
 #include <cstdint>
 #include <limits>
@@ -9,7 +9,7 @@
 class my_data
 {
 public:
-    static bool contains(const std::string& value)
+    static bool contains(const std::string_view value)
     {
         if (const size_t len = value.length(); len != 5u)
             return false;

@@ -6,14 +6,14 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CPlusPlu
         $$"""
               struct e
               {
-                  {{genCfg.GetTypeName(false)}} value;
+                  {{genCfg.GetTypeName()}} value;
                   uint32_t hash_code;
 
-                  e(const {{genCfg.GetTypeName(false)}} value, const uint32_t hash_code)
+                  e(const {{genCfg.GetTypeName()}} value, const uint32_t hash_code)
                   : value(value), hash_code(hash_code) {}
               };
 
-              {{cfg.GetFieldModifier()}}std::array<e, {{ctx.Data.Length}}> entries = {
+              {{cfg.GetFieldModifier(false)}}std::array<e, {{ctx.Data.Length}}> entries = {
           {{FormatColumns(ctx.Data, Render)}}
               };
 

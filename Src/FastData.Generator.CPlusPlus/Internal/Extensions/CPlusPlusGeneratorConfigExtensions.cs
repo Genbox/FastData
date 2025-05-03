@@ -30,7 +30,7 @@ internal static class CPlusPlusGeneratorConfigExtensions
         return sb.ToString();
     }
 
-    public static string GetFieldModifier(this CPlusPlusCodeGeneratorConfig config) => "inline static const ";
+    public static string GetFieldModifier(this CPlusPlusCodeGeneratorConfig config, bool constexpr = true) => constexpr ? "static constexpr " : "inline static const ";
 
     public static string GetMethodModifier(this CPlusPlusCodeGeneratorConfig config) => "static ";
 

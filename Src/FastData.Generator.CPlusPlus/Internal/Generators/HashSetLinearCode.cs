@@ -15,11 +15,11 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CPlusPlusCodeGen
                   : start_index(start_index), end_index(end_index) { }
               };
 
-              {{cfg.GetFieldModifier()}}std::array<b, {{ctx.Buckets.Length}}> buckets = {
+              {{cfg.GetFieldModifier(false)}}std::array<b, {{ctx.Buckets.Length}}> buckets = {
           {{FormatColumns(ctx.Buckets, RenderBucket)}}
               };
 
-              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName(false)}}, {{ctx.Data.Length}}> items = {
+              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> items = {
           {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
               };
 

@@ -1,7 +1,7 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: HashSetChain
 #pragma once
-#include <string>
+#include <string_view>
 #include <array>
 #include <cstdint>
 #include <limits>
@@ -12,13 +12,13 @@ class my_data
     {
         uint32_t hash_code;
         int8_t next;
-        std::string value;
+        std::string_view value;
 
-        e(const uint32_t hash_code, const int8_t next, std::string value)
+        e(const uint32_t hash_code, const int8_t next, std::string_view value)
            : hash_code(hash_code), next(next), value(value) {}
     };
 
-    inline static const std::array<int8_t, 3> buckets = {
+    static constexpr std::array<int8_t, 3> buckets = {
         3, 2, 1
      };
 
@@ -26,11 +26,11 @@ class my_data
         e(3957504911, -1, "item1"), e(2391420970, -1, "item2"), e(825337029, -1, "item3")
     };
 
-    static uint32_t get_hash(const std::string& value)
+    static uint32_t get_hash(const std::string_view value)
     {
         uint32_t hash = 352654597;
 
-        const char_t* ptr = value.data();
+        const char* ptr = value.data();
         size_t len = value.size();
 
         while (len-- > 0) {
@@ -42,7 +42,7 @@ class my_data
     }
 
 public:
-    static bool contains(const std::string& value)
+    static bool contains(const std::string_view value)
     {
         if (const size_t len = value.length(); len != 5u)
             return false;

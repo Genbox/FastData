@@ -1,19 +1,19 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: EytzingerSearch
 #pragma once
-#include <string>
+#include <string_view>
 #include <array>
 #include <cstdint>
 #include <limits>
 
 class my_data
 {
-    inline static const std::array<std::string, 3> entries = {
+    static constexpr std::array<std::string_view, 3> entries = {
         "item2", "item1", "item3"
     };
 
 public:
-    static bool contains(const std::string& value)
+    static bool contains(const std::string_view value)
     {
         if (const size_t len = value.length(); len != 5u)
             return false;

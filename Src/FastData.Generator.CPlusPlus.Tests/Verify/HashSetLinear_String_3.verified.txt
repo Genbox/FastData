@@ -1,7 +1,7 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: HashSetLinear
 #pragma once
-#include <string>
+#include <string_view>
 #include <array>
 #include <cstdint>
 #include <limits>
@@ -21,19 +21,19 @@ class my_data
         b(0, 0), b(0, 0), b(0, 0), b(1, 1), b(0, 0), b(0, 0), b(2, 2)
     };
 
-    inline static const std::array<std::string, 3> items = {
+    static constexpr std::array<std::string_view, 3> items = {
         "item2", "item1", "item3"
     };
 
-    inline static const std::array<uint32_t, 3> hash_codes = {
+    static constexpr std::array<uint32_t, 3> hash_codes = {
         2391420970, 3957504911, 825337029
     };
 
-    static uint32_t get_hash(const std::string& value)
+    static uint32_t get_hash(const std::string_view value)
     {
         uint32_t hash = 352654597;
 
-        const char_t* ptr = value.data();
+        const char* ptr = value.data();
         size_t len = value.size();
 
         while (len-- > 0) {
@@ -45,7 +45,7 @@ class my_data
     }
 
 public:
-    static bool contains(const std::string& value)
+    static bool contains(const std::string_view value)
     {
         if (const size_t len = value.length(); len != 5u)
             return false;

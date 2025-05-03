@@ -4,10 +4,9 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
 
 internal static class GeneratorConfigExtensions
 {
-    internal static string GetTypeName(this GeneratorConfig config, bool asReference = true) => config.DataType switch
+    internal static string GetTypeName(this GeneratorConfig config) => config.DataType switch
     {
-        DataType.String when asReference => "std::string&",
-        DataType.String => "std::string",
+        DataType.String => "std::string_view",
         DataType.Boolean => "bool",
         DataType.SByte => "int8_t",
         DataType.Byte => "uint8_t",
@@ -28,11 +27,11 @@ internal static class GeneratorConfigExtensions
         if (config.DataType == DataType.String)
         {
             return """
-                       static uint32_t get_hash(const std::string& value)
+                       static uint32_t get_hash(const std::string_view value)
                        {
                            uint32_t hash = 352654597;
 
-                           const char_t* ptr = value.data();
+                           const char* ptr = value.data();
                            size_t len = value.size();
 
                            while (len-- > 0) {

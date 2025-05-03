@@ -52,7 +52,7 @@ public class CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig userCfg) : ICod
         _sb.AppendLine("#pragma once"); //Add include guard
 
         if (genCfg.DataType == DataType.String)
-            _sb.AppendLine("#include <string>");
+            _sb.AppendLine("#include <string_view>");
 
         _sb.Append($$"""
                      #include <array>

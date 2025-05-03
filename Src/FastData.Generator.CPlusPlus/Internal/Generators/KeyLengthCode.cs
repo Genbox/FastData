@@ -12,7 +12,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusCodeGenerat
         string?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()).ToArray();
 
         return $$"""
-                     {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName(false)}}, {{lengths.Length}}> entries = {
+                     {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{lengths.Length}}> entries = {
                  {{FormatColumns(lengths, RenderOne)}}
                      };
 

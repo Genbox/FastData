@@ -1,19 +1,19 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: KeyLength
 #pragma once
-#include <string>
+#include <string_view>
 #include <array>
 #include <cstdint>
 #include <limits>
 
 class my_data
 {
-    inline static const std::array<std::string, 4> entries = {
+    static constexpr std::array<std::string_view, 4> entries = {
         "a", "", "aaa", "aaaa"
     };
 
 public:
-    static bool contains(const std::string& value)
+    static bool contains(const std::string_view value)
     {
         if ((13ULL & 1ULL << (value.length() - 1) % 64) == 0)
             return false;

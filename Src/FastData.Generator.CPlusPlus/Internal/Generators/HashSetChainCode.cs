@@ -10,9 +10,9 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusCodeGene
               {
                   uint32_t hash_code;
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
-                  {{genCfg.GetTypeName(false)}} value;
+                  {{genCfg.GetTypeName()}} value;
 
-                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{genCfg.GetTypeName(false)}} value)
+                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{genCfg.GetTypeName()}} value)
                      : hash_code(hash_code), next(next), value(value) {}
               };
 
@@ -20,7 +20,7 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusCodeGene
           {{FormatColumns(ctx.Buckets, static (sb, x) => sb.Append(x))}}
                };
 
-              {{cfg.GetFieldModifier()}}std::array<e, {{ctx.Entries.Length}}> entries = {
+              {{cfg.GetFieldModifier(false)}}std::array<e, {{ctx.Entries.Length}}> entries = {
           {{FormatColumns(ctx.Entries, RenderEntry)}}
               };
 

@@ -20,11 +20,11 @@ class my_data
         b(0, 0), b(0, 0), b(1, 2), b(0, 0), b(0, 0), b(0, 0), b(0, 0)
     };
 
-    inline static const std::array<int64_t, 3> items = {
+    static constexpr std::array<int64_t, 3> items = {
         0ll, std::numeric_limits<int64_t>::max(), std::numeric_limits<int64_t>::lowest()
     };
 
-    inline static const std::array<uint32_t, 3> hash_codes = {
+    static constexpr std::array<uint32_t, 3> hash_codes = {
         0, 2147483648, 2147483648
     };
 

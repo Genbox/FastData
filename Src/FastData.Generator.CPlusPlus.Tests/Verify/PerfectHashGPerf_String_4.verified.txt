@@ -1,14 +1,14 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: PerfectHashGPerf
 #pragma once
-#include <string>
+#include <string_view>
 #include <array>
 #include <cstdint>
 #include <limits>
 
 class my_data
 {
-    inline static const std::array<uint8_t, 256> asso = {
+    static constexpr std::array<uint8_t, 256> asso = {
         8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
         8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
         8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
@@ -37,12 +37,12 @@ class my_data
         8, 8, 8, 8, 8, 8
     };
 
-    inline static const std::array<std::string, 8> items = {
+    static constexpr std::array<std::string_view, 8> items = {
         "item4", "", "item2", "", "", "item3", "", "item1"
     };
 
 public:
-    static bool contains(const std::string& value)
+    static bool contains(const std::string_view value)
     {
         if (const size_t len = value.length(); len != 5u)
             return false;
@@ -55,7 +55,7 @@ public:
         return items[hash] == value;
     }
 
-    static uint32_t get_hash(const std::string& str)
+    static uint32_t get_hash(const std::string_view str)
     {
         return static_cast<uint32_t>(asso[str[4]]);
     }

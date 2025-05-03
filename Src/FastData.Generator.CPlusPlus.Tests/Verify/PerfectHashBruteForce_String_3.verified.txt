@@ -1,7 +1,7 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: PerfectHashBruteForce
 #pragma once
-#include <string>
+#include <string_view>
 #include <array>
 #include <cstdint>
 #include <limits>
@@ -10,10 +10,10 @@ class my_data
 {
     struct e
     {
-        std::string value;
+        std::string_view value;
         uint32_t hash_code;
 
-        e(const std::string value, const uint32_t hash_code)
+        e(const std::string_view value, const uint32_t hash_code)
         : value(value), hash_code(hash_code) {}
     };
 
@@ -21,11 +21,11 @@ class my_data
         e("item2", 2874739758u), e("item3", 2030593309u), e("item1", 3482164928u)
     };
 
-    static uint32_t get_hash(const std::string& value)
+    static uint32_t get_hash(const std::string_view value)
     {
         uint32_t hash = 352654597;
 
-        const char_t* ptr = value.data();
+        const char* ptr = value.data();
         size_t len = value.size();
 
         while (len-- > 0) {
@@ -47,7 +47,7 @@ class my_data
     }
 
 public:
-    static bool contains(const std::string& value)
+    static bool contains(const std::string_view value)
     {
         if (const size_t len = value.length(); len != 5u)
             return false;
