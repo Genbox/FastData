@@ -25,7 +25,7 @@ class my_data
         e(1048576, -1, std::numeric_limits<double>::lowest()), e(0, -1, 0.0), e(2148532224, 1, std::numeric_limits<double>::max())
     };
 
-    static uint32_t get_hash(double value)
+    static uint32_t get_hash(const double value)
     {
         uint64_t bits;
         std::memcpy(&bits, &value, sizeof(bits));

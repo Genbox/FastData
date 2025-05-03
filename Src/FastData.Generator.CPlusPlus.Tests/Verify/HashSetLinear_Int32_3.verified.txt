@@ -28,10 +28,10 @@ class my_data
         0, 2147483647, 2147483648
     };
 
-static uint32_t get_hash(int32_t value)
-{
-    return static_cast<uint32_t>(value);
-}
+    static uint32_t get_hash(const int32_t value)
+    {
+        return static_cast<uint32_t>(value);
+    }
 
 public:
     static bool contains(const int32_t value)

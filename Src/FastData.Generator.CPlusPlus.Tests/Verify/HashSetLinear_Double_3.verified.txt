@@ -28,7 +28,7 @@ class my_data
         0, 1048576, 2148532224
     };
 
-    static uint32_t get_hash(double value)
+    static uint32_t get_hash(const double value)
     {
         uint64_t bits;
         std::memcpy(&bits, &value, sizeof(bits));
