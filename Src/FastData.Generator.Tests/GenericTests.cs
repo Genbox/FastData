@@ -17,6 +17,7 @@ public class GenericTests
 
     private class DummyGenerator : ICodeGenerator
     {
+        public bool UseUTF16Encoding => false;
         public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source) => throw new NotSupportedException();
     }
 }

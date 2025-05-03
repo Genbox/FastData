@@ -8,6 +8,8 @@ public class RustCodeGenerator(RustCodeGeneratorConfig userCfg) : ICodeGenerator
     private readonly StringBuilder _sb = new StringBuilder();
     private readonly SharedCode _shared = new SharedCode();
 
+    public bool UseUTF16Encoding => false;
+
     public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source)
     {
         _sb.Clear();

@@ -9,6 +9,8 @@ public class CSharpCodeGenerator(CSharpCodeGeneratorConfig userCfg) : ICodeGener
     private readonly StringBuilder _sb = new StringBuilder();
     private readonly SharedCode _shared = new SharedCode();
 
+    public bool UseUTF16Encoding => true;
+
     public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source)
     {
         _sb.Clear();

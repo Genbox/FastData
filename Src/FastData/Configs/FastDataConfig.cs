@@ -1,9 +1,11 @@
 ﻿using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
+using JetBrains.Annotations;
 
 namespace Genbox.FastData.Configs;
 
-public class FastDataConfig(StructureType structureType = StructureType.Auto)
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+public sealed class FastDataConfig(StructureType structureType = StructureType.Auto)
 {
     public StructureType StructureType { get; set; } = structureType;
     public StorageOption StorageOptions { get; set; }

@@ -7,6 +7,8 @@ public class CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig userCfg) : ICod
 {
     private readonly StringBuilder _sb = new StringBuilder();
 
+    public bool UseUTF16Encoding => false;
+
     public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source)
     {
         source = null;

@@ -1,9 +1,11 @@
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.Enums;
+using JetBrains.Annotations;
 
 namespace Genbox.FastData.Generator.CSharp;
 
-public sealed class CSharpCodeGeneratorConfig(string className) : CodeGeneratorConfig(true)
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+public sealed class CSharpCodeGeneratorConfig(string className)
 {
     public string ClassName { get; set; } = className;
     public string? Namespace { get; set; }
