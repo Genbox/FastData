@@ -44,7 +44,7 @@ internal static class MyData
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(int value)
+    private static uint Hash(int value)
     {
         return unchecked((uint)(value));
     }

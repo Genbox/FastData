@@ -45,31 +45,21 @@ internal static class MyData
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint Hash(string value)
+    private static uint Hash(string value)
     {
-        uint hash1 = (5381 << 16) + 5381;
-        uint hash2 = (5381 << 16) + 5381;
-        int length = value.Length;
-        ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
-        ref uint ptr32 = ref Unsafe.As<char, uint>(ref ptr);
+         uint hash1 = 352654597;
+         uint hash2 = 352654597;
 
-        while (length >= 4)
-        {
-            hash1 = (((hash1 << 5) | (hash1 >> (32 - 5))) + hash1) ^ ptr32;
-            hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ Unsafe.Add(ref ptr32, 1);
+         ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
+         int len = value.Length;
 
-            ptr32 = ref Unsafe.Add(ref ptr32, 2);
-            length -= 4;
-        }
+         while (len-- > 0)
+         {
+             hash2 = (((hash2 << 5) | (hash2 >> 27)) + hash2) ^ ptr;
+             ptr = ref Unsafe.Add(ref ptr, 1);
+         }
 
-        ref char ptrChar = ref Unsafe.As<uint, char>(ref ptr32);
-        while (length-- > 0)
-        {
-            hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ ptrChar;
-            ptrChar = ref Unsafe.Add(ref ptrChar, 1);
-        }
-
-        return hash1 + (hash2 * 1566083941);
+         return hash1 + (hash2 * 1566083941);
     }
 
     [StructLayout(LayoutKind.Auto)]

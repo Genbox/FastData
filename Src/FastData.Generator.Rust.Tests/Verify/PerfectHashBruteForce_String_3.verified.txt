@@ -14,15 +14,15 @@ impl MyData {
     ];
 
     unsafe fn get_hash(value: &str) -> u32 {
-        let hash1: u32 = (5381 << 16) + 5381;
-        let mut hash2: u32 = (5381 << 16) + 5381;
+        let hash1: u32 = 352654597;
+        let mut hash2: u32 = 352654597;
+
         let vec: Vec<u16> = value.encode_utf16().collect();
         let mut ptr = vec.as_ptr();
         let mut len = vec.len();
 
         while len > 0 {
-            let ch = *ptr;
-            hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ ch as u32;
+            hash2 = (((hash2 << 5) | (hash2 >> (32 - 5))) + hash2) ^ *ptr as u32;
             ptr = ptr.add(1);
             len -= 1;
         }
