@@ -8,12 +8,12 @@
 
 class my_data
 {
-    inline static const std::array<std::u16string, 4> entries = {
-        u"a", u"", u"aaa", u"aaaa"
+    inline static const std::array<std::string, 4> entries = {
+        "a", "", "aaa", "aaaa"
     };
 
 public:
-    static bool contains(const std::u16string& value)
+    static bool contains(const std::string& value)
     {
         if ((13ULL & 1ULL << (value.length() - 1) % 64) == 0)
             return false;

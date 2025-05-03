@@ -31,9 +31,8 @@ internal static class GeneratorConfigExtensions
                        unsafe fn get_hash(value: &str) -> u32 {
                            let mut hash: u32 = 352654597;
 
-                           let vec: Vec<u16> = value.encode_utf16().collect();
-                           let mut ptr = vec.as_ptr();
-                           let mut len = vec.len();
+                           let mut ptr = value.as_ptr();
+                           let mut len = value.len();
 
                            while len > 0 {
                                hash = (((hash << 5) | (hash >> 27)) + hash) ^ *ptr as u32;
@@ -41,7 +40,7 @@ internal static class GeneratorConfigExtensions
                                len -= 1;
                            }
 
-                           return 352654597 + hash2.wrapping_mul(1566083941)
+                           return 352654597 + hash.wrapping_mul(1566083941)
                         }
                    """;
         }

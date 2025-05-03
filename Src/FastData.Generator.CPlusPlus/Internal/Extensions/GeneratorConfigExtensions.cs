@@ -6,8 +6,8 @@ internal static class GeneratorConfigExtensions
 {
     internal static string GetTypeName(this GeneratorConfig config, bool asReference = true) => config.DataType switch
     {
-        DataType.String when asReference => "std::u16string&",
-        DataType.String => "std::u16string",
+        DataType.String when asReference => "std::string&",
+        DataType.String => "std::string",
         DataType.Boolean => "bool",
         DataType.SByte => "int8_t",
         DataType.Byte => "uint8_t",
@@ -28,11 +28,11 @@ internal static class GeneratorConfigExtensions
         if (config.DataType == DataType.String)
         {
             return """
-                       static uint32_t get_hash(const std::u16string& value)
+                       static uint32_t get_hash(const std::string& value)
                        {
                            uint32_t hash = 352654597;
 
-                           const char16_t* ptr = value.data();
+                           const char_t* ptr = value.data();
                            size_t len = value.size();
 
                            while (len-- > 0) {

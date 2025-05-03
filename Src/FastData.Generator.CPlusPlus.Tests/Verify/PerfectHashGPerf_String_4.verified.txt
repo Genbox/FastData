@@ -37,12 +37,12 @@ class my_data
         8, 8, 8, 8, 8, 8
     };
 
-    inline static const std::array<std::u16string, 8> items = {
-        u"item4", u"", u"item2", u"", u"", u"item3", u"", u"item1"
+    inline static const std::array<std::string, 8> items = {
+        "item4", "", "item2", "", "", "item3", "", "item1"
     };
 
 public:
-    static bool contains(const std::u16string& value)
+    static bool contains(const std::string& value)
     {
         if (const size_t len = value.length(); len != 5u)
             return false;
@@ -55,7 +55,7 @@ public:
         return items[hash] == value;
     }
 
-    static uint32_t get_hash(const std::u16string& str)
+    static uint32_t get_hash(const std::string& str)
     {
         return static_cast<uint32_t>(asso[str[4]]);
     }

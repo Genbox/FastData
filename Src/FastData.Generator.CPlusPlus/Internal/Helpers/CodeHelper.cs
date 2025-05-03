@@ -25,8 +25,8 @@ internal static class CodeHelper
 
     internal static string ToValueLabel(object? value) => value switch
     {
-        null => "u\"\"",
-        string val => $"u\"{val}\"",
+        null => "\"\"",
+        string val => $"\"{val}\"",
         char val => ((byte)val).ToString(CultureInfo.InvariantCulture),
         ulong val => val + "ull",
         long val => val + "ll",
@@ -50,7 +50,7 @@ internal static class CodeHelper
 
     internal static string ToValueLabel(object? value, DataType dataType) => dataType switch
     {
-        DataType.String => $"u\"{value}\"",
+        DataType.String => $"\"{value}\"",
         DataType.Char => $"{(byte)(char)value}",
         DataType.UInt64 => value + "ull",
         DataType.Int64 => value + "ll",

@@ -27,9 +27,9 @@ public static class FastDataGenerator
 
         foreach (object candidate in GetDataStructureCandidates(data, fdCfg, strCfg))
         {
-            if (TryCreateStructure(candidate, data, out IContext? context))
+            if (TryCreateStructure(candidate, data, generator.UseUTF16Encoding, out IHashSpec? hashSpec, out IContext? context))
             {
-                GeneratorConfig genCfg = new GeneratorConfig(fdCfg.StructureType, fdCfg.StringComparison, props, DefaultHashSpec.Instance);
+                GeneratorConfig genCfg = new GeneratorConfig(fdCfg.StructureType, fdCfg.StringComparison, props, hashSpec);
                 return generator.TryGenerate(genCfg, context, out source);
             }
         }
@@ -87,10 +87,15 @@ public static class FastDataGenerator
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
 
-    private static bool TryCreateStructure(object candidate, object[] data, out IContext? context)
+    private static bool TryCreateStructure(object candidate, object[] data, bool useUTF16Encoding, out IHashSpec? hashSpec, out IContext? context)
     {
+        hashSpec = null;
+
         if (candidate is IHashStructure hs)
-            return hs.TryCreate(data, DefaultHashSpec.Instance.GetHashFunction(), out context);
+        {
+            hashSpec = new DefaultHashSpec(useUTF16Encoding);
+            return hs.TryCreate(data, hashSpec.GetHashFunction(), out context);
+        }
 
         if (candidate is IStructure s)
             return s.TryCreate(data, out context);

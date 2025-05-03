@@ -9,9 +9,9 @@
 class my_data
 {
 public:
-    static bool contains(const std::u16string& value)
+    static bool contains(const std::string& value)
     {
-        return value == u"value";
+        return value == "value";
     }
 
     static constexpr unsigned int item_count = 1;

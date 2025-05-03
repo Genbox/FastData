@@ -9,12 +9,12 @@
 class my_data
 {
 public:
-    static bool contains(const std::u16string& value)
+    static bool contains(const std::string& value)
     {
         if (const size_t len = value.length(); len != 5u)
             return false;
 
-        if (value == u"item1" || value == u"item2" || value == u"item3")
+        if (value == "item1" || value == "item2" || value == "item3")
             return true;
 
         return false;

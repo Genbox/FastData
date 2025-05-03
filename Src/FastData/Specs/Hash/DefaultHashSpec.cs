@@ -1,21 +1,22 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Internal.Hashes;
 
 namespace Genbox.FastData.Specs.Hash;
 
-public sealed class DefaultHashSpec : IHashSpec
+public sealed class DefaultHashSpec(bool useUTF16Encoding) : IHashSpec
 {
-    private DefaultHashSpec() { }
-    public static DefaultHashSpec Instance { get; } = new DefaultHashSpec();
-
-    public HashFunc GetHashFunction() => static obj =>
+    public HashFunc GetHashFunction() => obj =>
     {
         if (obj is string str)
         {
-            ref char ptr = ref MemoryMarshal.GetReference(str.AsSpan());
-            return DJB2Hash.ComputeHash(ref ptr, str.Length);
+            if (useUTF16Encoding)
+                return DJB2Hash.ComputeHash(ref MemoryMarshal.GetReference(str.AsSpan()), str.Length);
+
+            byte[] bytes = Encoding.UTF8.GetBytes(str);
+            return DJB2Hash.ComputeHash(ref bytes[0], bytes.Length);
         }
 
         uint hash = obj switch
