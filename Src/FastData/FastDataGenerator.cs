@@ -2,7 +2,6 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
@@ -28,9 +27,9 @@ public static class FastDataGenerator
 
         foreach (object candidate in GetDataStructureCandidates(data, fdCfg, strCfg))
         {
-            if (TryCreateStructure(candidate, data, props, fdCfg, out IHashSpec? hashSpec, out IContext? context))
+            if (TryCreateStructure(candidate, data, out IContext? context))
             {
-                GeneratorConfig genCfg = new GeneratorConfig(fdCfg.StructureType, fdCfg.StringComparison, props, hashSpec ?? DefaultHashSpec.Instance);
+                GeneratorConfig genCfg = new GeneratorConfig(fdCfg.StructureType, fdCfg.StringComparison, props, DefaultHashSpec.Instance);
                 return generator.TryGenerate(genCfg, context, out source);
             }
         }
@@ -88,26 +87,10 @@ public static class FastDataGenerator
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
 
-    private static bool TryCreateStructure(object candidate, object[] data, DataProperties props, FastDataConfig fdCfg, out IHashSpec? hashSpec, out IContext? context)
+    private static bool TryCreateStructure(object candidate, object[] data, out IContext? context)
     {
         if (candidate is IHashStructure hs)
-        {
-            hashSpec = DefaultHashSpec.Instance;
-
-            if (props.StringProps != null)
-            {
-                Simulator simulator = new Simulator(data, fdCfg.SimulatorConfig);
-
-                if (fdCfg.AnalyzerConfig is BruteForceAnalyzerConfig bfCfg)
-                    hashSpec = new BruteForceAnalyzer(props.StringProps.Value, bfCfg, simulator).Run().Spec;
-                else if (fdCfg.AnalyzerConfig is GeneticAnalyzerConfig gaCfg)
-                    hashSpec = new GeneticAnalyzer(gaCfg, simulator).Run().Spec;
-            }
-
-            return hs.TryCreate(data, hashSpec.GetHashFunction(), out context);
-        }
-
-        hashSpec = null;
+            return hs.TryCreate(data, DefaultHashSpec.Instance.GetHashFunction(), out context);
 
         if (candidate is IStructure s)
             return s.TryCreate(data, out context);

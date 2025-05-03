@@ -1,5 +1,4 @@
-﻿using Genbox.FastData.Abstracts;
-using Genbox.FastData.Enums;
+﻿using Genbox.FastData.Enums;
 using JetBrains.Annotations;
 
 namespace Genbox.FastData.Configs;
@@ -10,6 +9,5 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
     public StructureType StructureType { get; set; } = structureType;
     public StorageOption StorageOptions { get; set; }
     public SimulatorConfig SimulatorConfig { get; set; } = new SimulatorConfig();
-    public IAnalyzerConfig? AnalyzerConfig { get; set; }
     public StringComparison StringComparison { get; set; } = StringComparison.Ordinal;
 }

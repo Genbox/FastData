@@ -11,8 +11,6 @@ internal static class Program
         CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpCodeGeneratorConfig("test"));
 
         FastDataConfig cfg = new FastDataConfig(StructureType.HashSetChain);
-        cfg.AnalyzerConfig = new GeneticAnalyzerConfig();
-
         FastDataGenerator.TryGenerate(["item1", "item2"], cfg, generator, out string? source);
 
         Console.WriteLine(source);
