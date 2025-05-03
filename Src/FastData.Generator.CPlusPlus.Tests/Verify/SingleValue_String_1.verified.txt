@@ -9,7 +9,7 @@
 class my_data
 {
 public:
-    static bool contains(const std::string_view value)
+    static constexpr bool contains(const std::string_view value)
     {
         return value == "value";
     }
