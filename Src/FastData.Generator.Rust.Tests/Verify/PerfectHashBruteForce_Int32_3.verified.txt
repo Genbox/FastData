@@ -10,7 +10,7 @@ pub struct MyData;
 
 impl MyData {
     const ENTRIES: [E; 3] = [
-        E { value: 3, hash_code: 3262916883 }, E { value: 1, hash_code: 2476801540 }, E { value: 2, hash_code: 1228498187 }
+        E { value: 2147483647, hash_code: 1427853558 }, E { value: 0, hash_code: 1364076727 }, E { value: -2147483648, hash_code: 2340387434 }
     ];
 
     fn get_hash(value: i32) -> u32 {
@@ -27,10 +27,10 @@ impl MyData {
     }
 
     pub fn contains(value: i32) -> bool {
-        if value < 1 || value > 3 {
+        if value < -2147483648 || value > 2147483647 {
             return false;
         }
-        let hash = Self::murmur_32(unsafe { Self::get_hash(value) } ^ 10);
+        let hash = Self::murmur_32(unsafe { Self::get_hash(value) } ^ 1);
         let index = (hash % 3) as usize;
         let entry = &Self::ENTRIES[index];
 
@@ -38,8 +38,8 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_VALUE: i32 = 1;
-    pub const MAX_VALUE: i32 = 3;
+    pub const MIN_VALUE: i32 = -2147483648;
+    pub const MAX_VALUE: i32 = 2147483647;
 }
 struct E {
     value: i32,

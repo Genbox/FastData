@@ -35,14 +35,18 @@ public static class TestVectorHelper
             else if (type == StructureType.SingleValue)
             {
                 yield return (type, ["value"]);
-                yield return (type, [1]);
+                yield return (type, [int.MinValue]);
+                yield return (type, [long.MinValue]);
+                yield return (type, [double.MinValue]);
             }
             else if (type == StructureType.PerfectHashGPerf)
                 yield return (type, ["item1", "item2", "item3", "item4"]);
             else
             {
                 yield return (type, ["item1", "item2", "item3"]);
-                yield return (type, [1, 2, 3]);
+                yield return (type, [int.MinValue, 0, int.MaxValue]);
+                yield return (type, [long.MinValue, (long)0, long.MaxValue]);
+                yield return (type, [double.MinValue, (double)0, double.MaxValue]);
             }
         }
     }

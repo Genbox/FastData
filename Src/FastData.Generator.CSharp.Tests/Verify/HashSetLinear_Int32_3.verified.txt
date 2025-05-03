@@ -9,21 +9,21 @@ using System.Runtime.InteropServices;
 internal static class MyData 
 {
     private static readonly B[] _buckets = {
-        new B(0, 0), new B(0, 0), new B(1, 1), new B(2, 2), new B(0, 0), new B(0, 0), new B(0, 0)
+        new B(0, 0), new B(1, 1), new B(2, 2), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0)
     };
 
     private static readonly int[] _items = new int[] {
-        1, 2, 3
+        0, 2147483647, -2147483648
     };
 
     private static readonly uint[] _hashCodes = {
-        1, 2, 3
+        0, 2147483647, 2147483648
     };
 
     
     public static bool Contains(int value)
     {
-        if (value < 1 || value > 3)
+        if (value < -2147483648 || value > 2147483647)
             return false;
 
         uint hash = Hash(value);
@@ -63,6 +63,6 @@ internal static class MyData
     }
 
     public const int ItemCount = 3;
-    public const int MinValue = 1;
-    public const int MaxValue = 3;
+    public const int MinValue = -2147483648;
+    public const int MaxValue = 2147483647;
 }

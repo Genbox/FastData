@@ -11,10 +11,10 @@ internal static class MyData
     
     public static bool Contains(int value)
     {
-        return value.Equals(1);
+        return value.Equals(-2147483648);
     }
 
     public const int ItemCount = 1;
-    public const int MinValue = 1;
-    public const int MaxValue = 1;
+    public const int MinValue = -2147483648;
+    public const int MaxValue = -2147483648;
 }

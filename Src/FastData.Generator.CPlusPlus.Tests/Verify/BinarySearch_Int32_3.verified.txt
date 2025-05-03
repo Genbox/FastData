@@ -8,13 +8,13 @@
 class my_data
 {
     inline static const std::array<int32_t, 3> entries = {
-        1, 2, 3
+        std::numeric_limits<int32_t>::lowest(), 0ll, std::numeric_limits<int32_t>::max()
     };
 
 public:
     static bool contains(const int32_t value)
     {
-        if (value < 1 || value > 3)
+        if (value < std::numeric_limits<int32_t>::lowest() || value > std::numeric_limits<int32_t>::max())
             return false;
 
         int lo = 0;
@@ -36,6 +36,6 @@ public:
     }
 
     static constexpr unsigned int item_count = 3;
-    static constexpr int32_t min_value = 1;
-    static constexpr int32_t max_value = 3;
+    static constexpr int32_t min_value = std::numeric_limits<int32_t>::lowest();
+    static constexpr int32_t max_value = std::numeric_limits<int32_t>::max();
 };

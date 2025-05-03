@@ -1,0 +1,31 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+
+class my_data
+{
+    inline static const std::array<double, 3> entries = {
+        std::numeric_limits<double>::lowest(), 0.0, std::numeric_limits<double>::max()
+    };
+
+public:
+    static bool contains(const double value)
+    {
+        if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
+            return false;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (entries[i] == value)
+               return true;
+        }
+        return false;
+    }
+
+    static constexpr unsigned int item_count = 3;
+    static constexpr double min_value = std::numeric_limits<double>::lowest();
+    static constexpr double max_value = std::numeric_limits<double>::max();
+};

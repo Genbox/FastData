@@ -28,9 +28,20 @@ internal static class CodeHelper
         null => "\"\"",
         string val => $"\"{val}\"",
         char val => ((byte)val).ToString(CultureInfo.InvariantCulture),
-        ulong val => val + "ull",
-        long val => val + "ll",
+        int val => val switch
+        {
+            int.MaxValue => "std::numeric_limits<int32_t>::max()",
+            int.MinValue => "std::numeric_limits<int32_t>::lowest()",
+            _ => val + "ll"
+        },
         uint val => val + "u",
+        long val => val switch
+        {
+            long.MaxValue => "std::numeric_limits<int64_t>::max()",
+            long.MinValue => "std::numeric_limits<int64_t>::lowest()",
+            _ => val + "ll"
+        },
+        ulong val => val + "ll",
         float val => val switch
         {
             float.MaxValue => "std::numeric_limits<float>::max()",
@@ -52,9 +63,10 @@ internal static class CodeHelper
     {
         DataType.String => $"\"{value}\"",
         DataType.Char => $"{(byte)(char)value}",
-        DataType.UInt64 => value + "ull",
-        DataType.Int64 => value + "ll",
+        DataType.Int32 => (long)value == int.MaxValue ? "std::numeric_limits<int32_t>::max()" : (long)value == int.MinValue ? "std::numeric_limits<int32_t>::lowest()" : value.ToString(),
         DataType.UInt32 => value + "u",
+        DataType.Int64 => (long)value == long.MaxValue ? "std::numeric_limits<int64_t>::max()" : (long)value == long.MinValue ? "std::numeric_limits<int64_t>::lowest()" : value + "ll",
+        DataType.UInt64 => value + "ull",
         DataType.Single => (double)value == float.MaxValue ? "std::numeric_limits<float>::max()" : (double)value == float.MinValue ? "std::numeric_limits<float>::lowest()" : ((double)value).ToString("0.0", CultureInfo.InvariantCulture) + "f",
         DataType.Double => (double)value == double.MaxValue ? "std::numeric_limits<double>::max()" : (double)value == double.MinValue ? "std::numeric_limits<double>::lowest()" : ((double)value).ToString("0.0", CultureInfo.InvariantCulture),
         DataType.Boolean => value.ToString().ToLowerInvariant(),

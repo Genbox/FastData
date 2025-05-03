@@ -1,0 +1,41 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+
+class my_data
+{
+    inline static const std::array<int64_t, 3> entries = {
+        std::numeric_limits<int64_t>::lowest(), 0ll, std::numeric_limits<int64_t>::max()
+    };
+
+public:
+    static bool contains(const int64_t value)
+    {
+        if (value < std::numeric_limits<int64_t>::lowest() || value > std::numeric_limits<int64_t>::max())
+            return false;
+
+        int lo = 0;
+        int hi = 2;
+        while (lo <= hi)
+        {
+            const int mid = lo + ((hi - lo) >> 1);
+
+            if (entries[mid] == value)
+                return true;
+
+            if (entries[mid] < value)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+
+    static constexpr unsigned int item_count = 3;
+    static constexpr int64_t min_value = std::numeric_limits<int64_t>::lowest();
+    static constexpr int64_t max_value = std::numeric_limits<int64_t>::max();
+};

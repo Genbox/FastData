@@ -17,7 +17,7 @@ class my_data
     };
 
     inline static const std::array<e, 3> entries = {
-        e(3, 3262916883u), e(1, 2476801540u), e(2, 1228498187u)
+        e(std::numeric_limits<int32_t>::max(), 1427853558u), e(0ll, 1364076727u), e(std::numeric_limits<int32_t>::lowest(), 2340387434u)
     };
 
 static uint32_t get_hash(int32_t value)
@@ -38,9 +38,9 @@ static uint32_t get_hash(int32_t value)
 public:
     static bool contains(const int32_t value)
     {
-        if (value < 1 || value > 3)
+        if (value < std::numeric_limits<int32_t>::lowest() || value > std::numeric_limits<int32_t>::max())
             return false;
-        const uint32_t hash = murmur_32(get_hash(value) ^ 10);
+        const uint32_t hash = murmur_32(get_hash(value) ^ 1);
         const uint32_t index = hash % 3;
         const e& entry = entries[index];
 
@@ -48,6 +48,6 @@ public:
     }
 
     static constexpr unsigned int item_count = 3;
-    static constexpr int32_t min_value = 1;
-    static constexpr int32_t max_value = 3;
+    static constexpr int32_t min_value = std::numeric_limits<int32_t>::lowest();
+    static constexpr int32_t max_value = std::numeric_limits<int32_t>::max();
 };

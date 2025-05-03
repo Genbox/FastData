@@ -1,0 +1,38 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: EytzingerSearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+
+class my_data
+{
+    inline static const std::array<double, 3> entries = {
+        0.0, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max()
+    };
+
+public:
+    static bool contains(const double value)
+    {
+        if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
+            return false;
+
+        unsigned int i = 0;
+        while (i < entries.size())
+        {
+            if (entries[i] == value)
+                return true;
+
+            if (entries[i] < value)
+                i = 2 * i + 2;
+            else
+                i = 2 * i + 1;
+        }
+
+        return false;
+    }
+
+    static constexpr unsigned int item_count = 3;
+    static constexpr double min_value = std::numeric_limits<double>::lowest();
+    static constexpr double max_value = std::numeric_limits<double>::max();
+};

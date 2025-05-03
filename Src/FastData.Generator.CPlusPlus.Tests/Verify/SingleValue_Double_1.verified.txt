@@ -1,0 +1,19 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: SingleValue
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+
+class my_data
+{
+public:
+    static bool contains(const double value)
+    {
+        return value == std::numeric_limits<double>::lowest();
+    }
+
+    static constexpr unsigned int item_count = 1;
+    static constexpr double min_value = std::numeric_limits<double>::lowest();
+    static constexpr double max_value = std::numeric_limits<double>::lowest();
+};

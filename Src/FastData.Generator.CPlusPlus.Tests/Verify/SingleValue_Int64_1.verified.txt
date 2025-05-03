@@ -1,0 +1,19 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: SingleValue
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+
+class my_data
+{
+public:
+    static bool contains(const int64_t value)
+    {
+        return value == std::numeric_limits<int64_t>::lowest();
+    }
+
+    static constexpr unsigned int item_count = 1;
+    static constexpr int64_t min_value = std::numeric_limits<int64_t>::lowest();
+    static constexpr int64_t max_value = std::numeric_limits<int64_t>::lowest();
+};

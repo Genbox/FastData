@@ -10,15 +10,15 @@ pub struct MyData;
 
 impl MyData {
     const BUCKETS: [B; 7] = [
-        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 1, end_index: 1 }, B { start_index: 2, end_index: 2 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }
+        B { start_index: 0, end_index: 0 }, B { start_index: 1, end_index: 1 }, B { start_index: 2, end_index: 2 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }
     ];
 
     const ITEMS: [i32; 3] = [
-        1, 2, 3
+        0, 2147483647, -2147483648
     ];
 
     const HASH_CODES: [u32; 3] = [
-        1, 2, 3
+        0, 2147483647, 2147483648
     ];
 
     fn get_hash(value: i32) -> u32 {
@@ -26,7 +26,7 @@ impl MyData {
     }
 
     pub fn contains(value: i32) -> bool {
-        if value < 1 || value > 3 {
+        if value < -2147483648 || value > 2147483647 {
             return false;
         }
 
@@ -46,8 +46,8 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_VALUE: i32 = 1;
-    pub const MAX_VALUE: i32 = 3;
+    pub const MIN_VALUE: i32 = -2147483648;
+    pub const MAX_VALUE: i32 = 2147483647;
 }
 struct B {
     start_index: u8,

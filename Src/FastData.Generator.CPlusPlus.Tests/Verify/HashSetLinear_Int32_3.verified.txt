@@ -17,15 +17,15 @@ class my_data
     };
 
     inline static const std::array<b, 7> buckets = {
-        b(0, 0), b(0, 0), b(1, 1), b(2, 2), b(0, 0), b(0, 0), b(0, 0)
+        b(0, 0), b(1, 1), b(2, 2), b(0, 0), b(0, 0), b(0, 0), b(0, 0)
     };
 
     inline static const std::array<int32_t, 3> items = {
-        1, 2, 3
+        0ll, std::numeric_limits<int32_t>::max(), std::numeric_limits<int32_t>::lowest()
     };
 
     inline static const std::array<uint32_t, 3> hash_codes = {
-        1, 2, 3
+        0, 2147483647, 2147483648
     };
 
 static uint32_t get_hash(int32_t value)
@@ -36,7 +36,7 @@ static uint32_t get_hash(int32_t value)
 public:
     static bool contains(const int32_t value)
     {
-        if (value < 1 || value > 3)
+        if (value < std::numeric_limits<int32_t>::lowest() || value > std::numeric_limits<int32_t>::max())
             return false;
 
         const uint32_t hash = get_hash(value);
@@ -56,6 +56,6 @@ public:
     }
 
     static constexpr unsigned int item_count = 3;
-    static constexpr int32_t min_value = 1;
-    static constexpr int32_t max_value = 3;
+    static constexpr int32_t min_value = std::numeric_limits<int32_t>::lowest();
+    static constexpr int32_t max_value = std::numeric_limits<int32_t>::max();
 };

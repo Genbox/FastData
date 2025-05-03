@@ -10,11 +10,11 @@ pub struct MyData;
 
 impl MyData {
     const BUCKETS: [i8; 3] = [
-        3, 1, 2
+        2, 3, 1
     ];
 
     const ENTRIES: [E; 3] = [
-        E { hash_code: 1, next: -1, value: 1 }, E { hash_code: 2, next: -1, value: 2 }, E { hash_code: 3, next: -1, value: 3 }
+        E { hash_code: 2147483648, next: -1, value: -2147483648 }, E { hash_code: 0, next: -1, value: 0 }, E { hash_code: 2147483647, next: -1, value: 2147483647 }
     ];
 
     fn get_hash(value: i32) -> u32 {
@@ -22,7 +22,7 @@ impl MyData {
     }
 
     pub fn contains(value: i32) -> bool {
-        if value < 1 || value > 3 {
+        if value < -2147483648 || value > 2147483647 {
             return false;
         }
 
@@ -42,8 +42,8 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_VALUE: i32 = 1;
-    pub const MAX_VALUE: i32 = 3;
+    pub const MIN_VALUE: i32 = -2147483648;
+    pub const MAX_VALUE: i32 = 2147483647;
 }
 struct E {
     hash_code: u32,

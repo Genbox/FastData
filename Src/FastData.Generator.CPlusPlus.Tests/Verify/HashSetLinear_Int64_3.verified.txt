@@ -1,0 +1,61 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashSetLinear
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+
+class my_data
+{
+    struct b
+    {
+        uint8_t start_index;
+        uint8_t end_index;
+
+        b(const uint8_t start_index, const uint8_t end_index)
+        : start_index(start_index), end_index(end_index) { }
+    };
+
+    inline static const std::array<b, 7> buckets = {
+        b(0, 0), b(0, 0), b(1, 2), b(0, 0), b(0, 0), b(0, 0), b(0, 0)
+    };
+
+    inline static const std::array<int64_t, 3> items = {
+        0ll, std::numeric_limits<int64_t>::max(), std::numeric_limits<int64_t>::lowest()
+    };
+
+    inline static const std::array<uint32_t, 3> hash_codes = {
+        0, 2147483648, 2147483648
+    };
+
+static uint32_t get_hash(int64_t value)
+{
+    return static_cast<uint32_t>(static_cast<int32_t>(value) ^ static_cast<int32_t>(value >> 32));
+}
+
+public:
+    static bool contains(const int64_t value)
+    {
+        if (value < std::numeric_limits<int64_t>::lowest() || value > std::numeric_limits<int64_t>::max())
+            return false;
+
+        const uint32_t hash = get_hash(value);
+        const auto& [start_index, end_index]= buckets[hash % 7];
+
+        uint8_t index = start_index;
+
+        while (index <= end_index)
+        {
+            if (hash_codes[index] == hash && items[index] == value)
+                return true;
+
+            index++;
+        }
+
+        return false;
+    }
+
+    static constexpr unsigned int item_count = 3;
+    static constexpr int64_t min_value = std::numeric_limits<int64_t>::lowest();
+    static constexpr int64_t max_value = std::numeric_limits<int64_t>::max();
+};
