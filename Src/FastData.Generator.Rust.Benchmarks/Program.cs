@@ -45,7 +45,7 @@ internal static class Program
                   fn bench_contains(c: &mut Criterion) {
                       c.bench_function("Rust_{{spec.Identifier}}", |b| {
                           b.iter(|| {
-                              {{spec.Identifier}}::contains({{ToValueLabel(data[0])}})
+                  {{PrintQueries(data, spec.Identifier)}}
                           });
                       });
                   }
@@ -64,5 +64,16 @@ internal static class Program
         TestHelper.TryWriteFile(Path.Combine(rootPath, "Cargo.toml"), sb.ToString());
 
         BenchmarkHelper.RunBenchmark("cargo", "bench", rootPath, "--adapter rust_criterion --testbed Rust");
+    }
+
+    private static string PrintQueries(object[] data, string identifier)
+    {
+        Random rng = new Random(42);
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < 25; i++)
+            sb.AppendLine(CultureInfo.InvariantCulture, $"           {identifier}::contains({ToValueLabel(data[rng.Next(0, data.Length)])});");
+
+        return sb.ToString();
     }
 }

@@ -34,17 +34,28 @@ internal static class Program
                   {
                       for (auto _ : state)
                       {
-                          DoNotOptimize({{spec.Identifier}}::contains({{ToValueLabel(data[0])}}));
+                  {{PrintQueries(data, spec.Identifier)}}
                       }
                   }
 
                   BENCHMARK(CPlusPlus_{{spec.Identifier}});
                   """);
-
         }
+
         sb.AppendLine("BENCHMARK_MAIN();");
 
         string executable = compiler.Compile("all_benchmarks", sb.ToString());
         BenchmarkHelper.RunBenchmark(executable, "--benchmark_format=json", rootDir, "--adapter cpp_google --testbed CPlusPlus");
+    }
+
+    private static string PrintQueries(object[] data, string identifier)
+    {
+        Random rng = new Random(42);
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < 25; i++)
+            sb.AppendLine(CultureInfo.InvariantCulture, $"        DoNotOptimize({identifier}::contains({ToValueLabel(data[rng.Next(0, data.Length)])}));");
+
+        return sb.ToString();
     }
 }

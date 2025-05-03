@@ -51,7 +51,13 @@ internal static class Program
             TestHelper.TryWriteFile(Path.Combine(rootDir, spec.Identifier + ".cs"), spec.Source);
 
             //CSharp duplicate in the name due to https://github.com/bencherdev/bencher/issues/605
-            sb.AppendLine(CultureInfo.InvariantCulture, $"    [Benchmark] public bool CSharp_{spec.Identifier}() => {spec.Identifier}.Contains({ToValueLabel(data[0])});");
+            sb.AppendLine(CultureInfo.InvariantCulture, $$"""
+                                                              [Benchmark]
+                                                              public void CSharp_{{spec.Identifier}}()
+                                                              {
+                                                          {{PrintQueries(data, spec.Identifier)}}
+                                                              }
+                                                          """);
         }
 
         sb.AppendLine("""
@@ -62,5 +68,16 @@ internal static class Program
 
         TestHelper.TryWriteFile(Path.Combine(rootDir, "Program.cs"), sb.ToString());
         BenchmarkHelper.RunBenchmark("dotnet", "run -c release", rootDir, @"--adapter c_sharp_dot_net --file BenchmarkDotNet.Artifacts\results\CSharp.Program-report-brief-compressed.json --testbed CSharp");
+    }
+
+    private static string PrintQueries(object[] data, string identifier)
+    {
+        Random rng = new Random(42);
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < 25; i++)
+            sb.AppendLine(CultureInfo.InvariantCulture, $"        {identifier}.Contains({ToValueLabel(data[rng.Next(0, data.Length)])});");
+
+        return sb.ToString();
     }
 }
