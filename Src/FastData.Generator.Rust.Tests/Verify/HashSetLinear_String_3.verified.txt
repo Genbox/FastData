@@ -28,13 +28,13 @@ impl MyData {
         let mut ptr = value.as_ptr();
         let mut len = value.len();
 
-        while len > 0 {
-            hash = (((hash << 5) | (hash >> 27)) + hash) ^ *ptr as u32;
-            ptr = ptr.add(1);
-            len -= 1;
-        }
+         while len > 0 {
+                hash = hash.rotate_left(5).wrapping_add(hash) ^ (ptr.read() as u32);
+                ptr = ptr.add(1);
+                len -= 1;
+         }
 
-        return 352654597 + hash.wrapping_mul(1566083941)
+        hash.wrapping_mul(1566083941).wrapping_add(352654597)
     }
 
     #[must_use]
