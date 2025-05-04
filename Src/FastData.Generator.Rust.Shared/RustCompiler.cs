@@ -12,6 +12,7 @@ public sealed class RustCompiler
     {
         _release = release;
         _rootPath = rootPath;
+        Directory.CreateDirectory(rootPath);
 
         if (TryRunProcess("rustc.exe", "--version"))
             _compile = CompileRustC;
