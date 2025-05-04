@@ -42,6 +42,7 @@ impl MyData {
         "item4", "", "item2", "", "", "item3", "", "item1"
     ];
 
+    #[must_use]
     pub fn contains(value: &str) -> bool {
         if value.len() != 5 {
             return false;

@@ -8,6 +8,7 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, RustCodeGeneratorConfig 
           {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
               ];
 
+              #[must_use]
               {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
           {{cfg.GetEarlyExits(genCfg)}}
 

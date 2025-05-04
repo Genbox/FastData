@@ -26,6 +26,7 @@ impl MyData {
         return h;
     }
 
+    #[must_use]
     pub fn contains(value: i32) -> bool {
         if value < -2147483648 || value > 2147483647 {
             return false;

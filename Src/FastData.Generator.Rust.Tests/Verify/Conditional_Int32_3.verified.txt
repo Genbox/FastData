@@ -9,6 +9,7 @@ use std::ptr;
 pub struct MyData;
 
 impl MyData {
+    #[must_use]
     pub fn contains(value: i32) -> bool {
         if value < -2147483648 || value > 2147483647 {
             return false;

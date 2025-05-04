@@ -27,6 +27,7 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, RustCode
                          return h;
                      }
 
+                     #[must_use]
                      {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
                  {{cfg.GetEarlyExits(genCfg)}}
                          let hash = Self::murmur_32(unsafe { Self::get_hash(value) } ^ {{ctx.Seed}});

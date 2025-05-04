@@ -36,6 +36,7 @@ impl MyData {
         return 352654597 + hash.wrapping_mul(1566083941)
      }
 
+    #[must_use]
     pub fn contains(value: &'static str) -> bool {
         if value.len() != 5 {
             return false;

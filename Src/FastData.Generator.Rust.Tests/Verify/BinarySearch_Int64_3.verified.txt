@@ -13,6 +13,7 @@ impl MyData {
         -9223372036854775808, 0, 9223372036854775807
     ];
 
+    #[must_use]
     pub fn contains(value: i64) -> bool {
         if value < -9223372036854775808 || value > 9223372036854775807 {
             return false;

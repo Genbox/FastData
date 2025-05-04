@@ -21,6 +21,7 @@ impl MyData {
         return ((value as i32) ^ ((value >> 32) as i32)) as u32;
     }
 
+    #[must_use]
     pub fn contains(value: i64) -> bool {
         if value < -9223372036854775808 || value > 9223372036854775807 {
             return false;

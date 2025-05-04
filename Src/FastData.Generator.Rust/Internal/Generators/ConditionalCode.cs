@@ -4,6 +4,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, RustCodeGeneratorC
 {
     public string Generate()
         => $$"""
+                 #[must_use]
                  {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
              {{cfg.GetEarlyExits(genCfg)}}
 

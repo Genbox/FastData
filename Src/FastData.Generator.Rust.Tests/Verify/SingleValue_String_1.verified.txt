@@ -9,6 +9,7 @@ use std::ptr;
 pub struct MyData;
 
 impl MyData {
+    #[must_use]
     pub fn contains(value: &str) -> bool {
         return "value" == value;
     }

@@ -26,6 +26,7 @@ impl MyData {
         (bits as u32) ^ ((bits >> 32) as u32)
     }
 
+    #[must_use]
     pub fn contains(value: f64) -> bool {
         if value < f64::MIN || value > f64::MAX {
             return false;

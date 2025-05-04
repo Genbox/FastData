@@ -19,6 +19,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, RustCodeGeneratorCon
                  {{FormatColumns(lengths, RenderOne)}}
                      ];
 
+                     #[must_use]
                      {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
                          return Self::ENTRIES[(value.len() - {{ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}}) as usize] == value;
@@ -38,6 +39,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, RustCodeGeneratorCon
                  {{FormatList(lengths, RenderMany, ",\n")}}
                      ];
 
+                     #[must_use]
                      {{cfg.GetMethodModifier()}}fn contains(value: &{{genCfg.GetTypeName()}}) -> bool {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
                          let idx = (value.len() - {{ctx.MinLength}}) as usize;

@@ -9,6 +9,7 @@ use std::ptr;
 pub struct MyData;
 
 impl MyData {
+    #[must_use]
     pub fn contains(value: f64) -> bool {
         return f64::MIN == value;
     }

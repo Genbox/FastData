@@ -31,6 +31,7 @@ impl MyData {
         return h;
     }
 
+    #[must_use]
     pub fn contains(value: f64) -> bool {
         if value < f64::MIN || value > f64::MAX {
             return false;

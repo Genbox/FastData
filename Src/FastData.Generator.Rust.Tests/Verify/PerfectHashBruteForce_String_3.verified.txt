@@ -37,6 +37,7 @@ impl MyData {
         return h;
     }
 
+    #[must_use]
     pub fn contains(value: &str) -> bool {
         if value.len() != 5 {
             return false;

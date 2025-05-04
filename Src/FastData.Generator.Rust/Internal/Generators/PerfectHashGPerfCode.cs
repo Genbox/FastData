@@ -15,6 +15,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustCodeGener
                  {{FormatColumns(items, static (sb, x) => sb.Append(ToValueLabel(x)))}}
                      ];
 
+                     #[must_use]
                      {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
                  {{cfg.GetEarlyExits(genCfg)}}
 
