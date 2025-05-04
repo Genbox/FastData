@@ -47,6 +47,9 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustCodeGener
         if (key == -1 || key < minLen)
             return RenderExpression();
 
+        //We add one to key to have one more branch for the usual default case
+        key++;
+
         StringBuilder sb = new StringBuilder("""
                                                      let bytes = str.as_bytes();
                                                      let mut hash: u32 = 0;
