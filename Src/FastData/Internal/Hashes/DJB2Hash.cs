@@ -1,6 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using static System.Numerics.BitOperations;
 
 namespace Genbox.FastData.Internal.Hashes;
 

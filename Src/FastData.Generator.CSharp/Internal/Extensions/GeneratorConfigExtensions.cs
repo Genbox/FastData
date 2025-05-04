@@ -1,5 +1,4 @@
 using Genbox.FastData.Extensions;
-using Genbox.FastData.Specs.Hash;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Extensions;
 
