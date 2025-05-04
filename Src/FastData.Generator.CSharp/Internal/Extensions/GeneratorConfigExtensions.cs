@@ -39,37 +39,35 @@ internal static class GeneratorConfigExtensions
         return $"{variable}.CompareTo(value)";
     }
 
-    internal static string GetHashSource(this GeneratorConfig config)
+    internal static string GetHashSource(this GeneratorConfig config) =>
+        $$"""
+              [MethodImpl(MethodImplOptions.AggressiveInlining)]
+              private static uint Hash({{config.GetTypeName()}} value)
+              {
+          {{GetHash(config.DataType)}}
+              }
+          """;
+
+    private static string GetHash(DataType type)
     {
-        if (config.DataType == DataType.String)
+        if (type == DataType.String)
         {
-            return $$"""
-                         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                         private static uint Hash({{config.GetTypeName()}} value)
-                         {
-                              uint hash1 = 352654597;
-                              uint hash2 = 352654597;
+            return """
+                            uint hash = 352654597;
 
-                              ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
-                              int len = value.Length;
+                            ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
+                            int len = value.Length;
 
-                              while (len-- > 0)
-                              {
-                                  hash2 = (((hash2 << 5) | (hash2 >> 27)) + hash2) ^ ptr;
-                                  ptr = ref Unsafe.Add(ref ptr, 1);
-                              }
+                            while (len-- > 0)
+                            {
+                                hash = (((hash << 5) | (hash >> 27)) + hash) ^ ptr;
+                                ptr = ref Unsafe.Add(ref ptr, 1);
+                            }
 
-                              return hash1 + (hash2 * 1566083941);
-                         }
-                     """;
+                            return 352654597 + (hash * 1566083941);
+                   """;
         }
 
-        return $$"""
-                     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                     private static uint Hash({{config.GetTypeName()}} value)
-                     {
-                         return unchecked((uint)(value{{(config.DataType.IsIdentityHash() ? "" : ".GetHashCode()")}}));
-                     }
-                 """;
+        return $"        return unchecked((uint)(value{(type.IsIdentityHash() ? "" : ".GetHashCode()")}));";
     }
 }

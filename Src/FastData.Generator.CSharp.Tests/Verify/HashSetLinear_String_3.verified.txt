@@ -46,19 +46,18 @@ internal static class MyData
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static uint Hash(string value)
     {
-         uint hash1 = 352654597;
-         uint hash2 = 352654597;
+         uint hash = 352654597;
 
          ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
          int len = value.Length;
 
          while (len-- > 0)
          {
-             hash2 = (((hash2 << 5) | (hash2 >> 27)) + hash2) ^ ptr;
+             hash = (((hash << 5) | (hash >> 27)) + hash) ^ ptr;
              ptr = ref Unsafe.Add(ref ptr, 1);
          }
 
-         return hash1 + (hash2 * 1566083941);
+         return 352654597 + (hash * 1566083941);
     }
 
     [StructLayout(LayoutKind.Auto)]
