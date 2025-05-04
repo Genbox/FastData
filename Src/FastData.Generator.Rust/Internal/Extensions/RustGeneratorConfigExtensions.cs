@@ -41,9 +41,9 @@ internal static class RustGeneratorConfigExtensions
 
     internal static string GetMaskEarlyExit(ulong bitSet) =>
         $$"""
-          if {{bitSet}}u64 & (1u64 << ((value.len() - 1) % 64)) == 0 {
-              return false;
-          }
+                  if {{bitSet}}u64 & (1u64 << ((value.len() - 1) % 64)) == 0 {
+                      return false;
+                  }
           """;
 
     internal static string GetValueEarlyExits(object min, object max, DataType dataType) =>

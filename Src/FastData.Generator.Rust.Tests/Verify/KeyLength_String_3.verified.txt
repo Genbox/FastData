@@ -15,9 +15,9 @@ impl MyData {
 
     #[must_use]
     pub fn contains(value: &str) -> bool {
-if 13u64 & (1u64 << ((value.len() - 1) % 64)) == 0 {
-    return false;
-}
+        if 13u64 & (1u64 << ((value.len() - 1) % 64)) == 0 {
+            return false;
+        }
         return Self::ENTRIES[(value.len() - 1) as usize] == value;
     }
 
