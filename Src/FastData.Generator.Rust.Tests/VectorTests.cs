@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Rust.Shared;
 using Genbox.FastData.InternalShared;
+using static Genbox.FastData.Generator.Helpers.FormatHelper;
 using static Genbox.FastData.Generator.Rust.Internal.Helpers.CodeHelper;
 using static Genbox.FastData.InternalShared.TestHelper;
 
@@ -21,8 +22,13 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
               {{spec.Source}}
 
               fn main() {
-                  let result = if {{spec.Identifier}}::contains({{ToValueLabel(data[0])}}) { 1 } else { 0 };
-                  std::process::exit(result);
+              {{FormatList(data, x => $$"""
+                                        if !{{spec.Identifier}}::contains({{ToValueLabel(x)}}) {
+                                            std::process::exit(0);
+                                        }
+                                        """, "\n")}}
+
+                  std::process::exit(1);
               }
               """);
 

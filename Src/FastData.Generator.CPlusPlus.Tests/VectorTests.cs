@@ -1,8 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.CPlusPlus.Internal.Helpers;
 using Genbox.FastData.Generator.CPlusPlus.Shared;
 using Genbox.FastData.InternalShared;
+using static Genbox.FastData.Generator.CPlusPlus.Internal.Helpers.CodeHelper;
+using static Genbox.FastData.Generator.Helpers.FormatHelper;
 using static Genbox.FastData.InternalShared.TestHelper;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Tests;
@@ -24,7 +25,12 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
 
               int main(int argc, char* argv[])
               {
-                  return {{spec.Identifier}}::contains({{CodeHelper.ToValueLabel(data[0])}});
+              {{FormatList(data, x => $"""
+                                       if (!{spec.Identifier}::contains({ToValueLabel(x)}))
+                                           return false;
+                                       """, "\n")}}
+
+                  return 1;
               }
               """);
 
