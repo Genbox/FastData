@@ -17,6 +17,7 @@ impl MyData {
         E { hash_code: 2147483648, next: -1, value: -9223372036854775808 }, E { hash_code: 0, next: -1, value: 0 }, E { hash_code: 2147483648, next: 0, value: 9223372036854775807 }
     ];
 
+    #[inline(always)]
     fn get_hash(value: i64) -> u32 {
         return ((value as i32) ^ ((value >> 32) as i32)) as u32;
     }

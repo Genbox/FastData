@@ -23,12 +23,19 @@ internal static class GeneratorConfigExtensions
         _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
     };
 
-    internal static string GetHashSource(this GeneratorConfig config)
+    internal static string GetHashSource(this GeneratorConfig config) =>
+        $$"""
+              {{(config.DataType == DataType.String ? "#[inline]" : "#[inline(always)]")}}
+              {{(config.DataType == DataType.String ? "unsafe " : "")}}fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
+          {{GetHash(config.DataType)}}
+              }
+          """;
+
+    private static string GetHash(DataType type)
     {
-        if (config.DataType == DataType.String)
+        if (type == DataType.String)
         {
             return """
-                       unsafe fn get_hash(value: &str) -> u32 {
                            let mut hash: u32 = 352654597;
 
                            let mut ptr = value.as_ptr();
@@ -41,56 +48,39 @@ internal static class GeneratorConfigExtensions
                            }
 
                            return 352654597 + hash.wrapping_mul(1566083941)
-                        }
                    """;
         }
 
-        if (config.DataType.IsIdentityHash() || config.DataType == DataType.Boolean)
+        if (type.IsIdentityHash() || type == DataType.Boolean)
+            return "        value as u32";
+
+        if (type is DataType.Int64 or DataType.UInt64)
+            return "        return ((value as i32) ^ ((value >> 32) as i32)) as u32;";
+
+        if (type == DataType.Single)
         {
-            return $$"""
-                         fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
-                             value as u32
-                         }
-                     """;
+            return """
+                           let mut bits = value.to_bits();
+
+                           if ((bits.wrapping_sub(1)) & !0x8000_0000) >= 0x7F80_0000 {
+                               bits &= 0x7F80_0000;
+                           }
+                           bits
+                   """;
         }
 
-        if (config.DataType is DataType.Int64 or DataType.UInt64)
+        if (type == DataType.Double)
         {
-            return $$"""
-                         fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
-                             return ((value as i32) ^ ((value >> 32) as i32)) as u32;
-                         }
-                     """;
+            return """
+                           let mut bits = value.to_bits();
+
+                           if ((bits.wrapping_sub(1)) & !0x8000_0000_0000_0000) >= 0x7FF0_0000_0000_0000 {
+                               bits &= 0x7FF0_0000_0000_0000;
+                           }
+                           (bits as u32) ^ ((bits >> 32) as u32)
+                   """;
         }
 
-        if (config.DataType == DataType.Single)
-        {
-            return $$"""
-                         fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
-                             let mut bits = value.to_bits();
-
-                             if ((bits.wrapping_sub(1)) & !0x8000_0000) >= 0x7F80_0000 {
-                                 bits &= 0x7F80_0000;
-                             }
-                             bits
-                         }
-                     """;
-        }
-
-        if (config.DataType == DataType.Double)
-        {
-            return $$"""
-                         fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
-                             let mut bits = value.to_bits();
-
-                             if ((bits.wrapping_sub(1)) & !0x8000_0000_0000_0000) >= 0x7FF0_0000_0000_0000 {
-                                 bits &= 0x7FF0_0000_0000_0000;
-                             }
-                             (bits as u32) ^ ((bits >> 32) as u32)
-                         }
-                     """;
-        }
-
-        throw new InvalidOperationException("Unsupported data type: " + config.DataType);
+        throw new InvalidOperationException("Unsupported data type: " + type);
     }
 }

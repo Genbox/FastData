@@ -21,6 +21,7 @@ impl MyData {
         2391420970, 3957504911, 825337029
     ];
 
+    #[inline]
     unsafe fn get_hash(value: &str) -> u32 {
         let mut hash: u32 = 352654597;
 
@@ -34,7 +35,7 @@ impl MyData {
         }
 
         return 352654597 + hash.wrapping_mul(1566083941)
-     }
+    }
 
     #[must_use]
     pub fn contains(value: &'static str) -> bool {

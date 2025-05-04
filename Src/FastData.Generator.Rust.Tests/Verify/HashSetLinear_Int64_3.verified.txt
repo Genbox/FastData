@@ -21,6 +21,7 @@ impl MyData {
         0, 2147483648, 2147483648
     ];
 
+    #[inline(always)]
     fn get_hash(value: i64) -> u32 {
         return ((value as i32) ^ ((value >> 32) as i32)) as u32;
     }

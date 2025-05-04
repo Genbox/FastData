@@ -17,6 +17,7 @@ impl MyData {
         E { hash_code: 3957504911, next: -1, value: "item1" }, E { hash_code: 2391420970, next: -1, value: "item2" }, E { hash_code: 825337029, next: -1, value: "item3" }
     ];
 
+    #[inline]
     unsafe fn get_hash(value: &str) -> u32 {
         let mut hash: u32 = 352654597;
 
@@ -30,7 +31,7 @@ impl MyData {
         }
 
         return 352654597 + hash.wrapping_mul(1566083941)
-     }
+    }
 
     #[must_use]
     pub fn contains(value: &str) -> bool {

@@ -13,6 +13,7 @@ impl MyData {
         E { value: 2147483647, hash_code: 1427853558 }, E { value: 0, hash_code: 1364076727 }, E { value: -2147483648, hash_code: 2340387434 }
     ];
 
+    #[inline(always)]
     fn get_hash(value: i32) -> u32 {
         value as u32
     }

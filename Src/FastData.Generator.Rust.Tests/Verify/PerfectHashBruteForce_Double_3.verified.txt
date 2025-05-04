@@ -13,6 +13,7 @@ impl MyData {
         E { value: f64::MAX, hash_code: 2066174499 }, E { value: 0.0, hash_code: 1364076727 }, E { value: f64::MIN, hash_code: 2886815657 }
     ];
 
+    #[inline(always)]
     fn get_hash(value: f64) -> u32 {
         let mut bits = value.to_bits();
 

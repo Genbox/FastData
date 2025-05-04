@@ -21,6 +21,7 @@ impl MyData {
         0, 1048576, 2148532224
     ];
 
+    #[inline(always)]
     fn get_hash(value: f64) -> u32 {
         let mut bits = value.to_bits();
 

@@ -13,6 +13,7 @@ impl MyData {
         E { value: "item2", hash_code: 2874739758 }, E { value: "item3", hash_code: 2030593309 }, E { value: "item1", hash_code: 3482164928 }
     ];
 
+    #[inline]
     unsafe fn get_hash(value: &str) -> u32 {
         let mut hash: u32 = 352654597;
 
@@ -26,7 +27,7 @@ impl MyData {
         }
 
         return 352654597 + hash.wrapping_mul(1566083941)
-     }
+    }
 
     fn murmur_32(mut h: u32) -> u32 {
         h ^= h >> 16;
