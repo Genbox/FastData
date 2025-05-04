@@ -29,7 +29,7 @@ impl MyData {
         h ^= h >> 13;
         h = h.wrapping_mul(0xC2B2_AE35);
         h ^= h >> 16;
-        return h;
+        h
     }
 
     #[must_use]

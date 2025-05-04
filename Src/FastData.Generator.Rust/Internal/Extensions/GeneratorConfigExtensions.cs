@@ -55,7 +55,7 @@ internal static class GeneratorConfigExtensions
             return "        value as u32";
 
         if (type is DataType.Int64 or DataType.UInt64)
-            return "        return ((value as i32) ^ ((value >> 32) as i32)) as u32;";
+            return "        ((value as i32) ^ ((value >> 32) as i32)) as u32";
 
         if (type == DataType.Single)
         {

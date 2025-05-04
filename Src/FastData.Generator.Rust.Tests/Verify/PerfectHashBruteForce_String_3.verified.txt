@@ -1,4 +1,4 @@
-//! This file is auto-generated. Do not edit manually.
+﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: PerfectHashBruteForce
 #![allow(unused_parens)]
 #![allow(missing_docs)]
@@ -35,7 +35,7 @@ impl MyData {
         h ^= h >> 13;
         h = h.wrapping_mul(0xC2B2_AE35);
         h ^= h >> 16;
-        return h;
+        h
     }
 
     #[must_use]

@@ -26,7 +26,7 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, RustCodeGenera
                       }
                   }
 
-                  return false;
+                  false
               }
           """;
 }

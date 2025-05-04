@@ -6,7 +6,7 @@ internal sealed class SingleValueCode(GeneratorConfig genCfg, RustCodeGeneratorC
         $$"""
               #[must_use]
               {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
-                  return {{ToValueLabel(ctx.Item)}} == value;
+                  {{ToValueLabel(ctx.Item)}} == value
               }
           """;
 }

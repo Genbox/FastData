@@ -11,7 +11,7 @@ pub struct MyData;
 impl MyData {
     #[must_use]
     pub fn contains(value: i64) -> bool {
-        return -9223372036854775808 == value;
+        -9223372036854775808 == value
     }
 
     pub const ITEM_COUNT: usize = 1;
