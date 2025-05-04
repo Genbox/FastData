@@ -5,7 +5,7 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, RustCodeGenera
     public string Generate() =>
         $$"""
               {{cfg.GetFieldModifier()}}const ENTRIES: [{{genCfg.GetTypeName()}}; {{ctx.Data.Length}}] = [
-          {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               ];
 
               #[must_use]

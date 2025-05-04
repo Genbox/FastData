@@ -14,7 +14,7 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CPlusPlu
               };
 
               {{cfg.GetFieldModifier(false)}}std::array<e, {{ctx.Data.Length}}> entries = {
-          {{FormatColumns(ctx.Data, Render)}}
+          {{FormatColumns(ctx.Data, static x => $"e({ToValueLabel(x.Key)}, {ToValueLabel(x.Value)})")}}
               };
 
           {{genCfg.GetHashSource()}}
@@ -41,6 +41,4 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CPlusPlu
                   return hash == entry.hash_code && value == entry.value;
               }
           """;
-
-    private static void Render(StringBuilder sb, KeyValuePair<object, uint> obj) => sb.Append("e(").Append(ToValueLabel(obj.Key)).Append(", ").Append(ToValueLabel(obj.Value)).Append(')');
 }

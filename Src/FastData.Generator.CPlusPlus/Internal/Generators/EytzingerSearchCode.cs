@@ -5,7 +5,7 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, CPlusPlusCodeG
     public string Generate() =>
         $$"""
               {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> entries = {
-          {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
           public:

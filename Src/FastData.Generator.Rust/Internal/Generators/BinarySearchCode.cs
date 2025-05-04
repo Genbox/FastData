@@ -1,3 +1,5 @@
+using Genbox.FastData.Generator.Extensions;
+
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
 internal sealed class BinarySearchCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, BinarySearchContext ctx) : IOutputWriter
@@ -5,7 +7,7 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, RustCodeGenerator
     public string Generate() =>
         $$"""
               {{cfg.GetFieldModifier()}}const ENTRIES: [{{genCfg.GetTypeName(true)}}; {{ctx.Data.Length}}] = [
-          {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               ];
 
               #[must_use]
@@ -13,7 +15,7 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, RustCodeGenerator
           {{cfg.GetEarlyExits(genCfg)}}
 
                   let mut lo: usize = 0;
-                  let mut hi: usize = {{(ctx.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
+                  let mut hi: usize = {{(ctx.Data.Length - 1).ToStringInvariant()}};
                   while lo <= hi {
                       let i = lo + ((hi - lo) >> 1);
                       let entry = Self::ENTRIES[i];

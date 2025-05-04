@@ -46,16 +46,16 @@ internal static class CodeHelper
         {
             float.MaxValue => "std::numeric_limits<float>::max()",
             float.MinValue => "std::numeric_limits<float>::lowest()",
-            _ => val.ToString("0.0", CultureInfo.InvariantCulture) + "f"
+            _ => val.ToString("0.0", NumberFormatInfo.InvariantInfo) + "f"
         },
         double val => val switch
         {
             double.MaxValue => "std::numeric_limits<double>::max()",
             double.MinValue => "std::numeric_limits<double>::lowest()",
-            _ => val.ToString("0.0", CultureInfo.InvariantCulture)
+            _ => val.ToString("0.0", NumberFormatInfo.InvariantInfo)
         },
         bool val => val.ToString().ToLowerInvariant(),
-        IFormattable val => val.ToString(null, CultureInfo.InvariantCulture),
+        IFormattable val => val.ToString(null, NumberFormatInfo.InvariantInfo),
         _ => value.ToString()!
     };
 
@@ -67,8 +67,8 @@ internal static class CodeHelper
         DataType.UInt32 => value + "u",
         DataType.Int64 => (long)value == long.MaxValue ? "std::numeric_limits<int64_t>::max()" : (long)value == long.MinValue ? "std::numeric_limits<int64_t>::lowest()" : value + "ll",
         DataType.UInt64 => value + "ull",
-        DataType.Single => (double)value == float.MaxValue ? "std::numeric_limits<float>::max()" : (double)value == float.MinValue ? "std::numeric_limits<float>::lowest()" : ((double)value).ToString("0.0", CultureInfo.InvariantCulture) + "f",
-        DataType.Double => (double)value == double.MaxValue ? "std::numeric_limits<double>::max()" : (double)value == double.MinValue ? "std::numeric_limits<double>::lowest()" : ((double)value).ToString("0.0", CultureInfo.InvariantCulture),
+        DataType.Single => (double)value == float.MaxValue ? "std::numeric_limits<float>::max()" : (double)value == float.MinValue ? "std::numeric_limits<float>::lowest()" : ((double)value).ToString("0.0", NumberFormatInfo.InvariantInfo) + "f",
+        DataType.Double => (double)value == double.MaxValue ? "std::numeric_limits<double>::max()" : (double)value == double.MinValue ? "std::numeric_limits<double>::lowest()" : ((double)value).ToString("0.0", NumberFormatInfo.InvariantInfo),
         DataType.Boolean => value.ToString().ToLowerInvariant(),
         _ => value.ToString()
     };

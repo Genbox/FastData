@@ -1,4 +1,4 @@
-using Genbox.FastData.Contexts.Misc;
+using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
@@ -16,11 +16,11 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, RustCodeGenerator
 
         return $$"""
                      {{cfg.GetFieldModifier()}}const BUCKETS: [{{GetSmallestSignedType(ctx.Buckets.Length)}}; {{ctx.Buckets.Length}}] = [
-                 {{FormatColumns(ctx.Buckets, static (sb, x) => sb.Append(x))}}
+                 {{FormatColumns(ctx.Buckets, static x => x.ToStringInvariant())}}
                      ];
 
                      {{cfg.GetFieldModifier()}}const ENTRIES: [E; {{ctx.Entries.Length}}] = [
-                 {{FormatColumns(ctx.Entries, RenderEntry)}}
+                 {{FormatColumns(ctx.Entries, static x => $"E {{ hash_code: {x.Hash}, next: {x.Next.ToStringInvariant()}, value: {ToValueLabel(x.Value)} }}")}}
                      ];
 
                  {{genCfg.GetHashSource()}}
@@ -45,7 +45,4 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, RustCodeGenerator
                      }
                  """;
     }
-
-    private static void RenderEntry(StringBuilder sb, HashSetEntry x) =>
-        sb.Append("E { hash_code: ").Append(x.Hash).Append(", next: ").Append(x.Next).Append(", value: ").Append(ToValueLabel(x.Value)).Append(" }");
 }

@@ -1,4 +1,4 @@
-using Genbox.FastData.Contexts.Misc;
+using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
@@ -17,11 +17,11 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusCodeGene
               };
 
               {{cfg.GetFieldModifier()}}std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length}}> buckets = {
-          {{FormatColumns(ctx.Buckets, static (sb, x) => sb.Append(x))}}
+          {{FormatColumns(ctx.Buckets, static x => x.ToStringInvariant())}}
                };
 
               {{cfg.GetFieldModifier(false)}}std::array<e, {{ctx.Entries.Length}}> entries = {
-          {{FormatColumns(ctx.Entries, RenderEntry)}}
+          {{FormatColumns(ctx.Entries, static x => $"e({x.Hash}, {x.Next.ToStringInvariant()}, {ToValueLabel(x.Value)})")}}
               };
 
           {{genCfg.GetHashSource()}}
@@ -49,6 +49,4 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CPlusPlusCodeGene
                   return false;
               }
           """;
-
-    private static void RenderEntry(StringBuilder sb, HashSetEntry x) => sb.Append("e(").Append(x.Hash).Append(", ").Append(x.Next).Append(", ").Append(ToValueLabel(x.Value)).Append(')');
 }

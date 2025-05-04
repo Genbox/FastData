@@ -1,4 +1,4 @@
-using Genbox.FastData.Contexts.Misc;
+using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
@@ -7,11 +7,11 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpCodeGenerat
     public string Generate() =>
         $$"""
               {{cfg.GetFieldModifier()}}{{GetSmallestSignedType(ctx.Buckets.Length)}}[] _buckets = new {{GetSmallestSignedType(ctx.Buckets.Length)}}[] {
-          {{FormatColumns(ctx.Buckets, static (sb, x) => sb.Append(x))}}
+          {{FormatColumns(ctx.Buckets, static x => x.ToStringInvariant())}}
                };
 
               {{cfg.GetFieldModifier()}}E[] _entries = {
-          {{FormatColumns(ctx.Entries, RenderEntry)}}
+          {{FormatColumns(ctx.Entries, static x => $"new E({x.Hash}, {x.Next.ToStringInvariant()}, {ToValueLabel(x.Value)})")}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -53,6 +53,4 @@ internal sealed class HashSetChainCode(GeneratorConfig genCfg, CSharpCodeGenerat
                   }
               }
           """;
-
-    private static void RenderEntry(StringBuilder sb, HashSetEntry x) => sb.Append("new E(").Append(x.Hash).Append(", ").Append(x.Next).Append(", ").Append(ToValueLabel(x.Value)).Append(')');
 }

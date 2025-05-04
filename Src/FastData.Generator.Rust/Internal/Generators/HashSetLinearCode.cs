@@ -1,4 +1,4 @@
-using Genbox.FastData.Contexts.Misc;
+using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
@@ -15,15 +15,15 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, RustCodeGenerato
 
         return $$"""
                      {{cfg.GetFieldModifier()}}const BUCKETS: [B; {{ctx.Buckets.Length}}] = [
-                 {{FormatColumns(ctx.Buckets, RenderBucket)}}
+                 {{FormatColumns(ctx.Buckets, static x => $"B {{ start_index: {x.StartIndex.ToStringInvariant()}, end_index: {x.EndIndex.ToStringInvariant()} }}")}}
                      ];
 
                      {{cfg.GetFieldModifier()}}const ITEMS: [{{genCfg.GetTypeName(true)}}; {{ctx.Data.Length}}] = [
-                 {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
+                 {{FormatColumns(ctx.Data, ToValueLabel)}}
                      ];
 
                      {{cfg.GetFieldModifier()}}const HASH_CODES: [u32; {{ctx.HashCodes.Length}}] = [
-                 {{FormatColumns(ctx.HashCodes, static (sb, obj) => sb.Append(obj))}}
+                 {{FormatColumns(ctx.HashCodes, static x => x.ToStringInvariant())}}
                      ];
 
                  {{genCfg.GetHashSource()}}
@@ -48,7 +48,4 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, RustCodeGenerato
                      }
                  """;
     }
-
-    private static void RenderBucket(StringBuilder sb, HashSetBucket x) =>
-        sb.Append("B { start_index: ").Append(x.StartIndex).Append(", end_index: ").Append(x.EndIndex).Append(" }");
 }

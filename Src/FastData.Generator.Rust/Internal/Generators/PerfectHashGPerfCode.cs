@@ -1,3 +1,5 @@
+using Genbox.FastData.Generator.Extensions;
+
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
 internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, PerfectHashGPerfContext ctx) : IOutputWriter
@@ -8,11 +10,11 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustCodeGener
 
         return $$"""
                      {{cfg.GetFieldModifier()}}const ASSO: [{{GetSmallestUnsignedType(ctx.MaxHash + 1)}}; {{ctx.AssociationValues.Length}}] = [
-                 {{FormatColumns(ctx.AssociationValues, RenderAssociativeValue)}}
+                 {{FormatColumns(ctx.AssociationValues, static x => x.ToStringInvariant())}}
                      ];
 
                      {{cfg.GetFieldModifier()}}const ITEMS: [&'static str; {{items.Length}}] = [
-                 {{FormatColumns(items, static (sb, x) => sb.Append(ToValueLabel(x)))}}
+                 {{FormatColumns(items, ToValueLabel)}}
                      ];
 
                      #[must_use]
@@ -116,6 +118,4 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustCodeGener
             index++;
         }
     }
-
-    private static void RenderAssociativeValue(StringBuilder sb, int value) => sb.Append(value.ToString(NumberFormatInfo.InvariantInfo));
 }

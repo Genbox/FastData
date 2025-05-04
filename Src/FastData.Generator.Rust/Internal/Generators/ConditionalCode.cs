@@ -8,13 +8,11 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, RustCodeGeneratorC
                  {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
              {{cfg.GetEarlyExits(genCfg)}}
 
-                     if {{FormatList(ctx.Data, Render, " || ")}} {
+                     if {{FormatList(ctx.Data, static x => $"value == {ToValueLabel(x)}", " || ")}} {
                          return true;
                      }
 
                      false
                  }
              """;
-
-    private static void Render(StringBuilder sb, object obj) => sb.Append($"value == {ToValueLabel(obj)}");
 }

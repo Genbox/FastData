@@ -13,7 +13,7 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, RustCode
 
         return $$"""
                      {{cfg.GetFieldModifier()}}const ENTRIES: [E; {{ctx.Data.Length}}] = [
-                 {{FormatColumns(ctx.Data, Render)}}
+                 {{FormatColumns(ctx.Data, static x => $"E {{ value: {ToValueLabel(x.Key)}, hash_code: {ToValueLabel(x.Value)} }}")}}
                      ];
 
                  {{genCfg.GetHashSource()}}
@@ -38,7 +38,4 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, RustCode
                      }
                  """;
     }
-
-    private static void Render(StringBuilder sb, KeyValuePair<object, uint> obj) =>
-        sb.Append("E { value: ").Append(ToValueLabel(obj.Key)).Append(", hash_code: ").Append(ToValueLabel(obj.Value)).Append(" }");
 }

@@ -1,3 +1,5 @@
+using Genbox.FastData.Generator.Extensions;
+
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class ArrayCode(GeneratorConfig genCfg, CSharpCodeGeneratorConfig cfg, ArrayContext ctx) : IOutputWriter
@@ -5,7 +7,7 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CSharpCodeGeneratorConfi
     public string Generate() =>
         $$"""
               {{cfg.GetFieldModifier()}}{{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
-          {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -13,7 +15,7 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CSharpCodeGeneratorConfi
               {
           {{cfg.GetEarlyExits(genCfg)}}
 
-                  for (int i = 0; i < {{ctx.Data.Length.ToString(NumberFormatInfo.InvariantInfo)}}; i++)
+                  for (int i = 0; i < {{ctx.Data.Length.ToStringInvariant()}}; i++)
                   {
                       if ({{genCfg.GetEqualFunction("_entries[i]")}})
                          return true;

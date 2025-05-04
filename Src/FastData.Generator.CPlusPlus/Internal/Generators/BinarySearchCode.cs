@@ -1,3 +1,5 @@
+using Genbox.FastData.Generator.Extensions;
+
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, BinarySearchContext ctx) : IOutputWriter
@@ -5,7 +7,7 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusCodeGene
     public string Generate() =>
         $$"""
               {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> entries = {
-          {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
           public:
@@ -15,7 +17,7 @@ internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusCodeGene
           {{cfg.GetEarlyExits(genCfg)}}
 
                   size_t lo = 0;
-                  size_t hi = {{(ctx.Data.Length - 1).ToString(NumberFormatInfo.InvariantInfo)}};
+                  size_t hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
                   while (lo <= hi)
                   {
                       const size_t mid = lo + ((hi - lo) >> 1);

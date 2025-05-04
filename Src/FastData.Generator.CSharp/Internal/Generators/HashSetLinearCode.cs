@@ -1,4 +1,4 @@
-using Genbox.FastData.Contexts.Misc;
+using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
@@ -7,15 +7,15 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpCodeGenera
     public string Generate() =>
         $$"""
               {{cfg.GetFieldModifier()}}B[] _buckets = {
-          {{FormatColumns(ctx.Buckets, RenderBucket)}}
+          {{FormatColumns(ctx.Buckets, static x => $"new B({x.StartIndex.ToStringInvariant()}, {x.EndIndex.ToStringInvariant()})")}}
               };
 
               {{cfg.GetFieldModifier()}}{{genCfg.GetTypeName()}}[] _items = new {{genCfg.GetTypeName()}}[] {
-          {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
               {{cfg.GetFieldModifier()}}uint[] _hashCodes = {
-          {{FormatColumns(ctx.HashCodes, static (sb, obj) => sb.Append(obj))}}
+          {{FormatColumns(ctx.HashCodes, static x => x.ToStringInvariant())}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -55,6 +55,4 @@ internal sealed class HashSetLinearCode(GeneratorConfig genCfg, CSharpCodeGenera
                   }
               }
           """;
-
-    private static void RenderBucket(StringBuilder sb, HashSetBucket x) => sb.Append("new B(").Append(x.StartIndex).Append(", ").Append(x.EndIndex).Append(')');
 }

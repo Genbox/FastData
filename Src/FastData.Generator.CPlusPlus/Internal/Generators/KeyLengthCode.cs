@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
@@ -13,7 +13,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusCodeGenerat
 
         return $$"""
                      {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{lengths.Length}}> entries = {
-                 {{FormatColumns(lengths, RenderOne)}}
+                 {{FormatColumns(lengths, ToValueLabel)}}
                      };
 
                  public:
@@ -22,7 +22,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusCodeGenerat
                      {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
 
-                         return value == entries[value.length() - {{ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}}];
+                         return value == entries[value.length() - {{ctx.MinLength.ToStringInvariant()}}];
                      }
                  """;
     }
@@ -75,14 +75,11 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CPlusPlusCodeGenerat
         throw new InvalidOperationException("No early exits were found. They are required for UniqueKeyLength");
     }
 
-    private static void RenderOne(StringBuilder sb, string? x) => sb.Append(ToValueLabel(x));
-
-    [SuppressMessage("Roslynator", "RCS1197:Optimize StringBuilder.Append/AppendLine call")]
-    private static void RenderMany(StringBuilder sb, List<string>? x)
+    private static string RenderMany(List<string>? x)
     {
         if (x == null)
-            sb.Append("        \"\"");
-        else
-            sb.Append("        new [] {").Append(string.Join(",", x.Select(ToValueLabel))).Append('}');
+            return "        \"\"";
+
+        return $"new [] {{ {string.Join(",", x.Select(ToValueLabel))} }}";
     }
 }

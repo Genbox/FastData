@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
@@ -16,13 +16,13 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, RustCodeGeneratorCon
 
         return $$"""
                      {{cfg.GetFieldModifier()}}const ENTRIES: [{{genCfg.GetTypeName()}}; {{lengths.Length}}] = [
-                 {{FormatColumns(lengths, RenderOne)}}
+                 {{FormatColumns(lengths, ToValueLabel)}}
                      ];
 
                      #[must_use]
                      {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
                  {{GetEarlyExit(genCfg.EarlyExits)}}
-                         return Self::ENTRIES[(value.len() - {{ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}}) as usize] == value;
+                         return Self::ENTRIES[(value.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize] == value;
                      }
                  """;
     }
@@ -78,14 +78,11 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, RustCodeGeneratorCon
         throw new InvalidOperationException("No early exits were found. They are required for UniqueKeyLength");
     }
 
-    private static void RenderOne(StringBuilder sb, string? x) => sb.Append(ToValueLabel(x));
-
-    [SuppressMessage("Roslynator", "RCS1197:Optimize StringBuilder.Append/AppendLine call")]
-    private static void RenderMany(StringBuilder sb, List<string>? x)
+    private static string RenderMany(List<string>? x)
     {
         if (x == null)
-            sb.Append("Vec::new()");
-        else
-            sb.Append("vec![").Append(string.Join(", ", x.Select(ToValueLabel))).Append(']');
+            return "Vec::new()";
+
+        return $"vec![{string.Join(", ", x.Select(ToValueLabel))}]";
     }
 }

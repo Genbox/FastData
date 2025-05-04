@@ -4,7 +4,7 @@ namespace Genbox.FastData.Generator.Helpers;
 
 public static class FormatHelper
 {
-    public static string FormatColumns<T>(IEnumerable<T> items, Action<StringBuilder, T> Render, int indent = 8, int columns = 10)
+    public static string FormatColumns<T>(IEnumerable<T> items, Func<T, string> Render, int indent = 8, int columns = 10)
     {
         StringBuilder sb = new StringBuilder();
         int count = 0;
@@ -27,21 +27,21 @@ public static class FormatHelper
                 }
             }
 
-            Render(sb, item);
+            sb.Append(Render(item));
             count++;
         }
 
         return sb.ToString();
     }
 
-    public static string FormatList<T>(IEnumerable<T> data, Action<StringBuilder, T> render, string delim = ", ")
+    public static string FormatList<T>(IEnumerable<T> data, Func<T, string> render, string delim = ", ")
     {
         using IEnumerator<T> enumerator = data.GetEnumerator();
         StringBuilder sb = new StringBuilder();
 
         while (enumerator.MoveNext())
         {
-            render(sb, enumerator.Current);
+            sb.Append(render(enumerator.Current));
             sb.Append(delim);
         }
 

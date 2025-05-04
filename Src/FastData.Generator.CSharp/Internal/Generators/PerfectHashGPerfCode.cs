@@ -1,3 +1,5 @@
+using Genbox.FastData.Generator.Extensions;
+
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpCodeGeneratorConfig cfg, PerfectHashGPerfContext ctx) : IOutputWriter
@@ -5,11 +7,11 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpCodeGen
     public string Generate() =>
         $$"""
               {{cfg.GetFieldModifier()}}{{GetSmallestUnsignedType(ctx.MaxHash + 1)}}[] _asso = new {{GetSmallestUnsignedType(ctx.MaxHash + 1)}}[] {
-          {{FormatColumns(ctx.AssociationValues, RenderAssociativeValue)}}
+          {{FormatColumns(ctx.AssociationValues, static x => x.ToStringInvariant())}}
               };
 
               {{cfg.GetFieldModifier()}}string?[] _items = {
-          {{FormatColumns(WrapWords(ctx.Items), static (sb, x) => sb.Append(ToValueLabel(x)))}}
+          {{FormatColumns(WrapWords(ctx.Items), ToValueLabel)}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -19,7 +21,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpCodeGen
 
                   uint hash = Hash(value);
 
-                  if (hash > {{ctx.MaxHash.ToString(NumberFormatInfo.InvariantInfo)}})
+                  if (hash > {{ctx.MaxHash.ToStringInvariant()}})
                       return false;
 
                   return {{genCfg.GetEqualFunction("_items[hash]")}};
@@ -53,7 +55,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpCodeGen
                                                        {
                                                            default:
                                                                hash += {{RenderAsso(key)}};
-                                                               goto case {{key}};
+                                                               goto case {{key.ToStringInvariant()}};
 
                                                """);
 
@@ -135,6 +137,4 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpCodeGen
             index++;
         }
     }
-
-    private static void RenderAssociativeValue(StringBuilder sb, int value) => sb.Append(value.ToString(NumberFormatInfo.InvariantInfo));
 }

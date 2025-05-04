@@ -1,3 +1,5 @@
+using Genbox.FastData.Generator.Extensions;
+
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class ArrayCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, ArrayContext ctx) : IOutputWriter
@@ -5,7 +7,7 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorCo
     public string Generate() =>
         $$"""
               {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> entries = {
-          {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
           public:
@@ -14,7 +16,7 @@ internal sealed class ArrayCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorCo
               {
           {{cfg.GetEarlyExits(genCfg)}}
 
-                  for (size_t i = 0; i < {{ctx.Data.Length.ToString(NumberFormatInfo.InvariantInfo)}}; i++)
+                  for (size_t i = 0; i < {{ctx.Data.Length.ToStringInvariant()}}; i++)
                   {
                       if (entries[i] == value)
                          return true;

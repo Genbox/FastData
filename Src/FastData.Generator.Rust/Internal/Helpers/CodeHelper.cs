@@ -32,16 +32,16 @@ internal static class CodeHelper
         {
             float.MaxValue => "f32::MAX",
             float.MinValue => "f32::MIN",
-            _ => val.ToString("0.0", CultureInfo.InvariantCulture)
+            _ => val.ToString("0.0", NumberFormatInfo.InvariantInfo)
         },
         double val => val switch
         {
             double.MaxValue => "f64::MAX",
             double.MinValue => "f64::MIN",
-            _ => val.ToString("0.0", CultureInfo.InvariantCulture)
+            _ => val.ToString("0.0", NumberFormatInfo.InvariantInfo)
         },
         bool val => val.ToString().ToLowerInvariant(),
-        IFormattable f => f.ToString(null, CultureInfo.InvariantCulture),
+        IFormattable f => f.ToString(null, NumberFormatInfo.InvariantInfo),
         _ => value.ToString()!
     };
 
@@ -49,8 +49,8 @@ internal static class CodeHelper
     {
         DataType.String => $"\"{value}\"",
         DataType.Char => $"'{value}'",
-        DataType.Single => (double)value == float.MaxValue ? "f32::MAX" : (double)value == float.MinValue ? "f32::MIN" : ((double)value).ToString("0.0", CultureInfo.InvariantCulture),
-        DataType.Double => (double)value == double.MaxValue ? "f64::MAX" : (double)value == double.MinValue ? "f64::MIN" : ((double)value).ToString("0.0", CultureInfo.InvariantCulture),
+        DataType.Single => (double)value == float.MaxValue ? "f32::MAX" : (double)value == float.MinValue ? "f32::MIN" : ((double)value).ToString("0.0", NumberFormatInfo.InvariantInfo),
+        DataType.Double => (double)value == double.MaxValue ? "f64::MAX" : (double)value == double.MinValue ? "f64::MIN" : ((double)value).ToString("0.0", NumberFormatInfo.InvariantInfo),
         DataType.Boolean => ((bool)value).ToString().ToLowerInvariant(),
         _ => value.ToString()!
     };

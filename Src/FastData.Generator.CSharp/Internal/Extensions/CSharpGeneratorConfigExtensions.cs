@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Generator.CSharp.Enums;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Specs.EarlyExit;
 
@@ -41,10 +42,10 @@ internal static class CSharpGeneratorConfigExtensions
             return "0";
 
         if (config.GeneratorOptions.HasFlag(CSharpOptions.DisableModulusOptimization))
-            return $"hash % {value.ToString(NumberFormatInfo.InvariantInfo)}";
+            return $"hash % {value.ToStringInvariant()}";
 
         if (MathHelper.IsPowerOfTwo((uint)value))
-            return $"hash & {(value - 1).ToString(NumberFormatInfo.InvariantInfo)}";
+            return $"hash & {(value - 1).ToStringInvariant()}";
 
         ulong multiplier = MathHelper.GetFastModMultiplier((uint)value);
         return $"unchecked((uint)((((({multiplier}ul * hash) >> 32) + 1) * {value}) >> 32))";

@@ -5,7 +5,7 @@ internal sealed class EytzingerSearchCode(GeneratorConfig genCfg, CSharpCodeGene
     public string Generate() =>
         $$"""
               {{cfg.GetFieldModifier()}}{{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
-          {{FormatColumns(ctx.Data, static (sb, x) => sb.Append(ToValueLabel(x)))}}
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
               {{cfg.GetMethodAttributes()}}

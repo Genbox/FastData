@@ -30,7 +30,7 @@ internal static class CodeHelper
         uint val => val + "u",
         float val => val + "f",
         bool val => val.ToString().ToLowerInvariant(),
-        IFormattable val => val.ToString(null, CultureInfo.InvariantCulture),
+        IFormattable val => val.ToString(null, NumberFormatInfo.InvariantInfo),
         _ => value.ToString()!
     };
 

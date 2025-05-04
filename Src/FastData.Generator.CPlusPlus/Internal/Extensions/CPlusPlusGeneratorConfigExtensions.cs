@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Generator.CPlusPlus.Enums;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
@@ -36,7 +37,7 @@ internal static class CPlusPlusGeneratorConfigExtensions
 
     internal static string GetModFunction(this CPlusPlusCodeGeneratorConfig config, int length)
     {
-        return $"hash % {length.ToString(NumberFormatInfo.InvariantInfo)}";
+        return $"hash % {length.ToStringInvariant()}";
     }
 
     internal static string GetMaskEarlyExit(ulong bitSet) =>

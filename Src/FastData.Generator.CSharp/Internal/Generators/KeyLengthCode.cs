@@ -1,5 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Generator.Enums;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
@@ -27,7 +27,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpCodeGeneratorC
     private string GenerateUniqIf() =>
         $$"""
               {{cfg.GetFieldModifier()}}{{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
-          {{FormatColumns(ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()), RenderOne)}}
+          {{FormatColumns(ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()), ToValueLabel)}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -35,7 +35,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpCodeGeneratorC
               {
           {{GetEarlyExit(genCfg.EarlyExits)}}
 
-                  return {{genCfg.GetEqualFunction($"_entries[value.Length - {ctx.MinLength.ToString(NumberFormatInfo.InvariantInfo)}]")}};
+                  return {{genCfg.GetEqualFunction($"_entries[value.Length - {ctx.MinLength.ToStringInvariant()}]")}};
               }
           """;
 
@@ -48,7 +48,10 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpCodeGeneratorC
 
                   switch (value.Length)
                   {
-          {{GenerateSwitch(genCfg, ctx.Lengths.Where(x => x != null).Select(x => x![0]))}}
+          {{FormatList(ctx.Lengths.Where(x => x != null).Select(x => x![0]), x => $"""
+                                                                                               case {x.Length}:
+                                                                                                   return {genCfg.GetEqualFunction(ToValueLabel(x))};
+                                                                                   """)}}
                       default:
                           return false;
                   }
@@ -80,21 +83,6 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpCodeGeneratorC
               }
           """;
 
-    private static string GenerateSwitch(GeneratorConfig genCfg, IEnumerable<string> values)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        foreach (string value in values)
-        {
-            sb.AppendLine($"""
-                                       case {value.Length}:
-                                           return {genCfg.GetEqualFunction(ToValueLabel(value))};
-                           """);
-        }
-
-        return sb.ToString();
-    }
-
     private string GetEarlyExit(IEarlyExit[] exits)
     {
         //We do this to force an early exit for this data structure. Otherwise, we will get an IndexOutOfRangeException
@@ -113,14 +101,11 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpCodeGeneratorC
         throw new InvalidOperationException("No early exits were found. They are required for UniqueKeyLength");
     }
 
-    private static void RenderOne(StringBuilder sb, string? x) => sb.Append(ToValueLabel(x));
-
-    [SuppressMessage("Roslynator", "RCS1197:Optimize StringBuilder.Append/AppendLine call")]
-    private static void RenderMany(StringBuilder sb, List<string>? x)
+    private static string RenderMany(List<string>? x)
     {
         if (x == null)
-            sb.Append("        null");
-        else
-            sb.Append("        new [] {").Append(string.Join(",", x.Select(ToValueLabel))).Append('}');
+            return "        null";
+
+        return $"new [] {{{string.Join(",", x.Select(ToValueLabel))}}}";
     }
 }

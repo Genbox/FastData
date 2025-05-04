@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Rust.Enums;
 using Genbox.FastData.Specs.EarlyExit;
 
@@ -36,7 +37,7 @@ internal static class RustGeneratorConfigExtensions
 
     internal static string GetModFunction(this RustCodeGeneratorConfig config, int length)
     {
-        return $"hash % {length.ToString(NumberFormatInfo.InvariantInfo)}";
+        return $"hash % {length.ToStringInvariant()}";
     }
 
     internal static string GetMaskEarlyExit(ulong bitSet) =>

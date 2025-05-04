@@ -5,7 +5,7 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpCo
     public string Generate() =>
         $$"""
               {{cfg.GetFieldModifier()}}E[] _entries = {
-          {{FormatColumns(ctx.Data, Render)}}
+          {{FormatColumns(ctx.Data, static x => $"new E({ToValueLabel(x.Key)}, {ToValueLabel(x.Value)})")}}
               };
 
               {{cfg.GetMethodAttributes()}}
@@ -49,6 +49,4 @@ internal sealed class PerfectHashBruteForceCode(GeneratorConfig genCfg, CSharpCo
                   internal uint HashCode;
               }
           """;
-
-    private static void Render(StringBuilder sb, KeyValuePair<object, uint> obj) => sb.Append("new E(").Append(ToValueLabel(obj.Key)).Append(", ").Append(ToValueLabel(obj.Value)).Append(')');
 }

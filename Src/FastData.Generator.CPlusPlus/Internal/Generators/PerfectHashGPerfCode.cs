@@ -1,3 +1,5 @@
+using Genbox.FastData.Generator.Extensions;
+
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, PerfectHashGPerfContext ctx) : IOutputWriter
@@ -8,11 +10,11 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusCode
 
         return $$"""
                      {{cfg.GetFieldModifier()}}std::array<{{GetSmallestUnsignedType(ctx.MaxHash + 1)}}, {{ctx.AssociationValues.Length}}> asso = {
-                 {{FormatColumns(ctx.AssociationValues, RenderAssociativeValue)}}
+                 {{FormatColumns(ctx.AssociationValues, static x => x.ToStringInvariant())}}
                      };
 
                      {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{items.Length}}> items = {
-                 {{FormatColumns(items, static (sb, x) => sb.Append(ToValueLabel(x)))}}
+                 {{FormatColumns(items, ToValueLabel)}}
                      };
 
                  public:
@@ -23,7 +25,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusCode
 
                          const uint32_t hash = get_hash(value);
 
-                         if (hash > {{ctx.MaxHash.ToString(NumberFormatInfo.InvariantInfo)}})
+                         if (hash > {{ctx.MaxHash.ToStringInvariant()}})
                              return false;
 
                          return items[hash] == value;
@@ -137,6 +139,4 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusCode
             index++;
         }
     }
-
-    private static void RenderAssociativeValue(StringBuilder sb, int value) => sb.Append(value.ToString(NumberFormatInfo.InvariantInfo));
 }

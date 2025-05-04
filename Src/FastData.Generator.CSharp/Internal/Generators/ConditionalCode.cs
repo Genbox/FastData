@@ -18,7 +18,7 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpCodeGenerato
               {
           {{cfg.GetEarlyExits(genCfg)}}
 
-                  if ({{FormatList(ctx.Data, (x, y) => Render(genCfg, x, y), " || ")}})
+                  if ({{FormatList(ctx.Data, x => genCfg.GetEqualFunction(ToValueLabel(x)), " || ")}})
                       return true;
 
                   return false;
@@ -34,14 +34,11 @@ internal sealed class ConditionalCode(GeneratorConfig genCfg, CSharpCodeGenerato
 
                   switch (value)
                   {
-          {{FormatList(ctx.Data, Render, "\n")}}
+          {{FormatList(ctx.Data, static x => $"            case {ToValueLabel(x)}:", "\n")}}
                           return true;
                       default:
                           return false;
                   }
               }
           """;
-
-    private static void Render(StringBuilder sb, object obj) => sb.Append($"            case {ToValueLabel(obj)}:");
-    private static void Render(GeneratorConfig genCfg, StringBuilder sb, object obj) => sb.Append(genCfg.GetEqualFunction(ToValueLabel(obj)));
 }
