@@ -1,6 +1,5 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Contexts;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Misc;
@@ -25,8 +24,9 @@ internal sealed class KeyLengthStructure<T>(StructureConfig config) : IStructure
         //idx 2: null
         //idx 3: "aaa", "bbb"
 
-        uint minLen = config.DataProperties.StringProps!.Value.LengthData.Min;
-        uint maxLen = config.DataProperties.StringProps!.Value.LengthData.Max;
+        StringProperties props = config.DataProperties.StringProps!.Value;
+        uint minLen = props.LengthData.Min;
+        uint maxLen = props.LengthData.Max;
 
         //We don't have to use HashSets to deduplicate within a bucket as all items are unique
         List<string>?[] lengths = new List<string>?[maxLen + 1]; //We need a place for zero
