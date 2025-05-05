@@ -4,74 +4,73 @@ namespace Genbox.FastData.Internal.Helpers;
 
 internal static class PerfectHashHelper
 {
-    internal static IEnumerable<uint> Generate<T>(T[] data, Func<T, uint, uint> hashFunc, uint maxCandidates = uint.MaxValue, uint maxAttempts = uint.MaxValue, int length = 0, Func<bool>? condition = null)
+    internal static uint Generate(uint[] hashCodes, Func<uint, uint, uint> mixer, uint maxAttempts = uint.MaxValue, uint length = 0)
     {
+        //Length = 0 means minimal perfect hash function
         if (length == 0)
-            length = data.Length;
+            length = (uint)hashCodes.Length;
 
         if (length == 1)
-        {
-            yield return 1;
-            yield break;
-        }
+            return 1;
 
-        //If there are duplicate hash codes, we might as well early exit as there exist no solution
-        HashSet<uint> codes = new HashSet<uint>();
-        foreach (T item in data)
-        {
-            if (!codes.Add(hashFunc(item, 0)))
-                yield break;
-        }
-
-        bool[] bArray = new bool[length];
-        ulong fastMod = MathHelper.GetFastModMultiplier((uint)length);
-        int numFound = 0;
         uint seed;
+        SwitchArray arr = new SwitchArray(length);
+        ulong fastMod = MathHelper.GetFastModMultiplier(length);
 
         //Hash each candidate. Exit when the first duplicate is detected, or when we run out of candidates to test.
-        for (seed = 1; seed < uint.MaxValue - 1; seed++)
+        for (seed = 1; seed < maxAttempts; seed++)
         {
-            //Clear the array for next use
-            Array.Clear(bArray, 0, bArray.Length);
+            arr.Clear();
 
-            for (int k = 0; k < data.Length; k++)
+            for (int i = 0; i < hashCodes.Length; i++)
             {
-                uint offset = MathHelper.FastMod(hashFunc(data[k], seed), (uint)length, fastMod);
+                uint offset = MathHelper.FastMod(mixer(hashCodes[i], seed), length, fastMod);
 
                 //If this offset is already set we can early exit
-                if (bArray[offset])
-                    goto NotFound;
+                if (arr[offset])
+                    goto TryAgain;
 
-                bArray[offset] = true;
+                arr[offset] = true;
             }
 
-            numFound++;
-            yield return seed;
+            TryAgain: ;
+        }
 
-            if (numFound == maxCandidates)
-                yield break;
+        return seed;
+    }
 
-            NotFound:
+    private sealed class SwitchArray(uint capacity)
+    {
+        private readonly uint[] _data = new uint[capacity];
+        private uint _counter;
 
-            if (maxAttempts-- == 0)
-                yield break;
+        public bool this[uint index]
+        {
+            get => _data[index] == _counter;
+            set => _data[index] = _counter;
+        }
 
-            if (condition != null && condition())
-                yield break;
+        public void Clear()
+        {
+            _counter++;
+
+            if (_counter == uint.MaxValue)
+                Array.Clear(_data, 0, _data.Length);
         }
     }
 
-    internal static bool Validate<T>(T[] data, uint seed, Func<object, uint, uint> hashFunc, out byte[] offsets, uint length = 0)
+    internal static bool Validate(uint[] hashCodes, uint seed, Func<uint, uint, uint> mixer, out byte[] offsets, uint length = 0)
     {
         if (length == 0)
-            length = (uint)data.Length;
+            length = (uint)hashCodes.Length;
 
         bool[] bArray = new bool[length];
         offsets = new byte[length];
         ulong fastMod = MathHelper.GetFastModMultiplier(length);
-        for (uint i = 0; i < data.Length; i++)
+
+        for (uint i = 0; i < hashCodes.Length; i++)
         {
-            uint offset = MathHelper.FastMod(hashFunc(data[i], seed), length, fastMod);
+            uint offset = MathHelper.FastMod(mixer(hashCodes[i], seed), length, fastMod);
             offsets[i] = (byte)offset;
 
             if (bArray[offset])

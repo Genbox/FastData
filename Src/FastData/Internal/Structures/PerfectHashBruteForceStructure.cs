@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Contexts;
@@ -12,36 +11,33 @@ internal sealed class PerfectHashBruteForceStructure<T> : IHashStructure<T>
 {
     public bool TryCreate(T[] data, HashFunc<T> hashFunc, out IContext? context)
     {
-        uint localHash(T obj, uint seed) => Murmur_32(hashFunc(obj) ^ seed);
+        uint[] hashCodes = new uint[data.Length];
 
-        long timestamp = Stopwatch.GetTimestamp();
+        for (int i = 0; i < data.Length; i++)
+            hashCodes[i] = hashFunc(data[i]);
 
         //Find the proper seeds
-        uint[] seed = PerfectHashHelper.Generate(data, localHash, 1, uint.MaxValue, data.Length, () =>
-        {
-            TimeSpan span = new TimeSpan(Stopwatch.GetTimestamp() - timestamp);
-            return span.TotalSeconds > 10;
-        }).ToArray(); //We call .ToArray() as FirstOrDefault() would return 0 (in the default case), which is a valid seed.
+        uint seed = PerfectHashHelper.Generate(hashCodes, (hash, seed) => Murmur_32(hash ^ seed), 1, 100_000);
 
         // If we have 0 seeds, it means either there is no solution, or we hit the exit condition
-        if (seed.Length == 0)
+        if (seed == 0)
         {
             context = null;
             return false;
         }
 
-        KeyValuePair<T, uint>[] pairs = new KeyValuePair<T, uint>[data.Length];
+        KeyValuePair<T, uint>[] pairs = new KeyValuePair<T, uint>[hashCodes.Length];
 
-        for (int i = 0; i < data.Length; i++)
+        for (int i = 0; i < hashCodes.Length; i++)
         {
             T value = data[i];
 
-            uint hash = localHash(value, seed[0]);
+            uint hash = Murmur_32(hashFunc(value) ^ seed);
             uint index = (uint)(hash % pairs.Length);
             pairs[index] = new KeyValuePair<T, uint>(value, hash);
         }
 
-        context = new PerfectHashBruteForceContext<T>(pairs, seed[0]);
+        context = new PerfectHashBruteForceContext<T>(pairs, seed);
         return true;
     }
 
