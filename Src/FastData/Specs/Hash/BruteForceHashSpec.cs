@@ -10,7 +10,7 @@ namespace Genbox.FastData.Specs.Hash;
 [SuppressMessage("Naming", "CA1721:Property names should not match get methods")]
 public readonly record struct BruteForceHashSpec(HashFunction HashFunction, StringSegment[] Segments) : IHashSpec
 {
-    public HashFunc GetHashFunction()
+    public HashFunc<string> GetHashFunction()
     {
         StringSegment seg = Segments[0];
 
@@ -27,5 +27,5 @@ public readonly record struct BruteForceHashSpec(HashFunction HashFunction, Stri
         };
     }
 
-    public EqualFunc GetEqualFunction() => static (a, b) => ((string)a).Equals((string)b, StringComparison.Ordinal);
+    public EqualFunc<string> GetEqualFunction() => static (a, b) => a.Equals(b, StringComparison.Ordinal);
 }

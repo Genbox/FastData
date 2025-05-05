@@ -28,7 +28,7 @@ public class GeneratorConfig
 
     private static Constants CreateConstants(DataProperties props)
     {
-        Constants constants = new Constants((uint)props.ItemCount);
+        Constants constants = new Constants(props.ItemCount);
 
         if (props.StringProps.HasValue)
         {

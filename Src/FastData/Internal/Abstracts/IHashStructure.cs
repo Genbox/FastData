@@ -3,7 +3,7 @@ using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Internal.Abstracts;
 
-internal interface IHashStructure
+internal interface IHashStructure<T>
 {
-    bool TryCreate(object[] data, HashFunc hash, out IContext? context);
+    bool TryCreate(T[] data, HashFunc<T> hash, out IContext? context);
 }

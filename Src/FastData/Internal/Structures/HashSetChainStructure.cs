@@ -6,27 +6,27 @@ using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashSetChainStructure : IHashStructure
+internal sealed class HashSetChainStructure<T> : IHashStructure<T>
 {
-    public bool TryCreate(object[] data, HashFunc hash, out IContext? context)
+    public bool TryCreate(T[] data, HashFunc<T> hash, out IContext? context)
     {
         int[] buckets = new int[data.Length];
-        HashSetEntry[] entries = new HashSetEntry[data.Length];
+        HashSetEntry<T>[] entries = new HashSetEntry<T>[data.Length];
 
         for (int i = 0; i < data.Length; i++)
         {
-            object value = data[i];
+            T value = data[i];
             uint hashCode = hash(value);
             ref int bucket = ref buckets[hashCode % data.Length];
 
-            ref HashSetEntry entry = ref entries[i];
+            ref HashSetEntry<T> entry = ref entries[i];
             entry.Hash = hashCode;
             entry.Next = bucket - 1;
             entry.Value = value;
             bucket = i + 1;
         }
 
-        context = new HashSetChainContext(data, buckets, entries);
+        context = new HashSetChainContext<T>(data, buckets, entries);
         return true;
     }
 }

@@ -2,7 +2,7 @@ using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class BinarySearchCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, BinarySearchContext ctx) : IOutputWriter
+internal sealed class BinarySearchCode<T>(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, BinarySearchContext<T> ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

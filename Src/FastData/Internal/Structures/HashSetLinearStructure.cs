@@ -8,11 +8,11 @@ using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashSetLinearStructure : IHashStructure
+internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
 {
     //TODO: Either implement a bitmap for seen buckets everywhere or don't use bitmaps for simplicity
 
-    public bool TryCreate(object[] data, HashFunc hash, out IContext? context)
+    public bool TryCreate(T[] data, HashFunc<T> hash, out IContext? context)
     {
         uint[] hashCodes = new uint[data.Length];
         for (int i = 0; i < data.Length; i++)
@@ -66,7 +66,7 @@ internal sealed class HashSetLinearStructure : IHashStructure
             finalBuckets[bucketNum] = new HashSetBucket(bucketStart, (bucketStart + bucketCount) - 1);
         }
 
-        object[] newData = new object[data.Length];
+        T[] newData = new T[data.Length];
 
         for (int srcIndex = 0; srcIndex < hashCodes.Length; srcIndex++)
         {
@@ -74,7 +74,7 @@ internal sealed class HashSetLinearStructure : IHashStructure
             newData[destIndex] = data[srcIndex];
         }
 
-        context = new HashSetLinearContext(newData, finalBuckets, finalCodes);
+        context = new HashSetLinearContext<T>(newData, finalBuckets, finalCodes);
         return true;
     }
 

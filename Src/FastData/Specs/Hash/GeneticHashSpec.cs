@@ -16,12 +16,12 @@ public struct GeneticHashSpec(int mixerSeed, int mixerIterations, int avalancheS
     internal int AvalancheIterations = avalancheIterations;
     internal StringSegment[] Segments = segments;
 
-    public readonly HashFunc GetHashFunction()
+    public readonly HashFunc<string> GetHashFunction()
     {
         Func<uint, uint, uint> mixer = GetMixer().Compile();
         Func<uint, uint> avalanche = GetAvalanche().Compile();
         uint seed = (uint)MixerSeed;
-        return str => Hash((string)str, seed, mixer, avalanche);
+        return str => Hash(str, seed, mixer, avalanche);
     }
 
     private static uint Hash(string str, uint seed, Func<uint, uint, uint> mixer, Func<uint, uint> avalanche)
@@ -36,7 +36,7 @@ public struct GeneticHashSpec(int mixerSeed, int mixerIterations, int avalancheS
         return avalanche(acc);
     }
 
-    public readonly EqualFunc GetEqualFunction() => static (a, b) => ((string)a).Equals((string)b, StringComparison.Ordinal);
+    public readonly EqualFunc<string> GetEqualFunction() => static (a, b) => a.Equals(b, StringComparison.Ordinal);
 
     public readonly Expression<Func<uint, uint, uint>> GetMixer()
     {

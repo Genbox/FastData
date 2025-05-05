@@ -1,3 +1,3 @@
 namespace Genbox.FastData.Specs;
 
-public delegate bool EqualFunc(object a, object b);
+public delegate bool EqualFunc<in T>(T a, T b);

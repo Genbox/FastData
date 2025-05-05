@@ -54,7 +54,7 @@ public class PerfectHashBenchmarks
 
     public static IEnumerable<MixSpec> GetFunctions()
     {
-        yield return new MixSpec(nameof(Mixers.Murmur_32), static obj => Mixers.Murmur_32((uint)obj));
-        yield return new MixSpec(nameof(Mixers.XXH2_32), static obj => Mixers.Murmur_32((uint)obj));
+        yield return new MixSpec(nameof(Mixers.Murmur_32), static obj => Mixers.Murmur_32(obj));
+        yield return new MixSpec(nameof(Mixers.XXH2_32), static obj => Mixers.Murmur_32(obj));
     }
 }

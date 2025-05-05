@@ -2,9 +2,9 @@ using Genbox.FastData.Contexts.Misc;
 
 namespace Genbox.FastData.Contexts;
 
-public class HashSetLinearContext(object[] data) : DefaultContext(data)
+public class HashSetLinearContext<T>(T[] data) : DefaultContext<T>(data)
 {
-    public HashSetLinearContext(object[] data, HashSetBucket[] buckets, uint[] hashCodes) : this(data)
+    public HashSetLinearContext(T[] data, HashSetBucket[] buckets, uint[] hashCodes) : this(data)
     {
         Buckets = buckets;
         HashCodes = hashCodes;

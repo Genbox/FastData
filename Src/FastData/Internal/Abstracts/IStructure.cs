@@ -2,7 +2,7 @@ using Genbox.FastData.Abstracts;
 
 namespace Genbox.FastData.Internal.Abstracts;
 
-internal interface IStructure
+internal interface IStructure<in T>
 {
-    bool TryCreate(object[] data, out IContext? context);
+    bool TryCreate(T[] data, out IContext? context);
 }

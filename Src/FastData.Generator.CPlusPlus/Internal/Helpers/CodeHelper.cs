@@ -23,7 +23,7 @@ internal static class CodeHelper
         _ => "int64_t"
     };
 
-    internal static string ToValueLabel(object? value) => value switch
+    internal static string ToValueLabel<T>(T? value) => value switch
     {
         null => "\"\"",
         string val => $"\"{val}\"",

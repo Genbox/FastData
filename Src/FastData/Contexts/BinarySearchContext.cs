@@ -1,3 +1,3 @@
 namespace Genbox.FastData.Contexts;
 
-public class BinarySearchContext(object[] data) : DefaultContext(data);
+public class BinarySearchContext<T>(T[] data) : DefaultContext<T>(data);

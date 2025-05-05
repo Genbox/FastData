@@ -2,7 +2,7 @@ using Genbox.FastData.Abstracts;
 
 namespace Genbox.FastData.Contexts;
 
-public abstract class DefaultContext(object[] data) : IContext
+public abstract class DefaultContext<T>(T[] data) : IContext
 {
-    public object[] Data { get; } = data;
+    public T[] Data { get; } = data;
 }

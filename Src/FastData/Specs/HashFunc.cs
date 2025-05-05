@@ -1,3 +1,3 @@
 namespace Genbox.FastData.Specs;
 
-public delegate uint HashFunc(object obj);
+public delegate uint HashFunc<in T>(T obj);

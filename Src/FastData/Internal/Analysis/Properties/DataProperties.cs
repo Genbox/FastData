@@ -1,61 +1,82 @@
-using System.Runtime.InteropServices;
 using Genbox.FastData.Enums;
 
 namespace Genbox.FastData.Internal.Analysis.Properties;
 
-[StructLayout(LayoutKind.Auto)]
-internal readonly record struct DataProperties
+internal class DataProperties
 {
-    public DataProperties(object[] data)
+    private DataProperties(uint items,
+                           DataType type,
+                           StringProperties? stringProps,
+                           IntegerProperties? intProps,
+                           UnsignedIntegerProperties? uintProps,
+                           CharProperties? charProps,
+                           FloatProperties? floatProps)
     {
-        ItemCount = data.Length;
-        DataType = (DataType)Enum.Parse(typeof(DataType), data[0].GetType().Name);
+        ItemCount = items;
+        DataType = type;
 
-        switch (DataType)
+        StringProps = stringProps;
+        IntProps = intProps;
+        UIntProps = uintProps;
+        CharProps = charProps;
+        FloatProps = floatProps;
+    }
+
+    internal static DataProperties Create<T>(T[] data)
+    {
+        StringProperties? stringProps = null;
+        IntegerProperties? intProps = null;
+        UnsignedIntegerProperties? uintProps = null;
+        CharProperties? charProps = null;
+        FloatProperties? floatProps = null;
+
+        switch (data)
         {
-            case DataType.SByte:
-                IntProps = DataAnalyzer.GetSByteProperties(data);
+            case sbyte[] sbyteArr:
+                intProps = DataAnalyzer.GetSByteProperties(sbyteArr);
                 break;
-            case DataType.Byte:
-                UIntProps = DataAnalyzer.GetByteProperties(data);
+            case byte[] byteArr:
+                uintProps = DataAnalyzer.GetByteProperties(byteArr);
                 break;
-            case DataType.Int16:
-                IntProps = DataAnalyzer.GetInt16Properties(data);
+            case short[] shortArr:
+                intProps = DataAnalyzer.GetInt16Properties(shortArr);
                 break;
-            case DataType.UInt16:
-                UIntProps = DataAnalyzer.GetUInt16Properties(data);
+            case ushort[] ushortArr:
+                uintProps = DataAnalyzer.GetUInt16Properties(ushortArr);
                 break;
-            case DataType.Int32:
-                IntProps = DataAnalyzer.GetInt32Properties(data);
+            case int[] intArr:
+                intProps = DataAnalyzer.GetInt32Properties(intArr);
                 break;
-            case DataType.UInt32:
-                UIntProps = DataAnalyzer.GetUInt32Properties(data);
+            case uint[] uintArr:
+                uintProps = DataAnalyzer.GetUInt32Properties(uintArr);
                 break;
-            case DataType.Int64:
-                IntProps = DataAnalyzer.GetInt64Properties(data);
+            case long[] longArr:
+                intProps = DataAnalyzer.GetInt64Properties(longArr);
                 break;
-            case DataType.UInt64:
-                UIntProps = DataAnalyzer.GetUInt64Properties(data);
+            case ulong[] ulongArr:
+                uintProps = DataAnalyzer.GetUInt64Properties(ulongArr);
                 break;
-            case DataType.String:
-                StringProps = DataAnalyzer.GetStringProperties(data);
+            case string[] stringArr:
+                stringProps = DataAnalyzer.GetStringProperties(stringArr);
                 break;
-            case DataType.Char:
-                CharProps = DataAnalyzer.GetCharProperties(data);
+            case char[] charArr:
+                charProps = DataAnalyzer.GetCharProperties(charArr);
                 break;
-            case DataType.Single:
-                FloatProps = DataAnalyzer.GetSingleProperties(data);
+            case float[] floatArr:
+                floatProps = DataAnalyzer.GetSingleProperties(floatArr);
                 break;
-            case DataType.Double:
-                FloatProps = DataAnalyzer.GetDoubleProperties(data);
+            case double[] doubleArr:
+                floatProps = DataAnalyzer.GetDoubleProperties(doubleArr);
                 break;
             case DataType.Boolean:
             case DataType.Unknown:
                 //Do nothing
                 break;
             default:
-                throw new InvalidOperationException($"Unknown data type: {DataType}");
+                throw new InvalidOperationException($"Unknown data type: {typeof(T)}");
         }
+
+        return new DataProperties((uint)data.Length, (DataType)Enum.Parse(typeof(DataType), typeof(T).Name), stringProps, intProps, uintProps, charProps, floatProps);
     }
 
     public StringProperties? StringProps { get; }
@@ -64,5 +85,5 @@ internal readonly record struct DataProperties
     public CharProperties? CharProps { get; }
     public FloatProperties? FloatProps { get; }
     public DataType DataType { get; }
-    public int ItemCount { get; }
+    public uint ItemCount { get; }
 }

@@ -20,7 +20,7 @@ internal static class CodeHelper
         _ => "long"
     };
 
-    internal static string ToValueLabel(object? value) => value switch
+    internal static string ToValueLabel<T>(T? value) => value switch
     {
         null => "null",
         string val => $"\"{val}\"",

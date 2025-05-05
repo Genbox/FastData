@@ -4,6 +4,6 @@ namespace Genbox.FastData.Abstracts;
 
 public interface IHashSpec
 {
-    HashFunc GetHashFunction();
-    EqualFunc GetEqualFunction();
+    HashFunc<string> GetHashFunction();
+    EqualFunc<string> GetEqualFunction();
 }

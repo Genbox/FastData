@@ -32,7 +32,7 @@ internal static class AnalysisTest
         RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
     }
 
-    private static void RunBruteForce(object[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
+    private static void RunBruteForce(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
     {
         Console.WriteLine("###############");
         Print(data, source);
@@ -52,7 +52,7 @@ internal static class AnalysisTest
         RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
     }
 
-    private static void Print(object[] data, string? source) => Console.WriteLine(source + ": " + string.Join(", ", data.Take(5)));
+    private static void Print(string[] data, string? source) => Console.WriteLine(source + ": " + string.Join(", ", data.Take(5)));
 
     private static string MutateString(string str, double factor, char[] alphabet)
     {
@@ -89,7 +89,7 @@ internal static class AnalysisTest
         return new string('a', (int)factor) + str;
     }
 
-    private static object[] RunFunc(string[] str, double factor, Func<string, double, string> func)
+    private static string[] RunFunc(string[] str, double factor, Func<string, double, string> func)
     {
         string[] res = new string[str.Length];
 
@@ -101,7 +101,7 @@ internal static class AnalysisTest
         return res;
     }
 
-    private static void RunGeneticAnalysis(object[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
+    private static void RunGeneticAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
     {
         Console.WriteLine("###############");
         Print(data, source);

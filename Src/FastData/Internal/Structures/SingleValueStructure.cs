@@ -4,9 +4,9 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class SingleValueStructure : IStructure
+internal sealed class SingleValueStructure<T> : IStructure<T>
 {
-    public bool TryCreate(object[] data, out IContext? context)
+    public bool TryCreate(T[] data, out IContext? context)
     {
         if (data.Length != 1)
         {
@@ -14,7 +14,7 @@ internal sealed class SingleValueStructure : IStructure
             return false;
         }
 
-        context = new SingleValueContext(data[0]);
+        context = new SingleValueContext<T>(data[0]);
         return true;
     }
 }

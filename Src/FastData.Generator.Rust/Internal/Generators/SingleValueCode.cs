@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class SingleValueCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, SingleValueContext ctx) : IOutputWriter
+internal sealed class SingleValueCode<T>(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, SingleValueContext<T> ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

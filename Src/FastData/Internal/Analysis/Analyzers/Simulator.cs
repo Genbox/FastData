@@ -6,13 +6,13 @@ using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal class Simulator(object[] data, SimulatorConfig config)
+internal class Simulator(string[] data, SimulatorConfig config)
 {
     internal void Run<T>(ref Candidate<T> cand) where T : struct, IHashSpec
     {
         // Generate a hash function from the spec
-        HashFunc hashFunc = cand.Spec.GetHashFunction();
-        EqualFunc equalFunc = cand.Spec.GetEqualFunction();
+        HashFunc<string> hashFunc = cand.Spec.GetHashFunction();
+        EqualFunc<string> equalFunc = cand.Spec.GetEqualFunction();
         uint capacity = (uint)(data.Length * config.CapacityFactor);
 
         long ticks = Stopwatch.GetTimestamp();
@@ -34,10 +34,9 @@ internal class Simulator(object[] data, SimulatorConfig config)
         cand.Metadata["TimeNormalized"] = normTime;
     }
 
-    private static double[] Emulate(Dictionary<string, object> metadata, object[] data, uint capacity, HashFunc hashFunc, EqualFunc equalFunc)
+    private static double[] Emulate(Dictionary<string, object> metadata, string[] data, uint capacity, HashFunc<string> hashFunc, EqualFunc<string> equalFunc)
     {
-        //Note: FastSet does not call equals on elements
-        FastSet<object> set = new FastSet<object>(capacity, hashFunc, equalFunc);
+        FastSet set = new FastSet(capacity, hashFunc, equalFunc);
 
         int collisions = 0;
         foreach (string str in data)
@@ -54,7 +53,7 @@ internal class Simulator(object[] data, SimulatorConfig config)
         return [(double)capacity / (collisions + 1)];
     }
 
-    private ref struct FastSet<T>(uint capacity, HashFunc hashFunc, EqualFunc equalFunc)
+    private ref struct FastSet(uint capacity, HashFunc<string> hashFunc, EqualFunc<string> equalFunc)
     {
         private readonly int[] _buckets = new int[capacity];
         private readonly Entry[] _entries = new Entry[capacity];
@@ -64,7 +63,7 @@ internal class Simulator(object[] data, SimulatorConfig config)
         public readonly int MinVariance => _buckets.Where(x => x != 0).Min();
         public readonly int MaxVariance => _buckets.Max();
 
-        public bool Add(T value)
+        public bool Add(string value)
         {
             uint hashCode = hashFunc(value);
             ref int bucket = ref _buckets[hashCode % capacity];
@@ -91,6 +90,6 @@ internal class Simulator(object[] data, SimulatorConfig config)
         }
 
         [StructLayout(LayoutKind.Auto)]
-        private record struct Entry(uint Hash, int Next, T Value);
+        private record struct Entry(uint Hash, int Next, string Value);
     }
 }

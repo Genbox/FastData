@@ -10,7 +10,7 @@ public class RustCodeGenerator(RustCodeGeneratorConfig userCfg) : ICodeGenerator
 
     public bool UseUTF16Encoding => false;
 
-    public bool TryGenerate(GeneratorConfig genCfg, IContext context, out string? source)
+    public bool TryGenerate<T>(GeneratorConfig genCfg, IContext context, out string? source)
     {
         _sb.Clear();
         _shared.Clear();
@@ -19,15 +19,15 @@ public class RustCodeGenerator(RustCodeGeneratorConfig userCfg) : ICodeGenerator
 
         _sb.Append(context switch
         {
-            SingleValueContext c2 => new SingleValueCode(genCfg, userCfg, c2).Generate(),
-            ArrayContext c1 => new ArrayCode(genCfg, userCfg, c1).Generate(),
-            BinarySearchContext c2 => new BinarySearchCode(genCfg, userCfg, c2).Generate(),
-            ConditionalContext c2 => new ConditionalCode(genCfg, userCfg, c2).Generate(),
-            EytzingerSearchContext c2 => new EytzingerSearchCode(genCfg, userCfg, c2).Generate(),
-            PerfectHashBruteForceContext c2 => new PerfectHashBruteForceCode(genCfg, userCfg, c2, _shared).Generate(),
+            SingleValueContext<T> c2 => new SingleValueCode<T>(genCfg, userCfg, c2).Generate(),
+            ArrayContext<T> c1 => new ArrayCode<T>(genCfg, userCfg, c1).Generate(),
+            BinarySearchContext<T> c2 => new BinarySearchCode<T>(genCfg, userCfg, c2).Generate(),
+            ConditionalContext<T> c2 => new ConditionalCode<T>(genCfg, userCfg, c2).Generate(),
+            EytzingerSearchContext<T> c2 => new EytzingerSearchCode<T>(genCfg, userCfg, c2).Generate(),
+            PerfectHashBruteForceContext<T> c2 => new PerfectHashBruteForceCode<T>(genCfg, userCfg, c2, _shared).Generate(),
             PerfectHashGPerfContext c2 => new PerfectHashGPerfCode(genCfg, userCfg, c2).Generate(),
-            HashSetChainContext c2 => new HashSetChainCode(genCfg, userCfg, c2, _shared).Generate(),
-            HashSetLinearContext c2 => new HashSetLinearCode(genCfg, userCfg, c2, _shared).Generate(),
+            HashSetChainContext<T> c2 => new HashSetChainCode<T>(genCfg, userCfg, c2, _shared).Generate(),
+            HashSetLinearContext<T> c2 => new HashSetLinearCode<T>(genCfg, userCfg, c2, _shared).Generate(),
             KeyLengthContext c2 => new KeyLengthCode(genCfg, userCfg, c2).Generate(),
             _ => throw new NotSupportedException("The context type is not supported: " + context.GetType().Name)
         });

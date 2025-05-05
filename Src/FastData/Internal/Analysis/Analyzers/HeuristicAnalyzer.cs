@@ -43,7 +43,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
 /// <summary>Finds the least number of positions in a string that hashes to a unique value for all inputs.</summary>
 [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
-internal class HeuristicAnalyzer(object[] data, StringProperties props, HeuristicAnalyzerConfig config, Simulator simulator) : IHashAnalyzer<HeuristicHashSpec>
+internal class HeuristicAnalyzer(string[] data, StringProperties props, HeuristicAnalyzerConfig config, Simulator simulator) : IHashAnalyzer<HeuristicHashSpec>
 {
     private const double _epsilon = 1e-6;
 

@@ -8,11 +8,11 @@ using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class PerfectHashBruteForceStructure : IHashStructure
+internal sealed class PerfectHashBruteForceStructure<T> : IHashStructure<T>
 {
-    public bool TryCreate(object[] data, HashFunc hashFunc, out IContext? context)
+    public bool TryCreate(T[] data, HashFunc<T> hashFunc, out IContext? context)
     {
-        uint localHash(object obj, uint seed) => Murmur_32(hashFunc(obj) ^ seed);
+        uint localHash(T obj, uint seed) => Murmur_32(hashFunc(obj) ^ seed);
 
         long timestamp = Stopwatch.GetTimestamp();
 
@@ -30,18 +30,18 @@ internal sealed class PerfectHashBruteForceStructure : IHashStructure
             return false;
         }
 
-        KeyValuePair<object, uint>[] pairs = new KeyValuePair<object, uint>[data.Length];
+        KeyValuePair<T, uint>[] pairs = new KeyValuePair<T, uint>[data.Length];
 
         for (int i = 0; i < data.Length; i++)
         {
-            object value = data[i];
+            T value = data[i];
 
             uint hash = localHash(value, seed[0]);
             uint index = (uint)(hash % pairs.Length);
-            pairs[index] = new KeyValuePair<object, uint>(value, hash);
+            pairs[index] = new KeyValuePair<T, uint>(value, hash);
         }
 
-        context = new PerfectHashBruteForceContext(pairs, seed[0]);
+        context = new PerfectHashBruteForceContext<T>(pairs, seed[0]);
         return true;
     }
 

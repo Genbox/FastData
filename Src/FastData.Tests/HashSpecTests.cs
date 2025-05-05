@@ -10,7 +10,7 @@ public class HashSpecTests
     [MemberData(nameof(GetSpecs))]
     internal void HashSpecEqualityTest(IHashSpec spec, uint vector)
     {
-        HashFunc func = spec.GetHashFunction();
+        HashFunc<string> func = spec.GetHashFunction();
         Assert.Equal(vector, func("hello world"));
     }
 

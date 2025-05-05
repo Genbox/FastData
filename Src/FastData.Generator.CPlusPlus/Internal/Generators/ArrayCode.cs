@@ -2,7 +2,7 @@ using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class ArrayCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, ArrayContext ctx) : IOutputWriter
+internal sealed class ArrayCode<T>(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, ArrayContext<T> ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

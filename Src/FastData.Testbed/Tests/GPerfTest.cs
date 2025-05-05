@@ -32,10 +32,10 @@ internal static class GPerfTest
 
             Console.SetOut(tw);
 
-            object[] data = File.ReadAllLines(file).Cast<object>().ToArray();
+            string[] data = File.ReadAllLines(file);
 
-            StructureConfig cfg = new StructureConfig(new DataProperties(data));
-            PerfectHashGPerfStructure code = new PerfectHashGPerfStructure(cfg);
+            StructureConfig cfg = new StructureConfig(DataProperties.Create(data));
+            PerfectHashGPerfStructure<string> code = new PerfectHashGPerfStructure<string>(cfg);
 
             try
             {

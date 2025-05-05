@@ -4,9 +4,9 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class ConditionalStructure : IStructure
+internal sealed class ConditionalStructure<T> : IStructure<T>
 {
-    public bool TryCreate(object[] data, out IContext? context)
+    public bool TryCreate(T[] data, out IContext? context)
     {
         if (data.Length > ushort.MaxValue)
         {
@@ -14,7 +14,7 @@ internal sealed class ConditionalStructure : IStructure
             return false;
         }
 
-        context = new ConditionalContext(data);
+        context = new ConditionalContext<T>(data);
         return true;
     }
 }

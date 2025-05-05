@@ -6,16 +6,16 @@ namespace Genbox.FastData.Specs.Hash;
 [StructLayout(LayoutKind.Auto)]
 public readonly record struct HeuristicHashSpec(int[] Positions) : IHashSpec
 {
-    public HashFunc GetHashFunction()
+    public HashFunc<string> GetHashFunction()
     {
         int[] localPos = Positions;
-        return obj => Hash((string)obj, localPos);
+        return obj => Hash(obj, localPos);
     }
 
-    public EqualFunc GetEqualFunction()
+    public EqualFunc<string> GetEqualFunction()
     {
         int[] localPos = Positions;
-        return (a, b) => Equal((string)a, (string)b, localPos);
+        return (a, b) => Equal(a, b, localPos);
     }
 
     private static uint Hash(string input, int[] positions)

@@ -34,18 +34,18 @@ namespace Genbox.FastData.Internal.Structures;
 //TODO: Convert to a IHashStructure
 
 [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
-internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStructure
+internal sealed class PerfectHashGPerfStructure<T>(StructureConfig config) : IStructure<T>
 {
-    public bool TryCreate(object[] data, out IContext? context)
+    public bool TryCreate(T[] data, out IContext? context)
     {
         context = null;
 
-        // It won't work with zero or one item. The case where we get 1 item should be handled by SingleItem anyway.
-        if (data.Length < 2)
+        // GPerf only works on strings
+        if (data is not string[] stringArr)
             return false;
 
-        // GPerf only works on strings
-        if (config.DataProperties.DataType != DataType.String)
+        // It won't work with zero or one item. The case where we get 1 item should be handled by SingleItem anyway.
+        if (stringArr.Length < 2)
             return false;
 
         // We cannot work on empty strings
@@ -55,8 +55,8 @@ internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStruc
             return false;
 
         // Step 1: Finding good positions
-        Simulator sim = new Simulator(data, new SimulatorConfig { TimeWeight = 0 });
-        HeuristicAnalyzer analyzer = new HeuristicAnalyzer(data, strProps, new HeuristicAnalyzerConfig(), sim);
+        Simulator sim = new Simulator(stringArr, new SimulatorConfig { TimeWeight = 0 });
+        HeuristicAnalyzer analyzer = new HeuristicAnalyzer(stringArr, strProps, new HeuristicAnalyzerConfig(), sim);
         Candidate<HeuristicHashSpec> candidate = analyzer.Run();
 
         // If we didn't get any positions, we don't want to move any further
@@ -67,8 +67,8 @@ internal sealed class PerfectHashGPerfStructure(StructureConfig config) : IStruc
         int maxLen = (int)strProps.LengthData.Max;
 
         // TODO: For now, we keep regenerating state within Keyword. In the future, I hope to do this more efficiently
-        List<Keyword> keywords = new List<Keyword>(data.Length);
-        keywords.AddRange(data.Select(x => new Keyword((string)x)));
+        List<Keyword> keywords = new List<Keyword>(stringArr.Length);
+        keywords.AddRange(stringArr.Select(x => new Keyword(x)));
 
         // Step 2: Find good alpha increments
         int[] alphaInc = FindAlphaIncrements(keywords, maxLen, positions);

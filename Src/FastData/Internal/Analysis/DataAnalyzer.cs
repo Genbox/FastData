@@ -6,7 +6,7 @@ namespace Genbox.FastData.Internal.Analysis;
 
 internal static class DataAnalyzer
 {
-    internal static StringProperties GetStringProperties(object[] data)
+    internal static StringProperties GetStringProperties(string[] data)
     {
         //Contains a set of unique lengths between 1 an 64
         IntegerBitSet lengthMap = new IntegerBitSet();
@@ -15,7 +15,7 @@ internal static class DataAnalyzer
         CharacterMap characterMap = new CharacterMap();
 
         //We need to know the longest string for optimal mixing. Probably not 100% necessary.
-        string maxStr = (string)data[0];
+        string maxStr = data[0];
         int minLength = int.MaxValue;
 
         foreach (string val in data)
@@ -74,7 +74,7 @@ internal static class DataAnalyzer
         return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, lengthMap), new DeltaData(left, right), new CharacterData(allAscii, counts, characterMap));
     }
 
-    internal static CharProperties GetCharProperties(object[] data)
+    internal static CharProperties GetCharProperties(char[] data)
     {
         char min = char.MaxValue;
         char max = char.MinValue;
@@ -88,7 +88,7 @@ internal static class DataAnalyzer
         return new CharProperties(min, max);
     }
 
-    internal static FloatProperties GetSingleProperties(object[] data)
+    internal static FloatProperties GetSingleProperties(float[] data)
     {
         float min = float.MaxValue;
         float max = float.MinValue;
@@ -102,7 +102,7 @@ internal static class DataAnalyzer
         return new FloatProperties(min, max);
     }
 
-    internal static FloatProperties GetDoubleProperties(object[] data)
+    internal static FloatProperties GetDoubleProperties(double[] data)
     {
         double min = double.MaxValue;
         double max = double.MinValue;
@@ -116,12 +116,12 @@ internal static class DataAnalyzer
         return new FloatProperties(min, max);
     }
 
-    internal static UnsignedIntegerProperties GetByteProperties(object[] data)
+    internal static UnsignedIntegerProperties GetByteProperties(byte[] data)
     {
         byte min = byte.MaxValue;
         byte max = byte.MinValue;
 
-        byte lastValue = (byte)data[0];
+        byte lastValue = data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
@@ -140,12 +140,12 @@ internal static class DataAnalyzer
         return new UnsignedIntegerProperties(min, max, consecutive);
     }
 
-    internal static IntegerProperties GetSByteProperties(object[] data)
+    internal static IntegerProperties GetSByteProperties(sbyte[] data)
     {
         sbyte min = sbyte.MaxValue;
         sbyte max = sbyte.MinValue;
 
-        sbyte lastValue = (sbyte)data[0];
+        sbyte lastValue = data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
@@ -164,12 +164,12 @@ internal static class DataAnalyzer
         return new IntegerProperties(min, max, consecutive);
     }
 
-    internal static IntegerProperties GetInt16Properties(object[] data)
+    internal static IntegerProperties GetInt16Properties(short[] data)
     {
         short min = short.MaxValue;
         short max = short.MinValue;
 
-        short lastValue = (short)data[0];
+        short lastValue = data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
@@ -188,12 +188,12 @@ internal static class DataAnalyzer
         return new IntegerProperties(min, max, consecutive);
     }
 
-    internal static UnsignedIntegerProperties GetUInt16Properties(object[] data)
+    internal static UnsignedIntegerProperties GetUInt16Properties(ushort[] data)
     {
         ushort min = ushort.MaxValue;
         ushort max = ushort.MinValue;
 
-        ushort lastValue = (ushort)data[0];
+        ushort lastValue = data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
@@ -212,12 +212,12 @@ internal static class DataAnalyzer
         return new UnsignedIntegerProperties(min, max, consecutive);
     }
 
-    internal static IntegerProperties GetInt32Properties(object[] data)
+    internal static IntegerProperties GetInt32Properties(int[] data)
     {
         int min = int.MaxValue;
         int max = int.MinValue;
 
-        int lastValue = (int)data[0];
+        int lastValue = data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
@@ -236,12 +236,12 @@ internal static class DataAnalyzer
         return new IntegerProperties(min, max, consecutive);
     }
 
-    internal static UnsignedIntegerProperties GetUInt32Properties(object[] data)
+    internal static UnsignedIntegerProperties GetUInt32Properties(uint[] data)
     {
         uint min = uint.MaxValue;
         uint max = uint.MinValue;
 
-        uint lastValue = (uint)data[0];
+        uint lastValue = data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
@@ -260,12 +260,12 @@ internal static class DataAnalyzer
         return new UnsignedIntegerProperties(min, max, consecutive);
     }
 
-    internal static IntegerProperties GetInt64Properties(object[] data)
+    internal static IntegerProperties GetInt64Properties(long[] data)
     {
         long min = long.MaxValue;
         long max = long.MinValue;
 
-        long lastValue = (long)data[0];
+        long lastValue = data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
@@ -284,12 +284,12 @@ internal static class DataAnalyzer
         return new IntegerProperties(min, max, consecutive);
     }
 
-    internal static UnsignedIntegerProperties GetUInt64Properties(object[] data)
+    internal static UnsignedIntegerProperties GetUInt64Properties(ulong[] data)
     {
         ulong min = ulong.MaxValue;
         ulong max = ulong.MinValue;
 
-        ulong lastValue = (ulong)data[0];
+        ulong lastValue = data[0];
 
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);

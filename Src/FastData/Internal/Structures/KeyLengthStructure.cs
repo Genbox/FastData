@@ -2,16 +2,17 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Contexts;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class KeyLengthStructure(StructureConfig config) : IStructure
+internal sealed class KeyLengthStructure<T>(StructureConfig config) : IStructure<T>
 {
-    public bool TryCreate(object[] data, out IContext? context)
+    public bool TryCreate(T[] data, out IContext? context)
     {
         // This data structure is only appropriate for strings
-        if (config.DataProperties.DataType != DataType.String)
+        if (data is not string[] stringArr)
         {
             context = null;
             return false;
@@ -31,7 +32,7 @@ internal sealed class KeyLengthStructure(StructureConfig config) : IStructure
         List<string>?[] lengths = new List<string>?[maxLen + 1]; //We need a place for zero
 
         bool uniq = true;
-        foreach (string value in data)
+        foreach (string value in stringArr)
         {
             ref List<string>? item = ref lengths[value.Length];
             item ??= new List<string>();

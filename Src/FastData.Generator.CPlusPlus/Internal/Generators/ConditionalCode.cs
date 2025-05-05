@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class ConditionalCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, ConditionalContext ctx) : IOutputWriter
+internal sealed class ConditionalCode<T>(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, ConditionalContext<T> ctx) : IOutputWriter
 {
     public string Generate()
         => $$"""

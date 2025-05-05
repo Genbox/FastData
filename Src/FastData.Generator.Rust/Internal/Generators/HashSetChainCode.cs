@@ -2,7 +2,7 @@ using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class HashSetChainCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, HashSetChainContext ctx, SharedCode shared) : IOutputWriter
+internal sealed class HashSetChainCode<T>(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, HashSetChainContext<T> ctx, SharedCode shared) : IOutputWriter
 {
     public string Generate()
     {
