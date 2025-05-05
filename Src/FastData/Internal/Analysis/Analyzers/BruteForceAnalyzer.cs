@@ -14,20 +14,16 @@ internal class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConf
     public Candidate<BruteForceHashSpec> Run()
     {
         Candidate<BruteForceHashSpec> best = new Candidate<BruteForceHashSpec>();
-        HashFunction[] hashFunctions = Enum.GetValues(typeof(HashFunction)).Cast<HashFunction>().ToArray();
 
         foreach (StringSegment segment in SegmentManager.Generate(props))
         {
-            foreach (HashFunction func in hashFunctions)
-            {
-                BruteForceHashSpec spec = new BruteForceHashSpec(func, [segment]);
+            BruteForceHashSpec spec = new BruteForceHashSpec(segment);
 
-                Candidate<BruteForceHashSpec> candidate = new Candidate<BruteForceHashSpec>(spec);
-                simulator.Run(ref candidate);
+            Candidate<BruteForceHashSpec> candidate = new Candidate<BruteForceHashSpec>(spec);
+            simulator.Run(ref candidate);
 
-                if (candidate.Fitness > best.Fitness)
-                    best = candidate;
-            }
+            if (candidate.Fitness > best.Fitness)
+                best = candidate;
         }
 
         return best;

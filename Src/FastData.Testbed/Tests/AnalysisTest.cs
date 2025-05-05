@@ -131,7 +131,7 @@ internal static class AnalysisTest
         Console.WriteLine($"- {nameof(GeneticHashSpec.MixerIterations)}: {spec.MixerIterations}");
         Console.WriteLine($"- {nameof(GeneticHashSpec.AvalancheSeed)}: {spec.AvalancheSeed}");
         Console.WriteLine($"- {nameof(GeneticHashSpec.AvalancheIterations)}: {spec.AvalancheIterations}");
-        Console.WriteLine($"- {nameof(GeneticHashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(x => '[' + x.Offset.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Length.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Alignment + ']'))}");
+        Console.WriteLine($"- {nameof(GeneticHashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(PrintSegment))}");
         Console.WriteLine($"- Mixer: {ExpressionConverter.Instance.GetCode(spec.GetMixer())}");
         Console.WriteLine($"- Avalanche: {ExpressionConverter.Instance.GetCode(spec.GetAvalanche())}");
     }
@@ -142,7 +142,11 @@ internal static class AnalysisTest
 
         BruteForceHashSpec spec = candidate.Spec;
         Console.WriteLine("Hash:");
-        Console.WriteLine($"- {nameof(BruteForceHashSpec.HashFunction)}: {spec.HashFunction}");
-        Console.WriteLine($"- {nameof(BruteForceHashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(x => '[' + x.Offset.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Length.ToString(NumberFormatInfo.InvariantInfo) + '|' + x.Alignment + ']'))}");
+        Console.WriteLine($"- {nameof(BruteForceHashSpec.Segment)}: {PrintSegment(spec.Segment)}");
+    }
+
+    private static string PrintSegment(StringSegment segment)
+    {
+        return $"[{segment.Offset.ToString(NumberFormatInfo.InvariantInfo)}|{segment.Length.ToString(NumberFormatInfo.InvariantInfo)}|{segment.Alignment}]";
     }
 }
