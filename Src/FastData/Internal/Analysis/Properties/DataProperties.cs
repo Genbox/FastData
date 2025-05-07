@@ -30,42 +30,46 @@ internal class DataProperties
         CharProperties? charProps = null;
         FloatProperties? floatProps = null;
 
+        DataType dataType = (DataType)Enum.Parse(typeof(DataType), typeof(T).Name);
+
+        //The 'when' in the switch seems redundant, but it isn't. C# apparently interprets byte[] as sbyte[] automatically
+
         switch (data)
         {
-            case sbyte[] sbyteArr:
+            case sbyte[] sbyteArr when dataType == DataType.SByte:
                 intProps = DataAnalyzer.GetSByteProperties(sbyteArr);
                 break;
-            case byte[] byteArr:
+            case byte[] byteArr when dataType == DataType.Byte:
                 uintProps = DataAnalyzer.GetByteProperties(byteArr);
                 break;
-            case short[] shortArr:
+            case short[] shortArr when dataType == DataType.Int16:
                 intProps = DataAnalyzer.GetInt16Properties(shortArr);
                 break;
-            case ushort[] ushortArr:
+            case ushort[] ushortArr when dataType == DataType.UInt16:
                 uintProps = DataAnalyzer.GetUInt16Properties(ushortArr);
                 break;
-            case int[] intArr:
+            case int[] intArr when dataType == DataType.Int32:
                 intProps = DataAnalyzer.GetInt32Properties(intArr);
                 break;
-            case uint[] uintArr:
+            case uint[] uintArr when dataType == DataType.UInt32:
                 uintProps = DataAnalyzer.GetUInt32Properties(uintArr);
                 break;
-            case long[] longArr:
+            case long[] longArr when dataType == DataType.Int64:
                 intProps = DataAnalyzer.GetInt64Properties(longArr);
                 break;
-            case ulong[] ulongArr:
+            case ulong[] ulongArr when dataType == DataType.UInt64:
                 uintProps = DataAnalyzer.GetUInt64Properties(ulongArr);
                 break;
-            case string[] stringArr:
+            case string[] stringArr when dataType == DataType.String:
                 stringProps = DataAnalyzer.GetStringProperties(stringArr);
                 break;
-            case char[] charArr:
+            case char[] charArr when dataType == DataType.Char:
                 charProps = DataAnalyzer.GetCharProperties(charArr);
                 break;
-            case float[] floatArr:
+            case float[] floatArr when dataType == DataType.Single:
                 floatProps = DataAnalyzer.GetSingleProperties(floatArr);
                 break;
-            case double[] doubleArr:
+            case double[] doubleArr when dataType == DataType.Double:
                 floatProps = DataAnalyzer.GetDoubleProperties(doubleArr);
                 break;
             case bool[]:
@@ -76,7 +80,7 @@ internal class DataProperties
                 throw new InvalidOperationException($"Unknown data type: {typeof(T)}");
         }
 
-        return new DataProperties((uint)data.Length, (DataType)Enum.Parse(typeof(DataType), typeof(T).Name), stringProps, intProps, uintProps, charProps, floatProps);
+        return new DataProperties((uint)data.Length, dataType, stringProps, intProps, uintProps, charProps, floatProps);
     }
 
     public StringProperties? StringProps { get; }

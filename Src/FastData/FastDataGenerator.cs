@@ -31,8 +31,8 @@ public static class FastDataGenerator
         bool analysisEnabled = false;
 
         IHashSpec? spec = null;
-        if (analysisEnabled && data is string[] stringArr)
-            spec = GetHashSpec(stringArr, props);
+        if (data is string[] stringArr)
+            spec = analysisEnabled ? GetHashSpec(stringArr, props) : new DefaultHashSpec(generator.UseUTF16Encoding);
 
         HashFunc<T> hashFunc;
 
@@ -40,7 +40,16 @@ public static class FastDataGenerator
         if (spec != null)
             hashFunc = (HashFunc<T>)(object)spec.GetHashFunction();
         else
-            hashFunc = static obj => (uint)obj.GetHashCode();
+            hashFunc = props.DataType switch
+            {
+                DataType.Char => static obj => (char)(object)obj,
+                DataType.SByte => static obj => (uint)(sbyte)(object)obj,
+                DataType.Byte => static obj => (byte)(object)obj,
+                DataType.Int16 => static obj => (uint)(short)(object)obj,
+                DataType.UInt16 => static obj => (ushort)(object)obj,
+                DataType.Int32 => static obj => (uint)(int)(object)obj,
+                _ => static obj => (uint)obj.GetHashCode()
+            };
 
         IContext? context = null;
 

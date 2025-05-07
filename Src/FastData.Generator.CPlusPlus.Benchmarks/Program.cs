@@ -21,10 +21,10 @@ internal static class Program
                       using namespace benchmark;
                       """);
 
-        foreach ((StructureType type, object[] data) in TestVectorHelper.GetBenchmarkVectors())
+        foreach (ITestData data in TestVectorHelper.GetBenchmarkVectors())
         {
-            if (!TestVectorHelper.TryGenerate(id => new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig(id)), type, data, out GeneratorSpec spec))
-                throw new InvalidOperationException("Unable to build " + type);
+            if (!TestVectorHelper.TryGenerate(id => new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig(id)), data, out GeneratorSpec spec))
+                throw new InvalidOperationException("Unable to build " + data.StructureType);
 
             sb.AppendLine(CultureInfo.InvariantCulture,
                 $$"""
@@ -34,7 +34,7 @@ internal static class Program
                   {
                       for (auto _ : state)
                       {
-                  {{PrintQueries(data, spec.Identifier)}}
+                  {{PrintQueries(data.Items, spec.Identifier)}}
                       }
                   }
 

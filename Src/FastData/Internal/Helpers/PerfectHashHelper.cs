@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Helpers;
 
 namespace Genbox.FastData.Internal.Helpers;
 
 internal static class PerfectHashHelper
 {
+    [SuppressMessage("Major Bug", "S1751:Loops with at most one iteration should be refactored")]
     internal static uint Generate(uint[] hashCodes, Func<uint, uint, uint> mixer, uint maxAttempts = uint.MaxValue, uint length = 0)
     {
         //Length = 0 means minimal perfect hash function
@@ -33,10 +35,11 @@ internal static class PerfectHashHelper
                 arr[offset] = true;
             }
 
+            return seed;
             TryAgain: ;
         }
 
-        return seed == maxAttempts ? 0 : seed;
+        return 0;
     }
 
     private sealed class SwitchArray(uint capacity)
@@ -55,28 +58,10 @@ internal static class PerfectHashHelper
             _counter++;
 
             if (_counter == uint.MaxValue)
+            {
                 Array.Clear(_data, 0, _data.Length);
+                _counter = 0;
+            }
         }
-    }
-
-    internal static bool Validate(uint[] hashCodes, uint seed, Func<uint, uint, uint> mixer, out byte[] offsets, uint length = 0)
-    {
-        if (length == 0)
-            length = (uint)hashCodes.Length;
-
-        bool[] bArray = new bool[length];
-        offsets = new byte[length];
-        ulong fastMod = MathHelper.GetFastModMultiplier(length);
-
-        for (uint i = 0; i < hashCodes.Length; i++)
-        {
-            uint offset = MathHelper.FastMod(mixer(hashCodes[i], seed), length, fastMod);
-            offsets[i] = (byte)offset;
-
-            if (bArray[offset])
-                return false;
-        }
-
-        return true;
     }
 }

@@ -1,4 +1,3 @@
-using Genbox.FastData.Enums;
 using Genbox.FastData.InternalShared;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Tests;
@@ -9,10 +8,9 @@ public class GeneratorTests
 
     [Theory]
     [ClassData(typeof(TestDataClass))]
-    internal async Task GenerateStructureType(StructureType structureType, object[] data)
+    internal async Task GenerateStructureType(ITestData data)
     {
-        Assert.True(TestVectorHelper.TryGenerate(_ => _generator, structureType, data, out GeneratorSpec spec));
-
+        Assert.True(TestVectorHelper.TryGenerate(_ => _generator, data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
 
         await Verify(spec.Source)

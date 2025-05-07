@@ -1,4 +1,3 @@
-using Genbox.FastData.Enums;
 using Genbox.FastData.InternalShared;
 using static Genbox.FastData.Generator.CSharp.Internal.Helpers.CodeHelper;
 using static Genbox.FastData.Generator.Helpers.FormatHelper;
@@ -9,9 +8,9 @@ public class VectorTests
 {
     [Theory]
     [ClassData(typeof(TestVectorClass))]
-    public void Test(StructureType type, object[] data)
+    public void Test(ITestData testData)
     {
-        Assert.True(TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), type, data, out GeneratorSpec spec));
+        Assert.True(TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), testData, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
 
         string wrapper = $$"""
@@ -21,7 +20,7 @@ public class VectorTests
                            {
                                public static bool Contains()
                                {
-                           {{FormatList(data, x => $"""
+                           {{FormatList(testData.Items, x => $"""
                                                     if (!{spec.Identifier}.Contains({ToValueLabel(x)}))
                                                         return false;
                                                     """, "\n")}};

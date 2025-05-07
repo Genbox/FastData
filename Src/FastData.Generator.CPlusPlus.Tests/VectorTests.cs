@@ -12,9 +12,9 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
 {
     [Theory]
     [ClassData(typeof(TestVectorClass))]
-    public void Test(StructureType type, object[] data)
+    public void Test(ITestData data)
     {
-        Assert.True(TestVectorHelper.TryGenerate(id => new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig(id)), type, data, out GeneratorSpec spec));
+        Assert.True(TestVectorHelper.TryGenerate(id => new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
 
         string executable = context.Compiler.Compile(spec.Identifier,
             $$"""
@@ -25,10 +25,10 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
 
               int main(int argc, char* argv[])
               {
-              {{FormatList(data, x => $"""
-                                       if (!{spec.Identifier}::contains({ToValueLabel(x)}))
-                                           return false;
-                                       """, "\n")}}
+              {{FormatList(data.Items, x => $"""
+                                             if (!{spec.Identifier}::contains({ToValueLabel(x)}))
+                                                 return false;
+                                             """, "\n")}}
 
                   return 1;
               }

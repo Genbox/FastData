@@ -1,15 +1,14 @@
-using Genbox.FastData.Enums;
 using Xunit;
 
 namespace Genbox.FastData.InternalShared;
 
-public sealed class TestVectorClass : TheoryData<StructureType, object[]>
+public sealed class TestVectorClass : TheoryData<ITestData>
 {
     public TestVectorClass()
     {
-        foreach ((StructureType type, object[] data) in TestVectorHelper.GetTestVectors())
+        foreach (ITestData data in TestVectorHelper.GetTestVectors())
         {
-            Add(type, data);
+            Add(data);
         }
     }
 }

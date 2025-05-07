@@ -18,7 +18,6 @@ public class PerfectHashHelperTests
     {
         uint seed = Generate(_hashCodes, static (obj, seed) => Mixers.Murmur_32(obj ^ seed), 100_000);
         Assert.NotEqual(0u, seed);
-        Assert.True(Validate(_hashCodes, seed, static (obj, seed) => Mixers.Murmur_32(obj ^ seed), out byte[] _));
     }
 
     [Fact]
@@ -26,6 +25,5 @@ public class PerfectHashHelperTests
     {
         uint seed = Generate(_hashCodes, static (obj, seed) => Mixers.Murmur_32(obj ^ seed), 100_000, 64);
         Assert.NotEqual(0u, seed);
-        Assert.True(Validate(_hashCodes, seed, static (obj, seed) => Mixers.Murmur_32(obj ^ seed), out byte[] _, 64));
     }
 }

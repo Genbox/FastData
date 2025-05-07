@@ -7,15 +7,29 @@ namespace Genbox.FastData.InternalShared;
 
 public static class TestVectorHelper
 {
-    public static bool TryGenerate(Func<string, ICodeGenerator> generatorFunc, StructureType structureType, object[] data, out GeneratorSpec spec)
+    public static bool TryGenerate(Func<string, ICodeGenerator> gen, ITestData data, out GeneratorSpec spec) => data switch
     {
-        DataType dataType = (DataType)Enum.Parse(typeof(DataType), data[0].GetType().Name);
+        TestData<string> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<bool> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<char> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<sbyte> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<byte> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<short> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<ushort> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<int> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<uint> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<long> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<ulong> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<float> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        TestData<double> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
+        _ => throw new NotSupportedException("Unsupported data type: " + data.Type)
+    };
 
-        string identifier = $"{structureType}_{dataType}_{data.Length}";
-
-        if (FastDataGenerator.TryGenerate(data, new FastDataConfig(structureType), generatorFunc(identifier), out string? source))
+    private static bool Run<T>(StructureType type, T[] data, string identifier, Func<string, ICodeGenerator> gen, out GeneratorSpec spec)
+    {
+        if (FastDataGenerator.TryGenerate(data, new FastDataConfig(type), gen(identifier), out string? source))
         {
-            spec = new GeneratorSpec(identifier, source);
+            spec = new GeneratorSpec(identifier, source!);
             return true;
         }
 
@@ -23,44 +37,44 @@ public static class TestVectorHelper
         return false;
     }
 
-    public static IEnumerable<(StructureType, object[])> GetTestData()
+    public static IEnumerable<ITestData> GetTestData()
     {
-        foreach (StructureType type in Enum.GetValues(typeof(StructureType)))
+        foreach (StructureType type in Enum.GetValues<StructureType>())
         {
             if (type == StructureType.Auto) //We don't test auto. It is covered by the other tests
                 continue;
 
             if (type == StructureType.KeyLength)
-                yield return (type, ["a", "aaa", "aaaa"]);
+                yield return new TestData<string>(type, ["a", "aaa", "aaaa"]);
             else if (type == StructureType.SingleValue)
             {
-                yield return (type, ["value"]);
-                yield return (type, [int.MinValue]);
-                yield return (type, [long.MinValue]);
-                yield return (type, [double.MinValue]);
+                yield return new TestData<string>(type, ["value"]);
+                yield return new TestData<int>(type, [int.MinValue]);
+                yield return new TestData<long>(type, [long.MinValue]);
+                yield return new TestData<double>(type, [double.MinValue]);
             }
             else if (type == StructureType.PerfectHashGPerf)
-                yield return (type, ["item1", "item2", "item3", "item4"]);
+                yield return new TestData<string>(type, ["item1", "item2", "item3", "item4"]);
             else if (type == StructureType.PerfectHashBruteForce)
             {
                 //We omit long types because it has duplicate hash codes for 0/max
-                yield return (type, ["item1", "item2", "item3"]);
-                yield return (type, [int.MinValue, 0, int.MaxValue]);
-                yield return (type, [double.MinValue, (double)0, double.MaxValue]);
+                yield return new TestData<string>(type, ["item1", "item2", "item3"]);
+                yield return new TestData<int>(type, [int.MinValue, 0, int.MaxValue]);
+                yield return new TestData<double>(type, [double.MinValue, (double)0, double.MaxValue]);
             }
             else
             {
-                yield return (type, ["item1", "item2", "item3"]);
-                yield return (type, [int.MinValue, 0, int.MaxValue]);
-                yield return (type, [long.MinValue, (long)0, long.MaxValue]);
-                yield return (type, [double.MinValue, (double)0, double.MaxValue]);
+                yield return new TestData<string>(type, ["item1", "item2", "item3"]);
+                yield return new TestData<int>(type, [int.MinValue, 0, int.MaxValue]);
+                yield return new TestData<long>(type, [long.MinValue, (long)0, long.MaxValue]);
+                yield return new TestData<double>(type, [double.MinValue, (double)0, double.MaxValue]);
             }
         }
     }
 
-    public static IEnumerable<(StructureType, object[])> GetTestVectors()
+    public static IEnumerable<ITestData> GetTestVectors()
     {
-        foreach (StructureType type in Enum.GetValues(typeof(StructureType)))
+        foreach (StructureType type in Enum.GetValues<StructureType>())
         {
             switch (type)
             {
@@ -69,28 +83,25 @@ public static class TestVectorHelper
 
                 case StructureType.KeyLength:
                     // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
-                    yield return (type, ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]);
+                    yield return new TestData<string>(type, ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]);
                     break;
 
                 case StructureType.SingleValue:
-                    foreach (object[] data in GetSingleSets())
-                    {
-                        yield return (type, data);
-                    }
+                    foreach (ITestData data in GetSingleSets(type))
+                        yield return data;
+
                     break;
 
                 case StructureType.PerfectHashGPerf:
-                    yield return (type, ["a", "b"]); //Minimum test case
-                    yield return (type, ["aaaaaaaaaa", "bbbbbbbbbb", "cccccccccc"]); //Same length (and longer than 1)
-                    yield return (type, ["item1", "item2", "item3", "item4"]); //Only differ on 1 char
-                    yield return (type, ["1", "2", "a", "aa", "aaa", "item", new string('a', 255)]); //Test long strings
+                    yield return new TestData<string>(type, ["a", "b"]); //Minimum test case
+                    yield return new TestData<string>(type, ["aaaaaaaaaa", "bbbbbbbbbb", "cccccccccc"]); //Same length (and longer than 1)
+                    yield return new TestData<string>(type, ["item1", "item2", "item3", "item4"]); //Only differ on 1 char
+                    yield return new TestData<string>(type, ["1", "2", "a", "aa", "aaa", "item", new string('a', 255)]); //Test long strings
                     break;
 
                 case StructureType.PerfectHashBruteForce: //We've kept to a small set since larger ones will just hit timeout
-                    foreach (object[] data in GetEdgeCaseSets())
-                    {
-                        yield return (type, data);
-                    }
+                    foreach (ITestData data in GetEdgeCaseSets(type))
+                        yield return data;
                     break;
 
                 case StructureType.Conditional:
@@ -99,15 +110,10 @@ public static class TestVectorHelper
                 case StructureType.HashSetChain:
                 case StructureType.HashSetLinear:
                 case StructureType.Array:
-                    foreach (object[] data in GetEdgeCaseSets())
-                    {
-                        yield return (type, data);
-                    }
-
-                    foreach (object[] data in GetSetOfSize(100))
-                    {
-                        yield return (type, data);
-                    }
+                    foreach (ITestData data in GetEdgeCaseSets(type))
+                        yield return data;
+                    foreach (ITestData data in GetSetOfSize(type, 100))
+                        yield return data;
                     break;
                 default:
                     throw new NotSupportedException("There are no test vectors for " + type);
@@ -115,11 +121,11 @@ public static class TestVectorHelper
         }
     }
 
-    public static IEnumerable<(StructureType, object[])> GetBenchmarkVectors()
+    public static IEnumerable<ITestData> GetBenchmarkVectors()
     {
         const int benchmarkSize = 1000;
 
-        foreach (StructureType type in Enum.GetValues(typeof(StructureType)))
+        foreach (StructureType type in Enum.GetValues<StructureType>())
         {
             switch (type)
             {
@@ -129,18 +135,16 @@ public static class TestVectorHelper
                     continue;
 
                 case StructureType.KeyLength:
-                    yield return (type, Enumerable.Range(0, benchmarkSize).Select(x => new string('a', x)).ToArray<object>());
+                    yield return new TestData<string>(type, Enumerable.Range(0, benchmarkSize).Select(x => new string('a', x)).ToArray());
                     break;
 
                 case StructureType.PerfectHashGPerf:
-                    yield return (type, Enumerable.Range(0, benchmarkSize).Select(x => "item" + x).ToArray<object>());
+                    yield return new TestData<string>(type, Enumerable.Range(0, benchmarkSize).Select(x => "item" + x).ToArray());
                     break;
 
                 case StructureType.PerfectHashBruteForce:
-                    foreach (object[] data in GetSetOfSize(10))
-                    {
-                        yield return (type, data);
-                    }
+                    foreach (ITestData data in GetSetOfSize(type, 10))
+                        yield return data;
                     break;
 
                 case StructureType.Conditional:
@@ -149,10 +153,8 @@ public static class TestVectorHelper
                 case StructureType.HashSetChain:
                 case StructureType.HashSetLinear:
                 case StructureType.Array:
-                    foreach (object[] data in GetSetOfSize(benchmarkSize))
-                    {
-                        yield return (type, data);
-                    }
+                    foreach (ITestData data in GetSetOfSize(type, benchmarkSize))
+                        yield return data;
                     break;
                 default:
                     throw new NotSupportedException("There are no benchmark vectors for " + type);
@@ -160,46 +162,52 @@ public static class TestVectorHelper
         }
     }
 
-    private static IEnumerable<object[]> GetSingleSets()
+    private static IEnumerable<ITestData> GetSingleSets(StructureType type)
     {
         // We want to test a single value too of each type. It should result in a special SingleValue structure.
-        yield return [true];
-        yield return [(sbyte)1];
-        yield return [(byte)1];
-        yield return ['a'];
-        yield return [1.0];
-        yield return [1f];
-        yield return [(short)1];
-        yield return [(ushort)1];
-        yield return [1];
-        yield return [1U];
-        yield return [1L];
-        yield return [1UL];
-        yield return ["value"];
+        yield return new TestData<bool>(type, [true]);
+        yield return new TestData<sbyte>(type, [(sbyte)1]);
+        yield return new TestData<byte>(type, [(byte)1]);
+        yield return new TestData<char>(type, ['a']);
+        yield return new TestData<double>(type, [1.0]);
+        yield return new TestData<float>(type, [1f]);
+        yield return new TestData<short>(type, [(short)1]);
+        yield return new TestData<ushort>(type, [(ushort)1]);
+        yield return new TestData<int>(type, [1]);
+        yield return new TestData<uint>(type, [1U]);
+        yield return new TestData<long>(type, [1L]);
+        yield return new TestData<ulong>(type, [1UL]);
+        yield return new TestData<string>(type, ["value"]);
     }
 
-    private static IEnumerable<object[]> GetEdgeCaseSets()
+    private static IEnumerable<ITestData> GetEdgeCaseSets(StructureType type)
     {
         // We want to test edge values
-        yield return [true, false];
-        yield return [sbyte.MinValue, (sbyte)-1, (sbyte)0, (sbyte)1, sbyte.MaxValue];
-        yield return [(byte)0, (byte)1, byte.MaxValue];
-        yield return ['\0', 'a', (char)127]; //We keep it within ASCII range as C#'s char does not translate to other languages
-        yield return [double.MinValue, 0.0, 1.0, double.MaxValue];
-        yield return [float.MinValue, -1f, 0f, 1f, float.MaxValue];
-        yield return [short.MinValue, (short)-1, (short)0, (short)1, short.MaxValue];
-        yield return [(ushort)0, (ushort)1, (ushort)2, ushort.MaxValue];
-        yield return [int.MinValue, -1, 0, 1, int.MaxValue];
-        yield return [0U, 1U, 2U, uint.MaxValue];
-        yield return [long.MinValue, -5L, 0L, 1L, long.MaxValue - 1]; //We use -5 and -1 to avoid hash collisions
-        yield return [0UL, 1UL, 2UL, ulong.MaxValue - 10]; //We use -1 to avoid hash collisions
-        yield return ["a", "item", new string('a', 255)];
+        yield return new TestData<bool>(type, [true, false]);
+        yield return new TestData<sbyte>(type, [sbyte.MinValue, (sbyte)-1, (sbyte)0, (sbyte)1, sbyte.MaxValue]);
+        yield return new TestData<byte>(type, [(byte)0, (byte)1, byte.MaxValue]);
+
+        //We keep it within ASCII range as C#'s char does not translate to other languages
+        yield return new TestData<char>(type, ['\0', 'a', (char)127]);
+        yield return new TestData<double>(type, [double.MinValue, 0.0, 1.0, double.MaxValue]);
+        yield return new TestData<float>(type, [float.MinValue, -1f, 0f, 1f, float.MaxValue]);
+        yield return new TestData<short>(type, [short.MinValue, (short)-1, (short)0, (short)1, short.MaxValue]);
+        yield return new TestData<ushort>(type, [(ushort)0, (ushort)1, (ushort)2, ushort.MaxValue]);
+        yield return new TestData<int>(type, [int.MinValue, -1, 0, 1, int.MaxValue]);
+        yield return new TestData<uint>(type, [0U, 1U, 2U, uint.MaxValue]);
+
+        //We use -5 and -1 to avoid hash collisions
+        yield return new TestData<long>(type, [long.MinValue, -5L, 0L, 1L, long.MaxValue - 1]);
+
+        //We use -1 to avoid hash collisions
+        yield return new TestData<ulong>(type, [0UL, 1UL, 2UL, ulong.MaxValue - 10]);
+        yield return new TestData<string>(type, ["a", "item", new string('a', 255)]);
     }
 
-    private static IEnumerable<object[]> GetSetOfSize(int size)
+    private static IEnumerable<ITestData> GetSetOfSize(StructureType type, int size)
     {
-        yield return Enumerable.Range(0, size).Select(x => x).Cast<object>().ToArray();
-        yield return Enumerable.Range(0, size).Select(x => (float)x).Cast<object>().ToArray();
-        yield return Enumerable.Range(0, size).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).Cast<object>().ToArray();
+        yield return new TestData<int>(type, Enumerable.Range(0, size).Select(x => x).ToArray());
+        yield return new TestData<float>(type, Enumerable.Range(0, size).Select(x => (float)x).ToArray());
+        yield return new TestData<string>(type, Enumerable.Range(0, size).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).ToArray());
     }
 }

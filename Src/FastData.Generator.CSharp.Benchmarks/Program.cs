@@ -43,10 +43,10 @@ internal static class Program
                       {
                       """);
 
-        foreach ((StructureType type, object[] data) in TestVectorHelper.GetBenchmarkVectors())
+        foreach (ITestData data in TestVectorHelper.GetBenchmarkVectors())
         {
-            if (!TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), type, data, out GeneratorSpec spec))
-                throw new InvalidOperationException("Unable to build " + type);
+            if (!TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), data, out GeneratorSpec spec))
+                throw new InvalidOperationException("Unable to build " + data.StructureType);
 
             TestHelper.TryWriteFile(Path.Combine(rootDir, spec.Identifier + ".cs"), spec.Source);
 
@@ -55,7 +55,7 @@ internal static class Program
                                                               [Benchmark]
                                                               public void CSharp_{{spec.Identifier}}()
                                                               {
-                                                          {{PrintQueries(data, spec.Identifier)}}
+                                                          {{PrintQueries(data.Items, spec.Identifier)}}
                                                               }
                                                           """);
         }

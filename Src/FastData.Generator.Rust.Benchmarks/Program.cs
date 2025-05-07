@@ -29,10 +29,10 @@ internal static class Program
 
                       """);
 
-        foreach ((StructureType type, object[] data) in TestVectorHelper.GetBenchmarkVectors())
+        foreach (ITestData data in TestVectorHelper.GetBenchmarkVectors())
         {
-            if (!TestVectorHelper.TryGenerate(id => new RustCodeGenerator(new RustCodeGeneratorConfig(id)), type, data, out GeneratorSpec spec))
-                throw new InvalidOperationException("Unable to build " + type);
+            if (!TestVectorHelper.TryGenerate(id => new RustCodeGenerator(new RustCodeGeneratorConfig(id)), data, out GeneratorSpec spec))
+                throw new InvalidOperationException("Unable to build " + data.StructureType);
 
             TestHelper.TryWriteFile(Path.Combine(benchPath, spec.Identifier + ".rs"),
                 $$"""
@@ -45,7 +45,7 @@ internal static class Program
                   fn bench_contains(c: &mut Criterion) {
                       c.bench_function("Rust_{{spec.Identifier}}", |b| {
                           b.iter(|| {
-                  {{PrintQueries(data, spec.Identifier)}}
+                  {{PrintQueries(data.Items, spec.Identifier)}}
                           });
                       });
                   }
