@@ -36,7 +36,7 @@ internal static class PerfectHashHelper
             TryAgain: ;
         }
 
-        return seed;
+        return seed == maxAttempts ? 0 : seed;
     }
 
     private sealed class SwitchArray(uint capacity)

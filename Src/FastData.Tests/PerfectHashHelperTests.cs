@@ -10,20 +10,22 @@ public class PerfectHashHelperTests
     public PerfectHashHelperTests()
     {
         string[] words = ["Area", "Army", "Baby", "Back", "Ball", "Band", "Bank", "Base", "Bill", "Body"];
-        _hashCodes = words.Select(x => (uint)x.GetHashCode()).ToArray();
+        _hashCodes = words.Select(x => unchecked((uint)x.GetHashCode())).ToArray();
     }
 
     [Fact]
     public void MinimalPerfectHashTest()
     {
-        uint seed = Generate(_hashCodes, static (obj, seed) => Mixers.Murmur_32(obj ^ seed), 1);
+        uint seed = Generate(_hashCodes, static (obj, seed) => Mixers.Murmur_32(obj ^ seed), 100_000);
+        Assert.NotEqual(0u, seed);
         Assert.True(Validate(_hashCodes, seed, static (obj, seed) => Mixers.Murmur_32(obj ^ seed), out byte[] _));
     }
 
     [Fact]
     public void PerfectHashTest()
     {
-        uint seed = Generate(_hashCodes, static (obj, seed) => Mixers.Murmur_32(obj ^ seed), length: 64);
+        uint seed = Generate(_hashCodes, static (obj, seed) => Mixers.Murmur_32(obj ^ seed), 100_000, 64);
+        Assert.NotEqual(0u, seed);
         Assert.True(Validate(_hashCodes, seed, static (obj, seed) => Mixers.Murmur_32(obj ^ seed), out byte[] _, 64));
     }
 }
