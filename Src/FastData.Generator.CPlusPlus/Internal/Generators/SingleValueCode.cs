@@ -15,7 +15,7 @@ internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx) : OutputWrit
               {{GetMethodAttributes()}}
               {{GetMethodModifier()}}constexpr bool contains(const {{GetTypeName()}} value) noexcept
               {
-                  return value == {{ToValueLabel(ctx.Item)}};
+                  return {{GetEqualFunction("value", ToValueLabel(ctx.Item))}};
               }
           """;
 }

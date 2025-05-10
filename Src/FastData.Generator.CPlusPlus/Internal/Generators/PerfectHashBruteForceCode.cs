@@ -40,7 +40,7 @@ internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<
                   const size_t index = {{GetModFunction("hash", ctx.Data.Length)}};
                   const e& entry = entries[index];
 
-                  return hash == entry.hash_code && value == entry.value;
+                  return {{GetEqualFunction("hash", "entry.hash_code")}} && {{GetEqualFunction("value", "entry.value")}};
               }
           """;
 }

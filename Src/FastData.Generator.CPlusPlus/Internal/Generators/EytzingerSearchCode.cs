@@ -19,7 +19,7 @@ internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx) : Ou
                   size_t i = 0;
                   while (i < entries.size())
                   {
-                      if (entries[i] == value)
+                      if ({{GetEqualFunction("entries[i]", "value")}})
                           return true;
 
                       if (entries[i] < value)

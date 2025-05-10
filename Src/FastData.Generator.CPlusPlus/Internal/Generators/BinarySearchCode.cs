@@ -23,7 +23,7 @@ internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : OutputWr
                   {
                       const size_t mid = lo + ((hi - lo) >> 1);
 
-                      if (entries[mid] == value)
+                      if ({{GetEqualFunction("entries[mid]", "value")}})
                           return true;
 
                       if (entries[mid] < value)

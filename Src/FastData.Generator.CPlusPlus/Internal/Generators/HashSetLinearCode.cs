@@ -43,7 +43,7 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx) : CPlusP
 
                   while (index <= end_index)
                   {
-                      if (hash_codes[index] == hash && items[index] == value)
+                      if ({{GetEqualFunction("hash_codes[index]", "hash")}} && {{GetEqualFunction("items[index]", "value")}})
                           return true;
 
                       index++;

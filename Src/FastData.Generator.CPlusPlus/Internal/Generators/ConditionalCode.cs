@@ -12,7 +12,7 @@ internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx) : OutputWrit
               {
           {{GetEarlyExits()}}
 
-                  if ({{FormatList(ctx.Data, x => $"value == {ToValueLabel(x)}", " || ")}})
+                  if ({{FormatList(ctx.Data, x => $"{GetEqualFunction("value",ToValueLabel(x))}", " || ")}})
                       return true;
 
                   return false;

@@ -41,7 +41,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlu
                   {
                       const auto& [hash_code, next, value1] = entries[i];
 
-                      if (hash_code == hash && value1 == value)
+                      if ({{GetEqualFunction("hash_code", "hash")}} && {{GetEqualFunction("value1", "value")}})
                           return true;
 
                       i = next;

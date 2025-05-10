@@ -22,7 +22,7 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx) : OutputWriter<T>
                      {
                  {{GetEarlyExits()}}
 
-                         return value == entries[value.length() - {{ctx.MinLength.ToStringInvariant()}}];
+                         return {{GetEqualFunction("value", $"entries[value.length() - {ctx.MinLength.ToStringInvariant()}]")}};
                      }
                  """;
     }
@@ -48,7 +48,7 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx) : OutputWriter<T>
 
                          foreach ({{GetTypeName()}} str in bucket)
                          {
-                             if (str == value)
+                             if ({{GetEqualFunction("str", "value")}})
                                  return true;
                          }
 

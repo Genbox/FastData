@@ -29,7 +29,7 @@ internal sealed class PerfectHashGPerfCode<T>(PerfectHashGPerfContext ctx, Gener
                          if (hash > {{ctx.MaxHash.ToStringInvariant()}})
                              return false;
 
-                         return items[hash] == value;
+                         return {{GetEqualFunction("items[hash]", "value")}};
                      }
 
                      {{GetMethodModifier()}}uint32_t get_hash(const {{GetTypeName()}} str)
