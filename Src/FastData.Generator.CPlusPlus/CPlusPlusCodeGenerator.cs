@@ -6,16 +6,11 @@ using Genbox.FastData.Generator.Framework.Interfaces.Specs;
 
 namespace Genbox.FastData.Generator.CPlusPlus;
 
-public class CPlusPlusCodeGenerator : CodeGenerator
+public sealed class CPlusPlusCodeGenerator : CodeGenerator
 {
     private readonly CPlusPlusCodeGeneratorConfig _userCfg;
 
-    private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig userCfg,
-                                   ILanguageSpec langSpec,
-                                   ICodeSpec codeSpec,
-                                   IConstantsSpec constants,
-                                   IEarlyExitHandler earlyExitHandler,
-                                   IHashHandler hashHandler) : base(langSpec, codeSpec, constants, earlyExitHandler, hashHandler)
+    private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig userCfg, ILanguageSpec langSpec, ICodeSpec codeSpec, IConstantsSpec constants, IEarlyExitHandler earlyExitHandler, IHashHandler hashHandler) : base(langSpec, codeSpec, constants, earlyExitHandler, hashHandler)
     {
         _userCfg = userCfg;
     }

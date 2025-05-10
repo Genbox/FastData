@@ -8,7 +8,6 @@ internal class CPlusPlusLanguageSpec : ILanguageSpec
 {
     public bool UseUTF16Encoding => false;
     public string CommentChar => "//";
-    public string AssignmentChar => "=";
     public string ArraySizeType => "size_t";
 
     public IList<ITypeSpec> Primitives => new List<ITypeSpec>

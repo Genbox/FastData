@@ -7,7 +7,6 @@ namespace Genbox.FastData.Generator.Framework;
 public class CodeHelper(ILanguageSpec spec, TypeMap typeMap)
 {
     public virtual void Comment(StringBuilder sb, string value) => sb.Append(spec.CommentChar).Append(' ').AppendLine(value);
-    public virtual void Assign(StringBuilder sb, string left, string right) => sb.Append(left).Append(spec.AssignmentChar).Append(right);
 
     public string ToValueLabel<T>(T? value)
     {
