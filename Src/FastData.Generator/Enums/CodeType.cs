@@ -1,4 +1,4 @@
-namespace Genbox.FastData.Generator;
+namespace Genbox.FastData.Generator.Enums;
 
 public enum CodeType
 {
