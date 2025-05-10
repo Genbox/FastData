@@ -73,7 +73,6 @@ internal class DataProperties
                 floatProps = DataAnalyzer.GetDoubleProperties(doubleArr);
                 break;
             case bool[]:
-            case DataType.Unknown:
                 //Do nothing
                 break;
             default:

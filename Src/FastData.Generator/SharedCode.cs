@@ -1,4 +1,5 @@
 // ReSharper disable CanSimplifyDictionaryLookupWithTryAdd
+
 namespace Genbox.FastData.Generator;
 
 public sealed class SharedCode
