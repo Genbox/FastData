@@ -17,7 +17,7 @@ internal sealed class PerfectHashBruteForceStructure<T> : IHashStructure<T>
             hashCodes[i] = hashFunc(data[i]);
 
         //Find the proper seeds
-        uint seed = PerfectHashHelper.Generate(hashCodes, static (hash, seed) => Murmur_32(hash) ^ seed, 10_000_000);
+        uint seed = PerfectHashHelper.Generate(hashCodes, static (hash, seed) => Murmur_32(hash ^ seed), 10_000_000);
 
         // If we have 0 seeds, it means either there is no solution, or we hit the exit condition
         if (seed == 0)
