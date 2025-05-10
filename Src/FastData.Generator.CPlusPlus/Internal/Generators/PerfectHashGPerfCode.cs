@@ -1,27 +1,28 @@
 using Genbox.FastData.Generator.Extensions;
+using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, PerfectHashGPerfContext ctx) : IOutputWriter
+internal sealed class PerfectHashGPerfCode<T>(PerfectHashGPerfContext ctx, GeneratorConfig<T> genCfg) : OutputWriter<T>
 {
-    public string Generate()
+    public override string Generate()
     {
         string?[] items = WrapWords(ctx.Items).ToArray();
 
         return $$"""
-                     {{cfg.GetFieldModifier()}}std::array<{{GetSmallestUnsignedType(ctx.MaxHash + 1)}}, {{ctx.AssociationValues.Length}}> asso = {
+                     {{GetFieldModifier()}}std::array<{{GetSmallestUnsignedType(ctx.MaxHash + 1)}}, {{ctx.AssociationValues.Length}}> asso = {
                  {{FormatColumns(ctx.AssociationValues, static x => x.ToStringInvariant())}}
                      };
 
-                     {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{items.Length}}> items = {
+                     {{GetFieldModifier()}}std::array<{{GetTypeName()}}, {{items.Length}}> items = {
                  {{FormatColumns(items, ToValueLabel)}}
                      };
 
                  public:
-                     [[nodiscard]]
-                     {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
+                     {{GetMethodAttributes()}}
+                     {{GetMethodModifier()}}bool contains(const {{GetTypeName()}} value) noexcept
                      {
-                 {{cfg.GetEarlyExits(genCfg)}}
+                 {{GetEarlyExits()}}
 
                          const uint32_t hash = get_hash(value);
 
@@ -31,7 +32,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusCode
                          return items[hash] == value;
                      }
 
-                     {{cfg.GetMethodModifier()}}uint32_t get_hash(const {{genCfg.GetTypeName()}} str)
+                     {{GetMethodModifier()}}uint32_t get_hash(const {{GetTypeName()}} str)
                      {
                  {{RenderHashFunction()}}
                      }
@@ -45,7 +46,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CPlusPlusCode
         //IQ: We also assume that positions are listed in descending order
 
         //We need to know the shortest string
-        uint minLen = (uint)genCfg.Constants.MinValue;
+        uint minLen = genCfg.Constants.MinStringLength;
 
         //We start with the highest position.
         int key = ctx.Positions[0];

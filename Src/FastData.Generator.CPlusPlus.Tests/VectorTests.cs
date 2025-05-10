@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
-using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.CPlusPlus.Shared;
+using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.InternalShared;
-using static Genbox.FastData.Generator.CPlusPlus.Internal.Helpers.CodeHelper;
 using static Genbox.FastData.Generator.Helpers.FormatHelper;
 using static Genbox.FastData.InternalShared.TestHelper;
 
@@ -12,9 +12,13 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
 {
     [Theory]
     [ClassData(typeof(TestVectorClass))]
-    public void Test(ITestData data)
+    public void Test<T>(TestData<T> data)
     {
-        Assert.True(TestVectorHelper.TryGenerate(id => new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
+        Assert.True(TestVectorHelper.TryGenerate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
+        Assert.NotEmpty(spec.Source);
+
+        CPlusPlusLanguageSpec langSpec = new CPlusPlusLanguageSpec();
+        CodeHelper helper = new CodeHelper(langSpec, new TypeMap(langSpec.Primitives));
 
         string executable = context.Compiler.Compile(spec.Identifier,
             $$"""
@@ -25,10 +29,10 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
 
               int main(int argc, char* argv[])
               {
-              {{FormatList(data.Items, x => $"""
-                                             if (!{spec.Identifier}::contains({ToValueLabel(x)}))
-                                                 return false;
-                                             """, "\n")}}
+              {{FormatList(data.Values, x => $"""
+                                              if (!{spec.Identifier}::contains({helper.ToValueLabel(x)}))
+                                                  return false;
+                                              """, "\n")}}
 
                   return 1;
               }

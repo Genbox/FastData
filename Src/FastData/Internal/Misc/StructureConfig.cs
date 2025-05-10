@@ -2,9 +2,9 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Misc;
 
-internal sealed class StructureConfig(DataProperties dataProperties, StringComparison comparison = StringComparison.Ordinal)
+internal sealed class StructureConfig<T>(DataProperties<T> dataProperties, StringComparison comparison = StringComparison.Ordinal)
 {
-    public DataProperties DataProperties { get; } = dataProperties;
+    public DataProperties<T> DataProperties { get; } = dataProperties;
 
     internal StringComparer GetStringComparer() => comparison switch
     {

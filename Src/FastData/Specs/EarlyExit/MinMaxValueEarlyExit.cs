@@ -2,4 +2,4 @@ using Genbox.FastData.Abstracts;
 
 namespace Genbox.FastData.Specs.EarlyExit;
 
-public record MinMaxValueEarlyExit(object MinValue, object MaxValue) : IEarlyExit;
+public record MinMaxValueEarlyExit<T>(T MinValue, T MaxValue) : IEarlyExit;

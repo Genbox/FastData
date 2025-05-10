@@ -11,7 +11,7 @@ public class RustCodeGenerator(RustCodeGeneratorConfig userCfg) : ICodeGenerator
 
     public bool UseUTF16Encoding => false;
 
-    public bool TryGenerate<T>(GeneratorConfig genCfg, IContext context, out string? source)
+    public bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
     {
         _sb.Clear();
         _shared.Clear();
@@ -26,10 +26,10 @@ public class RustCodeGenerator(RustCodeGeneratorConfig userCfg) : ICodeGenerator
             ConditionalContext<T> c2 => new ConditionalCode<T>(genCfg, userCfg, c2).Generate(),
             EytzingerSearchContext<T> c2 => new EytzingerSearchCode<T>(genCfg, userCfg, c2).Generate(),
             PerfectHashBruteForceContext<T> c2 => new PerfectHashBruteForceCode<T>(genCfg, userCfg, c2, _shared).Generate(),
-            PerfectHashGPerfContext c2 => new PerfectHashGPerfCode(genCfg, userCfg, c2).Generate(),
+            PerfectHashGPerfContext c2 => new PerfectHashGPerfCode<T>(genCfg, userCfg, c2).Generate(),
             HashSetChainContext<T> c2 => new HashSetChainCode<T>(genCfg, userCfg, c2, _shared).Generate(),
             HashSetLinearContext<T> c2 => new HashSetLinearCode<T>(genCfg, userCfg, c2, _shared).Generate(),
-            KeyLengthContext c2 => new KeyLengthCode(genCfg, userCfg, c2).Generate(),
+            KeyLengthContext c2 => new KeyLengthCode<T>(genCfg, userCfg, c2).Generate(),
             _ => throw new NotSupportedException("The context type is not supported: " + context.GetType().Name)
         });
 
@@ -46,7 +46,7 @@ public class RustCodeGenerator(RustCodeGeneratorConfig userCfg) : ICodeGenerator
         return true;
     }
 
-    private void AppendHeader(GeneratorConfig genCfg)
+    private void AppendHeader<T>(GeneratorConfig<T> genCfg)
     {
         _sb.AppendLine("//! This file is auto-generated. Do not edit manually.");
         _sb.Append("//! Structure: ").AppendLine(genCfg.StructureType.ToString());
@@ -70,7 +70,7 @@ public class RustCodeGenerator(RustCodeGeneratorConfig userCfg) : ICodeGenerator
                      """);
     }
 
-    private void AppendFooter(GeneratorConfig genCfg)
+    private void AppendFooter<T>(GeneratorConfig<T> genCfg)
     {
         _sb.Append($"""
 
@@ -87,8 +87,8 @@ public class RustCodeGenerator(RustCodeGeneratorConfig userCfg) : ICodeGenerator
         }
         else if (genCfg.DataType == DataType.String)
         {
-            _sb.Append("    pub const MIN_LENGTH: usize = ").Append(genCfg.Constants.MinValue).AppendLine(";");
-            _sb.Append("    pub const MAX_LENGTH: usize = ").Append(genCfg.Constants.MaxValue).AppendLine(";");
+            _sb.Append("    pub const MIN_LENGTH: usize = ").Append(genCfg.Constants.MinStringLength).AppendLine(";");
+            _sb.Append("    pub const MAX_LENGTH: usize = ").Append(genCfg.Constants.MaxStringLength).AppendLine(";");
         }
 
         _sb.Append('}');

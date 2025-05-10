@@ -4,6 +4,7 @@
 #include <array>
 #include <cstdint>
 #include <limits>
+#include <string_view>
 
 class my_data final
 {
@@ -14,13 +15,12 @@ public:
         if (value < std::numeric_limits<int32_t>::lowest() || value > std::numeric_limits<int32_t>::max())
             return false;
 
-        if (value == std::numeric_limits<int32_t>::lowest() || value == 0ll || value == std::numeric_limits<int32_t>::max())
+        if (value == std::numeric_limits<int32_t>::lowest() || value == 0 || value == std::numeric_limits<int32_t>::max())
             return true;
 
         return false;
     }
-
-    static constexpr unsigned int item_count = 3;
+    static constexpr size_t item_count = 3;
     static constexpr int32_t min_value = std::numeric_limits<int32_t>::lowest();
     static constexpr int32_t max_value = std::numeric_limits<int32_t>::max();
 

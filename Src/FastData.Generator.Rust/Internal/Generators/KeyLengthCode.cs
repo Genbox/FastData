@@ -3,7 +3,7 @@ using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class KeyLengthCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, KeyLengthContext ctx) : IOutputWriter
+internal sealed class KeyLengthCode<T>(GeneratorConfig<T> genCfg, RustCodeGeneratorConfig cfg, KeyLengthContext ctx) : IOutputWriter
 {
     public string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
 
@@ -67,7 +67,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, RustCodeGeneratorCon
         if (exit1 != null)
             return RustGeneratorConfigExtensions.GetLengthEarlyExits(exit1.MinValue, exit1.MaxValue);
 
-        MinMaxValueEarlyExit? exit2 = (MinMaxValueEarlyExit?)Array.Find(exits, x => x is MinMaxValueEarlyExit);
+        MinMaxValueEarlyExit<T>? exit2 = (MinMaxValueEarlyExit<T>?)Array.Find(exits, x => x is MinMaxValueEarlyExit<T>);
         if (exit2 != null)
             return RustGeneratorConfigExtensions.GetValueEarlyExits(exit2.MinValue, exit2.MaxValue, genCfg.DataType);
 

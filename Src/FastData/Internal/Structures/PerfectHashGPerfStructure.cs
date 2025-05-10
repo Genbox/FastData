@@ -33,7 +33,7 @@ namespace Genbox.FastData.Internal.Structures;
 //TODO: Convert to a IHashStructure
 
 [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
-internal sealed class PerfectHashGPerfStructure<T>(StructureConfig config) : IStructure<T>
+internal sealed class PerfectHashGPerfStructure<T>(StructureConfig<T> config) : IStructure<T>
 {
     public bool TryCreate(T[] data, out IContext? context)
     {

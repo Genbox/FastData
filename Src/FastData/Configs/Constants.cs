@@ -1,8 +1,12 @@
 namespace Genbox.FastData.Configs;
 
-public class Constants(uint itemCount)
+public class Constants<T>(uint itemCount)
 {
     public uint ItemCount { get; set; } = itemCount;
-    public object MinValue { get; set; } // When DataType is string, this contains the length of the shortest string
-    public object MaxValue { get; set; } // When DataType is string, this contains the length of the longest string
+
+    public T MinValue { get; set; }
+    public T MaxValue { get; set; }
+
+    public uint MinStringLength { get; set; }
+    public uint MaxStringLength { get; set; }
 }

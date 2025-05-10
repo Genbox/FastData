@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
 using System.Text;
-using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.CPlusPlus.Shared;
+using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.InternalShared;
-using static Genbox.FastData.Generator.CPlusPlus.Internal.Helpers.CodeHelper;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Benchmarks;
 
@@ -23,8 +23,7 @@ internal static class Program
 
         foreach (ITestData data in TestVectorHelper.GetBenchmarkVectors())
         {
-            if (!TestVectorHelper.TryGenerate(id => new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig(id)), data, out GeneratorSpec spec))
-                throw new InvalidOperationException("Unable to build " + data.StructureType);
+            data.Generate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), out GeneratorSpec spec);
 
             sb.AppendLine(CultureInfo.InvariantCulture,
                 $$"""
@@ -34,7 +33,7 @@ internal static class Program
                   {
                       for (auto _ : state)
                       {
-                  {{PrintQueries(data.Items, spec.Identifier)}}
+                  {{PrintQueries(data, spec.Identifier)}}
                       }
                   }
 
@@ -48,13 +47,15 @@ internal static class Program
         BenchmarkHelper.RunBenchmark(executable, "--benchmark_format=json", rootDir, "--adapter cpp_google --testbed CPlusPlus");
     }
 
-    private static string PrintQueries(object[] data, string identifier)
+    private static string PrintQueries(ITestData data, string identifier)
     {
-        Random rng = new Random(42);
+        CPlusPlusLanguageSpec langSpec = new CPlusPlusLanguageSpec();
+        CodeHelper helper = new CodeHelper(langSpec, new TypeMap(langSpec.Primitives));
+
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < 25; i++)
-            sb.AppendLine(CultureInfo.InvariantCulture, $"        DoNotOptimize({identifier}::contains({ToValueLabel(data[rng.Next(0, data.Length)])}));");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"        DoNotOptimize({identifier}::contains({data.GetValueLabel(helper)}));");
 
         return sb.ToString();
     }

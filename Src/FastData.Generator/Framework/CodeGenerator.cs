@@ -12,15 +12,15 @@ public abstract class CodeGenerator : ICodeGenerator
 {
     private readonly TypeMap _typeMap;
     private readonly CodeHelper _helper;
+    private readonly ILanguageSpec _langSpec;
     private readonly ICodeSpec _codeSpec;
     private readonly IConstantsSpec _constants;
     private readonly IEarlyExitHandler _earlyExitHandler;
     private readonly IHashHandler _hashHandler;
 
-    private readonly string _arrayType;
-
     protected CodeGenerator(ILanguageSpec langSpec, ICodeSpec codeSpec, IConstantsSpec constants, IEarlyExitHandler earlyExitHandler, IHashHandler hashHandler)
     {
+        _langSpec = langSpec;
         _codeSpec = codeSpec;
         _constants = constants;
         _earlyExitHandler = earlyExitHandler;
@@ -28,28 +28,26 @@ public abstract class CodeGenerator : ICodeGenerator
 
         _typeMap = new TypeMap(langSpec.Primitives);
         _helper = new CodeHelper(langSpec, _typeMap);
-
-        _arrayType = _typeMap.GetArraySizeType().Name;
     }
 
-    public bool UseUTF16Encoding => false;
+    public bool UseUTF16Encoding => _langSpec.UseUTF16Encoding;
 
-    public virtual bool TryGenerate<T>(GeneratorConfig genCfg, IContext context, out string? source)
+    public virtual bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
     {
-        string typeName = _typeMap.GetRequired<T>().Name;
+        string typeName = _typeMap.Get<T>().Name;
 
         StringBuilder sb = new StringBuilder();
         AppendHeader(sb, genCfg);
-        AppendBody<T>(sb, genCfg, typeName, context);
+        AppendBody(sb, genCfg, typeName, context);
         AppendFooter(sb, genCfg, typeName);
 
         source = sb.ToString();
         return true;
     }
 
-    protected abstract OutputWriter? GetOutputWriter<T>(GeneratorConfig genCfg, IContext context);
+    protected abstract OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext context);
 
-    protected virtual void AppendHeader(StringBuilder sb, GeneratorConfig genCfg)
+    protected virtual void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg)
     {
         _helper.Comment(sb, "This file is auto-generated. Do not edit manually.");
         _helper.Comment(sb, "Structure: " + genCfg.StructureType);
@@ -60,30 +58,30 @@ public abstract class CodeGenerator : ICodeGenerator
 #endif
     }
 
-    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig genCfg, string typeName, IContext context)
+    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext context)
     {
-        OutputWriter? writer = GetOutputWriter<T>(genCfg, context);
+        OutputWriter<T>? writer = GetOutputWriter(genCfg, context);
 
         if (writer == null)
             throw new NotSupportedException("The context type is not supported: " + context.GetType().Name);
 
-        writer.Initialize(_codeSpec, _typeMap, _earlyExitHandler, _helper, _hashHandler, genCfg, typeName);
-        sb.Append(writer.Generate());
+        writer.Initialize(_codeSpec, _langSpec, _earlyExitHandler, _helper, _hashHandler, genCfg, typeName);
+        sb.AppendLine(writer.Generate());
     }
 
-    protected virtual void AppendFooter(StringBuilder sb, GeneratorConfig genCfg, string typeName)
+    protected virtual void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)
     {
-        sb.Append($"    {_codeSpec.GetFieldModifier()} {_arrayType} {_constants.ItemName} = {genCfg.Constants.ItemCount};");
+        sb.AppendLine($"    {_codeSpec.GetFieldModifier()}{_langSpec.ArraySizeType} {_constants.ItemName} = {genCfg.Constants.ItemCount};");
 
         if (genCfg.DataType.IsInteger())
         {
-            sb.Append($"    {_codeSpec.GetFieldModifier()} {typeName} {_constants.MinValueName} = {_helper.ToValueLabel(genCfg.Constants.MinValue, genCfg.DataType)};");
-            sb.Append($"    {_codeSpec.GetFieldModifier()} {typeName} {_constants.MaxValueName} = {_helper.ToValueLabel(genCfg.Constants.MaxValue, genCfg.DataType)};");
+            sb.AppendLine($"    {_codeSpec.GetFieldModifier()}{typeName} {_constants.MinValueName} = {_helper.ToValueLabel(genCfg.Constants.MinValue)};");
+            sb.AppendLine($"    {_codeSpec.GetFieldModifier()}{typeName} {_constants.MaxValueName} = {_helper.ToValueLabel(genCfg.Constants.MaxValue)};");
         }
         else if (genCfg.DataType == DataType.String)
         {
-            sb.Append($"    {_codeSpec.GetFieldModifier()} {_arrayType} {_constants.MinLengthName} = {genCfg.Constants.MinValue};");
-            sb.Append($"    {_codeSpec.GetFieldModifier()} {_arrayType} {_constants.MaxLengthName} = {genCfg.Constants.MaxValue};");
+            sb.AppendLine($"    {_codeSpec.GetFieldModifier()}{_langSpec.ArraySizeType} {_constants.MinLengthName} = {genCfg.Constants.MinStringLength};");
+            sb.AppendLine($"    {_codeSpec.GetFieldModifier()}{_langSpec.ArraySizeType} {_constants.MaxLengthName} = {genCfg.Constants.MaxStringLength};");
         }
     }
 }

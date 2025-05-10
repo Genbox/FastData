@@ -4,6 +4,7 @@
 #include <array>
 #include <cstdint>
 #include <limits>
+#include <string_view>
 
 class my_data final
 {
@@ -13,8 +14,7 @@ public:
     {
         return value == std::numeric_limits<double>::lowest();
     }
-
-    static constexpr unsigned int item_count = 1;
+    static constexpr size_t item_count = 1;
     static constexpr double min_value = std::numeric_limits<double>::lowest();
     static constexpr double max_value = std::numeric_limits<double>::lowest();
 

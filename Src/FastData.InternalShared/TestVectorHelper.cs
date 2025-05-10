@@ -7,29 +7,11 @@ namespace Genbox.FastData.InternalShared;
 
 public static class TestVectorHelper
 {
-    public static bool TryGenerate(Func<string, ICodeGenerator> gen, ITestData data, out GeneratorSpec spec) => data switch
+    public static bool TryGenerate<T>(Func<string, ICodeGenerator> gen, TestData<T> data, out GeneratorSpec spec)
     {
-        TestData<string> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<bool> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<char> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<sbyte> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<byte> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<short> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<ushort> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<int> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<uint> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<long> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<ulong> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<float> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        TestData<double> x => Run(data.StructureType, x.Values, data.Identifier, gen, out spec),
-        _ => throw new NotSupportedException("Unsupported data type: " + data.Type)
-    };
-
-    private static bool Run<T>(StructureType type, T[] data, string identifier, Func<string, ICodeGenerator> gen, out GeneratorSpec spec)
-    {
-        if (FastDataGenerator.TryGenerate(data, new FastDataConfig(type), gen(identifier), out string? source))
+        if (FastDataGenerator.TryGenerate(data.Values, new FastDataConfig(data.StructureType), gen(data.Identifier), out string? source))
         {
-            spec = new GeneratorSpec(identifier, source!);
+            spec = new GeneratorSpec(data.Identifier, source!);
             return true;
         }
 

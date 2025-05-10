@@ -6,4 +6,5 @@ public interface ILanguageSpec
     string CommentChar { get; }
     string AssignmentChar { get; }
     IList<ITypeSpec> Primitives { get; }
+    string ArraySizeType { get; }
 }

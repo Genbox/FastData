@@ -6,7 +6,7 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class KeyLengthStructure<T>(StructureConfig config) : IStructure<T>
+internal sealed class KeyLengthStructure<T>(StructureConfig<T> config) : IStructure<T>
 {
     public bool TryCreate(T[] data, out IContext? context)
     {

@@ -34,7 +34,7 @@ internal static class GPerfTest
 
             string[] data = File.ReadAllLines(file);
 
-            StructureConfig cfg = new StructureConfig(DataProperties.Create(data));
+            StructureConfig<string> cfg = new StructureConfig<string>(DataProperties<string>.Create(data));
             PerfectHashGPerfStructure<string> code = new PerfectHashGPerfStructure<string>(cfg);
 
             try

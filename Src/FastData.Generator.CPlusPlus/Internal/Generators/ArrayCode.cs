@@ -1,24 +1,25 @@
 using Genbox.FastData.Generator.Extensions;
+using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class ArrayCode<T>(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, ArrayContext<T> ctx) : IOutputWriter
+internal sealed class ArrayCode<T>(ArrayContext<T> ctx) : OutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> entries = {
+              {{GetFieldModifier()}}std::array<{{GetTypeName()}}, {{ctx.Data.Length}}> entries = {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
           public:
-              [[nodiscard]]
-              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool contains(const {{GetTypeName()}} value) noexcept
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
 
-                  for (size_t i = 0; i < {{ctx.Data.Length.ToStringInvariant()}}; i++)
+                  for ({{GetArraySizeType()}} i = 0; i < {{ctx.Data.Length.ToStringInvariant()}}; i++)
                   {
-                      if (entries[i] == value)
+                      if ({{GetEqualFunction("entries[i]", "value")}})
                          return true;
                   }
                   return false;

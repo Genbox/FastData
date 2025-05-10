@@ -1,33 +1,30 @@
+using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.Framework;
 using Xunit.Abstractions;
 
 namespace Genbox.FastData.InternalShared;
 
-public class TestData<T> : ITestData, IXunitSerializable
+public class TestData<T>(StructureType structureType, T[] values) : ITestData, IXunitSerializable
 {
-    public TestData(StructureType structureType, T[] values)
-    {
-        StructureType = structureType;
-        Values = values;
-    }
+    private readonly Random _rng = new Random(42);
+    private readonly DataType _dataType = Enum.Parse<DataType>(typeof(T).Name);
 
-    public Type Type => typeof(T);
-    public int Length => Values.Length;
-    public object[] Items => Values.Cast<object>().ToArray();
+    public T[] Values { get; private set; } = values;
+    public StructureType StructureType { get; private set; } = structureType;
 
-    public string Identifier
-    {
-        get
-        {
-            DataType dataType = Enum.Parse<DataType>(Type.Name);
-            return $"{StructureType}_{dataType}_{Length}";
-        }
-    }
-
-    public StructureType StructureType { get; set; }
-    public T[] Values { get; set; }
+    public string Identifier => $"{StructureType}_{_dataType}_{Values.Length}";
 
     public override string ToString() => Identifier;
+
+    public void Generate(Func<string, ICodeGenerator> factory, out GeneratorSpec spec)
+    {
+        if (!TestVectorHelper.TryGenerate(factory, this, out spec))
+            throw new InvalidOperationException("Unable to build " + Identifier);
+    }
+
+    public string GetValueLabel(CodeHelper helper) => helper.ToValueLabel(Values[_rng.Next(0, Values.Length)]);
+    public string GetValueLabel(Func<object?, DataType, string> func) => func(Values[_rng.Next(0, Values.Length)], _dataType);
 
     public void Serialize(IXunitSerializationInfo info)
     {

@@ -1,35 +1,18 @@
 using Genbox.FastData.Extensions;
+using Genbox.FastData.Generator.Framework.Interfaces;
 
-namespace Genbox.FastData.Generator.CPlusPlus.Internal.Extensions;
+namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
-internal static class GeneratorConfigExtensions
+internal class CPlusPlusHashHandler : IHashHandler
 {
-    internal static string GetTypeName(this GeneratorConfig config) => config.DataType switch
+    public string GetHashSource(DataType dataType, string typeName)
     {
-        DataType.String => "std::string_view",
-        DataType.Boolean => "bool",
-        DataType.SByte => "int8_t",
-        DataType.Byte => "uint8_t",
-        DataType.Char => "char",
-        DataType.Int16 => "int16_t",
-        DataType.UInt16 => "uint16_t",
-        DataType.Int32 => "int32_t",
-        DataType.UInt32 => "uint32_t",
-        DataType.Int64 => "int64_t",
-        DataType.UInt64 => "uint64_t",
-        DataType.Single => "float",
-        DataType.Double => "double",
-        _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
-    };
-
-    internal static string GetHashSource(this GeneratorConfig config)
-    {
-        bool norConst = config.DataType is DataType.Single or DataType.Double or DataType.Int64 or DataType.UInt64;
+        bool norConst = dataType is DataType.Single or DataType.Double or DataType.Int64 or DataType.UInt64;
 
         return $$"""
-                     static{{(norConst ? " " : " constexpr ")}}uint32_t get_hash(const {{config.GetTypeName()}} value) noexcept
+                     static{{(norConst ? " " : " constexpr ")}}uint32_t get_hash(const {{typeName}} value) noexcept
                      {
-                 {{GetHash(config.DataType)}}
+                 {{GetHash(dataType)}}
                      }
                  """;
     }

@@ -49,7 +49,7 @@ internal static class CodeHelper
     {
         DataType.String => $"\"{value}\"",
         DataType.Char => $"'{value}'",
-        DataType.Single => (double)value == float.MaxValue ? "f32::MAX" : (double)value == float.MinValue ? "f32::MIN" : ((double)value).ToString("0.0", NumberFormatInfo.InvariantInfo),
+        DataType.Single => (float)value == float.MaxValue ? "f32::MAX" : (float)value == float.MinValue ? "f32::MIN" : ((float)value).ToString("0.0", NumberFormatInfo.InvariantInfo),
         DataType.Double => (double)value == double.MaxValue ? "f64::MAX" : (double)value == double.MinValue ? "f64::MIN" : ((double)value).ToString("0.0", NumberFormatInfo.InvariantInfo),
         DataType.Boolean => ((bool)value).ToString().ToLowerInvariant(),
         _ => value.ToString()!

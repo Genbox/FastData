@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class PerfectHashBruteForceCode<T>(GeneratorConfig genCfg, CSharpCodeGeneratorConfig cfg, PerfectHashBruteForceContext<T> ctx) : IOutputWriter
+internal sealed class PerfectHashBruteForceCode<T>(GeneratorConfig<T> genCfg, CSharpCodeGeneratorConfig cfg, PerfectHashBruteForceContext<T> ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""

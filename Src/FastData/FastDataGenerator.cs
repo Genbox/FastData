@@ -25,8 +25,8 @@ public static class FastDataGenerator
                 throw new InvalidOperationException("Duplicate data found: " + val);
         }
 
-        DataProperties props = DataProperties.Create(data);
-        StructureConfig strCfg = new StructureConfig(props, fdCfg.StringComparison);
+        DataProperties<T> props = DataProperties<T>.Create(data);
+        StructureConfig<T> strCfg = new StructureConfig<T>(props, fdCfg.StringComparison);
 
         bool analysisEnabled = false;
 
@@ -68,11 +68,11 @@ public static class FastDataGenerator
         if (context == null)
             throw new InvalidOperationException("Unable to find a suitable data structure for the data. Please report this as a bug.");
 
-        GeneratorConfig genCfg = new GeneratorConfig(fdCfg.StructureType, fdCfg.StringComparison, props, spec);
+        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, fdCfg.StringComparison, props, spec);
         return generator.TryGenerate<T>(genCfg, context, out source);
     }
 
-    private static IEnumerable<object> GetDataStructureCandidates<T>(T[] data, FastDataConfig config, StructureConfig cfg)
+    private static IEnumerable<object> GetDataStructureCandidates<T>(T[] data, FastDataConfig config, StructureConfig<T> cfg)
     {
         StructureType ds = config.StructureType;
 
@@ -118,7 +118,7 @@ public static class FastDataGenerator
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
 
-    private static IHashSpec GetHashSpec(string[] data, DataProperties props)
+    private static IHashSpec GetHashSpec<T>(string[] data, DataProperties<T> props)
     {
         //Run each of the analyzers
         Simulator simulator = new Simulator(data, new SimulatorConfig());

@@ -1,11 +1,12 @@
+using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.InternalShared;
 
 public interface ITestData
 {
-    public Type Type { get; }
-    public StructureType StructureType { get; }
-    public object[] Items { get; }
-    string Identifier { get; }
+    void Generate(Func<string, ICodeGenerator> factory, out GeneratorSpec spec);
+    string GetValueLabel(CodeHelper helper);
+    string GetValueLabel(Func<object?, DataType, string> func);
 }

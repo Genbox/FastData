@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Rust.Shared;
 using Genbox.FastData.InternalShared;
 using static Genbox.FastData.Generator.Helpers.FormatHelper;
@@ -12,9 +11,10 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
 {
     [Theory]
     [ClassData(typeof(TestVectorClass))]
-    public void Test(ITestData data)
+    public void Test<T>(TestData<T> data)
     {
         Assert.True(TestVectorHelper.TryGenerate(id => new RustCodeGenerator(new RustCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
+        Assert.NotEmpty(spec.Source);
 
         string executable = context.Compiler.Compile(spec.Identifier,
             $$"""
@@ -22,11 +22,11 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
               {{spec.Source}}
 
               fn main() {
-              {{FormatList(data.Items, x => $$"""
-                                              if !{{spec.Identifier}}::contains({{ToValueLabel(x)}}) {
-                                                  std::process::exit(0);
-                                              }
-                                              """, "\n")}}
+              {{FormatList(data.Values, x => $$"""
+                                               if !{{spec.Identifier}}::contains({{ToValueLabel(x)}}) {
+                                                   std::process::exit(0);
+                                               }
+                                               """, "\n")}}
 
                   std::process::exit(1);
               }

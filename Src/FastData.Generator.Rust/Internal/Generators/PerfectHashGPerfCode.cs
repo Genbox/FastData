@@ -2,7 +2,7 @@ using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, PerfectHashGPerfContext ctx) : IOutputWriter
+internal sealed class PerfectHashGPerfCode<T>(GeneratorConfig<T> genCfg, RustCodeGeneratorConfig cfg, PerfectHashGPerfContext ctx) : IOutputWriter
 {
     public string Generate()
     {
@@ -38,7 +38,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, RustCodeGener
     private string RenderHashFunction()
     {
         //We need to know the shortest string
-        uint minLen = (uint)genCfg.Constants.MinValue;
+        uint minLen = genCfg.Constants.MinStringLength;
 
         //We start with the highest position.
         int key = ctx.Positions[0];

@@ -8,9 +8,9 @@ public class VectorTests
 {
     [Theory]
     [ClassData(typeof(TestVectorClass))]
-    public void Test(ITestData testData)
+    public void Test<T>(TestData<T> data)
     {
-        Assert.True(TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), testData, out GeneratorSpec spec));
+        Assert.True(TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
 
         string wrapper = $$"""
@@ -20,10 +20,10 @@ public class VectorTests
                            {
                                public static bool Contains()
                                {
-                           {{FormatList(testData.Items, x => $"""
-                                                    if (!{spec.Identifier}.Contains({ToValueLabel(x)}))
-                                                        return false;
-                                                    """, "\n")}};
+                           {{FormatList(data.Values, x => $"""
+                                                           if (!{spec.Identifier}.Contains({ToValueLabel(x)}))
+                                                               return false;
+                                                           """, "\n")}};
 
                                    return true;
                                }

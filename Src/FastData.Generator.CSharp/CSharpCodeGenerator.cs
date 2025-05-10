@@ -12,7 +12,7 @@ public class CSharpCodeGenerator(CSharpCodeGeneratorConfig userCfg) : ICodeGener
 
     public bool UseUTF16Encoding => true;
 
-    public bool TryGenerate<T>(GeneratorConfig genCfg, IContext context, out string? source)
+    public bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
     {
         _sb.Clear();
         _shared.Clear();
@@ -27,10 +27,10 @@ public class CSharpCodeGenerator(CSharpCodeGeneratorConfig userCfg) : ICodeGener
             ConditionalContext<T> c2 => new ConditionalCode<T>(genCfg, userCfg, c2).Generate(),
             EytzingerSearchContext<T> c2 => new EytzingerSearchCode<T>(genCfg, userCfg, c2).Generate(),
             PerfectHashBruteForceContext<T> c2 => new PerfectHashBruteForceCode<T>(genCfg, userCfg, c2).Generate(),
-            PerfectHashGPerfContext c2 => new PerfectHashGPerfCode(genCfg, userCfg, c2).Generate(),
+            PerfectHashGPerfContext c2 => new PerfectHashGPerfCode<T>(genCfg, userCfg, c2).Generate(),
             HashSetChainContext<T> c2 => new HashSetChainCode<T>(genCfg, userCfg, c2).Generate(),
             HashSetLinearContext<T> c2 => new HashSetLinearCode<T>(genCfg, userCfg, c2).Generate(),
-            KeyLengthContext c2 => new KeyLengthCode(genCfg, userCfg, c2).Generate(),
+            KeyLengthContext c2 => new KeyLengthCode<T>(genCfg, userCfg, c2).Generate(),
             _ => throw new NotSupportedException("The context type is not supported: " + context.GetType().Name)
         });
 
@@ -47,7 +47,7 @@ public class CSharpCodeGenerator(CSharpCodeGeneratorConfig userCfg) : ICodeGener
         return true;
     }
 
-    private void AppendHeader(GeneratorConfig genCfg)
+    private void AppendHeader<T>(GeneratorConfig<T> genCfg)
     {
         string cn = userCfg.ClassName;
         string? ns = userCfg.Namespace != null ? $"namespace {userCfg.Namespace};\n" : null;
@@ -105,7 +105,7 @@ public class CSharpCodeGenerator(CSharpCodeGeneratorConfig userCfg) : ICodeGener
                          """);
     }
 
-    private void AppendFooter(GeneratorConfig genCfg)
+    private void AppendFooter<T>(GeneratorConfig<T> genCfg)
     {
         _sb.Append($"""
 
@@ -129,8 +129,8 @@ public class CSharpCodeGenerator(CSharpCodeGeneratorConfig userCfg) : ICodeGener
         }
         else if (genCfg.DataType == DataType.String)
         {
-            _sb.Append("    public const int MinLength = ").Append(genCfg.Constants.MinValue).AppendLine(";");
-            _sb.Append("    public const int MaxLength = ").Append(genCfg.Constants.MaxValue).AppendLine(";");
+            _sb.Append("    public const int MinLength = ").Append(genCfg.Constants.MinStringLength).AppendLine(";");
+            _sb.Append("    public const int MaxLength = ").Append(genCfg.Constants.MaxStringLength).AppendLine(";");
         }
 
         _sb.Append('}');

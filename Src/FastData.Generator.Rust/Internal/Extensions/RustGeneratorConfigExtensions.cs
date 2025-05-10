@@ -9,7 +9,7 @@ namespace Genbox.FastData.Generator.Rust.Internal.Extensions;
 [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
 internal static class RustGeneratorConfigExtensions
 {
-    internal static string GetEarlyExits(this RustCodeGeneratorConfig cfg, GeneratorConfig genCfg)
+    internal static string GetEarlyExits<T>(this RustCodeGeneratorConfig cfg, GeneratorConfig<T> genCfg)
     {
         if (cfg.GeneratorOptions.HasFlag(RustOptions.DisableEarlyExits))
             return string.Empty;
@@ -20,7 +20,7 @@ internal static class RustGeneratorConfigExtensions
         {
             if (spec is MinMaxLengthEarlyExit(var minLength, var maxLength))
                 sb.Append(GetLengthEarlyExits(minLength, maxLength));
-            else if (spec is MinMaxValueEarlyExit(var minValue, var maxValue))
+            else if (spec is MinMaxValueEarlyExit<T>(var minValue, var maxValue))
                 sb.Append(GetValueEarlyExits(minValue, maxValue, genCfg.DataType));
             else if (spec is LengthBitSetEarlyExit(var bitSet))
                 sb.Append(GetMaskEarlyExit(bitSet));

@@ -4,6 +4,7 @@
 #include <array>
 #include <cstdint>
 #include <limits>
+#include <string_view>
 
 class my_data final
 {
@@ -22,7 +23,7 @@ class my_data final
      };
 
     inline static const std::array<e, 3> entries = {
-        e(2147483648, -1, std::numeric_limits<int32_t>::lowest()), e(0, -1, 0ll), e(2147483647, -1, std::numeric_limits<int32_t>::max())
+        e(2147483648, -1, std::numeric_limits<int32_t>::lowest()), e(0, -1, 0), e(2147483647, -1, std::numeric_limits<int32_t>::max())
     };
 
     static constexpr uint32_t get_hash(const int32_t value) noexcept
@@ -53,8 +54,7 @@ public:
 
         return false;
     }
-
-    static constexpr unsigned int item_count = 3;
+    static constexpr size_t item_count = 3;
     static constexpr int32_t min_value = std::numeric_limits<int32_t>::lowest();
     static constexpr int32_t max_value = std::numeric_limits<int32_t>::max();
 

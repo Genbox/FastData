@@ -74,7 +74,7 @@ internal static class DataAnalyzer
         return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, lengthMap), new DeltaData(left, right), new CharacterData(allAscii, counts, characterMap));
     }
 
-    internal static CharProperties GetCharProperties(char[] data)
+    internal static CharProperties<T> GetCharProperties<T>(char[] data)
     {
         char min = char.MaxValue;
         char max = char.MinValue;
@@ -85,10 +85,10 @@ internal static class DataAnalyzer
             max = c > max ? c : max;
         }
 
-        return new CharProperties(min, max);
+        return new CharProperties<T>((T)(object)min, (T)(object)max);
     }
 
-    internal static FloatProperties GetSingleProperties(float[] data)
+    internal static FloatProperties<T> GetSingleProperties<T>(float[] data)
     {
         float min = float.MaxValue;
         float max = float.MinValue;
@@ -99,10 +99,10 @@ internal static class DataAnalyzer
             max = c > max ? c : max;
         }
 
-        return new FloatProperties(min, max);
+        return new FloatProperties<T>((T)(object)min, (T)(object)max);
     }
 
-    internal static FloatProperties GetDoubleProperties(double[] data)
+    internal static FloatProperties<T> GetDoubleProperties<T>(double[] data)
     {
         double min = double.MaxValue;
         double max = double.MinValue;
@@ -113,10 +113,10 @@ internal static class DataAnalyzer
             max = c > max ? c : max;
         }
 
-        return new FloatProperties(min, max);
+        return new FloatProperties<T>((T)(object)min, (T)(object)max);
     }
 
-    internal static UnsignedIntegerProperties GetByteProperties(byte[] data)
+    internal static UnsignedIntegerProperties<T> GetByteProperties<T>(byte[] data)
     {
         byte min = byte.MaxValue;
         byte max = byte.MinValue;
@@ -137,10 +137,10 @@ internal static class DataAnalyzer
             lastValue = val;
         }
 
-        return new UnsignedIntegerProperties(min, max, consecutive);
+        return new UnsignedIntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
     }
 
-    internal static IntegerProperties GetSByteProperties(sbyte[] data)
+    internal static IntegerProperties<T> GetSByteProperties<T>(sbyte[] data)
     {
         sbyte min = sbyte.MaxValue;
         sbyte max = sbyte.MinValue;
@@ -161,10 +161,10 @@ internal static class DataAnalyzer
             lastValue = val;
         }
 
-        return new IntegerProperties(min, max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
     }
 
-    internal static IntegerProperties GetInt16Properties(short[] data)
+    internal static IntegerProperties<T> GetInt16Properties<T>(short[] data)
     {
         short min = short.MaxValue;
         short max = short.MinValue;
@@ -185,10 +185,10 @@ internal static class DataAnalyzer
             lastValue = val;
         }
 
-        return new IntegerProperties(min, max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
     }
 
-    internal static UnsignedIntegerProperties GetUInt16Properties(ushort[] data)
+    internal static UnsignedIntegerProperties<T> GetUInt16Properties<T>(ushort[] data)
     {
         ushort min = ushort.MaxValue;
         ushort max = ushort.MinValue;
@@ -209,10 +209,10 @@ internal static class DataAnalyzer
             lastValue = val;
         }
 
-        return new UnsignedIntegerProperties(min, max, consecutive);
+        return new UnsignedIntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
     }
 
-    internal static IntegerProperties GetInt32Properties(int[] data)
+    internal static IntegerProperties<T> GetInt32Properties<T>(int[] data)
     {
         int min = int.MaxValue;
         int max = int.MinValue;
@@ -233,10 +233,10 @@ internal static class DataAnalyzer
             lastValue = val;
         }
 
-        return new IntegerProperties(min, max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
     }
 
-    internal static UnsignedIntegerProperties GetUInt32Properties(uint[] data)
+    internal static UnsignedIntegerProperties<T> GetUInt32Properties<T>(uint[] data)
     {
         uint min = uint.MaxValue;
         uint max = uint.MinValue;
@@ -257,10 +257,10 @@ internal static class DataAnalyzer
             lastValue = val;
         }
 
-        return new UnsignedIntegerProperties(min, max, consecutive);
+        return new UnsignedIntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
     }
 
-    internal static IntegerProperties GetInt64Properties(long[] data)
+    internal static IntegerProperties<T> GetInt64Properties<T>(long[] data)
     {
         long min = long.MaxValue;
         long max = long.MinValue;
@@ -281,10 +281,10 @@ internal static class DataAnalyzer
             lastValue = val;
         }
 
-        return new IntegerProperties(min, max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
     }
 
-    internal static UnsignedIntegerProperties GetUInt64Properties(ulong[] data)
+    internal static UnsignedIntegerProperties<T> GetUInt64Properties<T>(ulong[] data)
     {
         ulong min = ulong.MaxValue;
         ulong max = ulong.MinValue;
@@ -305,6 +305,6 @@ internal static class DataAnalyzer
             lastValue = val;
         }
 
-        return new UnsignedIntegerProperties(min, max, consecutive);
+        return new UnsignedIntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
     }
 }

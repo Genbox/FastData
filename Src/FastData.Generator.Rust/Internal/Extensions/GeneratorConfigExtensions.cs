@@ -4,7 +4,7 @@ namespace Genbox.FastData.Generator.Rust.Internal.Extensions;
 
 internal static class GeneratorConfigExtensions
 {
-    internal static string GetTypeName(this GeneratorConfig config, bool asStatic = false) => config.DataType switch
+    internal static string GetTypeName<T>(this GeneratorConfig<T> config, bool asStatic = false) => config.DataType switch
     {
         DataType.String when asStatic => "&'static str",
         DataType.String => "&str",
@@ -23,7 +23,7 @@ internal static class GeneratorConfigExtensions
         _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
     };
 
-    internal static string GetHashSource(this GeneratorConfig config) =>
+    internal static string GetHashSource<T>(this GeneratorConfig<T> config) =>
         $$"""
               {{(config.DataType == DataType.String ? "#[inline]" : "#[inline(always)]")}}
               {{(config.DataType == DataType.String ? "unsafe " : "")}}fn get_hash(value: {{config.GetTypeName()}}) -> u32 {

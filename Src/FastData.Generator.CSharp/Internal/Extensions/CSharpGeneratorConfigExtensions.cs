@@ -10,7 +10,7 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Extensions;
 [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
 internal static class CSharpGeneratorConfigExtensions
 {
-    internal static string GetEarlyExits(this CSharpCodeGeneratorConfig cfg, GeneratorConfig genCfg)
+    internal static string GetEarlyExits<T>(this CSharpCodeGeneratorConfig cfg, GeneratorConfig<T> genCfg)
     {
         if (cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableEarlyExits))
             return string.Empty;
@@ -21,7 +21,7 @@ internal static class CSharpGeneratorConfigExtensions
         {
             if (spec is MinMaxLengthEarlyExit(var minLength, var maxLength))
                 sb.Append(GetLengthEarlyExits(minLength, maxLength));
-            else if (spec is MinMaxValueEarlyExit(var minValue, var maxValue))
+            else if (spec is MinMaxValueEarlyExit<T>(var minValue, var maxValue))
                 sb.Append(GetValueEarlyExits(minValue, maxValue, genCfg.DataType));
             else if (spec is LengthBitSetEarlyExit(var bitSet))
                 sb.Append(GetMaskEarlyExit(bitSet));

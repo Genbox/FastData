@@ -2,7 +2,7 @@ using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpCodeGeneratorConfig cfg, PerfectHashGPerfContext ctx) : IOutputWriter
+internal sealed class PerfectHashGPerfCode<T>(GeneratorConfig<T> genCfg, CSharpCodeGeneratorConfig cfg, PerfectHashGPerfContext ctx) : IOutputWriter
 {
     public string Generate() =>
         $$"""
@@ -40,7 +40,7 @@ internal sealed class PerfectHashGPerfCode(GeneratorConfig genCfg, CSharpCodeGen
         //IQ: We also assume that positions are listed in descending order
 
         //We need to know the shortest string
-        uint minLen = (uint)genCfg.Constants.MinValue;
+        uint minLen = genCfg.Constants.MinStringLength;
 
         //We start with the highest position.
         int key = ctx.Positions[0];

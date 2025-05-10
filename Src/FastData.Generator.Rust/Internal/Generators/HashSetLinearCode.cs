@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class HashSetLinearCode<T>(GeneratorConfig genCfg, RustCodeGeneratorConfig cfg, HashSetLinearContext<T> ctx, SharedCode shared) : IOutputWriter
+internal sealed class HashSetLinearCode<T>(GeneratorConfig<T> genCfg, RustCodeGeneratorConfig cfg, HashSetLinearContext<T> ctx, SharedCode shared) : IOutputWriter
 {
     public string Generate()
     {

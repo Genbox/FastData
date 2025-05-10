@@ -4,7 +4,7 @@ using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpCodeGeneratorConfig cfg, KeyLengthContext ctx) : IOutputWriter
+internal sealed class KeyLengthCode<T>(GeneratorConfig<T> genCfg, CSharpCodeGeneratorConfig cfg, KeyLengthContext ctx) : IOutputWriter
 {
     //TODO: Remove gaps in array by reducing the index via a map (if (idx > 10) return 4) where 4 is the number to subtract from the index
 
@@ -90,7 +90,7 @@ internal sealed class KeyLengthCode(GeneratorConfig genCfg, CSharpCodeGeneratorC
         if (exit1 != null)
             return CSharpGeneratorConfigExtensions.GetLengthEarlyExits(exit1.MinValue, exit1.MaxValue);
 
-        MinMaxValueEarlyExit? exit2 = (MinMaxValueEarlyExit?)Array.Find(exits, x => x is MinMaxValueEarlyExit);
+        MinMaxValueEarlyExit<T>? exit2 = (MinMaxValueEarlyExit<T>?)Array.Find(exits, x => x is MinMaxValueEarlyExit<T>);
         if (exit2 != null)
             return CSharpGeneratorConfigExtensions.GetValueEarlyExits(exit2.MinValue, exit2.MaxValue, genCfg.DataType);
 

@@ -1,18 +1,20 @@
+using Genbox.FastData.Generator.Framework;
+
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class EytzingerSearchCode<T>(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, EytzingerSearchContext<T> ctx) : IOutputWriter
+internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx) : OutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> entries = {
+              {{GetFieldModifier()}}std::array<{{GetTypeName()}}, {{ctx.Data.Length}}> entries = {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
           public:
-              [[nodiscard]]
-              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool contains(const {{GetTypeName()}} value) noexcept
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
 
                   size_t i = 0;
                   while (i < entries.size())

@@ -4,7 +4,7 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Extensions;
 
 internal static class GeneratorConfigExtensions
 {
-    internal static string GetTypeName(this GeneratorConfig config) => config.DataType switch
+    internal static string GetTypeName<T>(this GeneratorConfig<T> config) => config.DataType switch
     {
         DataType.String => "string",
         DataType.Boolean => "bool",
@@ -22,7 +22,7 @@ internal static class GeneratorConfigExtensions
         _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
     };
 
-    internal static string GetEqualFunction(this GeneratorConfig config, string variable)
+    internal static string GetEqualFunction<T>(this GeneratorConfig<T> config, string variable)
     {
         if (config.DataType == DataType.String)
             return $"StringComparer.{config.StringComparison}.Equals(value, {variable})";
@@ -30,7 +30,7 @@ internal static class GeneratorConfigExtensions
         return $"value.Equals({variable})";
     }
 
-    internal static string GetCompareFunction(this GeneratorConfig config, string variable)
+    internal static string GetCompareFunction<T>(this GeneratorConfig<T> config, string variable)
     {
         if (config.DataType == DataType.String)
             return $"StringComparer.{config.StringComparison}.Compare({variable}, value)";
@@ -38,7 +38,7 @@ internal static class GeneratorConfigExtensions
         return $"{variable}.CompareTo(value)";
     }
 
-    internal static string GetHashSource(this GeneratorConfig config) =>
+    internal static string GetHashSource<T>(this GeneratorConfig<T> config) =>
         $$"""
               [MethodImpl(MethodImplOptions.AggressiveInlining)]
               private static uint Hash({{config.GetTypeName()}} value)

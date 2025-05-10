@@ -1,23 +1,24 @@
 using Genbox.FastData.Generator.Extensions;
+using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class BinarySearchCode<T>(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, BinarySearchContext<T> ctx) : IOutputWriter
+internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : OutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> entries = {
+              {{GetFieldModifier()}}std::array<{{GetTypeName()}}, {{ctx.Data.Length}}> entries = {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
           public:
-              [[nodiscard]]
-              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool contains(const {{GetTypeName()}} value) noexcept
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
 
-                  size_t lo = 0;
-                  size_t hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
+                  {{GetArraySizeType()}} lo = 0;
+                  {{GetArraySizeType()}} hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
                   while (lo <= hi)
                   {
                       const size_t mid = lo + ((hi - lo) >> 1);

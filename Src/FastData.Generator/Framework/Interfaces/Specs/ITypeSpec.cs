@@ -8,8 +8,7 @@ public interface ITypeSpec
     string Name { get; }
 }
 
-// ReSharper disable once UnusedTypeParameter
-#pragma warning disable S2326
 public interface ITypeSpec<in T> : ITypeSpec
-#pragma warning restore S2326
-{ }
+{
+    Func<T, string> Print { get; }
+}

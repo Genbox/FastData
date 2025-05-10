@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.InternalShared;
 using static Genbox.FastData.Generator.Rust.Internal.Helpers.CodeHelper;
 
@@ -31,8 +30,7 @@ internal static class Program
 
         foreach (ITestData data in TestVectorHelper.GetBenchmarkVectors())
         {
-            if (!TestVectorHelper.TryGenerate(id => new RustCodeGenerator(new RustCodeGeneratorConfig(id)), data, out GeneratorSpec spec))
-                throw new InvalidOperationException("Unable to build " + data.StructureType);
+            data.Generate(id => new RustCodeGenerator(new RustCodeGeneratorConfig(id)), out GeneratorSpec spec);
 
             TestHelper.TryWriteFile(Path.Combine(benchPath, spec.Identifier + ".rs"),
                 $$"""
@@ -45,7 +43,7 @@ internal static class Program
                   fn bench_contains(c: &mut Criterion) {
                       c.bench_function("Rust_{{spec.Identifier}}", |b| {
                           b.iter(|| {
-                  {{PrintQueries(data.Items, spec.Identifier)}}
+                  {{PrintQueries(data, spec.Identifier)}}
                           });
                       });
                   }
@@ -66,13 +64,12 @@ internal static class Program
         BenchmarkHelper.RunBenchmark("cargo", "bench", rootPath, "--adapter rust_criterion --testbed Rust");
     }
 
-    private static string PrintQueries(object[] data, string identifier)
+    private static string PrintQueries(ITestData data, string identifier)
     {
-        Random rng = new Random(42);
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < 25; i++)
-            sb.AppendLine(CultureInfo.InvariantCulture, $"           {identifier}::contains({ToValueLabel(data[rng.Next(0, data.Length)])});");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"           {identifier}::contains({data.GetValueLabel(ToValueLabel)});");
 
         return sb.ToString();
     }

@@ -1,23 +1,25 @@
+using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
+
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class PerfectHashBruteForceCode<T>(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, PerfectHashBruteForceContext<T> ctx) : IOutputWriter
+internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
               struct e
               {
-                  {{genCfg.GetTypeName()}} value;
+                  {{GetTypeName()}} value;
                   uint32_t hash_code;
 
-                  e(const {{genCfg.GetTypeName()}} value, const uint32_t hash_code)
+                  e(const {{GetTypeName()}} value, const uint32_t hash_code)
                   : value(value), hash_code(hash_code) {}
               };
 
-              {{cfg.GetFieldModifier(false)}}std::array<e, {{ctx.Data.Length}}> entries = {
-          {{FormatColumns(ctx.Data, static x => $"e({ToValueLabel(x.Key)}, {ToValueLabel(x.Value)})")}}
+              {{GetFieldModifier(false)}}std::array<e, {{ctx.Data.Length}}> entries = {
+          {{FormatColumns(ctx.Data, x => $"e({ToValueLabel(x.Key)}, {ToValueLabel(x.Value)})")}}
               };
 
-          {{genCfg.GetHashSource()}}
+          {{GetHashSource()}}
 
               static uint32_t murmur_32(uint32_t h) noexcept
               {
@@ -30,12 +32,12 @@ internal sealed class PerfectHashBruteForceCode<T>(GeneratorConfig genCfg, CPlus
               }
 
           public:
-              [[nodiscard]]
-              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool contains(const {{GetTypeName()}} value) noexcept
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
                   const uint32_t hash = murmur_32(get_hash(value) ^ {{ctx.Seed}});
-                  const size_t index = {{cfg.GetModFunction(ctx.Data.Length)}};
+                  const size_t index = {{GetModFunction("hash", ctx.Data.Length)}};
                   const e& entry = entries[index];
 
                   return hash == entry.hash_code && value == entry.value;

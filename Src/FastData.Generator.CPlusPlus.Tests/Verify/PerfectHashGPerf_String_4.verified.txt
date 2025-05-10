@@ -1,10 +1,10 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: PerfectHashGPerf
 #pragma once
-#include <string_view>
 #include <array>
 #include <cstdint>
 #include <limits>
+#include <string_view>
 
 class my_data final
 {
@@ -61,10 +61,9 @@ public:
         return static_cast<uint32_t>(asso[str[4]]);
     }
 
-
-    static constexpr unsigned int item_count = 4;
-    static constexpr int min_length = 5;
-    static constexpr int max_length = 5;
+    static constexpr size_t item_count = 4;
+    static constexpr size_t min_length = 5;
+    static constexpr size_t max_length = 5;
 
 public:
     my_data() = delete;

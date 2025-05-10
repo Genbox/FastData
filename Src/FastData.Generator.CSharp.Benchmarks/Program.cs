@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.InternalShared;
 using static Genbox.FastData.Generator.CSharp.Internal.Helpers.CodeHelper;
 
@@ -8,7 +7,7 @@ namespace Genbox.FastData.Generator.CSharp.Benchmarks;
 
 internal static class Program
 {
-    private static void Main(string[] args)
+    private static void Main()
     {
         string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "CSharp");
         Directory.CreateDirectory(rootDir);
@@ -45,8 +44,7 @@ internal static class Program
 
         foreach (ITestData data in TestVectorHelper.GetBenchmarkVectors())
         {
-            if (!TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), data, out GeneratorSpec spec))
-                throw new InvalidOperationException("Unable to build " + data.StructureType);
+            data.Generate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), out GeneratorSpec spec);
 
             TestHelper.TryWriteFile(Path.Combine(rootDir, spec.Identifier + ".cs"), spec.Source);
 
@@ -55,7 +53,7 @@ internal static class Program
                                                               [Benchmark]
                                                               public void CSharp_{{spec.Identifier}}()
                                                               {
-                                                          {{PrintQueries(data.Items, spec.Identifier)}}
+                                                          {{PrintQueries(data, spec.Identifier)}}
                                                               }
                                                           """);
         }
@@ -70,13 +68,12 @@ internal static class Program
         BenchmarkHelper.RunBenchmark("dotnet", "run -c release", rootDir, @"--adapter c_sharp_dot_net --file BenchmarkDotNet.Artifacts\results\CSharp.Program-report-brief-compressed.json --testbed CSharp");
     }
 
-    private static string PrintQueries(object[] data, string identifier)
+    private static string PrintQueries(ITestData data, string identifier)
     {
-        Random rng = new Random(42);
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < 25; i++)
-            sb.AppendLine(CultureInfo.InvariantCulture, $"        {identifier}.Contains({ToValueLabel(data[rng.Next(0, data.Length)])});");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"        {identifier}.Contains({data.GetValueLabel(ToValueLabel)});");
 
         return sb.ToString();
     }

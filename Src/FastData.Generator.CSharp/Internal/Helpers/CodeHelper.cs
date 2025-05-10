@@ -41,7 +41,7 @@ internal static class CodeHelper
         DataType.UInt64 => value + "ul",
         DataType.Int64 => value + "l",
         DataType.UInt32 => value + "u",
-        DataType.Single => (double)value + "f",
+        DataType.Single => value + "f",
         DataType.Boolean => value.ToString().ToLowerInvariant(),
         _ => value.ToString()
     };

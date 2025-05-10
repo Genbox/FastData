@@ -93,7 +93,7 @@ internal static class Program
         cppCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn) =>
         {
             CPlusPlusCodeGeneratorConfig genCfg = new CPlusPlusCodeGeneratorConfig(cn);
-            CPlusPlusCodeGenerator generator = new CPlusPlusCodeGenerator(genCfg);
+            CPlusPlusCodeGenerator generator = CPlusPlusCodeGenerator.Create(genCfg);
 
             await GenerateAsync(inputFile, dataType, structureType, generator, outputFile);
         }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt);

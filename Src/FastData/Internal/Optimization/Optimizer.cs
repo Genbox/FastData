@@ -19,23 +19,23 @@ internal static class Optimizer
             yield return new MinMaxLengthEarlyExit(prop.LengthData.Min, prop.LengthData.Max); //Also handles same lengths
     }
 
-    public static IEnumerable<IEarlyExit> GetEarlyExits(IntegerProperties prop)
+    public static IEnumerable<IEarlyExit> GetEarlyExits<T>(IntegerProperties<T> prop)
     {
-        yield return new MinMaxValueEarlyExit(prop.MinValue, prop.MaxValue);
+        yield return new MinMaxValueEarlyExit<T>(prop.MinValue, prop.MaxValue);
     }
 
-    public static IEnumerable<IEarlyExit> GetEarlyExits(UnsignedIntegerProperties prop)
+    public static IEnumerable<IEarlyExit> GetEarlyExits<T>(UnsignedIntegerProperties<T> prop)
     {
-        yield return new MinMaxValueEarlyExit(prop.MinValue, prop.MaxValue);
+        yield return new MinMaxValueEarlyExit<T>(prop.MinValue, prop.MaxValue);
     }
 
-    public static IEnumerable<IEarlyExit> GetEarlyExits(CharProperties prop)
+    public static IEnumerable<IEarlyExit> GetEarlyExits<T>(CharProperties<T> prop)
     {
-        yield return new MinMaxValueEarlyExit(prop.MinValue, prop.MaxValue);
+        yield return new MinMaxValueEarlyExit<T>(prop.MinValue, prop.MaxValue);
     }
 
-    public static IEnumerable<IEarlyExit> GetEarlyExits(FloatProperties prop)
+    public static IEnumerable<IEarlyExit> GetEarlyExits<T>(FloatProperties<T> prop)
     {
-        yield return new MinMaxValueEarlyExit(prop.MinValue, prop.MaxValue);
+        yield return new MinMaxValueEarlyExit<T>(prop.MinValue, prop.MaxValue);
     }
 }

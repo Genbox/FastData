@@ -5,5 +5,5 @@ namespace Genbox.FastData.Generator.Framework.Interfaces;
 
 public interface IEarlyExitHandler
 {
-    string GetEarlyExits(IEnumerable<IEarlyExit> earlyExits, DataType dataType);
+    string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits);
 }

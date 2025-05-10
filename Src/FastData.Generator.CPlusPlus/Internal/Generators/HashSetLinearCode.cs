@@ -1,10 +1,11 @@
+using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class HashSetLinearCode<T>(GeneratorConfig genCfg, CPlusPlusCodeGeneratorConfig cfg, HashSetLinearContext<T> ctx) : IOutputWriter
+internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
               struct b
               {
@@ -15,28 +16,28 @@ internal sealed class HashSetLinearCode<T>(GeneratorConfig genCfg, CPlusPlusCode
                   : start_index(start_index), end_index(end_index) { }
               };
 
-              {{cfg.GetFieldModifier(false)}}std::array<b, {{ctx.Buckets.Length}}> buckets = {
+              {{GetFieldModifier(false)}}std::array<b, {{ctx.Buckets.Length}}> buckets = {
           {{FormatColumns(ctx.Buckets, static x => $"b({x.StartIndex.ToStringInvariant()}, {x.EndIndex.ToStringInvariant()})")}}
               };
 
-              {{cfg.GetFieldModifier()}}std::array<{{genCfg.GetTypeName()}}, {{ctx.Data.Length}}> items = {
+              {{GetFieldModifier()}}std::array<{{GetTypeName()}}, {{ctx.Data.Length}}> items = {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
-              {{cfg.GetFieldModifier()}}std::array<uint32_t, {{ctx.HashCodes.Length}}> hash_codes = {
+              {{GetFieldModifier()}}std::array<uint32_t, {{ctx.HashCodes.Length}}> hash_codes = {
           {{FormatColumns(ctx.HashCodes, static x => x.ToStringInvariant())}}
               };
 
-          {{genCfg.GetHashSource()}}
+          {{GetHashSource()}}
 
           public:
-              [[nodiscard]]
-              {{cfg.GetMethodModifier()}}bool contains(const {{genCfg.GetTypeName()}} value) noexcept
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool contains(const {{GetTypeName()}} value) noexcept
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
 
                   const uint32_t hash = get_hash(value);
-                  const auto& [start_index, end_index]= buckets[{{cfg.GetModFunction(ctx.Buckets.Length)}}];
+                  const auto& [start_index, end_index]= buckets[{{GetModFunction("hash", ctx.Buckets.Length)}}];
 
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} index = start_index;
 

@@ -9,39 +9,25 @@ public class CodeHelper(ILanguageSpec spec, TypeMap typeMap)
     public virtual void Comment(StringBuilder sb, string value) => sb.Append(spec.CommentChar).Append(' ').AppendLine(value);
     public virtual void Assign(StringBuilder sb, string left, string right) => sb.Append(left).Append(spec.AssignmentChar).Append(right);
 
-    public virtual string ToValueLabel<T>(T? value)
+    public string ToValueLabel<T>(T? value)
     {
-        ITypeSpec<T>? s = typeMap.Get<T>();
-
-        if (s == null)
-            return value.ToString();
-
-        return value.ToString();
-    }
-
-    public virtual string ToValueLabel(object? value, DataType dataType)
-    {
-        ITypeSpec? s = typeMap.Get(dataType);
-
-        if (s == null)
-            return value.ToString();
-
-        return value.ToString();
+        ITypeSpec<T> s = typeMap.Get<T>();
+        return s.Print(value);
     }
 
     public string GetSmallestUIntType(ulong value) => value switch
     {
-        <= byte.MaxValue => typeMap.GetRequired<byte>().Name,
-        <= ushort.MaxValue => typeMap.GetRequired<ushort>().Name,
-        <= uint.MaxValue => typeMap.GetRequired<uint>().Name,
-        _ => typeMap.GetRequired<ulong>().Name
+        <= byte.MaxValue => typeMap.Get<byte>().Name,
+        <= ushort.MaxValue => typeMap.Get<ushort>().Name,
+        <= uint.MaxValue => typeMap.Get<uint>().Name,
+        _ => typeMap.Get<ulong>().Name
     };
 
     public string GetSmallestIntType(long value) => value switch
     {
-        <= sbyte.MaxValue => typeMap.GetRequired<sbyte>().Name,
-        <= short.MaxValue => typeMap.GetRequired<short>().Name,
-        <= int.MaxValue => typeMap.GetRequired<int>().Name,
-        _ => typeMap.GetRequired<long>().Name
+        <= sbyte.MaxValue => typeMap.Get<sbyte>().Name,
+        <= short.MaxValue => typeMap.Get<short>().Name,
+        <= int.MaxValue => typeMap.Get<int>().Name,
+        _ => typeMap.Get<long>().Name
     };
 }

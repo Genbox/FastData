@@ -5,9 +5,9 @@ using Genbox.FastData.Internal.Optimization;
 
 namespace Genbox.FastData.Configs;
 
-public class GeneratorConfig
+public class GeneratorConfig<T>
 {
-    internal GeneratorConfig(StructureType structureType, StringComparison stringComparison, DataProperties props, IHashSpec hashSpec)
+    internal GeneratorConfig(StructureType structureType, StringComparison stringComparison, DataProperties<T> props, IHashSpec hashSpec)
     {
         StructureType = structureType;
         StringComparison = stringComparison;
@@ -23,17 +23,17 @@ public class GeneratorConfig
     public DataType DataType { get; }
     public IEarlyExit[] EarlyExits { get; }
     public IHashSpec HashSpec { get; set; }
-    public Constants Constants { get; }
+    public Constants<T> Constants { get; }
     public Metadata Metadata { get; }
 
-    private static Constants CreateConstants(DataProperties props)
+    private static Constants<T> CreateConstants(DataProperties<T> props)
     {
-        Constants constants = new Constants(props.ItemCount);
+        Constants<T> constants = new Constants<T>(props.ItemCount);
 
         if (props.StringProps.HasValue)
         {
-            constants.MinValue = props.StringProps.Value.LengthData.Min;
-            constants.MaxValue = props.StringProps.Value.LengthData.Max;
+            constants.MinStringLength = props.StringProps.Value.LengthData.Min;
+            constants.MaxStringLength = props.StringProps.Value.LengthData.Max;
         }
         else if (props.IntProps.HasValue)
         {
@@ -58,7 +58,7 @@ public class GeneratorConfig
         return constants;
     }
 
-    private static IEarlyExit[] GetEarlyExits(DataProperties props)
+    private static IEarlyExit[] GetEarlyExits(DataProperties<T> props)
     {
         if (props.StringProps.HasValue)
             return Optimizer.GetEarlyExits(props.StringProps.Value).ToArray();

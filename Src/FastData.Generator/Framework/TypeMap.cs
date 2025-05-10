@@ -1,4 +1,3 @@
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework.Interfaces;
 using Genbox.FastData.Generator.Framework.Interfaces.Specs;
 
@@ -6,9 +5,8 @@ namespace Genbox.FastData.Generator.Framework;
 
 public sealed class TypeMap
 {
-    private readonly ITypeSpec?[] _index = new ITypeSpec?[18];
+    private readonly ITypeSpec?[] _index = new ITypeSpec?[19];
     private readonly ITypeSpec _default;
-    private readonly ITypeSpec _arrayType;
 
     public TypeMap(IList<ITypeSpec> typeSpecs)
     {
@@ -21,9 +19,6 @@ public sealed class TypeMap
             {
                 if (n.Flags.HasFlag(IntegerTypeFlags.Default))
                     _default = spec;
-
-                if (n.Flags.HasFlag(IntegerTypeFlags.ArraySize))
-                    _arrayType = spec;
             }
         }
 
@@ -31,18 +26,13 @@ public sealed class TypeMap
             throw new InvalidOperationException("No default type was specified");
     }
 
-    public ITypeSpec? Get(DataType type) => _index[(int)type];
-    public ITypeSpec<T>? Get<T>() => (ITypeSpec<T>)_index[(int)Type.GetTypeCode(typeof(T))];
-
-    public ITypeSpec GetRequired<T>()
+    public ITypeSpec<T> Get<T>()
     {
-        ITypeSpec<T>? res = Get<T>();
+        ITypeSpec<T>? res = (ITypeSpec<T>?)_index[(int)Type.GetTypeCode(typeof(T))];
 
         if (res == null)
             throw new InvalidOperationException("No type spec was found for " + typeof(T).Name);
 
         return res;
     }
-
-    public ITypeSpec GetArraySizeType() => _arrayType;
 }

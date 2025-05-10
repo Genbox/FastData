@@ -10,7 +10,7 @@ public abstract class EarlyExitHandler : IEarlyExitHandler
 {
     protected abstract bool IsEnabled { get; }
 
-    public string GetEarlyExits(IEnumerable<IEarlyExit> earlyExits, DataType dataType)
+    public string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits)
     {
         if (!IsEnabled)
             return string.Empty;
@@ -21,8 +21,8 @@ public abstract class EarlyExitHandler : IEarlyExitHandler
         {
             if (spec is MinMaxLengthEarlyExit(var minLength, var maxLength))
                 sb.Append(GetLengthEarlyExits(minLength, maxLength));
-            else if (spec is MinMaxValueEarlyExit(var minValue, var maxValue))
-                sb.Append(GetValueEarlyExits(minValue, maxValue, dataType));
+            else if (spec is MinMaxValueEarlyExit<T>(var minValue, var maxValue))
+                sb.Append(GetValueEarlyExits(minValue, maxValue));
             else if (spec is LengthBitSetEarlyExit(var bitSet))
                 sb.Append(GetMaskEarlyExit(bitSet));
             else
@@ -33,6 +33,6 @@ public abstract class EarlyExitHandler : IEarlyExitHandler
     }
 
     protected abstract string GetMaskEarlyExit(ulong bitSet);
-    protected abstract string GetValueEarlyExits(object min, object max, DataType dataType);
+    protected abstract string GetValueEarlyExits<T>(T min, T max);
     protected abstract string GetLengthEarlyExits(uint min, uint max);
 }
