@@ -4,11 +4,10 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 internal class CPlusPlusConstantsDef : IConstantsDef
 {
-    public string MinLengthName => "min_length";
-    public string MaxLengthName => "max_length";
-    public string MinValueName => "min_value";
-    public string MaxValueName => "max_value";
-    public string ItemName => "item_count";
-    public string FieldModifier => "static constexpr ";
-    public string CommentChar => "//";
+    public string Comment => "//";
+    public Func<string, string, string> MinLengthTemplate => (type, value) => $"static constexpr {type} min_length = {value}";
+    public Func<string, string, string> MaxLengthTemplate => (type, value) => $"static constexpr {type} max_length = {value}";
+    public Func<string, string, string> MinValueTemplate => (type, value) => $"static constexpr {type} min_value = {value}";
+    public Func<string, string, string> MaxValueTemplate => (type, value) => $"static constexpr {type} max_value = {value}";
+    public Func<string, string, string> ItemCountTemplate => (type, value) => $"static constexpr {type} item_count = {value}";
 }

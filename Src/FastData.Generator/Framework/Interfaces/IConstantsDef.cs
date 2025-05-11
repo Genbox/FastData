@@ -2,11 +2,10 @@ namespace Genbox.FastData.Generator.Framework.Interfaces;
 
 public interface IConstantsDef
 {
-    string MinLengthName { get; }
-    string MaxLengthName { get; }
-    string MinValueName { get; }
-    string MaxValueName { get; }
-    string ItemName { get; }
-    string FieldModifier { get; }
-    string CommentChar { get; }
+    string Comment { get; }
+    Func<string, string, string> MinLengthTemplate { get; }
+    Func<string, string, string> MaxLengthTemplate { get; }
+    Func<string, string, string> MinValueTemplate { get; }
+    Func<string, string, string> MaxValueTemplate { get; }
+    Func<string, string, string> ItemCountTemplate { get; }
 }
