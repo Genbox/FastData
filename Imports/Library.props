@@ -31,7 +31,6 @@
     <PackageReference Include="SmartAnalyzers.MultithreadingAnalyzer" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" PrivateAssets="all" />
     <PackageReference Include="SharpSource" PrivateAssets="all" />
-    <PackageReference Include="Blowin.Required" PrivateAssets="all" />
     <PackageReference Include="Meziantou.Analyzer" PrivateAssets="all" />
     <PackageReference Include="NetFabric.Hyperlinq.Analyzer" PrivateAssets="all" />
     <PackageReference Include="SonarAnalyzer.CSharp" PrivateAssets="all" />
