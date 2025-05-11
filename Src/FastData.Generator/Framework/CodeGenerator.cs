@@ -25,18 +25,25 @@ public abstract class CodeGenerator : ICodeGenerator
 
         _typeMap = new TypeMap(langDef.TypeDefinitions);
         _helper = new TypeHelper(_typeMap);
+        Shared = new SharedCode();
     }
 
     public bool UseUTF16Encoding => _langDef.UseUTF16Encoding;
+    public SharedCode Shared { get; }
 
     public virtual bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
     {
+        Shared.Clear();
+
         string typeName = _typeMap.Get<T>().Name;
 
         StringBuilder sb = new StringBuilder();
         AppendHeader(sb, genCfg);
         AppendBody(sb, genCfg, typeName, context);
         AppendFooter(sb, genCfg, typeName);
+
+        foreach (string classCode in Shared.GetType(CodeType.Class))
+            sb.AppendLine(classCode);
 
         source = sb.ToString();
         return true;
