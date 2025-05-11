@@ -7,6 +7,5 @@ public enum CSharpOptions
     DisableEarlyExits = 1,
     DisableModulusOptimization = 2,
     DisableInlining = 4,
-    AggressiveInlining = 8,
-    GenerateInterface = 16
+    AggressiveInlining = 8
 }

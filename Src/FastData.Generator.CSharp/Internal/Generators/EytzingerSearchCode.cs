@@ -1,22 +1,24 @@
+using Genbox.FastData.Generator.CSharp.Internal.Framework;
+
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class EytzingerSearchCode<T>(GeneratorConfig<T> genCfg, CSharpCodeGeneratorConfig cfg, EytzingerSearchContext<T> ctx) : IOutputWriter
+internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx) : CSharpOutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}{{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
+              {{GetFieldModifier()}}{{GetTypeName()}}[] _entries = new {{GetTypeName()}}[] {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
-              {{cfg.GetMethodAttributes()}}
-              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
 
                   int i = 0;
                   while (i < _entries.Length)
                   {
-                      int comparison = {{genCfg.GetCompareFunction("_entries[i]")}};
+                      int comparison = {{GetCompareFunction("_entries[i]", "value")}};
 
                       if (comparison == 0)
                           return true;

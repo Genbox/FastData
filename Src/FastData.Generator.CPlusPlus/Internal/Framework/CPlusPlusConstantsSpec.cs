@@ -9,4 +9,5 @@ internal class CPlusPlusConstantsSpec : IConstantsSpec
     public string MinValueName => "min_value";
     public string MaxValueName => "max_value";
     public string ItemName => "item_count";
+    public string FieldModifier => "static constexpr ";
 }

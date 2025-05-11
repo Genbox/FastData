@@ -8,7 +8,7 @@ internal static class Program
 {
     private static void Main()
     {
-        CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpCodeGeneratorConfig("test"));
+        CSharpCodeGenerator generator = CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("test"));
 
         FastDataConfig cfg = new FastDataConfig(StructureType.HashSetChain);
         FastDataGenerator.TryGenerate(["item1", "item2"], cfg, generator, out string? source);

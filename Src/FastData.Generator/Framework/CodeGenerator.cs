@@ -71,17 +71,18 @@ public abstract class CodeGenerator : ICodeGenerator
 
     protected virtual void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)
     {
-        sb.AppendLine($"    {_codeSpec.GetFieldModifier()}{_langSpec.ArraySizeType} {_constants.ItemName} = {genCfg.Constants.ItemCount};");
+        sb.AppendLine();
+        sb.AppendLine($"    {_constants.FieldModifier}{_langSpec.ArraySizeType} {_constants.ItemName} = {genCfg.Constants.ItemCount};");
 
         if (genCfg.DataType.IsInteger())
         {
-            sb.AppendLine($"    {_codeSpec.GetFieldModifier()}{typeName} {_constants.MinValueName} = {_helper.ToValueLabel(genCfg.Constants.MinValue)};");
-            sb.AppendLine($"    {_codeSpec.GetFieldModifier()}{typeName} {_constants.MaxValueName} = {_helper.ToValueLabel(genCfg.Constants.MaxValue)};");
+            sb.AppendLine($"    {_constants.FieldModifier}{typeName} {_constants.MinValueName} = {_helper.ToValueLabel(genCfg.Constants.MinValue)};");
+            sb.AppendLine($"    {_constants.FieldModifier}{typeName} {_constants.MaxValueName} = {_helper.ToValueLabel(genCfg.Constants.MaxValue)};");
         }
         else if (genCfg.DataType == DataType.String)
         {
-            sb.AppendLine($"    {_codeSpec.GetFieldModifier()}{_langSpec.ArraySizeType} {_constants.MinLengthName} = {genCfg.Constants.MinStringLength};");
-            sb.AppendLine($"    {_codeSpec.GetFieldModifier()}{_langSpec.ArraySizeType} {_constants.MaxLengthName} = {genCfg.Constants.MaxStringLength};");
+            sb.AppendLine($"    {_constants.FieldModifier}{_langSpec.ArraySizeType} {_constants.MinLengthName} = {genCfg.Constants.MinStringLength};");
+            sb.AppendLine($"    {_constants.FieldModifier}{_langSpec.ArraySizeType} {_constants.MaxLengthName} = {genCfg.Constants.MaxStringLength};");
         }
     }
 }

@@ -1,26 +1,27 @@
+using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class BinarySearchCode<T>(GeneratorConfig<T> genCfg, CSharpCodeGeneratorConfig cfg, BinarySearchContext<T> ctx) : IOutputWriter
+internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : CSharpOutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}{{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
+              {{GetFieldModifier()}}{{GetTypeName()}}[] _entries = new {{GetTypeName()}}[] {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
-              {{cfg.GetMethodAttributes()}}
-              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
 
                   int lo = 0;
                   int hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
                   while (lo <= hi)
                   {
                       int i = lo + ((hi - lo) >> 1);
-                      int order = {{genCfg.GetCompareFunction("_entries[i]")}};
+                      int order = {{GetCompareFunction("_entries[i]", "value")}};
 
                       if (order == 0)
                           return true;

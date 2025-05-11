@@ -1,26 +1,28 @@
+using Genbox.FastData.Generator.CSharp.Internal.Framework;
+
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class PerfectHashBruteForceCode<T>(GeneratorConfig<T> genCfg, CSharpCodeGeneratorConfig cfg, PerfectHashBruteForceContext<T> ctx) : IOutputWriter
+internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<T> ctx) : CSharpOutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}E[] _entries = {
-          {{FormatColumns(ctx.Data, static x => $"new E({ToValueLabel(x.Key)}, {ToValueLabel(x.Value)})")}}
+              {{GetFieldModifier()}}E[] _entries = {
+          {{FormatColumns(ctx.Data, x => $"new E({ToValueLabel(x.Key)}, {ToValueLabel(x.Value)})")}}
               };
 
-              {{cfg.GetMethodAttributes()}}
-              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
 
                   uint hash = Murmur_32(Hash(value) ^ {{ctx.Seed}});
-                  uint index = {{cfg.GetModFunction(ctx.Data.Length)}};
+                  uint index = {{GetModFunction("hash", ctx.Data.Length)}};
                   ref E entry = ref _entries[index];
 
-                  return hash == entry.HashCode && {{genCfg.GetEqualFunction("entry.Value")}};
+                  return hash == entry.HashCode && {{GetEqualFunction("value", "entry.Value")}};
               }
 
-          {{genCfg.GetHashSource()}}
+          {{GetHashSource()}}
 
               [MethodImpl(MethodImplOptions.AggressiveInlining)]
               private static uint Murmur_32(uint h)
@@ -39,13 +41,13 @@ internal sealed class PerfectHashBruteForceCode<T>(GeneratorConfig<T> genCfg, CS
               [StructLayout(LayoutKind.Auto)]
               private struct E
               {
-                  internal E({{genCfg.GetTypeName()}} value, uint hashCode)
+                  internal E({{GetTypeName()}} value, uint hashCode)
                   {
                       Value = value;
                       HashCode = hashCode;
                   }
 
-                  internal {{genCfg.GetTypeName()}} Value;
+                  internal {{GetTypeName()}} Value;
                   internal uint HashCode;
               }
           """;

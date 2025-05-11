@@ -1,37 +1,38 @@
+using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class HashSetLinearCode<T>(GeneratorConfig<T> genCfg, CSharpCodeGeneratorConfig cfg, HashSetLinearContext<T> ctx) : IOutputWriter
+internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx) : CSharpOutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}B[] _buckets = {
+              {{GetFieldModifier()}}B[] _buckets = {
           {{FormatColumns(ctx.Buckets, static x => $"new B({x.StartIndex.ToStringInvariant()}, {x.EndIndex.ToStringInvariant()})")}}
               };
 
-              {{cfg.GetFieldModifier()}}{{genCfg.GetTypeName()}}[] _items = new {{genCfg.GetTypeName()}}[] {
+              {{GetFieldModifier()}}{{GetTypeName()}}[] _items = new {{GetTypeName()}}[] {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
-              {{cfg.GetFieldModifier()}}uint[] _hashCodes = {
+              {{GetFieldModifier()}}uint[] _hashCodes = {
           {{FormatColumns(ctx.HashCodes, static x => x.ToStringInvariant())}}
               };
 
-              {{cfg.GetMethodAttributes()}}
-              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
 
                   uint hash = Hash(value);
-                  ref B b = ref _buckets[{{cfg.GetModFunction(ctx.Buckets.Length)}}];
+                  ref B b = ref _buckets[{{GetModFunction("hash", ctx.Buckets.Length)}}];
 
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} index = b.StartIndex;
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} endIndex = b.EndIndex;
 
                   while (index <= endIndex)
                   {
-                      if (_hashCodes[index] == hash && {{genCfg.GetEqualFunction("_items[index]")}})
+                      if (_hashCodes[index] == hash && {{GetEqualFunction("value", "_items[index]")}})
                           return true;
 
                       index++;
@@ -40,7 +41,7 @@ internal sealed class HashSetLinearCode<T>(GeneratorConfig<T> genCfg, CSharpCode
                   return false;
               }
 
-          {{genCfg.GetHashSource()}}
+          {{GetHashSource()}}
 
               [StructLayout(LayoutKind.Auto)]
               private readonly struct B

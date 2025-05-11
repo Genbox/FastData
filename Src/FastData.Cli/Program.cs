@@ -85,7 +85,7 @@ internal static class Program
             genCfg.ClassVisibility = cv;
             genCfg.ClassType = ct;
 
-            CSharpCodeGenerator generator = new CSharpCodeGenerator(genCfg);
+            CSharpCodeGenerator generator = CSharpCodeGenerator.Create(genCfg);
 
             await GenerateAsync(inputFile, dataType, structureType, generator, outputFile);
         }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt, namespaceOpt, classVisibilityOpt, classTypeOpt);

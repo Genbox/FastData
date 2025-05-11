@@ -1,7 +1,8 @@
 ﻿using System.Globalization;
 using System.Text;
+using Genbox.FastData.Generator.CSharp.Internal.Framework;
+using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.InternalShared;
-using static Genbox.FastData.Generator.CSharp.Internal.Helpers.CodeHelper;
 
 namespace Genbox.FastData.Generator.CSharp.Benchmarks;
 
@@ -44,7 +45,7 @@ internal static class Program
 
         foreach (ITestData data in TestVectorHelper.GetBenchmarkVectors())
         {
-            data.Generate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), out GeneratorSpec spec);
+            data.Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), out GeneratorSpec spec);
 
             TestHelper.TryWriteFile(Path.Combine(rootDir, spec.Identifier + ".cs"), spec.Source);
 
@@ -70,10 +71,13 @@ internal static class Program
 
     private static string PrintQueries(ITestData data, string identifier)
     {
+        CSharpLanguageSpec langSpec = new CSharpLanguageSpec();
+        CodeHelper helper = new CodeHelper(langSpec, new TypeMap(langSpec.Primitives));
+
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < 25; i++)
-            sb.AppendLine(CultureInfo.InvariantCulture, $"        {identifier}.Contains({data.GetValueLabel(ToValueLabel)});");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"        {identifier}.Contains({data.GetValueLabel(helper)});");
 
         return sb.ToString();
     }

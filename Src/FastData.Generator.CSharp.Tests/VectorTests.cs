@@ -1,5 +1,6 @@
+using Genbox.FastData.Generator.CSharp.Internal.Framework;
+using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.InternalShared;
-using static Genbox.FastData.Generator.CSharp.Internal.Helpers.CodeHelper;
 using static Genbox.FastData.Generator.Helpers.FormatHelper;
 
 namespace Genbox.FastData.Generator.CSharp.Tests;
@@ -10,8 +11,11 @@ public class VectorTests
     [ClassData(typeof(TestVectorClass))]
     public void Test<T>(TestData<T> data)
     {
-        Assert.True(TestVectorHelper.TryGenerate(id => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
+        Assert.True(TestVectorHelper.TryGenerate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
+
+        CSharpLanguageSpec langSpec = new CSharpLanguageSpec();
+        CodeHelper helper = new CodeHelper(langSpec, new TypeMap(langSpec.Primitives));
 
         string wrapper = $$"""
                            {{spec.Source}}
@@ -21,7 +25,7 @@ public class VectorTests
                                public static bool Contains()
                                {
                            {{FormatList(data.Values, x => $"""
-                                                           if (!{spec.Identifier}.Contains({ToValueLabel(x)}))
+                                                           if (!{spec.Identifier}.Contains({helper.ToValueLabel(x)}))
                                                                return false;
                                                            """, "\n")}};
 

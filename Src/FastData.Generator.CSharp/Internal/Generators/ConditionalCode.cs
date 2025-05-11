@@ -1,10 +1,11 @@
+using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Enums;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class ConditionalCode<T>(GeneratorConfig<T> genCfg, CSharpCodeGeneratorConfig cfg, ConditionalContext<T> ctx) : IOutputWriter
+internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>
 {
-    public string Generate() => cfg.ConditionalBranchType switch
+    public override string Generate() => cfg.ConditionalBranchType switch
     {
         BranchType.If => GenerateIf(),
         BranchType.Switch => GenerateSwitch(),
@@ -13,12 +14,12 @@ internal sealed class ConditionalCode<T>(GeneratorConfig<T> genCfg, CSharpCodeGe
 
     private string GenerateIf() =>
         $$"""
-              {{cfg.GetMethodAttributes()}}
-              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
 
-                  if ({{FormatList(ctx.Data, x => genCfg.GetEqualFunction(ToValueLabel(x)), " || ")}})
+                  if ({{FormatList(ctx.Data, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}})
                       return true;
 
                   return false;
@@ -27,14 +28,14 @@ internal sealed class ConditionalCode<T>(GeneratorConfig<T> genCfg, CSharpCodeGe
 
     private string GenerateSwitch() =>
         $$"""
-              {{cfg.GetMethodAttributes()}}
-              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
 
                   switch (value)
                   {
-          {{FormatList(ctx.Data, static x => $"            case {ToValueLabel(x)}:", "\n")}}
+          {{FormatList(ctx.Data, x => $"            case {ToValueLabel(x)}:", "\n")}}
                           return true;
                       default:
                           return false;

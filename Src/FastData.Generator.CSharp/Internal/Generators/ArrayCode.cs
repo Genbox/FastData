@@ -1,23 +1,24 @@
+using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class ArrayCode<T>(GeneratorConfig<T> genCfg, CSharpCodeGeneratorConfig cfg, ArrayContext<T> ctx) : IOutputWriter
+internal sealed class ArrayCode<T>(ArrayContext<T> ctx) : CSharpOutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}{{genCfg.GetTypeName()}}[] _entries = new {{genCfg.GetTypeName()}}[] {
+              {{GetFieldModifier()}}{{GetTypeName()}}[] _entries = new {{GetTypeName()}}[] {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
-              {{cfg.GetMethodAttributes()}}
-              {{cfg.GetMethodModifier()}}bool Contains({{genCfg.GetTypeName()}} value)
+              {{GetMethodAttributes()}}
+              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
               {
-          {{cfg.GetEarlyExits(genCfg)}}
+          {{GetEarlyExits()}}
 
                   for (int i = 0; i < {{ctx.Data.Length.ToStringInvariant()}}; i++)
                   {
-                      if ({{genCfg.GetEqualFunction("_entries[i]")}})
+                      if ({{GetEqualFunction("value", "_entries[i]")}})
                          return true;
                   }
                   return false;

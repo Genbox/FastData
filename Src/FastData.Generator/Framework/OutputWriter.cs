@@ -12,8 +12,6 @@ public abstract class OutputWriter<T> : IOutputWriter
     private IEarlyExitHandler _earlyExitHandler;
     private CodeHelper _codeHelper;
     private IHashHandler _hashHandler;
-    private string _typeName;
-    private GeneratorConfig<T> _genCfg;
 
     internal void Initialize(ICodeSpec codeSpec,
                              ILanguageSpec langSpec,
@@ -28,15 +26,18 @@ public abstract class OutputWriter<T> : IOutputWriter
         _earlyExitHandler = earlyExitHandler;
         _codeHelper = codeHelper;
         _hashHandler = hashHandler;
-        _typeName = typeName;
-        _genCfg = genCfg;
+        TypeName = typeName;
+        GeneratorConfig = genCfg;
     }
+
+    protected string TypeName { get; private set; }
+    protected GeneratorConfig<T> GeneratorConfig { get; private set; }
 
     public abstract string Generate();
 
-    protected string GetTypeName() => _typeName;
-    protected string GetEarlyExits() => _earlyExitHandler.GetEarlyExits<T>(_genCfg.EarlyExits);
-    protected string GetHashSource() => _hashHandler.GetHashSource(_genCfg.DataType, _typeName);
+    protected string GetTypeName() => TypeName;
+    protected string GetEarlyExits() => _earlyExitHandler.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
+    protected string GetHashSource() => _hashHandler.GetHashSource(GeneratorConfig.DataType, TypeName);
 
     protected string GetArraySizeType() => _langSpec.ArraySizeType;
 
