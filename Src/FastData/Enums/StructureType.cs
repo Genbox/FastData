@@ -17,7 +17,7 @@ public enum StructureType : byte
 
     // O(1) data structures
     PerfectHashGPerf,
-    PerfectHashBruteForce,
+    HashSetPerfect,
     HashSetChain,
     HashSetLinear,
 

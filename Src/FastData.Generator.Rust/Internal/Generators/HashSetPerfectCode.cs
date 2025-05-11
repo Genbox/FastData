@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Rust.Internal.Framework;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<T> ctx, GeneratorConfig<T> genCfg, SharedCode shared) : RustOutputWriter<T>
+internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, GeneratorConfig<T> genCfg, SharedCode shared) : RustOutputWriter<T>
 {
     public override string Generate()
     {

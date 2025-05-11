@@ -124,8 +124,8 @@ public static class FastDataGenerator
             yield return new EytzingerSearchStructure<T>(cfg);
         else if (ds == StructureType.PerfectHashGPerf)
             yield return new PerfectHashGPerfStructure<T>(cfg);
-        else if (ds == StructureType.PerfectHashBruteForce)
-            yield return new PerfectHashBruteForceStructure<T>();
+        else if (ds == StructureType.HashSetPerfect)
+            yield return new HashSetPerfectStructure<T>();
         else if (ds == StructureType.HashSetChain)
             yield return new HashSetChainStructure<T>();
         else if (ds == StructureType.HashSetLinear)

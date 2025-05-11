@@ -2,7 +2,7 @@ using Genbox.FastData.Generator.CSharp.Internal.Framework;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
+internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
     public override string Generate() =>
         $$"""

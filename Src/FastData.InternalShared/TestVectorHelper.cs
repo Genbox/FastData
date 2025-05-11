@@ -37,7 +37,7 @@ public static class TestVectorHelper
             }
             else if (type == StructureType.PerfectHashGPerf)
                 yield return new TestData<string>(type, ["item1", "item2", "item3", "item4"]);
-            else if (type == StructureType.PerfectHashBruteForce)
+            else if (type == StructureType.HashSetPerfect)
             {
                 //We omit long types because it has duplicate hash codes for 0/max
                 yield return new TestData<string>(type, ["item1", "item2", "item3"]);
@@ -81,7 +81,7 @@ public static class TestVectorHelper
                     yield return new TestData<string>(type, ["1", "2", "a", "aa", "aaa", "item", new string('a', 255)]); //Test long strings
                     break;
 
-                case StructureType.PerfectHashBruteForce: //We've kept to a small set since larger ones will just hit timeout
+                case StructureType.HashSetPerfect: //We've kept to a small set since larger ones will just hit timeout
                     foreach (ITestData data in GetEdgeCaseSets(type))
                         yield return data;
                     break;
@@ -124,7 +124,7 @@ public static class TestVectorHelper
                     yield return new TestData<string>(type, Enumerable.Range(0, benchmarkSize).Select(x => "item" + x).ToArray());
                     break;
 
-                case StructureType.PerfectHashBruteForce:
+                case StructureType.HashSetPerfect:
                     foreach (ITestData data in GetSetOfSize(type, 10))
                         yield return data;
                     break;

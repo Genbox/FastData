@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: PerfectHashBruteForce
+// Structure: HashSetPerfect
 #pragma once
 #include <array>
 #include <cstdint>
@@ -10,24 +10,30 @@ class my_data final
 {
     struct e
     {
-        double value;
+        std::string_view value;
         uint32_t hash_code;
 
-        e(const double value, const uint32_t hash_code)
+        e(const std::string_view value, const uint32_t hash_code)
         : value(value), hash_code(hash_code) {}
     };
 
     inline static const std::array<e, 3> entries = {
-        e(std::numeric_limits<double>::max(), 2066174499u), e(0.0, 1364076727u), e(std::numeric_limits<double>::lowest(), 2886815657u)
+        e("item2", 2874739758u), e("item3", 2030593309u), e("item1", 3482164928u)
     };
 
-    static uint32_t get_hash(const double value) noexcept
+    static constexpr uint32_t get_hash(const std::string_view value) noexcept
     {
-        uint64_t bits;
-        std::memcpy(&bits, &value, sizeof(bits));
-        if (((bits - 1) & ~0x8000000000000000ull) >= 0x7FF0000000000000ull)
-            bits &= 0x7FF0000000000000ull;
-        return static_cast<uint32_t>(bits) ^ static_cast<uint32_t>(bits >> 32);
+        uint32_t hash = 352654597;
+
+        const char* ptr = value.data();
+        size_t len = value.size();
+
+        while (len-- > 0) {
+            hash = (((hash << 5) | (hash >> 27)) + hash) ^ *ptr;
+            ptr++;
+        }
+
+        return 352654597 + (hash * 1566083941);
     }
 
     static uint32_t murmur_32(uint32_t h) noexcept
@@ -42,11 +48,11 @@ class my_data final
 
 public:
     [[nodiscard]]
-    static bool contains(const double value) noexcept
+    static bool contains(const std::string_view value) noexcept
     {
-        if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
+        if (value.length() != 5u)
             return false;
-        const uint32_t hash = murmur_32(get_hash(value) ^ 1);
+        const uint32_t hash = murmur_32(get_hash(value) ^ 3);
         const size_t index = hash % 3;
         const e& entry = entries[index];
 
@@ -54,8 +60,8 @@ public:
     }
 
     static constexpr size_t item_count = 3;
-    static constexpr double min_value = std::numeric_limits<double>::lowest();
-    static constexpr double max_value = std::numeric_limits<double>::max();
+    static constexpr size_t min_length = 5;
+    static constexpr size_t max_length = 5;
 
 public:
     my_data() = delete;

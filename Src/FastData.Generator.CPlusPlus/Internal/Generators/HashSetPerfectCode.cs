@@ -2,7 +2,7 @@ using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<T> ctx) : CPlusPlusOutputWriter<T>
+internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
     public override string Generate() =>
         $$"""

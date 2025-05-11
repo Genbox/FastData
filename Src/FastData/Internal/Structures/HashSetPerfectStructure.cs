@@ -7,7 +7,7 @@ using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class PerfectHashBruteForceStructure<T> : IHashStructure<T>
+internal sealed class HashSetPerfectStructure<T> : IHashStructure<T>
 {
     public bool TryCreate(T[] data, HashFunc<T> hashFunc, out IContext? context)
     {
@@ -37,7 +37,7 @@ internal sealed class PerfectHashBruteForceStructure<T> : IHashStructure<T>
             pairs[index] = new KeyValuePair<T, uint>(value, hash);
         }
 
-        context = new PerfectHashBruteForceContext<T>(pairs, seed);
+        context = new HashSetPerfectContext<T>(pairs, seed);
         return true;
     }
 
