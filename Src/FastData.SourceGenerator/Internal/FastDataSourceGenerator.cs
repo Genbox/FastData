@@ -52,7 +52,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
                     if (obj is CombinedConfig combinedCfg)
                     {
-                        if (!FastDataGenerator.TryGenerate(combinedCfg.Data, combinedCfg.FDConfig, new CSharpCodeGenerator(combinedCfg.CSConfig), out string? source))
+                        if (!FastDataGenerator.TryGenerate(combinedCfg.Data, combinedCfg.FDConfig, CSharpCodeGenerator.Create(combinedCfg.CSConfig), out string? source))
                         {
                             StructureType ds = combinedCfg.FDConfig.StructureType;
 

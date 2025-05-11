@@ -51,7 +51,7 @@ public class SourceGeneratorTests
     [InlineData(StructureType.BinarySearch)]
     [InlineData(StructureType.EytzingerSearch)]
     [InlineData(StructureType.PerfectHashGPerf)]
-    [InlineData(StructureType.PerfectHashBruteForce)]
+    [InlineData(StructureType.HashSetPerfect)]
     [InlineData(StructureType.HashSetChain)]
     [InlineData(StructureType.HashSetLinear)]
     [InlineData(StructureType.KeyLength)]
@@ -99,10 +99,10 @@ public class SourceGeneratorTests
         switch (visibility)
         {
             case ClassVisibility.Internal:
-                Assert.Contains("internal static class StaticData ", output, StringComparison.Ordinal);
+                Assert.Contains("internal static class StaticData", output, StringComparison.Ordinal);
                 break;
             case ClassVisibility.Public:
-                Assert.Contains("public static class StaticData ", output, StringComparison.Ordinal);
+                Assert.Contains("public static class StaticData", output, StringComparison.Ordinal);
                 break;
             case ClassVisibility.Unknown:
             default:
