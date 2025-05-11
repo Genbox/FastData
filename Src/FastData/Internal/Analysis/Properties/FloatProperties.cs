@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
+using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Analysis.Properties;
 
 [StructLayout(LayoutKind.Auto)]
-internal readonly record struct FloatProperties<T>(T MinValue, T MaxValue);
+internal record FloatProperties<T>(T MinValue, T MaxValue) : IHasMinMax<T>;

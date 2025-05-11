@@ -12,8 +12,7 @@ public:
     [[nodiscard]]
     static bool contains(const double value) noexcept
     {
-        if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
-            return false;
+
 
         if (value == std::numeric_limits<double>::lowest() || value == 0.0 || value == std::numeric_limits<double>::max())
             return true;

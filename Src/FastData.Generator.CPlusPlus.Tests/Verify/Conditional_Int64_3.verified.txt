@@ -12,8 +12,7 @@ public:
     [[nodiscard]]
     static bool contains(const int64_t value) noexcept
     {
-        if (value < std::numeric_limits<int64_t>::lowest() || value > std::numeric_limits<int64_t>::max())
-            return false;
+
 
         if (value == std::numeric_limits<int64_t>::lowest() || value == 0ll || value == std::numeric_limits<int64_t>::max())
             return true;

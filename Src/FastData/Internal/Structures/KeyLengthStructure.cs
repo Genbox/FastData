@@ -24,7 +24,7 @@ internal sealed class KeyLengthStructure<T>(StructureConfig<T> config) : IStruct
         //idx 2: null
         //idx 3: "aaa", "bbb"
 
-        StringProperties props = config.DataProperties.StringProps!.Value;
+        StringProperties props = config.DataProperties.StringProps!;
         uint minLen = props.LengthData.Min;
         uint maxLen = props.LengthData.Max;
 

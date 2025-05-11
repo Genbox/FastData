@@ -48,7 +48,7 @@ internal sealed class PerfectHashGPerfStructure<T>(StructureConfig<T> config) : 
             return false;
 
         // We cannot work on empty strings
-        StringProperties strProps = config.DataProperties.StringProps!.Value;
+        StringProperties strProps = config.DataProperties.StringProps!;
 
         if (strProps.LengthData.Min == 0)
             return false;

@@ -1,4 +1,5 @@
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Specs.EarlyExit;
 
@@ -19,22 +20,7 @@ internal static class Optimizer
             yield return new MinMaxLengthEarlyExit(prop.LengthData.Min, prop.LengthData.Max); //Also handles same lengths
     }
 
-    public static IEnumerable<IEarlyExit> GetEarlyExits<T>(IntegerProperties<T> prop)
-    {
-        yield return new MinMaxValueEarlyExit<T>(prop.MinValue, prop.MaxValue);
-    }
-
-    public static IEnumerable<IEarlyExit> GetEarlyExits<T>(UnsignedIntegerProperties<T> prop)
-    {
-        yield return new MinMaxValueEarlyExit<T>(prop.MinValue, prop.MaxValue);
-    }
-
-    public static IEnumerable<IEarlyExit> GetEarlyExits<T>(CharProperties<T> prop)
-    {
-        yield return new MinMaxValueEarlyExit<T>(prop.MinValue, prop.MaxValue);
-    }
-
-    public static IEnumerable<IEarlyExit> GetEarlyExits<T>(FloatProperties<T> prop)
+    public static IEnumerable<IEarlyExit> GetEarlyExits<T>(IHasMinMax<T> prop)
     {
         yield return new MinMaxValueEarlyExit<T>(prop.MinValue, prop.MaxValue);
     }

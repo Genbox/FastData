@@ -13,7 +13,7 @@ public class GeneratorConfig<T>
         StringComparison = stringComparison;
         HashSpec = hashSpec;
         DataType = props.DataType;
-        EarlyExits = GetEarlyExits(props);
+        EarlyExits = GetEarlyExits(props, structureType);
         Constants = CreateConstants(props);
         Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.Now);
     }
@@ -30,46 +30,44 @@ public class GeneratorConfig<T>
     {
         Constants<T> constants = new Constants<T>(props.ItemCount);
 
-        if (props.StringProps.HasValue)
+        if (props.StringProps != null)
         {
-            constants.MinStringLength = props.StringProps.Value.LengthData.Min;
-            constants.MaxStringLength = props.StringProps.Value.LengthData.Max;
+            constants.MinStringLength = props.StringProps.LengthData.Min;
+            constants.MaxStringLength = props.StringProps.LengthData.Max;
         }
-        else if (props.IntProps.HasValue)
+        else if (props.IntProps != null)
         {
-            constants.MinValue = props.IntProps.Value.MinValue;
-            constants.MaxValue = props.IntProps.Value.MaxValue;
+            constants.MinValue = props.IntProps.MinValue;
+            constants.MaxValue = props.IntProps.MaxValue;
         }
-        else if (props.UIntProps.HasValue)
+        else if (props.FloatProps != null)
         {
-            constants.MinValue = props.UIntProps.Value.MinValue;
-            constants.MaxValue = props.UIntProps.Value.MaxValue;
+            constants.MinValue = props.FloatProps.MinValue;
+            constants.MaxValue = props.FloatProps.MaxValue;
         }
-        else if (props.FloatProps.HasValue)
-        {
-            constants.MinValue = props.FloatProps.Value.MinValue;
-            constants.MaxValue = props.FloatProps.Value.MaxValue;
-        }
-        else if (props.CharProps.HasValue)
-        {
-            constants.MinValue = props.CharProps.Value.MinValue;
-            constants.MaxValue = props.CharProps.Value.MaxValue;
-        }
+
         return constants;
     }
 
-    private static IEarlyExit[] GetEarlyExits(DataProperties<T> props)
+    private static IEarlyExit[] GetEarlyExits(DataProperties<T> props, StructureType structureType)
     {
-        if (props.StringProps.HasValue)
-            return Optimizer.GetEarlyExits(props.StringProps.Value).ToArray();
-        if (props.IntProps.HasValue)
-            return Optimizer.GetEarlyExits(props.IntProps.Value).ToArray();
-        if (props.UIntProps.HasValue)
-            return Optimizer.GetEarlyExits(props.UIntProps.Value).ToArray();
-        if (props.CharProps.HasValue)
-            return Optimizer.GetEarlyExits(props.CharProps.Value).ToArray();
-        if (props.FloatProps.HasValue)
-            return Optimizer.GetEarlyExits(props.FloatProps.Value).ToArray();
+        //There is no point to using early exists if there is just one item
+        if (props.ItemCount == 1)
+            return [];
+
+        if (props.StringProps != null)
+            return Optimizer.GetEarlyExits(props.StringProps).ToArray();
+
+        //Conditional structures are not very useful with less than 3 items as checks costs more than the benefits
+        if (structureType == StructureType.Conditional && props.ItemCount <= 3)
+            return [];
+
+        if (props.IntProps != null)
+            return Optimizer.GetEarlyExits(props.IntProps).ToArray();
+
+        if (props.FloatProps != null)
+            return Optimizer.GetEarlyExits(props.FloatProps).ToArray();
+
         return [];
     }
 }

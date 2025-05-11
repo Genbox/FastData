@@ -12,8 +12,7 @@ internal static class MyData
     
     public static bool Contains(int value)
     {
-        if (value < int.MinValue || value > int.MaxValue)
-            return false;
+
 
         switch (value)
         {

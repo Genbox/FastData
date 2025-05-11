@@ -140,13 +140,13 @@ public static class FastDataGenerator
     {
         //Run each of the analyzers
         Simulator simulator = new Simulator(data, new SimulatorConfig());
-        BruteForceAnalyzer bf = new BruteForceAnalyzer(props.StringProps!.Value, new BruteForceAnalyzerConfig(), simulator);
+        BruteForceAnalyzer bf = new BruteForceAnalyzer(props.StringProps!, new BruteForceAnalyzerConfig(), simulator);
         Candidate<BruteForceHashSpec> bfCand = bf.Run();
 
         GeneticAnalyzer ga = new GeneticAnalyzer(new GeneticAnalyzerConfig(), simulator);
         Candidate<GeneticHashSpec> gaCand = ga.Run();
 
-        HeuristicAnalyzer ha = new HeuristicAnalyzer(data, props.StringProps!.Value, new HeuristicAnalyzerConfig(), simulator);
+        HeuristicAnalyzer ha = new HeuristicAnalyzer(data, props.StringProps!, new HeuristicAnalyzerConfig(), simulator);
         Candidate<HeuristicHashSpec> haCand = ha.Run();
 
         //Select the spec with the best fitness
