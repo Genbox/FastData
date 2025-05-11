@@ -1,5 +1,6 @@
 using System.Text;
 using Genbox.FastData.Specs.Hash;
+using Genbox.FastData.Specs.Misc;
 
 namespace Genbox.FastData.Internal.Helpers;
 

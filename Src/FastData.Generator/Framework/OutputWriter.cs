@@ -6,17 +6,12 @@ namespace Genbox.FastData.Generator.Framework;
 
 public abstract class OutputWriter<T> : IOutputWriter
 {
-    private ILanguageDef _langDef;
-    private IEarlyExitDef _earlyExitDef;
-    private TypeHelper _typeHelper;
-    private IHashDef _hashDef;
+    private ILanguageDef _langDef = null!;
+    private IEarlyExitDef _earlyExitDef = null!;
+    private TypeHelper _typeHelper = null!;
+    private IHashDef _hashDef = null!;
 
-    internal void Initialize(ILanguageDef langDef,
-                             IEarlyExitDef earlyExitDef,
-                             TypeHelper typeHelper,
-                             IHashDef hashDef,
-                             GeneratorConfig<T> genCfg,
-                             string typeName)
+    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeHelper typeHelper, IHashDef hashDef, GeneratorConfig<T> genCfg, string typeName)
     {
         _langDef = langDef;
         _earlyExitDef = earlyExitDef;
@@ -26,8 +21,8 @@ public abstract class OutputWriter<T> : IOutputWriter
         GeneratorConfig = genCfg;
     }
 
-    protected string TypeName { get; private set; }
-    protected GeneratorConfig<T> GeneratorConfig { get; private set; }
+    protected string TypeName { get; private set; } = null!;
+    protected GeneratorConfig<T> GeneratorConfig { get; private set; } = null!;
 
     public abstract string Generate();
 

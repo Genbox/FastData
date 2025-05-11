@@ -4,7 +4,7 @@ namespace Genbox.FastData.Generator.Framework;
 
 public class TypeHelper(TypeMap typeMap)
 {
-    public string ToValueLabel<T>(T? value)
+    public string ToValueLabel<T>(T value)
     {
         ITypeDef<T> s = typeMap.Get<T>();
         return s.Print(value);

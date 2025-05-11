@@ -1,22 +1,11 @@
-using System.Runtime.InteropServices;
 using Genbox.FastData.Abstracts;
 
 namespace Genbox.FastData.Specs.Hash;
 
-[StructLayout(LayoutKind.Auto)]
-public readonly record struct HeuristicHashSpec(int[] Positions) : IHashSpec
+public sealed record HeuristicStringHash(int[] Positions) : IStringHash
 {
-    public HashFunc<string> GetHashFunction()
-    {
-        int[] localPos = Positions;
-        return obj => Hash(obj, localPos);
-    }
-
-    public EqualFunc<string> GetEqualFunction()
-    {
-        int[] localPos = Positions;
-        return (a, b) => Equal(a, b, localPos);
-    }
+    public HashFunc<string> GetHashFunction() => obj => Hash(obj, Positions);
+    public EqualFunc<string> GetEqualFunction() => (a, b) => Equal(a, b, Positions);
 
     private static uint Hash(string input, int[] positions)
     {

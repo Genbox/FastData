@@ -8,7 +8,7 @@ namespace Genbox.FastData.Internal.Abstracts;
 /// It does so by analyzing a array for entropy and selecting enough of the array, such that a hash of the resulting
 /// segments is unique (or only has a few collisions).
 /// </summary>
-internal interface IHashAnalyzer<T> where T : struct, IHashSpec
+internal interface IHashAnalyzer<T> where T : IStringHash
 {
     /// <summary>
     /// Runs the analyzer. Data is usually provided in the ctor.

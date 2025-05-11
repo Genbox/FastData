@@ -2,26 +2,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Specs.Misc;
 
 namespace Genbox.FastData.Specs.Hash;
 
-[StructLayout(LayoutKind.Auto)]
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-[SuppressMessage("Major Code Smell", "S125:Sections of code should not be commented out")]
-public struct GeneticHashSpec(int mixerSeed, int mixerIterations, int avalancheSeed, int avalancheIterations, StringSegment[] segments) : IHashSpec
+public sealed record GeneticStringHash(int MixerSeed, int MixerIterations, int AvalancheSeed, int AvalancheIterations, StringSegment[] Segments) : IStringHash
 {
-    internal int MixerSeed = mixerSeed;
-    internal int MixerIterations = mixerIterations;
-    internal int AvalancheSeed = avalancheSeed;
-    internal int AvalancheIterations = avalancheIterations;
-    internal StringSegment[] Segments = segments;
-
-    public readonly HashFunc<string> GetHashFunction()
+    public HashFunc<string> GetHashFunction()
     {
         Func<uint, uint, uint> mixer = GetMixer().Compile();
         Func<uint, uint> avalanche = GetAvalanche().Compile();
-        uint seed = (uint)MixerSeed;
-        return str => Hash(str, seed, mixer, avalanche);
+        return str => Hash(str, (uint)MixerSeed, mixer, avalanche);
     }
 
     private static uint Hash(string str, uint seed, Func<uint, uint, uint> mixer, Func<uint, uint> avalanche)
@@ -36,9 +28,9 @@ public struct GeneticHashSpec(int mixerSeed, int mixerIterations, int avalancheS
         return avalanche(acc);
     }
 
-    public readonly EqualFunc<string> GetEqualFunction() => static (a, b) => a.Equals(b, StringComparison.Ordinal);
+    public EqualFunc<string> GetEqualFunction() => static (a, b) => a.Equals(b, StringComparison.Ordinal);
 
-    public readonly Expression<Func<uint, uint, uint>> GetMixer()
+    public Expression<Func<uint, uint, uint>> GetMixer()
     {
         ParameterExpression accParam = Expression.Parameter(typeof(uint), "accParam");
         ParameterExpression inputParam = Expression.Parameter(typeof(uint), "inputParam");
@@ -51,7 +43,7 @@ public struct GeneticHashSpec(int mixerSeed, int mixerIterations, int avalancheS
         return Expression.Lambda<Func<uint, uint, uint>>(block, accParam, inputParam);
     }
 
-    public readonly Expression<Func<uint, uint>> GetAvalanche()
+    public Expression<Func<uint, uint>> GetAvalanche()
     {
         ParameterExpression accParam = Expression.Parameter(typeof(uint), "accParam");
         ParameterExpression acc = Expression.Parameter(typeof(uint), "acc");

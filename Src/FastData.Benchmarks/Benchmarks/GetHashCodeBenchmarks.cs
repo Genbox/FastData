@@ -4,7 +4,7 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 public class GetHashCodeBenchmarks
 {
-    private readonly double _value = 12.5; //Don't make const (it will make the compiler optimize further). We need to simulate real-lfie.
+    private readonly double _value = 12.5; //Don't make const (it will make the compiler optimize further). We need to simulate real-life.
 
     [Benchmark]
     public uint DoubleHashCode()

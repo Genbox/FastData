@@ -8,7 +8,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
 internal class Simulator(string[] data, SimulatorConfig config)
 {
-    internal void Run<T>(ref Candidate<T> cand) where T : struct, IHashSpec
+    internal void Run<T>(ref Candidate<T> cand) where T : IStringHash
     {
         // Generate a hash function from the spec
         HashFunc<string> hashFunc = cand.Spec.GetHashFunction();

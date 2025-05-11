@@ -2,7 +2,7 @@ using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Abstracts;
 
-public interface IHashSpec
+public interface IStringHash
 {
     HashFunc<string> GetHashFunction();
     EqualFunc<string> GetEqualFunction();

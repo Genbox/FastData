@@ -43,11 +43,11 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
 /// <summary>Finds the least number of positions in a string that hashes to a unique value for all inputs.</summary>
 [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
-internal class HeuristicAnalyzer(string[] data, StringProperties props, HeuristicAnalyzerConfig config, Simulator simulator) : IHashAnalyzer<HeuristicHashSpec>
+internal class HeuristicAnalyzer(string[] data, StringProperties props, HeuristicAnalyzerConfig config, Simulator simulator) : IHashAnalyzer<HeuristicStringHash>
 {
     private const double _epsilon = 1e-6;
 
-    public Candidate<HeuristicHashSpec> Run()
+    public Candidate<HeuristicStringHash> Run()
     {
         // Stage 1: Find all positions that are mandatory. If two items are the same length, but differ only on one character, then we must include that character.
         HashSet<int> mandatory = GetMandatory();
@@ -231,9 +231,9 @@ internal class HeuristicAnalyzer(string[] data, StringProperties props, Heuristi
 
     private double CalculateFitness(HashSet<int> set) => CalculateFitnessInternal(set).Fitness; //The algorithm here works with less fitness = better. At least for now.
 
-    private Candidate<HeuristicHashSpec> CalculateFitnessInternal(HashSet<int> set)
+    private Candidate<HeuristicStringHash> CalculateFitnessInternal(HashSet<int> set)
     {
-        Candidate<HeuristicHashSpec> cand = new Candidate<HeuristicHashSpec>(new HeuristicHashSpec(set.OrderBy(x => x).ToArray()));
+        Candidate<HeuristicStringHash> cand = new Candidate<HeuristicStringHash>(new HeuristicStringHash(set.OrderBy(x => x).ToArray()));
         simulator.Run(ref cand);
         return cand;
     }
@@ -241,7 +241,7 @@ internal class HeuristicAnalyzer(string[] data, StringProperties props, Heuristi
     [Conditional("DebugPrint")]
     private void Print(string stage, HashSet<int> set)
     {
-        Candidate<HeuristicHashSpec> cand = CalculateFitnessInternal(set);
+        Candidate<HeuristicStringHash> cand = CalculateFitnessInternal(set);
 
         Console.Write($"{stage} ({cand.Metadata["Collisions"]}): ");
         bool lastChar = false;

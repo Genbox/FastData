@@ -30,8 +30,6 @@ namespace Genbox.FastData.Internal.Structures;
   - Random associated values tables
  */
 
-//TODO: Convert to a IHashStructure
-
 [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
 internal sealed class PerfectHashGPerfStructure<T>(StructureConfig<T> config) : IStructure<T>
 {
@@ -56,7 +54,7 @@ internal sealed class PerfectHashGPerfStructure<T>(StructureConfig<T> config) : 
         // Step 1: Finding good positions
         Simulator sim = new Simulator(stringArr, new SimulatorConfig { TimeWeight = 0 });
         HeuristicAnalyzer analyzer = new HeuristicAnalyzer(stringArr, strProps, new HeuristicAnalyzerConfig(), sim);
-        Candidate<HeuristicHashSpec> candidate = analyzer.Run();
+        Candidate<HeuristicStringHash> candidate = analyzer.Run();
 
         // If we didn't get any positions, we don't want to move any further
         if (candidate.Spec.Positions.Length == 0)

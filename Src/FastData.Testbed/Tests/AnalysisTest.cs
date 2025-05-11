@@ -8,6 +8,7 @@ using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Specs.Hash;
+using Genbox.FastData.Specs.Misc;
 
 namespace Genbox.FastData.Testbed.Tests;
 
@@ -40,7 +41,7 @@ internal static class AnalysisTest
 
         Simulator sim = new Simulator(data, new SimulatorConfig());
         BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), sim);
-        Candidate<BruteForceHashSpec> top1 = analyzer.Run();
+        Candidate<BruteForceStringHash> top1 = analyzer.Run();
         PrintCandidate(in top1);
     }
 
@@ -109,40 +110,40 @@ internal static class AnalysisTest
 
         Simulator sim = new Simulator(data, new SimulatorConfig());
         GeneticAnalyzer analyzer = new GeneticAnalyzer(new GeneticAnalyzerConfig(), sim);
-        Candidate<GeneticHashSpec> top1 = analyzer.Run();
+        Candidate<GeneticStringHash> top1 = analyzer.Run();
         PrintCandidate(in top1, in props);
     }
 
-    private static void PrintHeader<T>(in Candidate<T> candidate) where T : struct, IHashSpec
+    private static void PrintHeader<T>(in Candidate<T> candidate) where T : IStringHash
     {
         Console.WriteLine("Result:");
         Console.WriteLine($"- {nameof(candidate.Fitness)}: {candidate.Fitness}");
         Console.WriteLine($"- {nameof(candidate.Metadata)}: {string.Join(", ", candidate.Metadata.Select(x => x.ToString()))}");
     }
 
-    private static void PrintCandidate(in Candidate<GeneticHashSpec> candidate, in StringProperties props)
+    private static void PrintCandidate(in Candidate<GeneticStringHash> candidate, in StringProperties props)
     {
         PrintHeader(in candidate);
 
-        GeneticHashSpec spec = candidate.Spec;
+        GeneticStringHash spec = candidate.Spec;
 
         Console.WriteLine("Hash:");
-        Console.WriteLine($"- {nameof(GeneticHashSpec.MixerSeed)}: {spec.MixerSeed}");
-        Console.WriteLine($"- {nameof(GeneticHashSpec.MixerIterations)}: {spec.MixerIterations}");
-        Console.WriteLine($"- {nameof(GeneticHashSpec.AvalancheSeed)}: {spec.AvalancheSeed}");
-        Console.WriteLine($"- {nameof(GeneticHashSpec.AvalancheIterations)}: {spec.AvalancheIterations}");
-        Console.WriteLine($"- {nameof(GeneticHashSpec.Segments)}: {string.Join(", ", spec.Segments.Select(PrintSegment))}");
+        Console.WriteLine($"- {nameof(GeneticStringHash.MixerSeed)}: {spec.MixerSeed}");
+        Console.WriteLine($"- {nameof(GeneticStringHash.MixerIterations)}: {spec.MixerIterations}");
+        Console.WriteLine($"- {nameof(GeneticStringHash.AvalancheSeed)}: {spec.AvalancheSeed}");
+        Console.WriteLine($"- {nameof(GeneticStringHash.AvalancheIterations)}: {spec.AvalancheIterations}");
+        Console.WriteLine($"- {nameof(GeneticStringHash.Segments)}: {string.Join(", ", spec.Segments.Select(PrintSegment))}");
         Console.WriteLine($"- Mixer: {ExpressionConverter.Instance.GetCode(spec.GetMixer())}");
         Console.WriteLine($"- Avalanche: {ExpressionConverter.Instance.GetCode(spec.GetAvalanche())}");
     }
 
-    private static void PrintCandidate(in Candidate<BruteForceHashSpec> candidate)
+    private static void PrintCandidate(in Candidate<BruteForceStringHash> candidate)
     {
         PrintHeader(in candidate);
 
-        BruteForceHashSpec spec = candidate.Spec;
+        BruteForceStringHash spec = candidate.Spec;
         Console.WriteLine("Hash:");
-        Console.WriteLine($"- {nameof(BruteForceHashSpec.Segment)}: {PrintSegment(spec.Segment)}");
+        Console.WriteLine($"- {nameof(BruteForceStringHash.Segment)}: {PrintSegment(spec.Segment)}");
     }
 
     private static string PrintSegment(StringSegment segment)

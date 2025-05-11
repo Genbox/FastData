@@ -48,9 +48,9 @@ public static class FastDataGenerator
 
         bool analysisEnabled = false;
 
-        IHashSpec? spec = null;
+        IStringHash? spec = null;
         if (data is string[] stringArr)
-            spec = analysisEnabled ? GetHashSpec(stringArr, props) : new DefaultHashSpec(generator.UseUTF16Encoding);
+            spec = analysisEnabled ? GetHashSpec(stringArr, props) : new DefaultStringHash(generator.UseUTF16Encoding);
 
         HashFunc<T> hashFunc;
 
@@ -66,6 +66,7 @@ public static class FastDataGenerator
                 DataType.Int16 => static obj => (uint)(short)(object)obj,
                 DataType.UInt16 => static obj => (ushort)(object)obj,
                 DataType.Int32 => static obj => (uint)(int)(object)obj,
+                DataType.UInt32 => static obj => (uint)(object)obj,
                 _ => static obj => (uint)obj.GetHashCode()
             };
 
@@ -136,18 +137,18 @@ public static class FastDataGenerator
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
 
-    private static IHashSpec GetHashSpec<T>(string[] data, DataProperties<T> props)
+    private static IStringHash GetHashSpec<T>(string[] data, DataProperties<T> props)
     {
         //Run each of the analyzers
         Simulator simulator = new Simulator(data, new SimulatorConfig());
         BruteForceAnalyzer bf = new BruteForceAnalyzer(props.StringProps!, new BruteForceAnalyzerConfig(), simulator);
-        Candidate<BruteForceHashSpec> bfCand = bf.Run();
+        Candidate<BruteForceStringHash> bfCand = bf.Run();
 
         GeneticAnalyzer ga = new GeneticAnalyzer(new GeneticAnalyzerConfig(), simulator);
-        Candidate<GeneticHashSpec> gaCand = ga.Run();
+        Candidate<GeneticStringHash> gaCand = ga.Run();
 
         HeuristicAnalyzer ha = new HeuristicAnalyzer(data, props.StringProps!, new HeuristicAnalyzerConfig(), simulator);
-        Candidate<HeuristicHashSpec> haCand = ha.Run();
+        Candidate<HeuristicStringHash> haCand = ha.Run();
 
         //Select the spec with the best fitness
         return bfCand.Fitness >= gaCand.Fitness ? bfCand.Fitness >= haCand.Fitness ? bfCand.Spec : haCand.Spec :

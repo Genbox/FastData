@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Genbox.FastData.Specs.Hash;
+namespace Genbox.FastData.Specs.Misc;
 
 //Note: if length is -1, it means we don't constraint it
 

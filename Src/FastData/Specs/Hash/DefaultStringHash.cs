@@ -5,11 +5,11 @@ using Genbox.FastData.Internal.Hashes;
 
 namespace Genbox.FastData.Specs.Hash;
 
-public sealed class DefaultHashSpec(bool useUTF16Encoding) : IHashSpec
+public sealed record DefaultStringHash(bool UseUTF16Encoding) : IStringHash
 {
     public HashFunc<string> GetHashFunction() => str =>
     {
-        if (useUTF16Encoding)
+        if (UseUTF16Encoding)
             return DJB2Hash.ComputeHash(ref MemoryMarshal.GetReference(str.AsSpan()), str.Length);
 
         byte[] bytes = Encoding.UTF8.GetBytes(str);
