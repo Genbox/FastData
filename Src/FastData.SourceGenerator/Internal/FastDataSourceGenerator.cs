@@ -52,9 +52,9 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
                     if (obj is CombinedConfig combinedCfg)
                     {
-                        if (!FastDataGenerator.TryGenerate(combinedCfg.Data, combinedCfg.FastDataConfig, new CSharpCodeGenerator(combinedCfg.CSharpGeneratorConfig), out string? source))
+                        if (!FastDataGenerator.TryGenerate(combinedCfg.Data, combinedCfg.FDConfig, new CSharpCodeGenerator(combinedCfg.CSConfig), out string? source))
                         {
-                            StructureType ds = combinedCfg.FastDataConfig.StructureType;
+                            StructureType ds = combinedCfg.FDConfig.StructureType;
 
                             if (ds != StructureType.Auto)
                                 throw new InvalidOperationException($"Failed to generate code with '{ds}'. Try setting DataStructure to Auto.");
@@ -62,7 +62,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                             throw new InvalidOperationException("Failed to generate code.");
                         }
 
-                        spc.AddSource(combinedCfg.CSharpGeneratorConfig.ClassName + ".g.cs", SourceText.From(source, Encoding.UTF8));
+                        spc.AddSource(combinedCfg.CSConfig.ClassName + ".g.cs", SourceText.From(source, Encoding.UTF8));
                     }
                     else
                         throw new InvalidOperationException("Unknown object type: " + obj.GetType().Name);
@@ -152,7 +152,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             BindValue(() => config.StructureType, ad.NamedArguments);
             BindValue(() => config.StorageOptions, ad.NamedArguments);
 
-            CSharpGeneratorConfig config2 = new CSharpGeneratorConfig(name);
+            CSharpCodeGeneratorConfig config2 = new CSharpCodeGeneratorConfig(name);
             BindValue(() => config2.Namespace, ad.NamedArguments);
             BindValue(() => config2.ClassVisibility, ad.NamedArguments);
             BindValue(() => config2.ClassType, ad.NamedArguments);

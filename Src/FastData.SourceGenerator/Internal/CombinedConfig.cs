@@ -2,9 +2,9 @@ using Genbox.FastData.Generator.CSharp;
 
 namespace Genbox.FastData.SourceGenerator.Internal;
 
-internal class CombinedConfig(object[] data, FastDataConfig fastDataConfig, CSharpGeneratorConfig cSharpGeneratorConfig)
+internal class CombinedConfig(object[] data, FastDataConfig fdConfig, CSharpCodeGeneratorConfig csConfig)
 {
     public object[] Data { get; } = data;
-    internal FastDataConfig FastDataConfig { get; } = fastDataConfig;
-    internal CSharpGeneratorConfig CSharpGeneratorConfig { get; } = cSharpGeneratorConfig;
+    internal FastDataConfig FDConfig { get; } = fdConfig;
+    internal CSharpCodeGeneratorConfig CSConfig { get; } = csConfig;
 }

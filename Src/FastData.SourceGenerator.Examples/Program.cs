@@ -8,7 +8,7 @@ internal static class Program
 {
     private static void Main()
     {
-        Console.WriteLine(Dogs.Contains("item1"));
-        Console.WriteLine(Dogs.Contains("notthere"));
+        Console.WriteLine("Labrador is a dog? -> " + Dogs.Contains("Labrador"));
+        Console.WriteLine("Lamp is a dog? -> " + Dogs.Contains("Lamp"));
     }
 }

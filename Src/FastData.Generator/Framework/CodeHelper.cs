@@ -1,5 +1,4 @@
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework.Interfaces.Specs;
 
 namespace Genbox.FastData.Generator.Framework;

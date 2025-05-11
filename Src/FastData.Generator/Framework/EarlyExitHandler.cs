@@ -1,6 +1,5 @@
 using System.Text;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework.Interfaces;
 using Genbox.FastData.Specs.EarlyExit;
 
