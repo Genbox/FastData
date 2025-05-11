@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Contexts;
 using Genbox.FastData.Internal.Abstracts;
@@ -17,7 +16,7 @@ internal sealed class HashSetPerfectStructure<T> : IHashStructure<T>
             hashCodes[i] = hashFunc(data[i]);
 
         //Find the proper seeds
-        uint seed = PerfectHashHelper.Generate(hashCodes, static (hash, seed) => Murmur_32(hash ^ seed), 10_000_000);
+        uint seed = PerfectHashHelper.Generate(hashCodes, static (hash, seed) => Mixers.Murmur_32(hash ^ seed), 10_000_000);
 
         // If we have 0 seeds, it means either there is no solution, or we hit the exit condition
         if (seed == 0)
@@ -32,26 +31,12 @@ internal sealed class HashSetPerfectStructure<T> : IHashStructure<T>
         {
             T value = data[i];
 
-            uint hash = Murmur_32(hashFunc(value) ^ seed);
+            uint hash = Mixers.Murmur_32(hashFunc(value) ^ seed);
             uint index = (uint)(hash % pairs.Length);
             pairs[index] = new KeyValuePair<T, uint>(value, hash);
         }
 
         context = new HashSetPerfectContext<T>(pairs, seed);
         return true;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static uint Murmur_32(uint h)
-    {
-        unchecked
-        {
-            h ^= h >> 16;
-            h *= 0x85EBCA6BU;
-            h ^= h >> 13;
-            h *= 0xC2B2AE35U;
-            h ^= h >> 16;
-            return h;
-        }
     }
 }

@@ -29,7 +29,12 @@ internal static class MyData
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static uint Hash(double value)
     {
-        return unchecked((uint)(value.GetHashCode()));
+        ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
+
+        if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
+            bits &= 0x7FF0_0000_0000_0000;
+
+        return (uint)bits ^ (uint)(bits >> 32);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

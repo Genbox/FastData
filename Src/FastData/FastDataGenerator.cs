@@ -54,21 +54,11 @@ public static class FastDataGenerator
 
         HashFunc<T> hashFunc;
 
-        //If we have a hash spec, use it.
+        //If we have a string hash, use it.
         if (spec != null)
             hashFunc = (HashFunc<T>)(object)spec.GetHashFunction();
         else
-            hashFunc = props.DataType switch
-            {
-                DataType.Char => static obj => (char)(object)obj,
-                DataType.SByte => static obj => (uint)(sbyte)(object)obj,
-                DataType.Byte => static obj => (byte)(object)obj,
-                DataType.Int16 => static obj => (uint)(short)(object)obj,
-                DataType.UInt16 => static obj => (ushort)(object)obj,
-                DataType.Int32 => static obj => (uint)(int)(object)obj,
-                DataType.UInt32 => static obj => (uint)(object)obj,
-                _ => static obj => (uint)obj.GetHashCode()
-            };
+            hashFunc = PrimitiveHash.GetHash<T>(props.DataType);
 
         IContext? context = null;
 

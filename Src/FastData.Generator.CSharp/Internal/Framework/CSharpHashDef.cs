@@ -6,13 +6,13 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 internal class CSharpHashDef : IHashDef
 {
     public string GetHashSource(DataType dataType, string typeName) =>
-            $$"""
-                  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                  private static uint Hash({{typeName}} value)
-                  {
-              {{GetHash(dataType)}}
-                  }
-              """;
+        $$"""
+              [MethodImpl(MethodImplOptions.AggressiveInlining)]
+              private static uint Hash({{typeName}} value)
+              {
+          {{GetHash(dataType)}}
+              }
+          """;
 
     private static string GetHash(DataType type)
     {
@@ -31,6 +31,30 @@ internal class CSharpHashDef : IHashDef
                             }
 
                             return 352654597 + (hash * 1566083941);
+                   """;
+        }
+
+        if (type == DataType.Single)
+        {
+            return """
+                           uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
+
+                           if (((bits - 1) & ~(0x8000_0000)) >= 0x7FF0_0000)
+                               bits &= 0x7FF0_0000;
+
+                           return bits;
+                   """;
+        }
+
+        if (type == DataType.Double)
+        {
+            return """
+                           ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
+
+                           if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
+                               bits &= 0x7FF0_0000_0000_0000;
+
+                           return (uint)bits ^ (uint)(bits >> 32);
                    """;
         }
 
