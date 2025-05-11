@@ -14,6 +14,24 @@ namespace Genbox.FastData;
 
 public static class FastDataGenerator
 {
+    public static bool TryGenerate(object[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source) => data[0] switch
+    {
+        bool => TryGenerate(data.Cast<bool>().ToArray(), fdCfg, generator, out source),
+        char => TryGenerate(data.Cast<char>().ToArray(), fdCfg, generator, out source),
+        sbyte => TryGenerate(data.Cast<sbyte>().ToArray(), fdCfg, generator, out source),
+        byte => TryGenerate(data.Cast<byte>().ToArray(), fdCfg, generator, out source),
+        short => TryGenerate(data.Cast<short>().ToArray(), fdCfg, generator, out source),
+        ushort => TryGenerate(data.Cast<ushort>().ToArray(), fdCfg, generator, out source),
+        int => TryGenerate(data.Cast<int>().ToArray(), fdCfg, generator, out source),
+        uint => TryGenerate(data.Cast<uint>().ToArray(), fdCfg, generator, out source),
+        long => TryGenerate(data.Cast<long>().ToArray(), fdCfg, generator, out source),
+        ulong => TryGenerate(data.Cast<ulong>().ToArray(), fdCfg, generator, out source),
+        float => TryGenerate(data.Cast<float>().ToArray(), fdCfg, generator, out source),
+        double => TryGenerate(data.Cast<double>().ToArray(), fdCfg, generator, out source),
+        string => TryGenerate(data.Cast<string>().ToArray(), fdCfg, generator, out source),
+        _ => throw new InvalidOperationException("Unsupported data type: " + data[0].GetType().Name)
+    };
+
     public static bool TryGenerate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source)
     {
         //Validate that we only have unique data
@@ -69,7 +87,7 @@ public static class FastDataGenerator
             throw new InvalidOperationException("Unable to find a suitable data structure for the data. Please report this as a bug.");
 
         GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, fdCfg.StringComparison, props, spec);
-        return generator.TryGenerate<T>(genCfg, context, out source);
+        return generator.TryGenerate(genCfg, context, out source);
     }
 
     private static IEnumerable<object> GetDataStructureCandidates<T>(T[] data, FastDataConfig config, StructureConfig<T> cfg)
