@@ -101,7 +101,7 @@ internal static class Program
         rustCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn) =>
         {
             RustCodeGeneratorConfig genCfg = new RustCodeGeneratorConfig(cn);
-            RustCodeGenerator generator = new RustCodeGenerator(genCfg);
+            RustCodeGenerator generator = RustCodeGenerator.Create(genCfg);
 
             await GenerateAsync(inputFile, dataType, structureType, generator, outputFile);
         }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt);

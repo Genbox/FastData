@@ -11,11 +11,11 @@ pub struct MyData;
 impl MyData {
     #[must_use]
     pub fn contains(value: i32) -> bool {
-        if value < -2147483648 || value > 2147483647 {
+        if value < i32::MIN || value > i32::MAX {
             return false;
         }
 
-        if value == -2147483648 || value == 0 || value == 2147483647 {
+        if value == i32::MIN || value == 0 || value == i32::MAX {
             return true;
         }
 
@@ -23,6 +23,6 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_VALUE: i32 = -2147483648;
-    pub const MAX_VALUE: i32 = 2147483647;
+    pub const MIN_VALUE: i32 = i32::MIN;
+    pub const MAX_VALUE: i32 = i32::MAX;
 }

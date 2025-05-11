@@ -56,7 +56,7 @@ impl MyData {
         return Self::ITEMS[hash] == value;
     }
 
-     fn get_hash(str: &str) -> u32 {
+    fn get_hash(str: &str) -> u32 {
         let bytes = str.as_bytes();
         return Self::ASSO[bytes[4] as usize] as u32;
     }

@@ -14,7 +14,7 @@ impl MyData {
     ];
 
     const ENTRIES: [E; 3] = [
-        E { hash_code: 2147483648, next: -1, value: -2147483648 }, E { hash_code: 0, next: -1, value: 0 }, E { hash_code: 2147483647, next: -1, value: 2147483647 }
+        E { hash_code: 2147483648, next: -1, value: i32::MIN }, E { hash_code: 0, next: -1, value: 0 }, E { hash_code: 2147483647, next: -1, value: i32::MAX }
     ];
 
     #[inline(always)]
@@ -24,7 +24,7 @@ impl MyData {
 
     #[must_use]
     pub fn contains(value: i32) -> bool {
-        if value < -2147483648 || value > 2147483647 {
+        if value < i32::MIN || value > i32::MAX {
             return false;
         }
 
@@ -44,8 +44,8 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_VALUE: i32 = -2147483648;
-    pub const MAX_VALUE: i32 = 2147483647;
+    pub const MIN_VALUE: i32 = i32::MIN;
+    pub const MAX_VALUE: i32 = i32::MAX;
 }
 struct E {
     hash_code: u32,

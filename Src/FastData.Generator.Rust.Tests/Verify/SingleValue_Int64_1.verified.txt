@@ -11,10 +11,10 @@ pub struct MyData;
 impl MyData {
     #[must_use]
     pub fn contains(value: i64) -> bool {
-        -9223372036854775808 == value
+        i64::MIN == value
     }
 
     pub const ITEM_COUNT: usize = 1;
-    pub const MIN_VALUE: i64 = -9223372036854775808;
-    pub const MAX_VALUE: i64 = -9223372036854775808;
+    pub const MIN_VALUE: i64 = i64::MIN;
+    pub const MAX_VALUE: i64 = i64::MIN;
 }

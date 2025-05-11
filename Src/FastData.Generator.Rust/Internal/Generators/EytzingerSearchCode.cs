@@ -1,16 +1,18 @@
+using Genbox.FastData.Generator.Rust.Internal.Framework;
+
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class EytzingerSearchCode<T>(GeneratorConfig<T> genCfg, RustCodeGeneratorConfig cfg, EytzingerSearchContext<T> ctx) : IOutputWriter
+internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx) : RustOutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}const ENTRIES: [{{genCfg.GetTypeName()}}; {{ctx.Data.Length}}] = [
+              {{GetFieldModifier()}}const ENTRIES: [{{TypeName}}; {{ctx.Data.Length}}] = [
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               ];
 
               #[must_use]
-              {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
-          {{cfg.GetEarlyExits(genCfg)}}
+              {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
+          {{GetEarlyExits()}}
 
                   let mut i: usize = 0;
                   while i < Self::ENTRIES.len() {

@@ -1,33 +1,15 @@
 using Genbox.FastData.Extensions;
+using Genbox.FastData.Generator.Framework.Interfaces;
 
-namespace Genbox.FastData.Generator.Rust.Internal.Extensions;
+namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
-internal static class GeneratorConfigExtensions
+internal class RustHashDef : IHashDef
 {
-    internal static string GetTypeName<T>(this GeneratorConfig<T> config, bool asStatic = false) => config.DataType switch
-    {
-        DataType.String when asStatic => "&'static str",
-        DataType.String => "&str",
-        DataType.Boolean => "bool",
-        DataType.SByte => "i8",
-        DataType.Byte => "u8",
-        DataType.Char => "char",
-        DataType.Int16 => "i16",
-        DataType.UInt16 => "u16",
-        DataType.Int32 => "i32",
-        DataType.UInt32 => "u32",
-        DataType.Int64 => "i64",
-        DataType.UInt64 => "u64",
-        DataType.Single => "f32",
-        DataType.Double => "f64",
-        _ => throw new InvalidOperationException("Invalid DataType: " + config.DataType)
-    };
-
-    internal static string GetHashSource<T>(this GeneratorConfig<T> config) =>
+    public string GetHashSource(DataType dataType, string typeName) =>
         $$"""
-              {{(config.DataType == DataType.String ? "#[inline]" : "#[inline(always)]")}}
-              {{(config.DataType == DataType.String ? "unsafe " : "")}}fn get_hash(value: {{config.GetTypeName()}}) -> u32 {
-          {{GetHash(config.DataType)}}
+              {{(dataType == DataType.String ? "#[inline]" : "#[inline(always)]")}}
+              {{(dataType == DataType.String ? "unsafe " : "")}}fn get_hash(value: {{typeName}}) -> u32 {
+          {{GetHash(dataType)}}
               }
           """;
 

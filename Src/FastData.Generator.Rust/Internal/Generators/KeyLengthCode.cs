@@ -1,11 +1,12 @@
 using Genbox.FastData.Generator.Extensions;
+using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class KeyLengthCode<T>(GeneratorConfig<T> genCfg, RustCodeGeneratorConfig cfg, KeyLengthContext ctx) : IOutputWriter
+internal sealed class KeyLengthCode<T>(KeyLengthContext ctx) : RustOutputWriter<T>
 {
-    public string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
+    public override string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
 
     private string GenerateUniq()
     {
@@ -15,13 +16,13 @@ internal sealed class KeyLengthCode<T>(GeneratorConfig<T> genCfg, RustCodeGenera
                                .ToArray();
 
         return $$"""
-                     {{cfg.GetFieldModifier()}}const ENTRIES: [{{genCfg.GetTypeName()}}; {{lengths.Length}}] = [
+                     {{GetFieldModifier()}}const ENTRIES: [{{TypeName}}; {{lengths.Length}}] = [
                  {{FormatColumns(lengths, ToValueLabel)}}
                      ];
 
                      #[must_use]
-                     {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
-                 {{GetEarlyExit(genCfg.EarlyExits)}}
+                     {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
+                 {{GetEarlyExits()}}
                          return Self::ENTRIES[(value.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize] == value;
                      }
                  """;
@@ -35,13 +36,13 @@ internal sealed class KeyLengthCode<T>(GeneratorConfig<T> genCfg, RustCodeGenera
                                      .ToArray();
 
         return $$"""
-                     {{cfg.GetFieldModifier()}}const ENTRIES: [Vec<{{genCfg.GetTypeName()}}>; {{lengths.Length}}] = [
+                     {{GetFieldModifier()}}const ENTRIES: [Vec<{{TypeName}}>; {{lengths.Length}}] = [
                  {{FormatList(lengths, RenderMany, ",\n")}}
                      ];
 
                      #[must_use]
-                     {{cfg.GetMethodModifier()}}fn contains(value: &{{genCfg.GetTypeName()}}) -> bool {
-                 {{GetEarlyExit(genCfg.EarlyExits)}}
+                     {{GetMethodModifier()}}fn contains(value: &{{TypeName}}) -> bool {
+                 {{GetEarlyExits()}}
                          let idx = (value.len() - {{ctx.MinLength}}) as usize;
                          let bucket = &Self::ENTRIES[idx];
 
@@ -60,25 +61,7 @@ internal sealed class KeyLengthCode<T>(GeneratorConfig<T> genCfg, RustCodeGenera
                  """;
     }
 
-    private string GetEarlyExit(IEarlyExit[] exits)
-    {
-        // unchanged
-        MinMaxLengthEarlyExit? exit1 = (MinMaxLengthEarlyExit?)Array.Find(exits, x => x is MinMaxLengthEarlyExit);
-        if (exit1 != null)
-            return RustGeneratorConfigExtensions.GetLengthEarlyExits(exit1.MinValue, exit1.MaxValue);
-
-        MinMaxValueEarlyExit<T>? exit2 = (MinMaxValueEarlyExit<T>?)Array.Find(exits, x => x is MinMaxValueEarlyExit<T>);
-        if (exit2 != null)
-            return RustGeneratorConfigExtensions.GetValueEarlyExits(exit2.MinValue, exit2.MaxValue, genCfg.DataType);
-
-        LengthBitSetEarlyExit? exit3 = (LengthBitSetEarlyExit?)Array.Find(exits, x => x is LengthBitSetEarlyExit);
-        if (exit3 != null)
-            return RustGeneratorConfigExtensions.GetMaskEarlyExit(exit3.BitSet);
-
-        throw new InvalidOperationException("No early exits were found. They are required for UniqueKeyLength");
-    }
-
-    private static string RenderMany(List<string>? x)
+    private string RenderMany(List<string>? x)
     {
         if (x == null)
             return "Vec::new()";

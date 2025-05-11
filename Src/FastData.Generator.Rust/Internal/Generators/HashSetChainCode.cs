@@ -1,37 +1,38 @@
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
+using Genbox.FastData.Generator.Rust.Internal.Framework;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class HashSetChainCode<T>(GeneratorConfig<T> genCfg, RustCodeGeneratorConfig cfg, HashSetChainContext<T> ctx, SharedCode shared) : IOutputWriter
+internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, GeneratorConfig<T> genCfg, SharedCode shared) : RustOutputWriter<T>
 {
-    public string Generate()
+    public override string Generate()
     {
         shared.Add("chain-struct-" + genCfg.DataType, CodeType.Class, $$"""
-                                                                        {{cfg.GetFieldModifier()}}struct E {
+                                                                        {{GetFieldModifier()}}struct E {
                                                                             hash_code: u32,
                                                                             next: {{GetSmallestSignedType(ctx.Buckets.Length)}},
-                                                                            value: {{genCfg.GetTypeName(true)}},
+                                                                            value: {{GetTypeNameWithLifetime()}},
                                                                         }
                                                                         """);
 
         return $$"""
-                     {{cfg.GetFieldModifier()}}const BUCKETS: [{{GetSmallestSignedType(ctx.Buckets.Length)}}; {{ctx.Buckets.Length}}] = [
+                     {{GetFieldModifier()}}const BUCKETS: [{{GetSmallestSignedType(ctx.Buckets.Length)}}; {{ctx.Buckets.Length}}] = [
                  {{FormatColumns(ctx.Buckets, static x => x.ToStringInvariant())}}
                      ];
 
-                     {{cfg.GetFieldModifier()}}const ENTRIES: [E; {{ctx.Entries.Length}}] = [
-                 {{FormatColumns(ctx.Entries, static x => $"E {{ hash_code: {x.Hash}, next: {x.Next.ToStringInvariant()}, value: {ToValueLabel(x.Value)} }}")}}
+                     {{GetFieldModifier()}}const ENTRIES: [E; {{ctx.Entries.Length}}] = [
+                 {{FormatColumns(ctx.Entries, x => $"E {{ hash_code: {x.Hash}, next: {x.Next.ToStringInvariant()}, value: {ToValueLabel(x.Value)} }}")}}
                      ];
 
-                 {{genCfg.GetHashSource()}}
+                 {{GetHashSource()}}
 
                      #[must_use]
-                     {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
-                 {{cfg.GetEarlyExits(genCfg)}}
+                     {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
+                 {{GetEarlyExits()}}
 
                          let hash = unsafe { Self::get_hash(value) };
-                         let index = {{cfg.GetModFunction(ctx.Buckets.Length)}};
+                         let index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                          let mut i: {{GetSmallestSignedType(ctx.Buckets.Length)}} = (Self::BUCKETS[index as usize] as {{GetSmallestSignedType(ctx.Buckets.Length)}}) - 1;
 
                          while i >= 0 {

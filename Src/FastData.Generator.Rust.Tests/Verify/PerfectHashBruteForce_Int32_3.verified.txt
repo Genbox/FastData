@@ -10,7 +10,7 @@ pub struct MyData;
 
 impl MyData {
     const ENTRIES: [E; 3] = [
-        E { value: 2147483647, hash_code: 1427853558 }, E { value: 0, hash_code: 1364076727 }, E { value: -2147483648, hash_code: 2340387434 }
+        E { value: i32::MAX, hash_code: 1427853558 }, E { value: 0, hash_code: 1364076727 }, E { value: i32::MIN, hash_code: 2340387434 }
     ];
 
     #[inline(always)]
@@ -29,7 +29,7 @@ impl MyData {
 
     #[must_use]
     pub fn contains(value: i32) -> bool {
-        if value < -2147483648 || value > 2147483647 {
+        if value < i32::MIN || value > i32::MAX {
             return false;
         }
         let hash = Self::murmur_32(unsafe { Self::get_hash(value) } ^ 1);
@@ -40,8 +40,8 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_VALUE: i32 = -2147483648;
-    pub const MAX_VALUE: i32 = 2147483647;
+    pub const MIN_VALUE: i32 = i32::MIN;
+    pub const MAX_VALUE: i32 = i32::MAX;
 }
 struct E {
     value: i32,

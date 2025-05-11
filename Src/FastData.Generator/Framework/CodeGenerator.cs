@@ -45,7 +45,10 @@ public abstract class CodeGenerator : ICodeGenerator
         AppendFooter(sb, genCfg, typeName);
 
         foreach (string classCode in Shared.GetType(CodeType.Class))
+        {
+            sb.AppendLine();
             sb.AppendLine(classCode);
+        }
 
         source = sb.ToString();
         return true;

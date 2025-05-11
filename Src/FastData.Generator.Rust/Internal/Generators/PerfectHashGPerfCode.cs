@@ -1,25 +1,26 @@
 using Genbox.FastData.Generator.Extensions;
+using Genbox.FastData.Generator.Rust.Internal.Framework;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class PerfectHashGPerfCode<T>(GeneratorConfig<T> genCfg, RustCodeGeneratorConfig cfg, PerfectHashGPerfContext ctx) : IOutputWriter
+internal sealed class PerfectHashGPerfCode<T>(PerfectHashGPerfContext ctx, GeneratorConfig<T> genCfg) : RustOutputWriter<T>
 {
-    public string Generate()
+    public override string Generate()
     {
         string?[] items = WrapWords(ctx.Items).ToArray();
 
         return $$"""
-                     {{cfg.GetFieldModifier()}}const ASSO: [{{GetSmallestUnsignedType(ctx.MaxHash + 1)}}; {{ctx.AssociationValues.Length}}] = [
+                     {{GetFieldModifier()}}const ASSO: [{{GetSmallestUnsignedType(ctx.MaxHash + 1)}}; {{ctx.AssociationValues.Length}}] = [
                  {{FormatColumns(ctx.AssociationValues, static x => x.ToStringInvariant())}}
                      ];
 
-                     {{cfg.GetFieldModifier()}}const ITEMS: [&'static str; {{items.Length}}] = [
+                     {{GetFieldModifier()}}const ITEMS: [&'static str; {{items.Length}}] = [
                  {{FormatColumns(items, ToValueLabel)}}
                      ];
 
                      #[must_use]
-                     {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
-                 {{cfg.GetEarlyExits(genCfg)}}
+                     {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
+                 {{GetEarlyExits()}}
 
                          let hash = unsafe { Self::get_hash(value) } as usize;
                          if hash > {{ctx.MaxHash}} {
@@ -29,7 +30,7 @@ internal sealed class PerfectHashGPerfCode<T>(GeneratorConfig<T> genCfg, RustCod
                          return Self::ITEMS[hash] == value;
                      }
 
-                     {{cfg.GetMethodModifier(true)}}fn get_hash(str: &str) -> u32 {
+                     fn get_hash(str: &str) -> u32 {
                  {{RenderHashFunction()}}
                      }
                  """;

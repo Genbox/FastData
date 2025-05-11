@@ -1,24 +1,25 @@
 using Genbox.FastData.Generator.Enums;
+using Genbox.FastData.Generator.Rust.Internal.Framework;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class PerfectHashBruteForceCode<T>(GeneratorConfig<T> genCfg, RustCodeGeneratorConfig cfg, PerfectHashBruteForceContext<T> ctx, SharedCode shared) : IOutputWriter
+internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<T> ctx, GeneratorConfig<T> genCfg, SharedCode shared) : RustOutputWriter<T>
 {
-    public string Generate()
+    public override string Generate()
     {
         shared.Add("ph-struct-" + genCfg.DataType, CodeType.Class, $$"""
-                                                                     {{cfg.GetFieldModifier()}}struct E {
-                                                                         value: {{genCfg.GetTypeName(true)}},
+                                                                     {{GetFieldModifier()}}struct E {
+                                                                         value: {{GetTypeNameWithLifetime()}},
                                                                          hash_code: u32,
                                                                      }
                                                                      """);
 
         return $$"""
-                     {{cfg.GetFieldModifier()}}const ENTRIES: [E; {{ctx.Data.Length}}] = [
-                 {{FormatColumns(ctx.Data, static x => $"E {{ value: {ToValueLabel(x.Key)}, hash_code: {ToValueLabel(x.Value)} }}")}}
+                     {{GetFieldModifier()}}const ENTRIES: [E; {{ctx.Data.Length}}] = [
+                 {{FormatColumns(ctx.Data, x => $"E {{ value: {ToValueLabel(x.Key)}, hash_code: {ToValueLabel(x.Value)} }}")}}
                      ];
 
-                 {{genCfg.GetHashSource()}}
+                 {{GetHashSource()}}
 
                      fn murmur_32(mut h: u32) -> u32 {
                          h ^= h >> 16;
@@ -30,10 +31,10 @@ internal sealed class PerfectHashBruteForceCode<T>(GeneratorConfig<T> genCfg, Ru
                      }
 
                      #[must_use]
-                     {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
-                 {{cfg.GetEarlyExits(genCfg)}}
+                     {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
+                 {{GetEarlyExits()}}
                          let hash = Self::murmur_32(unsafe { Self::get_hash(value) } ^ {{ctx.Seed}});
-                         let index = ({{cfg.GetModFunction(ctx.Data.Length)}}) as usize;
+                         let index = ({{GetModFunction("hash", (ulong)ctx.Data.Length)}}) as usize;
                          let entry = &Self::ENTRIES[index];
 
                          return hash == entry.hash_code && value == entry.value;

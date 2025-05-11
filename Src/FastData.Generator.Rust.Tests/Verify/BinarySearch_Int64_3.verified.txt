@@ -10,12 +10,12 @@ pub struct MyData;
 
 impl MyData {
     const ENTRIES: [i64; 3] = [
-        -9223372036854775808, 0, 9223372036854775807
+        i64::MIN, 0, i64::MAX
     ];
 
     #[must_use]
     pub fn contains(value: i64) -> bool {
-        if value < -9223372036854775808 || value > 9223372036854775807 {
+        if value < i64::MIN || value > i64::MAX {
             return false;
         }
 
@@ -39,6 +39,6 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_VALUE: i64 = -9223372036854775808;
-    pub const MAX_VALUE: i64 = 9223372036854775807;
+    pub const MIN_VALUE: i64 = i64::MIN;
+    pub const MAX_VALUE: i64 = i64::MAX;
 }

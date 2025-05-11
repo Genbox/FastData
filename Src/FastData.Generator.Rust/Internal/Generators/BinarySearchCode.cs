@@ -1,18 +1,19 @@
 using Genbox.FastData.Generator.Extensions;
+using Genbox.FastData.Generator.Rust.Internal.Framework;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class BinarySearchCode<T>(GeneratorConfig<T> genCfg, RustCodeGeneratorConfig cfg, BinarySearchContext<T> ctx) : IOutputWriter
+internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : RustOutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}const ENTRIES: [{{genCfg.GetTypeName(true)}}; {{ctx.Data.Length}}] = [
+              {{GetFieldModifier()}}const ENTRIES: [{{GetTypeNameWithLifetime()}}; {{ctx.Data.Length}}] = [
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               ];
 
               #[must_use]
-              {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
-          {{cfg.GetEarlyExits(genCfg)}}
+              {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
+          {{GetEarlyExits()}}
 
                   let mut lo: usize = 0;
                   let mut hi: usize = {{(ctx.Data.Length - 1).ToStringInvariant()}};

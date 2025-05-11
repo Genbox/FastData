@@ -1,16 +1,18 @@
+using Genbox.FastData.Generator.Rust.Internal.Framework;
+
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class ArrayCode<T>(GeneratorConfig<T> genCfg, RustCodeGeneratorConfig cfg, ArrayContext<T> ctx) : IOutputWriter
+internal sealed class ArrayCode<T>(ArrayContext<T> ctx) : RustOutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
-              {{cfg.GetFieldModifier()}}const ENTRIES: [{{genCfg.GetTypeName()}}; {{ctx.Data.Length}}] = [
+              {{GetFieldModifier()}}const ENTRIES: [{{TypeName}}; {{ctx.Data.Length}}] = [
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               ];
 
               #[must_use]
-              {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
-          {{cfg.GetEarlyExits(genCfg)}}
+              {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
+          {{GetEarlyExits()}}
 
                   for entry in Self::ENTRIES.iter() {
                       if *entry == value {

@@ -14,7 +14,7 @@ impl MyData {
     ];
 
     const ITEMS: [i32; 3] = [
-        0, 2147483647, -2147483648
+        0, i32::MAX, i32::MIN
     ];
 
     const HASH_CODES: [u32; 3] = [
@@ -28,7 +28,7 @@ impl MyData {
 
     #[must_use]
     pub fn contains(value: i32) -> bool {
-        if value < -2147483648 || value > 2147483647 {
+        if value < i32::MIN || value > i32::MAX {
             return false;
         }
 
@@ -48,8 +48,8 @@ impl MyData {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_VALUE: i32 = -2147483648;
-    pub const MAX_VALUE: i32 = 2147483647;
+    pub const MIN_VALUE: i32 = i32::MIN;
+    pub const MAX_VALUE: i32 = i32::MAX;
 }
 struct B {
     start_index: u8,

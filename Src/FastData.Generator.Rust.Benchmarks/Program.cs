@@ -1,7 +1,8 @@
 ﻿using System.Globalization;
 using System.Text;
+using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.InternalShared;
-using static Genbox.FastData.Generator.Rust.Internal.Helpers.CodeHelper;
 
 namespace Genbox.FastData.Generator.Rust.Benchmarks;
 
@@ -30,7 +31,7 @@ internal static class Program
 
         foreach (ITestData data in TestVectorHelper.GetBenchmarkVectors())
         {
-            data.Generate(id => new RustCodeGenerator(new RustCodeGeneratorConfig(id)), out GeneratorSpec spec);
+            data.Generate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), out GeneratorSpec spec);
 
             TestHelper.TryWriteFile(Path.Combine(benchPath, spec.Identifier + ".rs"),
                 $$"""
@@ -66,10 +67,13 @@ internal static class Program
 
     private static string PrintQueries(ITestData data, string identifier)
     {
+        RustLanguageDef langDef = new RustLanguageDef();
+        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
+
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < 25; i++)
-            sb.AppendLine(CultureInfo.InvariantCulture, $"           {identifier}::contains({data.GetValueLabel(ToValueLabel)});");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"           {identifier}::contains({data.GetValueLabel(helper)});");
 
         return sb.ToString();
     }

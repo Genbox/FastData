@@ -1,11 +1,13 @@
+using Genbox.FastData.Generator.Rust.Internal.Framework;
+
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class SingleValueCode<T>(GeneratorConfig<T> genCfg, RustCodeGeneratorConfig cfg, SingleValueContext<T> ctx) : IOutputWriter
+internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx) : RustOutputWriter<T>
 {
-    public string Generate() =>
+    public override string Generate() =>
         $$"""
               #[must_use]
-              {{cfg.GetMethodModifier()}}fn contains(value: {{genCfg.GetTypeName()}}) -> bool {
+              {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
                   {{ToValueLabel(ctx.Item)}} == value
               }
           """;
