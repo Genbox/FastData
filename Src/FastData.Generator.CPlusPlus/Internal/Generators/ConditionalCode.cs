@@ -1,14 +1,14 @@
-using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx) : OutputWriter<T>
+internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
     public override string Generate() =>
         $$"""
           public:
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool contains(const {{GetTypeName()}} value) noexcept
+              {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
               {
           {{GetEarlyExits()}}
 

@@ -4,7 +4,7 @@ using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class PerfectHashGPerfCode<T>(PerfectHashGPerfContext ctx, GeneratorConfig<T> genCfg, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>
+internal sealed class PerfectHashGPerfCode<T>(PerfectHashGPerfContext ctx, GeneratorConfig<T> genCfg, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
     public override string Generate() =>
         $$"""
@@ -17,7 +17,7 @@ internal sealed class PerfectHashGPerfCode<T>(PerfectHashGPerfContext ctx, Gener
               };
 
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
+              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
               {
           {{GetEarlyExits()}}
 

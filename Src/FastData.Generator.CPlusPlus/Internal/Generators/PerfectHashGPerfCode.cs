@@ -1,9 +1,9 @@
+using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.Extensions;
-using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class PerfectHashGPerfCode<T>(PerfectHashGPerfContext ctx, GeneratorConfig<T> genCfg) : OutputWriter<T>
+internal sealed class PerfectHashGPerfCode<T>(PerfectHashGPerfContext ctx, GeneratorConfig<T> genCfg) : CPlusPlusOutputWriter<T>
 {
     public override string Generate()
     {
@@ -14,13 +14,13 @@ internal sealed class PerfectHashGPerfCode<T>(PerfectHashGPerfContext ctx, Gener
                  {{FormatColumns(ctx.AssociationValues, static x => x.ToStringInvariant())}}
                      };
 
-                     {{GetFieldModifier()}}std::array<{{GetTypeName()}}, {{items.Length}}> items = {
+                     {{GetFieldModifier()}}std::array<{{TypeName}}, {{items.Length}}> items = {
                  {{FormatColumns(items, ToValueLabel)}}
                      };
 
                  public:
                      {{GetMethodAttributes()}}
-                     {{GetMethodModifier()}}bool contains(const {{GetTypeName()}} value) noexcept
+                     {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
                      {
                  {{GetEarlyExits()}}
 
@@ -32,7 +32,7 @@ internal sealed class PerfectHashGPerfCode<T>(PerfectHashGPerfContext ctx, Gener
                          return {{GetEqualFunction("items[hash]", "value")}};
                      }
 
-                     {{GetMethodModifier()}}uint32_t get_hash(const {{GetTypeName()}} str)
+                     {{GetMethodModifier()}}uint32_t get_hash(const {{TypeName}} str)
                      {
                  {{RenderHashFunction()}}
                      }

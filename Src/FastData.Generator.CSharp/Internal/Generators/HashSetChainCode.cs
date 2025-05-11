@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CSharpOutputWriter<T>
+internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
     public override string Generate() =>
         $$"""
@@ -16,12 +16,12 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CSharpOu
               };
 
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
+              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
               {
           {{GetEarlyExits()}}
 
                   uint hash = Hash(value);
-                  uint index = {{GetModFunction("hash", ctx.Buckets.Length)}};
+                  uint index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} i = ({{GetSmallestSignedType(ctx.Buckets.Length)}})(_buckets[index] - 1);
 
                   while (i >= 0)
@@ -44,9 +44,9 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CSharpOu
               {
                   internal readonly uint HashCode;
                   internal readonly {{GetSmallestSignedType(ctx.Buckets.Length)}} Next;
-                  internal readonly {{GetTypeName()}} Value;
+                  internal readonly {{TypeName}} Value;
 
-                  internal E(uint hashCode, {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{GetTypeName()}} value)
+                  internal E(uint hashCode, {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{TypeName}} value)
                   {
                       HashCode = hashCode;
                       Next = next;

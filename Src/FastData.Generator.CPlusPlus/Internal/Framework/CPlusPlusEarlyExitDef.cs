@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
-internal class CPlusPlusEarlyExitHandler(CodeHelper helper, CPlusPlusOptions options) : EarlyExitHandler
+internal class CPlusPlusEarlyExitDef(TypeHelper helper, CPlusPlusOptions options) : EarlyExitDef
 {
     protected override bool IsEnabled => !options.HasFlag(CPlusPlusOptions.DisableEarlyExits);
 

@@ -4,7 +4,7 @@ using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>
+internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
     //TODO: Remove gaps in array by reducing the index via a map (if (idx > 10) return 4) where 4 is the number to subtract from the index
 
@@ -26,12 +26,12 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGenerator
 
     private string GenerateUniqIf() =>
         $$"""
-              {{GetFieldModifier()}}{{GetTypeName()}}[] _entries = new {{GetTypeName()}}[] {
+              {{GetFieldModifier()}}{{TypeName}}[] _entries = new {{TypeName}}[] {
           {{FormatColumns(ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()), ToValueLabel)}}
               };
 
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
+              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
               {
           {{GetEarlyExits()}}
 
@@ -42,7 +42,7 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGenerator
     private string GenerateUniqSwitch() =>
         $$"""
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
+              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
               {
           {{GetEarlyExits()}}
 
@@ -60,20 +60,20 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGenerator
 
     private string GenerateNormal() =>
         $$"""
-              {{GetFieldModifier()}}{{GetTypeName()}}[]?[] _entries = new {{GetTypeName()}}[]?[] {
+              {{GetFieldModifier()}}{{TypeName}}[]?[] _entries = new {{TypeName}}[]?[] {
           {{FormatList(ctx.Lengths.Skip((int)ctx.MinLength).Take((int)((ctx.MaxLength - ctx.MinLength) + 1)), RenderMany, ",\n")}}
               };
 
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
+              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
               {
           {{GetEarlyExits()}}
-                  {{GetTypeName()}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];
+                  {{TypeName}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];
 
                   if (bucket == null)
                       return false;
 
-                  foreach ({{GetTypeName()}} str in bucket)
+                  foreach ({{TypeName}} str in bucket)
                   {
                       if ({{GetEqualFunction("value", "str")}})
                           return true;

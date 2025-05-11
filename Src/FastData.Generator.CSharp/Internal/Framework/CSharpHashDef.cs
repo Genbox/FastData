@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Framework.Interfaces;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
-internal class CSharpHashHandler : IHashHandler
+internal class CSharpHashDef : IHashDef
 {
     public string GetHashSource(DataType dataType, string typeName) =>
             $$"""

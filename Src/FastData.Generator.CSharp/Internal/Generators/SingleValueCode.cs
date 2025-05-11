@@ -2,7 +2,7 @@ using Genbox.FastData.Generator.CSharp.Internal.Framework;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx) : CSharpOutputWriter<T>
+internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
     //We don't support early exits in this generator.
     // - Strings: Length is checked in the equals function
@@ -12,7 +12,7 @@ internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx) : CSharpOutp
     public override string Generate() =>
         $$"""
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
+              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
               {
                   return {{GetEqualFunction("value", ToValueLabel(ctx.Item))}};
               }

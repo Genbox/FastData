@@ -8,10 +8,10 @@ internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<
         $$"""
               struct e
               {
-                  {{GetTypeName()}} value;
+                  {{TypeName}} value;
                   uint32_t hash_code;
 
-                  e(const {{GetTypeName()}} value, const uint32_t hash_code)
+                  e(const {{TypeName}} value, const uint32_t hash_code)
                   : value(value), hash_code(hash_code) {}
               };
 
@@ -33,11 +33,11 @@ internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<
 
           public:
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool contains(const {{GetTypeName()}} value) noexcept
+              {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
               {
           {{GetEarlyExits()}}
                   const uint32_t hash = murmur_32(get_hash(value) ^ {{ctx.Seed}});
-                  const size_t index = {{GetModFunction("hash", ctx.Data.Length)}};
+                  const size_t index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                   const e& entry = entries[index];
 
                   return {{GetEqualFunction("hash", "entry.hash_code")}} && {{GetEqualFunction("value", "entry.value")}};

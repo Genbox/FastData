@@ -1,9 +1,9 @@
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.Framework.Interfaces.Specs;
+using Genbox.FastData.Generator.Framework.Interfaces;
 
 namespace Genbox.FastData.Generator.Framework;
 
-public class BoolTypeSpec<T>(string name) : ITypeSpec<T> where T : notnull
+public class BoolTypeDef<T>(string name) : ITypeDef<T> where T : notnull
 {
     public DataType DataType => DataType.Boolean;
     public string Name { get; } = name;

@@ -3,32 +3,24 @@ using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.CSharp.Internal.Generators;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Interfaces;
-using Genbox.FastData.Generator.Framework.Interfaces.Specs;
 
 namespace Genbox.FastData.Generator.CSharp;
 
 public sealed class CSharpCodeGenerator : CodeGenerator
 {
-    private readonly CSharpCodeGeneratorConfig _userCfg;
+    private readonly CSharpCodeGeneratorConfig _cfg;
 
-    private CSharpCodeGenerator(CSharpCodeGeneratorConfig userCfg,
-                                ILanguageSpec langSpec,
-                                ICodeSpec codeSpec,
-                                IConstantsSpec constants,
-                                IEarlyExitHandler earlyExitHandler,
-                                IHashHandler hashHandler) : base(langSpec, codeSpec, constants, earlyExitHandler, hashHandler)
-    {
-        _userCfg = userCfg;
-    }
+    private CSharpCodeGenerator(CSharpCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
+        : base(langDef, constDef, earlyExitDef, hashDef) => _cfg = cfg;
 
     public static CSharpCodeGenerator Create(CSharpCodeGeneratorConfig userCfg)
     {
-        CSharpLanguageSpec langSpec = new CSharpLanguageSpec();
-        TypeMap typeMap = new TypeMap(langSpec.Primitives);
-        CodeHelper helper = new CodeHelper(langSpec, typeMap);
+        CSharpLanguageDef langDef = new CSharpLanguageDef();
+        TypeMap typeMap = new TypeMap(langDef.TypeDefinitions);
+        TypeHelper helper = new TypeHelper(typeMap);
 
-        return new CSharpCodeGenerator(userCfg, langSpec, new CSharpCodeSpec(userCfg), new CSharpConstantsSpec(), new CSharpEarlyExitHandler(helper, userCfg.GeneratorOptions),
-            new CSharpHashHandler());
+        return new CSharpCodeGenerator(userCfg, langDef, new CSharpConstantsDef(), new CSharpEarlyExitDef(helper, userCfg.GeneratorOptions),
+            new CSharpHashDef());
     }
 
     protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg)
@@ -44,20 +36,20 @@ public sealed class CSharpCodeGenerator : CodeGenerator
 
                   """);
 
-        string cn = _userCfg.ClassName;
-        string? ns = _userCfg.Namespace != null ? $"namespace {_userCfg.Namespace};\n" : null;
-        string visibility = _userCfg.ClassVisibility.ToString().ToLowerInvariant();
+        string cn = _cfg.ClassName;
+        string? ns = _cfg.Namespace != null ? $"namespace {_cfg.Namespace};\n" : null;
+        string visibility = _cfg.ClassVisibility.ToString().ToLowerInvariant();
 
-        string type = _userCfg.ClassType switch
+        string type = _cfg.ClassType switch
         {
             ClassType.Static => " static class",
             ClassType.Instance => " class",
             ClassType.Struct => " struct",
-            _ => throw new InvalidOperationException("Invalid ClassType: " + _userCfg.ClassType)
+            _ => throw new InvalidOperationException("Invalid ClassType: " + _cfg.ClassType)
         };
 
-        string? attr = _userCfg.ClassType == ClassType.Struct ? "[StructLayout(LayoutKind.Auto)]" : null;
-        string? partial = _userCfg.ClassType != ClassType.Static ? " partial" : null;
+        string? attr = _cfg.ClassType == ClassType.Struct ? "[StructLayout(LayoutKind.Auto)]" : null;
+        string? partial = _cfg.ClassType != ClassType.Static ? " partial" : null;
 
         sb.AppendLine($$"""
 
@@ -76,16 +68,16 @@ public sealed class CSharpCodeGenerator : CodeGenerator
 
     protected override OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext context) => context switch
     {
-        SingleValueContext<T> x => new SingleValueCode<T>(x),
-        ArrayContext<T> x => new ArrayCode<T>(x),
-        BinarySearchContext<T> x => new BinarySearchCode<T>(x),
-        ConditionalContext<T> x => new ConditionalCode<T>(x, _userCfg),
-        EytzingerSearchContext<T> x => new EytzingerSearchCode<T>(x),
-        PerfectHashBruteForceContext<T> x => new PerfectHashBruteForceCode<T>(x),
-        PerfectHashGPerfContext x => new PerfectHashGPerfCode<T>(x, genCfg, _userCfg),
-        HashSetChainContext<T> x => new HashSetChainCode<T>(x),
-        HashSetLinearContext<T> x => new HashSetLinearCode<T>(x),
-        KeyLengthContext x => new KeyLengthCode<T>(x, _userCfg),
+        SingleValueContext<T> x => new SingleValueCode<T>(x, _cfg),
+        ArrayContext<T> x => new ArrayCode<T>(x, _cfg),
+        BinarySearchContext<T> x => new BinarySearchCode<T>(x, _cfg),
+        ConditionalContext<T> x => new ConditionalCode<T>(x, _cfg),
+        EytzingerSearchContext<T> x => new EytzingerSearchCode<T>(x, _cfg),
+        PerfectHashBruteForceContext<T> x => new PerfectHashBruteForceCode<T>(x, _cfg),
+        PerfectHashGPerfContext x => new PerfectHashGPerfCode<T>(x, genCfg, _cfg),
+        HashSetChainContext<T> x => new HashSetChainCode<T>(x, _cfg),
+        HashSetLinearContext<T> x => new HashSetLinearCode<T>(x, _cfg),
+        KeyLengthContext x => new KeyLengthCode<T>(x, _cfg),
         _ => null
     };
 }

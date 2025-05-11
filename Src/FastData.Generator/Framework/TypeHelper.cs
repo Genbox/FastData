@@ -1,15 +1,12 @@
-using System.Text;
-using Genbox.FastData.Generator.Framework.Interfaces.Specs;
+using Genbox.FastData.Generator.Framework.Interfaces;
 
 namespace Genbox.FastData.Generator.Framework;
 
-public class CodeHelper(ILanguageSpec spec, TypeMap typeMap)
+public class TypeHelper(TypeMap typeMap)
 {
-    public virtual void Comment(StringBuilder sb, string value) => sb.Append(spec.CommentChar).Append(' ').AppendLine(value);
-
     public string ToValueLabel<T>(T? value)
     {
-        ITypeSpec<T> s = typeMap.Get<T>();
+        ITypeDef<T> s = typeMap.Get<T>();
         return s.Print(value);
     }
 

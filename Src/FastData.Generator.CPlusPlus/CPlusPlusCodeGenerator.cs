@@ -2,26 +2,22 @@ using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Interfaces;
-using Genbox.FastData.Generator.Framework.Interfaces.Specs;
 
 namespace Genbox.FastData.Generator.CPlusPlus;
 
 public sealed class CPlusPlusCodeGenerator : CodeGenerator
 {
-    private readonly CPlusPlusCodeGeneratorConfig _userCfg;
+    private readonly CPlusPlusCodeGeneratorConfig _cfg;
 
-    private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig userCfg, ILanguageSpec langSpec, ICodeSpec codeSpec, IConstantsSpec constants, IEarlyExitHandler earlyExitHandler, IHashHandler hashHandler) : base(langSpec, codeSpec, constants, earlyExitHandler, hashHandler)
-    {
-        _userCfg = userCfg;
-    }
+    private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
+        : base(langDef, constDef, earlyExitDef, hashDef) => _cfg = cfg;
 
     public static CPlusPlusCodeGenerator Create(CPlusPlusCodeGeneratorConfig userCfg)
     {
-        CPlusPlusLanguageSpec langSpec = new CPlusPlusLanguageSpec();
-        TypeMap typeMap = new TypeMap(langSpec.Primitives);
-        CodeHelper helper = new CodeHelper(langSpec, typeMap);
+        CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
+        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
 
-        return new CPlusPlusCodeGenerator(userCfg, langSpec, new CPlusPlusCodeSpec(), new CPlusPlusConstantsSpec(), new CPlusPlusEarlyExitHandler(helper, userCfg.GeneratorOptions), new CPlusPlusHashHandler());
+        return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(helper, userCfg.GeneratorOptions), new CPlusPlusHashDef());
     }
 
     public override bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
@@ -48,7 +44,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     #include <limits>
                     #include <string_view>
 
-                    class {{_userCfg.ClassName}} final
+                    class {{_cfg.ClassName}} final
                     {
 
                     """);
@@ -58,7 +54,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     {
         base.AppendFooter(sb, genCfg, typeName);
 
-        string cn = _userCfg.ClassName;
+        string cn = _cfg.ClassName;
         sb.Append($$"""
 
                     public:

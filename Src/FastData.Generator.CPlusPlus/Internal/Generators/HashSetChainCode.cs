@@ -11,9 +11,9 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlu
               {
                   uint32_t hash_code;
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
-                  {{GetTypeName()}} value;
+                  {{TypeName}} value;
 
-                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{GetTypeName()}} value)
+                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{TypeName}} value)
                      : hash_code(hash_code), next(next), value(value) {}
               };
 
@@ -29,12 +29,12 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlu
 
           public:
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool contains(const {{GetTypeName()}} value) noexcept
+              {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
               {
           {{GetEarlyExits()}}
 
                   const uint32_t hash = get_hash(value);
-                  const size_t index = {{GetModFunction("hash", ctx.Buckets.Length)}};
+                  const size_t index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} i = buckets[index] - 1;
 
                   while (i >= 0)

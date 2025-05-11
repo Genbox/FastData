@@ -58,6 +58,7 @@ public:
 
         return hash == entry.hash_code && value == entry.value;
     }
+
     static constexpr size_t item_count = 3;
     static constexpr size_t min_length = 5;
     static constexpr size_t max_length = 5;

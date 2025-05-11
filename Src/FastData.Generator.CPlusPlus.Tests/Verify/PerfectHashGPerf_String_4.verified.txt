@@ -61,6 +61,7 @@ public:
         return static_cast<uint32_t>(asso[str[4]]);
     }
 
+
     static constexpr size_t item_count = 4;
     static constexpr size_t min_length = 5;
     static constexpr size_t max_length = 5;

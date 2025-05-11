@@ -2,7 +2,7 @@ using Genbox.FastData.Generator.CSharp.Internal.Framework;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<T> ctx) : CSharpOutputWriter<T>
+internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
     public override string Generate() =>
         $$"""
@@ -11,12 +11,12 @@ internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<
               };
 
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
+              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
               {
           {{GetEarlyExits()}}
 
                   uint hash = Murmur_32(Hash(value) ^ {{ctx.Seed}});
-                  uint index = {{GetModFunction("hash", ctx.Data.Length)}};
+                  uint index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                   ref E entry = ref _entries[index];
 
                   return hash == entry.HashCode && {{GetEqualFunction("value", "entry.Value")}};
@@ -41,13 +41,13 @@ internal sealed class PerfectHashBruteForceCode<T>(PerfectHashBruteForceContext<
               [StructLayout(LayoutKind.Auto)]
               private struct E
               {
-                  internal E({{GetTypeName()}} value, uint hashCode)
+                  internal E({{TypeName}} value, uint hashCode)
                   {
                       Value = value;
                       HashCode = hashCode;
                   }
 
-                  internal {{GetTypeName()}} Value;
+                  internal {{TypeName}} Value;
                   internal uint HashCode;
               }
           """;

@@ -1,8 +1,8 @@
-using Genbox.FastData.Generator.Framework.Interfaces.Specs;
+using Genbox.FastData.Generator.Framework.Interfaces;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
-internal class CPlusPlusConstantsSpec : IConstantsSpec
+internal class CPlusPlusConstantsDef : IConstantsDef
 {
     public string MinLengthName => "min_length";
     public string MaxLengthName => "max_length";
@@ -10,4 +10,5 @@ internal class CPlusPlusConstantsSpec : IConstantsSpec
     public string MaxValueName => "max_value";
     public string ItemName => "item_count";
     public string FieldModifier => "static constexpr ";
+    public string CommentChar => "//";
 }

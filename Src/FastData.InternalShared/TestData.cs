@@ -23,7 +23,7 @@ public class TestData<T>(StructureType structureType, T[] values) : ITestData, I
             throw new InvalidOperationException("Unable to build " + Identifier);
     }
 
-    public string GetValueLabel(CodeHelper helper) => helper.ToValueLabel(Values[_rng.Next(0, Values.Length)]);
+    public string GetValueLabel(TypeHelper helper) => helper.ToValueLabel(Values[_rng.Next(0, Values.Length)]);
     public string GetValueLabel(Func<object?, DataType, string> func) => func(Values[_rng.Next(0, Values.Length)], _dataType);
 
     public void Serialize(IXunitSerializationInfo info)

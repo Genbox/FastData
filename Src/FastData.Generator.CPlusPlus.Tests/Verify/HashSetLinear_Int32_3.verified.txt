@@ -56,6 +56,7 @@ public:
 
         return false;
     }
+
     static constexpr size_t item_count = 3;
     static constexpr int32_t min_value = std::numeric_limits<int32_t>::lowest();
     static constexpr int32_t max_value = std::numeric_limits<int32_t>::max();

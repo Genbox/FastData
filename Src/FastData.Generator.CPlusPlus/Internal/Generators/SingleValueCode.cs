@@ -1,8 +1,8 @@
-using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx) : OutputWriter<T>
+internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
     //We don't support early exits in this generator.
     // - Strings: Length is checked in the equals function
@@ -13,7 +13,7 @@ internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx) : OutputWrit
         $$"""
           public:
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}constexpr bool contains(const {{GetTypeName()}} value) noexcept
+              {{GetMethodModifier()}}constexpr bool contains(const {{TypeName}} value) noexcept
               {
                   return {{GetEqualFunction("value", ToValueLabel(ctx.Item))}};
               }

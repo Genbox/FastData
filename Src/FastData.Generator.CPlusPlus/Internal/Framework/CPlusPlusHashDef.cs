@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Framework.Interfaces;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
-internal class CPlusPlusHashHandler : IHashHandler
+internal class CPlusPlusHashDef : IHashDef
 {
     public string GetHashSource(DataType dataType, string typeName)
     {

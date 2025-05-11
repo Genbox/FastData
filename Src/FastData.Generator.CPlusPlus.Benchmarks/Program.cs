@@ -49,8 +49,8 @@ internal static class Program
 
     private static string PrintQueries(ITestData data, string identifier)
     {
-        CPlusPlusLanguageSpec langSpec = new CPlusPlusLanguageSpec();
-        CodeHelper helper = new CodeHelper(langSpec, new TypeMap(langSpec.Primitives));
+        CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
+        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
 
         StringBuilder sb = new StringBuilder();
 

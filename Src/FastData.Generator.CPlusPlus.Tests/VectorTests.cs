@@ -17,8 +17,8 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
         Assert.True(TestVectorHelper.TryGenerate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
 
-        CPlusPlusLanguageSpec langSpec = new CPlusPlusLanguageSpec();
-        CodeHelper helper = new CodeHelper(langSpec, new TypeMap(langSpec.Primitives));
+        CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
+        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
 
         string executable = context.Compiler.Compile(spec.Identifier,
             $$"""

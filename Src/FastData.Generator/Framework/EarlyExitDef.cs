@@ -5,7 +5,7 @@ using Genbox.FastData.Specs.EarlyExit;
 
 namespace Genbox.FastData.Generator.Framework;
 
-public abstract class EarlyExitHandler : IEarlyExitHandler
+public abstract class EarlyExitDef : IEarlyExitDef
 {
     protected abstract bool IsEnabled { get; }
 

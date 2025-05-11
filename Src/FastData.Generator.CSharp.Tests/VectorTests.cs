@@ -14,8 +14,8 @@ public class VectorTests
         Assert.True(TestVectorHelper.TryGenerate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
 
-        CSharpLanguageSpec langSpec = new CSharpLanguageSpec();
-        CodeHelper helper = new CodeHelper(langSpec, new TypeMap(langSpec.Primitives));
+        CSharpLanguageDef langDef = new CSharpLanguageDef();
+        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
 
         string wrapper = $$"""
                            {{spec.Source}}

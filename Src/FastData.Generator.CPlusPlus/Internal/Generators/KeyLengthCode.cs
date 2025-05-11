@@ -1,9 +1,9 @@
+using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.Extensions;
-using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class KeyLengthCode<T>(KeyLengthContext ctx) : OutputWriter<T>
+internal sealed class KeyLengthCode<T>(KeyLengthContext ctx) : CPlusPlusOutputWriter<T>
 {
     public override string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
 
@@ -12,13 +12,13 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx) : OutputWriter<T>
         string?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()).ToArray();
 
         return $$"""
-                     {{GetFieldModifier()}}std::array<{{GetTypeName()}}, {{lengths.Length}}> entries = {
+                     {{GetFieldModifier()}}std::array<{{TypeName}}, {{lengths.Length}}> entries = {
                  {{FormatColumns(lengths, ToValueLabel)}}
                      };
 
                  public:
                      {{GetMethodAttributes()}}
-                     {{GetMethodModifier()}}bool contains(const {{GetTypeName()}} value) noexcept
+                     {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
                      {
                  {{GetEarlyExits()}}
 
@@ -32,21 +32,21 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx) : OutputWriter<T>
         List<string>?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Take((int)((ctx.MaxLength - ctx.MinLength) + 1)).ToArray();
 
         return $$"""
-                     {{GetFieldModifier()}}std:array<std:vector<{{GetTypeName()}}>, {{lengths.Length}}> entries = {
+                     {{GetFieldModifier()}}std:array<std:vector<{{TypeName}}>, {{lengths.Length}}> entries = {
                  {{FormatList(lengths, RenderMany, ",\n")}}
                      };
 
                  public:
                      {{GetMethodAttributes()}}
-                     {{GetMethodModifier()}}bool contains(const {{GetTypeName()}}& value) noexcept
+                     {{GetMethodModifier()}}bool contains(const {{TypeName}}& value) noexcept
                      {
                  {{GetEarlyExits()}}
-                         std::vector<{{GetTypeName()}}> bucket = entries[value.length() - {{ctx.MinLength}}];
+                         std::vector<{{TypeName}}> bucket = entries[value.length() - {{ctx.MinLength}}];
 
                          if (bucket == nullptr)
                              return false;
 
-                         foreach ({{GetTypeName()}} str in bucket)
+                         foreach ({{TypeName}} str in bucket)
                          {
                              if ({{GetEqualFunction("str", "value")}})
                                  return true;

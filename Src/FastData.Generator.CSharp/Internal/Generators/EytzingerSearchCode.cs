@@ -2,16 +2,16 @@ using Genbox.FastData.Generator.CSharp.Internal.Framework;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx) : CSharpOutputWriter<T>
+internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
     public override string Generate() =>
         $$"""
-              {{GetFieldModifier()}}{{GetTypeName()}}[] _entries = new {{GetTypeName()}}[] {
+              {{GetFieldModifier()}}{{TypeName}}[] _entries = new {{TypeName}}[] {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
+              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
               {
           {{GetEarlyExits()}}
 

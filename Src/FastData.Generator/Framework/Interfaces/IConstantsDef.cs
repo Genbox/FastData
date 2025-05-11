@@ -1,6 +1,6 @@
-namespace Genbox.FastData.Generator.Framework.Interfaces.Specs;
+namespace Genbox.FastData.Generator.Framework.Interfaces;
 
-public interface IConstantsSpec
+public interface IConstantsDef
 {
     string MinLengthName { get; }
     string MaxLengthName { get; }
@@ -8,4 +8,5 @@ public interface IConstantsSpec
     string MaxValueName { get; }
     string ItemName { get; }
     string FieldModifier { get; }
+    string CommentChar { get; }
 }

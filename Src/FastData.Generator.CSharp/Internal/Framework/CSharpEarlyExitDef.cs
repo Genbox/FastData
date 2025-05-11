@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
-internal class CSharpEarlyExitHandler(CodeHelper helper, CSharpOptions options) : EarlyExitHandler
+internal class CSharpEarlyExitDef(TypeHelper helper, CSharpOptions options) : EarlyExitDef
 {
     protected override bool IsEnabled => !options.HasFlag(CSharpOptions.DisableEarlyExits);
 

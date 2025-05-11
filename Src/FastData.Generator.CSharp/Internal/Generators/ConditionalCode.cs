@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Enums;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>
+internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
     public override string Generate() => cfg.ConditionalBranchType switch
     {
@@ -15,7 +15,7 @@ internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGe
     private string GenerateIf() =>
         $$"""
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
+              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
               {
           {{GetEarlyExits()}}
 
@@ -29,7 +29,7 @@ internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGe
     private string GenerateSwitch() =>
         $$"""
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
+              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
               {
           {{GetEarlyExits()}}
 

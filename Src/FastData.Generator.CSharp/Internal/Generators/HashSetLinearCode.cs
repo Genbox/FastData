@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx) : CSharpOutputWriter<T>
+internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
     public override string Generate() =>
         $$"""
@@ -11,7 +11,7 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx) : CSharp
           {{FormatColumns(ctx.Buckets, static x => $"new B({x.StartIndex.ToStringInvariant()}, {x.EndIndex.ToStringInvariant()})")}}
               };
 
-              {{GetFieldModifier()}}{{GetTypeName()}}[] _items = new {{GetTypeName()}}[] {
+              {{GetFieldModifier()}}{{TypeName}}[] _items = new {{TypeName}}[] {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
@@ -20,12 +20,12 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx) : CSharp
               };
 
               {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{GetTypeName()}} value)
+              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
               {
           {{GetEarlyExits()}}
 
                   uint hash = Hash(value);
-                  ref B b = ref _buckets[{{GetModFunction("hash", ctx.Buckets.Length)}}];
+                  ref B b = ref _buckets[{{GetModFunction("hash", (ulong)ctx.Buckets.Length)}}];
 
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} index = b.StartIndex;
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} endIndex = b.EndIndex;

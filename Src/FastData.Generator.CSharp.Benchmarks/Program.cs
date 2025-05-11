@@ -71,8 +71,8 @@ internal static class Program
 
     private static string PrintQueries(ITestData data, string identifier)
     {
-        CSharpLanguageSpec langSpec = new CSharpLanguageSpec();
-        CodeHelper helper = new CodeHelper(langSpec, new TypeMap(langSpec.Primitives));
+        CSharpLanguageDef langDef = new CSharpLanguageDef();
+        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
 
         StringBuilder sb = new StringBuilder();
 
