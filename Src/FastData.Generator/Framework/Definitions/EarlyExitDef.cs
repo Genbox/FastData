@@ -3,7 +3,7 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Generator.Framework.Interfaces;
 using Genbox.FastData.Specs.EarlyExit;
 
-namespace Genbox.FastData.Generator.Framework;
+namespace Genbox.FastData.Generator.Framework.Definitions;
 
 public abstract class EarlyExitDef : IEarlyExitDef
 {

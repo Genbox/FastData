@@ -1,7 +1,7 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework.Interfaces;
 
-namespace Genbox.FastData.Generator.Framework;
+namespace Genbox.FastData.Generator.Framework.Definitions;
 
 public class IntegerTypeDef<T>(string name, T minValue, T maxValue, string minValueStr, string maxValueStr, Func<T, string>? print = null)
     : ITypeDef<T> where T : notnull
