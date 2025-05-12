@@ -28,7 +28,7 @@ internal static class MyData
             return false;
 
         uint hash = Hash(value);
-        ref B b = ref _buckets[unchecked((uint)(((((2635249153387078803ul * hash) >> 32) + 1) * 7) >> 32))];
+        ref B b = ref _buckets[unchecked((uint)(((((2635249153387078803ul * (uint)hash) >> 32) + 1) * 7) >> 32))];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
@@ -47,7 +47,7 @@ internal static class MyData
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static uint Hash(long value)
     {
-        return unchecked((uint)(value.GetHashCode()));
+        return (uint)value.GetHashCode();
     }
 
     [StructLayout(LayoutKind.Auto)]

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
@@ -10,10 +10,10 @@ internal static class Program
 {
     private static void Main()
     {
-        string rootPath = Path.Combine(Path.GetTempPath(), "FastData", "Rust");
-        Directory.CreateDirectory(rootPath);
+        string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "Rust");
+        TestHelper.CreateOrEmptyDirectory(rootDir);
 
-        string benchPath = Path.Combine(rootPath, "benches");
+        string benchPath = Path.Combine(rootDir, "benches");
         Directory.CreateDirectory(benchPath);
 
         // Build the Cargo.toml file
@@ -60,9 +60,9 @@ internal static class Program
                                                          """);
         }
 
-        TestHelper.TryWriteFile(Path.Combine(rootPath, "Cargo.toml"), sb.ToString());
+        TestHelper.TryWriteFile(Path.Combine(rootDir, "Cargo.toml"), sb.ToString());
 
-        BenchmarkHelper.RunBenchmark("cargo", "bench", rootPath, "--adapter rust_criterion --testbed Rust");
+        BenchmarkHelper.RunBenchmark("cargo", "bench", rootDir, "--adapter rust_criterion --testbed Rust");
     }
 
     private static string PrintQueries(ITestData data, string identifier)
@@ -73,7 +73,7 @@ internal static class Program
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < 25; i++)
-            sb.AppendLine(CultureInfo.InvariantCulture, $"           {identifier}::contains({data.GetValueLabel(helper)});");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"           let _ = {identifier}::contains({data.GetValueLabel(helper)});");
 
         return sb.ToString();
     }

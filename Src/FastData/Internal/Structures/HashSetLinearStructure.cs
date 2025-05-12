@@ -14,7 +14,7 @@ internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
 
     public bool TryCreate(T[] data, HashFunc<T> hash, out IContext? context)
     {
-        uint[] hashCodes = new uint[data.Length];
+        ulong[] hashCodes = new ulong[data.Length];
         for (int i = 0; i < data.Length; i++)
         {
             hashCodes[i] = hash(data[i]);
@@ -32,15 +32,15 @@ internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
 
         for (int i = 0; i < hashCodes.Length; i++)
         {
-            uint hashCode = hashCodes[i];
-            uint bucketNum = hashCode % numBuckets;
+            ulong hashCode = hashCodes[i];
+            uint bucketNum = (uint)(hashCode % numBuckets);
 
             ref int bucketStart = ref bucketStarts[bucketNum];
             nexts[i] = bucketStart;
             bucketStart = i;
         }
 
-        uint[] finalCodes = new uint[hashCodes.Length];
+        ulong[] finalCodes = new ulong[hashCodes.Length];
         HashSetBucket[] finalBuckets = new HashSetBucket[bucketStarts.Length];
         int count = 0;
         for (int bucketNum = 0; bucketNum < finalBuckets.Length; bucketNum++)
@@ -54,9 +54,9 @@ internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
             bucketStart = count;
             while (index >= 0)
             {
-                ref uint hashCode = ref hashCodes[index];
+                ref ulong hashCode = ref hashCodes[index];
                 finalCodes[count] = hashCode;
-                hashCode = (uint)count;
+                hashCode = (ulong)count;
                 count++;
                 bucketCount++;
 
@@ -70,7 +70,7 @@ internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
 
         for (int srcIndex = 0; srcIndex < hashCodes.Length; srcIndex++)
         {
-            uint destIndex = hashCodes[srcIndex];
+            ulong destIndex = hashCodes[srcIndex];
             newData[destIndex] = data[srcIndex];
         }
 
@@ -78,7 +78,7 @@ internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
         return true;
     }
 
-    private static uint CalcNumBuckets(ReadOnlySpan<uint> hashCodes)
+    private static uint CalcNumBuckets(ReadOnlySpan<ulong> hashCodes)
     {
         //Note: this code starts with a sane capacity factor for how many buckets are needed.
         //      it then increase the bucket capacity with the next prime number until it reaches less than 5% collisions
@@ -89,9 +89,9 @@ internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
         const int MaxSmallBucketTableMultiplier = 16;
         const uint MaxLargeBucketTableMultiplier = 3;
 
-        HashSet<uint> codes = new HashSet<uint>();
+        HashSet<ulong> codes = new HashSet<ulong>();
 
-        foreach (uint hashCode in hashCodes)
+        foreach (ulong hashCode in hashCodes)
         {
             codes.Add(hashCode);
         }
@@ -136,7 +136,7 @@ internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
 
             numCollisions = 0;
 
-            foreach (uint code in codes)
+            foreach (ulong code in codes)
             {
                 if (!IsBucketFirstVisit(code))
                     break;
@@ -155,17 +155,17 @@ internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
 
         return bestNumBuckets;
 
-        bool IsBucketFirstVisit(uint code)
+        bool IsBucketFirstVisit(ulong code)
         {
-            uint bucketNum = code % numBuckets;
-            if ((seenBuckets[bucketNum / 32] & (1 << (int)bucketNum)) != 0)
+            int bucketNum = (int)(code % numBuckets);
+            if ((seenBuckets[bucketNum / 32] & (1 << bucketNum)) != 0)
             {
                 numCollisions++;
                 if (numCollisions >= bestNumCollisions)
                     return false;
             }
             else
-                seenBuckets[bucketNum / 32] |= 1 << (int)bucketNum;
+                seenBuckets[bucketNum / 32] |= 1 << bucketNum;
 
             return true;
         }

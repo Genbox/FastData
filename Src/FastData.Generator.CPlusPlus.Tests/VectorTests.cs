@@ -20,23 +20,24 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
         TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
 
-        string executable = context.Compiler.Compile(spec.Identifier,
-            $$"""
-              #include <string>
-              #include <iostream>
+        string source = $$"""
+                          #include <string>
+                          #include <iostream>
 
-              {{spec.Source}}
+                          {{spec.Source}}
 
-              int main(int argc, char* argv[])
-              {
-              {{FormatList(data.Values, x => $"""
-                                              if (!{spec.Identifier}::contains({helper.ToValueLabel(x)}))
-                                                  return false;
-                                              """, "\n")}}
+                          int main(int argc, char* argv[])
+                          {
+                          {{FormatList(data.Values, x => $"""
+                                                          if (!{spec.Identifier}::contains({helper.ToValueLabel(x)}))
+                                                              return false;
+                                                          """, "\n")}}
 
-                  return 1;
-              }
-              """);
+                              return 1;
+                          }
+                          """;
+
+        string executable = context.Compiler.Compile(spec.Identifier, source);
 
         Assert.Equal(1, RunProcess(executable));
     }

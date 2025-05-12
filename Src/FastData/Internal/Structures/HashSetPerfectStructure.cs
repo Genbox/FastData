@@ -10,13 +10,13 @@ internal sealed class HashSetPerfectStructure<T> : IHashStructure<T>
 {
     public bool TryCreate(T[] data, HashFunc<T> hashFunc, out IContext? context)
     {
-        uint[] hashCodes = new uint[data.Length];
+        ulong[] hashCodes = new ulong[data.Length];
 
         for (int i = 0; i < data.Length; i++)
             hashCodes[i] = hashFunc(data[i]);
 
         //Find the proper seeds
-        uint seed = PerfectHashHelper.Generate(hashCodes, static (hash, seed) => Mixers.Murmur_32(hash ^ seed), 10_000_000);
+        uint seed = PerfectHashHelper.Generate(hashCodes, static (hash, seed) => Mixers.Murmur_32((uint)(hash ^ seed)), 10_000_000);
 
         // If we have 0 seeds, it means either there is no solution, or we hit the exit condition
         if (seed == 0)
@@ -25,15 +25,15 @@ internal sealed class HashSetPerfectStructure<T> : IHashStructure<T>
             return false;
         }
 
-        KeyValuePair<T, uint>[] pairs = new KeyValuePair<T, uint>[hashCodes.Length];
+        KeyValuePair<T, ulong>[] pairs = new KeyValuePair<T, ulong>[hashCodes.Length];
 
         for (int i = 0; i < hashCodes.Length; i++)
         {
             T value = data[i];
 
-            uint hash = Mixers.Murmur_32(hashFunc(value) ^ seed);
+            uint hash = Mixers.Murmur_32((uint)(hashFunc(value) ^ seed));
             uint index = (uint)(hash % pairs.Length);
-            pairs[index] = new KeyValuePair<T, uint>(value, hash);
+            pairs[index] = new KeyValuePair<T, ulong>(value, hash);
         }
 
         context = new HashSetPerfectContext<T>(pairs, seed);

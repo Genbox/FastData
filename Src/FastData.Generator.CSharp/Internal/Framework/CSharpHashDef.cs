@@ -5,59 +5,74 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
 internal class CSharpHashDef : IHashDef
 {
-    public string GetHashSource(DataType dataType, string typeName) =>
-        $$"""
-              [MethodImpl(MethodImplOptions.AggressiveInlining)]
-              private static uint Hash({{typeName}} value)
-              {
-          {{GetHash(dataType)}}
-              }
-          """;
-
-    private static string GetHash(DataType type)
+    public string GetHashSource(DataType dataType, string typeName, bool use64Bit)
     {
-        if (type == DataType.String)
+        string type = use64Bit ? "ulong" : "uint";
+
+        return $$"""
+                     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                     private static {{type}} Hash({{typeName}} value)
+                     {
+                 {{GetHash(dataType, use64Bit, type)}}
+                     }
+                 """;
+    }
+
+    private static string GetHash(DataType dataType, bool use64Bit, string type)
+    {
+        if (dataType == DataType.String)
         {
-            return """
-                            uint hash = 352654597;
+            return $$"""
+                              {{type}} hash = 352654597;
 
-                            ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
-                            int len = value.Length;
+                              ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
+                              int len = value.Length;
 
-                            while (len-- > 0)
-                            {
-                                hash = (((hash << 5) | (hash >> 27)) + hash) ^ ptr;
-                                ptr = ref Unsafe.Add(ref ptr, 1);
-                            }
+                              while (len-- > 0)
+                              {
+                                  hash = (((hash << 5) | (hash >> 27)) + hash) ^ ptr;
+                                  ptr = ref Unsafe.Add(ref ptr, 1);
+                              }
 
-                            return 352654597 + (hash * 1566083941);
-                   """;
+                              return 352654597 + (hash * 1566083941);
+                     """;
         }
 
-        if (type == DataType.Single)
+        if (dataType.IsIdentityHash())
+            return $"        return ({type})value;";
+
+        if (dataType is DataType.Int64 or DataType.UInt64)
         {
-            return """
-                           uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
+            if (use64Bit)
+                return $"        return ({type})value;";
 
-                           if (((bits - 1) & ~(0x8000_0000)) >= 0x7FF0_0000)
-                               bits &= 0x7FF0_0000;
-
-                           return bits;
-                   """;
+            return $"        return ({type})value.GetHashCode();";
         }
 
-        if (type == DataType.Double)
+        if (dataType == DataType.Single)
         {
-            return """
-                           ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
+            return $"""
+                            uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
 
-                           if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
-                               bits &= 0x7FF0_0000_0000_0000;
+                            if (((bits - 1) & ~(0x8000_0000)) >= 0x7FF0_0000)
+                                bits &= 0x7FF0_0000;
 
-                           return (uint)bits ^ (uint)(bits >> 32);
-                   """;
+                            return ({type})bits;
+                    """;
         }
 
-        return $"        return unchecked((uint)(value{(type.IsIdentityHash() ? "" : ".GetHashCode()")}));";
+        if (dataType == DataType.Double)
+        {
+            return $"""
+                            ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
+
+                            if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
+                                bits &= 0x7FF0_0000_0000_0000;
+
+                            return {(use64Bit ? "bits" : "(uint)bits ^ (uint)(bits >> 32)")};
+                    """;
+        }
+
+        return $"        return ({type})value.GetHashCode();";
     }
 }

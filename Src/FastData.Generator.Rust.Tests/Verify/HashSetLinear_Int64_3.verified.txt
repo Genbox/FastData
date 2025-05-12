@@ -23,7 +23,7 @@ impl MyData {
 
     #[inline(always)]
     fn get_hash(value: i64) -> u32 {
-        ((value as i32) ^ ((value >> 32) as i32)) as u32
+        ((value as u32) ^ ((value >> 32) as u32)) as u32
     }
 
     #[must_use]

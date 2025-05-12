@@ -5,24 +5,26 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 internal class CPlusPlusHashDef : IHashDef
 {
-    public string GetHashSource(DataType dataType, string typeName)
+    public string GetHashSource(DataType dataType, string typeName, bool use64Bit)
     {
         bool norConst = dataType is DataType.Single or DataType.Double or DataType.Int64 or DataType.UInt64;
 
+        string type = use64Bit ? "uint64_t" : "uint32_t";
+
         return $$"""
-                     static{{(norConst ? " " : " constexpr ")}}uint32_t get_hash(const {{typeName}} value) noexcept
+                     static{{(norConst ? " " : " constexpr ")}}{{type}} get_hash(const {{typeName}} value) noexcept
                      {
-                 {{GetHash(dataType)}}
+                 {{GetHash(dataType, use64Bit, type)}}
                      }
                  """;
     }
 
-    private static string GetHash(DataType dataType)
+    private static string GetHash(DataType dataType, bool use64Bit, string type)
     {
         if (dataType == DataType.String)
         {
-            return """
-                           uint32_t hash = 352654597;
+            return $$"""
+                           {{type}} hash = 352654597;
 
                            const char* ptr = value.data();
                            size_t len = value.size();
@@ -37,10 +39,10 @@ internal class CPlusPlusHashDef : IHashDef
         }
 
         if (dataType.IsIdentityHash() || dataType == DataType.Boolean)
-            return "        return static_cast<uint32_t>(value);";
+            return $"        return static_cast<{type}>(value);";
 
         if (dataType is DataType.Int64 or DataType.UInt64)
-            return "        return static_cast<uint32_t>(static_cast<int32_t>(value) ^ static_cast<int32_t>(value >> 32));";
+            return $"        return static_cast<{type}>{(use64Bit ? "(value)" : "(static_cast<int32_t>(value) ^ static_cast<int32_t>(value >> 32))")};";
 
         if (dataType == DataType.Single)
         {
@@ -55,13 +57,13 @@ internal class CPlusPlusHashDef : IHashDef
 
         if (dataType == DataType.Double)
         {
-            return """
-                           uint64_t bits;
-                           std::memcpy(&bits, &value, sizeof(bits));
-                           if (((bits - 1) & ~0x8000000000000000ull) >= 0x7FF0000000000000ull)
-                               bits &= 0x7FF0000000000000ull;
-                           return static_cast<uint32_t>(bits) ^ static_cast<uint32_t>(bits >> 32);
-                   """;
+            return $"""
+                            uint64_t bits;
+                            std::memcpy(&bits, &value, sizeof(bits));
+                            if (((bits - 1) & ~0x8000000000000000ull) >= 0x7FF0000000000000ull)
+                                bits &= 0x7FF0000000000000ull;
+                            return {(use64Bit ? "bits" : "static_cast<uint32_t>(bits) ^ static_cast<uint32_t>(bits >> 32)")};
+                    """;
         }
 
         throw new InvalidOperationException("Unsupported data type: " + dataType);

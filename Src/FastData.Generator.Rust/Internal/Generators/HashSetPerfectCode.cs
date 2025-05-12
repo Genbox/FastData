@@ -1,4 +1,5 @@
 using Genbox.FastData.Generator.Enums;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
@@ -16,7 +17,7 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, Genera
 
         return $$"""
                      {{GetFieldModifier()}}const ENTRIES: [E; {{ctx.Data.Length}}] = [
-                 {{FormatColumns(ctx.Data, x => $"E {{ value: {ToValueLabel(x.Key)}, hash_code: {ToValueLabel(x.Value)} }}")}}
+                 {{FormatColumns(ctx.Data, x => $"E {{ value: {ToValueLabel(x.Key)}, hash_code: {x.Value.ToStringInvariant()} }}")}}
                      ];
 
                  {{GetHashSource()}}

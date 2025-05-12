@@ -11,7 +11,7 @@ internal static class Program
     private static void Main()
     {
         string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "CSharp");
-        Directory.CreateDirectory(rootDir);
+        TestHelper.CreateOrEmptyDirectory(rootDir);
 
         TestHelper.TryWriteFile(Path.Combine(rootDir, "CSharp.csproj"),
             """

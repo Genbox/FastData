@@ -10,7 +10,13 @@ public static class TestHelper
     private static readonly Encoding _utf8NoBom = new UTF8Encoding(false);
     private static readonly Random _random = new Random(42);
 
-    public static uint[] GetIntegers(IEnumerable<string> input) => input.Select(x => BitConverter.ToUInt32(Encoding.ASCII.GetBytes(x), 0)).ToArray();
+    public static void CreateOrEmptyDirectory(string path)
+    {
+        if (Directory.Exists(path))
+            Directory.Delete(path, true);
+
+        Directory.CreateDirectory(path);
+    }
 
     public static string GenerateRandomString(int length)
     {

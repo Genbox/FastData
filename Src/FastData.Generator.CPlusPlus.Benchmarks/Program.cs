@@ -12,7 +12,7 @@ internal static class Program
     private static void Main()
     {
         string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "CPlusPlus");
-        Directory.CreateDirectory(rootDir);
+        TestHelper.CreateOrEmptyDirectory(rootDir);
 
         CPlusPlusCompiler compiler = new CPlusPlusCompiler(true, rootDir);
         StringBuilder sb = new StringBuilder();

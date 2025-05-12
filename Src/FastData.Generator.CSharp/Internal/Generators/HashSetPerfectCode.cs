@@ -1,4 +1,5 @@
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
+using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
@@ -7,7 +8,7 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, CSharp
     public override string Generate() =>
         $$"""
               {{GetFieldModifier()}}E[] _entries = {
-          {{FormatColumns(ctx.Data, x => $"new E({ToValueLabel(x.Key)}, {ToValueLabel(x.Value)})")}}
+          {{FormatColumns(ctx.Data, x => $"new E({ToValueLabel(x.Key)}, {x.Value.ToStringInvariant()})")}}
               };
 
               {{GetMethodAttributes()}}
@@ -15,7 +16,7 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, CSharp
               {
           {{GetEarlyExits()}}
 
-                  uint hash = Murmur_32(Hash(value) ^ {{ctx.Seed}});
+                  {{HashType}} hash = Mixer(Hash(value) ^ {{ctx.Seed}});
                   uint index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                   ref E entry = ref _entries[index];
 
@@ -24,31 +25,54 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, CSharp
 
           {{GetHashSource()}}
 
-              [MethodImpl(MethodImplOptions.AggressiveInlining)]
-              private static uint Murmur_32(uint h)
-              {
-                  unchecked
-                  {
-                      h ^= h >> 16;
-                      h *= 0x85EBCA6BU;
-                      h ^= h >> 13;
-                      h *= 0xC2B2AE35U;
-                      h ^= h >> 16;
-                      return h;
-                  }
-              }
+          {{GetMixer()}}
 
               [StructLayout(LayoutKind.Auto)]
               private struct E
               {
-                  internal E({{TypeName}} value, uint hashCode)
+                  internal E({{TypeName}} value, {{HashType}} hashCode)
                   {
                       Value = value;
                       HashCode = hashCode;
                   }
 
                   internal {{TypeName}} Value;
-                  internal uint HashCode;
+                  internal {{HashType}} HashCode;
               }
           """;
+
+    private string GetMixer()
+    {
+        if (GeneratorConfig.Use64BitHashing)
+        {
+            return """
+                       [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                       private static ulong Mixer(ulong h)
+                       {
+                           h ^= h >> 33;
+                           h *= 0xFF51AFD7ED558CCD;
+                           h ^= h >> 33;
+                           h *= 0xC4CEB9FE1A85EC53;
+                           h ^= h >> 33;
+                           return h;
+                       }
+                   """;
+        }
+
+        return """
+                   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                   private static uint Mixer(uint h)
+                   {
+                       unchecked
+                       {
+                           h ^= h >> 16;
+                           h *= 0x85EBCA6BU;
+                           h ^= h >> 13;
+                           h *= 0xC2B2AE35U;
+                           h ^= h >> 16;
+                           return h;
+                       }
+                   }
+               """;
+    }
 }

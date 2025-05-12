@@ -65,7 +65,7 @@ internal class Simulator(string[] data, SimulatorConfig config)
 
         public bool Add(string value)
         {
-            uint hashCode = hashFunc(value);
+            ulong hashCode = hashFunc(value);
             ref int bucket = ref _buckets[hashCode % capacity];
             int i = bucket - 1;
 
@@ -90,6 +90,6 @@ internal class Simulator(string[] data, SimulatorConfig config)
         }
 
         [StructLayout(LayoutKind.Auto)]
-        private record struct Entry(uint Hash, int Next, string Value);
+        private record struct Entry(ulong Hash, int Next, string Value);
     }
 }

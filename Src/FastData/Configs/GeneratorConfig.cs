@@ -7,11 +7,12 @@ namespace Genbox.FastData.Configs;
 
 public class GeneratorConfig<T>
 {
-    internal GeneratorConfig(StructureType structureType, StringComparison stringComparison, DataProperties<T> props, IStringHash stringHash)
+    internal GeneratorConfig(StructureType structureType, StringComparison stringComparison, DataProperties<T> props, IStringHash stringHash, bool use64BitHashing)
     {
         StructureType = structureType;
         StringComparison = stringComparison;
         StringHash = stringHash;
+        Use64BitHashing = use64BitHashing;
         DataType = props.DataType;
         EarlyExits = GetEarlyExits(props, structureType);
         Constants = CreateConstants(props);
@@ -23,6 +24,7 @@ public class GeneratorConfig<T>
     public DataType DataType { get; }
     public IEarlyExit[] EarlyExits { get; }
     public IStringHash StringHash { get; set; }
+    public bool Use64BitHashing { get; }
     public Constants<T> Constants { get; }
     public Metadata Metadata { get; }
 

@@ -1,5 +1,6 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework.Interfaces;
 
 namespace Genbox.FastData.Generator.Framework;
@@ -17,8 +18,8 @@ public abstract class OutputWriter<T> : IOutputWriter
         _earlyExitDef = earlyExitDef;
         _typeHelper = typeHelper;
         _hashDef = hashDef;
-        TypeName = typeName;
         GeneratorConfig = genCfg;
+        TypeName = typeName;
     }
 
     protected string TypeName { get; private set; } = null!;
@@ -27,7 +28,7 @@ public abstract class OutputWriter<T> : IOutputWriter
     public abstract string Generate();
 
     protected string GetEarlyExits() => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
-    protected string GetHashSource() => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName);
+    protected string GetHashSource() => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName, GeneratorConfig.Use64BitHashing);
 
     protected string GetArraySizeType() => _langDef.ArraySizeType;
 

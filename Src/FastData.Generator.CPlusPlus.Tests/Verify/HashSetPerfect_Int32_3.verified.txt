@@ -18,7 +18,7 @@ class my_data final
     };
 
     inline static const std::array<e, 3> entries = {
-        e(std::numeric_limits<int32_t>::max(), 1427853558u), e(0, 1364076727u), e(std::numeric_limits<int32_t>::lowest(), 2340387434u)
+        e(std::numeric_limits<int32_t>::max(), 1427853558), e(0, 1364076727), e(std::numeric_limits<int32_t>::lowest(), 2340387434)
     };
 
     static constexpr uint32_t get_hash(const int32_t value) noexcept
@@ -26,7 +26,7 @@ class my_data final
         return static_cast<uint32_t>(value);
     }
 
-    static uint32_t murmur_32(uint32_t h) noexcept
+    static uint32_t mixer(uint32_t h) noexcept
     {
         h ^= h >> 16;
         h *= 0x85EBCA6BU;
@@ -42,7 +42,7 @@ public:
     {
         if (value < std::numeric_limits<int32_t>::lowest() || value > std::numeric_limits<int32_t>::max())
             return false;
-        const uint32_t hash = murmur_32(get_hash(value) ^ 1);
+        const uint32_t hash = mixer(get_hash(value) ^ 1);
         const size_t index = hash % 3;
         const e& entry = entries[index];
 

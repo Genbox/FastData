@@ -18,7 +18,7 @@ class my_data final
     };
 
     inline static const std::array<e, 3> entries = {
-        e("item2", 2874739758u), e("item3", 2030593309u), e("item1", 3482164928u)
+        e("item2", 2874739758), e("item3", 2030593309), e("item1", 3482164928)
     };
 
     static constexpr uint32_t get_hash(const std::string_view value) noexcept
@@ -36,7 +36,7 @@ class my_data final
         return 352654597 + (hash * 1566083941);
     }
 
-    static uint32_t murmur_32(uint32_t h) noexcept
+    static uint32_t mixer(uint32_t h) noexcept
     {
         h ^= h >> 16;
         h *= 0x85EBCA6BU;
@@ -52,7 +52,7 @@ public:
     {
         if (value.length() != 5u)
             return false;
-        const uint32_t hash = murmur_32(get_hash(value) ^ 3);
+        const uint32_t hash = mixer(get_hash(value) ^ 3);
         const size_t index = hash % 3;
         const e& entry = entries[index];
 

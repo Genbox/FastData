@@ -24,7 +24,7 @@ internal class RustEarlyExitDef(TypeHelper helper, RustOptions options) : EarlyE
 
     protected override string GetLengthEarlyExits(uint min, uint max) =>
         $$"""
-                  if {{(min.Equals(max) ? $"value.len() != {helper.ToValueLabel(max)}" : $"value.len() < {helper.ToValueLabel(min)} || value.len() > {helper.ToValueLabel(max)}")}} {
+                  if {{(min.Equals(max) ? $"value.len() != {helper.ToValueLabel(max)} as usize" : $"value.len() < {helper.ToValueLabel(min)} as usize || value.len() > {helper.ToValueLabel(max)} as usize")}} {
                       return false;
                   }
           """;

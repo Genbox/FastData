@@ -52,13 +52,20 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
         if (value == 1)
             return "0";
 
-        if (cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableModulusOptimization))
+        if (value > uint.MaxValue || cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableModulusOptimization))
             return $"{variable} % {value}";
 
         if (MathHelper.IsPowerOfTwo((uint)value))
             return $"{variable} & {value - 1}";
 
-        ulong multiplier = MathHelper.GetFastModMultiplier((uint)value);
-        return $"unchecked((uint)((((({multiplier}ul * {variable}) >> 32) + 1) * {value}) >> 32))";
+        if (!GeneratorConfig.Use64BitHashing)
+        {
+            ulong multiplier = MathHelper.GetFastModMultiplier((uint)value);
+            return $"unchecked((uint)((((({multiplier}ul * (uint){variable}) >> 32) + 1) * {value}) >> 32))";
+        }
+
+        return $"{variable} % {value}";
     }
+
+    protected string HashType => GeneratorConfig.Use64BitHashing ? "ulong" : "uint";
 }

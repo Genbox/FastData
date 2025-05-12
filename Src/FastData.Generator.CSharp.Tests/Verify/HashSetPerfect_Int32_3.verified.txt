@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 internal static class MyData
 {
     private static readonly E[] _entries = {
-        new E(int.MaxValue, 1427853558u), new E(0, 1364076727u), new E(int.MinValue, 2340387434u)
+        new E(int.MaxValue, 1427853558), new E(0, 1364076727), new E(int.MinValue, 2340387434)
     };
 
     
@@ -19,8 +19,8 @@ internal static class MyData
         if (value < int.MinValue || value > int.MaxValue)
             return false;
 
-        uint hash = Murmur_32(Hash(value) ^ 1);
-        uint index = unchecked((uint)(((((6148914691236517206ul * hash) >> 32) + 1) * 3) >> 32));
+        uint hash = Mixer(Hash(value) ^ 1);
+        uint index = unchecked((uint)(((((6148914691236517206ul * (uint)hash) >> 32) + 1) * 3) >> 32));
         ref E entry = ref _entries[index];
 
         return hash == entry.HashCode && value.Equals(entry.Value);
@@ -29,11 +29,11 @@ internal static class MyData
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static uint Hash(int value)
     {
-        return unchecked((uint)(value));
+        return (uint)value;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static uint Murmur_32(uint h)
+    private static uint Mixer(uint h)
     {
         unchecked
         {

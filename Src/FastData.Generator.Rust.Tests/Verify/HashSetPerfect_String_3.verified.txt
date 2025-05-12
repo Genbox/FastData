@@ -21,7 +21,7 @@ impl MyData {
         let mut len = value.len();
 
          while len > 0 {
-                hash = hash.rotate_left(5).wrapping_add(hash) ^ (ptr.read() as u32);
+                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u32);
                 ptr = ptr.add(1);
                 len -= 1;
          }
@@ -40,7 +40,7 @@ impl MyData {
 
     #[must_use]
     pub fn contains(value: &str) -> bool {
-        if value.len() != 5 {
+        if value.len() != 5 as usize {
             return false;
         }
         let hash = Self::murmur_32(unsafe { Self::get_hash(value) } ^ 3);

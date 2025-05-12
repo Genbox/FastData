@@ -15,7 +15,7 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx, CSharpCo
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
-              {{GetFieldModifier()}}uint[] _hashCodes = {
+              {{GetFieldModifier()}}{{HashType}}[] _hashCodes = {
           {{FormatColumns(ctx.HashCodes, static x => x.ToStringInvariant())}}
               };
 
@@ -24,7 +24,7 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx, CSharpCo
               {
           {{GetEarlyExits()}}
 
-                  uint hash = Hash(value);
+                  {{HashType}} hash = Hash(value);
                   ref B b = ref _buckets[{{GetModFunction("hash", (ulong)ctx.Buckets.Length)}}];
 
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} index = b.StartIndex;

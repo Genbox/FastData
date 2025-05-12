@@ -10,7 +10,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, GeneratorC
     {
         shared.Add("chain-struct-" + genCfg.DataType, CodeType.Class, $$"""
                                                                         {{GetFieldModifier()}}struct E {
-                                                                            hash_code: u32,
+                                                                            hash_code: {{HashType}},
                                                                             next: {{GetSmallestSignedType(ctx.Buckets.Length)}},
                                                                             value: {{GetTypeNameWithLifetime()}},
                                                                         }

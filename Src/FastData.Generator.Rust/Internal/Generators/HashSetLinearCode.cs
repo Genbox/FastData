@@ -24,7 +24,7 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx, Generato
                  {{FormatColumns(ctx.Data, ToValueLabel)}}
                      ];
 
-                     {{GetFieldModifier()}}const HASH_CODES: [u32; {{ctx.HashCodes.Length}}] = [
+                     {{GetFieldModifier()}}const HASH_CODES: [{{HashType}}; {{ctx.HashCodes.Length}}] = [
                  {{FormatColumns(ctx.HashCodes, static x => x.ToStringInvariant())}}
                      ];
 

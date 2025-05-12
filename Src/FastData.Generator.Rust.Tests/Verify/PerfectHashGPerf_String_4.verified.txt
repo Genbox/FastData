@@ -44,7 +44,7 @@ impl MyData {
 
     #[must_use]
     pub fn contains(value: &str) -> bool {
-        if value.len() != 5 {
+        if value.len() != 5 as usize {
             return false;
         }
 

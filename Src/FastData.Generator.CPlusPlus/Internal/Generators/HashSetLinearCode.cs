@@ -24,7 +24,7 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx) : CPlusP
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
-              {{GetFieldModifier()}}std::array<uint32_t, {{ctx.HashCodes.Length}}> hash_codes = {
+              {{GetFieldModifier()}}std::array<{{HashType}}, {{ctx.HashCodes.Length}}> hash_codes = {
           {{FormatColumns(ctx.HashCodes, static x => x.ToStringInvariant())}}
               };
 
@@ -36,7 +36,7 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx) : CPlusP
               {
           {{GetEarlyExits()}}
 
-                  const uint32_t hash = get_hash(value);
+                  const {{HashType}} hash = get_hash(value);
                   const auto& [start_index, end_index]= buckets[{{GetModFunction("hash", (ulong)ctx.Buckets.Length)}}];
 
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} index = start_index;

@@ -47,10 +47,11 @@ public static class FastDataGenerator
         StructureConfig<T> strCfg = new StructureConfig<T>(props, fdCfg.StringComparison);
 
         bool analysisEnabled = false;
+        bool use64BitHashing = fdCfg.StorageOptions.HasFlag(StorageOption.OptimizeForSpeed);
 
         IStringHash? spec = null;
         if (data is string[] stringArr)
-            spec = analysisEnabled ? GetHashSpec(stringArr, props) : new DefaultStringHash(generator.UseUTF16Encoding);
+            spec = analysisEnabled ? GetHashSpec(stringArr, props) : new DefaultStringHash(generator.UseUTF16Encoding, use64BitHashing);
 
         HashFunc<T> hashFunc;
 
@@ -58,7 +59,7 @@ public static class FastDataGenerator
         if (spec != null)
             hashFunc = (HashFunc<T>)(object)spec.GetHashFunction();
         else
-            hashFunc = PrimitiveHash.GetHash<T>(props.DataType);
+            hashFunc = PrimitiveHash.GetHash<T>(props.DataType, use64BitHashing);
 
         IContext? context = null;
 
@@ -77,7 +78,7 @@ public static class FastDataGenerator
         if (context == null)
             throw new InvalidOperationException("Unable to find a suitable data structure for the data. Please report this as a bug.");
 
-        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, fdCfg.StringComparison, props, spec);
+        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, fdCfg.StringComparison, props, spec, use64BitHashing);
         return generator.TryGenerate(genCfg, context, out source);
     }
 
@@ -96,6 +97,8 @@ public static class FastDataGenerator
 
                 // We try key lengths
                 yield return new KeyLengthStructure<T>(cfg);
+
+                // TODO: Attempt perfect hashing
 
                 if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
                     yield return new BinarySearchStructure<T>(cfg);

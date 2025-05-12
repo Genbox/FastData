@@ -7,7 +7,7 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class PerfectHashBenchmarks
 {
-    private static uint[] _hashCodes;
+    private static ulong[] _hashCodes;
 
     [GlobalSetup]
     public void Setup()
@@ -27,18 +27,18 @@ public class PerfectHashBenchmarks
             "Wine", "Wood", "Word", "Work", "Year"
         ];
 
-        _hashCodes = words.Select(x => (uint)x.GetHashCode()).ToArray();
+        _hashCodes = words.Select(x => (ulong)x.GetHashCode()).ToArray();
     }
 
     [Benchmark]
     public uint TimeToConstruct()
     {
-        return PerfectHashHelper.Generate(_hashCodes, (obj, seed) => Mixers.Murmur_32(obj) ^ seed, 1, (uint)(_hashCodes.Length * 2));
+        return PerfectHashHelper.Generate(_hashCodes, (obj, seed) => Mixers.Murmur_64(obj) ^ seed, 1, (uint)(_hashCodes.Length * 2));
     }
 
     [Benchmark]
     public uint TimeToConstructMinimal()
     {
-        return PerfectHashHelper.Generate(_hashCodes, (obj, seed) => Mixers.Murmur_32(obj) ^ seed, 1);
+        return PerfectHashHelper.Generate(_hashCodes, (obj, seed) => Mixers.Murmur_64(obj) ^ seed, 1);
     }
 }

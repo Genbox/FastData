@@ -16,8 +16,8 @@ internal sealed class HashSetChainStructure<T> : IHashStructure<T>
         for (int i = 0; i < data.Length; i++)
         {
             T value = data[i];
-            uint hashCode = hash(value);
-            ref int bucket = ref buckets[hashCode % data.Length];
+            ulong hashCode = hash(value);
+            ref int bucket = ref buckets[hashCode % (uint)data.Length];
 
             ref HashSetEntry<T> entry = ref entries[i];
             entry.Hash = hashCode;

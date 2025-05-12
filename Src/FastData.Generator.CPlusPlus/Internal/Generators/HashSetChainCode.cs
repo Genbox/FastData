@@ -9,11 +9,11 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlu
         $$"""
               struct e
               {
-                  uint32_t hash_code;
+                  {{HashType}} hash_code;
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
                   {{TypeName}} value;
 
-                  e(const uint32_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{TypeName}} value)
+                  e(const {{HashType}} hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{TypeName}} value)
                      : hash_code(hash_code), next(next), value(value) {}
               };
 
@@ -22,7 +22,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlu
                };
 
               {{GetFieldModifier(false)}}std::array<e, {{ctx.Entries.Length}}> entries = {
-          {{FormatColumns(ctx.Entries, x => $"e({x.Hash}, {x.Next.ToStringInvariant()}, {ToValueLabel(x.Value)})")}}
+          {{FormatColumns(ctx.Entries, x => $"e({x.Hash.ToStringInvariant()}, {x.Next.ToStringInvariant()}, {ToValueLabel(x.Value)})")}}
               };
 
           {{GetHashSource()}}
@@ -33,7 +33,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlu
               {
           {{GetEarlyExits()}}
 
-                  const uint32_t hash = get_hash(value);
+                  const {{HashType}} hash = get_hash(value);
                   const size_t index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} i = buckets[index] - 1;
 
