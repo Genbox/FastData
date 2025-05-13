@@ -47,7 +47,7 @@ public static class FastDataGenerator
         StructureConfig<T> strCfg = new StructureConfig<T>(props, fdCfg.StringComparison);
 
         bool analysisEnabled = false;
-        bool use64BitHashing = fdCfg.StorageOptions.HasFlag(StorageOption.OptimizeForSpeed);
+        bool use64BitHashing = fdCfg.StorageOptions.HasFlag(StorageOption.Enable64BitHashing);
 
         IStringHash? spec = null;
         if (data is string[] stringArr)
