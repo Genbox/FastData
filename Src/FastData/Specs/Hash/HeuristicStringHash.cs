@@ -2,12 +2,12 @@ using Genbox.FastData.Abstracts;
 
 namespace Genbox.FastData.Specs.Hash;
 
-public sealed record HeuristicStringHash(int[] Positions) : IStringHash
+public sealed record HeuristicStringHash(List<int> Positions) : IStringHash
 {
     public HashFunc<string> GetHashFunction() => obj => Hash(obj, Positions);
     public EqualFunc<string> GetEqualFunction() => (a, b) => Equal(a, b, Positions);
 
-    private static uint Hash(string input, int[] positions)
+    private static uint Hash(string input, List<int> positions)
     {
         //This hash function is PJW hash
 
@@ -33,7 +33,7 @@ public sealed record HeuristicStringHash(int[] Positions) : IStringHash
         return h;
     }
 
-    private static bool Equal(string a, string b, int[] positions)
+    private static bool Equal(string a, string b, List<int> positions)
     {
         foreach (int pos in positions)
         {

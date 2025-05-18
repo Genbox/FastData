@@ -57,10 +57,10 @@ internal sealed class PerfectHashGPerfStructure<T>(StructureConfig<T> config) : 
         Candidate<HeuristicStringHash> candidate = analyzer.Run();
 
         // If we didn't get any positions, we don't want to move any further
-        if (candidate.Spec.Positions.Length == 0)
+        if (candidate.Spec.Positions.Count == 0)
             return false;
 
-        int[] positions = candidate.Spec.Positions;
+        int[] positions = candidate.Spec.Positions.ToArray();
         int maxLen = (int)strProps.LengthData.Max;
 
         // TODO: For now, we keep regenerating state within Keyword. In the future, I hope to do this more efficiently

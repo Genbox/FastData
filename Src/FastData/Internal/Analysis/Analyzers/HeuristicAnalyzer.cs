@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -42,47 +41,45 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
  */
 
 /// <summary>Finds the least number of positions in a string that hashes to a unique value for all inputs.</summary>
-[SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
 internal class HeuristicAnalyzer(string[] data, StringProperties props, HeuristicAnalyzerConfig config, Simulator simulator) : IHashAnalyzer<HeuristicStringHash>
 {
     private const double _epsilon = 1e-6;
 
     public Candidate<HeuristicStringHash> Run()
     {
-        // Stage 1: Find all positions that are mandatory. If two items are the same length, but differ only on one character, then we must include that character.
-        HashSet<int> mandatory = GetMandatory();
-        Print("Stage1", mandatory);
-
         int max = (int)Math.Min(props.LengthData.Max - 1, config.MaxPositions - 1);
 
-        // Stage 2: Attempt using just the mandatory positions first, then add positions as long as it decrease the collision count
-        HashSet<int> current = new HashSet<int>(mandatory);
+        // Stage 1: Find all positions that are mandatory. If two items are the same length, but differ only on one character, then we must include that character.
+        DirectMap mandatory = new DirectMap(max + 1);
+        GetMandatory(mandatory);
+        Print("Stage1", mandatory);
+
+        // Stage 2: Attempt to use just the mandatory positions first, then add positions as long as it decrease the collision count
+        DirectMap current = new DirectMap(mandatory);
         double currentFitness = CalculateFitness(current);
-        AddWhileBetter(max, ref current, ref currentFitness);
+        AddWhileBetter(max, current, ref currentFitness);
         Print("Stage2", current);
 
         // Stage 3: Remove positions, as long as this doesn't increase the collision count.
-        RemoveSinglePositions(max, mandatory, ref current, ref currentFitness);
+        RemoveSinglePositions(max, mandatory, current, ref currentFitness);
         Print("Stage3", current);
 
         // Stage 4: Replace two positions by one, as long as this doesn't increase the collision count.
-        MergePositions(max, mandatory, ref current, ref currentFitness);
+        MergePositions(max, mandatory, current, ref currentFitness);
         Print("Stage4", current);
 
         return CalculateFitnessInternal(current);
     }
 
-    private HashSet<int> GetMandatory()
+    private void GetMandatory(DirectMap mandatory)
     {
-        HashSet<int> mandatory = new HashSet<int>();
-
         for (int i1 = 0; i1 < data.Length - 1; i1++)
         {
-            string str1 = (string)data[i1];
+            string str1 = data[i1];
 
             for (int i2 = i1 + 1; i2 < data.Length; i2++) // We want to avoid comparing the item to itself
             {
-                string str2 = (string)data[i2];
+                string str2 = data[i2];
 
                 if (str1.Length == str2.Length) // Same length
                 {
@@ -109,28 +106,25 @@ internal class HeuristicAnalyzer(string[] data, StringProperties props, Heuristi
                 }
             }
         }
-
-        return mandatory;
     }
 
-    private void AddWhileBetter(int max, ref HashSet<int> currentSet, ref double currentFitness)
+    private void AddWhileBetter(int max, DirectMap currentSet, ref double currentFitness)
     {
         while (true)
         {
-            HashSet<int>? bestSet = null;
+            int bestIndex = int.MinValue;
             double bestFitness = double.MinValue;
 
             for (int i = max; i >= -1; i--)
             {
-                if (!currentSet.Contains(i))
+                if (currentSet.Add(i))
                 {
-                    HashSet<int> attemptSet = new HashSet<int>(currentSet);
-                    attemptSet.Add(i);
-                    double attemptFitness = CalculateFitness(attemptSet);
+                    double attemptFitness = CalculateFitness(currentSet);
+                    currentSet.RemoveLast(i);
 
                     if (attemptFitness > bestFitness || (Math.Abs(attemptFitness - bestFitness) < _epsilon && i >= 0))
                     {
-                        bestSet = attemptSet;
+                        bestIndex = i;
                         bestFitness = attemptFitness;
                     }
                 }
@@ -140,31 +134,30 @@ internal class HeuristicAnalyzer(string[] data, StringProperties props, Heuristi
             if (bestFitness <= currentFitness)
                 break;
 
-            currentSet = bestSet!;
+            currentSet.Add(bestIndex);
             currentFitness = bestFitness;
             Print("- new best", currentSet);
         }
     }
 
-    private void RemoveSinglePositions(int max, HashSet<int> mandatory, ref HashSet<int> currentSet, ref double currentFitness)
+    private void RemoveSinglePositions(int max, DirectMap mandatory, DirectMap currentSet, ref double currentFitness)
     {
         while (true)
         {
-            HashSet<int>? bestSet = null;
+            int bestIndex = int.MinValue;
             double bestFitness = double.MinValue;
 
             for (int i = max; i >= -1; i--)
             {
-                if (currentSet.Contains(i) && !mandatory.Contains(i))
+                if (!mandatory.Contains(i) && currentSet.Remove(i))
                 {
-                    HashSet<int> attemptSet = new HashSet<int>(currentSet);
-                    attemptSet.Remove(i);
-                    double attemptFitness = CalculateFitness(attemptSet);
+                    double attemptFitness = CalculateFitness(currentSet);
+                    currentSet.Add(i);
 
                     // If the number of collisions are the same, we prefer our new attempt, as it has one instruction less, but produce the same number of collisions
                     if (attemptFitness > bestFitness || (Math.Abs(attemptFitness - bestFitness) < _epsilon && i == -1))
                     {
-                        bestSet = attemptSet;
+                        bestIndex = i;
                         bestFitness = attemptFitness;
                     }
                 }
@@ -174,17 +167,17 @@ internal class HeuristicAnalyzer(string[] data, StringProperties props, Heuristi
             if (bestFitness < currentFitness)
                 break;
 
-            currentSet = bestSet!;
+            currentSet.Remove(bestIndex);
             currentFitness = bestFitness;
             Print("- new best", currentSet);
         }
     }
 
-    private void MergePositions(int max, HashSet<int> mandatory, ref HashSet<int> currentSet, ref double currentFitness)
+    private void MergePositions(int max, DirectMap mandatory, DirectMap currentSet, ref double currentFitness)
     {
         while (true)
         {
-            HashSet<int>? bestSet = null;
+            int bestI1 = int.MinValue, bestI2 = int.MinValue, bestI3 = int.MinValue;
             double bestFitness = double.MinValue;
 
             for (int i1 = max; i1 >= -1; i1--)
@@ -197,19 +190,21 @@ internal class HeuristicAnalyzer(string[] data, StringProperties props, Heuristi
                         {
                             for (int i3 = max; i3 >= 0; i3--)
                             {
-                                if (!currentSet.Contains(i3))
+                                if (currentSet.Add(i3))
                                 {
-                                    HashSet<int> attemptSet = new HashSet<int>(currentSet);
-                                    attemptSet.Remove(i1);
-                                    attemptSet.Remove(i2);
-                                    attemptSet.Add(i3);
-
-                                    double attemptFitness = CalculateFitness(attemptSet);
+                                    currentSet.Remove(i1);
+                                    currentSet.Remove(i2);
+                                    double attemptFitness = CalculateFitness(currentSet);
+                                    currentSet.Add(i1);
+                                    currentSet.Add(i2);
+                                    currentSet.Remove(i3);
 
                                     // If the number of collisions are the same, we prefer our new attempt, as it has two instructions less, but produce the same number of collisions
                                     if (attemptFitness > bestFitness || (Math.Abs(attemptFitness - bestFitness) < _epsilon && (i1 == -1 || i2 == -1)))
                                     {
-                                        bestSet = attemptSet;
+                                        bestI1 = i1;
+                                        bestI2 = i2;
+                                        bestI3 = i3;
                                         bestFitness = attemptFitness;
                                     }
                                 }
@@ -223,30 +218,53 @@ internal class HeuristicAnalyzer(string[] data, StringProperties props, Heuristi
             if (bestFitness < currentFitness)
                 break;
 
-            currentSet = bestSet!;
+            currentSet.Remove(bestI1);
+            currentSet.Remove(bestI2);
+            currentSet.Add(bestI3);
             currentFitness = bestFitness;
             Print("- new best", currentSet);
         }
     }
 
-    private double CalculateFitness(HashSet<int> set) => CalculateFitnessInternal(set).Fitness; //The algorithm here works with less fitness = better. At least for now.
+    private double CalculateFitness(DirectMap set) => CalculateFitnessInternal(set).Fitness; //The algorithm here works with less fitness = better. At least for now.
 
-    private Candidate<HeuristicStringHash> CalculateFitnessInternal(HashSet<int> set)
+    private Candidate<HeuristicStringHash> CalculateFitnessInternal(DirectMap map)
     {
-        Candidate<HeuristicStringHash> cand = new Candidate<HeuristicStringHash>(new HeuristicStringHash(set.OrderBy(x => x).ToArray()));
-        simulator.Run(ref cand);
-        return cand;
+        Candidate<HeuristicStringHash> _cand = new Candidate<HeuristicStringHash>();
+
+        _cand.Spec = new HeuristicStringHash(map.Positions);
+        simulator.Run(ref _cand);
+        return _cand;
+    }
+
+    private static bool Equal(string a, string b, List<int> positions)
+    {
+        foreach (int pos in positions)
+        {
+            if (pos == -1) //This if-case should come first, or else it will overlap with the next
+            {
+                if (a[a.Length - 1] != b[b.Length - 1])
+                    return false;
+            }
+            else if (pos <= a.Length - 1 && pos <= b.Length - 1)
+            {
+                if (a[pos] != b[pos])
+                    return false;
+            }
+        }
+
+        return true;
     }
 
     [Conditional("DebugPrint")]
-    private void Print(string stage, HashSet<int> set)
+    private void Print(string stage, DirectMap map)
     {
-        Candidate<HeuristicStringHash> cand = CalculateFitnessInternal(set);
+        Candidate<HeuristicStringHash> cand = CalculateFitnessInternal(map);
 
         Console.Write($"{stage} ({cand.Metadata["Collisions"]}): ");
         bool lastChar = false;
         bool first = true;
-        foreach (int i in set.OrderBy(x => x))
+        foreach (int i in map.Positions)
         {
             if (!first)
                 Console.Write(", ");
@@ -266,5 +284,67 @@ internal class HeuristicAnalyzer(string[] data, StringProperties props, Heuristi
             Console.Write("$");
         }
         Console.WriteLine();
+    }
+
+    private sealed class DirectMap
+    {
+        private readonly bool[] _lookup;
+        private readonly int _capacity;
+
+        internal DirectMap(DirectMap input)
+        {
+            _lookup = new bool[input._lookup.Length];
+            Array.Copy(input._lookup, _lookup, _lookup.Length);
+
+            Positions = new List<int>(input._capacity);
+            Positions.AddRange(input.Positions);
+            _capacity = input._capacity;
+        }
+
+        internal DirectMap(int capacity)
+        {
+            _lookup = new bool[capacity + 1]; //We add space for -1
+            Positions = new List<int>(capacity);
+            _capacity = capacity;
+        }
+
+        public List<int> Positions { get; }
+
+        public bool Add(int index)
+        {
+            ref bool lookup = ref _lookup[index + 1];
+
+            //The item is not in the lookup. Add it and return true.
+            if (!lookup)
+            {
+                lookup = true;
+                Positions.Add(index);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool Contains(int index) => _lookup[index + 1];
+
+        public bool Remove(int index)
+        {
+            ref bool lookup = ref _lookup[index + 1];
+
+            if (lookup)
+            {
+                lookup = false;
+                Positions.Remove(index);
+                return true;
+            }
+
+            return false;
+        }
+
+        public void RemoveLast(int index)
+        {
+            _lookup[index + 1] = false;
+            Positions.RemoveAt(Positions.Count - 1);
+        }
     }
 }
