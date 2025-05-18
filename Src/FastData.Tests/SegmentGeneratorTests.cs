@@ -92,13 +92,14 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         }
     }
 
-    private string[] GenerateStrings(int len, int count)
+    private static string[] GenerateStrings(int len, int count)
     {
+        Random rng = new Random(42);
         string[] res = new string[count];
 
         for (int i = 0; i < count; i++)
         {
-            res[i] = TestHelper.GenerateRandomString(len);
+            res[i] = TestHelper.GenerateRandomString(rng, len);
         }
 
         return res;

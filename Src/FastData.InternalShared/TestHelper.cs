@@ -8,7 +8,6 @@ public static class TestHelper
 {
     private const string _alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static readonly Encoding _utf8NoBom = new UTF8Encoding(false);
-    private static readonly Random _random = new Random(42);
 
     public static void CreateOrEmptyDirectory(string path)
     {
@@ -18,13 +17,13 @@ public static class TestHelper
         Directory.CreateDirectory(path);
     }
 
-    public static string GenerateRandomString(int length)
+    public static string GenerateRandomString(Random rng, int length)
     {
         char[] data = new char[length];
 
         for (int i = 0; i < length; i++)
         {
-            data[i] = _alphabet[_random.Next(0, _alphabet.Length)];
+            data[i] = _alphabet[rng.Next(0, _alphabet.Length)];
         }
 
         return new string(data);

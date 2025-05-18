@@ -60,7 +60,7 @@ internal static class GPerfTest
 
             for (int k = 0; k < i; k++)
             {
-                elements[k] = TestHelper.GenerateRandomString(_random.Next(1, 10));
+                elements[k] = TestHelper.GenerateRandomString(_random, _random.Next(1, 10));
             }
 
             using FileStream fs = File.OpenWrite(Path.Combine(path, filename));

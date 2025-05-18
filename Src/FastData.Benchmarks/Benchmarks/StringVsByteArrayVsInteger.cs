@@ -10,7 +10,7 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 public class StringVsByteArrayVsInteger
 {
     //Create 100x 4 character strings. They are all ASCII
-    private static readonly string[] _query1 = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(4)).ToArray();
+    private static readonly string[] _query1 = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(Random.Shared, 4)).ToArray();
     private static readonly byte[][] _query2 = _query1.Select(x => Encoding.ASCII.GetBytes(x)).ToArray();
     private static readonly int[] _query3 = _query2.Select(x => BitConverter.ToInt32(x)).ToArray();
 
