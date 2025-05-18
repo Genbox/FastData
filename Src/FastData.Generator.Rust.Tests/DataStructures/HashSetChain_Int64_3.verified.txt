@@ -10,16 +10,16 @@ pub struct MyData;
 
 impl MyData {
     const BUCKETS: [i8; 3] = [
-        2, 0, 3
+        2, 3, 1
     ];
 
     const ENTRIES: [E; 3] = [
-        E { hash_code: 2147483648, next: -1, value: i64::MIN }, E { hash_code: 0, next: -1, value: 0 }, E { hash_code: 2147483648, next: 0, value: i64::MAX }
+        E { hash_code: 9223372036854775808, next: -1, value: i64::MIN }, E { hash_code: 0, next: -1, value: 0 }, E { hash_code: 9223372036854775807, next: -1, value: i64::MAX }
     ];
 
     #[inline(always)]
-    fn get_hash(value: i64) -> u32 {
-        ((value as u32) ^ ((value >> 32) as u32)) as u32
+    fn get_hash(value: i64) -> u64 {
+        value as u64
     }
 
     #[must_use]
@@ -48,7 +48,7 @@ impl MyData {
     pub const MAX_VALUE: i64 = i64::MAX;
 }
 struct E {
-    hash_code: u32,
+    hash_code: u64,
     next: i8,
     value: i64,
 }

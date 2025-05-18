@@ -18,24 +18,24 @@ class my_data final
     };
 
     inline static const std::array<b, 7> buckets = {
-        b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(1, 1), b(0, 0), b(2, 2)
+        b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(1, 1), b(2, 2)
     };
 
     static constexpr std::array<double, 3> items = {
-        0.0, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max()
+        0.0, std::numeric_limits<double>::max(), std::numeric_limits<double>::lowest()
     };
 
-    static constexpr std::array<uint32_t, 3> hash_codes = {
-        0, 1048576, 2148532224
+    static constexpr std::array<uint64_t, 3> hash_codes = {
+        0, 9218868437227405311, 18442240474082181119
     };
 
-    static uint32_t get_hash(const double value) noexcept
+    static uint64_t get_hash(const double value) noexcept
     {
         uint64_t bits;
         std::memcpy(&bits, &value, sizeof(bits));
         if (((bits - 1) & ~0x8000000000000000ull) >= 0x7FF0000000000000ull)
             bits &= 0x7FF0000000000000ull;
-        return static_cast<uint32_t>(bits) ^ static_cast<uint32_t>(bits >> 32);
+        return bits;
     }
 
 public:
@@ -45,7 +45,7 @@ public:
         if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
             return false;
 
-        const uint32_t hash = get_hash(value);
+        const uint64_t hash = get_hash(value);
         const auto& [start_index, end_index]= buckets[hash % 7];
 
         uint8_t index = start_index;

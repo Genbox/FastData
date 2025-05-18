@@ -14,12 +14,12 @@ impl MyData {
     ];
 
     const ENTRIES: [E; 3] = [
-        E { hash_code: 2147483648, next: -1, value: i32::MIN }, E { hash_code: 0, next: -1, value: 0 }, E { hash_code: 2147483647, next: -1, value: i32::MAX }
+        E { hash_code: 18446744071562067968, next: -1, value: i32::MIN }, E { hash_code: 0, next: -1, value: 0 }, E { hash_code: 2147483647, next: -1, value: i32::MAX }
     ];
 
     #[inline(always)]
-    fn get_hash(value: i32) -> u32 {
-        value as u32
+    fn get_hash(value: i32) -> u64 {
+        value as u64
     }
 
     #[must_use]
@@ -48,7 +48,7 @@ impl MyData {
     pub const MAX_VALUE: i32 = i32::MAX;
 }
 struct E {
-    hash_code: u32,
+    hash_code: u64,
     next: i8,
     value: i32,
 }

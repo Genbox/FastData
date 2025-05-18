@@ -18,20 +18,20 @@ class my_data final
     };
 
     inline static const std::array<b, 7> buckets = {
-        b(0, 0), b(0, 0), b(0, 0), b(1, 1), b(0, 0), b(0, 0), b(2, 2)
+        b(0, 0), b(0, 0), b(1, 1), b(0, 0), b(0, 0), b(2, 2), b(0, 0)
     };
 
     static constexpr std::array<std::string_view, 3> items = {
         "item2", "item1", "item3"
     };
 
-    static constexpr std::array<uint32_t, 3> hash_codes = {
-        2391420970, 3957504911, 825337029
+    static constexpr std::array<uint64_t, 3> hash_codes = {
+        17825845003995989450, 17825845005562073391, 17825845002429905509
     };
 
-    static constexpr uint32_t get_hash(const std::string_view value) noexcept
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept
     {
-        uint32_t hash = 352654597;
+        {uint64_t hash = 352654597;
 
         const char* ptr = value.data();
         size_t len = value.size();
@@ -51,7 +51,7 @@ public:
         if (value.length() != 5u)
             return false;
 
-        const uint32_t hash = get_hash(value);
+        const uint64_t hash = get_hash(value);
         const auto& [start_index, end_index]= buckets[hash % 7];
 
         uint8_t index = start_index;

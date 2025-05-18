@@ -10,29 +10,29 @@ class my_data final
 {
     struct e
     {
-        uint32_t hash_code;
+        uint64_t hash_code;
         int8_t next;
         double value;
 
-        e(const uint32_t hash_code, const int8_t next, const double value)
+        e(const uint64_t hash_code, const int8_t next, const double value)
            : hash_code(hash_code), next(next), value(value) {}
     };
 
     static constexpr std::array<int8_t, 3> buckets = {
-        3, 1, 0
+        3, 0, 1
      };
 
     inline static const std::array<e, 3> entries = {
-        e(1048576, -1, std::numeric_limits<double>::lowest()), e(0, -1, 0.0), e(2148532224, 1, std::numeric_limits<double>::max())
+        e(18442240474082181119, -1, std::numeric_limits<double>::lowest()), e(0, -1, 0.0), e(9218868437227405311, 1, std::numeric_limits<double>::max())
     };
 
-    static uint32_t get_hash(const double value) noexcept
+    static uint64_t get_hash(const double value) noexcept
     {
         uint64_t bits;
         std::memcpy(&bits, &value, sizeof(bits));
         if (((bits - 1) & ~0x8000000000000000ull) >= 0x7FF0000000000000ull)
             bits &= 0x7FF0000000000000ull;
-        return static_cast<uint32_t>(bits) ^ static_cast<uint32_t>(bits >> 32);
+        return bits;
     }
 
 public:
@@ -42,7 +42,7 @@ public:
         if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
             return false;
 
-        const uint32_t hash = get_hash(value);
+        const uint64_t hash = get_hash(value);
         const size_t index = hash % 3;
         int8_t i = buckets[index] - 1;
 

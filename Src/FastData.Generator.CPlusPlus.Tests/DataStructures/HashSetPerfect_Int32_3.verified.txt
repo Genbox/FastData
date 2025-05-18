@@ -11,9 +11,9 @@ class my_data final
     struct e
     {
         int32_t value;
-        uint32_t hash_code;
+        uint64_t hash_code;
 
-        e(const int32_t value, const uint32_t hash_code)
+        e(const int32_t value, const uint64_t hash_code)
         : value(value), hash_code(hash_code) {}
     };
 
@@ -21,18 +21,18 @@ class my_data final
         e(std::numeric_limits<int32_t>::max(), 1427853558), e(0, 1364076727), e(std::numeric_limits<int32_t>::lowest(), 2340387434)
     };
 
-    static constexpr uint32_t get_hash(const int32_t value) noexcept
+    static constexpr uint64_t get_hash(const int32_t value) noexcept
     {
-        return static_cast<uint32_t>(value);
+        return static_cast<uint64_t>(value);
     }
 
-    static uint32_t mixer(uint32_t h) noexcept
+    static uint64 mixer(uint64 h) noexcept
     {
-        h ^= h >> 16;
-        h *= 0x85EBCA6BU;
-        h ^= h >> 13;
-        h *= 0xC2B2AE35U;
-        h ^= h >> 16;
+        h ^= h >> 33;
+        h *= 0xFF51AFD7ED558CCD;
+        h ^= h >> 33;
+        h *= 0xC4CEB9FE1A85EC53;
+        h ^= h >> 33;
         return h;
     }
 
@@ -42,7 +42,7 @@ public:
     {
         if (value < std::numeric_limits<int32_t>::lowest() || value > std::numeric_limits<int32_t>::max())
             return false;
-        const uint32_t hash = mixer(get_hash(value) ^ 1);
+        const uint64_t hash = mixer(get_hash(value) ^ 1);
         const size_t index = hash % 3;
         const e& entry = entries[index];
 

@@ -10,15 +10,16 @@ using System.Runtime.InteropServices;
 internal static class MyData
 {
     private static readonly B[] _buckets = {
-        new B(0, 0), new B(1, 1), new B(2, 2), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0)
+        new B(0, 0), new B(1, 1), new B(0, 0), new B(2, 2), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), 
+        new B(0, 0)
     };
 
     private static readonly int[] _items = new int[] {
         0, int.MaxValue, int.MinValue
     };
 
-    private static readonly uint[] _hashCodes = {
-        0, 2147483647, 2147483648
+    private static readonly ulong[] _hashCodes = {
+        0, 2147483647, 18446744071562067968
     };
 
     
@@ -27,8 +28,8 @@ internal static class MyData
         if (value < int.MinValue || value > int.MaxValue)
             return false;
 
-        uint hash = Hash(value);
-        ref B b = ref _buckets[unchecked((uint)(((((2635249153387078803ul * (uint)hash) >> 32) + 1) * 7) >> 32))];
+        ulong hash = Hash(value);
+        ref B b = ref _buckets[hash % 11];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
@@ -45,9 +46,9 @@ internal static class MyData
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static uint Hash(int value)
+    private static ulong Hash(int value)
     {
-        return (uint)value;
+        return (ulong)value;
     }
 
     [StructLayout(LayoutKind.Auto)]

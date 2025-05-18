@@ -10,18 +10,18 @@ pub struct MyData;
 
 impl MyData {
     const ENTRIES: [E; 3] = [
-        E { value: "item2", hash_code: 2874739758 }, E { value: "item3", hash_code: 2030593309 }, E { value: "item1", hash_code: 3482164928 }
+        E { value: "item1", hash_code: 2617859997 }, E { value: "item3", hash_code: 677793355 }, E { value: "item2", hash_code: 1354700345 }
     ];
 
     #[inline]
-    unsafe fn get_hash(value: &str) -> u32 {
-        let mut hash: u32 = 352654597;
+    unsafe fn get_hash(value: &str) -> u64 {
+        let mut hash: u64 = 352654597;
 
         let mut ptr = value.as_ptr();
         let mut len = value.len();
 
          while len > 0 {
-                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u32);
+                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
                 ptr = ptr.add(1);
                 len -= 1;
          }
@@ -43,7 +43,7 @@ impl MyData {
         if value.len() != 5 as usize {
             return false;
         }
-        let hash = Self::murmur_32(unsafe { Self::get_hash(value) } ^ 3);
+        let hash = Self::murmur_32(unsafe { Self::get_hash(value) } ^ 7);
         let index = (hash % 3) as usize;
         let entry = &Self::ENTRIES[index];
 

@@ -14,7 +14,7 @@ internal static class MyData
      };
 
     private static readonly E[] _entries = {
-        new E(2147483648, -1, int.MinValue), new E(0, -1, 0), new E(2147483647, -1, int.MaxValue)
+        new E(18446744071562067968, -1, int.MinValue), new E(0, -1, 0), new E(2147483647, -1, int.MaxValue)
     };
 
     
@@ -23,8 +23,8 @@ internal static class MyData
         if (value < int.MinValue || value > int.MaxValue)
             return false;
 
-        uint hash = Hash(value);
-        uint index = (uint)(unchecked((uint)(((((6148914691236517206ul * (uint)hash) >> 32) + 1) * 3) >> 32)));
+        ulong hash = Hash(value);
+        uint index = (uint)(hash % 3);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
         while (i >= 0)
@@ -41,19 +41,19 @@ internal static class MyData
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static uint Hash(int value)
+    private static ulong Hash(int value)
     {
-        return (uint)value;
+        return (ulong)value;
     }
 
     [StructLayout(LayoutKind.Auto)]
     private readonly struct E
     {
-        internal readonly uint HashCode;
+        internal readonly ulong HashCode;
         internal readonly sbyte Next;
         internal readonly int Value;
 
-        internal E(uint hashCode, sbyte next, int value)
+        internal E(ulong hashCode, sbyte next, int value)
         {
             HashCode = hashCode;
             Next = next;

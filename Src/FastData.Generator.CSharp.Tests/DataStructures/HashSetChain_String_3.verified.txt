@@ -10,11 +10,11 @@ using System.Runtime.InteropServices;
 internal static class MyData
 {
     private static readonly sbyte[] _buckets = new sbyte[] {
-        3, 2, 1
+        1, 3, 2
      };
 
     private static readonly E[] _entries = {
-        new E(3957504911, -1, "item1"), new E(2391420970, -1, "item2"), new E(825337029, -1, "item3")
+        new E(17825845005562073391, -1, "item1"), new E(17825845003995989450, -1, "item2"), new E(17825845002429905509, -1, "item3")
     };
 
     
@@ -23,8 +23,8 @@ internal static class MyData
         if (value.Length != 5u)
             return false;
 
-        uint hash = Hash(value);
-        uint index = (uint)(unchecked((uint)(((((6148914691236517206ul * (uint)hash) >> 32) + 1) * 3) >> 32)));
+        ulong hash = Hash(value);
+        uint index = (uint)(hash % 3);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
         while (i >= 0)
@@ -41,9 +41,9 @@ internal static class MyData
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static uint Hash(string value)
+    private static ulong Hash(string value)
     {
-         uint hash = 352654597;
+         ulong hash = 352654597;
 
          ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
          int len = value.Length;
@@ -60,11 +60,11 @@ internal static class MyData
     [StructLayout(LayoutKind.Auto)]
     private readonly struct E
     {
-        internal readonly uint HashCode;
+        internal readonly ulong HashCode;
         internal readonly sbyte Next;
         internal readonly string Value;
 
-        internal E(uint hashCode, sbyte next, string value)
+        internal E(ulong hashCode, sbyte next, string value)
         {
             HashCode = hashCode;
             Next = next;

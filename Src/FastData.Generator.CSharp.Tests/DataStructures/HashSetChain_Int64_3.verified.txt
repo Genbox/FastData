@@ -10,11 +10,11 @@ using System.Runtime.InteropServices;
 internal static class MyData
 {
     private static readonly sbyte[] _buckets = new sbyte[] {
-        2, 0, 3
+        2, 3, 1
      };
 
     private static readonly E[] _entries = {
-        new E(2147483648, -1, long.MinValue), new E(0, -1, 0l), new E(2147483648, 0, long.MaxValue)
+        new E(9223372036854775808, -1, long.MinValue), new E(0, -1, 0l), new E(9223372036854775807, -1, long.MaxValue)
     };
 
     
@@ -23,8 +23,8 @@ internal static class MyData
         if (value < long.MinValue || value > long.MaxValue)
             return false;
 
-        uint hash = Hash(value);
-        uint index = (uint)(unchecked((uint)(((((6148914691236517206ul * (uint)hash) >> 32) + 1) * 3) >> 32)));
+        ulong hash = Hash(value);
+        uint index = (uint)(hash % 3);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
         while (i >= 0)
@@ -41,19 +41,19 @@ internal static class MyData
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static uint Hash(long value)
+    private static ulong Hash(long value)
     {
-        return (uint)value.GetHashCode();
+        return (ulong)value;
     }
 
     [StructLayout(LayoutKind.Auto)]
     private readonly struct E
     {
-        internal readonly uint HashCode;
+        internal readonly ulong HashCode;
         internal readonly sbyte Next;
         internal readonly long Value;
 
-        internal E(uint hashCode, sbyte next, long value)
+        internal E(ulong hashCode, sbyte next, long value)
         {
             HashCode = hashCode;
             Next = next;

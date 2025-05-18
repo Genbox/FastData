@@ -10,15 +10,15 @@ using System.Runtime.InteropServices;
 internal static class MyData
 {
     private static readonly B[] _buckets = {
-        new B(0, 0), new B(0, 0), new B(0, 0), new B(1, 1), new B(0, 0), new B(0, 0), new B(2, 2)
+        new B(0, 0), new B(0, 0), new B(1, 1), new B(0, 0), new B(0, 0), new B(2, 2), new B(0, 0)
     };
 
     private static readonly string[] _items = new string[] {
         "item2", "item1", "item3"
     };
 
-    private static readonly uint[] _hashCodes = {
-        2391420970, 3957504911, 825337029
+    private static readonly ulong[] _hashCodes = {
+        17825845003995989450, 17825845005562073391, 17825845002429905509
     };
 
     
@@ -27,8 +27,8 @@ internal static class MyData
         if (value.Length != 5u)
             return false;
 
-        uint hash = Hash(value);
-        ref B b = ref _buckets[unchecked((uint)(((((2635249153387078803ul * (uint)hash) >> 32) + 1) * 7) >> 32))];
+        ulong hash = Hash(value);
+        ref B b = ref _buckets[hash % 7];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
@@ -45,9 +45,9 @@ internal static class MyData
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static uint Hash(string value)
+    private static ulong Hash(string value)
     {
-         uint hash = 352654597;
+         ulong hash = 352654597;
 
          ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
          int len = value.Length;

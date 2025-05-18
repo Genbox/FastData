@@ -10,15 +10,15 @@ using System.Runtime.InteropServices;
 internal static class MyData
 {
     private static readonly B[] _buckets = {
-        new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(1, 1), new B(0, 0), new B(2, 2)
+        new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(1, 1), new B(2, 2)
     };
 
     private static readonly double[] _items = new double[] {
-        0.0, double.MinValue, double.MaxValue
+        0.0, double.MaxValue, double.MinValue
     };
 
-    private static readonly uint[] _hashCodes = {
-        0, 1048576, 2148532224
+    private static readonly ulong[] _hashCodes = {
+        0, 9218868437227405311, 18442240474082181119
     };
 
     
@@ -27,8 +27,8 @@ internal static class MyData
         if (value < double.MinValue || value > double.MaxValue)
             return false;
 
-        uint hash = Hash(value);
-        ref B b = ref _buckets[unchecked((uint)(((((2635249153387078803ul * (uint)hash) >> 32) + 1) * 7) >> 32))];
+        ulong hash = Hash(value);
+        ref B b = ref _buckets[hash % 7];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
@@ -45,14 +45,14 @@ internal static class MyData
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static uint Hash(double value)
+    private static ulong Hash(double value)
     {
         ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
 
         if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
             bits &= 0x7FF0_0000_0000_0000;
 
-        return (uint)bits ^ (uint)(bits >> 32);
+        return bits;
     }
 
     [StructLayout(LayoutKind.Auto)]

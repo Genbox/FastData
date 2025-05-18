@@ -19,8 +19,8 @@ public static class PrimitiveHash
             DataType.Int32 => static obj => (ulong)(int)(object)obj,
             DataType.UInt32 => static obj => (uint)(object)obj,
             DataType.Single => static obj => HashF32((float)(object)obj),
-            DataType.Int64 => static obj => (ulong)(object)obj, //Use value directly
-            DataType.UInt64 => static obj => (ulong)(long)(object)obj, //Use value directly
+            DataType.Int64 => static obj => (ulong)(long)(object)obj, //Use value directly
+            DataType.UInt64 => static obj => (ulong)(object)obj, //Use value directly
             DataType.Double => static obj => HashF64((double)(object)obj), //Does not fold to 32bit
             _ => throw new InvalidOperationException($"Unsupported data type: {dataType}")
         };

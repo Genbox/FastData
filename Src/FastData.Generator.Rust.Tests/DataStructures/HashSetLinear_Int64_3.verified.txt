@@ -9,21 +9,22 @@ use std::ptr;
 pub struct MyData;
 
 impl MyData {
-    const BUCKETS: [B; 7] = [
-        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 1, end_index: 2 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }
+    const BUCKETS: [B; 11] = [
+        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 1, end_index: 1 }, B { start_index: 2, end_index: 2 }, B { start_index: 0, end_index: 0 }, 
+        B { start_index: 0, end_index: 0 }
     ];
 
     const ITEMS: [i64; 3] = [
         0, i64::MAX, i64::MIN
     ];
 
-    const HASH_CODES: [u32; 3] = [
-        0, 2147483648, 2147483648
+    const HASH_CODES: [u64; 3] = [
+        0, 9223372036854775807, 9223372036854775808
     ];
 
     #[inline(always)]
-    fn get_hash(value: i64) -> u32 {
-        ((value as u32) ^ ((value >> 32) as u32)) as u32
+    fn get_hash(value: i64) -> u64 {
+        value as u64
     }
 
     #[must_use]
@@ -33,7 +34,7 @@ impl MyData {
         }
 
         let hash = unsafe { Self::get_hash(value) };
-        let bucket = &Self::BUCKETS[(hash % 7) as usize];
+        let bucket = &Self::BUCKETS[(hash % 11) as usize];
         let mut index: u8 = bucket.start_index;
         let end_index: u8 = bucket.end_index;
 

@@ -10,11 +10,11 @@ using System.Runtime.InteropServices;
 internal static class MyData
 {
     private static readonly sbyte[] _buckets = new sbyte[] {
-        3, 1, 0
+        3, 0, 1
      };
 
     private static readonly E[] _entries = {
-        new E(1048576, -1, double.MinValue), new E(0, -1, 0.0), new E(2148532224, 1, double.MaxValue)
+        new E(18442240474082181119, -1, double.MinValue), new E(0, -1, 0.0), new E(9218868437227405311, 1, double.MaxValue)
     };
 
     
@@ -23,8 +23,8 @@ internal static class MyData
         if (value < double.MinValue || value > double.MaxValue)
             return false;
 
-        uint hash = Hash(value);
-        uint index = (uint)(unchecked((uint)(((((6148914691236517206ul * (uint)hash) >> 32) + 1) * 3) >> 32)));
+        ulong hash = Hash(value);
+        uint index = (uint)(hash % 3);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
         while (i >= 0)
@@ -41,24 +41,24 @@ internal static class MyData
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static uint Hash(double value)
+    private static ulong Hash(double value)
     {
         ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
 
         if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
             bits &= 0x7FF0_0000_0000_0000;
 
-        return (uint)bits ^ (uint)(bits >> 32);
+        return bits;
     }
 
     [StructLayout(LayoutKind.Auto)]
     private readonly struct E
     {
-        internal readonly uint HashCode;
+        internal readonly ulong HashCode;
         internal readonly sbyte Next;
         internal readonly double Value;
 
-        internal E(uint hashCode, sbyte next, double value)
+        internal E(ulong hashCode, sbyte next, double value)
         {
             HashCode = hashCode;
             Next = next;

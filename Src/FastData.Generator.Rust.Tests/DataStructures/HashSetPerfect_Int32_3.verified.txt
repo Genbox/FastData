@@ -14,8 +14,8 @@ impl MyData {
     ];
 
     #[inline(always)]
-    fn get_hash(value: i32) -> u32 {
-        value as u32
+    fn get_hash(value: i32) -> u64 {
+        value as u64
     }
 
     fn murmur_32(mut h: u32) -> u32 {
