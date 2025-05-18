@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Order;
 using Genbox.FastData.Internal.Hashes;
@@ -27,7 +28,8 @@ public class HashBenchmarks
         foreach (string s in _array)
         {
             ref char ptr = ref MemoryMarshal.GetReference(s.AsSpan());
-            value += DJB2Hash.ComputeHash(ref ptr, s.Length);
+            ref byte ptr2 = ref Unsafe.As<char, byte>(ref ptr);
+            value += DJB2Hash.ComputeHash(ref ptr2, s.Length);
         }
 
         return value;

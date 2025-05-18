@@ -1,20 +1,24 @@
-using System.Runtime.InteropServices;
-using System.Text;
+using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Internal.Hashes;
 
 namespace Genbox.FastData.Specs.Hash;
 
-public sealed record DefaultStringHash(bool UseUTF16Encoding) : IStringHash
+/// <summary>Hashes the entire string using DJB2 hash</summary>
+public sealed record DefaultStringHash : IExpressionStringHash
 {
-    public HashFunc<string> GetHashFunction() => str =>
+    public HashFunc GetHashFunction() => BuildExpression().Compile();
+    public Expression<HashFunc> BuildExpression() => ExpressionHashBuilder.BuildFull(Mixer, Avalanche);
+
+    private static Expression Mixer(Expression hash, Expression read)
     {
-        if (UseUTF16Encoding)
-            return DJB2Hash.ComputeHash64(ref MemoryMarshal.GetReference(str.AsSpan()), str.Length);
+        // (((hash << 5) | (hash >> 27)) + hash) ^ Read(data, offset)
+        BinaryExpression rotated = Expression.Or(Expression.LeftShift(hash, Expression.Constant(5)), Expression.RightShift(hash, Expression.Constant(27)));
+        return Expression.Assign(hash, Expression.ExclusiveOr(Expression.Add(rotated, hash), read));
+    }
 
-        byte[] bytes = Encoding.UTF8.GetBytes(str);
-        return DJB2Hash.ComputeHash64(ref bytes[0], bytes.Length);
-    };
-
-    public EqualFunc<string> GetEqualFunction() => static (a, b) => a.Equals(b, StringComparison.Ordinal);
+    private static Expression Avalanche(Expression hash)
+    {
+        // 352654597 + (hash * 1566083941)
+        return Expression.Add(Expression.Constant(352654597ul), Expression.Multiply(hash, Expression.Constant(1566083941ul)));
+    }
 }

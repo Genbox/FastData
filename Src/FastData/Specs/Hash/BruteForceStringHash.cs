@@ -1,18 +1,18 @@
-using System.Runtime.InteropServices;
+using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Internal.Hashes;
-using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Specs.Misc;
+using static Genbox.FastData.Internal.Helpers.ExpressionHelper;
 
 namespace Genbox.FastData.Specs.Hash;
 
-public sealed record BruteForceStringHash(StringSegment Segment) : IStringHash
+public sealed record BruteForceStringHash(StringSegment Segment, Mixer Mixer, Avalanche Avalanche) : IExpressionStringHash
 {
-    public HashFunc<string> GetHashFunction() => str =>
-    {
-        ref char ptr = ref MemoryMarshal.GetReference(SegmentHelper.GetSpan(Segment, str));
-        return DJB2Hash.ComputeHash(ref ptr, str.Length);
-    };
+    public HashFunc GetHashFunction() => BuildExpression().Compile();
+    public Expression<HashFunc> BuildExpression() => ExpressionHashBuilder.Build([Segment], Mixer, Avalanche);
 
-    public EqualFunc<string> GetEqualFunction() => static (a, b) => a.Equals(b, StringComparison.Ordinal);
+    public override string ToString() => $"{nameof(Segment)} = {Segment.ToString()}, {nameof(Mixer)} = {Print(Mixer)}, {nameof(Avalanche)} = {Print(Avalanche)}";
+
+    public StringSegment Segment { get; internal set; } = Segment;
+    public Mixer Mixer { get; internal set; } = Mixer;
+    public Avalanche Avalanche { get; internal set; } = Avalanche;
 }

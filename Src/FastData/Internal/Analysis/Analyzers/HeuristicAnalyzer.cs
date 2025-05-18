@@ -233,7 +233,7 @@ internal class HeuristicAnalyzer(string[] data, StringProperties props, Heuristi
         Candidate<HeuristicStringHash> _cand = new Candidate<HeuristicStringHash>();
 
         _cand.Spec = new HeuristicStringHash(map.Positions);
-        simulator.Run(ref _cand);
+        simulator.RunWithEqual(data, _cand, (s, s1) => Equal(s, s1, map.Positions));
         return _cand;
     }
 

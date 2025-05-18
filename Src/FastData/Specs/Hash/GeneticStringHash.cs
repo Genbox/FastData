@@ -1,33 +1,32 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Specs.Misc;
 
 namespace Genbox.FastData.Specs.Hash;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-public sealed record GeneticStringHash(int MixerSeed, int MixerIterations, int AvalancheSeed, int AvalancheIterations, StringSegment[] Segments) : IStringHash
+public sealed record GeneticStringHash(int MixerSeed, int MixerIterations, int AvalancheSeed, int AvalancheIterations) : IStringHash
 {
-    public HashFunc<string> GetHashFunction()
+    public HashFunc GetHashFunction()
     {
-        Func<uint, uint, uint> mixer = GetMixer().Compile();
-        Func<uint, uint> avalanche = GetAvalanche().Compile();
-        return str => Hash(str, (uint)MixerSeed, mixer, avalanche);
+        // Func<uint, uint, uint> mixer = GetMixer().Compile();
+        // Func<uint, uint> avalanche = GetAvalanche().Compile();
+        // return str => Hash(str, (uint)MixerSeed, mixer, avalanche);
+
+        return null!;
     }
 
-    private static uint Hash(string str, uint seed, Func<uint, uint, uint> mixer, Func<uint, uint> avalanche)
+    private static uint Hash(string str, uint seed, Func<uint, uint, uint> mixer, Func<uint, uint> avalanche, int length)
     {
         uint acc = seed;
 
-        for (int i = 0; i < str.Length; i++)
+        for (int i = 0; i < length; i++)
         {
             acc = mixer(acc, str[i]);
         }
 
         return avalanche(acc);
     }
-
-    public EqualFunc<string> GetEqualFunction() => static (a, b) => a.Equals(b, StringComparison.Ordinal);
 
     public Expression<Func<uint, uint, uint>> GetMixer()
     {
@@ -96,4 +95,6 @@ public sealed record GeneticStringHash(int MixerSeed, int MixerIterations, int A
         0xED5AD4BB, 0xAC4C1B51, 0x31848BAB, //Triple
         0x85EBCA77, 0xC2B2AE3D // XXHash2
     ];
+
+    public override string ToString() => $"{nameof(MixerSeed)} = {MixerSeed}, {nameof(MixerIterations)} = {MixerIterations}, {nameof(AvalancheSeed)} = {AvalancheSeed}, {nameof(AvalancheIterations)} = {AvalancheIterations}";
 }

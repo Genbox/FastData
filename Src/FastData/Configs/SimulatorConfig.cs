@@ -6,6 +6,5 @@ namespace Genbox.FastData.Configs;
 public sealed class SimulatorConfig
 {
     public double CapacityFactor { get; set; } = 1.0;
-    public double TimeWeight { get; set; } = 1.0;
-    public double EmulationWeight { get; set; } = 1.0;
+    public bool UseUtf8 { get; set; }
 }

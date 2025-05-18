@@ -52,7 +52,7 @@ internal sealed class PerfectHashGPerfStructure<T>(StructureConfig<T> config) : 
             return false;
 
         // Step 1: Finding good positions
-        Simulator sim = new Simulator(stringArr, new SimulatorConfig { TimeWeight = 0 });
+        Simulator sim = new Simulator(new SimulatorConfig());
         HeuristicAnalyzer analyzer = new HeuristicAnalyzer(stringArr, strProps, new HeuristicAnalyzerConfig(), sim);
         Candidate<HeuristicStringHash> candidate = analyzer.Run();
 

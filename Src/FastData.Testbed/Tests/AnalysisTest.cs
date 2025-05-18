@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Genbox.FastData.Abstracts;
@@ -13,7 +12,6 @@ using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Specs;
 using Genbox.FastData.Specs.Hash;
-using Genbox.FastData.Specs.Misc;
 
 namespace Genbox.FastData.Testbed.Tests;
 
@@ -30,6 +28,45 @@ internal static class AnalysisTest
         "podzolized", "pozzolanic", "puzzlement", "schizotypy", "scuzzballs", "shockjocks", "sizzlingly", "unhouzzled", "zanthoxyls", "zigzagging", "blackjacks", "crackajack"
     ];
 
+    public static void TestAnalyzers()
+    {
+        string[] data = ["aab", "agedehams", "afiskenet", "oastemad", "garisestald", "karseklipning"];
+        StringProperties props = DataAnalyzer.GetStringProperties(data);
+
+        Simulator sim = new Simulator(new SimulatorConfig { UseUtf8 = true });
+        BruteForceAnalyzer bf = new BruteForceAnalyzer(data, props, new BruteForceAnalyzerConfig(), sim);
+        Candidate<BruteForceStringHash> bfCand = bf.Run();
+        Console.WriteLine($"BruteForceStringHash: ({bfCand.Fitness}) {bfCand.Spec}");
+
+        HashFunc func = bfCand.Spec.GetHashFunction();
+
+        foreach (string d in data)
+        {
+            byte[] b = Encoding.UTF8.GetBytes(d);
+            Console.WriteLine(d + ": " + func(ref b[0], b.Length));
+        }
+        Console.WriteLine();
+        Console.WriteLine("C# code:");
+
+        var compiler = new CSharpExpressionCompiler(new TypeHelper(new TypeMap(new CSharpLanguageDef().TypeDefinitions)));
+        Console.WriteLine(compiler.GetCode(bfCand.Spec.BuildExpression()));
+
+        // GeneticAnalyzer ga = new GeneticAnalyzer(data, new GeneticAnalyzerConfig(), sim);
+        // Candidate<GeneticStringHash> gaCand = ga.Run();
+        // Console.WriteLine($"GeneticStringHash: ({gaCand.Fitness}) {gaCand.Spec}");
+        //
+        // HeuristicAnalyzer ha = new HeuristicAnalyzer(data, props, new HeuristicAnalyzerConfig(), sim);
+        // Candidate<HeuristicStringHash> haCand = ha.Run();
+        // Console.WriteLine($"HeuristicStringHash: ({haCand.Fitness}) {haCand.Spec}");
+
+        //Select the spec with the best fitness
+        // object best = bfCand.Fitness >= gaCand.Fitness ? bfCand.Fitness >= haCand.Fitness ? bfCand.Spec : haCand.Spec :
+        // gaCand.Fitness >= haCand.Fitness ? gaCand.Spec : haCand.Spec;
+
+        // Console.WriteLine();
+        // Console.WriteLine("Best: " + best);
+    }
+
     private static void BruteForce()
     {
         RunBruteForce(RunFunc(Data, 5.0, PrependString));
@@ -44,8 +81,8 @@ internal static class AnalysisTest
         Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        Simulator sim = new Simulator(data, new SimulatorConfig());
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), sim);
+        Simulator sim = new Simulator(new SimulatorConfig());
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(data, props, new BruteForceAnalyzerConfig(), sim);
         Candidate<BruteForceStringHash> top1 = analyzer.Run();
         PrintCandidate(in top1);
     }
@@ -113,8 +150,8 @@ internal static class AnalysisTest
         Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        Simulator sim = new Simulator(data, new SimulatorConfig());
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(new GeneticAnalyzerConfig(), sim);
+        Simulator sim = new Simulator(new SimulatorConfig());
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(data, new GeneticAnalyzerConfig(), sim);
         Candidate<GeneticStringHash> top1 = analyzer.Run();
         PrintCandidate(in top1, in props);
     }
@@ -149,5 +186,8 @@ internal static class AnalysisTest
         BruteForceStringHash spec = candidate.Spec;
         Console.WriteLine("Hash:");
         Console.WriteLine($"- {nameof(BruteForceStringHash.Segment)}: {spec.Segment.ToString()}");
+
+        Console.WriteLine($"- Mixer: {ExpressionHelper.Print(spec.Mixer)}");
+        Console.WriteLine($"- Avalanche: {ExpressionHelper.Print(spec.Avalanche)}");
     }
 }

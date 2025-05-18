@@ -50,7 +50,7 @@ public static class FastDataGenerator
 
         IStringHash? spec = null;
         if (data is string[] stringArr)
-            spec = analysisEnabled ? GetHashSpec(stringArr, props) : new DefaultStringHash(generator.UseUTF16Encoding);
+            spec = analysisEnabled ? GetHashSpec(stringArr, props, fdCfg.SimulatorConfig) : new DefaultStringHash();
 
         HashFunc<T> hashFunc;
 
@@ -129,14 +129,14 @@ public static class FastDataGenerator
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
 
-    private static IStringHash GetHashSpec<T>(string[] data, DataProperties<T> props)
+    private static IStringHash GetHashSpec<T>(string[] data, DataProperties<T> props, SimulatorConfig simulatorConfig)
     {
         //Run each of the analyzers
-        Simulator simulator = new Simulator(data, new SimulatorConfig());
-        BruteForceAnalyzer bf = new BruteForceAnalyzer(props.StringProps!, new BruteForceAnalyzerConfig(), simulator);
+        Simulator simulator = new Simulator(simulatorConfig);
+        BruteForceAnalyzer bf = new BruteForceAnalyzer(data, props.StringProps!, new BruteForceAnalyzerConfig(), simulator);
         Candidate<BruteForceStringHash> bfCand = bf.Run();
 
-        GeneticAnalyzer ga = new GeneticAnalyzer(new GeneticAnalyzerConfig(), simulator);
+        GeneticAnalyzer ga = new GeneticAnalyzer(data, new GeneticAnalyzerConfig(), simulator);
         Candidate<GeneticStringHash> gaCand = ga.Run();
 
         HeuristicAnalyzer ha = new HeuristicAnalyzer(data, props.StringProps!, new HeuristicAnalyzerConfig(), simulator);

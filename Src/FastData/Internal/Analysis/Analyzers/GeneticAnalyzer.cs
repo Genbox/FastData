@@ -1,6 +1,5 @@
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.CrossOver;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
@@ -10,11 +9,10 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Termination;
 using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Specs.Hash;
-using Genbox.FastData.Specs.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed class GeneticAnalyzer(GeneticAnalyzerConfig config, Simulator simulator) : IHashAnalyzer<GeneticStringHash>
+internal sealed class GeneticAnalyzer(string[] data, GeneticAnalyzerConfig config, Simulator simulator) : IHashAnalyzer<GeneticStringHash>
 {
     /*
      This is a genetic algorithm that determines the best configuration from a random population, that via evolution is biased
@@ -89,8 +87,8 @@ internal sealed class GeneticAnalyzer(GeneticAnalyzerConfig config, Simulator si
             new IntGene(nameof(GeneticStringHash.MixerSeed), 1, 0, 100),
             new IntGene(nameof(GeneticStringHash.MixerIterations), 1, 0, 10),
             new IntGene(nameof(GeneticStringHash.AvalancheSeed), 1, 0, 100),
-            new IntGene(nameof(GeneticStringHash.AvalancheIterations), 1, 0, 10),
-            new StringSegmentGene(nameof(GeneticStringHash.Segments), [new StringSegment(0, -1, Alignment.Left)]) //TODO: Get segments
+            new IntGene(nameof(GeneticStringHash.AvalancheIterations), 1, 0, 10)
+            // new StringSegmentGene(nameof(GeneticStringHash.Segments), [new StringSegment(0, -1, Alignment.Left)]) //TODO: Get segments
         ]);
 
         DefaultRandom random = new DefaultRandom(config.RandomSeed);
@@ -119,7 +117,7 @@ internal sealed class GeneticAnalyzer(GeneticAnalyzerConfig config, Simulator si
 
         //Run the simulation
         Candidate<GeneticStringHash> cand = new Candidate<GeneticStringHash>(spec);
-        simulator.Run(ref cand);
+        simulator.RunWithEqual(data, cand);
 
         //Copy over metadata
         entity.Metadata = cand.Metadata;
@@ -134,7 +132,8 @@ internal sealed class GeneticAnalyzer(GeneticAnalyzerConfig config, Simulator si
             ((IntGene)entity.Genes[0]).Value,
             ((IntGene)entity.Genes[1]).Value,
             ((IntGene)entity.Genes[2]).Value,
-            ((IntGene)entity.Genes[3]).Value,
-            ((StringSegmentGene)entity.Genes[4]).Value);
+            ((IntGene)entity.Genes[3]).Value
+            // ((StringSegmentGene)entity.Genes[4]).Value
+            );
     }
 }
