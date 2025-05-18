@@ -8,6 +8,4 @@ internal abstract class CPlusPlusOutputWriter<T> : OutputWriter<T>
     protected override string GetFieldModifier() => "static constexpr ";
     protected override string GetMethodModifier() => "static ";
     protected override string GetMethodAttributes() => "[[nodiscard]]";
-
-    protected string HashType => GeneratorConfig.Use64BitHashing ? "uint64_t" : "uint32_t";
 }

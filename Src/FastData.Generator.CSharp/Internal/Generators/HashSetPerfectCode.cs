@@ -16,7 +16,7 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, CSharp
               {
           {{GetEarlyExits()}}
 
-                  {{HashType}} hash = Mixer(Hash(value) ^ {{ctx.Seed}});
+                  ulong hash = Mixer(Hash(value) ^ {{ctx.Seed}});
                   uint index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                   ref E entry = ref _entries[index];
 
@@ -25,54 +25,28 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, CSharp
 
           {{GetHashSource()}}
 
-          {{GetMixer()}}
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                private static ulong Mixer(ulong h)
+                {
+                    h ^= h >> 33;
+                    h *= 0xFF51AFD7ED558CCD;
+                    h ^= h >> 33;
+                    h *= 0xC4CEB9FE1A85EC53;
+                    h ^= h >> 33;
+                    return h;
+                }
 
               [StructLayout(LayoutKind.Auto)]
               private struct E
               {
-                  internal E({{TypeName}} value, {{HashType}} hashCode)
+                  internal E({{TypeName}} value, ulong hashCode)
                   {
                       Value = value;
                       HashCode = hashCode;
                   }
 
                   internal {{TypeName}} Value;
-                  internal {{HashType}} HashCode;
+                  internal ulong HashCode;
               }
           """;
-
-    private string GetMixer()
-    {
-        if (GeneratorConfig.Use64BitHashing)
-        {
-            return """
-                       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                       private static ulong Mixer(ulong h)
-                       {
-                           h ^= h >> 33;
-                           h *= 0xFF51AFD7ED558CCD;
-                           h ^= h >> 33;
-                           h *= 0xC4CEB9FE1A85EC53;
-                           h ^= h >> 33;
-                           return h;
-                       }
-                   """;
-        }
-
-        return """
-                   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                   private static uint Mixer(uint h)
-                   {
-                       unchecked
-                       {
-                           h ^= h >> 16;
-                           h *= 0x85EBCA6BU;
-                           h ^= h >> 13;
-                           h *= 0xC2B2AE35U;
-                           h ^= h >> 16;
-                           return h;
-                       }
-                   }
-               """;
-    }
 }

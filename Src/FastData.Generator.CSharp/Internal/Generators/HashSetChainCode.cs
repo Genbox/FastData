@@ -20,7 +20,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, CSharpCode
               {
           {{GetEarlyExits()}}
 
-                  {{HashType}} hash = Hash(value);
+                  ulong hash = Hash(value);
                   uint index = (uint)({{GetModFunction("hash", (ulong)ctx.Buckets.Length)}});
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} i = ({{GetSmallestSignedType(ctx.Buckets.Length)}})(_buckets[index] - 1);
 
@@ -42,11 +42,11 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, CSharpCode
               [StructLayout(LayoutKind.Auto)]
               private readonly struct E
               {
-                  internal readonly {{HashType}} HashCode;
+                  internal readonly ulong HashCode;
                   internal readonly {{GetSmallestSignedType(ctx.Buckets.Length)}} Next;
                   internal readonly {{TypeName}} Value;
 
-                  internal E({{HashType}} hashCode, {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{TypeName}} value)
+                  internal E(ulong hashCode, {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{TypeName}} value)
                   {
                       HashCode = hashCode;
                       Next = next;

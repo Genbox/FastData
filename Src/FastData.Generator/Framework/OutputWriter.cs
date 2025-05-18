@@ -27,7 +27,7 @@ public abstract class OutputWriter<T> : IOutputWriter
     public abstract string Generate();
 
     protected string GetEarlyExits() => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
-    protected string GetHashSource() => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName, GeneratorConfig.Use64BitHashing);
+    protected string GetHashSource() => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName);
 
     protected string GetArraySizeType() => _langDef.ArraySizeType;
 

@@ -13,6 +13,4 @@ internal abstract class RustOutputWriter<T> : OutputWriter<T>
 
         return TypeName;
     }
-
-    protected string HashType => GeneratorConfig.Use64BitHashing ? "u64" : "u32";
 }
