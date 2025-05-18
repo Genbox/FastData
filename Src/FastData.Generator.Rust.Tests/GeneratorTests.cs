@@ -15,7 +15,7 @@ public class GeneratorTests
 
         await Verify(spec.Source)
               .UseFileName(spec.Identifier)
-              .UseDirectory("Verify")
+              .UseDirectory("DataStructures")
               .DisableDiff();
     }
 }
