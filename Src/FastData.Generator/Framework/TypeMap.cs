@@ -15,12 +15,16 @@ public sealed class TypeMap
         }
     }
 
-    public ITypeDef<T> Get<T>()
+    public string GetName(Type t) => GetDef(t).Name;
+
+    public ITypeDef<T> Get<T>() => (ITypeDef<T>)GetDef(typeof(T));
+
+    private ITypeDef GetDef(Type t)
     {
-        ITypeDef<T>? res = (ITypeDef<T>?)_index[(int)Type.GetTypeCode(typeof(T))];
+        ITypeDef? res = _index[(int)Type.GetTypeCode(t)];
 
         if (res == null)
-            throw new InvalidOperationException("No type spec was found for " + typeof(T).Name);
+            throw new InvalidOperationException("No type spec was found for " + t.Name);
 
         return res;
     }
