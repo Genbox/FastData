@@ -1,6 +1,5 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework.Interfaces;
 
 namespace Genbox.FastData.Generator.Framework;
