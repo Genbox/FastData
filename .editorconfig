@@ -4,7 +4,7 @@ root = true
 charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = false
-max_line_length = 180
+max_line_length = 2000
 
 # XML based formats
 [*.{appxmanifest,axml,build,config,csproj,dbml,discomap,dtd,jsproj,lsproj,njsproj,nuspec,proj,props,resw,resx,StyleCop,targets,tasks,vbproj,xml,xsd}]
