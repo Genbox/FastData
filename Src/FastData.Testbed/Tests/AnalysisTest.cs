@@ -1,12 +1,17 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Generator.CSharp.Internal;
+using Genbox.FastData.Generator.CSharp.Internal.Framework;
+using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Helpers;
+using Genbox.FastData.Specs;
 using Genbox.FastData.Specs.Hash;
 using Genbox.FastData.Specs.Misc;
 
@@ -132,9 +137,9 @@ internal static class AnalysisTest
         Console.WriteLine($"- {nameof(GeneticStringHash.MixerIterations)}: {spec.MixerIterations}");
         Console.WriteLine($"- {nameof(GeneticStringHash.AvalancheSeed)}: {spec.AvalancheSeed}");
         Console.WriteLine($"- {nameof(GeneticStringHash.AvalancheIterations)}: {spec.AvalancheIterations}");
-        Console.WriteLine($"- {nameof(GeneticStringHash.Segments)}: {string.Join(", ", spec.Segments.Select(PrintSegment))}");
-        Console.WriteLine($"- Mixer: {ExpressionConverter.Instance.GetCode(spec.GetMixer())}");
-        Console.WriteLine($"- Avalanche: {ExpressionConverter.Instance.GetCode(spec.GetAvalanche())}");
+
+        Console.WriteLine($"- Mixer: {ExpressionHelper.Print(spec.GetMixer())}");
+        Console.WriteLine($"- Avalanche: {ExpressionHelper.Print(spec.GetAvalanche())}");
     }
 
     private static void PrintCandidate(in Candidate<BruteForceStringHash> candidate)
@@ -143,11 +148,6 @@ internal static class AnalysisTest
 
         BruteForceStringHash spec = candidate.Spec;
         Console.WriteLine("Hash:");
-        Console.WriteLine($"- {nameof(BruteForceStringHash.Segment)}: {PrintSegment(spec.Segment)}");
-    }
-
-    private static string PrintSegment(StringSegment segment)
-    {
-        return $"[{segment.Offset.ToString(NumberFormatInfo.InvariantInfo)}|{segment.Length.ToString(NumberFormatInfo.InvariantInfo)}|{segment.Alignment}]";
+        Console.WriteLine($"- {nameof(BruteForceStringHash.Segment)}: {spec.Segment.ToString()}");
     }
 }
