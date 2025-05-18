@@ -11,7 +11,13 @@ internal class OffsetGenerator : ISegmentGenerator
 
     public IEnumerable<StringSegment> Generate(StringProperties props)
     {
-        for (int offset = 0; offset < props.LengthData.Min; offset++)
+        //Generates:
+        //[test]
+        //t[est]
+        //te[st]
+        //tes[t]
+
+        for (uint offset = 0; offset < props.LengthData.Min; offset++)
         {
             yield return new StringSegment(offset, -1, Alignment.Left);
         }

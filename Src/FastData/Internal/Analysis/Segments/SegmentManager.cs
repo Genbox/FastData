@@ -13,8 +13,8 @@ internal static class SegmentManager
 
         foreach (ISegmentGenerator generator in GetGenerators())
         {
-            // if (!generator.IsAppropriate(props))
-            // continue;
+            if (!generator.IsAppropriate(props))
+                continue;
 
             foreach (StringSegment segment in generator.Generate(props))
             {

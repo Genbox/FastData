@@ -11,19 +11,19 @@ namespace Genbox.FastData.Internal.Analysis.Segments;
 /// </summary>
 internal class DeltaGenerator : ISegmentGenerator
 {
-    public bool IsAppropriate(StringProperties props) => props.LengthData.Min >= 8;
+    public bool IsAppropriate(StringProperties props) => true;
 
     /*
     The idea behind this generator is to read the delta maps made during string analysis and derive
-    a string segment that uses the characters that change most often (highest delta).
+    a string segment that uses the characters that change most often (the highest delta).
 
     The goal is to use as few characters as possible, so it outputs small segments from the start of the string
-    first, and then expand in length for each iteration. It starts by finding segments of characters that are within
+    first and then expands in length for each iteration. It starts by finding segments of characters that are within
     a certain threshold, then it finds the segment with the highest variance (max(maxVal - minVal)) and starts there
 
     However, if the segment is too far into the strings, it might bot be a proper offset, so we constrain the algorithm
-    to only explore possibilities that are within the shortest string first. Afterward it explore possibilities from the
-    end of the string. We prefer start of string first because it avoids an extra operation (str.Length - offset).
+    to only explore possibilities that are within the shortest string first. Afterward it explores possibilities from the
+    end of the string. We prefer the start of string first because it avoids an extra operation (str.Length - offset).
 
     ## Example ##
     Input is as such:
@@ -54,7 +54,7 @@ internal class DeltaGenerator : ISegmentGenerator
     --------XXXXXXXXX----[XX]X--XXXXXXXXXX
     --------XXXXXXXXX----[XXX]--XXXXXXXXXX
 
-    So what about the third segment? We use the right aligned delta data instead. Let's do the example for the same data.
+    So what about the third segment? We use the right-aligned delta data instead. Let's do the example for the same data.
     It is right-adjusted to better illustrate what happens. Here is our data:
 
          aaaaaaaaahAj9dDmaaaaaKUAaahd8ad
@@ -64,7 +64,7 @@ internal class DeltaGenerator : ISegmentGenerator
     Create a delta map:
     ------------------------------------
 
-    As we can see, there are no interesting segments for this particular inputs when it is right-aligned.
+    As we can see, there are no interesting segments for this particular input when it is right-aligned.
     */
 
     public IEnumerable<StringSegment> Generate(StringProperties props)
@@ -72,10 +72,12 @@ internal class DeltaGenerator : ISegmentGenerator
         // We start from the left, which is faster due to not having to do right-align checks
         foreach (StringSegment segment in CalculateSegments(props.DeltaData.Left))
         {
-            // Left Alignment:  offset + length <= Min
+            // Left Alignment: offset + length <= Min
             int maxLength = (int)(props.LengthData.Min - segment.Offset);
             int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
-            yield return new StringSegment(segment.Offset, length, Alignment.Left);
+
+            if (length > 0)
+                yield return new StringSegment(segment.Offset, length, Alignment.Left);
         }
 
         // Process right-aligned segments
@@ -84,7 +86,9 @@ internal class DeltaGenerator : ISegmentGenerator
             // Right Alignment: offset + length <= Min
             int maxLength = (int)(props.LengthData.Min - segment.Offset);
             int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
-            yield return new StringSegment(segment.Offset, length, Alignment.Right);
+
+            if (length > 0)
+                yield return new StringSegment(segment.Offset, length, Alignment.Right);
         }
     }
 
@@ -92,7 +96,7 @@ internal class DeltaGenerator : ISegmentGenerator
     private static IEnumerable<StringSegment> CalculateSegments(int[] deltaMap)
     {
         // Use the delta map to generate segments.
-        IEnumerable<StringSegment> segments = GetSegments(deltaMap).ToList();
+        IEnumerable<StringSegment> segments = GetSegments(deltaMap);
 
         // We sort the segments in order of variance
         return segments.OrderByDescending(segment => ComputeVariance(segment, deltaMap));
@@ -106,7 +110,7 @@ internal class DeltaGenerator : ISegmentGenerator
 
         int min = int.MaxValue;
         int max = int.MinValue;
-        for (int i = segment.Offset; i < Math.Min(data.Length, segment.Offset + segment.Length); i++)
+        for (uint i = segment.Offset; i < Math.Min(data.Length, segment.Offset + segment.Length); i++)
         {
             min = Math.Min(data[i], min);
             max = Math.Max(data[i], max);
@@ -125,7 +129,7 @@ internal class DeltaGenerator : ISegmentGenerator
     {
         // We reuse the StringSegment struct here, but set the alignment to unknown
         // We need to keep track if we already returned data to avoid duplications
-        int offset = 0;
+        uint offset = 0;
         while (offset < arr.Length)
         {
             while (offset < arr.Length && arr[offset] == 0)
@@ -136,16 +140,13 @@ internal class DeltaGenerator : ISegmentGenerator
             if (offset >= arr.Length)
                 break;
 
-            int start = offset;
+            uint start = offset;
             while (offset < arr.Length && arr[offset] != 0)
             {
                 offset++;
             }
 
-            yield return new StringSegment(start, offset - start, Alignment.Unknown);
+            yield return new StringSegment(start, (int)(offset - start), Alignment.Unknown);
         }
-
-        if (arr.Length > 0)
-            yield return new StringSegment(0, -1, Alignment.Unknown);
     }
 }

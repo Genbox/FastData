@@ -16,10 +16,11 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     internal void CoverageTest(ISegmentGenerator generator, int maxLen)
     {
         //Tests if BruteForceGenerator, EdgeGramGenerator and OffsetGenerator covers the entire string for lengths [1..max]
+        Random rng = new Random(42);
 
         for (int len = 1; len < maxLen; len++)
         {
-            string[] data = GenerateStrings(len, 1);
+            string[] data = GenerateStrings(rng, len, 1);
             StringProperties props = DataAnalyzer.GetStringProperties(data);
             int[] coverage = new int[len]; // Track how many times each index is covered
 
@@ -44,12 +45,13 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     {
         // The generator should provide n*n number of results for strings up to length 8
         BruteForceGenerator gen = new BruteForceGenerator();
+        Random rng = new Random(42);
 
-        byte[] counts = [1, 3, 6, 10, 15, 21, 28, 36, 72, 72];
+        byte[] counts = [2, 6, 12, 20, 30, 42, 56, 72, 72, 72];
 
         for (int i = 1; i <= 10; i++)
         {
-            string[] data = GenerateStrings(i, 1);
+            string[] data = GenerateStrings(rng, i, 1);
 
             StringProperties props = DataAnalyzer.GetStringProperties(data);
             Assert.True(gen.IsAppropriate(props));
@@ -62,10 +64,11 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     {
         // The generator should provide n*n number of results for strings up to length 8
         EdgeGramGenerator gen = new EdgeGramGenerator();
+        Random rng = new Random(42);
 
         for (int i = 1; i <= 10; i++)
         {
-            string[] data = GenerateStrings(i, 1);
+            string[] data = GenerateStrings(rng, i, 1);
 
             StringProperties props = DataAnalyzer.GetStringProperties(data);
             Assert.True(gen.IsAppropriate(props));
@@ -80,10 +83,11 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     {
         // The generator should provide n*n number of results for strings up to length 8
         DeltaGenerator gen = new DeltaGenerator();
+        Random rng = new Random(42);
 
         for (int i = 8; i <= 32; i++)
         {
-            string[] data = GenerateStrings(i, 1);
+            string[] data = GenerateStrings(rng, i, 2);
 
             StringProperties props = DataAnalyzer.GetStringProperties(data);
             Assert.True(gen.IsAppropriate(props));
@@ -91,9 +95,42 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         }
     }
 
-    private static string[] GenerateStrings(int len, int count)
+    [Theory]
+    [InlineData(new[] { "aax9halbb", "aarexf1bb" }, 2, 5)] //Test same length
+    [InlineData(new[] { "aax9halbb", "aarexf1" }, 2, 5)] //Test diff length
+    [InlineData(new[] { "aa", "bb" }, 0, 2)] //Test diff length with identical chars
+    [InlineData(new[] { "aa", "bbbbbbbbbbbb" }, 0, 2)] //Test larger diff length with identical chars
+    [InlineData(new[] { "aaxbb", "aanbb" }, 2, 1)] //Test single char difference
+    public void DeltaGeneratorPatternTest(string[] input, uint offset, int length)
     {
-        Random rng = new Random(42);
+        StringProperties props = DataAnalyzer.GetStringProperties(input);
+
+        DeltaGenerator gen = new DeltaGenerator();
+        Assert.True(gen.IsAppropriate(props)); //We allow delta always
+
+        StringSegment expected = new StringSegment(offset, length, Alignment.Left);
+        StringSegment[] res = gen.Generate(props).ToArray();
+
+        foreach (StringSegment segment in res)
+        {
+            o.WriteLine($"{segment}. res: {string.Join(",", input.Select(x => SegmentHelper.InsertSegmentBounds(x, segment)))}");
+        }
+
+        Assert.Equal(res[0], expected);
+    }
+
+    [Theory]
+    [InlineData((object)new[] { "aa", "aaaaaaaaaaaaaa" })] //We don't support inputs where characters don't differ
+    public void DeltaGeneratorFailureTest(string[] input)
+    {
+        StringProperties props = DataAnalyzer.GetStringProperties(input);
+
+        DeltaGenerator gen = new DeltaGenerator();
+        Assert.Empty(gen.Generate(props));
+    }
+
+    private static string[] GenerateStrings(Random rng, int len, int count)
+    {
         string[] res = new string[count];
 
         for (int i = 0; i < count; i++)

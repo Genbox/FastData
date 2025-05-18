@@ -15,7 +15,12 @@ internal class BruteForceGenerator : ISegmentGenerator
     {
         int max = (int)Math.Min(props.LengthData.Min, MaxLength); //We cannot segment above the shortest string.
 
-        for (int offset = 0; offset < max; offset++)
+        //Generates:
+        //[t]est
+        //[te]st
+        //[tes]t
+
+        for (uint offset = 0; offset < max; offset++)
         {
             for (int length = 1; length <= max - offset; length++)
             {
@@ -23,14 +28,16 @@ internal class BruteForceGenerator : ISegmentGenerator
             }
         }
 
-        if (props.LengthData.Min > MaxLength)
+        //Generates:
+        //tes[t]
+        //te[st]
+        //t[est]
+
+        for (uint offset = 0; offset < max; offset++)
         {
-            for (int offset = 0; offset < max; offset++)
+            for (int length = 1; length <= max - offset; length++)
             {
-                for (int length = 1; length <= max - offset; length++)
-                {
-                    yield return new StringSegment(offset, length, Alignment.Right);
-                }
+                yield return new StringSegment(offset, length, Alignment.Right);
             }
         }
     }
