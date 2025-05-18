@@ -1,95 +1,65 @@
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
-using Genbox.FastData.Specs;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal class Simulator(string[] data, SimulatorConfig config)
+internal sealed class Simulator
 {
-    internal void Run<T>(ref Candidate<T> cand) where T : IStringHash
+    private readonly uint _capacity;
+    private readonly NoEqualityEmulator _set;
+    private readonly string[] _data;
+
+    public Simulator(string[] data, SimulatorConfig config)
     {
-        // Generate a hash function from the spec
-        HashFunc<string> hashFunc = cand.Spec.GetHashFunction();
-        EqualFunc<string> equalFunc = cand.Spec.GetEqualFunction();
-        uint capacity = (uint)(data.Length * config.CapacityFactor);
-
-        long ticks = Stopwatch.GetTimestamp();
-        double[] results = Emulate(cand.Metadata, data, capacity, hashFunc, equalFunc);
-        ticks = Stopwatch.GetTimestamp() - ticks;
-
-        double normEmu = results.Average() * config.EmulationWeight;
-        double normTime = 1.0 / (1.0 + ((double)ticks / 1000)) * config.TimeWeight;
-
-        int count = 0;
-
-        if (config.EmulationWeight > 0) count++;
-        if (config.TimeWeight > 0) count++;
-
-        cand.Fitness = (normEmu + normTime) / count;
-
-        cand.Metadata["EmulationNormalized"] = normEmu;
-        cand.Metadata["Time"] = ticks;
-        cand.Metadata["TimeNormalized"] = normTime;
+        _data = data;
+        _capacity = (uint)(data.Length * config.CapacityFactor);
+        _set = new NoEqualityEmulator(_capacity);
     }
 
-    private static double[] Emulate(Dictionary<string, object> metadata, string[] data, uint capacity, HashFunc<string> hashFunc, EqualFunc<string> equalFunc)
+    internal Candidate Run(IStringHash stringHash, Func<double>? extraFitness = null)
     {
-        FastSet set = new FastSet(capacity, hashFunc, equalFunc);
+        _set.SetHash(stringHash.GetHashFunction());
 
         int collisions = 0;
-        foreach (string str in data)
+        foreach (string str in _data)
         {
-            if (!set.Add(str))
+            if (!_set.Add(str))
                 collisions++;
         }
 
-        metadata["Collisions"] = collisions;
-        metadata["MinVariance"] = set.MinVariance;
-        metadata["MaxVariance"] = set.MaxVariance;
+        _set.Clear();
 
-        //TODO: Use MinVariance & MaxVariance
-        return [(double)capacity / (collisions + 1)];
+        double fitness = (_capacity - collisions) / (double)_capacity;
+
+        if (extraFitness != null)
+            fitness = (fitness + extraFitness()) * 0.5;
+
+        return new Candidate(stringHash, fitness, collisions);
     }
 
-    private ref struct FastSet(uint capacity, HashFunc<string> hashFunc, EqualFunc<string> equalFunc)
+    private sealed class NoEqualityEmulator(uint capacity)
     {
         private readonly int[] _buckets = new int[capacity];
-        private readonly Entry[] _entries = new Entry[capacity];
-        private int _count;
+        private HashFunc<string> _hashFunc;
 
-        //TODO: optimize
-        public readonly int MinVariance => _buckets.Where(x => x != 0).Min();
-        public readonly int MaxVariance => _buckets.Max();
+        public void SetHash(HashFunc<string> hashFunc) => _hashFunc = hashFunc;
 
         public bool Add(string value)
         {
-            ulong hashCode = hashFunc(value);
-            ref int bucket = ref _buckets[hashCode % capacity];
-            int i = bucket - 1;
+            ulong hashCode = _hashFunc(value);
+            ref int bucket = ref _buckets[hashCode % (ulong)_buckets.Length];
 
-            while (i >= 0)
+            if (bucket == 0)
             {
-                Entry entry = _entries[i];
-
-                if (entry.Hash == hashCode && equalFunc(entry.Value, value))
-                    return false;
-
-                i = entry.Next;
+                bucket++;
+                return true;
             }
 
-            ref Entry newEntry = ref _entries[_count];
-            newEntry.Hash = hashCode;
-            newEntry.Next = bucket - 1;
-            newEntry.Value = value;
-            bucket = _count + 1;
-
-            _count++;
-            return true;
+            bucket++;
+            return false;
         }
 
-        [StructLayout(LayoutKind.Auto)]
-        private record struct Entry(ulong Hash, int Next, string Value);
+        public void Clear() => Array.Clear(_buckets, 0, _buckets.Length);
     }
 }

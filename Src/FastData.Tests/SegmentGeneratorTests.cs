@@ -2,10 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Analysis.Segments;
+using Genbox.FastData.Internal.Analysis.SegmentGenerators;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.InternalShared;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Tests;
 
@@ -24,7 +24,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
             StringProperties props = DataAnalyzer.GetStringProperties(data);
             int[] coverage = new int[len]; // Track how many times each index is covered
 
-            foreach (StringSegment segment in generator.Generate(props))
+            foreach (ArraySegment segment in generator.Generate(props))
             {
                 SegmentHelper.ConvertToOffsets(data[0].Length, in segment, out int start, out int end);
 
@@ -108,10 +108,10 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         DeltaGenerator gen = new DeltaGenerator();
         Assert.True(gen.IsAppropriate(props)); //We allow delta always
 
-        StringSegment expected = new StringSegment(offset, length, Alignment.Left);
-        StringSegment[] res = gen.Generate(props).ToArray();
+        ArraySegment expected = new ArraySegment(offset, length, Alignment.Left);
+        ArraySegment[] res = gen.Generate(props).ToArray();
 
-        foreach (StringSegment segment in res)
+        foreach (ArraySegment segment in res)
         {
             o.WriteLine($"{segment}. res: {string.Join(",", input.Select(x => SegmentHelper.InsertSegmentBounds(x, segment)))}");
         }

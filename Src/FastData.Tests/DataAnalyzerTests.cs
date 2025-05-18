@@ -23,8 +23,8 @@ public class DataAnalyzerTests
             Assert.True(map.Contains(str.Length));
         }
 
-        Assert.Equal((uint)data.Min(x => ((string)x).Length), map.MinValue);
-        Assert.Equal((uint)data.Max(x => ((string)x).Length), map.MaxValue);
+        Assert.Equal((uint)data.Min(x => x.Length), map.MinValue);
+        Assert.Equal((uint)data.Max(x => x.Length), map.MaxValue);
 
         //Anything over 64 should fail (at least for now)
         Assert.False(map.Contains(100));

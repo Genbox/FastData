@@ -1,9 +1,10 @@
-using Genbox.FastData.Specs;
+using System.Linq.Expressions;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Abstracts;
 
 public interface IStringHash
 {
     HashFunc<string> GetHashFunction();
-    EqualFunc<string> GetEqualFunction();
+    Expression<HashFunc<string>> GetExpression();
 }

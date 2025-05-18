@@ -1,26 +1,20 @@
 using System.Diagnostics;
-using System.Globalization;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using System.Text;
-using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
-using Genbox.FastData.Generator.CSharp.Internal;
-using Genbox.FastData.Generator.CSharp.Internal.Framework;
-using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Helpers;
-using Genbox.FastData.Specs;
-using Genbox.FastData.Specs.Hash;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.InternalShared;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Testbed.Tests;
 
 internal static class AnalysisTest
 {
-    private static readonly char[] LoEntropy = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
-    private static readonly char[] HiEntropy = Enumerable.Range(0, ushort.MaxValue).Select(i => (char)i).ToArray();
+    // private static readonly char[] LoEntropy = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
+    // private static readonly char[] HiEntropy = Enumerable.Range(0, ushort.MaxValue).Select(i => (char)i).ToArray();
     private static readonly string[] Data =
     [
         "razzmatazz", "quizzified", "quizzifies", "zymeszymic", "buzzworthy", "vajazzling", "whizzingly", "jazzercise", "quizzeries", "quizziness", "squeezebox", "whizzbangs",
@@ -30,12 +24,28 @@ internal static class AnalysisTest
         "podzolized", "pozzolanic", "puzzlement", "schizotypy", "scuzzballs", "shockjocks", "sizzlingly", "unhouzzled", "zanthoxyls", "zigzagging", "blackjacks", "crackajack"
     ];
 
-    private static void BruteForce()
+    public static void TestBruteForceAnalyzer()
     {
         RunBruteForce(RunFunc(Data, 5.0, PrependString));
-        RunBruteForce(RunFunc(Data, 1.0, PermuteString));
-        RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
-        RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
+        // RunBruteForce(RunFunc(Data, 1.0, PermuteString));
+        // RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
+        // RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
+    }
+
+    public static void TestGeneticAnalyzer()
+    {
+        RunGeneticAnalysis(RunFunc(Data, 5.0, PrependString));
+        // RunGeneticAnalysis(RunFunc(Data, 1.0, PermuteString));
+        // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
+        // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
+    }
+
+    public static void TestGPerfAnalyzer()
+    {
+        RunGPerfAnalysis(RunFunc(Data, 5.0, PrependString));
+        // RunGeneticAnalysis(RunFunc(Data, 1.0, PermuteString));
+        // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
+        // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
     }
 
     private static void RunBruteForce(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
@@ -44,18 +54,28 @@ internal static class AnalysisTest
         Print(data, source);
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        Simulator sim = new Simulator(data, new SimulatorConfig());
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), sim);
-        Candidate<BruteForceStringHash> top1 = analyzer.Run();
-        PrintCandidate(in top1);
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), new Simulator(data, new SimulatorConfig()));
+        PrintCandidate(analyzer.GetCandidates().First());
     }
 
-    private static void GeneticAnalysis()
+    private static void RunGeneticAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
     {
-        RunGeneticAnalysis(RunFunc(Data, 5.0, PrependString));
-        RunGeneticAnalysis(RunFunc(Data, 1.0, PermuteString));
-        RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
-        RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
+        Console.WriteLine("###############");
+        Print(data, source);
+
+        StringProperties props = DataAnalyzer.GetStringProperties(data);
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), new Simulator(data, new SimulatorConfig()));
+        PrintCandidate(analyzer.GetCandidates().First());
+    }
+
+    private static void RunGPerfAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
+    {
+        Console.WriteLine("###############");
+        Print(data, source);
+
+        StringProperties props = DataAnalyzer.GetStringProperties(data);
+        GPerfAnalyzer analyzer = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(),new Simulator(data, new SimulatorConfig()));
+        PrintCandidate(analyzer.GetCandidates().First());
     }
 
     private static void Print(string[] data, string? source) => Console.WriteLine(source + ": " + string.Join(", ", data.Take(5)));
@@ -107,47 +127,21 @@ internal static class AnalysisTest
         return res;
     }
 
-    private static void RunGeneticAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
+    private static void PrintCandidate(Candidate candidate)
     {
-        Console.WriteLine("###############");
-        Print(data, source);
-        StringProperties props = DataAnalyzer.GetStringProperties(data);
+        Console.WriteLine();
+        Console.WriteLine("#### Candidate ####");
+        Console.WriteLine($"{nameof(candidate.Fitness)}: {candidate.Fitness}");
+        Console.WriteLine($"{nameof(candidate.Collisions)}: {candidate.Collisions}");
+        // Console.WriteLine($"{nameof(candidate.Time)}: {candidate.Time}");
+        // Console.WriteLine($"{nameof(candidate.Metadata)}: {string.Join(", ", candidate.Metadata.Select(x => x.ToString()))}");
 
-        Simulator sim = new Simulator(data, new SimulatorConfig());
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(new GeneticAnalyzerConfig(), sim);
-        Candidate<GeneticStringHash> top1 = analyzer.Run();
-        PrintCandidate(in top1, in props);
-    }
+        Console.WriteLine();
+        Console.WriteLine("#### Hash ####");
+        Console.WriteLine(candidate.StringHash);
 
-    private static void PrintHeader<T>(in Candidate<T> candidate) where T : IStringHash
-    {
-        Console.WriteLine("Result:");
-        Console.WriteLine($"- {nameof(candidate.Fitness)}: {candidate.Fitness}");
-        Console.WriteLine($"- {nameof(candidate.Metadata)}: {string.Join(", ", candidate.Metadata.Select(x => x.ToString()))}");
-    }
-
-    private static void PrintCandidate(in Candidate<GeneticStringHash> candidate, in StringProperties props)
-    {
-        PrintHeader(in candidate);
-
-        GeneticStringHash spec = candidate.Spec;
-
-        Console.WriteLine("Hash:");
-        Console.WriteLine($"- {nameof(GeneticStringHash.MixerSeed)}: {spec.MixerSeed}");
-        Console.WriteLine($"- {nameof(GeneticStringHash.MixerIterations)}: {spec.MixerIterations}");
-        Console.WriteLine($"- {nameof(GeneticStringHash.AvalancheSeed)}: {spec.AvalancheSeed}");
-        Console.WriteLine($"- {nameof(GeneticStringHash.AvalancheIterations)}: {spec.AvalancheIterations}");
-
-        Console.WriteLine($"- Mixer: {ExpressionHelper.Print(spec.GetMixer())}");
-        Console.WriteLine($"- Avalanche: {ExpressionHelper.Print(spec.GetAvalanche())}");
-    }
-
-    private static void PrintCandidate(in Candidate<BruteForceStringHash> candidate)
-    {
-        PrintHeader(in candidate);
-
-        BruteForceStringHash spec = candidate.Spec;
-        Console.WriteLine("Hash:");
-        Console.WriteLine($"- {nameof(BruteForceStringHash.Segment)}: {spec.Segment.ToString()}");
+        Console.WriteLine();
+        Console.WriteLine("#### Expression ####");
+        Console.WriteLine(ExpressionHelper.Print(candidate.StringHash.GetExpression()));
     }
 }

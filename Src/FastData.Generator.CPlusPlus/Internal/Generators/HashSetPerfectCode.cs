@@ -22,22 +22,12 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx) : CPlu
 
           {{GetHashSource()}}
 
-              static uint64 mixer(uint64 h) noexcept
-              {
-                  h ^= h >> 33;
-                  h *= 0xFF51AFD7ED558CCD;
-                  h ^= h >> 33;
-                  h *= 0xC4CEB9FE1A85EC53;
-                  h ^= h >> 33;
-                  return h;
-              }
-
           public:
               {{GetMethodAttributes()}}
               {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
               {
           {{GetEarlyExits()}}
-                  const uint64_t hash = mixer(get_hash(value) ^ {{ctx.Seed}});
+                  const uint64_t hash = get_hash(value);
                   const size_t index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                   const e& entry = entries[index];
 

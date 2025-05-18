@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+using System.Text;
 using Genbox.FastData.Internal.Hashes;
 
 namespace Genbox.FastData.Tests;
@@ -6,10 +6,11 @@ namespace Genbox.FastData.Tests;
 public class HashTests
 {
     [Theory]
-    [InlineData("Hello world", 1638393291)]
-    [InlineData("H", 757113168u)]
-    public void DJBTest(string input, uint value)
+    [InlineData("Hello world", 18344482337671887600)]
+    [InlineData("H", 11144410978260493662)]
+    public void DJBTest(string input, ulong value)
     {
-        Assert.Equal(value, DJB2Hash.ComputeHash(ref MemoryMarshal.GetReference(input.AsSpan()), input.Length));
+        byte[] bytes = Encoding.Unicode.GetBytes(input);
+        Assert.Equal(value, DJB2Hash.ComputeHash(ref bytes[0], bytes.Length));
     }
 }

@@ -73,7 +73,6 @@ public sealed class CSharpCodeGenerator : CodeGenerator
         BinarySearchContext<T> x => new BinarySearchCode<T>(x, _cfg),
         ConditionalContext<T> x => new ConditionalCode<T>(x, _cfg),
         EytzingerSearchContext<T> x => new EytzingerSearchCode<T>(x, _cfg),
-        PerfectHashGPerfContext x => new PerfectHashGPerfCode<T>(x, genCfg, _cfg),
         HashSetChainContext<T> x => new HashSetChainCode<T>(x, _cfg),
         HashSetLinearContext<T> x => new HashSetLinearCode<T>(x, _cfg),
         HashSetPerfectContext<T> x => new HashSetPerfectCode<T>(x, _cfg),
