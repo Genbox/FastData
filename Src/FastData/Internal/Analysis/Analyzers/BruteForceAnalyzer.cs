@@ -37,7 +37,7 @@ internal class BruteForceAnalyzer(string[] data, StringProperties props, BruteFo
     public Candidate<BruteForceStringHash> Run()
     {
         double bestFitness = 0;
-        BruteForceStringHash spec = new BruteForceStringHash(new StringSegment(0, -1, Alignment.Left), null!, null!);
+        BruteForceStringHash spec = new BruteForceStringHash();
 
         Candidate<BruteForceStringHash> candidate = new Candidate<BruteForceStringHash>();
         candidate.Spec = spec;
