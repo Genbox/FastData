@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Specs;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Misc;
 using static Genbox.FastData.Internal.Helpers.ExpressionHelper;
 
 namespace Genbox.FastData.ArrayHash;
@@ -18,8 +17,8 @@ public sealed record BruteForceArrayHash : IExpressionArrayHash
         Avalanche = avalance;
     }
 
-    public HashFunc GetHashFunction() => BuildExpression().Compile();
-    public Expression<HashFunc> BuildExpression() => ExpressionHashBuilder.Build([Segment], Mixer, Avalanche);
+    public ArrayHashFunc GetHashFunction() => BuildExpression().Compile();
+    public Expression<ArrayHashFunc> BuildExpression() => ExpressionHashBuilder.Build([Segment], Mixer, Avalanche);
 
     public override string ToString() => $"{nameof(Segment)} = {Segment.ToString()}, {nameof(Mixer)} = {Print(Mixer)}, {nameof(Avalanche)} = {Print(Avalanche)}";
 

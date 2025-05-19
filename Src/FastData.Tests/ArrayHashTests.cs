@@ -1,10 +1,11 @@
 using System.Text;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Specs;
+using Genbox.FastData.ArrayHash;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Tests;
 
-public class StringHashTests
+public class ArrayHashTests
 {
     private readonly byte[] _utf8Bytes = "hello world"u8.ToArray();
     private readonly byte[] _utf16Bytes = Encoding.Unicode.GetBytes("hello world");
@@ -13,7 +14,7 @@ public class StringHashTests
     [MemberData(nameof(GetSpecs))]
     internal void StringHashTestVector(IArrayHash spec, bool utf8, ulong vector)
     {
-        HashFunc func = spec.GetHashFunction();
+        ArrayHashFunc func = spec.GetHashFunction();
         byte[] bytes = utf8 ? _utf8Bytes : _utf16Bytes;
         Assert.Equal(vector, func(ref bytes[0], bytes.Length));
     }

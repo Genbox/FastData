@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Misc;
 
-namespace Genbox.FastData.Internal.Analysis.Segments;
+namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
 internal static class SegmentManager
 {

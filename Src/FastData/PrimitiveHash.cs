@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Specs;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData;
 

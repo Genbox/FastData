@@ -8,7 +8,7 @@ using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
-using Genbox.FastData.Specs;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData;
 

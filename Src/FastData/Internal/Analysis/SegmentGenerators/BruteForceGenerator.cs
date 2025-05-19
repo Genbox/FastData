@@ -1,8 +1,8 @@
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Misc;
 
-namespace Genbox.FastData.Internal.Analysis.Segments;
+namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
 /// <summary>Returns segments with offset [0..max-1] and length [1..max-1]</summary>
 internal class BruteForceGenerator : ISegmentGenerator

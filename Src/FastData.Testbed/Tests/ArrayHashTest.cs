@@ -1,4 +1,5 @@
 using System.Text;
+using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Generator.CSharp.Internal;
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Framework;
@@ -6,9 +7,9 @@ using Genbox.FastData.Internal.Hashes;
 
 namespace Genbox.FastData.Testbed.Tests;
 
-public static class StringHashTest
+public static class ArrayHashTest
 {
-    public static void TestHash()
+    public static void Run()
     {
         const string str = "hello world";
 

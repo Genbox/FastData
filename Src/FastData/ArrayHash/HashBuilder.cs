@@ -2,8 +2,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Genbox.FastData.Specs;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Misc;
 using JetBrains.Annotations;
 using static System.Linq.Expressions.Expression;
 
@@ -15,7 +14,7 @@ public delegate Expression Avalanche(Expression hash);
 
 public static class ExpressionHashBuilder
 {
-    public static Expression<HashFunc> BuildFull(Mixer mixer, Avalanche avalanche)
+    public static Expression<ArrayHashFunc> BuildFull(Mixer mixer, Avalanche avalanche)
     {
         ParameterExpression input = Parameter(typeof(byte).MakeByRefType(), "input");
         ParameterExpression length = Parameter(typeof(int), "length");
@@ -49,10 +48,10 @@ public static class ExpressionHashBuilder
         ex.Add(Assign(hash, avalanche(hash)));
 
         UnaryExpression block = Convert(Block([offset, hash], ex), typeof(ulong));
-        return Lambda<HashFunc>(block, input, length);
+        return Lambda<ArrayHashFunc>(block, input, length);
     }
 
-    public static Expression<HashFunc> Build(ArraySegment[] segments, Mixer mixer, Avalanche avalanche)
+    public static Expression<ArrayHashFunc> Build(ArraySegment[] segments, Mixer mixer, Avalanche avalanche)
     {
         ParameterExpression input = Parameter(typeof(byte).MakeByRefType(), "input");
         ParameterExpression length = Parameter(typeof(int), "length");
@@ -92,7 +91,7 @@ public static class ExpressionHashBuilder
         ex.Add(Assign(hash, avalanche(hash)));
 
         UnaryExpression block = Convert(Block([offset, hash], ex), typeof(ulong));
-        return Lambda<HashFunc>(block, input, length);
+        return Lambda<ArrayHashFunc>(block, input, length);
     }
 
     private static void OutputFullHash(List<Expression> ex, ArraySegment seg, Expression length, Expression input, Expression hash, Expression offset, Mixer mixer)

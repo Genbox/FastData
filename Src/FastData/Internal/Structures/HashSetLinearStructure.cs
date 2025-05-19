@@ -4,7 +4,7 @@ using Genbox.FastData.Contexts;
 using Genbox.FastData.Contexts.Misc;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Specs;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 

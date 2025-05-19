@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Misc;
 
-namespace Genbox.FastData.Internal.Analysis.Segments;
+namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
 /// <summary>
 /// This generator uses the delta map from string analysis to provide segments that avoids areas with identical characters and instead try and target areas of high deltas
@@ -127,8 +127,6 @@ internal class DeltaGenerator : ISegmentGenerator
     /// <summary>Finds segments in the strings using a delta map</summary>
     private static IEnumerable<ArraySegment> GetSegments(int[] arr)
     {
-        // We reuse the StringSegment struct here, but set the alignment to unknown
-        // We need to keep track if we already returned data to avoid duplications
         uint offset = 0;
         while (offset < arr.Length)
         {

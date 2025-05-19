@@ -1,4 +1,4 @@
-namespace Genbox.FastData.Specs.Misc;
+namespace Genbox.FastData.Misc;
 
 public enum Alignment : byte
 {

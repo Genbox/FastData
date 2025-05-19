@@ -1,5 +1,5 @@
 using System.Text;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Internal.Helpers;
 

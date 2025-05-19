@@ -1,3 +1,4 @@
+using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;

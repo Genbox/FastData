@@ -1,8 +1,8 @@
-using Genbox.FastData.Specs;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Abstracts;
 
 public interface IArrayHash
 {
-    HashFunc GetHashFunction();
+    ArrayHashFunc GetHashFunction();
 }

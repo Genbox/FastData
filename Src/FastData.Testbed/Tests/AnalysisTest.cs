@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Generator.CSharp.Internal;
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
@@ -10,7 +11,7 @@ using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Helpers;
-using Genbox.FastData.Specs;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Testbed.Tests;
 
@@ -37,7 +38,7 @@ internal static class AnalysisTest
         Candidate<BruteForceArrayHash> bfCand = bf.Run();
         Console.WriteLine($"BruteForceStringHash: ({bfCand.Fitness}) {bfCand.Spec}");
 
-        HashFunc func = bfCand.Spec.GetHashFunction();
+        ArrayHashFunc func = bfCand.Spec.GetHashFunction();
 
         foreach (string d in data)
         {

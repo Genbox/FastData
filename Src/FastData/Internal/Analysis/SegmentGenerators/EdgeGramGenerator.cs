@@ -1,8 +1,8 @@
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Misc;
 
-namespace Genbox.FastData.Internal.Analysis.Segments;
+namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
 /// <summary>Creates edge-grams with offsets of 0 and lengths [1..max]</summary>
 internal class EdgeGramGenerator : ISegmentGenerator

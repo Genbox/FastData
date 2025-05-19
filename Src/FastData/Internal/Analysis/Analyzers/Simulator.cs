@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
-using Genbox.FastData.Specs;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
@@ -13,7 +13,7 @@ internal class Simulator(SimulatorConfig config)
         equalFunc ??= DefaultEqual;
 
         // Generate a hash function from the spec
-        HashFunc hashFunc = cand.Spec.GetHashFunction();
+        ArrayHashFunc hashFunc = cand.Spec.GetHashFunction();
         uint capacity = (uint)(data.Length * config.CapacityFactor);
 
         cand.Fitness = Emulate(cand.Metadata, data, capacity, hashFunc, equalFunc);
@@ -22,7 +22,7 @@ internal class Simulator(SimulatorConfig config)
     internal void Run<T>(string[] data, Candidate<T> cand) where T : IArrayHash
     {
         // Generate a hash function from the spec
-        HashFunc hashFunc = cand.Spec.GetHashFunction();
+        ArrayHashFunc hashFunc = cand.Spec.GetHashFunction();
         uint capacity = (uint)(data.Length * config.CapacityFactor);
 
         cand.Fitness = Emulate2(cand.Metadata, data, capacity, hashFunc);
@@ -30,7 +30,7 @@ internal class Simulator(SimulatorConfig config)
 
     private static bool DefaultEqual(string a, string b) => a.Equals(b, StringComparison.Ordinal);
 
-    private double Emulate(Dictionary<string, object> metadata, string[] data, uint capacity, HashFunc hashFunc, EqualFunc<string> equalFunc)
+    private double Emulate(Dictionary<string, object> metadata, string[] data, uint capacity, ArrayHashFunc hashFunc, EqualFunc<string> equalFunc)
     {
         FastSet set = new FastSet(capacity, hashFunc, equalFunc, config.UseUtf8);
 
@@ -52,7 +52,7 @@ internal class Simulator(SimulatorConfig config)
         return (raw - min) / (max - min);
     }
 
-    private double Emulate2(Dictionary<string, object> metadata, string[] data, uint capacity, HashFunc hashFunc)
+    private double Emulate2(Dictionary<string, object> metadata, string[] data, uint capacity, ArrayHashFunc hashFunc)
     {
         FastSet2 set = new FastSet2(capacity, hashFunc, config.UseUtf8);
 
@@ -74,7 +74,7 @@ internal class Simulator(SimulatorConfig config)
         return (raw - min) / (max - min);
     }
 
-    private ref struct FastSet(uint capacity, HashFunc hashFunc, EqualFunc<string> equalFunc, bool utf8)
+    private ref struct FastSet(uint capacity, ArrayHashFunc hashFunc, EqualFunc<string> equalFunc, bool utf8)
     {
         private readonly int[] _buckets = new int[capacity];
         private readonly Entry[] _entries = new Entry[capacity];
@@ -116,7 +116,7 @@ internal class Simulator(SimulatorConfig config)
         private record struct Entry(ulong Hash, int Next, string Value);
     }
 
-    private ref struct FastSet2(uint capacity, HashFunc hashFunc, bool utf8)
+    private ref struct FastSet2(uint capacity, ArrayHashFunc hashFunc, bool utf8)
     {
         private readonly int[] _buckets = new int[capacity];
 

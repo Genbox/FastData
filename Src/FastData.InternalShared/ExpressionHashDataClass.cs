@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.ArrayHash;
+using Genbox.FastData.Misc;
 using Xunit;
 
 namespace Genbox.FastData.InternalShared;

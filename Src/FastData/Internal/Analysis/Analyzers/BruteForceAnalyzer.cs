@@ -2,8 +2,8 @@ using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Analysis.Segments;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Internal.Analysis.SegmentGenerators;
+using Genbox.FastData.Misc;
 using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;

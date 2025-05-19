@@ -1,11 +1,11 @@
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Specs;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.ArrayHash;
 
 public sealed record HeuristicArrayHash(List<int> Positions) : IArrayHash
 {
-    public HashFunc GetHashFunction()
+    public ArrayHashFunc GetHashFunction()
     {
         return null!;
 
