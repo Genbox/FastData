@@ -11,7 +11,7 @@ internal class BruteForceGenerator : ISegmentGenerator
 
     public bool IsAppropriate(StringProperties props) => true;
 
-    public IEnumerable<StringSegment> Generate(StringProperties props)
+    public IEnumerable<ArraySegment> Generate(StringProperties props)
     {
         int max = (int)Math.Min(props.LengthData.Min, MaxLength); //We cannot segment above the shortest string.
 
@@ -24,7 +24,7 @@ internal class BruteForceGenerator : ISegmentGenerator
         {
             for (int length = 1; length <= max - offset; length++)
             {
-                yield return new StringSegment(offset, length, Alignment.Left);
+                yield return new ArraySegment(offset, length, Alignment.Left);
             }
         }
 
@@ -37,7 +37,7 @@ internal class BruteForceGenerator : ISegmentGenerator
         {
             for (int length = 1; length <= max - offset; length++)
             {
-                yield return new StringSegment(offset, length, Alignment.Right);
+                yield return new ArraySegment(offset, length, Alignment.Right);
             }
         }
     }

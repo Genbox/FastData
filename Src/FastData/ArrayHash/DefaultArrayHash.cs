@@ -1,11 +1,12 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Specs;
 using static System.Linq.Expressions.Expression;
 
-namespace Genbox.FastData.Specs.Hash;
+namespace Genbox.FastData.ArrayHash;
 
 /// <summary>Hashes the entire string using DJB2 hash</summary>
-public sealed record DefaultStringHash : IExpressionStringHash
+public sealed record DefaultArrayHash : IExpressionArrayHash
 {
     public HashFunc GetHashFunction() => BuildExpression().Compile();
     public Expression<HashFunc> BuildExpression() => ExpressionHashBuilder.BuildFull(Mixer, Avalanche);

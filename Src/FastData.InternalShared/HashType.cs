@@ -1,4 +1,4 @@
-namespace Genbox.FastData.Generator.CSharp.Tests;
+namespace Genbox.FastData.InternalShared;
 
 public enum HashType
 {

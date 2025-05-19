@@ -9,7 +9,7 @@ internal class OffsetGenerator : ISegmentGenerator
 {
     public bool IsAppropriate(StringProperties props) => true;
 
-    public IEnumerable<StringSegment> Generate(StringProperties props)
+    public IEnumerable<ArraySegment> Generate(StringProperties props)
     {
         //Generates:
         //[test]
@@ -19,7 +19,7 @@ internal class OffsetGenerator : ISegmentGenerator
 
         for (uint offset = 0; offset < props.LengthData.Min; offset++)
         {
-            yield return new StringSegment(offset, -1, Alignment.Left);
+            yield return new ArraySegment(offset, -1, Alignment.Left);
         }
     }
 }

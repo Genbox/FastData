@@ -2,7 +2,7 @@ using Genbox.FastData.Abstracts;
 
 namespace Genbox.FastData.Internal.Analysis;
 
-internal sealed class Candidate<T> where T : IStringHash
+internal sealed class Candidate<T> where T : IArrayHash
 {
     internal T Spec { get; set; }
     internal double Fitness { get; set; } = 0;

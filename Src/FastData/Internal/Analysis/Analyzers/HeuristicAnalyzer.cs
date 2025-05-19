@@ -1,8 +1,8 @@
 using System.Diagnostics;
+using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Specs.Hash;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
@@ -41,11 +41,11 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
  */
 
 /// <summary>Finds the least number of positions in a string that hashes to a unique value for all inputs.</summary>
-internal class HeuristicAnalyzer(string[] data, StringProperties props, HeuristicAnalyzerConfig config, Simulator simulator) : IHashAnalyzer<HeuristicStringHash>
+internal class HeuristicAnalyzer(string[] data, StringProperties props, HeuristicAnalyzerConfig config, Simulator simulator) : IHashAnalyzer<HeuristicArrayHash>
 {
     private const double _epsilon = 1e-6;
 
-    public Candidate<HeuristicStringHash> Run()
+    public Candidate<HeuristicArrayHash> Run()
     {
         int max = (int)Math.Min(props.LengthData.Max - 1, config.MaxPositions - 1);
 
@@ -228,11 +228,11 @@ internal class HeuristicAnalyzer(string[] data, StringProperties props, Heuristi
 
     private double CalculateFitness(DirectMap set) => CalculateFitnessInternal(set).Fitness; //The algorithm here works with less fitness = better. At least for now.
 
-    private Candidate<HeuristicStringHash> CalculateFitnessInternal(DirectMap map)
+    private Candidate<HeuristicArrayHash> CalculateFitnessInternal(DirectMap map)
     {
-        Candidate<HeuristicStringHash> _cand = new Candidate<HeuristicStringHash>();
+        Candidate<HeuristicArrayHash> _cand = new Candidate<HeuristicArrayHash>();
 
-        _cand.Spec = new HeuristicStringHash(map.Positions);
+        _cand.Spec = new HeuristicArrayHash(map.Positions);
         simulator.RunWithEqual(data, _cand, (s, s1) => Equal(s, s1, map.Positions));
         return _cand;
     }
@@ -259,7 +259,7 @@ internal class HeuristicAnalyzer(string[] data, StringProperties props, Heuristi
     [Conditional("DebugPrint")]
     private void Print(string stage, DirectMap map)
     {
-        Candidate<HeuristicStringHash> cand = CalculateFitnessInternal(map);
+        Candidate<HeuristicArrayHash> cand = CalculateFitnessInternal(map);
 
         Console.Write($"{stage} ({cand.Metadata["Collisions"]}): ");
         bool lastChar = false;

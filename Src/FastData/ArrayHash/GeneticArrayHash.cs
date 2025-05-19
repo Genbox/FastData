@@ -1,11 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Specs;
 
-namespace Genbox.FastData.Specs.Hash;
+namespace Genbox.FastData.ArrayHash;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-public sealed record GeneticStringHash(int MixerSeed, int MixerIterations, int AvalancheSeed, int AvalancheIterations) : IStringHash
+public sealed record GeneticArrayHash(int MixerSeed, int MixerIterations, int AvalancheSeed, int AvalancheIterations) : IArrayHash
 {
     public HashFunc GetHashFunction()
     {

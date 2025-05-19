@@ -1,8 +1,9 @@
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Specs;
 
-namespace Genbox.FastData.Specs.Hash;
+namespace Genbox.FastData.ArrayHash;
 
-public sealed record HeuristicStringHash(List<int> Positions) : IStringHash
+public sealed record HeuristicArrayHash(List<int> Positions) : IArrayHash
 {
     public HashFunc GetHashFunction()
     {

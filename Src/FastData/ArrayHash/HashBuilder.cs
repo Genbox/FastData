@@ -2,11 +2,12 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Genbox.FastData.Specs;
 using Genbox.FastData.Specs.Misc;
 using JetBrains.Annotations;
 using static System.Linq.Expressions.Expression;
 
-namespace Genbox.FastData.Specs.Hash;
+namespace Genbox.FastData.ArrayHash;
 
 public delegate Expression Mixer(Expression hash, Expression readFunc);
 
@@ -51,7 +52,7 @@ public static class ExpressionHashBuilder
         return Lambda<HashFunc>(block, input, length);
     }
 
-    public static Expression<HashFunc> Build(StringSegment[] segments, Mixer mixer, Avalanche avalanche)
+    public static Expression<HashFunc> Build(ArraySegment[] segments, Mixer mixer, Avalanche avalanche)
     {
         ParameterExpression input = Parameter(typeof(byte).MakeByRefType(), "input");
         ParameterExpression length = Parameter(typeof(int), "length");
@@ -66,7 +67,7 @@ public static class ExpressionHashBuilder
         }
         else
         {
-            foreach (StringSegment seg in segments)
+            foreach (ArraySegment seg in segments)
             {
                 // int offset = <offset>
                 ex.Add(Assign(offset, Constant((int)seg.Offset)));
@@ -94,7 +95,7 @@ public static class ExpressionHashBuilder
         return Lambda<HashFunc>(block, input, length);
     }
 
-    private static void OutputFullHash(List<Expression> ex, StringSegment seg, Expression length, Expression input, Expression hash, Expression offset, Mixer mixer)
+    private static void OutputFullHash(List<Expression> ex, ArraySegment seg, Expression length, Expression input, Expression hash, Expression offset, Mixer mixer)
     {
         // int offset = <offset>
         // int length -= offset

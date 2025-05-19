@@ -11,7 +11,7 @@ internal class EdgeGramGenerator : ISegmentGenerator
 
     public bool IsAppropriate(StringProperties props) => true;
 
-    public IEnumerable<StringSegment> Generate(StringProperties props)
+    public IEnumerable<ArraySegment> Generate(StringProperties props)
     {
         int len;
 
@@ -25,12 +25,12 @@ internal class EdgeGramGenerator : ISegmentGenerator
 
         for (len = 1; len <= max; len++)
         {
-            yield return new StringSegment(0, len, Alignment.Left);
+            yield return new ArraySegment(0, len, Alignment.Left);
         }
 
         for (len = 1; len <= max; len++)
         {
-            yield return new StringSegment(0, len, Alignment.Right);
+            yield return new ArraySegment(0, len, Alignment.Right);
         }
     }
 }

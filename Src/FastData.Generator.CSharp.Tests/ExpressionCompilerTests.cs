@@ -10,7 +10,7 @@ public class ExpressionCompilerTests
 {
     [Theory]
     [ClassData(typeof(ExpressionHashDataClass))]
-    internal async Task GenerateStructureType(HashType type, IExpressionStringHash hash)
+    internal async Task GenerateStructureType(HashType type, IExpressionArrayHash hash)
     {
         CSharpExpressionCompiler compiler = new CSharpExpressionCompiler(new TypeHelper(new TypeMap(new CSharpLanguageDef().TypeDefinitions)));
 

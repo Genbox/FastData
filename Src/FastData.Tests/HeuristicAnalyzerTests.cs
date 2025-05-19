@@ -3,7 +3,6 @@ using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.InternalShared;
-using Genbox.FastData.Specs.Hash;
 
 namespace Genbox.FastData.Tests;
 
@@ -20,7 +19,7 @@ public class HeuristicAnalyzerTests
         Simulator s = new Simulator(new SimulatorConfig());
         HeuristicAnalyzer a = new HeuristicAnalyzer(data, props, new HeuristicAnalyzerConfig(), s);
 
-        Candidate<HeuristicStringHash> res = a.Run();
+        Candidate<HeuristicArrayHash> res = a.Run();
 
         await Verify(res.Spec.Positions)
               .UseFileName("Test" + value)

@@ -1,4 +1,5 @@
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
@@ -8,7 +9,6 @@ using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.Specs;
-using Genbox.FastData.Specs.Hash;
 
 namespace Genbox.FastData;
 
@@ -48,9 +48,9 @@ public static class FastDataGenerator
 
         bool analysisEnabled = false;
 
-        IStringHash? spec = null;
+        IArrayHash? spec = null;
         if (data is string[] stringArr)
-            spec = analysisEnabled ? GetHashSpec(stringArr, props, fdCfg.SimulatorConfig) : new DefaultStringHash();
+            spec = analysisEnabled ? GetHashSpec(stringArr, props, fdCfg.SimulatorConfig) : new DefaultArrayHash();
 
         HashFunc<T> hashFunc;
 
@@ -129,18 +129,18 @@ public static class FastDataGenerator
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
 
-    private static IStringHash GetHashSpec<T>(string[] data, DataProperties<T> props, SimulatorConfig simulatorConfig)
+    private static IArrayHash GetHashSpec<T>(string[] data, DataProperties<T> props, SimulatorConfig simulatorConfig)
     {
         //Run each of the analyzers
         Simulator simulator = new Simulator(simulatorConfig);
         BruteForceAnalyzer bf = new BruteForceAnalyzer(data, props.StringProps!, new BruteForceAnalyzerConfig(), simulator);
-        Candidate<BruteForceStringHash> bfCand = bf.Run();
+        Candidate<BruteForceArrayHash> bfCand = bf.Run();
 
         GeneticAnalyzer ga = new GeneticAnalyzer(data, new GeneticAnalyzerConfig(), simulator);
-        Candidate<GeneticStringHash> gaCand = ga.Run();
+        Candidate<GeneticArrayHash> gaCand = ga.Run();
 
         HeuristicAnalyzer ha = new HeuristicAnalyzer(data, props.StringProps!, new HeuristicAnalyzerConfig(), simulator);
-        Candidate<HeuristicStringHash> haCand = ha.Run();
+        Candidate<HeuristicArrayHash> haCand = ha.Run();
 
         //Select the spec with the best fitness
         return bfCand.Fitness >= gaCand.Fitness ? bfCand.Fitness >= haCand.Fitness ? bfCand.Spec : haCand.Spec :

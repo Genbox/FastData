@@ -67,43 +67,43 @@ internal class DeltaGenerator : ISegmentGenerator
     As we can see, there are no interesting segments for this particular input when it is right-aligned.
     */
 
-    public IEnumerable<StringSegment> Generate(StringProperties props)
+    public IEnumerable<ArraySegment> Generate(StringProperties props)
     {
         // We start from the left, which is faster due to not having to do right-align checks
-        foreach (StringSegment segment in CalculateSegments(props.DeltaData.Left))
+        foreach (ArraySegment segment in CalculateSegments(props.DeltaData.Left))
         {
             // Left Alignment: offset + length <= Min
             int maxLength = (int)(props.LengthData.Min - segment.Offset);
             int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
 
             if (length > 0)
-                yield return new StringSegment(segment.Offset, length, Alignment.Left);
+                yield return new ArraySegment(segment.Offset, length, Alignment.Left);
         }
 
         // Process right-aligned segments
-        foreach (StringSegment segment in CalculateSegments(props.DeltaData.Right))
+        foreach (ArraySegment segment in CalculateSegments(props.DeltaData.Right))
         {
             // Right Alignment: offset + length <= Min
             int maxLength = (int)(props.LengthData.Min - segment.Offset);
             int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
 
             if (length > 0)
-                yield return new StringSegment(segment.Offset, length, Alignment.Right);
+                yield return new ArraySegment(segment.Offset, length, Alignment.Right);
         }
     }
 
     /// <summary>Returns segments with increasing length. It starts with the highest variance segment first and then continues to lower ones</summary>
-    private static IEnumerable<StringSegment> CalculateSegments(int[] deltaMap)
+    private static IEnumerable<ArraySegment> CalculateSegments(int[] deltaMap)
     {
         // Use the delta map to generate segments.
-        IEnumerable<StringSegment> segments = GetSegments(deltaMap);
+        IEnumerable<ArraySegment> segments = GetSegments(deltaMap);
 
         // We sort the segments in order of variance
         return segments.OrderByDescending(segment => ComputeVariance(segment, deltaMap));
     }
 
     /// <summary>Computes the highest variance (difference between min and max of delta)</summary>
-    private static int ComputeVariance(StringSegment segment, int[] data)
+    private static int ComputeVariance(ArraySegment segment, int[] data)
     {
         if (segment.Offset > data.Length)
             return 0;
@@ -125,7 +125,7 @@ internal class DeltaGenerator : ISegmentGenerator
     }
 
     /// <summary>Finds segments in the strings using a delta map</summary>
-    private static IEnumerable<StringSegment> GetSegments(int[] arr)
+    private static IEnumerable<ArraySegment> GetSegments(int[] arr)
     {
         // We reuse the StringSegment struct here, but set the alignment to unknown
         // We need to keep track if we already returned data to avoid duplications
@@ -146,7 +146,7 @@ internal class DeltaGenerator : ISegmentGenerator
                 offset++;
             }
 
-            yield return new StringSegment(start, (int)(offset - start), Alignment.Unknown);
+            yield return new ArraySegment(start, (int)(offset - start), Alignment.Unknown);
         }
     }
 }

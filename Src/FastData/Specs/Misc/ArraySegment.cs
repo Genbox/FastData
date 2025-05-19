@@ -7,7 +7,7 @@ namespace Genbox.FastData.Specs.Misc;
 
 [DebuggerDisplay("{Offset},{Length},{Alignment}")]
 [StructLayout(LayoutKind.Auto)]
-public readonly record struct StringSegment(uint Offset, int Length, Alignment Alignment)
+public readonly record struct ArraySegment(uint Offset, int Length, Alignment Alignment)
 {
     public override string ToString() => $"{Offset}|{Length}|{Alignment}";
 }

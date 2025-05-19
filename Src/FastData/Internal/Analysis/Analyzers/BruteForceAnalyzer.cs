@@ -1,14 +1,14 @@
+using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Analysis.Segments;
-using Genbox.FastData.Specs.Hash;
 using Genbox.FastData.Specs.Misc;
 using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal class BruteForceAnalyzer(string[] data, StringProperties props, BruteForceAnalyzerConfig _, Simulator simulator) : IHashAnalyzer<BruteForceStringHash>
+internal class BruteForceAnalyzer(string[] data, StringProperties props, BruteForceAnalyzerConfig _, Simulator simulator) : IHashAnalyzer<BruteForceArrayHash>
 {
     // This brute-forces all combinations of string segments with all possible mixer and avalanche functions.
     // Its initial state is the smallest/fastest in the hope we can reach an optimal state fast.
@@ -34,18 +34,18 @@ internal class BruteForceAnalyzer(string[] data, StringProperties props, BruteFo
         new AvalancheXorRightShift(12, 36)
     ];
 
-    public Candidate<BruteForceStringHash> Run()
+    public Candidate<BruteForceArrayHash> Run()
     {
         double bestFitness = 0;
-        BruteForceStringHash spec = new BruteForceStringHash();
+        BruteForceArrayHash spec = new BruteForceArrayHash();
 
-        Candidate<BruteForceStringHash> candidate = new Candidate<BruteForceStringHash>();
+        Candidate<BruteForceArrayHash> candidate = new Candidate<BruteForceArrayHash>();
         candidate.Spec = spec;
 
         BruteForceGenerator segGen = new BruteForceGenerator();
-        StringSegment[] segments = segGen.Generate(props).ToArray();
+        ArraySegment[] segments = segGen.Generate(props).ToArray();
 
-        foreach (StringSegment segment in segments)
+        foreach (ArraySegment segment in segments)
         {
             spec.Segment = segment;
 

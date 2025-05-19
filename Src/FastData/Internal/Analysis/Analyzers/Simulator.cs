@@ -8,7 +8,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
 internal class Simulator(SimulatorConfig config)
 {
-    internal void RunWithEqual<T>(string[] data, Candidate<T> cand, EqualFunc<string>? equalFunc = null) where T : IStringHash
+    internal void RunWithEqual<T>(string[] data, Candidate<T> cand, EqualFunc<string>? equalFunc = null) where T : IArrayHash
     {
         equalFunc ??= DefaultEqual;
 
@@ -19,7 +19,7 @@ internal class Simulator(SimulatorConfig config)
         cand.Fitness = Emulate(cand.Metadata, data, capacity, hashFunc, equalFunc);
     }
 
-    internal void Run<T>(string[] data, Candidate<T> cand) where T : IStringHash
+    internal void Run<T>(string[] data, Candidate<T> cand) where T : IArrayHash
     {
         // Generate a hash function from the spec
         HashFunc hashFunc = cand.Spec.GetHashFunction();

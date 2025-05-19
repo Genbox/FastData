@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Contexts;
 using Genbox.FastData.Internal.Abstracts;
@@ -7,7 +8,6 @@ using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Misc;
-using Genbox.FastData.Specs.Hash;
 using static Genbox.FastData.Internal.Helpers.DebugHelper;
 
 namespace Genbox.FastData.Internal.Structures;
@@ -54,7 +54,7 @@ internal sealed class PerfectHashGPerfStructure<T>(StructureConfig<T> config) : 
         // Step 1: Finding good positions
         Simulator sim = new Simulator(new SimulatorConfig());
         HeuristicAnalyzer analyzer = new HeuristicAnalyzer(stringArr, strProps, new HeuristicAnalyzerConfig(), sim);
-        Candidate<HeuristicStringHash> candidate = analyzer.Run();
+        Candidate<HeuristicArrayHash> candidate = analyzer.Run();
 
         // If we didn't get any positions, we don't want to move any further
         if (candidate.Spec.Positions.Count == 0)

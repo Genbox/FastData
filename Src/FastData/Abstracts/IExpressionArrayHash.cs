@@ -3,7 +3,7 @@ using Genbox.FastData.Specs;
 
 namespace Genbox.FastData.Abstracts;
 
-public interface IExpressionStringHash : IStringHash
+public interface IExpressionArrayHash : IArrayHash
 {
     Expression<HashFunc> BuildExpression();
 }

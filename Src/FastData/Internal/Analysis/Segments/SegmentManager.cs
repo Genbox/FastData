@@ -7,16 +7,16 @@ namespace Genbox.FastData.Internal.Analysis.Segments;
 
 internal static class SegmentManager
 {
-    internal static IEnumerable<StringSegment> Generate(StringProperties props)
+    internal static IEnumerable<ArraySegment> Generate(StringProperties props)
     {
-        HashSet<StringSegment> uniq = new HashSet<StringSegment>();
+        HashSet<ArraySegment> uniq = new HashSet<ArraySegment>();
 
         foreach (ISegmentGenerator generator in GetGenerators())
         {
             if (!generator.IsAppropriate(props))
                 continue;
 
-            foreach (StringSegment segment in generator.Generate(props))
+            foreach (ArraySegment segment in generator.Generate(props))
             {
                 Debug.Assert(segment.Length is -1 or >= 1); //Length must always be -1 (unconstrained) or more than 0
 

@@ -4,7 +4,7 @@ using Genbox.FastData.Specs.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
 
-internal sealed class StringSegmentGene(string name, StringSegment[] segments) : Gene<StringSegment[]>(name, [])
+internal sealed class StringSegmentGene(string name, ArraySegment[] segments) : Gene<ArraySegment[]>(name, [])
 {
     public override void Mutate(IRandom rng)
     {
