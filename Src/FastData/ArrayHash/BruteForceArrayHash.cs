@@ -10,11 +10,11 @@ public sealed record BruteForceArrayHash : IExpressionArrayHash
     //We need this ctor when resuing the object
     internal BruteForceArrayHash() { }
 
-    public BruteForceArrayHash(ArraySegment segment, Mixer mixer, Avalanche avalance)
+    public BruteForceArrayHash(ArraySegment segment, Mixer mixer, Avalanche avalanche)
     {
         Segment = segment;
         Mixer = mixer;
-        Avalanche = avalance;
+        Avalanche = avalanche;
     }
 
     public ArrayHashFunc GetHashFunction() => BuildExpression().Compile();

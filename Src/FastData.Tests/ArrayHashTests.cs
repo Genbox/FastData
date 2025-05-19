@@ -24,11 +24,11 @@ public class ArrayHashTests
         { new DefaultArrayHash(), true, 16317555765854685474 },
         { new DefaultArrayHash(), false, 15042149576436727275 },
 
-        // { new BruteForceStringHash([new StringSegment(0, -1, Alignment.Left)]), true, 2374722304133963099 },
-        // { new BruteForceStringHash([new StringSegment(1, 4, Alignment.Left)]), false, 2837689576666164741 },
+        // { new BruteForceStringHash([new ArraySegment(0, -1, Alignment.Left)]), true, 2374722304133963099 },
+        // { new BruteForceStringHash([new ArraySegment(1, 4, Alignment.Left)]), false, 2837689576666164741 },
 
-        { new GeneticArrayHash(1, 1, 1, 1), true, 587415029 },
-        { new GeneticArrayHash(2, 1, 2, 1), false, 3487984234 },
+        { new GeneticArrayHash(new ArraySegment(0, -1, Alignment.Left), 1, 1, 1, 1), true, 587415029 },
+        { new GeneticArrayHash(new ArraySegment(0, -1, Alignment.Left), 2, 1, 2, 1), false, 3487984234 },
 
         { new HeuristicArrayHash([1]), true, 101 },
         { new HeuristicArrayHash([0, 1]), true, 1765 },

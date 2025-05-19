@@ -2,99 +2,77 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Misc;
+using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.ArrayHash;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-public sealed record GeneticArrayHash(int MixerSeed, int MixerIterations, int AvalancheSeed, int AvalancheIterations) : IArrayHash
+public sealed record GeneticArrayHash(ArraySegment Segment, int MixerSeed, int MixerIterations, int AvalancheSeed, int AvalancheIterations) : IExpressionArrayHash
 {
-    public ArrayHashFunc GetHashFunction()
+    public ArrayHashFunc GetHashFunction() => BuildExpression().Compile();
+    public Expression<ArrayHashFunc> BuildExpression() => ExpressionHashBuilder.Build([Segment], GetMixer(), GetAvalanche());
+
+    //TODO: Make simulator prefer smaller segments and shorter expressions
+
+    public Mixer GetMixer() => (hash, read) =>
     {
-        // Func<uint, uint, uint> mixer = GetMixer().Compile();
-        // Func<uint, uint> avalanche = GetAvalanche().Compile();
-        // return str => Hash(str, (uint)MixerSeed, mixer, avalanche);
+        Random rng = new Random(MixerSeed);
 
-        return null!;
-    }
+        BinaryExpression op = GetOp(rng, hash, read);
+        return CreateMixer(MixerIterations, rng, op);
+    };
 
-    private static uint Hash(string str, uint seed, Func<uint, uint, uint> mixer, Func<uint, uint> avalanche, int length)
-    {
-        uint acc = seed;
+    public Avalanche GetAvalanche() => hash => CreateMixer(AvalancheIterations, new Random(AvalancheSeed), hash);
 
-        for (int i = 0; i < length; i++)
-        {
-            acc = mixer(acc, str[i]);
-        }
-
-        return avalanche(acc);
-    }
-
-    public Expression<Func<uint, uint, uint>> GetMixer()
-    {
-        ParameterExpression accParam = Expression.Parameter(typeof(uint), "accParam");
-        ParameterExpression inputParam = Expression.Parameter(typeof(uint), "inputParam");
-        ParameterExpression acc = Expression.Parameter(typeof(uint), "acc");
-
-        IEnumerable<Expression> expressions = CreateMixer(MixerIterations, new Random(MixerSeed), acc);
-
-        BinaryExpression initLocalAcc = Expression.Assign(acc, Expression.Add(accParam, Expression.Multiply(inputParam, Expression.Constant(Seeds[0]))));
-        BlockExpression block = Expression.Block([acc], expressions.Prepend(initLocalAcc));
-        return Expression.Lambda<Func<uint, uint, uint>>(block, accParam, inputParam);
-    }
-
-    public Expression<Func<uint, uint>> GetAvalanche()
-    {
-        ParameterExpression accParam = Expression.Parameter(typeof(uint), "accParam");
-        ParameterExpression acc = Expression.Parameter(typeof(uint), "acc");
-
-        IEnumerable<Expression> expressions = CreateMixer(AvalancheIterations, new Random(AvalancheSeed), acc);
-
-        BinaryExpression initLocalAcc = Expression.Assign(acc, accParam);
-        BlockExpression block = Expression.Block([acc], expressions.Prepend(initLocalAcc));
-        return Expression.Lambda<Func<uint, uint>>(block, accParam);
-    }
-
-    private static IEnumerable<Expression> CreateMixer(int iterations, Random rng, ParameterExpression acc)
+    private static Expression CreateMixer(int iterations, Random rng, Expression value)
     {
         for (int i = 0; i < iterations; i++)
-        {
-            int choice = rng.Next(1, 7);
+            value = GetMix(rng, value);
 
-            Expression body = acc;
-            body = choice switch
-            {
-                1 => Add(body, Seeds[rng.Next(0, Seeds.Length)]),
-                2 => Multiply(body, Seeds[rng.Next(0, Seeds.Length)]),
-                3 => RotateLeft(body, rng.Next(1, 64)),
-                4 => RotateRight(body, rng.Next(1, 64)),
-                5 => XorShift(body, rng.Next(1, 64)),
-                6 => Square(body),
-                _ => throw new InvalidOperationException("Value out of range")
-            };
-
-            yield return Expression.Assign(acc, body);
-        }
+        return value;
     }
 
-    private static BinaryExpression Add(Expression e, uint x) => Expression.Add(e, Expression.Constant(x));
-    private static BinaryExpression Multiply(Expression e, uint x) => Expression.Multiply(e, Expression.Constant(x));
-    private static BinaryExpression RotateLeft(Expression e, int x) => Expression.Or(Expression.LeftShift(e, Expression.Constant(x)), Expression.RightShift(e, Expression.Constant(64 - x)));
-    private static BinaryExpression RotateRight(Expression e, int x) => Expression.Or(Expression.RightShift(e, Expression.Constant(x)), Expression.LeftShift(e, Expression.Constant(64 - x)));
-    private static BinaryExpression XorShift(Expression e, int x) => Expression.ExclusiveOr(e, Expression.RightShift(e, Expression.Constant(x)));
-    private static BinaryExpression Square(Expression e) => Expression.Add(Expression.Or(Expression.Constant(1U), e), Expression.Multiply(e, e));
+    private static BinaryExpression GetMix(Random rng, Expression hash) =>
+        rng.Next(1, 7) switch
+        {
+            1 => MixAdd(hash, Seeds[rng.Next(0, Seeds.Length)]),
+            2 => MixMultiply(hash, Seeds[rng.Next(0, Seeds.Length)]),
+            3 => MixRotateLeft(hash, rng.Next(1, 64)),
+            4 => MixRotateRight(hash, rng.Next(1, 64)),
+            5 => MixXorShift(hash, rng.Next(1, 64)),
+            6 => MixSquare(hash),
+            _ => throw new InvalidOperationException("Value out of range")
+        };
+
+    private static BinaryExpression GetOp(Random rng, Expression hash, Expression read) =>
+        rng.Next(1, 4) switch
+        {
+            1 => OpAdd(hash, read),
+            2 => OpSubtract(hash, read),
+            3 => OpMultiply(hash, read),
+            4 => OpXor(hash, read),
+            _ => throw new InvalidOperationException("Value out of range")
+        };
+
+    private static BinaryExpression OpAdd(Expression e, Expression x) => Add(e, x);
+    private static BinaryExpression OpSubtract(Expression e, Expression x) => Subtract(e, x);
+    private static BinaryExpression OpMultiply(Expression e, Expression x) => Multiply(e, x);
+    private static BinaryExpression OpXor(Expression e, Expression x) => ExclusiveOr(e, x);
+
+    private static BinaryExpression MixAdd(Expression e, ulong x) => Add(e, Constant(x));
+    private static BinaryExpression MixMultiply(Expression e, ulong x) => Multiply(e, Constant(x));
+    private static BinaryExpression MixRotateLeft(Expression e, int x) => Or(LeftShift(e, Constant(x)), RightShift(e, Constant(64 - x)));
+    private static BinaryExpression MixRotateRight(Expression e, int x) => Or(RightShift(e, Constant(x)), LeftShift(e, Constant(64 - x)));
+    private static BinaryExpression MixXorShift(Expression e, int x) => ExclusiveOr(e, RightShift(e, Constant(x)));
+    private static BinaryExpression MixSquare(Expression e) => Add(Or(Constant(1UL), e), Multiply(e, e));
 
     // A good seed has the following properties:
     // - Odd: Avoids getting the mixer stuck in a loop of 0.
     // - Large: Means we push a lot of the lower bits into higher bits. Gives better avalanche.
     // - Low bias: No correlation between input bits and output bits
-    private static readonly uint[] Seeds =
+    private static readonly ulong[] Seeds =
     [
-        0x85EBCA6B, 0xC2B2AE35, //Murmur
-        0x45D9F3B, // Degski
-        0x9E3779B9, // FP32
-        0x7FEB352D, 0x846CA68B, // Lowbias
-        0xED5AD4BB, 0xAC4C1B51, 0x31848BAB, //Triple
-        0x85EBCA77, 0xC2B2AE3D // XXHash2
+        0xFF51AFD7ED558CCD, 0xC4CEB9FE1A85EC53, //Murmur
     ];
 
     public override string ToString() => $"{nameof(MixerSeed)} = {MixerSeed}, {nameof(MixerIterations)} = {MixerIterations}, {nameof(AvalancheSeed)} = {AvalancheSeed}, {nameof(AvalancheIterations)} = {AvalancheIterations}";

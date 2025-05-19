@@ -6,7 +6,6 @@ internal static class Program
 {
     private static void Main()
     {
-        AnalysisTest.TestAnalyzers();
-        Console.ReadLine();
+        AnalysisTest.GeneticAnalysis();
     }
 }

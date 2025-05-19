@@ -136,7 +136,7 @@ public static class FastDataGenerator
         BruteForceAnalyzer bf = new BruteForceAnalyzer(data, props.StringProps!, new BruteForceAnalyzerConfig(), simulator);
         Candidate<BruteForceArrayHash> bfCand = bf.Run();
 
-        GeneticAnalyzer ga = new GeneticAnalyzer(data, new GeneticAnalyzerConfig(), simulator);
+        GeneticAnalyzer ga = new GeneticAnalyzer(data, props.StringProps!, new GeneticAnalyzerConfig(), simulator);
         Candidate<GeneticArrayHash> gaCand = ga.Run();
 
         HeuristicAnalyzer ha = new HeuristicAnalyzer(data, props.StringProps!, new HeuristicAnalyzerConfig(), simulator);

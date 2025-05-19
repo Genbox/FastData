@@ -1,17 +1,12 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
-using Genbox.FastData.Generator.CSharp.Internal;
-using Genbox.FastData.Generator.CSharp.Internal.Framework;
-using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Helpers;
-using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Testbed.Tests;
 
@@ -28,46 +23,7 @@ internal static class AnalysisTest
         "podzolized", "pozzolanic", "puzzlement", "schizotypy", "scuzzballs", "shockjocks", "sizzlingly", "unhouzzled", "zanthoxyls", "zigzagging", "blackjacks", "crackajack"
     ];
 
-    public static void TestAnalyzers()
-    {
-        string[] data = ["aab", "agedehams", "afiskenet", "oastemad", "garisestald", "karseklipning"];
-        StringProperties props = DataAnalyzer.GetStringProperties(data);
-
-        Simulator sim = new Simulator(new SimulatorConfig { UseUtf8 = true });
-        BruteForceAnalyzer bf = new BruteForceAnalyzer(data, props, new BruteForceAnalyzerConfig(), sim);
-        Candidate<BruteForceArrayHash> bfCand = bf.Run();
-        Console.WriteLine($"BruteForceStringHash: ({bfCand.Fitness}) {bfCand.Spec}");
-
-        ArrayHashFunc func = bfCand.Spec.GetHashFunction();
-
-        foreach (string d in data)
-        {
-            byte[] b = Encoding.UTF8.GetBytes(d);
-            Console.WriteLine(d + ": " + func(ref b[0], b.Length));
-        }
-        Console.WriteLine();
-        Console.WriteLine("C# code:");
-
-        var compiler = new CSharpExpressionCompiler(new TypeHelper(new TypeMap(new CSharpLanguageDef().TypeDefinitions)));
-        Console.WriteLine(compiler.GetCode(bfCand.Spec.BuildExpression()));
-
-        // GeneticAnalyzer ga = new GeneticAnalyzer(data, new GeneticAnalyzerConfig(), sim);
-        // Candidate<GeneticStringHash> gaCand = ga.Run();
-        // Console.WriteLine($"GeneticStringHash: ({gaCand.Fitness}) {gaCand.Spec}");
-        //
-        // HeuristicAnalyzer ha = new HeuristicAnalyzer(data, props, new HeuristicAnalyzerConfig(), sim);
-        // Candidate<HeuristicStringHash> haCand = ha.Run();
-        // Console.WriteLine($"HeuristicStringHash: ({haCand.Fitness}) {haCand.Spec}");
-
-        //Select the spec with the best fitness
-        // object best = bfCand.Fitness >= gaCand.Fitness ? bfCand.Fitness >= haCand.Fitness ? bfCand.Spec : haCand.Spec :
-        // gaCand.Fitness >= haCand.Fitness ? gaCand.Spec : haCand.Spec;
-
-        // Console.WriteLine();
-        // Console.WriteLine("Best: " + best);
-    }
-
-    private static void BruteForce()
+    public static void BruteForce()
     {
         RunBruteForce(RunFunc(Data, 5.0, PrependString));
         RunBruteForce(RunFunc(Data, 1.0, PermuteString));
@@ -87,12 +43,13 @@ internal static class AnalysisTest
         PrintCandidate(in top1);
     }
 
-    private static void GeneticAnalysis()
+    public static void GeneticAnalysis()
     {
         RunGeneticAnalysis(RunFunc(Data, 5.0, PrependString));
-        RunGeneticAnalysis(RunFunc(Data, 1.0, PermuteString));
-        RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
-        RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
+
+        // RunGeneticAnalysis(RunFunc(Data, 1.0, PermuteString));
+        // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
+        // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
     }
 
     private static void Print(string[] data, string? source) => Console.WriteLine(source + ": " + string.Join(", ", data.Take(5)));
@@ -148,12 +105,12 @@ internal static class AnalysisTest
     {
         Console.WriteLine("###############");
         Print(data, source);
-        StringProperties props = DataAnalyzer.GetStringProperties(data);
 
+        StringProperties props = DataAnalyzer.GetStringProperties(data);
         Simulator sim = new Simulator(new SimulatorConfig());
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(data, new GeneticAnalyzerConfig(), sim);
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(data, props, new GeneticAnalyzerConfig(), sim);
         Candidate<GeneticArrayHash> top1 = analyzer.Run();
-        PrintCandidate(in top1, in props);
+        PrintCandidate(in top1);
     }
 
     private static void PrintHeader<T>(in Candidate<T> candidate) where T : IArrayHash
@@ -163,7 +120,7 @@ internal static class AnalysisTest
         Console.WriteLine($"- {nameof(candidate.Metadata)}: {string.Join(", ", candidate.Metadata.Select(x => x.ToString()))}");
     }
 
-    private static void PrintCandidate(in Candidate<GeneticArrayHash> candidate, in StringProperties props)
+    private static void PrintCandidate(in Candidate<GeneticArrayHash> candidate)
     {
         PrintHeader(in candidate);
 
@@ -175,8 +132,12 @@ internal static class AnalysisTest
         Console.WriteLine($"- {nameof(GeneticArrayHash.AvalancheSeed)}: {spec.AvalancheSeed}");
         Console.WriteLine($"- {nameof(GeneticArrayHash.AvalancheIterations)}: {spec.AvalancheIterations}");
 
+        Console.WriteLine($"- Segment: {spec.Segment}");
         Console.WriteLine($"- Mixer: {ExpressionHelper.Print(spec.GetMixer())}");
         Console.WriteLine($"- Avalanche: {ExpressionHelper.Print(spec.GetAvalanche())}");
+
+        Console.WriteLine("#### CODE ####");
+        Console.WriteLine($"- Avalanche: {ExpressionHelper.Print(spec.BuildExpression())}");
     }
 
     private static void PrintCandidate(in Candidate<BruteForceArrayHash> candidate)
@@ -187,7 +148,11 @@ internal static class AnalysisTest
         Console.WriteLine("Hash:");
         Console.WriteLine($"- {nameof(BruteForceArrayHash.Segment)}: {spec.Segment.ToString()}");
 
+        Console.WriteLine($"- Segment: {spec.Segment}");
         Console.WriteLine($"- Mixer: {ExpressionHelper.Print(spec.Mixer)}");
         Console.WriteLine($"- Avalanche: {ExpressionHelper.Print(spec.Avalanche)}");
+
+        Console.WriteLine("#### CODE ####");
+        Console.WriteLine($"- Avalanche: {ExpressionHelper.Print(spec.BuildExpression())}");
     }
 }
