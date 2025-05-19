@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
+using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.Specs.Hash;
 
@@ -9,16 +10,11 @@ public sealed record DefaultStringHash : IExpressionStringHash
     public HashFunc GetHashFunction() => BuildExpression().Compile();
     public Expression<HashFunc> BuildExpression() => ExpressionHashBuilder.BuildFull(Mixer, Avalanche);
 
-    private static Expression Mixer(Expression hash, Expression read)
-    {
-        // (((hash << 5) | (hash >> 27)) + hash) ^ Read(data, offset)
-        BinaryExpression rotated = Expression.Or(Expression.LeftShift(hash, Expression.Constant(5)), Expression.RightShift(hash, Expression.Constant(27)));
-        return Expression.Assign(hash, Expression.ExclusiveOr(Expression.Add(rotated, hash), read));
-    }
+    // (((hash << 5) | (hash >> 27)) + hash) ^ Read(data, offset)
+    private static Expression Mixer(Expression hash, Expression read) =>
+        Assign(hash, ExclusiveOr(Add(Or(LeftShift(hash, Constant(5)), RightShift(hash, Constant(27))), hash), read));
 
-    private static Expression Avalanche(Expression hash)
-    {
-        // 352654597 + (hash * 1566083941)
-        return Expression.Add(Expression.Constant(352654597ul), Expression.Multiply(hash, Expression.Constant(1566083941ul)));
-    }
+    // 352654597 + (hash * 1566083941)
+    private static Expression Avalanche(Expression hash) =>
+        Add(Constant(352654597ul), Multiply(hash, Constant(1566083941ul)));
 }

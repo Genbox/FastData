@@ -1,10 +1,10 @@
-using System.Linq.Expressions;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Analysis.Segments;
 using Genbox.FastData.Specs.Hash;
 using Genbox.FastData.Specs.Misc;
+using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
@@ -94,47 +94,47 @@ internal class BruteForceAnalyzer(string[] data, StringProperties props, BruteFo
 
     private sealed class MixerAdd : SimpleMixerGen
     {
-        protected override Mixer GetOperation() => Expression.Add;
+        protected override Mixer GetOperation() => Add;
     }
 
     private sealed class MixerSubtract : SimpleMixerGen
     {
-        protected override Mixer GetOperation() => Expression.Subtract;
+        protected override Mixer GetOperation() => Subtract;
     }
 
     private sealed class MixerMultiply : SimpleMixerGen
     {
-        protected override Mixer GetOperation() => Expression.Multiply;
+        protected override Mixer GetOperation() => Multiply;
     }
 
     private sealed class MixerXor : SimpleMixerGen
     {
-        protected override Mixer GetOperation() => Expression.ExclusiveOr;
+        protected override Mixer GetOperation() => ExclusiveOr;
     }
 
     private sealed class MixerRotateLeft(int initial, int max) : MixerGen(initial, max)
     {
         protected override Mixer GetOperation(int idx) => (h, r) =>
-            Expression.ExclusiveOr(Expression.Or(Expression.LeftShift(h, Expression.Constant(idx)), Expression.RightShift(h, Expression.Constant(64 - idx))), r);
+            ExclusiveOr(Or(LeftShift(h, Constant(idx)), RightShift(h, Constant(64 - idx))), r);
     }
 
     private sealed class MixerRotateRight(int initial, int max) : MixerGen(initial, max)
     {
         protected override Mixer GetOperation(int idx) => (h, r) =>
-            Expression.ExclusiveOr(Expression.Or(Expression.RightShift(h, Expression.Constant(idx)), Expression.LeftShift(h, Expression.Constant(64 - idx))), r);
+            ExclusiveOr(Or(RightShift(h, Constant(idx)), LeftShift(h, Constant(64 - idx))), r);
     }
 
     private sealed class MixerXorShift(int initial, int max) : MixerGen(initial, max)
     {
         protected override Mixer GetOperation(int idx) => (h, r) =>
-            Expression.ExclusiveOr(Expression.ExclusiveOr(h, Expression.RightShift(h, Expression.Constant(idx))), r);
+            ExclusiveOr(ExclusiveOr(h, RightShift(h, Constant(idx))), r);
     }
 
     private sealed class MixerSquare : SimpleMixerGen
     {
         // h = (1 | h) + h*h  then xor r
         protected override Mixer GetOperation() => (h, r) =>
-            Expression.ExclusiveOr(Expression.Add(Expression.Or(Expression.Constant(1UL), h), Expression.Multiply(h, h)), r);
+            ExclusiveOr(Add(Or(Constant(1UL), h), Multiply(h, h)), r);
     }
 
     private sealed class AvalancheIdentity : IAvalancheGenerator
@@ -151,13 +151,13 @@ internal class BruteForceAnalyzer(string[] data, StringProperties props, BruteFo
     private sealed class AvalancheMultiply(ulong[] seeds) : AvalancheGen(0, seeds.Length - 1)
     {
         protected override Avalanche GetOperation(int idx) => h =>
-            Expression.Multiply(h, Expression.Constant(seeds[idx], typeof(ulong)));
+            Multiply(h, Constant(seeds[idx], typeof(ulong)));
     }
 
     private sealed class AvalancheXorRightShift(int initial, int max) : AvalancheGen(initial, max)
     {
         protected override Avalanche GetOperation(int idx) => h =>
-            Expression.ExclusiveOr(h, Expression.RightShift(h, Expression.Constant(idx)));
+            ExclusiveOr(h, RightShift(h, Constant(idx)));
     }
 
     private static readonly ulong[] Seeds =

@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Genbox.FastData.Specs.Misc;
 using JetBrains.Annotations;
+using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.Specs.Hash;
 
@@ -15,48 +16,48 @@ public static class ExpressionHashBuilder
 {
     public static Expression<HashFunc> BuildFull(Mixer mixer, Avalanche avalanche)
     {
-        ParameterExpression input = Expression.Parameter(typeof(byte).MakeByRefType(), "input");
-        ParameterExpression length = Expression.Parameter(typeof(int), "length");
+        ParameterExpression input = Parameter(typeof(byte).MakeByRefType(), "input");
+        ParameterExpression length = Parameter(typeof(int), "length");
 
-        ParameterExpression offset = Expression.Variable(typeof(int), "offset");
-        ParameterExpression hash = Expression.Variable(typeof(ulong), "hash");
+        ParameterExpression offset = Variable(typeof(int), "offset");
+        ParameterExpression hash = Variable(typeof(ulong), "hash");
         List<Expression> ex = new List<Expression>();
 
         // int offset = 0
-        ex.Add(Expression.Assign(offset, Expression.Constant(0)));
+        ex.Add(Assign(offset, Constant(0)));
 
         // int hash = 352654597U
-        ex.Add(Expression.Assign(hash, Expression.Constant(352654597UL)));
+        ex.Add(Assign(hash, Constant(352654597UL)));
 
         // while (length > 0)
-        LabelTarget breakLabel = Expression.Label();
-        LoopExpression loop = Expression.Loop(
-            Expression.IfThenElse(
-                Expression.GreaterThan(length, Expression.Constant(0)),
-                Expression.Block(
-                    Expression.Assign(hash, mixer(hash, GetReadFunc(input, offset, 1))),
-                    Expression.AddAssign(offset, Expression.Constant(1)),
-                    Expression.SubtractAssign(length, Expression.Constant(1))),
-                Expression.Break(breakLabel)
+        LabelTarget breakLabel = Label();
+        LoopExpression loop = Loop(
+            IfThenElse(
+                GreaterThan(length, Constant(0)),
+                Block(
+                    Assign(hash, mixer(hash, GetReadFunc(input, offset, 1))),
+                    AddAssign(offset, Constant(1)),
+                    SubtractAssign(length, Constant(1))),
+                Break(breakLabel)
             ),
             breakLabel
         );
         ex.Add(loop);
 
         // hash = avalanche(hash);
-        ex.Add(Expression.Assign(hash, avalanche(hash)));
+        ex.Add(Assign(hash, avalanche(hash)));
 
-        UnaryExpression block = Expression.Convert(Expression.Block([offset, hash], ex), typeof(ulong));
-        return Expression.Lambda<HashFunc>(block, input, length);
+        UnaryExpression block = Convert(Block([offset, hash], ex), typeof(ulong));
+        return Lambda<HashFunc>(block, input, length);
     }
 
     public static Expression<HashFunc> Build(StringSegment[] segments, Mixer mixer, Avalanche avalanche)
     {
-        ParameterExpression input = Expression.Parameter(typeof(byte).MakeByRefType(), "input");
-        ParameterExpression length = Expression.Parameter(typeof(int), "length");
+        ParameterExpression input = Parameter(typeof(byte).MakeByRefType(), "input");
+        ParameterExpression length = Parameter(typeof(int), "length");
 
-        ParameterExpression offset = Expression.Variable(typeof(int), "offset");
-        ParameterExpression hash = Expression.Variable(typeof(ulong), "hash");
+        ParameterExpression offset = Variable(typeof(int), "offset");
+        ParameterExpression hash = Variable(typeof(ulong), "hash");
         List<Expression> ex = new List<Expression>();
 
         if (segments.Length == 1 && segments[0].Length == -1)
@@ -68,7 +69,7 @@ public static class ExpressionHashBuilder
             foreach (StringSegment seg in segments)
             {
                 // int offset = <offset>
-                ex.Add(Expression.Assign(offset, Expression.Constant((int)seg.Offset)));
+                ex.Add(Assign(offset, Constant((int)seg.Offset)));
 
                 int rem = seg.Length;
                 while (rem > 0)
@@ -79,34 +80,34 @@ public static class ExpressionHashBuilder
 
                     // Mixer(hash, Read(data, offset))
                     // offset += chunk
-                    ex.Add(Expression.Assign(hash, mixer(hash, GetReadFunc(input, offset, chunk))));
-                    ex.Add(Expression.AddAssign(offset, Expression.Constant(chunk)));
+                    ex.Add(Assign(hash, mixer(hash, GetReadFunc(input, offset, chunk))));
+                    ex.Add(AddAssign(offset, Constant(chunk)));
                     rem -= chunk;
                 }
             }
         }
 
         // hash = avalanche(hash);
-        ex.Add(Expression.Assign(hash, avalanche(hash)));
+        ex.Add(Assign(hash, avalanche(hash)));
 
-        UnaryExpression block = Expression.Convert(Expression.Block([offset, hash], ex), typeof(ulong));
-        return Expression.Lambda<HashFunc>(block, input, length);
+        UnaryExpression block = Convert(Block([offset, hash], ex), typeof(ulong));
+        return Lambda<HashFunc>(block, input, length);
     }
 
     private static void OutputFullHash(List<Expression> ex, StringSegment seg, Expression length, Expression input, Expression hash, Expression offset, Mixer mixer)
     {
         // int offset = <offset>
         // int length -= offset
-        ex.Add(Expression.Assign(offset, Expression.Constant((int)seg.Offset)));
-        ex.Add(Expression.SubtractAssign(length, offset));
+        ex.Add(Assign(offset, Constant((int)seg.Offset)));
+        ex.Add(SubtractAssign(length, offset));
 
         // while (length > 0)
-        LabelTarget breakLabel = Expression.Label();
-        LoopExpression loop = Expression.Loop(
-            Expression.IfThenElse(
-                Expression.GreaterThan(length, Expression.Constant(0)),
+        LabelTarget breakLabel = Label();
+        LoopExpression loop = Loop(
+            IfThenElse(
+                GreaterThan(length, Constant(0)),
                 BuildDynamicChunkBlock(input, offset, length, hash, mixer),
-                Expression.Break(breakLabel)
+                Break(breakLabel)
             ),
             breakLabel
         );
@@ -116,14 +117,14 @@ public static class ExpressionHashBuilder
     private static ConditionalExpression BuildDynamicChunkBlock(Expression data, Expression offset, Expression length, Expression hash, Mixer mixer)
     {
         // Branch for chunk size of 8, 4, 2, 1
-        return Expression.IfThenElse(
-            Expression.GreaterThanOrEqual(length, Expression.Constant(8)),
+        return IfThenElse(
+            GreaterThanOrEqual(length, Constant(8)),
             DynamicChunk(8, data, offset, length, hash, mixer),
-            Expression.IfThenElse(
-                Expression.GreaterThanOrEqual(length, Expression.Constant(4)),
+            IfThenElse(
+                GreaterThanOrEqual(length, Constant(4)),
                 DynamicChunk(4, data, offset, length, hash, mixer),
-                Expression.IfThenElse(
-                    Expression.GreaterThanOrEqual(length, Expression.Constant(2)),
+                IfThenElse(
+                    GreaterThanOrEqual(length, Constant(2)),
                     DynamicChunk(2, data, offset, length, hash, mixer),
                     DynamicChunk(1, data, offset, length, hash, mixer)
                 )
@@ -138,10 +139,10 @@ public static class ExpressionHashBuilder
         // hash = mixer(Read(data, offset))
         // offset += chunk
         // length -= chunk
-        return Expression.Block(
-            Expression.Assign(hash, mixer(hash, readCall)),
-            Expression.AddAssign(offset, Expression.Constant(chunk)),
-            Expression.SubtractAssign(length, Expression.Constant(chunk))
+        return Block(
+            Assign(hash, mixer(hash, readCall)),
+            AddAssign(offset, Constant(chunk)),
+            SubtractAssign(length, Constant(chunk))
         );
     }
 
@@ -162,7 +163,7 @@ public static class ExpressionHashBuilder
             throw new InvalidOperationException("Could not find method");
 
         // Read(data, idx)
-        return Expression.Convert(Expression.Call(readFunc, data, idx), typeof(ulong));
+        return Convert(Call(readFunc, data, idx), typeof(ulong));
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.Members)]
