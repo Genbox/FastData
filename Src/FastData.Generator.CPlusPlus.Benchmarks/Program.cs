@@ -21,7 +21,7 @@ internal static class Program
                       using namespace benchmark;
                       """);
 
-        foreach (ITestData data in TestVectorHelper.GetBenchmarkVectors())
+        foreach (ITestData data in TestVectorHelper.GetBenchmarkData())
         {
             data.Generate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), out GeneratorSpec spec);
 

@@ -12,7 +12,7 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
 {
     [Theory]
     [ClassData(typeof(TestVectorClass))]
-    public void Test<T>(TestData<T> data)
+    public void Test<T>(TestVector<T> data)
     {
         Assert.True(TestVectorHelper.TryGenerate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);

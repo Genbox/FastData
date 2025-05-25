@@ -2,11 +2,11 @@ using Xunit;
 
 namespace Genbox.FastData.InternalShared;
 
-public sealed class TestVectorClass : TheoryData<ITestData>
+public sealed class TestVectorClass : TheoryData<ITestVector>
 {
     public TestVectorClass()
     {
-        foreach (ITestData data in TestVectorHelper.GetTestVectors())
+        foreach (ITestVector data in TestVectorHelper.GetTestVectors())
         {
             Add(data);
         }

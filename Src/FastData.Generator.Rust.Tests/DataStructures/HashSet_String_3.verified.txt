@@ -1,0 +1,65 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashSet
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct MyData;
+
+impl MyData {
+    const BUCKETS: [i8; 3] = [
+        1, 3, 2
+    ];
+
+    const ENTRIES: [E; 3] = [
+        E { hash_code: 17825845005562073391, next: -1, value: "item1" }, E { hash_code: 17825845003995989450, next: -1, value: "item2" }, E { hash_code: 17825845002429905509, next: -1, value: "item3" }
+    ];
+
+    #[inline]
+    unsafe fn get_hash(value: &str) -> u64 {
+        let mut hash: u64 = 352654597;
+
+        let mut ptr = value.as_ptr();
+        let mut len = value.len();
+
+         while len > 0 {
+                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
+                ptr = ptr.add(1);
+                len -= 1;
+         }
+
+        hash.wrapping_mul(1566083941).wrapping_add(352654597)
+    }
+
+    #[must_use]
+    pub fn contains(value: &str) -> bool {
+        if value.len() != 5 as usize {
+            return false;
+        }
+
+        let hash = unsafe { Self::get_hash(value) };
+        let index = hash % 3;
+        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+
+        while i >= 0 {
+            let entry = &Self::ENTRIES[i as usize];
+            if entry.hash_code == hash && entry.value == value {
+                return true;
+            }
+            i = entry.next;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_LENGTH: usize = 5;
+    pub const MAX_LENGTH: usize = 5;
+}
+struct E {
+    hash_code: u64,
+    next: i8,
+    value: &'static str,
+}

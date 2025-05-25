@@ -6,7 +6,7 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class KeyLengthStructure<T>(StructureConfig<T> config) : IStructure<T>
+internal sealed class KeyLengthStructure<T>(StringProperties props) : IStructure<T>
 {
     public bool TryCreate(T[] data, out IContext? context)
     {
@@ -24,7 +24,6 @@ internal sealed class KeyLengthStructure<T>(StructureConfig<T> config) : IStruct
         //idx 2: null
         //idx 3: "aaa", "bbb"
 
-        StringProperties props = config.DataProperties.StringProps!;
         uint minLen = props.LengthData.Min;
         uint maxLen = props.LengthData.Max;
 

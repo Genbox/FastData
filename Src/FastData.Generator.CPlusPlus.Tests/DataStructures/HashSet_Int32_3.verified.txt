@@ -1,0 +1,68 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashSet
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class my_data final
+{
+    struct e
+    {
+        uint64_t hash_code;
+        int8_t next;
+        int32_t value;
+
+        e(const uint64_t hash_code, const int8_t next, const int32_t value)
+           : hash_code(hash_code), next(next), value(value) {}
+    };
+
+    static constexpr std::array<int8_t, 3> buckets = {
+        2, 3, 1
+     };
+
+    inline static const std::array<e, 3> entries = {
+        e(18446744071562067968, -1, std::numeric_limits<int32_t>::lowest()), e(0, -1, 0), e(2147483647, -1, std::numeric_limits<int32_t>::max())
+    };
+
+    static constexpr uint64_t get_hash(const int32_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const int32_t value) noexcept
+    {
+        if (value < std::numeric_limits<int32_t>::lowest() || value > std::numeric_limits<int32_t>::max())
+            return false;
+
+        const uint64_t hash = get_hash(value);
+        const size_t index = hash % 3;
+        int8_t i = buckets[index] - 1;
+
+        while (i >= 0)
+        {
+            const auto& [hash_code, next, value1] = entries[i];
+
+            if (hash_code == hash && value1 == value)
+                return true;
+
+            i = next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr int32_t min_value = std::numeric_limits<int32_t>::lowest();
+    static constexpr int32_t max_value = std::numeric_limits<int32_t>::max();
+
+public:
+    my_data() = delete;
+    my_data(const my_data&) = delete;
+    my_data& operator=(const my_data&) = delete;
+    my_data(my_data&&) = delete;
+    my_data& operator=(my_data&&) = delete;
+};

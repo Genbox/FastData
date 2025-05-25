@@ -95,8 +95,9 @@ public static class FastDataGenerator
                 // For small amounts of data, logic is the fastest, so we try that first
                 yield return new ConditionalStructure<T>();
 
-                // We try key lengths
-                yield return new KeyLengthStructure<T>(cfg);
+                // If it is a string, we try key lengths
+                if (cfg.DataProperties.DataType == DataType.String)
+                    yield return new KeyLengthStructure<T>(cfg.DataProperties.StringProps!);
 
                 // TODO: Attempt perfect hashing
                 // yield return new HashSetPerfectStructure<T>();

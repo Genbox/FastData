@@ -43,7 +43,7 @@ internal static class Program
                       {
                       """);
 
-        foreach (ITestData data in TestVectorHelper.GetBenchmarkVectors())
+        foreach (ITestData data in TestVectorHelper.GetBenchmarkData())
         {
             data.Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), out GeneratorSpec spec);
 

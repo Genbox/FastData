@@ -29,7 +29,7 @@ internal static class Program
 
                       """);
 
-        foreach (ITestData data in TestVectorHelper.GetBenchmarkVectors())
+        foreach (ITestData data in TestVectorHelper.GetBenchmarkData())
         {
             data.Generate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), out GeneratorSpec spec);
 

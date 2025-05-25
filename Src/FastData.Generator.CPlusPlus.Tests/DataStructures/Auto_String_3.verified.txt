@@ -1,0 +1,34 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class my_data final
+{
+public:
+    [[nodiscard]]
+    static bool contains(const std::string_view value) noexcept
+    {
+        if (value.length() != 5u)
+            return false;
+
+        if (value == "item1" || value == "item2" || value == "item3")
+            return true;
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr size_t min_length = 5;
+    static constexpr size_t max_length = 5;
+
+public:
+    my_data() = delete;
+    my_data(const my_data&) = delete;
+    my_data& operator=(const my_data&) = delete;
+    my_data(my_data&&) = delete;
+    my_data& operator=(my_data&&) = delete;
+};

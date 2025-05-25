@@ -9,7 +9,7 @@ public class VectorTests
 {
     [Theory]
     [ClassData(typeof(TestVectorClass))]
-    public void Test<T>(TestData<T> data)
+    public void Test<T>(TestVector<T> data)
     {
         Assert.True(TestVectorHelper.TryGenerate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
