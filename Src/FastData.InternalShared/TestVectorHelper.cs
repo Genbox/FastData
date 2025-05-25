@@ -35,21 +35,12 @@ public static class TestVectorHelper
                 yield return new TestData<long>(type, [long.MinValue]);
                 yield return new TestData<double>(type, [double.MinValue]);
             }
-            else if (type == StructureType.PerfectHashGPerf)
-                yield return new TestData<string>(type, ["item1", "item2", "item3", "item4"]);
-            else if (type == StructureType.HashSetPerfect)
-            {
-                //We omit long types because it has duplicate hash codes for 0/max
-                yield return new TestData<string>(type, ["item1", "item2", "item3"]);
-                yield return new TestData<int>(type, [int.MinValue, 0, int.MaxValue]);
-                yield return new TestData<double>(type, [double.MinValue, (double)0, double.MaxValue]);
-            }
             else
             {
                 yield return new TestData<string>(type, ["item1", "item2", "item3"]);
                 yield return new TestData<int>(type, [int.MinValue, 0, int.MaxValue]);
-                yield return new TestData<long>(type, [long.MinValue, (long)0, long.MaxValue]);
-                yield return new TestData<double>(type, [double.MinValue, (double)0, double.MaxValue]);
+                yield return new TestData<long>(type, [long.MinValue, 0, long.MaxValue]);
+                yield return new TestData<double>(type, [double.MinValue, 0, double.MaxValue]);
             }
         }
     }
@@ -70,19 +61,6 @@ public static class TestVectorHelper
 
                 case StructureType.SingleValue:
                     foreach (ITestData data in GetSingleSets(type))
-                        yield return data;
-
-                    break;
-
-                case StructureType.PerfectHashGPerf:
-                    yield return new TestData<string>(type, ["a", "b"]); //Minimum test case
-                    yield return new TestData<string>(type, ["aaaaaaaaaa", "bbbbbbbbbb", "cccccccccc"]); //Same length (and longer than 1)
-                    yield return new TestData<string>(type, ["item1", "item2", "item3", "item4"]); //Only differ on 1 char
-                    yield return new TestData<string>(type, ["1", "2", "a", "aa", "aaa", "item", new string('a', 255)]); //Test long strings
-                    break;
-
-                case StructureType.HashSetPerfect: //We've kept to a small set since larger ones will just hit timeout
-                    foreach (ITestData data in GetEdgeCaseSets(type))
                         yield return data;
                     break;
 
@@ -120,15 +98,6 @@ public static class TestVectorHelper
                     yield return new TestData<string>(type, Enumerable.Range(0, benchmarkSize).Select(x => new string('a', x)).ToArray());
                     break;
 
-                case StructureType.PerfectHashGPerf:
-                    yield return new TestData<string>(type, Enumerable.Range(0, benchmarkSize).Select(x => "item" + x).ToArray());
-                    break;
-
-                case StructureType.HashSetPerfect:
-                    foreach (ITestData data in GetSetOfSize(type, 10))
-                        yield return data;
-                    break;
-
                 case StructureType.Conditional:
                 case StructureType.BinarySearch:
                 case StructureType.EytzingerSearch:
@@ -148,13 +117,13 @@ public static class TestVectorHelper
     {
         // We want to test a single value too of each type. It should result in a special SingleValue structure.
         yield return new TestData<bool>(type, [true]);
-        yield return new TestData<sbyte>(type, [(sbyte)1]);
-        yield return new TestData<byte>(type, [(byte)1]);
+        yield return new TestData<sbyte>(type, [1]);
+        yield return new TestData<byte>(type, [1]);
         yield return new TestData<char>(type, ['a']);
         yield return new TestData<double>(type, [1.0]);
         yield return new TestData<float>(type, [1f]);
-        yield return new TestData<short>(type, [(short)1]);
-        yield return new TestData<ushort>(type, [(ushort)1]);
+        yield return new TestData<short>(type, [1]);
+        yield return new TestData<ushort>(type, [1]);
         yield return new TestData<int>(type, [1]);
         yield return new TestData<uint>(type, [1U]);
         yield return new TestData<long>(type, [1L]);
@@ -166,15 +135,15 @@ public static class TestVectorHelper
     {
         // We want to test edge values
         yield return new TestData<bool>(type, [true, false]);
-        yield return new TestData<sbyte>(type, [sbyte.MinValue, (sbyte)-1, (sbyte)0, (sbyte)1, sbyte.MaxValue]);
-        yield return new TestData<byte>(type, [(byte)0, (byte)1, byte.MaxValue]);
+        yield return new TestData<sbyte>(type, [sbyte.MinValue, -1, 0, 1, sbyte.MaxValue]);
+        yield return new TestData<byte>(type, [0, 1, byte.MaxValue]);
 
         //We keep it within ASCII range as C#'s char does not translate to other languages
         yield return new TestData<char>(type, ['\0', 'a', (char)127]);
         yield return new TestData<double>(type, [double.MinValue, 0.0, 1.0, double.MaxValue]);
         yield return new TestData<float>(type, [float.MinValue, -1f, 0f, 1f, float.MaxValue]);
-        yield return new TestData<short>(type, [short.MinValue, (short)-1, (short)0, (short)1, short.MaxValue]);
-        yield return new TestData<ushort>(type, [(ushort)0, (ushort)1, (ushort)2, ushort.MaxValue]);
+        yield return new TestData<short>(type, [short.MinValue, -1, 0, 1, short.MaxValue]);
+        yield return new TestData<ushort>(type, [0, 1, 2, ushort.MaxValue]);
         yield return new TestData<int>(type, [int.MinValue, -1, 0, 1, int.MaxValue]);
         yield return new TestData<uint>(type, [0U, 1U, 2U, uint.MaxValue]);
 

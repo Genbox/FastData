@@ -16,7 +16,7 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, CSharp
               {
           {{GetEarlyExits()}}
 
-                  ulong hash = Mixer(Hash(value) ^ {{ctx.Seed}});
+                  ulong hash = Hash(value);
                   uint index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                   ref E entry = ref _entries[index];
 
@@ -24,17 +24,6 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, CSharp
               }
 
           {{GetHashSource()}}
-
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                private static ulong Mixer(ulong h)
-                {
-                    h ^= h >> 33;
-                    h *= 0xFF51AFD7ED558CCD;
-                    h ^= h >> 33;
-                    h *= 0xC4CEB9FE1A85EC53;
-                    h ^= h >> 33;
-                    return h;
-                }
 
               [StructLayout(LayoutKind.Auto)]
               private struct E

@@ -1,3 +1,4 @@
+using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
@@ -8,13 +9,15 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Mutation;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Reinsertion;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Termination;
+using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Analysis.SegmentGenerators;
+using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
-using Genbox.FastData.Specs.Hash;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed class GeneticAnalyzer(GeneticAnalyzerConfig config, Simulator simulator) : IHashAnalyzer<GeneticStringHash>
+internal sealed class GeneticAnalyzer(StringProperties props, GeneticAnalyzerConfig config, Simulator sim) : IStringHashAnalyzer
 {
     /*
      This is a genetic algorithm that determines the best configuration from a random population, that via evolution is biased
@@ -78,19 +81,22 @@ internal sealed class GeneticAnalyzer(GeneticAnalyzerConfig config, Simulator si
       of extra buckets (overhead) that we are willing to tolerate.
   */
 
-    public Candidate<GeneticStringHash> Run()
+    public bool IsAppropriate(StringProperties props) => true;
+
+    public IEnumerable<Candidate> GetCandidates()
     {
-        //Map needed properties
         GeneticEngineConfig cfg = new GeneticEngineConfig();
         cfg.PopulationSize = config.PopulationSize;
         cfg.ShuffleParents = config.ShuffleParents;
 
+        ArraySegment[] segments = SegmentManager.Generate(props).ToArray();
+
         GeneticEngine engine = new GeneticEngine(cfg, [
+            new ArraySegmentGene(nameof(GeneticStringHash.Segment), segments),
             new IntGene(nameof(GeneticStringHash.MixerSeed), 1, 0, 100),
-            new IntGene(nameof(GeneticStringHash.MixerIterations), 1, 0, 10),
+            new IntGene(nameof(GeneticStringHash.MixerIterations), 1, 0, 3),
             new IntGene(nameof(GeneticStringHash.AvalancheSeed), 1, 0, 100),
-            new IntGene(nameof(GeneticStringHash.AvalancheIterations), 1, 0, 10),
-            new StringSegmentGene(nameof(GeneticStringHash.Segments), [new StringSegment(0, -1, Alignment.Left)]) //TODO: Get segments
+            new IntGene(nameof(GeneticStringHash.AvalancheIterations), 1, 0, 3)
         ]);
 
         DefaultRandom random = new DefaultRandom(config.RandomSeed);
@@ -103,38 +109,33 @@ internal sealed class GeneticAnalyzer(GeneticAnalyzerConfig config, Simulator si
 
         Entity best = engine.Evolve(Simulation, selection, crossOver, mutation, reinsertion, termination, random);
 
-        //Copy genes to a GeneticHashSpec
-        GeneticStringHash spec = CopyGenes(ref best);
+        //Copy genes to a GeneticArrayHash
+        GeneticStringHash stringHash = CopyGenes(ref best);
 
         //Copy results to a candidate
-        Candidate<GeneticStringHash> cand = new Candidate<GeneticStringHash>(spec);
-        cand.Fitness = best.Fitness;
-        return cand;
+        yield return sim.Run(stringHash);
     }
 
     private void Simulation(ref Entity entity)
     {
-        //Convert entity to GeneticHashSpec
+        //Convert entity to GeneticArrayHash
         GeneticStringHash spec = CopyGenes(ref entity);
 
         //Run the simulation
-        Candidate<GeneticStringHash> cand = new Candidate<GeneticStringHash>(spec);
-        simulator.Run(ref cand);
-
-        //Copy over metadata
-        entity.Metadata = cand.Metadata;
+        Candidate candidate = sim.Run(spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));
 
         //Copy over the fitness value
-        entity.Fitness = cand.Fitness;
+        entity.Fitness = candidate.Fitness;
     }
 
     private static GeneticStringHash CopyGenes(ref Entity entity)
     {
         return new GeneticStringHash(
-            ((IntGene)entity.Genes[0]).Value,
+            ((ArraySegmentGene)entity.Genes[0]).Value,
             ((IntGene)entity.Genes[1]).Value,
             ((IntGene)entity.Genes[2]).Value,
             ((IntGene)entity.Genes[3]).Value,
-            ((StringSegmentGene)entity.Genes[4]).Value);
+            ((IntGene)entity.Genes[4]).Value
+        );
     }
 }

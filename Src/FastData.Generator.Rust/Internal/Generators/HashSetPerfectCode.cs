@@ -22,19 +22,10 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, Genera
 
                  {{GetHashSource()}}
 
-                     fn murmur_32(mut h: u32) -> u32 {
-                         h ^= h >> 16;
-                         h = h.wrapping_mul(0x85EB_CA6B);
-                         h ^= h >> 13;
-                         h = h.wrapping_mul(0xC2B2_AE35);
-                         h ^= h >> 16;
-                         h
-                     }
-
                      #[must_use]
                      {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
                  {{GetEarlyExits()}}
-                         let hash = Self::murmur_32(unsafe { Self::get_hash(value) } ^ {{ctx.Seed}});
+                         let hash = unsafe { Self::get_hash(value) };
                          let index = ({{GetModFunction("hash", (ulong)ctx.Data.Length)}}) as usize;
                          let entry = &Self::ENTRIES[index];
 

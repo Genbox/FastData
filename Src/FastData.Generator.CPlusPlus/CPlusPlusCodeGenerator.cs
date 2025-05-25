@@ -74,7 +74,6 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         BinarySearchContext<T> x => new BinarySearchCode<T>(x),
         ConditionalContext<T> x => new ConditionalCode<T>(x),
         EytzingerSearchContext<T> x => new EytzingerSearchCode<T>(x),
-        PerfectHashGPerfContext x => new PerfectHashGPerfCode<T>(x, genCfg),
         HashSetChainContext<T> x => new HashSetChainCode<T>(x),
         HashSetLinearContext<T> x => new HashSetLinearCode<T>(x),
         HashSetPerfectContext<T> x => new HashSetPerfectCode<T>(x),

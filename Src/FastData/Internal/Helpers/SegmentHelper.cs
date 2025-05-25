@@ -1,12 +1,12 @@
 using System.Text;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Internal.Helpers;
 
 internal static class SegmentHelper
 {
     /// <summary>Inserts [ and ] around the segment of a string. Used for debugging</summary>
-    internal static string InsertSegmentBounds(string input, in StringSegment segment)
+    internal static string InsertSegmentBounds(string input, in ArraySegment segment)
     {
         StringBuilder sb = new StringBuilder(input);
         ConvertToOffsets(input.Length, in segment, out int start, out int end);
@@ -16,7 +16,7 @@ internal static class SegmentHelper
         return sb.ToString();
     }
 
-    internal static void ConvertToOffsets(int strLen, in StringSegment segment, out int start, out int end)
+    internal static void ConvertToOffsets(int strLen, in ArraySegment segment, out int start, out int end)
     {
         if (segment.Alignment == Alignment.Left)
         {
@@ -32,13 +32,13 @@ internal static class SegmentHelper
             throw new InvalidOperationException("Invalid alignment");
     }
 
-    internal static ReadOnlySpan<char> GetSpan(in StringSegment segment, string input)
+    internal static ReadOnlySpan<char> GetSpan(in ArraySegment segment, string input)
     {
         ConvertToOffsets(input.Length, segment, out int start, out int end);
         return input.AsSpan(start, end - start);
     }
 
-    internal static string Print(StringSegment[] segments)
+    internal static string Print(ArraySegment[] segments)
     {
         return string.Join(", ", segments.Select(x => x.ToString()));
     }

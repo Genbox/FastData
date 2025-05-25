@@ -1,8 +1,8 @@
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Analysis.Segments;
+using Genbox.FastData.Internal.Analysis.SegmentGenerators;
 using Genbox.FastData.InternalShared;
-using Genbox.FastData.Specs.Misc;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
@@ -17,14 +17,14 @@ public class SegmentGeneratorsBenchmarks
     private readonly OffsetGenerator _ofGen = new OffsetGenerator();
 
     [Benchmark]
-    public StringSegment[] BruteForceGenerator() => _bfGen.Generate(_props).ToArray();
+    public ArraySegment[] BruteForceGenerator() => _bfGen.Generate(_props).ToArray();
 
     [Benchmark]
-    public StringSegment[] EdgeGramGenerator() => _egGen.Generate(_props).ToArray();
+    public ArraySegment[] EdgeGramGenerator() => _egGen.Generate(_props).ToArray();
 
     [Benchmark]
-    public StringSegment[] DeltaGenerator() => _deltaGen.Generate(_props).ToArray();
+    public ArraySegment[] DeltaGenerator() => _deltaGen.Generate(_props).ToArray();
 
     [Benchmark]
-    public StringSegment[] OffsetGenerator() => _ofGen.Generate(_props).ToArray();
+    public ArraySegment[] OffsetGenerator() => _ofGen.Generate(_props).ToArray();
 }

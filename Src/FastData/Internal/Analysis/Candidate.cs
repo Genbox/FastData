@@ -2,12 +2,12 @@ using Genbox.FastData.Abstracts;
 
 namespace Genbox.FastData.Internal.Analysis;
 
-internal sealed class Candidate<T> where T : IStringHash
+internal sealed class Candidate(IStringHash stringHash, double fitness, int collisions)
 {
-    internal T Spec { get; set; }
-    internal double Fitness { get; set; } = 0;
-    internal readonly Dictionary<string, object> Metadata = [];
+    internal double Fitness { get; } = fitness;
+    internal int Collisions { get; } = collisions;
+    internal double Time { get; set; }
 
-    public Candidate(T spec) => Spec = spec;
-    public Candidate() { }
+    internal IStringHash StringHash { get; } = stringHash;
+    internal readonly Dictionary<string, object> Metadata = [];
 }

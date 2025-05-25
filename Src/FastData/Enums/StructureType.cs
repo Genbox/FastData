@@ -16,8 +16,6 @@ public enum StructureType : byte
     EytzingerSearch,
 
     // O(1) data structures
-    PerfectHashGPerf,
-    HashSetPerfect,
     HashSetChain,
     HashSetLinear,
 

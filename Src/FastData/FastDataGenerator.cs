@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
@@ -7,8 +9,7 @@ using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
-using Genbox.FastData.Specs;
-using Genbox.FastData.Specs.Hash;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData;
 
@@ -40,7 +41,7 @@ public static class FastDataGenerator
         foreach (T val in data)
         {
             if (!uniq.Add(val))
-                throw new InvalidOperationException("Duplicate data found: " + val);
+                throw new InvalidOperationException($"Duplicate data found: {val}");
         }
 
         DataProperties<T> props = DataProperties<T>.Create(data);
@@ -50,7 +51,7 @@ public static class FastDataGenerator
 
         IStringHash? spec = null;
         if (data is string[] stringArr)
-            spec = analysisEnabled ? GetHashSpec(stringArr, props) : new DefaultStringHash(generator.UseUTF16Encoding);
+            spec = analysisEnabled ? GetBestHash(stringArr, props.StringProps!, fdCfg.SimulatorConfig) : new DefaultStringHash();
 
         HashFunc<T> hashFunc;
 
@@ -98,6 +99,7 @@ public static class FastDataGenerator
                 yield return new KeyLengthStructure<T>(cfg);
 
                 // TODO: Attempt perfect hashing
+                // yield return new HashSetPerfectStructure<T>();
 
                 if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
                     yield return new BinarySearchStructure<T>(cfg);
@@ -115,10 +117,6 @@ public static class FastDataGenerator
             yield return new BinarySearchStructure<T>(cfg);
         else if (ds == StructureType.EytzingerSearch)
             yield return new EytzingerSearchStructure<T>(cfg);
-        else if (ds == StructureType.PerfectHashGPerf)
-            yield return new PerfectHashGPerfStructure<T>(cfg);
-        else if (ds == StructureType.HashSetPerfect)
-            yield return new HashSetPerfectStructure<T>();
         else if (ds == StructureType.HashSetChain)
             yield return new HashSetChainStructure<T>();
         else if (ds == StructureType.HashSetLinear)
@@ -129,21 +127,107 @@ public static class FastDataGenerator
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
 
-    private static IStringHash GetHashSpec<T>(string[] data, DataProperties<T> props)
+    private static IStringHash GetBestHash(string[] data, StringProperties props, SimulatorConfig simConf)
     {
+        Simulator sim = new Simulator(data, simConf);
+
         //Run each of the analyzers
-        Simulator simulator = new Simulator(data, new SimulatorConfig());
-        BruteForceAnalyzer bf = new BruteForceAnalyzer(props.StringProps!, new BruteForceAnalyzerConfig(), simulator);
-        Candidate<BruteForceStringHash> bfCand = bf.Run();
+        List<Candidate> candidates = new List<Candidate>();
 
-        GeneticAnalyzer ga = new GeneticAnalyzer(new GeneticAnalyzerConfig(), simulator);
-        Candidate<GeneticStringHash> gaCand = ga.Run();
+        BruteForceAnalyzer bf = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), sim);
+        if (bf.IsAppropriate(props))
+            candidates.AddRange(bf.GetCandidates());
 
-        HeuristicAnalyzer ha = new HeuristicAnalyzer(data, props.StringProps!, new HeuristicAnalyzerConfig(), simulator);
-        Candidate<HeuristicStringHash> haCand = ha.Run();
+        GeneticAnalyzer ga = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), sim);
+        if (ga.IsAppropriate(props))
+            candidates.AddRange(ga.GetCandidates());
 
-        //Select the spec with the best fitness
-        return bfCand.Fitness >= gaCand.Fitness ? bfCand.Fitness >= haCand.Fitness ? bfCand.Spec : haCand.Spec :
-            gaCand.Fitness >= haCand.Fitness ? gaCand.Spec : haCand.Spec;
+        GPerfAnalyzer ha = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(), sim);
+        if (ha.IsAppropriate(props))
+            candidates.AddRange(ha.GetCandidates());
+
+        //Split candidates into perfect and not perfect
+        List<Candidate> perfect = new List<Candidate>();
+        List<Candidate> notPerfect = new List<Candidate>();
+
+        foreach (Candidate candidate in candidates)
+        {
+            if (candidate.Collisions == 0)
+                perfect.Add(candidate);
+            else
+                notPerfect.Add(candidate);
+        }
+
+        //Sort both on fitness
+        perfect.Sort(static (a, b) => a.Fitness.CompareTo(b.Fitness));
+        notPerfect.Sort(static (a, b) => a.Fitness.CompareTo(b.Fitness));
+
+        //We start with the perfect results (if any)
+        if (perfect.Count > 0)
+        {
+            foreach (Candidate candidate in perfect)
+                Benchmark(data, candidate);
+
+            //Sort by time
+            perfect.Sort(static (a, b) => a.Time.CompareTo(b.Time));
+
+            //Take the first non-perfect candidate (highest fitness) and benchmark it too
+            if (notPerfect.Count > 0)
+            {
+                Candidate np = notPerfect[0];
+                Benchmark(data, np);
+
+                //If the perfect is faster, we use that one.
+                Candidate p = perfect[0];
+
+                if (p.Time <= np.Time)
+                    return p.StringHash;
+
+                //If the not-perfect is faster, it has to be so by x% before we pick it over a perfect hash.
+                //E.g. we still want the perfect, even if it is x% slower
+
+                double threshold = p.Time + (p.Time * 0.25);
+
+                if (np.Time < threshold)
+                    return np.StringHash;
+
+                return p.StringHash;
+            }
+        }
+
+        //If there are no perfect candidates, we benchmark 10 candidates and return the fastest.
+        for (int i = 0; i < 10; i++)
+            Benchmark(data, notPerfect[i]);
+
+        notPerfect.Sort(static (a, b) => a.Time.CompareTo(b.Time));
+        return notPerfect[0].StringHash;
+    }
+
+    private static void Benchmark(string[] data, Candidate candidate)
+    {
+        //The candidate has already been benchmarked. Do nothing.
+        if (candidate.Time >= double.Epsilon)
+            return;
+
+        HashFunc<string> func = candidate.StringHash.GetHashFunction();
+
+        //Warmup
+        for (int i = 0; i < 10; i++)
+        {
+            foreach (string s in data)
+                func(s);
+        }
+
+        Stopwatch sw = new Stopwatch();
+
+        for (int i = 0; i < 10; i++)
+        {
+            foreach (string s in data)
+                func(s);
+        }
+
+        sw.Stop();
+
+        candidate.Time = sw.ElapsedTicks / 10.0;
     }
 }

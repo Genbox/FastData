@@ -1,6 +1,9 @@
 using System.Text;
+using Genbox.FastData.Abstracts;
+using Genbox.FastData.Configs;
+using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared;
 
@@ -33,18 +36,13 @@ internal static class GPerfTest
             Console.SetOut(tw);
 
             string[] data = File.ReadAllLines(file);
+            StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-            StructureConfig<string> cfg = new StructureConfig<string>(DataProperties<string>.Create(data));
-            PerfectHashGPerfStructure<string> code = new PerfectHashGPerfStructure<string>(cfg);
+            GPerfAnalyzer analyzer = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(), new Simulator(data, new SimulatorConfig()));
+            Candidate hashFunc = analyzer.GetCandidates().First();
 
-            try
-            {
-                code.TryCreate(data, out _);
-            }
-            catch
-            {
-                // Console.WriteLine("Error");
-            }
+            HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>();
+            structure.TryCreate(data, hashFunc.StringHash.GetHashFunction(), out IContext? context);
         }
 
         Console.SetOut(org);
