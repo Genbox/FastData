@@ -45,11 +45,11 @@ public static class TestVectorHelper
         if (vector.Type == typeof(SingleValueStructure<>))
             structure = new SingleValueStructure<T>();
         else if (vector.Type == typeof(BinarySearchStructure<>))
-            structure = new BinarySearchStructure<T>(new StructureConfig<T>(props));
+            structure = new BinarySearchStructure<T>(props.DataType, StringComparison.Ordinal);
         else if (vector.Type == typeof(ConditionalStructure<>))
             structure = new ConditionalStructure<T>();
         else if (vector.Type == typeof(EytzingerSearchStructure<>))
-            structure = new EytzingerSearchStructure<T>(new StructureConfig<T>(props));
+            structure = new EytzingerSearchStructure<T>(props.DataType, StringComparison.Ordinal);
         else if (vector.Type == typeof(HashSetChainStructure<>))
             structure = new HashSetChainStructure<T>();
         else if (vector.Type == typeof(HashSetPerfectStructure<>))

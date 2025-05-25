@@ -2,11 +2,11 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Contexts;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Misc;
+using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class BinarySearchStructure<T>(StructureConfig<T> config) : IStructure<T>
+internal sealed class BinarySearchStructure<T>(DataType dataType, StringComparison comparison) : IStructure<T>
 {
     public bool TryCreate(T[] data, out IContext? context)
     {
@@ -14,8 +14,8 @@ internal sealed class BinarySearchStructure<T>(StructureConfig<T> config) : IStr
         T[] copy = new T[data.Length];
         data.CopyTo(copy, 0);
 
-        if (config.DataProperties.DataType == DataType.String)
-            Array.Sort(copy, config.GetStringComparer());
+        if (dataType == DataType.String)
+            Array.Sort(copy, StringHelper.GetStringComparer(comparison));
         else
             Array.Sort(copy);
 

@@ -1,12 +1,8 @@
-using Genbox.FastData.Internal.Analysis.Properties;
+namespace Genbox.FastData.Internal.Helpers;
 
-namespace Genbox.FastData.Internal.Misc;
-
-internal sealed class StructureConfig<T>(DataProperties<T> dataProperties, StringComparison comparison = StringComparison.Ordinal)
+internal static class StringHelper
 {
-    public DataProperties<T> DataProperties { get; } = dataProperties;
-
-    internal StringComparer GetStringComparer() => comparison switch
+    internal static StringComparer GetStringComparer(StringComparison comparison) => comparison switch
     {
         StringComparison.CurrentCulture => StringComparer.CurrentCulture,
         StringComparison.CurrentCultureIgnoreCase => StringComparer.CurrentCultureIgnoreCase,

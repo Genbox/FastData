@@ -45,7 +45,6 @@ public static class FastDataGenerator
         }
 
         DataProperties<T> props = DataProperties<T>.Create(data);
-        StructureConfig<T> strCfg = new StructureConfig<T>(props, fdCfg.StringComparison);
 
         bool analysisEnabled = false;
 
@@ -63,7 +62,7 @@ public static class FastDataGenerator
 
         IContext? context = null;
 
-        foreach (object candidate in GetDataStructureCandidates(data, fdCfg, strCfg))
+        foreach (object candidate in GetDataStructureCandidates(data, fdCfg, props))
         {
             if (candidate is IHashStructure<T> hs)
             {
@@ -82,7 +81,7 @@ public static class FastDataGenerator
         return generator.TryGenerate(genCfg, context, out source);
     }
 
-    private static IEnumerable<object> GetDataStructureCandidates<T>(T[] data, FastDataConfig config, StructureConfig<T> cfg)
+    private static IEnumerable<object> GetDataStructureCandidates<T>(T[] data, FastDataConfig config, DataProperties<T> props)
     {
         StructureType ds = config.StructureType;
 
@@ -96,14 +95,14 @@ public static class FastDataGenerator
                 yield return new ConditionalStructure<T>();
 
                 // If it is a string, we try key lengths
-                if (cfg.DataProperties.DataType == DataType.String)
-                    yield return new KeyLengthStructure<T>(cfg.DataProperties.StringProps!);
+                if (props.DataType == DataType.String)
+                    yield return new KeyLengthStructure<T>(props.StringProps!);
 
                 // TODO: Attempt perfect hashing
                 // yield return new HashSetPerfectStructure<T>();
 
                 if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
-                    yield return new BinarySearchStructure<T>(cfg);
+                    yield return new BinarySearchStructure<T>(props.DataType, config.StringComparison);
                 else
                     yield return new HashSetChainStructure<T>();
             }
@@ -113,7 +112,7 @@ public static class FastDataGenerator
         else if (ds == StructureType.Conditional)
             yield return new ConditionalStructure<T>();
         else if (ds == StructureType.BinarySearch)
-            yield return new BinarySearchStructure<T>(cfg);
+            yield return new BinarySearchStructure<T>(props.DataType, config.StringComparison);
         else if (ds == StructureType.HashSet)
             yield return new HashSetChainStructure<T>();
         else
