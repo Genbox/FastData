@@ -107,22 +107,14 @@ public static class FastDataGenerator
                     yield return new HashSetChainStructure<T>();
             }
         }
-        else if (ds == StructureType.SingleValue)
-            yield return new SingleValueStructure<T>();
         else if (ds == StructureType.Array)
             yield return new ArrayStructure<T>();
         else if (ds == StructureType.Conditional)
             yield return new ConditionalStructure<T>();
         else if (ds == StructureType.BinarySearch)
             yield return new BinarySearchStructure<T>(cfg);
-        else if (ds == StructureType.EytzingerSearch)
-            yield return new EytzingerSearchStructure<T>(cfg);
-        else if (ds == StructureType.HashSetChain)
+        else if (ds == StructureType.HashSet)
             yield return new HashSetChainStructure<T>();
-        else if (ds == StructureType.HashSetLinear)
-            yield return new HashSetLinearStructure<T>();
-        else if (ds == StructureType.KeyLength)
-            yield return new KeyLengthStructure<T>(cfg);
         else
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }

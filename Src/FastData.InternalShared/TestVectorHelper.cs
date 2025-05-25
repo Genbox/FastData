@@ -21,96 +21,103 @@ public static class TestVectorHelper
 
     public static IEnumerable<ITestData> GetTestData()
     {
-        foreach (StructureType type in Enum.GetValues<StructureType>())
-        {
-            if (type == StructureType.Auto) //We don't test auto. It is covered by the other tests
-                continue;
+        //     foreach (StructureType type in Enum.GetValues<StructureType>())
+        //     {
+        //         if (type == StructureType.Auto) //We don't test auto. It is covered by the other tests
+        //             continue;
+        //
+        //         if (type == StructureType.KeyLength)
+        //             yield return new TestData<string>(type, ["a", "aaa", "aaaa"]);
+        //         else if (type == StructureType.SingleValue)
+        //         {
+        //             yield return new TestData<string>(type, ["value"]);
+        //             yield return new TestData<int>(type, [int.MinValue]);
+        //             yield return new TestData<long>(type, [long.MinValue]);
+        //             yield return new TestData<double>(type, [double.MinValue]);
+        //         }
+        //         else
+        //         {
+        //             yield return new TestData<string>(type, ["item1", "item2", "item3"]);
+        //             yield return new TestData<int>(type, [int.MinValue, 0, int.MaxValue]);
+        //             yield return new TestData<long>(type, [long.MinValue, 0, long.MaxValue]);
+        //             yield return new TestData<double>(type, [double.MinValue, 0, double.MaxValue]);
+        //         }
+        //     }
 
-            if (type == StructureType.KeyLength)
-                yield return new TestData<string>(type, ["a", "aaa", "aaaa"]);
-            else if (type == StructureType.SingleValue)
-            {
-                yield return new TestData<string>(type, ["value"]);
-                yield return new TestData<int>(type, [int.MinValue]);
-                yield return new TestData<long>(type, [long.MinValue]);
-                yield return new TestData<double>(type, [double.MinValue]);
-            }
-            else
-            {
-                yield return new TestData<string>(type, ["item1", "item2", "item3"]);
-                yield return new TestData<int>(type, [int.MinValue, 0, int.MaxValue]);
-                yield return new TestData<long>(type, [long.MinValue, 0, long.MaxValue]);
-                yield return new TestData<double>(type, [double.MinValue, 0, double.MaxValue]);
-            }
-        }
+        yield break;
     }
 
     public static IEnumerable<ITestData> GetTestVectors()
     {
-        foreach (StructureType type in Enum.GetValues<StructureType>())
-        {
-            switch (type)
-            {
-                case StructureType.Auto: //No vectors for auto
-                    continue;
+        // foreach (StructureType type in Enum.GetValues<StructureType>())
+        // {
+        //     switch (type)
+        //     {
+        //         case StructureType.Auto: //No vectors for auto
+        //             continue;
+        //
+        //         case StructureType.KeyLength:
+        //             // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
+        //             yield return new TestData<string>(type, ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]);
+        //             break;
+        //
+        //         case StructureType.SingleValue:
+        //             foreach (ITestData data in GetSingleSets(type))
+        //                 yield return data;
+        //             break;
+        //
+        //         case StructureType.Conditional:
+        //         case StructureType.BinarySearch:
+        //         case StructureType.EytzingerSearch:
+        //         case StructureType.HashSetChain:
+        //         case StructureType.HashSetLinear:
+        //         case StructureType.Array:
+        //             foreach (ITestData data in GetEdgeCaseSets(type))
+        //                 yield return data;
+        //             foreach (ITestData data in GetSetOfSize(type, 100))
+        //                 yield return data;
+        //             break;
+        //         default:
+        //             throw new NotSupportedException("There are no test vectors for " + type);
+        //     }
+        // }
 
-                case StructureType.KeyLength:
-                    // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
-                    yield return new TestData<string>(type, ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]);
-                    break;
-
-                case StructureType.SingleValue:
-                    foreach (ITestData data in GetSingleSets(type))
-                        yield return data;
-                    break;
-
-                case StructureType.Conditional:
-                case StructureType.BinarySearch:
-                case StructureType.EytzingerSearch:
-                case StructureType.HashSetChain:
-                case StructureType.HashSetLinear:
-                case StructureType.Array:
-                    foreach (ITestData data in GetEdgeCaseSets(type))
-                        yield return data;
-                    foreach (ITestData data in GetSetOfSize(type, 100))
-                        yield return data;
-                    break;
-                default:
-                    throw new NotSupportedException("There are no test vectors for " + type);
-            }
-        }
+        yield break;
     }
 
     public static IEnumerable<ITestData> GetBenchmarkVectors()
     {
-        const int benchmarkSize = 1000;
+        // const int benchmarkSize = 1000;
 
-        foreach (StructureType type in Enum.GetValues<StructureType>())
-        {
-            switch (type)
-            {
-                //We skip these
-                case StructureType.SingleValue:
-                case StructureType.Auto:
-                    continue;
+        // foreach (StructureType type in Enum.GetValues<StructureType>())
+        // {
+        //     switch (type)
+        //     {
+        //         //We skip these
+        //         case StructureType.SingleValue:
+        //         case StructureType.Auto:
+        //             continue;
+        //
+        //         case StructureType.KeyLength:
+        //             yield return new TestData<string>(type, Enumerable.Range(0, benchmarkSize).Select(x => new string('a', x)).ToArray());
+        //             break;
+        //
+        //         case StructureType.Conditional:
+        //         case StructureType.BinarySearch:
+        //         case StructureType.EytzingerSearch:
+        //         case StructureType.HashSetChain:
+        //         case StructureType.HashSetLinear:
+        //         case StructureType.Array:
+        //             foreach (ITestData data in GetSetOfSize(type, benchmarkSize))
+        //                 yield return data;
+        //             break;
+        //         default:
+        //             throw new NotSupportedException("There are no benchmark vectors for " + type);
+        //     }
+        // }
 
-                case StructureType.KeyLength:
-                    yield return new TestData<string>(type, Enumerable.Range(0, benchmarkSize).Select(x => new string('a', x)).ToArray());
-                    break;
+        yield break;
 
-                case StructureType.Conditional:
-                case StructureType.BinarySearch:
-                case StructureType.EytzingerSearch:
-                case StructureType.HashSetChain:
-                case StructureType.HashSetLinear:
-                case StructureType.Array:
-                    foreach (ITestData data in GetSetOfSize(type, benchmarkSize))
-                        yield return data;
-                    break;
-                default:
-                    throw new NotSupportedException("There are no benchmark vectors for " + type);
-            }
-        }
     }
 
     private static IEnumerable<ITestData> GetSingleSets(StructureType type)

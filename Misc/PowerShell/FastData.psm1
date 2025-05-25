@@ -5,7 +5,7 @@ function Invoke-FastData
         [string]$OutputFile,
         [ValidateSet("bool", "char", "double", "int16", "int32", "int64", "int8", "single", "string", "uint16", "uint32", "uint64", "uint8")]
         [string]$DataType = "string",
-        [ValidateSet("Array", "Auto", "BinarySearch", "Conditional", "EytzingerSearch", "HashSetChain", "HashSetLinear", "KeyLength", "PerfectHashBruteForce", "PerfectHashGPerf", "SingleValue")]
+        [ValidateSet("Array", "Auto", "BinarySearch", "Conditional", "HashSet")]
         [string]$StructureType = "Auto",
         [Parameter(Mandatory = $true)] [string]$InputFile,
         [string]$Namespace,
