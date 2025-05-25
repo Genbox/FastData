@@ -22,5 +22,5 @@ public class AnalyzerBenchmarks
     }
 
     [Benchmark]
-    public object HeuristicAnalyzer() => _analyzer.GetCandidates();
+    public object GPerfAnalyzer() => _analyzer.GetCandidates();
 }
