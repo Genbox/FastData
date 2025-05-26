@@ -30,7 +30,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 /// <summary>Finds the least number of positions in a string that hashes to a unique value for all inputs.</summary>
 internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyzerConfig config, Simulator sim) : IStringHashAnalyzer
 {
-    public bool IsAppropriate(StringProperties props) => props.CharacterData.AllAscii;
+    public bool IsAppropriate() => props.CharacterData.AllAscii;
 
     [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
     public IEnumerable<Candidate> GetCandidates()
@@ -82,7 +82,7 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
         // Set unused asso[c] to maxHash + 1.
         // This is not necessary but speeds up the lookup function in many cases of lookup failure:
         // no string comparison is needed once the hash value of a string is larger than the hash value of any keyword.
-        table.MaxHash = keywords[keywords.Count - 1].HashValue; //TODO: Make maxhash local?
+        table.MaxHash = keywords[keywords.Count - 1].HashValue;
 
         for (int i = 0; i < alphaSize; i++)
         {
@@ -115,7 +115,6 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
 #endif
 
         // We convert keywords to KeyValuePair to keep Keyword internal
-        //TODO orderby might not be needed
         GPerfStringHash stringHash = new GPerfStringHash(table.Values, alphaInc, positions.OrderByDescending(x => x).ToArray(), props.LengthData.Min);
         yield return sim.Run(stringHash);
     }
@@ -444,7 +443,7 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
             // Look which alphaInc[i] we are free to increment
             List<int> indices = new List<int>();
 
-            foreach (int keyPos in positions.OrderByDescending(x => x)) //TODO Might not be nessecary
+            foreach (int keyPos in positions.OrderByDescending(x => x))
             {
                 if (keyPos >= maxKeyLen || keyPos == -1)
                     continue;
@@ -1142,7 +1141,7 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
             Span<char> keySet = stackalloc char[positions.Length];
 
             int ptr = 0;
-            foreach (int i in positions.OrderBy(x => x)) //TODO: Order might not be nessecary
+            foreach (int i in positions.OrderBy(x => x))
             {
                 if (i >= AllChars.Length)
                     continue;

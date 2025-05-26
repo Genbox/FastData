@@ -81,7 +81,7 @@ internal sealed class GeneticAnalyzer(StringProperties props, GeneticAnalyzerCon
       of extra buckets (overhead) that we are willing to tolerate.
   */
 
-    public bool IsAppropriate(StringProperties props) => true;
+    public bool IsAppropriate() => true;
 
     public IEnumerable<Candidate> GetCandidates()
     {

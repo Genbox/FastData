@@ -127,15 +127,15 @@ public static class FastDataGenerator
         List<Candidate> candidates = new List<Candidate>();
 
         BruteForceAnalyzer bf = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), sim);
-        if (bf.IsAppropriate(props))
+        if (bf.IsAppropriate())
             candidates.AddRange(bf.GetCandidates());
 
         GeneticAnalyzer ga = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), sim);
-        if (ga.IsAppropriate(props))
+        if (ga.IsAppropriate())
             candidates.AddRange(ga.GetCandidates());
 
         GPerfAnalyzer ha = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(), sim);
-        if (ha.IsAppropriate(props))
+        if (ha.IsAppropriate())
             candidates.AddRange(ha.GetCandidates());
 
         //Split candidates into perfect and not perfect

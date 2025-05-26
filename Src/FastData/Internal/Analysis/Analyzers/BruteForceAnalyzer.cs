@@ -1,6 +1,7 @@
 using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Analysis.SegmentGenerators;
 using Genbox.FastData.Internal.Helpers;
@@ -35,16 +36,16 @@ internal class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConf
         new AvalancheXorRightShift(12, 36)
     ];
 
-    public bool IsAppropriate(StringProperties props) => true; //TODO: Not appropriate when there is a lot of items
+    public bool IsAppropriate() => true; //TODO: Not appropriate when there is a lot of items
 
     public IEnumerable<Candidate> GetCandidates()
     {
+        MinHeap<Candidate> heap = new MinHeap<Candidate>(config.MaxReturned);
         BruteForceStringHash spec = new BruteForceStringHash();
         BruteForceGenerator segGen = new BruteForceGenerator();
         ArraySegment[] segments = segGen.Generate(props).ToArray();
 
         int leftAttempts = config.MaxAttempts;
-        int leftReturned = config.MaxReturned;
         foreach (ArraySegment segment in segments)
         {
             spec.Segment = segment;
@@ -70,20 +71,17 @@ internal class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConf
                             Candidate current = sim.Run(spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));
 
                             if (current.Fitness >= config.MinFitness)
-                            {
-                                yield return current;
-
-                                if (leftReturned-- == 0)
-                                    yield break;
-                            }
+                                heap.Add(current.Fitness, current);
 
                             if (leftAttempts-- == 0)
-                                yield break;
+                                return [];
                         }
                     }
                 }
             }
         }
+
+        return heap.Values;
     }
 
     private sealed class MixerIdentity : SimpleMixerGen

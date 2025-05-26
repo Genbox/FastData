@@ -22,7 +22,7 @@ internal class CPlusPlusHashDef : IHashDef
         if (dataType == DataType.String)
         {
             return """
-                           {uint64_t hash = 352654597;
+                           uint64_t hash = 352654597;
 
                            const char* ptr = value.data();
                            size_t len = value.size();
