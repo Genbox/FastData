@@ -5,6 +5,7 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Reinsertion;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Termination;
 using Genbox.FastData.Internal.Misc;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Genbox.FastData.Testbed.Tests;
 
@@ -16,7 +17,7 @@ internal static class GeneticEngineTest
             new IntGene("test", -1, -1000, 1000),
             new IntGene("test2", 42, -1000, 1000),
             new IntGene("test2", 99, -1000, 1000)
-        ]);
+        ], NullLogger.Instance);
 
         DefaultRandom random = new DefaultRandom();
 
@@ -26,7 +27,7 @@ internal static class GeneticEngineTest
             new UniformMutation(0.05, random),
             new EliteReinsertion(0.2),
             new FitnessThresholdTermination(1),
-            random);
+            random).First();
 
         Console.WriteLine("Result: " + entity.Fitness);
         Console.WriteLine("Gene0: " + ((IntGene)entity.Genes[0]).Value);

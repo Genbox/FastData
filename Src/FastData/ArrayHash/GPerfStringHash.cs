@@ -7,9 +7,22 @@ using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.ArrayHash;
 
-public sealed record GPerfStringHash(int[] AssociationValues, int[] AlphaIncrements, int[] Positions, uint MinLen) : IStringHash
+public sealed record GPerfStringHash : IStringHash
 {
-    private Expression<HashFunc<string>>? _expression;
+    private Expression<HashFunc<string>>? _expression; //We cache the expression because it does not change
+
+    internal GPerfStringHash(int[] associationValues, int[] alphaIncrements, int[] positions, uint minLen)
+    {
+        AssociationValues = associationValues;
+        AlphaIncrements = alphaIncrements;
+        Positions = positions;
+        MinLen = minLen;
+    }
+
+    public int[] AssociationValues { get; }
+    public int[] AlphaIncrements { get; }
+    public int[] Positions { get; }
+    public uint MinLen { get; }
 
     public HashFunc<string> GetHashFunction() => GetExpression().Compile();
     public Expression<HashFunc<string>> GetExpression() => _expression ??= CreateExpression();

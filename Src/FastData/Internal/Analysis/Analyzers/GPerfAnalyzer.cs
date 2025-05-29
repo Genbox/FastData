@@ -1,11 +1,11 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Text;
 using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using static Genbox.FastData.Internal.Helpers.DebugHelper;
+using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
@@ -28,7 +28,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
  */
 
 /// <summary>Finds the least number of positions in a string that hashes to a unique value for all inputs.</summary>
-internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyzerConfig config, Simulator sim) : IStringHashAnalyzer
+internal sealed partial class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyzerConfig config, Simulator sim, ILogger<GPerfAnalyzer> logger) : IStringHashAnalyzer
 {
     public bool IsAppropriate() => props.CharacterData.AllAscii;
 
@@ -41,6 +41,7 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
 
         // Step1: Find positions
         int[] positions = GetPositions();
+        LogPositions(logger, string.Join(", ", positions));
 
         // If we didn't get any positions, we don't want to move any further
         if (positions.Length == 0)
@@ -55,12 +56,18 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
         // Step 2: Find good alpha increments
         int[] alphaInc = FindAlphaIncrements(keywords, maxLen, positions);
         int alphaSize = ComputeAlphaSize(alphaInc);
+        LogAlphaPositions(logger, alphaSize, string.Join(", ", alphaInc));
 
         // Step 3: Finding good association table values
-        AssociationTable table = new AssociationTable();
+        AssociationTable table = new AssociationTable(logger);
 
         if (!table.TryFindGoodValues(keywords, positions, alphaInc, alphaSize))
+        {
+            LogUnableToFindAsso(logger);
             yield break;
+        }
+
+        LogAsso(logger, string.Join(", ", table.Values));
 
 #if DEBUG
 
@@ -82,41 +89,53 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
         // Set unused asso[c] to maxHash + 1.
         // This is not necessary but speeds up the lookup function in many cases of lookup failure:
         // no string comparison is needed once the hash value of a string is larger than the hash value of any keyword.
-        table.MaxHash = keywords[keywords.Count - 1].HashValue;
+        int maxHash = keywords[keywords.Count - 1].HashValue;
+
+        LogMaxHash(logger, maxHash);
 
         for (int i = 0; i < alphaSize; i++)
         {
             if (table.Occurrences[i] == 0)
-                table.Values[i] = table.MaxHash + 1;
+                table.Values[i] = maxHash + 1;
         }
 
-#if DebugPrint
-        Print("\ndumping occurrence and associated values tables");
+#if DEBUG
+        if (logger.IsEnabled(LogLevel.Trace))
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("\ndumping occurrence and associated values tables");
 
-        for (int i = 0; i < alphaSize; i++)
-            if (table.Occurrences[i] != 0)
-                Print($"asso_values[{(char)i}] = {table.Values[i],6}, occurrences[{(char)i}] = {table.Occurrences[i],6}");
+            for (int i = 0; i < alphaSize; i++)
+                if (table.Occurrences[i] != 0)
+                    sb.AppendLine($"asso_values[{(char)i}] = {table.Values[i],6}, occurrences[{(char)i}] = {table.Occurrences[i],6}");
 
-        Print("end table dumping");
+            sb.AppendLine("end table dumping");
 
-        Print("\nDumping key list information:\n" +
-              $"total non-static linked keywords = {keywords.Count}\n" +
-              $"total keywords = {keywords.Count}\n" +
-              "total duplicates = 0\n" +
-              $"maximum key length = {maxLen}");
+            sb.AppendLine("\nDumping key list information:\n" +
+                          $"total non-static linked keywords = {keywords.Count}\n" +
+                          $"total keywords = {keywords.Count}\n" +
+                          "total duplicates = 0\n" +
+                          $"maximum key length = {maxLen}");
 
-        Print("\nList contents are:\n(hash value, key length, index, selchars, keyword):");
-        int field_width = keywords.Max(x => x.SelChars.Length);
+            sb.AppendLine("\nList contents are:\n(hash value, key length, index, selchars, keyword):");
+            int field_width = keywords.Max(x => x.SelChars.Length);
 
-        foreach (Keyword keyword in keywords)
-            Print($"{keyword.HashValue,11},{keyword.AllChars.Length,11},{"-1",6}, {keyword.SelChars.PadLeft(field_width)}, {keyword.AllChars}");
+            foreach (Keyword keyword in keywords)
+                sb.AppendLine($"{keyword.HashValue,11},{keyword.AllChars.Length,11},{"-1",6}, {keyword.SelChars.PadLeft(field_width)}, {keyword.AllChars}");
 
-        Print("End dumping list.\n");
+            sb.AppendLine("End dumping list.\n");
+
+            LogGPerfDebug(logger, sb.ToString());
+        }
 #endif
 
         // We convert keywords to KeyValuePair to keep Keyword internal
         GPerfStringHash stringHash = new GPerfStringHash(table.Values, alphaInc, positions.OrderByDescending(x => x).ToArray(), props.LengthData.Min);
-        yield return sim.Run(stringHash);
+
+        Candidate candidate = sim.Run(stringHash);
+        LogCandidate(logger, candidate.Fitness, candidate.Collisions);
+
+        yield return candidate;
     }
 
     private int[] GetPositions()
@@ -338,21 +357,21 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
 
     private uint GetCollisions(DirectMap map) => _emulator.GetCollisions(map.Positions);
 
-    [Conditional("DebugPrint")]
     private void PrintMap(string stage, DirectMap map)
     {
-        Console.Write($"{stage} ({GetCollisions(map)}): ");
+        StringBuilder sb = new StringBuilder();
+        sb.Append($"{stage} ({GetCollisions(map)}): ");
         bool lastChar = false;
         bool first = true;
         foreach (int i in map.Positions)
         {
             if (!first)
-                Console.Write(", ");
+                sb.Append(", ");
             if (i == -1)
                 lastChar = true;
             else
             {
-                Console.Write(i);
+                sb.Append(i);
                 first = false;
             }
         }
@@ -360,10 +379,12 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
         if (lastChar)
         {
             if (!first)
-                Console.Write(", ");
-            Console.Write("$");
+                sb.Append(", ");
+            sb.Append('$');
         }
-        Console.WriteLine();
+        sb.AppendLine();
+
+        LogGPerfDebug(logger, sb.ToString());
     }
 
     private sealed class DirectMap
@@ -429,14 +450,14 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
     }
 
     [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
-    private static int[] FindAlphaIncrements(List<Keyword> keywords, int maxKeyLen, int[] positions)
+    private int[] FindAlphaIncrements(List<Keyword> keywords, int maxKeyLen, int[] positions)
     {
         uint duplicatesGoal = CountDuplicates(keywords, positions);
-        Print("duplicates_goal: " + duplicatesGoal);
+        LogGPerfDebug(logger, "duplicates_goal: " + duplicatesGoal);
 
         int[] alphaInc = new int[maxKeyLen];
         uint duplicatesCurrent = CountDuplicates(keywords, positions, alphaInc);
-        Print("current_duplicates_count: " + duplicatesCurrent);
+        LogGPerfDebug(logger, "current_duplicates_count: " + duplicatesCurrent);
 
         if (duplicatesCurrent > duplicatesGoal)
         {
@@ -451,7 +472,7 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
                 indices.Add(keyPos);
             }
 
-            Print("nindices: " + indices.Count);
+            LogGPerfDebug(logger, "nindices: " + indices.Count);
 
             // Perform several rounds of searching for a good alpha increment.
             // Each round reduces the number of artificial collisions by adding an increment in a single key position.
@@ -470,7 +491,7 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
                         alphaInc.CopyTo(attempt, 0);
                         attempt[indices[j]] += inc;
                         uint tryDuplicatesCount = CountDuplicates(keywords, positions, attempt);
-                        Print("try_duplicates_count: " + tryDuplicatesCount);
+                        LogGPerfDebug(logger, "try_duplicates_count: " + tryDuplicatesCount);
 
                         // We prefer 'try' to 'best' if it produces fewer duplicates.
                         if (tryDuplicatesCount < bestDuplicatesCount)
@@ -485,25 +506,32 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
                     {
                         best.CopyTo(alphaInc, 0);
                         duplicatesCurrent = bestDuplicatesCount;
-                        Print("new best: " + duplicatesCurrent);
+                        LogGPerfDebug(logger, "new best: " + duplicatesCurrent);
                         break;
                     }
                 }
             } while (duplicatesCurrent > duplicatesGoal);
 
-#if DebugPrint
-            Console.Write("\nComputed alpha increments: ");
-            bool first = true;
-            for (int j = indices.Count; j-- > 0;)
-                if (alphaInc[indices[j]] != 0)
+            if (logger.IsEnabled(LogLevel.Trace))
+            {
+                LogGPerfDebug(logger, "\nComputed alpha increments: ");
+                bool first = true;
+
+                StringBuilder sb = new StringBuilder();
+                for (int j = indices.Count; j-- > 0;)
                 {
-                    if (!first)
-                        Console.Write(", ");
-                    Console.Write($"{indices[j] + 1}:+{alphaInc[indices[j]]}");
-                    first = false;
+                    if (alphaInc[indices[j]] != 0)
+                    {
+                        if (!first)
+                            sb.Append(", ");
+                        sb.Append($"{indices[j] + 1}:+{alphaInc[indices[j]]}");
+                        first = false;
+                    }
                 }
-            Console.WriteLine();
-#endif
+
+                sb.AppendLine();
+                LogGPerfDebug(logger, sb.ToString());
+            }
         }
 
         return alphaInc;
@@ -557,7 +585,7 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
         return sum;
     }
 
-    private sealed class AssociationTable
+    private sealed class AssociationTable(ILogger logger)
     {
         internal int[] Values { get; set; }
         internal int MaxHash { get; set; }
@@ -575,8 +603,6 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
             // Compute the maximum SelChars.Length over all keywords.
             int maxSelCharsLength = keywords.Max(x => x.SelChars.Length);
 
-            // Console.WriteLine("_max_selchars_length: " + maxSelCharsLength);
-
             int totalDuplicates = 0;
 
             // Make a hash set for efficiency.
@@ -591,7 +617,7 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
             // Exit program if duplicates exists and option[DUP] not set, since we don't want to continue in this case.
             if (totalDuplicates > 0)
             {
-                Print($"{totalDuplicates} input keys have identical hash values");
+                LogGPerfDebug(logger, $"{totalDuplicates} input keys have identical hash values");
                 return false;
             }
 
@@ -626,20 +652,26 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
             MaxHash = (assoValueMax - 1) * maxSelCharsLength;
 
             // Allocate a sparse bit vector for detection of collisions of hash values.
-            CollisionDetector = new BoolArray(MaxHash + 1);
+            CollisionDetector = new BoolArray(MaxHash + 1, logger);
 
-#if DebugPrint
-            Console.WriteLine($"total non-linked keys = {keywords.Count}" +
+#if DEBUG
+            if (logger.IsEnabled(LogLevel.Trace))
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"total non-linked keys = {keywords.Count}" +
                               $"\nmaximum associated value is {assoValueMax}" +
                               $"\nmaximum size of generated hash table is {MaxHash}");
 
-            Console.WriteLine("\ndumping the keyword list without duplicates");
-            Console.WriteLine("keyword #, keysig, keyword");
+                sb.AppendLine("\ndumping the keyword list without duplicates");
+                sb.AppendLine("keyword #, keysig, keyword");
 
-            int field_width = keywords.Max(x => x.SelChars.Length);
-            int i = 0;
-            foreach (Keyword keyword in keywords)
-                Console.WriteLine($"{++i,9}, {keyword.SelChars.PadLeft(field_width)}, {keyword.AllChars}");
+                int field_width = keywords.Max(x => x.SelChars.Length);
+                int i = 0;
+                foreach (Keyword keyword in keywords)
+                    sb.AppendLine($"{++i,9}, {keyword.SelChars.PadLeft(field_width)}, {keyword.AllChars}");
+
+                LogGPerfDebug(logger, sb.ToString());
+            }
 #endif
 
             FindAssoValues(keywords, assoValueMax, 5, maxSelCharsLength, alphaSize);
@@ -740,28 +772,34 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
                 step.ChangingCount = changing_count;
                 step.AssoValueMax = assoValueMax;
 
-#if DebugPrint
+#if DEBUG
                 step.ExpectedLower = Math.Exp((double)bestPossibleCollisions / MaxHash);
                 step.ExpectedUpper = Math.Exp((double)bestPossibleCollisions / assoValueMax);
 #endif
+
                 step._next = steps;
                 steps = step;
             }
 
-#if DebugPrint
-            uint stepNum = 0;
-            for (Step? step = steps; step != null; step = step._next)
+#if DEBUG
+            if (logger.IsEnabled(LogLevel.Trace))
             {
-                stepNum++;
-                Console.WriteLine($"Step {stepNum} chooses _asso_values[{string.Join(",", step.Changing.Select(x => "'" + (char)x + "'"))}], expected number of iterations between {step.ExpectedLower:F6} and {step.ExpectedUpper:F6}.");
-
-                Console.WriteLine("Keyword equivalence classes:");
-                for (EquivalenceClass? cls = step.Partition; cls != null; cls = cls.Next)
+                StringBuilder sb = new StringBuilder();
+                uint stepNum = 0;
+                for (Step? step = steps; step != null; step = step._next)
                 {
-                    foreach (Keyword keyword in cls.Keywords)
-                        Console.WriteLine("  " + keyword.AllChars);
+                    stepNum++;
+                    sb.AppendLine($"Step {stepNum} chooses _asso_values[{string.Join(",", step.Changing.Select(x => "'" + (char)x + "'"))}], expected number of iterations between {step.ExpectedLower:F6} and {step.ExpectedUpper:F6}.");
+                    sb.AppendLine("Keyword equivalence classes:");
+                    for (EquivalenceClass? cls = step.Partition; cls != null; cls = cls.Next)
+                    {
+                        foreach (Keyword keyword in cls.Keywords)
+                            sb.AppendLine("  " + keyword.AllChars);
+                    }
+                    sb.AppendLine();
                 }
-                Console.WriteLine();
+
+                LogGPerfDebug(logger, sb.ToString());
             }
 #endif
 
@@ -898,7 +936,7 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
                                 MaxHash = (assoValueMax - 1) * maxSelCharsLength;
 
                                 // Reinitialize CollisionDetector.
-                                CollisionDetector = new BoolArray(MaxHash + 1);
+                                CollisionDetector = new BoolArray(MaxHash + 1, logger);
                             }
                         }
                     }
@@ -910,9 +948,7 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
                     foundNext: ;
                 }
 
-#if DebugPrint
-                Console.WriteLine($"Step {stepNo} chose _asso_values[{string.Join(",", step.Changing.Select(x => "'" + (char)x + "'"))}] in {iterations} iterations.");
-#endif
+                LogGPerfDebug(logger, $"Step {stepNo} chose _asso_values[{string.Join(",", step.Changing.Select(x => "'" + (char)x + "'"))}] in {iterations} iterations.");
             }
         }
 
@@ -1047,13 +1083,10 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
         private readonly uint[] _storageArray;
         private uint _iterationNumber = 1;
 
-        public BoolArray(int size)
+        public BoolArray(int size, ILogger logger)
         {
             _storageArray = new uint[size];
-
-#if DebugPrint
-            Console.WriteLine($"\nbool array size = {size}, total bytes = {size * sizeof(uint)}");
-#endif
+            LogGPerfDebug(logger, $"\nbool array size = {size}, total bytes = {size * sizeof(uint)}");
         }
 
         public bool SetBit(int index)
@@ -1110,7 +1143,9 @@ internal class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyze
         // The characters whose values will be determined after this step.
         public bool[] Undetermined;
 
-#if DebugPrint
+#if DEBUG
+
+        // These two are only used for debug printing
         public double ExpectedLower;
         public double ExpectedUpper;
 #endif

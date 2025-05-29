@@ -1,6 +1,5 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.Framework;
 using Xunit.Abstractions;
 
 namespace Genbox.FastData.InternalShared;

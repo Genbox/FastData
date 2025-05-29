@@ -7,13 +7,9 @@ using Genbox.FastData.Misc;
 using JetBrains.Annotations;
 using static System.Linq.Expressions.Expression;
 
-namespace Genbox.FastData.ArrayHash;
+namespace Genbox.FastData.Internal.Analysis.Misc;
 
-public delegate Expression Mixer(Expression hash, Expression readFunc);
-
-public delegate Expression Avalanche(Expression hash);
-
-public static class ExpressionHashBuilder
+internal static class ExpressionHashBuilder
 {
     public static Expression<HashFunc<string>> BuildFull(Mixer mixer, Avalanche avalanche)
     {

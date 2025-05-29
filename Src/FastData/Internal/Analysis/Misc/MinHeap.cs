@@ -7,29 +7,42 @@ namespace Genbox.FastData.Internal.Analysis.Misc;
 public class MinHeap<T>(int capacity)
 {
     private readonly int _capacity = capacity;
-    private readonly double[] _keys = new double[capacity];
-    private readonly T[] _values = new T[capacity];
+    private readonly (double, T)[] _items = new (double, T)[capacity];
     private int _count;
+    private double _best = double.MinValue;
 
     /// <summary>
     /// Adds a new value-item pair. If capacity not reached, inserts and restores heap.
     /// If full and value &gt; root, replaces root and restores heap.
     /// </summary>
-    public void Add(double value, T item)
+    /// <returns>True if the value was better than the best in the heap, otherwise false</returns>
+    public bool Add(double key, T value)
     {
         if (_count < _capacity)
         {
-            _keys[_count] = value;
-            _values[_count] = item;
+            _items[_count] = (key, value);
             MoveUp(_count);
             _count++;
+
+            if (key > _best)
+            {
+                _best = key;
+                return true;
+            }
         }
-        else if (value > _keys[0])
+        else if (key > _items[0].Item1)
         {
-            _keys[0] = value;
-            _values[0] = item;
+            _items[0] = (key, value);
             MoveDown(0);
+
+            if (key > _best)
+            {
+                _best = key;
+                return true;
+            }
         }
+
+        return false;
     }
 
     private void MoveUp(int i)
@@ -37,7 +50,10 @@ public class MinHeap<T>(int capacity)
         while (i > 0)
         {
             int parent = (i - 1) / 2;
-            if (_keys[i] >= _keys[parent]) break;
+
+            if (_items[i].Item1 >= _items[parent].Item1)
+                break;
+
             Swap(i, parent);
             i = parent;
         }
@@ -51,11 +67,12 @@ public class MinHeap<T>(int capacity)
             int right = (2 * i) + 2;
             int smallest = i;
 
-            if (left < _count && _keys[left] < _keys[smallest])
+            if (left < _count && _items[left].Item1 < _items[smallest].Item1)
                 smallest = left;
-            if (right < _count && _keys[right] < _keys[smallest])
+            if (right < _count && _items[right].Item1 < _items[smallest].Item1)
                 smallest = right;
-            if (smallest == i) break;
+            if (smallest == i)
+                break;
 
             Swap(i, smallest);
             i = smallest;
@@ -64,32 +81,20 @@ public class MinHeap<T>(int capacity)
 
     private void Swap(int i, int j)
     {
-        (_keys[i], _keys[j]) = (_keys[j], _keys[i]);
-        (_values[i], _values[j]) = (_values[j], _values[i]);
+        (_items[i], _items[j]) = (_items[j], _items[i]);
     }
 
-    public IEnumerable<double> Keys
+    public IEnumerable<(double, T)> Items
     {
         get
         {
             for (int i = 0; i < _count; i++)
-                yield return _keys[i];
-        }
-    }
-
-    public IEnumerable<T> Values
-    {
-        get
-        {
-            for (int i = 0; i < _count; i++)
-                yield return _values[i];
+                yield return _items[i];
         }
     }
 
     public void Clear()
     {
-        Array.Clear(_keys, 0, _count);
-        Array.Clear(_values, 0, _count);
         _count = 0;
     }
 }

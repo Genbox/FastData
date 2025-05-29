@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Misc;
 using static System.Linq.Expressions.Expression;
 using static Genbox.FastData.Internal.Helpers.ExpressionHelper;
@@ -8,12 +9,25 @@ using static Genbox.FastData.Internal.Helpers.ExpressionHelper;
 namespace Genbox.FastData.ArrayHash;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
-public sealed record GeneticStringHash(ArraySegment Segment, int MixerSeed, int MixerIterations, int AvalancheSeed, int AvalancheIterations) : IStringHash
+public sealed record GeneticStringHash : IStringHash
 {
-    private Expression<HashFunc<string>>? _expression;
+    internal GeneticStringHash(ArraySegment segment, int mixerSeed, int mixerIterations, int avalancheSeed, int avalancheIterations)
+    {
+        Segment = segment;
+        MixerSeed = mixerSeed;
+        MixerIterations = mixerIterations;
+        AvalancheSeed = avalancheSeed;
+        AvalancheIterations = avalancheIterations;
+    }
+
+    public ArraySegment Segment { get; }
+    public int MixerSeed { get; }
+    public int MixerIterations { get; }
+    public int AvalancheSeed { get; }
+    public int AvalancheIterations { get; }
 
     public HashFunc<string> GetHashFunction() => GetExpression().Compile();
-    public Expression<HashFunc<string>> GetExpression() => _expression ??= ExpressionHashBuilder.Build([Segment], GetMixer(), GetAvalanche());
+    public Expression<HashFunc<string>> GetExpression() => ExpressionHashBuilder.Build([Segment], GetMixer(), GetAvalanche());
 
     private Mixer GetMixer() => (hash, read) =>
     {

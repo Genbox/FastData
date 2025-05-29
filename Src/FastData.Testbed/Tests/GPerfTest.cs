@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
@@ -6,11 +7,17 @@ using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Serilog;
+using Serilog.Configuration;
+using Serilog.Core;
+using Serilog.Extensions.Logging;
 
 namespace Genbox.FastData.Testbed.Tests;
 
 /// <summary>
-/// This code enables verification of FastData against GPerf. When DebugPrint is enabled and a special version of GPerf is run on the same files, it should give the same
+/// This code enables verification of FastData against GPerf. When Trace logging is enabled and a special version of GPerf is run on the same files, it should give the same
 /// console text
 /// </summary>
 internal static class GPerfTest
@@ -19,7 +26,9 @@ internal static class GPerfTest
 
     public static void ProduceOutputs(string path)
     {
-        TextWriter org = Console.Out;
+        LoggerSinkConfiguration baseConf = new LoggerConfiguration()
+                                           .MinimumLevel.Verbose()
+                                           .WriteTo;
 
         foreach (string file in Directory.GetFiles(path))
         {
@@ -30,22 +39,20 @@ internal static class GPerfTest
             options.Access = FileAccess.Write;
             options.Mode = FileMode.Create;
 
-            using TextWriter tw = new StreamWriter(Path.Combine(path, "fastdata", Path.GetFileNameWithoutExtension(file) + ".output"), Encoding.Latin1, options);
-            tw.NewLine = "\n";
+            string logFile = Path.Combine(path, "fastdata", Path.GetFileNameWithoutExtension(file) + ".output");
 
-            Console.SetOut(tw);
+            Logger serilog = baseConf.File(logFile, formatProvider: CultureInfo.InvariantCulture).CreateLogger();
+            using SerilogLoggerFactory factory = new SerilogLoggerFactory(serilog);
 
             string[] data = File.ReadAllLines(file);
             StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-            GPerfAnalyzer analyzer = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(), new Simulator(data, new SimulatorConfig()));
+            GPerfAnalyzer analyzer = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(), new Simulator(data, new SimulatorConfig()), factory.CreateLogger<GPerfAnalyzer>());
             Candidate hashFunc = analyzer.GetCandidates().First();
 
             HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>();
             structure.TryCreate(data, hashFunc.StringHash.GetHashFunction(), out IContext? context);
         }
-
-        Console.SetOut(org);
     }
 
     public static void MakeTestFiles(string path)

@@ -6,11 +6,12 @@ using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Analysis.SegmentGenerators;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Misc;
+using Microsoft.Extensions.Logging;
 using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConfig config, Simulator sim) : IStringHashAnalyzer
+internal sealed partial class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConfig config, Simulator sim, ILogger<BruteForceAnalyzer> logger) : IStringHashAnalyzer
 {
     // This brute-forces all combinations of string segments with all possible mixer and avalanche functions.
     // Its initial state is the smallest/fastest in the hope we can reach an optimal state fast.
@@ -36,13 +37,13 @@ internal class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConf
         new AvalancheXorRightShift(12, 36)
     ];
 
-    public bool IsAppropriate() => true; //TODO: Not appropriate when there is a lot of items
+    public bool IsAppropriate() => true;
 
     public IEnumerable<Candidate> GetCandidates()
     {
         MinHeap<Candidate> heap = new MinHeap<Candidate>(config.MaxReturned);
         BruteForceStringHash spec = new BruteForceStringHash();
-        BruteForceGenerator segGen = new BruteForceGenerator();
+        BruteForceGenerator segGen = new BruteForceGenerator(8);
         ArraySegment[] segments = segGen.Generate(props).ToArray();
 
         int leftAttempts = config.MaxAttempts;
@@ -58,6 +59,7 @@ internal class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConf
                 while (mixGen.TryGet(out Mixer mixer))
                 {
                     spec.Mixer = mixer;
+                    LogMixer(logger, ExpressionHelper.Print(mixer));
 
                     // for each mixer, try every avalanche
                     foreach (IAvalancheGenerator avGen in _avalanchers)
@@ -67,11 +69,12 @@ internal class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConf
                         while (avGen.TryGet(out Avalanche avalanche))
                         {
                             spec.Avalanche = avalanche;
+                            LogAvalanche(logger, ExpressionHelper.Print(avalanche));
 
                             Candidate current = sim.Run(spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));
 
-                            if (current.Fitness >= config.MinFitness)
-                                heap.Add(current.Fitness, current);
+                            if (heap.Add(current.Fitness, current))
+                                LogBetterCandidate(logger, current.Fitness, current.Collisions, ExpressionHelper.Print(mixer), ExpressionHelper.Print(avalanche));
 
                             if (leftAttempts-- == 0)
                                 return [];
@@ -81,7 +84,7 @@ internal class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConf
             }
         }
 
-        return heap.Values;
+        return heap.Items.Select(x => x.Item2);
     }
 
     private sealed class MixerIdentity : SimpleMixerGen

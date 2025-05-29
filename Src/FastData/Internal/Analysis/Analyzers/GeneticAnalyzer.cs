@@ -14,10 +14,11 @@ using Genbox.FastData.Internal.Analysis.SegmentGenerators;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Misc;
+using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed class GeneticAnalyzer(StringProperties props, GeneticAnalyzerConfig config, Simulator sim) : IStringHashAnalyzer
+internal sealed partial class GeneticAnalyzer(StringProperties props, GeneticAnalyzerConfig config, Simulator sim, ILogger<GeneticAnalyzer> logger) : IStringHashAnalyzer
 {
     /*
      This is a genetic algorithm that determines the best configuration from a random population, that via evolution is biased
@@ -90,6 +91,7 @@ internal sealed class GeneticAnalyzer(StringProperties props, GeneticAnalyzerCon
         cfg.ShuffleParents = config.ShuffleParents;
 
         ArraySegment[] segments = SegmentManager.Generate(props).ToArray();
+        LogSegmentCount(logger, segments.Length);
 
         GeneticEngine engine = new GeneticEngine(cfg, [
             new ArraySegmentGene(nameof(GeneticStringHash.Segment), segments),
@@ -97,7 +99,7 @@ internal sealed class GeneticAnalyzer(StringProperties props, GeneticAnalyzerCon
             new IntGene(nameof(GeneticStringHash.MixerIterations), 1, 0, 3),
             new IntGene(nameof(GeneticStringHash.AvalancheSeed), 1, 0, 100),
             new IntGene(nameof(GeneticStringHash.AvalancheIterations), 1, 0, 3)
-        ]);
+        ], logger);
 
         DefaultRandom random = new DefaultRandom(config.RandomSeed);
 
@@ -105,15 +107,15 @@ internal sealed class GeneticAnalyzer(StringProperties props, GeneticAnalyzerCon
         ICrossOver crossOver = new OnePointCrossOver(random);
         IMutation mutation = new UniformMutation(0.05, random);
         IReinsertion reinsertion = new EliteReinsertion(0.1);
-        ITermination termination = new MaxGenerationsTermination(100);
+        ITermination termination = new MaxGenerationsTermination(config.MaxGenerations);
 
-        Entity best = engine.Evolve(Simulation, selection, crossOver, mutation, reinsertion, termination, random);
+        foreach (Entity entity in engine.Evolve(Simulation, selection, crossOver, mutation, reinsertion, termination, random))
+        {
+            Entity localEntity = entity;
+            GeneticStringHash hash = CopyGenes(ref localEntity);
 
-        //Copy genes to a GeneticArrayHash
-        GeneticStringHash stringHash = CopyGenes(ref best);
-
-        //Copy results to a candidate
-        yield return sim.Run(stringHash);
+            yield return new Candidate(hash, entity.Fitness, (int)entity.Tag);
+        }
     }
 
     private void Simulation(ref Entity entity)
@@ -126,6 +128,7 @@ internal sealed class GeneticAnalyzer(StringProperties props, GeneticAnalyzerCon
 
         //Copy over the fitness value
         entity.Fitness = candidate.Fitness;
+        entity.Tag = candidate.Collisions; //We cache collisions here and pull it out later
     }
 
     private static GeneticStringHash CopyGenes(ref Entity entity)

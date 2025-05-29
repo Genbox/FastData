@@ -14,8 +14,8 @@ public static class GeneratorTest
         string[] data = ["cake", "fish", "horse", "internet", "word", "what"];
         StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-        TestGenerators(data, props, new BruteForceGenerator());
-        TestGenerators(data, props, new EdgeGramGenerator());
+        TestGenerators(data, props, new BruteForceGenerator(8));
+        TestGenerators(data, props, new EdgeGramGenerator(8));
         TestGenerators(data, props, new OffsetGenerator());
         TestGenerators(data, props, new DeltaGenerator());
     }

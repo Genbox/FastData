@@ -12,4 +12,11 @@
     <ProjectReference Include="..\FastData\FastData.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AgileObjects.ReadableExpressions" />
+    <PackageReference Include="Serilog.Expressions" />
+    <PackageReference Include="Serilog.Extensions.Logging" />
+    <PackageReference Include="Serilog.Sinks.File" />
+  </ItemGroup>
+
 </Project>

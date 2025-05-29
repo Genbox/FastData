@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using Genbox.FastData.ArrayHash;
+using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Internal.Helpers;
 

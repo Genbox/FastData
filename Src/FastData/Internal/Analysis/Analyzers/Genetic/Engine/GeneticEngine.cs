@@ -2,12 +2,13 @@ using System.Diagnostics;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Abstracts;
+using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Extensions;
-using static Genbox.FastData.Internal.Helpers.DebugHelper;
+using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
 
-internal sealed class GeneticEngine(GeneticEngineConfig config, IGene[] genes)
+internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] genes, ILogger logger)
 {
     /// <summary>Runs the evolution process.</summary>
     /// <param name="simulation">
@@ -16,7 +17,7 @@ internal sealed class GeneticEngine(GeneticEngineConfig config, IGene[] genes)
     /// </param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    internal Entity Evolve(Simulation simulation, ISelection selection, ICrossOver crossOver, IMutation mutation, IReinsertion reinsertion, ITermination termination, IRandom random)
+    internal IEnumerable<Entity> Evolve(Simulation simulation, ISelection selection, ICrossOver crossOver, IMutation mutation, IReinsertion reinsertion, ITermination termination, IRandom random)
     {
         //Create the initial population
         StaticArray<Entity> population = new StaticArray<Entity>(config.PopulationSize * 2);
@@ -32,21 +33,25 @@ internal sealed class GeneticEngine(GeneticEngineConfig config, IGene[] genes)
         }
 
         int generation = 0;
-        Entity top1 = new Entity([]);
-        top1.Fitness = double.MinValue;
 
         //These lists are for reuse. We clear them each generation.
         List<int> parents = new List<int>();
+        MinHeap<Entity> heap = new MinHeap<Entity>(config.MaxReturned);
+
+        double bestFitness = double.MinValue;
 
         do
         {
-            Print("Generation: " + generation);
+            LogGeneration(logger, generation);
 
             int bestIdx = RunPopulation(population, simulation);
             ref Entity popBest = ref population[bestIdx];
 
-            if (popBest.Fitness > top1.Fitness)
-                top1 = popBest; //This creates a copy, which is what we want, since we clear the population array
+            if (heap.Add(popBest.Fitness, popBest)) //This creates a copy, which is what we want, since we clear the population array
+            {
+                LogBetterCandidate(logger, popBest.Fitness, (int)popBest.Tag, string.Join(", ", popBest.Genes.AsEnumerable()));
+                bestFitness = popBest.Fitness;
+            }
 
             //Note: The algorithm here is derived from my understanding of genetics in biology.
             //      It might be different from established terminology in the comp.sci field
@@ -86,9 +91,9 @@ internal sealed class GeneticEngine(GeneticEngineConfig config, IGene[] genes)
 
             //Termination of the simulation is given the generation and top fitness.
             //Makes it able to either terminate after a set generation, or when a certain fitness is reached
-        } while (!termination.Process(generation++, top1.Fitness));
+        } while (!termination.Process(generation++, bestFitness));
 
-        return top1;
+        return heap.Items.Select(x => x.Item2);
     }
 
     private static void Repopulate(StaticArray<Entity> population, int minPopulation, IGene[] genes, IRandom random)

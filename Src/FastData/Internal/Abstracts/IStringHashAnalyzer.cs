@@ -1,5 +1,4 @@
 using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Abstracts;
 

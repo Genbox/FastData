@@ -7,5 +7,7 @@ internal static class Program
     private static void Main()
     {
         AnalysisTest.TestGeneticAnalyzer();
+        AnalysisTest.TestBruteForceAnalyzer();
+        AnalysisTest.TestGPerfAnalyzer();
     }
 }

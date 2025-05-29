@@ -5,15 +5,13 @@ using Genbox.FastData.Misc;
 namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
 /// <summary>Returns segments with offset [0..max-1] and length [1..max-1]</summary>
-internal class BruteForceGenerator : ISegmentGenerator
+internal sealed class BruteForceGenerator(int maxLength) : ISegmentGenerator
 {
-    internal const int MaxLength = 8;
-
     public bool IsAppropriate(StringProperties props) => true;
 
     public IEnumerable<ArraySegment> Generate(StringProperties props)
     {
-        int max = (int)Math.Min(props.LengthData.Min, MaxLength); //We cannot segment above the shortest string.
+        int max = (int)Math.Min(props.LengthData.Min, maxLength); //We cannot segment above the shortest string.
 
         //Generates:
         //[t]est

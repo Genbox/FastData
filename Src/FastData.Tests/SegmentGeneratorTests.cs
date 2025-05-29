@@ -44,7 +44,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     public void BruteForceGeneratorTest()
     {
         // The generator should provide n*n number of results for strings up to length 8
-        BruteForceGenerator gen = new BruteForceGenerator();
+        BruteForceGenerator gen = new BruteForceGenerator(8);
         Random rng = new Random(42);
 
         byte[] counts = [2, 6, 12, 20, 30, 42, 56, 72, 72, 72];
@@ -63,7 +63,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     public void EdgeGramGeneratorTest()
     {
         // The generator should provide n*n number of results for strings up to length 8
-        EdgeGramGenerator gen = new EdgeGramGenerator();
+        EdgeGramGenerator gen = new EdgeGramGenerator(8);
         Random rng = new Random(42);
 
         for (int i = 1; i <= 10; i++)
@@ -143,8 +143,8 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
 
     internal static TheoryData<ISegmentGenerator, int> GetGenerators() => new TheoryData<ISegmentGenerator, int>
     {
-        { new BruteForceGenerator(), BruteForceGenerator.MaxLength },
-        { new EdgeGramGenerator(), EdgeGramGenerator.MaxLength },
+        { new BruteForceGenerator(8), 8 },
+        { new EdgeGramGenerator(8), 8 },
         { new OffsetGenerator(), 8 } // There is no maxlength, but we test up to 8
     };
 }

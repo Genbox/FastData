@@ -27,5 +27,5 @@ internal static class SegmentManager
         }
     }
 
-    private static IEnumerable<ISegmentGenerator> GetGenerators() => [new BruteForceGenerator(), new EdgeGramGenerator(), new DeltaGenerator(), new OffsetGenerator()];
+    private static IEnumerable<ISegmentGenerator> GetGenerators() => [new BruteForceGenerator(8), new EdgeGramGenerator(8), new DeltaGenerator(), new OffsetGenerator()];
 }

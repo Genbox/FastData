@@ -7,34 +7,37 @@ using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.Misc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Genbox.FastData;
 
 public static class FastDataGenerator
 {
-    public static bool TryGenerate(object[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source) => data[0] switch
+    public static bool TryGenerate(object[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null) => data[0] switch
     {
-        bool => TryGenerate(data.Cast<bool>().ToArray(), fdCfg, generator, out source),
-        char => TryGenerate(data.Cast<char>().ToArray(), fdCfg, generator, out source),
-        sbyte => TryGenerate(data.Cast<sbyte>().ToArray(), fdCfg, generator, out source),
-        byte => TryGenerate(data.Cast<byte>().ToArray(), fdCfg, generator, out source),
-        short => TryGenerate(data.Cast<short>().ToArray(), fdCfg, generator, out source),
-        ushort => TryGenerate(data.Cast<ushort>().ToArray(), fdCfg, generator, out source),
-        int => TryGenerate(data.Cast<int>().ToArray(), fdCfg, generator, out source),
-        uint => TryGenerate(data.Cast<uint>().ToArray(), fdCfg, generator, out source),
-        long => TryGenerate(data.Cast<long>().ToArray(), fdCfg, generator, out source),
-        ulong => TryGenerate(data.Cast<ulong>().ToArray(), fdCfg, generator, out source),
-        float => TryGenerate(data.Cast<float>().ToArray(), fdCfg, generator, out source),
-        double => TryGenerate(data.Cast<double>().ToArray(), fdCfg, generator, out source),
-        string => TryGenerate(data.Cast<string>().ToArray(), fdCfg, generator, out source),
-        _ => throw new InvalidOperationException("Unsupported data type: " + data[0].GetType().Name)
+        bool => TryGenerate(data.Cast<bool>().ToArray(), fdCfg, generator, out source, factory),
+        char => TryGenerate(data.Cast<char>().ToArray(), fdCfg, generator, out source, factory),
+        sbyte => TryGenerate(data.Cast<sbyte>().ToArray(), fdCfg, generator, out source, factory),
+        byte => TryGenerate(data.Cast<byte>().ToArray(), fdCfg, generator, out source, factory),
+        short => TryGenerate(data.Cast<short>().ToArray(), fdCfg, generator, out source, factory),
+        ushort => TryGenerate(data.Cast<ushort>().ToArray(), fdCfg, generator, out source, factory),
+        int => TryGenerate(data.Cast<int>().ToArray(), fdCfg, generator, out source, factory),
+        uint => TryGenerate(data.Cast<uint>().ToArray(), fdCfg, generator, out source, factory),
+        long => TryGenerate(data.Cast<long>().ToArray(), fdCfg, generator, out source, factory),
+        ulong => TryGenerate(data.Cast<ulong>().ToArray(), fdCfg, generator, out source, factory),
+        float => TryGenerate(data.Cast<float>().ToArray(), fdCfg, generator, out source, factory),
+        double => TryGenerate(data.Cast<double>().ToArray(), fdCfg, generator, out source, factory),
+        string => TryGenerate(data.Cast<string>().ToArray(), fdCfg, generator, out source, factory),
+        _ => throw new InvalidOperationException($"Unsupported data type: {data[0].GetType().Name}")
     };
 
-    public static bool TryGenerate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source)
+    public static bool TryGenerate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null)
     {
+        factory ??= NullLoggerFactory.Instance;
+
         //Validate that we only have unique data
         HashSet<T> uniq = new HashSet<T>();
 
@@ -50,7 +53,7 @@ public static class FastDataGenerator
 
         IStringHash? spec = null;
         if (data is string[] stringArr)
-            spec = analysisEnabled ? GetBestHash(stringArr, props.StringProps!, fdCfg.SimulatorConfig) : new DefaultStringHash();
+            spec = analysisEnabled ? GetBestHash(stringArr, props.StringProps!, fdCfg.SimulatorConfig, factory) : new DefaultStringHash();
 
         HashFunc<T> hashFunc;
 
@@ -119,22 +122,22 @@ public static class FastDataGenerator
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
 
-    private static IStringHash GetBestHash(string[] data, StringProperties props, SimulatorConfig simConf)
+    private static IStringHash GetBestHash(string[] data, StringProperties props, SimulatorConfig simConf, ILoggerFactory factory)
     {
         Simulator sim = new Simulator(data, simConf);
 
         //Run each of the analyzers
         List<Candidate> candidates = new List<Candidate>();
 
-        BruteForceAnalyzer bf = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), sim);
+        BruteForceAnalyzer bf = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), sim, factory.CreateLogger<BruteForceAnalyzer>());
         if (bf.IsAppropriate())
             candidates.AddRange(bf.GetCandidates());
 
-        GeneticAnalyzer ga = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), sim);
+        GeneticAnalyzer ga = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), sim, factory.CreateLogger<GeneticAnalyzer>());
         if (ga.IsAppropriate())
             candidates.AddRange(ga.GetCandidates());
 
-        GPerfAnalyzer ha = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(), sim);
+        GPerfAnalyzer ha = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(), sim, factory.CreateLogger<GPerfAnalyzer>());
         if (ha.IsAppropriate())
             candidates.AddRange(ha.GetCandidates());
 
@@ -163,7 +166,7 @@ public static class FastDataGenerator
             //Sort by time
             perfect.Sort(static (a, b) => a.Time.CompareTo(b.Time));
 
-            //Take the first non-perfect candidate (highest fitness) and benchmark it too
+            //Take the first non-perfect candidate (the highest fitness) and benchmark it too
             if (notPerfect.Count > 0)
             {
                 Candidate np = notPerfect[0];
