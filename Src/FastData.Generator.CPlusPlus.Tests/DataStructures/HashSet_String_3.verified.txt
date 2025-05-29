@@ -28,7 +28,7 @@ class my_data final
 
     static constexpr uint64_t get_hash(const std::string_view value) noexcept
     {
-        {uint64_t hash = 352654597;
+        uint64_t hash = 352654597;
 
         const char* ptr = value.data();
         size_t len = value.size();

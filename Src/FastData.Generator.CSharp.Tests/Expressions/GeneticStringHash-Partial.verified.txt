@@ -1,0 +1,8 @@
+﻿int length;
+int offset;
+ulong hash;
+length = input;
+offset = 1;
+hash = (((((hash + ReadU32(input, offset)) + 18397679294719823053ul) ^ (((hash + ReadU32(input, offset)) + 18397679294719823053ul) >> 42)) << 23) | ((((hash + ReadU32(input, offset)) + 18397679294719823053ul) ^ (((hash + ReadU32(input, offset)) + 18397679294719823053ul) >> 42)) >> 41));
+offset += 4;
+hash = ((((1ul | hash) + (hash * hash)) ^ (((1ul | hash) + (hash * hash)) >> 48)) ^ ((((1ul | hash) + (hash * hash)) ^ (((1ul | hash) + (hash * hash)) >> 48)) >> 46));
