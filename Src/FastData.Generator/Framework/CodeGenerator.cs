@@ -12,26 +12,28 @@ namespace Genbox.FastData.Generator.Framework;
 public abstract class CodeGenerator : ICodeGenerator
 {
     private readonly TypeMap _typeMap;
-    private readonly TypeHelper _helper;
     private readonly ILanguageDef _langDef;
     private readonly IConstantsDef _constDef;
     private readonly IEarlyExitDef _earlyExitDef;
     private readonly IHashDef _hashDef;
+    private readonly ExpressionCompiler _compiler;
 
-    protected CodeGenerator(ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
+    protected CodeGenerator(ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, ExpressionCompiler compiler)
     {
         _langDef = langDef;
         _constDef = constDef;
         _earlyExitDef = earlyExitDef;
         _hashDef = hashDef;
+        _compiler = compiler;
 
         _typeMap = new TypeMap(langDef.TypeDefinitions);
-        _helper = new TypeHelper(_typeMap);
+        Typehelper = new TypeHelper(_typeMap);
         Shared = new SharedCode();
     }
 
     public bool UseUTF16Encoding => _langDef.UseUTF16Encoding;
     public SharedCode Shared { get; }
+    public TypeHelper Typehelper { get; }
 
     public virtual bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
     {
@@ -41,7 +43,7 @@ public abstract class CodeGenerator : ICodeGenerator
 
         StringBuilder sb = new StringBuilder();
         AppendHeader(sb, genCfg);
-        AppendBody(sb, genCfg, typeName, context);
+        AppendBody(sb, genCfg, typeName, context, _compiler);
         AppendFooter(sb, genCfg, typeName);
 
         foreach (string classCode in Shared.GetType(CodeType.Class))
@@ -67,14 +69,14 @@ public abstract class CodeGenerator : ICodeGenerator
 #endif
     }
 
-    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext context)
+    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext context, ExpressionCompiler? compiler)
     {
         OutputWriter<T>? writer = GetOutputWriter(genCfg, context);
 
         if (writer == null)
             throw new NotSupportedException("The context type is not supported: " + context.GetType().Name);
 
-        writer.Initialize(_langDef, _earlyExitDef, _helper, _hashDef, genCfg, typeName);
+        writer.Initialize(_langDef, _earlyExitDef, Typehelper, _hashDef, genCfg, typeName, compiler);
         sb.AppendLine(writer.Generate());
     }
 
@@ -85,8 +87,8 @@ public abstract class CodeGenerator : ICodeGenerator
 
         if (genCfg.DataType.IsInteger())
         {
-            sb.AppendLine(_constDef.MinValueTemplate(typeName, _helper.ToValueLabel(genCfg.Constants.MinValue)));
-            sb.AppendLine(_constDef.MaxValueTemplate(typeName, _helper.ToValueLabel(genCfg.Constants.MaxValue)));
+            sb.AppendLine(_constDef.MinValueTemplate(typeName, Typehelper.ToValueLabel(genCfg.Constants.MinValue)));
+            sb.AppendLine(_constDef.MaxValueTemplate(typeName, Typehelper.ToValueLabel(genCfg.Constants.MaxValue)));
         }
         else if (genCfg.DataType == DataType.String)
         {

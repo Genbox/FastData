@@ -1,6 +1,6 @@
-﻿        int length;
-        int offset;
-        ulong hash;
+﻿        int32_t length;
+        int32_t offset;
+        uint64_t hash;
         length = value.Length;
         offset = 0;
         length -= offset;

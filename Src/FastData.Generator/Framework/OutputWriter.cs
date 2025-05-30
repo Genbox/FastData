@@ -1,5 +1,6 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework.Interfaces;
 
 namespace Genbox.FastData.Generator.Framework;
@@ -10,8 +11,9 @@ public abstract class OutputWriter<T> : IOutputWriter
     private IEarlyExitDef _earlyExitDef = null!;
     private TypeHelper _typeHelper = null!;
     private IHashDef _hashDef = null!;
+    private ExpressionCompiler? _compiler;
 
-    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeHelper typeHelper, IHashDef hashDef, GeneratorConfig<T> genCfg, string typeName)
+    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeHelper typeHelper, IHashDef hashDef, GeneratorConfig<T> genCfg, string typeName, ExpressionCompiler? compiler)
     {
         _langDef = langDef;
         _earlyExitDef = earlyExitDef;
@@ -19,6 +21,7 @@ public abstract class OutputWriter<T> : IOutputWriter
         _hashDef = hashDef;
         GeneratorConfig = genCfg;
         TypeName = typeName;
+        _compiler = compiler;
     }
 
     protected string TypeName { get; private set; } = null!;
@@ -27,7 +30,7 @@ public abstract class OutputWriter<T> : IOutputWriter
     public abstract string Generate();
 
     protected string GetEarlyExits() => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
-    protected string GetHashSource() => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName);
+    protected string GetHashSource() => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName, GeneratorConfig.DataType == DataType.String ? _compiler.GetCode(GeneratorConfig.StringHash.GetExpression()) : null);
 
     protected string GetArraySizeType() => _langDef.ArraySizeType;
 

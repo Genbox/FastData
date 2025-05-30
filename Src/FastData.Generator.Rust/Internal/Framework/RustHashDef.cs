@@ -5,15 +5,15 @@ namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
 internal class RustHashDef : IHashDef
 {
-    public string GetHashSource(DataType dataType, string typeName) =>
+    public string GetHashSource(DataType dataType, string typeName, string? stringHash) =>
         $$"""
               {{(dataType == DataType.String ? "#[inline]" : "#[inline(always)]")}}
               {{(dataType == DataType.String ? "unsafe " : "")}}fn get_hash(value: {{typeName}}) -> u64 {
-          {{GetHash(dataType)}}
+          {{GetHash(dataType, stringHash)}}
               }
           """;
 
-    private static string GetHash(DataType dataType)
+    private static string GetHash(DataType dataType, string? stringHash)
     {
         if (dataType == DataType.String)
         {

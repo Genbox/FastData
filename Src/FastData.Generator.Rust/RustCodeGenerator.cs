@@ -1,5 +1,6 @@
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generator.Rust.Internal;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.Generator.Rust.Internal.Generators;
 
@@ -9,16 +10,15 @@ public sealed class RustCodeGenerator : CodeGenerator
 {
     private readonly RustCodeGeneratorConfig _cfg;
 
-    private RustCodeGenerator(RustCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
-        : base(langDef, constDef, earlyExitDef, hashDef) => _cfg = cfg;
+    private RustCodeGenerator(RustCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, ExpressionCompiler compiler)
+        : base(langDef, constDef, earlyExitDef, hashDef, compiler) => _cfg = cfg;
 
     public static RustCodeGenerator Create(RustCodeGeneratorConfig userCfg)
     {
         RustLanguageDef langDef = new RustLanguageDef();
         TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
 
-        return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(helper, userCfg.GeneratorOptions),
-            new RustHashDef());
+        return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(helper, userCfg.GeneratorOptions), new RustHashDef(), new RustExpressionCompiler(helper));
     }
 
     protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg)

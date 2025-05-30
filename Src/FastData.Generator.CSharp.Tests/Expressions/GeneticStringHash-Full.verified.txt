@@ -1,41 +1,41 @@
-﻿int length;
-int offset;
-ulong hash;
-length = input;
-offset = 0;
-length -= offset;
-while ((length > 0))
-{
-    if ((length >= 8))
-    {
-        hash = (((((hash + ReadU64(input, offset)) + 18397679294719823053ul) ^ (((hash + ReadU64(input, offset)) + 18397679294719823053ul) >> 42)) << 23) | ((((hash + ReadU64(input, offset)) + 18397679294719823053ul) ^ (((hash + ReadU64(input, offset)) + 18397679294719823053ul) >> 42)) >> 41));
-        offset += 8;
-        length -= 8;
-    }
-    else
-    {
-        if ((length >= 4))
+﻿        int length;
+        int offset;
+        ulong hash;
+        length = value.Length;
+        offset = 0;
+        length -= offset;
+        while ((length > 0))
         {
-            hash = (((((hash + ReadU32(input, offset)) + 18397679294719823053ul) ^ (((hash + ReadU32(input, offset)) + 18397679294719823053ul) >> 42)) << 23) | ((((hash + ReadU32(input, offset)) + 18397679294719823053ul) ^ (((hash + ReadU32(input, offset)) + 18397679294719823053ul) >> 42)) >> 41));
-            offset += 4;
-            length -= 4;
-        }
-        else
-        {
-            if ((length >= 2))
+            if ((length >= 8))
             {
-                hash = (((((hash + ReadU16(input, offset)) + 18397679294719823053ul) ^ (((hash + ReadU16(input, offset)) + 18397679294719823053ul) >> 42)) << 23) | ((((hash + ReadU16(input, offset)) + 18397679294719823053ul) ^ (((hash + ReadU16(input, offset)) + 18397679294719823053ul) >> 42)) >> 41));
-                offset += 2;
-                length -= 2;
+                hash = (((((hash + ReadU64(value, offset)) + 18397679294719823053ul) ^ (((hash + ReadU64(value, offset)) + 18397679294719823053ul) >> 42)) << 23) | ((((hash + ReadU64(value, offset)) + 18397679294719823053ul) ^ (((hash + ReadU64(value, offset)) + 18397679294719823053ul) >> 42)) >> 41));
+                offset += 8;
+                length -= 8;
             }
             else
             {
-                hash = (((((hash + ReadU8(input, offset)) + 18397679294719823053ul) ^ (((hash + ReadU8(input, offset)) + 18397679294719823053ul) >> 42)) << 23) | ((((hash + ReadU8(input, offset)) + 18397679294719823053ul) ^ (((hash + ReadU8(input, offset)) + 18397679294719823053ul) >> 42)) >> 41));
-                offset += 1;
-                length -= 1;
+                if ((length >= 4))
+                {
+                    hash = (((((hash + ReadU32(value, offset)) + 18397679294719823053ul) ^ (((hash + ReadU32(value, offset)) + 18397679294719823053ul) >> 42)) << 23) | ((((hash + ReadU32(value, offset)) + 18397679294719823053ul) ^ (((hash + ReadU32(value, offset)) + 18397679294719823053ul) >> 42)) >> 41));
+                    offset += 4;
+                    length -= 4;
+                }
+                else
+                {
+                    if ((length >= 2))
+                    {
+                        hash = (((((hash + ReadU16(value, offset)) + 18397679294719823053ul) ^ (((hash + ReadU16(value, offset)) + 18397679294719823053ul) >> 42)) << 23) | ((((hash + ReadU16(value, offset)) + 18397679294719823053ul) ^ (((hash + ReadU16(value, offset)) + 18397679294719823053ul) >> 42)) >> 41));
+                        offset += 2;
+                        length -= 2;
+                    }
+                    else
+                    {
+                        hash = (((((hash + ReadU8(value, offset)) + 18397679294719823053ul) ^ (((hash + ReadU8(value, offset)) + 18397679294719823053ul) >> 42)) << 23) | ((((hash + ReadU8(value, offset)) + 18397679294719823053ul) ^ (((hash + ReadU8(value, offset)) + 18397679294719823053ul) >> 42)) >> 41));
+                        offset += 1;
+                        length -= 1;
+                    }
+                }
             }
         }
-    }
-}
 
-hash = ((((1ul | hash) + (hash * hash)) ^ (((1ul | hash) + (hash * hash)) >> 48)) ^ ((((1ul | hash) + (hash * hash)) ^ (((1ul | hash) + (hash * hash)) >> 48)) >> 46));
+        hash = ((((1ul | hash) + (hash * hash)) ^ (((1ul | hash) + (hash * hash)) >> 48)) ^ ((((1ul | hash) + (hash * hash)) ^ (((1ul | hash) + (hash * hash)) >> 48)) >> 46));

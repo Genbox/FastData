@@ -15,7 +15,11 @@ public sealed class TypeMap
         }
     }
 
-    public string GetName(Type t) => GetDef(t).Name;
+    public string GetName(Type t)
+    {
+        ITypeDef? res = _index[(int)Type.GetTypeCode(t)];
+        return res == null ? t.Name : res.Name;
+    }
 
     public ITypeDef<T> Get<T>() => (ITypeDef<T>)GetDef(typeof(T));
 

@@ -5,13 +5,15 @@ namespace Genbox.FastData.Generator;
 
 public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
 {
-    protected readonly FastStringBuilder Sb = new FastStringBuilder();
+    protected readonly FastStringBuilder Output = new FastStringBuilder();
 
-    public string GetCode(Expression expression)
+    public string GetCode(Expression expression, int indent = 2)
     {
-        Sb.Clear();
+        Output.Clear();
+        Output.Indent = indent;
+
         Visit(expression);
-        return Sb.ToString();
+        return Output.ToString();
     }
 
     protected override Expression VisitMethodCall(MethodCallExpression node)
@@ -19,15 +21,27 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
         if (node.Object != null)
         {
             Visit(node.Object);
-            Sb.Append(".");
+            Output.Append(".");
         }
-        Sb.Append(node.Method.Name).Append("(");
+        Output.Append(node.Method.Name).Append("(");
         for (int i = 0; i < node.Arguments.Count; i++)
         {
             Visit(node.Arguments[i]);
-            if (i < node.Arguments.Count - 1) Sb.Append(", ");
+            if (i < node.Arguments.Count - 1) Output.Append(", ");
         }
-        Sb.Append(")");
+        Output.Append(")");
+        return node;
+    }
+
+    protected override Expression VisitMember(MemberExpression node)
+    {
+        if (node.Expression != null)
+            Visit(node.Expression);
+        else
+            Output.Append(helper.GetTypeName(node.Member.DeclaringType));
+
+        Output.Append(".");
+        Output.Append(node.Member.Name);
         return node;
     }
 
@@ -40,32 +54,50 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
     protected override Expression VisitBlock(BlockExpression node)
     {
         foreach (ParameterExpression v in node.Variables)
-            Sb.AppendLine($"{helper.GetTypeName(v.Type)} {v.Name};");
+        {
+            Type t = v.Type;
+
+            if (v.Type.IsArray)
+                t = v.Type.GetElementType()!;
+
+            Output.AppendLine($"{helper.GetTypeName(t)}{(v.Type.IsArray ? "[]" : "")} {v.Name};");
+        }
 
         foreach (Expression expr in node.Expressions)
         {
             Visit(expr);
             if (expr is LoopExpression)
-                Sb.AppendLine();
+                Output.AppendLine();
             else
-                Sb.AppendLine(";");
+                Output.AppendLine(";");
         }
         return node;
     }
 
     protected override Expression VisitBinary(BinaryExpression node)
     {
+        if (node.NodeType == ExpressionType.ArrayIndex)
+        {
+            Output.Append("(");
+            Visit(node.Left);
+            Output.Append(")");
+            Output.Append("[");
+            Visit(node.Right);
+            Output.Append("]");
+            return node;
+        }
+
         bool isAssign = node.NodeType is ExpressionType.Assign or ExpressionType.AddAssign or ExpressionType.SubtractAssign;
 
         if (!isAssign)
-            Sb.Append('(');
+            Output.Append('(');
 
         Visit(node.Left);
-        Sb.Append(GetBinaryOperator(node.NodeType));
+        Output.Append(GetBinaryOperator(node.NodeType));
         Visit(node.Right);
 
         if (!isAssign)
-            Sb.Append(')');
+            Output.Append(')');
 
         return node;
     }
@@ -87,16 +119,44 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
             double x => helper.ToValueLabel(x),
             string x => helper.ToValueLabel(x),
             bool x => helper.ToValueLabel(x),
-            _ => throw new InvalidOperationException("Unsupported type " + node.Value.GetType().Name)
+            _ => node.Value.ToString()
         };
 
-        Sb.Append(str);
+        Output.Append(str);
+        return node;
+    }
+
+    protected override Expression VisitNewArray(NewArrayExpression node)
+    {
+        string elemType = helper.GetTypeName(node.Type.GetElementType());
+        if (node.NodeType == ExpressionType.NewArrayInit)
+        {
+            Output.Append("new ").Append(elemType).Append("[] {");
+            for (int i = 0; i < node.Expressions.Count; i++)
+            {
+                Visit(node.Expressions[i]);
+                if (i < node.Expressions.Count - 1)
+                    Output.Append(", ");
+            }
+            Output.Append("}");
+        }
+        else if (node.NodeType == ExpressionType.NewArrayBounds)
+        {
+            Output.Append("new ").Append(elemType).Append("[");
+            for (int i = 0; i < node.Expressions.Count; i++)
+            {
+                Visit(node.Expressions[i]);
+                if (i < node.Expressions.Count - 1)
+                    Output.Append(", ");
+            }
+            Output.Append("]");
+        }
         return node;
     }
 
     protected override Expression VisitParameter(ParameterExpression node)
     {
-        Sb.Append(node.Name!);
+        Output.Append(node.Name!);
         return node;
     }
 
@@ -105,8 +165,8 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
         Visit(node.Operand);
         switch (node.NodeType)
         {
-            case ExpressionType.PostIncrementAssign: Sb.Append("++"); break;
-            case ExpressionType.PostDecrementAssign: Sb.Append("--"); break;
+            case ExpressionType.PostIncrementAssign: Output.Append("++"); break;
+            case ExpressionType.PostDecrementAssign: Output.Append("--"); break;
             case ExpressionType.Convert: break;
             default: throw new NotSupportedException($"Unary operator {node.NodeType} is not supported.");
         }
@@ -115,47 +175,45 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
 
     protected override Expression VisitConditional(ConditionalExpression node)
     {
-        Sb.Append("if (");
+        Output.Append("if (");
         Visit(node.Test);
-        Sb.AppendLine(")");
-        Sb.AppendLine("{");
-        Sb.IncrementIndent();
+        Output.AppendLine(")");
+        Output.AppendLine("{");
+        Output.IncrementIndent();
         Visit(node.IfTrue);
-        Sb.DecrementIndent();
-        Sb.AppendLine("}");
+        Output.DecrementIndent();
+        Output.AppendLine("}");
 
         if (node.IfFalse != Expression.Empty())
         {
-            Sb.AppendLine("else");
-            Sb.AppendLine("{");
-            Sb.IncrementIndent();
+            Output.AppendLine("else");
+            Output.AppendLine("{");
+            Output.IncrementIndent();
             Visit(node.IfFalse);
-            Sb.DecrementIndent();
-            Sb.AppendLine("}");
+            Output.DecrementIndent();
+            Output.AppendLine("}");
         }
         return node;
     }
 
     protected override Expression VisitLoop(LoopExpression node)
     {
-        if (node.Body is ConditionalExpression cond &&
-            cond.IfFalse is GotoExpression ge &&
-            ge.Kind == GotoExpressionKind.Break)
+        if (node.Body is ConditionalExpression cond && cond.IfFalse is GotoExpression ge && ge.Kind == GotoExpressionKind.Break)
         {
-            Sb.Append("while (");
+            Output.Append("while (");
             Visit(cond.Test);
-            Sb.AppendLine(")");
-            Sb.AppendLine("{");
-            Sb.IncrementIndent();
+            Output.AppendLine(")");
+            Output.AppendLine("{");
+            Output.IncrementIndent();
             Visit(cond.IfTrue);
-            Sb.DecrementIndent();
-            Sb.AppendLine("}");
+            Output.DecrementIndent();
+            Output.AppendLine("}");
 
             if (ge.Value != null)
             {
-                Sb.Append("return ");
+                Output.Append("return ");
                 Visit(ge.Value);
-                Sb.Append(";");
+                Output.Append(";");
             }
         }
         return node;
@@ -167,14 +225,14 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
         {
             if (node.Value != null)
             {
-                Sb.Append("return ");
+                Output.Append("return ");
                 Visit(node.Value);
             }
-            else Sb.Append("break");
+            else Output.Append("break");
         }
         else if (node.Kind == GotoExpressionKind.Continue)
         {
-            Sb.Append("continue");
+            Output.Append("continue");
         }
         return node;
     }

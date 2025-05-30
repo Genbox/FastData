@@ -1,3 +1,4 @@
+using Genbox.FastData.Generator.CPlusPlus.Internal;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 using Genbox.FastData.Generator.Framework;
@@ -9,15 +10,15 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 {
     private readonly CPlusPlusCodeGeneratorConfig _cfg;
 
-    private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
-        : base(langDef, constDef, earlyExitDef, hashDef) => _cfg = cfg;
+    private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, ExpressionCompiler compiler)
+        : base(langDef, constDef, earlyExitDef, hashDef, compiler) => _cfg = cfg;
 
     public static CPlusPlusCodeGenerator Create(CPlusPlusCodeGeneratorConfig userCfg)
     {
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
         TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
 
-        return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(helper, userCfg.GeneratorOptions), new CPlusPlusHashDef());
+        return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(helper, userCfg.GeneratorOptions), new CPlusPlusHashDef(), new CPlusPlusExpressionCompiler(helper));
     }
 
     public override bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)

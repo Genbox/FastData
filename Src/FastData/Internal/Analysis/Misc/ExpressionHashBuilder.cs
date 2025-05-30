@@ -13,7 +13,7 @@ internal static class ExpressionHashBuilder
 {
     public static Expression<HashFunc<string>> BuildFull(Mixer mixer, Avalanche avalanche)
     {
-        ParameterExpression input = Parameter(typeof(string), "input");
+        ParameterExpression input = Parameter(typeof(string), "value");
 
         ParameterExpression length = Variable(typeof(int), "length");
         ParameterExpression offset = Variable(typeof(int), "offset");
@@ -53,7 +53,7 @@ internal static class ExpressionHashBuilder
 
     public static Expression<HashFunc<string>> Build(ArraySegment[] segments, Mixer mixer, Avalanche avalanche)
     {
-        ParameterExpression input = Parameter(typeof(string), "input");
+        ParameterExpression input = Parameter(typeof(string), "value");
 
         ParameterExpression length = Variable(typeof(int), "length");
         ParameterExpression offset = Variable(typeof(int), "offset");
@@ -167,15 +167,6 @@ internal static class ExpressionHashBuilder
 
         // Read(data, idx)
         return Convert(Call(readFunc, data, idx), typeof(ulong));
-    }
-
-    [UsedImplicitly(ImplicitUseTargetFlags.Members)]
-    private static class ReaderHelpers2
-    {
-        public static byte ReadU8(ref byte ptr, int offset) => Unsafe.Add(ref ptr, offset);
-        public static ushort ReadU16(ref byte ptr, int offset) => Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref ptr, offset));
-        public static uint ReadU32(ref byte ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.Add(ref ptr, offset));
-        public static ulong ReadU64(ref byte ptr, int offset) => Unsafe.ReadUnaligned<ulong>(ref Unsafe.Add(ref ptr, offset));
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.Members)]

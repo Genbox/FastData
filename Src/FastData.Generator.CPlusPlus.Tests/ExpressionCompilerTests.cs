@@ -1,10 +1,10 @@
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.Generator.CSharp.Internal;
-using Genbox.FastData.Generator.CSharp.Internal.Framework;
+using Genbox.FastData.Generator.CPlusPlus.Internal;
+using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.InternalShared;
 
-namespace Genbox.FastData.Generator.CSharp.Tests;
+namespace Genbox.FastData.Generator.CPlusPlus.Tests;
 
 public class ExpressionCompilerTests
 {
@@ -12,7 +12,7 @@ public class ExpressionCompilerTests
     [ClassData(typeof(ExpressionHashDataClass))]
     internal async Task GenerateExpression(HashType type, IStringHash hash)
     {
-        CSharpExpressionCompiler compiler = new CSharpExpressionCompiler(new TypeHelper(new TypeMap(new CSharpLanguageDef().TypeDefinitions)));
+        CPlusPlusExpressionCompiler compiler = new CPlusPlusExpressionCompiler(new TypeHelper(new TypeMap(new CPlusPlusLanguageDef().TypeDefinitions)));
 
         string code = compiler.GetCode(hash.GetExpression());
         Assert.NotEmpty(code);

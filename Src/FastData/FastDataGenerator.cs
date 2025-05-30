@@ -51,17 +51,17 @@ public static class FastDataGenerator
 
         bool analysisEnabled = false;
 
-        IStringHash? spec = null;
+        IStringHash? stringHash = null;
         if (data is string[] stringArr)
-            spec = analysisEnabled ? GetBestHash(stringArr, props.StringProps!, fdCfg.SimulatorConfig, factory) : new DefaultStringHash();
+            stringHash = analysisEnabled ? GetBestHash(stringArr, props.StringProps!, fdCfg.SimulatorConfig, factory) : new DefaultStringHash();
 
         HashFunc<T> hashFunc;
 
         //If we have a string hash, use it.
-        if (spec != null)
-            hashFunc = (HashFunc<T>)(object)spec.GetHashFunction();
-        else
+        if (stringHash == null)
             hashFunc = PrimitiveHash.GetHash<T>(props.DataType);
+        else
+            hashFunc = (HashFunc<T>)(object)stringHash.GetHashFunction();
 
         IContext? context = null;
 
@@ -80,7 +80,7 @@ public static class FastDataGenerator
         if (context == null)
             throw new InvalidOperationException("Unable to find a suitable data structure for the data. Please report this as a bug.");
 
-        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, fdCfg.StringComparison, props, spec);
+        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, fdCfg.StringComparison, props, stringHash);
         return generator.TryGenerate(genCfg, context, out source);
     }
 

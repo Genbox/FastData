@@ -5,9 +5,10 @@ namespace Genbox.FastData.Generator;
 public sealed class FastStringBuilder
 {
     private const byte IndentSize = 4;
-    private int _indent;
     private bool _indentPending = true;
     private readonly StringBuilder _sb = new StringBuilder();
+
+    public int Indent { get; set; }
 
     public FastStringBuilder Append(object value)
     {
@@ -65,34 +66,31 @@ public sealed class FastStringBuilder
     public FastStringBuilder Clear()
     {
         _sb.Clear();
-        _indent = 0;
+        Indent = 0;
 
         return this;
     }
 
     public FastStringBuilder IncrementIndent()
     {
-        _indent++;
+        Indent++;
         return this;
     }
 
     public FastStringBuilder DecrementIndent()
     {
-        if (_indent > 0)
-            _indent--;
+        if (Indent > 0)
+            Indent--;
 
         return this;
     }
-
-    public IDisposable Indent() => new Indenter(this);
-    public IDisposable SuspendIndent() => new IndentSuspender(this);
 
     public override string ToString() => _sb.ToString();
 
     private void DoIndent()
     {
-        if (_indentPending && _indent > 0)
-            _sb.Append(' ', _indent * IndentSize);
+        if (_indentPending && Indent > 0)
+            _sb.Append(' ', Indent * IndentSize);
 
         _indentPending = false;
     }
@@ -118,10 +116,10 @@ public sealed class FastStringBuilder
         public IndentSuspender(FastStringBuilder stringBuilder)
         {
             _stringBuilder = stringBuilder;
-            _indent = _stringBuilder._indent;
-            _stringBuilder._indent = 0;
+            _indent = _stringBuilder.Indent;
+            _stringBuilder.Indent = 0;
         }
 
-        public void Dispose() => _stringBuilder._indent = _indent;
+        public void Dispose() => _stringBuilder.Indent = _indent;
     }
 }

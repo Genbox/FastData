@@ -5,19 +5,19 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 internal class CPlusPlusHashDef : IHashDef
 {
-    public string GetHashSource(DataType dataType, string typeName)
+    public string GetHashSource(DataType dataType, string typeName, string? stringHash)
     {
         bool notConst = dataType is DataType.Single or DataType.Double or DataType.Int64 or DataType.UInt64;
 
         return $$"""
                      static{{(notConst ? " " : " constexpr ")}}uint64_t get_hash(const {{typeName}} value) noexcept
                      {
-                 {{GetHash(dataType)}}
+                 {{GetHash(dataType, stringHash)}}
                      }
                  """;
     }
 
-    private static string GetHash(DataType dataType)
+    private static string GetHash(DataType dataType, string? stringHash)
     {
         if (dataType == DataType.String)
         {
