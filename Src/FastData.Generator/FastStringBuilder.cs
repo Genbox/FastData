@@ -5,8 +5,8 @@ namespace Genbox.FastData.Generator;
 public sealed class FastStringBuilder
 {
     private const byte IndentSize = 4;
-    private bool _indentPending = true;
     private readonly StringBuilder _sb = new StringBuilder();
+    private bool _indentPending = true;
 
     public int Indent { get; set; }
 

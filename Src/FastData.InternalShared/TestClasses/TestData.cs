@@ -8,15 +8,13 @@ namespace Genbox.FastData.InternalShared.TestClasses;
 
 public class TestData<T>(StructureType structureType, T[] values) : ITestData, IXunitSerializable
 {
-    private readonly Random _rng = new Random(42);
     private readonly DataType _dataType = Enum.Parse<DataType>(typeof(T).Name);
+    private readonly Random _rng = new Random(42);
 
     public T[] Values { get; private set; } = values;
     public StructureType StructureType { get; private set; } = structureType;
 
     public string Identifier => $"{StructureType}_{_dataType}_{Values.Length}";
-
-    public override string ToString() => Identifier;
 
     public void Generate(Func<string, ICodeGenerator> factory, out GeneratorSpec spec)
     {
@@ -37,4 +35,6 @@ public class TestData<T>(StructureType structureType, T[] values) : ITestData, I
         StructureType = info.GetValue<StructureType>(nameof(StructureType));
         Values = info.GetValue<T[]>(nameof(Values));
     }
+
+    public override string ToString() => Identifier;
 }

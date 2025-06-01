@@ -3,10 +3,7 @@ using BenchmarkDotNet.Order;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
-/// <summary>
-/// Benchmark used to illustrate the algorithmic complexity differences between Array and HashSet.
-/// Needed for the Readme.
-/// </summary>
+/// <summary>Benchmark used to illustrate the algorithmic complexity differences between Array and HashSet. Needed for the Readme.</summary>
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class ArrayVsHashSetBenchmarks
 {

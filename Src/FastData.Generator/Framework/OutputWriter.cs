@@ -7,11 +7,22 @@ namespace Genbox.FastData.Generator.Framework;
 
 public abstract class OutputWriter<T> : IOutputWriter
 {
-    private ILanguageDef _langDef = null!;
-    private IEarlyExitDef _earlyExitDef = null!;
-    private TypeHelper _typeHelper = null!;
-    private IHashDef _hashDef = null!;
     private ExpressionCompiler? _compiler;
+    private IEarlyExitDef _earlyExitDef = null!;
+    private IHashDef _hashDef = null!;
+    private ILanguageDef _langDef = null!;
+    private TypeHelper _typeHelper = null!;
+
+    protected string TypeName { get; private set; } = null!;
+    protected GeneratorConfig<T> GeneratorConfig { get; private set; } = null!;
+
+    protected string EarlyExits => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
+    protected string HashSource => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName, GeneratorConfig.DataType == DataType.String && _compiler != null && GeneratorConfig.StringHash != null ? _compiler.GetCode(GeneratorConfig.StringHash.GetExpression()) : null);
+    protected string HashSizeType => _typeHelper.GetTypeName(typeof(ulong));
+    protected static DataType HashSizeDataType => DataType.UInt64;
+    protected string ArraySizeType => _langDef.ArraySizeType;
+
+    public abstract string Generate();
 
     internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeHelper typeHelper, IHashDef hashDef, GeneratorConfig<T> genCfg, string typeName, ExpressionCompiler? compiler)
     {
@@ -23,17 +34,6 @@ public abstract class OutputWriter<T> : IOutputWriter
         TypeName = typeName;
         _compiler = compiler;
     }
-
-    protected string TypeName { get; private set; } = null!;
-    protected GeneratorConfig<T> GeneratorConfig { get; private set; } = null!;
-
-    public abstract string Generate();
-
-    protected string EarlyExits => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
-    protected string HashSource => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName, GeneratorConfig.DataType == DataType.String && _compiler != null && GeneratorConfig.StringHash != null ? _compiler.GetCode(GeneratorConfig.StringHash.GetExpression()) : null);
-    protected string HashSizeType => _typeHelper.GetTypeName(typeof(ulong));
-    protected static DataType HashSizeDataType => DataType.UInt64;
-    protected string ArraySizeType => _langDef.ArraySizeType;
 
     protected virtual string GetEqualFunction(string value1, string value2, DataType dataType = DataType.Null) => $"{value1} == {value2}";
     protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";

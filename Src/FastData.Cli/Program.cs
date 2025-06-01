@@ -143,7 +143,9 @@ internal static class Program
         Func<string, object> func = GetTypeFunc(dataType);
 
         await foreach (string line in File.ReadLinesAsync(file))
+        {
             yield return func(line);
+        }
     }
 
     private static Func<string, object> GetTypeFunc(DataType dataType) => dataType switch

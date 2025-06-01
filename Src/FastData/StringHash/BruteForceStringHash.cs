@@ -19,13 +19,13 @@ public sealed record BruteForceStringHash : IStringHash
         Avalanche = avalanche;
     }
 
-    public HashFunc<string> GetHashFunction() => GetExpression().Compile();
-
-    public Expression<HashFunc<string>> GetExpression() => ExpressionHashBuilder.Build([Segment], Mixer, Avalanche);
-
     internal ArraySegment Segment { get; set; }
     internal Mixer Mixer { get; set; }
     internal Avalanche Avalanche { get; set; }
+
+    public HashFunc<string> GetHashFunction() => GetExpression().Compile();
+
+    public Expression<HashFunc<string>> GetExpression() => ExpressionHashBuilder.Build([Segment], Mixer, Avalanche);
 
     public override string ToString() =>
         $"""

@@ -5,9 +5,9 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [InvocationCount(1_000_000)]
 public class PriorityStructureBenchmarks
 {
-    private readonly MinHeap<bool> _heap = new MinHeap<bool>(10);
     private readonly RingBuffer _buffer = new RingBuffer(10);
     private readonly FixedSet _fixedSet = new FixedSet(10);
+    private readonly MinHeap<bool> _heap = new MinHeap<bool>(10);
     private readonly SortedSet<double> _sorted = new SortedSet<double>();
 
     [IterationCleanup]
@@ -23,28 +23,36 @@ public class PriorityStructureBenchmarks
     public void MinHeapTest()
     {
         for (double i = 0; i < 100; i++)
+        {
             _heap.Add(i, true);
+        }
     }
 
     [Benchmark]
     public void RingBufferTest()
     {
         for (double i = 0; i < 100; i++)
+        {
             _buffer.Add(i);
+        }
     }
 
     [Benchmark]
     public void FixedSetTest()
     {
         for (double i = 0; i < 100; i++)
+        {
             _fixedSet.Add(i);
+        }
     }
 
     [Benchmark]
     public void SortedSetTest()
     {
         for (double i = 0; i < 100; i++)
+        {
             _sorted.Add(i);
+        }
     }
 
     private sealed class FixedSet(int capacity)
@@ -81,8 +89,8 @@ public class PriorityStructureBenchmarks
     {
         private readonly double[] _buffer = new double[capacity];
         private int _count;
-        private int _next;
         private int _minIndex = -1;
+        private int _next;
 
         public void Add(double value)
         {

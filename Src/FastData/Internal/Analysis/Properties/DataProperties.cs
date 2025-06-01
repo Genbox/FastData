@@ -14,6 +14,12 @@ internal sealed class DataProperties<T>
         FloatProps = floatProps;
     }
 
+    internal StringProperties? StringProps { get; }
+    internal IntegerProperties<T>? IntProps { get; }
+    internal FloatProperties<T>? FloatProps { get; }
+    internal DataType DataType { get; }
+    internal uint ItemCount { get; }
+
     internal static DataProperties<T> Create(T[] data)
     {
         StringProperties? stringProps = null;
@@ -71,10 +77,4 @@ internal sealed class DataProperties<T>
 
         return new DataProperties<T>((uint)data.Length, dataType, stringProps, intProps, floatProps);
     }
-
-    internal StringProperties? StringProps { get; }
-    internal IntegerProperties<T>? IntProps { get; }
-    internal FloatProperties<T>? FloatProps { get; }
-    internal DataType DataType { get; }
-    internal uint ItemCount { get; }
 }

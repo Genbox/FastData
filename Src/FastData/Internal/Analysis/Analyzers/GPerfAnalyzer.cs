@@ -30,6 +30,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 /// <summary>Finds the least number of positions in a string that hashes to a unique value for all inputs.</summary>
 internal sealed partial class GPerfAnalyzer(string[] data, StringProperties props, GPerfAnalyzerConfig config, Simulator sim, ILogger<GPerfAnalyzer> logger) : IStringHashAnalyzer
 {
+    private readonly FastSet _emulator = new FastSet(data);
     public bool IsAppropriate() => props.CharacterData.AllAscii;
 
     [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
@@ -106,8 +107,10 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
             sb.AppendLine("\ndumping occurrence and associated values tables");
 
             for (int i = 0; i < alphaSize; i++)
+            {
                 if (table.Occurrences[i] != 0)
                     sb.AppendLine($"asso_values[{(char)i}] = {table.Values[i],6}, occurrences[{(char)i}] = {table.Occurrences[i],6}");
+            }
 
             sb.AppendLine("end table dumping");
 
@@ -121,7 +124,9 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
             int field_width = keywords.Max(x => x.SelChars.Length);
 
             foreach (Keyword keyword in keywords)
+            {
                 sb.AppendLine($"{keyword.HashValue,11},{keyword.AllChars.Length,11},{"-1",6}, {keyword.SelChars.PadLeft(field_width)}, {keyword.AllChars}");
+            }
 
             sb.AppendLine("End dumping list.\n");
 
@@ -353,8 +358,6 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
         }
     }
 
-    private readonly FastSet _emulator = new FastSet(data);
-
     private uint GetCollisions(DirectMap map) => _emulator.GetCollisions(map.Positions);
 
     private void PrintMap(string stage, DirectMap map)
@@ -385,68 +388,6 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
         sb.AppendLine();
 
         LogGPerfDebug(logger, sb.ToString());
-    }
-
-    private sealed class DirectMap
-    {
-        private readonly bool[] _lookup;
-        private readonly int _capacity;
-
-        internal DirectMap(DirectMap input)
-        {
-            _lookup = new bool[input._lookup.Length];
-            Array.Copy(input._lookup, _lookup, _lookup.Length);
-
-            Positions = new List<int>(input._capacity);
-            Positions.AddRange(input.Positions);
-            _capacity = input._capacity;
-        }
-
-        internal DirectMap(int capacity)
-        {
-            _lookup = new bool[capacity + 1]; //We add space for -1
-            Positions = new List<int>(capacity);
-            _capacity = capacity;
-        }
-
-        public List<int> Positions { get; }
-
-        public bool Add(int index)
-        {
-            ref bool lookup = ref _lookup[index + 1];
-
-            //The item is not in the lookup. Add it and return true.
-            if (!lookup)
-            {
-                lookup = true;
-                Positions.Add(index);
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool Contains(int index) => _lookup[index + 1];
-
-        public bool Remove(int index)
-        {
-            ref bool lookup = ref _lookup[index + 1];
-
-            if (lookup)
-            {
-                lookup = false;
-                Positions.Remove(index);
-                return true;
-            }
-
-            return false;
-        }
-
-        public void RemoveLast(int index)
-        {
-            _lookup[index + 1] = false;
-            Positions.RemoveAt(Positions.Count - 1);
-        }
     }
 
     [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
@@ -585,10 +526,70 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
         return sum;
     }
 
+    private sealed class DirectMap
+    {
+        private readonly int _capacity;
+        private readonly bool[] _lookup;
+
+        internal DirectMap(DirectMap input)
+        {
+            _lookup = new bool[input._lookup.Length];
+            Array.Copy(input._lookup, _lookup, _lookup.Length);
+
+            Positions = new List<int>(input._capacity);
+            Positions.AddRange(input.Positions);
+            _capacity = input._capacity;
+        }
+
+        internal DirectMap(int capacity)
+        {
+            _lookup = new bool[capacity + 1]; //We add space for -1
+            Positions = new List<int>(capacity);
+            _capacity = capacity;
+        }
+
+        public List<int> Positions { get; }
+
+        public bool Add(int index)
+        {
+            ref bool lookup = ref _lookup[index + 1];
+
+            //The item is not in the lookup. Add it and return true.
+            if (!lookup)
+            {
+                lookup = true;
+                Positions.Add(index);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool Contains(int index) => _lookup[index + 1];
+
+        public bool Remove(int index)
+        {
+            ref bool lookup = ref _lookup[index + 1];
+
+            if (lookup)
+            {
+                lookup = false;
+                Positions.Remove(index);
+                return true;
+            }
+
+            return false;
+        }
+
+        public void RemoveLast(int index)
+        {
+            _lookup[index + 1] = false;
+            Positions.RemoveAt(Positions.Count - 1);
+        }
+    }
+
     private sealed class AssociationTable(ILogger logger)
     {
-        private int _maxHash;
-
         internal int[] Values { get; private set; }
         internal int[] Occurrences { get; private set; }
         internal BoolArray CollisionDetector { get; private set; }
@@ -650,7 +651,7 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
             assoValueMax++;
 
             // Given the bound for _asso_values[c], we have a bound for the possible hash values, as computed in compute_hash().
-            _maxHash = (assoValueMax - 1) * maxSelCharsLength;
+            int _maxHash = (assoValueMax - 1) * maxSelCharsLength;
 
             // Allocate a sparse bit vector for detection of collisions of hash values.
             CollisionDetector = new BoolArray(_maxHash + 1, logger);
@@ -669,7 +670,9 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
                 int field_width = keywords.Max(x => x.SelChars.Length);
                 int i = 0;
                 foreach (Keyword keyword in keywords)
+                {
                     sb.AppendLine($"{++i,9}, {keyword.SelChars.PadLeft(field_width)}, {keyword.AllChars}");
+                }
 
                 LogGPerfDebug(logger, sb.ToString());
             }
@@ -795,7 +798,9 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
                     for (EquivalenceClass? cls = step.Partition; cls != null; cls = cls.Next)
                     {
                         foreach (Keyword keyword in cls.Keywords)
+                        {
                             sb.AppendLine("  " + keyword.AllChars);
+                        }
                     }
                     sb.AppendLine();
                 }
@@ -934,10 +939,10 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
                                 assoValueMax = step.AssoValueMax;
 
                                 // Reinitialize MaxHash.
-                                _maxHash = (assoValueMax - 1) * maxSelCharsLength;
+                                int maxHash = (assoValueMax - 1) * maxSelCharsLength;
 
                                 // Reinitialize CollisionDetector.
-                                CollisionDetector = new BoolArray(_maxHash + 1, logger);
+                                CollisionDetector = new BoolArray(maxHash + 1, logger);
                             }
                         }
                     }
@@ -1254,9 +1259,6 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
             return collisions;
         }
 
-        [StructLayout(LayoutKind.Auto)]
-        private record struct Entry(ulong Hash, int Next, string Value);
-
         private static bool Equal(string a, string b, List<int> positions)
         {
             foreach (int pos in positions)
@@ -1301,5 +1303,8 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
             }
             return h;
         }
+
+        [StructLayout(LayoutKind.Auto)]
+        private record struct Entry(ulong Hash, int Next, string Value);
     }
 }

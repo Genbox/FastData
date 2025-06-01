@@ -2,9 +2,7 @@ using BenchmarkDotNet.Order;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
-/// <summary>
-/// Benchmark used in Readme
-/// </summary>
+/// <summary>Benchmark used in Readme</summary>
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class DogsBenchmark
 {
@@ -20,7 +18,7 @@ public class DogsBenchmark
     {
         public static bool Contains(string value)
         {
-            if ((49280UL & (1UL << (value.Length - 1) % 64)) == 0)
+            if ((49280UL & (1UL << ((value.Length - 1) % 64))) == 0)
                 return false;
 
             return value switch

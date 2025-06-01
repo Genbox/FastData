@@ -14,8 +14,6 @@ public class TestVector<T>(Type type, T[] values, IStringHash? stringHash = null
 
     public string Identifier => $"{Type.Name.Replace("`1", "", StringComparison.Ordinal)}_{_dataType}_{Values.Length}";
 
-    public override string ToString() => Identifier;
-
     public void Serialize(IXunitSerializationInfo info)
     {
         info.AddValue(nameof(Type), Type);
@@ -29,4 +27,6 @@ public class TestVector<T>(Type type, T[] values, IStringHash? stringHash = null
         Values = info.GetValue<T[]>(nameof(Values));
         StringHash = info.GetValue<IStringHash>(nameof(StringHash));
     }
+
+    public override string ToString() => Identifier;
 }

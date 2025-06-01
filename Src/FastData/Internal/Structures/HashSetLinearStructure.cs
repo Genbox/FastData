@@ -63,7 +63,7 @@ internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
                 index = nexts[index];
             }
 
-            finalBuckets[bucketNum] = new HashSetBucket(bucketStart, (bucketStart + bucketCount) - 1);
+            finalBuckets[bucketNum] = new HashSetBucket(bucketStart, bucketStart + bucketCount - 1);
         }
 
         T[] newData = new T[data.Length];

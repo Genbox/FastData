@@ -1,20 +1,25 @@
 namespace Genbox.FastData.Internal.Analysis.Misc;
 
-/// <summary>
-/// Min-heap of fixed capacity that stores values with associated items.
-/// Maintains the smallest element at the root; when full, adding a larger value replaces the root.
-/// </summary>
+/// <summary>Min-heap of fixed capacity that stores values with associated items. Maintains the smallest element at the root; when full, adding a larger value replaces the root.</summary>
 internal sealed class MinHeap<T>(int capacity)
 {
     private readonly int _capacity = capacity;
     private readonly (double, T)[] _items = new (double, T)[capacity];
-    private int _count;
     private double _best = double.MinValue;
+    private int _count;
 
-    /// <summary>
-    /// Adds a new value-item pair. If capacity not reached, inserts and restores heap.
-    /// If full and value &gt; root, replaces root and restores heap.
-    /// </summary>
+    public IEnumerable<(double, T)> Items
+    {
+        get
+        {
+            for (int i = 0; i < _count; i++)
+            {
+                yield return _items[i];
+            }
+        }
+    }
+
+    /// <summary>Adds a new value-item pair. If capacity not reached, inserts and restores heap. If full and value &gt; root, replaces root and restores heap.</summary>
     /// <returns>True if the value was better than the best in the heap, otherwise false</returns>
     public bool Add(double key, T value)
     {
@@ -82,15 +87,6 @@ internal sealed class MinHeap<T>(int capacity)
     private void Swap(int i, int j)
     {
         (_items[i], _items[j]) = (_items[j], _items[i]);
-    }
-
-    public IEnumerable<(double, T)> Items
-    {
-        get
-        {
-            for (int i = 0; i < _count; i++)
-                yield return _items[i];
-        }
     }
 
     public void Clear()

@@ -6,15 +6,9 @@ namespace Genbox.FastData.Internal.Helpers;
 
 internal static class ExpressionHelper
 {
-    internal static string Print(Mixer mixer)
-    {
-        return mixer(Expression.Variable(typeof(ulong), "hash"), Expression.Variable(typeof(ulong), "Value")).ToString();
-    }
+    internal static string Print(Mixer mixer) => mixer(Expression.Variable(typeof(ulong), "hash"), Expression.Variable(typeof(ulong), "Value")).ToString();
 
-    internal static string Print(Avalanche avalanche)
-    {
-        return avalanche(Expression.Variable(typeof(ulong), "hash")).ToString();
-    }
+    internal static string Print(Avalanche avalanche) => avalanche(Expression.Variable(typeof(ulong), "hash")).ToString();
 
     internal static string Print(Expression exp)
     {

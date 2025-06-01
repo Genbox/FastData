@@ -6,6 +6,23 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
 internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : OutputWriter<T>
 {
+    protected string FieldModifier => cfg.ClassType == ClassType.Static ? "private static readonly " : "private readonly ";
+    protected string MethodModifier => cfg.ClassType == ClassType.Static ? "public static " : "public ";
+
+    protected string MethodAttribute
+    {
+        get
+        {
+            if (cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableInlining))
+                return "[MethodImpl(MethodImplOptions.NoInlining)]";
+
+            if (cfg.GeneratorOptions.HasFlag(CSharpOptions.AggressiveInlining))
+                return "[MethodImpl(MethodImplOptions.AggressiveInlining)]";
+
+            return string.Empty;
+        }
+    }
+
     internal string GetCompareFunction(string var1, string var2)
     {
         if (GeneratorConfig.DataType == DataType.String)
@@ -23,23 +40,6 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
             return $"StringComparer.{GeneratorConfig.StringComparison}.Equals({var1}, {var2})";
 
         return $"{var1} == {var2}";
-    }
-
-    protected string FieldModifier => cfg.ClassType == ClassType.Static ? "private static readonly " : "private readonly ";
-    protected string MethodModifier => cfg.ClassType == ClassType.Static ? "public static " : "public ";
-
-    protected string MethodAttribute
-    {
-        get
-        {
-            if (cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableInlining))
-                return "[MethodImpl(MethodImplOptions.NoInlining)]";
-
-            if (cfg.GeneratorOptions.HasFlag(CSharpOptions.AggressiveInlining))
-                return "[MethodImpl(MethodImplOptions.AggressiveInlining)]";
-
-            return string.Empty;
-        }
     }
 
     protected override string GetModFunction(string variable, ulong value)

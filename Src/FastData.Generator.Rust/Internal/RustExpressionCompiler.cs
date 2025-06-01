@@ -10,7 +10,9 @@ internal sealed class RustExpressionCompiler(TypeHelper helper) : ExpressionComp
     protected override Expression VisitBlock(BlockExpression node)
     {
         foreach (ParameterExpression v in node.Variables)
+        {
             Output.AppendLine($"let mut {_helper.GetTypeName(v.Type)} {v.Name};");
+        }
 
         foreach (Expression expr in node.Expressions)
         {

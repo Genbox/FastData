@@ -5,12 +5,14 @@
 
 ## Description
 
-FastData is a code generator that analyzes your data and creates high-performance, read-only lookup data structures for static data. It can output the data structures
+FastData is a code generator that analyzes your data and creates high-performance, read-only lookup data structures for
+static data. It can output the data structures
 in many different languages (C#, C++, Rust, etc.), ready for inclusion in your project with zero dependencies.
 
 ## Use case
 
-Imagine a scenario where you have a predefined list of words (e.g., dog breeds) and need to check whether a specific dog breed exists in the set.
+Imagine a scenario where you have a predefined list of words (e.g., dog breeds) and need to check whether a specific dog
+breed exists in the set.
 Usually you create an array and look up the value. However, this is far from optimal and is missing a few optimizations.
 
 ```csharp
@@ -140,7 +142,8 @@ Each output language has different settings. Type `fastdata <lang> --help` to se
 
 ### Data structures
 
-By default, FastData chooses the optimal data structure for your data, but you can also set it manually with `fastdata -s <type>`. See the details of each structure type below.
+By default, FastData chooses the optimal data structure for your data, but you can also set it manually with
+`fastdata -s <type>`. See the details of each structure type below.
 
 #### SingleValue
 
@@ -148,7 +151,8 @@ By default, FastData chooses the optimal data structure for your data, but you c
 * Latency: Low
 * Complexity: O(1)
 
-This data structure only supports a single value. It is much faster than an array with a single item and has no overhead associated with it.
+This data structure only supports a single value. It is much faster than an array with a single item and has no overhead
+associated with it.
 FastData always selects this data structure whenever your dataset only contains one item.
 
 #### Conditional
@@ -157,9 +161,11 @@ FastData always selects this data structure whenever your dataset only contains 
 * Latency: Low
 * Complexity: O(n)
 
-This data structure relies on built-in logic in the programming language. It produces if/switch statements which ultimately become machine instructions on the CPU, rather than data
+This data structure relies on built-in logic in the programming language. It produces if/switch statements which
+ultimately become machine instructions on the CPU, rather than data
 that resides in memory.
-Latency is therefore incredibly low, but the higher number of instructions bloat the assembly, and at a certain point it becomes more efficient to have
+Latency is therefore incredibly low, but the higher number of instructions bloat the assembly, and at a certain point it
+becomes more efficient to have
 the data reside in memory.
 
 #### Array
@@ -168,8 +174,10 @@ the data reside in memory.
 * Latency: Low
 * Complexity: O(n)
 
-This data structure uses an array as the backing store. It is often faster than a normal array due to efficient early exits (value/length range checks).
-It works well for small amounts of data since the array is scanned linearly, but for larger datasets, the O(n) complexity hurts performance a lot.
+This data structure uses an array as the backing store. It is often faster than a normal array due to efficient early
+exits (value/length range checks).
+It works well for small amounts of data since the array is scanned linearly, but for larger datasets, the O(n)
+complexity hurts performance a lot.
 
 #### BinarySearch
 
@@ -177,8 +185,10 @@ It works well for small amounts of data since the array is scanned linearly, but
 * Latency: Medium
 * Complexity: O(log n)
 
-This data structure sorts your data and does a binary search on it. Since data is sorted at compile time, there is no overhead at runtime. Each lookup
-has a higher latency than a simple array, but once the dataset gets to a few hundred items, it beats the array due to a lower complexity.
+This data structure sorts your data and does a binary search on it. Since data is sorted at compile time, there is no
+overhead at runtime. Each lookup
+has a higher latency than a simple array, but once the dataset gets to a few hundred items, it beats the array due to a
+lower complexity.
 
 #### EytzingerSearch
 
@@ -186,7 +196,8 @@ has a higher latency than a simple array, but once the dataset gets to a few hun
 * Latency: Medium
 * Complexity: O(n*log(n))
 
-This data structure sorts data using an Eytzinger layout. It has better cache-locality than binary search. Under some circumstances it has better performance.
+This data structure sorts data using an Eytzinger layout. It has better cache-locality than binary search. Under some
+circumstances it has better performance.
 
 #### KeyLength
 
@@ -194,7 +205,8 @@ This data structure sorts data using an Eytzinger layout. It has better cache-lo
 * Latency: Low
 * Complexity: O(1)
 
-This data structure only works on strings, but it indexes them after their length, rather than a hash. In the case all the strings have unique lengths, the
+This data structure only works on strings, but it indexes them after their length, rather than a hash. In the case all
+the strings have unique lengths, the
 data structure further optimizes for latency.
 
 #### HashSetChain
@@ -203,7 +215,8 @@ data structure further optimizes for latency.
 * Latency: Medium
 * Complexity: O(1)
 
-This data structure is based on a hash table with separate chaining collision resolution. It uses a separate array for buckets to stay cache coherent, but it also uses more
+This data structure is based on a hash table with separate chaining collision resolution. It uses a separate array for
+buckets to stay cache coherent, but it also uses more
 memory since it needs to keep track of indices.
 
 #### HashSetLinear
@@ -220,7 +233,8 @@ This data structure is also a hash table, but with linear collision resolution.
 * Latency: Low
 * Complexity: O(1)
 
-This data structure tries to create a perfect hash for the dataset. It does so by brute-forcing a seed for a simple hash function
+This data structure tries to create a perfect hash for the dataset. It does so by brute-forcing a seed for a simple hash
+function
 until it hits the right combination. If the dataset is small enough, it can even produce a minimal perfect hash.
 
 #### PerfectHashGPerf
@@ -229,12 +243,15 @@ until it hits the right combination. If the dataset is small enough, it can even
 * Latency: Low
 * Complexity: O(1)
 
-This data structure uses the same algorithm as gperf to derive a perfect hash. It uses Richard J. Cichelli's method for creating an associative table,
-which is augmented using alpha increments to resolve collisions. It only works on strings, but it is great for medium-sized datasets.
+This data structure uses the same algorithm as gperf to derive a perfect hash. It uses Richard J. Cichelli's method for
+creating an associative table,
+which is augmented using alpha increments to resolve collisions. It only works on strings, but it is great for
+medium-sized datasets.
 
 ## How does it work?
 
-The idea behind the project is to generate a data-dependent optimized data structure for read-only lookup. When data is known beforehand, the algorithm can select from a set
+The idea behind the project is to generate a data-dependent optimized data structure for read-only lookup. When data is
+known beforehand, the algorithm can select from a set
 of different data structures, indexing, and comparison methods that are tailor-built for the data.
 
 ### Compile-time generation
@@ -256,12 +273,15 @@ FastData uses advanced data analysis techniques to generate optimized data struc
 * Character mapping
 * Encoding analysis
 
-It uses the analysis to create so-called early-exits, which are fast `O(1)` checks on your input before doing any `O(n)` checks on the actual dataset.
+It uses the analysis to create so-called early-exits, which are fast `O(1)` checks on your input before doing any `O(n)`
+checks on the actual dataset.
 
 #### Hash function generators
 
-Hash functions come in many flavors. Some are designed for low latency, some for throughput, others for low collision rate.
-Programming language runtimes come with a hash function that is a tradeoff between these parameters. FastData builds a hash function specifically tailored to the dataset.
+Hash functions come in many flavors. Some are designed for low latency, some for throughput, others for low collision
+rate.
+Programming language runtimes come with a hash function that is a tradeoff between these parameters. FastData builds a
+hash function specifically tailored to the dataset.
 It has support for several techniques:
 
 1. **Default:** If no technique is selected, FastData uses a hash function by Daniel Bernstein (DJB2)

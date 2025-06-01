@@ -116,7 +116,9 @@ public static class TestVectorHelper
     public static IEnumerable<ITestVector> GetTestVectors()
     {
         foreach (ITestVector testVector in GenerateTestVectors(GetSingleValues(), typeof(SingleValueStructure<>)))
+        {
             yield return testVector;
+        }
 
         foreach (ITestVector testVector in GenerateTestVectors(GetEdgeCaseValues(),
                      typeof(ArrayStructure<>),
@@ -125,7 +127,9 @@ public static class TestVectorHelper
                      typeof(EytzingerSearchStructure<>),
                      typeof(HashSetChainStructure<>),
                      typeof(HashSetLinearStructure<>)))
+        {
             yield return testVector;
+        }
 
         foreach (ITestVector testVector in GenerateTestVectors(GetDataOfSize(100),
                      typeof(ArrayStructure<>),
@@ -134,11 +138,15 @@ public static class TestVectorHelper
                      typeof(EytzingerSearchStructure<>),
                      typeof(HashSetChainStructure<>),
                      typeof(HashSetLinearStructure<>)))
+        {
             yield return testVector;
+        }
 
         // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
         foreach (ITestVector testVector in GenerateTestVectors([(typeof(string), ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"])], typeof(KeyLengthStructure<>)))
+        {
             yield return testVector;
+        }
     }
 
     public static IEnumerable<ITestData> GetBenchmarkData()
@@ -176,7 +184,9 @@ public static class TestVectorHelper
                 //Convert object[] to T[]
                 Array arr = Array.CreateInstance(vt, values.Length);
                 for (int i = 0; i < values.Length; i++)
+                {
                     arr.SetValue(values[i], i);
+                }
 
                 //Create an instance of TestVector<T> and give it the type of the structure
                 Type vector = typeof(TestVector<>).MakeGenericType(vt);

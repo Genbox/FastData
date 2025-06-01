@@ -7,8 +7,8 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 internal sealed class Simulator
 {
     private readonly uint _capacity;
-    private readonly NoEqualityEmulator _set;
     private readonly string[] _data;
+    private readonly NoEqualityEmulator _set;
 
     public Simulator(string[] data, SimulatorConfig config)
     {

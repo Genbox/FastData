@@ -186,7 +186,9 @@ public static partial class FastDataGenerator
         if (perfect.Count > 0)
         {
             foreach (Candidate candidate in perfect)
+            {
                 Benchmark(data, candidate);
+            }
 
             //Sort by time
             perfect.Sort(static (a, b) => a.Time.CompareTo(b.Time));
@@ -217,7 +219,9 @@ public static partial class FastDataGenerator
 
         //If there are no perfect candidates, we benchmark 10 candidates and return the fastest.
         for (int i = 0; i < 10; i++)
+        {
             Benchmark(data, notPerfect[i]);
+        }
 
         notPerfect.Sort(static (a, b) => a.Time.CompareTo(b.Time));
         return notPerfect[0].StringHash;
@@ -235,7 +239,9 @@ public static partial class FastDataGenerator
         for (int i = 0; i < 10; i++)
         {
             foreach (string s in data)
+            {
                 func(s);
+            }
         }
 
         Stopwatch sw = new Stopwatch();
@@ -243,7 +249,9 @@ public static partial class FastDataGenerator
         for (int i = 0; i < 10; i++)
         {
             foreach (string s in data)
+            {
                 func(s);
+            }
         }
 
         sw.Stop();

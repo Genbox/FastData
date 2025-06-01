@@ -5,7 +5,7 @@ namespace Genbox.FastData.Tests.Code;
 /// <summary>Always returns 1 in all calls. Used in tests.</summary>
 internal sealed class StaticRandom : IRandom
 {
-    private StaticRandom() {}
+    private StaticRandom() { }
 
     internal static StaticRandom Instance { get; } = new StaticRandom();
 

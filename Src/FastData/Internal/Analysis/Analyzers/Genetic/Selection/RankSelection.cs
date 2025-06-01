@@ -5,10 +5,7 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 
-/// <summary>
-/// Rank Selection is a selection method in genetic algorithms where individuals are ranked by fitness rather than selected based on raw fitness values. The selection
-/// probability is determined by rank instead of absolute fitness, ensuring a fairer selection pressure and preventing dominance by a few extremely fit individuals.
-/// </summary>
+/// <summary>Rank Selection is a selection method in genetic algorithms where individuals are ranked by fitness rather than selected based on raw fitness values. The selection probability is determined by rank instead of absolute fitness, ensuring a fairer selection pressure and preventing dominance by a few extremely fit individuals.</summary>
 internal sealed class RankSelection(IRandom random) : ISelection
 {
     public void Process(StaticArray<Entity> population, List<int> parents, int maxParents)

@@ -14,10 +14,7 @@ using Serilog.Extensions.Logging;
 
 namespace Genbox.FastData.Testbed.Tests;
 
-/// <summary>
-/// This code enables verification of FastData against GPerf. When Trace logging is enabled and a special version of GPerf is run on the same files, it should give the same
-/// console text
-/// </summary>
+/// <summary>This code enables verification of FastData against GPerf. When Trace logging is enabled and a special version of GPerf is run on the same files, it should give the same console text</summary>
 internal static class GPerfTest
 {
     private static readonly Random _random = new Random(42);

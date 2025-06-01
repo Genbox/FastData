@@ -6,10 +6,7 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
-/// <summary>
-/// This generator uses the delta map from string analysis to provide segments that avoids areas with identical characters and instead try and target areas of high deltas
-/// (differences in characters). It is suitable for large strings where brute-force is infeasible.
-/// </summary>
+/// <summary>This generator uses the delta map from string analysis to provide segments that avoids areas with identical characters and instead try and target areas of high deltas (differences in characters). It is suitable for large strings where brute-force is infeasible.</summary>
 internal sealed class DeltaGenerator : ISegmentGenerator
 {
     public bool IsAppropriate(StringProperties props) => true;

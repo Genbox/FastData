@@ -65,9 +65,7 @@ internal static class ExpressionHashBuilder
         ex.Add(Assign(length, Property(input, "Length")));
 
         if (segments.Length == 1 && segments[0].Length == -1)
-        {
             OutputFullHash(ex, segments[0], length, input, hash, offset, mixer);
-        }
         else
         {
             foreach (ArraySegment seg in segments)
@@ -118,10 +116,9 @@ internal static class ExpressionHashBuilder
         ex.Add(loop);
     }
 
-    private static ConditionalExpression BuildDynamicChunkBlock(Expression data, Expression offset, Expression length, Expression hash, Mixer mixer)
-    {
-        // Branch for chunk size of 8, 4, 2, 1
-        return IfThenElse(
+    // Branch for chunk size of 8, 4, 2, 1
+    private static ConditionalExpression BuildDynamicChunkBlock(Expression data, Expression offset, Expression length, Expression hash, Mixer mixer) =>
+        IfThenElse(
             GreaterThanOrEqual(length, Constant(8)),
             DynamicChunk(8, data, offset, length, hash, mixer),
             IfThenElse(
@@ -134,7 +131,6 @@ internal static class ExpressionHashBuilder
                 )
             )
         );
-    }
 
     private static BlockExpression DynamicChunk(int chunk, Expression data, Expression offset, Expression length, Expression hash, Mixer mixer)
     {

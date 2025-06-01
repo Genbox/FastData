@@ -29,7 +29,7 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx) : CPlusPlusOutputWr
 
     private string GenerateNormal()
     {
-        List<string>?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Take((int)((ctx.MaxLength - ctx.MinLength) + 1)).ToArray();
+        List<string>?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Take((int)(ctx.MaxLength - ctx.MinLength + 1)).ToArray();
 
         return $$"""
                      {{FieldModifier}}std:array<std:vector<{{TypeName}}>, {{lengths.Length.ToStringInvariant()}}> entries = {

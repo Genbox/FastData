@@ -12,6 +12,15 @@ namespace Genbox.FastData.StringHash;
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
 public sealed record GeneticStringHash : IStringHash
 {
+    // A good seed has the following properties:
+    // - Odd: Avoids getting the mixer stuck in a loop of 0.
+    // - Large: Means we push a lot of the lower bits into higher bits. Gives better avalanche.
+    // - Low bias: No correlation between input bits and output bits
+    private static readonly ulong[] Seeds =
+    [
+        0xFF51AFD7ED558CCD, 0xC4CEB9FE1A85EC53 //Murmur
+    ];
+
     internal GeneticStringHash(ArraySegment segment, int mixerSeed, int mixerIterations, int avalancheSeed, int avalancheIterations)
     {
         Segment = segment;
@@ -43,7 +52,9 @@ public sealed record GeneticStringHash : IStringHash
     private static Expression CreateMixer(int iterations, Random rng, Expression value)
     {
         for (int i = 0; i < iterations; i++)
+        {
             value = GetMix(rng, value);
+        }
 
         return value;
     }
@@ -81,15 +92,6 @@ public sealed record GeneticStringHash : IStringHash
     private static BinaryExpression MixRotateRight(Expression e, int x) => Or(RightShift(e, Constant(x)), LeftShift(e, Constant(64 - x)));
     private static BinaryExpression MixXorShift(Expression e, int x) => ExclusiveOr(e, RightShift(e, Constant(x)));
     private static BinaryExpression MixSquare(Expression e) => Add(Or(Constant(1UL), e), Multiply(e, e));
-
-    // A good seed has the following properties:
-    // - Odd: Avoids getting the mixer stuck in a loop of 0.
-    // - Large: Means we push a lot of the lower bits into higher bits. Gives better avalanche.
-    // - Low bias: No correlation between input bits and output bits
-    private static readonly ulong[] Seeds =
-    [
-        0xFF51AFD7ED558CCD, 0xC4CEB9FE1A85EC53, //Murmur
-    ];
 
     public override string ToString() =>
         $"""

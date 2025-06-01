@@ -13,6 +13,18 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
 internal sealed partial class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConfig config, Simulator sim, ILogger<BruteForceAnalyzer> logger) : IStringHashAnalyzer
 {
+    private static readonly ulong[] Seeds =
+    [
+        0xFF51AFD7ED558CCD, 0xC4CEB9FE1A85EC53 //Murmur
+    ];
+
+    private readonly IAvalancheGenerator[] _avalanchers =
+    [
+        new AvalancheIdentity(),
+        new AvalancheMultiply(Seeds),
+        new AvalancheXorRightShift(12, 36)
+    ];
+
     // This brute-forces all combinations of string segments with all possible mixer and avalanche functions.
     // Its initial state is the smallest/fastest in the hope we can reach an optimal state fast.
     // It stops if it reaches the maximum fitness.
@@ -28,13 +40,6 @@ internal sealed partial class BruteForceAnalyzer(StringProperties props, BruteFo
         new MixerRotateRight(12, 36),
         new MixerXorShift(12, 36),
         new MixerSquare()
-    ];
-
-    private readonly IAvalancheGenerator[] _avalanchers =
-    [
-        new AvalancheIdentity(),
-        new AvalancheMultiply(Seeds),
-        new AvalancheXorRightShift(12, 36)
     ];
 
     public bool IsAppropriate() => true;
@@ -159,11 +164,6 @@ internal sealed partial class BruteForceAnalyzer(StringProperties props, BruteFo
         protected override Avalanche GetOperation(int idx) => h =>
             ExclusiveOr(h, RightShift(h, Constant(idx)));
     }
-
-    private static readonly ulong[] Seeds =
-    [
-        0xFF51AFD7ED558CCD, 0xC4CEB9FE1A85EC53 //Murmur
-    ];
 
     private interface IMixerGenerator
     {

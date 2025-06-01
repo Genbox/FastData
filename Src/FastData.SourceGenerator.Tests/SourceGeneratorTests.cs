@@ -108,8 +108,6 @@ public class SourceGeneratorTests
               .DisableDiff();
     }
 
-    //TODO: Test StorageOptions
-
     private static string RunGenerator(string source)
     {
         string output = SourceGenHelper.RunSourceGenerator<Internal.FastDataSourceGenerator>(source, false, out var compilerDiagnostics, out var codeGenDiagnostics);

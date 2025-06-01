@@ -231,9 +231,7 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
             else Output.Append("break");
         }
         else if (node.Kind == GotoExpressionKind.Continue)
-        {
             Output.Append("continue");
-        }
         return node;
     }
 

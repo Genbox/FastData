@@ -56,7 +56,9 @@ public sealed record GPerfStringHash : IStringHash
         {
             // simple sum over all positions
             foreach (int pos in Positions)
+            {
                 ex.Add(Assign(hash, Add(hash, GetPosition(asso, bytes, pos))));
+            }
         }
         else
         {

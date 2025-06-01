@@ -57,7 +57,9 @@ internal static class Program
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < 25; i++)
+        {
             sb.AppendLine(CultureInfo.InvariantCulture, $"        DoNotOptimize({identifier}::contains({data.GetValueLabel(helper)}));");
+        }
 
         return sb.ToString();
     }

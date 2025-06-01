@@ -11,13 +11,13 @@ namespace Genbox.FastData.Generator.Framework;
 
 public abstract class CodeGenerator : ICodeGenerator
 {
-    private readonly TypeMap _typeMap;
-    private readonly ILanguageDef _langDef;
+    private readonly ExpressionCompiler _compiler;
     private readonly IConstantsDef _constDef;
     private readonly IEarlyExitDef _earlyExitDef;
     private readonly IHashDef _hashDef;
-    private readonly ExpressionCompiler _compiler;
+    private readonly ILanguageDef _langDef;
     private readonly TypeHelper _typeHelper;
+    private readonly TypeMap _typeMap;
 
     protected CodeGenerator(ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, ExpressionCompiler compiler)
     {
@@ -32,8 +32,9 @@ public abstract class CodeGenerator : ICodeGenerator
         Shared = new SharedCode();
     }
 
-    public bool UseUTF16Encoding => _langDef.UseUTF16Encoding;
     protected SharedCode Shared { get; }
+
+    public bool UseUTF16Encoding => _langDef.UseUTF16Encoding;
 
     public virtual bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
     {

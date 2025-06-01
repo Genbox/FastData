@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Configs;
+// ReSharper disable All
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 

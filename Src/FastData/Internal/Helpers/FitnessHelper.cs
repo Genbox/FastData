@@ -24,9 +24,7 @@ internal static class FitnessHelper
                 segFit = 1.0;
         }
         else
-        {
             segFit = segLen == 1 ? 1.0 : 0.0;
-        }
 
         //The number of operations is a factor
         ExpressionCounter counter = new ExpressionCounter();

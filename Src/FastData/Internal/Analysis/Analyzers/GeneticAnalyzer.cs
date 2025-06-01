@@ -130,14 +130,11 @@ internal sealed partial class GeneticAnalyzer(StringProperties props, GeneticAna
         entity.Tag = candidate.Collisions; //We cache collisions here and pull it out later
     }
 
-    private static GeneticStringHash CopyGenes(ref Entity entity)
-    {
-        return new GeneticStringHash(
-            ((ArraySegmentGene)entity.Genes[0]).Value,
-            ((IntGene)entity.Genes[1]).Value,
-            ((IntGene)entity.Genes[2]).Value,
-            ((IntGene)entity.Genes[3]).Value,
-            ((IntGene)entity.Genes[4]).Value
-        );
-    }
+    private static GeneticStringHash CopyGenes(ref Entity entity) => new GeneticStringHash(
+        ((ArraySegmentGene)entity.Genes[0]).Value,
+        ((IntGene)entity.Genes[1]).Value,
+        ((IntGene)entity.Genes[2]).Value,
+        ((IntGene)entity.Genes[3]).Value,
+        ((IntGene)entity.Genes[4]).Value
+    );
 }

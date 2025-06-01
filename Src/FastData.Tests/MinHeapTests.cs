@@ -14,7 +14,9 @@ public class MinHeapTests
         MinHeap<bool> buffer = new MinHeap<bool>(expected.Length);
 
         foreach (double value in input)
+        {
             buffer.Add(value, true);
+        }
 
         Assert.Equal(expected, buffer.Items.Select(x => x.Item1));
     }
