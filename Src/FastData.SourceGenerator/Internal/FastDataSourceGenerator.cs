@@ -150,7 +150,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
             FastDataConfig config = new FastDataConfig();
             BindValue(() => config.StructureType, ad.NamedArguments);
-            BindValue(() => config.StorageOptions, ad.NamedArguments);
+            // BindValue(() => config.StorageOptions, ad.NamedArguments);
 
             CSharpCodeGeneratorConfig config2 = new CSharpCodeGeneratorConfig(name);
             BindValue(() => config2.Namespace, ad.NamedArguments);

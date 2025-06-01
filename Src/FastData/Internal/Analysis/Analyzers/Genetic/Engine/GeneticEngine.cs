@@ -11,11 +11,6 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
 internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] genes, ILogger logger)
 {
     /// <summary>Runs the evolution process.</summary>
-    /// <param name="simulation">
-    /// A delegate that should be run as part of the simulation. Callers should run their fitness calculating code and update Entity with the value
-    /// (Entity.Fitness)
-    /// </param>
-    /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     internal IEnumerable<Entity> Evolve(Simulation simulation, ISelection selection, ICrossOver crossOver, IMutation mutation, IReinsertion reinsertion, ITermination termination, IRandom random)
     {

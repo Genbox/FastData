@@ -21,7 +21,7 @@ internal class RustLanguageDef : ILanguageDef
         new IntegerTypeDef<ulong>("u64", ulong.MinValue, ulong.MaxValue, "u64::MIN", "u64::MAX"),
         new IntegerTypeDef<float>("f32", float.MinValue, float.MaxValue, "f32::MIN", "f32::MAX", x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
         new IntegerTypeDef<double>("f64", double.MinValue, double.MaxValue, "f64::MIN", "f64::MAX", x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
-        new StringTypeDef<string>("&str"),
-        new BoolTypeDef<bool>("bool")
+        new StringTypeDef("&str"),
+        new BoolTypeDef("bool")
     };
 }

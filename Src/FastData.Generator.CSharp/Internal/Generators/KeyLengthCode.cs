@@ -6,8 +6,6 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    //TODO: Remove gaps in array by reducing the index via a map (if (idx > 10) return 4) where 4 is the number to subtract from the index
-
     public override string Generate()
     {
         if (ctx.LengthsAreUniq)
@@ -26,14 +24,14 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGenerator
 
     private string GenerateUniqIf() =>
         $$"""
-              {{GetFieldModifier()}}{{TypeName}}[] _entries = new {{TypeName}}[] {
+              {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
           {{FormatColumns(ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()), ToValueLabel)}}
               };
 
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
+              {{MethodAttribute}}
+              {{MethodModifier}}bool Contains({{TypeName}} value)
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
                   return {{GetEqualFunction("value", $"_entries[value.Length - {ctx.MinLength.ToStringInvariant()}]")}};
               }
@@ -41,10 +39,10 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGenerator
 
     private string GenerateUniqSwitch() =>
         $$"""
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
+              {{MethodAttribute}}
+              {{MethodModifier}}bool Contains({{TypeName}} value)
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
                   switch (value.Length)
                   {
@@ -60,14 +58,14 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGenerator
 
     private string GenerateNormal() =>
         $$"""
-              {{GetFieldModifier()}}{{TypeName}}[]?[] _entries = new {{TypeName}}[]?[] {
-          {{FormatList(ctx.Lengths.Skip((int)ctx.MinLength).Take((int)((ctx.MaxLength - ctx.MinLength) + 1)), RenderMany, ",\n")}}
+              {{FieldModifier}}{{TypeName}}[]?[] _entries = new {{TypeName}}[]?[] {
+          {{FormatList(ctx.Lengths.Skip((int)ctx.MinLength).Take((int)(ctx.MaxLength - ctx.MinLength + 1)), RenderMany, ",\n")}}
               };
 
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
+              {{MethodAttribute}}
+              {{MethodModifier}}bool Contains({{TypeName}} value)
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
                   {{TypeName}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];
 
                   if (bucket == null)
@@ -83,11 +81,5 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGenerator
               }
           """;
 
-    private string RenderMany(List<string>? x)
-    {
-        if (x == null)
-            return "        null";
-
-        return $"new [] {{{string.Join(",", x.Select(ToValueLabel))}}}";
-    }
+    private string RenderMany(List<string>? x) => x == null ? "        null" : $"new [] {{{string.Join(",", x.Select(ToValueLabel))}}}";
 }

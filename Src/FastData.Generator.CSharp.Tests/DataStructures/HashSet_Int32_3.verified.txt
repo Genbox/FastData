@@ -30,7 +30,7 @@ internal static class MyData
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && value.Equals(entry.Value))
+            if (entry.HashCode == hash && value == entry.Value)
                 return true;
 
             i = entry.Next;

@@ -46,6 +46,8 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
     }
 
     [SuppressMessage("Design", "CA1034:Nested types should not be visible")]
+    [SuppressMessage("Maintainability", "CA1515:Consider making public types internal")]
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public sealed class CPlusPlusContext
     {
         public CPlusPlusContext()

@@ -3,9 +3,9 @@ using Genbox.FastData.Generator.Framework.Interfaces;
 
 namespace Genbox.FastData.Generator.Framework.Definitions;
 
-public class BoolTypeDef<T>(string name) : ITypeDef<T> where T : notnull
+public class BoolTypeDef(string name) : ITypeDef<bool>
 {
     public DataType DataType => DataType.Boolean;
     public string Name { get; } = name;
-    public Func<T, string> Print => x => (bool)(object)x ? "true" : "false";
+    public Func<bool, string> Print => x => x ? "true" : "false";
 }

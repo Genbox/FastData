@@ -1,6 +1,7 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.InternalShared;
+using Genbox.FastData.InternalShared.Helpers;
 
 namespace Genbox.FastData.SourceGenerator.Tests;
 

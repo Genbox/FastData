@@ -94,32 +94,4 @@ public sealed class FastStringBuilder
 
         _indentPending = false;
     }
-
-    private sealed class Indenter : IDisposable
-    {
-        private readonly FastStringBuilder _stringBuilder;
-
-        public Indenter(FastStringBuilder stringBuilder)
-        {
-            _stringBuilder = stringBuilder;
-            _stringBuilder.IncrementIndent();
-        }
-
-        public void Dispose() => _stringBuilder.DecrementIndent();
-    }
-
-    private sealed class IndentSuspender : IDisposable
-    {
-        private readonly FastStringBuilder _stringBuilder;
-        private readonly int _indent;
-
-        public IndentSuspender(FastStringBuilder stringBuilder)
-        {
-            _stringBuilder = stringBuilder;
-            _indent = _stringBuilder.Indent;
-            _stringBuilder.Indent = 0;
-        }
-
-        public void Dispose() => _stringBuilder.Indent = _indent;
-    }
 }

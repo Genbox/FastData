@@ -68,7 +68,7 @@ public class GenericSelectionTests
 
     private static void TestSeed(ISelection a, ISelection b, bool equal)
     {
-        StaticArray<Entity>? population = GeneticsHelper.GeneratePopulation(10, 0, 10);
+        StaticArray<Entity> population = GeneticsHelper.GeneratePopulation(10, 0, 10);
 
         List<int> indexes1 = new List<int>();
         a.Process(population, indexes1, 10);

@@ -137,7 +137,7 @@ public static class TestVectorHelper
             yield return testVector;
 
         // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
-        foreach (ITestVector testVector in GenerateTestVectors([(typeof(string), ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]),], typeof(KeyLengthStructure<>)))
+        foreach (ITestVector testVector in GenerateTestVectors([(typeof(string), ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"])], typeof(KeyLengthStructure<>)))
             yield return testVector;
     }
 
@@ -214,7 +214,7 @@ public static class TestVectorHelper
     [
         (typeof(int), Enumerable.Range(0, size).Select(x => x).Cast<object>().ToArray()),
         (typeof(float), Enumerable.Range(0, size).Select(x => (float)x).Cast<object>().ToArray()),
-        (typeof(string), Enumerable.Range(0, size).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).Cast<object>().ToArray()),
+        (typeof(string), Enumerable.Range(0, size).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).Cast<object>().ToArray())
     ];
 
     private static IEnumerable<(Type type, object[] value)> GetSingleValues() =>

@@ -4,8 +4,10 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 internal abstract class CPlusPlusOutputWriter<T> : OutputWriter<T>
 {
-    protected string GetFieldModifier(bool value) => value ? GetFieldModifier() : "inline static const ";
-    protected override string GetFieldModifier() => "static constexpr ";
-    protected override string GetMethodModifier() => "static ";
-    protected override string GetMethodAttributes() => "[[nodiscard]]";
+    protected string GetFieldModifier(bool value) => value ? FieldModifier : "inline static const ";
+
+    protected string FieldModifier => "static constexpr ";
+    protected string MethodModifier => "static ";
+    protected string PostMethodModifier => " noexcept";
+    protected string MethodAttribute => "[[nodiscard]]";
 }

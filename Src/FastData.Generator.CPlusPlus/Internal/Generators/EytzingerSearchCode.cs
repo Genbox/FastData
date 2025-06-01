@@ -1,4 +1,5 @@
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
+using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
@@ -6,15 +7,15 @@ internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx) : CP
 {
     public override string Generate() =>
         $$"""
-              {{GetFieldModifier()}}std::array<{{TypeName}}, {{ctx.Data.Length}}> entries = {
+              {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
           public:
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
+              {{MethodAttribute}}
+              {{MethodModifier}}bool contains(const {{TypeName}} value){{PostMethodModifier}}
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
                   size_t i = 0;
                   while (i < entries.size())

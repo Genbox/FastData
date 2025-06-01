@@ -14,10 +14,10 @@ internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGe
 
     private string GenerateIf() =>
         $$"""
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
+              {{MethodAttribute}}
+              {{MethodModifier}}bool Contains({{TypeName}} value)
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
                   if ({{FormatList(ctx.Data, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}})
                       return true;
@@ -28,10 +28,10 @@ internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGe
 
     private string GenerateSwitch() =>
         $$"""
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
+              {{MethodAttribute}}
+              {{MethodModifier}}bool Contains({{TypeName}} value)
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
                   switch (value)
                   {

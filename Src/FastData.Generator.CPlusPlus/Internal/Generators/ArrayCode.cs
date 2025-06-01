@@ -7,17 +7,17 @@ internal sealed class ArrayCode<T>(ArrayContext<T> ctx) : CPlusPlusOutputWriter<
 {
     public override string Generate() =>
         $$"""
-              {{GetFieldModifier()}}std::array<{{TypeName}}, {{ctx.Data.Length}}> entries = {
+              {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
           public:
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
+              {{MethodAttribute}}
+              {{MethodModifier}}bool contains(const {{TypeName}} value){{PostMethodModifier}}
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
-                  for ({{GetArraySizeType()}} i = 0; i < {{ctx.Data.Length.ToStringInvariant()}}; i++)
+                  for ({{ArraySizeType}} i = 0; i < {{ctx.Data.Length.ToStringInvariant()}}; i++)
                   {
                       if ({{GetEqualFunction("entries[i]", "value")}})
                          return true;

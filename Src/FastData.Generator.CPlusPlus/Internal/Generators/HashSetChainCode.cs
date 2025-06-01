@@ -9,32 +9,32 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlu
         $$"""
               struct e
               {
-                  uint64_t hash_code;
+                  {{HashSizeType}} hash_code;
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
                   {{TypeName}} value;
 
-                  e(const uint64_t hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{TypeName}} value)
+                  e(const {{HashSizeType}} hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{TypeName}} value)
                      : hash_code(hash_code), next(next), value(value) {}
               };
 
-              {{GetFieldModifier()}}std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length}}> buckets = {
+              {{FieldModifier}}std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length.ToStringInvariant()}}> buckets = {
           {{FormatColumns(ctx.Buckets, static x => x.ToStringInvariant())}}
                };
 
-              {{GetFieldModifier(false)}}std::array<e, {{ctx.Entries.Length}}> entries = {
+              {{GetFieldModifier(false)}}std::array<e, {{ctx.Entries.Length.ToStringInvariant()}}> entries = {
           {{FormatColumns(ctx.Entries, x => $"e({x.Hash.ToStringInvariant()}, {x.Next.ToStringInvariant()}, {ToValueLabel(x.Value)})")}}
               };
 
-          {{GetHashSource()}}
+          {{HashSource}}
 
           public:
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
+              {{MethodAttribute}}
+              {{MethodModifier}}bool contains(const {{TypeName}} value){{PostMethodModifier}}
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
-                  const uint64_t hash = get_hash(value);
-                  const size_t index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
+                  const {{HashSizeType}} hash = get_hash(value);
+                  const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} i = buckets[index] - 1;
 
                   while (i >= 0)

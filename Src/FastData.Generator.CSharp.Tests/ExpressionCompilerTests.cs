@@ -3,7 +3,6 @@ using Genbox.FastData.Generator.CSharp.Internal;
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.InternalShared;
-using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.InternalShared.TestClasses.TheoryData;
 
 namespace Genbox.FastData.Generator.CSharp.Tests;

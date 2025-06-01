@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Analysis;

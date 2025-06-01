@@ -162,7 +162,7 @@ internal sealed partial class BruteForceAnalyzer(StringProperties props, BruteFo
 
     private static readonly ulong[] Seeds =
     [
-        0xFF51AFD7ED558CCD, 0xC4CEB9FE1A85EC53, //Murmur
+        0xFF51AFD7ED558CCD, 0xC4CEB9FE1A85EC53 //Murmur
     ];
 
     private interface IMixerGenerator

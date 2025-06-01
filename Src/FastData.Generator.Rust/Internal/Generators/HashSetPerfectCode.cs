@@ -9,27 +9,27 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, Genera
     public override string Generate()
     {
         shared.Add("ph-struct-" + genCfg.DataType, CodeType.Class, $$"""
-                                                                     {{GetFieldModifier()}}struct E {
-                                                                         value: {{GetTypeNameWithLifetime()}},
-                                                                         hash_code: u32,
+                                                                     {{FieldModifier}}struct E {
+                                                                         value: {{TypeNameWithLifetime}},
+                                                                         hash_code: {{HashSizeType}},
                                                                      }
                                                                      """);
 
         return $$"""
-                     {{GetFieldModifier()}}const ENTRIES: [E; {{ctx.Data.Length}}] = [
+                     {{FieldModifier}}const ENTRIES: [E; {{ctx.Data.Length.ToStringInvariant()}}] = [
                  {{FormatColumns(ctx.Data, x => $"E {{ value: {ToValueLabel(x.Key)}, hash_code: {x.Value.ToStringInvariant()} }}")}}
                      ];
 
-                 {{GetHashSource()}}
+                 {{HashSource}}
 
-                     #[must_use]
-                     {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
-                 {{GetEarlyExits()}}
+                     {{MethodAttribute}}
+                     {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+                 {{EarlyExits}}
                          let hash = unsafe { Self::get_hash(value) };
                          let index = ({{GetModFunction("hash", (ulong)ctx.Data.Length)}}) as usize;
                          let entry = &Self::ENTRIES[index];
 
-                         return hash == entry.hash_code && value == entry.value;
+                         return {{GetEqualFunction("hash", "entry.hash_code")}} && {{GetEqualFunction("value", "entry.value")}};
                      }
                  """;
     }

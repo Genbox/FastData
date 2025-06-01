@@ -9,27 +9,27 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, GeneratorC
     public override string Generate()
     {
         shared.Add("chain-struct-" + genCfg.DataType, CodeType.Class, $$"""
-                                                                        {{GetFieldModifier()}}struct E {
-                                                                            hash_code: u64,
+                                                                        {{FieldModifier}}struct E {
+                                                                            hash_code: {{HashSizeType}},
                                                                             next: {{GetSmallestSignedType(ctx.Buckets.Length)}},
-                                                                            value: {{GetTypeNameWithLifetime()}},
+                                                                            value: {{TypeNameWithLifetime}},
                                                                         }
                                                                         """);
 
         return $$"""
-                     {{GetFieldModifier()}}const BUCKETS: [{{GetSmallestSignedType(ctx.Buckets.Length)}}; {{ctx.Buckets.Length}}] = [
+                     {{FieldModifier}}const BUCKETS: [{{GetSmallestSignedType(ctx.Buckets.Length)}}; {{ctx.Buckets.Length.ToStringInvariant()}}] = [
                  {{FormatColumns(ctx.Buckets, static x => x.ToStringInvariant())}}
                      ];
 
-                     {{GetFieldModifier()}}const ENTRIES: [E; {{ctx.Entries.Length}}] = [
+                     {{FieldModifier}}const ENTRIES: [E; {{ctx.Entries.Length}}] = [
                  {{FormatColumns(ctx.Entries, x => $"E {{ hash_code: {x.Hash}, next: {x.Next.ToStringInvariant()}, value: {ToValueLabel(x.Value)} }}")}}
                      ];
 
-                 {{GetHashSource()}}
+                 {{HashSource}}
 
-                     #[must_use]
-                     {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
-                 {{GetEarlyExits()}}
+                     {{MethodAttribute}}
+                     {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+                 {{EarlyExits}}
 
                          let hash = unsafe { Self::get_hash(value) };
                          let index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
@@ -37,7 +37,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, GeneratorC
 
                          while i >= 0 {
                              let entry = &Self::ENTRIES[i as usize];
-                             if entry.hash_code == hash && entry.value == value {
+                             if {{GetEqualFunction("entry.hash_code", "hash")}} && {{GetEqualFunction("entry.value", "value")}} {
                                  return true;
                              }
                              i = entry.next;

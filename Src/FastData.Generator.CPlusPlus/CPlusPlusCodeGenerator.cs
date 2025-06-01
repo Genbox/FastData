@@ -24,7 +24,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     public override bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
     {
         //C++ generator does not support chars outside ASCII
-        if (genCfg.DataType == DataType.Char && (char)(object)genCfg.Constants.MaxValue > 127)
+        if (genCfg.DataType == DataType.Char && (char)(object)genCfg.Constants.MaxValue! > 127)
         {
             source = null;
             return false;

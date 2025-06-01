@@ -8,18 +8,18 @@ internal static class PrimitiveHash
 {
     internal static HashFunc<T> GetHash<T>(DataType dataType) => dataType switch
     {
-        DataType.Boolean => static obj => (ulong)((bool)(object)obj ? 1 : 0),
-        DataType.Char => static obj => (char)(object)obj,
-        DataType.SByte => static obj => (ulong)(sbyte)(object)obj,
-        DataType.Byte => static obj => (byte)(object)obj,
-        DataType.Int16 => static obj => (ulong)(short)(object)obj,
-        DataType.UInt16 => static obj => (ushort)(object)obj,
-        DataType.Int32 => static obj => (ulong)(int)(object)obj,
-        DataType.UInt32 => static obj => (uint)(object)obj,
-        DataType.Single => static obj => HashF32((float)(object)obj),
-        DataType.Int64 => static obj => (ulong)(long)(object)obj, //Use value directly
-        DataType.UInt64 => static obj => (ulong)(object)obj, //Use value directly
-        DataType.Double => static obj => HashF64((double)(object)obj), //Does not fold to 32bit
+        DataType.Boolean => static obj => (ulong)((bool)(object)obj! ? 1 : 0),
+        DataType.Char => static obj => (char)(object)obj!,
+        DataType.SByte => static obj => (ulong)(sbyte)(object)obj!,
+        DataType.Byte => static obj => (byte)(object)obj!,
+        DataType.Int16 => static obj => (ulong)(short)(object)obj!,
+        DataType.UInt16 => static obj => (ushort)(object)obj!,
+        DataType.Int32 => static obj => (ulong)(int)(object)obj!,
+        DataType.UInt32 => static obj => (uint)(object)obj!,
+        DataType.Single => static obj => HashF32((float)(object)obj!),
+        DataType.Int64 => static obj => (ulong)(long)(object)obj!, //Use value directly
+        DataType.UInt64 => static obj => (ulong)(object)obj!, //Use value directly
+        DataType.Double => static obj => HashF64((double)(object)obj!), //Does not fold to 32bit
         _ => throw new InvalidOperationException($"Unsupported data type: {dataType}")
     };
 

@@ -3,7 +3,7 @@ using VerifyTests.DiffPlex;
 
 namespace Genbox.FastData.Generator.CSharp.Tests.Properties;
 
-public static class ModuleInitializer
+internal static class ModuleInitializer
 {
     [ModuleInitializer]
     public static void Initialize() => VerifyDiffPlex.Initialize(OutputType.Compact);

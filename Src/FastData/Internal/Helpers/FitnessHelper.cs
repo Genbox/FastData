@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Internal.Analysis.Expressions;
-using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Misc;
 

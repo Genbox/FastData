@@ -7,14 +7,14 @@ internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx, CSharpCode
 {
     public override string Generate() =>
         $$"""
-              {{GetFieldModifier()}}{{TypeName}}[] _entries = new {{TypeName}}[] {
+              {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
+              {{MethodAttribute}}
+              {{MethodModifier}}bool Contains({{TypeName}} value)
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
                   int lo = 0;
                   int hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};

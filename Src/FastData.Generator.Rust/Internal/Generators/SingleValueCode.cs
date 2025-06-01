@@ -6,9 +6,9 @@ internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx) : RustOutput
 {
     public override string Generate() =>
         $$"""
-              #[must_use]
-              {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
-                  {{ToValueLabel(ctx.Item)}} == value
+              {{MethodAttribute}}
+              {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+                   {{GetEqualFunction(ToValueLabel(ctx.Item), "value")}}
               }
           """;
 }

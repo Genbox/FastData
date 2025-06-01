@@ -6,7 +6,6 @@ public sealed class StaticArray<T>(int capacity) : IEnumerable<T> where T : stru
 {
     private readonly T[] _array = new T[capacity];
 
-    internal int Capacity { get; } = capacity;
     internal int Count { get; private set; }
 
     internal ref T this[int index] => ref _array[index];

@@ -17,6 +17,7 @@ public abstract class CodeGenerator : ICodeGenerator
     private readonly IEarlyExitDef _earlyExitDef;
     private readonly IHashDef _hashDef;
     private readonly ExpressionCompiler _compiler;
+    private readonly TypeHelper _typeHelper;
 
     protected CodeGenerator(ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, ExpressionCompiler compiler)
     {
@@ -27,13 +28,12 @@ public abstract class CodeGenerator : ICodeGenerator
         _compiler = compiler;
 
         _typeMap = new TypeMap(langDef.TypeDefinitions);
-        Typehelper = new TypeHelper(_typeMap);
+        _typeHelper = new TypeHelper(_typeMap);
         Shared = new SharedCode();
     }
 
     public bool UseUTF16Encoding => _langDef.UseUTF16Encoding;
-    public SharedCode Shared { get; }
-    public TypeHelper Typehelper { get; }
+    protected SharedCode Shared { get; }
 
     public virtual bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
     {
@@ -76,7 +76,7 @@ public abstract class CodeGenerator : ICodeGenerator
         if (writer == null)
             throw new NotSupportedException("The context type is not supported: " + context.GetType().Name);
 
-        writer.Initialize(_langDef, _earlyExitDef, Typehelper, _hashDef, genCfg, typeName, compiler);
+        writer.Initialize(_langDef, _earlyExitDef, _typeHelper, _hashDef, genCfg, typeName, compiler);
         sb.AppendLine(writer.Generate());
     }
 
@@ -87,8 +87,8 @@ public abstract class CodeGenerator : ICodeGenerator
 
         if (genCfg.DataType.IsInteger())
         {
-            sb.AppendLine(_constDef.MinValueTemplate(typeName, Typehelper.ToValueLabel(genCfg.Constants.MinValue)));
-            sb.AppendLine(_constDef.MaxValueTemplate(typeName, Typehelper.ToValueLabel(genCfg.Constants.MaxValue)));
+            sb.AppendLine(_constDef.MinValueTemplate(typeName, _typeHelper.ToValueLabel(genCfg.Constants.MinValue)));
+            sb.AppendLine(_constDef.MaxValueTemplate(typeName, _typeHelper.ToValueLabel(genCfg.Constants.MaxValue)));
         }
         else if (genCfg.DataType == DataType.String)
         {

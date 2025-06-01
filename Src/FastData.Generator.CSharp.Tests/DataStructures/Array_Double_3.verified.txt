@@ -20,7 +20,7 @@ internal static class MyData
 
         for (int i = 0; i < 3; i++)
         {
-            if (value.Equals(_entries[i]))
+            if (value == _entries[i])
                return true;
         }
         return false;

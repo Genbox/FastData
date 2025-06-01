@@ -7,24 +7,24 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx, CSharpCo
 {
     public override string Generate() =>
         $$"""
-              {{GetFieldModifier()}}B[] _buckets = {
+              {{FieldModifier}}B[] _buckets = {
           {{FormatColumns(ctx.Buckets, static x => $"new B({x.StartIndex.ToStringInvariant()}, {x.EndIndex.ToStringInvariant()})")}}
               };
 
-              {{GetFieldModifier()}}{{TypeName}}[] _items = new {{TypeName}}[] {
+              {{FieldModifier}}{{TypeName}}[] _items = new {{TypeName}}[] {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
-              {{GetFieldModifier()}}ulong[] _hashCodes = {
+              {{FieldModifier}}{{HashSizeType}}[] _hashCodes = {
           {{FormatColumns(ctx.HashCodes, static x => x.ToStringInvariant())}}
               };
 
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
+              {{MethodAttribute}}
+              {{MethodModifier}}bool Contains({{TypeName}} value)
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
-                  ulong hash = Hash(value);
+                  {{HashSizeType}} hash = Hash(value);
                   ref B b = ref _buckets[{{GetModFunction("hash", (ulong)ctx.Buckets.Length)}}];
 
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} index = b.StartIndex;
@@ -32,7 +32,7 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx, CSharpCo
 
                   while (index <= endIndex)
                   {
-                      if (_hashCodes[index] == hash && {{GetEqualFunction("value", "_items[index]")}})
+                      if ({{GetEqualFunction("_hashCodes[index]", "hash")}} && {{GetEqualFunction("value", "_items[index]")}})
                           return true;
 
                       index++;
@@ -41,7 +41,7 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx, CSharpCo
                   return false;
               }
 
-          {{GetHashSource()}}
+          {{HashSource}}
 
               [StructLayout(LayoutKind.Auto)]
               private readonly struct B

@@ -7,28 +7,28 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, CSharpCode
 {
     public override string Generate() =>
         $$"""
-              {{GetFieldModifier()}}{{GetSmallestSignedType(ctx.Buckets.Length)}}[] _buckets = new {{GetSmallestSignedType(ctx.Buckets.Length)}}[] {
+              {{FieldModifier}}{{GetSmallestSignedType(ctx.Buckets.Length)}}[] _buckets = new {{GetSmallestSignedType(ctx.Buckets.Length)}}[] {
           {{FormatColumns(ctx.Buckets, static x => x.ToStringInvariant())}}
                };
 
-              {{GetFieldModifier()}}E[] _entries = {
+              {{FieldModifier}}E[] _entries = {
           {{FormatColumns(ctx.Entries, x => $"new E({x.Hash}, {x.Next.ToStringInvariant()}, {ToValueLabel(x.Value)})")}}
               };
 
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
+              {{MethodAttribute}}
+              {{MethodModifier}}bool Contains({{TypeName}} value)
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
-                  ulong hash = Hash(value);
-                  uint index = (uint)({{GetModFunction("hash", (ulong)ctx.Buckets.Length)}});
+                  {{HashSizeType}} hash = Hash(value);
+                  {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} i = ({{GetSmallestSignedType(ctx.Buckets.Length)}})(_buckets[index] - 1);
 
                   while (i >= 0)
                   {
                       ref E entry = ref _entries[i];
 
-                      if (entry.HashCode == hash && {{GetEqualFunction("value", "entry.Value")}})
+                      if ({{GetEqualFunction("entry.HashCode", "hash", HashSizeDataType)}} && {{GetEqualFunction("value", "entry.Value")}})
                           return true;
 
                       i = entry.Next;
@@ -37,16 +37,16 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, CSharpCode
                   return false;
               }
 
-          {{GetHashSource()}}
+          {{HashSource}}
 
               [StructLayout(LayoutKind.Auto)]
               private readonly struct E
               {
-                  internal readonly ulong HashCode;
+                  internal readonly {{HashSizeType}} HashCode;
                   internal readonly {{GetSmallestSignedType(ctx.Buckets.Length)}} Next;
                   internal readonly {{TypeName}} Value;
 
-                  internal E(ulong hashCode, {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{TypeName}} value)
+                  internal E({{HashSizeType}} hashCode, {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{TypeName}} value)
                   {
                       HashCode = hashCode;
                       Next = next;

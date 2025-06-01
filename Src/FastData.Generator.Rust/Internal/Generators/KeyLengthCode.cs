@@ -15,13 +15,13 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx) : RustOutputWriter<
                                .ToArray();
 
         return $$"""
-                     {{GetFieldModifier()}}const ENTRIES: [{{TypeName}}; {{lengths.Length}}] = [
+                     {{FieldModifier}}const ENTRIES: [{{TypeName}}; {{lengths.Length.ToStringInvariant()}}] = [
                  {{FormatColumns(lengths, ToValueLabel)}}
                      ];
 
-                     #[must_use]
-                     {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
-                 {{GetEarlyExits()}}
+                     {{MethodAttribute}}
+                     {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+                 {{EarlyExits}}
                          return Self::ENTRIES[(value.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize] == value;
                      }
                  """;
@@ -31,27 +31,27 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx) : RustOutputWriter<
     {
         List<string>?[] lengths = ctx.Lengths
                                      .Skip((int)ctx.MinLength)
-                                     .Take((int)((ctx.MaxLength - ctx.MinLength) + 1))
+                                     .Take((int)(ctx.MaxLength - ctx.MinLength + 1))
                                      .ToArray();
 
         return $$"""
-                     {{GetFieldModifier()}}const ENTRIES: [Vec<{{TypeName}}>; {{lengths.Length}}] = [
+                     {{FieldModifier}}const ENTRIES: [Vec<{{TypeName}}>; {{lengths.Length}}] = [
                  {{FormatList(lengths, RenderMany, ",\n")}}
                      ];
 
-                     #[must_use]
-                     {{GetMethodModifier()}}fn contains(value: &{{TypeName}}) -> bool {
-                 {{GetEarlyExits()}}
-                         let idx = (value.len() - {{ctx.MinLength}}) as usize;
+                     {{MethodAttribute}}
+                     {{MethodModifier}}fn contains(value: &{{TypeName}}) -> bool {
+                 {{EarlyExits}}
+                         let idx = (value.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize;
                          let bucket = &Self::ENTRIES[idx];
 
                          if bucket.is_empty() {
-                             return false;
+                             false
                          }
 
                          for item in bucket.iter() {
                              if item == value {
-                                 return true;
+                                 true
                              }
                          }
 
@@ -60,11 +60,5 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx) : RustOutputWriter<
                  """;
     }
 
-    private string RenderMany(List<string>? x)
-    {
-        if (x == null)
-            return "Vec::new()";
-
-        return $"vec![{string.Join(", ", x.Select(ToValueLabel))}]";
-    }
+    private string RenderMany(List<string>? x) => x == null ? "Vec::new()" : $"vec![{string.Join(", ", x.Select(ToValueLabel))}]";
 }

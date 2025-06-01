@@ -7,7 +7,7 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class PerfectHashBenchmarks
 {
-    private static ulong[] _hashCodes;
+    private static ulong[] _hashCodes = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -27,7 +27,7 @@ public class PerfectHashBenchmarks
             "Wine", "Wood", "Word", "Work", "Year"
         ];
 
-        _hashCodes = words.Select(x => (ulong)x.GetHashCode()).ToArray();
+        _hashCodes = words.Select(x => (ulong)x.GetHashCode(StringComparison.Ordinal)).ToArray();
     }
 
     [Benchmark]

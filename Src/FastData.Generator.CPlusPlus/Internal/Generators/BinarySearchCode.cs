@@ -7,18 +7,18 @@ internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : CPlusPlu
 {
     public override string Generate() =>
         $$"""
-              {{GetFieldModifier()}}std::array<{{TypeName}}, {{ctx.Data.Length}}> entries = {
+              {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
           public:
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
+              {{MethodAttribute}}
+              {{MethodModifier}}bool contains(const {{TypeName}} value){{PostMethodModifier}}
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
-                  {{GetArraySizeType()}} lo = 0;
-                  {{GetArraySizeType()}} hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
+                  {{ArraySizeType}} lo = 0;
+                  {{ArraySizeType}} hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
                   while (lo <= hi)
                   {
                       const size_t mid = lo + ((hi - lo) >> 1);

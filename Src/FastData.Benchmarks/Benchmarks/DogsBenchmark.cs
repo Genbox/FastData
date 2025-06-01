@@ -29,9 +29,5 @@ public class DogsBenchmark
                 _ => false
             };
         }
-
-        public const int ItemCount = 3;
-        public const int MinLength = 8;
-        public const int MaxLength = 16;
     }
 }

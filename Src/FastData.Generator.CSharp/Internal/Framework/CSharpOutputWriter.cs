@@ -14,33 +14,32 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
         return $"{var1}.CompareTo({var2})";
     }
 
-    internal string GetEqualFunction(string var1, string var2)
+    protected override string GetEqualFunction(string var1, string var2, DataType dataType = DataType.Null)
     {
-        if (GeneratorConfig.DataType == DataType.String)
+        if (dataType == DataType.Null)
+            dataType = GeneratorConfig.DataType;
+
+        if (dataType == DataType.String)
             return $"StringComparer.{GeneratorConfig.StringComparison}.Equals({var1}, {var2})";
 
-        return $"{var1}.Equals({var2})";
+        return $"{var1} == {var2}";
     }
 
-    protected override string GetFieldModifier()
+    protected string FieldModifier => cfg.ClassType == ClassType.Static ? "private static readonly " : "private readonly ";
+    protected string MethodModifier => cfg.ClassType == ClassType.Static ? "public static " : "public ";
+
+    protected string MethodAttribute
     {
-        return cfg.ClassType == ClassType.Static ? "private static readonly " : "private readonly ";
-    }
+        get
+        {
+            if (cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableInlining))
+                return "[MethodImpl(MethodImplOptions.NoInlining)]";
 
-    protected override string GetMethodModifier()
-    {
-        return cfg.ClassType == ClassType.Static ? "public static " : "public ";
-    }
+            if (cfg.GeneratorOptions.HasFlag(CSharpOptions.AggressiveInlining))
+                return "[MethodImpl(MethodImplOptions.AggressiveInlining)]";
 
-    protected override string GetMethodAttributes()
-    {
-        if (cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableInlining))
-            return "[MethodImpl(MethodImplOptions.NoInlining)]";
-
-        if (cfg.GeneratorOptions.HasFlag(CSharpOptions.AggressiveInlining))
-            return "[MethodImpl(MethodImplOptions.AggressiveInlining)]";
-
-        return string.Empty;
+            return string.Empty;
+        }
     }
 
     protected override string GetModFunction(string variable, ulong value)
@@ -53,8 +52,8 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
             return "0";
 
         if (MathHelper.IsPowerOfTwo((uint)value) && !cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableModulusOptimization))
-            return $"{variable} & {value - 1}";
+            return $"({ArraySizeType})({variable} & {value - 1})";
 
-        return $"{variable} % {value}";
+        return $"({ArraySizeType})({variable} % {value})";
     }
 }

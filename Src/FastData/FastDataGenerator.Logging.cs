@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData;
 
-public partial class FastDataGenerator
+public static partial class FastDataGenerator
 {
     [LoggerMessage(LogLevel.Information, "There are {Count} unique items")]
     internal static partial void LogUniqueItems(ILogger logger, int count);

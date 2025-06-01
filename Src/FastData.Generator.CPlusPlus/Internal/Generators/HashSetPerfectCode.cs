@@ -10,29 +10,28 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx) : CPlu
               struct e
               {
                   {{TypeName}} value;
-                  uint64_t hash_code;
+                  {{HashSizeType}} hash_code;
 
-                  e(const {{TypeName}} value, const uint64_t hash_code)
+                  e(const {{TypeName}} value, const {{HashSizeType}} hash_code)
                   : value(value), hash_code(hash_code) {}
               };
 
-              {{GetFieldModifier(false)}}std::array<e, {{ctx.Data.Length}}> entries = {
+              {{GetFieldModifier(false)}}std::array<e, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
           {{FormatColumns(ctx.Data, x => $"e({ToValueLabel(x.Key)}, {x.Value.ToStringInvariant()})")}}
               };
 
-          {{GetHashSource()}}
+          {{HashSource}}
 
           public:
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
+              {{MethodAttribute}}
+              {{MethodModifier}}bool contains(const {{TypeName}} value){{PostMethodModifier}}
               {
-          {{GetEarlyExits()}}
-                  const uint64_t hash = get_hash(value);
-                  const size_t index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
+          {{EarlyExits}}
+                  const {{HashSizeType}} hash = get_hash(value);
+                  const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                   const e& entry = entries[index];
 
                   return {{GetEqualFunction("hash", "entry.hash_code")}} && {{GetEqualFunction("value", "entry.value")}};
               }
           """;
-
 }

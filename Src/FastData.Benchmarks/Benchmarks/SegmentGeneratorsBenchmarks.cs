@@ -1,7 +1,6 @@
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Analysis.SegmentGenerators;
-using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Helpers;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;

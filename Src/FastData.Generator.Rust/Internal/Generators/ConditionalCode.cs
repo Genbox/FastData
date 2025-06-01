@@ -6,11 +6,11 @@ internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx) : RustOutput
 {
     public override string Generate() =>
         $$"""
-              #[must_use]
-              {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
-          {{GetEarlyExits()}}
+              {{MethodAttribute}}
+              {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+          {{EarlyExits}}
 
-                  if {{FormatList(ctx.Data, x => $"value == {ToValueLabel(x)}", " || ")}} {
+                  if {{FormatList(ctx.Data, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}} {
                       return true;
                   }
 

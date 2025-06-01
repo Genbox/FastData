@@ -7,7 +7,7 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Testbed.Tests;
 
-public static class GeneratorTest
+internal static class GeneratorTest
 {
     public static void TestGenerators()
     {

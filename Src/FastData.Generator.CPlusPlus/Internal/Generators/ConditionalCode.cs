@@ -7,12 +7,12 @@ internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx) : CPlusPlusO
     public override string Generate() =>
         $$"""
           public:
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
+              {{MethodAttribute}}
+              {{MethodModifier}}bool contains(const {{TypeName}} value){{PostMethodModifier}}
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
-                  if ({{FormatList(ctx.Data, x => $"{GetEqualFunction("value",ToValueLabel(x))}", " || ")}})
+                  if ({{FormatList(ctx.Data, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}})
                       return true;
 
                   return false;

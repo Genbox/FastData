@@ -7,35 +7,35 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, CSharp
 {
     public override string Generate() =>
         $$"""
-              {{GetFieldModifier()}}E[] _entries = {
+              {{FieldModifier}}E[] _entries = {
           {{FormatColumns(ctx.Data, x => $"new E({ToValueLabel(x.Key)}, {x.Value.ToStringInvariant()})")}}
               };
 
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
+              {{MethodAttribute}}
+              {{MethodModifier}}bool Contains({{TypeName}} value)
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
-                  ulong hash = Hash(value);
-                  uint index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
+                  {{HashSizeType}} hash = Hash(value);
+                  {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                   ref E entry = ref _entries[index];
 
-                  return hash == entry.HashCode && {{GetEqualFunction("value", "entry.Value")}};
+                  return {{GetEqualFunction("hash", "entry.HashCode")}} && {{GetEqualFunction("value", "entry.Value")}};
               }
 
-          {{GetHashSource()}}
+          {{HashSource}}
 
               [StructLayout(LayoutKind.Auto)]
               private struct E
               {
-                  internal E({{TypeName}} value, ulong hashCode)
+                  internal E({{TypeName}} value, {{HashSizeType}} hashCode)
                   {
                       Value = value;
                       HashCode = hashCode;
                   }
 
                   internal {{TypeName}} Value;
-                  internal ulong HashCode;
+                  internal {{HashSizeType}} HashCode;
               }
           """;
 }

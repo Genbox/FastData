@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Internal.Analysis.Expressions;
-using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Misc;
 using static System.Linq.Expressions.Expression;

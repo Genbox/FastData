@@ -7,13 +7,13 @@ internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : RustOutp
 {
     public override string Generate() =>
         $$"""
-              {{GetFieldModifier()}}const ENTRIES: [{{GetTypeNameWithLifetime()}}; {{ctx.Data.Length}}] = [
+              {{FieldModifier}}const ENTRIES: [{{TypeNameWithLifetime}}; {{ctx.Data.Length.ToStringInvariant()}}] = [
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               ];
 
-              #[must_use]
-              {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
-          {{GetEarlyExits()}}
+              {{MethodAttribute}}
+              {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+          {{EarlyExits}}
 
                   let mut lo: usize = 0;
                   let mut hi: usize = {{(ctx.Data.Length - 1).ToStringInvariant()}};
@@ -31,7 +31,7 @@ internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : RustOutp
                       }
                   }
 
-                  return false;
+                  false
               }
           """;
 }

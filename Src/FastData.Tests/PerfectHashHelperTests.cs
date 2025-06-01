@@ -10,7 +10,7 @@ public class PerfectHashHelperTests
     public PerfectHashHelperTests()
     {
         string[] words = ["Area", "Army", "Baby", "Back", "Ball", "Band", "Bank", "Base", "Bill", "Body"];
-        _hashCodes = words.Select(x => unchecked((ulong)x.GetHashCode())).ToArray();
+        _hashCodes = words.Select(x => unchecked((ulong)x.GetHashCode(StringComparison.Ordinal))).ToArray();
     }
 
     [Fact]

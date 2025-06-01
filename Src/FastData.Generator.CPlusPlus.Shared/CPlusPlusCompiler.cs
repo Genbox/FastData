@@ -60,16 +60,14 @@ public sealed class CPlusPlusCompiler
         if (!File.Exists(vsWherePath))
             return false;
 
-        using Process process = new Process
+        using Process process = new Process();
+        process.StartInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = vsWherePath,
-                Arguments = "-latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property productPath",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
-            }
+            FileName = vsWherePath,
+            Arguments = "-latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property productPath",
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            CreateNoWindow = true
         };
 
         process.Start();
@@ -80,7 +78,7 @@ public sealed class CPlusPlusCompiler
             return false;
 
         //productPath points to LaunchDevCmd.bat which is not what we want. We want VsDevCmd.bat in the same folder
-        _path = Path.Combine(Path.GetDirectoryName(productPath), "VsDevCmd.bat");
+        _path = Path.Combine(Path.GetDirectoryName(productPath)!, "VsDevCmd.bat");
         return true;
     }
 

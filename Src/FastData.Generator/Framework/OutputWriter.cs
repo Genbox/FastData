@@ -29,15 +29,13 @@ public abstract class OutputWriter<T> : IOutputWriter
 
     public abstract string Generate();
 
-    protected string GetEarlyExits() => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
-    protected string GetHashSource() => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName, GeneratorConfig.DataType == DataType.String ? _compiler.GetCode(GeneratorConfig.StringHash.GetExpression()) : null);
+    protected string EarlyExits => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
+    protected string HashSource => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName, GeneratorConfig.DataType == DataType.String && _compiler != null && GeneratorConfig.StringHash != null ? _compiler.GetCode(GeneratorConfig.StringHash.GetExpression()) : null);
+    protected string HashSizeType => _typeHelper.GetTypeName(typeof(ulong));
+    protected static DataType HashSizeDataType => DataType.UInt64;
+    protected string ArraySizeType => _langDef.ArraySizeType;
 
-    protected string GetArraySizeType() => _langDef.ArraySizeType;
-
-    protected virtual string GetFieldModifier() => string.Empty;
-    protected virtual string GetMethodModifier() => string.Empty;
-    protected virtual string GetMethodAttributes() => string.Empty;
-    protected virtual string GetEqualFunction(string value1, string value2) => $"{value1} == {value2}";
+    protected virtual string GetEqualFunction(string value1, string value2, DataType dataType = DataType.Null) => $"{value1} == {value2}";
     protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";
 
     protected string ToValueLabel<T2>(T2 value) => _typeHelper.ToValueLabel(value);

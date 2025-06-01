@@ -9,30 +9,30 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx, Generato
     public override string Generate()
     {
         shared.Add("linear-struct-" + genCfg.DataType, CodeType.Class, $$"""
-                                                                         {{GetFieldModifier()}}struct B {
+                                                                         {{FieldModifier}}struct B {
                                                                              start_index: {{GetSmallestUnsignedType(ctx.Data.Length)}},
                                                                              end_index: {{GetSmallestUnsignedType(ctx.Data.Length)}},
                                                                          }
                                                                          """);
 
         return $$"""
-                     {{GetFieldModifier()}}const BUCKETS: [B; {{ctx.Buckets.Length}}] = [
+                     {{FieldModifier}}const BUCKETS: [B; {{ctx.Buckets.Length}}] = [
                  {{FormatColumns(ctx.Buckets, static x => $"B {{ start_index: {x.StartIndex.ToStringInvariant()}, end_index: {x.EndIndex.ToStringInvariant()} }}")}}
                      ];
 
-                     {{GetFieldModifier()}}const ITEMS: [{{GetTypeNameWithLifetime()}}; {{ctx.Data.Length}}] = [
+                     {{FieldModifier}}const ITEMS: [{{TypeNameWithLifetime}}; {{ctx.Data.Length}}] = [
                  {{FormatColumns(ctx.Data, ToValueLabel)}}
                      ];
 
-                     {{GetFieldModifier()}}const HASH_CODES: [u64; {{ctx.HashCodes.Length}}] = [
+                     {{FieldModifier}}const HASH_CODES: [u64; {{ctx.HashCodes.Length}}] = [
                  {{FormatColumns(ctx.HashCodes, static x => x.ToStringInvariant())}}
                      ];
 
-                 {{GetHashSource()}}
+                 {{HashSource}}
 
-                     #[must_use]
-                     {{GetMethodModifier()}}fn contains(value: {{GetTypeNameWithLifetime()}}) -> bool {
-                 {{GetEarlyExits()}}
+                     {{MethodAttribute}}
+                     {{MethodModifier}}fn contains(value: {{TypeNameWithLifetime}}) -> bool {
+                 {{EarlyExits}}
 
                          let hash = unsafe { Self::get_hash(value) };
                          let bucket = &Self::BUCKETS[({{GetModFunction("hash", (ulong)ctx.Buckets.Length)}}) as usize];
@@ -40,7 +40,7 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx, Generato
                          let end_index: {{GetSmallestUnsignedType(ctx.Data.Length)}} = bucket.end_index;
 
                          while index <= end_index {
-                             if Self::HASH_CODES[index as usize] == hash && Self::ITEMS[index as usize] == value {
+                             if {{GetEqualFunction("Self::HASH_CODES[index as usize]", "hash")}} && {{GetEqualFunction("Self::ITEMS[index as usize]", "value")}} {
                                  return true;
                              }
                              index += 1;

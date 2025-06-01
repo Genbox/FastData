@@ -34,8 +34,8 @@ public sealed record GPerfStringHash : IStringHash
         ParameterExpression hash = Variable(typeof(ulong), "hash");
         ConstantExpression asso = Constant(AssociationValues, typeof(int[]));
 
-        MemberExpression utf8Prop = Property(null, typeof(Encoding).GetProperty(nameof(Encoding.ASCII), BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly));
-        MethodInfo? getBytesMeth = typeof(Encoding).GetMethod(nameof(Encoding.GetBytes), [typeof(string)]);
+        MemberExpression utf8Prop = Property(null, typeof(Encoding).GetProperty(nameof(Encoding.ASCII), BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)!);
+        MethodInfo getBytesMeth = typeof(Encoding).GetMethod(nameof(Encoding.GetBytes), [typeof(string)])!;
 
         List<Expression> ex = new List<Expression>
         {

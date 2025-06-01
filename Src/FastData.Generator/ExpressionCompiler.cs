@@ -38,7 +38,7 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
         if (node.Expression != null)
             Visit(node.Expression);
         else
-            Output.Append(helper.GetTypeName(node.Member.DeclaringType));
+            Output.Append(helper.GetTypeName(node.Member.DeclaringType!));
 
         Output.Append(".");
         Output.Append(node.Member.Name);
@@ -119,7 +119,7 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
             double x => helper.ToValueLabel(x),
             string x => helper.ToValueLabel(x),
             bool x => helper.ToValueLabel(x),
-            _ => node.Value.ToString()
+            _ => node.Value!.ToString()
         };
 
         Output.Append(str);
@@ -128,7 +128,7 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
 
     protected override Expression VisitNewArray(NewArrayExpression node)
     {
-        string elemType = helper.GetTypeName(node.Type.GetElementType());
+        string elemType = helper.GetTypeName(node.Type.GetElementType()!);
         if (node.NodeType == ExpressionType.NewArrayInit)
         {
             Output.Append("new ").Append(elemType).Append("[] {");

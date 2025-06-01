@@ -1,15 +1,12 @@
 using System.Globalization;
-using System.Text;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Structures;
-using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Helpers;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Core;

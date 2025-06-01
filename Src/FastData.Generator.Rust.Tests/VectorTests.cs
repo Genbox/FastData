@@ -42,7 +42,9 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
         Assert.Equal(1, RunProcess(executable));
     }
 
+    // ReSharper disable once ClassNeverInstantiated.Global
     [SuppressMessage("Design", "CA1034:Nested types should not be visible")]
+    [SuppressMessage("Maintainability", "CA1515:Consider making public types internal")]
     public sealed class RustContext
     {
         public RustCompiler Compiler { get; } = new RustCompiler(false, Path.Combine(Path.GetTempPath(), "FastData", "Rust"));

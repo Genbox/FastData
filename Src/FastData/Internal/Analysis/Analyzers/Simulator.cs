@@ -41,7 +41,7 @@ internal sealed class Simulator
     private sealed class NoEqualityEmulator(uint capacity)
     {
         private readonly int[] _buckets = new int[capacity];
-        private HashFunc<string> _hashFunc;
+        private HashFunc<string> _hashFunc = null!;
 
         public void SetHash(HashFunc<string> hashFunc) => _hashFunc = hashFunc;
 

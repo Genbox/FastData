@@ -6,13 +6,13 @@ internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx) : Ru
 {
     public override string Generate() =>
         $$"""
-              {{GetFieldModifier()}}const ENTRIES: [{{TypeName}}; {{ctx.Data.Length}}] = [
+              {{FieldModifier}}const ENTRIES: [{{TypeName}}; {{ctx.Data.Length}}] = [
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               ];
 
-              #[must_use]
-              {{GetMethodModifier()}}fn contains(value: {{TypeName}}) -> bool {
-          {{GetEarlyExits()}}
+              {{MethodAttribute}}
+              {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+          {{EarlyExits}}
 
                   let mut i: usize = 0;
                   while i < Self::ENTRIES.len() {

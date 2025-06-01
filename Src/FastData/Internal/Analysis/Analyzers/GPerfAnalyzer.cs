@@ -587,10 +587,11 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
 
     private sealed class AssociationTable(ILogger logger)
     {
-        internal int[] Values { get; set; }
-        internal int MaxHash { get; set; }
-        internal int[] Occurrences { get; set; }
-        internal BoolArray CollisionDetector { get; set; }
+        private int _maxHash;
+
+        internal int[] Values { get; private set; }
+        internal int[] Occurrences { get; private set; }
+        internal BoolArray CollisionDetector { get; private set; }
 
         internal bool TryFindGoodValues(List<Keyword> keywords, int[] positions, int[] alphaInc, int alphaSize)
         {
@@ -649,10 +650,10 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
             assoValueMax++;
 
             // Given the bound for _asso_values[c], we have a bound for the possible hash values, as computed in compute_hash().
-            MaxHash = (assoValueMax - 1) * maxSelCharsLength;
+            _maxHash = (assoValueMax - 1) * maxSelCharsLength;
 
             // Allocate a sparse bit vector for detection of collisions of hash values.
-            CollisionDetector = new BoolArray(MaxHash + 1, logger);
+            CollisionDetector = new BoolArray(_maxHash + 1, logger);
 
 #if DEBUG
             if (logger.IsEnabled(LogLevel.Trace))
@@ -660,7 +661,7 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine($"total non-linked keys = {keywords.Count}" +
                               $"\nmaximum associated value is {assoValueMax}" +
-                              $"\nmaximum size of generated hash table is {MaxHash}");
+                              $"\nmaximum size of generated hash table is {_maxHash}");
 
                 sb.AppendLine("\ndumping the keyword list without duplicates");
                 sb.AppendLine("keyword #, keysig, keyword");
@@ -773,7 +774,7 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
                 step.AssoValueMax = assoValueMax;
 
 #if DEBUG
-                step.ExpectedLower = Math.Exp((double)bestPossibleCollisions / MaxHash);
+                step.ExpectedLower = Math.Exp((double)bestPossibleCollisions / _maxHash);
                 step.ExpectedUpper = Math.Exp((double)bestPossibleCollisions / assoValueMax);
 #endif
 
@@ -933,10 +934,10 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
                                 assoValueMax = step.AssoValueMax;
 
                                 // Reinitialize MaxHash.
-                                MaxHash = (assoValueMax - 1) * maxSelCharsLength;
+                                _maxHash = (assoValueMax - 1) * maxSelCharsLength;
 
                                 // Reinitialize CollisionDetector.
-                                CollisionDetector = new BoolArray(MaxHash + 1, logger);
+                                CollisionDetector = new BoolArray(_maxHash + 1, logger);
                             }
                         }
                     }

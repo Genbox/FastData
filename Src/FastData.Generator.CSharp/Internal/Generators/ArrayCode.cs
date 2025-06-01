@@ -7,14 +7,14 @@ internal sealed class ArrayCode<T>(ArrayContext<T> ctx, CSharpCodeGeneratorConfi
 {
     public override string Generate() =>
         $$"""
-              {{GetFieldModifier()}}{{TypeName}}[] _entries = new {{TypeName}}[] {
+              {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool Contains({{TypeName}} value)
+              {{MethodAttribute}}
+              {{MethodModifier}}bool Contains({{TypeName}} value)
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
                   for (int i = 0; i < {{ctx.Data.Length.ToStringInvariant()}}; i++)
                   {

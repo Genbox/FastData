@@ -10,7 +10,7 @@ public sealed class TypeMap
     {
         for (int i = 0; i < typeSpecs.Count; i++)
         {
-            ITypeDef? spec = typeSpecs[i];
+            ITypeDef spec = typeSpecs[i];
             _index[(byte)spec.DataType] = spec;
         }
     }

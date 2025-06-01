@@ -37,7 +37,7 @@ public static partial class FastDataGenerator
         _ => throw new InvalidOperationException($"Unsupported data type: {data[0].GetType().Name}")
     };
 
-    public static bool TryGenerate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null)
+    public static bool TryGenerate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null) where T : notnull
     {
         factory ??= NullLoggerFactory.Instance;
 

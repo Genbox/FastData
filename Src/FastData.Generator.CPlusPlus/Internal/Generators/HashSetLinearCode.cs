@@ -16,27 +16,27 @@ internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx) : CPlusP
                   : start_index(start_index), end_index(end_index) { }
               };
 
-              {{GetFieldModifier(false)}}std::array<b, {{ctx.Buckets.Length}}> buckets = {
+              {{GetFieldModifier(false)}}std::array<b, {{ctx.Buckets.Length.ToStringInvariant()}}> buckets = {
           {{FormatColumns(ctx.Buckets, static x => $"b({x.StartIndex.ToStringInvariant()}, {x.EndIndex.ToStringInvariant()})")}}
               };
 
-              {{GetFieldModifier()}}std::array<{{TypeName}}, {{ctx.Data.Length}}> items = {
+              {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> items = {
           {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
-              {{GetFieldModifier()}}std::array<uint64_t, {{ctx.HashCodes.Length}}> hash_codes = {
+              {{FieldModifier}}std::array<{{HashSizeType}}, {{ctx.HashCodes.Length.ToStringInvariant()}}> hash_codes = {
           {{FormatColumns(ctx.HashCodes, static x => x.ToStringInvariant())}}
               };
 
-          {{GetHashSource()}}
+          {{HashSource}}
 
           public:
-              {{GetMethodAttributes()}}
-              {{GetMethodModifier()}}bool contains(const {{TypeName}} value) noexcept
+              {{MethodAttribute}}
+              {{MethodModifier}}bool contains(const {{TypeName}} value){{PostMethodModifier}}
               {
-          {{GetEarlyExits()}}
+          {{EarlyExits}}
 
-                  const uint64_t hash = get_hash(value);
+                  const {{HashSizeType}} hash = get_hash(value);
                   const auto& [start_index, end_index]= buckets[{{GetModFunction("hash", (ulong)ctx.Buckets.Length)}}];
 
                   {{GetSmallestUnsignedType(ctx.Data.Length)}} index = start_index;

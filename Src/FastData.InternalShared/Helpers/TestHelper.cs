@@ -43,16 +43,14 @@ public static class TestHelper
 
     public static int RunProcess(string application, string? args = null, string? workingDir = null)
     {
-        using Process process = new Process
+        using Process process = new Process();
+        process.StartInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = application,
-                Arguments = args,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                WorkingDirectory = workingDir
-            }
+            FileName = application,
+            Arguments = args,
+            CreateNoWindow = true,
+            UseShellExecute = false,
+            WorkingDirectory = workingDir
         };
 
         process.Start();

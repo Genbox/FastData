@@ -5,10 +5,12 @@ namespace Genbox.FastData.Generator.Rust.Internal;
 
 internal sealed class RustExpressionCompiler(TypeHelper helper) : ExpressionCompiler(helper)
 {
+    private readonly TypeHelper _helper = helper;
+
     protected override Expression VisitBlock(BlockExpression node)
     {
         foreach (ParameterExpression v in node.Variables)
-            Output.AppendLine($"let mut {helper.GetTypeName(v.Type)} {v.Name};");
+            Output.AppendLine($"let mut {_helper.GetTypeName(v.Type)} {v.Name};");
 
         foreach (Expression expr in node.Expressions)
         {

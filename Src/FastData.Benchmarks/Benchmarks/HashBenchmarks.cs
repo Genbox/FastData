@@ -10,7 +10,7 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class HashBenchmarks
 {
-    private string[] _array;
+    private string[] _array = null!;
 
     [Params(1_000, 10_000, 100_000, 1_000_000)]
     public int Size { get; set; }

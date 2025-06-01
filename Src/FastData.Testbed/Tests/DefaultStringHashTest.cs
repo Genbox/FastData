@@ -7,7 +7,7 @@ using Genbox.FastData.StringHash;
 
 namespace Genbox.FastData.Testbed.Tests;
 
-public static class DefaultStringHashTest
+internal static class DefaultStringHashTest
 {
     public static void Run()
     {

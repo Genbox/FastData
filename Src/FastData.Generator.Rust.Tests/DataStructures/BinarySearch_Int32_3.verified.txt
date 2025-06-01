@@ -35,7 +35,7 @@ impl MyData {
             }
         }
 
-        return false;
+        false
     }
 
     pub const ITEM_COUNT: usize = 3;
