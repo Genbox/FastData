@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(IncludeAnalyzers)' == 'True'">
-    <!--    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />-->
     <PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
     <PackageReference Include="IDisposableAnalyzers" PrivateAssets="all" />
     <PackageReference Include="Roslynator.Analyzers" PrivateAssets="all" />
