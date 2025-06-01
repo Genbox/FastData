@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using BenchmarkDotNet.Order;
 using Genbox.FastData.InternalShared;
+using Genbox.FastData.InternalShared.Helpers;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 

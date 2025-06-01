@@ -1,11 +1,12 @@
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Misc;
+using Genbox.FastData.Internal.Enums;
+using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
 /// <summary>Creates edge-grams with offsets of 0 and lengths [1..max]</summary>
-internal class EdgeGramGenerator(int maxLength) : ISegmentGenerator
+internal sealed class EdgeGramGenerator(int maxLength) : ISegmentGenerator
 {
     public bool IsAppropriate(StringProperties props) => true;
 

@@ -2,9 +2,9 @@ using System.Runtime.CompilerServices;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Misc;
 
-namespace Genbox.FastData;
+namespace Genbox.FastData.Internal.Misc;
 
-public static class PrimitiveHash
+internal static class PrimitiveHash
 {
     internal static HashFunc<T> GetHash<T>(DataType dataType) => dataType switch
     {

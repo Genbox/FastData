@@ -3,7 +3,5 @@ namespace Genbox.FastData.Enums;
 [Flags]
 public enum StorageOption
 {
-    None = 0,
-    OptimizeForMemory = 1,
-    OptimizeForSpeed = 2
+    None = 0
 }

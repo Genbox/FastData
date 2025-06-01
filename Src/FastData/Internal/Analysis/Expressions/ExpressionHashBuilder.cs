@@ -3,15 +3,16 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Misc;
 using JetBrains.Annotations;
 using static System.Linq.Expressions.Expression;
 
-namespace Genbox.FastData.Internal.Analysis.Misc;
+namespace Genbox.FastData.Internal.Analysis.Expressions;
 
 internal static class ExpressionHashBuilder
 {
-    public static Expression<HashFunc<string>> BuildFull(Mixer mixer, Avalanche avalanche)
+    internal static Expression<HashFunc<string>> BuildFull(Mixer mixer, Avalanche avalanche)
     {
         ParameterExpression input = Parameter(typeof(string), "value");
 
@@ -51,7 +52,7 @@ internal static class ExpressionHashBuilder
         return Lambda<HashFunc<string>>(block, input);
     }
 
-    public static Expression<HashFunc<string>> Build(ArraySegment[] segments, Mixer mixer, Avalanche avalanche)
+    internal static Expression<HashFunc<string>> Build(ArraySegment[] segments, Mixer mixer, Avalanche avalanche)
     {
         ParameterExpression input = Parameter(typeof(string), "value");
 

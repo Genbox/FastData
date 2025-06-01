@@ -2,8 +2,7 @@ using Genbox.FastData.Abstracts;
 
 namespace Genbox.FastData.Configs;
 
-//Note: Internal for now
-internal sealed class GeneticAnalyzerConfig : IAnalyzerConfig
+public sealed class GeneticAnalyzerConfig : IAnalyzerConfig
 {
     public bool ShuffleParents { get; set; }
 

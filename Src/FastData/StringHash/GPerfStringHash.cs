@@ -5,7 +5,7 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Misc;
 using static System.Linq.Expressions.Expression;
 
-namespace Genbox.FastData.ArrayHash;
+namespace Genbox.FastData.StringHash;
 
 public sealed record GPerfStringHash : IStringHash
 {
@@ -19,10 +19,10 @@ public sealed record GPerfStringHash : IStringHash
         MinLen = minLen;
     }
 
-    public int[] AssociationValues { get; }
-    public int[] AlphaIncrements { get; }
-    public int[] Positions { get; }
-    public uint MinLen { get; }
+    internal int[] AssociationValues { get; }
+    internal int[] AlphaIncrements { get; }
+    internal int[] Positions { get; }
+    internal uint MinLen { get; }
 
     public HashFunc<string> GetHashFunction() => GetExpression().Compile();
     public Expression<HashFunc<string>> GetExpression() => _expression ??= CreateExpression();

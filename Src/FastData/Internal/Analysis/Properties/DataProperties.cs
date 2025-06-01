@@ -72,9 +72,9 @@ internal sealed class DataProperties<T>
         return new DataProperties<T>((uint)data.Length, dataType, stringProps, intProps, floatProps);
     }
 
-    public StringProperties? StringProps { get; }
-    public IntegerProperties<T>? IntProps { get; }
-    public FloatProperties<T>? FloatProps { get; }
-    public DataType DataType { get; }
-    public uint ItemCount { get; }
+    internal StringProperties? StringProps { get; }
+    internal IntegerProperties<T>? IntProps { get; }
+    internal FloatProperties<T>? FloatProps { get; }
+    internal DataType DataType { get; }
+    internal uint ItemCount { get; }
 }

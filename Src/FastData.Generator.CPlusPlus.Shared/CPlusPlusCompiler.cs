@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.IO.Compression;
-using static Genbox.FastData.InternalShared.TestHelper;
+using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Shared;
 

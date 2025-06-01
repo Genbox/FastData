@@ -1,14 +1,14 @@
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Misc;
+using Genbox.FastData.StringHash;
 
 namespace Genbox.FastData.Tests;
 
-public class ArrayHashTests
+public class StringHashTests
 {
     [Theory]
     [MemberData(nameof(GetSpecs))]
-    internal void StringHashTestVector(IStringHash spec, bool _, ulong vector)
+    internal void TestVector(IStringHash spec, bool _, ulong vector)
     {
         HashFunc<string> func = spec.GetHashFunction();
         Assert.Equal(vector, func("hello world"));

@@ -2,7 +2,7 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
 using Xunit.Abstractions;
 
-namespace Genbox.FastData.InternalShared;
+namespace Genbox.FastData.InternalShared.TestClasses;
 
 public class TestVector<T>(Type type, T[] values, IStringHash? stringHash = null) : ITestVector, IXunitSerializable
 {

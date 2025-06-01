@@ -1,10 +1,11 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Internal.Analysis.Expressions;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Misc;
 using static System.Linq.Expressions.Expression;
 
-namespace Genbox.FastData.ArrayHash;
+namespace Genbox.FastData.StringHash;
 
 /// <summary>Hashes the entire string using DJB2 hash</summary>
 public sealed record DefaultStringHash : IStringHash

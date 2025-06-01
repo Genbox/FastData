@@ -2,7 +2,7 @@ using Genbox.FastData.Abstracts;
 
 namespace Genbox.FastData.Contexts;
 
-public class KeyLengthContext(List<string>?[] lengths, bool lengthsAreUniq, uint minLength, uint maxLength) : IContext
+public sealed class KeyLengthContext(List<string>?[] lengths, bool lengthsAreUniq, uint minLength, uint maxLength) : IContext
 {
     public List<string>?[] Lengths { get; } = lengths;
     public bool LengthsAreUniq { get; } = lengthsAreUniq;

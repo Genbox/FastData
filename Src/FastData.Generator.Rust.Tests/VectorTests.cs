@@ -3,15 +3,18 @@ using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.Generator.Rust.Shared;
 using Genbox.FastData.InternalShared;
+using Genbox.FastData.InternalShared.Helpers;
+using Genbox.FastData.InternalShared.TestClasses;
+using Genbox.FastData.InternalShared.TestClasses.TheoryData;
 using static Genbox.FastData.Generator.Helpers.FormatHelper;
-using static Genbox.FastData.InternalShared.TestHelper;
+using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.Rust.Tests;
 
 public class VectorTests(VectorTests.RustContext context) : IClassFixture<VectorTests.RustContext>
 {
     [Theory]
-    [ClassData(typeof(TestVectorClass))]
+    [ClassData(typeof(TestVectorTheoryData))]
     public void Test<T>(TestVector<T> data)
     {
         Assert.True(TestVectorHelper.TryGenerate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), data, out GeneratorSpec spec));

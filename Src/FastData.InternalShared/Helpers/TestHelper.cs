@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Genbox.FastData.InternalShared;
+namespace Genbox.FastData.InternalShared.Helpers;
 
 public static class TestHelper
 {
@@ -67,7 +67,7 @@ public static class TestHelper
         if (File.Exists(path))
         {
             byte[] oldHash = SHA1.HashData(File.ReadAllBytes(path));
-            byte[] newHash = SHA1.HashData(Encoding.UTF8.GetBytes(content));
+            byte[] newHash = SHA1.HashData(_utf8NoBom.GetBytes(content));
 
             if (oldHash.SequenceEqual(newHash))
                 return false;

@@ -1,4 +1,7 @@
 using Genbox.FastData.InternalShared;
+using Genbox.FastData.InternalShared.Helpers;
+using Genbox.FastData.InternalShared.TestClasses;
+using Genbox.FastData.InternalShared.TestClasses.TheoryData;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Tests;
 
@@ -7,7 +10,7 @@ public class GeneratorTests
     private readonly CPlusPlusCodeGenerator _generator = CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig("my_data"));
 
     [Theory]
-    [ClassData(typeof(TestDataClass))]
+    [ClassData(typeof(TestTheoryData))]
     internal async Task GenerateStructureType<T>(TestData<T> data)
     {
         Assert.True(TestVectorHelper.TryGenerate(_ => _generator, data, out GeneratorSpec spec));

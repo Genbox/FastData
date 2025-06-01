@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace Genbox.FastData.Internal.Analysis.Misc;
+namespace Genbox.FastData.Internal.Analysis.Expressions;
 
 internal sealed class ExpressionCounter : ExpressionVisitor
 {

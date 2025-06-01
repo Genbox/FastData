@@ -1,3 +1,4 @@
+using Genbox.FastData.InternalShared;
 using static Genbox.FastData.Internal.Helpers.PerfectHashHelper;
 
 namespace Genbox.FastData.Tests;

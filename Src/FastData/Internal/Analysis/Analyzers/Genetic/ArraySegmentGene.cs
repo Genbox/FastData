@@ -1,6 +1,6 @@
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Abstracts;
-using Genbox.FastData.Misc;
+using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
 

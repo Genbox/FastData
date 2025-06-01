@@ -1,14 +1,16 @@
 using System.Globalization;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
+using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.Misc;
+using Genbox.FastData.StringHash;
 
-namespace Genbox.FastData.InternalShared;
+namespace Genbox.FastData.InternalShared.Helpers;
 
 public static class TestVectorHelper
 {
@@ -89,7 +91,7 @@ public static class TestVectorHelper
         }
 
         ICodeGenerator generator = gen(vector.Identifier);
-        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(structureType, StringComparison.Ordinal, props, stringHash);
+        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(structureType, FastDataGenerator.DefaultStringComparison, props, stringHash);
         if (generator.TryGenerate(genCfg, context, out string? source))
         {
             spec = new GeneratorSpec(vector.Identifier, source);
@@ -137,8 +139,6 @@ public static class TestVectorHelper
         // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
         foreach (ITestVector testVector in GenerateTestVectors([(typeof(string), ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]),], typeof(KeyLengthStructure<>)))
             yield return testVector;
-
-        // typeof(HashSetPerfectStructure<>),
     }
 
     public static IEnumerable<ITestData> GetBenchmarkData()

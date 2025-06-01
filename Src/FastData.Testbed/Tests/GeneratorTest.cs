@@ -3,7 +3,7 @@ using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Analysis.SegmentGenerators;
 using Genbox.FastData.Internal.Helpers;
-using Genbox.FastData.Misc;
+using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Testbed.Tests;
 

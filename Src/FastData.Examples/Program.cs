@@ -8,7 +8,6 @@ internal static class Program
     private static void Main()
     {
         FastDataConfig config = new FastDataConfig();
-        config.StringComparison = StringComparison.OrdinalIgnoreCase;
 
         CSharpCodeGenerator generator = CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("Dogs"));
 

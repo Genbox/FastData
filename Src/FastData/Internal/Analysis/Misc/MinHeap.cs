@@ -4,7 +4,7 @@ namespace Genbox.FastData.Internal.Analysis.Misc;
 /// Min-heap of fixed capacity that stores values with associated items.
 /// Maintains the smallest element at the root; when full, adding a larger value replaces the root.
 /// </summary>
-public class MinHeap<T>(int capacity)
+internal sealed class MinHeap<T>(int capacity)
 {
     private readonly int _capacity = capacity;
     private readonly (double, T)[] _items = new (double, T)[capacity];

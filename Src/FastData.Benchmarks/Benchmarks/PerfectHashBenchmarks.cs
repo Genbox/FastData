@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Order;
 using Genbox.FastData.Internal.Helpers;
+using Genbox.FastData.InternalShared;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 

@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using Genbox.FastData.Internal.Helpers;
 using static System.Numerics.BitOperations;
 
-namespace Genbox.FastData.Internal.Analysis.Misc;
+namespace Genbox.FastData.Internal.Analysis.Data;
 
 [StructLayout(LayoutKind.Auto)]
 internal struct IntegerBitSet

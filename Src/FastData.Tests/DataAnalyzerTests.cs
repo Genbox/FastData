@@ -1,3 +1,4 @@
+using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 using static Genbox.FastData.Internal.Analysis.DataAnalyzer;
@@ -39,19 +40,5 @@ public class DataAnalyzerTests
         StringProperties res = GetStringProperties(data);
         Assert.Equal(res.DeltaData.LeftZeroCount, leftZero);
         Assert.Equal(res.DeltaData.RightZeroCount, rightZero);
-    }
-
-    [Theory]
-    [InlineData(new[] { "item1", "item2", "item3", "item4" }, '1', 't')]
-    public void GetStringProperties_CharacterMap_Test(string[] data, char minChar, char maxChar)
-    {
-        StringProperties res = GetStringProperties(data);
-        CharacterMap map = res.CharacterData.CharacterMap;
-
-        Assert.True(map.Contains(minChar));
-        Assert.True(map.Contains(maxChar));
-
-        Assert.Equal(minChar, map.MinChar);
-        Assert.Equal(maxChar, map.MaxChar);
     }
 }

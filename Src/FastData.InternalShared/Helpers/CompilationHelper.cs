@@ -6,15 +6,10 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 
-namespace Genbox.FastData.InternalShared;
+namespace Genbox.FastData.InternalShared.Helpers;
 
 public static class CompilationHelper
 {
-    public static T GetDelegate<T>(string source, bool release) where T : Delegate
-    {
-        return GetDelegate<T>(source, static types => types[0], release);
-    }
-
     /// <summary>This is used to wrap a hash function and get it as a delegate</summary>
     public static T GetDelegate<T>(string source, Func<Type[], Type> typeFilter, bool release) where T : Delegate
     {
@@ -30,7 +25,7 @@ public static class CompilationHelper
         return me.CreateDelegate<T>();
     }
 
-    public static CSharpCompilation CreateCompilation(string source, bool release, params Type[] types)
+    private static CSharpCompilation CreateCompilation(string source, bool release, params Type[] types)
     {
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
 

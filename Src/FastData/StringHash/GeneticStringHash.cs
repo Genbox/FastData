@@ -1,12 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.Internal.Analysis.Expressions;
 using Genbox.FastData.Internal.Analysis.Misc;
+using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Misc;
 using static System.Linq.Expressions.Expression;
 using static Genbox.FastData.Internal.Helpers.ExpressionHelper;
 
-namespace Genbox.FastData.ArrayHash;
+namespace Genbox.FastData.StringHash;
 
 [SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
 public sealed record GeneticStringHash : IStringHash
@@ -20,11 +22,11 @@ public sealed record GeneticStringHash : IStringHash
         AvalancheIterations = avalancheIterations;
     }
 
-    public ArraySegment Segment { get; }
-    public int MixerSeed { get; }
-    public int MixerIterations { get; }
-    public int AvalancheSeed { get; }
-    public int AvalancheIterations { get; }
+    internal ArraySegment Segment { get; }
+    internal int MixerSeed { get; }
+    internal int MixerIterations { get; }
+    internal int AvalancheSeed { get; }
+    internal int AvalancheIterations { get; }
 
     public HashFunc<string> GetHashFunction() => GetExpression().Compile();
     public Expression<HashFunc<string>> GetExpression() => ExpressionHashBuilder.Build([Segment], GetMixer(), GetAvalanche());

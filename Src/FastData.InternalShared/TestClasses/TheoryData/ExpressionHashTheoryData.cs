@@ -1,15 +1,16 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.ArrayHash;
-using Genbox.FastData.Misc;
+using Genbox.FastData.Internal.Enums;
+using Genbox.FastData.Internal.Misc;
+using Genbox.FastData.StringHash;
 using Xunit;
 
-namespace Genbox.FastData.InternalShared;
+namespace Genbox.FastData.InternalShared.TestClasses.TheoryData;
 
 /// <summary>This class is used to generate expression-based hashes in each language to check if they are correctly outputting the expression.</summary>
-public sealed class ExpressionHashDataClass : TheoryData<HashType, IStringHash>
+public sealed class ExpressionHashTheoryData : TheoryData<HashType, IStringHash>
 {
-    public ExpressionHashDataClass()
+    public ExpressionHashTheoryData()
     {
         Add(HashType.Full, new DefaultStringHash());
         Add(HashType.Full, new BruteForceStringHash(new ArraySegment(0, -1, Alignment.Left), Mixer, Avalanche));

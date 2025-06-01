@@ -8,11 +8,8 @@ internal static class DataAnalyzer
 {
     internal static StringProperties GetStringProperties(string[] data)
     {
-        //Contains a set of unique lengths between 1 an 64
+        //Contains a set of unique lengths between 1 and 64
         IntegerBitSet lengthMap = new IntegerBitSet();
-
-        //Contains a map of each character and their count within the ASCII space
-        CharacterMap characterMap = new CharacterMap();
 
         //We need to know the longest string for optimal mixing. Probably not 100% necessary.
         string maxStr = data[0];
@@ -31,7 +28,6 @@ internal static class DataAnalyzer
         //We can derive common substrings from it, as well as high-entropy substring hash functions
         int[] left = new int[maxStr.Length];
         int[] right = new int[maxStr.Length];
-        uint[] counts = new uint[maxStr.Length]; //This is a heatmap offsets where there are characters
         bool flag = true;
         bool allAscii = true;
 
@@ -44,12 +40,9 @@ internal static class DataAnalyzer
 
                 left[i] += flag ? c : -c;
                 right[i] += flag ? rc : -rc;
-                counts[i]++;
 
                 if (c > 255)
                     allAscii = false;
-                else
-                    characterMap.Add(c); //char map only supports up to 255
             }
 
             flag = !flag;
@@ -71,7 +64,7 @@ internal static class DataAnalyzer
             }
         }
 
-        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, lengthMap), new DeltaData(left, right), new CharacterData(allAscii, counts, characterMap));
+        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
     }
 
     internal static IntegerProperties<T> GetCharProperties<T>(char[] data)
@@ -85,7 +78,7 @@ internal static class DataAnalyzer
             max = c > max ? c : max;
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max, false);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
     }
 
     internal static FloatProperties<T> GetSingleProperties<T>(float[] data)
@@ -126,18 +119,13 @@ internal static class DataAnalyzer
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
-        bool consecutive = true;
         foreach (byte val in data)
         {
-            if (consecutive && lastValue + 1 != val)
-                consecutive = false;
-
             min = Math.Min(min, val);
             max = Math.Max(max, val);
-            lastValue = val;
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
     }
 
     internal static IntegerProperties<T> GetSByteProperties<T>(sbyte[] data)
@@ -161,7 +149,7 @@ internal static class DataAnalyzer
             lastValue = val;
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
     }
 
     internal static IntegerProperties<T> GetInt16Properties<T>(short[] data)
@@ -174,18 +162,13 @@ internal static class DataAnalyzer
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
-        bool consecutive = true;
         foreach (short val in data)
         {
-            if (consecutive && lastValue + 1 != val)
-                consecutive = false;
-
             min = Math.Min(min, val);
             max = Math.Max(max, val);
-            lastValue = val;
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
     }
 
     internal static IntegerProperties<T> GetUInt16Properties<T>(ushort[] data)
@@ -198,18 +181,13 @@ internal static class DataAnalyzer
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
-        bool consecutive = true;
         foreach (ushort val in data)
         {
-            if (consecutive && lastValue + 1 != val)
-                consecutive = false;
-
             min = Math.Min(min, val);
             max = Math.Max(max, val);
-            lastValue = val;
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
     }
 
     internal static IntegerProperties<T> GetInt32Properties<T>(int[] data)
@@ -222,18 +200,13 @@ internal static class DataAnalyzer
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
-        bool consecutive = true;
         foreach (int val in data)
         {
-            if (consecutive && lastValue + 1 != val)
-                consecutive = false;
-
             min = Math.Min(min, val);
             max = Math.Max(max, val);
-            lastValue = val;
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
     }
 
     internal static IntegerProperties<T> GetUInt32Properties<T>(uint[] data)
@@ -246,18 +219,13 @@ internal static class DataAnalyzer
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
-        bool consecutive = true;
         foreach (uint val in data)
         {
-            if (consecutive && lastValue + 1 != val)
-                consecutive = false;
-
             min = Math.Min(min, val);
             max = Math.Max(max, val);
-            lastValue = val;
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
     }
 
     internal static IntegerProperties<T> GetInt64Properties<T>(long[] data)
@@ -270,18 +238,13 @@ internal static class DataAnalyzer
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
-        bool consecutive = true;
         foreach (long val in data)
         {
-            if (consecutive && lastValue + 1 != val)
-                consecutive = false;
-
             min = Math.Min(min, val);
             max = Math.Max(max, val);
-            lastValue = val;
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
     }
 
     internal static IntegerProperties<T> GetUInt64Properties<T>(ulong[] data)
@@ -294,17 +257,12 @@ internal static class DataAnalyzer
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
-        bool consecutive = true;
         foreach (ulong val in data)
         {
-            if (consecutive && lastValue + 1 != val)
-                consecutive = false;
-
             min = Math.Min(min, val);
             max = Math.Max(max, val);
-            lastValue = val;
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max, consecutive);
+        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
     }
 }

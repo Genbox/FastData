@@ -1,11 +1,12 @@
 using Genbox.FastData.Abstracts;
+using Genbox.FastData.EarlyExits;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Optimization;
 
 namespace Genbox.FastData.Configs;
 
-public class GeneratorConfig<T>
+public sealed class GeneratorConfig<T>
 {
     internal GeneratorConfig(StructureType structureType, StringComparison stringComparison, DataProperties<T> props, IStringHash? stringHash)
     {
@@ -56,18 +57,36 @@ public class GeneratorConfig<T>
             return [];
 
         if (props.StringProps != null)
-            return Optimizer.GetEarlyExits(props.StringProps).ToArray();
+            return GetEarlyExits(props.StringProps).ToArray();
 
         //Conditional structures are not very useful with less than 3 items as checks costs more than the benefits
         if (structureType == StructureType.Conditional && props.ItemCount <= 3)
             return [];
 
         if (props.IntProps != null)
-            return Optimizer.GetEarlyExits(props.IntProps).ToArray();
+            return GetEarlyExits(props.IntProps).ToArray();
 
         if (props.FloatProps != null)
-            return Optimizer.GetEarlyExits(props.FloatProps).ToArray();
+            return GetEarlyExits(props.FloatProps).ToArray();
 
         return [];
+    }
+
+    private static IEnumerable<IEarlyExit> GetEarlyExits(StringProperties prop)
+    {
+        //Logic:
+        // - If all lengths are the same, we check against that (1 inst)
+        // - If lengths are consecutive (5, 6, 7, etc.) we do a range check (2 inst)
+        // - If the lengths are non-consecutive (4, 9, 12, etc.) we use a small bitset (4 inst)
+
+        if (prop.LengthData.Max <= 64 && !prop.LengthData.LengthMap.Consecutive)
+            yield return new LengthBitSetEarlyExit(prop.LengthData.LengthMap.BitSet);
+        else
+            yield return new MinMaxLengthEarlyExit(prop.LengthData.Min, prop.LengthData.Max); //Also handles same lengths
+    }
+
+    private static IEnumerable<IEarlyExit> GetEarlyExits(IHasMinMax<T> prop)
+    {
+        yield return new MinMaxValueEarlyExit<T>(prop.MinValue, prop.MaxValue);
     }
 }

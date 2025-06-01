@@ -1,4 +1,4 @@
-namespace Genbox.FastData.InternalShared;
+namespace Genbox.FastData.InternalShared.Helpers;
 
 public static class BenchmarkHelper
 {

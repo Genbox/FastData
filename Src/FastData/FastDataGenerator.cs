@@ -1,21 +1,23 @@
 using System.Diagnostics;
 using Genbox.FastData.Abstracts;
-using Genbox.FastData.ArrayHash;
 using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.Misc;
+using Genbox.FastData.StringHash;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Genbox.FastData;
 
 public static class FastDataGenerator
 {
+    internal const StringComparison DefaultStringComparison = StringComparison.Ordinal;
+
     public static bool TryGenerate(object[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null) => data[0] switch
     {
         bool => TryGenerate(data.Cast<bool>().ToArray(), fdCfg, generator, out source, factory),
@@ -36,7 +38,7 @@ public static class FastDataGenerator
 
     public static bool TryGenerate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null)
     {
-        factory ??= NullLoggerFactory.Instance;
+        // factory ??= NullLoggerFactory.Instance;
 
         //Validate that we only have unique data
         HashSet<T> uniq = new HashSet<T>();
@@ -49,11 +51,9 @@ public static class FastDataGenerator
 
         DataProperties<T> props = DataProperties<T>.Create(data);
 
-        bool analysisEnabled = false;
-
         IStringHash? stringHash = null;
-        if (data is string[] stringArr)
-            stringHash = analysisEnabled ? GetBestHash(stringArr, props.StringProps!, fdCfg.SimulatorConfig, factory) : new DefaultStringHash();
+        if (data is string[])
+            stringHash = /*analysisEnabled ? GetBestHash(stringArr, props.StringProps!, fdCfg.SimulatorConfig, factory) :*/ new DefaultStringHash();
 
         HashFunc<T> hashFunc;
 
@@ -80,7 +80,7 @@ public static class FastDataGenerator
         if (context == null)
             throw new InvalidOperationException("Unable to find a suitable data structure for the data. Please report this as a bug.");
 
-        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, fdCfg.StringComparison, props, stringHash);
+        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, DefaultStringComparison, props, stringHash);
         return generator.TryGenerate(genCfg, context, out source);
     }
 
@@ -103,11 +103,8 @@ public static class FastDataGenerator
 
                 // TODO: Attempt perfect hashing
                 // yield return new HashSetPerfectStructure<T>();
-
-                if (config.StorageOptions.HasFlag(StorageOption.OptimizeForMemory))
-                    yield return new BinarySearchStructure<T>(props.DataType, config.StringComparison);
-                else
-                    yield return new HashSetChainStructure<T>();
+                // yield return new BinarySearchStructure<T>(props.DataType, config.StringComparison);
+                yield return new HashSetChainStructure<T>();
             }
         }
         else if (ds == StructureType.Array)
@@ -115,7 +112,7 @@ public static class FastDataGenerator
         else if (ds == StructureType.Conditional)
             yield return new ConditionalStructure<T>();
         else if (ds == StructureType.BinarySearch)
-            yield return new BinarySearchStructure<T>(props.DataType, config.StringComparison);
+            yield return new BinarySearchStructure<T>(props.DataType, DefaultStringComparison);
         else if (ds == StructureType.HashSet)
             yield return new HashSetChainStructure<T>();
         else

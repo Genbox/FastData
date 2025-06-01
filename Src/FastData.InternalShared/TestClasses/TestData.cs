@@ -1,9 +1,10 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.InternalShared.Helpers;
 using Xunit.Abstractions;
 
-namespace Genbox.FastData.InternalShared;
+namespace Genbox.FastData.InternalShared.TestClasses;
 
 public class TestData<T>(StructureType structureType, T[] values) : ITestData, IXunitSerializable
 {

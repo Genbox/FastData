@@ -3,13 +3,15 @@ using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Rust.Internal;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.InternalShared;
+using Genbox.FastData.InternalShared.TestClasses;
+using Genbox.FastData.InternalShared.TestClasses.TheoryData;
 
 namespace Genbox.FastData.Generator.Rust.Tests;
 
 public class ExpressionCompilerTests
 {
     [Theory]
-    [ClassData(typeof(ExpressionHashDataClass))]
+    [ClassData(typeof(ExpressionHashTheoryData))]
     internal async Task GenerateExpression(HashType type, IStringHash hash)
     {
         RustExpressionCompiler compiler = new RustExpressionCompiler(new TypeHelper(new TypeMap(new RustLanguageDef().TypeDefinitions)));

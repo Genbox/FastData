@@ -1,6 +1,6 @@
 namespace Genbox.FastData.InternalShared;
 
-public enum HashType
+public enum HashType : byte
 {
     Full,
     Partial

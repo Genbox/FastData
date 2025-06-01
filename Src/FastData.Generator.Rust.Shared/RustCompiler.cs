@@ -1,4 +1,4 @@
-using static Genbox.FastData.InternalShared.TestHelper;
+using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.Rust.Shared;
 

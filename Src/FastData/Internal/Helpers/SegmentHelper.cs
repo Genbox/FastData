@@ -1,5 +1,6 @@
 using System.Text;
-using Genbox.FastData.Misc;
+using Genbox.FastData.Internal.Enums;
+using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Helpers;
 

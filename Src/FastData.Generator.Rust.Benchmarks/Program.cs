@@ -3,6 +3,8 @@ using System.Text;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.InternalShared;
+using Genbox.FastData.InternalShared.Helpers;
+using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.Generator.Rust.Benchmarks;
 

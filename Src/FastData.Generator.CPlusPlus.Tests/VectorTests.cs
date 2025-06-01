@@ -3,15 +3,18 @@ using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.CPlusPlus.Shared;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.InternalShared;
+using Genbox.FastData.InternalShared.Helpers;
+using Genbox.FastData.InternalShared.TestClasses;
+using Genbox.FastData.InternalShared.TestClasses.TheoryData;
 using static Genbox.FastData.Generator.Helpers.FormatHelper;
-using static Genbox.FastData.InternalShared.TestHelper;
+using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Tests;
 
 public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<VectorTests.CPlusPlusContext>
 {
     [Theory]
-    [ClassData(typeof(TestVectorClass))]
+    [ClassData(typeof(TestVectorTheoryData))]
     public void Test<T>(TestVector<T> data)
     {
         Assert.True(TestVectorHelper.TryGenerate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
