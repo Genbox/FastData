@@ -110,7 +110,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PowerShell", "PowerShell", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Scripts", "_Scripts", "{6257D463-0651-404E-8440-BD7AD4EC89F4}"
 	ProjectSection(SolutionItems) = preProject
-		Publish.ps1 = Publish.ps1
+		Scripts\Build.ps1 = Scripts\Build.ps1
+		Scripts\Publish.ps1 = Scripts\Publish.ps1
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.Rust", "Src\FastData.Generator.Rust\FastData.Generator.Rust.csproj", "{8880847E-5007-4845-91D5-CCEB1A96B97C}"
