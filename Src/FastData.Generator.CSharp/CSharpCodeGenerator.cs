@@ -37,7 +37,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                   """);
 
         string cn = _cfg.ClassName;
-        string? ns = _cfg.Namespace != null ? $"namespace {_cfg.Namespace};\n" : null;
+        string? ns = _cfg.Namespace != null ? $"namespace {_cfg.Namespace};\n\n" : null;
         string visibility = _cfg.ClassVisibility.ToString().ToLowerInvariant();
 
         string type = _cfg.ClassType switch
@@ -48,13 +48,12 @@ public sealed class CSharpCodeGenerator : CodeGenerator
             _ => throw new InvalidOperationException("Invalid ClassType: " + _cfg.ClassType)
         };
 
-        string? attr = _cfg.ClassType == ClassType.Struct ? "[StructLayout(LayoutKind.Auto)]" : null;
+        string? attr = _cfg.ClassType == ClassType.Struct ? "[StructLayout(LayoutKind.Auto)]\n" : null;
         string? partial = _cfg.ClassType != ClassType.Static ? " partial" : null;
 
         sb.AppendLine($$"""
 
-                        {{ns}}
-                        {{attr}}{{visibility}}{{partial}}{{type}} {{cn}}
+                        {{ns}}{{attr}}{{visibility}}{{partial}}{{type}} {{cn}}
                         {
                         """);
     }

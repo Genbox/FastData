@@ -6,8 +6,8 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-
-[StructLayout(LayoutKind.Auto)]internal partial struct StaticData
+[StructLayout(LayoutKind.Auto)]
+internal partial struct StaticData
 {
     
     public bool Contains(string value)

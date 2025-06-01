@@ -6,7 +6,6 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-
 internal static class MyData
 {
     private static readonly sbyte[] _buckets = new sbyte[] {
