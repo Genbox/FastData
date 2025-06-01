@@ -30,32 +30,11 @@ public class SourceGeneratorTests
     }
 
     [Theory]
-    [InlineData(StructureType.SingleValue)]
-    public void DataStructureSingleTest(StructureType ds)
-    {
-        string source = $"""
-                         using Genbox.FastData.SourceGenerator;
-                         using Genbox.FastData.Enums;
-
-                         [assembly: FastData<string>("StaticData", ["item1"], StructureType = StructureType.{ds})]
-                         """;
-
-        string output = RunGenerator(source);
-
-        Assert.Contains("Structure: " + ds, output, StringComparison.Ordinal);
-    }
-
-    [Theory]
     [InlineData(StructureType.Array)]
     [InlineData(StructureType.Conditional)]
     [InlineData(StructureType.BinarySearch)]
-    [InlineData(StructureType.EytzingerSearch)]
-    [InlineData(StructureType.PerfectHashGPerf)]
-    [InlineData(StructureType.HashSetPerfect)]
-    [InlineData(StructureType.HashSetChain)]
-    [InlineData(StructureType.HashSetLinear)]
-    [InlineData(StructureType.KeyLength)]
-    public void DataStructureTest(StructureType ds)
+    [InlineData(StructureType.HashSet)]
+    public async Task DataStructureTest(StructureType ds)
     {
         string source = $"""
                          using Genbox.FastData.SourceGenerator;
@@ -65,12 +44,14 @@ public class SourceGeneratorTests
                          """;
 
         string output = RunGenerator(source);
-
-        Assert.Contains("Structure: " + ds, output, StringComparison.Ordinal);
+        await Verify(output)
+              .UseFileName(ds.ToString())
+              .UseDirectory("Verify")
+              .DisableDiff();
     }
 
     [Fact]
-    public void NamespaceTest()
+    public async Task NamespaceTest()
     {
         const string source = """
                               using Genbox.FastData.SourceGenerator;
@@ -79,13 +60,16 @@ public class SourceGeneratorTests
                               """;
 
         string output = RunGenerator(source);
-        Assert.Contains("namespace MyNamespace;", output, StringComparison.Ordinal);
+        await Verify(output)
+              .UseFileName("namespace")
+              .UseDirectory("Verify")
+              .DisableDiff();
     }
 
     [Theory]
     [InlineData(ClassVisibility.Internal)]
     [InlineData(ClassVisibility.Public)]
-    public void ClassVisibilityTest(ClassVisibility visibility)
+    public async Task ClassVisibilityTest(ClassVisibility visibility)
     {
         string source = $"""
                          using Genbox.FastData.SourceGenerator;
@@ -96,25 +80,17 @@ public class SourceGeneratorTests
 
         string output = RunGenerator(source);
 
-        switch (visibility)
-        {
-            case ClassVisibility.Internal:
-                Assert.Contains("internal static class StaticData", output, StringComparison.Ordinal);
-                break;
-            case ClassVisibility.Public:
-                Assert.Contains("public static class StaticData", output, StringComparison.Ordinal);
-                break;
-            case ClassVisibility.Unknown:
-            default:
-                throw new ArgumentOutOfRangeException(nameof(visibility), visibility, null);
-        }
+        await Verify(output)
+              .UseFileName(visibility.ToString())
+              .UseDirectory("Verify")
+              .DisableDiff();
     }
 
     [Theory]
     [InlineData(ClassType.Static)]
     [InlineData(ClassType.Instance)]
     [InlineData(ClassType.Struct)]
-    public void ClassTypeTest(ClassType type)
+    public async Task ClassTypeTest(ClassType type)
     {
         string source = $"""
                          using Genbox.FastData.SourceGenerator;
@@ -125,21 +101,10 @@ public class SourceGeneratorTests
 
         string output = RunGenerator(source);
 
-        switch (type)
-        {
-            case ClassType.Static:
-                Assert.Contains("static class StaticData", output, StringComparison.Ordinal);
-                break;
-            case ClassType.Instance:
-                Assert.Contains("partial class StaticData", output, StringComparison.Ordinal);
-                break;
-            case ClassType.Struct:
-                Assert.Contains("partial struct StaticData", output, StringComparison.Ordinal);
-                break;
-            case ClassType.Unknown:
-            default:
-                throw new ArgumentOutOfRangeException(nameof(type), type, null);
-        }
+        await Verify(output)
+              .UseFileName(type.ToString())
+              .UseDirectory("Verify")
+              .DisableDiff();
     }
 
     //TODO: Test StorageOptions
@@ -149,7 +114,7 @@ public class SourceGeneratorTests
         string output = SourceGenHelper.RunSourceGenerator<Internal.FastDataSourceGenerator>(source, false, out var compilerDiagnostics, out var codeGenDiagnostics);
         Assert.Empty(compilerDiagnostics);
         Assert.Empty(codeGenDiagnostics);
-        Assert.NotEmpty(output); //We test source later in order to show diagnostics first
+        Assert.NotEmpty(output); //We test the source later to show diagnostics first
 
         return output;
     }
