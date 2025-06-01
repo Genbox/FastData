@@ -11,10 +11,11 @@ using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.Misc;
 using Genbox.FastData.StringHash;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Genbox.FastData;
 
-public static class FastDataGenerator
+public static partial class FastDataGenerator
 {
     internal const StringComparison DefaultStringComparison = StringComparison.Ordinal;
 
@@ -38,7 +39,7 @@ public static class FastDataGenerator
 
     public static bool TryGenerate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null)
     {
-        // factory ??= NullLoggerFactory.Instance;
+        factory ??= NullLoggerFactory.Instance;
 
         //Validate that we only have unique data
         HashSet<T> uniq = new HashSet<T>();
@@ -49,7 +50,19 @@ public static class FastDataGenerator
                 throw new InvalidOperationException($"Duplicate data found: {val}");
         }
 
+        ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));
+        LogUniqueItems(logger, uniq.Count);
+
         DataProperties<T> props = DataProperties<T>.Create(data);
+
+        LogDataType(logger, props.DataType);
+
+        if (props.FloatProps != null)
+            LogMinMaxValues(logger, props.FloatProps.MinValue, props.FloatProps.MaxValue);
+        else if (props.IntProps != null)
+            LogMinMaxValues(logger, props.IntProps.MinValue, props.IntProps.MaxValue);
+        else if (props.StringProps != null)
+            LogMinMaxLength(logger, props.StringProps.LengthData.Min, props.StringProps.LengthData.Max);
 
         IStringHash? stringHash = null;
         if (data is string[])
@@ -65,16 +78,31 @@ public static class FastDataGenerator
 
         IContext? context = null;
 
+        LogUserStructureType(logger, fdCfg.StructureType);
         foreach (object candidate in GetDataStructureCandidates(data, fdCfg, props))
         {
+            LogCandidateAttempt(logger, candidate.GetType().Name);
+
             if (candidate is IHashStructure<T> hs)
             {
                 if (hs.TryCreate(data, hashFunc, out context))
+                {
+                    LogCandidateSuccess(logger, candidate.GetType().Name);
                     break;
+                }
+
+                LogCandidateFailed(logger, candidate.GetType().Name);
             }
             else if (candidate is IStructure<T> s)
+            {
                 if (s.TryCreate(data, out context))
+                {
+                    LogCandidateSuccess(logger, candidate.GetType().Name);
                     break;
+                }
+
+                LogCandidateFailed(logger, candidate.GetType().Name);
+            }
         }
 
         if (context == null)
