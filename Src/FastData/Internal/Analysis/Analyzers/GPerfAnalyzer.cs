@@ -590,6 +590,8 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
 
     private sealed class AssociationTable(ILogger logger)
     {
+        private int _maxHash;
+
         internal int[] Values { get; private set; }
         internal int[] Occurrences { get; private set; }
         internal BoolArray CollisionDetector { get; private set; }
@@ -651,7 +653,7 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
             assoValueMax++;
 
             // Given the bound for _asso_values[c], we have a bound for the possible hash values, as computed in compute_hash().
-            int _maxHash = (assoValueMax - 1) * maxSelCharsLength;
+            _maxHash = (assoValueMax - 1) * maxSelCharsLength;
 
             // Allocate a sparse bit vector for detection of collisions of hash values.
             CollisionDetector = new BoolArray(_maxHash + 1, logger);
@@ -939,10 +941,10 @@ internal sealed partial class GPerfAnalyzer(string[] data, StringProperties prop
                                 assoValueMax = step.AssoValueMax;
 
                                 // Reinitialize MaxHash.
-                                int maxHash = (assoValueMax - 1) * maxSelCharsLength;
+                                _maxHash = (assoValueMax - 1) * maxSelCharsLength;
 
                                 // Reinitialize CollisionDetector.
-                                CollisionDetector = new BoolArray(maxHash + 1, logger);
+                                CollisionDetector = new BoolArray(_maxHash + 1, logger);
                             }
                         }
                     }
