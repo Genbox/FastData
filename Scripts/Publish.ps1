@@ -1,6 +1,6 @@
 $Config = "Release"
 $Framework = "net9.0"
-$Root = "$PSScriptRoot/../"
+$Root = "$PSScriptRoot/.."
 $PublishDir = "$Root/Publish"
 $ArtifactsDir = "$Root/Publish/Artifacts"
 $Color = "DarkBlue"
@@ -10,9 +10,6 @@ Remove-Item -Path $PublishDir/* -Recurse -Force -ErrorAction Ignore | Out-Null
 
 Write-Host -BackgroundColor $Color "Publish the dll files"
 dotnet publish $Root/Src/FastData/FastData.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
-dotnet publish $Root/Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
-dotnet publish $Root/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
-dotnet publish $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
 
 Write-Host -BackgroundColor $Color "Pack the PowerShell variant"
 New-Item -ItemType Directory -Path $PublishDir/PowerShell | Out-Null
@@ -35,10 +32,16 @@ Write-Host -BackgroundColor $Color "Pack the CLI tool as executable"
 dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -f $Framework -r win-x64 -p:PublishSingleFile=true -p:SelfContained=true -p:PublishTrimmed=true -p:TargetFrameworks=$Framework -p:DebugType=none -p:GenerateDocumentationFile=false -p:EnableCompressionInSingleFile=true -p:InvariantGlobalization=true -o $PublishDir
 
 Write-Host -BackgroundColor $Color "Pack the CLI tool as a dotnet tool (NuGet)"
-dotnet pack $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -p:PackAsTool=true -p:ToolCommandName=fastdata -p:PackageVersion=$semver -o $PublishDir
+dotnet pack $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -p:ContinuousIntegrationBuild=true -p:PackAsTool=true -p:ToolCommandName=fastdata -p:PackageVersion=$semver -o $PublishDir
 
 Write-Host -BackgroundColor $Color "Pack the source generator"
-dotnet pack $Root/Src/FastData.SourceGenerator/FastData.SourceGenerator.csproj -c $Config -p:PackageVersion=$semver -o $PublishDir
+dotnet pack $Root/Src/FastData.SourceGenerator/FastData.SourceGenerator.csproj -c $Config -p:ContinuousIntegrationBuild=true -p:PackageVersion=$semver -o $PublishDir
+
+Write-Host -BackgroundColor $Color "Pack FastData as a library"
+dotnet pack $Root/Src/FastData/FastData.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
+dotnet pack $Root/Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
+dotnet pack $Root/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
+dotnet pack $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
 
 #Write-Host -BackgroundColor $Color "Publish PowerShell module to PowerShellGallery"
 #Publish-Module -Path "$PublishDir/PowerShell/" -NuGetApiKey $env:PWSHG_KEY

@@ -1,8 +1,10 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <Description>TODO</Description>
-    <PackageTags>TODO</PackageTags>
+    <Description>A code generator that analyzes your data and creates high-performance, read-only lookup data structures for static data.
+      It supports outputting in many different languages (C#, C++, Rust, etc.)
+    </Description>
+    <PackageTags>Source generator;Code generator;GPerf;High performance</PackageTags>
   </PropertyGroup>
 
 </Project>
