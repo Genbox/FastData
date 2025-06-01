@@ -19,7 +19,7 @@ New-Item -ItemType Directory -Path $PublishDir/PowerShell | Out-Null
 New-Item -ItemType Directory -Path $PublishDir/PowerShell/lib | Out-Null
 
 Write-Host -BackgroundColor $Color "Get the version number of the generator dll file"
-$ver = [System.Reflection.AssemblyName]::GetAssemblyName("$ArtifactsDir\Genbox.FastData.dll").Version
+$ver = [System.Reflection.AssemblyName]::GetAssemblyName("$ArtifactsDir/Genbox.FastData.dll").Version
 $semver = "$($ver.Major).$($ver.Minor).$($ver.Build)"
 
 Write-Host -BackgroundColor $Color "Version: $semver"
