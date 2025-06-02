@@ -137,15 +137,10 @@ internal static class DataAnalyzer
         min = Math.Min(min, lastValue);
         max = Math.Max(max, lastValue);
 
-        bool consecutive = true;
         foreach (sbyte val in data)
         {
-            if (consecutive && lastValue + 1 != val)
-                consecutive = false;
-
             min = Math.Min(min, val);
             max = Math.Max(max, val);
-            lastValue = val;
         }
 
         return new IntegerProperties<T>((T)(object)min, (T)(object)max);
