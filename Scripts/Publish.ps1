@@ -10,6 +10,10 @@ Remove-Item -Path $PublishDir/* -Recurse -Force -ErrorAction Ignore | Out-Null
 
 Write-Host -BackgroundColor $Color "Publish the dll files"
 dotnet publish $Root/Src/FastData/FastData.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator/FastData.Generator.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
 
 Write-Host -BackgroundColor $Color "Pack the PowerShell variant"
 New-Item -ItemType Directory -Path $PublishDir/PowerShell | Out-Null
@@ -39,6 +43,7 @@ dotnet pack $Root/Src/FastData.SourceGenerator/FastData.SourceGenerator.csproj -
 
 Write-Host -BackgroundColor $Color "Pack FastData as a library"
 dotnet pack $Root/Src/FastData/FastData.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
+dotnet pack $Root/Src/FastData.Generator/FastData.Generator.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
 dotnet pack $Root/Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
 dotnet pack $Root/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
 dotnet pack $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
@@ -47,4 +52,6 @@ dotnet pack $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c 
 #Publish-Module -Path "$PublishDir/PowerShell/" -NuGetApiKey $env:PWSHG_KEY
 
 #Write-Host -BackgroundColor $Color "Publish dotnet tool to NuGet"
-#dotnet nuget push $PublishDir/*.nupkg --api-key $env:NUGET_KEY
+Get-ChildItem -Path "$PublishDir/*.nupkg" | ForEach-Object {
+    dotnet nuget push $_.FullName --api-key $env:NUGET_KEY --source https://api.nuget.org/v3/index.json
+}
