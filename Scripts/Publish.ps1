@@ -1,5 +1,4 @@
 $Config = "Release"
-$Framework = "net9.0"
 $Root = "$PSScriptRoot/.."
 $PublishDir = "$Root/Publish"
 $ArtifactsDir = "$Root/Publish/Artifacts"
@@ -9,11 +8,12 @@ Write-Host -BackgroundColor $Color "Clean up from previous publishes"
 Remove-Item -Path $PublishDir/* -Recurse -Force -ErrorAction Ignore | Out-Null
 
 Write-Host -BackgroundColor $Color "Publish the dll files"
-dotnet publish $Root/Src/FastData/FastData.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
-dotnet publish $Root/Src/FastData.Generator/FastData.Generator.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
-dotnet publish $Root/Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
-dotnet publish $Root/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
-dotnet publish $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config -f $Framework -p:GenerateDependencyFile=false -o $ArtifactsDir
+$PwshFramework = "netstandard2.0" # Version needed by PowerShell
+dotnet publish $Root/Src/FastData/FastData.csproj -c $Config -f $PwshFramework -p:GenerateDependencyFile=false -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator/FastData.Generator.csproj -c $Config -f $PwshFramework -p:GenerateDependencyFile=false -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj -c $Config -f $PwshFramework -p:GenerateDependencyFile=false -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj -c $Config -f $PwshFramework -p:GenerateDependencyFile=false -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config -f $PwshFramework -p:GenerateDependencyFile=false -o $ArtifactsDir
 
 Write-Host -BackgroundColor $Color "Pack the PowerShell variant"
 New-Item -ItemType Directory -Path $PublishDir/PowerShell | Out-Null
@@ -33,7 +33,7 @@ Copy-Item $Root/Misc/PowerShell/FastData.psm1 $PublishDir/PowerShell/FastData.ps
 Copy-Item $ArtifactsDir/*.dll $PublishDir/PowerShell/lib/
 
 Write-Host -BackgroundColor $Color "Pack the CLI tool as executable"
-dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -f $Framework -r win-x64 -p:PublishSingleFile=true -p:SelfContained=true -p:PublishTrimmed=true -p:TargetFrameworks=$Framework -p:DebugType=none -p:GenerateDocumentationFile=false -p:EnableCompressionInSingleFile=true -p:InvariantGlobalization=true -o $PublishDir
+dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -r win-x64 -p:PublishSingleFile=true -p:SelfContained=true -p:PublishTrimmed=true -p:TargetFrameworks="net9.0" -p:DebugType=none -p:GenerateDocumentationFile=false -p:EnableCompressionInSingleFile=true -p:InvariantGlobalization=true -o $PublishDir
 
 Write-Host -BackgroundColor $Color "Pack the CLI tool as a dotnet tool (NuGet)"
 dotnet pack $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -p:ContinuousIntegrationBuild=true -p:PackAsTool=true -p:ToolCommandName=fastdata -p:PackageVersion=$semver -o $PublishDir

@@ -5,7 +5,7 @@ function Invoke-FastData
         [string]$OutputFile,
         [ValidateSet("char", "double", "int16", "int32", "int64", "int8", "single", "string", "uint16", "uint32", "uint64", "uint8")]
         [string]$DataType = "string",
-        [ValidateSet("Array", "Auto", "BinarySearch", "Conditional", "HashSet")]
+        [ValidateSet("Auto", "Array", "BinarySearch", "Conditional", "HashSet")]
         [string]$StructureType = "Auto",
         [Parameter(Mandatory = $true)] [string]$InputFile,
         [string]$Namespace,
@@ -23,48 +23,19 @@ function Invoke-FastData
         param ($DataType)
         switch ($DataType)
         {
-            "string"  {
-                return { [string]$_ }
-            }
-            "bool"    {
-                return { [bool]$_ }
-            }
-            "char"    {
-                return { [char]$_ }
-            }
-            "int8"    {
-                return { [sbyte]::Parse($_) }
-            }
-            "uint8"   {
-                return { [byte]::Parse($_) }
-            }
-            "int16"   {
-                return { [short]::Parse($_) }
-            }
-            "uint16"  {
-                return { [ushort]::Parse($_) }
-            }
-            "int32"   {
-                return { [int]::Parse($_) }
-            }
-            "uint32"  {
-                return { [uint]::Parse($_) }
-            }
-            "int64"   {
-                return { [long]::Parse($_) }
-            }
-            "uint64"  {
-                return { [ulong]::Parse($_) }
-            }
-            "single"  {
-                return { [float]::Parse($_) }
-            }
-            "double"  {
-                return { [double]::Parse($_) }
-            }
-            default   {
-                throw "Unsupported data type: $DataType"
-            }
+            "string" { return { [string]$_ } }
+            "char" { return { [char]$_ } }
+            "int8" { return { [sbyte]::Parse($_) } }
+            "uint8" { return { [byte]::Parse($_) } }
+            "int16" { return { [short]::Parse($_) } }
+            "uint16" { return { [ushort]::Parse($_) } }
+            "int32" { return { [int]::Parse($_) } }
+            "uint32" { return { [uint]::Parse($_) } }
+            "int64" { return { [long]::Parse($_) } }
+            "uint64" { return { [ulong]::Parse($_) } }
+            "single" { return { [float]::Parse($_) } }
+            "double" { return { [double]::Parse($_) } }
+            default { throw "Unsupported data type: $DataType" }
         }
     }
 
@@ -74,19 +45,20 @@ function Invoke-FastData
 
     if ($Command -eq "csharp")
     {
-        $cfg = New-Object Genbox.FastData.Generator.CSharp.CSharpGeneratorConfig($ClassName)
+        $cfg = New-Object Genbox.FastData.Generator.CSharp.CSharpCodeGeneratorConfig($ClassName)
         $cfg.Namespace = $Namespace
-        $generator = New-Object Genbox.FastData.Generator.CSharp.CSharpCodeGenerator $cfg
+        $generator = [Genbox.FastData.Generator.CSharp.CSharpCodeGenerator]::Create($cfg)
     }
     elseif ($Command -eq "cpp")
     {
-        $cfg = New-Object Genbox.FastData.Generator.CPlusPlus.CPlusPlusGeneratorConfig($ClassName)
-        $generator = New-Object Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator $cfg
+        $cfg = New-Object Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig($ClassName)
+        $generator = [Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator]::Create($cfg)
+
     }
     elseif ($Command -eq "rust")
     {
-        $cfg = New-Object Genbox.FastData.Generator.Rust.RustGeneratorConfig($ClassName)
-        $generator = New-Object Genbox.FastData.Generator.Rust.RustCodeGenerator $cfg
+        $cfg = New-Object Genbox.FastData.Generator.Rust.RustCodeGeneratorConfig($ClassName)
+        $generator = [Genbox.FastData.Generator.Rust.RustCodeGenerator]::Create($cfg)
     }
 
     $source = [ref]''

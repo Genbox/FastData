@@ -4,7 +4,7 @@
     GUID              = 'd1a5f1e6-b2df-4e63-8a5c-4f1ec1d345a3'
     Author            = 'Ian Qvist'
     Description       = 'Data structure generator for high-performance lookups of static data'
-    PowerShellVersion = '6.0'
+    PowerShellVersion = '5.1'
     FileList          = @('FastData.psm1',
                           'FastData.psd1',
                           'lib\Genbox.FastData.dll',
