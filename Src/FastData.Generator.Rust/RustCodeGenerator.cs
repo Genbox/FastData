@@ -21,9 +21,9 @@ public sealed class RustCodeGenerator : CodeGenerator
         return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(helper, userCfg.GeneratorOptions), new RustHashDef(), new RustExpressionCompiler(helper));
     }
 
-    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg)
+    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext context)
     {
-        base.AppendHeader(sb, genCfg);
+        base.AppendHeader(sb, genCfg, context);
 
         sb.Append($$"""
                     #![allow(unused_parens)]

@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: Auto
+// Structure: Auto (Conditional)
 #pragma once
 #include <array>
 #include <cstdint>

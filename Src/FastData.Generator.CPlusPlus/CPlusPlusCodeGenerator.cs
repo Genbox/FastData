@@ -33,9 +33,9 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         return base.TryGenerate(genCfg, context, out source);
     }
 
-    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg)
+    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext context)
     {
-        base.AppendHeader(sb, genCfg);
+        base.AppendHeader(sb, genCfg, context);
 
         sb.AppendLine("#pragma once"); //Add include guard
 
