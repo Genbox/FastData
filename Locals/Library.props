@@ -5,4 +5,7 @@
     <PackageReference Remove="NetFabric.Hyperlinq.Analyzer" PrivateAssets="all" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <PackageProjectUrl>https://github.com/Genbox/FastData</PackageProjectUrl>
+  </PropertyGroup>
 </Project>
