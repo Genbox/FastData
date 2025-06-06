@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/github/license/Genbox/FastData)](https://github.com/Genbox/FastData/blob/master/LICENSE.txt)
 
-![Docs/FastData.png](Docs/FastData.png)
+![Docs/FastData.png](./Docs/FastData.png)
 
 ## Description
 
@@ -12,18 +12,19 @@ in many different languages (C#, C++, Rust, etc.), ready for inclusion in your p
 
 ## Download
 
+* Executable: [Executable](https://github.com/Genbox/FastData/releases)
+* C# source generator: [![C# source generator](https://img.shields.io/nuget/v/Genbox.FastData.SourceGenerator.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.FastData.SourceGenerator/)
 * C# library: [![C# library](https://img.shields.io/nuget/v/Genbox.FastData.Generator.CSharp.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.FastData.Generator.CSharp/)
 * .NET Tool: [![.NET Tool](https://img.shields.io/nuget/v/Genbox.FastData.Cli.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.FastData.Cli/)
 
-
-## Use case
+## Use Case
 
 Imagine a scenario where you have a predefined list of words (e.g., dog breeds) and need to check whether a specific dog
 breed exists in the set.
-Usually you create an array and look up the value. However, this is far from optimal and is lacks several optimizations.
+Usually you create an array and look up the value. However, this is far from optimal and lacks several optimizations.
 
 ```csharp
-string[] breeds = ["Labrador", "German Shepherd", "Golden Retriever"];
+string[] breeds = { "Labrador", "German Shepherd", "Golden Retriever" };
 
 if (breeds.Contains("Beagle"))
     Console.WriteLine("It contains Beagle");
