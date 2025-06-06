@@ -121,7 +121,15 @@ internal static class Program
                         })
                         .Build();
 
-        return await parser.InvokeAsync(args);
+        try
+        {
+            return await parser.InvokeAsync(args);
+        }
+        catch (Exception e)
+        {
+            await Console.Error.WriteLineAsync("An error happened: " + e.Message);
+            return -1;
+        }
     }
 
     private static async Task GenerateAsync(FileInfo inputFile, DataType dataType, StructureType structureType, ICodeGenerator generator, FileInfo? outputFile)
