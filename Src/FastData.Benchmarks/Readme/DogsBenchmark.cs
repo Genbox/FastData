@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Order;
 
-namespace Genbox.FastData.Benchmarks.Benchmarks;
+namespace Genbox.FastData.Benchmarks.Readme;
 
 /// <summary>Benchmark used in Readme</summary>
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
