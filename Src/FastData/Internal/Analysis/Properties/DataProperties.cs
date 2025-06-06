@@ -68,9 +68,6 @@ internal sealed class DataProperties<T>
             case double[] doubleArr when dataType == DataType.Double:
                 floatProps = DataAnalyzer.GetDoubleProperties<T>(doubleArr);
                 break;
-            case bool[]:
-                //Do nothing
-                break;
             default:
                 throw new InvalidOperationException($"Unknown data type: {typeof(T)}");
         }

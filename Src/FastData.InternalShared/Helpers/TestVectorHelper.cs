@@ -197,9 +197,7 @@ public static class TestVectorHelper
 
     private static IEnumerable<(Type type, object[] value)> GetEdgeCaseValues() =>
     [
-
         // We want to test edge values
-        (typeof(bool), [true, false]),
         (typeof(sbyte), [sbyte.MinValue, (sbyte)-1, (sbyte)0, (sbyte)1, sbyte.MaxValue]),
         (typeof(byte), [(byte)0, (byte)1, byte.MaxValue]),
 
@@ -229,7 +227,6 @@ public static class TestVectorHelper
 
     private static IEnumerable<(Type type, object[] value)> GetSingleValues() =>
     [
-        (typeof(bool), [true]),
         (typeof(sbyte), [(sbyte)1]),
         (typeof(byte), [(byte)1]),
         (typeof(char), ['a']),

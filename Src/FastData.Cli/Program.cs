@@ -151,7 +151,6 @@ internal static class Program
     private static Func<string, object> GetTypeFunc(DataType dataType) => dataType switch
     {
         DataType.String => str => str,
-        DataType.Bool => str => bool.Parse(str),
         DataType.Int8 => str => sbyte.Parse(str, CultureInfo.InvariantCulture),
         DataType.UInt8 => str => byte.Parse(str, CultureInfo.InvariantCulture),
         DataType.Char => str => char.Parse(str),

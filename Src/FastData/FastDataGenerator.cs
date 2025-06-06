@@ -21,7 +21,6 @@ public static partial class FastDataGenerator
 
     public static bool TryGenerate(object[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null) => data[0] switch
     {
-        bool => TryGenerate(data.Cast<bool>().ToArray(), fdCfg, generator, out source, factory),
         char => TryGenerate(data.Cast<char>().ToArray(), fdCfg, generator, out source, factory),
         sbyte => TryGenerate(data.Cast<sbyte>().ToArray(), fdCfg, generator, out source, factory),
         byte => TryGenerate(data.Cast<byte>().ToArray(), fdCfg, generator, out source, factory),

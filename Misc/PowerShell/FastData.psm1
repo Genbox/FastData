@@ -3,7 +3,7 @@ function Invoke-FastData
     param (
         [Parameter(Mandatory = $true)][ValidateSet("csharp", "cpp", "rust")] [string]$Command,
         [string]$OutputFile,
-        [ValidateSet("bool", "char", "double", "int16", "int32", "int64", "int8", "single", "string", "uint16", "uint32", "uint64", "uint8")]
+        [ValidateSet("char", "double", "int16", "int32", "int64", "int8", "single", "string", "uint16", "uint32", "uint64", "uint8")]
         [string]$DataType = "string",
         [ValidateSet("Array", "Auto", "BinarySearch", "Conditional", "HashSet")]
         [string]$StructureType = "Auto",

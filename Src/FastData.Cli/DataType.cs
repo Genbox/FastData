@@ -3,7 +3,6 @@ namespace Genbox.FastData.Cli;
 internal enum DataType
 {
     String = 1,
-    Bool,
     Int8,
     UInt8,
     Char,
