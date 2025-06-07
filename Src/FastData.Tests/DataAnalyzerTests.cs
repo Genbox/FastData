@@ -15,19 +15,16 @@ public class DataAnalyzerTests
     public void GetStringProperties_LengthMap_Test(string[] data)
     {
         StringProperties res = GetStringProperties(data);
-        IntegerBitSet map = res.LengthData.LengthMap;
-        Assert.Equal((uint)data.Distinct().Count(), map.Count);
+        LengthBitArray map = res.LengthData.LengthMap;
+        Assert.Equal(data.Distinct().Count(), map.Count);
 
         foreach (string str in data)
         {
-            Assert.True(map.Contains(str.Length));
+            Assert.True(map.Get(str.Length));
         }
 
-        Assert.Equal((uint)data.Min(x => x.Length), map.MinValue);
-        Assert.Equal((uint)data.Max(x => x.Length), map.MaxValue);
-
-        //Anything over 64 should fail (at least for now)
-        Assert.False(map.Contains(100));
+        Assert.Equal((uint)data.Min(x => x.Length), res.LengthData.Min);
+        Assert.Equal((uint)data.Max(x => x.Length), res.LengthData.Max);
     }
 
     [Theory]

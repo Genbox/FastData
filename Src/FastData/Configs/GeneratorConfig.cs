@@ -80,7 +80,7 @@ public sealed class GeneratorConfig<T>
         // - If the lengths are non-consecutive (4, 9, 12, etc.) we use a small bitset (4 inst)
 
         if (prop.LengthData.Max <= 64 && !prop.LengthData.LengthMap.Consecutive)
-            yield return new LengthBitSetEarlyExit(prop.LengthData.LengthMap.BitSet);
+            yield return new LengthBitSetEarlyExit(prop.LengthData.LengthMap.FirstValue);
         else
             yield return new MinMaxLengthEarlyExit(prop.LengthData.Min, prop.LengthData.Max); //Also handles same lengths
     }

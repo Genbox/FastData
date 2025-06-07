@@ -7,12 +7,13 @@ internal static class DataAnalyzer
 {
     internal static StringProperties GetStringProperties(string[] data)
     {
-        //Contains a set of unique lengths between 1 and 64
-        IntegerBitSet lengthMap = new IntegerBitSet();
+        //Contains a map of unique lengths
+        LengthBitArray lengthMap = new LengthBitArray();
 
         //We need to know the longest string for optimal mixing. Probably not 100% necessary.
         string maxStr = data[0];
         int minLength = int.MaxValue;
+        bool uniq = true;
 
         foreach (string val in data)
         {
@@ -20,7 +21,7 @@ internal static class DataAnalyzer
                 maxStr = val;
 
             minLength = Math.Min(minLength, val.Length); //Track the smallest string. It might be more than what lengthmap supports
-            lengthMap.Set(val.Length);
+            uniq &= !lengthMap.SetTrue(val.Length);
         }
 
         //Build a forward and reverse map of merged entropy
@@ -63,7 +64,7 @@ internal static class DataAnalyzer
             }
         }
 
-        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
+        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
     }
 
     internal static IntegerProperties<T> GetCharProperties<T>(char[] data)

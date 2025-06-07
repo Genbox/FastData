@@ -29,18 +29,14 @@ internal sealed class KeyLengthStructure<T>(StringProperties props) : IStructure
         //We don't have to use HashSets to deduplicate within a bucket as all items are unique
         List<string>?[] lengths = new List<string>?[maxLen + 1]; //We need a place for zero
 
-        bool uniq = true;
         foreach (string value in stringArr)
         {
             ref List<string>? item = ref lengths[value.Length];
             item ??= new List<string>();
             item.Add(value);
-
-            if (item.Count > 1)
-                uniq = false;
         }
 
-        context = new KeyLengthContext(lengths, uniq, minLen, maxLen);
+        context = new KeyLengthContext(lengths, props.LengthData.Unique, minLen, maxLen);
         return true;
     }
 }
