@@ -77,7 +77,7 @@ internal sealed class HashSetLinearStructure<T>(HashData hashData) : IStructure<
     private static uint CalcNumBuckets(ulong[] hashCodes, bool hashCodesUnique)
     {
         //Note: this code starts with a sane capacity factor for how many buckets are needed.
-        //      it then increase the bucket capacity with the next prime number until it reaches less than 5% collisions
+        //      it then increases the bucket capacity with the next prime number until it reaches less than 5% collisions
         //      it does this using a bitmap of buckets seen. It also uses unique hash codes to avoid duplicates counting toward collisions
 
         const double AcceptableCollisionRate = 0.05;

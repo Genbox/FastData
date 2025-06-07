@@ -143,8 +143,7 @@ public static class TestHelper
         }
 
         ICodeGenerator generator = gen(vector.Identifier);
-        IStringHash? stringHash = props.DataType == DataType.String ? vector.StringHash ?? new DefaultStringHash() : null;
-        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(structureType, FastDataGenerator.DefaultStringComparison, props, stringHash);
+        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(structureType, FastDataGenerator.DefaultStringComparison, props, null);
         if (generator.TryGenerate(genCfg, context, out string? source))
         {
             spec = new GeneratorSpec(vector.Identifier, source);
