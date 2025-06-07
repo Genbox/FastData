@@ -17,7 +17,7 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
     [ClassData(typeof(TestVectorTheoryData))]
     public void Test<T>(TestVector<T> data)
     {
-        Assert.True(TestVectorHelper.TryGenerate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
+        Assert.True(TryGenerate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
 
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();

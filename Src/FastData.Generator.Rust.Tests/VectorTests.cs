@@ -17,7 +17,7 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
     [ClassData(typeof(TestVectorTheoryData))]
     public void Test<T>(TestVector<T> data)
     {
-        Assert.True(TestVectorHelper.TryGenerate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
+        Assert.True(TryGenerate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
 
         RustLanguageDef langDef = new RustLanguageDef();

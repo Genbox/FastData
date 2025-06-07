@@ -5,6 +5,7 @@ using Genbox.FastData.InternalShared.Helpers;
 using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.InternalShared.TestClasses.TheoryData;
 using static Genbox.FastData.Generator.Helpers.FormatHelper;
+using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.CSharp.Tests;
 
@@ -14,7 +15,7 @@ public class VectorTests
     [ClassData(typeof(TestVectorTheoryData))]
     public void Test<T>(TestVector<T> data)
     {
-        Assert.True(TestVectorHelper.TryGenerate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
+        Assert.True(TryGenerate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
 
         CSharpLanguageDef langDef = new CSharpLanguageDef();
