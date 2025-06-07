@@ -8,6 +8,7 @@ internal sealed class ConditionalStructure<T> : IStructure<T>
 {
     public bool TryCreate(T[] data, out IContext? context)
     {
+        //It is inappropriate for large inputs
         if (data.Length > ushort.MaxValue)
         {
             context = null;

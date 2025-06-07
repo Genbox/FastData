@@ -23,7 +23,6 @@ internal sealed class KeyLengthStructure<T>(StringProperties props) : IStructure
         //idx 2: null
         //idx 3: "aaa", "bbb"
 
-        uint minLen = props.LengthData.Min;
         uint maxLen = props.LengthData.Max;
 
         //We don't have to use HashSets to deduplicate within a bucket as all items are unique
@@ -36,7 +35,7 @@ internal sealed class KeyLengthStructure<T>(StringProperties props) : IStructure
             item.Add(value);
         }
 
-        context = new KeyLengthContext(lengths, props.LengthData.Unique, minLen, maxLen);
+        context = new KeyLengthContext(lengths, props.LengthData.Unique, props.LengthData.Min, maxLen);
         return true;
     }
 }
