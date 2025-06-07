@@ -1,0 +1,34 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Conditional
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ConditionalStructure_UInt64_4 final
+{
+public:
+    [[nodiscard]]
+    static bool contains(const uint64_t value) noexcept
+    {
+        if (value < 0 || value > 18446744073709551605ull)
+            return false;
+
+        if (value == 0 || value == 1ull || value == 2ull || value == 18446744073709551605ull)
+            return true;
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 4;
+    static constexpr uint64_t min_value = 0;
+    static constexpr uint64_t max_value = 18446744073709551605ull;
+
+public:
+    ConditionalStructure_UInt64_4() = delete;
+    ConditionalStructure_UInt64_4(const ConditionalStructure_UInt64_4&) = delete;
+    ConditionalStructure_UInt64_4& operator=(const ConditionalStructure_UInt64_4&) = delete;
+    ConditionalStructure_UInt64_4(ConditionalStructure_UInt64_4&&) = delete;
+    ConditionalStructure_UInt64_4& operator=(ConditionalStructure_UInt64_4&&) = delete;
+};

@@ -7,16 +7,6 @@ namespace Genbox.FastData.InternalShared.Helpers;
 
 public static class TestVectorHelper
 {
-    public static IEnumerable<ITestData> GetTestData()
-    {
-        foreach (StructureType type in Enum.GetValues<StructureType>())
-        {
-            yield return new TestData<string>(type, ["item1", "item2", "item3"]);
-            yield return new TestData<int>(type, [int.MinValue, 0, int.MaxValue]);
-            yield return new TestData<long>(type, [long.MinValue, 0, long.MaxValue]);
-            yield return new TestData<double>(type, [double.MinValue, 0, double.MaxValue]);
-        }
-    }
 
     public static IEnumerable<ITestVector> GetTestVectors()
     {

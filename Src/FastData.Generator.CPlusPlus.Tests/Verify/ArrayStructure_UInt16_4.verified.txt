@@ -1,0 +1,40 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ArrayStructure_UInt16_4 final
+{
+    static constexpr std::array<uint16_t, 4> entries = {
+        0, 1, 2, std::numeric_limits<uint16_t>::max()
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const uint16_t value) noexcept
+    {
+        if (value < 0 || value > std::numeric_limits<uint16_t>::max())
+            return false;
+
+        for (size_t i = 0; i < 4; i++)
+        {
+            if (entries[i] == value)
+               return true;
+        }
+        return false;
+    }
+
+    static constexpr size_t item_count = 4;
+    static constexpr uint16_t min_value = 0;
+    static constexpr uint16_t max_value = std::numeric_limits<uint16_t>::max();
+
+public:
+    ArrayStructure_UInt16_4() = delete;
+    ArrayStructure_UInt16_4(const ArrayStructure_UInt16_4&) = delete;
+    ArrayStructure_UInt16_4& operator=(const ArrayStructure_UInt16_4&) = delete;
+    ArrayStructure_UInt16_4(ArrayStructure_UInt16_4&&) = delete;
+    ArrayStructure_UInt16_4& operator=(ArrayStructure_UInt16_4&&) = delete;
+};

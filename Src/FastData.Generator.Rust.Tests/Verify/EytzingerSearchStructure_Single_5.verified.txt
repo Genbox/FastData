@@ -1,0 +1,42 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: BinarySearch
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct EytzingerSearchStructure_Single_5;
+
+impl EytzingerSearchStructure_Single_5 {
+    const ENTRIES: [f32; 5] = [
+        1.0, -1.0, f32::MAX, f32::MIN, 0.0
+    ];
+
+    #[must_use]
+    pub fn contains(value: f32) -> bool {
+        if value < f32::MIN || value > f32::MAX {
+            return false;
+        }
+
+        let mut i: usize = 0;
+        while i < Self::ENTRIES.len() {
+            let entry = Self::ENTRIES[i];
+
+            if entry == value {
+                return true;
+            }
+            if entry < value {
+                i = 2 * i + 2;
+            } else {
+                i = 2 * i + 1;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_VALUE: f32 = f32::MIN;
+    pub const MAX_VALUE: f32 = f32::MAX;
+}

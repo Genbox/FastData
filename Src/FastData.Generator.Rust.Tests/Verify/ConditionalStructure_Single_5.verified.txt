@@ -1,0 +1,28 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Conditional
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct ConditionalStructure_Single_5;
+
+impl ConditionalStructure_Single_5 {
+    #[must_use]
+    pub fn contains(value: f32) -> bool {
+        if value < f32::MIN || value > f32::MAX {
+            return false;
+        }
+
+        if value == f32::MIN || value == -1.0 || value == 0.0 || value == 1.0 || value == f32::MAX {
+            return true;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_VALUE: f32 = f32::MIN;
+    pub const MAX_VALUE: f32 = f32::MAX;
+}

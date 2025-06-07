@@ -1,0 +1,72 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashSet
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashSetChainStructure_Int32_100;
+
+impl HashSetChainStructure_Int32_100 {
+    const BUCKETS: [i8; 100] = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
+        11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+        21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+        31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 
+        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 
+        51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 
+        61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 
+        71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 
+        81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 
+        91, 92, 93, 94, 95, 96, 97, 98, 99, 100
+    ];
+
+    const ENTRIES: [E; 100] = [
+        E { hash_code: 0, next: -1, value: 0 }, E { hash_code: 1, next: -1, value: 1 }, E { hash_code: 2, next: -1, value: 2 }, E { hash_code: 3, next: -1, value: 3 }, E { hash_code: 4, next: -1, value: 4 }, E { hash_code: 5, next: -1, value: 5 }, E { hash_code: 6, next: -1, value: 6 }, E { hash_code: 7, next: -1, value: 7 }, E { hash_code: 8, next: -1, value: 8 }, E { hash_code: 9, next: -1, value: 9 }, 
+        E { hash_code: 10, next: -1, value: 10 }, E { hash_code: 11, next: -1, value: 11 }, E { hash_code: 12, next: -1, value: 12 }, E { hash_code: 13, next: -1, value: 13 }, E { hash_code: 14, next: -1, value: 14 }, E { hash_code: 15, next: -1, value: 15 }, E { hash_code: 16, next: -1, value: 16 }, E { hash_code: 17, next: -1, value: 17 }, E { hash_code: 18, next: -1, value: 18 }, E { hash_code: 19, next: -1, value: 19 }, 
+        E { hash_code: 20, next: -1, value: 20 }, E { hash_code: 21, next: -1, value: 21 }, E { hash_code: 22, next: -1, value: 22 }, E { hash_code: 23, next: -1, value: 23 }, E { hash_code: 24, next: -1, value: 24 }, E { hash_code: 25, next: -1, value: 25 }, E { hash_code: 26, next: -1, value: 26 }, E { hash_code: 27, next: -1, value: 27 }, E { hash_code: 28, next: -1, value: 28 }, E { hash_code: 29, next: -1, value: 29 }, 
+        E { hash_code: 30, next: -1, value: 30 }, E { hash_code: 31, next: -1, value: 31 }, E { hash_code: 32, next: -1, value: 32 }, E { hash_code: 33, next: -1, value: 33 }, E { hash_code: 34, next: -1, value: 34 }, E { hash_code: 35, next: -1, value: 35 }, E { hash_code: 36, next: -1, value: 36 }, E { hash_code: 37, next: -1, value: 37 }, E { hash_code: 38, next: -1, value: 38 }, E { hash_code: 39, next: -1, value: 39 }, 
+        E { hash_code: 40, next: -1, value: 40 }, E { hash_code: 41, next: -1, value: 41 }, E { hash_code: 42, next: -1, value: 42 }, E { hash_code: 43, next: -1, value: 43 }, E { hash_code: 44, next: -1, value: 44 }, E { hash_code: 45, next: -1, value: 45 }, E { hash_code: 46, next: -1, value: 46 }, E { hash_code: 47, next: -1, value: 47 }, E { hash_code: 48, next: -1, value: 48 }, E { hash_code: 49, next: -1, value: 49 }, 
+        E { hash_code: 50, next: -1, value: 50 }, E { hash_code: 51, next: -1, value: 51 }, E { hash_code: 52, next: -1, value: 52 }, E { hash_code: 53, next: -1, value: 53 }, E { hash_code: 54, next: -1, value: 54 }, E { hash_code: 55, next: -1, value: 55 }, E { hash_code: 56, next: -1, value: 56 }, E { hash_code: 57, next: -1, value: 57 }, E { hash_code: 58, next: -1, value: 58 }, E { hash_code: 59, next: -1, value: 59 }, 
+        E { hash_code: 60, next: -1, value: 60 }, E { hash_code: 61, next: -1, value: 61 }, E { hash_code: 62, next: -1, value: 62 }, E { hash_code: 63, next: -1, value: 63 }, E { hash_code: 64, next: -1, value: 64 }, E { hash_code: 65, next: -1, value: 65 }, E { hash_code: 66, next: -1, value: 66 }, E { hash_code: 67, next: -1, value: 67 }, E { hash_code: 68, next: -1, value: 68 }, E { hash_code: 69, next: -1, value: 69 }, 
+        E { hash_code: 70, next: -1, value: 70 }, E { hash_code: 71, next: -1, value: 71 }, E { hash_code: 72, next: -1, value: 72 }, E { hash_code: 73, next: -1, value: 73 }, E { hash_code: 74, next: -1, value: 74 }, E { hash_code: 75, next: -1, value: 75 }, E { hash_code: 76, next: -1, value: 76 }, E { hash_code: 77, next: -1, value: 77 }, E { hash_code: 78, next: -1, value: 78 }, E { hash_code: 79, next: -1, value: 79 }, 
+        E { hash_code: 80, next: -1, value: 80 }, E { hash_code: 81, next: -1, value: 81 }, E { hash_code: 82, next: -1, value: 82 }, E { hash_code: 83, next: -1, value: 83 }, E { hash_code: 84, next: -1, value: 84 }, E { hash_code: 85, next: -1, value: 85 }, E { hash_code: 86, next: -1, value: 86 }, E { hash_code: 87, next: -1, value: 87 }, E { hash_code: 88, next: -1, value: 88 }, E { hash_code: 89, next: -1, value: 89 }, 
+        E { hash_code: 90, next: -1, value: 90 }, E { hash_code: 91, next: -1, value: 91 }, E { hash_code: 92, next: -1, value: 92 }, E { hash_code: 93, next: -1, value: 93 }, E { hash_code: 94, next: -1, value: 94 }, E { hash_code: 95, next: -1, value: 95 }, E { hash_code: 96, next: -1, value: 96 }, E { hash_code: 97, next: -1, value: 97 }, E { hash_code: 98, next: -1, value: 98 }, E { hash_code: 99, next: -1, value: 99 }
+    ];
+
+    #[inline(always)]
+    fn get_hash(value: i32) -> u64 {
+        value as u64
+    }
+
+    #[must_use]
+    pub fn contains(value: i32) -> bool {
+        if value < 0 || value > 99 {
+            return false;
+        }
+
+        let hash = unsafe { Self::get_hash(value) };
+        let index = hash % 100;
+        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+
+        while i >= 0 {
+            let entry = &Self::ENTRIES[i as usize];
+            if entry.hash_code == hash && entry.value == value {
+                return true;
+            }
+            i = entry.next;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 100;
+    pub const MIN_VALUE: i32 = 0;
+    pub const MAX_VALUE: i32 = 99;
+}
+struct E {
+    hash_code: u64,
+    next: i8,
+    value: i32,
+}

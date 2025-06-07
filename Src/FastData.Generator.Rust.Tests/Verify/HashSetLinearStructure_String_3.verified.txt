@@ -1,0 +1,69 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashSet
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashSetLinearStructure_String_3;
+
+impl HashSetLinearStructure_String_3 {
+    const BUCKETS: [B; 11] = [
+        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 1, end_index: 1 }, B { start_index: 2, end_index: 2 }, 
+        B { start_index: 0, end_index: 0 }
+    ];
+
+    const ITEMS: [&'static str; 3] = [
+        "item", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "a"
+    ];
+
+    const HASH_CODES: [u64; 3] = [
+        16750939634977259983, 9198652691199425319, 18225461187723808291
+    ];
+
+    #[inline]
+    unsafe fn get_hash(value: &str) -> u64 {
+        let mut hash: u64 = 352654597;
+
+        let mut ptr = value.as_ptr();
+        let mut len = value.len();
+
+         while len > 0 {
+                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
+                ptr = ptr.add(1);
+                len -= 1;
+         }
+
+        hash.wrapping_mul(1566083941).wrapping_add(352654597)
+    }
+
+    #[must_use]
+    pub fn contains(value: &'static str) -> bool {
+        if value.len() < 1 as usize || value.len() > 255 as usize {
+            return false;
+        }
+
+        let hash = unsafe { Self::get_hash(value) };
+        let bucket = &Self::BUCKETS[(hash % 11) as usize];
+        let mut index: u8 = bucket.start_index;
+        let end_index: u8 = bucket.end_index;
+
+        while index <= end_index {
+            if Self::HASH_CODES[index as usize] == hash && Self::ITEMS[index as usize] == value {
+                return true;
+            }
+            index += 1;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_LENGTH: usize = 1;
+    pub const MAX_LENGTH: usize = 255;
+}
+struct B {
+    start_index: u8,
+    end_index: u8,
+}

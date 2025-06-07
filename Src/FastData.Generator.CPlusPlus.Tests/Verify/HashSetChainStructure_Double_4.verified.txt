@@ -1,0 +1,72 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashSet
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashSetChainStructure_Double_4 final
+{
+    struct e
+    {
+        uint64_t hash_code;
+        int8_t next;
+        double value;
+
+        e(const uint64_t hash_code, const int8_t next, const double value)
+           : hash_code(hash_code), next(next), value(value) {}
+    };
+
+    static constexpr std::array<int8_t, 4> buckets = {
+        3, 0, 0, 4
+     };
+
+    inline static const std::array<e, 4> entries = {
+        e(18442240474082181119, -1, std::numeric_limits<double>::lowest()), e(0, -1, 0.0), e(4607182418800017408, 1, 1.0), e(9218868437227405311, 0, std::numeric_limits<double>::max())
+    };
+
+    static uint64_t get_hash(const double value) noexcept
+    {
+        uint64_t bits;
+        std::memcpy(&bits, &value, sizeof(bits));
+        if (((bits - 1) & ~0x8000000000000000ull) >= 0x7FF0000000000000ull)
+            bits &= 0x7FF0000000000000ull;
+        return bits;
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const double value) noexcept
+    {
+        if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
+            return false;
+
+        const uint64_t hash = get_hash(value);
+        const size_t index = hash % 4;
+        int8_t i = buckets[index] - 1;
+
+        while (i >= 0)
+        {
+            const auto& [hash_code, next, value1] = entries[i];
+
+            if (hash_code == hash && value1 == value)
+                return true;
+
+            i = next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 4;
+    static constexpr double min_value = std::numeric_limits<double>::lowest();
+    static constexpr double max_value = std::numeric_limits<double>::max();
+
+public:
+    HashSetChainStructure_Double_4() = delete;
+    HashSetChainStructure_Double_4(const HashSetChainStructure_Double_4&) = delete;
+    HashSetChainStructure_Double_4& operator=(const HashSetChainStructure_Double_4&) = delete;
+    HashSetChainStructure_Double_4(HashSetChainStructure_Double_4&&) = delete;
+    HashSetChainStructure_Double_4& operator=(HashSetChainStructure_Double_4&&) = delete;
+};

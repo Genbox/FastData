@@ -1,0 +1,40 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ArrayStructure_Char_3 final
+{
+    static constexpr std::array<char, 3> entries = {
+        0, 97, 127
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const char value) noexcept
+    {
+        if (value < 0 || value > 127)
+            return false;
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            if (entries[i] == value)
+               return true;
+        }
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr char min_value = 0;
+    static constexpr char max_value = 127;
+
+public:
+    ArrayStructure_Char_3() = delete;
+    ArrayStructure_Char_3(const ArrayStructure_Char_3&) = delete;
+    ArrayStructure_Char_3& operator=(const ArrayStructure_Char_3&) = delete;
+    ArrayStructure_Char_3(ArrayStructure_Char_3&&) = delete;
+    ArrayStructure_Char_3& operator=(ArrayStructure_Char_3&&) = delete;
+};

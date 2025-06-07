@@ -1,0 +1,47 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class EytzingerSearchStructure_Int64_5 final
+{
+    static constexpr std::array<int64_t, 5> entries = {
+        1ll, -5ll, 9223372036854775806ll, std::numeric_limits<int64_t>::lowest(), 0ll
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const int64_t value) noexcept
+    {
+        if (value < std::numeric_limits<int64_t>::lowest() || value > 9223372036854775806ll)
+            return false;
+
+        size_t i = 0;
+        while (i < entries.size())
+        {
+            if (entries[i] == value)
+                return true;
+
+            if (entries[i] < value)
+                i = 2 * i + 2;
+            else
+                i = 2 * i + 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int64_t min_value = std::numeric_limits<int64_t>::lowest();
+    static constexpr int64_t max_value = 9223372036854775806ll;
+
+public:
+    EytzingerSearchStructure_Int64_5() = delete;
+    EytzingerSearchStructure_Int64_5(const EytzingerSearchStructure_Int64_5&) = delete;
+    EytzingerSearchStructure_Int64_5& operator=(const EytzingerSearchStructure_Int64_5&) = delete;
+    EytzingerSearchStructure_Int64_5(EytzingerSearchStructure_Int64_5&&) = delete;
+    EytzingerSearchStructure_Int64_5& operator=(EytzingerSearchStructure_Int64_5&&) = delete;
+};

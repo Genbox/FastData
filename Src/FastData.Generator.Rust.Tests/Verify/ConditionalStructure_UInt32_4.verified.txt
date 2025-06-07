@@ -1,0 +1,28 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Conditional
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct ConditionalStructure_UInt32_4;
+
+impl ConditionalStructure_UInt32_4 {
+    #[must_use]
+    pub fn contains(value: u32) -> bool {
+        if value < u32::MIN || value > u32::MAX {
+            return false;
+        }
+
+        if value == u32::MIN || value == 1 || value == 2 || value == u32::MAX {
+            return true;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 4;
+    pub const MIN_VALUE: u32 = u32::MIN;
+    pub const MAX_VALUE: u32 = u32::MAX;
+}

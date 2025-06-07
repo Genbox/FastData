@@ -1,0 +1,35 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (KeyLengthContext)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class KeyLengthStructure_String_7 final
+{
+    static constexpr std::array<std::string_view, 8> entries = {
+        "aaa", "", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const std::string_view value) noexcept
+    {
+        if ((1012ULL & (1ULL << (value.length() - 1))) == 0)
+            return false;
+
+        return value == entries[value.length() - 3];
+    }
+
+    static constexpr size_t item_count = 7;
+    static constexpr size_t min_length = 3;
+    static constexpr size_t max_length = 10;
+
+public:
+    KeyLengthStructure_String_7() = delete;
+    KeyLengthStructure_String_7(const KeyLengthStructure_String_7&) = delete;
+    KeyLengthStructure_String_7& operator=(const KeyLengthStructure_String_7&) = delete;
+    KeyLengthStructure_String_7(KeyLengthStructure_String_7&&) = delete;
+    KeyLengthStructure_String_7& operator=(KeyLengthStructure_String_7&&) = delete;
+};

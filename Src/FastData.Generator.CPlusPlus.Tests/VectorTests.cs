@@ -15,10 +15,15 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
 {
     [Theory]
     [ClassData(typeof(TestVectorTheoryData))]
-    public void Test<T>(TestVector<T> data)
+    public async Task Test<T>(TestVector<T> data)
     {
         Assert.True(TryGenerate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
+
+        await Verify(spec.Source)
+              .UseFileName(spec.Identifier)
+              .UseDirectory("Verify")
+              .DisableDiff();
 
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
         TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));

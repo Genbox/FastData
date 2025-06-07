@@ -1,0 +1,44 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: BinarySearch
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct BinarySearchStructure_UInt64_4;
+
+impl BinarySearchStructure_UInt64_4 {
+    const ENTRIES: [u64; 4] = [
+        u64::MIN, 1, 2, 18446744073709551605
+    ];
+
+    #[must_use]
+    pub fn contains(value: u64) -> bool {
+        if value < u64::MIN || value > 18446744073709551605 {
+            return false;
+        }
+
+        let mut lo: usize = 0;
+        let mut hi: usize = 3;
+        while lo <= hi {
+            let i = lo + ((hi - lo) >> 1);
+            let entry = Self::ENTRIES[i];
+
+            if entry == value {
+                return true;
+            }
+            if entry < value {
+                lo = i + 1;
+            } else {
+                hi = i - 1;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 4;
+    pub const MIN_VALUE: u64 = u64::MIN;
+    pub const MAX_VALUE: u64 = 18446744073709551605;
+}

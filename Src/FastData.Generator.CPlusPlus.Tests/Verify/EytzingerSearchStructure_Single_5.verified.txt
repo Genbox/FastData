@@ -1,0 +1,47 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class EytzingerSearchStructure_Single_5 final
+{
+    static constexpr std::array<float, 5> entries = {
+        1.0f, -1.0f, std::numeric_limits<float>::max(), std::numeric_limits<float>::lowest(), 0.0f
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const float value) noexcept
+    {
+        if (value < std::numeric_limits<float>::lowest() || value > std::numeric_limits<float>::max())
+            return false;
+
+        size_t i = 0;
+        while (i < entries.size())
+        {
+            if (entries[i] == value)
+                return true;
+
+            if (entries[i] < value)
+                i = 2 * i + 2;
+            else
+                i = 2 * i + 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr float min_value = std::numeric_limits<float>::lowest();
+    static constexpr float max_value = std::numeric_limits<float>::max();
+
+public:
+    EytzingerSearchStructure_Single_5() = delete;
+    EytzingerSearchStructure_Single_5(const EytzingerSearchStructure_Single_5&) = delete;
+    EytzingerSearchStructure_Single_5& operator=(const EytzingerSearchStructure_Single_5&) = delete;
+    EytzingerSearchStructure_Single_5(EytzingerSearchStructure_Single_5&&) = delete;
+    EytzingerSearchStructure_Single_5& operator=(EytzingerSearchStructure_Single_5&&) = delete;
+};

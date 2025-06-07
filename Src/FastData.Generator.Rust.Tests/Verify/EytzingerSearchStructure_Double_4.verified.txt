@@ -1,0 +1,42 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: BinarySearch
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct EytzingerSearchStructure_Double_4;
+
+impl EytzingerSearchStructure_Double_4 {
+    const ENTRIES: [f64; 4] = [
+        1.0, 0.0, f64::MAX, f64::MIN
+    ];
+
+    #[must_use]
+    pub fn contains(value: f64) -> bool {
+        if value < f64::MIN || value > f64::MAX {
+            return false;
+        }
+
+        let mut i: usize = 0;
+        while i < Self::ENTRIES.len() {
+            let entry = Self::ENTRIES[i];
+
+            if entry == value {
+                return true;
+            }
+            if entry < value {
+                i = 2 * i + 2;
+            } else {
+                i = 2 * i + 1;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 4;
+    pub const MIN_VALUE: f64 = f64::MIN;
+    pub const MAX_VALUE: f64 = f64::MAX;
+}

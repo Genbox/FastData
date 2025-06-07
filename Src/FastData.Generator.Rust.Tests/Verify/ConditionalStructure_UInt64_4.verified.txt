@@ -1,0 +1,28 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Conditional
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct ConditionalStructure_UInt64_4;
+
+impl ConditionalStructure_UInt64_4 {
+    #[must_use]
+    pub fn contains(value: u64) -> bool {
+        if value < u64::MIN || value > 18446744073709551605 {
+            return false;
+        }
+
+        if value == u64::MIN || value == 1 || value == 2 || value == 18446744073709551605 {
+            return true;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 4;
+    pub const MIN_VALUE: u64 = u64::MIN;
+    pub const MAX_VALUE: u64 = 18446744073709551605;
+}

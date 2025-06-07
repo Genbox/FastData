@@ -1,0 +1,33 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Array
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct ArrayStructure_SByte_5;
+
+impl ArrayStructure_SByte_5 {
+    const ENTRIES: [i8; 5] = [
+        i8::MIN, -1, 0, 1, i8::MAX
+    ];
+
+    #[must_use]
+    pub fn contains(value: i8) -> bool {
+        if value < i8::MIN || value > i8::MAX {
+            return false;
+        }
+
+        for entry in Self::ENTRIES.iter() {
+            if *entry == value {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_VALUE: i8 = i8::MIN;
+    pub const MAX_VALUE: i8 = i8::MAX;
+}

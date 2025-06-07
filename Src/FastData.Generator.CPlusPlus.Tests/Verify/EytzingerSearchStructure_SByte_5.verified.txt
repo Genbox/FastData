@@ -1,0 +1,47 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class EytzingerSearchStructure_SByte_5 final
+{
+    static constexpr std::array<int8_t, 5> entries = {
+        1, -1, std::numeric_limits<int8_t>::max(), std::numeric_limits<int8_t>::lowest(), 0
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const int8_t value) noexcept
+    {
+        if (value < std::numeric_limits<int8_t>::lowest() || value > std::numeric_limits<int8_t>::max())
+            return false;
+
+        size_t i = 0;
+        while (i < entries.size())
+        {
+            if (entries[i] == value)
+                return true;
+
+            if (entries[i] < value)
+                i = 2 * i + 2;
+            else
+                i = 2 * i + 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int8_t min_value = std::numeric_limits<int8_t>::lowest();
+    static constexpr int8_t max_value = std::numeric_limits<int8_t>::max();
+
+public:
+    EytzingerSearchStructure_SByte_5() = delete;
+    EytzingerSearchStructure_SByte_5(const EytzingerSearchStructure_SByte_5&) = delete;
+    EytzingerSearchStructure_SByte_5& operator=(const EytzingerSearchStructure_SByte_5&) = delete;
+    EytzingerSearchStructure_SByte_5(EytzingerSearchStructure_SByte_5&&) = delete;
+    EytzingerSearchStructure_SByte_5& operator=(EytzingerSearchStructure_SByte_5&&) = delete;
+};

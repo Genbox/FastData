@@ -1,0 +1,34 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Conditional
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ConditionalStructure_SByte_5 final
+{
+public:
+    [[nodiscard]]
+    static bool contains(const int8_t value) noexcept
+    {
+        if (value < std::numeric_limits<int8_t>::lowest() || value > std::numeric_limits<int8_t>::max())
+            return false;
+
+        if (value == std::numeric_limits<int8_t>::lowest() || value == -1 || value == 0 || value == 1 || value == std::numeric_limits<int8_t>::max())
+            return true;
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int8_t min_value = std::numeric_limits<int8_t>::lowest();
+    static constexpr int8_t max_value = std::numeric_limits<int8_t>::max();
+
+public:
+    ConditionalStructure_SByte_5() = delete;
+    ConditionalStructure_SByte_5(const ConditionalStructure_SByte_5&) = delete;
+    ConditionalStructure_SByte_5& operator=(const ConditionalStructure_SByte_5&) = delete;
+    ConditionalStructure_SByte_5(ConditionalStructure_SByte_5&&) = delete;
+    ConditionalStructure_SByte_5& operator=(ConditionalStructure_SByte_5&&) = delete;
+};

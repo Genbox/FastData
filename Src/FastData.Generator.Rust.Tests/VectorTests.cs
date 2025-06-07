@@ -15,10 +15,15 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
 {
     [Theory]
     [ClassData(typeof(TestVectorTheoryData))]
-    public void Test<T>(TestVector<T> data)
+    public async Task Test<T>(TestVector<T> data)
     {
         Assert.True(TryGenerate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
+
+        await Verify(spec.Source)
+              .UseFileName(spec.Identifier)
+              .UseDirectory("Verify")
+              .DisableDiff();
 
         RustLanguageDef langDef = new RustLanguageDef();
         TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));

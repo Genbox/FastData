@@ -1,0 +1,68 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashSet
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashSetChainStructure_UInt32_4 final
+{
+    struct e
+    {
+        uint64_t hash_code;
+        int8_t next;
+        uint32_t value;
+
+        e(const uint64_t hash_code, const int8_t next, const uint32_t value)
+           : hash_code(hash_code), next(next), value(value) {}
+    };
+
+    static constexpr std::array<int8_t, 4> buckets = {
+        1, 2, 3, 4
+     };
+
+    inline static const std::array<e, 4> entries = {
+        e(0, -1, 0), e(1, -1, 1u), e(2, -1, 2u), e(4294967295, -1, std::numeric_limits<uint32_t>::max())
+    };
+
+    static constexpr uint64_t get_hash(const uint32_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const uint32_t value) noexcept
+    {
+        if (value < 0 || value > std::numeric_limits<uint32_t>::max())
+            return false;
+
+        const uint64_t hash = get_hash(value);
+        const size_t index = hash % 4;
+        int8_t i = buckets[index] - 1;
+
+        while (i >= 0)
+        {
+            const auto& [hash_code, next, value1] = entries[i];
+
+            if (hash_code == hash && value1 == value)
+                return true;
+
+            i = next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 4;
+    static constexpr uint32_t min_value = 0;
+    static constexpr uint32_t max_value = std::numeric_limits<uint32_t>::max();
+
+public:
+    HashSetChainStructure_UInt32_4() = delete;
+    HashSetChainStructure_UInt32_4(const HashSetChainStructure_UInt32_4&) = delete;
+    HashSetChainStructure_UInt32_4& operator=(const HashSetChainStructure_UInt32_4&) = delete;
+    HashSetChainStructure_UInt32_4(HashSetChainStructure_UInt32_4&&) = delete;
+    HashSetChainStructure_UInt32_4& operator=(HashSetChainStructure_UInt32_4&&) = delete;
+};

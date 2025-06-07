@@ -1,0 +1,40 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ArrayStructure_Int32_5 final
+{
+    static constexpr std::array<int32_t, 5> entries = {
+        std::numeric_limits<int32_t>::lowest(), -1, 0, 1, std::numeric_limits<int32_t>::max()
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const int32_t value) noexcept
+    {
+        if (value < std::numeric_limits<int32_t>::lowest() || value > std::numeric_limits<int32_t>::max())
+            return false;
+
+        for (size_t i = 0; i < 5; i++)
+        {
+            if (entries[i] == value)
+               return true;
+        }
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int32_t min_value = std::numeric_limits<int32_t>::lowest();
+    static constexpr int32_t max_value = std::numeric_limits<int32_t>::max();
+
+public:
+    ArrayStructure_Int32_5() = delete;
+    ArrayStructure_Int32_5(const ArrayStructure_Int32_5&) = delete;
+    ArrayStructure_Int32_5& operator=(const ArrayStructure_Int32_5&) = delete;
+    ArrayStructure_Int32_5(ArrayStructure_Int32_5&&) = delete;
+    ArrayStructure_Int32_5& operator=(ArrayStructure_Int32_5&&) = delete;
+};

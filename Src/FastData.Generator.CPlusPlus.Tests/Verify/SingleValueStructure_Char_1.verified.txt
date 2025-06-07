@@ -1,0 +1,28 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (SingleValue)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class SingleValueStructure_Char_1 final
+{
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const char value) noexcept
+    {
+        return value == 97;
+    }
+
+    static constexpr size_t item_count = 1;
+    static constexpr char min_value = 97;
+    static constexpr char max_value = 97;
+
+public:
+    SingleValueStructure_Char_1() = delete;
+    SingleValueStructure_Char_1(const SingleValueStructure_Char_1&) = delete;
+    SingleValueStructure_Char_1& operator=(const SingleValueStructure_Char_1&) = delete;
+    SingleValueStructure_Char_1(SingleValueStructure_Char_1&&) = delete;
+    SingleValueStructure_Char_1& operator=(SingleValueStructure_Char_1&&) = delete;
+};

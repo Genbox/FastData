@@ -1,0 +1,50 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class BinarySearchStructure_String_3 final
+{
+    static constexpr std::array<std::string_view, 3> entries = {
+        "a", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "item"
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const std::string_view value) noexcept
+    {
+        if (const size_t len = value.length(); len < 1u || len > 255u)
+            return false;
+
+        size_t lo = 0;
+        size_t hi = 2;
+        while (lo <= hi)
+        {
+            const size_t mid = lo + ((hi - lo) >> 1);
+
+            if (entries[mid] == value)
+                return true;
+
+            if (entries[mid] < value)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr size_t min_length = 1;
+    static constexpr size_t max_length = 255;
+
+public:
+    BinarySearchStructure_String_3() = delete;
+    BinarySearchStructure_String_3(const BinarySearchStructure_String_3&) = delete;
+    BinarySearchStructure_String_3& operator=(const BinarySearchStructure_String_3&) = delete;
+    BinarySearchStructure_String_3(BinarySearchStructure_String_3&&) = delete;
+    BinarySearchStructure_String_3& operator=(BinarySearchStructure_String_3&&) = delete;
+};

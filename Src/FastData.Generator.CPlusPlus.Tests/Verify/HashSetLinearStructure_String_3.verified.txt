@@ -1,0 +1,81 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashSet
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashSetLinearStructure_String_3 final
+{
+    struct b
+    {
+        uint8_t start_index;
+        uint8_t end_index;
+
+        b(const uint8_t start_index, const uint8_t end_index)
+        : start_index(start_index), end_index(end_index) { }
+    };
+
+    inline static const std::array<b, 11> buckets = {
+        b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(1, 1), b(2, 2), 
+        b(0, 0)
+    };
+
+    static constexpr std::array<std::string_view, 3> items = {
+        "item", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "a"
+    };
+
+    static constexpr std::array<uint64_t, 3> hash_codes = {
+        16750939634977259983, 9198652691199425319, 18225461187723808291
+    };
+
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept
+    {
+        uint64_t hash = 352654597;
+
+        const char* ptr = value.data();
+        size_t len = value.size();
+
+        while (len-- > 0) {
+            hash = (((hash << 5) | (hash >> 27)) + hash) ^ *ptr;
+            ptr++;
+        }
+
+        return 352654597 + (hash * 1566083941);
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const std::string_view value) noexcept
+    {
+        if (const size_t len = value.length(); len < 1u || len > 255u)
+            return false;
+
+        const uint64_t hash = get_hash(value);
+        const auto& [start_index, end_index]= buckets[hash % 11];
+
+        uint8_t index = start_index;
+
+        while (index <= end_index)
+        {
+            if (hash_codes[index] == hash && items[index] == value)
+                return true;
+
+            index++;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr size_t min_length = 1;
+    static constexpr size_t max_length = 255;
+
+public:
+    HashSetLinearStructure_String_3() = delete;
+    HashSetLinearStructure_String_3(const HashSetLinearStructure_String_3&) = delete;
+    HashSetLinearStructure_String_3& operator=(const HashSetLinearStructure_String_3&) = delete;
+    HashSetLinearStructure_String_3(HashSetLinearStructure_String_3&&) = delete;
+    HashSetLinearStructure_String_3& operator=(HashSetLinearStructure_String_3&&) = delete;
+};

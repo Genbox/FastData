@@ -1,0 +1,28 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (SingleValue)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class SingleValueStructure_UInt64_1 final
+{
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const uint64_t value) noexcept
+    {
+        return value == 1ull;
+    }
+
+    static constexpr size_t item_count = 1;
+    static constexpr uint64_t min_value = 1ull;
+    static constexpr uint64_t max_value = 1ull;
+
+public:
+    SingleValueStructure_UInt64_1() = delete;
+    SingleValueStructure_UInt64_1(const SingleValueStructure_UInt64_1&) = delete;
+    SingleValueStructure_UInt64_1& operator=(const SingleValueStructure_UInt64_1&) = delete;
+    SingleValueStructure_UInt64_1(SingleValueStructure_UInt64_1&&) = delete;
+    SingleValueStructure_UInt64_1& operator=(SingleValueStructure_UInt64_1&&) = delete;
+};

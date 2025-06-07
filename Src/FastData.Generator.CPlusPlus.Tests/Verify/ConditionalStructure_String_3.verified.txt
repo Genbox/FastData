@@ -1,0 +1,34 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Conditional
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ConditionalStructure_String_3 final
+{
+public:
+    [[nodiscard]]
+    static bool contains(const std::string_view value) noexcept
+    {
+        if (const size_t len = value.length(); len < 1u || len > 255u)
+            return false;
+
+        if (value == "a" || value == "item" || value == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+            return true;
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr size_t min_length = 1;
+    static constexpr size_t max_length = 255;
+
+public:
+    ConditionalStructure_String_3() = delete;
+    ConditionalStructure_String_3(const ConditionalStructure_String_3&) = delete;
+    ConditionalStructure_String_3& operator=(const ConditionalStructure_String_3&) = delete;
+    ConditionalStructure_String_3(ConditionalStructure_String_3&&) = delete;
+    ConditionalStructure_String_3& operator=(ConditionalStructure_String_3&&) = delete;
+};

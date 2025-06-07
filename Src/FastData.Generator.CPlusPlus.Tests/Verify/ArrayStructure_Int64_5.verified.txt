@@ -1,0 +1,40 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ArrayStructure_Int64_5 final
+{
+    static constexpr std::array<int64_t, 5> entries = {
+        std::numeric_limits<int64_t>::lowest(), -5ll, 0ll, 1ll, 9223372036854775806ll
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const int64_t value) noexcept
+    {
+        if (value < std::numeric_limits<int64_t>::lowest() || value > 9223372036854775806ll)
+            return false;
+
+        for (size_t i = 0; i < 5; i++)
+        {
+            if (entries[i] == value)
+               return true;
+        }
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int64_t min_value = std::numeric_limits<int64_t>::lowest();
+    static constexpr int64_t max_value = 9223372036854775806ll;
+
+public:
+    ArrayStructure_Int64_5() = delete;
+    ArrayStructure_Int64_5(const ArrayStructure_Int64_5&) = delete;
+    ArrayStructure_Int64_5& operator=(const ArrayStructure_Int64_5&) = delete;
+    ArrayStructure_Int64_5(ArrayStructure_Int64_5&&) = delete;
+    ArrayStructure_Int64_5& operator=(ArrayStructure_Int64_5&&) = delete;
+};

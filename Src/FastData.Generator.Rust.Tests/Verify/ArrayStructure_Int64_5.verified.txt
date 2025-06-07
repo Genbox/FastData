@@ -1,0 +1,33 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Array
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct ArrayStructure_Int64_5;
+
+impl ArrayStructure_Int64_5 {
+    const ENTRIES: [i64; 5] = [
+        i64::MIN, -5, 0, 1, 9223372036854775806
+    ];
+
+    #[must_use]
+    pub fn contains(value: i64) -> bool {
+        if value < i64::MIN || value > 9223372036854775806 {
+            return false;
+        }
+
+        for entry in Self::ENTRIES.iter() {
+            if *entry == value {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_VALUE: i64 = i64::MIN;
+    pub const MAX_VALUE: i64 = 9223372036854775806;
+}

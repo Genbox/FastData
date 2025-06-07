@@ -1,0 +1,33 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Array
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct ArrayStructure_UInt16_4;
+
+impl ArrayStructure_UInt16_4 {
+    const ENTRIES: [u16; 4] = [
+        u16::MIN, 1, 2, u16::MAX
+    ];
+
+    #[must_use]
+    pub fn contains(value: u16) -> bool {
+        if value < u16::MIN || value > u16::MAX {
+            return false;
+        }
+
+        for entry in Self::ENTRIES.iter() {
+            if *entry == value {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 4;
+    pub const MIN_VALUE: u16 = u16::MIN;
+    pub const MAX_VALUE: u16 = u16::MAX;
+}

@@ -1,0 +1,59 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class BinarySearchStructure_Int32_100 final
+{
+    static constexpr std::array<int32_t, 100> entries = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
+        10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
+        20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 
+        30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+        40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 
+        50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 
+        60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 
+        70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 
+        80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 
+        90, 91, 92, 93, 94, 95, 96, 97, 98, 99
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const int32_t value) noexcept
+    {
+        if (value < 0 || value > 99)
+            return false;
+
+        size_t lo = 0;
+        size_t hi = 99;
+        while (lo <= hi)
+        {
+            const size_t mid = lo + ((hi - lo) >> 1);
+
+            if (entries[mid] == value)
+                return true;
+
+            if (entries[mid] < value)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 100;
+    static constexpr int32_t min_value = 0;
+    static constexpr int32_t max_value = 99;
+
+public:
+    BinarySearchStructure_Int32_100() = delete;
+    BinarySearchStructure_Int32_100(const BinarySearchStructure_Int32_100&) = delete;
+    BinarySearchStructure_Int32_100& operator=(const BinarySearchStructure_Int32_100&) = delete;
+    BinarySearchStructure_Int32_100(BinarySearchStructure_Int32_100&&) = delete;
+    BinarySearchStructure_Int32_100& operator=(BinarySearchStructure_Int32_100&&) = delete;
+};

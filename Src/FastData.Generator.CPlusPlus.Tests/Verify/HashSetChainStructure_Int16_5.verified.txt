@@ -1,0 +1,68 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashSet
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashSetChainStructure_Int16_5 final
+{
+    struct e
+    {
+        uint64_t hash_code;
+        int8_t next;
+        int16_t value;
+
+        e(const uint64_t hash_code, const int8_t next, const int16_t value)
+           : hash_code(hash_code), next(next), value(value) {}
+    };
+
+    static constexpr std::array<int8_t, 5> buckets = {
+        3, 4, 5, 1, 0
+     };
+
+    inline static const std::array<e, 5> entries = {
+        e(18446744073709518848, -1, std::numeric_limits<int16_t>::lowest()), e(18446744073709551615, -1, -1), e(0, 1, 0), e(1, -1, 1), e(32767, -1, std::numeric_limits<int16_t>::max())
+    };
+
+    static constexpr uint64_t get_hash(const int16_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const int16_t value) noexcept
+    {
+        if (value < std::numeric_limits<int16_t>::lowest() || value > std::numeric_limits<int16_t>::max())
+            return false;
+
+        const uint64_t hash = get_hash(value);
+        const size_t index = hash % 5;
+        int8_t i = buckets[index] - 1;
+
+        while (i >= 0)
+        {
+            const auto& [hash_code, next, value1] = entries[i];
+
+            if (hash_code == hash && value1 == value)
+                return true;
+
+            i = next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int16_t min_value = std::numeric_limits<int16_t>::lowest();
+    static constexpr int16_t max_value = std::numeric_limits<int16_t>::max();
+
+public:
+    HashSetChainStructure_Int16_5() = delete;
+    HashSetChainStructure_Int16_5(const HashSetChainStructure_Int16_5&) = delete;
+    HashSetChainStructure_Int16_5& operator=(const HashSetChainStructure_Int16_5&) = delete;
+    HashSetChainStructure_Int16_5(HashSetChainStructure_Int16_5&&) = delete;
+    HashSetChainStructure_Int16_5& operator=(HashSetChainStructure_Int16_5&&) = delete;
+};

@@ -1,0 +1,70 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashSet
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashSetLinearStructure_Byte_3 final
+{
+    struct b
+    {
+        uint8_t start_index;
+        uint8_t end_index;
+
+        b(const uint8_t start_index, const uint8_t end_index)
+        : start_index(start_index), end_index(end_index) { }
+    };
+
+    inline static const std::array<b, 7> buckets = {
+        b(0, 0), b(1, 1), b(0, 0), b(2, 2), b(0, 0), b(0, 0), b(0, 0)
+    };
+
+    static constexpr std::array<uint8_t, 3> items = {
+        0, 1, std::numeric_limits<uint8_t>::max()
+    };
+
+    static constexpr std::array<uint64_t, 3> hash_codes = {
+        0, 1, 255
+    };
+
+    static constexpr uint64_t get_hash(const uint8_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const uint8_t value) noexcept
+    {
+        if (value < 0 || value > std::numeric_limits<uint8_t>::max())
+            return false;
+
+        const uint64_t hash = get_hash(value);
+        const auto& [start_index, end_index]= buckets[hash % 7];
+
+        uint8_t index = start_index;
+
+        while (index <= end_index)
+        {
+            if (hash_codes[index] == hash && items[index] == value)
+                return true;
+
+            index++;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr uint8_t min_value = 0;
+    static constexpr uint8_t max_value = std::numeric_limits<uint8_t>::max();
+
+public:
+    HashSetLinearStructure_Byte_3() = delete;
+    HashSetLinearStructure_Byte_3(const HashSetLinearStructure_Byte_3&) = delete;
+    HashSetLinearStructure_Byte_3& operator=(const HashSetLinearStructure_Byte_3&) = delete;
+    HashSetLinearStructure_Byte_3(HashSetLinearStructure_Byte_3&&) = delete;
+    HashSetLinearStructure_Byte_3& operator=(HashSetLinearStructure_Byte_3&&) = delete;
+};

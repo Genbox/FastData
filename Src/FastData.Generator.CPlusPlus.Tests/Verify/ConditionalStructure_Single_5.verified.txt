@@ -1,0 +1,34 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Conditional
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ConditionalStructure_Single_5 final
+{
+public:
+    [[nodiscard]]
+    static bool contains(const float value) noexcept
+    {
+        if (value < std::numeric_limits<float>::lowest() || value > std::numeric_limits<float>::max())
+            return false;
+
+        if (value == std::numeric_limits<float>::lowest() || value == -1.0f || value == 0.0f || value == 1.0f || value == std::numeric_limits<float>::max())
+            return true;
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr float min_value = std::numeric_limits<float>::lowest();
+    static constexpr float max_value = std::numeric_limits<float>::max();
+
+public:
+    ConditionalStructure_Single_5() = delete;
+    ConditionalStructure_Single_5(const ConditionalStructure_Single_5&) = delete;
+    ConditionalStructure_Single_5& operator=(const ConditionalStructure_Single_5&) = delete;
+    ConditionalStructure_Single_5(ConditionalStructure_Single_5&&) = delete;
+    ConditionalStructure_Single_5& operator=(ConditionalStructure_Single_5&&) = delete;
+};

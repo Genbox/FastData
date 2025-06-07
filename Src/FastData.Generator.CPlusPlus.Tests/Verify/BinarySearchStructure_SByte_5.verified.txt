@@ -1,0 +1,50 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class BinarySearchStructure_SByte_5 final
+{
+    static constexpr std::array<int8_t, 5> entries = {
+        std::numeric_limits<int8_t>::lowest(), -1, 0, 1, std::numeric_limits<int8_t>::max()
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const int8_t value) noexcept
+    {
+        if (value < std::numeric_limits<int8_t>::lowest() || value > std::numeric_limits<int8_t>::max())
+            return false;
+
+        size_t lo = 0;
+        size_t hi = 4;
+        while (lo <= hi)
+        {
+            const size_t mid = lo + ((hi - lo) >> 1);
+
+            if (entries[mid] == value)
+                return true;
+
+            if (entries[mid] < value)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int8_t min_value = std::numeric_limits<int8_t>::lowest();
+    static constexpr int8_t max_value = std::numeric_limits<int8_t>::max();
+
+public:
+    BinarySearchStructure_SByte_5() = delete;
+    BinarySearchStructure_SByte_5(const BinarySearchStructure_SByte_5&) = delete;
+    BinarySearchStructure_SByte_5& operator=(const BinarySearchStructure_SByte_5&) = delete;
+    BinarySearchStructure_SByte_5(BinarySearchStructure_SByte_5&&) = delete;
+    BinarySearchStructure_SByte_5& operator=(BinarySearchStructure_SByte_5&&) = delete;
+};

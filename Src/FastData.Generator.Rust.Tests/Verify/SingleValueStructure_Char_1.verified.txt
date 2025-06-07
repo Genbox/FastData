@@ -1,0 +1,20 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (SingleValue)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct SingleValueStructure_Char_1;
+
+impl SingleValueStructure_Char_1 {
+    #[must_use]
+    pub fn contains(value: char) -> bool {
+         'a' == value
+    }
+
+    pub const ITEM_COUNT: usize = 1;
+    pub const MIN_VALUE: char = 'a';
+    pub const MAX_VALUE: char = 'a';
+}

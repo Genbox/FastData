@@ -1,0 +1,47 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class EytzingerSearchStructure_Char_3 final
+{
+    static constexpr std::array<char, 3> entries = {
+        97, 0, 127
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const char value) noexcept
+    {
+        if (value < 0 || value > 127)
+            return false;
+
+        size_t i = 0;
+        while (i < entries.size())
+        {
+            if (entries[i] == value)
+                return true;
+
+            if (entries[i] < value)
+                i = 2 * i + 2;
+            else
+                i = 2 * i + 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr char min_value = 0;
+    static constexpr char max_value = 127;
+
+public:
+    EytzingerSearchStructure_Char_3() = delete;
+    EytzingerSearchStructure_Char_3(const EytzingerSearchStructure_Char_3&) = delete;
+    EytzingerSearchStructure_Char_3& operator=(const EytzingerSearchStructure_Char_3&) = delete;
+    EytzingerSearchStructure_Char_3(EytzingerSearchStructure_Char_3&&) = delete;
+    EytzingerSearchStructure_Char_3& operator=(EytzingerSearchStructure_Char_3&&) = delete;
+};

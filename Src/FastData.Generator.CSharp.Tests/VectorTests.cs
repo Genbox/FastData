@@ -13,10 +13,15 @@ public class VectorTests
 {
     [Theory]
     [ClassData(typeof(TestVectorTheoryData))]
-    public void Test<T>(TestVector<T> data)
+    public async Task Test<T>(TestVector<T> data)
     {
         Assert.True(TryGenerate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
         Assert.NotEmpty(spec.Source);
+
+        await Verify(spec.Source)
+              .UseFileName(spec.Identifier)
+              .UseDirectory("Verify")
+              .DisableDiff();
 
         CSharpLanguageDef langDef = new CSharpLanguageDef();
         TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));

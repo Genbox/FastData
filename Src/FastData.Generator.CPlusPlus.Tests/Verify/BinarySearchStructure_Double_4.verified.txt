@@ -1,0 +1,50 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class BinarySearchStructure_Double_4 final
+{
+    static constexpr std::array<double, 4> entries = {
+        std::numeric_limits<double>::lowest(), 0.0, 1.0, std::numeric_limits<double>::max()
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const double value) noexcept
+    {
+        if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
+            return false;
+
+        size_t lo = 0;
+        size_t hi = 3;
+        while (lo <= hi)
+        {
+            const size_t mid = lo + ((hi - lo) >> 1);
+
+            if (entries[mid] == value)
+                return true;
+
+            if (entries[mid] < value)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 4;
+    static constexpr double min_value = std::numeric_limits<double>::lowest();
+    static constexpr double max_value = std::numeric_limits<double>::max();
+
+public:
+    BinarySearchStructure_Double_4() = delete;
+    BinarySearchStructure_Double_4(const BinarySearchStructure_Double_4&) = delete;
+    BinarySearchStructure_Double_4& operator=(const BinarySearchStructure_Double_4&) = delete;
+    BinarySearchStructure_Double_4(BinarySearchStructure_Double_4&&) = delete;
+    BinarySearchStructure_Double_4& operator=(BinarySearchStructure_Double_4&&) = delete;
+};

@@ -1,0 +1,33 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Conditional
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ConditionalStructure_Char_3 final
+{
+public:
+    [[nodiscard]]
+    static bool contains(const char value) noexcept
+    {
+
+
+        if (value == 0 || value == 97 || value == 127)
+            return true;
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr char min_value = 0;
+    static constexpr char max_value = 127;
+
+public:
+    ConditionalStructure_Char_3() = delete;
+    ConditionalStructure_Char_3(const ConditionalStructure_Char_3&) = delete;
+    ConditionalStructure_Char_3& operator=(const ConditionalStructure_Char_3&) = delete;
+    ConditionalStructure_Char_3(ConditionalStructure_Char_3&&) = delete;
+    ConditionalStructure_Char_3& operator=(ConditionalStructure_Char_3&&) = delete;
+};

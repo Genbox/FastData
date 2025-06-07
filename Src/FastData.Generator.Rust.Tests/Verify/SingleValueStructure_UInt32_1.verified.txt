@@ -1,0 +1,20 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (SingleValue)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct SingleValueStructure_UInt32_1;
+
+impl SingleValueStructure_UInt32_1 {
+    #[must_use]
+    pub fn contains(value: u32) -> bool {
+         1 == value
+    }
+
+    pub const ITEM_COUNT: usize = 1;
+    pub const MIN_VALUE: u32 = 1;
+    pub const MAX_VALUE: u32 = 1;
+}

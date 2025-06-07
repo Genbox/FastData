@@ -1,0 +1,54 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashSet
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashSetChainStructure_Byte_3;
+
+impl HashSetChainStructure_Byte_3 {
+    const BUCKETS: [i8; 3] = [
+        3, 2, 0
+    ];
+
+    const ENTRIES: [E; 3] = [
+        E { hash_code: 0, next: -1, value: u8::MIN }, E { hash_code: 1, next: -1, value: 1 }, E { hash_code: 255, next: 0, value: u8::MAX }
+    ];
+
+    #[inline(always)]
+    fn get_hash(value: u8) -> u64 {
+        value as u64
+    }
+
+    #[must_use]
+    pub fn contains(value: u8) -> bool {
+        if value < u8::MIN || value > u8::MAX {
+            return false;
+        }
+
+        let hash = unsafe { Self::get_hash(value) };
+        let index = hash % 3;
+        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+
+        while i >= 0 {
+            let entry = &Self::ENTRIES[i as usize];
+            if entry.hash_code == hash && entry.value == value {
+                return true;
+            }
+            i = entry.next;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_VALUE: u8 = u8::MIN;
+    pub const MAX_VALUE: u8 = u8::MAX;
+}
+struct E {
+    hash_code: u64,
+    next: i8,
+    value: u8,
+}

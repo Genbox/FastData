@@ -1,0 +1,33 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Array
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct ArrayStructure_Single_5;
+
+impl ArrayStructure_Single_5 {
+    const ENTRIES: [f32; 5] = [
+        f32::MIN, -1.0, 0.0, 1.0, f32::MAX
+    ];
+
+    #[must_use]
+    pub fn contains(value: f32) -> bool {
+        if value < f32::MIN || value > f32::MAX {
+            return false;
+        }
+
+        for entry in Self::ENTRIES.iter() {
+            if *entry == value {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_VALUE: f32 = f32::MIN;
+    pub const MAX_VALUE: f32 = f32::MAX;
+}

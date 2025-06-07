@@ -1,0 +1,28 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (SingleValue)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class SingleValueStructure_Single_1 final
+{
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const float value) noexcept
+    {
+        return value == 1.0f;
+    }
+
+    static constexpr size_t item_count = 1;
+    static constexpr float min_value = 1.0f;
+    static constexpr float max_value = 1.0f;
+
+public:
+    SingleValueStructure_Single_1() = delete;
+    SingleValueStructure_Single_1(const SingleValueStructure_Single_1&) = delete;
+    SingleValueStructure_Single_1& operator=(const SingleValueStructure_Single_1&) = delete;
+    SingleValueStructure_Single_1(SingleValueStructure_Single_1&&) = delete;
+    SingleValueStructure_Single_1& operator=(SingleValueStructure_Single_1&&) = delete;
+};

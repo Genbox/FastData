@@ -1,0 +1,27 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (KeyLengthContext)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct KeyLengthStructure_String_7;
+
+impl KeyLengthStructure_String_7 {
+    const ENTRIES: [&str; 8] = [
+        "aaa", "", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"
+    ];
+
+    #[must_use]
+    pub fn contains(value: &str) -> bool {
+        if 1012u64 & (1u64 << (value.len() - 1)) == 0 {
+            return false;
+        }
+        return Self::ENTRIES[(value.len() - 3) as usize] == value;
+    }
+
+    pub const ITEM_COUNT: usize = 7;
+    pub const MIN_LENGTH: usize = 3;
+    pub const MAX_LENGTH: usize = 10;
+}
