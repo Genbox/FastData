@@ -3,7 +3,6 @@ using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.CPlusPlus.Shared;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.InternalShared;
-using Genbox.FastData.InternalShared.Helpers;
 using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.InternalShared.TestClasses.TheoryData;
 using static Genbox.FastData.Generator.Helpers.FormatHelper;
