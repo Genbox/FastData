@@ -34,6 +34,13 @@ Copy-Item $ArtifactsDir/*.dll $PublishDir/PowerShell/lib/
 
 Write-Host -BackgroundColor $Color "Pack the CLI tool as executable"
 dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -r win-x64 -p:PublishSingleFile=true -p:SelfContained=true -p:PublishTrimmed=true -p:TargetFrameworks="net9.0" -p:DebugType=none -p:GenerateDocumentationFile=false -p:EnableCompressionInSingleFile=true -p:InvariantGlobalization=true -o $PublishDir
+Move-Item $PublishDir/FastData.exe $PublishDir/FastData-win.exe -Force
+
+dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -r linux-x64 -p:PublishSingleFile=true -p:SelfContained=true -p:PublishTrimmed=true -p:TargetFrameworks="net9.0" -p:DebugType=none -p:GenerateDocumentationFile=false -p:EnableCompressionInSingleFile=true -p:InvariantGlobalization=true -o $PublishDir
+Move-Item $PublishDir/FastData $PublishDir/FastData-lin -Force
+
+dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -r osx-x64 -p:PublishSingleFile=true -p:SelfContained=true -p:PublishTrimmed=true -p:TargetFrameworks="net9.0" -p:DebugType=none -p:GenerateDocumentationFile=false -p:EnableCompressionInSingleFile=true -p:InvariantGlobalization=true -o $PublishDir
+Move-Item $PublishDir/FastData $PublishDir/FastData-osx -Force
 
 Write-Host -BackgroundColor $Color "Pack the CLI tool as a dotnet tool (NuGet)"
 dotnet pack $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -p:ContinuousIntegrationBuild=true -p:PackAsTool=true -p:ToolCommandName=fastdata -p:PackageVersion=$semver -o $PublishDir
