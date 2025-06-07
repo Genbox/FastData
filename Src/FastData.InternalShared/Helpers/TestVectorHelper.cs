@@ -48,7 +48,12 @@ public static class TestVectorHelper
         }
 
         // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
-        foreach (ITestVector testVector in GenerateTestVectors([(typeof(string), ["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"])], typeof(KeyLengthStructure<>)))
+        foreach (ITestVector testVector in GenerateTestVectors([["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]], typeof(KeyLengthStructure<>)))
+        {
+            yield return testVector;
+        }
+
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], typeof(HashSetPerfectStructure<>)))
         {
             yield return testVector;
         }
@@ -98,6 +103,13 @@ public static class TestVectorHelper
                 yield return (ITestVector)Activator.CreateInstance(vector, st, arr, null)!;
             }
         }
+    }
+
+    //This overload is to get some little type safety when only a single type is used
+    private static IEnumerable<ITestVector> GenerateTestVectors<T>(IEnumerable<T[]> data, params Type[] dataStructs)
+    {
+        Type type = typeof(T);
+        return GenerateTestVectors(data.Select(x => (type, x.Cast<object>().ToArray())), dataStructs);
     }
 
     private static IEnumerable<(Type type, object[] value)> GetEdgeCaseValues() =>
