@@ -10,7 +10,7 @@ internal class CSharpEarlyExitDef(TypeHelper helper, CSharpOptions options) : Ea
 
     protected override string GetMaskEarlyExit(ulong bitSet) =>
         $"""
-                 if (({bitSet}UL & (1UL << (value.Length - 1) % 64)) == 0)
+                 if (({bitSet}UL & (1UL << (value.Length - 1))) == 0)
                      return false;
          """;
 

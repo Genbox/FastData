@@ -10,7 +10,7 @@ internal class RustEarlyExitDef(TypeHelper helper, RustOptions options) : EarlyE
 
     protected override string GetMaskEarlyExit(ulong bitSet) =>
         $$"""
-                  if {{bitSet}}u64 & (1u64 << ((value.len() - 1) % 64)) == 0 {
+                  if {{bitSet}}u64 & (1u64 << (value.len() - 1)) == 0 {
                       return false;
                   }
           """;

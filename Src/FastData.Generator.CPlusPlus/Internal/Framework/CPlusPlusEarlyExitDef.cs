@@ -10,7 +10,7 @@ internal class CPlusPlusEarlyExitDef(TypeHelper helper, CPlusPlusOptions options
 
     protected override string GetMaskEarlyExit(ulong bitSet) =>
         $"""
-                 if (({bitSet}ULL & 1ULL << (value.length() - 1) % 64) == 0)
+                 if (({bitSet}ULL & (1ULL << (value.length() - 1))) == 0)
                      return false;
          """;
 
