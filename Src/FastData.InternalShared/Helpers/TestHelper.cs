@@ -115,11 +115,11 @@ public static class TestHelper
         else if (vector.Type == typeof(EytzingerSearchStructure<>))
             structure = new EytzingerSearchStructure<T>(props.DataType, StringComparison.Ordinal);
         else if (vector.Type == typeof(HashSetChainStructure<>))
-            structure = new HashSetChainStructure<T>(HashData.Create(data, props.DataType));
+            structure = new HashSetChainStructure<T>(HashData.Create(data, props.DataType, 1));
         else if (vector.Type == typeof(HashSetPerfectStructure<>))
-            structure = new HashSetPerfectStructure<T>(HashData.Create(data, props.DataType));
+            structure = new HashSetPerfectStructure<T>(HashData.Create(data, props.DataType, 1));
         else if (vector.Type == typeof(HashSetLinearStructure<>))
-            structure = new HashSetLinearStructure<T>(HashData.Create(data, props.DataType));
+            structure = new HashSetLinearStructure<T>(HashData.Create(data, props.DataType, 1));
         else if (vector.Type == typeof(KeyLengthStructure<>))
             structure = new KeyLengthStructure<T>(props.StringProps!);
         else if (vector.Type == typeof(ArrayStructure<>))

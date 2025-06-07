@@ -17,14 +17,14 @@ internal sealed class HashSetPerfectStructure<T>(HashData hashData) : IStructure
             return false;
         }
 
-        ulong[] hashCodes = hashData.HashCodes;
-        KeyValuePair<T, ulong>[] pairs = new KeyValuePair<T, ulong>[data.Length];
+        ulong size = (ulong)(data.Length * hashData.CapacityFactor);
 
-        ulong dataLength = (ulong)data.Length;
+        ulong[] hashCodes = hashData.HashCodes;
+        KeyValuePair<T, ulong>[] pairs = new KeyValuePair<T, ulong>[size];
 
         //We need to reorder the data to match hashes
         for (int i = 0; i < data.Length; i++)
-            pairs[hashCodes[i] % dataLength] = new KeyValuePair<T, ulong>(data[i], hashCodes[i]);
+            pairs[hashCodes[i] % size] = new KeyValuePair<T, ulong>(data[i], hashCodes[i]);
 
         context = new HashSetPerfectContext<T>(pairs);
         return true;
