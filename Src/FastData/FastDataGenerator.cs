@@ -98,17 +98,23 @@ public static partial class FastDataGenerator
                 yield return new SingleValueStructure<T>();
             else
             {
-                // For small amounts of data, logic is the fastest, so we try that first
-                yield return new ConditionalStructure<T>();
+                // For small amounts of data, logic is the fastest.
+                // However, it increases the assembly size, so we want to try some special cases first.
 
-                // If it is a string, we try key lengths
-                if (props.DataType == DataType.String)
+                // If it is string data, and we have unique lengths, we prefer to use a KeyLengthStructure.
+                if (props.DataType == DataType.String && props.StringProps!.LengthData.Unique)
                     yield return new KeyLengthStructure<T>(props.StringProps!);
 
-                // TODO: Attempt perfect hashing
-                // yield return new HashSetPerfectStructure<T>();
-                // yield return new BinarySearchStructure<T>(props.DataType, config.StringComparison);
-                yield return new HashSetChainStructure<T>(HashData.Create(data, props.DataType));
+                // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
+                if (data.Length < 400)
+                    yield return new ConditionalStructure<T>();
+
+                HashData hashData = HashData.Create(data, props.DataType);
+
+                if (hashData.HashCodesPerfect)
+                    yield return new HashSetPerfectStructure<T>(hashData);
+
+                yield return new HashSetChainStructure<T>(hashData);
             }
         }
         else if (ds == StructureType.Array)
