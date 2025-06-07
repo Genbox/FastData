@@ -2,21 +2,22 @@ using Genbox.FastData.Abstracts;
 using Genbox.FastData.Contexts;
 using Genbox.FastData.Contexts.Misc;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashSetChainStructure<T> : IHashStructure<T>
+internal sealed class HashSetChainStructure<T>(HashData hashData) : IStructure<T>
 {
-    public bool TryCreate(T[] data, HashFunc<T> hash, out IContext? context)
+    public bool TryCreate(T[] data, out IContext? context)
     {
         int[] buckets = new int[data.Length];
         HashSetEntry<T>[] entries = new HashSetEntry<T>[data.Length];
 
         for (int i = 0; i < data.Length; i++)
         {
+            ulong hashCode = hashData.HashCodes[i];
             T value = data[i];
-            ulong hashCode = hash(value);
             ref int bucket = ref buckets[hashCode % (uint)data.Length];
 
             ref HashSetEntry<T> entry = ref entries[i];

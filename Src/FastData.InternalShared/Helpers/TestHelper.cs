@@ -103,16 +103,8 @@ public static class TestHelper
     {
         DataProperties<T> props = DataProperties<T>.Create(vector.Values);
 
-        IContext? context = null;
-        IStringHash? stringHash = props.DataType == DataType.String ? vector.StringHash ?? new DefaultStringHash() : null;
-
-        HashFunc<T> hashFunc;
-        if (stringHash != null)
-            hashFunc = (HashFunc<T>)(object)stringHash.GetHashFunction();
-        else
-            hashFunc = PrimitiveHash.GetHash<T>(props.DataType);
-
-        object? structure;
+        IStructure<T>? structure;
+        T[] data = vector.Values;
 
         if (vector.Type == typeof(SingleValueStructure<>))
             structure = new SingleValueStructure<T>();
@@ -123,11 +115,11 @@ public static class TestHelper
         else if (vector.Type == typeof(EytzingerSearchStructure<>))
             structure = new EytzingerSearchStructure<T>(props.DataType, StringComparison.Ordinal);
         else if (vector.Type == typeof(HashSetChainStructure<>))
-            structure = new HashSetChainStructure<T>();
+            structure = new HashSetChainStructure<T>(HashData.Create(data, props.DataType));
         else if (vector.Type == typeof(HashSetPerfectStructure<>))
-            structure = new HashSetPerfectStructure<T>();
+            structure = new HashSetPerfectStructure<T>(HashData.Create(data, props.DataType));
         else if (vector.Type == typeof(HashSetLinearStructure<>))
-            structure = new HashSetLinearStructure<T>();
+            structure = new HashSetLinearStructure<T>(HashData.Create(data, props.DataType));
         else if (vector.Type == typeof(KeyLengthStructure<>))
             structure = new KeyLengthStructure<T>(props.StringProps!);
         else if (vector.Type == typeof(ArrayStructure<>))
@@ -144,24 +136,14 @@ public static class TestHelper
             _ => StructureType.Auto
         };
 
-        if (structure is IStructure<T> s)
+        if (!structure.TryCreate(vector.Values, out IContext? context))
         {
-            if (!s.TryCreate(vector.Values, out context))
-            {
-                spec = default;
-                return false;
-            }
-        }
-        else if (structure is IHashStructure<T> hs)
-        {
-            if (!hs.TryCreate(vector.Values, hashFunc, out context))
-            {
-                spec = default;
-                return false;
-            }
+            spec = default;
+            return false;
         }
 
         ICodeGenerator generator = gen(vector.Identifier);
+        IStringHash? stringHash = props.DataType == DataType.String ? vector.StringHash ?? new DefaultStringHash() : null;
         GeneratorConfig<T> genCfg = new GeneratorConfig<T>(structureType, FastDataGenerator.DefaultStringComparison, props, stringHash);
         if (generator.TryGenerate(genCfg, context, out string? source))
         {

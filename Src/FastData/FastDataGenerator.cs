@@ -9,7 +9,6 @@ using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.Misc;
-using Genbox.FastData.StringHash;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -66,55 +65,30 @@ public static partial class FastDataGenerator
         else if (props.StringProps != null)
             LogMinMaxLength(logger, props.StringProps.LengthData.Min, props.StringProps.LengthData.Max);
 
-        IStringHash? stringHash = null;
-        if (data is string[])
-            stringHash = /*analysisEnabled ? GetBestHash(stringArr, props.StringProps!, fdCfg.SimulatorConfig, factory) :*/ new DefaultStringHash();
-
-        HashFunc<T> hashFunc;
-
-        //If we have a string hash, use it.
-        if (stringHash == null)
-            hashFunc = PrimitiveHash.GetHash<T>(props.DataType);
-        else
-            hashFunc = (HashFunc<T>)(object)stringHash.GetHashFunction();
-
         IContext? context = null;
 
         LogUserStructureType(logger, fdCfg.StructureType);
-        foreach (object candidate in GetDataStructureCandidates(data, fdCfg, props))
+        foreach (IStructure<T>? candidate in GetDataStructureCandidates(data, fdCfg, props))
         {
             LogCandidateAttempt(logger, candidate.GetType().Name);
 
-            if (candidate is IHashStructure<T> hs)
+            if (candidate.TryCreate(data, out context))
             {
-                if (hs.TryCreate(data, hashFunc, out context))
-                {
-                    LogCandidateSuccess(logger, candidate.GetType().Name);
-                    break;
-                }
-
-                LogCandidateFailed(logger, candidate.GetType().Name);
+                LogCandidateSuccess(logger, candidate.GetType().Name);
+                break;
             }
-            else if (candidate is IStructure<T> s)
-            {
-                if (s.TryCreate(data, out context))
-                {
-                    LogCandidateSuccess(logger, candidate.GetType().Name);
-                    break;
-                }
 
-                LogCandidateFailed(logger, candidate.GetType().Name);
-            }
+            LogCandidateFailed(logger, candidate.GetType().Name);
         }
 
         if (context == null)
             throw new InvalidOperationException("Unable to find a suitable data structure for the data. Please report this as a bug.");
 
-        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, DefaultStringComparison, props, stringHash);
+        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, DefaultStringComparison, props, null);
         return generator.TryGenerate(genCfg, context, out source);
     }
 
-    private static IEnumerable<object> GetDataStructureCandidates<T>(T[] data, FastDataConfig config, DataProperties<T> props)
+    private static IEnumerable<IStructure<T>> GetDataStructureCandidates<T>(T[] data, FastDataConfig config, DataProperties<T> props)
     {
         StructureType ds = config.StructureType;
 
@@ -134,7 +108,7 @@ public static partial class FastDataGenerator
                 // TODO: Attempt perfect hashing
                 // yield return new HashSetPerfectStructure<T>();
                 // yield return new BinarySearchStructure<T>(props.DataType, config.StringComparison);
-                yield return new HashSetChainStructure<T>();
+                yield return new HashSetChainStructure<T>(HashData.Create(data, props.DataType));
             }
         }
         else if (ds == StructureType.Array)
@@ -144,7 +118,7 @@ public static partial class FastDataGenerator
         else if (ds == StructureType.BinarySearch)
             yield return new BinarySearchStructure<T>(props.DataType, DefaultStringComparison);
         else if (ds == StructureType.HashSet)
-            yield return new HashSetChainStructure<T>();
+            yield return new HashSetChainStructure<T>(HashData.Create(data, props.DataType));
         else
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }

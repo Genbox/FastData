@@ -1,9 +1,11 @@
 using System.Globalization;
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Configs;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Helpers;
 using Microsoft.Extensions.Logging;
@@ -43,10 +45,12 @@ internal static class GPerfTest
             StringProperties props = DataAnalyzer.GetStringProperties(data);
 
             GPerfAnalyzer analyzer = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(), new Simulator(data, new SimulatorConfig()), factory.CreateLogger<GPerfAnalyzer>());
-            Candidate hashFunc = analyzer.GetCandidates().First();
+            Candidate hashFunc = analyzer.GetCandidates().First(); //TODO: use
 
-            HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>();
-            structure.TryCreate(data, hashFunc.StringHash.GetHashFunction(), out IContext? context);
+            HashData hashData = HashData.Create(data, DataType.String);
+            HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>(hashData);
+
+            structure.TryCreate(data, out IContext? context);
         }
     }
 

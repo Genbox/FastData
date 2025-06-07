@@ -4,23 +4,19 @@ using Genbox.FastData.Contexts;
 using Genbox.FastData.Contexts.Misc;
 using Genbox.FastData.Helpers;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
+internal sealed class HashSetLinearStructure<T>(HashData hashData) : IStructure<T>
 {
     //TODO: Either implement a bitmap for seen buckets everywhere or don't use bitmaps for simplicity
 
-    public bool TryCreate(T[] data, HashFunc<T> hash, out IContext? context)
+    public bool TryCreate(T[] data, out IContext? context)
     {
-        ulong[] hashCodes = new ulong[data.Length];
-        for (int i = 0; i < data.Length; i++)
-        {
-            hashCodes[i] = hash(data[i]);
-        }
-
-        uint numBuckets = CalcNumBuckets(hashCodes);
+        ulong[] hashCodes = hashData.HashCodes;
+        uint numBuckets = CalcNumBuckets(hashCodes, hashData.HashCodesUnique);
         int[] bucketStarts = new int[numBuckets];
 
         for (int i = 0; i < bucketStarts.Length; i++)
@@ -78,7 +74,7 @@ internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
         return true;
     }
 
-    private static uint CalcNumBuckets(ReadOnlySpan<ulong> hashCodes)
+    private static uint CalcNumBuckets(ulong[] hashCodes, bool hashCodesUnique)
     {
         //Note: this code starts with a sane capacity factor for how many buckets are needed.
         //      it then increase the bucket capacity with the next prime number until it reaches less than 5% collisions
@@ -89,11 +85,15 @@ internal sealed class HashSetLinearStructure<T> : IHashStructure<T>
         const int MaxSmallBucketTableMultiplier = 16;
         const uint MaxLargeBucketTableMultiplier = 3;
 
-        HashSet<ulong> codes = new HashSet<ulong>();
+        ICollection<ulong> codes = hashCodes;
 
-        foreach (ulong hashCode in hashCodes)
+        if (!hashCodesUnique)
         {
-            codes.Add(hashCode);
+            HashSet<ulong> uniqCodes = new HashSet<ulong>();
+            foreach (ulong hashCode in hashCodes)
+                uniqCodes.Add(hashCode);
+
+            codes = uniqCodes;
         }
 
         uint uniqueCodesCount = (uint)codes.Count;

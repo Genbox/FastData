@@ -1,23 +1,30 @@
 using Genbox.FastData.Abstracts;
 using Genbox.FastData.Contexts;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashSetPerfectStructure<T> : IHashStructure<T>
+internal sealed class HashSetPerfectStructure<T>(HashData hashData) : IStructure<T>
 {
-    public bool TryCreate(T[] data, HashFunc<T> hashFunc, out IContext? context)
+    public bool TryCreate(T[] data, out IContext? context)
     {
         //This code is only called when the hash function is perfect.
+        if (!hashData.HashCodesPerfect)
+        {
+            context = null;
+            return false;
+        }
 
+        ulong[] hashCodes = hashData.HashCodes;
         KeyValuePair<T, ulong>[] pairs = new KeyValuePair<T, ulong>[data.Length];
 
+        ulong dataLength = (ulong)data.Length;
+
+        //We need to reorder the data to match hashes
         for (int i = 0; i < data.Length; i++)
-        {
-            T key = data[i];
-            pairs[i] = new KeyValuePair<T, ulong>(key, hashFunc(key));
-        }
+            pairs[hashCodes[i] % dataLength] = new KeyValuePair<T, ulong>(data[i], hashCodes[i]);
 
         context = new HashSetPerfectContext<T>(pairs);
         return true;
