@@ -395,6 +395,7 @@ dotnet_diagnostic.CS8762.severity = error # Parameter must have a non-null value
 # temp broken
 dotnet_diagnostic.SS039.severity = none # EnumWithoutDefaultValue
 dotnet_diagnostic.GU0017.severity = none # Don't use discarded
+dotnet_diagnostic.xUnit1007.severity = none # Reports wrong when using TheoryData
 
 # temp review
 
