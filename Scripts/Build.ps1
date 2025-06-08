@@ -1,5 +1,5 @@
 $Config = "Debug"
-$Root = "$PSScriptRoot/.."
+$Root = (Resolve-Path "$PSScriptRoot/..").Path
 $Color = "DarkBlue"
 
 Write-Host -BackgroundColor $Color "Building solution"
