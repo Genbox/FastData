@@ -86,7 +86,7 @@ internal static class Program
 
             CSharpCodeGenerator generator = CSharpCodeGenerator.Create(genCfg);
 
-            await GenerateAsync(inputFile, dataType, structureType, generator, outputFile);
+            await GenerateAsync(inputFile, dataType, structureType, generator, outputFile).ConfigureAwait(false);
         }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt, namespaceOpt, classVisibilityOpt, classTypeOpt);
 
         cppCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn) =>
@@ -94,7 +94,7 @@ internal static class Program
             CPlusPlusCodeGeneratorConfig genCfg = new CPlusPlusCodeGeneratorConfig(cn);
             CPlusPlusCodeGenerator generator = CPlusPlusCodeGenerator.Create(genCfg);
 
-            await GenerateAsync(inputFile, dataType, structureType, generator, outputFile);
+            await GenerateAsync(inputFile, dataType, structureType, generator, outputFile).ConfigureAwait(false);
         }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt);
 
         rustCmd.SetHandler(async (outputFile, dataType, structureType, inputFile, cn) =>
@@ -102,7 +102,7 @@ internal static class Program
             RustCodeGeneratorConfig genCfg = new RustCodeGeneratorConfig(cn);
             RustCodeGenerator generator = RustCodeGenerator.Create(genCfg);
 
-            await GenerateAsync(inputFile, dataType, structureType, generator, outputFile);
+            await GenerateAsync(inputFile, dataType, structureType, generator, outputFile).ConfigureAwait(false);
         }, outputFileOpt, dataTypeOpt, structureTypeOpt, inputFileArg, classNameOpt);
 
         Parser parser = new CommandLineBuilder(rootCmd)
@@ -122,18 +122,18 @@ internal static class Program
 
         try
         {
-            return await parser.InvokeAsync(args);
+            return await parser.InvokeAsync(args).ConfigureAwait(false);
         }
         catch (Exception e)
         {
-            await Console.Error.WriteLineAsync("An error happened: " + e.Message);
+            await Console.Error.WriteLineAsync("An error happened: " + e.Message).ConfigureAwait(false);
             return -1;
         }
     }
 
     private static async Task GenerateAsync(FileInfo inputFile, DataType dataType, StructureType structureType, ICodeGenerator generator, FileInfo? outputFile)
     {
-        object[] data = await ReadFile(inputFile.FullName, dataType).ToArrayAsync();
+        object[] data = await ReadFileAsync(inputFile.FullName, dataType).ToArrayAsync().ConfigureAwait(false);
         FastDataConfig config = new FastDataConfig(structureType);
 
         if (!FastDataGenerator.TryGenerate(data, config, generator, out string? source))
@@ -142,14 +142,14 @@ internal static class Program
         if (outputFile == null)
             Console.WriteLine(source);
         else
-            await File.WriteAllTextAsync(outputFile.FullName, source);
+            await File.WriteAllTextAsync(outputFile.FullName, source).ConfigureAwait(false);
     }
 
-    private static async IAsyncEnumerable<object> ReadFile(string file, DataType dataType)
+    private static async IAsyncEnumerable<object> ReadFileAsync(string file, DataType dataType)
     {
         Func<string, object> func = GetTypeFunc(dataType);
 
-        await foreach (string line in File.ReadLinesAsync(file))
+        await foreach (string line in File.ReadLinesAsync(file).ConfigureAwait(false))
         {
             yield return func(line);
         }

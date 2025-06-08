@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Genbox.FastData;
 
+[SuppressMessage("ApiDesign", "RS0026:Do not add multiple public overloads with optional parameters")]
 public static partial class FastDataGenerator
 {
     internal const StringComparison DefaultStringComparison = StringComparison.Ordinal;
@@ -34,7 +36,7 @@ public static partial class FastDataGenerator
         _ => throw new InvalidOperationException($"Unsupported data type: {data[0].GetType().Name}")
     };
 
-    public static bool TryGenerate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null)
+    public static bool TryGenerate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null) where T : notnull
     {
         if (data.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");

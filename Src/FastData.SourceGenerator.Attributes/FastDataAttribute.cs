@@ -4,7 +4,7 @@ namespace Genbox.FastData.SourceGenerator.Attributes;
 
 [UsedImplicitly(ImplicitUseTargetFlags.Members)]
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-public class FastDataAttribute<T> : Attribute
+public sealed class FastDataAttribute<T> : Attribute
 {
     public FastDataAttribute(string name, T[] data)
     {
