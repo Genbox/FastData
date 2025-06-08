@@ -14,8 +14,8 @@ public sealed class CSharpCodeGenerator : CodeGenerator
 {
     private readonly CSharpCodeGeneratorConfig _cfg;
 
-    private CSharpCodeGenerator(CSharpCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, ExpressionCompiler compiler)
-        : base(langDef, constDef, earlyExitDef, hashDef, compiler) => _cfg = cfg;
+    private CSharpCodeGenerator(CSharpCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
+        : base(langDef, constDef, earlyExitDef, hashDef) => _cfg = cfg;
 
     public static CSharpCodeGenerator Create(CSharpCodeGeneratorConfig userCfg)
     {
@@ -23,7 +23,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
         TypeMap typeMap = new TypeMap(langDef.TypeDefinitions);
         TypeHelper helper = new TypeHelper(typeMap);
 
-        return new CSharpCodeGenerator(userCfg, langDef, new CSharpConstantsDef(), new CSharpEarlyExitDef(helper, userCfg.GeneratorOptions), new CSharpHashDef(), new CSharpExpressionCompiler(helper));
+        return new CSharpCodeGenerator(userCfg, langDef, new CSharpConstantsDef(), new CSharpEarlyExitDef(helper, userCfg.GeneratorOptions), new CSharpHashDef());
     }
 
     protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext context)

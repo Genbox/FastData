@@ -1,8 +1,0 @@
-﻿        uint8_t[] bytes;
-        uint64_t hash;
-        bytes = Encoding.ASCII.GetBytes(str);
-        hash = 0;
-        hash = (hash + (System.Int32[])[(bytes)[1]]);
-        hash = (hash + (System.Int32[])[(bytes)[2]]);
-        hash = (hash + (System.Int32[])[(bytes.Length - 1)]);
-        hash;

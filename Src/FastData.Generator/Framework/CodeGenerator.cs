@@ -11,7 +11,6 @@ namespace Genbox.FastData.Generator.Framework;
 
 public abstract class CodeGenerator : ICodeGenerator
 {
-    private readonly ExpressionCompiler _compiler;
     private readonly IConstantsDef _constDef;
     private readonly IEarlyExitDef _earlyExitDef;
     private readonly IHashDef _hashDef;
@@ -19,13 +18,12 @@ public abstract class CodeGenerator : ICodeGenerator
     private readonly TypeHelper _typeHelper;
     private readonly TypeMap _typeMap;
 
-    protected CodeGenerator(ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, ExpressionCompiler compiler)
+    protected CodeGenerator(ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
     {
         _langDef = langDef;
         _constDef = constDef;
         _earlyExitDef = earlyExitDef;
         _hashDef = hashDef;
-        _compiler = compiler;
 
         _typeMap = new TypeMap(langDef.TypeDefinitions);
         _typeHelper = new TypeHelper(_typeMap);
@@ -44,7 +42,7 @@ public abstract class CodeGenerator : ICodeGenerator
 
         StringBuilder sb = new StringBuilder();
         AppendHeader(sb, genCfg, context);
-        AppendBody(sb, genCfg, typeName, context, _compiler);
+        AppendBody(sb, genCfg, typeName, context);
         AppendFooter(sb, genCfg, typeName);
 
         foreach (string classCode in Shared.GetType(CodeType.Class))
@@ -70,14 +68,14 @@ public abstract class CodeGenerator : ICodeGenerator
 #endif
     }
 
-    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext context, ExpressionCompiler? compiler)
+    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext context)
     {
         OutputWriter<T>? writer = GetOutputWriter(genCfg, context);
 
         if (writer == null)
             throw new NotSupportedException("The context type is not supported: " + context.GetType().Name);
 
-        writer.Initialize(_langDef, _earlyExitDef, _typeHelper, _hashDef, genCfg, typeName, compiler);
+        writer.Initialize(_langDef, _earlyExitDef, _typeHelper, _hashDef, genCfg, typeName);
         sb.AppendLine(writer.Generate());
     }
 

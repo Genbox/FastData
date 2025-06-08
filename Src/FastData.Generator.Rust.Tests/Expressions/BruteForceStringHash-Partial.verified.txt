@@ -1,8 +1,0 @@
-﻿        let mut i32 length;
-        let mut i32 offset;
-        let mut u64 hash;
-        length = value.len();
-        offset = 1;
-        hash = (hash + ReadU32(value, offset));
-        offset += 4;
-        hash = hash;

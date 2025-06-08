@@ -1,8 +1,0 @@
-﻿        let mut i32 length;
-        let mut i32 offset;
-        let mut u64 hash;
-        length = value.len();
-        offset = 1;
-        hash = (((((hash + ReadU32(value, offset)) + 18397679294719823053) ^ (((hash + ReadU32(value, offset)) + 18397679294719823053) >> 42)) << 23) | ((((hash + ReadU32(value, offset)) + 18397679294719823053) ^ (((hash + ReadU32(value, offset)) + 18397679294719823053) >> 42)) >> 41));
-        offset += 4;
-        hash = ((((1 | hash) + (hash * hash)) ^ (((1 | hash) + (hash * hash)) >> 48)) ^ ((((1 | hash) + (hash * hash)) ^ (((1 | hash) + (hash * hash)) >> 48)) >> 46));

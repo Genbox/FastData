@@ -1,8 +1,0 @@
-﻿        int length;
-        int offset;
-        ulong hash;
-        length = value.Length;
-        offset = 1;
-        hash = (hash + ReadU32(value, offset));
-        offset += 4;
-        hash = hash;

@@ -4,5 +4,5 @@ namespace Genbox.FastData.Generator.Framework.Interfaces;
 
 public interface IHashDef
 {
-    string GetHashSource(DataType dataType, string typeName, string? stringHash);
+    string GetHashSource(DataType dataType, string typeName);
 }

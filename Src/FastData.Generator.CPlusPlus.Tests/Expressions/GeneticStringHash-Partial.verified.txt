@@ -1,8 +1,0 @@
-﻿        int32_t length;
-        int32_t offset;
-        uint64_t hash;
-        length = value.Length;
-        offset = 1;
-        hash = (((((hash + ReadU32(value, offset)) + 18397679294719823053ull) ^ (((hash + ReadU32(value, offset)) + 18397679294719823053ull) >> 42)) << 23) | ((((hash + ReadU32(value, offset)) + 18397679294719823053ull) ^ (((hash + ReadU32(value, offset)) + 18397679294719823053ull) >> 42)) >> 41));
-        offset += 4;
-        hash = ((((1ull | hash) + (hash * hash)) ^ (((1ull | hash) + (hash * hash)) >> 48)) ^ ((((1ull | hash) + (hash * hash)) ^ (((1ull | hash) + (hash * hash)) >> 48)) >> 46));

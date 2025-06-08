@@ -1,8 +1,0 @@
-﻿        byte[] bytes;
-        ulong hash;
-        bytes = Encoding.ASCII.GetBytes(str);
-        hash = ulong.MinValue;
-        hash = (hash + (System.Int32[])[(bytes)[1]]);
-        hash = (hash + (System.Int32[])[(bytes)[2]]);
-        hash = (hash + (System.Int32[])[(bytes.Length - 1)]);
-        hash;

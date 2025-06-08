@@ -5,16 +5,16 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
 internal class CSharpHashDef : IHashDef
 {
-    public string GetHashSource(DataType dataType, string typeName, string? stringHash) =>
+    public string GetHashSource(DataType dataType, string typeName) =>
         $$"""
               [MethodImpl(MethodImplOptions.AggressiveInlining)]
               private static ulong Hash({{typeName}} value)
               {
-          {{GetHash(dataType, stringHash)}}
+          {{GetHash(dataType)}}
               }
           """;
 
-    private static string GetHash(DataType dataType, string? stringHash)
+    private static string GetHash(DataType dataType)
     {
         if (dataType == DataType.String)
         {

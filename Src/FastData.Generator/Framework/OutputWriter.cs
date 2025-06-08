@@ -7,7 +7,6 @@ namespace Genbox.FastData.Generator.Framework;
 
 public abstract class OutputWriter<T> : IOutputWriter
 {
-    private ExpressionCompiler? _compiler;
     private IEarlyExitDef _earlyExitDef = null!;
     private IHashDef _hashDef = null!;
     private ILanguageDef _langDef = null!;
@@ -17,14 +16,14 @@ public abstract class OutputWriter<T> : IOutputWriter
     protected GeneratorConfig<T> GeneratorConfig { get; private set; } = null!;
 
     protected string EarlyExits => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
-    protected string HashSource => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName, GeneratorConfig.DataType == DataType.String && _compiler != null && GeneratorConfig.StringHash != null ? _compiler.GetCode(GeneratorConfig.StringHash.GetExpression()) : null);
+    protected string HashSource => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName);
     protected string HashSizeType => _typeHelper.GetTypeName(typeof(ulong));
     protected static DataType HashSizeDataType => DataType.UInt64;
     protected string ArraySizeType => _langDef.ArraySizeType;
 
     public abstract string Generate();
 
-    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeHelper typeHelper, IHashDef hashDef, GeneratorConfig<T> genCfg, string typeName, ExpressionCompiler? compiler)
+    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeHelper typeHelper, IHashDef hashDef, GeneratorConfig<T> genCfg, string typeName)
     {
         _langDef = langDef;
         _earlyExitDef = earlyExitDef;
@@ -32,7 +31,6 @@ public abstract class OutputWriter<T> : IOutputWriter
         _hashDef = hashDef;
         GeneratorConfig = genCfg;
         TypeName = typeName;
-        _compiler = compiler;
     }
 
     protected virtual string GetEqualFunction(string value1, string value2, DataType dataType = DataType.Null) => $"{value1} == {value2}";

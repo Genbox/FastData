@@ -1,8 +1,0 @@
-﻿        let mut Byte[] bytes;
-        let mut u64 hash;
-        bytes = ASCII.GetBytes(str);
-        hash = u64::MIN;
-        hash = (hash + (System.Int32[])[(bytes)[1]]);
-        hash = (hash + (System.Int32[])[(bytes)[2]]);
-        hash = (hash + (System.Int32[])[(bytes.len() - 1)]);
-        hash;
