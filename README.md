@@ -7,32 +7,21 @@
 ## Description
 
 FastData is a code generator that analyzes your data and creates high-performance, read-only lookup data structures for
-static data. It can output the data structures
-in many different languages (C#, C++, Rust, etc.), ready for inclusion in your project with zero dependencies.
+static data. It can output the data structures in many different languages (C#, C++, Rust, etc.), ready for inclusion in your project with zero dependencies.
 
 ## Download
 
-* Executable: [Executable](https://github.com/Genbox/FastData/releases)
-* C# source generator: [![C# source generator](https://img.shields.io/nuget/v/Genbox.FastData.SourceGenerator.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.FastData.SourceGenerator/)
-* C# library: [![C# library](https://img.shields.io/nuget/v/Genbox.FastData.Generator.CSharp.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.FastData.Generator.CSharp/)
-* .NET Tool: [![.NET Tool](https://img.shields.io/nuget/v/Genbox.FastData.Cli.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.FastData.Cli/)
+| Name                | Link                                                                                                                                                                                        |
+|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Executable          | [GitHub Releases](https://github.com/Genbox/FastData/releases/latest)                                                                                                                       |
+| C# source generator | [![C# source generator](https://img.shields.io/nuget/v/Genbox.FastData.SourceGenerator.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.FastData.SourceGenerator/) |
+| C# library          | [![C# library](https://img.shields.io/nuget/v/Genbox.FastData.Generator.CSharp.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.FastData.Generator.CSharp/)        |
+| .NET Tool           | [![.NET Tool](https://img.shields.io/nuget/v/Genbox.FastData.Cli.svg?style=flat-square&label=nuget)](https://www.nuget.org/packages/Genbox.FastData.Cli/)                                   |
+| PowerShell          | [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/Genbox.FastData.svg?style=flat-square&label=powershell)](https://www.powershellgallery.com/packages/Genbox.FastData/)     |
 
-## Use Case
+## Getting started
 
-Imagine a scenario where you have a predefined list of words (e.g., dog breeds) and need to check whether a specific dog
-breed exists in the set.
-Usually you create an array and look up the value. However, this is far from optimal and lacks several optimizations.
-
-```csharp
-string[] breeds = { "Labrador", "German Shepherd", "Golden Retriever" };
-
-if (breeds.Contains("Beagle"))
-    Console.WriteLine("It contains Beagle");
-```
-
-We can do better by analyzing the dataset and generating an optimized data structure.
-
-1. Create a file `Dogs.txt` with the following contents:
+For some guides below you'll need a `dogs.txt`file with the following contents:
 
 ```
 Labrador
@@ -40,14 +29,83 @@ German Shepherd
 Golden Retriever
 ```
 
-2. Run `FastData csharp Dogs.txt`. It produces the following output:
+### Using the executable
+
+1. [Download](https://github.com/Genbox/FastData/releases/latest) the executable
+2. Run `FastData csharp dogs.txt`
+
+### Using the .NET CLI tool
+1. install the [Genbox.FastData.Cli tool](https://www.nuget.org/packages/Genbox.FastData.Cli/): `dotnet tool install --global Genbox.FastData.Cli`
+2. Run `FastData csharp dogs.txt`
+
+### Using the PowerShell module
+1. Install the [PowerShell module](https://www.powershellgallery.com/packages/Genbox.FastData/): `Install-Module -Name Genbox.FastData`
+2. Run `Invoke-FastData -Language CSharp -InputFile dogs.txt`
+
+### Using the .NET Source Generator
+
+1. Add the [Genbox.FastData.SourceGenerator](https://www.nuget.org/packages/Genbox.FastData.SourceGenerator/) package to your project
+2. Add `FastDataAttribute` as an assembly level attribute.
+
+```csharp
+using Genbox.FastData.SourceGenerator;
+
+[assembly: FastData<string>("Dogs", ["Labrador", "German Shepherd", "Golden Retriever"])]
+
+internal static class Program
+{
+    private static void Main()
+    {
+        Console.WriteLine(Dogs.Contains("Labrador"));
+        Console.WriteLine(Dogs.Contains("Beagle"));
+    }
+}
+```
+
+The `Dogs` class is generated at compile time and contains a `Contains()` method that checks if the value exists in the dataset.
+
+### Using the C# library
+
+1. Add the [Genbox.FastData.Generator.CSharp](https://www.nuget.org/packages/Genbox.FastData.Generator.CSharp/) NuGet package to your project.
+2. Use the `FastDataGenerator.TryGenerate()` method. Give it your data as an array.
+
+```csharp
+internal static class Program
+{
+    private static void Main()
+    {
+        FastDataConfig config = new FastDataConfig();
+        CSharpCodeGenerator generator = CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("Dogs"));
+
+        if (!FastDataGenerator.TryGenerate(["Labrador", "German Shepherd", "Golden Retriever"], config, generator, out string? source))
+            Console.WriteLine("Failed to generate source code");
+
+        Console.WriteLine(source);
+    }
+}
+```
+
+## Why use FastData?
+
+Imagine a scenario where you have a predefined list of words (e.g., dog breeds) and need to check whether a specific dog breed exists in the set.
+Usually you create an array and look up the value. However, this is far from optimal and lacks several optimizations.
+
+```csharp
+string[] dogs = { "Labrador", "German Shepherd", "Golden Retriever" };
+
+if (dogs.Contains("Beagle"))
+    Console.WriteLine("It contains Beagle");
+```
+
+We can do better by analyzing the dataset and generating an optimized data structure.
+Running FastData on the same dataset produces the following code:
 
 ```csharp
 internal static class Dogs
 {
     public static bool Contains(string value)
     {
-        if ((49280UL & (1UL << (value.Length - 1) % 64)) == 0)
+        if ((49280UL & (1UL << (value.Length - 1))) == 0)
            return false;
 
         switch (value)
@@ -69,75 +127,21 @@ internal static class Dogs
 
 Benefits of the generated code:
 
-- **Fast Early Exit:** A bitmap of string lengths allows early termination for out-of-range values.
-- **Efficient Lookups:** A switch-based data structure which is fast for small datasets.
-- **Additional Metadata:** Provides item count and other useful properties.
+- **Fast early exit:** A bitmap of string lengths allows early termination for string lengths that cannot be in the set.
+- **Efficient lookups:** A switch-based data structure which is fast for small datasets.
+- **Additional metadata:** Provides item count and other useful properties.
 
 A benchmark of the array versus our generated structure really illustrates the difference. It is 13x faster.
 
-| Method    |      Mean |     Error |    StdDev | Ratio |
-|-----------|----------:|----------:|----------:|------:|
-| Generated | 0.5311 ns | 0.0170 ns | 0.0026 ns |  0.08 |
-| Array     | 6.9286 ns | 0.1541 ns | 0.0684 ns |  1.00 |
-
-## Getting started
-
-There are several ways of running FastData. See the sections below for details.
-
-### Using the executable
-
-1. Download the FastData executable
-2. Create a file with an item per line
-3. Run `FastData csharp File.txt`
-
-### Using the .NET Source Generator
-
-1. Add the `Genbox.FastData.SourceGenerator` package to your project
-2. Add `FastDataAttribute` as an assembly level attribute.
-
-```csharp
-using Genbox.FastData.SourceGenerator;
-
-[assembly: FastData<string>("Dogs", ["Labrador", "German Shepherd", "Golden Retriever"])]
-
-internal static class Program
-{
-    private static void Main()
-    {
-        Console.WriteLine(Dogs.Contains("Labrador"));
-        Console.WriteLine(Dogs.Contains("Beagle"));
-    }
-}
-```
-
-### Using it as a C# library
-
-1. Add the `Genbox.FastData.Generator.CSharp` NuGet package to your project.
-2. Use the `FastDataGenerator.TryGenerate()` method. Give it your data as an array.
-
-```csharp
-internal static class Program
-{
-    private static void Main()
-    {
-        FastDataConfig config = new FastDataConfig();
-
-        CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpGeneratorConfig("Dogs"));
-
-        if (!FastDataGenerator.TryGenerate(["Labrador", "German Shepherd", "Golden Retriever"], config, generator, out string? source))
-            Console.WriteLine("Failed to generate source code");
-
-        Console.WriteLine(source);
-    }
-}
-```
-
-Whenever you change the array, it automatically generates the new source code.
+| Method   |      Mean |     Error |    StdDev | Ratio |
+|----------|----------:|----------:|----------:|------:|
+| FastData | 0.5311 ns | 0.0170 ns | 0.0026 ns |  0.08 |
+| Array    | 6.9286 ns | 0.1541 ns | 0.0684 ns |  1.00 |
 
 ## Features
 
-- **Data Analysis:** Optimizes the structure based on the inherent properties of the dataset.
-- **Multiple Structures:** FastData automatically chooses the best data structure for your data.
+- **Data analysis:** Optimizes the structure based on the inherent properties of the dataset.
+- **Multiple structures:** FastData automatically chooses the best data structure for your data.
 - **Fast hashing:** String lookups are fast due to a fast string hash function
 
 It supports several output programming languages.
@@ -154,7 +158,7 @@ By default, FastData chooses the optimal data structure for your data, but you c
 `FastData -s <type>`. See the details of each structure type below.
 
 #### Auto
-This is the default option. It autoselects the best data structure based on the number of items you provide.
+This is the default option. It automatically selects the best data structure based on the number of items you provide.
 
 #### Array
 
@@ -229,15 +233,27 @@ FastData uses advanced data analysis techniques to generate optimized data struc
 It uses the analysis to create so-called early-exits, which are fast `O(1)` checks on your input before doing any `O(n)`
 checks on the actual dataset.
 
-## Best practices
-
-* Put the most often queried items first in the input data. It can speed up query speed for some data structures.
-
 ## FAQ
 
-* Q: Why not use System.Collections.Frozen?
-* A: There are several reasons:
-    * Frozen comes with considerable runtime overhead
-    * Frozen is only available in .NET 8.0+
-    * Frozen only provides a few of the optimizations provided in FastData
-    * Frozen is only available in C#. FastData can produce data structures in many languages.
+#### Why not use System.Collections.Frozen?
+There are several reasons:
+* Frozen comes with considerable runtime overhead
+* Frozen is only available in .NET 8.0+
+* Frozen only provides a few of the optimizations provided in FastData
+* Frozen is only available in C#. FastData can produce data structures in many languages.
+
+#### Does it support case-insensitive lookups?
+No, not yet.
+
+#### Does it support custom equality comparers?
+No, not yet.
+
+#### Does it support keyed lookup?
+No, not yet.
+
+#### Are there any best pratcies for using FastData?
+Yes. See below:
+* Put the most often queried items first in the input data. It can speed up query speed for some data structures.
+
+#### Can I use it for dynamic data?
+No, FastData is designed for static data only. It generates code at compile time, so the data must be known beforehand.

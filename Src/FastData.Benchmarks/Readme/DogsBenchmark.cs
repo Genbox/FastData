@@ -12,13 +12,13 @@ public class DogsBenchmark
     public bool Array() => _array.Contains("Beagle");
 
     [Benchmark]
-    public bool Generated() => Dogs.Contains("Beagle");
+    public bool FastData() => Dogs.Contains("Beagle");
 
     private static class Dogs
     {
         public static bool Contains(string value)
         {
-            if ((49280UL & (1UL << ((value.Length - 1) % 64))) == 0)
+            if ((49280UL & (1UL << (value.Length - 1))) == 0)
                 return false;
 
             return value switch
