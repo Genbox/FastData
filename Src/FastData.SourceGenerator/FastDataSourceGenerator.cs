@@ -58,7 +58,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                     {
                         if (!FastDataGenerator.TryGenerate(combinedCfg.Data, combinedCfg.FDConfig, CSharpCodeGenerator.Create(combinedCfg.CSConfig), out string? source))
                         {
-                            StructureType ds = (StructureType)combinedCfg.FDConfig.StructureType;
+                            StructureType ds = combinedCfg.FDConfig.StructureType;
 
                             if (ds != StructureType.Auto)
                                 throw new InvalidOperationException($"Failed to generate code with '{ds}'. Try setting DataStructure to Auto.");

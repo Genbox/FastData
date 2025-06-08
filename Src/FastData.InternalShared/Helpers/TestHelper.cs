@@ -83,19 +83,6 @@ public static class TestHelper
         return true;
     }
 
-    /// <summary>This variant of TryGenerate calls the public API of FastDataGenerator such that we test it like a user would invoke it.</summary>
-    public static bool TryGenerate<T>(Func<string, ICodeGenerator> gen, TestData<T> testData, out GeneratorSpec spec)
-    {
-        if (FastDataGenerator.TryGenerate(testData.Values, new FastDataConfig(testData.StructureType), gen(testData.Identifier), out string? source))
-        {
-            spec = new GeneratorSpec(testData.Identifier, source!);
-            return true;
-        }
-
-        spec = default;
-        return false;
-    }
-
     /// <summary>This variant of TryGenerate bypasses the public API to test more advanced combinations of parameters</summary>
     public static bool TryGenerate<T>(Func<string, ICodeGenerator> gen, TestVector<T> vector, out GeneratorSpec spec)
     {

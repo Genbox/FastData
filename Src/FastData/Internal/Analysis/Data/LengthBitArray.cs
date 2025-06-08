@@ -28,7 +28,7 @@ internal sealed class LengthBitArray(int length = 64)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Get(int index)
     {
-        if ((uint)index >= (uint)_length)
+        if (unchecked((uint)index >= (uint)_length))
             throw new ArgumentException("Index out of range: " + index, nameof(index));
 
         return (_array[index >> 6] & (1UL << ((index & 63) - 1))) != 0; //-1 because we want a length of 1 to set the 0th bit
@@ -43,15 +43,18 @@ internal sealed class LengthBitArray(int length = 64)
         if (index >= _length)
             Expand(index + 1);
 
-        ulong mask = 1UL << ((index & 63) - 1); //-1 because we want a length of 1 to set the 0th bit
-        ref ulong slot = ref _array[index >> 6];
-        bool alreadySet = (slot & mask) != 0;
+        unchecked
+        {
+            ulong mask = 1UL << ((index & 63) - 1); //-1 because we want a length of 1 to set the 0th bit
+            ref ulong slot = ref _array[index >> 6];
+            bool alreadySet = (slot & mask) != 0;
 
-        if (!alreadySet)
-            Count++;
+            if (!alreadySet)
+                Count++;
 
-        slot |= mask;
-        return alreadySet;
+            slot |= mask;
+            return alreadySet;
+        }
     }
 
     private void Expand(int newLength)
