@@ -151,7 +151,14 @@ public static partial class FastDataGenerator
         else if (ds == StructureType.BinarySearch)
             yield return new BinarySearchStructure<T>(props.DataType, DefaultStringComparison);
         else if (ds == StructureType.HashSet)
-            yield return new HashSetChainStructure<T>(HashData.Create(data, props.DataType, config.HashCapacityFactor));
+        {
+            HashData hashData = HashData.Create(data, props.DataType, config.HashCapacityFactor);
+
+            if (hashData.HashCodesPerfect)
+                yield return new HashSetPerfectStructure<T>(hashData);
+
+            yield return new HashSetChainStructure<T>(hashData);
+        }
         else
             throw new InvalidOperationException($"Unsupported DataStructure {ds}");
     }
