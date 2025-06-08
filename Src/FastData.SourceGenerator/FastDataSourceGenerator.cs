@@ -1,11 +1,15 @@
 using System.Collections.Immutable;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp;
+using Genbox.FastData.SourceGenerator.Attributes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using StructureType = Genbox.FastData.Enums.StructureType;
 
-namespace Genbox.FastData.SourceGenerator.Internal;
+namespace Genbox.FastData.SourceGenerator;
 
 [Generator]
 internal class FastDataSourceGenerator : IIncrementalGenerator
@@ -54,7 +58,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                     {
                         if (!FastDataGenerator.TryGenerate(combinedCfg.Data, combinedCfg.FDConfig, CSharpCodeGenerator.Create(combinedCfg.CSConfig), out string? source))
                         {
-                            StructureType ds = combinedCfg.FDConfig.StructureType;
+                            StructureType ds = (StructureType)combinedCfg.FDConfig.StructureType;
 
                             if (ds != StructureType.Auto)
                                 throw new InvalidOperationException($"Failed to generate code with '{ds}'. Try setting DataStructure to Auto.");

@@ -1,6 +1,6 @@
 using Genbox.FastData.Generator.CSharp;
 
-namespace Genbox.FastData.SourceGenerator.Internal;
+namespace Genbox.FastData.SourceGenerator;
 
 internal class CombinedConfig(object[] data, FastDataConfig fdConfig, CSharpCodeGeneratorConfig csConfig)
 {

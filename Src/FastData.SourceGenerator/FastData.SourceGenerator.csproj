@@ -11,53 +11,31 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" PrivateAssets="All" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="All" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
-  </PropertyGroup>
-
-  <Target Name="GetDependencyTargetPaths">
-    <ItemGroup>
-      <TargetPathWithTargetPlatformMoniker Include="$(PkgMicrosoft_Extensions_Logging_Abstractions)\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll" IncludeRuntimeDependency="false" />
-    </ItemGroup>
-  </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\FastData.Generator.CSharp\FastData.Generator.CSharp.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\FastData.Generator\FastData.Generator.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\FastData\FastData.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\FastData.SourceGenerator.Attributes\FastData.SourceGenerator.Attributes.csproj" PrivateAssets="All" />
+  </ItemGroup>
 
   <PropertyGroup Condition="'$(IsPack)' != 'true'">
     <DefineConstants>$(DefineConstants);INTERNAL_BUILD</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(PkgMicrosoft_Extensions_Logging_Abstractions)\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\FastData\**\*.cs">
-      <Link>FastData\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Remove="..\FastData\bin\**" />
-    <Compile Remove="..\FastData\obj\**" />
-    <Compile Remove="..\FastData\Properties\**" />
-  </ItemGroup>
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 
-  <ItemGroup>
-    <Compile Include="..\FastData.Generator\**\*.cs">
-      <Link>FastDataGen\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Remove="..\FastData.Generator\bin\**" />
-    <Compile Remove="..\FastData.Generator\obj\**" />
-    <Compile Remove="..\FastData.Generator\Properties\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\FastData.Generator.CSharp\**\*.cs">
-      <Link>FastDataGenCSharp\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Remove="..\FastData.Generator.CSharp\bin\**" />
-    <Compile Remove="..\FastData.Generator.CSharp\obj\**" />
-    <Compile Remove="..\FastData.Generator.CSharp\Properties\**" />
+    <!-- We include the attribute twice. One for the source generator and one for the consumer -->
+    <None Include="$(OutputPath)\$(AssemblyName).Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\$(AssemblyName).Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="false" />
+    <None Include="$(OutputPath)\Genbox.FastData.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\Genbox.FastData.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\Genbox.FastData.Generator.CSharp.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
 </Project>

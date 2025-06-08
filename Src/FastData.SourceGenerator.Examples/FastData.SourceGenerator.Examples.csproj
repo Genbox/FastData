@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Remove="..\FastData.SourceGenerator\FastData.SourceGenerator.csproj" />
-    <ProjectReference Include="..\FastData.SourceGenerator\FastData.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
+    <PackageReference Include="Genbox.FastData.SourceGenerator" />
   </ItemGroup>
 
 </Project>

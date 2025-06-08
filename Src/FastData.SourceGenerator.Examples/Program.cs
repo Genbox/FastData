@@ -1,4 +1,4 @@
-using Genbox.FastData.SourceGenerator;
+using Genbox.FastData.SourceGenerator.Attributes;
 
 [assembly: FastData<string>("Dogs", ["Labrador", "German Shepherd", "Golden Retriever"])]
 

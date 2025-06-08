@@ -126,6 +126,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.Rust.Ben
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.Rust.Shared", "Src\FastData.Generator.Rust.Shared\FastData.Generator.Rust.Shared.csproj", "{EAC5FF10-F7A3-4F9E-AD29-D921492DC8D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.SourceGenerator.Attributes", "Src\FastData.SourceGenerator.Attributes\FastData.SourceGenerator.Attributes.csproj", "{8EADDF3D-A395-4D17-AA2E-4006858E6EA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -227,6 +229,10 @@ Global
 		{EAC5FF10-F7A3-4F9E-AD29-D921492DC8D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAC5FF10-F7A3-4F9E-AD29-D921492DC8D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAC5FF10-F7A3-4F9E-AD29-D921492DC8D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EADDF3D-A395-4D17-AA2E-4006858E6EA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EADDF3D-A395-4D17-AA2E-4006858E6EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EADDF3D-A395-4D17-AA2E-4006858E6EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EADDF3D-A395-4D17-AA2E-4006858E6EA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{24810DE3-EAFF-4FA9-8813-209C15AC75EC} = {B774BCA8-4D2D-44E7-903F-0FFC349FCC85}
@@ -253,5 +259,6 @@ Global
 		{9E8DD07A-0453-41BB-8F35-527A92B5E52E} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
 		{58AE6356-6FC2-4942-AF52-E8DB0DDDA5F5} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
 		{EAC5FF10-F7A3-4F9E-AD29-D921492DC8D9} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
+		{8EADDF3D-A395-4D17-AA2E-4006858E6EA6} = {B9FFA687-707F-4F18-A7F1-92CD0B9A258A}
 	EndGlobalSection
 EndGlobal

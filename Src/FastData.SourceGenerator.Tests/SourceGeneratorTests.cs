@@ -1,7 +1,5 @@
-using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.CSharp.Enums;
-using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Helpers;
+using Genbox.FastData.SourceGenerator.Attributes;
 
 namespace Genbox.FastData.SourceGenerator.Tests;
 
@@ -14,7 +12,7 @@ public class SourceGeneratorTests
     public void GenericTest()
     {
         const string source = """
-                              using Genbox.FastData.SourceGenerator;
+                              using Genbox.FastData.SourceGenerator.Attributes;
 
                               [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"])]
                               """;
@@ -38,8 +36,7 @@ public class SourceGeneratorTests
     public async Task DataStructureTest(StructureType ds)
     {
         string source = $"""
-                         using Genbox.FastData.SourceGenerator;
-                         using Genbox.FastData.Enums;
+                         using Genbox.FastData.SourceGenerator.Attributes;
 
                          [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], StructureType = StructureType.{ds})]
                          """;
@@ -55,7 +52,7 @@ public class SourceGeneratorTests
     public async Task NamespaceTest()
     {
         const string source = """
-                              using Genbox.FastData.SourceGenerator;
+                              using Genbox.FastData.SourceGenerator.Attributes;
 
                               [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], Namespace = "MyNamespace")]
                               """;
@@ -73,8 +70,7 @@ public class SourceGeneratorTests
     public async Task ClassVisibilityTest(ClassVisibility visibility)
     {
         string source = $"""
-                         using Genbox.FastData.SourceGenerator;
-                         using Genbox.FastData.Generator.CSharp.Enums;
+                         using Genbox.FastData.SourceGenerator.Attributes;
 
                          [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], ClassVisibility = ClassVisibility.{visibility})]
                          """;
@@ -94,8 +90,7 @@ public class SourceGeneratorTests
     public async Task ClassTypeTest(ClassType type)
     {
         string source = $"""
-                         using Genbox.FastData.SourceGenerator;
-                         using Genbox.FastData.Generator.CSharp.Enums;
+                         using Genbox.FastData.SourceGenerator.Attributes;
 
                          [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], ClassType = ClassType.{type})]
                          """;
@@ -110,7 +105,7 @@ public class SourceGeneratorTests
 
     private static string RunGenerator(string source)
     {
-        string output = SourceGenHelper.RunSourceGenerator<Internal.FastDataSourceGenerator>(source, false, out var compilerDiagnostics, out var codeGenDiagnostics);
+        string output = SourceGenHelper.RunSourceGenerator<FastDataSourceGenerator>(source, false, out var compilerDiagnostics, out var codeGenDiagnostics);
         Assert.Empty(compilerDiagnostics);
         Assert.Empty(codeGenDiagnostics);
         Assert.NotEmpty(output); //We test the source later to show diagnostics first
