@@ -1,5 +1,6 @@
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
+using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 

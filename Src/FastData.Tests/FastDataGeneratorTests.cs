@@ -1,9 +1,6 @@
-using Genbox.FastData.Abstracts;
-using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.TestClasses;
-using Newtonsoft.Json;
 
 namespace Genbox.FastData.Tests;
 
@@ -33,19 +30,5 @@ public class FastDataGeneratorTests
             data.Add(new TestData<double>(type, [double.MinValue, 0, double.MaxValue]));
         }
         return data;
-    }
-
-    private sealed class DummyGenerator : ICodeGenerator
-    {
-        public bool UseUTF16Encoding => true;
-
-        public bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
-        {
-            source = JsonConvert.SerializeObject(context, new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            });
-            return true;
-        }
     }
 }

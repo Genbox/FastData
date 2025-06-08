@@ -1,7 +1,7 @@
 using System.Text;
-using Genbox.FastData.Abstracts;
-using Genbox.FastData.EarlyExits;
 using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.EarlyExits;
 
 namespace Genbox.FastData.Generator.Framework.Definitions;
 

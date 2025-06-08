@@ -1,7 +1,8 @@
-using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Misc;
-using Genbox.FastData.StringHash;
+using Genbox.FastData.Generators;
+using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.StringHash;
+using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Misc;
 

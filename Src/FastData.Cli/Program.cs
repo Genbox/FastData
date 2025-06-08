@@ -3,13 +3,12 @@ using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Parsing;
 using System.Globalization;
-using Genbox.FastData.Abstracts;
-using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus;
 using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.Rust;
+using Genbox.FastData.Generators.Abstracts;
 using Spectre.Console;
 
 namespace Genbox.FastData.Cli;

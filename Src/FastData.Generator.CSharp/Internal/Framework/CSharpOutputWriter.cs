@@ -1,6 +1,6 @@
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.Framework;
-using Genbox.FastData.Helpers;
+using Genbox.FastData.Generators.Helpers;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 

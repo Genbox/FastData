@@ -1,4 +1,3 @@
-using Genbox.FastData.Configs;
 using Genbox.FastData.Generator.CSharp;
 
 namespace Genbox.FastData.Examples;

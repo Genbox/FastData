@@ -3,6 +3,9 @@ using Genbox.FastData.Generator.Framework.Interfaces;
 using Genbox.FastData.Generator.Rust.Internal;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.Generator.Rust.Internal.Generators;
+using Genbox.FastData.Generators;
+using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.Rust;
 

@@ -1,4 +1,4 @@
-using Genbox.FastData.Configs;
+using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Abstracts;
@@ -12,7 +12,6 @@ using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Analysis.SegmentGenerators;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
-using Genbox.FastData.StringHash;
 using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;

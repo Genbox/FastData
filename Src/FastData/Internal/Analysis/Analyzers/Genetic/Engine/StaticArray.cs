@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
 
-public sealed class StaticArray<T>(int capacity) : IEnumerable<T> where T : struct
+internal sealed class StaticArray<T>(int capacity) : IEnumerable<T> where T : struct
 {
     private readonly T[] _array = new T[capacity];
 

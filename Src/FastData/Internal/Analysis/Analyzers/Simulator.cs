@@ -1,6 +1,6 @@
-using Genbox.FastData.Abstracts;
-using Genbox.FastData.Configs;
-using Genbox.FastData.Misc;
+using Genbox.FastData.Generators;
+using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 

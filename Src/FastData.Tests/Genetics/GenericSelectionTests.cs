@@ -10,7 +10,7 @@ public class GenericSelectionTests
 {
     [Theory]
     [MemberData(nameof(GetSelectionsWithRandom))]
-    public void ShouldSelectHighestFitness(ISelection selection)
+    public void ShouldSelectHighestFitness(object selection)
     {
         StaticArray<Entity> population = new StaticArray<Entity>(3)
         {
@@ -23,7 +23,7 @@ public class GenericSelectionTests
         List<int> selected = new List<int>();
         for (int i = 0; i < 100; i++)
         {
-            selection.Process(population, selected, 3);
+            ((ISelection)selection).Process(population, selected, 3);
         }
 
         //Setup the counters, starting with a value of 0
@@ -47,12 +47,12 @@ public class GenericSelectionTests
 
     [Theory]
     [MemberData(nameof(GetAllSelections))]
-    public void AllShouldReturnValidIndexes(ISelection selection)
+    public void AllShouldReturnValidIndexes(object selection)
     {
         StaticArray<Entity> population = GeneticsHelper.GeneratePopulation(10, 10, 100);
 
         List<int> selectedIndexes = new List<int>();
-        selection.Process(population, selectedIndexes, 10);
+        ((ISelection)selection).Process(population, selectedIndexes, 10);
 
         Assert.True(selectedIndexes.Count >= 1, "We expect it to return at least one element");
         Assert.All(selectedIndexes, index => Assert.InRange(index, 0, population.Count - 1));
@@ -60,11 +60,11 @@ public class GenericSelectionTests
 
     [Theory]
     [MemberData(nameof(GetSeededSelections))]
-    public void ShouldBeDeterministicWithSameSeed(ISelection a, ISelection b) => TestSeed(a, b, true);
+    public void ShouldBeDeterministicWithSameSeed(object a, object b) => TestSeed((ISelection)a, (ISelection)b, true);
 
     [Theory]
     [MemberData(nameof(GetSeededDiffSelections))]
-    public void ShouldProduceDifferentResultsWithDifferentSeeds(ISelection a, ISelection b) => TestSeed(a, b, false);
+    public void ShouldProduceDifferentResultsWithDifferentSeeds(object a, object b) => TestSeed((ISelection)a, (ISelection)b, false);
 
     private static void TestSeed(ISelection a, ISelection b, bool equal)
     {
@@ -82,7 +82,7 @@ public class GenericSelectionTests
             Assert.NotEqual(indexes1, indexes2);
     }
 
-    public static TheoryData<ISelection> GetAllSelections() =>
+    public static TheoryData<object> GetAllSelections() =>
     [
         new BoltzmannSelection(10, SharedRandom.Instance),
         new EliteSelection(0.5),
@@ -94,12 +94,12 @@ public class GenericSelectionTests
         new TournamentSelection(4, SharedRandom.Instance)
     ];
 
-    public static TheoryData<ISelection, ISelection> GetSeededSelections()
+    public static TheoryData<object, object> GetSeededSelections()
     {
         DefaultRandom rng1 = new DefaultRandom(42);
         DefaultRandom rng2 = new DefaultRandom(42);
 
-        return new TheoryData<ISelection, ISelection>
+        return new TheoryData<object, object>
         {
             { new BoltzmannSelection(10, rng1), new BoltzmannSelection(10, rng2) },
             { new RandomSelection(false, rng1), new RandomSelection(false, rng2) },
@@ -111,12 +111,12 @@ public class GenericSelectionTests
         };
     }
 
-    public static TheoryData<ISelection, ISelection> GetSeededDiffSelections()
+    public static TheoryData<object, object> GetSeededDiffSelections()
     {
         DefaultRandom rng1 = new DefaultRandom(42);
         DefaultRandom rng2 = new DefaultRandom(99);
 
-        return new TheoryData<ISelection, ISelection>
+        return new TheoryData<object, object>
         {
             { new BoltzmannSelection(10, rng1), new BoltzmannSelection(10, rng2) },
             { new RandomSelection(false, rng1), new RandomSelection(false, rng2) },
@@ -128,7 +128,7 @@ public class GenericSelectionTests
         };
     }
 
-    public static TheoryData<ISelection> GetSelectionsWithRandom() =>
+    public static TheoryData<object> GetSelectionsWithRandom() =>
     [
         new BoltzmannSelection(1, SharedRandom.Instance),
         new RankSelection(SharedRandom.Instance),

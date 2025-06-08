@@ -1,5 +1,5 @@
-using Genbox.FastData.Extensions;
 using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generators.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 

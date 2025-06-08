@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
-using Genbox.FastData.Abstracts;
-using Genbox.FastData.Configs;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generators;
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Misc;

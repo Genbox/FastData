@@ -3,7 +3,7 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Abstracts;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
 
-public struct Entity
+internal struct Entity
 {
     internal Entity(IGene[] genes)
     {

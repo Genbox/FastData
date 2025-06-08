@@ -1,6 +1,6 @@
-using Genbox.FastData.Abstracts;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.InternalShared.Helpers;
 using Xunit.Abstractions;
 

@@ -1,5 +1,4 @@
-using Genbox.FastData.Abstracts;
-using Genbox.FastData.Configs;
+using Genbox.FastData.InternalShared;
 
 namespace Genbox.FastData.Generator.Tests;
 
@@ -14,10 +13,4 @@ public class GenericTests
 
     [Fact]
     public Task VerifyChecksTest() => VerifyChecks.Run();
-
-    private class DummyGenerator : ICodeGenerator
-    {
-        public bool UseUTF16Encoding => false;
-        public bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source) => throw new NotSupportedException();
-    }
 }

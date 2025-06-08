@@ -2,8 +2,8 @@ using System.Text;
 using Genbox.FastData.Generator.CSharp.Internal;
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Internal.Hashes;
-using Genbox.FastData.StringHash;
 
 namespace Genbox.FastData.Testbed.Tests;
 

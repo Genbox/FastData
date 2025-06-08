@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="xunit.extensibility.core" />
   </ItemGroup>
 
