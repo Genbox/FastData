@@ -1,7 +1,9 @@
 ﻿using Genbox.FastData.Generator.CSharp.Enums;
+using JetBrains.Annotations;
 
 namespace Genbox.FastData.SourceGenerator;
 
+[UsedImplicitly(ImplicitUseTargetFlags.Members)]
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 public class FastDataAttribute<T> : Attribute
 {
