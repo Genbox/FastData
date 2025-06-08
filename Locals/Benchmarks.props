@@ -1,8 +1,10 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <ItemGroup>
-    <PackageReference Remove="BenchmarkDotNet" />
-    <Using Remove="BenchmarkDotNet.Attributes" />
-  </ItemGroup>
+    <!-- Disable BenchmarkDotNet as code generators don't need it. We will special handle other benchmark projects -->
+
+    <ItemGroup>
+        <PackageReference Remove="BenchmarkDotNet"/>
+        <Using Remove="BenchmarkDotNet.Attributes"/>
+    </ItemGroup>
 
 </Project>

@@ -141,7 +141,7 @@ public static class TestHelper
         }
 
         ICodeGenerator generator = gen(vector.Identifier);
-        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(structureType, FastDataGenerator.DefaultStringComparison, props, null);
+        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(structureType, FastDataGenerator.DefaultStringComparison, props);
         if (generator.TryGenerate(genCfg, context, out string? source))
         {
             spec = new GeneratorSpec(vector.Identifier, source);

@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
@@ -9,11 +8,10 @@ namespace Genbox.FastData.Generators;
 
 public sealed class GeneratorConfig<T>
 {
-    internal GeneratorConfig(StructureType structureType, StringComparison stringComparison, DataProperties<T> props, Expression<HashFunc<string>>? stringHash)
+    internal GeneratorConfig(StructureType structureType, StringComparison stringComparison, DataProperties<T> props)
     {
         StructureType = structureType;
         StringComparison = stringComparison;
-        StringHash = stringHash;
         DataType = props.DataType;
         EarlyExits = GetEarlyExits(props, structureType);
         Constants = CreateConstants(props);
@@ -24,7 +22,6 @@ public sealed class GeneratorConfig<T>
     public StringComparison StringComparison { get; }
     public DataType DataType { get; }
     public IEarlyExit[] EarlyExits { get; }
-    public Expression<HashFunc<string>>? StringHash { get; set; }
     public Constants<T> Constants { get; }
     public Metadata Metadata { get; }
 

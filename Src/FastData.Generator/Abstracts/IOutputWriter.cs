@@ -1,4 +1,4 @@
-namespace Genbox.FastData.Generators.Abstracts;
+namespace Genbox.FastData.Generator.Abstracts;
 
 public interface IOutputWriter
 {

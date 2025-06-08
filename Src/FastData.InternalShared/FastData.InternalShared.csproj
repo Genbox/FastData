@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);RS0016;RS0017;RS0037</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
