@@ -7,7 +7,6 @@ namespace Genbox.FastData.InternalShared.Helpers;
 
 public static class TestVectorHelper
 {
-
     public static IEnumerable<ITestVector> GetTestVectors()
     {
         foreach (ITestVector testVector in GenerateTestVectors(GetSingleValues(), typeof(SingleValueStructure<>)))

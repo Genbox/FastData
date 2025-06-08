@@ -6,6 +6,8 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Generators;
 
+/// <summary>Provides configuration data for code generators in the FastData library.</summary>
+/// <typeparam name="T">The type of data being generated.</typeparam>
 public sealed class GeneratorConfig<T>
 {
     internal GeneratorConfig(StructureType structureType, StringComparison stringComparison, DataProperties<T> props)
@@ -18,11 +20,22 @@ public sealed class GeneratorConfig<T>
         Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.Now);
     }
 
+    /// <summary>Gets the structure type that the generator will create.</summary>
     public StructureType StructureType { get; }
+
+    /// <summary>Gets the string comparison mode to use.</summary>
     public StringComparison StringComparison { get; }
+
+    /// <summary>Gets the data type being generated.</summary>
     public DataType DataType { get; }
+
+    /// <summary>Gets the set of early exit strategies used by the generator to optimize code generation.</summary>
     public IEarlyExit[] EarlyExits { get; }
+
+    /// <summary>Gets the constants used by the generator, such as min/max values or string lengths.</summary>
     public Constants<T> Constants { get; }
+
+    /// <summary>Gets the metadata about the generator, such as version and creation time.</summary>
     public Metadata Metadata { get; }
 
     private static Constants<T> CreateConstants(DataProperties<T> props)

@@ -103,13 +103,13 @@ Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.Equals(Genbox.FastDa
 Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.LengthBitSetEarlyExit(ulong BitSet) -> void
 Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit
 Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.<Clone>$() -> Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit!
-Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.Deconstruct(out uint MinValue, out uint MaxValue) -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.Deconstruct(out uint MinLength, out uint MaxLength) -> void
 Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.Equals(Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit? other) -> bool
-Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MaxValue.get -> uint
-Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MaxValue.init -> void
-Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MinMaxLengthEarlyExit(uint MinValue, uint MaxValue) -> void
-Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MinValue.get -> uint
-Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MinValue.init -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MaxLength.get -> uint
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MaxLength.init -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MinLength.get -> uint
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MinLength.init -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MinMaxLengthEarlyExit(uint MinLength, uint MaxLength) -> void
 Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>
 Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.<Clone>$() -> Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>!
 Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.Deconstruct(out T MinValue, out T MaxValue) -> void

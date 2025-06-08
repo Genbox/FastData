@@ -1,16 +1,20 @@
 namespace Genbox.FastData.SourceGenerator.Attributes;
 
+/// <summary>Specifies the data structure type to generate.</summary>
 public enum StructureType : byte
 {
+    /// <summary>Automatically select the best structure type.</summary>
     Auto = 0,
 
-    // O(n) data structures
+    /// <summary>Use a simple array structure. Complexity: O(n).</summary>
     Array,
+
+    /// <summary>Use a conditional structure. Complexity: O(n).</summary>
     Conditional,
 
-    // O(log(n)) data structures
+    /// <summary>Use a binary search structure. Complexity: O(log n).</summary>
     BinarySearch,
 
-    // O(1) data structures
+    /// <summary>Use a hash set structure. Complexity: O(1).</summary>
     HashSet
 }

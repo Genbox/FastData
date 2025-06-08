@@ -19,6 +19,14 @@ public static partial class FastDataGenerator
 {
     internal const StringComparison DefaultStringComparison = StringComparison.Ordinal;
 
+    /// <summary>Generate source code for the provided data.</summary>
+    /// <param name="data">The data to generate from. Note that all objects must be the same type.</param>
+    /// <param name="fdCfg">The configuration to use.</param>
+    /// <param name="generator">The code generator to use.</param>
+    /// <param name="source">The source code with the generated data structure.</param>
+    /// <param name="factory">A logging factory</param>
+    /// <returns>True, if the generation succeeded, Otherwise, it returns false.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when you gave an unsupported data type in data.</exception>
     public static bool TryGenerate(object[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null) => data[0] switch
     {
         char => TryGenerate(data.Cast<char>().ToArray(), fdCfg, generator, out source, factory),
@@ -36,6 +44,14 @@ public static partial class FastDataGenerator
         _ => throw new InvalidOperationException($"Unsupported data type: {data[0].GetType().Name}")
     };
 
+    /// <summary>Generate source code for the provided data.</summary>
+    /// <param name="data">The data to generate from.</param>
+    /// <param name="fdCfg">The configuration to use.</param>
+    /// <param name="generator">The code generator to use.</param>
+    /// <param name="source">The source code with the generated data structure.</param>
+    /// <param name="factory">A logging factory</param>
+    /// <returns>True, if the generation succeeded, Otherwise, it returns false.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when you gave an unsupported data type in data.</exception>
     public static bool TryGenerate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, out string? source, ILoggerFactory? factory = null) where T : notnull
     {
         if (data.Length == 0)
