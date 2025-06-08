@@ -28,5 +28,6 @@ jobs:
         env:
           NUGET_KEY: ${{secrets.NUGET_KEY}}
           PWSHG_KEY: ${{secrets.PWSHG_KEY}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
           ./Scripts/Publish.ps1
