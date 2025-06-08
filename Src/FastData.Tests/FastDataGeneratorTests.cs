@@ -6,9 +6,15 @@ namespace Genbox.FastData.Tests;
 
 public class FastDataGeneratorTests
 {
+    [Fact]
+    public void TryGenerate_ThrowOnInvalidType()
+    {
+        Assert.Throws<InvalidOperationException>(() => FastDataGenerator.TryGenerate([DateTime.Now, DateTime.UtcNow], new FastDataConfig(StructureType.Array), new DummyGenerator(), out _));
+    }
+
     [Theory]
     [MemberData(nameof(GetTestData))]
-    public async Task TryGenerateTest(ITestData testData)
+    public async Task TryGenerate_CommonInputs(ITestData testData)
     {
         testData.Generate(_ => new DummyGenerator(), out GeneratorSpec spec);
         Assert.NotNull(spec.Source);

@@ -39,6 +39,9 @@ public static partial class FastDataGenerator
         if (data.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
 
+        if (!IsValidType<T>())
+            throw new InvalidOperationException($"Unsupported data type: {typeof(T).Name}");
+
         factory ??= NullLoggerFactory.Instance;
 
         //Validate that we only have unique data
@@ -85,6 +88,13 @@ public static partial class FastDataGenerator
 
         GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, DefaultStringComparison, props);
         return generator.TryGenerate(genCfg, context, out source);
+    }
+
+    private static bool IsValidType<T>()
+    {
+        Type type = typeof(T);
+
+        return type == typeof(char) || type == typeof(sbyte) || type == typeof(byte) || type == typeof(short) || type == typeof(ushort) || type == typeof(int) || type == typeof(uint) || type == typeof(long) || type == typeof(ulong) || type == typeof(float) || type == typeof(double) || type == typeof(string);
     }
 
     private static IEnumerable<IStructure<T>> GetDataStructureCandidates<T>(T[] data, FastDataConfig config, DataProperties<T> props)
