@@ -1,0 +1,28 @@
+#nullable enable
+Genbox.FastData.SourceGenerator.Attributes.ClassType
+Genbox.FastData.SourceGenerator.Attributes.ClassType.Instance = 2 -> Genbox.FastData.SourceGenerator.Attributes.ClassType
+Genbox.FastData.SourceGenerator.Attributes.ClassType.Static = 1 -> Genbox.FastData.SourceGenerator.Attributes.ClassType
+Genbox.FastData.SourceGenerator.Attributes.ClassType.Struct = 3 -> Genbox.FastData.SourceGenerator.Attributes.ClassType
+Genbox.FastData.SourceGenerator.Attributes.ClassType.Unknown = 0 -> Genbox.FastData.SourceGenerator.Attributes.ClassType
+Genbox.FastData.SourceGenerator.Attributes.ClassVisibility
+Genbox.FastData.SourceGenerator.Attributes.ClassVisibility.Internal = 1 -> Genbox.FastData.SourceGenerator.Attributes.ClassVisibility
+Genbox.FastData.SourceGenerator.Attributes.ClassVisibility.Public = 2 -> Genbox.FastData.SourceGenerator.Attributes.ClassVisibility
+Genbox.FastData.SourceGenerator.Attributes.ClassVisibility.Unknown = 0 -> Genbox.FastData.SourceGenerator.Attributes.ClassVisibility
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.ClassType.get -> Genbox.FastData.SourceGenerator.Attributes.ClassType
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.ClassType.set -> void
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.ClassVisibility.get -> Genbox.FastData.SourceGenerator.Attributes.ClassVisibility
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.ClassVisibility.set -> void
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.Data.get -> T[]!
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.FastDataAttribute(string! name, T[]! data) -> void
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.Name.get -> string!
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.Namespace.get -> string?
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.Namespace.set -> void
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.StructureType.get -> Genbox.FastData.SourceGenerator.Attributes.StructureType
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.StructureType.set -> void
+Genbox.FastData.SourceGenerator.Attributes.StructureType
+Genbox.FastData.SourceGenerator.Attributes.StructureType.Array = 1 -> Genbox.FastData.SourceGenerator.Attributes.StructureType
+Genbox.FastData.SourceGenerator.Attributes.StructureType.Auto = 0 -> Genbox.FastData.SourceGenerator.Attributes.StructureType
+Genbox.FastData.SourceGenerator.Attributes.StructureType.BinarySearch = 3 -> Genbox.FastData.SourceGenerator.Attributes.StructureType
+Genbox.FastData.SourceGenerator.Attributes.StructureType.Conditional = 2 -> Genbox.FastData.SourceGenerator.Attributes.StructureType
+Genbox.FastData.SourceGenerator.Attributes.StructureType.HashSet = 4 -> Genbox.FastData.SourceGenerator.Attributes.StructureType

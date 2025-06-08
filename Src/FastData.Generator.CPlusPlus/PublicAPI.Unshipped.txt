@@ -1,0 +1,13 @@
+#nullable enable
+Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator
+Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig
+Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig.ClassName.get -> string!
+Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig.ClassName.set -> void
+Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig.CPlusPlusCodeGeneratorConfig(string! className) -> void
+Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig.GeneratorOptions.get -> Genbox.FastData.Generator.CPlusPlus.Enums.CPlusPlusOptions
+Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig.GeneratorOptions.set -> void
+Genbox.FastData.Generator.CPlusPlus.Enums.CPlusPlusOptions
+Genbox.FastData.Generator.CPlusPlus.Enums.CPlusPlusOptions.DisableEarlyExits = 1 -> Genbox.FastData.Generator.CPlusPlus.Enums.CPlusPlusOptions
+Genbox.FastData.Generator.CPlusPlus.Enums.CPlusPlusOptions.None = 0 -> Genbox.FastData.Generator.CPlusPlus.Enums.CPlusPlusOptions
+override Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator.TryGenerate<T>(Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, Genbox.FastData.Generators.Abstracts.IContext! context, out string? source) -> bool
+static Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator.Create(Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig! userCfg) -> Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator!

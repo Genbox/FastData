@@ -1,0 +1,12 @@
+#nullable enable
+Genbox.FastData.Generator.Rust.Enums.RustOptions
+Genbox.FastData.Generator.Rust.Enums.RustOptions.DisableEarlyExits = 1 -> Genbox.FastData.Generator.Rust.Enums.RustOptions
+Genbox.FastData.Generator.Rust.Enums.RustOptions.None = 0 -> Genbox.FastData.Generator.Rust.Enums.RustOptions
+Genbox.FastData.Generator.Rust.RustCodeGenerator
+Genbox.FastData.Generator.Rust.RustCodeGeneratorConfig
+Genbox.FastData.Generator.Rust.RustCodeGeneratorConfig.ClassName.get -> string!
+Genbox.FastData.Generator.Rust.RustCodeGeneratorConfig.ClassName.set -> void
+Genbox.FastData.Generator.Rust.RustCodeGeneratorConfig.GeneratorOptions.get -> Genbox.FastData.Generator.Rust.Enums.RustOptions
+Genbox.FastData.Generator.Rust.RustCodeGeneratorConfig.GeneratorOptions.set -> void
+Genbox.FastData.Generator.Rust.RustCodeGeneratorConfig.RustCodeGeneratorConfig(string! className) -> void
+static Genbox.FastData.Generator.Rust.RustCodeGenerator.Create(Genbox.FastData.Generator.Rust.RustCodeGeneratorConfig! userCfg) -> Genbox.FastData.Generator.Rust.RustCodeGenerator!

@@ -1,0 +1,169 @@
+#nullable enable
+Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.Boolean = 3 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.Byte = 6 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.Char = 4 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.Double = 14 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.Int16 = 7 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.Int32 = 9 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.Int64 = 11 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.Null = 0 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.SByte = 5 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.Single = 13 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.String = 18 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.UInt16 = 8 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.UInt32 = 10 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.DataType.UInt64 = 12 -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Enums.StructureType
+Genbox.FastData.Enums.StructureType.Array = 1 -> Genbox.FastData.Enums.StructureType
+Genbox.FastData.Enums.StructureType.Auto = 0 -> Genbox.FastData.Enums.StructureType
+Genbox.FastData.Enums.StructureType.BinarySearch = 3 -> Genbox.FastData.Enums.StructureType
+Genbox.FastData.Enums.StructureType.Conditional = 2 -> Genbox.FastData.Enums.StructureType
+Genbox.FastData.Enums.StructureType.HashSet = 4 -> Genbox.FastData.Enums.StructureType
+Genbox.FastData.FastDataConfig
+Genbox.FastData.FastDataConfig.FastDataConfig(Genbox.FastData.Enums.StructureType structureType = Genbox.FastData.Enums.StructureType.Auto) -> void
+Genbox.FastData.FastDataConfig.HashCapacityFactor.get -> int
+Genbox.FastData.FastDataConfig.HashCapacityFactor.set -> void
+Genbox.FastData.FastDataConfig.StructureType.get -> Genbox.FastData.Enums.StructureType
+Genbox.FastData.FastDataConfig.StructureType.set -> void
+Genbox.FastData.FastDataGenerator
+Genbox.FastData.Generators.Abstracts.ICodeGenerator
+Genbox.FastData.Generators.Abstracts.ICodeGenerator.TryGenerate<T>(Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, Genbox.FastData.Generators.Abstracts.IContext! context, out string? source) -> bool
+Genbox.FastData.Generators.Abstracts.ICodeGenerator.UseUTF16Encoding.get -> bool
+Genbox.FastData.Generators.Abstracts.IContext
+Genbox.FastData.Generators.Abstracts.IEarlyExit
+Genbox.FastData.Generators.Constants<T>
+Genbox.FastData.Generators.Constants<T>.Constants(uint itemCount) -> void
+Genbox.FastData.Generators.Constants<T>.ItemCount.get -> uint
+Genbox.FastData.Generators.Constants<T>.MaxStringLength.get -> uint
+Genbox.FastData.Generators.Constants<T>.MaxStringLength.set -> void
+Genbox.FastData.Generators.Constants<T>.MaxValue.get -> T
+Genbox.FastData.Generators.Constants<T>.MaxValue.set -> void
+Genbox.FastData.Generators.Constants<T>.MinStringLength.get -> uint
+Genbox.FastData.Generators.Constants<T>.MinStringLength.set -> void
+Genbox.FastData.Generators.Constants<T>.MinValue.get -> T
+Genbox.FastData.Generators.Constants<T>.MinValue.set -> void
+Genbox.FastData.Generators.Contexts.ArrayContext<T>
+Genbox.FastData.Generators.Contexts.ArrayContext<T>.ArrayContext(T[]! data) -> void
+Genbox.FastData.Generators.Contexts.BinarySearchContext<T>
+Genbox.FastData.Generators.Contexts.BinarySearchContext<T>.BinarySearchContext(T[]! data) -> void
+Genbox.FastData.Generators.Contexts.ConditionalContext<T>
+Genbox.FastData.Generators.Contexts.ConditionalContext<T>.ConditionalContext(T[]! data) -> void
+Genbox.FastData.Generators.Contexts.DefaultContext<T>
+Genbox.FastData.Generators.Contexts.DefaultContext<T>.Data.get -> T[]!
+Genbox.FastData.Generators.Contexts.DefaultContext<T>.DefaultContext(T[]! data) -> void
+Genbox.FastData.Generators.Contexts.EytzingerSearchContext<T>
+Genbox.FastData.Generators.Contexts.EytzingerSearchContext<T>.EytzingerSearchContext(T[]! data) -> void
+Genbox.FastData.Generators.Contexts.HashSetChainContext<T>
+Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.Buckets.get -> int[]!
+Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.Entries.get -> Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>[]!
+Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.HashSetChainContext(T[]! data, int[]! buckets, Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>[]! entries) -> void
+Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>
+Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>.Buckets.get -> Genbox.FastData.Generators.Contexts.Misc.HashSetBucket[]!
+Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>.HashCodes.get -> ulong[]!
+Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>.HashSetLinearContext(T[]! data, Genbox.FastData.Generators.Contexts.Misc.HashSetBucket[]! buckets, ulong[]! hashCodes) -> void
+Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>
+Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>.Data.get -> System.Collections.Generic.KeyValuePair<T, ulong>[]!
+Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>.HashSetPerfectContext(System.Collections.Generic.KeyValuePair<T, ulong>[]! data) -> void
+Genbox.FastData.Generators.Contexts.KeyLengthContext
+Genbox.FastData.Generators.Contexts.KeyLengthContext.KeyLengthContext(System.Collections.Generic.List<string!>?[]! lengths, bool lengthsAreUniq, uint minLength, uint maxLength) -> void
+Genbox.FastData.Generators.Contexts.KeyLengthContext.Lengths.get -> System.Collections.Generic.List<string!>?[]!
+Genbox.FastData.Generators.Contexts.KeyLengthContext.LengthsAreUniq.get -> bool
+Genbox.FastData.Generators.Contexts.KeyLengthContext.MaxLength.get -> uint
+Genbox.FastData.Generators.Contexts.KeyLengthContext.MinLength.get -> uint
+Genbox.FastData.Generators.Contexts.Misc.HashSetBucket
+Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.Deconstruct(out int StartIndex, out int EndIndex) -> void
+Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.EndIndex.get -> int
+Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.EndIndex.init -> void
+Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.Equals(Genbox.FastData.Generators.Contexts.Misc.HashSetBucket other) -> bool
+Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.HashSetBucket() -> void
+Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.HashSetBucket(int StartIndex, int EndIndex) -> void
+Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.StartIndex.get -> int
+Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.StartIndex.init -> void
+Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>
+Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.Deconstruct(out ulong Hash, out int Next, out T Value) -> void
+Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.Equals(Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T> other) -> bool
+Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.Hash.get -> ulong
+Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.Hash.set -> void
+Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.HashSetEntry() -> void
+Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.HashSetEntry(ulong Hash, int Next, T Value) -> void
+Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.Next.get -> int
+Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.Next.set -> void
+Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.Value.get -> T
+Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.Value.set -> void
+Genbox.FastData.Generators.Contexts.SingleValueContext<T>
+Genbox.FastData.Generators.Contexts.SingleValueContext<T>.Item.get -> T
+Genbox.FastData.Generators.Contexts.SingleValueContext<T>.SingleValueContext(T item) -> void
+Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit
+Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.<Clone>$() -> Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit!
+Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.BitSet.get -> ulong
+Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.BitSet.init -> void
+Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.Deconstruct(out ulong BitSet) -> void
+Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.Equals(Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit? other) -> bool
+Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.LengthBitSetEarlyExit(ulong BitSet) -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.<Clone>$() -> Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit!
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.Deconstruct(out uint MinValue, out uint MaxValue) -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.Equals(Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit? other) -> bool
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MaxValue.get -> uint
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MaxValue.init -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MinMaxLengthEarlyExit(uint MinValue, uint MaxValue) -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MinValue.get -> uint
+Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.MinValue.init -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>
+Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.<Clone>$() -> Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>!
+Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.Deconstruct(out T MinValue, out T MaxValue) -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.Equals(Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>? other) -> bool
+Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.MaxValue.get -> T
+Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.MaxValue.init -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.MinMaxValueEarlyExit(T MinValue, T MaxValue) -> void
+Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.MinValue.get -> T
+Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.MinValue.init -> void
+Genbox.FastData.Generators.Extensions.DataTypeExtensions
+Genbox.FastData.Generators.GeneratorConfig<T>
+Genbox.FastData.Generators.GeneratorConfig<T>.Constants.get -> Genbox.FastData.Generators.Constants<T>!
+Genbox.FastData.Generators.GeneratorConfig<T>.DataType.get -> Genbox.FastData.Enums.DataType
+Genbox.FastData.Generators.GeneratorConfig<T>.EarlyExits.get -> Genbox.FastData.Generators.Abstracts.IEarlyExit![]!
+Genbox.FastData.Generators.GeneratorConfig<T>.Metadata.get -> Genbox.FastData.Generators.Metadata!
+Genbox.FastData.Generators.GeneratorConfig<T>.StringComparison.get -> System.StringComparison
+Genbox.FastData.Generators.GeneratorConfig<T>.StructureType.get -> Genbox.FastData.Enums.StructureType
+Genbox.FastData.Generators.HashFunc<T>
+Genbox.FastData.Generators.Helpers.MathHelper
+Genbox.FastData.Generators.Metadata
+Genbox.FastData.Generators.Metadata.Metadata(System.Version! version, System.DateTimeOffset timestamp) -> void
+Genbox.FastData.Generators.Metadata.Program.get -> string!
+Genbox.FastData.Generators.Metadata.Timestamp.get -> string!
+override Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.GetHashCode() -> int
+override Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.GetHashCode() -> int
+override Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.Equals(object? obj) -> bool
+override Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.GetHashCode() -> int
+override Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.ToString() -> string!
+override Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.Equals(object? obj) -> bool
+override Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.GetHashCode() -> int
+override Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.ToString() -> string!
+override Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.Equals(object? obj) -> bool
+override Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.GetHashCode() -> int
+override Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.ToString() -> string!
+static Genbox.FastData.FastDataGenerator.TryGenerate(object![]! data, Genbox.FastData.FastDataConfig! fdCfg, Genbox.FastData.Generators.Abstracts.ICodeGenerator! generator, out string? source, Microsoft.Extensions.Logging.ILoggerFactory? factory = null) -> bool
+static Genbox.FastData.FastDataGenerator.TryGenerate<T>(T[]! data, Genbox.FastData.FastDataConfig! fdCfg, Genbox.FastData.Generators.Abstracts.ICodeGenerator! generator, out string? source, Microsoft.Extensions.Logging.ILoggerFactory? factory = null) -> bool
+static Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.operator !=(Genbox.FastData.Generators.Contexts.Misc.HashSetBucket left, Genbox.FastData.Generators.Contexts.Misc.HashSetBucket right) -> bool
+static Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.operator ==(Genbox.FastData.Generators.Contexts.Misc.HashSetBucket left, Genbox.FastData.Generators.Contexts.Misc.HashSetBucket right) -> bool
+static Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.operator !=(Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T> left, Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T> right) -> bool
+static Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.operator ==(Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T> left, Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T> right) -> bool
+static Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.operator !=(Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit? left, Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit? right) -> bool
+static Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.operator ==(Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit? left, Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit? right) -> bool
+static Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.operator !=(Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit? left, Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit? right) -> bool
+static Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.operator ==(Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit? left, Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit? right) -> bool
+static Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.operator !=(Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>? left, Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>? right) -> bool
+static Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.operator ==(Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>? left, Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>? right) -> bool
+static Genbox.FastData.Generators.Extensions.DataTypeExtensions.IsIdentityHash(this Genbox.FastData.Enums.DataType type) -> bool
+static Genbox.FastData.Generators.Extensions.DataTypeExtensions.IsInteger(this Genbox.FastData.Enums.DataType type) -> bool
+static Genbox.FastData.Generators.Helpers.MathHelper.FastMod(uint value, uint divisor, ulong multiplier) -> uint
+static Genbox.FastData.Generators.Helpers.MathHelper.GetFastModMultiplier(uint divisor) -> ulong
+static Genbox.FastData.Generators.Helpers.MathHelper.GetPrime(uint min) -> uint
+static Genbox.FastData.Generators.Helpers.MathHelper.IsPowerOfTwo(ulong x) -> bool
+virtual Genbox.FastData.Generators.HashFunc<T>.Invoke(T obj) -> ulong
+~override Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.Equals(object obj) -> bool
+~override Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.ToString() -> string
+~override Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.Equals(object obj) -> bool
+~override Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.ToString() -> string

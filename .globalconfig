@@ -400,3 +400,5 @@ dotnet_diagnostic.xUnit1007.severity = none # Reports wrong when using TheoryDat
 # temp review
 
 # temp suggestion
+dotnet_diagnostic.RS0016.severity = error # Public API analyzer should error on missing public types
+
