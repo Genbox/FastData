@@ -90,7 +90,7 @@ public static class TestVectorHelper
 
                 //Create an instance of TestVector<T> and give it the type of the structure
                 Type vector = typeof(TestVector<>).MakeGenericType(vt);
-                yield return (ITestVector)Activator.CreateInstance(vector, st, arr, null)!;
+                yield return (ITestVector)Activator.CreateInstance(vector, st, arr)!;
             }
         }
     }
