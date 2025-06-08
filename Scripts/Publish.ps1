@@ -53,7 +53,7 @@ New-Item -ItemType Directory -Path $PublishDir/Genbox.FastData | Out-Null
 New-Item -ItemType Directory -Path $PublishDir/Genbox.FastData/lib | Out-Null
 
 Write-Host -ForegroundColor $Color "Copy over the psd1 file, and update the version number in the process"
-(Get-Content $Root/Misc/PowerShell/FastData.psd1) -replace "TODO-VERSION", "$semver" | Set-Content $PublishDir/Genbox.FastData/Genbox.FastData.psd1
+(Get-Content $Root/Misc/PowerShell/FastData.psd1) -replace "TODO-VERSION", "$version" | Set-Content $PublishDir/Genbox.FastData/Genbox.FastData.psd1
 
 Write-Host -ForegroundColor $Color "Copy over the other PowerShell files"
 Copy-Item $Root/Misc/PowerShell/FastData.psm1 $PublishDir/Genbox.FastData/Genbox.FastData.psm1
