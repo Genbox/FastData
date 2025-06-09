@@ -43,10 +43,11 @@ internal static class GPerfTest
             StringProperties props = DataAnalyzer.GetStringProperties(data);
 
             GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(new SimulatorConfig()), factory.CreateLogger<GPerfAnalyzer>());
+
             // Candidate hashFunc = analyzer.GetCandidates(data).First(); //TODO: use
 
             HashData hashData = HashData.Create(data, DataType.String, 1);
-            HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>(hashData);
+            HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>(hashData, DataType.String);
             structure.Create(ref data);
         }
     }

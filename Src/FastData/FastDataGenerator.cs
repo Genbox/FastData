@@ -130,9 +130,9 @@ public static partial class FastDataGenerator
                 HashData hashData = HashData.Create(data, props.DataType, fdCfg.HashCapacityFactor);
 
                 if (hashData.HashCodesPerfect)
-                    return Generate(generator, genCfg, new HashSetPerfectStructure<T>(hashData), data);
+                    return Generate(generator, genCfg, new HashSetPerfectStructure<T>(hashData, props.DataType), data);
 
-                return Generate(generator, genCfg, new HashSetChainStructure<T>(hashData), data);
+                return Generate(generator, genCfg, new HashSetChainStructure<T>(hashData, props.DataType), data);
             }
             case StructureType.Array:
                 return Generate(generator, genCfg, new ArrayStructure<T>(), data);
@@ -145,9 +145,9 @@ public static partial class FastDataGenerator
                 HashData hashData = HashData.Create(data, props.DataType, fdCfg.HashCapacityFactor);
 
                 if (hashData.HashCodesPerfect)
-                    return Generate(generator, genCfg, new HashSetPerfectStructure<T>(hashData), data);
+                    return Generate(generator, genCfg, new HashSetPerfectStructure<T>(hashData, props.DataType), data);
 
-                return Generate(generator, genCfg, new HashSetChainStructure<T>(hashData), data);
+                return Generate(generator, genCfg, new HashSetChainStructure<T>(hashData, props.DataType), data);
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");

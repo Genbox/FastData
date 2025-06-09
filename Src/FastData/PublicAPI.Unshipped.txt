@@ -60,8 +60,8 @@ Genbox.FastData.Generators.Contexts.EytzingerSearchContext<T>.EytzingerSearchCon
 Genbox.FastData.Generators.Contexts.HashSetChainContext<T>
 Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.Buckets.get -> int[]!
 Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.Entries.get -> Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>[]!
-Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.HashSetChainContext() -> void
-Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.HashSetChainContext(int[]! buckets, Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>[]! entries) -> void
+Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.HashSetChainContext(int[]! buckets, Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>[]! entries, bool storeHashCode) -> void
+Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.StoreHashCode.get -> bool
 Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>
 Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>.Buckets.get -> Genbox.FastData.Generators.Contexts.Misc.HashSetBucket[]!
 Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>.Data.get -> T[]!
@@ -70,8 +70,8 @@ Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>.HashSetLinearContext
 Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>.HashSetLinearContext(T[]! data, Genbox.FastData.Generators.Contexts.Misc.HashSetBucket[]! buckets, ulong[]! hashCodes) -> void
 Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>
 Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>.Data.get -> System.Collections.Generic.KeyValuePair<T, ulong>[]!
-Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>.HashSetPerfectContext() -> void
-Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>.HashSetPerfectContext(System.Collections.Generic.KeyValuePair<T, ulong>[]! data) -> void
+Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>.HashSetPerfectContext(System.Collections.Generic.KeyValuePair<T, ulong>[]! data, bool storeHashCode) -> void
+Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>.StoreHashCode.get -> bool
 Genbox.FastData.Generators.Contexts.KeyLengthContext<T>
 Genbox.FastData.Generators.Contexts.KeyLengthContext<T>.KeyLengthContext() -> void
 Genbox.FastData.Generators.Contexts.KeyLengthContext<T>.KeyLengthContext(System.Collections.Generic.List<string!>?[]! lengths, bool lengthsAreUniq, uint minLength, uint maxLength) -> void

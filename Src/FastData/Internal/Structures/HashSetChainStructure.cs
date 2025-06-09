@@ -1,11 +1,13 @@
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Contexts.Misc;
+using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashSetChainStructure<T>(HashData hashData) : IStructure<T, HashSetChainContext<T>>
+internal sealed class HashSetChainStructure<T>(HashData hashData, DataType dataType) : IStructure<T, HashSetChainContext<T>>
 {
     public HashSetChainContext<T> Create(ref ReadOnlySpan<T> data)
     {
@@ -27,6 +29,6 @@ internal sealed class HashSetChainStructure<T>(HashData hashData) : IStructure<T
             bucket = i + 1;
         }
 
-        return new HashSetChainContext<T>(buckets, entries);
+        return new HashSetChainContext<T>(buckets, entries, !dataType.IsIdentityHash());
     }
 }

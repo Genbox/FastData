@@ -1,10 +1,12 @@
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Contexts;
+using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashSetPerfectStructure<T>(HashData hashData) : IStructure<T, HashSetPerfectContext<T>>
+internal sealed class HashSetPerfectStructure<T>(HashData hashData, DataType dataType) : IStructure<T, HashSetPerfectContext<T>>
 {
     public HashSetPerfectContext<T> Create(ref ReadOnlySpan<T> data)
     {
@@ -20,6 +22,6 @@ internal sealed class HashSetPerfectStructure<T>(HashData hashData) : IStructure
         for (int i = 0; i < data.Length; i++)
             pairs[hashCodes[i] % size] = new KeyValuePair<T, ulong>(data[i], hashCodes[i]);
 
-        return new HashSetPerfectContext<T>(pairs);
+        return new HashSetPerfectContext<T>(pairs, !dataType.IsIdentityHash());
     }
 }
