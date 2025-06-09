@@ -14,7 +14,7 @@ impl HashSetChainStructure_Int64_5 {
     ];
 
     const ENTRIES: [E; 5] = [
-        E { hash_code: 9223372036854775808, next: -1, value: i64::MIN }, E { hash_code: 18446744073709551611, next: -1, value: -5 }, E { hash_code: 0, next: -1, value: 0 }, E { hash_code: 1, next: 1, value: 1 }, E { hash_code: 9223372036854775806, next: 3, value: 9223372036854775806 }
+        E { next: -1, value: i64::MIN }, E { next: -1, value: -5 }, E { next: -1, value: 0 }, E { next: 1, value: 1 }, E { next: 3, value: 9223372036854775806 }
     ];
 
     #[inline(always)]
@@ -34,7 +34,7 @@ impl HashSetChainStructure_Int64_5 {
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.hash_code == hash && entry.value == value {
+            if entry.value == value {
                 return true;
             }
             i = entry.next;
@@ -48,7 +48,7 @@ impl HashSetChainStructure_Int64_5 {
     pub const MAX_VALUE: i64 = 9223372036854775806;
 }
 struct E {
-    hash_code: u64,
+    
     next: i8,
     value: i64,
 }

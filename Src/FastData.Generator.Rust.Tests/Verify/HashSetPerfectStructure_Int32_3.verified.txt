@@ -9,8 +9,8 @@ use std::ptr;
 pub struct HashSetPerfectStructure_Int32_3;
 
 impl HashSetPerfectStructure_Int32_3 {
-    const ENTRIES: [E; 3] = [
-        E { value: 3, hash_code: 3 }, E { value: 1, hash_code: 1 }, E { value: 2, hash_code: 2 }
+    const ENTRIES: [i32; 3] = [
+        3, 1, 2
     ];
 
     #[inline(always)]
@@ -25,16 +25,11 @@ impl HashSetPerfectStructure_Int32_3 {
         }
         let hash = unsafe { Self::get_hash(value) };
         let index = (hash % 3) as usize;
-        let entry = &Self::ENTRIES[index];
 
-        return hash == entry.hash_code && value == entry.value;
+        return value == Self::ENTRIES[index];
     }
 
     pub const ITEM_COUNT: usize = 3;
     pub const MIN_VALUE: i32 = 1;
     pub const MAX_VALUE: i32 = 3;
-}
-struct E {
-    value: i32,
-    hash_code: u64,
 }

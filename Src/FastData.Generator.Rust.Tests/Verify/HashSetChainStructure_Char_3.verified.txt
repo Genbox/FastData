@@ -14,7 +14,7 @@ impl HashSetChainStructure_Char_3 {
     ];
 
     const ENTRIES: [E; 3] = [
-        E { hash_code: 0, next: -1, value: char::MIN }, E { hash_code: 97, next: -1, value: 'a' }, E { hash_code: 127, next: 1, value: '' }
+        E { next: -1, value: char::MIN }, E { next: -1, value: 'a' }, E { next: 1, value: '' }
     ];
 
     #[inline(always)]
@@ -34,7 +34,7 @@ impl HashSetChainStructure_Char_3 {
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.hash_code == hash && entry.value == value {
+            if entry.value == value {
                 return true;
             }
             i = entry.next;
@@ -48,7 +48,7 @@ impl HashSetChainStructure_Char_3 {
     pub const MAX_VALUE: char = '';
 }
 struct E {
-    hash_code: u64,
+    
     next: i8,
     value: char,
 }

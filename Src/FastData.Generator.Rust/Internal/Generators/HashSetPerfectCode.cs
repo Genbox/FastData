@@ -10,16 +10,37 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, Genera
 {
     public override string Generate(ReadOnlySpan<T> data)
     {
-        shared.Add("ph-struct-" + genCfg.DataType, CodeType.Class, $$"""
-                                                                     {{FieldModifier}}struct E {
-                                                                         value: {{TypeNameWithLifetime}},
-                                                                         hash_code: {{HashSizeType}},
-                                                                     }
-                                                                     """);
+        if (ctx.StoreHashCode)
+        {
+            shared.Add("ph-struct-" + genCfg.DataType, CodeType.Class, $$"""
+                                                                         {{FieldModifier}}struct E {
+                                                                             value: {{TypeNameWithLifetime}},
+                                                                             hash_code: {{HashSizeType}},
+                                                                         }
+                                                                         """);
+
+            return $$"""
+                         {{FieldModifier}}const ENTRIES: [E; {{ctx.Data.Length.ToStringInvariant()}}] = [
+                     {{FormatColumns(ctx.Data, x => $"E {{ value: {ToValueLabel(x.Key)}, hash_code: {x.Value.ToStringInvariant()} }}")}}
+                         ];
+
+                     {{HashSource}}
+
+                         {{MethodAttribute}}
+                         {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+                     {{EarlyExits}}
+                             let hash = unsafe { Self::get_hash(value) };
+                             let index = ({{GetModFunction("hash", (ulong)ctx.Data.Length)}}) as usize;
+                             let entry = &Self::ENTRIES[index];
+
+                             return {{GetEqualFunction("hash", "entry.hash_code")}} && {{GetEqualFunction("value", "entry.value")}};
+                         }
+                     """;
+        }
 
         return $$"""
-                     {{FieldModifier}}const ENTRIES: [E; {{ctx.Data.Length.ToStringInvariant()}}] = [
-                 {{FormatColumns(ctx.Data, x => $"E {{ value: {ToValueLabel(x.Key)}, hash_code: {x.Value.ToStringInvariant()} }}")}}
+                     {{FieldModifier}}const ENTRIES: [{{TypeNameWithLifetime}}; {{ctx.Data.Length.ToStringInvariant()}}] = [
+                 {{FormatColumns(ctx.Data, x => ToValueLabel(x.Value))}}
                      ];
 
                  {{HashSource}}
@@ -29,9 +50,8 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, Genera
                  {{EarlyExits}}
                          let hash = unsafe { Self::get_hash(value) };
                          let index = ({{GetModFunction("hash", (ulong)ctx.Data.Length)}}) as usize;
-                         let entry = &Self::ENTRIES[index];
 
-                         return {{GetEqualFunction("hash", "entry.hash_code")}} && {{GetEqualFunction("value", "entry.value")}};
+                         return {{GetEqualFunction("value", "Self::ENTRIES[index]")}};
                      }
                  """;
     }

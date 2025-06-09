@@ -12,7 +12,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, GeneratorC
     {
         shared.Add("chain-struct-" + genCfg.DataType, CodeType.Class, $$"""
                                                                         {{FieldModifier}}struct E {
-                                                                            hash_code: {{HashSizeType}},
+                                                                            {{(ctx.StoreHashCode ? $"hash_code: {HashSizeType}," : "")}}
                                                                             next: {{GetSmallestSignedType(ctx.Buckets.Length)}},
                                                                             value: {{TypeNameWithLifetime}},
                                                                         }
@@ -24,7 +24,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, GeneratorC
                      ];
 
                      {{FieldModifier}}const ENTRIES: [E; {{ctx.Entries.Length}}] = [
-                 {{FormatColumns(ctx.Entries, x => $"E {{ hash_code: {x.Hash}, next: {x.Next.ToStringInvariant()}, value: {ToValueLabel(x.Value)} }}")}}
+                 {{FormatColumns(ctx.Entries, x => $"E {{ {(ctx.StoreHashCode ? $"hash_code: {x.Hash}, " : "")}next: {x.Next.ToStringInvariant()}, value: {ToValueLabel(x.Value)} }}")}}
                      ];
 
                  {{HashSource}}
@@ -39,7 +39,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, GeneratorC
 
                          while i >= 0 {
                              let entry = &Self::ENTRIES[i as usize];
-                             if {{GetEqualFunction("entry.hash_code", "hash")}} && {{GetEqualFunction("entry.value", "value")}} {
+                             if {{(ctx.StoreHashCode ? GetEqualFunction("entry.hash_code", "hash") + " && " : "")}}{{GetEqualFunction("entry.value", "value")}} {
                                  return true;
                              }
                              i = entry.next;

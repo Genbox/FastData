@@ -14,7 +14,7 @@ impl HashSetChainStructure_Byte_3 {
     ];
 
     const ENTRIES: [E; 3] = [
-        E { hash_code: 0, next: -1, value: u8::MIN }, E { hash_code: 1, next: -1, value: 1 }, E { hash_code: 255, next: 0, value: u8::MAX }
+        E { next: -1, value: u8::MIN }, E { next: -1, value: 1 }, E { next: 0, value: u8::MAX }
     ];
 
     #[inline(always)]
@@ -34,7 +34,7 @@ impl HashSetChainStructure_Byte_3 {
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.hash_code == hash && entry.value == value {
+            if entry.value == value {
                 return true;
             }
             i = entry.next;
@@ -48,7 +48,7 @@ impl HashSetChainStructure_Byte_3 {
     pub const MAX_VALUE: u8 = u8::MAX;
 }
 struct E {
-    hash_code: u64,
+    
     next: i8,
     value: u8,
 }

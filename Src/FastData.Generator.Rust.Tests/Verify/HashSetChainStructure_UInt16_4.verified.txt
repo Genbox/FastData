@@ -14,7 +14,7 @@ impl HashSetChainStructure_UInt16_4 {
     ];
 
     const ENTRIES: [E; 4] = [
-        E { hash_code: 0, next: -1, value: u16::MIN }, E { hash_code: 1, next: -1, value: 1 }, E { hash_code: 2, next: -1, value: 2 }, E { hash_code: 65535, next: -1, value: u16::MAX }
+        E { next: -1, value: u16::MIN }, E { next: -1, value: 1 }, E { next: -1, value: 2 }, E { next: -1, value: u16::MAX }
     ];
 
     #[inline(always)]
@@ -34,7 +34,7 @@ impl HashSetChainStructure_UInt16_4 {
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.hash_code == hash && entry.value == value {
+            if entry.value == value {
                 return true;
             }
             i = entry.next;
@@ -48,7 +48,7 @@ impl HashSetChainStructure_UInt16_4 {
     pub const MAX_VALUE: u16 = u16::MAX;
 }
 struct E {
-    hash_code: u64,
+    
     next: i8,
     value: u16,
 }
