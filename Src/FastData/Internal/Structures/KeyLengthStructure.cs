@@ -1,22 +1,15 @@
-using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class KeyLengthStructure<T>(StringProperties props) : IStructure<T>
+internal sealed class KeyLengthStructure<T>(StringProperties props) : IStructure<T, KeyLengthContext<T>>
 {
-    public bool TryCreate(T[] data, out IContext? context)
+    public KeyLengthContext<T> Create(ReadOnlySpan<T> data)
     {
-        // This data structure is only appropriate for strings
-        if (data is not string[] stringArr)
-        {
-            context = null;
-            return false;
-        }
-
-        //This implementation is the same as AutoUniqueLength, but takes duplicates into consideration
+        if (typeof(T) != typeof(string))
+            throw new InvalidCastException("This structure only works on strings");
 
         //idx 0: ""
         //idx 1: "a", "b"
@@ -28,14 +21,15 @@ internal sealed class KeyLengthStructure<T>(StringProperties props) : IStructure
         //We don't have to use HashSets to deduplicate within a bucket as all items are unique
         List<string>?[] lengths = new List<string>?[maxLen + 1]; //We need a place for zero
 
-        foreach (string value in stringArr)
+        foreach (T value in data)
         {
-            ref List<string>? item = ref lengths[value.Length];
+            string str = (string)(object)value;
+
+            ref List<string>? item = ref lengths[str.Length];
             item ??= new List<string>();
-            item.Add(value);
+            item.Add(str);
         }
 
-        context = new KeyLengthContext(lengths, props.LengthData.Unique, props.LengthData.Min, maxLen);
-        return true;
+        return new KeyLengthContext<T>(lengths, props.LengthData.Unique, props.LengthData.Min, maxLen);
     }
 }

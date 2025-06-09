@@ -5,7 +5,7 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    public override string Generate() =>
+    public override string Generate(ReadOnlySpan<T> data) =>
         $$"""
               {{MethodAttribute}}
               {{MethodModifier}}bool Contains({{TypeName}} value)

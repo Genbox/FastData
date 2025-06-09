@@ -6,7 +6,7 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
-    public override string Generate() =>
+    public override string Generate(ReadOnlySpan<T> data) =>
         $$"""
               {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
           {{FormatColumns(ctx.Data, ToValueLabel)}}

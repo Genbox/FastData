@@ -1,6 +1,5 @@
 using System.Globalization;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -40,16 +39,15 @@ internal static class GPerfTest
             Logger serilog = baseConf.File(logFile, formatProvider: CultureInfo.InvariantCulture).CreateLogger();
             using SerilogLoggerFactory factory = new SerilogLoggerFactory(serilog);
 
-            string[] data = File.ReadAllLines(file);
+            ReadOnlySpan<string> data = File.ReadAllLines(file).AsSpan();
             StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-            GPerfAnalyzer analyzer = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(), new Simulator(data, new SimulatorConfig()), factory.CreateLogger<GPerfAnalyzer>());
-            Candidate hashFunc = analyzer.GetCandidates().First(); //TODO: use
+            GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(new SimulatorConfig()), factory.CreateLogger<GPerfAnalyzer>());
+            // Candidate hashFunc = analyzer.GetCandidates(data).First(); //TODO: use
 
             HashData hashData = HashData.Create(data, DataType.String, 1);
             HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>(hashData);
-
-            structure.TryCreate(data, out IContext? context);
+            structure.Create(data);
         }
     }
 

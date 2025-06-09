@@ -5,9 +5,9 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
+internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    public override string Generate()
+    public override string Generate(ReadOnlySpan<T> data)
     {
         if (ctx.LengthsAreUniq)
         {
@@ -26,7 +26,7 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGenerator
     private string GenerateUniqIf() =>
         $$"""
               {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
-          {{FormatColumns(ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()), ToValueLabel)}}
+          {{FormatColumns(ctx.Lengths.AsReadOnlySpan((int)ctx.MinLength), x => ToValueLabel(x?.FirstOrDefault()))}}
               };
 
               {{MethodAttribute}}
@@ -38,49 +38,55 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext ctx, CSharpCodeGenerator
               }
           """;
 
-    private string GenerateUniqSwitch() =>
-        $$"""
-              {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{TypeName}} value)
-              {
-          {{EarlyExits}}
+    private string GenerateUniqSwitch()
+    {
+        string[] filtered = ctx.Lengths.Where(x => x != null).Select(x => x![0]).ToArray();
 
-                  switch (value.Length)
-                  {
-          {{FormatList(ctx.Lengths.Where(x => x != null).Select(x => x![0]), x => $"""
-                                                                                               case {x.Length}:
-                                                                                                   return {GetEqualFunction("value", ToValueLabel(x))};
-                                                                                   """)}}
-                      default:
-                          return false;
-                  }
-              }
-          """;
+        return $$"""
+                     {{MethodAttribute}}
+                     {{MethodModifier}}bool Contains({{TypeName}} value)
+                     {
+                 {{EarlyExits}}
 
-    private string GenerateNormal() =>
-        $$"""
-              {{FieldModifier}}{{TypeName}}[]?[] _entries = new {{TypeName}}[]?[] {
-          {{FormatList(ctx.Lengths.Skip((int)ctx.MinLength).Take((int)(ctx.MaxLength - ctx.MinLength + 1)), RenderMany, ",\n")}}
-              };
+                         switch (value.Length)
+                         {
+                 {{FormatList(filtered, x => $"""
+                                                          case {x.Length}:
+                                                              return {GetEqualFunction("value", ToValueLabel(x))};
+                                              """)}}
+                             default:
+                                 return false;
+                         }
+                     }
+                 """;
+    }
 
-              {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{TypeName}} value)
-              {
-          {{EarlyExits}}
-                  {{TypeName}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];
+    private string GenerateNormal()
+    {
+        return $$"""
+                     {{FieldModifier}}{{TypeName}}[]?[] _entries = new {{TypeName}}[]?[] {
+                 {{FormatList(ctx.Lengths.AsReadOnlySpan((int)ctx.MinLength, (int)(ctx.MaxLength - ctx.MinLength + 1)), RenderMany, ",\n")}}
+                     };
 
-                  if (bucket == null)
-                      return false;
+                     {{MethodAttribute}}
+                     {{MethodModifier}}bool Contains({{TypeName}} value)
+                     {
+                 {{EarlyExits}}
+                         {{TypeName}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];
 
-                  foreach ({{TypeName}} str in bucket)
-                  {
-                      if ({{GetEqualFunction("value", "str")}})
-                          return true;
-                  }
+                         if (bucket == null)
+                             return false;
 
-                  return false;
-              }
-          """;
+                         foreach ({{TypeName}} str in bucket)
+                         {
+                             if ({{GetEqualFunction("value", "str")}})
+                                 return true;
+                         }
+
+                         return false;
+                     }
+                 """;
+    }
 
     private string RenderMany(List<string>? x) => x == null ? "        null" : $"new [] {{{string.Join(",", x.Select(ToValueLabel))}}}";
 }

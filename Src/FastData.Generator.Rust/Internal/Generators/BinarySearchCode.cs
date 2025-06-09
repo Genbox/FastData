@@ -6,7 +6,7 @@ namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
 internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : RustOutputWriter<T>
 {
-    public override string Generate() =>
+    public override string Generate(ReadOnlySpan<T> data) =>
         $$"""
               {{FieldModifier}}const ENTRIES: [{{TypeNameWithLifetime}}; {{ctx.Data.Length.ToStringInvariant()}}] = [
           {{FormatColumns(ctx.Data, ToValueLabel)}}

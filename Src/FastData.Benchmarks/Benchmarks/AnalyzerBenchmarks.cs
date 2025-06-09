@@ -10,17 +10,23 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 public class AnalyzerBenchmarks
 {
     private readonly GPerfAnalyzer _analyzer;
+    private readonly string[] _data;
 
     public AnalyzerBenchmarks()
     {
         Random rng = new Random(42);
+        _data = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(rng, 50)).ToArray();
+        StringProperties props = DataAnalyzer.GetStringProperties(_data);
 
-        string[] data = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(rng, 50)).ToArray();
-        StringProperties props = DataAnalyzer.GetStringProperties(data);
-
-        _analyzer = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(), new Simulator(data, new SimulatorConfig()), NullLogger<GPerfAnalyzer>.Instance);
+        _analyzer = new GPerfAnalyzer(_data.Length, props, new GPerfAnalyzerConfig(), new Simulator(new SimulatorConfig()), NullLogger<GPerfAnalyzer>.Instance);
     }
 
     [Benchmark]
-    public object GPerfAnalyzer() => _analyzer.GetCandidates();
+    public void GPerfAnalyzer() => _analyzer.GetCandidates(_data, OnCandidateFound);
+
+    private static bool OnCandidateFound(Candidate candidate)
+    {
+        // Do nothing
+        return true;
+    }
 }

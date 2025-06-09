@@ -34,7 +34,7 @@ public abstract class CodeGenerator : ICodeGenerator
 
     public bool UseUTF16Encoding => _langDef.UseUTF16Encoding;
 
-    public virtual bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
+    public virtual string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context)
     {
         Shared.Clear();
 
@@ -42,7 +42,7 @@ public abstract class CodeGenerator : ICodeGenerator
 
         StringBuilder sb = new StringBuilder();
         AppendHeader(sb, genCfg, context);
-        AppendBody(sb, genCfg, typeName, context);
+        AppendBody(sb, genCfg, typeName, context, data);
         AppendFooter(sb, genCfg, typeName);
 
         foreach (string classCode in Shared.GetType(CodeType.Class))
@@ -51,13 +51,12 @@ public abstract class CodeGenerator : ICodeGenerator
             sb.AppendLine(classCode);
         }
 
-        source = sb.ToString();
-        return true;
+        return sb.ToString();
     }
 
-    protected abstract OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext context);
+    protected abstract OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext<T> context);
 
-    protected virtual void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext context)
+    protected virtual void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context)
     {
         string subType = context.GetType().Name.Replace("Context`1", "");
 
@@ -70,7 +69,7 @@ public abstract class CodeGenerator : ICodeGenerator
 #endif
     }
 
-    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext context)
+    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext<T> context, ReadOnlySpan<T> data)
     {
         OutputWriter<T>? writer = GetOutputWriter(genCfg, context);
 
@@ -78,7 +77,7 @@ public abstract class CodeGenerator : ICodeGenerator
             throw new NotSupportedException("The context type is not supported: " + context.GetType().Name);
 
         writer.Initialize(_langDef, _earlyExitDef, _typeHelper, _hashDef, genCfg, typeName);
-        sb.AppendLine(writer.Generate());
+        sb.AppendLine(writer.Generate(data));
     }
 
     protected virtual void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)

@@ -6,28 +6,28 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    public override string Generate() => cfg.ConditionalBranchType switch
+    public override string Generate(ReadOnlySpan<T> data) => cfg.ConditionalBranchType switch
     {
-        BranchType.If => GenerateIf(),
-        BranchType.Switch => GenerateSwitch(),
+        BranchType.If => GenerateIf(data),
+        BranchType.Switch => GenerateSwitch(data),
         _ => throw new InvalidOperationException("Invalid branch type: " + cfg.ConditionalBranchType)
     };
 
-    private string GenerateIf() =>
+    private string GenerateIf(ReadOnlySpan<T> data) =>
         $$"""
               {{MethodAttribute}}
               {{MethodModifier}}bool Contains({{TypeName}} value)
               {
           {{EarlyExits}}
 
-                  if ({{FormatList(ctx.Data, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}})
+                  if ({{FormatList(data, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}})
                       return true;
 
                   return false;
               }
           """;
 
-    private string GenerateSwitch() =>
+    private string GenerateSwitch(ReadOnlySpan<T> data) =>
         $$"""
               {{MethodAttribute}}
               {{MethodModifier}}bool Contains({{TypeName}} value)
@@ -36,7 +36,7 @@ internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGe
 
                   switch (value)
                   {
-          {{FormatList(ctx.Data, x => $"            case {ToValueLabel(x)}:", "\n")}}
+          {{FormatList(data, x => $"            case {ToValueLabel(x)}:", "\n")}}
                           return true;
                       default:
                           return false;

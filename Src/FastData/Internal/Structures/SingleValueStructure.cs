@@ -1,20 +1,15 @@
-using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class SingleValueStructure<T> : IStructure<T>
+internal sealed class SingleValueStructure<T> : IStructure<T, SingleValueContext<T>>
 {
-    public bool TryCreate(T[] data, out IContext? context)
+    public SingleValueContext<T> Create(ReadOnlySpan<T> data)
     {
         if (data.Length != 1)
-        {
-            context = null;
-            return false;
-        }
+            throw new InvalidOperationException("SingleValueStructure can only be created from a span with exactly one element.");
 
-        context = new SingleValueContext<T>(data[0]);
-        return true;
+        return new SingleValueContext<T>(data[0]);
     }
 }

@@ -7,7 +7,5 @@ internal interface IStringHashAnalyzer
 {
     bool IsAppropriate();
 
-    /// <summary>Runs the analyzer</summary>
-    /// <returns>A set of good candidates.</returns>
-    IEnumerable<Candidate> GetCandidates();
+    void GetCandidates(ReadOnlySpan<string> data, Func<Candidate, bool> onCandidateFound);
 }

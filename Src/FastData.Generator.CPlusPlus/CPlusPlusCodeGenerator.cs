@@ -23,19 +23,16 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(helper, userCfg.GeneratorOptions), new CPlusPlusHashDef());
     }
 
-    public override bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
+    public override string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context)
     {
         //C++ generator does not support chars outside ASCII
         if (genCfg.DataType == DataType.Char && (char)(object)genCfg.Constants.MaxValue! > 127)
-        {
-            source = null;
-            return false;
-        }
+            throw new InvalidOperationException("C++ generator does not support chars outside ASCII. Please use a different data type or reduce the max value to 127 or lower.");
 
-        return base.TryGenerate(genCfg, context, out source);
+        return base.Generate(data, genCfg, context);
     }
 
-    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext context)
+    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context)
     {
         base.AppendHeader(sb, genCfg, context);
 
@@ -70,7 +67,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     """);
     }
 
-    protected override OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext context) => context switch
+    protected override OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext<T> context) => context switch
     {
         SingleValueContext<T> x => new SingleValueCode<T>(x),
         ArrayContext<T> x => new ArrayCode<T>(x),
@@ -80,7 +77,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         HashSetChainContext<T> x => new HashSetChainCode<T>(x),
         HashSetLinearContext<T> x => new HashSetLinearCode<T>(x),
         HashSetPerfectContext<T> x => new HashSetPerfectCode<T>(x),
-        KeyLengthContext x => new KeyLengthCode<T>(x),
+        KeyLengthContext<T> x => new KeyLengthCode<T>(x),
         _ => null
     };
 }

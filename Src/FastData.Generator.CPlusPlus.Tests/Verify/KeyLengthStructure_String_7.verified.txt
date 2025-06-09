@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: Auto (KeyLengthContext)
+// Structure: Auto (KeyLength)
 #pragma once
 #include <array>
 #include <cstdint>

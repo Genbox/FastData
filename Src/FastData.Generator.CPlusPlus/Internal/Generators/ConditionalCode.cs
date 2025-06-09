@@ -5,7 +5,7 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
-    public override string Generate() =>
+    public override string Generate(ReadOnlySpan<T> data) =>
         $$"""
           public:
               {{MethodAttribute}}
@@ -13,7 +13,7 @@ internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx) : CPlusPlusO
               {
           {{EarlyExits}}
 
-                  if ({{FormatList(ctx.Data, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}})
+                  if ({{FormatList(data, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}})
                       return true;
 
                   return false;

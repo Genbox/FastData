@@ -3,25 +3,18 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed class Simulator
+internal sealed class Simulator(SimulatorConfig config)
 {
-    private readonly uint _capacity;
-    private readonly string[] _data;
-    private readonly NoEqualityEmulator _set;
+    private NoEqualityEmulator? _set;
 
-    public Simulator(string[] data, SimulatorConfig config)
+    internal Candidate Run(ReadOnlySpan<string> data, IStringHash stringHash, Func<double>? extraFitness = null)
     {
-        _data = data;
-        _capacity = (uint)(data.Length * config.CapacityFactor);
-        _set = new NoEqualityEmulator(_capacity);
-    }
-
-    internal Candidate Run(IStringHash stringHash, Func<double>? extraFitness = null)
-    {
+        uint _capacity = (uint)(data.Length * config.CapacityFactor);
+        _set ??= new NoEqualityEmulator(_capacity);
         _set.SetHash(stringHash.GetHashFunction());
 
         int collisions = 0;
-        foreach (string str in _data)
+        foreach (string str in data)
         {
             if (!_set.Add(str))
                 collisions++;

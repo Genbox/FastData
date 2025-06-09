@@ -23,7 +23,7 @@ public sealed class RustCodeGenerator : CodeGenerator
         return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(helper, userCfg.GeneratorOptions), new RustHashDef());
     }
 
-    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext context)
+    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context)
     {
         base.AppendHeader(sb, genCfg, context);
 
@@ -48,7 +48,7 @@ public sealed class RustCodeGenerator : CodeGenerator
         sb.Append('}');
     }
 
-    protected override OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext context) => context switch
+    protected override OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext<T> context) => context switch
     {
         SingleValueContext<T> x => new SingleValueCode<T>(x),
         ArrayContext<T> x => new ArrayCode<T>(x),
@@ -58,7 +58,7 @@ public sealed class RustCodeGenerator : CodeGenerator
         HashSetChainContext<T> x => new HashSetChainCode<T>(x, genCfg, Shared),
         HashSetLinearContext<T> x => new HashSetLinearCode<T>(x, genCfg, Shared),
         HashSetPerfectContext<T> x => new HashSetPerfectCode<T>(x, genCfg, Shared),
-        KeyLengthContext x => new KeyLengthCode<T>(x),
+        KeyLengthContext<T> x => new KeyLengthCode<T>(x),
         _ => null
     };
 }

@@ -1,8 +1,9 @@
 using Genbox.FastData.Enums;
+using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis.Properties;
 
-internal sealed class DataProperties<T>
+internal sealed class DataProperties<T> where T : notnull
 {
     private DataProperties(uint items, DataType type, StringProperties? stringProps, IntegerProperties<T>? intProps, FloatProperties<T>? floatProps)
     {
@@ -20,57 +21,33 @@ internal sealed class DataProperties<T>
     internal DataType DataType { get; }
     internal uint ItemCount { get; }
 
-    internal static DataProperties<T> Create(T[] data)
+    internal static DataProperties<T> Create(ReadOnlySpan<T> data)
     {
-        StringProperties? stringProps = null;
-        IntegerProperties<T>? intProps = null;
-        FloatProperties<T>? floatProps = null;
-
         DataType dataType = (DataType)Enum.Parse(typeof(DataType), typeof(T).Name);
 
         //The 'when' in the switch seems redundant, but it isn't. C# apparently interprets byte[] as sbyte[] automatically
-
-        switch (data)
+        IntegerProperties<T>? intProps = dataType switch
         {
-            case sbyte[] sbyteArr when dataType == DataType.SByte:
-                intProps = DataAnalyzer.GetSByteProperties<T>(sbyteArr);
-                break;
-            case byte[] byteArr when dataType == DataType.Byte:
-                intProps = DataAnalyzer.GetByteProperties<T>(byteArr);
-                break;
-            case short[] shortArr when dataType == DataType.Int16:
-                intProps = DataAnalyzer.GetInt16Properties<T>(shortArr);
-                break;
-            case ushort[] ushortArr when dataType == DataType.UInt16:
-                intProps = DataAnalyzer.GetUInt16Properties<T>(ushortArr);
-                break;
-            case int[] intArr when dataType == DataType.Int32:
-                intProps = DataAnalyzer.GetInt32Properties<T>(intArr);
-                break;
-            case uint[] uintArr when dataType == DataType.UInt32:
-                intProps = DataAnalyzer.GetUInt32Properties<T>(uintArr);
-                break;
-            case long[] longArr when dataType == DataType.Int64:
-                intProps = DataAnalyzer.GetInt64Properties<T>(longArr);
-                break;
-            case ulong[] ulongArr when dataType == DataType.UInt64:
-                intProps = DataAnalyzer.GetUInt64Properties<T>(ulongArr);
-                break;
-            case string[] stringArr when dataType == DataType.String:
-                stringProps = DataAnalyzer.GetStringProperties(stringArr);
-                break;
-            case char[] charArr when dataType == DataType.Char:
-                intProps = DataAnalyzer.GetCharProperties<T>(charArr);
-                break;
-            case float[] floatArr when dataType == DataType.Single:
-                floatProps = DataAnalyzer.GetSingleProperties<T>(floatArr);
-                break;
-            case double[] doubleArr when dataType == DataType.Double:
-                floatProps = DataAnalyzer.GetDoubleProperties<T>(doubleArr);
-                break;
-            default:
-                throw new InvalidOperationException($"Unknown data type: {typeof(T)}");
-        }
+            DataType.Char => DataAnalyzer.GetCharProperties<T>(UnsafeHelper.ConvertSpan<T, char>(data)),
+            DataType.SByte => DataAnalyzer.GetSByteProperties<T>(UnsafeHelper.ConvertSpan<T, sbyte>(data)),
+            DataType.Byte => DataAnalyzer.GetByteProperties<T>(UnsafeHelper.ConvertSpan<T, byte>(data)),
+            DataType.Int16 => DataAnalyzer.GetInt16Properties<T>(UnsafeHelper.ConvertSpan<T, short>(data)),
+            DataType.UInt16 => DataAnalyzer.GetUInt16Properties<T>(UnsafeHelper.ConvertSpan<T, ushort>(data)),
+            DataType.Int32 => DataAnalyzer.GetInt32Properties<T>(UnsafeHelper.ConvertSpan<T, int>(data)),
+            DataType.UInt32 => DataAnalyzer.GetUInt32Properties<T>(UnsafeHelper.ConvertSpan<T, uint>(data)),
+            DataType.Int64 => DataAnalyzer.GetInt64Properties<T>(UnsafeHelper.ConvertSpan<T, long>(data)),
+            DataType.UInt64 => DataAnalyzer.GetUInt64Properties<T>(UnsafeHelper.ConvertSpan<T, ulong>(data)),
+            _ => null
+        };
+
+        FloatProperties<T>? floatProps = dataType switch
+        {
+            DataType.Single => DataAnalyzer.GetSingleProperties<T>(UnsafeHelper.ConvertSpan<T, float>(data)),
+            DataType.Double => DataAnalyzer.GetDoubleProperties<T>(UnsafeHelper.ConvertSpan<T, double>(data)),
+            _ => null
+        };
+
+        StringProperties? stringProps = dataType == DataType.String ? DataAnalyzer.GetStringProperties(data) : null;
 
         return new DataProperties<T>((uint)data.Length, dataType, stringProps, intProps, floatProps);
     }

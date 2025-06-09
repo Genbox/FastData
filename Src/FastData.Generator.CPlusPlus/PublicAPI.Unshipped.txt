@@ -9,5 +9,5 @@ Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig.GeneratorOption
 Genbox.FastData.Generator.CPlusPlus.Enums.CPlusPlusOptions
 Genbox.FastData.Generator.CPlusPlus.Enums.CPlusPlusOptions.DisableEarlyExits = 1 -> Genbox.FastData.Generator.CPlusPlus.Enums.CPlusPlusOptions
 Genbox.FastData.Generator.CPlusPlus.Enums.CPlusPlusOptions.None = 0 -> Genbox.FastData.Generator.CPlusPlus.Enums.CPlusPlusOptions
-override Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator.TryGenerate<T>(Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, Genbox.FastData.Generators.Abstracts.IContext! context, out string? source) -> bool
+override Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator.Generate<T>(System.ReadOnlySpan<T> data, Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, Genbox.FastData.Generators.Abstracts.IContext<T>! context) -> string!
 static Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator.Create(Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig! userCfg) -> Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator!

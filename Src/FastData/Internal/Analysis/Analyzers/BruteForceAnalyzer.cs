@@ -43,7 +43,7 @@ internal sealed partial class BruteForceAnalyzer(StringProperties props, BruteFo
 
     public bool IsAppropriate() => true;
 
-    public IEnumerable<Candidate> GetCandidates()
+    public void GetCandidates(ReadOnlySpan<string> data, Func<Candidate, bool> onCandidateFound)
     {
         MinHeap<Candidate> heap = new MinHeap<Candidate>(config.MaxReturned);
         BruteForceStringHash spec = new BruteForceStringHash();
@@ -75,20 +75,24 @@ internal sealed partial class BruteForceAnalyzer(StringProperties props, BruteFo
                             spec.Avalanche = avalanche;
                             LogAvalanche(logger, ExpressionHelper.Print(avalanche));
 
-                            Candidate current = sim.Run(spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));
+                            Candidate current = sim.Run(data, spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));
 
                             if (heap.Add(current.Fitness, current))
                                 LogBetterCandidate(logger, current.Fitness, current.Collisions, ExpressionHelper.Print(mixer), ExpressionHelper.Print(avalanche));
 
                             if (leftAttempts-- == 0)
-                                return [];
+                                return;
                         }
                     }
                 }
             }
         }
 
-        return heap.Items.Select(x => x.Item2);
+        foreach ((double _, Candidate candidate) in heap.Items)
+        {
+            if (!onCandidateFound(candidate))
+                return;
+        }
     }
 
     private sealed class MixerIdentity : SimpleMixerGen

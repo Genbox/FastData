@@ -61,8 +61,7 @@ function Invoke-FastData
         $generator = [Genbox.FastData.Generator.Rust.RustCodeGenerator]::Create($cfg)
     }
 
-    $source = [ref]''
-    $ok = [Genbox.FastData.FastDataGenerator]::TryGenerate($data, $config, $generator, [ref]$source)
+    $source = [Genbox.FastData.FastDataGenerator]::Generate($data, $config, $generator)
 
     if (-not $ok)
     {

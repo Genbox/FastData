@@ -2,7 +2,7 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Internal.Abstracts;
 
-internal interface IStructure<in T>
+internal interface IStructure<T, out TContext> where TContext : IContext<T>
 {
-    bool TryCreate(T[] data, out IContext? context);
+    TContext Create(ReadOnlySpan<T> data);
 }

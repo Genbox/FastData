@@ -1,14 +1,12 @@
-using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class ArrayStructure<T> : IStructure<T>
+internal sealed class ArrayStructure<T> : IStructure<T, ArrayContext<T>>
 {
-    public bool TryCreate(T[] data, out IContext? context)
+    public ArrayContext<T> Create(ReadOnlySpan<T> data)
     {
-        context = new ArrayContext<T>(data);
-        return true;
+        return new ArrayContext<T>();
     }
 }

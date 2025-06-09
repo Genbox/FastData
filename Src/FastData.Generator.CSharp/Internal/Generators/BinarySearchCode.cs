@@ -6,7 +6,7 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    public override string Generate() =>
+    public override string Generate(ReadOnlySpan<T> data) =>
         $$"""
               {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
           {{FormatColumns(ctx.Data, ToValueLabel)}}

@@ -8,9 +8,9 @@ public interface ICodeGenerator
 
     /// <summary>Attempts to generate source code using the specified generator configuration and context.</summary>
     /// <typeparam name="T">The type of data being generated.</typeparam>
+    /// <param name="data">The data input.</param>
     /// <param name="genCfg">The generator configuration.</param>
     /// <param name="context">The context for code generation.</param>
-    /// <param name="source">When this method returns, contains the generated source code if the operation succeeded; otherwise, null.</param>
     /// <returns>True if code generation succeeded; otherwise, false.</returns>
-    bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source);
+    string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context);
 }

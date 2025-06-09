@@ -8,7 +8,7 @@ namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
 internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, GeneratorConfig<T> genCfg, SharedCode shared) : RustOutputWriter<T>
 {
-    public override string Generate()
+    public override string Generate(ReadOnlySpan<T> data)
     {
         shared.Add("ph-struct-" + genCfg.DataType, CodeType.Class, $$"""
                                                                      {{FieldModifier}}struct E {

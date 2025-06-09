@@ -1,17 +1,16 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.StringHash;
-using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Misc;
 
 internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUnique, bool HashCodesPerfect)
 {
-    internal static HashData Create<T>(T[] data, DataType dataType, int capacityFactor)
+    internal static HashData Create<T>(ReadOnlySpan<T> data, DataType dataType, int capacityFactor)
     {
-        IStringHash? stringHash = null;
-        if (data is string[])
-            stringHash = /*analysisEnabled ? GetBestHash(stringArr, props.StringProps!, fdCfg.SimulatorConfig, factory) :*/ new DefaultStringHash();
+        DefaultStringHash? stringHash = null;
+        if (typeof(T) == typeof(string))
+            stringHash = new DefaultStringHash();
 
         HashFunc<T> hashFunc;
 

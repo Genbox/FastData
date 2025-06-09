@@ -6,10 +6,10 @@ namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
 internal sealed class ArrayCode<T>(ArrayContext<T> ctx) : RustOutputWriter<T>
 {
-    public override string Generate() =>
+    public override string Generate(ReadOnlySpan<T> data) =>
         $$"""
-              {{FieldModifier}}const ENTRIES: [{{TypeName}}; {{ctx.Data.Length.ToStringInvariant()}}] = [
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
+              {{FieldModifier}}const ENTRIES: [{{TypeName}}; {{data.Length.ToStringInvariant()}}] = [
+          {{FormatColumns(data, ToValueLabel)}}
               ];
 
               {{MethodAttribute}}

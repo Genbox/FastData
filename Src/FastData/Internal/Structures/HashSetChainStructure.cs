@@ -1,4 +1,3 @@
-using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Contexts.Misc;
 using Genbox.FastData.Internal.Abstracts;
@@ -6,9 +5,9 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashSetChainStructure<T>(HashData hashData) : IStructure<T>
+internal sealed class HashSetChainStructure<T>(HashData hashData) : IStructure<T, HashSetChainContext<T>>
 {
-    public bool TryCreate(T[] data, out IContext? context)
+    public HashSetChainContext<T> Create(ReadOnlySpan<T> data)
     {
         ulong size = (ulong)(data.Length * hashData.CapacityFactor);
 
@@ -28,7 +27,6 @@ internal sealed class HashSetChainStructure<T>(HashData hashData) : IStructure<T
             bucket = i + 1;
         }
 
-        context = new HashSetChainContext<T>(data, buckets, entries);
-        return true;
+        return new HashSetChainContext<T>(buckets, entries);
     }
 }

@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using VerifyTests.DiffPlex;
 
-namespace Genbox.FastData.Generator.CPlusPlus.Tests.Properties;
+namespace Genbox.FastData.SourceGenerator.Tests.Properties;
 
 internal static class ModuleInitializer
 {

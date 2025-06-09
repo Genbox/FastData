@@ -136,8 +136,7 @@ internal static class Program
         object[] data = await ReadFileAsync(inputFile.FullName, dataType).ToArrayAsync().ConfigureAwait(false);
         FastDataConfig config = new FastDataConfig(structureType);
 
-        if (!FastDataGenerator.TryGenerate(data, config, generator, out string? source))
-            throw new InvalidOperationException("Unable to generate code");
+        string source = FastDataGenerator.Generate(data, config, generator);
 
         if (outputFile == null)
             Console.WriteLine(source);

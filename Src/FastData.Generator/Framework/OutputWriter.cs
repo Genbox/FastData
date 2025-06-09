@@ -5,7 +5,7 @@ using Genbox.FastData.Generators;
 
 namespace Genbox.FastData.Generator.Framework;
 
-public abstract class OutputWriter<T> : IOutputWriter
+public abstract class OutputWriter<T> : IOutputWriter<T>
 {
     private IEarlyExitDef _earlyExitDef = null!;
     private IHashDef _hashDef = null!;
@@ -21,7 +21,7 @@ public abstract class OutputWriter<T> : IOutputWriter
     protected static DataType HashSizeDataType => DataType.UInt64;
     protected string ArraySizeType => _langDef.ArraySizeType;
 
-    public abstract string Generate();
+    public abstract string Generate(ReadOnlySpan<T> data);
 
     internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeHelper typeHelper, IHashDef hashDef, GeneratorConfig<T> genCfg, string typeName)
     {

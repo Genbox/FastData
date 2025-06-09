@@ -67,7 +67,7 @@ The `Dogs` class is generated at compile time and contains a `Contains()` method
 ### Using the C# library
 
 1. Add the [Genbox.FastData.Generator.CSharp](https://www.nuget.org/packages/Genbox.FastData.Generator.CSharp/) NuGet package to your project.
-2. Use the `FastDataGenerator.TryGenerate()` method. Give it your data as an array.
+2. Use the `FastDataGenerator.Generate()` method. Give it your data as an array.
 
 ```csharp
 internal static class Program
@@ -77,9 +77,7 @@ internal static class Program
         FastDataConfig config = new FastDataConfig();
         CSharpCodeGenerator generator = CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("Dogs"));
 
-        if (!FastDataGenerator.TryGenerate(["Labrador", "German Shepherd", "Golden Retriever"], config, generator, out string? source))
-            Console.WriteLine("Failed to generate source code");
-
+        string source = FastDataGenerator.Generate(["Labrador", "German Shepherd", "Golden Retriever"], config, generator);
         Console.WriteLine(source);
     }
 }

@@ -6,10 +6,10 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class ArrayCode<T>(ArrayContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
-    public override string Generate() =>
+    public override string Generate(ReadOnlySpan<T> data) =>
         $$"""
-              {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
+              {{FieldModifier}}std::array<{{TypeName}}, {{data.Length.ToStringInvariant()}}> entries = {
+          {{FormatColumns(data, ToValueLabel)}}
               };
 
           public:
@@ -18,7 +18,7 @@ internal sealed class ArrayCode<T>(ArrayContext<T> ctx) : CPlusPlusOutputWriter<
               {
           {{EarlyExits}}
 
-                  for ({{ArraySizeType}} i = 0; i < {{ctx.Data.Length.ToStringInvariant()}}; i++)
+                  for ({{ArraySizeType}} i = 0; i < {{data.Length.ToStringInvariant()}}; i++)
                   {
                       if ({{GetEqualFunction("entries[i]", "value")}})
                          return true;

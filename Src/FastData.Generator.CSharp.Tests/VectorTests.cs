@@ -15,7 +15,7 @@ public class VectorTests
     [ClassData(typeof(TestVectorTheoryData))]
     public async Task Test<T>(TestVector<T> data)
     {
-        Assert.True(TryGenerate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), data, out GeneratorSpec spec));
+        GeneratorSpec spec = Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), data);
         Assert.NotEmpty(spec.Source);
 
         await Verify(spec.Source)

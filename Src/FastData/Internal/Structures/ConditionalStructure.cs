@@ -1,21 +1,12 @@
-using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class ConditionalStructure<T> : IStructure<T>
+internal sealed class ConditionalStructure<T> : IStructure<T, ConditionalContext<T>>
 {
-    public bool TryCreate(T[] data, out IContext? context)
+    public ConditionalContext<T> Create(ReadOnlySpan<T> data)
     {
-        //It is inappropriate for large inputs
-        if (data.Length > ushort.MaxValue)
-        {
-            context = null;
-            return false;
-        }
-
-        context = new ConditionalContext<T>(data);
-        return true;
+        return new ConditionalContext<T>();
     }
 }

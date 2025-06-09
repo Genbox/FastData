@@ -83,35 +83,36 @@ public static class TestHelper
         return true;
     }
 
-    /// <summary>This variant of TryGenerate bypasses the public API to test more advanced combinations of parameters</summary>
-    public static bool TryGenerate<T>(Func<string, ICodeGenerator> gen, TestVector<T> vector, out GeneratorSpec spec)
+    /// <summary>This variant of Generate bypasses the public API to test more advanced combinations of parameters</summary>
+    public static GeneratorSpec Generate<T>(Func<string, ICodeGenerator> func, TestVector<T> vector)
     {
         DataProperties<T> props = DataProperties<T>.Create(vector.Values);
-
-        IStructure<T>? structure;
-        T[] data = vector.Values;
+        ReadOnlySpan<T> data = vector.Values.AsSpan();
 
         if (vector.Type == typeof(SingleValueStructure<>))
-            structure = new SingleValueStructure<T>();
-        else if (vector.Type == typeof(BinarySearchStructure<>))
-            structure = new BinarySearchStructure<T>(props.DataType, StringComparison.Ordinal);
-        else if (vector.Type == typeof(ConditionalStructure<>))
-            structure = new ConditionalStructure<T>();
-        else if (vector.Type == typeof(EytzingerSearchStructure<>))
-            structure = new EytzingerSearchStructure<T>(props.DataType, StringComparison.Ordinal);
-        else if (vector.Type == typeof(HashSetChainStructure<>))
-            structure = new HashSetChainStructure<T>(HashData.Create(data, props.DataType, 1));
-        else if (vector.Type == typeof(HashSetPerfectStructure<>))
-            structure = new HashSetPerfectStructure<T>(HashData.Create(data, props.DataType, 1));
-        else if (vector.Type == typeof(HashSetLinearStructure<>))
-            structure = new HashSetLinearStructure<T>(HashData.Create(data, props.DataType, 1));
-        else if (vector.Type == typeof(KeyLengthStructure<>))
-            structure = new KeyLengthStructure<T>(props.StringProps!);
-        else if (vector.Type == typeof(ArrayStructure<>))
-            structure = new ArrayStructure<T>();
-        else
-            throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
+            return Generate(func, props, vector, new SingleValueStructure<T>());
+        if (vector.Type == typeof(BinarySearchStructure<>))
+            return Generate(func, props, vector, new BinarySearchStructure<T>(props.DataType, StringComparison.Ordinal));
+        if (vector.Type == typeof(ConditionalStructure<>))
+            return Generate(func, props, vector, new ConditionalStructure<T>());
+        if (vector.Type == typeof(EytzingerSearchStructure<>))
+            return Generate(func, props, vector, new EytzingerSearchStructure<T>(props.DataType, StringComparison.Ordinal));
+        if (vector.Type == typeof(HashSetChainStructure<>))
+            return Generate(func, props, vector, new HashSetChainStructure<T>(HashData.Create(data, props.DataType, 1)));
+        if (vector.Type == typeof(HashSetPerfectStructure<>))
+            return Generate(func, props, vector, new HashSetPerfectStructure<T>(HashData.Create(data, props.DataType, 1)));
+        if (vector.Type == typeof(HashSetLinearStructure<>))
+            return Generate(func, props, vector, new HashSetLinearStructure<T>(HashData.Create(data, props.DataType, 1)));
+        if (vector.Type == typeof(KeyLengthStructure<>))
+            return Generate(func, props, vector, new KeyLengthStructure<T>(props.StringProps!));
+        if (vector.Type == typeof(ArrayStructure<>))
+            return Generate(func, props, vector, new ArrayStructure<T>());
 
+        throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
+    }
+
+    private static GeneratorSpec Generate<T, TContext>(Func<string, ICodeGenerator> func, DataProperties<T> props, TestVector<T> vector, IStructure<T, TContext> structure) where TContext : IContext<T>
+    {
         StructureType structureType = structure switch
         {
             ArrayStructure<T> => StructureType.Array,
@@ -121,21 +122,11 @@ public static class TestHelper
             _ => StructureType.Auto
         };
 
-        if (!structure.TryCreate(vector.Values, out IContext? context))
-        {
-            spec = default;
-            return false;
-        }
+        TContext context = structure.Create(vector.Values);
+        ICodeGenerator generator = func(vector.Identifier);
 
-        ICodeGenerator generator = gen(vector.Identifier);
         GeneratorConfig<T> genCfg = new GeneratorConfig<T>(structureType, FastDataGenerator.DefaultStringComparison, props);
-        if (generator.TryGenerate(genCfg, context, out string? source))
-        {
-            spec = new GeneratorSpec(vector.Identifier, source);
-            return true;
-        }
-
-        spec = default;
-        return false;
+        string source = generator.Generate(vector.Values, genCfg, context);
+        return new GeneratorSpec(vector.Identifier, source);
     }
 }

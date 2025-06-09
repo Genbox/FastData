@@ -4,16 +4,19 @@ using Newtonsoft.Json;
 
 namespace Genbox.FastData.InternalShared;
 
-public sealed class DummyGenerator : ICodeGenerator
+public readonly struct DummyGenerator : ICodeGenerator
 {
     public bool UseUTF16Encoding => true;
 
-    public bool TryGenerate<T>(GeneratorConfig<T> genCfg, IContext context, out string? source)
+    public string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context)
     {
-        source = JsonConvert.SerializeObject(context, new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented
-        });
-        return true;
+        Combined<T> combined = new Combined<T>(data.ToArray(), context);
+        return JsonConvert.SerializeObject(combined, new JsonSerializerSettings { Formatting = Formatting.Indented });
+    }
+
+    private sealed class Combined<T>(T[] data, IContext<T> context)
+    {
+        public T[] Data { get; } = data;
+        public IContext<T> Context { get; } = context;
     }
 }

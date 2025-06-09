@@ -19,13 +19,4 @@ public static partial class FastDataGenerator
 
     [LoggerMessage(LogLevel.Information, "User selected structure type {Type}")]
     internal static partial void LogUserStructureType(ILogger logger, StructureType type);
-
-    [LoggerMessage(LogLevel.Information, "Trying data structure {Name}")]
-    internal static partial void LogCandidateAttempt(ILogger logger, string name);
-
-    [LoggerMessage(LogLevel.Information, "Data structure {Name} succeeded")]
-    internal static partial void LogCandidateSuccess(ILogger logger, string name);
-
-    [LoggerMessage(LogLevel.Information, "Data structure {Name} failed")]
-    internal static partial void LogCandidateFailed(ILogger logger, string name);
 }

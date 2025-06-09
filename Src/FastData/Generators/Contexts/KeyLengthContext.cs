@@ -7,7 +7,7 @@ namespace Genbox.FastData.Generators.Contexts;
 /// <param name="lengthsAreUniq">Indicates whether all lengths are unique.</param>
 /// <param name="minLength">The minimum string length.</param>
 /// <param name="maxLength">The maximum string length.</param>
-public sealed class KeyLengthContext(List<string>?[] lengths, bool lengthsAreUniq, uint minLength, uint maxLength) : IContext
+public sealed class KeyLengthContext<T>(List<string>?[] lengths, bool lengthsAreUniq, uint minLength, uint maxLength) : IContext<T>
 {
     /// <summary>Gets the array of lists containing string lengths.</summary>
     public List<string>?[] Lengths { get; } = lengths;

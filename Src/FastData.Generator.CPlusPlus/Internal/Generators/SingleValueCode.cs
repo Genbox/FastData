@@ -5,7 +5,7 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
-    public override string Generate() =>
+    public override string Generate(ReadOnlySpan<T> data) =>
         $$"""
           public:
               {{MethodAttribute}}

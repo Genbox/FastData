@@ -7,7 +7,6 @@ using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.SourceGenerator.Attributes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using StructureType = Genbox.FastData.Enums.StructureType;
 
 namespace Genbox.FastData.SourceGenerator;
 
@@ -56,16 +55,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
                     if (obj is CombinedConfig combinedCfg)
                     {
-                        if (!FastDataGenerator.TryGenerate(combinedCfg.Data, combinedCfg.FDConfig, CSharpCodeGenerator.Create(combinedCfg.CSConfig), out string? source))
-                        {
-                            StructureType ds = combinedCfg.FDConfig.StructureType;
-
-                            if (ds != StructureType.Auto)
-                                throw new InvalidOperationException($"Failed to generate code with '{ds}'. Try setting DataStructure to Auto.");
-
-                            throw new InvalidOperationException("Failed to generate code.");
-                        }
-
+                        string source = FastDataGenerator.Generate(combinedCfg.Data, combinedCfg.FDConfig, CSharpCodeGenerator.Create(combinedCfg.CSConfig));
                         spc.AddSource(combinedCfg.CSConfig.ClassName + ".g.cs", SourceText.From(source, Encoding.UTF8));
                     }
                     else
@@ -154,6 +144,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
             FastDataConfig config = new FastDataConfig();
             BindValue(() => config.StructureType, ad.NamedArguments);
+
             // BindValue(() => config.StorageOptions, ad.NamedArguments);
 
             CSharpCodeGeneratorConfig config2 = new CSharpCodeGeneratorConfig(name);

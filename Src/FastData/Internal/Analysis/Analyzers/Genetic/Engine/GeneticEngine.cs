@@ -12,7 +12,7 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
 {
     /// <summary>Runs the evolution process.</summary>
     /// <exception cref="InvalidOperationException"></exception>
-    internal IEnumerable<Entity> Evolve(Simulation simulation, ISelection selection, ICrossOver crossOver, IMutation mutation, IReinsertion reinsertion, ITermination termination, IRandom random)
+    internal IEnumerable<Entity> Evolve<T>(ReadOnlySpan<T> data, Simulation<T> simulation, ISelection selection, ICrossOver crossOver, IMutation mutation, IReinsertion reinsertion, ITermination termination, IRandom random)
     {
         //Create the initial population
         StaticArray<Entity> population = new StaticArray<Entity>(config.PopulationSize * 2);
@@ -39,7 +39,7 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
         {
             LogGeneration(logger, generation);
 
-            int bestIdx = RunPopulation(population, simulation);
+            int bestIdx = RunPopulation(data, population, simulation);
             ref Entity popBest = ref population[bestIdx];
 
             if (heap.Add(popBest.Fitness, popBest)) //This creates a copy, which is what we want, since we clear the population array
@@ -101,7 +101,7 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
         }
     }
 
-    private static int RunPopulation(StaticArray<Entity> population, Simulation simulation)
+    private static int RunPopulation<T>(ReadOnlySpan<T> data, StaticArray<Entity> population, Simulation<T> simulation)
     {
         double maxFit = double.MinValue;
         int bestIdx = 0;
@@ -109,7 +109,7 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
         for (int i = 0; i < population.Count; i++)
         {
             ref Entity entity = ref population[i];
-            simulation(ref entity);
+            simulation(data, ref entity);
 
             // We keep a running max
             if (entity.Fitness > maxFit)

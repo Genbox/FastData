@@ -66,8 +66,12 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), new Simulator(data, new SimulatorConfig()), loggerFactory.CreateLogger<BruteForceAnalyzer>());
-        PrintCandidate(analyzer.GetCandidates().OrderByDescending(x => x.Fitness).First());
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), new Simulator(new SimulatorConfig()), loggerFactory.CreateLogger<BruteForceAnalyzer>());
+        analyzer.GetCandidates(data, candidate =>
+        {
+            PrintCandidate(candidate);
+            return false;
+        });
     }
 
     private static void RunGeneticAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
@@ -76,8 +80,12 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), new Simulator(data, new SimulatorConfig()), loggerFactory.CreateLogger<GeneticAnalyzer>());
-        PrintCandidate(analyzer.GetCandidates().OrderByDescending(x => x.Fitness).First());
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), new Simulator(new SimulatorConfig()), loggerFactory.CreateLogger<GeneticAnalyzer>());
+        analyzer.GetCandidates(data, candidate =>
+        {
+            PrintCandidate(candidate);
+            return false;
+        });
     }
 
     private static void RunGPerfAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
@@ -86,8 +94,12 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        GPerfAnalyzer analyzer = new GPerfAnalyzer(data, props, new GPerfAnalyzerConfig(), new Simulator(data, new SimulatorConfig()), loggerFactory.CreateLogger<GPerfAnalyzer>());
-        PrintCandidate(analyzer.GetCandidates().OrderByDescending(x => x.Fitness).First());
+        GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(new SimulatorConfig()), loggerFactory.CreateLogger<GPerfAnalyzer>());
+        analyzer.GetCandidates(data, candidate =>
+        {
+            PrintCandidate(candidate);
+            return false;
+        });
     }
 
     private static void Print(string[] data, string? source)

@@ -1,3 +1,4 @@
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts.Misc;
 
 namespace Genbox.FastData.Generators.Contexts;
@@ -7,8 +8,10 @@ namespace Genbox.FastData.Generators.Contexts;
 /// <param name="data">The data array.</param>
 /// <param name="buckets">The array of hash set buckets.</param>
 /// <param name="hashCodes">The array of hash codes.</param>
-public sealed class HashSetLinearContext<T>(T[] data, HashSetBucket[] buckets, ulong[] hashCodes) : DefaultContext<T>(data)
+public sealed class HashSetLinearContext<T>(T[] data, HashSetBucket[] buckets, ulong[] hashCodes) : IContext<T>
 {
+    public T[] Data { get; } = data;
+
     /// <summary>Gets the array of hash set buckets.</summary>
     public HashSetBucket[] Buckets { get; } = buckets;
     /// <summary>Gets the array of hash codes.</summary>

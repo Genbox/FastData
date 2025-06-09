@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Contexts.Misc;
 using Genbox.FastData.Generators.Helpers;
@@ -8,11 +7,11 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashSetLinearStructure<T>(HashData hashData) : IStructure<T>
+internal sealed class HashSetLinearStructure<T>(HashData hashData) : IStructure<T, HashSetLinearContext<T>>
 {
     //TODO: Either implement a bitmap for seen buckets everywhere or don't use bitmaps for simplicity
 
-    public bool TryCreate(T[] data, out IContext? context)
+    public HashSetLinearContext<T> Create(ReadOnlySpan<T> data)
     {
         ulong[] hashCodes = hashData.HashCodes;
         uint numBuckets = CalcNumBuckets(hashCodes, hashData.HashCodesUnique);
@@ -69,8 +68,7 @@ internal sealed class HashSetLinearStructure<T>(HashData hashData) : IStructure<
             newData[destIndex] = data[srcIndex];
         }
 
-        context = new HashSetLinearContext<T>(newData, finalBuckets, finalCodes);
-        return true;
+        return new HashSetLinearContext<T>(newData, finalBuckets, finalCodes);
     }
 
     private static uint CalcNumBuckets(ulong[] hashCodes, bool hashCodesUnique)

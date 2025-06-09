@@ -1,10 +1,16 @@
 using System.Text;
+using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.Helpers;
 
 public static class FormatHelper
 {
-    public static string FormatColumns<T>(IEnumerable<T> items, Func<T, string> Render, int indent = 8, int columns = 10)
+    public static string FormatColumns<T>(T[] items, Func<T, string> Render, int indent = 8, int columns = 10)
+    {
+        return FormatColumns(items.AsReadOnlySpan(), Render, indent, columns);
+    }
+
+    public static string FormatColumns<T>(ReadOnlySpan<T> items, Func<T, string> Render, int indent = 8, int columns = 10)
     {
         StringBuilder sb = new StringBuilder();
         int count = 0;
@@ -34,14 +40,18 @@ public static class FormatHelper
         return sb.ToString();
     }
 
-    public static string FormatList<T>(IEnumerable<T> data, Func<T, string> render, string delim = ", ")
+    public static string FormatList<T>(T[] data, Func<T, string> render, string delim = ", ")
     {
-        using IEnumerator<T> enumerator = data.GetEnumerator();
+        return FormatList(data.AsReadOnlySpan(), render, delim);
+    }
+
+    public static string FormatList<T>(ReadOnlySpan<T> data, Func<T, string> render, string delim = ", ")
+    {
         StringBuilder sb = new StringBuilder();
 
-        while (enumerator.MoveNext())
+        foreach (T item in data)
         {
-            sb.Append(render(enumerator.Current));
+            sb.Append(render(item));
             sb.Append(delim);
         }
 

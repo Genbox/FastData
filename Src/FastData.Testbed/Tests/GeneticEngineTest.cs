@@ -21,7 +21,7 @@ internal static class GeneticEngineTest
 
         DefaultRandom random = new DefaultRandom();
 
-        Entity entity = engine.Evolve(Simulation,
+        Entity entity = engine.Evolve<string>([], Simulation,
             new TournamentSelection(4, random),
             new OnePointCrossOver(random),
             new UniformMutation(0.05, random),
@@ -35,7 +35,7 @@ internal static class GeneticEngineTest
         Console.WriteLine("Gene2: " + ((IntGene)entity.Genes[2]).Value);
     }
 
-    private static void Simulation(ref Entity entity)
+    private static void Simulation(ReadOnlySpan<string> data, ref Entity entity)
     {
         unchecked
         {

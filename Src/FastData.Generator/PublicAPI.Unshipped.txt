@@ -1,12 +1,12 @@
 #nullable enable
-abstract Genbox.FastData.Generator.Framework.CodeGenerator.GetOutputWriter<T>(Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, Genbox.FastData.Generators.Abstracts.IContext! context) -> Genbox.FastData.Generator.Framework.OutputWriter<T>?
+abstract Genbox.FastData.Generator.Framework.CodeGenerator.GetOutputWriter<T>(Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, Genbox.FastData.Generators.Abstracts.IContext<T>! context) -> Genbox.FastData.Generator.Framework.OutputWriter<T>?
 abstract Genbox.FastData.Generator.Framework.Definitions.EarlyExitDef.GetLengthEarlyExits(uint min, uint max) -> string!
 abstract Genbox.FastData.Generator.Framework.Definitions.EarlyExitDef.GetMaskEarlyExit(ulong bitSet) -> string!
 abstract Genbox.FastData.Generator.Framework.Definitions.EarlyExitDef.GetValueEarlyExits<T>(T min, T max) -> string!
 abstract Genbox.FastData.Generator.Framework.Definitions.EarlyExitDef.IsEnabled.get -> bool
-abstract Genbox.FastData.Generator.Framework.OutputWriter<T>.Generate() -> string!
-Genbox.FastData.Generator.Abstracts.IOutputWriter
-Genbox.FastData.Generator.Abstracts.IOutputWriter.Generate() -> string!
+abstract Genbox.FastData.Generator.Framework.OutputWriter<T>.Generate(System.ReadOnlySpan<T> data) -> string!
+Genbox.FastData.Generator.Abstracts.IOutputWriter<T>
+Genbox.FastData.Generator.Abstracts.IOutputWriter<T>.Generate(System.ReadOnlySpan<T> data) -> string!
 Genbox.FastData.Generator.Enums.BranchType
 Genbox.FastData.Generator.Enums.BranchType.If = 2 -> Genbox.FastData.Generator.Enums.BranchType
 Genbox.FastData.Generator.Enums.BranchType.Switch = 1 -> Genbox.FastData.Generator.Enums.BranchType
@@ -17,6 +17,7 @@ Genbox.FastData.Generator.Enums.CodeType.Directive = 3 -> Genbox.FastData.Genera
 Genbox.FastData.Generator.Enums.CodeType.Method = 1 -> Genbox.FastData.Generator.Enums.CodeType
 Genbox.FastData.Generator.Enums.CodeType.Unknown = 0 -> Genbox.FastData.Generator.Enums.CodeType
 Genbox.FastData.Generator.Extensions.IntegerExtensions
+Genbox.FastData.Generator.Extensions.SpanExtensions
 Genbox.FastData.Generator.Framework.CodeGenerator
 Genbox.FastData.Generator.Framework.CodeGenerator.CodeGenerator(Genbox.FastData.Generator.Framework.Interfaces.ILanguageDef! langDef, Genbox.FastData.Generator.Framework.Interfaces.IConstantsDef! constDef, Genbox.FastData.Generator.Framework.Interfaces.IEarlyExitDef! earlyExitDef, Genbox.FastData.Generator.Framework.Interfaces.IHashDef! hashDef) -> void
 Genbox.FastData.Generator.Framework.CodeGenerator.Shared.get -> Genbox.FastData.Generator.SharedCode!
@@ -89,12 +90,17 @@ Genbox.FastData.Generator.SharedCode.SharedCode() -> void
 static Genbox.FastData.Generator.Extensions.IntegerExtensions.ToStringInvariant(this int value) -> string!
 static Genbox.FastData.Generator.Extensions.IntegerExtensions.ToStringInvariant(this uint value) -> string!
 static Genbox.FastData.Generator.Extensions.IntegerExtensions.ToStringInvariant(this ulong value) -> string!
+static Genbox.FastData.Generator.Extensions.SpanExtensions.AsReadOnlySpan<T>(this T[]! arr) -> System.ReadOnlySpan<T>
+static Genbox.FastData.Generator.Extensions.SpanExtensions.AsReadOnlySpan<T>(this T[]! arr, int start) -> System.ReadOnlySpan<T>
+static Genbox.FastData.Generator.Extensions.SpanExtensions.AsReadOnlySpan<T>(this T[]! arr, int start, int length) -> System.ReadOnlySpan<T>
 static Genbox.FastData.Generator.Framework.OutputWriter<T>.HashSizeDataType.get -> Genbox.FastData.Enums.DataType
-static Genbox.FastData.Generator.Helpers.FormatHelper.FormatColumns<T>(System.Collections.Generic.IEnumerable<T>! items, System.Func<T, string!>! Render, int indent = 8, int columns = 10) -> string!
-static Genbox.FastData.Generator.Helpers.FormatHelper.FormatList<T>(System.Collections.Generic.IEnumerable<T>! data, System.Func<T, string!>! render, string! delim = ", ") -> string!
-virtual Genbox.FastData.Generator.Framework.CodeGenerator.AppendBody<T>(System.Text.StringBuilder! sb, Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, string! typeName, Genbox.FastData.Generators.Abstracts.IContext! context) -> void
+static Genbox.FastData.Generator.Helpers.FormatHelper.FormatColumns<T>(System.ReadOnlySpan<T> items, System.Func<T, string!>! Render, int indent = 8, int columns = 10) -> string!
+static Genbox.FastData.Generator.Helpers.FormatHelper.FormatColumns<T>(T[]! items, System.Func<T, string!>! Render, int indent = 8, int columns = 10) -> string!
+static Genbox.FastData.Generator.Helpers.FormatHelper.FormatList<T>(System.ReadOnlySpan<T> data, System.Func<T, string!>! render, string! delim = ", ") -> string!
+static Genbox.FastData.Generator.Helpers.FormatHelper.FormatList<T>(T[]! data, System.Func<T, string!>! render, string! delim = ", ") -> string!
+virtual Genbox.FastData.Generator.Framework.CodeGenerator.AppendBody<T>(System.Text.StringBuilder! sb, Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, string! typeName, Genbox.FastData.Generators.Abstracts.IContext<T>! context, System.ReadOnlySpan<T> data) -> void
 virtual Genbox.FastData.Generator.Framework.CodeGenerator.AppendFooter<T>(System.Text.StringBuilder! sb, Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, string! typeName) -> void
-virtual Genbox.FastData.Generator.Framework.CodeGenerator.AppendHeader<T>(System.Text.StringBuilder! sb, Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, Genbox.FastData.Generators.Abstracts.IContext! context) -> void
-virtual Genbox.FastData.Generator.Framework.CodeGenerator.TryGenerate<T>(Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, Genbox.FastData.Generators.Abstracts.IContext! context, out string? source) -> bool
+virtual Genbox.FastData.Generator.Framework.CodeGenerator.AppendHeader<T>(System.Text.StringBuilder! sb, Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, Genbox.FastData.Generators.Abstracts.IContext<T>! context) -> void
+virtual Genbox.FastData.Generator.Framework.CodeGenerator.Generate<T>(System.ReadOnlySpan<T> data, Genbox.FastData.Generators.GeneratorConfig<T>! genCfg, Genbox.FastData.Generators.Abstracts.IContext<T>! context) -> string!
 virtual Genbox.FastData.Generator.Framework.OutputWriter<T>.GetEqualFunction(string! value1, string! value2, Genbox.FastData.Enums.DataType dataType = Genbox.FastData.Enums.DataType.Null) -> string!
 virtual Genbox.FastData.Generator.Framework.OutputWriter<T>.GetModFunction(string! variable, ulong value) -> string!

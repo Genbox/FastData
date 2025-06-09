@@ -1,12 +1,11 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generators.Abstracts;
-using Genbox.FastData.InternalShared.Helpers;
 using Xunit.Abstractions;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public class TestData<T>(StructureType structureType, T[] values) : ITestData, IXunitSerializable
+public class TestData<T>(StructureType structureType, T[] values) : ITestData, IXunitSerializable where T : notnull
 {
     private readonly DataType _dataType = Enum.Parse<DataType>(typeof(T).Name);
     private readonly Random _rng = new Random(42);
@@ -18,10 +17,8 @@ public class TestData<T>(StructureType structureType, T[] values) : ITestData, I
 
     public void Generate(Func<string, ICodeGenerator> factory, out GeneratorSpec spec)
     {
-        if (!FastDataGenerator.TryGenerate(Values, new FastDataConfig(StructureType), factory(Identifier), out string? source))
-            throw new InvalidOperationException($"Unable to build {Identifier}");
-
-        spec = new GeneratorSpec(Identifier, source!);
+        string source = FastDataGenerator.Generate(Values, new FastDataConfig(StructureType), factory(Identifier));
+        spec = new GeneratorSpec(Identifier, source);
     }
 
     public string GetValueLabel(TypeHelper helper) => helper.ToValueLabel(Values[_rng.Next(0, Values.Length)]);

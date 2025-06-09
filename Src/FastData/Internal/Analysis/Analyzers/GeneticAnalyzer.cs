@@ -82,7 +82,7 @@ internal sealed partial class GeneticAnalyzer(StringProperties props, GeneticAna
 
     public bool IsAppropriate() => true;
 
-    public IEnumerable<Candidate> GetCandidates()
+    public void GetCandidates(ReadOnlySpan<string> data, Func<Candidate, bool> onCandidateFound)
     {
         GeneticEngineConfig cfg = new GeneticEngineConfig();
         cfg.PopulationSize = config.PopulationSize;
@@ -107,22 +107,23 @@ internal sealed partial class GeneticAnalyzer(StringProperties props, GeneticAna
         IReinsertion reinsertion = new EliteReinsertion(0.1);
         ITermination termination = new MaxGenerationsTermination(config.MaxGenerations);
 
-        foreach (Entity entity in engine.Evolve(Simulation, selection, crossOver, mutation, reinsertion, termination, random))
+        foreach (Entity entity in engine.Evolve(data, Simulation, selection, crossOver, mutation, reinsertion, termination, random))
         {
             Entity localEntity = entity;
             GeneticStringHash hash = CopyGenes(ref localEntity);
 
-            yield return new Candidate(hash, entity.Fitness, (int)entity.Tag);
+            if (!onCandidateFound(new Candidate(hash, entity.Fitness, (int)entity.Tag)))
+                return;
         }
     }
 
-    private void Simulation(ref Entity entity)
+    private void Simulation(ReadOnlySpan<string> data, ref Entity entity)
     {
         //Convert entity to GeneticArrayHash
         GeneticStringHash spec = CopyGenes(ref entity);
 
         //Run the simulation
-        Candidate candidate = sim.Run(spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));
+        Candidate candidate = sim.Run(data, spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));
 
         //Copy over the fitness value
         entity.Fitness = candidate.Fitness;
