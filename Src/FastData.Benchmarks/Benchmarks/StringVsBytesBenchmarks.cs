@@ -7,7 +7,7 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 /// <summary>Benchmarks the difference between checking string/byte[]</summary>
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-public class StringVsByteArrayVsInteger
+public class StringVsBytesBenchmarks
 {
     //Create 100x 4 character strings. They are all ASCII
     private static readonly string[] _query1 = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(Random.Shared, 4)).ToArray();
