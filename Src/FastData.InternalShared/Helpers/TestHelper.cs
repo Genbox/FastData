@@ -21,7 +21,13 @@ public static class TestHelper
     public static void CreateOrEmptyDirectory(string path)
     {
         if (Directory.Exists(path))
-            Directory.Delete(path, true);
+        {
+            foreach (string file in Directory.EnumerateFiles(path))
+                File.Delete(file);
+
+            foreach (string dir in Directory.EnumerateDirectories(path))
+                Directory.Delete(dir, recursive: true);
+        }
 
         Directory.CreateDirectory(path);
     }
