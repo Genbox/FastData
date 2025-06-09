@@ -8,7 +8,7 @@ internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx, CSha
     public override string Generate(ReadOnlySpan<T> data) =>
         $$"""
               {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
+          {{FormatColumns(data, ToValueLabel)}}
               };
 
               {{MethodAttribute}}

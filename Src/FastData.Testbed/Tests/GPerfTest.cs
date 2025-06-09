@@ -47,7 +47,7 @@ internal static class GPerfTest
 
             HashData hashData = HashData.Create(data, DataType.String, 1);
             HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>(hashData);
-            structure.Create(data);
+            structure.Create(ref data);
         }
     }
 

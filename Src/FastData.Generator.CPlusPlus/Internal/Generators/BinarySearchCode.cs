@@ -8,8 +8,8 @@ internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : CPlusPlu
 {
     public override string Generate(ReadOnlySpan<T> data) =>
         $$"""
-              {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
+              {{FieldModifier}}std::array<{{TypeName}}, {{data.Length.ToStringInvariant()}}> entries = {
+          {{FormatColumns(data, ToValueLabel)}}
               };
 
           public:
@@ -19,7 +19,7 @@ internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : CPlusPlu
           {{EarlyExits}}
 
                   {{ArraySizeType}} lo = 0;
-                  {{ArraySizeType}} hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
+                  {{ArraySizeType}} hi = {{(data.Length - 1).ToStringInvariant()}};
                   while (lo <= hi)
                   {
                       const size_t mid = lo + ((hi - lo) >> 1);

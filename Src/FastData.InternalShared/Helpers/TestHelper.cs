@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Internal.Abstracts;
@@ -122,11 +123,12 @@ public static class TestHelper
             _ => StructureType.Auto
         };
 
-        TContext context = structure.Create(vector.Values);
+        ReadOnlySpan<T> values = vector.Values.AsReadOnlySpan();
+        TContext context = structure.Create(ref values);
         ICodeGenerator generator = func(vector.Identifier);
 
         GeneratorConfig<T> genCfg = new GeneratorConfig<T>(structureType, FastDataGenerator.DefaultStringComparison, props);
-        string source = generator.Generate(vector.Values, genCfg, context);
+        string source = generator.Generate(values, genCfg, context);
         return new GeneratorSpec(vector.Identifier, source);
     }
 }

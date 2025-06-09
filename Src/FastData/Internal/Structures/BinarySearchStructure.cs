@@ -7,9 +7,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class BinarySearchStructure<T>(DataType dataType, StringComparison comparison) : IStructure<T, BinarySearchContext<T>>
 {
-    public BinarySearchContext<T> Create(ReadOnlySpan<T> data)
+    public BinarySearchContext<T> Create(ref ReadOnlySpan<T> data)
     {
-        //We make a copy to avoid altering the original data
         T[] copy = new T[data.Length];
         data.CopyTo(copy);
 
@@ -18,6 +17,7 @@ internal sealed class BinarySearchStructure<T>(DataType dataType, StringComparis
         else
             Array.Sort(copy);
 
-        return new BinarySearchContext<T>(copy);
+        data = copy;
+        return new BinarySearchContext<T>();
     }
 }

@@ -5,7 +5,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class ConditionalStructure<T> : IStructure<T, ConditionalContext<T>>
 {
-    public ConditionalContext<T> Create(ReadOnlySpan<T> data)
+    public ConditionalContext<T> Create(ref ReadOnlySpan<T> data)
     {
         return new ConditionalContext<T>();
     }

@@ -11,7 +11,7 @@ internal sealed class HashSetLinearStructure<T>(HashData hashData) : IStructure<
 {
     //TODO: Either implement a bitmap for seen buckets everywhere or don't use bitmaps for simplicity
 
-    public HashSetLinearContext<T> Create(ReadOnlySpan<T> data)
+    public HashSetLinearContext<T> Create(ref ReadOnlySpan<T> data)
     {
         ulong[] hashCodes = hashData.HashCodes;
         uint numBuckets = CalcNumBuckets(hashCodes, hashData.HashCodesUnique);

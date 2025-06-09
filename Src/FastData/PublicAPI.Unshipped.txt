@@ -48,10 +48,7 @@ Genbox.FastData.Generators.Contexts.ArrayContext<T>.ArrayContext() -> void
 Genbox.FastData.Generators.Contexts.ArrayContext<T>.ArrayContext(System.ReadOnlySpan<T> data) -> void
 Genbox.FastData.Generators.Contexts.ArrayContext<T>.Data.get -> System.ReadOnlySpan<T>
 Genbox.FastData.Generators.Contexts.BinarySearchContext<T>
-Genbox.FastData.Generators.Contexts.BinarySearchContext<T>.BinarySearchContext(T[]! data) -> void
-Genbox.FastData.Generators.Contexts.BinarySearchContext<T>.Data.get -> T[]!
-Genbox.FastData.Generators.Contexts.BinarySearchContext<T>.data.get -> T[]!
-Genbox.FastData.Generators.Contexts.BinarySearchContext<T>.data.init -> void
+Genbox.FastData.Generators.Contexts.BinarySearchContext<T>.BinarySearchContext() -> void
 Genbox.FastData.Generators.Contexts.ConditionalContext<T>
 Genbox.FastData.Generators.Contexts.ConditionalContext<T>.ConditionalContext() -> void
 Genbox.FastData.Generators.Contexts.ConditionalContext<T>.ConditionalContext(System.ReadOnlySpan<T> data) -> void
@@ -145,7 +142,6 @@ Genbox.FastData.Generators.Metadata
 Genbox.FastData.Generators.Metadata.Metadata(System.Version! version, System.DateTimeOffset timestamp) -> void
 Genbox.FastData.Generators.Metadata.Program.get -> string!
 Genbox.FastData.Generators.Metadata.Timestamp.get -> string!
-override Genbox.FastData.Generators.Contexts.BinarySearchContext<T>.ToString() -> string!
 override Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.GetHashCode() -> int
 override Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.GetHashCode() -> int
 override Genbox.FastData.Generators.EarlyExits.LengthBitSetEarlyExit.Equals(object? obj) -> bool

@@ -156,7 +156,7 @@ public static partial class FastDataGenerator
 
     private static string Generate<T, TContext>(ICodeGenerator generator, GeneratorConfig<T> genCfg, IStructure<T, TContext> structure, ReadOnlySpan<T> data) where TContext : IContext<T>
     {
-        TContext res = structure.Create(data);
+        TContext res = structure.Create(ref data);
         return generator.Generate(data, genCfg, res);
     }
 

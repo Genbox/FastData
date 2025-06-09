@@ -9,7 +9,7 @@ internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx, CSharpCode
     public override string Generate(ReadOnlySpan<T> data) =>
         $$"""
               {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
+          {{FormatColumns(data, ToValueLabel)}}
               };
 
               {{MethodAttribute}}
@@ -18,7 +18,7 @@ internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx, CSharpCode
           {{EarlyExits}}
 
                   int lo = 0;
-                  int hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
+                  int hi = {{(data.Length - 1).ToStringInvariant()}};
                   while (lo <= hi)
                   {
                       int i = lo + ((hi - lo) >> 1);

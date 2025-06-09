@@ -7,7 +7,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class HashSetChainStructure<T>(HashData hashData) : IStructure<T, HashSetChainContext<T>>
 {
-    public HashSetChainContext<T> Create(ReadOnlySpan<T> data)
+    public HashSetChainContext<T> Create(ref ReadOnlySpan<T> data)
     {
         ulong size = (ulong)(data.Length * hashData.CapacityFactor);
 

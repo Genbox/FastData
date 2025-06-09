@@ -4,5 +4,5 @@ namespace Genbox.FastData.Internal.Abstracts;
 
 internal interface IStructure<T, out TContext> where TContext : IContext<T>
 {
-    TContext Create(ReadOnlySpan<T> data);
+    TContext Create(ref ReadOnlySpan<T> data);
 }

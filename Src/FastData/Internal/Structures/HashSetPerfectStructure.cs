@@ -6,7 +6,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class HashSetPerfectStructure<T>(HashData hashData) : IStructure<T, HashSetPerfectContext<T>>
 {
-    public HashSetPerfectContext<T> Create(ReadOnlySpan<T> data)
+    public HashSetPerfectContext<T> Create(ref ReadOnlySpan<T> data)
     {
         if (!hashData.HashCodesPerfect)
             throw new InvalidOperationException("HashSetPerfectStructure can only be created with a perfect hash function.");
