@@ -10,12 +10,12 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlu
         $$"""
               struct e
               {
-                  {{HashSizeType}} hash_code;
+                  {{(ctx.StoreHashCode ? $"{HashSizeType} hash_code;" : "")}}
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
                   {{TypeName}} value;
 
-                  e(const {{HashSizeType}} hash_code, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{TypeName}} value)
-                     : hash_code(hash_code), next(next), value(value) {}
+                  e({{(ctx.StoreHashCode ? $"const {HashSizeType} hash_code, " : "")}}const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{TypeName}} value)
+                     : {{(ctx.StoreHashCode ? "hash_code(hash_code), " : "")}}next(next), value(value) {}
               };
 
               {{FieldModifier}}std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length.ToStringInvariant()}}> buckets = {
@@ -23,7 +23,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlu
                };
 
               {{GetFieldModifier(false)}}std::array<e, {{ctx.Entries.Length.ToStringInvariant()}}> entries = {
-          {{FormatColumns(ctx.Entries, x => $"e({x.Hash.ToStringInvariant()}, {x.Next.ToStringInvariant()}, {ToValueLabel(x.Value)})")}}
+          {{FormatColumns(ctx.Entries, x => $"e({(ctx.StoreHashCode ? $"{x.Hash.ToStringInvariant()}, " : "")}{x.Next.ToStringInvariant()}, {ToValueLabel(x.Value)})")}}
               };
 
           {{HashSource}}
@@ -40,9 +40,9 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlu
 
                   while (i >= 0)
                   {
-                      const auto& [hash_code, next, value1] = entries[i];
+                      const auto& [{{(ctx.StoreHashCode ? "hash_code, " : "")}}next, value1] = entries[i];
 
-                      if ({{GetEqualFunction("hash_code", "hash")}} && {{GetEqualFunction("value1", "value")}})
+                      if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("hash_code", "hash")} && " : "")}}{{GetEqualFunction("value1", "value")}})
                           return true;
 
                       i = next;

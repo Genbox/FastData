@@ -10,12 +10,12 @@ class HashSetChainStructure_SByte_5 final
 {
     struct e
     {
-        uint64_t hash_code;
+        
         int8_t next;
         int8_t value;
 
-        e(const uint64_t hash_code, const int8_t next, const int8_t value)
-           : hash_code(hash_code), next(next), value(value) {}
+        e(const int8_t next, const int8_t value)
+           : next(next), value(value) {}
     };
 
     static constexpr std::array<int8_t, 5> buckets = {
@@ -23,7 +23,7 @@ class HashSetChainStructure_SByte_5 final
      };
 
     inline static const std::array<e, 5> entries = {
-        e(18446744073709551488, -1, std::numeric_limits<int8_t>::lowest()), e(18446744073709551615, -1, -1), e(0, 1, 0), e(1, -1, 1), e(127, -1, std::numeric_limits<int8_t>::max())
+        e(-1, std::numeric_limits<int8_t>::lowest()), e(-1, -1), e(1, 0), e(-1, 1), e(-1, std::numeric_limits<int8_t>::max())
     };
 
     static constexpr uint64_t get_hash(const int8_t value) noexcept
@@ -44,9 +44,9 @@ public:
 
         while (i >= 0)
         {
-            const auto& [hash_code, next, value1] = entries[i];
+            const auto& [next, value1] = entries[i];
 
-            if (hash_code == hash && value1 == value)
+            if (value1 == value)
                 return true;
 
             i = next;
