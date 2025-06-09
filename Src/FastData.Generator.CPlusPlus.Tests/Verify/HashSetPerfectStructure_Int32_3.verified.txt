@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: HashSet
+// Structure: HashSet (HashSetPerfect)
 #pragma once
 #include <array>
 #include <cstdint>

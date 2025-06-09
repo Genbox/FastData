@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: BinarySearch
+// Structure: BinarySearch (EytzingerSearch)
 #pragma once
 #include <array>
 #include <cstdint>
