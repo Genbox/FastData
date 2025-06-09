@@ -13,7 +13,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, CSharpCode
                };
 
               {{FieldModifier}}E[] _entries = {
-          {{FormatColumns(ctx.Entries, x => $"new E({x.Hash}, {x.Next.ToStringInvariant()}, {ToValueLabel(x.Value)})")}}
+          {{FormatColumns(ctx.Entries, x => $"new E({(ctx.StoreHashCode ? $"{x.Hash}, " : "")}{x.Next.ToStringInvariant()}, {ToValueLabel(x.Value)})")}}
               };
 
               {{MethodAttribute}}
@@ -29,7 +29,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, CSharpCode
                   {
                       ref E entry = ref _entries[i];
 
-                      if ({{GetEqualFunction("entry.HashCode", "hash", HashSizeDataType)}} && {{GetEqualFunction("value", "entry.Value")}})
+                      if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", HashSizeDataType)} && " : "")}}{{GetEqualFunction("value", "entry.Value")}})
                           return true;
 
                       i = entry.Next;
@@ -43,13 +43,13 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, CSharpCode
               [StructLayout(LayoutKind.Auto)]
               private readonly struct E
               {
-                  internal readonly {{HashSizeType}} HashCode;
+                  {{(ctx.StoreHashCode ? $"internal readonly {HashSizeType} HashCode;" : "")}}
                   internal readonly {{GetSmallestSignedType(ctx.Buckets.Length)}} Next;
                   internal readonly {{TypeName}} Value;
 
-                  internal E({{HashSizeType}} hashCode, {{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{TypeName}} value)
+                  internal E({{(ctx.StoreHashCode ? $"{HashSizeType} hashCode, " : "")}}{{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{TypeName}} value)
                   {
-                      HashCode = hashCode;
+                      {{(ctx.StoreHashCode ? "HashCode = hashCode;" : "")}}
                       Next = next;
                       Value = value;
                   }

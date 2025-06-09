@@ -13,7 +13,7 @@ internal static class HashSetChainStructure_Char_3
      };
 
     private static readonly E[] _entries = {
-        new E(0, -1, char.MinValue), new E(97, -1, 'a'), new E(127, 1, '')
+        new E(-1, char.MinValue), new E(-1, 'a'), new E(1, '')
     };
 
     
@@ -30,7 +30,7 @@ internal static class HashSetChainStructure_Char_3
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && value == entry.Value)
+            if (value == entry.Value)
                 return true;
 
             i = entry.Next;
@@ -48,13 +48,13 @@ internal static class HashSetChainStructure_Char_3
     [StructLayout(LayoutKind.Auto)]
     private readonly struct E
     {
-        internal readonly ulong HashCode;
+        
         internal readonly sbyte Next;
         internal readonly char Value;
 
-        internal E(ulong hashCode, sbyte next, char value)
+        internal E(sbyte next, char value)
         {
-            HashCode = hashCode;
+            
             Next = next;
             Value = value;
         }

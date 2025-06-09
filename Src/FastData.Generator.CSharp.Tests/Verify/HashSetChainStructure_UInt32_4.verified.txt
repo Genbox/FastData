@@ -13,7 +13,7 @@ internal static class HashSetChainStructure_UInt32_4
      };
 
     private static readonly E[] _entries = {
-        new E(0, -1, uint.MinValue), new E(1, -1, 1u), new E(2, -1, 2u), new E(4294967295, -1, uint.MaxValue)
+        new E(-1, uint.MinValue), new E(-1, 1u), new E(-1, 2u), new E(-1, uint.MaxValue)
     };
 
     
@@ -30,7 +30,7 @@ internal static class HashSetChainStructure_UInt32_4
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && value == entry.Value)
+            if (value == entry.Value)
                 return true;
 
             i = entry.Next;
@@ -48,13 +48,13 @@ internal static class HashSetChainStructure_UInt32_4
     [StructLayout(LayoutKind.Auto)]
     private readonly struct E
     {
-        internal readonly ulong HashCode;
+        
         internal readonly sbyte Next;
         internal readonly uint Value;
 
-        internal E(ulong hashCode, sbyte next, uint value)
+        internal E(sbyte next, uint value)
         {
-            HashCode = hashCode;
+            
             Next = next;
             Value = value;
         }

@@ -13,7 +13,7 @@ internal static class HashSetChainStructure_Int32_5
      };
 
     private static readonly E[] _entries = {
-        new E(18446744071562067968, -1, int.MinValue), new E(18446744073709551615, -1, -1), new E(0, 1, 0), new E(1, -1, 1), new E(2147483647, -1, int.MaxValue)
+        new E(-1, int.MinValue), new E(-1, -1), new E(1, 0), new E(-1, 1), new E(-1, int.MaxValue)
     };
 
     
@@ -30,7 +30,7 @@ internal static class HashSetChainStructure_Int32_5
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && value == entry.Value)
+            if (value == entry.Value)
                 return true;
 
             i = entry.Next;
@@ -48,13 +48,13 @@ internal static class HashSetChainStructure_Int32_5
     [StructLayout(LayoutKind.Auto)]
     private readonly struct E
     {
-        internal readonly ulong HashCode;
+        
         internal readonly sbyte Next;
         internal readonly int Value;
 
-        internal E(ulong hashCode, sbyte next, int value)
+        internal E(sbyte next, int value)
         {
-            HashCode = hashCode;
+            
             Next = next;
             Value = value;
         }
