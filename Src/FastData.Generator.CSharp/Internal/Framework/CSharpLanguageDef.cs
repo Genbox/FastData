@@ -21,7 +21,6 @@ internal class CSharpLanguageDef : ILanguageDef
         new IntegerTypeDef<ulong>("ulong", ulong.MinValue, ulong.MaxValue, "ulong.MinValue", "ulong.MaxValue", x => x.ToString(NumberFormatInfo.InvariantInfo) + "ul"),
         new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "float.MinValue", "float.MaxValue", x => x.ToString(NumberFormatInfo.InvariantInfo) + "f"),
         new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "double.MinValue", "double.MaxValue", x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
-        new StringTypeDef("string"),
-        new BoolTypeDef("bool")
+        new StringTypeDef("string")
     };
 }

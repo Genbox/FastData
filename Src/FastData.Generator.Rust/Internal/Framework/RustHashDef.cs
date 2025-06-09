@@ -33,7 +33,7 @@ internal class RustHashDef : IHashDef
                    """;
         }
 
-        if (dataType.IsIdentityHash() || dataType == DataType.Boolean)
+        if (dataType.IsIdentityHash())
             return "        value as u64";
 
         if (dataType == DataType.Single)

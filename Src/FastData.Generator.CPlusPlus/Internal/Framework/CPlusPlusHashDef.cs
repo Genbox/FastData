@@ -36,7 +36,7 @@ internal class CPlusPlusHashDef : IHashDef
                    """;
         }
 
-        if (dataType.IsIdentityHash() || dataType == DataType.Boolean)
+        if (dataType.IsIdentityHash())
             return "        return static_cast<uint64_t>(value);";
 
         if (dataType == DataType.Single)

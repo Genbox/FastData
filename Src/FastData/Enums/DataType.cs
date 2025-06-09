@@ -8,7 +8,7 @@ public enum DataType : byte
 
     // Object = 1,
     // DBNull = 2,
-    Boolean = 3,
+    // Boolean = 3,
     Char = 4,
     SByte = 5,
     Byte = 6,

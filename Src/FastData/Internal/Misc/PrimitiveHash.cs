@@ -8,7 +8,6 @@ internal static class PrimitiveHash
 {
     internal static HashFunc<T> GetHash<T>(DataType dataType) => dataType switch
     {
-        DataType.Boolean => static obj => unchecked((ulong)((bool)(object)obj! ? 1 : 0)),
         DataType.Char => static obj => (char)(object)obj!,
         DataType.SByte => static obj => unchecked((ulong)(sbyte)(object)obj!),
         DataType.Byte => static obj => (byte)(object)obj!,
