@@ -141,6 +141,9 @@ A benchmark of the array versus our generated structure really illustrates the d
 - **Data analysis:** Optimizes the structure based on the inherent properties of the dataset.
 - **Multiple structures:** FastData automatically chooses the best data structure for your data.
 - **Fast hashing:** String lookups are fast due to a fast string hash function
+- **Zero dependencies:** The generated code has no dependencies, making it easy to integrate into your project.
+- **Minimal memory usage:** The generated data structures are memory-efficient, using only the necessary amount of memory for the dataset.
+- **High-perfromance:** The generated data structures are generated without unnecessary branching or virtualization making the compiler produce optimal code.
 
 It supports several output programming languages.
 
@@ -213,11 +216,10 @@ of different data structures, indexing, and comparison methods that are tailor-b
 
 There are many benefits gained from generating data structures at compile time:
 
-* Enables otherwise time-consuming data analysis
-* Zero runtime overhead
-* No defensive copying of data (takes time and needs double the memory)
-* No virtual dispatching (virtual method calls & inheritance)
 * Data as code means you can compile the data into your assembly
+* Enables otherwise time-consuming data analysis (e.g. zero runtime overhead)
+* No defensive copying of data (takes time and needs double the memory)
+* No virtual dispatching (virtual method calls & inheritance) and no unnecessary branching
 
 ### Data analysis
 
