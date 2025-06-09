@@ -40,7 +40,7 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, Genera
 
         return $$"""
                      {{FieldModifier}}const ENTRIES: [{{TypeNameWithLifetime}}; {{ctx.Data.Length.ToStringInvariant()}}] = [
-                 {{FormatColumns(ctx.Data, x => ToValueLabel(x.Value))}}
+                 {{FormatColumns(ctx.Data, x => ToValueLabel(x.Key))}}
                      ];
 
                  {{HashSource}}

@@ -41,7 +41,7 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, CSharp
             """
         : $$"""
                 {{FieldModifier}}{{TypeName}}[] _entries = {
-            {{FormatColumns(ctx.Data, x => x.Value.ToStringInvariant())}}
+            {{FormatColumns(ctx.Data, x => ToValueLabel(x.Key))}}
                 };
 
                 {{MethodAttribute}}

@@ -38,7 +38,7 @@ internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx) : CPlu
             """
         : $$"""
             {{GetFieldModifier(false)}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
-                {{FormatColumns(ctx.Data, x => x.Value.ToStringInvariant())}}
+                {{FormatColumns(ctx.Data, x => ToValueLabel(x.Key))}}
             };
 
             {{HashSource}}
