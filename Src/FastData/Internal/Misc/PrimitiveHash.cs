@@ -28,8 +28,8 @@ internal static class PrimitiveHash
 
         unchecked
         {
-            if (((bits - 1) & ~(0x8000_0000)) >= 0x7FF0_0000)
-                bits &= 0x7FF0_0000;
+            if (((bits - 1) & ~0x8000_0000) >= 0x7F80_0000)
+                bits &= 0x7F80_0000;
         }
 
         return bits;
