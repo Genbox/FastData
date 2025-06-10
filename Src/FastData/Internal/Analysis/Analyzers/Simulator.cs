@@ -3,13 +3,13 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed class Simulator(SimulatorConfig config)
+internal sealed class Simulator(int capacityFactor = 1)
 {
     private NoEqualityEmulator? _set;
 
     internal Candidate Run(ReadOnlySpan<string> data, IStringHash stringHash, Func<double>? extraFitness = null)
     {
-        uint _capacity = (uint)(data.Length * config.CapacityFactor);
+        uint _capacity = (uint)(data.Length * capacityFactor);
         _set ??= new NoEqualityEmulator(_capacity);
         _set.SetHash(stringHash.GetHashFunction());
 

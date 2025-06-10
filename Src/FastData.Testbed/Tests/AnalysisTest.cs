@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -66,12 +67,9 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), new Simulator(new SimulatorConfig()), loggerFactory.CreateLogger<BruteForceAnalyzer>());
-        analyzer.GetCandidates(data, candidate =>
-        {
-            PrintCandidate(candidate);
-            return false;
-        });
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), new Simulator(), loggerFactory.CreateLogger<BruteForceAnalyzer>());
+        PrintCandidate(GetCandidates(analyzer).OrderByDescending(x => x.Fitness).FirstOrDefault());
+
     }
 
     private static void RunGeneticAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
@@ -80,12 +78,9 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), new Simulator(new SimulatorConfig()), loggerFactory.CreateLogger<GeneticAnalyzer>());
-        analyzer.GetCandidates(data, candidate =>
-        {
-            PrintCandidate(candidate);
-            return false;
-        });
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), new Simulator(), loggerFactory.CreateLogger<GeneticAnalyzer>());
+        PrintCandidate(GetCandidates(analyzer).OrderByDescending(x => x.Fitness).FirstOrDefault());
+
     }
 
     private static void RunGPerfAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
@@ -94,17 +89,13 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(new SimulatorConfig()), loggerFactory.CreateLogger<GPerfAnalyzer>());
-        analyzer.GetCandidates(data, candidate =>
-        {
-            PrintCandidate(candidate);
-            return false;
-        });
+        GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(), loggerFactory.CreateLogger<GPerfAnalyzer>());
+        PrintCandidate(GetCandidates(analyzer).OrderByDescending(x => x.Fitness).FirstOrDefault());
     }
 
-    private static void Print(string[] data, string? source)
+    private static void Print(string[] data, string? source, [CallerMemberName]string? member = null)
     {
-        Console.WriteLine("###############");
+        Console.WriteLine($"############### {member} ###############");
         Console.WriteLine(source + ": " + string.Join(", ", data.Take(5)));
     }
 
@@ -155,8 +146,11 @@ internal static class AnalysisTest
         return res;
     }
 
-    private static void PrintCandidate(Candidate candidate)
+    private static void PrintCandidate(Candidate? candidate)
     {
+        if (candidate == null)
+            return;
+
         Console.WriteLine();
         Console.WriteLine("#### Candidate ####");
         Console.WriteLine($"{nameof(candidate.Fitness)}: {candidate.Fitness}");
@@ -174,5 +168,16 @@ internal static class AnalysisTest
 
         // Console.WriteLine(candidate.StringHash.GetExpression().ToReadableString());
         Console.WriteLine(ExpressionHelper.Print(candidate.StringHash.GetExpression()));
+    }
+
+    private static IEnumerable<Candidate> GetCandidates(IStringHashAnalyzer analyzer)
+    {
+        List<Candidate> candidates = new List<Candidate>();
+        analyzer.GetCandidates(Data, candidate =>
+        {
+            candidates.Add(candidate);
+            return true;
+        });
+        return candidates;
     }
 }

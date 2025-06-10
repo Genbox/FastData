@@ -8,7 +8,7 @@ using static System.Numerics.BitOperations;
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-public class HashBenchmarks
+public class StringHashBenchmarks
 {
     private string[] _array = null!;
 

@@ -18,7 +18,7 @@ public class AnalyzerBenchmarks
         _data = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(rng, 50)).ToArray();
         StringProperties props = DataAnalyzer.GetStringProperties(_data);
 
-        _analyzer = new GPerfAnalyzer(_data.Length, props, new GPerfAnalyzerConfig(), new Simulator(new SimulatorConfig()), NullLogger<GPerfAnalyzer>.Instance);
+        _analyzer = new GPerfAnalyzer(_data.Length, props, new GPerfAnalyzerConfig(), new Simulator(), NullLogger<GPerfAnalyzer>.Instance);
     }
 
     [Benchmark]

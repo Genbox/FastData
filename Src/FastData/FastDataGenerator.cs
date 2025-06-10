@@ -175,9 +175,9 @@ public static partial class FastDataGenerator
         return newArr;
     }
 
-    private static IStringHash GetBestHash(string[] data, StringProperties props, SimulatorConfig simConf, ILoggerFactory factory)
+    private static IStringHash GetBestHash(string[] data, StringProperties props, ILoggerFactory factory)
     {
-        Simulator sim = new Simulator(simConf);
+        Simulator sim = new Simulator();
 
         //Run each of the analyzers
         List<Candidate> candidates = new List<Candidate>();

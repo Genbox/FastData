@@ -109,7 +109,7 @@ internal sealed record GPerfStringHash : IStringHash
 
     public override string ToString() =>
         $"""
-         Asso = {string.Join(", ", AssociationValues)}
+         Asso = {string.Join(", ", AssociationValues.Where(x => x != AssociationValues[0]))}
          Alpha = {string.Join(", ", AlphaIncrements)}
          {nameof(Positions)} = {string.Join(", ", Positions)}
          {nameof(MinLen)} = {MinLen}
