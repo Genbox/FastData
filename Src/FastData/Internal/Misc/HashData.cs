@@ -13,8 +13,6 @@ internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUn
             stringHash = new DefaultStringHash();
 
         HashFunc<T> hashFunc;
-
-        //If we have a string hash, use it.
         if (stringHash == null)
             hashFunc = PrimitiveHash.GetHash<T>(dataType);
         else
@@ -24,7 +22,7 @@ internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUn
 
         ulong[] hashCodes = new ulong[size];
         HashSet<ulong> uniqSet = new HashSet<ulong>();
-        HashSet<ulong> perfectSet = new HashSet<ulong>(); //TOOD: Use direct addressing
+        HashSet<ulong> perfectSet = new HashSet<ulong>(); //TODO: Use direct addressing
 
         bool uniq = true;
         bool perfect = true;

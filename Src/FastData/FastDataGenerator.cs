@@ -94,10 +94,10 @@ public static partial class FastDataGenerator
         }
 
         ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));
+        LogUserStructureType(logger, fdCfg.StructureType);
         LogUniqueItems(logger, uniq.Count);
 
         DataProperties<T> props = DataProperties<T>.Create(data);
-
         LogDataType(logger, props.DataType);
 
         if (props.FloatProps != null)
@@ -107,7 +107,6 @@ public static partial class FastDataGenerator
         else if (props.StringProps != null)
             LogMinMaxLength(logger, props.StringProps.LengthData.Min, props.StringProps.LengthData.Max);
 
-        LogUserStructureType(logger, fdCfg.StructureType);
         GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, DefaultStringComparison, props);
 
         switch (fdCfg.StructureType)

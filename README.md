@@ -220,6 +220,7 @@ There are many benefits gained from generating data structures at compile time:
 * Enables otherwise time-consuming data analysis (e.g. zero runtime overhead)
 * No defensive copying of data (takes time and needs double the memory)
 * No virtual dispatching (virtual method calls & inheritance) and no unnecessary branching
+* Modulo operations are known constants and compilers optimize it to bitwise operations
 
 ### Data analysis
 
