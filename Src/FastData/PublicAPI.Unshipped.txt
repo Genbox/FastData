@@ -169,7 +169,7 @@ static Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.operator !=
 static Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.operator ==(Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>? left, Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>? right) -> bool
 static Genbox.FastData.Generators.Extensions.DataTypeExtensions.IsIdentityHash(this Genbox.FastData.Enums.DataType type) -> bool
 static Genbox.FastData.Generators.Extensions.DataTypeExtensions.IsInteger(this Genbox.FastData.Enums.DataType type) -> bool
-static Genbox.FastData.Generators.Helpers.MathHelper.FastMod(uint value, uint divisor, ulong multiplier) -> uint
+static Genbox.FastData.Generators.Helpers.MathHelper.FastMod(uint value, uint divisor, ulong multiplier) -> ulong
 static Genbox.FastData.Generators.Helpers.MathHelper.GetFastModMultiplier(uint divisor) -> ulong
 static Genbox.FastData.Generators.Helpers.MathHelper.GetPrime(uint min) -> uint
 static Genbox.FastData.Generators.Helpers.MathHelper.IsPowerOfTwo(ulong x) -> bool

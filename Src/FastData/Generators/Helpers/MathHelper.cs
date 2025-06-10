@@ -29,7 +29,7 @@ public static class MathHelper
     /// <param name="multiplier">The precomputed multiplier.</param>
     /// <returns>The result of value mod divisor.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint FastMod(uint value, uint divisor, ulong multiplier) => unchecked((uint)(((((multiplier * value) >> 32) + 1) * divisor) >> 32));
+    public static ulong FastMod(uint value, uint divisor, ulong multiplier) => unchecked(((((multiplier * value) >> 32) + 1) * divisor) >> 32);
 
     /// <summary>Determines whether the specified value is a power of two.</summary>
     /// <param name="x">The value to check.</param>
