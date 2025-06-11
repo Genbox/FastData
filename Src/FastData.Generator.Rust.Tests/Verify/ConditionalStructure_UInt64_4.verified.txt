@@ -11,11 +11,11 @@ pub struct ConditionalStructure_UInt64_4;
 impl ConditionalStructure_UInt64_4 {
     #[must_use]
     pub fn contains(value: u64) -> bool {
-        if value < u64::MIN || value > 18446744073709551605 {
+        if value < u64::MIN || value > u64::MAX {
             return false;
         }
 
-        if value == u64::MIN || value == 1 || value == 2 || value == 18446744073709551605 {
+        if value == u64::MIN || value == 1 || value == 2 || value == u64::MAX {
             return true;
         }
 
@@ -24,5 +24,5 @@ impl ConditionalStructure_UInt64_4 {
 
     pub const ITEM_COUNT: usize = 4;
     pub const MIN_VALUE: u64 = u64::MIN;
-    pub const MAX_VALUE: u64 = 18446744073709551605;
+    pub const MAX_VALUE: u64 = u64::MAX;
 }

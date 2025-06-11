@@ -9,26 +9,26 @@ using System.Runtime.InteropServices;
 internal static class HashSetLinearStructure_Int64_5
 {
     private static readonly B[] _buckets = {
-        new B(0, 0), new B(1, 1), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(2, 2), new B(0, 0), new B(3, 3), 
-        new B(0, 0), new B(0, 0), new B(0, 0), new B(4, 4), new B(0, 0), new B(0, 0), new B(0, 0)
+        new B(0, 0), new B(1, 1), new B(0, 0), new B(0, 0), new B(2, 2), new B(0, 0), new B(0, 0), new B(3, 3), new B(4, 4), new B(0, 0), 
+        new B(0, 0)
     };
 
     private static readonly long[] _items = new long[] {
-        0l, 1l, 9223372036854775806l, long.MinValue, -5l
+        0l, 1l, -1l, long.MaxValue, long.MinValue
     };
 
     private static readonly ulong[] _hashCodes = {
-        0, 1, 9223372036854775806, 9223372036854775808, 18446744073709551611
+        0, 1, 18446744073709551615, 9223372036854775807, 9223372036854775808
     };
 
     
     public static bool Contains(long value)
     {
-        if (value < long.MinValue || value > 9223372036854775806l)
+        if (value < long.MinValue || value > long.MaxValue)
             return false;
 
         ulong hash = Hash(value);
-        ref B b = ref _buckets[(uint)(hash % 17)];
+        ref B b = ref _buckets[(uint)(hash % 11)];
 
         byte index = b.StartIndex;
         byte endIndex = b.EndIndex;
@@ -65,5 +65,5 @@ internal static class HashSetLinearStructure_Int64_5
 
     public const uint ItemCount = 5;
     public const long MinValue = long.MinValue;
-    public const long MaxValue = 9223372036854775806l;
+    public const long MaxValue = long.MaxValue;
 }

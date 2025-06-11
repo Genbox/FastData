@@ -11,7 +11,7 @@ internal static class ConditionalStructure_UInt64_4
     
     public static bool Contains(ulong value)
     {
-        if (value < ulong.MinValue || value > 18446744073709551605ul)
+        if (value < ulong.MinValue || value > ulong.MaxValue)
             return false;
 
         switch (value)
@@ -19,7 +19,7 @@ internal static class ConditionalStructure_UInt64_4
             case ulong.MinValue:
             case 1ul:
             case 2ul:
-            case 18446744073709551605ul:
+            case ulong.MaxValue:
                 return true;
             default:
                 return false;
@@ -28,5 +28,5 @@ internal static class ConditionalStructure_UInt64_4
 
     public const uint ItemCount = 4;
     public const ulong MinValue = ulong.MinValue;
-    public const ulong MaxValue = 18446744073709551605ul;
+    public const ulong MaxValue = ulong.MaxValue;
 }

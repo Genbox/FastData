@@ -9,14 +9,14 @@
 class BinarySearchStructure_Int64_5 final
 {
     static constexpr std::array<int64_t, 5> entries = {
-        std::numeric_limits<int64_t>::lowest(), -5ll, 0ll, 1ll, 9223372036854775806ll
+        std::numeric_limits<int64_t>::lowest(), -1ll, 0ll, 1ll, std::numeric_limits<int64_t>::max()
     };
 
 public:
     [[nodiscard]]
     static bool contains(const int64_t value) noexcept
     {
-        if (value < std::numeric_limits<int64_t>::lowest() || value > 9223372036854775806ll)
+        if (value < std::numeric_limits<int64_t>::lowest() || value > std::numeric_limits<int64_t>::max())
             return false;
 
         size_t lo = 0;
@@ -39,7 +39,7 @@ public:
 
     static constexpr size_t item_count = 5;
     static constexpr int64_t min_value = std::numeric_limits<int64_t>::lowest();
-    static constexpr int64_t max_value = 9223372036854775806ll;
+    static constexpr int64_t max_value = std::numeric_limits<int64_t>::max();
 
 public:
     BinarySearchStructure_Int64_5() = delete;

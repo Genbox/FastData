@@ -116,12 +116,8 @@ public static class TestVectorHelper
         (typeof(ushort), [(ushort)0, (ushort)1, (ushort)2, ushort.MaxValue]),
         (typeof(int), [int.MinValue, -1, 0, 1, int.MaxValue]),
         (typeof(uint), [0U, 1U, 2U, uint.MaxValue]),
-
-        //We use -5 and -1 to avoid hash collisions
-        (typeof(long), [long.MinValue, -5L, 0L, 1L, long.MaxValue - 1]),
-
-        //We use -1 to avoid hash collisions
-        (typeof(ulong), [0UL, 1UL, 2UL, ulong.MaxValue - 10]),
+        (typeof(long), [long.MinValue, -1L, 0L, 1L, long.MaxValue]),
+        (typeof(ulong), [0UL, 1UL, 2UL, ulong.MaxValue]),
         (typeof(string), ["a", "item", new string('a', 255)])
     ];
 

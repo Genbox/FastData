@@ -10,11 +10,11 @@ pub struct HashSetChainStructure_UInt64_4;
 
 impl HashSetChainStructure_UInt64_4 {
     const BUCKETS: [i8; 4] = [
-        1, 4, 3, 0
+        1, 2, 3, 4
     ];
 
     const ENTRIES: [E; 4] = [
-        E { next: -1, value: u64::MIN }, E { next: -1, value: 1 }, E { next: -1, value: 2 }, E { next: 1, value: 18446744073709551605 }
+        E { next: -1, value: u64::MIN }, E { next: -1, value: 1 }, E { next: -1, value: 2 }, E { next: -1, value: u64::MAX }
     ];
 
     #[inline(always)]
@@ -24,7 +24,7 @@ impl HashSetChainStructure_UInt64_4 {
 
     #[must_use]
     pub fn contains(value: u64) -> bool {
-        if value < u64::MIN || value > 18446744073709551605 {
+        if value < u64::MIN || value > u64::MAX {
             return false;
         }
 
@@ -45,7 +45,7 @@ impl HashSetChainStructure_UInt64_4 {
 
     pub const ITEM_COUNT: usize = 4;
     pub const MIN_VALUE: u64 = u64::MIN;
-    pub const MAX_VALUE: u64 = 18446744073709551605;
+    pub const MAX_VALUE: u64 = u64::MAX;
 }
 struct E {
     

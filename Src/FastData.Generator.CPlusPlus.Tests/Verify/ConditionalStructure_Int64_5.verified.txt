@@ -12,10 +12,10 @@ public:
     [[nodiscard]]
     static bool contains(const int64_t value) noexcept
     {
-        if (value < std::numeric_limits<int64_t>::lowest() || value > 9223372036854775806ll)
+        if (value < std::numeric_limits<int64_t>::lowest() || value > std::numeric_limits<int64_t>::max())
             return false;
 
-        if (value == std::numeric_limits<int64_t>::lowest() || value == -5ll || value == 0ll || value == 1ll || value == 9223372036854775806ll)
+        if (value == std::numeric_limits<int64_t>::lowest() || value == -1ll || value == 0ll || value == 1ll || value == std::numeric_limits<int64_t>::max())
             return true;
 
         return false;
@@ -23,7 +23,7 @@ public:
 
     static constexpr size_t item_count = 5;
     static constexpr int64_t min_value = std::numeric_limits<int64_t>::lowest();
-    static constexpr int64_t max_value = 9223372036854775806ll;
+    static constexpr int64_t max_value = std::numeric_limits<int64_t>::max();
 
 public:
     ConditionalStructure_Int64_5() = delete;

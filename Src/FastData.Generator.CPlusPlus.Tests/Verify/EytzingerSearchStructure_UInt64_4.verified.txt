@@ -9,14 +9,14 @@
 class EytzingerSearchStructure_UInt64_4 final
 {
     static constexpr std::array<uint64_t, 4> entries = {
-        2ull, 1ull, 18446744073709551605ull, 0
+        2ull, 1ull, std::numeric_limits<uint64_t>::max(), 0
     };
 
 public:
     [[nodiscard]]
     static bool contains(const uint64_t value) noexcept
     {
-        if (value < 0 || value > 18446744073709551605ull)
+        if (value < 0 || value > std::numeric_limits<uint64_t>::max())
             return false;
 
         size_t i = 0;
@@ -36,7 +36,7 @@ public:
 
     static constexpr size_t item_count = 4;
     static constexpr uint64_t min_value = 0;
-    static constexpr uint64_t max_value = 18446744073709551605ull;
+    static constexpr uint64_t max_value = std::numeric_limits<uint64_t>::max();
 
 public:
     EytzingerSearchStructure_UInt64_4() = delete;

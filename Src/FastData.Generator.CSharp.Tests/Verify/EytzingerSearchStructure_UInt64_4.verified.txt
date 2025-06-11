@@ -9,13 +9,13 @@ using System.Runtime.InteropServices;
 internal static class EytzingerSearchStructure_UInt64_4
 {
     private static readonly ulong[] _entries = new ulong[] {
-        2ul, 1ul, 18446744073709551605ul, ulong.MinValue
+        2ul, 1ul, ulong.MaxValue, ulong.MinValue
     };
 
     
     public static bool Contains(ulong value)
     {
-        if (value < ulong.MinValue || value > 18446744073709551605ul)
+        if (value < ulong.MinValue || value > ulong.MaxValue)
             return false;
 
         int i = 0;
@@ -37,5 +37,5 @@ internal static class EytzingerSearchStructure_UInt64_4
 
     public const uint ItemCount = 4;
     public const ulong MinValue = ulong.MinValue;
-    public const ulong MaxValue = 18446744073709551605ul;
+    public const ulong MaxValue = ulong.MaxValue;
 }

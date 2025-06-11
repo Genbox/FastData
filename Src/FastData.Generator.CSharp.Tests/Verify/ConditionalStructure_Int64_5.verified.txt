@@ -11,16 +11,16 @@ internal static class ConditionalStructure_Int64_5
     
     public static bool Contains(long value)
     {
-        if (value < long.MinValue || value > 9223372036854775806l)
+        if (value < long.MinValue || value > long.MaxValue)
             return false;
 
         switch (value)
         {
             case long.MinValue:
-            case -5l:
+            case -1l:
             case 0l:
             case 1l:
-            case 9223372036854775806l:
+            case long.MaxValue:
                 return true;
             default:
                 return false;
@@ -29,5 +29,5 @@ internal static class ConditionalStructure_Int64_5
 
     public const uint ItemCount = 5;
     public const long MinValue = long.MinValue;
-    public const long MaxValue = 9223372036854775806l;
+    public const long MaxValue = long.MaxValue;
 }

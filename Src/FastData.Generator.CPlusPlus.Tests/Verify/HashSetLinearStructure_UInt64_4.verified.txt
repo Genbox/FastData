@@ -18,16 +18,16 @@ class HashSetLinearStructure_UInt64_4 final
     };
 
     inline static const std::array<b, 11> buckets = {
-        b(0, 0), b(1, 1), b(2, 2), b(0, 0), b(0, 0), b(3, 3), b(0, 0), b(0, 0), b(0, 0), b(0, 0), 
+        b(0, 0), b(1, 1), b(2, 2), b(0, 0), b(3, 3), b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(0, 0), 
         b(0, 0)
     };
 
     static constexpr std::array<uint64_t, 4> items = {
-        0, 1ull, 2ull, 18446744073709551605ull
+        0, 1ull, 2ull, std::numeric_limits<uint64_t>::max()
     };
 
     static constexpr std::array<uint64_t, 4> hash_codes = {
-        0, 1, 2, 18446744073709551605
+        0, 1, 2, 18446744073709551615
     };
 
     static uint64_t get_hash(const uint64_t value) noexcept
@@ -39,7 +39,7 @@ public:
     [[nodiscard]]
     static bool contains(const uint64_t value) noexcept
     {
-        if (value < 0 || value > 18446744073709551605ull)
+        if (value < 0 || value > std::numeric_limits<uint64_t>::max())
             return false;
 
         const uint64_t hash = get_hash(value);
@@ -60,7 +60,7 @@ public:
 
     static constexpr size_t item_count = 4;
     static constexpr uint64_t min_value = 0;
-    static constexpr uint64_t max_value = 18446744073709551605ull;
+    static constexpr uint64_t max_value = std::numeric_limits<uint64_t>::max();
 
 public:
     HashSetLinearStructure_UInt64_4() = delete;

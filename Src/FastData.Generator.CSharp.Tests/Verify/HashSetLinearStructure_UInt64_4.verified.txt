@@ -9,22 +9,22 @@ using System.Runtime.InteropServices;
 internal static class HashSetLinearStructure_UInt64_4
 {
     private static readonly B[] _buckets = {
-        new B(0, 0), new B(1, 1), new B(2, 2), new B(0, 0), new B(0, 0), new B(3, 3), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), 
+        new B(0, 0), new B(1, 1), new B(2, 2), new B(0, 0), new B(3, 3), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), new B(0, 0), 
         new B(0, 0)
     };
 
     private static readonly ulong[] _items = new ulong[] {
-        ulong.MinValue, 1ul, 2ul, 18446744073709551605ul
+        ulong.MinValue, 1ul, 2ul, ulong.MaxValue
     };
 
     private static readonly ulong[] _hashCodes = {
-        0, 1, 2, 18446744073709551605
+        0, 1, 2, 18446744073709551615
     };
 
     
     public static bool Contains(ulong value)
     {
-        if (value < ulong.MinValue || value > 18446744073709551605ul)
+        if (value < ulong.MinValue || value > ulong.MaxValue)
             return false;
 
         ulong hash = Hash(value);
@@ -65,5 +65,5 @@ internal static class HashSetLinearStructure_UInt64_4
 
     public const uint ItemCount = 4;
     public const ulong MinValue = ulong.MinValue;
-    public const ulong MaxValue = 18446744073709551605ul;
+    public const ulong MaxValue = ulong.MaxValue;
 }

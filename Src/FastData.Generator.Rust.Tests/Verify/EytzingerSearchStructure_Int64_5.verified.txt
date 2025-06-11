@@ -10,12 +10,12 @@ pub struct EytzingerSearchStructure_Int64_5;
 
 impl EytzingerSearchStructure_Int64_5 {
     const ENTRIES: [i64; 5] = [
-        1, -5, 9223372036854775806, i64::MIN, 0
+        1, -1, i64::MAX, i64::MIN, 0
     ];
 
     #[must_use]
     pub fn contains(value: i64) -> bool {
-        if value < i64::MIN || value > 9223372036854775806 {
+        if value < i64::MIN || value > i64::MAX {
             return false;
         }
 
@@ -38,5 +38,5 @@ impl EytzingerSearchStructure_Int64_5 {
 
     pub const ITEM_COUNT: usize = 5;
     pub const MIN_VALUE: i64 = i64::MIN;
-    pub const MAX_VALUE: i64 = 9223372036854775806;
+    pub const MAX_VALUE: i64 = i64::MAX;
 }

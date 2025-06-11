@@ -19,11 +19,11 @@ class HashSetChainStructure_Int64_5 final
     };
 
     static constexpr std::array<int8_t, 5> buckets = {
-        3, 5, 0, 1, 0
+        3, 4, 5, 1, 0
      };
 
     inline static const std::array<e, 5> entries = {
-        e(-1, std::numeric_limits<int64_t>::lowest()), e(-1, -5ll), e(-1, 0ll), e(1, 1ll), e(3, 9223372036854775806ll)
+        e(-1, std::numeric_limits<int64_t>::lowest()), e(-1, -1ll), e(1, 0ll), e(-1, 1ll), e(-1, std::numeric_limits<int64_t>::max())
     };
 
     static uint64_t get_hash(const int64_t value) noexcept
@@ -35,7 +35,7 @@ public:
     [[nodiscard]]
     static bool contains(const int64_t value) noexcept
     {
-        if (value < std::numeric_limits<int64_t>::lowest() || value > 9223372036854775806ll)
+        if (value < std::numeric_limits<int64_t>::lowest() || value > std::numeric_limits<int64_t>::max())
             return false;
 
         const uint64_t hash = get_hash(value);
@@ -57,7 +57,7 @@ public:
 
     static constexpr size_t item_count = 5;
     static constexpr int64_t min_value = std::numeric_limits<int64_t>::lowest();
-    static constexpr int64_t max_value = 9223372036854775806ll;
+    static constexpr int64_t max_value = std::numeric_limits<int64_t>::max();
 
 public:
     HashSetChainStructure_Int64_5() = delete;

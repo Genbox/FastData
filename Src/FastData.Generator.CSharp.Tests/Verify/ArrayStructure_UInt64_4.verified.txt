@@ -9,13 +9,13 @@ using System.Runtime.InteropServices;
 internal static class ArrayStructure_UInt64_4
 {
     private static readonly ulong[] _entries = new ulong[] {
-        ulong.MinValue, 1ul, 2ul, 18446744073709551605ul
+        ulong.MinValue, 1ul, 2ul, ulong.MaxValue
     };
 
     
     public static bool Contains(ulong value)
     {
-        if (value < ulong.MinValue || value > 18446744073709551605ul)
+        if (value < ulong.MinValue || value > ulong.MaxValue)
             return false;
 
         for (int i = 0; i < 4; i++)
@@ -28,5 +28,5 @@ internal static class ArrayStructure_UInt64_4
 
     public const uint ItemCount = 4;
     public const ulong MinValue = ulong.MinValue;
-    public const ulong MaxValue = 18446744073709551605ul;
+    public const ulong MaxValue = ulong.MaxValue;
 }

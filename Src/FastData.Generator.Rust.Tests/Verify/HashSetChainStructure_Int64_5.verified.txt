@@ -10,11 +10,11 @@ pub struct HashSetChainStructure_Int64_5;
 
 impl HashSetChainStructure_Int64_5 {
     const BUCKETS: [i8; 5] = [
-        3, 5, 0, 1, 0
+        3, 4, 5, 1, 0
     ];
 
     const ENTRIES: [E; 5] = [
-        E { next: -1, value: i64::MIN }, E { next: -1, value: -5 }, E { next: -1, value: 0 }, E { next: 1, value: 1 }, E { next: 3, value: 9223372036854775806 }
+        E { next: -1, value: i64::MIN }, E { next: -1, value: -1 }, E { next: 1, value: 0 }, E { next: -1, value: 1 }, E { next: -1, value: i64::MAX }
     ];
 
     #[inline(always)]
@@ -24,7 +24,7 @@ impl HashSetChainStructure_Int64_5 {
 
     #[must_use]
     pub fn contains(value: i64) -> bool {
-        if value < i64::MIN || value > 9223372036854775806 {
+        if value < i64::MIN || value > i64::MAX {
             return false;
         }
 
@@ -45,7 +45,7 @@ impl HashSetChainStructure_Int64_5 {
 
     pub const ITEM_COUNT: usize = 5;
     pub const MIN_VALUE: i64 = i64::MIN;
-    pub const MAX_VALUE: i64 = 9223372036854775806;
+    pub const MAX_VALUE: i64 = i64::MAX;
 }
 struct E {
     

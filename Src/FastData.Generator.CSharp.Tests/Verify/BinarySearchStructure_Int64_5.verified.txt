@@ -9,13 +9,13 @@ using System.Runtime.InteropServices;
 internal static class BinarySearchStructure_Int64_5
 {
     private static readonly long[] _entries = new long[] {
-        long.MinValue, -5l, 0l, 1l, 9223372036854775806l
+        long.MinValue, -1l, 0l, 1l, long.MaxValue
     };
 
     
     public static bool Contains(long value)
     {
-        if (value < long.MinValue || value > 9223372036854775806l)
+        if (value < long.MinValue || value > long.MaxValue)
             return false;
 
         int lo = 0;
@@ -38,5 +38,5 @@ internal static class BinarySearchStructure_Int64_5
 
     public const uint ItemCount = 5;
     public const long MinValue = long.MinValue;
-    public const long MaxValue = 9223372036854775806l;
+    public const long MaxValue = long.MaxValue;
 }
