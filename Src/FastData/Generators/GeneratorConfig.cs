@@ -8,7 +8,7 @@ namespace Genbox.FastData.Generators;
 
 /// <summary>Provides configuration data for code generators in the FastData library.</summary>
 /// <typeparam name="T">The type of data being generated.</typeparam>
-public sealed class GeneratorConfig<T>
+public sealed class GeneratorConfig<T> where T : notnull
 {
     internal GeneratorConfig(StructureType structureType, StringComparison stringComparison, DataProperties<T> props)
     {
@@ -18,6 +18,7 @@ public sealed class GeneratorConfig<T>
         EarlyExits = GetEarlyExits(props, structureType);
         Constants = CreateConstants(props);
         Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.Now);
+        HashInfo = new HashInfo(props.FloatProps?.hasZeroOrNaN ?? false);
     }
 
     /// <summary>Gets the structure type that the generator will create.</summary>
@@ -37,6 +38,9 @@ public sealed class GeneratorConfig<T>
 
     /// <summary>Gets the metadata about the generator, such as version and creation time.</summary>
     public Metadata Metadata { get; }
+
+    /// <summary>Contains information about the hash function to use.</summary>
+    public HashInfo HashInfo { get; }
 
     private static Constants<T> CreateConstants(DataProperties<T> props)
     {

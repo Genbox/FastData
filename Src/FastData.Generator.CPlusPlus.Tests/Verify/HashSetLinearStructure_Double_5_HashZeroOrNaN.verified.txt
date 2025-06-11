@@ -1,0 +1,73 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashSet (HashSetLinear)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashSetLinearStructure_Double_5_HashZeroOrNaN final
+{
+    struct b
+    {
+        uint8_t start_index;
+        uint8_t end_index;
+
+        b(const uint8_t start_index, const uint8_t end_index)
+        : start_index(start_index), end_index(end_index) { }
+    };
+
+    inline static const std::array<b, 11> buckets = {
+        b(0, 0), b(0, 0), b(0, 0), b(0, 0), b(1, 1), b(0, 0), b(2, 2), b(0, 0), b(3, 3), b(4, 4), 
+        b(0, 0)
+    };
+
+    static constexpr std::array<double, 5> items = {
+        1.0, 2.0, 3.0, 4.0, 5.0
+    };
+
+    static constexpr std::array<uint64_t, 5> hash_codes = {
+        4607182418800017408, 4611686018427387904, 4613937818241073152, 4616189618054758400, 4617315517961601024
+    };
+
+    static uint64_t get_hash(const double value) noexcept
+    {
+        uint64_t bits;
+        std::memcpy(&bits, &value, sizeof(bits));
+        return bits;
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const double value) noexcept
+    {
+        if (value < 1.0 || value > 5.0)
+            return false;
+
+        const uint64_t hash = get_hash(value);
+        const auto& [start_index, end_index]= buckets[hash % 11];
+
+        uint8_t index = start_index;
+
+        while (index <= end_index)
+        {
+            if (hash_codes[index] == hash && items[index] == value)
+                return true;
+
+            index++;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr double min_value = 1.0;
+    static constexpr double max_value = 5.0;
+
+public:
+    HashSetLinearStructure_Double_5_HashZeroOrNaN() = delete;
+    HashSetLinearStructure_Double_5_HashZeroOrNaN(const HashSetLinearStructure_Double_5_HashZeroOrNaN&) = delete;
+    HashSetLinearStructure_Double_5_HashZeroOrNaN& operator=(const HashSetLinearStructure_Double_5_HashZeroOrNaN&) = delete;
+    HashSetLinearStructure_Double_5_HashZeroOrNaN(HashSetLinearStructure_Double_5_HashZeroOrNaN&&) = delete;
+    HashSetLinearStructure_Double_5_HashZeroOrNaN& operator=(HashSetLinearStructure_Double_5_HashZeroOrNaN&&) = delete;
+};

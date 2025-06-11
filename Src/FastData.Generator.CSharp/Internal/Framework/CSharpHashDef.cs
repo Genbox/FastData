@@ -1,20 +1,21 @@
 using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Extensions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
 internal class CSharpHashDef : IHashDef
 {
-    public string GetHashSource(DataType dataType, string typeName) =>
+    public string GetHashSource(DataType dataType, string typeName, HashInfo info) =>
         $$"""
               [MethodImpl(MethodImplOptions.AggressiveInlining)]
               private static ulong Hash({{typeName}} value)
               {
-          {{GetHash(dataType)}}
+          {{GetHash(dataType, info)}}
               }
           """;
 
-    private static string GetHash(DataType dataType)
+    private static string GetHash(DataType dataType, HashInfo info)
     {
         if (dataType == DataType.String)
         {
@@ -39,26 +40,30 @@ internal class CSharpHashDef : IHashDef
 
         if (dataType == DataType.Single)
         {
-            return """
-                           uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
+            return info.HasZeroOrNaN
+                ? """
+                          uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
 
-                           if (((bits - 1) & ~(0x8000_0000)) >= 0x7FF0_0000)
-                               bits &= 0x7FF0_0000;
+                          if (((bits - 1) & ~(0x8000_0000)) >= 0x7FF0_0000)
+                              bits &= 0x7FF0_0000;
 
-                           return (ulong)bits;
-                   """;
+                          return (ulong)bits;
+                  """
+                : "        return (ulong)Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));";
         }
 
         if (dataType == DataType.Double)
         {
-            return """
-                           ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
+            return info.HasZeroOrNaN
+                ? """
+                          ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
 
-                           if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
-                               bits &= 0x7FF0_0000_0000_0000;
+                          if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
+                              bits &= 0x7FF0_0000_0000_0000;
 
-                           return bits;
-                   """;
+                          return bits;
+                  """
+                : "        return Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));";
         }
 
         return "        return (ulong)value.GetHashCode();";

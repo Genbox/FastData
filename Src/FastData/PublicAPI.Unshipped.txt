@@ -133,10 +133,14 @@ Genbox.FastData.Generators.GeneratorConfig<T>
 Genbox.FastData.Generators.GeneratorConfig<T>.Constants.get -> Genbox.FastData.Generators.Constants<T>!
 Genbox.FastData.Generators.GeneratorConfig<T>.DataType.get -> Genbox.FastData.Enums.DataType
 Genbox.FastData.Generators.GeneratorConfig<T>.EarlyExits.get -> Genbox.FastData.Generators.Abstracts.IEarlyExit![]!
+Genbox.FastData.Generators.GeneratorConfig<T>.HashInfo.get -> Genbox.FastData.Generators.HashInfo!
 Genbox.FastData.Generators.GeneratorConfig<T>.Metadata.get -> Genbox.FastData.Generators.Metadata!
 Genbox.FastData.Generators.GeneratorConfig<T>.StringComparison.get -> System.StringComparison
 Genbox.FastData.Generators.GeneratorConfig<T>.StructureType.get -> Genbox.FastData.Enums.StructureType
 Genbox.FastData.Generators.HashFunc<T>
+Genbox.FastData.Generators.HashInfo
+Genbox.FastData.Generators.HashInfo.HashInfo(bool hasZeroOrNaN) -> void
+Genbox.FastData.Generators.HashInfo.HasZeroOrNaN.get -> bool
 Genbox.FastData.Generators.Helpers.MathHelper
 Genbox.FastData.Generators.Metadata
 Genbox.FastData.Generators.Metadata.Metadata(System.Version! version, System.DateTimeOffset timestamp) -> void

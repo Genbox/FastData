@@ -105,11 +105,11 @@ public static class TestHelper
         if (vector.Type == typeof(EytzingerSearchStructure<>))
             return Generate(func, props, vector, new EytzingerSearchStructure<T>(props.DataType, StringComparison.Ordinal));
         if (vector.Type == typeof(HashSetChainStructure<>))
-            return Generate(func, props, vector, new HashSetChainStructure<T>(HashData.Create(data, props.DataType, 1), props.DataType));
+            return Generate(func, props, vector, new HashSetChainStructure<T>(HashData.Create(data, props.DataType, 1, false), props.DataType));
         if (vector.Type == typeof(HashSetPerfectStructure<>))
-            return Generate(func, props, vector, new HashSetPerfectStructure<T>(HashData.Create(data, props.DataType, 1), props.DataType));
+            return Generate(func, props, vector, new HashSetPerfectStructure<T>(HashData.Create(data, props.DataType, 1, false), props.DataType));
         if (vector.Type == typeof(HashSetLinearStructure<>))
-            return Generate(func, props, vector, new HashSetLinearStructure<T>(HashData.Create(data, props.DataType, 1)));
+            return Generate(func, props, vector, new HashSetLinearStructure<T>(HashData.Create(data, props.DataType, 1, false)));
         if (vector.Type == typeof(KeyLengthStructure<>))
             return Generate(func, props, vector, new KeyLengthStructure<T>(props.StringProps!));
         if (vector.Type == typeof(ArrayStructure<>))

@@ -46,7 +46,7 @@ internal static class GPerfTest
 
             // Candidate hashFunc = analyzer.GetCandidates(data).First(); //TODO: use
 
-            HashData hashData = HashData.Create(data, DataType.String, 1);
+            HashData hashData = HashData.Create(data, DataType.String, 1, false);
             HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>(hashData, DataType.String);
             structure.Create(ref data);
         }

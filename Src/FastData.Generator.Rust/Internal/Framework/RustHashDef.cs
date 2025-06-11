@@ -1,19 +1,20 @@
 using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Extensions;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
 internal class RustHashDef : IHashDef
 {
-    public string GetHashSource(DataType dataType, string typeName) =>
+    public string GetHashSource(DataType dataType, string typeName, HashInfo info) =>
         $$"""
               {{(dataType == DataType.String ? "#[inline]" : "#[inline(always)]")}}
               {{(dataType == DataType.String ? "unsafe " : "")}}fn get_hash(value: {{typeName}}) -> u64 {
-          {{GetHash(dataType)}}
+          {{GetHash(dataType, info)}}
               }
           """;
 
-    private static string GetHash(DataType dataType)
+    private static string GetHash(DataType dataType, HashInfo info)
     {
         if (dataType == DataType.String)
         {
@@ -38,26 +39,30 @@ internal class RustHashDef : IHashDef
 
         if (dataType == DataType.Single)
         {
-            return """
-                           let mut bits = value.to_bits();
+            return info.HasZeroOrNaN
+                ? """
+                          let mut bits = value.to_bits();
 
-                           if ((bits.wrapping_sub(1)) & !0x8000_0000) >= 0x7F80_0000 {
-                               bits &= 0x7F80_0000;
-                           }
-                           bits as u64
-                   """;
+                          if ((bits.wrapping_sub(1)) & !0x8000_0000) >= 0x7F80_0000 {
+                              bits &= 0x7F80_0000;
+                          }
+                          bits as u64
+                  """
+                : "        value.to_bits() as u64";
         }
 
         if (dataType == DataType.Double)
         {
-            return """
-                           let mut bits = value.to_bits();
+            return info.HasZeroOrNaN
+                ? """
+                          let mut bits = value.to_bits();
 
-                           if ((bits.wrapping_sub(1)) & !0x8000_0000_0000_0000) >= 0x7FF0_0000_0000_0000 {
-                               bits &= 0x7FF0_0000_0000_0000;
-                           }
-                           bits
-                   """;
+                          if ((bits.wrapping_sub(1)) & !0x8000_0000_0000_0000) >= 0x7FF0_0000_0000_0000 {
+                              bits &= 0x7FF0_0000_0000_0000;
+                          }
+                          bits
+                  """
+                : "        value.to_bits()";
         }
 
         throw new InvalidOperationException("Unsupported data type: " + dataType);

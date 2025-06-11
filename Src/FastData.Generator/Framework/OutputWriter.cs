@@ -5,7 +5,7 @@ using Genbox.FastData.Generators;
 
 namespace Genbox.FastData.Generator.Framework;
 
-public abstract class OutputWriter<T> : IOutputWriter<T>
+public abstract class OutputWriter<T> : IOutputWriter<T> where T : notnull
 {
     private IEarlyExitDef _earlyExitDef = null!;
     private IHashDef _hashDef = null!;
@@ -16,7 +16,7 @@ public abstract class OutputWriter<T> : IOutputWriter<T>
     protected GeneratorConfig<T> GeneratorConfig { get; private set; } = null!;
 
     protected string EarlyExits => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
-    protected string HashSource => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName);
+    protected string HashSource => _hashDef.GetHashSource(GeneratorConfig.DataType, TypeName, GeneratorConfig.HashInfo);
     protected string HashSizeType => _typeHelper.GetTypeName(typeof(ulong));
     protected static DataType HashSizeDataType => DataType.UInt64;
     protected string ArraySizeType => _langDef.ArraySizeType;

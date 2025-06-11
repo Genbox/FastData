@@ -9,12 +9,12 @@ public static class TestVectorHelper
 {
     public static IEnumerable<ITestVector> GetTestVectors()
     {
-        foreach (ITestVector testVector in GenerateTestVectors(GetSingleValues(), typeof(SingleValueStructure<>)))
+        foreach (ITestVector testVector in GenerateTestVectors(GetSingleValues(), null, typeof(SingleValueStructure<>)))
         {
             yield return testVector;
         }
 
-        foreach (ITestVector testVector in GenerateTestVectors(GetEdgeCaseValues(),
+        foreach (ITestVector testVector in GenerateTestVectors(GetEdgeCaseValues(), null,
                      typeof(ArrayStructure<>),
                      typeof(BinarySearchStructure<>),
                      typeof(ConditionalStructure<>),
@@ -25,7 +25,14 @@ public static class TestVectorHelper
             yield return testVector;
         }
 
-        foreach (ITestVector testVector in GenerateTestVectors(GetDataOfSize(100),
+        foreach (ITestVector testVector in GenerateTestVectors(GetFloatSpecialCases(), "HashZeroOrNaN",
+                     typeof(HashSetChainStructure<>),
+                     typeof(HashSetLinearStructure<>)))
+        {
+            yield return testVector;
+        }
+
+        foreach (ITestVector testVector in GenerateTestVectors(GetDataOfSize(100), null,
                      typeof(ArrayStructure<>),
                      typeof(BinarySearchStructure<>),
                      typeof(ConditionalStructure<>),
@@ -74,7 +81,7 @@ public static class TestVectorHelper
         }
     }
 
-    private static IEnumerable<ITestVector> GenerateTestVectors(IEnumerable<(Type, object[])> data, params Type[] dataStructs)
+    private static IEnumerable<ITestVector> GenerateTestVectors(IEnumerable<(Type, object[])> data, string? postfix = null, params Type[] dataStructs)
     {
         foreach ((Type vt, object[] values) in data)
         {
@@ -89,7 +96,7 @@ public static class TestVectorHelper
 
                 //Create an instance of TestVector<T> and give it the type of the structure
                 Type vector = typeof(TestVector<>).MakeGenericType(vt);
-                yield return (ITestVector)Activator.CreateInstance(vector, st, arr)!;
+                yield return (ITestVector)Activator.CreateInstance(vector, st, arr, postfix)!;
             }
         }
     }
@@ -98,7 +105,7 @@ public static class TestVectorHelper
     private static IEnumerable<ITestVector> GenerateTestVectors<T>(IEnumerable<T[]> data, params Type[] dataStructs)
     {
         Type type = typeof(T);
-        return GenerateTestVectors(data.Select(x => (type, x.Cast<object>().ToArray())), dataStructs);
+        return GenerateTestVectors(data.Select(x => (type, x.Cast<object>().ToArray())), null, dataStructs);
     }
 
     private static IEnumerable<(Type type, object[] value)> GetEdgeCaseValues() =>
@@ -119,6 +126,13 @@ public static class TestVectorHelper
         (typeof(long), [long.MinValue, -1L, 0L, 1L, long.MaxValue]),
         (typeof(ulong), [0UL, 1UL, 2UL, ulong.MaxValue]),
         (typeof(string), ["a", "item", new string('a', 255)])
+    ];
+
+    private static IEnumerable<(Type type, object[] value)> GetFloatSpecialCases() =>
+    [
+        //If we don't have zero or NaN, we can use a simple hash
+        (typeof(float), [1, 2, 3, 4, 5]),
+        (typeof(double), [1, 2, 3, 4, 5]),
     ];
 
     private static IEnumerable<(Type type, object[] value)> GetDataOfSize(int size) =>

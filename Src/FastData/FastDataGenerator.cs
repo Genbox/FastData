@@ -126,12 +126,7 @@ public static partial class FastDataGenerator
                 if (data.Length < 400)
                     return Generate(generator, genCfg, new ConditionalStructure<T>(), data);
 
-                HashData hashData = HashData.Create(data, props.DataType, fdCfg.HashCapacityFactor);
-
-                if (hashData.HashCodesPerfect)
-                    return Generate(generator, genCfg, new HashSetPerfectStructure<T>(hashData, props.DataType), data);
-
-                return Generate(generator, genCfg, new HashSetChainStructure<T>(hashData, props.DataType), data);
+                goto case StructureType.HashSet;
             }
             case StructureType.Array:
                 return Generate(generator, genCfg, new ArrayStructure<T>(), data);
@@ -141,7 +136,7 @@ public static partial class FastDataGenerator
                 return Generate(generator, genCfg, new BinarySearchStructure<T>(props.DataType, DefaultStringComparison), data);
             case StructureType.HashSet:
             {
-                HashData hashData = HashData.Create(data, props.DataType, fdCfg.HashCapacityFactor);
+                HashData hashData = HashData.Create(data, props.DataType, fdCfg.HashCapacityFactor, props.FloatProps?.hasZeroOrNaN ?? false); //When FloatProps is null, it does not matter what we set, because it is not floats
 
                 if (hashData.HashCodesPerfect)
                     return Generate(generator, genCfg, new HashSetPerfectStructure<T>(hashData, props.DataType), data);
@@ -153,7 +148,7 @@ public static partial class FastDataGenerator
         }
     }
 
-    private static string Generate<T, TContext>(ICodeGenerator generator, GeneratorConfig<T> genCfg, IStructure<T, TContext> structure, ReadOnlySpan<T> data) where TContext : IContext<T>
+    private static string Generate<T, TContext>(ICodeGenerator generator, GeneratorConfig<T> genCfg, IStructure<T, TContext> structure, ReadOnlySpan<T> data) where T : notnull where TContext : IContext<T>
     {
         TContext res = structure.Create(ref data);
         return generator.Generate(data, genCfg, res);

@@ -95,13 +95,19 @@ internal static class DataAnalyzer
         float min = float.MaxValue;
         float max = float.MinValue;
 
+        bool hasZeroOrNaN = false;
         foreach (float c in data)
         {
+#pragma warning disable S1244
+            if (!hasZeroOrNaN && (float.IsNaN(c) || c == 0.0f))
+#pragma warning restore S1244
+                hasZeroOrNaN = true;
+
             min = c < min ? c : min;
             max = c > max ? c : max;
         }
 
-        return new FloatProperties<T>((T)(object)min, (T)(object)max);
+        return new FloatProperties<T>((T)(object)min, (T)(object)max, hasZeroOrNaN);
     }
 
     internal static FloatProperties<T> GetDoubleProperties<T>(ReadOnlySpan<double> data)
@@ -109,13 +115,19 @@ internal static class DataAnalyzer
         double min = double.MaxValue;
         double max = double.MinValue;
 
+        bool hasZeroOrNaN = false;
         foreach (double c in data)
         {
+#pragma warning disable S1244
+            if (!hasZeroOrNaN && (double.IsNaN(c) || c == 0.0d))
+#pragma warning restore S1244
+                hasZeroOrNaN = true;
+
             min = c < min ? c : min;
             max = c > max ? c : max;
         }
 
-        return new FloatProperties<T>((T)(object)min, (T)(object)max);
+        return new FloatProperties<T>((T)(object)min, (T)(object)max, hasZeroOrNaN);
     }
 
     internal static IntegerProperties<T> GetByteProperties<T>(ReadOnlySpan<byte> data)

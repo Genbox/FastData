@@ -6,7 +6,7 @@ namespace Genbox.FastData.Internal.Misc;
 
 internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUnique, bool HashCodesPerfect)
 {
-    internal static HashData Create<T>(ReadOnlySpan<T> data, DataType dataType, int capacityFactor)
+    internal static HashData Create<T>(ReadOnlySpan<T> data, DataType dataType, int capacityFactor, bool hasZeroOrNaN)
     {
         DefaultStringHash? stringHash = null;
         if (typeof(T) == typeof(string))
@@ -14,7 +14,7 @@ internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUn
 
         HashFunc<T> hashFunc;
         if (stringHash == null)
-            hashFunc = PrimitiveHash.GetHash<T>(dataType);
+            hashFunc = PrimitiveHash.GetHash<T>(dataType, hasZeroOrNaN);
         else
             hashFunc = (HashFunc<T>)(object)stringHash.GetHashFunction();
 

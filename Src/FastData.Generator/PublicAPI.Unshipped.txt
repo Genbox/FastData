@@ -50,7 +50,7 @@ Genbox.FastData.Generator.Framework.Interfaces.IConstantsDef.MinValueTemplate.ge
 Genbox.FastData.Generator.Framework.Interfaces.IEarlyExitDef
 Genbox.FastData.Generator.Framework.Interfaces.IEarlyExitDef.GetEarlyExits<T>(System.Collections.Generic.IEnumerable<Genbox.FastData.Generators.Abstracts.IEarlyExit!>! earlyExits) -> string!
 Genbox.FastData.Generator.Framework.Interfaces.IHashDef
-Genbox.FastData.Generator.Framework.Interfaces.IHashDef.GetHashSource(Genbox.FastData.Enums.DataType dataType, string! typeName) -> string!
+Genbox.FastData.Generator.Framework.Interfaces.IHashDef.GetHashSource(Genbox.FastData.Enums.DataType dataType, string! typeName, Genbox.FastData.Generators.HashInfo! info) -> string!
 Genbox.FastData.Generator.Framework.Interfaces.ILanguageDef
 Genbox.FastData.Generator.Framework.Interfaces.ILanguageDef.ArraySizeType.get -> string!
 Genbox.FastData.Generator.Framework.Interfaces.ILanguageDef.TypeDefinitions.get -> System.Collections.Generic.IList<Genbox.FastData.Generator.Framework.Interfaces.ITypeDef!>!
