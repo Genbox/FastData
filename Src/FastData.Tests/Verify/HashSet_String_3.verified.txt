@@ -18,6 +18,7 @@
         "Key": "item2",
         "Value": 17825845003995989450
       }
-    ]
+    ],
+    "StoreHashCode": true
   }
 }
