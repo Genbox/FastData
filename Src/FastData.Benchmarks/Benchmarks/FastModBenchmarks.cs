@@ -1,6 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics.X86;
 using Genbox.FastData.Generators.Helpers;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;

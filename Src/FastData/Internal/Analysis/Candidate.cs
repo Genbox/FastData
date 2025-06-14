@@ -6,6 +6,6 @@ internal sealed class Candidate(IStringHash stringHash, double fitness, int coll
 {
     internal double Fitness { get; } = fitness;
     internal int Collisions { get; } = collisions;
-    internal double Time { get; set; }
     internal IStringHash StringHash { get; } = stringHash;
+    internal double Time { get; set; }
 }

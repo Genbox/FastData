@@ -19,7 +19,7 @@ internal sealed class MinHeap<T>(int capacity)
         }
     }
 
-    /// <summary>Adds a new value-item pair. If capacity not reached, inserts and restores heap. If full and value &gt; root, replaces root and restores heap.</summary>
+    /// <summary>Adds a new value-item pair. If capacity is not reached, inserts and restores heap. If full and value &gt; root, replaces root and restores heap.</summary>
     /// <returns>True if the value was better than the best in the heap, otherwise false</returns>
     public bool Add(double key, T value)
     {
