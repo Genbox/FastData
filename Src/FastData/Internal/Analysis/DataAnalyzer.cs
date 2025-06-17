@@ -1,10 +1,28 @@
+using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis;
 
 internal static class DataAnalyzer
 {
+    internal static ValueProperties<T> GetValueProperties<T>(ReadOnlySpan<T> data, DataType dataType) => dataType switch
+    {
+        DataType.Char => GetCharProperties<T>(UnsafeHelper.ConvertSpan<T, char>(data)),
+        DataType.SByte => GetSByteProperties<T>(UnsafeHelper.ConvertSpan<T, sbyte>(data)),
+        DataType.Byte => GetByteProperties<T>(UnsafeHelper.ConvertSpan<T, byte>(data)),
+        DataType.Int16 => GetInt16Properties<T>(UnsafeHelper.ConvertSpan<T, short>(data)),
+        DataType.UInt16 => GetUInt16Properties<T>(UnsafeHelper.ConvertSpan<T, ushort>(data)),
+        DataType.Int32 => GetInt32Properties<T>(UnsafeHelper.ConvertSpan<T, int>(data)),
+        DataType.UInt32 => GetUInt32Properties<T>(UnsafeHelper.ConvertSpan<T, uint>(data)),
+        DataType.Int64 => GetInt64Properties<T>(UnsafeHelper.ConvertSpan<T, long>(data)),
+        DataType.UInt64 => GetUInt64Properties<T>(UnsafeHelper.ConvertSpan<T, ulong>(data)),
+        DataType.Single => GetSingleProperties<T>(UnsafeHelper.ConvertSpan<T, float>(data)),
+        DataType.Double => GetDoubleProperties<T>(UnsafeHelper.ConvertSpan<T, double>(data)),
+        _ => throw new InvalidOperationException($"Unsupported data type: {dataType}")
+    };
+
     internal static StringProperties GetStringProperties(ReadOnlySpan<string> data)
     {
         return GetStringProperties<string>(data);
@@ -76,7 +94,7 @@ internal static class DataAnalyzer
         return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
     }
 
-    internal static IntegerProperties<T> GetCharProperties<T>(ReadOnlySpan<char> data)
+    internal static ValueProperties<T> GetCharProperties<T>(ReadOnlySpan<char> data)
     {
         char min = char.MaxValue;
         char max = char.MinValue;
@@ -87,10 +105,10 @@ internal static class DataAnalyzer
             max = c > max ? c : max;
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
+        return new ValueProperties<T>((T)(object)min, (T)(object)max, false);
     }
 
-    internal static FloatProperties<T> GetSingleProperties<T>(ReadOnlySpan<float> data)
+    internal static ValueProperties<T> GetSingleProperties<T>(ReadOnlySpan<float> data)
     {
         float min = float.MaxValue;
         float max = float.MinValue;
@@ -107,10 +125,10 @@ internal static class DataAnalyzer
             max = c > max ? c : max;
         }
 
-        return new FloatProperties<T>((T)(object)min, (T)(object)max, hasZeroOrNaN);
+        return new ValueProperties<T>((T)(object)min, (T)(object)max, hasZeroOrNaN);
     }
 
-    internal static FloatProperties<T> GetDoubleProperties<T>(ReadOnlySpan<double> data)
+    internal static ValueProperties<T> GetDoubleProperties<T>(ReadOnlySpan<double> data)
     {
         double min = double.MaxValue;
         double max = double.MinValue;
@@ -127,10 +145,10 @@ internal static class DataAnalyzer
             max = c > max ? c : max;
         }
 
-        return new FloatProperties<T>((T)(object)min, (T)(object)max, hasZeroOrNaN);
+        return new ValueProperties<T>((T)(object)min, (T)(object)max, hasZeroOrNaN);
     }
 
-    internal static IntegerProperties<T> GetByteProperties<T>(ReadOnlySpan<byte> data)
+    internal static ValueProperties<T> GetByteProperties<T>(ReadOnlySpan<byte> data)
     {
         byte min = byte.MaxValue;
         byte max = byte.MinValue;
@@ -146,10 +164,10 @@ internal static class DataAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
+        return new ValueProperties<T>((T)(object)min, (T)(object)max, false);
     }
 
-    internal static IntegerProperties<T> GetSByteProperties<T>(ReadOnlySpan<sbyte> data)
+    internal static ValueProperties<T> GetSByteProperties<T>(ReadOnlySpan<sbyte> data)
     {
         sbyte min = sbyte.MaxValue;
         sbyte max = sbyte.MinValue;
@@ -165,10 +183,10 @@ internal static class DataAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
+        return new ValueProperties<T>((T)(object)min, (T)(object)max, false);
     }
 
-    internal static IntegerProperties<T> GetInt16Properties<T>(ReadOnlySpan<short> data)
+    internal static ValueProperties<T> GetInt16Properties<T>(ReadOnlySpan<short> data)
     {
         short min = short.MaxValue;
         short max = short.MinValue;
@@ -184,10 +202,10 @@ internal static class DataAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
+        return new ValueProperties<T>((T)(object)min, (T)(object)max, false);
     }
 
-    internal static IntegerProperties<T> GetUInt16Properties<T>(ReadOnlySpan<ushort> data)
+    internal static ValueProperties<T> GetUInt16Properties<T>(ReadOnlySpan<ushort> data)
     {
         ushort min = ushort.MaxValue;
         ushort max = ushort.MinValue;
@@ -203,10 +221,10 @@ internal static class DataAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
+        return new ValueProperties<T>((T)(object)min, (T)(object)max, false);
     }
 
-    internal static IntegerProperties<T> GetInt32Properties<T>(ReadOnlySpan<int> data)
+    internal static ValueProperties<T> GetInt32Properties<T>(ReadOnlySpan<int> data)
     {
         int min = int.MaxValue;
         int max = int.MinValue;
@@ -222,10 +240,10 @@ internal static class DataAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
+        return new ValueProperties<T>((T)(object)min, (T)(object)max, false);
     }
 
-    internal static IntegerProperties<T> GetUInt32Properties<T>(ReadOnlySpan<uint> data)
+    internal static ValueProperties<T> GetUInt32Properties<T>(ReadOnlySpan<uint> data)
     {
         uint min = uint.MaxValue;
         uint max = uint.MinValue;
@@ -241,10 +259,10 @@ internal static class DataAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
+        return new ValueProperties<T>((T)(object)min, (T)(object)max, false);
     }
 
-    internal static IntegerProperties<T> GetInt64Properties<T>(ReadOnlySpan<long> data)
+    internal static ValueProperties<T> GetInt64Properties<T>(ReadOnlySpan<long> data)
     {
         long min = long.MaxValue;
         long max = long.MinValue;
@@ -260,10 +278,10 @@ internal static class DataAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
+        return new ValueProperties<T>((T)(object)min, (T)(object)max, false);
     }
 
-    internal static IntegerProperties<T> GetUInt64Properties<T>(ReadOnlySpan<ulong> data)
+    internal static ValueProperties<T> GetUInt64Properties<T>(ReadOnlySpan<ulong> data)
     {
         ulong min = ulong.MaxValue;
         ulong max = ulong.MinValue;
@@ -279,6 +297,6 @@ internal static class DataAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new IntegerProperties<T>((T)(object)min, (T)(object)max);
+        return new ValueProperties<T>((T)(object)min, (T)(object)max, false);
     }
 }

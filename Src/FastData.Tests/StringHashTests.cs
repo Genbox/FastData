@@ -1,5 +1,6 @@
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.StringHash;
+using Genbox.FastData.Generators.StringHash.Framework;
 
 namespace Genbox.FastData.Tests;
 

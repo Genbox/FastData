@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Generators;
+using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Misc;
 using JetBrains.Annotations;
 using static System.Linq.Expressions.Expression;
@@ -15,7 +16,6 @@ internal static class ExpressionHashBuilder
     internal static Expression<HashFunc<string>> BuildFull(Mixer mixer, Avalanche avalanche)
     {
         ParameterExpression input = Parameter(typeof(string), "value");
-
         ParameterExpression length = Variable(typeof(int), "length");
         ParameterExpression offset = Variable(typeof(int), "offset");
         ParameterExpression hash = Variable(typeof(ulong), "hash");
@@ -48,18 +48,20 @@ internal static class ExpressionHashBuilder
         // hash = avalanche(hash);
         ex.Add(Assign(hash, avalanche(hash)));
 
-        UnaryExpression block = Convert(Block([length, offset, hash], ex), typeof(ulong));
+        BlockExpression block = Block([length, offset, hash], ex);
         return Lambda<HashFunc<string>>(block, input);
     }
 
     internal static Expression<HashFunc<string>> Build(ArraySegment[] segments, Mixer mixer, Avalanche avalanche)
     {
         ParameterExpression input = Parameter(typeof(string), "value");
-
         ParameterExpression length = Variable(typeof(int), "length");
         ParameterExpression offset = Variable(typeof(int), "offset");
         ParameterExpression hash = Variable(typeof(ulong), "hash");
         List<Expression> ex = new List<Expression>();
+
+        //int hash = 0;
+        ex.Add(Assign(hash, Constant(0UL)));
 
         // int length = input.Length
         ex.Add(Assign(length, Property(input, "Length")));
@@ -92,7 +94,7 @@ internal static class ExpressionHashBuilder
         // hash = avalanche(hash);
         ex.Add(Assign(hash, avalanche(hash)));
 
-        UnaryExpression block = Convert(Block([length, offset, hash], ex), typeof(ulong));
+        BlockExpression block = Block([length, offset, hash], ex);
         return Lambda<HashFunc<string>>(block, input);
     }
 
@@ -100,6 +102,7 @@ internal static class ExpressionHashBuilder
     {
         // int offset = <offset>
         // int length -= offset
+        ex.Add(Assign(hash, Constant(0UL)));
         ex.Add(Assign(offset, Constant((int)seg.Offset)));
         ex.Add(SubtractAssign(length, offset));
 
@@ -148,16 +151,16 @@ internal static class ExpressionHashBuilder
 
     private static UnaryExpression GetReadFunc(Expression data, Expression idx, int length)
     {
-        string name = length switch
+        ReaderFunctions func = length switch
         {
-            1 => "ReadU8",
-            2 => "ReadU16",
-            4 => "ReadU32",
-            8 => "ReadU64",
+            1 => ReaderFunctions.ReadU8,
+            2 => ReaderFunctions.ReadU16,
+            4 => ReaderFunctions.ReadU32,
+            8 => ReaderFunctions.ReadU64,
             _ => throw new InvalidOperationException($"Invalid length: {length.ToString(NumberFormatInfo.InvariantInfo)}")
         };
 
-        MethodInfo? readFunc = typeof(ReaderHelpers).GetMethod(name, BindingFlags.Static | BindingFlags.Public);
+        MethodInfo? readFunc = typeof(ReaderHelpers).GetMethod(func.ToString(), BindingFlags.Static | BindingFlags.Public);
 
         if (readFunc == null)
             throw new InvalidOperationException("Could not find method");

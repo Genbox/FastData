@@ -39,6 +39,7 @@ internal static class HashSetChainStructure_UInt16_4
         return false;
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(ushort value)
     {

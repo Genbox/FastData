@@ -1,4 +1,5 @@
 using Genbox.FastData.Generator.CSharp.Enums;
+using Genbox.FastData.Generator.CSharp.Internal;
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.CSharp.Internal.Generators;
 using Genbox.FastData.Generator.Framework;
@@ -13,8 +14,8 @@ public sealed class CSharpCodeGenerator : CodeGenerator
 {
     private readonly CSharpCodeGeneratorConfig _cfg;
 
-    private CSharpCodeGenerator(CSharpCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
-        : base(langDef, constDef, earlyExitDef, hashDef) => _cfg = cfg;
+    private CSharpCodeGenerator(CSharpCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, ExpressionCompiler compiler)
+        : base(langDef, constDef, earlyExitDef, hashDef, compiler) => _cfg = cfg;
 
     public static CSharpCodeGenerator Create(CSharpCodeGeneratorConfig userCfg)
     {
@@ -22,7 +23,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
         TypeMap typeMap = new TypeMap(langDef.TypeDefinitions);
         TypeHelper helper = new TypeHelper(typeMap);
 
-        return new CSharpCodeGenerator(userCfg, langDef, new CSharpConstantsDef(), new CSharpEarlyExitDef(helper, userCfg.GeneratorOptions), new CSharpHashDef());
+        return new CSharpCodeGenerator(userCfg, langDef, new CSharpConstantsDef(), new CSharpEarlyExitDef(helper, userCfg.GeneratorOptions), new CSharpHashDef(), new CSharpExpressionCompiler(helper));
     }
 
     protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context)

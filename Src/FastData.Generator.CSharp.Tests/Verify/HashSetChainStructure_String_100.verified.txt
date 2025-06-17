@@ -57,6 +57,7 @@ internal static class HashSetChainStructure_String_100
         return false;
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(string value)
     {

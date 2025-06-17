@@ -6,6 +6,12 @@ public class TypeHelper(TypeMap typeMap)
 {
     public string GetTypeName(Type type) => typeMap.GetName(type);
 
+    public string ToValueLabel(object value, Type type)
+    {
+        ITypeDef s = typeMap.GetDef(type);
+        return s.PrintObj(value);
+    }
+
     public string ToValueLabel<T>(T value)
     {
         ITypeDef<T> s = typeMap.Get<T>();

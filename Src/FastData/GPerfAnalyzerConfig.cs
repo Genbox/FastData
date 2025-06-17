@@ -1,10 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Internal.Abstracts;
+using JetBrains.Annotations;
 
 namespace Genbox.FastData;
 
-[SuppressMessage("Minor Code Smell", "S2094:Classes should not be empty")]
-internal sealed class GPerfAnalyzerConfig : IAnalyzerConfig
+[PublicAPI]
+public sealed class GPerfAnalyzerConfig : IAnalyzerConfig
 {
     public uint MaxPositions { get; set; } = 255;
 }

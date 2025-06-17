@@ -1,11 +1,12 @@
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Analyzers;
 
 namespace Genbox.FastData.Internal.Abstracts;
 
 /// <summary>String hash analyzers try to find a hash function for a given set of strings.</summary>
-internal interface IStringHashAnalyzer
+internal interface IStringHashAnalyzer<T> where T : notnull
 {
     bool IsAppropriate();
 
-    void GetCandidates(ReadOnlySpan<string> data, Func<Candidate, bool> onCandidateFound);
+    IEnumerable<Candidate> GetCandidates(ReadOnlySpan<T> data);
 }

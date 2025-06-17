@@ -43,6 +43,7 @@ internal static class HashSetLinearStructure_Byte_3
         return false;
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(byte value)
     {

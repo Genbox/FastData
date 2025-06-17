@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Expressions;
 using Genbox.FastData.Internal.Misc;
@@ -34,9 +36,11 @@ internal sealed record GeneticStringHash : IStringHash
     internal int MixerIterations { get; }
     internal int AvalancheSeed { get; }
     internal int AvalancheIterations { get; }
+    public State[]? State => null;
 
     public HashFunc<string> GetHashFunction() => GetExpression().Compile();
     public Expression<HashFunc<string>> GetExpression() => ExpressionHashBuilder.Build([Segment], GetMixer(), GetAvalanche());
+    public ReaderFunctions Functions => ReaderFunctions.All;
 
     private Mixer GetMixer() => (hash, read) =>
     {

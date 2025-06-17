@@ -44,6 +44,7 @@ internal static class HashSetLinearStructure_Single_5_HashZeroOrNaN
         return false;
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(float value)
     {

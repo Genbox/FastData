@@ -23,7 +23,7 @@ public sealed class TypeMap
 
     public ITypeDef<T> Get<T>() => (ITypeDef<T>)GetDef(typeof(T));
 
-    private ITypeDef GetDef(Type t)
+    public ITypeDef GetDef(Type t)
     {
         ITypeDef? res = _index[(int)Type.GetTypeCode(t)];
 

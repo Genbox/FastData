@@ -1,4 +1,9 @@
 #nullable enable
+Genbox.FastData.SourceGenerator.Attributes.AnalysisLevel
+Genbox.FastData.SourceGenerator.Attributes.AnalysisLevel.Aggressive = 3 -> Genbox.FastData.SourceGenerator.Attributes.AnalysisLevel
+Genbox.FastData.SourceGenerator.Attributes.AnalysisLevel.Balanced = 0 -> Genbox.FastData.SourceGenerator.Attributes.AnalysisLevel
+Genbox.FastData.SourceGenerator.Attributes.AnalysisLevel.Disabled = 1 -> Genbox.FastData.SourceGenerator.Attributes.AnalysisLevel
+Genbox.FastData.SourceGenerator.Attributes.AnalysisLevel.Fast = 2 -> Genbox.FastData.SourceGenerator.Attributes.AnalysisLevel
 Genbox.FastData.SourceGenerator.Attributes.ClassType
 Genbox.FastData.SourceGenerator.Attributes.ClassType.Instance = 2 -> Genbox.FastData.SourceGenerator.Attributes.ClassType
 Genbox.FastData.SourceGenerator.Attributes.ClassType.Static = 1 -> Genbox.FastData.SourceGenerator.Attributes.ClassType
@@ -9,6 +14,8 @@ Genbox.FastData.SourceGenerator.Attributes.ClassVisibility.Internal = 1 -> Genbo
 Genbox.FastData.SourceGenerator.Attributes.ClassVisibility.Public = 2 -> Genbox.FastData.SourceGenerator.Attributes.ClassVisibility
 Genbox.FastData.SourceGenerator.Attributes.ClassVisibility.Unknown = 0 -> Genbox.FastData.SourceGenerator.Attributes.ClassVisibility
 Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.AnalysisLevel.get -> Genbox.FastData.SourceGenerator.Attributes.AnalysisLevel
+Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.AnalysisLevel.set -> void
 Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.ClassType.get -> Genbox.FastData.SourceGenerator.Attributes.ClassType
 Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.ClassType.set -> void
 Genbox.FastData.SourceGenerator.Attributes.FastDataAttribute<T>.ClassVisibility.get -> Genbox.FastData.SourceGenerator.Attributes.ClassVisibility

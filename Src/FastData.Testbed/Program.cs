@@ -6,8 +6,11 @@ internal static class Program
 {
     private static void Main()
     {
-        AnalysisTest.TestGeneticAnalyzer();
-        AnalysisTest.TestBruteForceAnalyzer();
-        AnalysisTest.TestGPerfAnalyzer();
+        AnalysisTest.TestBest();
+
+        // AnalysisTest.TestNoAnalyzer();
+        // AnalysisTest.TestGeneticAnalyzer();
+        // AnalysisTest.TestBruteForceAnalyzer();
+        // AnalysisTest.TestGPerfAnalyzer();
     }
 }

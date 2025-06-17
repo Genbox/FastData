@@ -14,16 +14,18 @@ public abstract class CodeGenerator : ICodeGenerator
     private readonly IConstantsDef _constDef;
     private readonly IEarlyExitDef _earlyExitDef;
     private readonly IHashDef _hashDef;
+    private readonly ExpressionCompiler? _compiler;
     private readonly ILanguageDef _langDef;
     private readonly TypeHelper _typeHelper;
     private readonly TypeMap _typeMap;
 
-    protected CodeGenerator(ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
+    protected CodeGenerator(ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, ExpressionCompiler? compiler)
     {
         _langDef = langDef;
         _constDef = constDef;
         _earlyExitDef = earlyExitDef;
         _hashDef = hashDef;
+        _compiler = compiler;
 
         _typeMap = new TypeMap(langDef.TypeDefinitions);
         _typeHelper = new TypeHelper(_typeMap);
@@ -34,7 +36,7 @@ public abstract class CodeGenerator : ICodeGenerator
 
     public bool UseUTF16Encoding => _langDef.UseUTF16Encoding;
 
-    public virtual string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context)
+    public virtual string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context) where T : notnull
     {
         Shared.Clear();
 
@@ -54,9 +56,9 @@ public abstract class CodeGenerator : ICodeGenerator
         return sb.ToString();
     }
 
-    protected abstract OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext<T> context);
+    protected abstract OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext<T> context) where T : notnull;
 
-    protected virtual void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context)
+    protected virtual void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context) where T : notnull
     {
         string subType = context.GetType().Name.Replace("Context`1", "");
 
@@ -69,14 +71,14 @@ public abstract class CodeGenerator : ICodeGenerator
 #endif
     }
 
-    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext<T> context, ReadOnlySpan<T> data)
+    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext<T> context, ReadOnlySpan<T> data) where T : notnull
     {
         OutputWriter<T>? writer = GetOutputWriter(genCfg, context);
 
         if (writer == null)
             throw new NotSupportedException("The context type is not supported: " + context.GetType().Name);
 
-        writer.Initialize(_langDef, _earlyExitDef, _typeHelper, _hashDef, genCfg, typeName);
+        writer.Initialize(_langDef, _earlyExitDef, _typeHelper, _hashDef, genCfg, typeName, _compiler);
         sb.AppendLine(writer.Generate(data));
     }
 

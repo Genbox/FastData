@@ -44,6 +44,7 @@ internal static class HashSetLinearStructure_Int64_5
         return false;
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(long value)
     {

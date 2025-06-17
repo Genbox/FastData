@@ -8,6 +8,8 @@ internal sealed class MinHeap<T>(int capacity)
     private double _best = double.MinValue;
     private int _count;
 
+    public bool HasMaxFitness => Math.Abs(_best - 1) < double.Epsilon;
+
     public IEnumerable<(double, T)> Items
     {
         get

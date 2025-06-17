@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Expressions;
 using static System.Linq.Expressions.Expression;
@@ -12,8 +14,10 @@ internal sealed record DefaultStringHash : IStringHash
 
     internal DefaultStringHash() { }
 
+    public State[]? State => null;
     public HashFunc<string> GetHashFunction() => GetExpression().Compile();
     public Expression<HashFunc<string>> GetExpression() => _expression ??= ExpressionHashBuilder.BuildFull(Mixer, Avalanche);
+    public ReaderFunctions Functions => ReaderFunctions.ReadU8;
 
     // (((hash << 5) | (hash >> 27)) + hash) ^ Read(data, offset)
     private static Expression Mixer(Expression hash, Expression read) =>

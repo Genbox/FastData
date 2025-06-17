@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Expressions;
 using Genbox.FastData.Internal.Misc;
@@ -21,10 +23,12 @@ internal sealed record BruteForceStringHash : IStringHash
     internal ArraySegment Segment { get; set; }
     internal Mixer Mixer { get; set; }
     internal Avalanche Avalanche { get; set; }
+    public State[]? State => null;
 
     public HashFunc<string> GetHashFunction() => GetExpression().Compile();
 
     public Expression<HashFunc<string>> GetExpression() => ExpressionHashBuilder.Build([Segment], Mixer, Avalanche);
+    public ReaderFunctions Functions => ReaderFunctions.All;
 
     public override string ToString() =>
         $"""

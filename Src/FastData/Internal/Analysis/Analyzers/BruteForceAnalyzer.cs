@@ -10,7 +10,7 @@ using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed partial class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConfig config, Simulator sim, ILogger<BruteForceAnalyzer> logger) : IStringHashAnalyzer
+internal sealed partial class BruteForceAnalyzer<T>(StringProperties props, BruteForceAnalyzerConfig config, Simulator<T> sim, ILogger<BruteForceAnalyzer<T>> logger) : IStringHashAnalyzer<T> where T : notnull
 {
     private static readonly ulong[] Seeds =
     [
@@ -43,7 +43,7 @@ internal sealed partial class BruteForceAnalyzer(StringProperties props, BruteFo
 
     public bool IsAppropriate() => true;
 
-    public void GetCandidates(ReadOnlySpan<string> data, Func<Candidate, bool> onCandidateFound)
+    public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<T> data)
     {
         MinHeap<Candidate> heap = new MinHeap<Candidate>(config.MaxReturned);
         BruteForceStringHash spec = new BruteForceStringHash();
@@ -80,19 +80,15 @@ internal sealed partial class BruteForceAnalyzer(StringProperties props, BruteFo
                             if (heap.Add(current.Fitness, current))
                                 LogBetterCandidate(logger, current.Fitness, current.Collisions, ExpressionHelper.Print(mixer), ExpressionHelper.Print(avalanche));
 
-                            if (leftAttempts-- == 0)
-                                return;
+                            if (heap.HasMaxFitness || leftAttempts-- == 0)
+                                return heap.Items.Select(x => x.Item2);
                         }
                     }
                 }
             }
         }
 
-        foreach ((double _, Candidate candidate) in heap.Items)
-        {
-            if (!onCandidateFound(candidate))
-                return;
-        }
+        return heap.Items.Select(x => x.Item2);
     }
 
     private sealed class MixerIdentity : SimpleMixerGen

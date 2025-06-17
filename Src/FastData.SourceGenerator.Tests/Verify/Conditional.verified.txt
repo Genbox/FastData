@@ -11,8 +11,7 @@ internal static class StaticData
     
     public static bool Contains(string value)
     {
-        if (value.Length != 5u)
-            return false;
+
 
         switch (value)
         {

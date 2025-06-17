@@ -16,10 +16,28 @@ Genbox.FastData.Generator.Enums.CodeType.Class = 2 -> Genbox.FastData.Generator.
 Genbox.FastData.Generator.Enums.CodeType.Directive = 3 -> Genbox.FastData.Generator.Enums.CodeType
 Genbox.FastData.Generator.Enums.CodeType.Method = 1 -> Genbox.FastData.Generator.Enums.CodeType
 Genbox.FastData.Generator.Enums.CodeType.Unknown = 0 -> Genbox.FastData.Generator.Enums.CodeType
+Genbox.FastData.Generator.ExpressionCompiler
+Genbox.FastData.Generator.ExpressionCompiler.ExpressionCompiler(Genbox.FastData.Generator.Framework.TypeHelper! helper) -> void
+Genbox.FastData.Generator.ExpressionCompiler.GetCode(System.Linq.Expressions.Expression! expression, int indent = 2) -> string!
+Genbox.FastData.Generator.Extensions.ArrayExtensions
 Genbox.FastData.Generator.Extensions.IntegerExtensions
 Genbox.FastData.Generator.Extensions.SpanExtensions
+Genbox.FastData.Generator.FastStringBuilder
+Genbox.FastData.Generator.FastStringBuilder.Append(char value) -> Genbox.FastData.Generator.FastStringBuilder!
+Genbox.FastData.Generator.FastStringBuilder.Append(object! value) -> Genbox.FastData.Generator.FastStringBuilder!
+Genbox.FastData.Generator.FastStringBuilder.Append(string! value) -> Genbox.FastData.Generator.FastStringBuilder!
+Genbox.FastData.Generator.FastStringBuilder.Append(System.FormattableString! value) -> Genbox.FastData.Generator.FastStringBuilder!
+Genbox.FastData.Generator.FastStringBuilder.AppendLine() -> Genbox.FastData.Generator.FastStringBuilder!
+Genbox.FastData.Generator.FastStringBuilder.AppendLine(string! value) -> Genbox.FastData.Generator.FastStringBuilder!
+Genbox.FastData.Generator.FastStringBuilder.AppendLine(System.FormattableString! value) -> Genbox.FastData.Generator.FastStringBuilder!
+Genbox.FastData.Generator.FastStringBuilder.Clear() -> Genbox.FastData.Generator.FastStringBuilder!
+Genbox.FastData.Generator.FastStringBuilder.DecrementIndent() -> Genbox.FastData.Generator.FastStringBuilder!
+Genbox.FastData.Generator.FastStringBuilder.FastStringBuilder() -> void
+Genbox.FastData.Generator.FastStringBuilder.IncrementIndent() -> Genbox.FastData.Generator.FastStringBuilder!
+Genbox.FastData.Generator.FastStringBuilder.Indent.get -> int
+Genbox.FastData.Generator.FastStringBuilder.Indent.set -> void
 Genbox.FastData.Generator.Framework.CodeGenerator
-Genbox.FastData.Generator.Framework.CodeGenerator.CodeGenerator(Genbox.FastData.Generator.Framework.Interfaces.ILanguageDef! langDef, Genbox.FastData.Generator.Framework.Interfaces.IConstantsDef! constDef, Genbox.FastData.Generator.Framework.Interfaces.IEarlyExitDef! earlyExitDef, Genbox.FastData.Generator.Framework.Interfaces.IHashDef! hashDef) -> void
+Genbox.FastData.Generator.Framework.CodeGenerator.CodeGenerator(Genbox.FastData.Generator.Framework.Interfaces.ILanguageDef! langDef, Genbox.FastData.Generator.Framework.Interfaces.IConstantsDef! constDef, Genbox.FastData.Generator.Framework.Interfaces.IEarlyExitDef! earlyExitDef, Genbox.FastData.Generator.Framework.Interfaces.IHashDef! hashDef, Genbox.FastData.Generator.ExpressionCompiler? compiler) -> void
 Genbox.FastData.Generator.Framework.CodeGenerator.Shared.get -> Genbox.FastData.Generator.SharedCode!
 Genbox.FastData.Generator.Framework.CodeGenerator.UseUTF16Encoding.get -> bool
 Genbox.FastData.Generator.Framework.Definitions.BoolTypeDef
@@ -35,11 +53,17 @@ Genbox.FastData.Generator.Framework.Definitions.IntegerTypeDef<T>.DataType.get -
 Genbox.FastData.Generator.Framework.Definitions.IntegerTypeDef<T>.IntegerTypeDef(string! name, T minValue, T maxValue, string! minValueStr, string! maxValueStr, System.Func<T, string!>? print = null) -> void
 Genbox.FastData.Generator.Framework.Definitions.IntegerTypeDef<T>.Name.get -> string!
 Genbox.FastData.Generator.Framework.Definitions.IntegerTypeDef<T>.Print.get -> System.Func<T, string!>!
+Genbox.FastData.Generator.Framework.Definitions.IntegerTypeDef<T>.PrintObj.get -> System.Func<object!, string!>!
 Genbox.FastData.Generator.Framework.Definitions.StringTypeDef
 Genbox.FastData.Generator.Framework.Definitions.StringTypeDef.DataType.get -> Genbox.FastData.Enums.DataType
 Genbox.FastData.Generator.Framework.Definitions.StringTypeDef.Name.get -> string!
 Genbox.FastData.Generator.Framework.Definitions.StringTypeDef.Print.get -> System.Func<string!, string!>!
+Genbox.FastData.Generator.Framework.Definitions.StringTypeDef.PrintObj.get -> System.Func<object!, string!>!
 Genbox.FastData.Generator.Framework.Definitions.StringTypeDef.StringTypeDef(string! name) -> void
+Genbox.FastData.Generator.Framework.HashInfo
+Genbox.FastData.Generator.Framework.HashInfo.HashInfo(bool hasZeroOrNaN, Genbox.FastData.Generator.Framework.StringHashInfo? stringHash) -> void
+Genbox.FastData.Generator.Framework.HashInfo.HasZeroOrNaN.get -> bool
+Genbox.FastData.Generator.Framework.HashInfo.StringHash.get -> Genbox.FastData.Generator.Framework.StringHashInfo?
 Genbox.FastData.Generator.Framework.Interfaces.IConstantsDef
 Genbox.FastData.Generator.Framework.Interfaces.IConstantsDef.Comment.get -> string!
 Genbox.FastData.Generator.Framework.Interfaces.IConstantsDef.ItemCountTemplate.get -> System.Func<string!, string!, string!>!
@@ -50,7 +74,7 @@ Genbox.FastData.Generator.Framework.Interfaces.IConstantsDef.MinValueTemplate.ge
 Genbox.FastData.Generator.Framework.Interfaces.IEarlyExitDef
 Genbox.FastData.Generator.Framework.Interfaces.IEarlyExitDef.GetEarlyExits<T>(System.Collections.Generic.IEnumerable<Genbox.FastData.Generators.Abstracts.IEarlyExit!>! earlyExits) -> string!
 Genbox.FastData.Generator.Framework.Interfaces.IHashDef
-Genbox.FastData.Generator.Framework.Interfaces.IHashDef.GetHashSource(Genbox.FastData.Enums.DataType dataType, string! typeName, Genbox.FastData.Generators.HashInfo! info) -> string!
+Genbox.FastData.Generator.Framework.Interfaces.IHashDef.GetHashSource(Genbox.FastData.Enums.DataType dataType, string! typeName, Genbox.FastData.Generator.Framework.HashInfo! info) -> string!
 Genbox.FastData.Generator.Framework.Interfaces.ILanguageDef
 Genbox.FastData.Generator.Framework.Interfaces.ILanguageDef.ArraySizeType.get -> string!
 Genbox.FastData.Generator.Framework.Interfaces.ILanguageDef.TypeDefinitions.get -> System.Collections.Generic.IList<Genbox.FastData.Generator.Framework.Interfaces.ITypeDef!>!
@@ -58,6 +82,7 @@ Genbox.FastData.Generator.Framework.Interfaces.ILanguageDef.UseUTF16Encoding.get
 Genbox.FastData.Generator.Framework.Interfaces.ITypeDef
 Genbox.FastData.Generator.Framework.Interfaces.ITypeDef.DataType.get -> Genbox.FastData.Enums.DataType
 Genbox.FastData.Generator.Framework.Interfaces.ITypeDef.Name.get -> string!
+Genbox.FastData.Generator.Framework.Interfaces.ITypeDef.PrintObj.get -> System.Func<object!, string!>!
 Genbox.FastData.Generator.Framework.Interfaces.ITypeDef<T>
 Genbox.FastData.Generator.Framework.Interfaces.ITypeDef<T>.Print.get -> System.Func<T, string!>!
 Genbox.FastData.Generator.Framework.OutputWriter<T>
@@ -71,22 +96,63 @@ Genbox.FastData.Generator.Framework.OutputWriter<T>.HashSource.get -> string!
 Genbox.FastData.Generator.Framework.OutputWriter<T>.OutputWriter() -> void
 Genbox.FastData.Generator.Framework.OutputWriter<T>.ToValueLabel<T2>(T2 value) -> string!
 Genbox.FastData.Generator.Framework.OutputWriter<T>.TypeName.get -> string!
+Genbox.FastData.Generator.Framework.ReaderFunctions
+Genbox.FastData.Generator.Framework.ReaderFunctions.None = 0 -> Genbox.FastData.Generator.Framework.ReaderFunctions
+Genbox.FastData.Generator.Framework.ReaderFunctions.ReadU16 = 2 -> Genbox.FastData.Generator.Framework.ReaderFunctions
+Genbox.FastData.Generator.Framework.ReaderFunctions.ReadU32 = 4 -> Genbox.FastData.Generator.Framework.ReaderFunctions
+Genbox.FastData.Generator.Framework.ReaderFunctions.ReadU64 = 8 -> Genbox.FastData.Generator.Framework.ReaderFunctions
+Genbox.FastData.Generator.Framework.ReaderFunctions.ReadU8 = 1 -> Genbox.FastData.Generator.Framework.ReaderFunctions
+Genbox.FastData.Generator.Framework.StateInfo
+Genbox.FastData.Generator.Framework.StateInfo.Name.get -> string!
+Genbox.FastData.Generator.Framework.StateInfo.StateInfo(string! name, string! typeName, string![]! values) -> void
+Genbox.FastData.Generator.Framework.StateInfo.TypeName.get -> string!
+Genbox.FastData.Generator.Framework.StateInfo.Values.get -> string![]!
+Genbox.FastData.Generator.Framework.StringHashInfo
+Genbox.FastData.Generator.Framework.StringHashInfo.HashSource.get -> string!
+Genbox.FastData.Generator.Framework.StringHashInfo.ReaderFunctions.get -> Genbox.FastData.Generators.StringHash.Framework.ReaderFunctions
+Genbox.FastData.Generator.Framework.StringHashInfo.State.get -> Genbox.FastData.Generator.Framework.StateInfo![]?
+Genbox.FastData.Generator.Framework.StringHashInfo.StringHashInfo(string! stringHash, Genbox.FastData.Generators.StringHash.Framework.ReaderFunctions functions, Genbox.FastData.Generator.Framework.StateInfo![]? state) -> void
 Genbox.FastData.Generator.Framework.TypeHelper
 Genbox.FastData.Generator.Framework.TypeHelper.GetSmallestIntType(long value) -> string!
 Genbox.FastData.Generator.Framework.TypeHelper.GetSmallestUIntType(ulong value) -> string!
 Genbox.FastData.Generator.Framework.TypeHelper.GetTypeName(System.Type! type) -> string!
+Genbox.FastData.Generator.Framework.TypeHelper.ToValueLabel(object! value, System.Type! type) -> string!
 Genbox.FastData.Generator.Framework.TypeHelper.ToValueLabel<T>(T value) -> string!
 Genbox.FastData.Generator.Framework.TypeHelper.TypeHelper(Genbox.FastData.Generator.Framework.TypeMap! typeMap) -> void
 Genbox.FastData.Generator.Framework.TypeMap
 Genbox.FastData.Generator.Framework.TypeMap.Get<T>() -> Genbox.FastData.Generator.Framework.Interfaces.ITypeDef<T>!
+Genbox.FastData.Generator.Framework.TypeMap.GetDef(System.Type! t) -> Genbox.FastData.Generator.Framework.Interfaces.ITypeDef!
 Genbox.FastData.Generator.Framework.TypeMap.GetName(System.Type! t) -> string!
 Genbox.FastData.Generator.Framework.TypeMap.TypeMap(System.Collections.Generic.IList<Genbox.FastData.Generator.Framework.Interfaces.ITypeDef!>! typeSpecs) -> void
+Genbox.FastData.Generator.HashInfo
+Genbox.FastData.Generator.HashInfo.HashInfo(bool hasZeroOrNaN, Genbox.FastData.Generator.StringHashInfo? stringHash) -> void
+Genbox.FastData.Generator.HashInfo.HasZeroOrNaN.get -> bool
+Genbox.FastData.Generator.HashInfo.StringHash.get -> Genbox.FastData.Generator.StringHashInfo?
 Genbox.FastData.Generator.Helpers.FormatHelper
 Genbox.FastData.Generator.SharedCode
 Genbox.FastData.Generator.SharedCode.Add(string! id, Genbox.FastData.Generator.Enums.CodeType type, string! value) -> void
 Genbox.FastData.Generator.SharedCode.Clear() -> void
 Genbox.FastData.Generator.SharedCode.GetType(Genbox.FastData.Generator.Enums.CodeType type) -> System.Collections.Generic.IEnumerable<string!>!
 Genbox.FastData.Generator.SharedCode.SharedCode() -> void
+Genbox.FastData.Generator.StringHashInfo
+Genbox.FastData.Generator.StringHashInfo.HashFunction.get -> Genbox.FastData.Generators.State![]?
+Genbox.FastData.Generator.StringHashInfo.HashSource.get -> string!
+Genbox.FastData.Generator.StringHashInfo.StringHashInfo(string! stringHash, Genbox.FastData.Generators.State![]? state) -> void
+override Genbox.FastData.Generator.ExpressionCompiler.VisitBinary(System.Linq.Expressions.BinaryExpression! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.ExpressionCompiler.VisitBlock(System.Linq.Expressions.BlockExpression! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.ExpressionCompiler.VisitConditional(System.Linq.Expressions.ConditionalExpression! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.ExpressionCompiler.VisitConstant(System.Linq.Expressions.ConstantExpression! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.ExpressionCompiler.VisitGoto(System.Linq.Expressions.GotoExpression! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.ExpressionCompiler.VisitIndex(System.Linq.Expressions.IndexExpression! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.ExpressionCompiler.VisitLambda<T>(System.Linq.Expressions.Expression<T>! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.ExpressionCompiler.VisitLoop(System.Linq.Expressions.LoopExpression! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.ExpressionCompiler.VisitMember(System.Linq.Expressions.MemberExpression! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.ExpressionCompiler.VisitMethodCall(System.Linq.Expressions.MethodCallExpression! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.ExpressionCompiler.VisitParameter(System.Linq.Expressions.ParameterExpression! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.ExpressionCompiler.VisitUnary(System.Linq.Expressions.UnaryExpression! node) -> System.Linq.Expressions.Expression!
+override Genbox.FastData.Generator.FastStringBuilder.ToString() -> string!
+readonly Genbox.FastData.Generator.ExpressionCompiler.Output -> Genbox.FastData.Generator.FastStringBuilder!
+static Genbox.FastData.Generator.Extensions.ArrayExtensions.GetEnumerable(this System.Array! array) -> System.Collections.Generic.IEnumerable<object!>!
 static Genbox.FastData.Generator.Extensions.IntegerExtensions.ToStringInvariant(this int value) -> string!
 static Genbox.FastData.Generator.Extensions.IntegerExtensions.ToStringInvariant(this uint value) -> string!
 static Genbox.FastData.Generator.Extensions.IntegerExtensions.ToStringInvariant(this ulong value) -> string!

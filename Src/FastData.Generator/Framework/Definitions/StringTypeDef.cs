@@ -7,5 +7,6 @@ public class StringTypeDef(string name) : ITypeDef<string>
 {
     public DataType DataType => DataType.String;
     public string Name { get; } = name;
+    public Func<object, string> PrintObj => x => $"\"{x}\"";
     public Func<string, string> Print => x => $"\"{x}\"";
 }

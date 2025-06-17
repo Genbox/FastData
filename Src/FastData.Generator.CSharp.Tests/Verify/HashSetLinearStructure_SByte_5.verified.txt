@@ -44,6 +44,7 @@ internal static class HashSetLinearStructure_SByte_5
         return false;
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(sbyte value)
     {

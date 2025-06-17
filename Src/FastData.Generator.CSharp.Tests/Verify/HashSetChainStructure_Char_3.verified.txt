@@ -39,6 +39,7 @@ internal static class HashSetChainStructure_Char_3
         return false;
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(char value)
     {

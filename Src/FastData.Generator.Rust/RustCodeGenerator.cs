@@ -13,7 +13,7 @@ public sealed class RustCodeGenerator : CodeGenerator
     private readonly RustCodeGeneratorConfig _cfg;
 
     private RustCodeGenerator(RustCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
-        : base(langDef, constDef, earlyExitDef, hashDef) => _cfg = cfg;
+        : base(langDef, constDef, earlyExitDef, hashDef, null) => _cfg = cfg;
 
     public static RustCodeGenerator Create(RustCodeGeneratorConfig userCfg)
     {

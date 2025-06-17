@@ -1,23 +1,13 @@
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
-using Genbox.FastData.Generators.StringHash;
+using Genbox.FastData.Generators.StringHash.Framework;
 
 namespace Genbox.FastData.Internal.Misc;
 
+/// <summary>Used internally in FastData to store hash codes and their properties.</summary>
 internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUnique, bool HashCodesPerfect)
 {
-    internal static HashData Create<T>(ReadOnlySpan<T> data, DataType dataType, int capacityFactor, bool hasZeroOrNaN)
+    internal static HashData Create<T>(ReadOnlySpan<T> data, int capacityFactor, HashFunc<T> hashFunc)
     {
-        DefaultStringHash? stringHash = null;
-        if (typeof(T) == typeof(string))
-            stringHash = new DefaultStringHash();
-
-        HashFunc<T> hashFunc;
-        if (stringHash == null)
-            hashFunc = PrimitiveHash.GetHash<T>(dataType, hasZeroOrNaN);
-        else
-            hashFunc = (HashFunc<T>)(object)stringHash.GetHashFunction();
-
         ulong size = (ulong)(data.Length * capacityFactor);
 
         ulong[] hashCodes = new ulong[size];

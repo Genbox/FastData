@@ -1,7 +1,7 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
-using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Generators;
@@ -10,15 +10,25 @@ namespace Genbox.FastData.Generators;
 /// <typeparam name="T">The type of data being generated.</typeparam>
 public sealed class GeneratorConfig<T> where T : notnull
 {
-    internal GeneratorConfig(StructureType structureType, StringComparison stringComparison, DataProperties<T> props)
+    private GeneratorConfig(StructureType structureType, DataType dataType, HashDetails hashDetails)
     {
         StructureType = structureType;
-        StringComparison = stringComparison;
-        DataType = props.DataType;
-        EarlyExits = GetEarlyExits(props, structureType);
-        Constants = CreateConstants(props);
+        DataType = dataType;
         Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.Now);
-        HashInfo = new HashInfo(props.FloatProps?.hasZeroOrNaN ?? false);
+        HashDetails = hashDetails;
+    }
+
+    internal GeneratorConfig(StructureType structureType, DataType dataType, uint itemCount, ValueProperties<T> props, HashDetails hashDetails) : this(structureType, dataType, hashDetails)
+    {
+        EarlyExits = GetEarlyExits(props, itemCount, structureType).ToArray();
+        Constants = CreateConstants(props, itemCount);
+    }
+
+    internal GeneratorConfig(StructureType structureType, DataType dataType, uint itemCount, StringProperties props, StringComparison stringComparison, HashDetails hashDetails) : this(structureType, dataType, hashDetails)
+    {
+        EarlyExits = GetEarlyExits(props, itemCount, structureType).ToArray();
+        Constants = CreateConstants(props, itemCount);
+        StringComparison = stringComparison;
     }
 
     /// <summary>Gets the structure type that the generator will create.</summary>
@@ -40,68 +50,55 @@ public sealed class GeneratorConfig<T> where T : notnull
     public Metadata Metadata { get; }
 
     /// <summary>Contains information about the hash function to use.</summary>
-    public HashInfo HashInfo { get; }
+    public HashDetails HashDetails { get; }
 
-    private static Constants<T> CreateConstants(DataProperties<T> props)
+    private static Constants<T> CreateConstants(ValueProperties<T> props, uint itemCount)
     {
-        Constants<T> constants = new Constants<T>(props.ItemCount);
-
-        if (props.StringProps != null)
-        {
-            constants.MinStringLength = props.StringProps.LengthData.Min;
-            constants.MaxStringLength = props.StringProps.LengthData.Max;
-        }
-        else if (props.IntProps != null)
-        {
-            constants.MinValue = props.IntProps.MinValue;
-            constants.MaxValue = props.IntProps.MaxValue;
-        }
-        else if (props.FloatProps != null)
-        {
-            constants.MinValue = props.FloatProps.MinValue;
-            constants.MaxValue = props.FloatProps.MaxValue;
-        }
-
+        Constants<T> constants = new Constants<T>(itemCount);
+        constants.MinValue = props.MinValue;
+        constants.MaxValue = props.MaxValue;
         return constants;
     }
 
-    private static IEarlyExit[] GetEarlyExits(DataProperties<T> props, StructureType structureType)
+    private static Constants<T> CreateConstants(StringProperties props, uint itemCount)
     {
-        //There is no point to using early exists if there is just one item
-        if (props.ItemCount == 1)
-            return [];
-
-        if (props.StringProps != null)
-            return GetEarlyExits(props.StringProps).ToArray();
-
-        //Conditional structures are not very useful with less than 3 items as checks costs more than the benefits
-        if (structureType == StructureType.Conditional && props.ItemCount <= 3)
-            return [];
-
-        if (props.IntProps != null)
-            return GetEarlyExits(props.IntProps).ToArray();
-
-        if (props.FloatProps != null)
-            return GetEarlyExits(props.FloatProps).ToArray();
-
-        return [];
+        Constants<T> constants = new Constants<T>(itemCount);
+        constants.MinStringLength = props.LengthData.Min;
+        constants.MaxStringLength = props.LengthData.Max;
+        return constants;
     }
 
-    private static IEnumerable<IEarlyExit> GetEarlyExits(StringProperties prop)
+    private static IEnumerable<IEarlyExit> GetEarlyExits(StringProperties props, uint itemCount, StructureType structureType)
     {
+        //There is no point to using early exists if there is just one item
+        if (itemCount == 1)
+            yield break;
+
+        //Conditional structures are not very useful with less than 3 items as checks costs more than the benefits
+        if (structureType == StructureType.Conditional && itemCount <= 3)
+            yield break;
+
         //Logic:
         // - If all lengths are the same, we check against that (1 inst)
         // - If lengths are consecutive (5, 6, 7, etc.) we do a range check (2 inst)
         // - If the lengths are non-consecutive (4, 9, 12, etc.) we use a small bitset (4 inst)
 
-        if (prop.LengthData.Max <= 64 && !prop.LengthData.LengthMap.Consecutive)
-            yield return new LengthBitSetEarlyExit(prop.LengthData.LengthMap.FirstValue);
+        if (props.LengthData.Max <= 64 && !props.LengthData.LengthMap.Consecutive)
+            yield return new LengthBitSetEarlyExit(props.LengthData.LengthMap.FirstValue);
         else
-            yield return new MinMaxLengthEarlyExit(prop.LengthData.Min, prop.LengthData.Max); //Also handles same lengths
+            yield return new MinMaxLengthEarlyExit(props.LengthData.Min, props.LengthData.Max); //Also handles same lengths
     }
 
-    private static IEnumerable<IEarlyExit> GetEarlyExits(IHasMinMax<T> prop)
+    private static IEnumerable<IEarlyExit> GetEarlyExits(ValueProperties<T> props, uint itemCount, StructureType structureType)
     {
-        yield return new MinMaxValueEarlyExit<T>(prop.MinValue, prop.MaxValue);
+        //There is no point to using early exists if there is just one item
+        if (itemCount == 1)
+            yield break;
+
+        //Conditional structures are not very useful with less than 3 items as checks costs more than the benefits
+        if (structureType == StructureType.Conditional && itemCount <= 3)
+            yield break;
+
+        yield return new MinMaxValueEarlyExit<T>(props.MinValue, props.MaxValue);
     }
 }

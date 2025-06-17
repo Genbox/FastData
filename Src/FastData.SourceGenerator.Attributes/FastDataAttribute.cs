@@ -18,4 +18,5 @@ public sealed class FastDataAttribute<T> : Attribute
     public string? Namespace { get; set; }
     public ClassVisibility ClassVisibility { get; set; }
     public ClassType ClassType { get; set; }
+    public AnalysisLevel AnalysisLevel { get; set; }
 }

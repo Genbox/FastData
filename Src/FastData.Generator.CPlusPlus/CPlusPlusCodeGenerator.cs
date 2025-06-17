@@ -13,7 +13,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     private readonly CPlusPlusCodeGeneratorConfig _cfg;
 
     private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
-        : base(langDef, constDef, earlyExitDef, hashDef) => _cfg = cfg;
+        : base(langDef, constDef, earlyExitDef, hashDef, null) => _cfg = cfg;
 
     public static CPlusPlusCodeGenerator Create(CPlusPlusCodeGeneratorConfig userCfg)
     {
@@ -26,7 +26,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     public override string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context)
     {
         //C++ generator does not support chars outside ASCII
-        if (genCfg.DataType == DataType.Char && (char)(object)genCfg.Constants.MaxValue! > 127)
+        if (genCfg.DataType == DataType.Char && (char)(object)genCfg.Constants.MaxValue > 127)
             throw new InvalidOperationException("C++ generator does not support chars outside ASCII. Please use a different data type or reduce the max value to 127 or lower.");
 
         return base.Generate(data, genCfg, context);

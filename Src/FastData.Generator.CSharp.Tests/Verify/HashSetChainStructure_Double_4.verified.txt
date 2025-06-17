@@ -39,6 +39,7 @@ internal static class HashSetChainStructure_Double_4
         return false;
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(double value)
     {

@@ -8,6 +8,7 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Mutation;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Reinsertion;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Termination;
+using Genbox.FastData.Internal.Analysis.Misc;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Analysis.SegmentGenerators;
 using Genbox.FastData.Internal.Helpers;
@@ -16,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed partial class GeneticAnalyzer(StringProperties props, GeneticAnalyzerConfig config, Simulator sim, ILogger<GeneticAnalyzer> logger) : IStringHashAnalyzer
+internal sealed partial class GeneticAnalyzer<T>(StringProperties props, GeneticAnalyzerConfig config, Simulator<T> sim, ILogger<GeneticAnalyzer<T>> logger) : IStringHashAnalyzer<T> where T : notnull
 {
     /*
      This is a genetic algorithm that determines the best configuration from a random population, that via evolution is biased
@@ -82,7 +83,7 @@ internal sealed partial class GeneticAnalyzer(StringProperties props, GeneticAna
 
     public bool IsAppropriate() => true;
 
-    public void GetCandidates(ReadOnlySpan<string> data, Func<Candidate, bool> onCandidateFound)
+    public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<T> data)
     {
         GeneticEngineConfig cfg = new GeneticEngineConfig();
         cfg.PopulationSize = config.PopulationSize;
@@ -93,31 +94,40 @@ internal sealed partial class GeneticAnalyzer(StringProperties props, GeneticAna
 
         GeneticEngine engine = new GeneticEngine(cfg, [
             new ArraySegmentGene(nameof(GeneticStringHash.Segment), segments),
-            new IntGene(nameof(GeneticStringHash.MixerSeed), 1, 0, 100),
+            new IntGene(nameof(GeneticStringHash.MixerSeed), 1, 0, 1000),
             new IntGene(nameof(GeneticStringHash.MixerIterations), 1, 0, 3),
-            new IntGene(nameof(GeneticStringHash.AvalancheSeed), 1, 0, 100),
+            new IntGene(nameof(GeneticStringHash.AvalancheSeed), 1, 0, 1000),
             new IntGene(nameof(GeneticStringHash.AvalancheIterations), 1, 0, 3)
         ], logger);
 
         DefaultRandom random = new DefaultRandom(config.RandomSeed);
 
-        ISelection selection = new TournamentSelection(4, random);
-        ICrossOver crossOver = new OnePointCrossOver(random);
-        IMutation mutation = new UniformMutation(0.05, random);
-        IReinsertion reinsertion = new EliteReinsertion(0.1);
-        ITermination termination = new MaxGenerationsTermination(config.MaxGenerations);
+        TournamentSelection selection = new TournamentSelection(4, random);
+        OnePointCrossOver crossOver = new OnePointCrossOver(random);
+        UniformMutation mutation = new UniformMutation(0.05, random);
+        EliteReinsertion reinsertion = new EliteReinsertion(0.1);
+        MaxGenerationsTermination termination = new MaxGenerationsTermination(config.MaxGenerations);
+
+        MinHeap<Candidate> heap = new MinHeap<Candidate>(10);
 
         foreach (Entity entity in engine.Evolve(data, Simulation, selection, crossOver, mutation, reinsertion, termination, random))
         {
             Entity localEntity = entity;
             GeneticStringHash hash = CopyGenes(ref localEntity);
 
-            if (!onCandidateFound(new Candidate(hash, entity.Fitness, (int)entity.Tag)))
-                return;
+            int collisions = (int)entity.Tag!;
+
+            if (heap.Add(entity.Fitness, new Candidate(hash, entity.Fitness, collisions)))
+                LogBetterCandidate(logger, entity.Fitness, collisions, ExpressionHelper.Print(hash.GetExpression()));
+
+            if (heap.HasMaxFitness)
+                break;
         }
+
+        return heap.Items.Select(x => x.Item2);
     }
 
-    private void Simulation(ReadOnlySpan<string> data, ref Entity entity)
+    private void Simulation(ReadOnlySpan<T> data, ref Entity entity)
     {
         //Convert entity to GeneticArrayHash
         GeneticStringHash spec = CopyGenes(ref entity);

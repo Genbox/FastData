@@ -11,9 +11,7 @@ pub struct ConditionalStructure_String_3;
 impl ConditionalStructure_String_3 {
     #[must_use]
     pub fn contains(value: &str) -> bool {
-        if value.len() < 1 as usize || value.len() > 255 as usize {
-            return false;
-        }
+
 
         if value == "a" || value == "item" || value == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" {
             return true;

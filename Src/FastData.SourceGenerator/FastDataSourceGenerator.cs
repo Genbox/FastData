@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -11,6 +12,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace Genbox.FastData.SourceGenerator;
 
 [Generator]
+[SuppressMessage("ReSharper", "ReplaceWithStringIsNullOrEmpty")]
 internal class FastDataSourceGenerator : IIncrementalGenerator
 {
     private static readonly string FastLookupAttr = typeof(FastDataAttribute<>).FullName!;
@@ -142,17 +144,61 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                 data[i] = value;
             }
 
-            FastDataConfig config = new FastDataConfig();
-            BindValue(() => config.StructureType, ad.NamedArguments);
+            FastDataConfig fdCfg = new FastDataConfig();
+            BindValue(() => fdCfg.StructureType, ad.NamedArguments);
 
-            // BindValue(() => config.StorageOptions, ad.NamedArguments);
+            CSharpCodeGeneratorConfig csCfg = new CSharpCodeGeneratorConfig(name);
+            BindValue(() => csCfg.Namespace, ad.NamedArguments);
+            BindValue(() => csCfg.ClassVisibility, ad.NamedArguments);
+            BindValue(() => csCfg.ClassType, ad.NamedArguments);
 
-            CSharpCodeGeneratorConfig config2 = new CSharpCodeGeneratorConfig(name);
-            BindValue(() => config2.Namespace, ad.NamedArguments);
-            BindValue(() => config2.ClassVisibility, ad.NamedArguments);
-            BindValue(() => config2.ClassType, ad.NamedArguments);
+            //We need logic for analysis level
+            object? alArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.AnalysisLevel)).Value.Value;
+            if (alArg != null)
+            {
+                AnalysisLevel al = (AnalysisLevel)alArg;
 
-            yield return new CombinedConfig(data, config, config2);
+                fdCfg.StringAnalyzerConfig = al switch
+                {
+                    AnalysisLevel.Disabled => null,
+                    AnalysisLevel.Fast => new StringAnalyzerConfig
+                    {
+                        BruteForceAnalyzerConfig = new BruteForceAnalyzerConfig
+                        {
+                            MaxAttempts = 1000
+                        },
+                        GeneticAnalyzerConfig = new GeneticAnalyzerConfig
+                        {
+                            PopulationSize = 16,
+                            MaxGenerations = 8
+                        },
+                        GPerfAnalyzerConfig = new GPerfAnalyzerConfig
+                        {
+                            MaxPositions = 64
+                        }
+                    },
+                    AnalysisLevel.Balanced => new StringAnalyzerConfig(),
+                    AnalysisLevel.Aggressive => new StringAnalyzerConfig
+                    {
+                        BruteForceAnalyzerConfig = new BruteForceAnalyzerConfig
+                        {
+                            MaxAttempts = 157_464
+                        },
+                        GeneticAnalyzerConfig = new GeneticAnalyzerConfig
+                        {
+                            PopulationSize = 64,
+                            MaxGenerations = 100
+                        },
+                        GPerfAnalyzerConfig = new GPerfAnalyzerConfig
+                        {
+                            MaxPositions = 1024
+                        }
+                    },
+                    _ => throw new ArgumentOutOfRangeException("Unsupported AnalysisLevel: " + al)
+                };
+            }
+
+            yield return new CombinedConfig(data, fdCfg, csCfg);
         }
     }
 

@@ -103,6 +103,28 @@ public class SourceGeneratorTests
               .DisableDiff();
     }
 
+    [Theory]
+    [InlineData(AnalysisLevel.Disabled)]
+    [InlineData(AnalysisLevel.Fast)]
+    [InlineData(AnalysisLevel.Balanced)]
+    [InlineData(AnalysisLevel.Aggressive)]
+    public async Task AnalysisLevelTest(AnalysisLevel al)
+    {
+        string source = $"""
+                         using Genbox.FastData.SourceGenerator.Attributes;
+
+                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], StructureType = StructureType.HashSet, AnalysisLevel = AnalysisLevel.{al})]
+                         """;
+
+        string output = RunGenerator(source);
+
+        await Verify(output)
+              .UseFileName(al.ToString())
+              .UseDirectory("Verify")
+              .DisableDiff();
+    }
+
+
     private static string RunGenerator(string source)
     {
         string output = SourceGenHelper.RunSourceGenerator<FastDataSourceGenerator>(source, false, out var compilerDiagnostics, out var codeGenDiagnostics);

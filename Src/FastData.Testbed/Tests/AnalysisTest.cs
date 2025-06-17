@@ -1,11 +1,19 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Genbox.FastData.Generator.CSharp.Internal;
+using Genbox.FastData.Generator.CSharp.Internal.Framework;
+using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generators;
+using Genbox.FastData.Generators.StringHash;
+using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Helpers;
+using Genbox.FastData.InternalShared.Helpers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
 using Serilog.Core;
 using Serilog.Extensions.Logging;
@@ -33,6 +41,45 @@ internal static class AnalysisTest
         "shimozzles", "shlemozzle", "zygomorphy", "bathmizvah", "bedazzling", "blizzarded", "chiffchaff", "embezzlers", "hazardizes", "mizzenmast", "passamezzo", "pizzicatos",
         "podzolized", "pozzolanic", "puzzlement", "schizotypy", "scuzzballs", "shockjocks", "sizzlingly", "unhouzzled", "zanthoxyls", "zigzagging", "blackjacks", "crackajack"
     ];
+
+    public static void TestBest()
+    {
+        StringProperties props = DataAnalyzer.GetStringProperties(Data);
+
+        StringAnalyzerConfig cfg = new StringAnalyzerConfig();
+        cfg.BruteForceAnalyzerConfig = null;
+        cfg.GPerfAnalyzerConfig = null;
+
+        GeneticAnalyzerConfig gcfg = new GeneticAnalyzerConfig();
+        cfg.GeneticAnalyzerConfig = gcfg;
+
+        Stopwatch sw = Stopwatch.StartNew();
+
+        for (int i = 1; i < 100; i++)
+        {
+            gcfg.MaxGenerations = i;
+
+            for (int j = 5; j < 100; j++)
+            {
+                gcfg.PopulationSize = j;
+
+                sw.Restart();
+                Candidate cand = FastDataGenerator.GetBestHash<string>(Data, props, cfg, NullLoggerFactory.Instance, false);
+
+                sw.Stop();
+                Console.WriteLine($"{i.ToString(),-10}{j.ToString(),-10}{sw.ElapsedMilliseconds,-10:N0}{cand.Collisions,-10:N0}");
+            }
+        }
+    }
+
+    public static void TestNoAnalyzer()
+    {
+        string[] data = RunFunc(Data, 5.0, PrependString).ToArray();
+        Print(data, "DefaultHash");
+
+        Simulator<string> sim = new Simulator<string>(data.Length);
+        PrintCandidate(sim.Run(data, new DefaultStringHash()));
+    }
 
     public static void TestBruteForceAnalyzer()
     {
@@ -67,9 +114,8 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), new Simulator(), loggerFactory.CreateLogger<BruteForceAnalyzer>());
-        PrintCandidate(GetCandidates(analyzer).OrderByDescending(x => x.Fitness).FirstOrDefault());
-
+        BruteForceAnalyzer<string> analyzer = new BruteForceAnalyzer<string>(props, new BruteForceAnalyzerConfig(), new Simulator<string>(data.Length), loggerFactory.CreateLogger<BruteForceAnalyzer<string>>());
+        PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());
     }
 
     private static void RunGeneticAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
@@ -78,9 +124,8 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), new Simulator(), loggerFactory.CreateLogger<GeneticAnalyzer>());
-        PrintCandidate(GetCandidates(analyzer).OrderByDescending(x => x.Fitness).FirstOrDefault());
-
+        GeneticAnalyzer<string> analyzer = new GeneticAnalyzer<string>(props, new GeneticAnalyzerConfig(), new Simulator<string>(data.Length), loggerFactory.CreateLogger<GeneticAnalyzer<string>>());
+        PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());
     }
 
     private static void RunGPerfAnalysis(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
@@ -89,12 +134,13 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(), loggerFactory.CreateLogger<GPerfAnalyzer>());
-        PrintCandidate(GetCandidates(analyzer).OrderByDescending(x => x.Fitness).FirstOrDefault());
+        GPerfAnalyzer<string> analyzer = new GPerfAnalyzer<string>(data.Length, props, new GPerfAnalyzerConfig(), new Simulator<string>(data.Length), loggerFactory.CreateLogger<GPerfAnalyzer<string>>());
+        PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());
     }
 
     private static void Print(string[] data, string? source, [CallerMemberName]string? member = null)
     {
+        Console.WriteLine("");
         Console.WriteLine($"############### {member} ###############");
         Console.WriteLine(source + ": " + string.Join(", ", data.Take(5)));
     }
@@ -155,29 +201,16 @@ internal static class AnalysisTest
         Console.WriteLine("#### Candidate ####");
         Console.WriteLine($"{nameof(candidate.Fitness)}: {candidate.Fitness}");
         Console.WriteLine($"{nameof(candidate.Collisions)}: {candidate.Collisions}");
-
-        // Console.WriteLine($"{nameof(candidate.Time)}: {candidate.Time}");
-        // Console.WriteLine($"{nameof(candidate.Metadata)}: {string.Join(", ", candidate.Metadata.Select(x => x.ToString()))}");
+        Console.WriteLine($"{nameof(candidate.Time)}: {candidate.Time}");
 
         Console.WriteLine();
         Console.WriteLine("#### Hash ####");
         Console.WriteLine(candidate.StringHash);
 
-        Console.WriteLine();
-        Console.WriteLine("#### Expression ####");
+        // Console.WriteLine();
+        // Console.WriteLine("#### Expression ####");
 
         // Console.WriteLine(candidate.StringHash.GetExpression().ToReadableString());
-        Console.WriteLine(ExpressionHelper.Print(candidate.StringHash.GetExpression()));
-    }
-
-    private static IEnumerable<Candidate> GetCandidates(IStringHashAnalyzer analyzer)
-    {
-        List<Candidate> candidates = new List<Candidate>();
-        analyzer.GetCandidates(Data, candidate =>
-        {
-            candidates.Add(candidate);
-            return true;
-        });
-        return candidates;
+        // Console.WriteLine(ExpressionHelper.Print(candidate.StringHash.GetExpression()));
     }
 }

@@ -11,8 +11,7 @@ internal static class ConditionalStructure_String_3
     
     public static bool Contains(string value)
     {
-        if (value.Length < 1u || value.Length > 255u)
-            return false;
+
 
         switch (value)
         {

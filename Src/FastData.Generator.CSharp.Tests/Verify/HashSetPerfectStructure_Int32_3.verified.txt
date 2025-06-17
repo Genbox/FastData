@@ -24,6 +24,7 @@ internal static class HashSetPerfectStructure_Int32_3
         return value == _entries[index];
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(int value)
     {

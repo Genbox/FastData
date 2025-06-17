@@ -84,6 +84,7 @@ internal static class HashSetLinearStructure_Int32_100
         return false;
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(int value)
     {

@@ -42,11 +42,10 @@ internal static class GPerfTest
             ReadOnlySpan<string> data = File.ReadAllLines(file).AsSpan();
             StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-            GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(), factory.CreateLogger<GPerfAnalyzer>());
+            GPerfAnalyzer<string> analyzer = new GPerfAnalyzer<string>(data.Length, props, new GPerfAnalyzerConfig(), new Simulator<string>(data.Length), factory.CreateLogger<GPerfAnalyzer<string>>());
 
-            // Candidate hashFunc = analyzer.GetCandidates(data).First(); //TODO: use
-
-            HashData hashData = HashData.Create(data, DataType.String, 1, false);
+            Candidate? cand = analyzer.GetCandidates(data).FirstOrDefault();
+            HashData hashData = HashData.Create(data, 1, cand!.StringHash.GetHashFunction());
             HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>(hashData, DataType.String);
             structure.Create(ref data);
         }

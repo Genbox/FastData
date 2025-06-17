@@ -27,17 +27,17 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
  */
 
 /// <summary>Finds the least number of positions in a string that hashes to a unique value for all inputs.</summary>
-internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties props, GPerfAnalyzerConfig config, Simulator sim, ILogger<GPerfAnalyzer> logger) : IStringHashAnalyzer
+internal sealed partial class GPerfAnalyzer<T>(int dataLength, StringProperties props, GPerfAnalyzerConfig config, Simulator<T> sim, ILogger<GPerfAnalyzer<T>> logger) : IStringHashAnalyzer<T> where T : notnull
 {
     private readonly FastSet _emulator = new FastSet(dataLength);
     public bool IsAppropriate() => props.CharacterData.AllAscii;
 
     [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'")]
-    public void GetCandidates(ReadOnlySpan<string> data, Func<Candidate, bool> onCandidateFound)
+    public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<T> data)
     {
         // We cannot work on empty strings
         if (props.LengthData.Min == 0)
-            return;
+            return [];
 
         // Step1: Find positions
         int[] positions = GetPositions(data);
@@ -45,15 +45,15 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties pro
 
         // If we didn't get any positions, we don't want to move any further
         if (positions.Length == 0)
-            return;
+            return [];
 
         int maxLen = (int)props.LengthData.Max;
 
         // TODO: For now, we keep regenerating state within Keyword. In the future, I hope to do this more efficiently
         List<Keyword> keywords = new List<Keyword>(data.Length);
 
-        foreach (string s in data)
-            keywords.Add(new Keyword(s));
+        foreach (T s in data)
+            keywords.Add(new Keyword((string)(object)s));
 
         // Step 2: Find good alpha increments
         int[] alphaInc = FindAlphaIncrements(keywords, maxLen, positions);
@@ -66,7 +66,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties pro
         if (!table.TryFindGoodValues(keywords, positions, alphaInc, alphaSize))
         {
             LogUnableToFindAsso(logger);
-            return;
+            return [];
         }
 
         LogAsso(logger, string.Join(", ", table.Values));
@@ -141,10 +141,10 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties pro
         Candidate candidate = sim.Run(data, stringHash);
         LogCandidate(logger, candidate.Fitness, candidate.Collisions);
 
-        onCandidateFound(candidate);
+        return [candidate];
     }
 
-    private int[] GetPositions(ReadOnlySpan<string> data)
+    private int[] GetPositions(ReadOnlySpan<T> data)
     {
         /*
             This is the algorithm for finding positions that results in a good hash. It is based on find_positions() in GPerf.
@@ -204,15 +204,15 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties pro
         return current.Positions.ToArray();
     }
 
-    private static void GetMandatory(ReadOnlySpan<string> data, DirectMap mandatory)
+    private static void GetMandatory(ReadOnlySpan<T> data, DirectMap mandatory)
     {
         for (int i1 = 0; i1 < data.Length - 1; i1++)
         {
-            string str1 = data[i1];
+            string str1 = (string)(object)data[i1];
 
             for (int i2 = i1 + 1; i2 < data.Length; i2++) // We want to avoid comparing the item to itself
             {
-                string str2 = data[i2];
+                string str2 = (string)(object)data[i2];
 
                 if (str1.Length == str2.Length) // Same length
                 {
@@ -241,7 +241,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties pro
         }
     }
 
-    private void AddWhileBetter(ReadOnlySpan<string> data, int max, DirectMap currentSet, ref uint currentCollisions)
+    private void AddWhileBetter(ReadOnlySpan<T> data, int max, DirectMap currentSet, ref uint currentCollisions)
     {
         while (true)
         {
@@ -273,7 +273,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties pro
         }
     }
 
-    private void RemoveSinglePositions(ReadOnlySpan<string> data, int max, DirectMap mandatory, DirectMap currentSet, ref uint currentFitness)
+    private void RemoveSinglePositions(ReadOnlySpan<T> data, int max, DirectMap mandatory, DirectMap currentSet, ref uint currentFitness)
     {
         while (true)
         {
@@ -306,7 +306,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties pro
         }
     }
 
-    private void MergePositions(ReadOnlySpan<string> data, int max, DirectMap mandatory, DirectMap currentSet, ref uint currentCollisions)
+    private void MergePositions(ReadOnlySpan<T> data, int max, DirectMap mandatory, DirectMap currentSet, ref uint currentCollisions)
     {
         while (true)
         {
@@ -359,9 +359,9 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties pro
         }
     }
 
-    private uint GetCollisions(ReadOnlySpan<string> data, DirectMap map) => _emulator.GetCollisions(data, map.Positions);
+    private uint GetCollisions(ReadOnlySpan<T> data, DirectMap map) => _emulator.GetCollisions(data, map.Positions);
 
-    private void PrintMap(string stage, ReadOnlySpan<string> data, DirectMap map)
+    private void PrintMap(string stage, ReadOnlySpan<T> data, DirectMap map)
     {
         StringBuilder sb = new StringBuilder();
         sb.Append($"{stage} ({GetCollisions(data, map)}): ");
@@ -589,6 +589,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties pro
         }
     }
 
+    [SuppressMessage("Minor Code Smell", "S1450:Private fields only used as local variables in methods should become local variables")]
     private sealed class AssociationTable(ILogger logger)
     {
         private int _maxHash;
@@ -1217,16 +1218,16 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties pro
         private readonly Entry[] _entries = new Entry[dataLength];
         private int _count;
 
-        internal uint GetCollisions(ReadOnlySpan<string> data, List<int> positions)
+        internal uint GetCollisions(ReadOnlySpan<T> data, List<int> positions)
         {
             if (positions.Count == 0)
                 return (uint)(data.Length - 1);
 
             uint collisions = 0;
 
-            foreach (string s in data)
+            foreach (T s in data)
             {
-                if (!Add(s, positions))
+                if (!Add((string)(object)s, positions))
                     collisions++;
             }
 

@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
+using Genbox.FastData.Generators.StringHash.Framework;
 
 namespace Genbox.FastData.Internal.Misc;
 
