@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Misc;
 using JetBrains.Annotations;
@@ -13,10 +12,10 @@ namespace Genbox.FastData.Internal.Analysis.Expressions;
 
 internal static class ExpressionHashBuilder
 {
-    internal static Expression<HashFunc<string>> BuildFull(Mixer mixer, Avalanche avalanche)
+    internal static Expression<StringHashFunc> BuildFull(Mixer mixer, Avalanche avalanche, bool useUTF16)
     {
-        ParameterExpression input = Parameter(typeof(string), "value");
-        ParameterExpression length = Variable(typeof(int), "length");
+        ParameterExpression input = Parameter(typeof(byte[]), "value");
+        ParameterExpression length = Parameter(typeof(int), "length");
         ParameterExpression offset = Variable(typeof(int), "offset");
         ParameterExpression hash = Variable(typeof(ulong), "hash");
         List<Expression> ex = new List<Expression>();
@@ -27,8 +26,7 @@ internal static class ExpressionHashBuilder
         // int hash = 352654597U
         ex.Add(Assign(hash, Constant(352654597UL)));
 
-        // int length = input.Length
-        ex.Add(Assign(length, Property(input, "Length")));
+        int size = useUTF16 ? 2 : 1;
 
         // while (length > 0)
         LabelTarget breakLabel = Label();
@@ -36,9 +34,9 @@ internal static class ExpressionHashBuilder
             IfThenElse(
                 GreaterThan(length, Constant(0)),
                 Block(
-                    Assign(hash, mixer(hash, GetReadFunc(input, offset, 1))),
-                    AddAssign(offset, Constant(1)),
-                    SubtractAssign(length, Constant(1))),
+                    Assign(hash, mixer(hash, GetReadFunc(input, offset, size))),
+                    AddAssign(offset, Constant(size)),
+                    SubtractAssign(length, Constant(size))),
                 Break(breakLabel)
             ),
             breakLabel
@@ -48,23 +46,20 @@ internal static class ExpressionHashBuilder
         // hash = avalanche(hash);
         ex.Add(Assign(hash, avalanche(hash)));
 
-        BlockExpression block = Block([length, offset, hash], ex);
-        return Lambda<HashFunc<string>>(block, input);
+        BlockExpression block = Block([offset, hash], ex);
+        return Lambda<StringHashFunc>(block, input, length);
     }
 
-    internal static Expression<HashFunc<string>> Build(ArraySegment[] segments, Mixer mixer, Avalanche avalanche)
+    internal static Expression<StringHashFunc> Build(ArraySegment[] segments, Mixer mixer, Avalanche avalanche)
     {
-        ParameterExpression input = Parameter(typeof(string), "value");
-        ParameterExpression length = Variable(typeof(int), "length");
+        ParameterExpression input = Parameter(typeof(byte[]), "value");
+        ParameterExpression length = Parameter(typeof(int), "length");
         ParameterExpression offset = Variable(typeof(int), "offset");
         ParameterExpression hash = Variable(typeof(ulong), "hash");
         List<Expression> ex = new List<Expression>();
 
         //int hash = 0;
         ex.Add(Assign(hash, Constant(0UL)));
-
-        // int length = input.Length
-        ex.Add(Assign(length, Property(input, "Length")));
 
         if (segments.Length == 1 && segments[0].Length == -1)
             OutputFullHash(ex, segments[0], length, input, hash, offset, mixer);
@@ -94,8 +89,8 @@ internal static class ExpressionHashBuilder
         // hash = avalanche(hash);
         ex.Add(Assign(hash, avalanche(hash)));
 
-        BlockExpression block = Block([length, offset, hash], ex);
-        return Lambda<HashFunc<string>>(block, input);
+        BlockExpression block = Block([offset, hash], ex);
+        return Lambda<StringHashFunc>(block, input, length);
     }
 
     private static void OutputFullHash(List<Expression> ex, ArraySegment seg, Expression length, Expression input, Expression hash, Expression offset, Mixer mixer)
@@ -172,9 +167,9 @@ internal static class ExpressionHashBuilder
     [UsedImplicitly(ImplicitUseTargetFlags.Members)]
     private static class ReaderHelpers
     {
-        public static byte ReadU8(string ptr, int offset) => (byte)Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset);
-        public static ushort ReadU16(string ptr, int offset) => Unsafe.ReadUnaligned<ushort>(ref Unsafe.As<char, byte>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset)));
-        public static uint ReadU32(string ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.As<char, byte>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset)));
-        public static ulong ReadU64(string ptr, int offset) => Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<char, byte>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset)));
+        public static byte ReadU8(byte[] ptr, int offset) => Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset);
+        public static ushort ReadU16(byte[] ptr, int offset) => Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));
+        public static uint ReadU32(byte[] ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));
+        public static ulong ReadU64(byte[] ptr, int offset) => Unsafe.ReadUnaligned<ulong>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));
     }
 }

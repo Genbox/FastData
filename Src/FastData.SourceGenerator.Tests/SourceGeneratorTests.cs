@@ -38,12 +38,12 @@ public class SourceGeneratorTests
         string source = $"""
                          using Genbox.FastData.SourceGenerator.Attributes;
 
-                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], StructureType = StructureType.{ds})]
+                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], StructureType = StructureType.{ds}, AnalysisLevel = AnalysisLevel.Disabled)]
                          """;
 
         string output = RunGenerator(source);
         await Verify(output)
-              .UseFileName(ds.ToString())
+              .UseFileName($"{nameof(DataStructureTest)}-{ds}")
               .UseDirectory("Verify")
               .DisableDiff();
     }
@@ -54,12 +54,12 @@ public class SourceGeneratorTests
         const string source = """
                               using Genbox.FastData.SourceGenerator.Attributes;
 
-                              [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], Namespace = "MyNamespace")]
+                              [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], Namespace = "MyNamespace", AnalysisLevel = AnalysisLevel.Disabled)]
                               """;
 
         string output = RunGenerator(source);
         await Verify(output)
-              .UseFileName("namespace")
+              .UseFileName(nameof(NamespaceTest))
               .UseDirectory("Verify")
               .DisableDiff();
     }
@@ -72,13 +72,13 @@ public class SourceGeneratorTests
         string source = $"""
                          using Genbox.FastData.SourceGenerator.Attributes;
 
-                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], ClassVisibility = ClassVisibility.{visibility})]
+                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], ClassVisibility = ClassVisibility.{visibility}, AnalysisLevel = AnalysisLevel.Disabled)]
                          """;
 
         string output = RunGenerator(source);
 
         await Verify(output)
-              .UseFileName(visibility.ToString())
+              .UseFileName($"{nameof(ClassVisibilityTest)}-{visibility}")
               .UseDirectory("Verify")
               .DisableDiff();
     }
@@ -92,13 +92,13 @@ public class SourceGeneratorTests
         string source = $"""
                          using Genbox.FastData.SourceGenerator.Attributes;
 
-                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], ClassType = ClassType.{type})]
+                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], ClassType = ClassType.{type}, AnalysisLevel = AnalysisLevel.Disabled)]
                          """;
 
         string output = RunGenerator(source);
 
         await Verify(output)
-              .UseFileName(type.ToString())
+              .UseFileName($"{nameof(ClassTypeTest)}-{type}")
               .UseDirectory("Verify")
               .DisableDiff();
     }
@@ -108,7 +108,7 @@ public class SourceGeneratorTests
     [InlineData(AnalysisLevel.Fast)]
     [InlineData(AnalysisLevel.Balanced)]
     [InlineData(AnalysisLevel.Aggressive)]
-    public async Task AnalysisLevelTest(AnalysisLevel al)
+    public void AnalysisLevelTest(AnalysisLevel al)
     {
         string source = $"""
                          using Genbox.FastData.SourceGenerator.Attributes;
@@ -118,12 +118,9 @@ public class SourceGeneratorTests
 
         string output = RunGenerator(source);
 
-        await Verify(output)
-              .UseFileName(al.ToString())
-              .UseDirectory("Verify")
-              .DisableDiff();
+        //We can't verify the outputs as they depend on the computer configuration and will be different across executions. Instead, we just assert it is not empty.
+        Assert.NotEmpty(output);
     }
-
 
     private static string RunGenerator(string source)
     {

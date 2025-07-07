@@ -53,6 +53,18 @@ public static class TestVectorHelper
         {
             yield return testVector;
         }
+
+        // Strings with characters that are not in the ASCII range
+        foreach (ITestVector testVector in GenerateTestVectors([["æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", "ñ", "ø", "å"]],
+                     typeof(ArrayStructure<>),
+                     typeof(BinarySearchStructure<>),
+                     typeof(ConditionalStructure<>),
+                     typeof(EytzingerSearchStructure<>),
+                     typeof(HashSetChainStructure<>),
+                     typeof(HashSetLinearStructure<>)))
+        {
+            yield return testVector;
+        }
     }
 
     public static IEnumerable<ITestData> GetBenchmarkData()
@@ -130,6 +142,7 @@ public static class TestVectorHelper
 
     private static IEnumerable<(Type type, object[] value)> GetFloatSpecialCases() =>
     [
+
         //If we don't have zero or NaN, we can use a simple hash
         (typeof(float), [1, 2, 3, 4, 5]),
         (typeof(double), [1, 2, 3, 4, 5]),

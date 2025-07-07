@@ -1,0 +1,74 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashSet (HashSetLinear)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashSetLinearStructure_String_13;
+
+impl HashSetLinearStructure_String_13 {
+    const BUCKETS: [B; 47] = [
+        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 1, end_index: 1 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, 
+        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 2, end_index: 2 }, B { start_index: 3, end_index: 3 }, 
+        B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 4, end_index: 4 }, B { start_index: 5, end_index: 5 }, B { start_index: 6, end_index: 6 }, B { start_index: 0, end_index: 0 }, B { start_index: 7, end_index: 7 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, 
+        B { start_index: 8, end_index: 8 }, B { start_index: 9, end_index: 9 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 10, end_index: 10 }, B { start_index: 0, end_index: 0 }, 
+        B { start_index: 11, end_index: 11 }, B { start_index: 12, end_index: 12 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }, B { start_index: 0, end_index: 0 }
+    ];
+
+    const ITEMS: [&'static str; 13] = [
+        "ö", "ñ", "å", "é", "ä", "è", "ü", "ç", "æ", "ê", 
+        "à", "ø", "ß"
+    ];
+
+    const HASH_CODES: [u64; 13] = [
+        11144404023281711681, 11144404021715627740, 11144404053037306560, 11144404034244299268, 11144404051471222619, 11144404032678215327, 11144404013885208035, 11144404049905138678, 11144404048339054737, 11144404029546047445, 
+        11144404045206886855, 11144404007620872271, 11144404062433810206
+    ];
+
+    #[inline]
+    unsafe fn get_hash(value: &str) -> u64 {
+        let mut hash: u64 = 352654597;
+
+        let mut ptr = value.as_ptr();
+        let mut len = value.len();
+
+         while len > 0 {
+                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
+                ptr = ptr.add(1);
+                len -= 1;
+         }
+
+        hash.wrapping_mul(1566083941).wrapping_add(352654597)
+    }
+
+    #[must_use]
+    pub fn contains(value: &'static str) -> bool {
+        if value.len() != 2 as usize {
+            return false;
+        }
+
+        let hash = unsafe { Self::get_hash(value) };
+        let bucket = &Self::BUCKETS[(hash % 47) as usize];
+        let mut index: u8 = bucket.start_index;
+        let end_index: u8 = bucket.end_index;
+
+        while index <= end_index {
+            if Self::HASH_CODES[index as usize] == hash && Self::ITEMS[index as usize] == value {
+                return true;
+            }
+            index += 1;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 13;
+    pub const MIN_LENGTH: usize = 1;
+    pub const MAX_LENGTH: usize = 1;
+}
+struct B {
+    start_index: u8,
+    end_index: u8,
+}

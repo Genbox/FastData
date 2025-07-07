@@ -216,11 +216,12 @@ of different data structures, indexing, and comparison methods that are tailor-b
 
 There are many benefits gained from generating data structures at compile time:
 
-* Data as code means you can compile the data into your assembly
+* _Data as code_ means you can compile the data into your assembly
 * Enables otherwise time-consuming data analysis (e.g. zero runtime overhead)
 * No defensive copying of data (takes time and needs double the memory)
 * No virtual dispatching (virtual method calls & inheritance) and no unnecessary branching
 * Modulo operations are known constants and compilers optimize it to bitwise operations
+* Data can be stored in smaller data types (e.g. `byte` instead of `int`) in values permit it
 
 ### Data analysis
 

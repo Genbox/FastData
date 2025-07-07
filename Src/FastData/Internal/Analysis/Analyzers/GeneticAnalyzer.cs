@@ -1,7 +1,6 @@
 using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
-using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.CrossOver;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Mutation;
@@ -17,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed partial class GeneticAnalyzer<T>(StringProperties props, GeneticAnalyzerConfig config, Simulator<T> sim, ILogger<GeneticAnalyzer<T>> logger) : IStringHashAnalyzer<T> where T : notnull
+internal sealed partial class GeneticAnalyzer(StringProperties props, GeneticAnalyzerConfig config, Simulator sim, ILogger<GeneticAnalyzer> logger) : IStringHashAnalyzer
 {
     /*
      This is a genetic algorithm that determines the best configuration from a random population, that via evolution is biased
@@ -83,7 +82,7 @@ internal sealed partial class GeneticAnalyzer<T>(StringProperties props, Genetic
 
     public bool IsAppropriate() => true;
 
-    public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<T> data)
+    public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<string> data)
     {
         GeneticEngineConfig cfg = new GeneticEngineConfig();
         cfg.PopulationSize = config.PopulationSize;
@@ -127,7 +126,7 @@ internal sealed partial class GeneticAnalyzer<T>(StringProperties props, Genetic
         return heap.Items.Select(x => x.Item2);
     }
 
-    private void Simulation(ReadOnlySpan<T> data, ref Entity entity)
+    private void Simulation(ReadOnlySpan<string> data, ref Entity entity)
     {
         //Convert entity to GeneticArrayHash
         GeneticStringHash spec = CopyGenes(ref entity);

@@ -1,6 +1,5 @@
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Interfaces;
-using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Extensions;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
@@ -24,17 +23,12 @@ internal class CPlusPlusHashDef : IHashDef
         if (dataType == DataType.String)
         {
             return """
-                           uint64_t hash = 352654597;
+                       uint64_t hash = 352654597;
 
-                           const char* ptr = value.data();
-                           size_t len = value.size();
+                       for (char32_t ch : value)
+                           hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
 
-                           while (len-- > 0) {
-                               hash = (((hash << 5) | (hash >> 27)) + hash) ^ *ptr;
-                               ptr++;
-                           }
-
-                           return 352654597 + (hash * 1566083941);
+                       return 352654597 + (hash * 1566083941);
                    """;
         }
 

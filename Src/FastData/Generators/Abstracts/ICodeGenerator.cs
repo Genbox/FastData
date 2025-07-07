@@ -12,5 +12,5 @@ public interface ICodeGenerator
     /// <param name="genCfg">The generator configuration.</param>
     /// <param name="context">The context for code generation.</param>
     /// <returns>True if code generation succeeded; otherwise, false.</returns>
-    string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context);
+    string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context) where T : notnull;
 }

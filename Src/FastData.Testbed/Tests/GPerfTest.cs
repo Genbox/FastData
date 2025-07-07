@@ -1,5 +1,7 @@
 using System.Globalization;
+using System.Text;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -42,10 +44,15 @@ internal static class GPerfTest
             ReadOnlySpan<string> data = File.ReadAllLines(file).AsSpan();
             StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-            GPerfAnalyzer<string> analyzer = new GPerfAnalyzer<string>(data.Length, props, new GPerfAnalyzerConfig(), new Simulator<string>(data.Length), factory.CreateLogger<GPerfAnalyzer<string>>());
+            GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, true), factory.CreateLogger<GPerfAnalyzer>());
+            Candidate cand = analyzer.GetCandidates(data).First();
+            StringHashFunc func = cand.StringHash.GetExpression().Compile();
 
-            Candidate? cand = analyzer.GetCandidates(data).FirstOrDefault();
-            HashData hashData = HashData.Create(data, 1, cand!.StringHash.GetHashFunction());
+            HashData hashData = HashData.Create(data, 1, x =>
+            {
+                byte[] data = Encoding.ASCII.GetBytes(x);
+                return func(data, data.Length);
+            });
             HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>(hashData, DataType.String);
             structure.Create(ref data);
         }

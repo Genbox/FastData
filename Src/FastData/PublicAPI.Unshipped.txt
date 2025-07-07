@@ -73,8 +73,6 @@ Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>
 Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>
 Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>.StoreHashCode.get -> bool
 Genbox.FastData.Generators.Contexts.KeyLengthContext<T>
-Genbox.FastData.Generators.Contexts.KeyLengthContext<T>.KeyLengthContext(System.Collections.Generic.List<string!>?[]! lengths, bool lengthsAreUniq, uint minLength, uint maxLength) -> void
-Genbox.FastData.Generators.Contexts.KeyLengthContext<T>.Lengths.get -> System.Collections.Generic.List<string!>?[]!
 Genbox.FastData.Generators.Contexts.KeyLengthContext<T>.LengthsAreUniq.get -> bool
 Genbox.FastData.Generators.Contexts.KeyLengthContext<T>.MaxLength.get -> uint
 Genbox.FastData.Generators.Contexts.KeyLengthContext<T>.MinLength.get -> uint
@@ -164,10 +162,8 @@ Genbox.FastData.Generators.StringHash.Framework.ReaderFunctions.ReadU64 = 8 -> G
 Genbox.FastData.Generators.StringHash.Framework.ReaderFunctions.ReadU8 = 1 -> Genbox.FastData.Generators.StringHash.Framework.ReaderFunctions
 Genbox.FastData.Generators.StringHash.Framework.State
 Genbox.FastData.Generators.StringHash.Framework.StringHashDetails
-Genbox.FastData.Generators.StringHash.Framework.StringHashDetails.Expression.get -> System.Linq.Expressions.Expression!
 Genbox.FastData.Generators.StringHash.Framework.StringHashDetails.Functions.get -> Genbox.FastData.Generators.StringHash.Framework.ReaderFunctions
-Genbox.FastData.Generators.StringHash.Framework.StringHashDetails.State.get -> Genbox.FastData.Generators.StringHash.Framework.State![]?
-Genbox.FastData.Generators.StringHash.Framework.StringHashDetails.StringHashDetails(System.Linq.Expressions.Expression! expression, Genbox.FastData.Generators.StringHash.Framework.ReaderFunctions functions, Genbox.FastData.Generators.StringHash.Framework.State![]? state) -> void
+Genbox.FastData.Generators.StringHash.Framework.StringHashFunc
 Genbox.FastData.Generators.StringHash.State.get -> Genbox.FastData.Generators.State![]!
 Genbox.FastData.Generators.StringHash.StringHash() -> void
 Genbox.FastData.Generators.StringHashDetails
@@ -209,10 +205,6 @@ override Genbox.FastData.Generators.EarlyExits.MinMaxLengthEarlyExit.ToString() 
 override Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.Equals(object? obj) -> bool
 override Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.GetHashCode() -> int
 override Genbox.FastData.Generators.EarlyExits.MinMaxValueEarlyExit<T>.ToString() -> string!
-static Genbox.FastData.FastDataGenerator.Generate(object![]! data, Genbox.FastData.FastDataConfig! fdCfg, Genbox.FastData.Generators.Abstracts.ICodeGenerator! generator, Microsoft.Extensions.Logging.ILoggerFactory? factory = null) -> string!
-static Genbox.FastData.FastDataGenerator.Generate(System.ReadOnlySpan<object!> data, Genbox.FastData.FastDataConfig! fdCfg, Genbox.FastData.Generators.Abstracts.ICodeGenerator! generator, Microsoft.Extensions.Logging.ILoggerFactory? factory = null) -> string!
-static Genbox.FastData.FastDataGenerator.Generate<T>(System.ReadOnlySpan<T> data, Genbox.FastData.FastDataConfig! fdCfg, Genbox.FastData.Generators.Abstracts.ICodeGenerator! generator, Microsoft.Extensions.Logging.ILoggerFactory? factory = null) -> string!
-static Genbox.FastData.FastDataGenerator.Generate<T>(T[]! data, Genbox.FastData.FastDataConfig! fdCfg, Genbox.FastData.Generators.Abstracts.ICodeGenerator! generator, Microsoft.Extensions.Logging.ILoggerFactory? factory = null) -> string!
 static Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.operator !=(Genbox.FastData.Generators.Contexts.Misc.HashSetBucket left, Genbox.FastData.Generators.Contexts.Misc.HashSetBucket right) -> bool
 static Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.operator ==(Genbox.FastData.Generators.Contexts.Misc.HashSetBucket left, Genbox.FastData.Generators.Contexts.Misc.HashSetBucket right) -> bool
 static Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.operator !=(Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T> left, Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T> right) -> bool
@@ -231,6 +223,7 @@ static Genbox.FastData.Generators.Helpers.MathHelper.GetPrime(uint min) -> uint
 static Genbox.FastData.Generators.Helpers.MathHelper.IsPowerOfTwo(ulong x) -> bool
 virtual Genbox.FastData.Generators.HashFunc<T>.Invoke(T obj) -> ulong
 virtual Genbox.FastData.Generators.StringHash.Framework.HashFunc<T>.Invoke(T obj) -> ulong
+virtual Genbox.FastData.Generators.StringHash.Framework.StringHashFunc.Invoke(byte[]! obj, int length) -> ulong
 ~Genbox.FastData.Generators.Abstracts.ICodeGenerator.Generate<T>(System.ReadOnlySpan<T> data, Genbox.FastData.Generators.GeneratorConfig<T> genCfg, Genbox.FastData.Generators.Abstracts.IContext<T> context) -> string
 ~Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.Buckets.get -> int[]
 ~Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.Entries.get -> Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>[]
@@ -241,6 +234,8 @@ virtual Genbox.FastData.Generators.StringHash.Framework.HashFunc<T>.Invoke(T obj
 ~Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>.HashSetLinearContext(T[] data, Genbox.FastData.Generators.Contexts.Misc.HashSetBucket[] buckets, ulong[] hashCodes) -> void
 ~Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>.Data.get -> System.Collections.Generic.KeyValuePair<T, ulong>[]
 ~Genbox.FastData.Generators.Contexts.HashSetPerfectContext<T>.HashSetPerfectContext(System.Collections.Generic.KeyValuePair<T, ulong>[] data, bool storeHashCode) -> void
+~Genbox.FastData.Generators.Contexts.KeyLengthContext<T>.KeyLengthContext(System.Collections.Generic.List<string>?[] lengths, bool lengthsAreUniq, uint minLength, uint maxLength) -> void
+~Genbox.FastData.Generators.Contexts.KeyLengthContext<T>.Lengths.get -> System.Collections.Generic.List<string>?[]
 ~Genbox.FastData.Generators.GeneratorConfig<T>.Constants.get -> Genbox.FastData.Generators.Constants<T>
 ~Genbox.FastData.Generators.GeneratorConfig<T>.EarlyExits.get -> Genbox.FastData.Generators.Abstracts.IEarlyExit[]
 ~Genbox.FastData.Generators.GeneratorConfig<T>.HashDetails.get -> Genbox.FastData.Generators.StringHash.Framework.HashDetails
@@ -252,7 +247,14 @@ virtual Genbox.FastData.Generators.StringHash.Framework.HashFunc<T>.Invoke(T obj
 ~Genbox.FastData.Generators.StringHash.Framework.State.State(string name, System.Type type, System.Array values) -> void
 ~Genbox.FastData.Generators.StringHash.Framework.State.Type.get -> System.Type
 ~Genbox.FastData.Generators.StringHash.Framework.State.Values.get -> System.Array
+~Genbox.FastData.Generators.StringHash.Framework.StringHashDetails.Expression.get -> System.Linq.Expressions.Expression
+~Genbox.FastData.Generators.StringHash.Framework.StringHashDetails.State.get -> Genbox.FastData.Generators.StringHash.Framework.State[]?
+~Genbox.FastData.Generators.StringHash.Framework.StringHashDetails.StringHashDetails(System.Linq.Expressions.Expression expression, Genbox.FastData.Generators.StringHash.Framework.ReaderFunctions functions, Genbox.FastData.Generators.StringHash.Framework.State[]? state) -> void
 ~override Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.Equals(object obj) -> bool
 ~override Genbox.FastData.Generators.Contexts.Misc.HashSetBucket.ToString() -> string
 ~override Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.Equals(object obj) -> bool
 ~override Genbox.FastData.Generators.Contexts.Misc.HashSetEntry<T>.ToString() -> string
+~static Genbox.FastData.FastDataGenerator.Generate(object[] data, Genbox.FastData.FastDataConfig fdCfg, Genbox.FastData.Generators.Abstracts.ICodeGenerator generator, Microsoft.Extensions.Logging.ILoggerFactory? factory = null) -> string
+~static Genbox.FastData.FastDataGenerator.Generate(System.ReadOnlySpan<object> data, Genbox.FastData.FastDataConfig fdCfg, Genbox.FastData.Generators.Abstracts.ICodeGenerator generator, Microsoft.Extensions.Logging.ILoggerFactory? factory = null) -> string
+~static Genbox.FastData.FastDataGenerator.Generate<T>(System.ReadOnlySpan<T> data, Genbox.FastData.FastDataConfig fdCfg, Genbox.FastData.Generators.Abstracts.ICodeGenerator generator, Microsoft.Extensions.Logging.ILoggerFactory? factory = null) -> string
+~static Genbox.FastData.FastDataGenerator.Generate<T>(T[] data, Genbox.FastData.FastDataConfig fdCfg, Genbox.FastData.Generators.Abstracts.ICodeGenerator generator, Microsoft.Extensions.Logging.ILoggerFactory? factory = null) -> string

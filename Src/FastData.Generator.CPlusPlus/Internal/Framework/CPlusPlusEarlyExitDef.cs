@@ -20,7 +20,7 @@ internal class CPlusPlusEarlyExitDef(TypeHelper helper, CPlusPlusOptions options
                      return false;
          """;
 
-    protected override string GetLengthEarlyExits(uint min, uint max) =>
+    protected override string GetLengthEarlyExits(uint min, uint max, uint minByte, uint maxByte) =>
         $"""
                  if ({(min.Equals(max) ? $"value.length() != {helper.ToValueLabel(max)}" : $"const size_t len = value.length(); len < {helper.ToValueLabel(min)} || len > {helper.ToValueLabel(max)}")})
                      return false;

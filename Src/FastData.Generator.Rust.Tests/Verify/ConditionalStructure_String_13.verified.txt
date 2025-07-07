@@ -1,0 +1,28 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Conditional
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct ConditionalStructure_String_13;
+
+impl ConditionalStructure_String_13 {
+    #[must_use]
+    pub fn contains(value: &str) -> bool {
+        if value.len() != 2 as usize {
+            return false;
+        }
+
+        if value == "æ" || value == "à" || value == "ä" || value == "ö" || value == "ü" || value == "ß" || value == "é" || value == "è" || value == "ê" || value == "ç" || value == "ñ" || value == "ø" || value == "å" {
+            return true;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 13;
+    pub const MIN_LENGTH: usize = 1;
+    pub const MAX_LENGTH: usize = 1;
+}

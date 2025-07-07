@@ -106,48 +106,62 @@ public static class TestHelper
         else
             props = DataAnalyzer.GetValueProperties(span, dataType);
 
+        ICodeGenerator generator = func(vector.Identifier);
+        bool useUTF16 = generator.UseUTF16Encoding;
+
         if (vector.Type == typeof(SingleValueStructure<>))
-            return Generate(func, vector, props, dataType, StructureType.Auto, new SingleValueStructure<T>());
+            return Generate(generator, vector, props, dataType, StructureType.Auto, new SingleValueStructure<T>());
         if (vector.Type == typeof(ArrayStructure<>))
-            return Generate(func, vector, props, dataType, StructureType.Array, new ArrayStructure<T>());
+            return Generate(generator, vector, props, dataType, StructureType.Array, new ArrayStructure<T>());
         if (vector.Type == typeof(ConditionalStructure<>))
-            return Generate(func, vector, props, dataType, StructureType.Conditional, new ConditionalStructure<T>());
+            return Generate(generator, vector, props, dataType, StructureType.Conditional, new ConditionalStructure<T>());
         if (vector.Type == typeof(BinarySearchStructure<>))
-            return Generate(func, vector, props, dataType, StructureType.BinarySearch, new BinarySearchStructure<T>(dataType, StringComparison.Ordinal));
+            return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new BinarySearchStructure<T>(dataType, StringComparison.Ordinal));
         if (vector.Type == typeof(EytzingerSearchStructure<>))
-            return Generate(func, vector, props, dataType, StructureType.BinarySearch, new EytzingerSearchStructure<T>(dataType, StringComparison.Ordinal));
+            return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new EytzingerSearchStructure<T>(dataType, StringComparison.Ordinal));
         if (vector.Type == typeof(HashSetChainStructure<>))
-        {
-            HashFunc<T> hashFunc = dataType == DataType.String ? (HashFunc<T>)(object)new DefaultStringHash().GetHashFunction() : PrimitiveHash.GetHash<T>(dataType, false);
-            return Generate(func, vector, props, dataType, StructureType.HashSet, new HashSetChainStructure<T>(HashData.Create(vector.Values.AsSpan(), 1, hashFunc), dataType));
-        }
+            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetChainStructure<T>(GetHashData(vector, dataType, useUTF16), dataType));
         if (vector.Type == typeof(HashSetPerfectStructure<>))
-        {
-            HashFunc<T> hashFunc = dataType == DataType.String ? (HashFunc<T>)(object)new DefaultStringHash().GetHashFunction() : PrimitiveHash.GetHash<T>(dataType, false);
-            return Generate(func, vector, props, dataType, StructureType.HashSet, new HashSetPerfectStructure<T>(HashData.Create(vector.Values.AsSpan(), 1, hashFunc), dataType));
-        }
+            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetPerfectStructure<T>(GetHashData(vector, dataType, useUTF16), dataType));
         if (vector.Type == typeof(HashSetLinearStructure<>))
-        {
-            HashFunc<T> hashFunc = dataType == DataType.String ? (HashFunc<T>)(object)new DefaultStringHash().GetHashFunction() : PrimitiveHash.GetHash<T>(dataType, false);
-            return Generate(func, vector, props, dataType, StructureType.HashSet, new HashSetLinearStructure<T>(HashData.Create(vector.Values.AsSpan(), 1, hashFunc)));
-        }
+            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetLinearStructure<T>(GetHashData(vector, dataType, useUTF16)));
         if (vector.Type == typeof(KeyLengthStructure<>))
-            return Generate(func, vector, props, dataType, StructureType.Auto, new KeyLengthStructure<T>((StringProperties)props));
+            return Generate(generator, vector, props, dataType, StructureType.Auto, new KeyLengthStructure<T>((StringProperties)props));
 
         throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
     }
 
-    private static GeneratorSpec Generate<T, TContext>(Func<string, ICodeGenerator> func, TestVector<T> vector, IProperties props, DataType dataType, StructureType structureType, IStructure<T, TContext> structure) where T : notnull where TContext : IContext<T>
+    private static HashData GetHashData<T>(TestVector<T> vector, DataType dataType, bool useUTF16) where T : notnull
+    {
+        HashData hashData;
+
+        if (dataType == DataType.String)
+        {
+            Encoding encoding = useUTF16 ? Encoding.Unicode : Encoding.UTF8;
+            StringHashFunc func = DefaultStringHash.GetInstance(useUTF16).GetExpression().Compile();
+
+            hashData = HashData.Create<T>(vector.Values.AsSpan(), 1, obj =>
+            {
+                byte[] data = encoding.GetBytes((string)(object)obj);
+                return func(data, data.Length);
+            });
+        }
+        else
+            hashData = HashData.Create(vector.Values.AsSpan(), 1, PrimitiveHash.GetHash<T>(dataType, false));
+
+        return hashData;
+    }
+
+    private static GeneratorSpec Generate<T, TContext>(ICodeGenerator generator, TestVector<T> vector, IProperties props, DataType dataType, StructureType structureType, IStructure<T, TContext> structure) where T : notnull where TContext : IContext<T>
     {
         ReadOnlySpan<T> values = vector.Values.AsReadOnlySpan();
         TContext context = structure.Create(ref values);
-        ICodeGenerator generator = func(vector.Identifier);
 
         GeneratorConfig<T> genCfg;
         HashDetails hashDetails = new HashDetails();
 
         if (props is StringProperties stringProps)
-            genCfg = new GeneratorConfig<T>(structureType, dataType, (uint)vector.Values.Length, stringProps, StringComparison.Ordinal, hashDetails);
+            genCfg = new GeneratorConfig<T>(structureType, dataType, (uint)vector.Values.Length, stringProps, StringComparison.Ordinal, hashDetails, generator.UseUTF16Encoding);
         else if (props is ValueProperties<T> valueProps)
         {
             hashDetails.HasZeroOrNaN = valueProps.HasZeroOrNaN;

@@ -1,0 +1,34 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Conditional
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ConditionalStructure_String_13 final
+{
+public:
+    [[nodiscard]]
+    static bool contains(const std::u32string_view value) noexcept
+    {
+        if (value.length() != 1u)
+            return false;
+
+        if (value == U"æ" || value == U"à" || value == U"ä" || value == U"ö" || value == U"ü" || value == U"ß" || value == U"é" || value == U"è" || value == U"ê" || value == U"ç" || value == U"ñ" || value == U"ø" || value == U"å")
+            return true;
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 13;
+    static constexpr size_t min_length = 1;
+    static constexpr size_t max_length = 1;
+
+public:
+    ConditionalStructure_String_13() = delete;
+    ConditionalStructure_String_13(const ConditionalStructure_String_13&) = delete;
+    ConditionalStructure_String_13& operator=(const ConditionalStructure_String_13&) = delete;
+    ConditionalStructure_String_13(ConditionalStructure_String_13&&) = delete;
+    ConditionalStructure_String_13& operator=(ConditionalStructure_String_13&&) = delete;
+};

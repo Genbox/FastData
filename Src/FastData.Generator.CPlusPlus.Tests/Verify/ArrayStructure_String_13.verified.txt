@@ -1,0 +1,41 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ArrayStructure_String_13 final
+{
+    static constexpr std::array<std::u32string_view, 13> entries = {
+        U"æ", U"à", U"ä", U"ö", U"ü", U"ß", U"é", U"è", U"ê", U"ç", 
+        U"ñ", U"ø", U"å"
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const std::u32string_view value) noexcept
+    {
+        if (value.length() != 1u)
+            return false;
+
+        for (size_t i = 0; i < 13; i++)
+        {
+            if (entries[i] == value)
+               return true;
+        }
+        return false;
+    }
+
+    static constexpr size_t item_count = 13;
+    static constexpr size_t min_length = 1;
+    static constexpr size_t max_length = 1;
+
+public:
+    ArrayStructure_String_13() = delete;
+    ArrayStructure_String_13(const ArrayStructure_String_13&) = delete;
+    ArrayStructure_String_13& operator=(const ArrayStructure_String_13&) = delete;
+    ArrayStructure_String_13(ArrayStructure_String_13&&) = delete;
+    ArrayStructure_String_13& operator=(ArrayStructure_String_13&&) = delete;
+};

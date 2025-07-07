@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using Genbox.FastData.Generators.Abstracts;
+using System.Text;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Expressions;
@@ -10,14 +10,18 @@ namespace Genbox.FastData.Generators.StringHash;
 /// <summary>Hashes the entire string using DJB2 hash</summary>
 internal sealed record DefaultStringHash : IStringHash
 {
-    private Expression<HashFunc<string>>? _expression; //We cache the expression because it does not change
+    private readonly bool _useUTF16;
 
-    internal DefaultStringHash() { }
+    private DefaultStringHash(bool useUTF16) => _useUTF16 = useUTF16;
+
+    internal static DefaultStringHash UTF16Instance { get; } = new DefaultStringHash(true);
+    internal static DefaultStringHash UTF8Instance { get; } = new DefaultStringHash(false);
+
+    internal static DefaultStringHash GetInstance(bool useUTF16) => useUTF16 ? UTF16Instance : UTF8Instance;
 
     public State[]? State => null;
-    public HashFunc<string> GetHashFunction() => GetExpression().Compile();
-    public Expression<HashFunc<string>> GetExpression() => _expression ??= ExpressionHashBuilder.BuildFull(Mixer, Avalanche);
-    public ReaderFunctions Functions => ReaderFunctions.ReadU8;
+    public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.BuildFull(Mixer, Avalanche, _useUTF16);
+    public ReaderFunctions Functions => ReaderFunctions.ReadU16;
 
     // (((hash << 5) | (hash >> 27)) + hash) ^ Read(data, offset)
     private static Expression Mixer(Expression hash, Expression read) =>

@@ -1,8 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
-using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Interfaces;
-using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Generators.StringHash.Framework;
 
@@ -50,6 +48,7 @@ internal class CSharpHashDef : IHashDef
         {
             return info.StringHash != null
                 ? $"""
+                           int length = value.Length;
                    {info.StringHash.HashSource}
                            return hash;
                    {GetFunctions(info.StringHash.ReaderFunctions)}

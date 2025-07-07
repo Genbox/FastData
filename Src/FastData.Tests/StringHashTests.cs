@@ -1,4 +1,4 @@
-using Genbox.FastData.Generators;
+using System.Text;
 using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Generators.StringHash.Framework;
 
@@ -8,13 +8,17 @@ public class StringHashTests
 {
     [Theory]
     [MemberData(nameof(GetSpecs))]
-    internal void TestVector(HashFunc<string> func, bool _, ulong vector)
+    internal void TestVector(StringHashFunc func, bool useUTF16, ulong vector)
     {
-        Assert.Equal(vector, func("hello world"));
+        Encoding encoding = useUTF16 ? Encoding.Unicode : Encoding.UTF8;
+
+        byte[] bytes = encoding.GetBytes("hello world");
+        Assert.Equal(vector, func(bytes, bytes.Length));
     }
 
-    public static TheoryData<HashFunc<string>, bool, ulong> GetSpecs() => new TheoryData<HashFunc<string>, bool, ulong>
+    public static TheoryData<StringHashFunc, bool, ulong> GetSpecs() => new TheoryData<StringHashFunc, bool, ulong>
     {
-        { new DefaultStringHash().GetHashFunction(), true, 16317555765854685474 },
+        { DefaultStringHash.UTF16Instance.GetExpression().Compile(), true, 16317555765854685474 },
+        { DefaultStringHash.UTF8Instance.GetExpression().Compile(), false, 16317555765854685474 },
     };
 }

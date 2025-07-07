@@ -1,8 +1,5 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using Genbox.FastData.Enums;
-using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using static System.Linq.Expressions.Expression;
@@ -11,8 +8,6 @@ namespace Genbox.FastData.Generators.StringHash;
 
 internal sealed record GPerfStringHash : IStringHash
 {
-    private Expression<HashFunc<string>>? _expression; //We cache the expression because it does not change
-
     internal GPerfStringHash(int[] associationValues, int[] alphaIncrements, int[] positions, uint minLen)
     {
         AssociationValues = associationValues;
@@ -26,14 +21,13 @@ internal sealed record GPerfStringHash : IStringHash
     internal int[] Positions { get; }
     internal uint MinLen { get; }
 
-    public HashFunc<string> GetHashFunction() => GetExpression().Compile();
-    public Expression<HashFunc<string>> GetExpression() => _expression ??= CreateExpression();
     public ReaderFunctions Functions => ReaderFunctions.None;
     public State[] State => [new State(nameof(AssociationValues), typeof(int), AssociationValues)];
 
-    private Expression<HashFunc<string>> CreateExpression()
+    public Expression<StringHashFunc> GetExpression()
     {
-        ParameterExpression str = Parameter(typeof(string), "value");
+        ParameterExpression value = Parameter(typeof(byte[]), "value");
+        ParameterExpression length = Parameter(typeof(int), "length");
         ParameterExpression hash = Variable(typeof(ulong), "hash");
 
         PropertyInfo assoProp = typeof(GPerfStringHash).GetProperty(nameof(AssociationValues), BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)!;
@@ -54,7 +48,7 @@ internal sealed record GPerfStringHash : IStringHash
         if (key == -1 || key < MinLen)
         {
             foreach (int pos in Positions)
-                ex.Add(Assign(hash, Add(hash, GetPosition(asso, str, pos))));
+                ex.Add(Assign(hash, Add(hash, GetPosition(asso, value, length, pos))));
         }
         else
         {
@@ -63,32 +57,29 @@ internal sealed record GPerfStringHash : IStringHash
             do
             {
                 ex.Add(IfThen(
-                    GreaterThanOrEqual(Property(str, "Length"), Constant(key)),
-                    Assign(hash, Add(hash, Convert(GetPosition(asso, str, key - 1), typeof(ulong)))
+                    GreaterThanOrEqual(Property(value, "Length"), Constant(key)),
+                    Assign(hash, Add(hash, Convert(GetPosition(asso, value, length, key - 1), typeof(ulong)))
                     )));
             } while (key-- > MinLen);
 
             if (key == -1)
-                ex.Add(Assign(hash, Add(hash, Convert(GetPosition(asso, str, key), typeof(ulong)))));
+                ex.Add(Assign(hash, Add(hash, Convert(GetPosition(asso, value, length, key), typeof(ulong)))));
         }
 
         BlockExpression body = Block([hash], ex);
-        return Lambda<HashFunc<string>>(body, str);
+        return Lambda<StringHashFunc>(body, value, length);
     }
 
-    private UnaryExpression GetPosition(Expression asso, Expression str, int pos)
+    private UnaryExpression GetPosition(Expression asso, Expression value, Expression length, int pos)
     {
         Expression idx;
 
         if (pos == -1)
-            idx = Subtract(Property(str, "Length"), Constant(1));
+            idx = Subtract(length, Constant(1));
         else
         {
-            // Cannot use ArrayIndex here because strings are not arrays
-            PropertyInfo? charsProp = typeof(string).GetProperty("Chars", [typeof(int)]);
-
             // Fixed position and optional increment
-            idx = MakeIndex(str, charsProp, [Constant(pos)]);
+            idx = ArrayIndex(value, Constant(pos));
 
             int inc = AlphaIncrements[pos];
 

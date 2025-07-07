@@ -36,7 +36,7 @@ internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlu
 
                   const {{HashSizeType}} hash = get_hash(value);
                   const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
-                  {{GetSmallestSignedType(ctx.Buckets.Length)}} i = buckets[index] - 1;
+                  {{GetSmallestSignedType(ctx.Buckets.Length)}} i = buckets[index] - static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(1);
 
                   while (i >= 0)
                   {

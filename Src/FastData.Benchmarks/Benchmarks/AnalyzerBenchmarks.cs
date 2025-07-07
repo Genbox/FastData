@@ -9,7 +9,7 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [MemoryDiagnoser]
 public class AnalyzerBenchmarks
 {
-    private readonly GPerfAnalyzer<string> _analyzer;
+    private readonly GPerfAnalyzer _analyzer;
     private readonly string[] _data;
 
     public AnalyzerBenchmarks()
@@ -18,7 +18,7 @@ public class AnalyzerBenchmarks
         _data = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(rng, 50)).ToArray();
 
         StringProperties props = DataAnalyzer.GetStringProperties(_data);
-        _analyzer = new GPerfAnalyzer<string>(_data.Length, props, new GPerfAnalyzerConfig(), new Simulator<string>(_data.Length), NullLogger<GPerfAnalyzer<string>>.Instance);
+        _analyzer = new GPerfAnalyzer(_data.Length, props, new GPerfAnalyzerConfig(), new Simulator(_data.Length, true), NullLogger<GPerfAnalyzer>.Instance);
     }
 
     [Benchmark]

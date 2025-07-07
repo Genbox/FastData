@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal partial class BruteForceAnalyzer<T>
+internal partial class BruteForceAnalyzer
 {
     [LoggerMessage(LogLevel.Trace, "Mixer: {Mixer}")]
     internal static partial void LogMixer(ILogger logger, string mixer);

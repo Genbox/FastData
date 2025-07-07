@@ -1,4 +1,3 @@
-using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.StringHash.Framework;
 
 namespace Genbox.FastData.Internal.Misc;
@@ -6,7 +5,7 @@ namespace Genbox.FastData.Internal.Misc;
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
 internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUnique, bool HashCodesPerfect)
 {
-    internal static HashData Create<T>(ReadOnlySpan<T> data, int capacityFactor, HashFunc<T> hashFunc)
+    internal static HashData Create<T>(ReadOnlySpan<T> data, int capacityFactor, HashFunc<T> func)
     {
         ulong size = (ulong)(data.Length * capacityFactor);
 
@@ -19,7 +18,7 @@ internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUn
 
         for (int i = 0; i < data.Length; i++)
         {
-            ulong hash = hashFunc(data[i]);
+            ulong hash = func(data[i]);
             hashCodes[i] = hash;
 
             if (uniq && !uniqSet.Add(hash)) //The unique check is first so that when it is false, we don't try the other conditions

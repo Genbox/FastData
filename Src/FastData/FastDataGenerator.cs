@@ -1,17 +1,16 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+using System.Linq.Expressions;
+using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
-using Genbox.FastData.Generators.Contexts.Misc;
 using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
 using Microsoft.Extensions.Logging;
@@ -56,7 +55,7 @@ public static partial class FastDataGenerator
         ulong => Generate(Cast<ulong>(data), fdCfg, generator, factory),
         float => Generate(Cast<float>(data), fdCfg, generator, factory),
         double => Generate(Cast<double>(data), fdCfg, generator, factory),
-        string => Generate(Cast<string>(data), fdCfg, generator, factory),
+        string => GenerateString(Cast<string>(data), fdCfg, generator, factory),
         _ => throw new InvalidOperationException($"Unsupported data type: {data[0].GetType().Name}")
     };
 
@@ -69,6 +68,9 @@ public static partial class FastDataGenerator
     /// <exception cref="InvalidOperationException">Thrown when you gave an unsupported data type in data.</exception>
     public static string Generate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) where T : notnull
     {
+        if (typeof(T) == typeof(string))
+            return GenerateString(new ReadOnlySpan<string>((string[])(object)data), fdCfg, generator, factory);
+
         return Generate(new ReadOnlySpan<T>(data), fdCfg, generator, factory);
     }
 
@@ -84,8 +86,10 @@ public static partial class FastDataGenerator
         if (data.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
 
-        if (!IsValidType<T>())
-            throw new InvalidOperationException($"Unsupported data type: {typeof(T).Name}");
+        Type type = typeof(T);
+
+        if (type != typeof(char) && type != typeof(sbyte) && type != typeof(byte) && type != typeof(short) && type != typeof(ushort) && type != typeof(int) && type != typeof(uint) && type != typeof(long) && type != typeof(ulong) && type != typeof(float) && type != typeof(double))
+            throw new InvalidOperationException($"Unsupported data type: {type.Name}");
 
         factory ??= NullLoggerFactory.Instance;
 
@@ -102,27 +106,14 @@ public static partial class FastDataGenerator
         LogUserStructureType(logger, fdCfg.StructureType);
         LogUniqueItems(logger, uniq.Count);
 
-        DataType dataType = (DataType)Enum.Parse(typeof(DataType), typeof(T).Name);
+        DataType dataType = (DataType)Enum.Parse(typeof(DataType), type.Name);
         LogDataType(logger, dataType);
 
-        GeneratorConfig<T> genCfg;
-        IProperties props;
         HashDetails hashDetails = new HashDetails();
 
-        if (dataType == DataType.String)
-        {
-            StringProperties strProps = DataAnalyzer.GetStringProperties(data);
-            LogMinMaxLength(logger, strProps.LengthData.Min, strProps.LengthData.Max);
-            genCfg = new GeneratorConfig<T>(fdCfg.StructureType, dataType, (uint)data.Length, strProps, DefaultStringComparison, hashDetails);
-            props = strProps;
-        }
-        else
-        {
-            ValueProperties<T> valProps = DataAnalyzer.GetValueProperties(data, dataType);
-            LogMinMaxValues(logger, valProps.MinValue, valProps.MaxValue);
-            genCfg = new GeneratorConfig<T>(fdCfg.StructureType, dataType, (uint)data.Length, valProps, hashDetails);
-            props = valProps;
-        }
+        ValueProperties<T> valProps = DataAnalyzer.GetValueProperties(data, dataType);
+        LogMinMaxValues(logger, valProps.MinValue, valProps.MaxValue);
+        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, dataType, (uint)data.Length, valProps, hashDetails);
 
         switch (fdCfg.StructureType)
         {
@@ -132,11 +123,6 @@ public static partial class FastDataGenerator
                     return Generate(generator, genCfg, new SingleValueStructure<T>(), data);
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
-
-                // If strings have unique lengths, we prefer to use a KeyLengthStructure.
-                if (props is StringProperties strProps && strProps.LengthData.Unique)
-                    return Generate(generator, genCfg, new KeyLengthStructure<T>(strProps), data);
-
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
                 if (data.Length < 400)
                     return Generate(generator, genCfg, new ConditionalStructure<T>(), data);
@@ -151,31 +137,8 @@ public static partial class FastDataGenerator
                 return Generate(generator, genCfg, new BinarySearchStructure<T>(dataType, DefaultStringComparison), data);
             case StructureType.HashSet:
             {
-                HashFunc<T> hashFunc;
-
-                if (props is StringProperties strProps)
-                {
-                    if (fdCfg.StringAnalyzerConfig != null)
-                    {
-                        IStringHash stringHash = GetBestHash(data, strProps, fdCfg.StringAnalyzerConfig, factory, true).StringHash;
-                        hashFunc = (HashFunc<T>)(object)stringHash.GetHashFunction();
-                        hashDetails.StringHash = new StringHashDetails(stringHash.GetExpression(), stringHash.Functions, stringHash.State);
-                    }
-                    else
-                    {
-                        DefaultStringHash stringHash = new DefaultStringHash();
-                        hashFunc = (HashFunc<T>)(object)stringHash.GetHashFunction();
-
-                        //We do not set hashDetails.StringHash here, as the user requested it to be disabled
-                    }
-                }
-                else if (props is ValueProperties<T> valueProps)
-                {
-                    hashFunc = PrimitiveHash.GetHash<T>(dataType, valueProps.HasZeroOrNaN);
-                    hashDetails.HasZeroOrNaN = valueProps.HasZeroOrNaN;
-                }
-                else
-                    throw new InvalidOperationException("Bug");
+                HashFunc<T> hashFunc = PrimitiveHash.GetHash<T>(dataType, valProps.HasZeroOrNaN);
+                hashDetails.HasZeroOrNaN = valProps.HasZeroOrNaN;
 
                 HashData hashData = HashData.Create(data, fdCfg.HashCapacityFactor, hashFunc);
 
@@ -189,16 +152,101 @@ public static partial class FastDataGenerator
         }
     }
 
+    private static string GenerateString(ReadOnlySpan<string> data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
+    {
+        if (data.Length == 0)
+            throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
+
+        factory ??= NullLoggerFactory.Instance;
+
+        //Validate that we only have unique data
+        HashSet<string> uniq = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (string val in data)
+        {
+            if (!uniq.Add(val))
+                throw new InvalidOperationException($"Duplicate data found: {val}");
+        }
+
+        ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));
+        LogUserStructureType(logger, fdCfg.StructureType);
+        LogUniqueItems(logger, uniq.Count);
+
+        const DataType dataType = DataType.String;
+        LogDataType(logger, dataType);
+
+        HashDetails hashDetails = new HashDetails();
+
+        StringProperties strProps = DataAnalyzer.GetStringProperties(data);
+        LogMinMaxLength(logger, strProps.LengthData.Min, strProps.LengthData.Max);
+        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, dataType, (uint)data.Length, strProps, DefaultStringComparison, hashDetails, generator.UseUTF16Encoding);
+
+        switch (fdCfg.StructureType)
+        {
+            case StructureType.Auto:
+            {
+                if (data.Length == 1)
+                    return Generate(generator, genCfg, new SingleValueStructure<string>(), data);
+
+                // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
+
+                // If strings have unique lengths, we prefer to use a KeyLengthStructure.
+                if (strProps.LengthData.Unique)
+                    return Generate(generator, genCfg, new KeyLengthStructure<string>(strProps), data);
+
+                // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
+                if (data.Length < 400)
+                    return Generate(generator, genCfg, new ConditionalStructure<string>(), data);
+
+                goto case StructureType.HashSet;
+            }
+            case StructureType.Array:
+                return Generate(generator, genCfg, new ArrayStructure<string>(), data);
+            case StructureType.Conditional:
+                return Generate(generator, genCfg, new ConditionalStructure<string>(), data);
+            case StructureType.BinarySearch:
+                return Generate(generator, genCfg, new BinarySearchStructure<string>(dataType, DefaultStringComparison), data);
+            case StructureType.HashSet:
+            {
+                StringHashFunc hashFunc;
+
+                if (fdCfg.StringAnalyzerConfig != null)
+                {
+                    Candidate candidate = GetBestHash(data, strProps, fdCfg.StringAnalyzerConfig, factory, generator.UseUTF16Encoding, true);
+                    LogStringHashFitness(logger, candidate.Fitness);
+
+                    Expression<StringHashFunc> expression = candidate.StringHash.GetExpression();
+                    hashDetails.StringHash = new StringHashDetails(expression, candidate.StringHash.Functions, candidate.StringHash.State);
+
+                    hashFunc = expression.Compile();
+                }
+                else
+                {
+                    hashFunc = DefaultStringHash.GetInstance(generator.UseUTF16Encoding).GetExpression().Compile();
+
+                    //We do not set hashDetails.StringHash here, as the user requested it to be disabled
+                }
+
+                HashData hashData = HashData.Create(data, fdCfg.HashCapacityFactor, x =>
+                {
+                    byte[] bytes = generator.UseUTF16Encoding ? Encoding.Unicode.GetBytes(x) : Encoding.UTF8.GetBytes(x);
+                    return hashFunc(bytes, bytes.Length);
+                });
+
+                if (hashData.HashCodesPerfect)
+                    return Generate(generator, genCfg, new HashSetPerfectStructure<string>(hashData, dataType), data);
+
+                return Generate(generator, genCfg, new HashSetChainStructure<string>(hashData, dataType), data);
+            }
+            default:
+                throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
+        }
+    }
+
     private static string Generate<T, TContext>(ICodeGenerator generator, GeneratorConfig<T> genCfg, IStructure<T, TContext> structure, ReadOnlySpan<T> data) where T : notnull where TContext : IContext<T>
     {
         TContext res = structure.Create(ref data);
         return generator.Generate(data, genCfg, res);
-    }
-
-    private static bool IsValidType<T>()
-    {
-        Type type = typeof(T);
-        return type == typeof(char) || type == typeof(sbyte) || type == typeof(byte) || type == typeof(short) || type == typeof(ushort) || type == typeof(int) || type == typeof(uint) || type == typeof(long) || type == typeof(ulong) || type == typeof(float) || type == typeof(double) || type == typeof(string);
     }
 
     private static ReadOnlySpan<T> Cast<T>(this ReadOnlySpan<object> data) where T : notnull
@@ -211,34 +259,34 @@ public static partial class FastDataGenerator
         return newArr;
     }
 
-    internal static Candidate GetBestHash<T>(ReadOnlySpan<T> data, StringProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, bool includeDefault) where T : notnull
+    internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, bool useUTF16, bool includeDefault)
     {
-        Simulator<T> sim = new Simulator<T>(data.Length);
+        Simulator sim = new Simulator(data.Length, useUTF16);
 
         //Run each of the analyzers
         List<Candidate> candidates = new List<Candidate>();
 
         //We always add the default hash as a candidate
         if (includeDefault)
-            candidates.Add(sim.Run(data, new DefaultStringHash()));
+            candidates.Add(sim.Run(data, DefaultStringHash.GetInstance(useUTF16)));
 
         if (cfg.BruteForceAnalyzerConfig != null)
         {
-            BruteForceAnalyzer<T> bf = new BruteForceAnalyzer<T>(props, cfg.BruteForceAnalyzerConfig, sim, factory.CreateLogger<BruteForceAnalyzer<T>>());
+            BruteForceAnalyzer bf = new BruteForceAnalyzer(props, cfg.BruteForceAnalyzerConfig, sim, factory.CreateLogger<BruteForceAnalyzer>());
             if (bf.IsAppropriate())
                 candidates.AddRange(bf.GetCandidates(data));
         }
 
         if (cfg.GeneticAnalyzerConfig != null)
         {
-            GeneticAnalyzer<T> ga = new GeneticAnalyzer<T>(props, cfg.GeneticAnalyzerConfig, sim, factory.CreateLogger<GeneticAnalyzer<T>>());
+            GeneticAnalyzer ga = new GeneticAnalyzer(props, cfg.GeneticAnalyzerConfig, sim, factory.CreateLogger<GeneticAnalyzer>());
             if (ga.IsAppropriate())
                 candidates.AddRange(ga.GetCandidates(data));
         }
 
         if (cfg.GPerfAnalyzerConfig != null)
         {
-            GPerfAnalyzer<T> ha = new GPerfAnalyzer<T>(data.Length, props, cfg.GPerfAnalyzerConfig, sim, factory.CreateLogger<GPerfAnalyzer<T>>());
+            GPerfAnalyzer ha = new GPerfAnalyzer(data.Length, props, cfg.GPerfAnalyzerConfig, sim, factory.CreateLogger<GPerfAnalyzer>());
             if (ha.IsAppropriate())
                 candidates.AddRange(ha.GetCandidates(data));
         }
@@ -260,12 +308,13 @@ public static partial class FastDataGenerator
         notPerfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
 
         string test = new string('a', (int)props.LengthData.Max);
+        byte[] testBytes = useUTF16 ? Encoding.Unicode.GetBytes(test) : Encoding.UTF8.GetBytes(test);
 
         //We start with the perfect results (if any)
         if (perfect.Count > 0)
         {
             foreach (Candidate candidate in perfect)
-                Benchmark(test, cfg.BenchmarkIterations, candidate);
+                Benchmark(testBytes, cfg.BenchmarkIterations, candidate);
 
             //Sort by time
             perfect.Sort(static (a, b) => a.Time.CompareTo(b.Time));
@@ -274,7 +323,7 @@ public static partial class FastDataGenerator
             if (notPerfect.Count > 0)
             {
                 Candidate np = notPerfect[0];
-                Benchmark(test, cfg.BenchmarkIterations, np);
+                Benchmark(testBytes, cfg.BenchmarkIterations, np);
 
                 //If the perfect is faster, we use that one.
                 Candidate p = perfect[0];
@@ -298,28 +347,28 @@ public static partial class FastDataGenerator
 
         //If there are no perfect candidates, we benchmark all the not-perfect candidates
         foreach (Candidate candidate in notPerfect)
-            Benchmark(test, cfg.BenchmarkIterations, candidate);
+            Benchmark(testBytes, cfg.BenchmarkIterations, candidate);
 
         notPerfect.Sort(static (a, b) => a.Time.CompareTo(b.Time));
         return notPerfect[0];
     }
 
-    private static void Benchmark(string str, int iterations, Candidate candidate)
+    private static void Benchmark(byte[] data, int iterations, Candidate candidate)
     {
         //The candidate has already been benchmarked. Do nothing.
         if (candidate.Time >= double.Epsilon)
             return;
 
-        HashFunc<string> func = candidate.StringHash.GetHashFunction();
+        StringHashFunc func = candidate.StringHash.GetExpression().Compile();
 
         //Warmup
         for (int i = 0; i < iterations; i++)
-            func(str);
+            func(data, data.Length);
 
         Stopwatch sw = Stopwatch.StartNew();
 
         for (int i = 0; i < iterations; i++)
-            func(str);
+            func(data, data.Length);
 
         sw.Stop();
 

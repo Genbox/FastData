@@ -40,7 +40,7 @@ public:
 
         const uint64_t hash = get_hash(value);
         const size_t index = hash % 5;
-        int8_t i = buckets[index] - 1;
+        int8_t i = buckets[index] - static_cast<int8_t>(1);
 
         while (i >= 0)
         {

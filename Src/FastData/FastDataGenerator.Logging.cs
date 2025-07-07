@@ -19,4 +19,7 @@ public static partial class FastDataGenerator
 
     [LoggerMessage(LogLevel.Information, "User selected structure type {Type}")]
     internal static partial void LogUserStructureType(ILogger logger, StructureType type);
+
+    [LoggerMessage(LogLevel.Information, "Generated StringHash with fitness {Fitness}")]
+    internal static partial void LogStringHashFitness(ILogger logger, double fitness);
 }

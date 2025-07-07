@@ -20,7 +20,7 @@ internal class CSharpEarlyExitDef(TypeHelper helper, CSharpOptions options) : Ea
                      return false;
          """;
 
-    protected override string GetLengthEarlyExits(uint min, uint max) =>
+    protected override string GetLengthEarlyExits(uint min, uint max, uint minByte, uint maxByte) =>
         $"""
                  if ({(min.Equals(max) ? $"value.Length != {helper.ToValueLabel(max)}" : $"value.Length < {helper.ToValueLabel(min)} || value.Length > {helper.ToValueLabel(max)}")})
                      return false;

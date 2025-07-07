@@ -36,9 +36,9 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
                           int main(int argc, char* argv[])
                           {
                           {{FormatList(data.Values, x => $"""
-                                                                   if (!{spec.Identifier}::contains({helper.ToValueLabel(x)}))
-                                                                       return false;
-                                                                   """, "\n")}}
+                                                          if (!{spec.Identifier}::contains({helper.ToValueLabel(x)}))
+                                                              return false;
+                                                          """, "\n")}}
 
                               return 1;
                           }

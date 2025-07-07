@@ -17,7 +17,7 @@ public class TestData<T>(StructureType structureType, T[] values) : ITestData, I
 
     public void Generate(Func<string, ICodeGenerator> factory, out GeneratorSpec spec)
     {
-        string source = FastDataGenerator.Generate(Values, new FastDataConfig(StructureType), factory(Identifier));
+        string source = FastDataGenerator.Generate(Values, new FastDataConfig(StructureType) { StringAnalyzerConfig = null }, factory(Identifier));
         spec = new GeneratorSpec(Identifier, source);
     }
 

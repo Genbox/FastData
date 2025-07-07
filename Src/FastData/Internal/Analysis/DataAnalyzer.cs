@@ -1,3 +1,4 @@
+using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -36,6 +37,10 @@ internal static class DataAnalyzer
         //We need to know the longest string for optimal mixing. Probably not 100% necessary.
         string maxStr = (string)(object)data[0];
         int minLength = int.MaxValue;
+        int minUtf8ByteLength = int.MaxValue;
+        int maxUtf8ByteLength = int.MinValue;
+        int minUtf16ByteLength = int.MaxValue;
+        int maxUtf16ByteLength = int.MinValue;
         bool uniq = true;
 
         foreach (T val in data)
@@ -44,6 +49,14 @@ internal static class DataAnalyzer
 
             if (str.Length > maxStr.Length)
                 maxStr = str;
+
+            int utf8ByteCount = Encoding.UTF8.GetByteCount(str);
+            minUtf8ByteLength = Math.Min(utf8ByteCount, minUtf8ByteLength);
+            maxUtf8ByteLength = Math.Max(utf8ByteCount, maxUtf8ByteLength);
+
+            int utf16ByteCount = Encoding.Unicode.GetByteCount(str);
+            minUtf16ByteLength = Math.Min(utf16ByteCount, minUtf16ByteLength);
+            maxUtf16ByteLength = Math.Max(utf16ByteCount, maxUtf16ByteLength);
 
             minLength = Math.Min(minLength, str.Length); //Track the smallest string. It might be more than what lengthmap supports
             uniq &= !lengthMap.SetTrue(str.Length);
@@ -91,7 +104,7 @@ internal static class DataAnalyzer
             }
         }
 
-        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
+        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, (uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
     }
 
     internal static ValueProperties<T> GetCharProperties<T>(ReadOnlySpan<char> data)

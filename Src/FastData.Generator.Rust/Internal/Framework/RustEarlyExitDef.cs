@@ -22,9 +22,9 @@ internal class RustEarlyExitDef(TypeHelper helper, RustOptions options) : EarlyE
                   }
           """;
 
-    protected override string GetLengthEarlyExits(uint min, uint max) =>
+    protected override string GetLengthEarlyExits(uint min, uint max, uint minByte, uint maxByte) =>
         $$"""
-                  if {{(min.Equals(max) ? $"value.len() != {helper.ToValueLabel(max)} as usize" : $"value.len() < {helper.ToValueLabel(min)} as usize || value.len() > {helper.ToValueLabel(max)} as usize")}} {
+                  if {{(minByte.Equals(maxByte) ? $"value.len() != {helper.ToValueLabel(maxByte)} as usize" : $"value.len() < {helper.ToValueLabel(minByte)} as usize || value.len() > {helper.ToValueLabel(maxByte)} as usize")}} {
                       return false;
                   }
           """;

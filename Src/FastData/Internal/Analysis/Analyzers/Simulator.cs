@@ -1,23 +1,25 @@
-using Genbox.FastData.Generators;
-using Genbox.FastData.Generators.Abstracts;
+using System.Text;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed class Simulator<T>(int length, int capacityFactor = 1) where T : notnull
+internal sealed class Simulator(int length, bool useUTF16, int capacityFactor = 1)
 {
     private readonly int _capacity = length * capacityFactor;
     private readonly NoEqualityEmulator _set = new NoEqualityEmulator((uint)(length * capacityFactor));
+    private readonly Encoding _encoding = useUTF16 ? Encoding.Unicode : Encoding.UTF8;
 
-    internal Candidate Run(ReadOnlySpan<T> data, IStringHash stringHash, Func<double>? extraFitness = null)
+    internal Candidate Run(ReadOnlySpan<string> data, IStringHash stringHash, Func<double>? extraFitness = null)
     {
-        _set.SetHash(stringHash.GetHashFunction());
+        _set.SetHash(stringHash.GetExpression().Compile());
 
         int collisions = 0;
-        foreach (T str in data)
+        foreach (string str in data)
         {
-            if (!_set.Add((string)(object)str))
+            byte[] bytes = _encoding.GetBytes(str);
+
+            if (!_set.Add(bytes))
                 collisions++;
         }
 
@@ -34,13 +36,13 @@ internal sealed class Simulator<T>(int length, int capacityFactor = 1) where T :
     private sealed class NoEqualityEmulator(uint capacity)
     {
         private readonly int[] _buckets = new int[capacity];
-        private HashFunc<string> _hashFunc = null!;
+        private StringHashFunc _hashFunc = null!;
 
-        public void SetHash(HashFunc<string> hashFunc) => _hashFunc = hashFunc;
+        public void SetHash(StringHashFunc hashFunc) => _hashFunc = hashFunc;
 
-        public bool Add(string value)
+        public bool Add(byte[] value)
         {
-            ulong hashCode = _hashFunc(value);
+            ulong hashCode = _hashFunc(value, value.Length);
             ref int bucket = ref _buckets[hashCode % (ulong)_buckets.Length];
 
             if (bucket == 0)

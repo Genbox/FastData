@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal partial class GPerfAnalyzer<T>
+internal partial class GPerfAnalyzer
 {
     [LoggerMessage(LogLevel.Trace, "{Message}", EventId = 42)]
     internal static partial void LogGPerfDebug(ILogger logger, string message);

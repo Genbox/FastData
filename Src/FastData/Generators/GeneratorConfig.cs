@@ -24,9 +24,9 @@ public sealed class GeneratorConfig<T> where T : notnull
         Constants = CreateConstants(props, itemCount);
     }
 
-    internal GeneratorConfig(StructureType structureType, DataType dataType, uint itemCount, StringProperties props, StringComparison stringComparison, HashDetails hashDetails) : this(structureType, dataType, hashDetails)
+    internal GeneratorConfig(StructureType structureType, DataType dataType, uint itemCount, StringProperties props, StringComparison stringComparison, HashDetails hashDetails, bool useUtf16) : this(structureType, dataType, hashDetails)
     {
-        EarlyExits = GetEarlyExits(props, itemCount, structureType).ToArray();
+        EarlyExits = GetEarlyExits(props, itemCount, structureType, useUtf16).ToArray();
         Constants = CreateConstants(props, itemCount);
         StringComparison = stringComparison;
     }
@@ -68,7 +68,7 @@ public sealed class GeneratorConfig<T> where T : notnull
         return constants;
     }
 
-    private static IEnumerable<IEarlyExit> GetEarlyExits(StringProperties props, uint itemCount, StructureType structureType)
+    private static IEnumerable<IEarlyExit> GetEarlyExits(StringProperties props, uint itemCount, StructureType structureType, bool useUtf16)
     {
         //There is no point to using early exists if there is just one item
         if (itemCount == 1)
@@ -86,7 +86,12 @@ public sealed class GeneratorConfig<T> where T : notnull
         if (props.LengthData.Max <= 64 && !props.LengthData.LengthMap.Consecutive)
             yield return new LengthBitSetEarlyExit(props.LengthData.LengthMap.FirstValue);
         else
-            yield return new MinMaxLengthEarlyExit(props.LengthData.Min, props.LengthData.Max); //Also handles same lengths
+        {
+            uint minByteCount = useUtf16 ? props.LengthData.MinUtf16ByteCount : props.LengthData.MinUtf8ByteCount;
+            uint maxByteCount = useUtf16 ? props.LengthData.MaxUtf16ByteCount : props.LengthData.MaxUtf8ByteCount;
+
+            yield return new MinMaxLengthEarlyExit(props.LengthData.Min, props.LengthData.Max, minByteCount, maxByteCount); //Also handles same lengths
+        }
     }
 
     private static IEnumerable<IEarlyExit> GetEarlyExits(ValueProperties<T> props, uint itemCount, StructureType structureType)
