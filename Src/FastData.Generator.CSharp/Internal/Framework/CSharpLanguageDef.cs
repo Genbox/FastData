@@ -16,11 +16,11 @@ internal class CSharpLanguageDef : ILanguageDef
         new IntegerTypeDef<short>("short", short.MinValue, short.MaxValue, "short.MinValue", "short.MaxValue"),
         new IntegerTypeDef<ushort>("ushort", ushort.MinValue, ushort.MaxValue, "ushort.MinValue", "ushort.MaxValue"),
         new IntegerTypeDef<int>("int", int.MinValue, int.MaxValue, "int.MinValue", "int.MaxValue"),
-        new IntegerTypeDef<uint>("uint", uint.MinValue, uint.MaxValue, "uint.MinValue", "uint.MaxValue", x => x.ToString(NumberFormatInfo.InvariantInfo) + "u"),
-        new IntegerTypeDef<long>("long", long.MinValue, long.MaxValue, "long.MinValue", "long.MaxValue", x => x.ToString(NumberFormatInfo.InvariantInfo) + "l"),
-        new IntegerTypeDef<ulong>("ulong", ulong.MinValue, ulong.MaxValue, "ulong.MinValue", "ulong.MaxValue", x => x.ToString(NumberFormatInfo.InvariantInfo) + "ul"),
-        new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "float.MinValue", "float.MaxValue", x => x.ToString(NumberFormatInfo.InvariantInfo) + "f"),
-        new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "double.MinValue", "double.MaxValue", x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
+        new IntegerTypeDef<uint>("uint", uint.MinValue, uint.MaxValue, "uint.MinValue", "uint.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "u"),
+        new IntegerTypeDef<long>("long", long.MinValue, long.MaxValue, "long.MinValue", "long.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "l"),
+        new IntegerTypeDef<ulong>("ulong", ulong.MinValue, ulong.MaxValue, "ulong.MinValue", "ulong.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "ul"),
+        new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "float.MinValue", "float.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "f"),
+        new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "double.MinValue", "double.MaxValue", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
         new StringTypeDef("string")
     };
 }
