@@ -44,7 +44,7 @@ internal static class GPerfTest
             ReadOnlySpan<string> data = File.ReadAllLines(file).AsSpan();
             StringProperties props = DataAnalyzer.GetStringProperties(data);
 
-            GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, true), factory.CreateLogger<GPerfAnalyzer>());
+            GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.UTF16), factory.CreateLogger<GPerfAnalyzer>());
             Candidate cand = analyzer.GetCandidates(data).First();
             StringHashFunc func = cand.StringHash.GetExpression().Compile();
 

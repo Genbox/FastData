@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Text;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Expressions;
@@ -10,17 +11,17 @@ namespace Genbox.FastData.Generators.StringHash;
 /// <summary>Hashes the entire string using DJB2 hash</summary>
 internal sealed record DefaultStringHash : IStringHash
 {
-    private readonly bool _useUTF16;
+    private readonly GeneratorEncoding _encoding;
 
-    private DefaultStringHash(bool useUTF16) => _useUTF16 = useUTF16;
+    private DefaultStringHash(GeneratorEncoding encoding) => _encoding = encoding;
 
-    internal static DefaultStringHash UTF16Instance { get; } = new DefaultStringHash(true);
-    internal static DefaultStringHash UTF8Instance { get; } = new DefaultStringHash(false);
+    internal static DefaultStringHash UTF8Instance { get; } = new DefaultStringHash(GeneratorEncoding.UTF8);
+    internal static DefaultStringHash UTF16Instance { get; } = new DefaultStringHash(GeneratorEncoding.UTF16);
 
-    internal static DefaultStringHash GetInstance(bool useUTF16) => useUTF16 ? UTF16Instance : UTF8Instance;
+    internal static DefaultStringHash GetInstance(GeneratorEncoding enc) => enc == GeneratorEncoding.UTF8 ? UTF8Instance : UTF16Instance;
 
     public State[]? State => null;
-    public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.BuildFull(Mixer, Avalanche, _useUTF16);
+    public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.BuildFull(Mixer, Avalanche, _encoding);
     public ReaderFunctions Functions => ReaderFunctions.ReadU16;
 
     // (((hash << 5) | (hash >> 27)) + hash) ^ Read(data, offset)

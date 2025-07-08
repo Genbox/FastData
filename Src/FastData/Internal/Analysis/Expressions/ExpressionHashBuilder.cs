@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Misc;
 using JetBrains.Annotations;
@@ -12,7 +13,7 @@ namespace Genbox.FastData.Internal.Analysis.Expressions;
 
 internal static class ExpressionHashBuilder
 {
-    internal static Expression<StringHashFunc> BuildFull(Mixer mixer, Avalanche avalanche, bool useUTF16)
+    internal static Expression<StringHashFunc> BuildFull(Mixer mixer, Avalanche avalanche, GeneratorEncoding encoding)
     {
         ParameterExpression input = Parameter(typeof(byte[]), "value");
         ParameterExpression length = Parameter(typeof(int), "length");
@@ -26,7 +27,7 @@ internal static class ExpressionHashBuilder
         // int hash = 352654597U
         ex.Add(Assign(hash, Constant(352654597UL)));
 
-        int size = useUTF16 ? 2 : 1;
+        int size = encoding == GeneratorEncoding.UTF8 ? 1 : 2;
 
         // while (length > 0)
         LabelTarget breakLabel = Label();

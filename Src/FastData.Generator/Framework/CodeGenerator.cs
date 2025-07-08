@@ -34,7 +34,7 @@ public abstract class CodeGenerator : ICodeGenerator
 
     protected SharedCode Shared { get; }
 
-    public bool UseUTF16Encoding => _langDef.UseUTF16Encoding;
+    public GeneratorEncoding Encoding => _langDef.Encoding;
 
     public virtual string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context) where T : notnull
     {

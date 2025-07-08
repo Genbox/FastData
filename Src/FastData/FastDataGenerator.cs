@@ -179,7 +179,7 @@ public static partial class FastDataGenerator
 
         StringProperties strProps = DataAnalyzer.GetStringProperties(data);
         LogMinMaxLength(logger, strProps.LengthData.Min, strProps.LengthData.Max);
-        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, dataType, (uint)data.Length, strProps, DefaultStringComparison, hashDetails, generator.UseUTF16Encoding);
+        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, dataType, (uint)data.Length, strProps, DefaultStringComparison, hashDetails, generator.Encoding);
 
         switch (fdCfg.StructureType)
         {
@@ -212,7 +212,7 @@ public static partial class FastDataGenerator
 
                 if (fdCfg.StringAnalyzerConfig != null)
                 {
-                    Candidate candidate = GetBestHash(data, strProps, fdCfg.StringAnalyzerConfig, factory, generator.UseUTF16Encoding, true);
+                    Candidate candidate = GetBestHash(data, strProps, fdCfg.StringAnalyzerConfig, factory, generator.Encoding, true);
                     LogStringHashFitness(logger, candidate.Fitness);
 
                     Expression<StringHashFunc> expression = candidate.StringHash.GetExpression();
@@ -222,14 +222,14 @@ public static partial class FastDataGenerator
                 }
                 else
                 {
-                    hashFunc = DefaultStringHash.GetInstance(generator.UseUTF16Encoding).GetExpression().Compile();
+                    hashFunc = DefaultStringHash.GetInstance(generator.Encoding).GetExpression().Compile();
 
                     //We do not set hashDetails.StringHash here, as the user requested it to be disabled
                 }
 
                 HashData hashData = HashData.Create(data, fdCfg.HashCapacityFactor, x =>
                 {
-                    byte[] bytes = generator.UseUTF16Encoding ? Encoding.Unicode.GetBytes(x) : Encoding.UTF8.GetBytes(x);
+                    byte[] bytes = generator.Encoding == GeneratorEncoding.UTF8 ? Encoding.UTF8.GetBytes(x) : Encoding.Unicode.GetBytes(x);
                     return hashFunc(bytes, bytes.Length);
                 });
 
@@ -259,16 +259,16 @@ public static partial class FastDataGenerator
         return newArr;
     }
 
-    internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, bool useUTF16, bool includeDefault)
+    internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, GeneratorEncoding encoding, bool includeDefault)
     {
-        Simulator sim = new Simulator(data.Length, useUTF16);
+        Simulator sim = new Simulator(data.Length, encoding);
 
         //Run each of the analyzers
         List<Candidate> candidates = new List<Candidate>();
 
         //We always add the default hash as a candidate
         if (includeDefault)
-            candidates.Add(sim.Run(data, DefaultStringHash.GetInstance(useUTF16)));
+            candidates.Add(sim.Run(data, DefaultStringHash.GetInstance(encoding)));
 
         if (cfg.BruteForceAnalyzerConfig != null)
         {
@@ -308,7 +308,7 @@ public static partial class FastDataGenerator
         notPerfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
 
         string test = new string('a', (int)props.LengthData.Max);
-        byte[] testBytes = useUTF16 ? Encoding.Unicode.GetBytes(test) : Encoding.UTF8.GetBytes(test);
+        byte[] testBytes = encoding == GeneratorEncoding.UTF8 ? Encoding.UTF8.GetBytes(test) : Encoding.Unicode.GetBytes(test);
 
         //We start with the perfect results (if any)
         if (perfect.Count > 0)

@@ -107,7 +107,7 @@ public static class TestHelper
             props = DataAnalyzer.GetValueProperties(span, dataType);
 
         ICodeGenerator generator = func(vector.Identifier);
-        bool useUTF16 = generator.UseUTF16Encoding;
+        GeneratorEncoding encoding = generator.Encoding;
 
         if (vector.Type == typeof(SingleValueStructure<>))
             return Generate(generator, vector, props, dataType, StructureType.Auto, new SingleValueStructure<T>());
@@ -120,25 +120,25 @@ public static class TestHelper
         if (vector.Type == typeof(EytzingerSearchStructure<>))
             return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new EytzingerSearchStructure<T>(dataType, StringComparison.Ordinal));
         if (vector.Type == typeof(HashSetChainStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetChainStructure<T>(GetHashData(vector, dataType, useUTF16), dataType));
+            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetChainStructure<T>(GetHashData(vector, dataType, encoding), dataType));
         if (vector.Type == typeof(HashSetPerfectStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetPerfectStructure<T>(GetHashData(vector, dataType, useUTF16), dataType));
+            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetPerfectStructure<T>(GetHashData(vector, dataType, encoding), dataType));
         if (vector.Type == typeof(HashSetLinearStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetLinearStructure<T>(GetHashData(vector, dataType, useUTF16)));
+            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetLinearStructure<T>(GetHashData(vector, dataType, encoding)));
         if (vector.Type == typeof(KeyLengthStructure<>))
             return Generate(generator, vector, props, dataType, StructureType.Auto, new KeyLengthStructure<T>((StringProperties)props));
 
         throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
     }
 
-    private static HashData GetHashData<T>(TestVector<T> vector, DataType dataType, bool useUTF16) where T : notnull
+    private static HashData GetHashData<T>(TestVector<T> vector, DataType dataType, GeneratorEncoding genEnc) where T : notnull
     {
         HashData hashData;
 
         if (dataType == DataType.String)
         {
-            Encoding encoding = useUTF16 ? Encoding.Unicode : Encoding.UTF8;
-            StringHashFunc func = DefaultStringHash.GetInstance(useUTF16).GetExpression().Compile();
+            Encoding encoding = genEnc == GeneratorEncoding.UTF8 ? Encoding.UTF8 : Encoding.Unicode;
+            StringHashFunc func = DefaultStringHash.GetInstance(genEnc).GetExpression().Compile();
 
             hashData = HashData.Create<T>(vector.Values.AsSpan(), 1, obj =>
             {
@@ -161,7 +161,7 @@ public static class TestHelper
         HashDetails hashDetails = new HashDetails();
 
         if (props is StringProperties stringProps)
-            genCfg = new GeneratorConfig<T>(structureType, dataType, (uint)vector.Values.Length, stringProps, StringComparison.Ordinal, hashDetails, generator.UseUTF16Encoding);
+            genCfg = new GeneratorConfig<T>(structureType, dataType, (uint)vector.Values.Length, stringProps, StringComparison.Ordinal, hashDetails, generator.Encoding);
         else if (props is ValueProperties<T> valueProps)
         {
             hashDetails.HasZeroOrNaN = valueProps.HasZeroOrNaN;

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
@@ -56,7 +57,7 @@ internal static class AnalysisTest
                 gcfg.PopulationSize = j;
 
                 sw.Restart();
-                Candidate cand = FastDataGenerator.GetBestHash(Data, props, cfg, NullLoggerFactory.Instance, true, false);
+                Candidate cand = FastDataGenerator.GetBestHash(Data, props, cfg, NullLoggerFactory.Instance, GeneratorEncoding.UTF16, false);
 
                 sw.Stop();
                 Console.WriteLine($"{i.ToString(),-10}{j.ToString(),-10}{sw.ElapsedMilliseconds,-10:N0}{cand.Collisions,-10:N0}");
@@ -69,7 +70,7 @@ internal static class AnalysisTest
         string[] data = RunFunc(Data, 5.0, PrependString).ToArray();
         Print(data, "DefaultHash");
 
-        Simulator sim = new Simulator(data.Length, true);
+        Simulator sim = new Simulator(data.Length, GeneratorEncoding.UTF16);
         PrintCandidate(sim.Run(data, DefaultStringHash.UTF16Instance));
     }
 
@@ -106,7 +107,7 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), new Simulator(data.Length, true), loggerFactory.CreateLogger<BruteForceAnalyzer>());
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.UTF16), loggerFactory.CreateLogger<BruteForceAnalyzer>());
         PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());
     }
 
@@ -116,7 +117,7 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), new Simulator(data.Length, true), loggerFactory.CreateLogger<GeneticAnalyzer>());
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.UTF16), loggerFactory.CreateLogger<GeneticAnalyzer>());
         PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());
     }
 
@@ -126,7 +127,7 @@ internal static class AnalysisTest
 
         StringProperties props = DataAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, true), loggerFactory.CreateLogger<GPerfAnalyzer>());
+        GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.UTF16), loggerFactory.CreateLogger<GPerfAnalyzer>());
         PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());
     }
 

@@ -1,3 +1,4 @@
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Newtonsoft.Json;
@@ -6,9 +7,9 @@ namespace Genbox.FastData.InternalShared;
 
 public readonly struct DummyGenerator : ICodeGenerator
 {
-    public bool UseUTF16Encoding => true;
+    public GeneratorEncoding Encoding => GeneratorEncoding.Unknown;
 
-    public string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context)
+    public string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context) where T : notnull
     {
         Combined<T> combined = new Combined<T>(data.ToArray(), context);
         return JsonConvert.SerializeObject(combined, new JsonSerializerSettings { Formatting = Formatting.Indented });

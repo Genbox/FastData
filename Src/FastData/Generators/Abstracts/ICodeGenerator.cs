@@ -1,10 +1,12 @@
+using Genbox.FastData.Enums;
+
 namespace Genbox.FastData.Generators.Abstracts;
 
 /// <summary>Defines the interface for code generators</summary>
 public interface ICodeGenerator
 {
     /// <summary>Gets a value indicating whether the generator uses UTF-16 encoding for string inputs (used in hashing).</summary>
-    bool UseUTF16Encoding { get; }
+    GeneratorEncoding Encoding { get; }
 
     /// <summary>Attempts to generate source code using the specified generator configuration and context.</summary>
     /// <typeparam name="T">The type of data being generated.</typeparam>
