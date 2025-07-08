@@ -11,10 +11,10 @@ namespace Genbox.FastData.Generator.Framework;
 
 public abstract class CodeGenerator : ICodeGenerator
 {
+    private readonly ExpressionCompiler? _compiler;
     private readonly IConstantsDef _constDef;
     private readonly IEarlyExitDef _earlyExitDef;
     private readonly IHashDef _hashDef;
-    private readonly ExpressionCompiler? _compiler;
     private readonly ILanguageDef _langDef;
     private readonly TypeHelper _typeHelper;
     private readonly TypeMap _typeMap;

@@ -1,5 +1,6 @@
 using Genbox.FastData.InternalShared.Helpers;
 using Genbox.FastData.SourceGenerator.Attributes;
+using Microsoft.CodeAnalysis;
 
 namespace Genbox.FastData.SourceGenerator.Tests;
 
@@ -124,7 +125,7 @@ public class SourceGeneratorTests
 
     private static string RunGenerator(string source)
     {
-        string output = SourceGenHelper.RunSourceGenerator<FastDataSourceGenerator>(source, false, out var compilerDiagnostics, out var codeGenDiagnostics);
+        string output = SourceGenHelper.RunSourceGenerator<FastDataSourceGenerator>(source, false, out Diagnostic[] compilerDiagnostics, out Diagnostic[] codeGenDiagnostics);
         Assert.Empty(compilerDiagnostics);
         Assert.Empty(codeGenDiagnostics);
         Assert.NotEmpty(output); //We test the source later to show diagnostics first
