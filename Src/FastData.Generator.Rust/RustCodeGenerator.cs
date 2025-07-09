@@ -12,15 +12,15 @@ public sealed class RustCodeGenerator : CodeGenerator
 {
     private readonly RustCodeGeneratorConfig _cfg;
 
-    private RustCodeGenerator(RustCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
-        : base(langDef, constDef, earlyExitDef, hashDef, null) => _cfg = cfg;
+    private RustCodeGenerator(RustCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, TypeMap map)
+        : base(langDef, constDef, earlyExitDef, hashDef, map, null) => _cfg = cfg;
 
     public static RustCodeGenerator Create(RustCodeGeneratorConfig userCfg)
     {
         RustLanguageDef langDef = new RustLanguageDef();
-        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, langDef.Encoding);
 
-        return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(helper, userCfg.GeneratorOptions), new RustHashDef());
+        return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(map, userCfg.GeneratorOptions), new RustHashDef(), map);
     }
 
     protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context)

@@ -1,7 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.Generator.Rust.Shared;
+using Genbox.FastData.Generators;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.InternalShared.TestClasses.TheoryData;
@@ -25,7 +28,7 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
               .DisableDiff();
 
         RustLanguageDef langDef = new RustLanguageDef();
-        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, spec.Flags.HasFlag(GeneratorFlags.AllAreASCII) ? GeneratorEncoding.ASCII : langDef.Encoding);
 
         string executable = context.Compiler.Compile(spec.Identifier,
             $$"""
@@ -34,7 +37,7 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
 
               fn main() {
               {{FormatList(data.Values, x => $$"""
-                                               if !{{spec.Identifier}}::contains({{helper.ToValueLabel(x)}}) {
+                                               if !{{spec.Identifier}}::contains({{map.ToValueLabel(x)}}) {
                                                    std::process::exit(0);
                                                }
                                                """, "\n")}}

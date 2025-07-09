@@ -22,15 +22,15 @@ class HashSetLinearStructure_String_3 final
         b(0, 0)
     };
 
-    static constexpr std::array<std::u32string_view, 3> items = {
-        U"item", U"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", U"a"
+    static constexpr std::array<std::string_view, 3> items = {
+        "item", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "a"
     };
 
     static constexpr std::array<uint64_t, 3> hash_codes = {
         16750939634977259983, 9198652691199425319, 18225461187723808291
     };
 
-    static constexpr uint64_t get_hash(const std::u32string_view value) noexcept
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept
     {
     uint64_t hash = 352654597;
 
@@ -42,7 +42,7 @@ class HashSetLinearStructure_String_3 final
 
 public:
     [[nodiscard]]
-    static bool contains(const std::u32string_view value) noexcept
+    static bool contains(const std::string_view value) noexcept
     {
         if (const size_t len = value.length(); len < 1u || len > 255u)
             return false;

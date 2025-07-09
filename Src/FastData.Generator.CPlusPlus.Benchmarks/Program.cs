@@ -52,13 +52,13 @@ internal static class Program
     private static string PrintQueries(ITestData data, string identifier)
     {
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
-        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, langDef.Encoding);
 
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < 25; i++)
         {
-            sb.AppendLine(CultureInfo.InvariantCulture, $"        DoNotOptimize({identifier}::contains({data.GetValueLabel(helper)}));");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"        DoNotOptimize({identifier}::contains({data.GetValueLabel(map)}));");
         }
 
         return sb.ToString();

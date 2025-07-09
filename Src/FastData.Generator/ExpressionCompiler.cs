@@ -1,9 +1,10 @@
 using System.Linq.Expressions;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.Generator;
 
-public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
+public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 {
     protected readonly FastStringBuilder Output = new FastStringBuilder();
 
@@ -24,7 +25,7 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
         }
         else if (node.Indexer != null)
         {
-            Output.Append(helper.GetTypeName(node.Indexer.DeclaringType!))
+            Output.Append(map.GetTypeName(node.Indexer.DeclaringType!))
                   .Append(".");
         }
 
@@ -68,7 +69,7 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
         if (node.Expression != null)
             Visit(node.Expression);
         else
-            Output.Append(helper.GetTypeName(node.Member.DeclaringType!));
+            Output.Append(map.GetTypeName(node.Member.DeclaringType!));
 
         Output.Append(".");
         Output.Append(node.Member.Name);
@@ -90,7 +91,7 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
             if (v.Type.IsArray)
                 t = v.Type.GetElementType()!;
 
-            Output.AppendLine($"{helper.GetTypeName(t)}{(v.Type.IsArray ? "[]" : "")} {v.Name};");
+            Output.AppendLine($"{map.GetTypeName(t)}{(v.Type.IsArray ? "[]" : "")} {v.Name};");
         }
 
         foreach (Expression expr in node.Expressions)
@@ -134,19 +135,19 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
     {
         string str = node.Value switch
         {
-            char x => helper.ToValueLabel(x),
-            sbyte x => helper.ToValueLabel(x),
-            byte x => helper.ToValueLabel(x),
-            short x => helper.ToValueLabel(x),
-            ushort x => helper.ToValueLabel(x),
-            int x => helper.ToValueLabel(x),
-            uint x => helper.ToValueLabel(x),
-            long x => helper.ToValueLabel(x),
-            ulong x => helper.ToValueLabel(x),
-            float x => helper.ToValueLabel(x),
-            double x => helper.ToValueLabel(x),
-            string x => helper.ToValueLabel(x),
-            bool x => helper.ToValueLabel(x),
+            char x => map.ToValueLabel(x),
+            sbyte x => map.ToValueLabel(x),
+            byte x => map.ToValueLabel(x),
+            short x => map.ToValueLabel(x),
+            ushort x => map.ToValueLabel(x),
+            int x => map.ToValueLabel(x),
+            uint x => map.ToValueLabel(x),
+            long x => map.ToValueLabel(x),
+            ulong x => map.ToValueLabel(x),
+            float x => map.ToValueLabel(x),
+            double x => map.ToValueLabel(x),
+            string x => map.ToValueLabel(x),
+            bool x => map.ToValueLabel(x),
             _ => "unknown"
         };
 
@@ -164,7 +165,7 @@ public abstract class ExpressionCompiler(TypeHelper helper) : ExpressionVisitor
     {
         if (node.NodeType == ExpressionType.Convert)
         {
-            Output.Append("(").Append(helper.GetTypeName(node.Type)).Append(")");
+            Output.Append("(").Append(map.GetTypeName(node.Type)).Append(")");
             Visit(node.Operand);
             return node;
         }

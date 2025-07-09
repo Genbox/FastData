@@ -1,6 +1,7 @@
 using System.Collections;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Abstracts;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework.Interfaces;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.StringHash.Framework;
@@ -11,24 +12,24 @@ public abstract class OutputWriter<T> : IOutputWriter<T> where T : notnull
 {
     private IEarlyExitDef _earlyExitDef = null!;
     private ILanguageDef _langDef = null!;
-    private TypeHelper _typeHelper = null!;
+    private TypeMap _map = null!;
 
     protected string TypeName { get; private set; } = null!;
     protected GeneratorConfig<T> GeneratorConfig { get; private set; } = null!;
     protected string HashSource { get; private set; } = null!;
 
     protected string EarlyExits => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
-    protected string HashSizeType => _typeHelper.GetTypeName(typeof(ulong));
+    protected string HashSizeType => _map.GetTypeName(typeof(ulong));
     protected static DataType HashSizeDataType => DataType.UInt64;
     protected string ArraySizeType => _langDef.ArraySizeType;
 
     public abstract string Generate(ReadOnlySpan<T> data);
 
-    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeHelper typeHelper, IHashDef hashDef, GeneratorConfig<T> genCfg, string typeName, ExpressionCompiler? compiler)
+    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<T> genCfg, string typeName, ExpressionCompiler? compiler)
     {
         _langDef = langDef;
         _earlyExitDef = earlyExitDef;
-        _typeHelper = typeHelper;
+        _map = map;
         GeneratorConfig = genCfg;
         TypeName = typeName;
 
@@ -49,7 +50,7 @@ public abstract class OutputWriter<T> : IOutputWriter<T> where T : notnull
                 for (int i = 0; i < fdState.Length; i++)
                 {
                     State state = fdState[i];
-                    genState[i] = new StateInfo(state.Name, _typeHelper.GetTypeName(state.Type), GetValues(state.Values, _typeHelper, state.Type).ToArray());
+                    genState[i] = new StateInfo(state.Name, _map.GetTypeName(state.Type), GetValues(state.Values, _map, state.Type).ToArray());
                 }
             }
 
@@ -60,18 +61,18 @@ public abstract class OutputWriter<T> : IOutputWriter<T> where T : notnull
         HashSource = hashDef.GetHashSource(GeneratorConfig.DataType, TypeName, hashInfo);
     }
 
-    private static IEnumerable<string> GetValues(Array array, TypeHelper typeHelper, Type type)
+    private static IEnumerable<string> GetValues(Array array, TypeMap map, Type type)
     {
         IEnumerator enumerator = array.GetEnumerator();
 
         while (enumerator.MoveNext())
-            yield return typeHelper.ToValueLabel(enumerator.Current, type);
+            yield return map.ToValueLabel(enumerator.Current, type);
     }
 
     protected virtual string GetEqualFunction(string value1, string value2, DataType dataType = DataType.Null) => $"{value1} == {value2}";
     protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";
 
-    protected string ToValueLabel<T2>(T2 value) => _typeHelper.ToValueLabel(value);
-    protected string GetSmallestSignedType(long value) => _typeHelper.GetSmallestIntType(value);
-    protected string GetSmallestUnsignedType(long value) => _typeHelper.GetSmallestUIntType((ulong)value);
+    protected string ToValueLabel<T2>(T2 value) => _map.ToValueLabel(value);
+    protected string GetSmallestSignedType(long value) => _map.GetSmallestIntType(value);
+    protected string GetSmallestUnsignedType(long value) => _map.GetSmallestUIntType((ulong)value);
 }

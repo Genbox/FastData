@@ -222,6 +222,7 @@ There are many benefits gained from generating data structures at compile time:
 * No virtual dispatching (virtual method calls & inheritance) and no unnecessary branching
 * Modulo operations are known constants and compilers optimize it to bitwise operations
 * Data can be stored in smaller data types (e.g. `byte` instead of `int`) in values permit it
+* Data can be encoding reduced. That is, if all characters are ASCII, they can be stored as single bytes, which saves memory and improves performance.
 
 ### Data analysis
 

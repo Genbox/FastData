@@ -10,21 +10,22 @@ namespace Genbox.FastData.Generators;
 /// <typeparam name="T">The type of data being generated.</typeparam>
 public sealed class GeneratorConfig<T> where T : notnull
 {
-    private GeneratorConfig(StructureType structureType, DataType dataType, HashDetails hashDetails)
+    private GeneratorConfig(StructureType structureType, DataType dataType, HashDetails hashDetails, GeneratorFlags flags)
     {
         StructureType = structureType;
         DataType = dataType;
         Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.Now);
         HashDetails = hashDetails;
+        Flags = flags;
     }
 
-    internal GeneratorConfig(StructureType structureType, DataType dataType, uint itemCount, ValueProperties<T> props, HashDetails hashDetails) : this(structureType, dataType, hashDetails)
+    internal GeneratorConfig(StructureType structureType, DataType dataType, uint itemCount, ValueProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, dataType, hashDetails, flags)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType).ToArray();
         Constants = CreateConstants(props, itemCount);
     }
 
-    internal GeneratorConfig(StructureType structureType, DataType dataType, uint itemCount, StringProperties props, StringComparison stringComparison, HashDetails hashDetails, GeneratorEncoding encoding) : this(structureType, dataType, hashDetails)
+    internal GeneratorConfig(StructureType structureType, DataType dataType, uint itemCount, StringProperties props, StringComparison stringComparison, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags) : this(structureType, dataType, hashDetails, flags)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType, encoding).ToArray();
         Constants = CreateConstants(props, itemCount);
@@ -51,6 +52,7 @@ public sealed class GeneratorConfig<T> where T : notnull
 
     /// <summary>Contains information about the hash function to use.</summary>
     public HashDetails HashDetails { get; }
+    public GeneratorFlags Flags { get; }
 
     private static Constants<T> CreateConstants(ValueProperties<T> props, uint itemCount)
     {

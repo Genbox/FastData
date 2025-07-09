@@ -12,15 +12,15 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 {
     private readonly CPlusPlusCodeGeneratorConfig _cfg;
 
-    private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef)
-        : base(langDef, constDef, earlyExitDef, hashDef, null) => _cfg = cfg;
+    private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, TypeMap helper)
+        : base(langDef, constDef, earlyExitDef, hashDef, helper, null) => _cfg = cfg;
 
     public static CPlusPlusCodeGenerator Create(CPlusPlusCodeGeneratorConfig userCfg)
     {
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
-        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, langDef.Encoding);
 
-        return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(helper, userCfg.GeneratorOptions), new CPlusPlusHashDef());
+        return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(map, userCfg.GeneratorOptions), new CPlusPlusHashDef(), map);
     }
 
     public override string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context)

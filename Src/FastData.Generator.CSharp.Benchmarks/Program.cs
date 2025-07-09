@@ -74,13 +74,13 @@ internal static class Program
     private static string PrintQueries(ITestData data, string identifier)
     {
         CSharpLanguageDef langDef = new CSharpLanguageDef();
-        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, langDef.Encoding);
 
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < 25; i++)
         {
-            sb.AppendLine(CultureInfo.InvariantCulture, $"        {identifier}.Contains({data.GetValueLabel(helper)});");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"        {identifier}.Contains({data.GetValueLabel(map)});");
         }
 
         return sb.ToString();

@@ -6,5 +6,5 @@ namespace Genbox.FastData.InternalShared.TestClasses;
 public interface ITestData
 {
     void Generate(Func<string, ICodeGenerator> factory, out GeneratorSpec spec);
-    string GetValueLabel(TypeHelper helper);
+    string GetValueLabel(TypeMap map);
 }

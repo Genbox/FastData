@@ -81,7 +81,7 @@ internal static class DataAnalyzer
                 left[i] += flag ? c : -c;
                 right[i] += flag ? rc : -rc;
 
-                if (c > 255)
+                if (c > 127)
                     allAscii = false;
             }
 

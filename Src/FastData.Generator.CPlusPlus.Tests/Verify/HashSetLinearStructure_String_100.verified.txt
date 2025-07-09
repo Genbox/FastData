@@ -50,17 +50,17 @@ class HashSetLinearStructure_String_100 final
         b(0, 0), b(0, 0), b(0, 0)
     };
 
-    static constexpr std::array<std::u32string_view, 100> items = {
-        U"86", U"41", U"6", U"38", U"9", U"35", U"13", U"75", U"29", U"24", 
-        U"64", U"30", U"16", U"92", U"53", U"21", U"83", U"42", U"3", U"19", 
-        U"95", U"70", U"84", U"61", U"37", U"11", U"77", U"59", U"78", U"56", 
-        U"26", U"66", U"48", U"69", U"47", U"0", U"32", U"14", U"90", U"51", 
-        U"23", U"81", U"40", U"5", U"39", U"8", U"72", U"28", U"98", U"63", 
-        U"89", U"31", U"17", U"93", U"54", U"20", U"82", U"45", U"2", U"96", 
-        U"71", U"87", U"60", U"7", U"34", U"12", U"74", U"79", U"57", U"25", 
-        U"65", U"68", U"46", U"33", U"15", U"91", U"52", U"22", U"80", U"43", 
-        U"4", U"18", U"94", U"73", U"99", U"85", U"62", U"88", U"36", U"10", 
-        U"76", U"58", U"55", U"27", U"67", U"49", U"44", U"1", U"97", U"50"
+    static constexpr std::array<std::string_view, 100> items = {
+        "86", "41", "6", "38", "9", "35", "13", "75", "29", "24", 
+        "64", "30", "16", "92", "53", "21", "83", "42", "3", "19", 
+        "95", "70", "84", "61", "37", "11", "77", "59", "78", "56", 
+        "26", "66", "48", "69", "47", "0", "32", "14", "90", "51", 
+        "23", "81", "40", "5", "39", "8", "72", "28", "98", "63", 
+        "89", "31", "17", "93", "54", "20", "82", "45", "2", "96", 
+        "71", "87", "60", "7", "34", "12", "74", "79", "57", "25", 
+        "65", "68", "46", "33", "15", "91", "52", "22", "80", "43", 
+        "4", "18", "94", "73", "99", "85", "62", "88", "36", "10", 
+        "76", "58", "55", "27", "67", "49", "44", "1", "97", "50"
     };
 
     static constexpr std::array<uint64_t, 100> hash_codes = {
@@ -76,7 +76,7 @@ class HashSetLinearStructure_String_100 final
         11144406134362864149, 11144406134362864149, 11144406154721955382, 11144406503958674225, 11144406284706922485, 11144406284706922485, 11144406305066013718, 18225461112551779123, 11144406715380006260, 11144406146891535677
     };
 
-    static constexpr uint64_t get_hash(const std::u32string_view value) noexcept
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept
     {
     uint64_t hash = 352654597;
 
@@ -88,7 +88,7 @@ class HashSetLinearStructure_String_100 final
 
 public:
     [[nodiscard]]
-    static bool contains(const std::u32string_view value) noexcept
+    static bool contains(const std::string_view value) noexcept
     {
         if (const size_t len = value.length(); len < 1u || len > 2u)
             return false;

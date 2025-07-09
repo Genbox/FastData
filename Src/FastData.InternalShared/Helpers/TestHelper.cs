@@ -160,17 +160,24 @@ public static class TestHelper
         GeneratorConfig<T> genCfg;
         HashDetails hashDetails = new HashDetails();
 
+        GeneratorFlags flags = GeneratorFlags.None;
+
         if (props is StringProperties stringProps)
-            genCfg = new GeneratorConfig<T>(structureType, dataType, (uint)vector.Values.Length, stringProps, StringComparison.Ordinal, hashDetails, generator.Encoding);
+        {
+            if (stringProps.CharacterData.AllAscii)
+                flags = GeneratorFlags.AllAreASCII;
+
+            genCfg = new GeneratorConfig<T>(structureType, dataType, (uint)vector.Values.Length, stringProps, StringComparison.Ordinal, hashDetails, generator.Encoding, flags);
+        }
         else if (props is ValueProperties<T> valueProps)
         {
             hashDetails.HasZeroOrNaN = valueProps.HasZeroOrNaN;
-            genCfg = new GeneratorConfig<T>(structureType, dataType, (uint)vector.Values.Length, valueProps, hashDetails);
+            genCfg = new GeneratorConfig<T>(structureType, dataType, (uint)vector.Values.Length, valueProps, hashDetails, flags);
         }
         else
             throw new InvalidOperationException("Bug");
 
         string source = generator.Generate(values, genCfg, context);
-        return new GeneratorSpec(vector.Identifier, source);
+        return new GeneratorSpec(vector.Identifier, source, flags);
     }
 }

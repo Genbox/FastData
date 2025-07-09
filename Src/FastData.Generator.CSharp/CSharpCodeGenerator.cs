@@ -14,16 +14,15 @@ public sealed class CSharpCodeGenerator : CodeGenerator
 {
     private readonly CSharpCodeGeneratorConfig _cfg;
 
-    private CSharpCodeGenerator(CSharpCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, ExpressionCompiler compiler)
-        : base(langDef, constDef, earlyExitDef, hashDef, compiler) => _cfg = cfg;
+    private CSharpCodeGenerator(CSharpCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, TypeMap map, ExpressionCompiler compiler)
+        : base(langDef, constDef, earlyExitDef, hashDef, map, compiler) => _cfg = cfg;
 
     public static CSharpCodeGenerator Create(CSharpCodeGeneratorConfig userCfg)
     {
         CSharpLanguageDef langDef = new CSharpLanguageDef();
-        TypeMap typeMap = new TypeMap(langDef.TypeDefinitions);
-        TypeHelper helper = new TypeHelper(typeMap);
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, langDef.Encoding);
 
-        return new CSharpCodeGenerator(userCfg, langDef, new CSharpConstantsDef(), new CSharpEarlyExitDef(helper, userCfg.GeneratorOptions), new CSharpHashDef(), new CSharpExpressionCompiler(helper));
+        return new CSharpCodeGenerator(userCfg, langDef, new CSharpConstantsDef(), new CSharpEarlyExitDef(map, userCfg.GeneratorOptions), new CSharpHashDef(), map, new CSharpExpressionCompiler(map));
     }
 
     protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context)

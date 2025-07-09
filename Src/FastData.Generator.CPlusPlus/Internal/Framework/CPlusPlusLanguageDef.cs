@@ -21,6 +21,10 @@ internal class CPlusPlusLanguageDef : ILanguageDef
         new IntegerTypeDef<ulong>("uint64_t", ulong.MinValue, ulong.MaxValue, "0", "std::numeric_limits<uint64_t>::max()", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "ull"),
         new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "std::numeric_limits<float>::lowest()", "std::numeric_limits<float>::max()", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo) + "f"),
         new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "std::numeric_limits<double>::lowest()", "std::numeric_limits<double>::max()", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
-        new StringTypeDef("std::u32string_view", static x => $"U\"{x}\"")
+
+        //Support reduction from UTF16 to ASCII
+        new DynamicStringTypeDef(
+            new StringType(GeneratorEncoding.UTF16, "std::u32string_view", static x => $"U\"{x}\""),
+            new StringType(GeneratorEncoding.ASCII, "std::string_view", static x => $"\"{x}\""))
     };
 }

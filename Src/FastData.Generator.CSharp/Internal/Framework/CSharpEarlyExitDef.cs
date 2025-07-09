@@ -1,10 +1,11 @@
 using Genbox.FastData.Generator.CSharp.Enums;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Definitions;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
-internal class CSharpEarlyExitDef(TypeHelper helper, CSharpOptions options) : EarlyExitDef
+internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExitDef
 {
     protected override bool IsEnabled => !options.HasFlag(CSharpOptions.DisableEarlyExits);
 
@@ -16,13 +17,13 @@ internal class CSharpEarlyExitDef(TypeHelper helper, CSharpOptions options) : Ea
 
     protected override string GetValueEarlyExits<T>(T min, T max) =>
         $"""
-                 if ({(min.Equals(max) ? $"value != {helper.ToValueLabel(max)}" : $"value < {helper.ToValueLabel(min)} || value > {helper.ToValueLabel(max)}")})
+                 if ({(min.Equals(max) ? $"value != {map.ToValueLabel(max)}" : $"value < {map.ToValueLabel(min)} || value > {map.ToValueLabel(max)}")})
                      return false;
          """;
 
     protected override string GetLengthEarlyExits(uint min, uint max, uint minByte, uint maxByte) =>
         $"""
-                 if ({(min.Equals(max) ? $"value.Length != {helper.ToValueLabel(max)}" : $"value.Length < {helper.ToValueLabel(min)} || value.Length > {helper.ToValueLabel(max)}")})
+                 if ({(min.Equals(max) ? $"value.Length != {map.ToValueLabel(max)}" : $"value.Length < {map.ToValueLabel(min)} || value.Length > {map.ToValueLabel(max)}")})
                      return false;
          """;
 }

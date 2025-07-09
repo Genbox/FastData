@@ -113,7 +113,7 @@ public static partial class FastDataGenerator
 
         ValueProperties<T> valProps = DataAnalyzer.GetValueProperties(data, dataType);
         LogMinMaxValues(logger, valProps.MinValue, valProps.MaxValue);
-        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, dataType, (uint)data.Length, valProps, hashDetails);
+        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, dataType, (uint)data.Length, valProps, hashDetails, GeneratorFlags.None);
 
         switch (fdCfg.StructureType)
         {
@@ -175,11 +175,11 @@ public static partial class FastDataGenerator
         const DataType dataType = DataType.String;
         LogDataType(logger, dataType);
 
-        HashDetails hashDetails = new HashDetails();
-
         StringProperties strProps = DataAnalyzer.GetStringProperties(data);
         LogMinMaxLength(logger, strProps.LengthData.Min, strProps.LengthData.Max);
-        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, dataType, (uint)data.Length, strProps, DefaultStringComparison, hashDetails, generator.Encoding);
+
+        HashDetails hashDetails = new HashDetails();
+        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, dataType, (uint)data.Length, strProps, DefaultStringComparison, hashDetails, generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None);
 
         switch (fdCfg.StructureType)
         {

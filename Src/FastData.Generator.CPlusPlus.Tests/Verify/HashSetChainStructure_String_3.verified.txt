@@ -12,9 +12,9 @@ class HashSetChainStructure_String_3 final
     {
         uint64_t hash_code;
         int8_t next;
-        std::u32string_view value;
+        std::string_view value;
 
-        e(const uint64_t hash_code, const int8_t next, const std::u32string_view value)
+        e(const uint64_t hash_code, const int8_t next, const std::string_view value)
            : hash_code(hash_code), next(next), value(value) {}
     };
 
@@ -23,10 +23,10 @@ class HashSetChainStructure_String_3 final
      };
 
     inline static const std::array<e, 3> entries = {
-        e(18225461187723808291, -1, U"a"), e(16750939634977259983, 0, U"item"), e(9198652691199425319, -1, U"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        e(18225461187723808291, -1, "a"), e(16750939634977259983, 0, "item"), e(9198652691199425319, -1, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     };
 
-    static constexpr uint64_t get_hash(const std::u32string_view value) noexcept
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept
     {
     uint64_t hash = 352654597;
 
@@ -38,7 +38,7 @@ class HashSetChainStructure_String_3 final
 
 public:
     [[nodiscard]]
-    static bool contains(const std::u32string_view value) noexcept
+    static bool contains(const std::string_view value) noexcept
     {
         if (const size_t len = value.length(); len < 1u || len > 255u)
             return false;

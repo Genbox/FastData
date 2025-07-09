@@ -1,7 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.CPlusPlus.Shared;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generators;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.InternalShared.TestClasses.TheoryData;
@@ -25,7 +28,7 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
               .DisableDiff();
 
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
-        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, spec.Flags.HasFlag(GeneratorFlags.AllAreASCII) ? GeneratorEncoding.ASCII : langDef.Encoding);
 
         string source = $$"""
                           #include <string>
@@ -36,7 +39,7 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
                           int main(int argc, char* argv[])
                           {
                           {{FormatList(data.Values, x => $"""
-                                                          if (!{spec.Identifier}::contains({helper.ToValueLabel(x)}))
+                                                          if (!{spec.Identifier}::contains({map.ToValueLabel(x)}))
                                                               return false;
                                                           """, "\n")}}
 

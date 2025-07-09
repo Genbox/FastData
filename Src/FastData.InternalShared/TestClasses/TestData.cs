@@ -1,5 +1,7 @@
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Xunit.Abstractions;
 
@@ -18,10 +20,10 @@ public class TestData<T>(StructureType structureType, T[] values) : ITestData, I
     public void Generate(Func<string, ICodeGenerator> factory, out GeneratorSpec spec)
     {
         string source = FastDataGenerator.Generate(Values, new FastDataConfig(StructureType) { StringAnalyzerConfig = null }, factory(Identifier));
-        spec = new GeneratorSpec(Identifier, source);
+        spec = new GeneratorSpec(Identifier, source, GeneratorFlags.None);
     }
 
-    public string GetValueLabel(TypeHelper helper) => helper.ToValueLabel(Values[_rng.Next(0, Values.Length)]);
+    public string GetValueLabel(TypeMap map) => map.ToValueLabel(Values[_rng.Next(0, Values.Length)]);
 
     public void Serialize(IXunitSerializationInfo info)
     {

@@ -1,5 +1,8 @@
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generators;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Helpers;
 using Genbox.FastData.InternalShared.TestClasses;
@@ -24,7 +27,7 @@ public class VectorTests
               .DisableDiff();
 
         CSharpLanguageDef langDef = new CSharpLanguageDef();
-        TypeHelper helper = new TypeHelper(new TypeMap(langDef.TypeDefinitions));
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, spec.Flags.HasFlag(GeneratorFlags.AllAreASCII) ? GeneratorEncoding.ASCII : langDef.Encoding);
 
         string wrapper = $$"""
                            {{spec.Source}}
@@ -34,7 +37,7 @@ public class VectorTests
                                public static bool Contains()
                                {
                            {{FormatList(data.Values, x => $"""
-                                                           if (!{spec.Identifier}.Contains({helper.ToValueLabel(x)}))
+                                                           if (!{spec.Identifier}.Contains({map.ToValueLabel(x)}))
                                                                return false;
                                                            """, "\n")}};
 
