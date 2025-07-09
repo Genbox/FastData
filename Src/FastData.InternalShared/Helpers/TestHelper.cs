@@ -10,6 +10,7 @@ using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.TestClasses;
@@ -99,12 +100,11 @@ public static class TestHelper
         DataType dataType = Enum.Parse<DataType>(typeof(T).Name);
 
         IProperties props;
-        ReadOnlySpan<T> span = vector.Values.AsReadOnlySpan();
 
-        if (typeof(T) == typeof(string))
-            props = DataAnalyzer.GetStringProperties(span);
+        if (vector.Values is string[] arr)
+            props = DataAnalyzer.GetStringProperties(new ReadOnlySpan<string>(arr));
         else
-            props = DataAnalyzer.GetValueProperties(span, dataType);
+            props = DataAnalyzer.GetValueProperties(new ReadOnlySpan<T>(vector.Values), dataType);
 
         ICodeGenerator generator = func(vector.Identifier);
         GeneratorEncoding encoding = generator.Encoding;
