@@ -6,7 +6,7 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
-    public override string Generate(ReadOnlySpan<T> data) => ctx.StoreHashCode
+    public override string Generate() => ctx.StoreHashCode
         ? $$"""
             struct e
             {

@@ -7,11 +7,11 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class EytzingerSearchStructure<T>(DataType dataType, StringComparison comparison) : IStructure<T, EytzingerSearchContext<T>>
 {
-    public EytzingerSearchContext<T> Create(ref ReadOnlySpan<T> data)
+    public EytzingerSearchContext<T> Create(T[] data)
     {
         //We make a copy to avoid altering the original data
         T[] copy = new T[data.Length];
-        data.CopyTo(copy);
+        data.CopyTo(copy, 0);
 
         if (dataType == DataType.String)
             Array.Sort(copy, StringHelper.GetStringComparer(comparison));
@@ -22,8 +22,7 @@ internal sealed class EytzingerSearchStructure<T>(DataType dataType, StringCompa
         int index = 0;
         EytzingerOrder(ref index, copy, output);
 
-        data = output;
-        return new EytzingerSearchContext<T>();
+        return new EytzingerSearchContext<T>(output);
     }
 
     private static void EytzingerOrder(ref int arrIdx, T[] data, T[] output, int eytIdx = 0)

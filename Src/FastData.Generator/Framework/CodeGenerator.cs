@@ -15,7 +15,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 
     public GeneratorEncoding Encoding => langDef.Encoding;
 
-    public virtual string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context)
+    public virtual string Generate<T>(GeneratorConfig<T> genCfg, IContext<T> context)
     {
         Shared.Clear();
 
@@ -26,7 +26,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 
         StringBuilder sb = new StringBuilder();
         AppendHeader(sb, genCfg, context);
-        AppendBody(sb, genCfg, typeName, context, data);
+        AppendBody(sb, genCfg, typeName, context);
         AppendFooter(sb, genCfg, typeName);
 
         foreach (string classCode in Shared.GetType(CodeType.Class))
@@ -53,7 +53,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 #endif
     }
 
-    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext<T> context, ReadOnlySpan<T> data)
+    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext<T> context)
     {
         OutputWriter<T>? writer = GetOutputWriter(genCfg, context);
 
@@ -61,7 +61,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
             throw new NotSupportedException("The context type is not supported: " + context.GetType().Name);
 
         writer.Initialize(langDef, earlyExitDef, map, hashDef, genCfg, typeName, compiler);
-        sb.AppendLine(writer.Generate(data));
+        sb.AppendLine(writer.Generate());
     }
 
     protected virtual void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)

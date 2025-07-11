@@ -23,13 +23,13 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(map, userCfg.GeneratorOptions), new CPlusPlusHashDef(), map);
     }
 
-    public override string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context)
+    public override string Generate<T>(GeneratorConfig<T> genCfg, IContext<T> context)
     {
         //C++ generator does not support chars outside ASCII
         if (genCfg.DataType == DataType.Char && (char)(object)genCfg.Constants.MaxValue > 127)
             throw new InvalidOperationException("C++ generator does not support chars outside ASCII. Please use a different data type or reduce the max value to 127 or lower.");
 
-        return base.Generate(data, genCfg, context);
+        return base.Generate(genCfg, context);
     }
 
     protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context)

@@ -5,10 +5,10 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    public override string Generate(ReadOnlySpan<T> data) =>
+    public override string Generate() =>
         $$"""
               {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
-          {{FormatColumns(data, ToValueLabel)}}
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
               {{MethodAttribute}}

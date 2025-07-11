@@ -6,10 +6,10 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    public override string Generate(ReadOnlySpan<T> data) =>
+    public override string Generate() =>
         $$"""
               {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
-          {{FormatColumns(data, ToValueLabel)}}
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
               {{MethodAttribute}}
@@ -18,7 +18,7 @@ internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx, CSharpCode
           {{EarlyExits}}
 
                   int lo = 0;
-                  int hi = {{(data.Length - 1).ToStringInvariant()}};
+                  int hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
                   while (lo <= hi)
                   {
                       int i = lo + ((hi - lo) >> 1);

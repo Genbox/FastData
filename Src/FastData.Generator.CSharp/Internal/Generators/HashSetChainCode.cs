@@ -6,7 +6,7 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    public override string Generate(ReadOnlySpan<T> data) =>
+    public override string Generate() =>
         $$"""
               {{FieldModifier}}{{GetSmallestSignedType(ctx.Buckets.Length)}}[] _buckets = new {{GetSmallestSignedType(ctx.Buckets.Length)}}[] {
           {{FormatColumns(ctx.Buckets, static x => x.ToStringInvariant())}}

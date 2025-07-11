@@ -6,7 +6,7 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class HashSetPerfectCode<T>(HashSetPerfectContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    public override string Generate(ReadOnlySpan<T> data) => ctx.StoreHashCode
+    public override string Generate() => ctx.StoreHashCode
         ? $$"""
                 {{FieldModifier}}E[] _entries = {
             {{FormatColumns(ctx.Data, x => $"new E({ToValueLabel(x.Key)}, {x.Value.ToStringInvariant()})")}}

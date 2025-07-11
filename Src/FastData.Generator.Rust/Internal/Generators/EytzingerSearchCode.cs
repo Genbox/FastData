@@ -5,10 +5,10 @@ namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
 internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx) : RustOutputWriter<T>
 {
-    public override string Generate(ReadOnlySpan<T> data) =>
+    public override string Generate() =>
         $$"""
-              {{FieldModifier}}const ENTRIES: [{{TypeName}}; {{data.Length}}] = [
-          {{FormatColumns(data, ToValueLabel)}}
+              {{FieldModifier}}const ENTRIES: [{{TypeName}}; {{ctx.Data.Length}}] = [
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               ];
 
               {{MethodAttribute}}

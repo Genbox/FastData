@@ -5,7 +5,7 @@ namespace Genbox.FastData.Internal.Misc;
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
 internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUnique, bool HashCodesPerfect)
 {
-    internal static HashData Create<T>(ReadOnlySpan<T> data, int capacityFactor, HashFunc<T> func)
+    internal static HashData Create<T>(T[] data, int capacityFactor, HashFunc<T> func)
     {
         ulong size = (ulong)(data.Length * capacityFactor);
 

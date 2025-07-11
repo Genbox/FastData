@@ -7,17 +7,16 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class BinarySearchStructure<T>(DataType dataType, StringComparison comparison) : IStructure<T, BinarySearchContext<T>>
 {
-    public BinarySearchContext<T> Create(ref ReadOnlySpan<T> data)
+    public BinarySearchContext<T> Create(T[] data)
     {
         T[] copy = new T[data.Length];
-        data.CopyTo(copy);
+        data.CopyTo(copy, 0);
 
         if (dataType == DataType.String)
             Array.Sort(copy, StringHelper.GetStringComparer(comparison));
         else
             Array.Sort(copy);
 
-        data = copy;
-        return new BinarySearchContext<T>();
+        return new BinarySearchContext<T>(copy);
     }
 }

@@ -6,10 +6,10 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    public override string Generate(ReadOnlySpan<T> data) => cfg.ConditionalBranchType switch
+    public override string Generate() => cfg.ConditionalBranchType switch
     {
-        BranchType.If => GenerateIf(data),
-        BranchType.Switch => GenerateSwitch(data),
+        BranchType.If => GenerateIf(ctx.Data),
+        BranchType.Switch => GenerateSwitch(ctx.Data),
         _ => throw new InvalidOperationException("Invalid branch type: " + cfg.ConditionalBranchType)
     };
 

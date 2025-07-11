@@ -5,7 +5,7 @@ namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
 internal sealed class SingleValueCode<T>(SingleValueContext<T> ctx) : RustOutputWriter<T>
 {
-    public override string Generate(ReadOnlySpan<T> data) =>
+    public override string Generate() =>
         $$"""
               {{MethodAttribute}}
               {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {

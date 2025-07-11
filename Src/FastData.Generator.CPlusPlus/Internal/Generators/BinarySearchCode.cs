@@ -6,10 +6,10 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
-    public override string Generate(ReadOnlySpan<T> data) =>
+    public override string Generate() =>
         $$"""
-              {{FieldModifier}}std::array<{{TypeName}}, {{data.Length.ToStringInvariant()}}> entries = {
-          {{FormatColumns(data, ToValueLabel)}}
+              {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
           public:
@@ -19,7 +19,7 @@ internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : CPlusPlu
           {{EarlyExits}}
 
                   {{ArraySizeType}} lo = 0;
-                  {{ArraySizeType}} hi = {{(data.Length - 1).ToStringInvariant()}};
+                  {{ArraySizeType}} hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
                   while (lo <= hi)
                   {
                       const size_t mid = lo + ((hi - lo) >> 1);

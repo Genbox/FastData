@@ -5,7 +5,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class SingleValueStructure<T> : IStructure<T, SingleValueContext<T>>
 {
-    public SingleValueContext<T> Create(ref ReadOnlySpan<T> data)
+    public SingleValueContext<T> Create(T[] data)
     {
         if (data.Length != 1)
             throw new InvalidOperationException("SingleValueStructure can only be created from a span with exactly one element.");

@@ -7,7 +7,7 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    public override string Generate(ReadOnlySpan<T> data)
+    public override string Generate()
     {
         if (ctx.LengthsAreUniq)
         {

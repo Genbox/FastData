@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Generator.Abstracts;
 
-public interface IOutputWriter<T>
+public interface IOutputWriter
 {
-    public string Generate(ReadOnlySpan<T> data);
+    public string Generate();
 }

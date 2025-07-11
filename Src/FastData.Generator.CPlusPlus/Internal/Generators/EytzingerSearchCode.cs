@@ -6,10 +6,10 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
-    public override string Generate(ReadOnlySpan<T> data) =>
+    public override string Generate() =>
         $$"""
-              {{FieldModifier}}std::array<{{TypeName}}, {{data.Length.ToStringInvariant()}}> entries = {
-          {{FormatColumns(data, ToValueLabel)}}
+              {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
+          {{FormatColumns(ctx.Data, ToValueLabel)}}
               };
 
           public:

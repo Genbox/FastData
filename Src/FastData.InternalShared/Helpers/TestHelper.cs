@@ -102,9 +102,9 @@ public static class TestHelper
         IProperties props;
 
         if (vector.Values is string[] arr)
-            props = DataAnalyzer.GetStringProperties(new ReadOnlySpan<string>(arr));
+            props = DataAnalyzer.GetStringProperties(arr);
         else
-            props = DataAnalyzer.GetValueProperties(new ReadOnlySpan<T>(vector.Values), dataType);
+            props = DataAnalyzer.GetValueProperties(vector.Values);
 
         ICodeGenerator generator = func(vector.Identifier);
         GeneratorEncoding encoding = generator.Encoding;
@@ -140,22 +140,21 @@ public static class TestHelper
             Encoding encoding = genEnc == GeneratorEncoding.UTF8 ? Encoding.UTF8 : Encoding.Unicode;
             StringHashFunc func = DefaultStringHash.GetInstance(genEnc).GetExpression().Compile();
 
-            hashData = HashData.Create<T>(vector.Values.AsSpan(), 1, obj =>
+            hashData = HashData.Create(vector.Values, 1, obj =>
             {
                 byte[] data = encoding.GetBytes((string)(object)obj);
                 return func(data, data.Length);
             });
         }
         else
-            hashData = HashData.Create(vector.Values.AsSpan(), 1, PrimitiveHash.GetHash<T>(dataType, false));
+            hashData = HashData.Create(vector.Values, 1, PrimitiveHash.GetHash<T>(dataType, false));
 
         return hashData;
     }
 
     private static GeneratorSpec Generate<T, TContext>(ICodeGenerator generator, TestVector<T> vector, IProperties props, DataType dataType, StructureType structureType, IStructure<T, TContext> structure) where TContext : IContext<T>
     {
-        ReadOnlySpan<T> values = vector.Values.AsReadOnlySpan();
-        TContext context = structure.Create(ref values);
+        TContext context = structure.Create(vector.Values);
 
         GeneratorConfig<T> genCfg;
         HashDetails hashDetails = new HashDetails();
@@ -177,7 +176,7 @@ public static class TestHelper
         else
             throw new InvalidOperationException("Bug");
 
-        string source = generator.Generate(values, genCfg, context);
+        string source = generator.Generate(genCfg, context);
         return new GeneratorSpec(vector.Identifier, source, flags);
     }
 }

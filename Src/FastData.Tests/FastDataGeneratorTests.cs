@@ -19,17 +19,17 @@ public class FastDataGeneratorTests
         Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate([DateTime.Now, DateTime.UtcNow], new FastDataConfig(StructureType.Array), new DummyGenerator()));
     }
 
-    [Fact]
-    public async Task Generate_SpanSupport()
-    {
-        ReadOnlySpan<int> span = [1, 2, 3, 4, 5];
-        string source = FastDataGenerator.Generate(span, new FastDataConfig(StructureType.Array), new DummyGenerator());
-
-        await Verify(source)
-              .UseFileName("SupportSpan")
-              .UseDirectory("Features")
-              .DisableDiff();
-    }
+    // [Fact]
+    // public async Task Generate_SpanSupport()
+    // {
+    //     ReadOnlySpan<int> span = [1, 2, 3, 4, 5];
+    //     string source = FastDataGenerator.Generate(span, new FastDataConfig(StructureType.Array), new DummyGenerator());
+    //
+    //     await Verify(source)
+    //           .UseFileName("SupportSpan")
+    //           .UseDirectory("Features")
+    //           .DisableDiff();
+    // }
 
     [Theory]
     [MemberData(nameof(GetTestData))]

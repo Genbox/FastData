@@ -6,7 +6,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class KeyLengthStructure<T>(StringProperties props) : IStructure<T, KeyLengthContext<T>>
 {
-    public KeyLengthContext<T> Create(ref ReadOnlySpan<T> data)
+    public KeyLengthContext<T> Create(T[] data)
     {
         if (typeof(T) != typeof(string))
             throw new InvalidCastException("This structure only works on strings");

@@ -6,7 +6,7 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 internal sealed class HashSetChainCode<T>(HashSetChainContext<T> ctx) : CPlusPlusOutputWriter<T>
 {
-    public override string Generate(ReadOnlySpan<T> data) =>
+    public override string Generate() =>
         $$"""
               struct e
               {

@@ -21,7 +21,7 @@ namespace Genbox.FastData;
 [SuppressMessage("ApiDesign", "RS0026:Do not add multiple public overloads with optional parameters")]
 public static partial class FastDataGenerator
 {
-    internal const StringComparison DefaultStringComparison = StringComparison.Ordinal;
+    private const StringComparison DefaultStringComparison = StringComparison.Ordinal;
 
     /// <summary>Generate source code for the provided data.</summary>
     /// <param name="data">The data to generate from. Note that all objects must be the same type.</param>
@@ -30,19 +30,7 @@ public static partial class FastDataGenerator
     /// <param name="factory">A logging factory</param>
     /// <returns>The generated source code.</returns>
     /// <exception cref="InvalidOperationException">Thrown when you gave an unsupported data type in data.</exception>
-    public static string Generate(object[] data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
-    {
-        return Generate(new ReadOnlySpan<object>(data), fdCfg, generator, factory);
-    }
-
-    /// <summary>Generate source code for the provided data.</summary>
-    /// <param name="data">The data to generate from. Note that all objects must be the same type.</param>
-    /// <param name="fdCfg">The configuration to use.</param>
-    /// <param name="generator">The code generator to use.</param>
-    /// <param name="factory">A logging factory</param>
-    /// <returns>The generated source code.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when you gave an unsupported data type in data.</exception>
-    public static string Generate(ReadOnlySpan<object> data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) => data[0] switch
+    public static string Generate(object[] data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) => data[0] switch
     {
         char => Generate(Cast<char>(data), fdCfg, generator, factory),
         sbyte => Generate(Cast<sbyte>(data), fdCfg, generator, factory),
@@ -68,23 +56,11 @@ public static partial class FastDataGenerator
     /// <exception cref="InvalidOperationException">Thrown when you gave an unsupported data type in data.</exception>
     public static string Generate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        if (typeof(T) == typeof(string))
-            return GenerateString(new ReadOnlySpan<string>((string[])(object)data), fdCfg, generator, factory);
-
-        return Generate(new ReadOnlySpan<T>(data), fdCfg, generator, factory);
-    }
-
-    /// <summary>Generate source code for the provided data.</summary>
-    /// <param name="data">The data to generate from.</param>
-    /// <param name="fdCfg">The configuration to use.</param>
-    /// <param name="generator">The code generator to use.</param>
-    /// <param name="factory">A logging factory</param>
-    /// <returns>The generated source code.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when you gave an unsupported data type in data.</exception>
-    public static string Generate<T>(ReadOnlySpan<T> data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
-    {
         if (data.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
+
+        if (data is string[] strArr)
+            return GenerateString(strArr, fdCfg, generator, factory);
 
         Type type = typeof(T);
 
@@ -111,7 +87,7 @@ public static partial class FastDataGenerator
 
         HashDetails hashDetails = new HashDetails();
 
-        ValueProperties<T> valProps = DataAnalyzer.GetValueProperties(data, dataType);
+        ValueProperties<T> valProps = DataAnalyzer.GetValueProperties(data);
         LogMinMaxValues(logger, valProps.MinValue, valProps.MaxValue);
         GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, dataType, (uint)data.Length, valProps, hashDetails, GeneratorFlags.None);
 
@@ -152,11 +128,8 @@ public static partial class FastDataGenerator
         }
     }
 
-    private static string GenerateString(ReadOnlySpan<string> data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
+    private static string GenerateString(string[] data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        if (data.Length == 0)
-            throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
-
         factory ??= NullLoggerFactory.Instance;
 
         //Validate that we only have unique data
@@ -243,13 +216,13 @@ public static partial class FastDataGenerator
         }
     }
 
-    private static string Generate<T, TContext>(ICodeGenerator generator, GeneratorConfig<T> genCfg, IStructure<T, TContext> structure, ReadOnlySpan<T> data) where TContext : IContext<T>
+    private static string Generate<T, TContext>(ICodeGenerator generator, GeneratorConfig<T> genCfg, IStructure<T, TContext> structure, T[] data) where TContext : IContext<T>
     {
-        TContext res = structure.Create(ref data);
-        return generator.Generate(data, genCfg, res);
+        TContext res = structure.Create(data);
+        return generator.Generate(genCfg, res);
     }
 
-    private static ReadOnlySpan<T> Cast<T>(this ReadOnlySpan<object> data)
+    private static T[] Cast<T>(this object[] data)
     {
         T[] newArr = new T[data.Length];
 

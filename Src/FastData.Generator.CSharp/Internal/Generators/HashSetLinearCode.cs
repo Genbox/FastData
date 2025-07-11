@@ -6,7 +6,7 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class HashSetLinearCode<T>(HashSetLinearContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
 {
-    public override string Generate(ReadOnlySpan<T> data) =>
+    public override string Generate() =>
         $$"""
               {{FieldModifier}}B[] _buckets = {
           {{FormatColumns(ctx.Buckets, static x => $"new B({x.StartIndex.ToStringInvariant()}, {x.EndIndex.ToStringInvariant()})")}}

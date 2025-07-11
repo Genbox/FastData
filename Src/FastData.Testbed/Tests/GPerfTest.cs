@@ -41,7 +41,7 @@ internal static class GPerfTest
             Logger serilog = baseConf.File(logFile, formatProvider: CultureInfo.InvariantCulture).CreateLogger();
             using SerilogLoggerFactory factory = new SerilogLoggerFactory(serilog);
 
-            ReadOnlySpan<string> data = File.ReadAllLines(file).AsSpan();
+            string[] data = File.ReadAllLines(file);
             StringProperties props = DataAnalyzer.GetStringProperties(data);
 
             GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.UTF16), factory.CreateLogger<GPerfAnalyzer>());
@@ -50,11 +50,11 @@ internal static class GPerfTest
 
             HashData hashData = HashData.Create(data, 1, x =>
             {
-                byte[] data = Encoding.ASCII.GetBytes(x);
-                return func(data, data.Length);
+                byte[] bytes = Encoding.ASCII.GetBytes(x);
+                return func(bytes, bytes.Length);
             });
             HashSetPerfectStructure<string> structure = new HashSetPerfectStructure<string>(hashData, DataType.String);
-            structure.Create(ref data);
+            structure.Create(data);
         }
     }
 

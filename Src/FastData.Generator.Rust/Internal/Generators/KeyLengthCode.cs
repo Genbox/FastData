@@ -6,7 +6,7 @@ namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
 internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx) : RustOutputWriter<T>
 {
-    public override string Generate(ReadOnlySpan<T> data) => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
+    public override string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
 
     private string GenerateUniq()
     {

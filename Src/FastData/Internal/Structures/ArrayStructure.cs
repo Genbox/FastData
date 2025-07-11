@@ -5,8 +5,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class ArrayStructure<T> : IStructure<T, ArrayContext<T>>
 {
-    public ArrayContext<T> Create(ref ReadOnlySpan<T> data)
+    public ArrayContext<T> Create(T[] data)
     {
-        return new ArrayContext<T>();
+        return new ArrayContext<T>(data);
     }
 }
