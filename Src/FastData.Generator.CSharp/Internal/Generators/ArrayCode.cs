@@ -4,20 +4,20 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class ArrayCode<T>(ArrayContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
+internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<TKey>(cfg)
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
+              {{FieldModifier}}{{KeyTypeName}}[] _entries = new {{KeyTypeName}}[] {
+          {{FormatColumns(ctx.Keys, ToValueLabel)}}
               };
 
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{TypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
               {
           {{EarlyExits}}
 
-                  for (int i = 0; i < {{ctx.Data.Length.ToStringInvariant()}}; i++)
+                  for (int i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
                   {
                       if ({{GetEqualFunction("value", "_entries[i]")}})
                          return true;

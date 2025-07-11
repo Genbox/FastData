@@ -3,10 +3,10 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class ConditionalStructure<T> : IStructure<T, ConditionalContext<T>>
+internal sealed class ConditionalStructure<TKey, TValue> : IStructure<TKey, TValue, ConditionalContext<TKey, TValue>>
 {
-    public ConditionalContext<T> Create(T[] data)
+    public ConditionalContext<TKey, TValue> Create(TKey[] data, TValue[]? values)
     {
-        return new ConditionalContext<T>(data);
+        return new ConditionalContext<TKey, TValue>(data, values);
     }
 }

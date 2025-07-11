@@ -4,7 +4,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx) : CPlusPlusOutputWriter<T>
+internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx) : CPlusPlusOutputWriter<TKey>
 {
     public override string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
 
@@ -13,13 +13,13 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx) : CPlusPlusOutpu
         string?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()).ToArray();
 
         return $$"""
-                     {{FieldModifier}}std::array<{{TypeName}}, {{lengths.Length.ToStringInvariant()}}> entries = {
+                     {{FieldModifier}}std::array<{{KeyTypeName}}, {{lengths.Length.ToStringInvariant()}}> entries = {
                  {{FormatColumns(lengths, ToValueLabel)}}
                      };
 
                  public:
                      {{MethodAttribute}}
-                     {{MethodModifier}}bool contains(const {{TypeName}} value){{PostMethodModifier}}
+                     {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
                      {
                  {{EarlyExits}}
 
@@ -33,21 +33,21 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx) : CPlusPlusOutpu
         List<string>?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Take((int)(ctx.MaxLength - ctx.MinLength + 1)).ToArray();
 
         return $$"""
-                     {{FieldModifier}}std:array<std:vector<{{TypeName}}>, {{lengths.Length.ToStringInvariant()}}> entries = {
+                     {{FieldModifier}}std:array<std:vector<{{KeyTypeName}}>, {{lengths.Length.ToStringInvariant()}}> entries = {
                  {{FormatList(lengths, RenderMany, ",\n")}}
                      };
 
                  public:
                      {{MethodAttribute}}
-                     {{MethodModifier}}bool contains(const {{TypeName}}& value){{PostMethodModifier}}
+                     {{MethodModifier}}bool contains(const {{KeyTypeName}}& value){{PostMethodModifier}}
                      {
                  {{EarlyExits}}
-                         std::vector<{{TypeName}}> bucket = entries[value.length() - {{ctx.MinLength.ToStringInvariant()}}];
+                         std::vector<{{KeyTypeName}}> bucket = entries[value.length() - {{ctx.MinLength.ToStringInvariant()}}];
 
                          if (bucket == nullptr)
                              return false;
 
-                         foreach ({{TypeName}} str in bucket)
+                         foreach ({{KeyTypeName}} str in bucket)
                          {
                              if ({{GetEqualFunction("str", "value")}})
                                  return true;

@@ -37,7 +37,7 @@ internal static class AnalysisTest
 
     public static void TestBest()
     {
-        StringProperties props = DataAnalyzer.GetStringProperties(Data);
+        StringProperties props = KeyAnalyzer.GetStringProperties(Data);
 
         StringAnalyzerConfig cfg = new StringAnalyzerConfig();
         cfg.BruteForceAnalyzerConfig = null;
@@ -105,7 +105,7 @@ internal static class AnalysisTest
     {
         Print(data, source);
 
-        StringProperties props = DataAnalyzer.GetStringProperties(data);
+        StringProperties props = KeyAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
         BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.UTF16), loggerFactory.CreateLogger<BruteForceAnalyzer>());
         PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());
@@ -115,7 +115,7 @@ internal static class AnalysisTest
     {
         Print(data, source);
 
-        StringProperties props = DataAnalyzer.GetStringProperties(data);
+        StringProperties props = KeyAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
         GeneticAnalyzer analyzer = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.UTF16), loggerFactory.CreateLogger<GeneticAnalyzer>());
         PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());
@@ -125,7 +125,7 @@ internal static class AnalysisTest
     {
         Print(data, source);
 
-        StringProperties props = DataAnalyzer.GetStringProperties(data);
+        StringProperties props = KeyAnalyzer.GetStringProperties(data);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
         GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.UTF16), loggerFactory.CreateLogger<GPerfAnalyzer>());
         PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());

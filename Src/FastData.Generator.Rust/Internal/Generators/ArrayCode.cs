@@ -4,16 +4,16 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class ArrayCode<T>(ArrayContext<T> ctx) : RustOutputWriter<T>
+internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx) : RustOutputWriter<TKey>
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}const ENTRIES: [{{TypeName}}; {{ctx.Data.Length.ToStringInvariant()}}] = [
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
+              {{FieldModifier}}const ENTRIES: [{{KeyTypeName}}; {{ctx.Keys.Length.ToStringInvariant()}}] = [
+          {{FormatColumns(ctx.Keys, ToValueLabel)}}
               ];
 
               {{MethodAttribute}}
-              {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+              {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
           {{EarlyExits}}
 
                   for entry in Self::ENTRIES.iter() {

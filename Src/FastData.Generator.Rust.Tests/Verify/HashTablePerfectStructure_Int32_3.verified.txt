@@ -1,0 +1,35 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashTable (HashTablePerfect)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashTablePerfectStructure_Int32_3;
+
+impl HashTablePerfectStructure_Int32_3 {
+    const ENTRIES: [i32; 3] = [
+        3, 1, 2
+    ];
+
+    #[inline(always)]
+    fn get_hash(value: i32) -> u64 {
+        value as u64
+    }
+
+    #[must_use]
+    pub fn contains(value: i32) -> bool {
+        if value < 1 || value > 3 {
+            return false;
+        }
+        let hash = unsafe { Self::get_hash(value) };
+        let index = (hash % 3) as usize;
+
+        return value == Self::ENTRIES[index];
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_VALUE: i32 = 1;
+    pub const MAX_VALUE: i32 = 3;
+}

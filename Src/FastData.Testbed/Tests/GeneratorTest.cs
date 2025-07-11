@@ -12,7 +12,7 @@ internal static class GeneratorTest
     public static void TestGenerators()
     {
         string[] data = ["cake", "fish", "horse", "internet", "word", "what"];
-        StringProperties props = DataAnalyzer.GetStringProperties(data);
+        StringProperties props = KeyAnalyzer.GetStringProperties(data);
 
         TestGenerators(data, props, new BruteForceGenerator(8));
         TestGenerators(data, props, new EdgeGramGenerator(8));

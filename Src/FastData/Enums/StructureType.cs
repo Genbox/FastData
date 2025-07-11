@@ -12,5 +12,5 @@ public enum StructureType : byte
     BinarySearch,
 
     // O(1) data structures
-    HashSet
+    HashTable
 }

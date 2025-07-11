@@ -5,7 +5,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
+internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<TKey>(cfg)
 {
     public override string Generate()
     {
@@ -25,12 +25,12 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx, CSharpCodeGenera
 
     private string GenerateUniqIf() =>
         $$"""
-              {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
+              {{FieldModifier}}{{KeyTypeName}}[] _entries = new {{KeyTypeName}}[] {
           {{FormatColumns(ctx.Lengths.AsReadOnlySpan((int)ctx.MinLength), x => ToValueLabel(x?.FirstOrDefault()))}}
               };
 
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{TypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
               {
           {{EarlyExits}}
 
@@ -44,7 +44,7 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx, CSharpCodeGenera
 
         return $$"""
                      {{MethodAttribute}}
-                     {{MethodModifier}}bool Contains({{TypeName}} value)
+                     {{MethodModifier}}bool Contains({{KeyTypeName}} value)
                      {
                  {{EarlyExits}}
 
@@ -64,20 +64,20 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx, CSharpCodeGenera
     private string GenerateNormal()
     {
         return $$"""
-                     {{FieldModifier}}{{TypeName}}[]?[] _entries = new {{TypeName}}[]?[] {
+                     {{FieldModifier}}{{KeyTypeName}}[]?[] _entries = new {{KeyTypeName}}[]?[] {
                  {{FormatList(ctx.Lengths.AsReadOnlySpan((int)ctx.MinLength, (int)(ctx.MaxLength - ctx.MinLength + 1)), RenderMany, ",\n")}}
                      };
 
                      {{MethodAttribute}}
-                     {{MethodModifier}}bool Contains({{TypeName}} value)
+                     {{MethodModifier}}bool Contains({{KeyTypeName}} value)
                      {
                  {{EarlyExits}}
-                         {{TypeName}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];
+                         {{KeyTypeName}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];
 
                          if (bucket == null)
                              return false;
 
-                         foreach ({{TypeName}} str in bucket)
+                         foreach ({{KeyTypeName}} str in bucket)
                          {
                              if ({{GetEqualFunction("value", "str")}})
                                  return true;

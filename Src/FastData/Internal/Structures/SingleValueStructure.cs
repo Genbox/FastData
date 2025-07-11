@@ -3,13 +3,13 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class SingleValueStructure<T> : IStructure<T, SingleValueContext<T>>
+internal sealed class SingleValueStructure<TKey, TValue> : IStructure<TKey, TValue, SingleValueContext<TKey, TValue>>
 {
-    public SingleValueContext<T> Create(T[] data)
+    public SingleValueContext<TKey, TValue> Create(TKey[] data, TValue[]? values)
     {
         if (data.Length != 1)
             throw new InvalidOperationException("SingleValueStructure can only be created from a span with exactly one element.");
 
-        return new SingleValueContext<T>(data[0]);
+        return new SingleValueContext<TKey, TValue>(data[0], values != null ? values[0] : default);
     }
 }

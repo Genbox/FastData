@@ -102,31 +102,32 @@ public static class TestHelper
         IProperties props;
 
         if (vector.Values is string[] arr)
-            props = DataAnalyzer.GetStringProperties(arr);
+            props = KeyAnalyzer.GetStringProperties(arr);
         else
-            props = DataAnalyzer.GetValueProperties(vector.Values);
+            props = KeyAnalyzer.GetValueProperties(vector.Values);
 
         ICodeGenerator generator = func(vector.Identifier);
         GeneratorEncoding encoding = generator.Encoding;
 
-        if (vector.Type == typeof(SingleValueStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.Auto, new SingleValueStructure<T>());
-        if (vector.Type == typeof(ArrayStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.Array, new ArrayStructure<T>());
-        if (vector.Type == typeof(ConditionalStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.Conditional, new ConditionalStructure<T>());
-        if (vector.Type == typeof(BinarySearchStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new BinarySearchStructure<T>(dataType, StringComparison.Ordinal));
-        if (vector.Type == typeof(EytzingerSearchStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new EytzingerSearchStructure<T>(dataType, StringComparison.Ordinal));
-        if (vector.Type == typeof(HashSetChainStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetChainStructure<T>(GetHashData(vector, dataType, encoding), dataType));
-        if (vector.Type == typeof(HashSetPerfectStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetPerfectStructure<T>(GetHashData(vector, dataType, encoding), dataType));
-        if (vector.Type == typeof(HashSetLinearStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.HashSet, new HashSetLinearStructure<T>(GetHashData(vector, dataType, encoding)));
-        if (vector.Type == typeof(KeyLengthStructure<>))
-            return Generate(generator, vector, props, dataType, StructureType.Auto, new KeyLengthStructure<T>((StringProperties)props));
+        byte[] values = new byte[vector.Values.Length];
+        Array.Fill(values, (byte)42);
+
+        if (vector.Type == typeof(SingleValueStructure<,>))
+            return Generate(generator, vector, props, dataType, StructureType.Auto, new SingleValueStructure<T, byte>(), values);
+        if (vector.Type == typeof(ArrayStructure<,>))
+            return Generate(generator, vector, props, dataType, StructureType.Array, new ArrayStructure<T, byte>(), values);
+        if (vector.Type == typeof(ConditionalStructure<,>))
+            return Generate(generator, vector, props, dataType, StructureType.Conditional, new ConditionalStructure<T, byte>(), values);
+        if (vector.Type == typeof(BinarySearchStructure<,>))
+            return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new BinarySearchStructure<T, byte>(dataType, StringComparison.Ordinal), values);
+        if (vector.Type == typeof(EytzingerSearchStructure<,>))
+            return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new EytzingerSearchStructure<T, byte>(dataType, StringComparison.Ordinal), values);
+        if (vector.Type == typeof(HashTableChainStructure<,>))
+            return Generate(generator, vector, props, dataType, StructureType.HashTable, new HashTableChainStructure<T, byte>(GetHashData(vector, dataType, encoding), dataType), values);
+        if (vector.Type == typeof(HashTablePerfectStructure<,>))
+            return Generate(generator, vector, props, dataType, StructureType.HashTable, new HashTablePerfectStructure<T, byte>(GetHashData(vector, dataType, encoding), dataType), values);
+        if (vector.Type == typeof(KeyLengthStructure<,>))
+            return Generate(generator, vector, props, dataType, StructureType.Auto, new KeyLengthStructure<T, byte>((StringProperties)props), values);
 
         throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
     }
@@ -152,11 +153,11 @@ public static class TestHelper
         return hashData;
     }
 
-    private static GeneratorSpec Generate<T, TContext>(ICodeGenerator generator, TestVector<T> vector, IProperties props, DataType dataType, StructureType structureType, IStructure<T, TContext> structure) where TContext : IContext<T>
+    private static GeneratorSpec Generate<TKey, TValue, TContext>(ICodeGenerator generator, TestVector<TKey> vector, IProperties props, DataType dataType, StructureType structureType, IStructure<TKey, TValue, TContext> structure, TValue[]? value) where TContext : IContext
     {
-        TContext context = structure.Create(vector.Values);
+        TContext context = structure.Create(vector.Values, value);
 
-        GeneratorConfig<T> genCfg;
+        GeneratorConfig<TKey> genCfg;
         HashDetails hashDetails = new HashDetails();
 
         GeneratorFlags flags = GeneratorFlags.None;
@@ -166,17 +167,17 @@ public static class TestHelper
             if (stringProps.CharacterData.AllAscii)
                 flags = GeneratorFlags.AllAreASCII;
 
-            genCfg = new GeneratorConfig<T>(structureType, dataType, (uint)vector.Values.Length, stringProps, StringComparison.Ordinal, hashDetails, generator.Encoding, flags);
+            genCfg = new GeneratorConfig<TKey>(structureType, dataType, (uint)vector.Values.Length, stringProps, StringComparison.Ordinal, hashDetails, generator.Encoding, flags);
         }
-        else if (props is ValueProperties<T> valueProps)
+        else if (props is ValueProperties<TKey> valueProps)
         {
             hashDetails.HasZeroOrNaN = valueProps.HasZeroOrNaN;
-            genCfg = new GeneratorConfig<T>(structureType, dataType, (uint)vector.Values.Length, valueProps, hashDetails, flags);
+            genCfg = new GeneratorConfig<TKey>(structureType, dataType, (uint)vector.Values.Length, valueProps, hashDetails, flags);
         }
         else
             throw new InvalidOperationException("Bug");
 
-        string source = generator.Generate(genCfg, context);
+        string source = generator.Generate<TKey, TValue>(genCfg, context);
         return new GeneratorSpec(vector.Identifier, source, flags);
     }
 }

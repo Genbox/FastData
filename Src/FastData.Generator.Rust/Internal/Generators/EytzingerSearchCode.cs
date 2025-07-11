@@ -3,16 +3,16 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx) : RustOutputWriter<T>
+internal sealed class EytzingerSearchCode<TKey, TValue>(EytzingerSearchContext<TKey, TValue> ctx) : RustOutputWriter<TKey>
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}const ENTRIES: [{{TypeName}}; {{ctx.Data.Length}}] = [
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
+              {{FieldModifier}}const ENTRIES: [{{KeyTypeName}}; {{ctx.Keys.Length}}] = [
+          {{FormatColumns(ctx.Keys, ToValueLabel)}}
               ];
 
               {{MethodAttribute}}
-              {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+              {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
           {{EarlyExits}}
 
                   let mut i: usize = 0;

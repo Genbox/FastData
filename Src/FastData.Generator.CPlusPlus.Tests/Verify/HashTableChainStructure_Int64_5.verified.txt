@@ -1,0 +1,68 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashTable (HashTableChain)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashTableChainStructure_Int64_5 final
+{
+    struct e
+    {
+        
+        int8_t next;
+        int64_t value;
+
+        e(const int8_t next, const int64_t value)
+           : next(next), value(value) {}
+    };
+
+    static constexpr std::array<int8_t, 5> buckets = {
+        3, 4, 5, 1, 0
+     };
+
+    inline static const std::array<e, 5> entries = {
+        e(-1, std::numeric_limits<int64_t>::lowest()), e(-1, -1ll), e(1, 0ll), e(-1, 1ll), e(-1, std::numeric_limits<int64_t>::max())
+    };
+
+    static uint64_t get_hash(const int64_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const int64_t value) noexcept
+    {
+        if (value < std::numeric_limits<int64_t>::lowest() || value > std::numeric_limits<int64_t>::max())
+            return false;
+
+        const uint64_t hash = get_hash(value);
+        const size_t index = hash % 5;
+        int8_t i = buckets[index] - static_cast<int8_t>(1);
+
+        while (i >= 0)
+        {
+            const auto& [next, value1] = entries[i];
+
+            if (value1 == value)
+                return true;
+
+            i = next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int64_t min_value = std::numeric_limits<int64_t>::lowest();
+    static constexpr int64_t max_value = std::numeric_limits<int64_t>::max();
+
+public:
+    HashTableChainStructure_Int64_5() = delete;
+    HashTableChainStructure_Int64_5(const HashTableChainStructure_Int64_5&) = delete;
+    HashTableChainStructure_Int64_5& operator=(const HashTableChainStructure_Int64_5&) = delete;
+    HashTableChainStructure_Int64_5(HashTableChainStructure_Int64_5&&) = delete;
+    HashTableChainStructure_Int64_5& operator=(HashTableChainStructure_Int64_5&&) = delete;
+};

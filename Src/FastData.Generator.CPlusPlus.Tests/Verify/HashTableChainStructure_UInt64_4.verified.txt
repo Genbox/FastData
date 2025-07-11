@@ -1,0 +1,68 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashTable (HashTableChain)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashTableChainStructure_UInt64_4 final
+{
+    struct e
+    {
+        
+        int8_t next;
+        uint64_t value;
+
+        e(const int8_t next, const uint64_t value)
+           : next(next), value(value) {}
+    };
+
+    static constexpr std::array<int8_t, 4> buckets = {
+        1, 2, 3, 4
+     };
+
+    inline static const std::array<e, 4> entries = {
+        e(-1, 0), e(-1, 1ull), e(-1, 2ull), e(-1, std::numeric_limits<uint64_t>::max())
+    };
+
+    static uint64_t get_hash(const uint64_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const uint64_t value) noexcept
+    {
+        if (value < 0 || value > std::numeric_limits<uint64_t>::max())
+            return false;
+
+        const uint64_t hash = get_hash(value);
+        const size_t index = hash % 4;
+        int8_t i = buckets[index] - static_cast<int8_t>(1);
+
+        while (i >= 0)
+        {
+            const auto& [next, value1] = entries[i];
+
+            if (value1 == value)
+                return true;
+
+            i = next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 4;
+    static constexpr uint64_t min_value = 0;
+    static constexpr uint64_t max_value = std::numeric_limits<uint64_t>::max();
+
+public:
+    HashTableChainStructure_UInt64_4() = delete;
+    HashTableChainStructure_UInt64_4(const HashTableChainStructure_UInt64_4&) = delete;
+    HashTableChainStructure_UInt64_4& operator=(const HashTableChainStructure_UInt64_4&) = delete;
+    HashTableChainStructure_UInt64_4(HashTableChainStructure_UInt64_4&&) = delete;
+    HashTableChainStructure_UInt64_4& operator=(HashTableChainStructure_UInt64_4&&) = delete;
+};

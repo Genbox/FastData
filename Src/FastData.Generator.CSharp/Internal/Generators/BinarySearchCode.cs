@@ -4,21 +4,21 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
+internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, TValue> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<TKey>(cfg)
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}{{TypeName}}[] _entries = new {{TypeName}}[] {
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
+              {{FieldModifier}}{{KeyTypeName}}[] _entries = new {{KeyTypeName}}[] {
+          {{FormatColumns(ctx.Keys, ToValueLabel)}}
               };
 
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{TypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
               {
           {{EarlyExits}}
 
                   int lo = 0;
-                  int hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
+                  int hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
                   while (lo <= hi)
                   {
                       int i = lo + ((hi - lo) >> 1);

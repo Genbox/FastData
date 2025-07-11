@@ -3,15 +3,15 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx) : RustOutputWriter<T>
+internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TValue> ctx) : RustOutputWriter<TKey>
 {
     public override string Generate() =>
         $$"""
               {{MethodAttribute}}
-              {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+              {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
           {{EarlyExits}}
 
-                  if {{FormatList(ctx.Data, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}} {
+                  if {{FormatList(ctx.Keys, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}} {
                       return true;
                   }
 

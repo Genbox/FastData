@@ -9,9 +9,8 @@ public interface ICodeGenerator
     GeneratorEncoding Encoding { get; }
 
     /// <summary>Attempts to generate source code using the specified generator configuration and context.</summary>
-    /// <typeparam name="T">The type of data being generated.</typeparam>
     /// <param name="genCfg">The generator configuration.</param>
     /// <param name="context">The context for code generation.</param>
     /// <returns>True if code generation succeeded; otherwise, false.</returns>
-    string Generate<T>(GeneratorConfig<T> genCfg, IContext<T> context);
+    string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context);
 }

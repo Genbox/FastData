@@ -23,7 +23,7 @@ public sealed class RustCodeGenerator : CodeGenerator
         return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(map, userCfg.GeneratorOptions), new RustHashDef(), map);
     }
 
-    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context)
+    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext context)
     {
         base.AppendHeader(sb, genCfg, context);
 
@@ -48,17 +48,16 @@ public sealed class RustCodeGenerator : CodeGenerator
         sb.Append('}');
     }
 
-    protected override OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext<T> context) => context switch
+    protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context) => context switch
     {
-        SingleValueContext<T> x => new SingleValueCode<T>(x),
-        ArrayContext<T> x => new ArrayCode<T>(x),
-        BinarySearchContext<T> x => new BinarySearchCode<T>(x),
-        ConditionalContext<T> x => new ConditionalCode<T>(x),
-        EytzingerSearchContext<T> x => new EytzingerSearchCode<T>(x),
-        HashSetChainContext<T> x => new HashSetChainCode<T>(x, genCfg, Shared),
-        HashSetLinearContext<T> x => new HashSetLinearCode<T>(x, genCfg, Shared),
-        HashSetPerfectContext<T> x => new HashSetPerfectCode<T>(x, genCfg, Shared),
-        KeyLengthContext<T> x => new KeyLengthCode<T>(x),
+        SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x),
+        ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x),
+        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x),
+        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x),
+        EytzingerSearchContext<TKey, TValue> x => new EytzingerSearchCode<TKey, TValue>(x),
+        HashTableChainContext<TKey, TValue> x => new HashTableChainCode<TKey, TValue>(x, genCfg, Shared),
+        HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, genCfg, Shared),
+        KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x),
         _ => null
     };
 }

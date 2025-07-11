@@ -10,7 +10,7 @@ public class TestVector<T>(Type type, T[] values, string? postfix = null) : ITes
     public T[] Values { get; private set; } = values;
     public Type Type { get; private set; } = type;
 
-    public string Identifier => $"{Type.Name.Replace("`1", "", StringComparison.Ordinal)}_{_dataType}_{Values.Length}" + (postfix != null ? $"_{postfix}" : "");
+    public string Identifier => $"{Type.Name.Replace("`1", "", StringComparison.Ordinal).Replace("`2", "", StringComparison.Ordinal)}_{_dataType}_{Values.Length}" + (postfix != null ? $"_{postfix}" : "");
 
     public void Serialize(IXunitSerializationInfo info)
     {

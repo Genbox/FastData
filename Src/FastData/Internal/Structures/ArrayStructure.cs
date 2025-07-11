@@ -3,10 +3,10 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class ArrayStructure<T> : IStructure<T, ArrayContext<T>>
+internal sealed class ArrayStructure<TKey, TValue> : IStructure<TKey, TValue, ArrayContext<TKey, TValue>>
 {
-    public ArrayContext<T> Create(T[] data)
+    public ArrayContext<TKey, TValue> Create(TKey[] data, TValue[]? values)
     {
-        return new ArrayContext<T>(data);
+        return new ArrayContext<TKey, TValue>(data, values);
     }
 }

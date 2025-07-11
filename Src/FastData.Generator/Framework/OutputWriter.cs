@@ -14,7 +14,8 @@ public abstract class OutputWriter<T> : IOutputWriter
     private ILanguageDef _langDef = null!;
     private TypeMap _map = null!;
 
-    protected string TypeName { get; private set; } = null!;
+    protected string KeyTypeName { get; private set; } = null!;
+    protected string ValueTypeName { get; private set; } = null!;
     protected GeneratorConfig<T> GeneratorConfig { get; private set; } = null!;
     protected string HashSource { get; private set; } = null!;
 
@@ -25,13 +26,14 @@ public abstract class OutputWriter<T> : IOutputWriter
 
     public abstract string Generate();
 
-    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<T> genCfg, string typeName, ExpressionCompiler? compiler)
+    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<T> genCfg, string keyTypeName, string valueTypeName, ExpressionCompiler? compiler)
     {
         _langDef = langDef;
         _earlyExitDef = earlyExitDef;
         _map = map;
         GeneratorConfig = genCfg;
-        TypeName = typeName;
+        KeyTypeName = keyTypeName;
+        ValueTypeName = valueTypeName;
 
         //If there is no compiler, or there is no specialized string hash, we give null to the hash definition
         StringHashInfo? stringHash = null;
@@ -58,7 +60,7 @@ public abstract class OutputWriter<T> : IOutputWriter
         }
 
         HashInfo hashInfo = new HashInfo(GeneratorConfig.HashDetails.HasZeroOrNaN, stringHash);
-        HashSource = hashDef.GetHashSource(GeneratorConfig.DataType, TypeName, hashInfo);
+        HashSource = hashDef.GetHashSource(GeneratorConfig.DataType, KeyTypeName, hashInfo);
     }
 
     private static IEnumerable<string> GetValues(Array array, TypeMap map, Type type)

@@ -9,59 +9,55 @@ public static class TestVectorHelper
 {
     public static IEnumerable<ITestVector> GetTestVectors()
     {
-        foreach (ITestVector testVector in GenerateTestVectors(GetSingleValues(), null, typeof(SingleValueStructure<>)))
+        foreach (ITestVector testVector in GenerateTestVectors(GetSingleValues(), null, typeof(SingleValueStructure<,>)))
         {
             yield return testVector;
         }
 
         foreach (ITestVector testVector in GenerateTestVectors(GetEdgeCaseValues(), null,
-                     typeof(ArrayStructure<>),
-                     typeof(BinarySearchStructure<>),
-                     typeof(ConditionalStructure<>),
-                     typeof(EytzingerSearchStructure<>),
-                     typeof(HashSetChainStructure<>),
-                     typeof(HashSetLinearStructure<>)))
+                     typeof(ArrayStructure<,>),
+                     typeof(BinarySearchStructure<,>),
+                     typeof(ConditionalStructure<,>),
+                     typeof(EytzingerSearchStructure<,>),
+                     typeof(HashTableChainStructure<,>)))
         {
             yield return testVector;
         }
 
         foreach (ITestVector testVector in GenerateTestVectors(GetFloatSpecialCases(), "HashZeroOrNaN",
-                     typeof(HashSetChainStructure<>),
-                     typeof(HashSetLinearStructure<>)))
+                     typeof(HashTableChainStructure<,>)))
         {
             yield return testVector;
         }
 
         foreach (ITestVector testVector in GenerateTestVectors(GetDataOfSize(100), null,
-                     typeof(ArrayStructure<>),
-                     typeof(BinarySearchStructure<>),
-                     typeof(ConditionalStructure<>),
-                     typeof(EytzingerSearchStructure<>),
-                     typeof(HashSetChainStructure<>),
-                     typeof(HashSetLinearStructure<>)))
+                     typeof(ArrayStructure<,>),
+                     typeof(BinarySearchStructure<,>),
+                     typeof(ConditionalStructure<,>),
+                     typeof(EytzingerSearchStructure<,>),
+                     typeof(HashTableChainStructure<,>)))
         {
             yield return testVector;
         }
 
         // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
-        foreach (ITestVector testVector in GenerateTestVectors([["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]], typeof(KeyLengthStructure<>)))
+        foreach (ITestVector testVector in GenerateTestVectors([["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]], typeof(KeyLengthStructure<,>)))
         {
             yield return testVector;
         }
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], typeof(HashSetPerfectStructure<>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], typeof(HashTablePerfectStructure<,>)))
         {
             yield return testVector;
         }
 
         // Strings with characters that are not in the ASCII range
         foreach (ITestVector testVector in GenerateTestVectors([["æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", "ñ", "ø", "å"]],
-                     typeof(ArrayStructure<>),
-                     typeof(BinarySearchStructure<>),
-                     typeof(ConditionalStructure<>),
-                     typeof(EytzingerSearchStructure<>),
-                     typeof(HashSetChainStructure<>),
-                     typeof(HashSetLinearStructure<>)))
+                     typeof(ArrayStructure<,>),
+                     typeof(BinarySearchStructure<,>),
+                     typeof(ConditionalStructure<,>),
+                     typeof(EytzingerSearchStructure<,>),
+                     typeof(HashTableChainStructure<,>)))
         {
             yield return testVector;
         }
@@ -82,7 +78,7 @@ public static class TestVectorHelper
                 case StructureType.Conditional:
                 case StructureType.BinarySearch:
                 case StructureType.Array:
-                case StructureType.HashSet:
+                case StructureType.HashTable:
                     yield return new TestData<int>(type, Enumerable.Range(0, benchmarkSize).Select(x => x).ToArray());
                     yield return new TestData<float>(type, Enumerable.Range(0, benchmarkSize).Select(x => (float)x).ToArray());
                     yield return new TestData<string>(type, Enumerable.Range(0, benchmarkSize).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).ToArray());

@@ -57,8 +57,8 @@ public sealed class GeneratorConfig<T>
     private static Constants<T> CreateConstants(ValueProperties<T> props, uint itemCount)
     {
         Constants<T> constants = new Constants<T>(itemCount);
-        constants.MinValue = props.MinValue;
-        constants.MaxValue = props.MaxValue;
+        constants.MinValue = props.MinKeyValue;
+        constants.MaxValue = props.MaxKeyValue;
         return constants;
     }
 
@@ -106,6 +106,6 @@ public sealed class GeneratorConfig<T>
         if (structureType == StructureType.Conditional && itemCount <= 3)
             yield break;
 
-        yield return new MinMaxValueEarlyExit<T>(props.MinValue, props.MaxValue);
+        yield return new MinMaxValueEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue);
     }
 }

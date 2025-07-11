@@ -4,26 +4,66 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class ArrayCode<T>(ArrayContext<T> ctx) : CPlusPlusOutputWriter<T>
+internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx) : CPlusPlusOutputWriter<TKey>
 {
-    public override string Generate() =>
-        $$"""
-              {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
-              };
+    public override string Generate()
+    {
+        if (ctx.Values != null)
+            return $$"""
+                         {{FieldModifier}}std::array<{{ValueTypeName}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
+                     {{FormatColumns(ctx.Values, ToValueLabel)}}
+                         };
 
-          public:
-              {{MethodAttribute}}
-              {{MethodModifier}}bool contains(const {{TypeName}} value){{PostMethodModifier}}
-              {
-          {{EarlyExits}}
+                         {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
+                     {{FormatColumns(ctx.Keys, ToValueLabel)}}
+                         };
 
-                  for ({{ArraySizeType}} i = 0; i < {{ctx.Data.Length.ToStringInvariant()}}; i++)
-                  {
-                      if ({{GetEqualFunction("entries[i]", "value")}})
-                         return true;
-                  }
-                  return false;
-              }
-          """;
+                     public:
+                         {{MethodAttribute}}
+                         {{MethodModifier}}{{ValueTypeName}} get_value(const {{KeyTypeName}} value){{PostMethodModifier}}
+                         {
+                     {{EarlyExits}}
+
+                             for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
+                             {
+                                 if ({{GetEqualFunction("keys[i]", "value")}})
+                                    return values[i];
+                             }
+                             return NULL;
+                         }
+
+                         {{MethodAttribute}}
+                         {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+                         {
+                     {{EarlyExits}}
+
+                             for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
+                             {
+                                 if ({{GetEqualFunction("keys[i]", "value")}})
+                                    return true;
+                             }
+                             return false;
+                         }
+                     """;
+
+        return $$"""
+                 {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
+                 {{FormatColumns(ctx.Keys, ToValueLabel)}}
+                 };
+
+                 public:
+                     {{MethodAttribute}}
+                     {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+                     {
+                 {{EarlyExits}}
+
+                         for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
+                         {
+                             if ({{GetEqualFunction("keys[i]", "value")}})
+                                return true;
+                         }
+                         return false;
+                     }
+                 """;
+    }
 }

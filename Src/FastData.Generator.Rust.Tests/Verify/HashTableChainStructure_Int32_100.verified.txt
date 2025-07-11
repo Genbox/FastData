@@ -1,0 +1,72 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashTable (HashTableChain)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashTableChainStructure_Int32_100;
+
+impl HashTableChainStructure_Int32_100 {
+    const BUCKETS: [i8; 100] = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
+        11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+        21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+        31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 
+        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 
+        51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 
+        61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 
+        71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 
+        81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 
+        91, 92, 93, 94, 95, 96, 97, 98, 99, 100
+    ];
+
+    const ENTRIES: [E; 100] = [
+        E { next: -1, value: 0 }, E { next: -1, value: 1 }, E { next: -1, value: 2 }, E { next: -1, value: 3 }, E { next: -1, value: 4 }, E { next: -1, value: 5 }, E { next: -1, value: 6 }, E { next: -1, value: 7 }, E { next: -1, value: 8 }, E { next: -1, value: 9 }, 
+        E { next: -1, value: 10 }, E { next: -1, value: 11 }, E { next: -1, value: 12 }, E { next: -1, value: 13 }, E { next: -1, value: 14 }, E { next: -1, value: 15 }, E { next: -1, value: 16 }, E { next: -1, value: 17 }, E { next: -1, value: 18 }, E { next: -1, value: 19 }, 
+        E { next: -1, value: 20 }, E { next: -1, value: 21 }, E { next: -1, value: 22 }, E { next: -1, value: 23 }, E { next: -1, value: 24 }, E { next: -1, value: 25 }, E { next: -1, value: 26 }, E { next: -1, value: 27 }, E { next: -1, value: 28 }, E { next: -1, value: 29 }, 
+        E { next: -1, value: 30 }, E { next: -1, value: 31 }, E { next: -1, value: 32 }, E { next: -1, value: 33 }, E { next: -1, value: 34 }, E { next: -1, value: 35 }, E { next: -1, value: 36 }, E { next: -1, value: 37 }, E { next: -1, value: 38 }, E { next: -1, value: 39 }, 
+        E { next: -1, value: 40 }, E { next: -1, value: 41 }, E { next: -1, value: 42 }, E { next: -1, value: 43 }, E { next: -1, value: 44 }, E { next: -1, value: 45 }, E { next: -1, value: 46 }, E { next: -1, value: 47 }, E { next: -1, value: 48 }, E { next: -1, value: 49 }, 
+        E { next: -1, value: 50 }, E { next: -1, value: 51 }, E { next: -1, value: 52 }, E { next: -1, value: 53 }, E { next: -1, value: 54 }, E { next: -1, value: 55 }, E { next: -1, value: 56 }, E { next: -1, value: 57 }, E { next: -1, value: 58 }, E { next: -1, value: 59 }, 
+        E { next: -1, value: 60 }, E { next: -1, value: 61 }, E { next: -1, value: 62 }, E { next: -1, value: 63 }, E { next: -1, value: 64 }, E { next: -1, value: 65 }, E { next: -1, value: 66 }, E { next: -1, value: 67 }, E { next: -1, value: 68 }, E { next: -1, value: 69 }, 
+        E { next: -1, value: 70 }, E { next: -1, value: 71 }, E { next: -1, value: 72 }, E { next: -1, value: 73 }, E { next: -1, value: 74 }, E { next: -1, value: 75 }, E { next: -1, value: 76 }, E { next: -1, value: 77 }, E { next: -1, value: 78 }, E { next: -1, value: 79 }, 
+        E { next: -1, value: 80 }, E { next: -1, value: 81 }, E { next: -1, value: 82 }, E { next: -1, value: 83 }, E { next: -1, value: 84 }, E { next: -1, value: 85 }, E { next: -1, value: 86 }, E { next: -1, value: 87 }, E { next: -1, value: 88 }, E { next: -1, value: 89 }, 
+        E { next: -1, value: 90 }, E { next: -1, value: 91 }, E { next: -1, value: 92 }, E { next: -1, value: 93 }, E { next: -1, value: 94 }, E { next: -1, value: 95 }, E { next: -1, value: 96 }, E { next: -1, value: 97 }, E { next: -1, value: 98 }, E { next: -1, value: 99 }
+    ];
+
+    #[inline(always)]
+    fn get_hash(value: i32) -> u64 {
+        value as u64
+    }
+
+    #[must_use]
+    pub fn contains(value: i32) -> bool {
+        if value < 0 || value > 99 {
+            return false;
+        }
+
+        let hash = unsafe { Self::get_hash(value) };
+        let index = hash % 100;
+        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+
+        while i >= 0 {
+            let entry = &Self::ENTRIES[i as usize];
+            if entry.value == value {
+                return true;
+            }
+            i = entry.next;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 100;
+    pub const MIN_VALUE: i32 = 0;
+    pub const MAX_VALUE: i32 = 99;
+}
+struct E {
+    
+    next: i8,
+    value: i32,
+}

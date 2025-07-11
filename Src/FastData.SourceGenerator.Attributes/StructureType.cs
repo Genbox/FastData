@@ -16,5 +16,5 @@ public enum StructureType : byte
     BinarySearch,
 
     /// <summary>Use a hash set structure. Complexity: O(1).</summary>
-    HashSet
+    HashTable
 }

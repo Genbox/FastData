@@ -4,19 +4,19 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<T>(cfg)
+internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TValue> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<TKey>(cfg)
 {
     public override string Generate() => cfg.ConditionalBranchType switch
     {
-        BranchType.If => GenerateIf(ctx.Data),
-        BranchType.Switch => GenerateSwitch(ctx.Data),
+        BranchType.If => GenerateIf(ctx.Keys),
+        BranchType.Switch => GenerateSwitch(ctx.Keys),
         _ => throw new InvalidOperationException("Invalid branch type: " + cfg.ConditionalBranchType)
     };
 
-    private string GenerateIf(ReadOnlySpan<T> data) =>
+    private string GenerateIf(ReadOnlySpan<TKey> data) =>
         $$"""
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{TypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
               {
           {{EarlyExits}}
 
@@ -27,10 +27,10 @@ internal sealed class ConditionalCode<T>(ConditionalContext<T> ctx, CSharpCodeGe
               }
           """;
 
-    private string GenerateSwitch(ReadOnlySpan<T> data) =>
+    private string GenerateSwitch(ReadOnlySpan<TKey> data) =>
         $$"""
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{TypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
               {
           {{EarlyExits}}
 

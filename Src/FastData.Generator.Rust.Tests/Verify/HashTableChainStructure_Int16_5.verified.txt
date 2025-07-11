@@ -1,0 +1,54 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashTable (HashTableChain)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashTableChainStructure_Int16_5;
+
+impl HashTableChainStructure_Int16_5 {
+    const BUCKETS: [i8; 5] = [
+        3, 4, 5, 1, 0
+    ];
+
+    const ENTRIES: [E; 5] = [
+        E { next: -1, value: i16::MIN }, E { next: -1, value: -1 }, E { next: 1, value: 0 }, E { next: -1, value: 1 }, E { next: -1, value: i16::MAX }
+    ];
+
+    #[inline(always)]
+    fn get_hash(value: i16) -> u64 {
+        value as u64
+    }
+
+    #[must_use]
+    pub fn contains(value: i16) -> bool {
+        if value < i16::MIN || value > i16::MAX {
+            return false;
+        }
+
+        let hash = unsafe { Self::get_hash(value) };
+        let index = hash % 5;
+        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+
+        while i >= 0 {
+            let entry = &Self::ENTRIES[i as usize];
+            if entry.value == value {
+                return true;
+            }
+            i = entry.next;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_VALUE: i16 = i16::MIN;
+    pub const MAX_VALUE: i16 = i16::MAX;
+}
+struct E {
+    
+    next: i8,
+    value: i16,
+}

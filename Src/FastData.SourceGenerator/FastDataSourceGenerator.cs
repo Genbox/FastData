@@ -57,7 +57,27 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
                     if (obj is CombinedConfig combinedCfg)
                     {
-                        string source = FastDataGenerator.Generate(combinedCfg.Data, combinedCfg.FDConfig, CSharpCodeGenerator.Create(combinedCfg.CSConfig));
+                        object[] data = combinedCfg.Data;
+                        FastDataConfig fdCfg = combinedCfg.FDConfig;
+                        CSharpCodeGenerator generator = CSharpCodeGenerator.Create(combinedCfg.CSConfig);
+
+                        string source = data[0] switch
+                        {
+                            char => FastDataGenerator.Generate(Cast<char>(data), fdCfg, generator),
+                            sbyte => FastDataGenerator.Generate(Cast<sbyte>(data), fdCfg, generator),
+                            byte => FastDataGenerator.Generate(Cast<byte>(data), fdCfg, generator),
+                            short => FastDataGenerator.Generate(Cast<short>(data), fdCfg, generator),
+                            ushort => FastDataGenerator.Generate(Cast<ushort>(data), fdCfg, generator),
+                            int => FastDataGenerator.Generate(Cast<int>(data), fdCfg, generator),
+                            uint => FastDataGenerator.Generate(Cast<uint>(data), fdCfg, generator),
+                            long => FastDataGenerator.Generate(Cast<long>(data), fdCfg, generator),
+                            ulong => FastDataGenerator.Generate(Cast<ulong>(data), fdCfg, generator),
+                            float => FastDataGenerator.Generate(Cast<float>(data), fdCfg, generator),
+                            double => FastDataGenerator.Generate(Cast<double>(data), fdCfg, generator),
+                            string => FastDataGenerator.Generate(Cast<string>(data), fdCfg, generator),
+                            _ => throw new InvalidOperationException($"Unsupported data type: {data[0].GetType().Name}")
+                        };
+
                         spc.AddSource(combinedCfg.CSConfig.ClassName + ".g.cs", SourceText.From(source, Encoding.UTF8));
                     }
                     else
@@ -69,6 +89,16 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                 spc.ReportDiagnostic(Diagnostic.Create(_generationError, null, e));
             }
         });
+    }
+
+    private static T[] Cast<T>(object[] data)
+    {
+        T[] newArr = new T[data.Length];
+
+        for (int i = 0; i < data.Length; i++)
+            newArr[i] = (T)data[i];
+
+        return newArr;
     }
 
     private static IEnumerable<object> Transform(Compilation c, CancellationToken token)

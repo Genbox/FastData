@@ -23,46 +23,38 @@ public static partial class FastDataGenerator
 {
     private const StringComparison DefaultStringComparison = StringComparison.Ordinal;
 
-    /// <summary>Generate source code for the provided data.</summary>
-    /// <param name="data">The data to generate from. Note that all objects must be the same type.</param>
-    /// <param name="fdCfg">The configuration to use.</param>
-    /// <param name="generator">The code generator to use.</param>
-    /// <param name="factory">A logging factory</param>
-    /// <returns>The generated source code.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when you gave an unsupported data type in data.</exception>
-    public static string Generate(object[] data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) => data[0] switch
+    public static string GenerateKeyed<TKey, TValue>(TKey[] keys, TValue[] values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        char => Generate(Cast<char>(data), fdCfg, generator, factory),
-        sbyte => Generate(Cast<sbyte>(data), fdCfg, generator, factory),
-        byte => Generate(Cast<byte>(data), fdCfg, generator, factory),
-        short => Generate(Cast<short>(data), fdCfg, generator, factory),
-        ushort => Generate(Cast<ushort>(data), fdCfg, generator, factory),
-        int => Generate(Cast<int>(data), fdCfg, generator, factory),
-        uint => Generate(Cast<uint>(data), fdCfg, generator, factory),
-        long => Generate(Cast<long>(data), fdCfg, generator, factory),
-        ulong => Generate(Cast<ulong>(data), fdCfg, generator, factory),
-        float => Generate(Cast<float>(data), fdCfg, generator, factory),
-        double => Generate(Cast<double>(data), fdCfg, generator, factory),
-        string => GenerateString(Cast<string>(data), fdCfg, generator, factory),
-        _ => throw new InvalidOperationException($"Unsupported data type: {data[0].GetType().Name}")
-    };
+        if (keys is string[] strArr)
+            return GenerateInternalString<byte>(strArr, null, fdCfg, generator, factory);
+
+        return GenerateInternal(keys, values, fdCfg, generator, factory);
+    }
 
     /// <summary>Generate source code for the provided data.</summary>
-    /// <param name="data">The data to generate from.</param>
+    /// <param name="keys">The data to generate from.</param>
     /// <param name="fdCfg">The configuration to use.</param>
     /// <param name="generator">The code generator to use.</param>
     /// <param name="factory">A logging factory</param>
     /// <returns>The generated source code.</returns>
     /// <exception cref="InvalidOperationException">Thrown when you gave an unsupported data type in data.</exception>
-    public static string Generate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
+    public static string Generate<TKey>(TKey[] keys, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        if (data.Length == 0)
+        if (keys is string[] strArr)
+            return GenerateInternalString<byte>(strArr, null, fdCfg, generator, factory);
+
+        return GenerateInternal<TKey, byte>(keys, null, fdCfg, generator, factory);
+    }
+
+    private static string GenerateInternal<TKey, TValue>(TKey[] keys, TValue[]? values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
+    {
+        if (keys.Length == 0 || values?.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
 
-        if (data is string[] strArr)
-            return GenerateString(strArr, fdCfg, generator, factory);
+        if (values != null && keys.Length != values.Length)
+            throw new InvalidOperationException("The number of values does not match the number of keys.");
 
-        Type type = typeof(T);
+        Type type = typeof(TKey);
 
         if (type != typeof(char) && type != typeof(sbyte) && type != typeof(byte) && type != typeof(short) && type != typeof(ushort) && type != typeof(int) && type != typeof(uint) && type != typeof(long) && type != typeof(ulong) && type != typeof(float) && type != typeof(double))
             throw new InvalidOperationException($"Unsupported data type: {type.Name}");
@@ -70,9 +62,9 @@ public static partial class FastDataGenerator
         factory ??= NullLoggerFactory.Instance;
 
         //Validate that we only have unique data
-        HashSet<T> uniq = new HashSet<T>();
+        HashSet<TKey> uniq = new HashSet<TKey>();
 
-        foreach (T val in data)
+        foreach (TKey val in keys)
         {
             if (!uniq.Add(val))
                 throw new InvalidOperationException($"Duplicate data found: {val}");
@@ -87,55 +79,61 @@ public static partial class FastDataGenerator
 
         HashDetails hashDetails = new HashDetails();
 
-        ValueProperties<T> valProps = DataAnalyzer.GetValueProperties(data);
-        LogMinMaxValues(logger, valProps.MinValue, valProps.MaxValue);
-        GeneratorConfig<T> genCfg = new GeneratorConfig<T>(fdCfg.StructureType, dataType, (uint)data.Length, valProps, hashDetails, GeneratorFlags.None);
+        ValueProperties<TKey> valProps = KeyAnalyzer.GetValueProperties(keys);
+        LogMinMaxValues(logger, valProps.MinKeyValue, valProps.MaxKeyValue);
+        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(fdCfg.StructureType, dataType, (uint)keys.Length, valProps, hashDetails, GeneratorFlags.None);
 
         switch (fdCfg.StructureType)
         {
             case StructureType.Auto:
             {
-                if (data.Length == 1)
-                    return Generate(generator, genCfg, new SingleValueStructure<T>(), data);
+                if (keys.Length == 1)
+                    return GenerateWrapper(generator, genCfg, new SingleValueStructure<TKey, TValue>(), keys, values);
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
-                if (data.Length < 400)
-                    return Generate(generator, genCfg, new ConditionalStructure<T>(), data);
+                if (keys.Length < 400)
+                    return GenerateWrapper(generator, genCfg, new ConditionalStructure<TKey, TValue>(), keys, values);
 
-                goto case StructureType.HashSet;
+                goto case StructureType.HashTable;
             }
             case StructureType.Array:
-                return Generate(generator, genCfg, new ArrayStructure<T>(), data);
+                return GenerateWrapper(generator, genCfg, new ArrayStructure<TKey, TValue>(), keys, values);
             case StructureType.Conditional:
-                return Generate(generator, genCfg, new ConditionalStructure<T>(), data);
+                return GenerateWrapper(generator, genCfg, new ConditionalStructure<TKey, TValue>(), keys, values);
             case StructureType.BinarySearch:
-                return Generate(generator, genCfg, new BinarySearchStructure<T>(dataType, DefaultStringComparison), data);
-            case StructureType.HashSet:
+                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<TKey, TValue>(dataType, DefaultStringComparison), keys, values);
+            case StructureType.HashTable:
             {
-                HashFunc<T> hashFunc = PrimitiveHash.GetHash<T>(dataType, valProps.HasZeroOrNaN);
+                HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(dataType, valProps.HasZeroOrNaN);
                 hashDetails.HasZeroOrNaN = valProps.HasZeroOrNaN;
 
-                HashData hashData = HashData.Create(data, fdCfg.HashCapacityFactor, hashFunc);
+                HashData hashData = HashData.Create(keys, fdCfg.HashCapacityFactor, hashFunc);
 
                 if (hashData.HashCodesPerfect)
-                    return Generate(generator, genCfg, new HashSetPerfectStructure<T>(hashData, dataType), data);
+                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<TKey, TValue>(hashData, dataType), keys, values);
 
-                return Generate(generator, genCfg, new HashSetChainStructure<T>(hashData, dataType), data);
+                return GenerateWrapper(generator, genCfg, new HashTableChainStructure<TKey, TValue>(hashData, dataType), keys, values);
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
         }
     }
 
-    private static string GenerateString(string[] data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
+    private static string GenerateInternalString<TValue>(string[] keys, TValue[]? values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
+        if (keys.Length == 0 || values?.Length == 0)
+            throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
+
+        if (values != null && keys.Length != values.Length)
+            throw new InvalidOperationException("The number of values does not match the number of keys.");
+
         factory ??= NullLoggerFactory.Instance;
 
         //Validate that we only have unique data
         HashSet<string> uniq = new HashSet<string>(StringComparer.Ordinal);
 
-        foreach (string val in data)
+        foreach (string val in keys)
         {
             if (!uniq.Add(val))
                 throw new InvalidOperationException($"Duplicate data found: {val}");
@@ -148,44 +146,44 @@ public static partial class FastDataGenerator
         const DataType dataType = DataType.String;
         LogDataType(logger, dataType);
 
-        StringProperties strProps = DataAnalyzer.GetStringProperties(data);
+        StringProperties strProps = KeyAnalyzer.GetStringProperties(keys);
         LogMinMaxLength(logger, strProps.LengthData.Min, strProps.LengthData.Max);
 
         HashDetails hashDetails = new HashDetails();
-        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, dataType, (uint)data.Length, strProps, DefaultStringComparison, hashDetails, generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None);
+        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, dataType, (uint)keys.Length, strProps, DefaultStringComparison, hashDetails, generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None);
 
         switch (fdCfg.StructureType)
         {
             case StructureType.Auto:
             {
-                if (data.Length == 1)
-                    return Generate(generator, genCfg, new SingleValueStructure<string>(), data);
+                if (keys.Length == 1)
+                    return GenerateWrapper(generator, genCfg, new SingleValueStructure<string, TValue>(), keys, values);
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
 
                 // If strings have unique lengths, we prefer to use a KeyLengthStructure.
                 if (strProps.LengthData.Unique)
-                    return Generate(generator, genCfg, new KeyLengthStructure<string>(strProps), data);
+                    return GenerateWrapper(generator, genCfg, new KeyLengthStructure<string, TValue>(strProps), keys, values);
 
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
-                if (data.Length < 400)
-                    return Generate(generator, genCfg, new ConditionalStructure<string>(), data);
+                if (keys.Length < 400)
+                    return GenerateWrapper(generator, genCfg, new ConditionalStructure<string, TValue>(), keys, values);
 
-                goto case StructureType.HashSet;
+                goto case StructureType.HashTable;
             }
             case StructureType.Array:
-                return Generate(generator, genCfg, new ArrayStructure<string>(), data);
+                return GenerateWrapper(generator, genCfg, new ArrayStructure<string, TValue>(), keys, values);
             case StructureType.Conditional:
-                return Generate(generator, genCfg, new ConditionalStructure<string>(), data);
+                return GenerateWrapper(generator, genCfg, new ConditionalStructure<string, TValue>(), keys, values);
             case StructureType.BinarySearch:
-                return Generate(generator, genCfg, new BinarySearchStructure<string>(dataType, DefaultStringComparison), data);
-            case StructureType.HashSet:
+                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<string, TValue>(dataType, DefaultStringComparison), keys, values);
+            case StructureType.HashTable:
             {
                 StringHashFunc hashFunc;
 
                 if (fdCfg.StringAnalyzerConfig != null)
                 {
-                    Candidate candidate = GetBestHash(data, strProps, fdCfg.StringAnalyzerConfig, factory, generator.Encoding, true);
+                    Candidate candidate = GetBestHash(keys, strProps, fdCfg.StringAnalyzerConfig, factory, generator.Encoding, true);
                     LogStringHashFitness(logger, candidate.Fitness);
 
                     Expression<StringHashFunc> expression = candidate.StringHash.GetExpression();
@@ -200,36 +198,26 @@ public static partial class FastDataGenerator
                     //We do not set hashDetails.StringHash here, as the user requested it to be disabled
                 }
 
-                HashData hashData = HashData.Create(data, fdCfg.HashCapacityFactor, x =>
+                HashData hashData = HashData.Create(keys, fdCfg.HashCapacityFactor, x =>
                 {
                     byte[] bytes = generator.Encoding == GeneratorEncoding.UTF8 ? Encoding.UTF8.GetBytes(x) : Encoding.Unicode.GetBytes(x);
                     return hashFunc(bytes, bytes.Length);
                 });
 
                 if (hashData.HashCodesPerfect)
-                    return Generate(generator, genCfg, new HashSetPerfectStructure<string>(hashData, dataType), data);
+                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<string, TValue>(hashData, dataType), keys, values);
 
-                return Generate(generator, genCfg, new HashSetChainStructure<string>(hashData, dataType), data);
+                return GenerateWrapper(generator, genCfg, new HashTableChainStructure<string, TValue>(hashData, dataType), keys, values);
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
         }
     }
 
-    private static string Generate<T, TContext>(ICodeGenerator generator, GeneratorConfig<T> genCfg, IStructure<T, TContext> structure, T[] data) where TContext : IContext<T>
+    private static string GenerateWrapper<TKey, TValue, TContext>(ICodeGenerator generator, GeneratorConfig<TKey> genCfg, IStructure<TKey, TValue, TContext> structure, TKey[] keys, TValue[]? values) where TContext : IContext
     {
-        TContext res = structure.Create(data);
-        return generator.Generate(genCfg, res);
-    }
-
-    private static T[] Cast<T>(this object[] data)
-    {
-        T[] newArr = new T[data.Length];
-
-        for (int i = 0; i < data.Length; i++)
-            newArr[i] = (T)data[i];
-
-        return newArr;
+        TContext res = structure.Create(keys, values);
+        return generator.Generate<TKey, TValue>(genCfg, res);
     }
 
     internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, GeneratorEncoding encoding, bool includeDefault)

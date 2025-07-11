@@ -9,7 +9,7 @@ public readonly struct DummyGenerator : ICodeGenerator
 {
     public GeneratorEncoding Encoding => GeneratorEncoding.Unknown;
 
-    public string Generate<T>(GeneratorConfig<T> genCfg, IContext<T> context)
+    public string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
     {
         return JsonConvert.SerializeObject(context, new JsonSerializerSettings { Formatting = Formatting.Indented });
     }

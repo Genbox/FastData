@@ -4,22 +4,22 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class BinarySearchCode<T>(BinarySearchContext<T> ctx) : CPlusPlusOutputWriter<T>
+internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, TValue> ctx) : CPlusPlusOutputWriter<TKey>
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
+              {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> entries = {
+          {{FormatColumns(ctx.Keys, ToValueLabel)}}
               };
 
           public:
               {{MethodAttribute}}
-              {{MethodModifier}}bool contains(const {{TypeName}} value){{PostMethodModifier}}
+              {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
               {
           {{EarlyExits}}
 
                   {{ArraySizeType}} lo = 0;
-                  {{ArraySizeType}} hi = {{(ctx.Data.Length - 1).ToStringInvariant()}};
+                  {{ArraySizeType}} hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
                   while (lo <= hi)
                   {
                       const size_t mid = lo + ((hi - lo) >> 1);

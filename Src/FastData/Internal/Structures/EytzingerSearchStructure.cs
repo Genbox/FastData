@@ -5,12 +5,12 @@ using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class EytzingerSearchStructure<T>(DataType dataType, StringComparison comparison) : IStructure<T, EytzingerSearchContext<T>>
+internal sealed class EytzingerSearchStructure<TKey, TValue>(DataType dataType, StringComparison comparison) : IStructure<TKey, TValue, EytzingerSearchContext<TKey, TValue>>
 {
-    public EytzingerSearchContext<T> Create(T[] data)
+    public EytzingerSearchContext<TKey, TValue> Create(TKey[] data, TValue[]? values)
     {
         //We make a copy to avoid altering the original data
-        T[] copy = new T[data.Length];
+        TKey[] copy = new TKey[data.Length];
         data.CopyTo(copy, 0);
 
         if (dataType == DataType.String)
@@ -18,14 +18,14 @@ internal sealed class EytzingerSearchStructure<T>(DataType dataType, StringCompa
         else
             Array.Sort(copy);
 
-        T[] output = new T[copy.Length];
+        TKey[] output = new TKey[copy.Length];
         int index = 0;
         EytzingerOrder(ref index, copy, output);
 
-        return new EytzingerSearchContext<T>(output);
+        return new EytzingerSearchContext<TKey, TValue>(output, values);
     }
 
-    private static void EytzingerOrder(ref int arrIdx, T[] data, T[] output, int eytIdx = 0)
+    private static void EytzingerOrder(ref int arrIdx, TKey[] data, TKey[] output, int eytIdx = 0)
     {
         if (eytIdx < data.Length)
         {

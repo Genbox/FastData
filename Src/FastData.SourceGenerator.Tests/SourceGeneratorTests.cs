@@ -33,7 +33,7 @@ public class SourceGeneratorTests
     [InlineData(StructureType.Array)]
     [InlineData(StructureType.Conditional)]
     [InlineData(StructureType.BinarySearch)]
-    [InlineData(StructureType.HashSet)]
+    [InlineData(StructureType.HashTable)]
     public async Task DataStructureTest(StructureType ds)
     {
         string source = $"""
@@ -114,7 +114,7 @@ public class SourceGeneratorTests
         string source = $"""
                          using Genbox.FastData.SourceGenerator.Attributes;
 
-                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], StructureType = StructureType.HashSet, AnalysisLevel = AnalysisLevel.{al})]
+                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], StructureType = StructureType.HashTable, AnalysisLevel = AnalysisLevel.{al})]
                          """;
 
         string output = RunGenerator(source);

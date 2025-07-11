@@ -4,11 +4,11 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class KeyLengthStructure<T>(StringProperties props) : IStructure<T, KeyLengthContext<T>>
+internal sealed class KeyLengthStructure<TKey, TValue>(StringProperties props) : IStructure<TKey, TValue, KeyLengthContext<TValue>>
 {
-    public KeyLengthContext<T> Create(T[] data)
+    public KeyLengthContext<TValue> Create(TKey[] data, TValue[]? values)
     {
-        if (typeof(T) != typeof(string))
+        if (typeof(TKey) != typeof(string))
             throw new InvalidCastException("This structure only works on strings");
 
         //idx 0: ""
@@ -21,7 +21,7 @@ internal sealed class KeyLengthStructure<T>(StringProperties props) : IStructure
         //We don't have to use HashSets to deduplicate within a bucket as all items are unique
         List<string>?[] lengths = new List<string>?[maxLen + 1]; //We need a place for zero
 
-        foreach (T value in data)
+        foreach (TKey value in data)
         {
             string str = (string)(object)value;
 
@@ -30,6 +30,6 @@ internal sealed class KeyLengthStructure<T>(StringProperties props) : IStructure
             item.Add(str);
         }
 
-        return new KeyLengthContext<T>(lengths, props.LengthData.Unique, props.LengthData.Min, maxLen);
+        return new KeyLengthContext<TValue>(lengths, props.LengthData.Unique, props.LengthData.Min, maxLen, values);
     }
 }

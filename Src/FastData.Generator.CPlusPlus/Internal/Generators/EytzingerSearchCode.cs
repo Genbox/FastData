@@ -4,17 +4,17 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class EytzingerSearchCode<T>(EytzingerSearchContext<T> ctx) : CPlusPlusOutputWriter<T>
+internal sealed class EytzingerSearchCode<TKey, TValue>(EytzingerSearchContext<TKey, TValue> ctx) : CPlusPlusOutputWriter<TKey>
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}std::array<{{TypeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
-          {{FormatColumns(ctx.Data, ToValueLabel)}}
+              {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> entries = {
+          {{FormatColumns(ctx.Keys, ToValueLabel)}}
               };
 
           public:
               {{MethodAttribute}}
-              {{MethodModifier}}bool contains(const {{TypeName}} value){{PostMethodModifier}}
+              {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
               {
           {{EarlyExits}}
 

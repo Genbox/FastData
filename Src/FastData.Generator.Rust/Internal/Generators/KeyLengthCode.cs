@@ -4,7 +4,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx) : RustOutputWriter<T>
+internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx) : RustOutputWriter<TKey>
 {
     public override string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
 
@@ -16,12 +16,12 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx) : RustOutputWrit
                                .ToArray();
 
         return $$"""
-                     {{FieldModifier}}const ENTRIES: [{{TypeName}}; {{lengths.Length.ToStringInvariant()}}] = [
+                     {{FieldModifier}}const ENTRIES: [{{KeyTypeName}}; {{lengths.Length.ToStringInvariant()}}] = [
                  {{FormatColumns(lengths, ToValueLabel)}}
                      ];
 
                      {{MethodAttribute}}
-                     {{MethodModifier}}fn contains(value: {{TypeName}}) -> bool {
+                     {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
                  {{EarlyExits}}
                          return Self::ENTRIES[(value.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize] == value;
                      }
@@ -36,12 +36,12 @@ internal sealed class KeyLengthCode<T>(KeyLengthContext<T> ctx) : RustOutputWrit
                                      .ToArray();
 
         return $$"""
-                     {{FieldModifier}}const ENTRIES: [Vec<{{TypeName}}>; {{lengths.Length}}] = [
+                     {{FieldModifier}}const ENTRIES: [Vec<{{KeyTypeName}}>; {{lengths.Length}}] = [
                  {{FormatList(lengths, RenderMany, ",\n")}}
                      ];
 
                      {{MethodAttribute}}
-                     {{MethodModifier}}fn contains(value: &{{TypeName}}) -> bool {
+                     {{MethodModifier}}fn contains(value: &{{KeyTypeName}}) -> bool {
                  {{EarlyExits}}
                          let idx = (value.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize;
                          let bucket = &Self::ENTRIES[idx];
