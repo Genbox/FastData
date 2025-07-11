@@ -8,7 +8,7 @@ using Genbox.FastData.Generators.StringHash.Framework;
 
 namespace Genbox.FastData.Generator.Framework;
 
-public abstract class OutputWriter<T> : IOutputWriter<T> where T : notnull
+public abstract class OutputWriter<T> : IOutputWriter<T>
 {
     private IEarlyExitDef _earlyExitDef = null!;
     private ILanguageDef _langDef = null!;

@@ -8,7 +8,7 @@ namespace Genbox.FastData.Generators;
 
 /// <summary>Provides configuration data for code generators in the FastData library.</summary>
 /// <typeparam name="T">The type of data being generated.</typeparam>
-public sealed class GeneratorConfig<T> where T : notnull
+public sealed class GeneratorConfig<T>
 {
     private GeneratorConfig(StructureType structureType, DataType dataType, HashDetails hashDetails, GeneratorFlags flags)
     {

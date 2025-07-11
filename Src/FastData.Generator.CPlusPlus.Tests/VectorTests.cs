@@ -17,7 +17,7 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
 {
     [Theory]
     [ClassData(typeof(TestVectorTheoryData))]
-    public async Task Test<T>(TestVector<T> data) where T : notnull
+    public async Task Test<T>(TestVector<T> data)
     {
         GeneratorSpec spec = Generate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), data);
         Assert.NotEmpty(spec.Source);

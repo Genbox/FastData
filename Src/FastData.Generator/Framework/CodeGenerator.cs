@@ -15,7 +15,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 
     public GeneratorEncoding Encoding => langDef.Encoding;
 
-    public virtual string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context) where T : notnull
+    public virtual string Generate<T>(ReadOnlySpan<T> data, GeneratorConfig<T> genCfg, IContext<T> context)
     {
         Shared.Clear();
 
@@ -38,9 +38,9 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         return sb.ToString();
     }
 
-    protected abstract OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext<T> context) where T : notnull;
+    protected abstract OutputWriter<T>? GetOutputWriter<T>(GeneratorConfig<T> genCfg, IContext<T> context);
 
-    protected virtual void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context) where T : notnull
+    protected virtual void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext<T> context)
     {
         string subType = context.GetType().Name.Replace("Context`1", "");
 
@@ -53,7 +53,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 #endif
     }
 
-    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext<T> context, ReadOnlySpan<T> data) where T : notnull
+    protected virtual void AppendBody<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName, IContext<T> context, ReadOnlySpan<T> data)
     {
         OutputWriter<T>? writer = GetOutputWriter(genCfg, context);
 

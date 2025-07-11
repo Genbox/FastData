@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public class TestData<T>(StructureType structureType, T[] values) : ITestData, IXunitSerializable where T : notnull
+public class TestData<T>(StructureType structureType, T[] values) : ITestData, IXunitSerializable
 {
     private readonly DataType _dataType = Enum.Parse<DataType>(typeof(T).Name);
     private readonly Random _rng = new Random(42);

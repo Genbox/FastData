@@ -95,7 +95,7 @@ public static class TestHelper
     }
 
     /// <summary>This variant of Generate bypasses the public API to test more advanced combinations of parameters</summary>
-    public static GeneratorSpec Generate<T>(Func<string, ICodeGenerator> func, TestVector<T> vector) where T : notnull
+    public static GeneratorSpec Generate<T>(Func<string, ICodeGenerator> func, TestVector<T> vector)
     {
         DataType dataType = Enum.Parse<DataType>(typeof(T).Name);
 
@@ -131,7 +131,7 @@ public static class TestHelper
         throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
     }
 
-    private static HashData GetHashData<T>(TestVector<T> vector, DataType dataType, GeneratorEncoding genEnc) where T : notnull
+    private static HashData GetHashData<T>(TestVector<T> vector, DataType dataType, GeneratorEncoding genEnc)
     {
         HashData hashData;
 
@@ -152,7 +152,7 @@ public static class TestHelper
         return hashData;
     }
 
-    private static GeneratorSpec Generate<T, TContext>(ICodeGenerator generator, TestVector<T> vector, IProperties props, DataType dataType, StructureType structureType, IStructure<T, TContext> structure) where T : notnull where TContext : IContext<T>
+    private static GeneratorSpec Generate<T, TContext>(ICodeGenerator generator, TestVector<T> vector, IProperties props, DataType dataType, StructureType structureType, IStructure<T, TContext> structure) where TContext : IContext<T>
     {
         ReadOnlySpan<T> values = vector.Values.AsReadOnlySpan();
         TContext context = structure.Create(ref values);

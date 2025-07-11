@@ -66,7 +66,7 @@ public static partial class FastDataGenerator
     /// <param name="factory">A logging factory</param>
     /// <returns>The generated source code.</returns>
     /// <exception cref="InvalidOperationException">Thrown when you gave an unsupported data type in data.</exception>
-    public static string Generate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) where T : notnull
+    public static string Generate<T>(T[] data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         if (typeof(T) == typeof(string))
             return GenerateString(new ReadOnlySpan<string>((string[])(object)data), fdCfg, generator, factory);
@@ -81,7 +81,7 @@ public static partial class FastDataGenerator
     /// <param name="factory">A logging factory</param>
     /// <returns>The generated source code.</returns>
     /// <exception cref="InvalidOperationException">Thrown when you gave an unsupported data type in data.</exception>
-    public static string Generate<T>(ReadOnlySpan<T> data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) where T : notnull
+    public static string Generate<T>(ReadOnlySpan<T> data, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         if (data.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
@@ -243,13 +243,13 @@ public static partial class FastDataGenerator
         }
     }
 
-    private static string Generate<T, TContext>(ICodeGenerator generator, GeneratorConfig<T> genCfg, IStructure<T, TContext> structure, ReadOnlySpan<T> data) where T : notnull where TContext : IContext<T>
+    private static string Generate<T, TContext>(ICodeGenerator generator, GeneratorConfig<T> genCfg, IStructure<T, TContext> structure, ReadOnlySpan<T> data) where TContext : IContext<T>
     {
         TContext res = structure.Create(ref data);
         return generator.Generate(data, genCfg, res);
     }
 
-    private static ReadOnlySpan<T> Cast<T>(this ReadOnlySpan<object> data) where T : notnull
+    private static ReadOnlySpan<T> Cast<T>(this ReadOnlySpan<object> data)
     {
         T[] newArr = new T[data.Length];
 

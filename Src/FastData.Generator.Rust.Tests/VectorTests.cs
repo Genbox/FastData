@@ -17,7 +17,7 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
 {
     [Theory]
     [ClassData(typeof(TestVectorTheoryData))]
-    public async Task Test<T>(TestVector<T> data) where T : notnull
+    public async Task Test<T>(TestVector<T> data)
     {
         GeneratorSpec spec = Generate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), data);
         Assert.NotEmpty(spec.Source);
