@@ -12,10 +12,10 @@ class HashTableChainStructure_Single_5 final
     {
         uint64_t hash_code;
         int8_t next;
-        float value;
+        float key;
 
-        e(const uint64_t hash_code, const int8_t next, const float value)
-           : hash_code(hash_code), next(next), value(value) {}
+        e(const uint64_t hash_code, const int8_t next, const float key)
+           : hash_code(hash_code), next(next), key(key) {}
     };
 
     static constexpr std::array<int8_t, 5> buckets = {
@@ -37,20 +37,20 @@ class HashTableChainStructure_Single_5 final
 
 public:
     [[nodiscard]]
-    static bool contains(const float value) noexcept
+    static bool contains(const float key) noexcept
     {
-        if (value < std::numeric_limits<float>::lowest() || value > std::numeric_limits<float>::max())
+        if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())
             return false;
 
-        const uint64_t hash = get_hash(value);
+        const uint64_t hash = get_hash(key);
         const size_t index = hash % 5;
         int8_t i = buckets[index] - static_cast<int8_t>(1);
 
         while (i >= 0)
         {
-            const auto& [hash_code, next, value1] = entries[i];
+            const auto& [hash_code, next, key1] = entries[i];
 
-            if (hash_code == hash && value1 == value)
+            if (hash_code == hash && key1 == key)
                 return true;
 
             i = next;

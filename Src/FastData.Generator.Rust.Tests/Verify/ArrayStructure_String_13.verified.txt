@@ -9,19 +9,19 @@ use std::ptr;
 pub struct ArrayStructure_String_13;
 
 impl ArrayStructure_String_13 {
-    const ENTRIES: [&str; 13] = [
+    const KEYS: [&str; 13] = [
         "æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", 
         "ñ", "ø", "å"
     ];
 
     #[must_use]
-    pub fn contains(value: &str) -> bool {
-        if value.len() != 2 as usize {
+    pub fn contains(key: &str) -> bool {
+        if key.len() != 2 as usize {
             return false;
         }
 
-        for entry in Self::ENTRIES.iter() {
-            if *entry == value {
+        for entry in Self::KEYS.iter() {
+            if *entry == key {
                 return true;
             }
         }

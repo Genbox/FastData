@@ -8,21 +8,21 @@ using System.Runtime.InteropServices;
 
 internal static class EytzingerSearchStructure_String_13
 {
-    private static readonly string[] _entries = new string[] {
+    private static readonly string[] _keys = new string[] {
         "é", "å", "ø", "à", "ç", "ñ", "ü", "ß", "ä", "æ", 
         "è", "ê", "ö"
     };
 
     
-    public static bool Contains(string value)
+    public static bool Contains(string key)
     {
-        if (value.Length != 1u)
+        if (key.Length != 1u)
             return false;
 
         int i = 0;
-        while (i < _entries.Length)
+        while (i < _keys.Length)
         {
-            int comparison = StringComparer.Ordinal.Compare(_entries[i], value);
+            int comparison = StringComparer.Ordinal.Compare(_keys[i], key);
 
             if (comparison == 0)
                 return true;

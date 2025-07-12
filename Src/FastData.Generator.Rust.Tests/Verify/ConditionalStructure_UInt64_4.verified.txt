@@ -10,12 +10,12 @@ pub struct ConditionalStructure_UInt64_4;
 
 impl ConditionalStructure_UInt64_4 {
     #[must_use]
-    pub fn contains(value: u64) -> bool {
-        if value < u64::MIN || value > u64::MAX {
+    pub fn contains(key: u64) -> bool {
+        if key < u64::MIN || key > u64::MAX {
             return false;
         }
 
-        if value == u64::MIN || value == 1 || value == 2 || value == u64::MAX {
+        if key == u64::MIN || key == 1 || key == 2 || key == u64::MAX {
             return true;
         }
 

@@ -8,15 +8,15 @@
 
 class BinarySearchStructure_SByte_5 final
 {
-    static constexpr std::array<int8_t, 5> entries = {
+    static constexpr std::array<int8_t, 5> keys = {
         std::numeric_limits<int8_t>::lowest(), -1, 0, 1, std::numeric_limits<int8_t>::max()
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const int8_t value) noexcept
+    static bool contains(const int8_t key) noexcept
     {
-        if (value < std::numeric_limits<int8_t>::lowest() || value > std::numeric_limits<int8_t>::max())
+        if (key < std::numeric_limits<int8_t>::lowest() || key > std::numeric_limits<int8_t>::max())
             return false;
 
         size_t lo = 0;
@@ -25,10 +25,10 @@ public:
         {
             const size_t mid = lo + ((hi - lo) >> 1);
 
-            if (entries[mid] == value)
+            if (keys[mid] == key)
                 return true;
 
-            if (entries[mid] < value)
+            if (keys[mid] < key)
                 lo = mid + 1;
             else
                 hi = mid - 1;

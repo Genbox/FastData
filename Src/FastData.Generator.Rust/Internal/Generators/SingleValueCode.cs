@@ -8,8 +8,8 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
     public override string Generate() =>
         $$"""
               {{MethodAttribute}}
-              {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
-                   {{GetEqualFunction(ToValueLabel(ctx.Item), "value")}}
+              {{MethodModifier}}fn contains(key: {{KeyTypeName}}) -> bool {
+                   {{GetEqualFunction(ToValueLabel(ctx.Item), "key")}}
               }
           """;
 }

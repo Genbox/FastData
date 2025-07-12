@@ -9,24 +9,24 @@ use std::ptr;
 pub struct EytzingerSearchStructure_Int64_5;
 
 impl EytzingerSearchStructure_Int64_5 {
-    const ENTRIES: [i64; 5] = [
+    const KEYS: [i64; 5] = [
         1, -1, i64::MAX, i64::MIN, 0
     ];
 
     #[must_use]
-    pub fn contains(value: i64) -> bool {
-        if value < i64::MIN || value > i64::MAX {
+    pub fn contains(key: i64) -> bool {
+        if key < i64::MIN || key > i64::MAX {
             return false;
         }
 
         let mut i: usize = 0;
-        while i < Self::ENTRIES.len() {
-            let entry = Self::ENTRIES[i];
+        while i < Self::KEYS.len() {
+            let entry = Self::KEYS[i];
 
-            if entry == value {
+            if entry == key {
                 return true;
             }
-            if entry < value {
+            if entry < key {
                 i = 2 * i + 2;
             } else {
                 i = 2 * i + 1;

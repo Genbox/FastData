@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 internal static class ConditionalStructure_UInt64_4
 {
     
-    public static bool Contains(ulong value)
+    public static bool Contains(ulong key)
     {
-        if (value < ulong.MinValue || value > ulong.MaxValue)
+        if (key < ulong.MinValue || key > ulong.MaxValue)
             return false;
 
-        switch (value)
+        switch (key)
         {
             case ulong.MinValue:
             case 1ul:

@@ -10,12 +10,12 @@ pub struct ConditionalStructure_Single_5;
 
 impl ConditionalStructure_Single_5 {
     #[must_use]
-    pub fn contains(value: f32) -> bool {
-        if value < f32::MIN || value > f32::MAX {
+    pub fn contains(key: f32) -> bool {
+        if key < f32::MIN || key > f32::MAX {
             return false;
         }
 
-        if value == f32::MIN || value == -1.0 || value == 0.0 || value == 1.0 || value == f32::MAX {
+        if key == f32::MIN || key == -1.0 || key == 0.0 || key == 1.0 || key == f32::MAX {
             return true;
         }
 

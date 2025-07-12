@@ -8,24 +8,24 @@
 
 class EytzingerSearchStructure_String_3 final
 {
-    static constexpr std::array<std::string_view, 3> entries = {
+    static constexpr std::array<std::string_view, 3> keys = {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "a", "item"
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const std::string_view value) noexcept
+    static bool contains(const std::string_view key) noexcept
     {
-        if (const size_t len = value.length(); len < 1u || len > 255u)
+        if (const size_t len = key.length(); len < 1u || len > 255u)
             return false;
 
         size_t i = 0;
-        while (i < entries.size())
+        while (i < keys.size())
         {
-            if (entries[i] == value)
+            if (keys[i] == key)
                 return true;
 
-            if (entries[i] < value)
+            if (keys[i] < key)
                 i = 2 * i + 2;
             else
                 i = 2 * i + 1;

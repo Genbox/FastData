@@ -8,14 +8,14 @@ using System.Runtime.InteropServices;
 
 internal static class BinarySearchStructure_SByte_5
 {
-    private static readonly sbyte[] _entries = new sbyte[] {
+    private static readonly sbyte[] _keys = new sbyte[] {
         sbyte.MinValue, -1, 0, 1, sbyte.MaxValue
     };
 
     
-    public static bool Contains(sbyte value)
+    public static bool Contains(sbyte key)
     {
-        if (value < sbyte.MinValue || value > sbyte.MaxValue)
+        if (key < sbyte.MinValue || key > sbyte.MaxValue)
             return false;
 
         int lo = 0;
@@ -23,7 +23,7 @@ internal static class BinarySearchStructure_SByte_5
         while (lo <= hi)
         {
             int i = lo + ((hi - lo) >> 1);
-            int order = _entries[i].CompareTo(value);
+            int order = _keys[i].CompareTo(key);
 
             if (order == 0)
                 return true;

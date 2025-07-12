@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 internal static class ConditionalStructure_String_13
 {
     
-    public static bool Contains(string value)
+    public static bool Contains(string key)
     {
-        if (value.Length != 1u)
+        if (key.Length != 1u)
             return false;
 
-        switch (value)
+        switch (key)
         {
             case "æ":
             case "à":

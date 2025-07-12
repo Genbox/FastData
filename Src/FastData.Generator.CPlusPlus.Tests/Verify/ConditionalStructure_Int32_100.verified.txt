@@ -10,12 +10,12 @@ class ConditionalStructure_Int32_100 final
 {
 public:
     [[nodiscard]]
-    static bool contains(const int32_t value) noexcept
+    static bool contains(const int32_t key) noexcept
     {
-        if (value < 0 || value > 99)
+        if (key < 0 || key > 99)
             return false;
 
-        if (value == 0 || value == 1 || value == 2 || value == 3 || value == 4 || value == 5 || value == 6 || value == 7 || value == 8 || value == 9 || value == 10 || value == 11 || value == 12 || value == 13 || value == 14 || value == 15 || value == 16 || value == 17 || value == 18 || value == 19 || value == 20 || value == 21 || value == 22 || value == 23 || value == 24 || value == 25 || value == 26 || value == 27 || value == 28 || value == 29 || value == 30 || value == 31 || value == 32 || value == 33 || value == 34 || value == 35 || value == 36 || value == 37 || value == 38 || value == 39 || value == 40 || value == 41 || value == 42 || value == 43 || value == 44 || value == 45 || value == 46 || value == 47 || value == 48 || value == 49 || value == 50 || value == 51 || value == 52 || value == 53 || value == 54 || value == 55 || value == 56 || value == 57 || value == 58 || value == 59 || value == 60 || value == 61 || value == 62 || value == 63 || value == 64 || value == 65 || value == 66 || value == 67 || value == 68 || value == 69 || value == 70 || value == 71 || value == 72 || value == 73 || value == 74 || value == 75 || value == 76 || value == 77 || value == 78 || value == 79 || value == 80 || value == 81 || value == 82 || value == 83 || value == 84 || value == 85 || value == 86 || value == 87 || value == 88 || value == 89 || value == 90 || value == 91 || value == 92 || value == 93 || value == 94 || value == 95 || value == 96 || value == 97 || value == 98 || value == 99)
+        if (key == 0 || key == 1 || key == 2 || key == 3 || key == 4 || key == 5 || key == 6 || key == 7 || key == 8 || key == 9 || key == 10 || key == 11 || key == 12 || key == 13 || key == 14 || key == 15 || key == 16 || key == 17 || key == 18 || key == 19 || key == 20 || key == 21 || key == 22 || key == 23 || key == 24 || key == 25 || key == 26 || key == 27 || key == 28 || key == 29 || key == 30 || key == 31 || key == 32 || key == 33 || key == 34 || key == 35 || key == 36 || key == 37 || key == 38 || key == 39 || key == 40 || key == 41 || key == 42 || key == 43 || key == 44 || key == 45 || key == 46 || key == 47 || key == 48 || key == 49 || key == 50 || key == 51 || key == 52 || key == 53 || key == 54 || key == 55 || key == 56 || key == 57 || key == 58 || key == 59 || key == 60 || key == 61 || key == 62 || key == 63 || key == 64 || key == 65 || key == 66 || key == 67 || key == 68 || key == 69 || key == 70 || key == 71 || key == 72 || key == 73 || key == 74 || key == 75 || key == 76 || key == 77 || key == 78 || key == 79 || key == 80 || key == 81 || key == 82 || key == 83 || key == 84 || key == 85 || key == 86 || key == 87 || key == 88 || key == 89 || key == 90 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96 || key == 97 || key == 98 || key == 99)
             return true;
 
         return false;

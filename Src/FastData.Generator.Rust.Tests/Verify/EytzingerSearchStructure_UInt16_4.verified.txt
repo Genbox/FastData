@@ -9,24 +9,24 @@ use std::ptr;
 pub struct EytzingerSearchStructure_UInt16_4;
 
 impl EytzingerSearchStructure_UInt16_4 {
-    const ENTRIES: [u16; 4] = [
+    const KEYS: [u16; 4] = [
         2, 1, u16::MAX, u16::MIN
     ];
 
     #[must_use]
-    pub fn contains(value: u16) -> bool {
-        if value < u16::MIN || value > u16::MAX {
+    pub fn contains(key: u16) -> bool {
+        if key < u16::MIN || key > u16::MAX {
             return false;
         }
 
         let mut i: usize = 0;
-        while i < Self::ENTRIES.len() {
-            let entry = Self::ENTRIES[i];
+        while i < Self::KEYS.len() {
+            let entry = Self::KEYS[i];
 
-            if entry == value {
+            if entry == key {
                 return true;
             }
-            if entry < value {
+            if entry < key {
                 i = 2 * i + 2;
             } else {
                 i = 2 * i + 1;

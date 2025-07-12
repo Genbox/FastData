@@ -11,19 +11,19 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
 
     protected override string GetMaskEarlyExit(ulong bitSet) =>
         $"""
-                 if (({bitSet}UL & (1UL << (value.Length - 1))) == 0)
+                 if (({bitSet}UL & (1UL << (key.Length - 1))) == 0)
                      return false;
          """;
 
     protected override string GetValueEarlyExits<T>(T min, T max) =>
         $"""
-                 if ({(min.Equals(max) ? $"value != {map.ToValueLabel(max)}" : $"value < {map.ToValueLabel(min)} || value > {map.ToValueLabel(max)}")})
+                 if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
                      return false;
          """;
 
     protected override string GetLengthEarlyExits(uint min, uint max, uint minByte, uint maxByte) =>
         $"""
-                 if ({(min.Equals(max) ? $"value.Length != {map.ToValueLabel(max)}" : $"value.Length < {map.ToValueLabel(min)} || value.Length > {map.ToValueLabel(max)}")})
+                 if ({(min.Equals(max) ? $"key.Length != {map.ToValueLabel(max)}" : $"key.Length < {map.ToValueLabel(min)} || key.Length > {map.ToValueLabel(max)}")})
                      return false;
          """;
 }

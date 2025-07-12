@@ -8,13 +8,13 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> entries = {
+              {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
           {{FormatColumns(ctx.Keys, ToValueLabel)}}
               };
 
           public:
               {{MethodAttribute}}
-              {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+              {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
               {
           {{EarlyExits}}
 
@@ -24,10 +24,10 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                   {
                       const size_t mid = lo + ((hi - lo) >> 1);
 
-                      if ({{GetEqualFunction("entries[mid]", "value")}})
+                      if ({{GetEqualFunction("keys[mid]", "key")}})
                           return true;
 
-                      if (entries[mid] < value)
+                      if (keys[mid] < key)
                           lo = mid + 1;
                       else
                           hi = mid - 1;

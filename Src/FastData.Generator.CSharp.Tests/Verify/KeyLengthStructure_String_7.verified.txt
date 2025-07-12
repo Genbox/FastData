@@ -13,12 +13,12 @@ internal static class KeyLengthStructure_String_7
     };
 
     
-    public static bool Contains(string value)
+    public static bool Contains(string key)
     {
-        if ((1012UL & (1UL << (value.Length - 1))) == 0)
+        if ((1012UL & (1UL << (key.Length - 1))) == 0)
             return false;
 
-        return StringComparer.Ordinal.Equals(value, _entries[value.Length - 3]);
+        return StringComparer.Ordinal.Equals(key, _entries[key.Length - 3]);
     }
 
     public const uint ItemCount = 7;

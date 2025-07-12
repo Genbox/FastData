@@ -12,10 +12,10 @@ internal sealed class HashTableChainCode<TKey, TValue>(HashTableChainContext<TKe
               {
                   {{(ctx.StoreHashCode ? $"{HashSizeType} hash_code;" : "")}}
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
-                  {{KeyTypeName}} value;
+                  {{KeyTypeName}} key;
 
-                  e({{(ctx.StoreHashCode ? $"const {HashSizeType} hash_code, " : "")}}const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{KeyTypeName}} value)
-                     : {{(ctx.StoreHashCode ? "hash_code(hash_code), " : "")}}next(next), value(value) {}
+                  e({{(ctx.StoreHashCode ? $"const {HashSizeType} hash_code, " : "")}}const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{KeyTypeName}} key)
+                     : {{(ctx.StoreHashCode ? "hash_code(hash_code), " : "")}}next(next), key(key) {}
               };
 
               {{FieldModifier}}std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length.ToStringInvariant()}}> buckets = {
@@ -30,19 +30,19 @@ internal sealed class HashTableChainCode<TKey, TValue>(HashTableChainContext<TKe
 
           public:
               {{MethodAttribute}}
-              {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+              {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
               {
           {{EarlyExits}}
 
-                  const {{HashSizeType}} hash = get_hash(value);
+                  const {{HashSizeType}} hash = get_hash(key);
                   const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} i = buckets[index] - static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(1);
 
                   while (i >= 0)
                   {
-                      const auto& [{{(ctx.StoreHashCode ? "hash_code, " : "")}}next, value1] = entries[i];
+                      const auto& [{{(ctx.StoreHashCode ? "hash_code, " : "")}}next, key1] = entries[i];
 
-                      if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("hash_code", "hash")} && " : "")}}{{GetEqualFunction("value1", "value")}})
+                      if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("hash_code", "hash")} && " : "")}}{{GetEqualFunction("key1", "key")}})
                           return true;
 
                       i = next;

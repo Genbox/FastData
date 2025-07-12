@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 internal static class ConditionalStructure_Int64_5
 {
     
-    public static bool Contains(long value)
+    public static bool Contains(long key)
     {
-        if (value < long.MinValue || value > long.MaxValue)
+        if (key < long.MinValue || key > long.MaxValue)
             return false;
 
-        switch (value)
+        switch (key)
         {
             case long.MinValue:
             case -1l:

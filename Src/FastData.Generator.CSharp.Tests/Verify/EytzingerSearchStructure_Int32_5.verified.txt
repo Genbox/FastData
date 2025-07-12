@@ -8,20 +8,20 @@ using System.Runtime.InteropServices;
 
 internal static class EytzingerSearchStructure_Int32_5
 {
-    private static readonly int[] _entries = new int[] {
+    private static readonly int[] _keys = new int[] {
         1, -1, int.MaxValue, int.MinValue, 0
     };
 
     
-    public static bool Contains(int value)
+    public static bool Contains(int key)
     {
-        if (value < int.MinValue || value > int.MaxValue)
+        if (key < int.MinValue || key > int.MaxValue)
             return false;
 
         int i = 0;
-        while (i < _entries.Length)
+        while (i < _keys.Length)
         {
-            int comparison = _entries[i].CompareTo(value);
+            int comparison = _keys[i].CompareTo(key);
 
             if (comparison == 0)
                 return true;

@@ -14,7 +14,7 @@ internal sealed class HashTableChainCode<TKey, TValue>(HashTableChainContext<TKe
                                                                         {{FieldModifier}}struct E {
                                                                             {{(ctx.StoreHashCode ? $"hash_code: {HashSizeType}," : "")}}
                                                                             next: {{GetSmallestSignedType(ctx.Buckets.Length)}},
-                                                                            value: {{TypeNameWithLifetime}},
+                                                                            key: {{TypeNameWithLifetime}},
                                                                         }
                                                                         """);
 
@@ -24,22 +24,22 @@ internal sealed class HashTableChainCode<TKey, TValue>(HashTableChainContext<TKe
                      ];
 
                      {{FieldModifier}}const ENTRIES: [E; {{ctx.Entries.Length}}] = [
-                 {{FormatColumns(ctx.Entries, x => $"E {{ {(ctx.StoreHashCode ? $"hash_code: {x.Hash}, " : "")}next: {x.Next.ToStringInvariant()}, value: {ToValueLabel(x.Value)} }}")}}
+                 {{FormatColumns(ctx.Entries, x => $"E {{ {(ctx.StoreHashCode ? $"hash_code: {x.Hash}, " : "")}next: {x.Next.ToStringInvariant()}, key: {ToValueLabel(x.Value)} }}")}}
                      ];
 
                  {{HashSource}}
 
                      {{MethodAttribute}}
-                     {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
+                     {{MethodModifier}}fn contains(key: {{KeyTypeName}}) -> bool {
                  {{EarlyExits}}
 
-                         let hash = unsafe { Self::get_hash(value) };
+                         let hash = unsafe { Self::get_hash(key) };
                          let index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                          let mut i: {{GetSmallestSignedType(ctx.Buckets.Length)}} = (Self::BUCKETS[index as usize] as {{GetSmallestSignedType(ctx.Buckets.Length)}}) - 1;
 
                          while i >= 0 {
                              let entry = &Self::ENTRIES[i as usize];
-                             if {{(ctx.StoreHashCode ? GetEqualFunction("entry.hash_code", "hash") + " && " : "")}}{{GetEqualFunction("entry.value", "value")}} {
+                             if {{(ctx.StoreHashCode ? GetEqualFunction("entry.hash_code", "hash") + " && " : "")}}{{GetEqualFunction("entry.key", "key")}} {
                                  return true;
                              }
                              i = entry.next;

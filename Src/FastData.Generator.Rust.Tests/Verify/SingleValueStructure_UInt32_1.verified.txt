@@ -10,8 +10,8 @@ pub struct SingleValueStructure_UInt32_1;
 
 impl SingleValueStructure_UInt32_1 {
     #[must_use]
-    pub fn contains(value: u32) -> bool {
-         1 == value
+    pub fn contains(key: u32) -> bool {
+         1 == key
     }
 
     pub const ITEM_COUNT: usize = 1;

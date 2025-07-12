@@ -14,7 +14,7 @@ impl HashTableChainStructure_Char_3 {
     ];
 
     const ENTRIES: [E; 3] = [
-        E { next: -1, value: char::MIN }, E { next: -1, value: 'a' }, E { next: 1, value: '' }
+        E { next: -1, key: char::MIN }, E { next: -1, key: 'a' }, E { next: 1, key: '' }
     ];
 
     #[inline(always)]
@@ -23,18 +23,18 @@ impl HashTableChainStructure_Char_3 {
     }
 
     #[must_use]
-    pub fn contains(value: char) -> bool {
-        if value < char::MIN || value > '' {
+    pub fn contains(key: char) -> bool {
+        if key < char::MIN || key > '' {
             return false;
         }
 
-        let hash = unsafe { Self::get_hash(value) };
+        let hash = unsafe { Self::get_hash(key) };
         let index = hash % 3;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.value == value {
+            if entry.key == key {
                 return true;
             }
             i = entry.next;
@@ -50,5 +50,5 @@ impl HashTableChainStructure_Char_3 {
 struct E {
     
     next: i8,
-    value: char,
+    key: char,
 }

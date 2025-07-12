@@ -30,11 +30,11 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
               };
 
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} key)
               {
           {{EarlyExits}}
 
-                  return {{GetEqualFunction("value", $"_entries[value.Length - {ctx.MinLength.ToStringInvariant()}]")}};
+                  return {{GetEqualFunction("key", $"_entries[key.Length - {ctx.MinLength.ToStringInvariant()}]")}};
               }
           """;
 
@@ -44,15 +44,15 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
 
         return $$"""
                      {{MethodAttribute}}
-                     {{MethodModifier}}bool Contains({{KeyTypeName}} value)
+                     {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                      {
                  {{EarlyExits}}
 
-                         switch (value.Length)
+                         switch (key.Length)
                          {
                  {{FormatList(filtered, x => $"""
                                                           case {x.Length}:
-                                                              return {GetEqualFunction("value", ToValueLabel(x))};
+                                                              return {GetEqualFunction("key", ToValueLabel(x))};
                                               """)}}
                              default:
                                  return false;
@@ -69,17 +69,17 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                      };
 
                      {{MethodAttribute}}
-                     {{MethodModifier}}bool Contains({{KeyTypeName}} value)
+                     {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                      {
                  {{EarlyExits}}
-                         {{KeyTypeName}}[]? bucket = _entries[value.Length - {{ctx.MinLength}}];
+                         {{KeyTypeName}}[]? bucket = _entries[key.Length - {{ctx.MinLength}}];
 
                          if (bucket == null)
                              return false;
 
                          foreach ({{KeyTypeName}} str in bucket)
                          {
-                             if ({{GetEqualFunction("value", "str")}})
+                             if ({{GetEqualFunction("key", "str")}})
                                  return true;
                          }
 

@@ -19,11 +19,11 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx) 
 
                  public:
                      {{MethodAttribute}}
-                     {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+                     {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
                      {
                  {{EarlyExits}}
 
-                         return {{GetEqualFunction("value", $"entries[value.length() - {ctx.MinLength.ToStringInvariant()}]")}};
+                         return {{GetEqualFunction("key", $"entries[key.length() - {ctx.MinLength.ToStringInvariant()}]")}};
                      }
                  """;
     }
@@ -39,17 +39,17 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx) 
 
                  public:
                      {{MethodAttribute}}
-                     {{MethodModifier}}bool contains(const {{KeyTypeName}}& value){{PostMethodModifier}}
+                     {{MethodModifier}}bool contains(const {{KeyTypeName}}& key){{PostMethodModifier}}
                      {
                  {{EarlyExits}}
-                         std::vector<{{KeyTypeName}}> bucket = entries[value.length() - {{ctx.MinLength.ToStringInvariant()}}];
+                         std::vector<{{KeyTypeName}}> bucket = entries[key.length() - {{ctx.MinLength.ToStringInvariant()}}];
 
                          if (bucket == nullptr)
                              return false;
 
                          foreach ({{KeyTypeName}} str in bucket)
                          {
-                             if ({{GetEqualFunction("str", "value")}})
+                             if ({{GetEqualFunction("str", "key")}})
                                  return true;
                          }
 

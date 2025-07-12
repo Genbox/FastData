@@ -10,9 +10,9 @@ class SingleValueStructure_Int64_1 final
 {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const int64_t value) noexcept
+    static constexpr bool contains(const int64_t key) noexcept
     {
-        return value == 1ll;
+        return key == 1ll;
     }
 
     static constexpr size_t item_count = 1;

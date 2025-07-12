@@ -20,26 +20,29 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx) : 
 
                      public:
                          {{MethodAttribute}}
-                         {{MethodModifier}}{{ValueTypeName}} get_value(const {{KeyTypeName}} value){{PostMethodModifier}}
+                         {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, {{ValueTypeName}}& value){{PostMethodModifier}}
                          {
                      {{EarlyExits}}
 
                              for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
                              {
-                                 if ({{GetEqualFunction("keys[i]", "value")}})
-                                    return values[i];
+                                 if ({{GetEqualFunction("keys[i]", "key")}})
+                                 {
+                                     value = values[i];
+                                     return true;
+                                 }
                              }
-                             return NULL;
+                             return false;
                          }
 
                          {{MethodAttribute}}
-                         {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+                         {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
                          {
                      {{EarlyExits}}
 
                              for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
                              {
-                                 if ({{GetEqualFunction("keys[i]", "value")}})
+                                 if ({{GetEqualFunction("keys[i]", "key")}})
                                     return true;
                              }
                              return false;
@@ -53,13 +56,13 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx) : 
 
                  public:
                      {{MethodAttribute}}
-                     {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+                     {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
                      {
                  {{EarlyExits}}
 
                          for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
                          {
-                             if ({{GetEqualFunction("keys[i]", "value")}})
+                             if ({{GetEqualFunction("keys[i]", "key")}})
                                 return true;
                          }
                          return false;

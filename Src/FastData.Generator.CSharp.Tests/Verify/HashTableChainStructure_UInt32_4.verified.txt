@@ -17,12 +17,12 @@ internal static class HashTableChainStructure_UInt32_4
     };
 
     
-    public static bool Contains(uint value)
+    public static bool Contains(uint key)
     {
-        if (value < uint.MinValue || value > uint.MaxValue)
+        if (key < uint.MinValue || key > uint.MaxValue)
             return false;
 
-        ulong hash = Hash(value);
+        ulong hash = Hash(key);
         uint index = (uint)(hash & 3);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
@@ -30,7 +30,7 @@ internal static class HashTableChainStructure_UInt32_4
         {
             ref E entry = ref _entries[i];
 
-            if (value == entry.Value)
+            if (key == entry.Key)
                 return true;
 
             i = entry.Next;
@@ -51,13 +51,13 @@ internal static class HashTableChainStructure_UInt32_4
     {
         
         internal readonly sbyte Next;
-        internal readonly uint Value;
+        internal readonly uint Key;
 
-        internal E(sbyte next, uint value)
+        internal E(sbyte next, uint key)
         {
             
             Next = next;
-            Value = value;
+            Key = key;
         }
     }
 

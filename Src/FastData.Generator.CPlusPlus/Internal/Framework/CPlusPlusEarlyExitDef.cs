@@ -11,19 +11,19 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
 
     protected override string GetMaskEarlyExit(ulong bitSet) =>
         $"""
-                 if (({bitSet}ULL & (1ULL << (value.length() - 1))) == 0)
+                 if (({bitSet}ULL & (1ULL << (key.length() - 1))) == 0)
                      return false;
          """;
 
     protected override string GetValueEarlyExits<T>(T min, T max) =>
         $"""
-                 if ({(min.Equals(max) ? $"value != {map.ToValueLabel(max)}" : $"value < {map.ToValueLabel(min)} || value > {map.ToValueLabel(max)}")})
+                 if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
                      return false;
          """;
 
     protected override string GetLengthEarlyExits(uint min, uint max, uint minByte, uint maxByte) =>
         $"""
-                 if ({(min.Equals(max) ? $"value.length() != {map.ToValueLabel(max)}" : $"const size_t len = value.length(); len < {map.ToValueLabel(min)} || len > {map.ToValueLabel(max)}")})
+                 if ({(min.Equals(max) ? $"key.length() != {map.ToValueLabel(max)}" : $"const size_t len = key.length(); len < {map.ToValueLabel(min)} || len > {map.ToValueLabel(max)}")})
                      return false;
          """;
 }

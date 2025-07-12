@@ -8,15 +8,15 @@
 
 class BinarySearchStructure_Char_3 final
 {
-    static constexpr std::array<char, 3> entries = {
+    static constexpr std::array<char, 3> keys = {
         0, 97, 127
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const char value) noexcept
+    static bool contains(const char key) noexcept
     {
-        if (value < 0 || value > 127)
+        if (key < 0 || key > 127)
             return false;
 
         size_t lo = 0;
@@ -25,10 +25,10 @@ public:
         {
             const size_t mid = lo + ((hi - lo) >> 1);
 
-            if (entries[mid] == value)
+            if (keys[mid] == key)
                 return true;
 
-            if (entries[mid] < value)
+            if (keys[mid] < key)
                 lo = mid + 1;
             else
                 hi = mid - 1;

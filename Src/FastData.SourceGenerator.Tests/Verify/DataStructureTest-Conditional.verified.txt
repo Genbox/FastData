@@ -9,11 +9,11 @@ using System.Runtime.InteropServices;
 internal static class StaticData
 {
     
-    public static bool Contains(string value)
+    public static bool Contains(string key)
     {
 
 
-        switch (value)
+        switch (key)
         {
             case "item1":
             case "item2":

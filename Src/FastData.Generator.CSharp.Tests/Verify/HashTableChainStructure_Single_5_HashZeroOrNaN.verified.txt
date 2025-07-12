@@ -17,12 +17,12 @@ internal static class HashTableChainStructure_Single_5_HashZeroOrNaN
     };
 
     
-    public static bool Contains(float value)
+    public static bool Contains(float key)
     {
-        if (value < 1f || value > 5f)
+        if (key < 1f || key > 5f)
             return false;
 
-        ulong hash = Hash(value);
+        ulong hash = Hash(key);
         uint index = (uint)(hash % 5);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
@@ -30,7 +30,7 @@ internal static class HashTableChainStructure_Single_5_HashZeroOrNaN
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && value == entry.Value)
+            if (entry.HashCode == hash && key == entry.Key)
                 return true;
 
             i = entry.Next;
@@ -51,13 +51,13 @@ internal static class HashTableChainStructure_Single_5_HashZeroOrNaN
     {
         internal readonly ulong HashCode;
         internal readonly sbyte Next;
-        internal readonly float Value;
+        internal readonly float Key;
 
-        internal E(ulong hashCode, sbyte next, float value)
+        internal E(ulong hashCode, sbyte next, float key)
         {
             HashCode = hashCode;
             Next = next;
-            Value = value;
+            Key = key;
         }
     }
 

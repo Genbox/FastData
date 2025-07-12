@@ -19,15 +19,15 @@ inline static const std::array<int32_t, 3> entries = {
 
 public:
     [[nodiscard]]
-    static bool contains(const int32_t value) noexcept
+    static bool contains(const int32_t key) noexcept
     {
-        if (value < 1 || value > 3)
+        if (key < 1 || key > 3)
             return false;
 
-        const uint64_t hash = get_hash(value);
+        const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;
 
-        return value == entries[index];
+        return key == entries[index];
     }
 
     static constexpr size_t item_count = 3;

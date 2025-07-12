@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 internal static class EytzingerSearchStructure_Int32_100
 {
-    private static readonly int[] _entries = new int[] {
+    private static readonly int[] _keys = new int[] {
         63, 31, 84, 15, 47, 76, 92, 7, 23, 39, 
         55, 71, 80, 88, 96, 3, 11, 19, 27, 35, 
         43, 51, 59, 67, 74, 78, 82, 86, 90, 94, 
@@ -22,15 +22,15 @@ internal static class EytzingerSearchStructure_Int32_100
     };
 
     
-    public static bool Contains(int value)
+    public static bool Contains(int key)
     {
-        if (value < 0 || value > 99)
+        if (key < 0 || key > 99)
             return false;
 
         int i = 0;
-        while (i < _entries.Length)
+        while (i < _keys.Length)
         {
-            int comparison = _entries[i].CompareTo(value);
+            int comparison = _keys[i].CompareTo(key);
 
             if (comparison == 0)
                 return true;

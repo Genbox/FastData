@@ -8,20 +8,20 @@ using System.Runtime.InteropServices;
 
 internal static class EytzingerSearchStructure_UInt64_4
 {
-    private static readonly ulong[] _entries = new ulong[] {
+    private static readonly ulong[] _keys = new ulong[] {
         2ul, 1ul, ulong.MaxValue, ulong.MinValue
     };
 
     
-    public static bool Contains(ulong value)
+    public static bool Contains(ulong key)
     {
-        if (value < ulong.MinValue || value > ulong.MaxValue)
+        if (key < ulong.MinValue || key > ulong.MaxValue)
             return false;
 
         int i = 0;
-        while (i < _entries.Length)
+        while (i < _keys.Length)
         {
-            int comparison = _entries[i].CompareTo(value);
+            int comparison = _keys[i].CompareTo(key);
 
             if (comparison == 0)
                 return true;

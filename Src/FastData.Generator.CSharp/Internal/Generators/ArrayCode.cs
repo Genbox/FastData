@@ -8,18 +8,18 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}{{KeyTypeName}}[] _entries = new {{KeyTypeName}}[] {
+              {{FieldModifier}}{{KeyTypeName}}[] _keys = new {{KeyTypeName}}[] {
           {{FormatColumns(ctx.Keys, ToValueLabel)}}
               };
 
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} key)
               {
           {{EarlyExits}}
 
                   for (int i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
                   {
-                      if ({{GetEqualFunction("value", "_entries[i]")}})
+                      if ({{GetEqualFunction("key", "_keys[i]")}})
                          return true;
                   }
                   return false;

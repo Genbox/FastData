@@ -10,9 +10,9 @@ class SingleValueStructure_Single_1 final
 {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const float value) noexcept
+    static constexpr bool contains(const float key) noexcept
     {
-        return value == 1.0f;
+        return key == 1.0f;
     }
 
     static constexpr size_t item_count = 1;

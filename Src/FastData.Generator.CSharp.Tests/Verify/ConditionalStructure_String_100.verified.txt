@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 internal static class ConditionalStructure_String_100
 {
     
-    public static bool Contains(string value)
+    public static bool Contains(string key)
     {
-        if (value.Length < 1u || value.Length > 2u)
+        if (key.Length < 1u || key.Length > 2u)
             return false;
 
-        switch (value)
+        switch (key)
         {
             case "0":
             case "1":

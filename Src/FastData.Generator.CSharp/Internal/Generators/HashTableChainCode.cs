@@ -17,11 +17,11 @@ internal sealed class HashTableChainCode<TKey, TValue>(HashTableChainContext<TKe
               };
 
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} key)
               {
           {{EarlyExits}}
 
-                  {{HashSizeType}} hash = Hash(value);
+                  {{HashSizeType}} hash = Hash(key);
                   {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                   {{GetSmallestSignedType(ctx.Buckets.Length)}} i = ({{GetSmallestSignedType(ctx.Buckets.Length)}})(_buckets[index] - 1);
 
@@ -29,7 +29,7 @@ internal sealed class HashTableChainCode<TKey, TValue>(HashTableChainContext<TKe
                   {
                       ref E entry = ref _entries[i];
 
-                      if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", HashSizeDataType)} && " : "")}}{{GetEqualFunction("value", "entry.Value")}})
+                      if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", HashSizeDataType)} && " : "")}}{{GetEqualFunction("key", "entry.Key")}})
                           return true;
 
                       i = entry.Next;
@@ -45,13 +45,13 @@ internal sealed class HashTableChainCode<TKey, TValue>(HashTableChainContext<TKe
               {
                   {{(ctx.StoreHashCode ? $"internal readonly {HashSizeType} HashCode;" : "")}}
                   internal readonly {{GetSmallestSignedType(ctx.Buckets.Length)}} Next;
-                  internal readonly {{KeyTypeName}} Value;
+                  internal readonly {{KeyTypeName}} Key;
 
-                  internal E({{(ctx.StoreHashCode ? $"{HashSizeType} hashCode, " : "")}}{{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{KeyTypeName}} value)
+                  internal E({{(ctx.StoreHashCode ? $"{HashSizeType} hashCode, " : "")}}{{GetSmallestSignedType(ctx.Buckets.Length)}} next, {{KeyTypeName}} key)
                   {
                       {{(ctx.StoreHashCode ? "HashCode = hashCode;" : "")}}
                       Next = next;
-                      Value = value;
+                      Key = key;
                   }
               }
           """;

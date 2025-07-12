@@ -10,8 +10,8 @@ pub struct SingleValueStructure_UInt64_1;
 
 impl SingleValueStructure_UInt64_1 {
     #[must_use]
-    pub fn contains(value: u64) -> bool {
-         1 == value
+    pub fn contains(key: u64) -> bool {
+         1 == key
     }
 
     pub const ITEM_COUNT: usize = 1;

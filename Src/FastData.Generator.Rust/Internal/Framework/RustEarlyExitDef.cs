@@ -11,21 +11,21 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
 
     protected override string GetMaskEarlyExit(ulong bitSet) =>
         $$"""
-                  if {{bitSet}}u64 & (1u64 << (value.len() - 1)) == 0 {
+                  if {{bitSet}}u64 & (1u64 << (key.len() - 1)) == 0 {
                       return false;
                   }
           """;
 
     protected override string GetValueEarlyExits<T>(T min, T max) =>
         $$"""
-                  if {{(min.Equals(max) ? $"value != {map.ToValueLabel(max)}" : $"value < {map.ToValueLabel(min)} || value > {map.ToValueLabel(max)}")}} {
+                  if {{(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")}} {
                       return false;
                   }
           """;
 
     protected override string GetLengthEarlyExits(uint min, uint max, uint minByte, uint maxByte) =>
         $$"""
-                  if {{(minByte.Equals(maxByte) ? $"value.len() != {map.ToValueLabel(maxByte)} as usize" : $"value.len() < {map.ToValueLabel(minByte)} as usize || value.len() > {map.ToValueLabel(maxByte)} as usize")}} {
+                  if {{(minByte.Equals(maxByte) ? $"key.len() != {map.ToValueLabel(maxByte)} as usize" : $"key.len() < {map.ToValueLabel(minByte)} as usize || key.len() > {map.ToValueLabel(maxByte)} as usize")}} {
                       return false;
                   }
           """;

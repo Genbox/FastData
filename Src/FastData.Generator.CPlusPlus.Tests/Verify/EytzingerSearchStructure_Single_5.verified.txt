@@ -8,24 +8,24 @@
 
 class EytzingerSearchStructure_Single_5 final
 {
-    static constexpr std::array<float, 5> entries = {
+    static constexpr std::array<float, 5> keys = {
         1.0f, -1.0f, std::numeric_limits<float>::max(), std::numeric_limits<float>::lowest(), 0.0f
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const float value) noexcept
+    static bool contains(const float key) noexcept
     {
-        if (value < std::numeric_limits<float>::lowest() || value > std::numeric_limits<float>::max())
+        if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())
             return false;
 
         size_t i = 0;
-        while (i < entries.size())
+        while (i < keys.size())
         {
-            if (entries[i] == value)
+            if (keys[i] == key)
                 return true;
 
-            if (entries[i] < value)
+            if (keys[i] < key)
                 i = 2 * i + 2;
             else
                 i = 2 * i + 1;

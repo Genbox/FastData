@@ -8,7 +8,7 @@
 
 class EytzingerSearchStructure_Single_100 final
 {
-    static constexpr std::array<float, 100> entries = {
+    static constexpr std::array<float, 100> keys = {
         63.0f, 31.0f, 84.0f, 15.0f, 47.0f, 76.0f, 92.0f, 7.0f, 23.0f, 39.0f, 
         55.0f, 71.0f, 80.0f, 88.0f, 96.0f, 3.0f, 11.0f, 19.0f, 27.0f, 35.0f, 
         43.0f, 51.0f, 59.0f, 67.0f, 74.0f, 78.0f, 82.0f, 86.0f, 90.0f, 94.0f, 
@@ -23,18 +23,18 @@ class EytzingerSearchStructure_Single_100 final
 
 public:
     [[nodiscard]]
-    static bool contains(const float value) noexcept
+    static bool contains(const float key) noexcept
     {
-        if (value < 0.0f || value > 99.0f)
+        if (key < 0.0f || key > 99.0f)
             return false;
 
         size_t i = 0;
-        while (i < entries.size())
+        while (i < keys.size())
         {
-            if (entries[i] == value)
+            if (keys[i] == key)
                 return true;
 
-            if (entries[i] < value)
+            if (keys[i] < key)
                 i = 2 * i + 2;
             else
                 i = 2 * i + 1;

@@ -9,7 +9,7 @@ use std::ptr;
 pub struct EytzingerSearchStructure_Single_100;
 
 impl EytzingerSearchStructure_Single_100 {
-    const ENTRIES: [f32; 100] = [
+    const KEYS: [f32; 100] = [
         63.0, 31.0, 84.0, 15.0, 47.0, 76.0, 92.0, 7.0, 23.0, 39.0, 
         55.0, 71.0, 80.0, 88.0, 96.0, 3.0, 11.0, 19.0, 27.0, 35.0, 
         43.0, 51.0, 59.0, 67.0, 74.0, 78.0, 82.0, 86.0, 90.0, 94.0, 
@@ -23,19 +23,19 @@ impl EytzingerSearchStructure_Single_100 {
     ];
 
     #[must_use]
-    pub fn contains(value: f32) -> bool {
-        if value < 0.0 || value > 99.0 {
+    pub fn contains(key: f32) -> bool {
+        if key < 0.0 || key > 99.0 {
             return false;
         }
 
         let mut i: usize = 0;
-        while i < Self::ENTRIES.len() {
-            let entry = Self::ENTRIES[i];
+        while i < Self::KEYS.len() {
+            let entry = Self::KEYS[i];
 
-            if entry == value {
+            if entry == key {
                 return true;
             }
-            if entry < value {
+            if entry < key {
                 i = 2 * i + 2;
             } else {
                 i = 2 * i + 1;

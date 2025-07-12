@@ -12,10 +12,10 @@ class HashTableChainStructure_UInt64_4 final
     {
         
         int8_t next;
-        uint64_t value;
+        uint64_t key;
 
-        e(const int8_t next, const uint64_t value)
-           : next(next), value(value) {}
+        e(const int8_t next, const uint64_t key)
+           : next(next), key(key) {}
     };
 
     static constexpr std::array<int8_t, 4> buckets = {
@@ -33,20 +33,20 @@ class HashTableChainStructure_UInt64_4 final
 
 public:
     [[nodiscard]]
-    static bool contains(const uint64_t value) noexcept
+    static bool contains(const uint64_t key) noexcept
     {
-        if (value < 0 || value > std::numeric_limits<uint64_t>::max())
+        if (key < 0 || key > std::numeric_limits<uint64_t>::max())
             return false;
 
-        const uint64_t hash = get_hash(value);
+        const uint64_t hash = get_hash(key);
         const size_t index = hash % 4;
         int8_t i = buckets[index] - static_cast<int8_t>(1);
 
         while (i >= 0)
         {
-            const auto& [next, value1] = entries[i];
+            const auto& [next, key1] = entries[i];
 
-            if (value1 == value)
+            if (key1 == key)
                 return true;
 
             i = next;

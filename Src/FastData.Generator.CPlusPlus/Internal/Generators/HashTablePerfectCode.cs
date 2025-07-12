@@ -10,11 +10,11 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
         ? $$"""
             struct e
             {
-                {{KeyTypeName}} value;
+                {{KeyTypeName}} key;
                 {{HashSizeType}} hash_code;
 
-                e(const {{KeyTypeName}} value, const {{HashSizeType}} hash_code)
-                : value(value), hash_code(hash_code) {}
+                e(const {{KeyTypeName}} key, const {{HashSizeType}} hash_code)
+                : key(key), hash_code(hash_code) {}
             };
 
             {{GetFieldModifier(false)}}std::array<e, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
@@ -25,15 +25,15 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
 
             public:
                 {{MethodAttribute}}
-                {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+                {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
                 {
             {{EarlyExits}}
 
-                    const {{HashSizeType}} hash = get_hash(value);
+                    const {{HashSizeType}} hash = get_hash(key);
                     const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                     const e& entry = entries[index];
 
-                    return {{GetEqualFunction("hash", "entry.hash_code")}} && {{GetEqualFunction("value", "entry.value")}};
+                    return {{GetEqualFunction("hash", "entry.hash_code")}} && {{GetEqualFunction("key", "entry.key")}};
                 }
             """
         : $$"""
@@ -45,14 +45,14 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
 
             public:
                 {{MethodAttribute}}
-                {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+                {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
                 {
             {{EarlyExits}}
 
-                    const {{HashSizeType}} hash = get_hash(value);
+                    const {{HashSizeType}} hash = get_hash(key);
                     const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
 
-                    return {{GetEqualFunction("value", "entries[index]")}};
+                    return {{GetEqualFunction("key", "entries[index]")}};
                 }
             """;
 }

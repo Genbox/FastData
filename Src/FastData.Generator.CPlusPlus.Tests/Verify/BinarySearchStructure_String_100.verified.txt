@@ -8,7 +8,7 @@
 
 class BinarySearchStructure_String_100 final
 {
-    static constexpr std::array<std::string_view, 100> entries = {
+    static constexpr std::array<std::string_view, 100> keys = {
         "0", "1", "10", "11", "12", "13", "14", "15", "16", "17", 
         "18", "19", "2", "20", "21", "22", "23", "24", "25", "26", 
         "27", "28", "29", "3", "30", "31", "32", "33", "34", "35", 
@@ -23,9 +23,9 @@ class BinarySearchStructure_String_100 final
 
 public:
     [[nodiscard]]
-    static bool contains(const std::string_view value) noexcept
+    static bool contains(const std::string_view key) noexcept
     {
-        if (const size_t len = value.length(); len < 1u || len > 2u)
+        if (const size_t len = key.length(); len < 1u || len > 2u)
             return false;
 
         size_t lo = 0;
@@ -34,10 +34,10 @@ public:
         {
             const size_t mid = lo + ((hi - lo) >> 1);
 
-            if (entries[mid] == value)
+            if (keys[mid] == key)
                 return true;
 
-            if (entries[mid] < value)
+            if (keys[mid] < key)
                 lo = mid + 1;
             else
                 hi = mid - 1;

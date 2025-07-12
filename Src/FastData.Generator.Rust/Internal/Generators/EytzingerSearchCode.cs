@@ -7,22 +7,22 @@ internal sealed class EytzingerSearchCode<TKey, TValue>(EytzingerSearchContext<T
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}const ENTRIES: [{{KeyTypeName}}; {{ctx.Keys.Length}}] = [
+              {{FieldModifier}}const KEYS: [{{KeyTypeName}}; {{ctx.Keys.Length}}] = [
           {{FormatColumns(ctx.Keys, ToValueLabel)}}
               ];
 
               {{MethodAttribute}}
-              {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
+              {{MethodModifier}}fn contains(key: {{KeyTypeName}}) -> bool {
           {{EarlyExits}}
 
                   let mut i: usize = 0;
-                  while i < Self::ENTRIES.len() {
-                      let entry = Self::ENTRIES[i];
+                  while i < Self::KEYS.len() {
+                      let entry = Self::KEYS[i];
 
-                      if entry == value {
+                      if entry == key {
                           return true;
                       }
-                      if entry < value {
+                      if entry < key {
                           i = 2 * i + 2;
                       } else {
                           i = 2 * i + 1;

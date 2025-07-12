@@ -10,10 +10,10 @@ pub struct ConditionalStructure_Char_3;
 
 impl ConditionalStructure_Char_3 {
     #[must_use]
-    pub fn contains(value: char) -> bool {
+    pub fn contains(key: char) -> bool {
 
 
-        if value == char::MIN || value == 'a' || value == '' {
+        if key == char::MIN || key == 'a' || key == '' {
             return true;
         }
 

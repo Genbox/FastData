@@ -10,9 +10,9 @@ class SingleValueStructure_SByte_1 final
 {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const int8_t value) noexcept
+    static constexpr bool contains(const int8_t key) noexcept
     {
-        return value == 1;
+        return key == 1;
     }
 
     static constexpr size_t item_count = 1;

@@ -9,13 +9,13 @@ use std::ptr;
 pub struct BinarySearchStructure_UInt64_4;
 
 impl BinarySearchStructure_UInt64_4 {
-    const ENTRIES: [u64; 4] = [
+    const KEYS: [u64; 4] = [
         u64::MIN, 1, 2, u64::MAX
     ];
 
     #[must_use]
-    pub fn contains(value: u64) -> bool {
-        if value < u64::MIN || value > u64::MAX {
+    pub fn contains(key: u64) -> bool {
+        if key < u64::MIN || key > u64::MAX {
             return false;
         }
 
@@ -23,12 +23,12 @@ impl BinarySearchStructure_UInt64_4 {
         let mut hi: usize = 3;
         while lo <= hi {
             let i = lo + ((hi - lo) >> 1);
-            let entry = Self::ENTRIES[i];
+            let entry = Self::KEYS[i];
 
-            if entry == value {
+            if entry == key {
                 return true;
             }
-            if entry < value {
+            if entry < key {
                 lo = i + 1;
             } else {
                 hi = i - 1;

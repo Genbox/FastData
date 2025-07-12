@@ -11,12 +11,12 @@ namespace MyNamespace;
 internal static class StaticData
 {
     
-    public static bool Contains(string value)
+    public static bool Contains(string key)
     {
-        if (value.Length != 5u)
+        if (key.Length != 5u)
             return false;
 
-        switch (value)
+        switch (key)
         {
             case "item1":
             case "item2":

@@ -9,9 +9,9 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
         $$"""
           public:
               {{MethodAttribute}}
-              {{MethodModifier}}constexpr bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+              {{MethodModifier}}constexpr bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
               {
-                  return {{GetEqualFunction("value", ToValueLabel(ctx.Item))}};
+                  return {{GetEqualFunction("key", ToValueLabel(ctx.Item))}};
               }
           """;
 }

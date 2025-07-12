@@ -10,12 +10,12 @@ class ConditionalStructure_Int64_5 final
 {
 public:
     [[nodiscard]]
-    static bool contains(const int64_t value) noexcept
+    static bool contains(const int64_t key) noexcept
     {
-        if (value < std::numeric_limits<int64_t>::lowest() || value > std::numeric_limits<int64_t>::max())
+        if (key < std::numeric_limits<int64_t>::lowest() || key > std::numeric_limits<int64_t>::max())
             return false;
 
-        if (value == std::numeric_limits<int64_t>::lowest() || value == -1ll || value == 0ll || value == 1ll || value == std::numeric_limits<int64_t>::max())
+        if (key == std::numeric_limits<int64_t>::lowest() || key == -1ll || key == 0ll || key == 1ll || key == std::numeric_limits<int64_t>::max())
             return true;
 
         return false;

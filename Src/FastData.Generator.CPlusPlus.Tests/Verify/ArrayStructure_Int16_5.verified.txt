@@ -8,20 +8,41 @@
 
 class ArrayStructure_Int16_5 final
 {
-    static constexpr std::array<int16_t, 5> entries = {
+    static constexpr std::array<uint8_t, 5> values = {
+        42, 42, 42, 42, 42
+    };
+
+    static constexpr std::array<int16_t, 5> keys = {
         std::numeric_limits<int16_t>::lowest(), -1, 0, 1, std::numeric_limits<int16_t>::max()
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const int16_t value) noexcept
+    static bool try_lookup(const int16_t key, uint8_t& value) noexcept
     {
-        if (value < std::numeric_limits<int16_t>::lowest() || value > std::numeric_limits<int16_t>::max())
+        if (key < std::numeric_limits<int16_t>::lowest() || key > std::numeric_limits<int16_t>::max())
             return false;
 
         for (size_t i = 0; i < 5; i++)
         {
-            if (entries[i] == value)
+            if (keys[i] == key)
+            {
+                value = values[i];
+                return true;
+            }
+        }
+        return false;
+    }
+
+    [[nodiscard]]
+    static bool contains(const int16_t key) noexcept
+    {
+        if (key < std::numeric_limits<int16_t>::lowest() || key > std::numeric_limits<int16_t>::max())
+            return false;
+
+        for (size_t i = 0; i < 5; i++)
+        {
+            if (keys[i] == key)
                return true;
         }
         return false;

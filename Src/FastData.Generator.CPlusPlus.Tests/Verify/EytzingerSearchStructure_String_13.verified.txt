@@ -8,25 +8,25 @@
 
 class EytzingerSearchStructure_String_13 final
 {
-    static constexpr std::array<std::u32string_view, 13> entries = {
+    static constexpr std::array<std::u32string_view, 13> keys = {
         U"é", U"å", U"ø", U"à", U"ç", U"ñ", U"ü", U"ß", U"ä", U"æ", 
         U"è", U"ê", U"ö"
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const std::u32string_view value) noexcept
+    static bool contains(const std::u32string_view key) noexcept
     {
-        if (value.length() != 1u)
+        if (key.length() != 1u)
             return false;
 
         size_t i = 0;
-        while (i < entries.size())
+        while (i < keys.size())
         {
-            if (entries[i] == value)
+            if (keys[i] == key)
                 return true;
 
-            if (entries[i] < value)
+            if (keys[i] < key)
                 i = 2 * i + 2;
             else
                 i = 2 * i + 1;

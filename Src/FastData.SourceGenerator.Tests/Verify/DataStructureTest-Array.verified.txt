@@ -8,19 +8,19 @@ using System.Runtime.InteropServices;
 
 internal static class StaticData
 {
-    private static readonly string[] _entries = new string[] {
+    private static readonly string[] _keys = new string[] {
         "item1", "item2", "item3"
     };
 
     
-    public static bool Contains(string value)
+    public static bool Contains(string key)
     {
-        if (value.Length != 5u)
+        if (key.Length != 5u)
             return false;
 
         for (int i = 0; i < 3; i++)
         {
-            if (StringComparer.Ordinal.Equals(value, _entries[i]))
+            if (StringComparer.Ordinal.Equals(key, _keys[i]))
                return true;
         }
         return false;

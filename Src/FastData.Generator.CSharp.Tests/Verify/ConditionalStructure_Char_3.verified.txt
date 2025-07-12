@@ -9,11 +9,11 @@ using System.Runtime.InteropServices;
 internal static class ConditionalStructure_Char_3
 {
     
-    public static bool Contains(char value)
+    public static bool Contains(char key)
     {
 
 
-        switch (value)
+        switch (key)
         {
             case char.MinValue:
             case 'a':

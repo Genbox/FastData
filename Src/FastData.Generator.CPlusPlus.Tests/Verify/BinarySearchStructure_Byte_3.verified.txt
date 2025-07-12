@@ -8,15 +8,15 @@
 
 class BinarySearchStructure_Byte_3 final
 {
-    static constexpr std::array<uint8_t, 3> entries = {
+    static constexpr std::array<uint8_t, 3> keys = {
         0, 1, std::numeric_limits<uint8_t>::max()
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const uint8_t value) noexcept
+    static bool contains(const uint8_t key) noexcept
     {
-        if (value < 0 || value > std::numeric_limits<uint8_t>::max())
+        if (key < 0 || key > std::numeric_limits<uint8_t>::max())
             return false;
 
         size_t lo = 0;
@@ -25,10 +25,10 @@ public:
         {
             const size_t mid = lo + ((hi - lo) >> 1);
 
-            if (entries[mid] == value)
+            if (keys[mid] == key)
                 return true;
 
-            if (entries[mid] < value)
+            if (keys[mid] < key)
                 lo = mid + 1;
             else
                 hi = mid - 1;

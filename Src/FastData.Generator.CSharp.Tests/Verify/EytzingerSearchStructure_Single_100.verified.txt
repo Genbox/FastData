@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 internal static class EytzingerSearchStructure_Single_100
 {
-    private static readonly float[] _entries = new float[] {
+    private static readonly float[] _keys = new float[] {
         63f, 31f, 84f, 15f, 47f, 76f, 92f, 7f, 23f, 39f, 
         55f, 71f, 80f, 88f, 96f, 3f, 11f, 19f, 27f, 35f, 
         43f, 51f, 59f, 67f, 74f, 78f, 82f, 86f, 90f, 94f, 
@@ -22,15 +22,15 @@ internal static class EytzingerSearchStructure_Single_100
     };
 
     
-    public static bool Contains(float value)
+    public static bool Contains(float key)
     {
-        if (value < 0f || value > 99f)
+        if (key < 0f || key > 99f)
             return false;
 
         int i = 0;
-        while (i < _entries.Length)
+        while (i < _keys.Length)
         {
-            int comparison = _entries[i].CompareTo(value);
+            int comparison = _keys[i].CompareTo(key);
 
             if (comparison == 0)
                 return true;

@@ -8,23 +8,23 @@ internal sealed class EytzingerSearchCode<TKey, TValue>(EytzingerSearchContext<T
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> entries = {
+              {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
           {{FormatColumns(ctx.Keys, ToValueLabel)}}
               };
 
           public:
               {{MethodAttribute}}
-              {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+              {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
               {
           {{EarlyExits}}
 
                   size_t i = 0;
-                  while (i < entries.size())
+                  while (i < keys.size())
                   {
-                      if ({{GetEqualFunction("entries[i]", "value")}})
+                      if ({{GetEqualFunction("keys[i]", "key")}})
                           return true;
 
-                      if (entries[i] < value)
+                      if (keys[i] < key)
                           i = 2 * i + 2;
                       else
                           i = 2 * i + 1;

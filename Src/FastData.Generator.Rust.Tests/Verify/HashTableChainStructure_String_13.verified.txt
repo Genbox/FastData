@@ -15,8 +15,8 @@ impl HashTableChainStructure_String_13 {
     ];
 
     const ENTRIES: [E; 13] = [
-        E { hash_code: 11144404048339054737, next: -1, value: "æ" }, E { hash_code: 11144404045206886855, next: -1, value: "à" }, E { hash_code: 11144404051471222619, next: -1, value: "ä" }, E { hash_code: 11144404023281711681, next: -1, value: "ö" }, E { hash_code: 11144404013885208035, next: -1, value: "ü" }, E { hash_code: 11144404062433810206, next: -1, value: "ß" }, E { hash_code: 11144404034244299268, next: 4, value: "é" }, E { hash_code: 11144404032678215327, next: -1, value: "è" }, E { hash_code: 11144404029546047445, next: -1, value: "ê" }, E { hash_code: 11144404049905138678, next: 8, value: "ç" }, 
-        E { hash_code: 11144404021715627740, next: 5, value: "ñ" }, E { hash_code: 11144404007620872271, next: 0, value: "ø" }, E { hash_code: 11144404053037306560, next: 7, value: "å" }
+        E { hash_code: 11144404048339054737, next: -1, key: "æ" }, E { hash_code: 11144404045206886855, next: -1, key: "à" }, E { hash_code: 11144404051471222619, next: -1, key: "ä" }, E { hash_code: 11144404023281711681, next: -1, key: "ö" }, E { hash_code: 11144404013885208035, next: -1, key: "ü" }, E { hash_code: 11144404062433810206, next: -1, key: "ß" }, E { hash_code: 11144404034244299268, next: 4, key: "é" }, E { hash_code: 11144404032678215327, next: -1, key: "è" }, E { hash_code: 11144404029546047445, next: -1, key: "ê" }, E { hash_code: 11144404049905138678, next: 8, key: "ç" }, 
+        E { hash_code: 11144404021715627740, next: 5, key: "ñ" }, E { hash_code: 11144404007620872271, next: 0, key: "ø" }, E { hash_code: 11144404053037306560, next: 7, key: "å" }
     ];
 
     #[inline]
@@ -36,18 +36,18 @@ impl HashTableChainStructure_String_13 {
     }
 
     #[must_use]
-    pub fn contains(value: &str) -> bool {
-        if value.len() != 2 as usize {
+    pub fn contains(key: &str) -> bool {
+        if key.len() != 2 as usize {
             return false;
         }
 
-        let hash = unsafe { Self::get_hash(value) };
+        let hash = unsafe { Self::get_hash(key) };
         let index = hash % 13;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.hash_code == hash && entry.value == value {
+            if entry.hash_code == hash && entry.key == key {
                 return true;
             }
             i = entry.next;
@@ -63,5 +63,5 @@ impl HashTableChainStructure_String_13 {
 struct E {
     hash_code: u64,
     next: i8,
-    value: &'static str,
+    key: &'static str,
 }

@@ -10,12 +10,12 @@ pub struct ConditionalStructure_Int64_5;
 
 impl ConditionalStructure_Int64_5 {
     #[must_use]
-    pub fn contains(value: i64) -> bool {
-        if value < i64::MIN || value > i64::MAX {
+    pub fn contains(key: i64) -> bool {
+        if key < i64::MIN || key > i64::MAX {
             return false;
         }
 
-        if value == i64::MIN || value == -1 || value == 0 || value == 1 || value == i64::MAX {
+        if key == i64::MIN || key == -1 || key == 0 || key == 1 || key == i64::MAX {
             return true;
         }
 

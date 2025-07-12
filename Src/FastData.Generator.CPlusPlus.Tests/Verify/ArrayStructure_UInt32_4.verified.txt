@@ -8,20 +8,41 @@
 
 class ArrayStructure_UInt32_4 final
 {
-    static constexpr std::array<uint32_t, 4> entries = {
+    static constexpr std::array<uint8_t, 4> values = {
+        42, 42, 42, 42
+    };
+
+    static constexpr std::array<uint32_t, 4> keys = {
         0, 1u, 2u, std::numeric_limits<uint32_t>::max()
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const uint32_t value) noexcept
+    static bool try_lookup(const uint32_t key, uint8_t& value) noexcept
     {
-        if (value < 0 || value > std::numeric_limits<uint32_t>::max())
+        if (key < 0 || key > std::numeric_limits<uint32_t>::max())
             return false;
 
         for (size_t i = 0; i < 4; i++)
         {
-            if (entries[i] == value)
+            if (keys[i] == key)
+            {
+                value = values[i];
+                return true;
+            }
+        }
+        return false;
+    }
+
+    [[nodiscard]]
+    static bool contains(const uint32_t key) noexcept
+    {
+        if (key < 0 || key > std::numeric_limits<uint32_t>::max())
+            return false;
+
+        for (size_t i = 0; i < 4; i++)
+        {
+            if (keys[i] == key)
                return true;
         }
         return false;

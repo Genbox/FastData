@@ -10,8 +10,8 @@ pub struct SingleValueStructure_String_1;
 
 impl SingleValueStructure_String_1 {
     #[must_use]
-    pub fn contains(value: &str) -> bool {
-         "value]" == value
+    pub fn contains(key: &str) -> bool {
+         "value]" == key
     }
 
     pub const ITEM_COUNT: usize = 1;

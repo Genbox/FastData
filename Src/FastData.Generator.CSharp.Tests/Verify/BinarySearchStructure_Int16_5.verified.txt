@@ -8,14 +8,14 @@ using System.Runtime.InteropServices;
 
 internal static class BinarySearchStructure_Int16_5
 {
-    private static readonly short[] _entries = new short[] {
+    private static readonly short[] _keys = new short[] {
         short.MinValue, -1, 0, 1, short.MaxValue
     };
 
     
-    public static bool Contains(short value)
+    public static bool Contains(short key)
     {
-        if (value < short.MinValue || value > short.MaxValue)
+        if (key < short.MinValue || key > short.MaxValue)
             return false;
 
         int lo = 0;
@@ -23,7 +23,7 @@ internal static class BinarySearchStructure_Int16_5
         while (lo <= hi)
         {
             int i = lo + ((hi - lo) >> 1);
-            int order = _entries[i].CompareTo(value);
+            int order = _keys[i].CompareTo(key);
 
             if (order == 0)
                 return true;

@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 internal static class SingleValueStructure_String_1
 {
     
-    public static bool Contains(string value)
+    public static bool Contains(string key)
     {
-        return StringComparer.Ordinal.Equals(value, "value]");
+        return StringComparer.Ordinal.Equals(key, "value]");
     }
 
     public const uint ItemCount = 1;

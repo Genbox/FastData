@@ -14,7 +14,7 @@ impl HashTableChainStructure_Single_5_HashZeroOrNaN {
     ];
 
     const ENTRIES: [E; 5] = [
-        E { hash_code: 1065353216, next: -1, value: 1.0 }, E { hash_code: 1073741824, next: -1, value: 2.0 }, E { hash_code: 1077936128, next: -1, value: 3.0 }, E { hash_code: 1082130432, next: -1, value: 4.0 }, E { hash_code: 1084227584, next: 1, value: 5.0 }
+        E { hash_code: 1065353216, next: -1, key: 1.0 }, E { hash_code: 1073741824, next: -1, key: 2.0 }, E { hash_code: 1077936128, next: -1, key: 3.0 }, E { hash_code: 1082130432, next: -1, key: 4.0 }, E { hash_code: 1084227584, next: 1, key: 5.0 }
     ];
 
     #[inline(always)]
@@ -23,18 +23,18 @@ impl HashTableChainStructure_Single_5_HashZeroOrNaN {
     }
 
     #[must_use]
-    pub fn contains(value: f32) -> bool {
-        if value < 1.0 || value > 5.0 {
+    pub fn contains(key: f32) -> bool {
+        if key < 1.0 || key > 5.0 {
             return false;
         }
 
-        let hash = unsafe { Self::get_hash(value) };
+        let hash = unsafe { Self::get_hash(key) };
         let index = hash % 5;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.hash_code == hash && entry.value == value {
+            if entry.hash_code == hash && entry.key == key {
                 return true;
             }
             i = entry.next;
@@ -50,5 +50,5 @@ impl HashTableChainStructure_Single_5_HashZeroOrNaN {
 struct E {
     hash_code: u64,
     next: i8,
-    value: f32,
+    key: f32,
 }

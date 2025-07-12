@@ -9,18 +9,18 @@ use std::ptr;
 pub struct ArrayStructure_UInt16_4;
 
 impl ArrayStructure_UInt16_4 {
-    const ENTRIES: [u16; 4] = [
+    const KEYS: [u16; 4] = [
         u16::MIN, 1, 2, u16::MAX
     ];
 
     #[must_use]
-    pub fn contains(value: u16) -> bool {
-        if value < u16::MIN || value > u16::MAX {
+    pub fn contains(key: u16) -> bool {
+        if key < u16::MIN || key > u16::MAX {
             return false;
         }
 
-        for entry in Self::ENTRIES.iter() {
-            if *entry == value {
+        for entry in Self::KEYS.iter() {
+            if *entry == key {
                 return true;
             }
         }

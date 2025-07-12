@@ -8,24 +8,24 @@
 
 class EytzingerSearchStructure_SByte_5 final
 {
-    static constexpr std::array<int8_t, 5> entries = {
+    static constexpr std::array<int8_t, 5> keys = {
         1, -1, std::numeric_limits<int8_t>::max(), std::numeric_limits<int8_t>::lowest(), 0
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const int8_t value) noexcept
+    static bool contains(const int8_t key) noexcept
     {
-        if (value < std::numeric_limits<int8_t>::lowest() || value > std::numeric_limits<int8_t>::max())
+        if (key < std::numeric_limits<int8_t>::lowest() || key > std::numeric_limits<int8_t>::max())
             return false;
 
         size_t i = 0;
-        while (i < entries.size())
+        while (i < keys.size())
         {
-            if (entries[i] == value)
+            if (keys[i] == key)
                 return true;
 
-            if (entries[i] < value)
+            if (keys[i] < key)
                 i = 2 * i + 2;
             else
                 i = 2 * i + 1;

@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 internal static class SingleValueStructure_Byte_1
 {
     
-    public static bool Contains(byte value)
+    public static bool Contains(byte key)
     {
-        return value == 1;
+        return key == 1;
     }
 
     public const uint ItemCount = 1;

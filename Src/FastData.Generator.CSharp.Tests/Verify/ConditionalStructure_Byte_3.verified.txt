@@ -9,11 +9,11 @@ using System.Runtime.InteropServices;
 internal static class ConditionalStructure_Byte_3
 {
     
-    public static bool Contains(byte value)
+    public static bool Contains(byte key)
     {
 
 
-        switch (value)
+        switch (key)
         {
             case byte.MinValue:
             case 1:

@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 internal static class ConditionalStructure_SByte_5
 {
     
-    public static bool Contains(sbyte value)
+    public static bool Contains(sbyte key)
     {
-        if (value < sbyte.MinValue || value > sbyte.MaxValue)
+        if (key < sbyte.MinValue || key > sbyte.MaxValue)
             return false;
 
-        switch (value)
+        switch (key)
         {
             case sbyte.MinValue:
             case -1:

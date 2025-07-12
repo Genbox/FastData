@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 internal static class SingleValueStructure_UInt32_1
 {
     
-    public static bool Contains(uint value)
+    public static bool Contains(uint key)
     {
-        return value == 1u;
+        return key == 1u;
     }
 
     public const uint ItemCount = 1;

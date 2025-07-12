@@ -8,20 +8,20 @@ using System.Runtime.InteropServices;
 
 internal static class EytzingerSearchStructure_SByte_5
 {
-    private static readonly sbyte[] _entries = new sbyte[] {
+    private static readonly sbyte[] _keys = new sbyte[] {
         1, -1, sbyte.MaxValue, sbyte.MinValue, 0
     };
 
     
-    public static bool Contains(sbyte value)
+    public static bool Contains(sbyte key)
     {
-        if (value < sbyte.MinValue || value > sbyte.MaxValue)
+        if (key < sbyte.MinValue || key > sbyte.MaxValue)
             return false;
 
         int i = 0;
-        while (i < _entries.Length)
+        while (i < _keys.Length)
         {
-            int comparison = _entries[i].CompareTo(value);
+            int comparison = _keys[i].CompareTo(key);
 
             if (comparison == 0)
                 return true;

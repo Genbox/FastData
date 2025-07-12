@@ -12,10 +12,10 @@ class HashTableChainStructure_Double_5_HashZeroOrNaN final
     {
         uint64_t hash_code;
         int8_t next;
-        double value;
+        double key;
 
-        e(const uint64_t hash_code, const int8_t next, const double value)
-           : hash_code(hash_code), next(next), value(value) {}
+        e(const uint64_t hash_code, const int8_t next, const double key)
+           : hash_code(hash_code), next(next), key(key) {}
     };
 
     static constexpr std::array<int8_t, 5> buckets = {
@@ -35,20 +35,20 @@ class HashTableChainStructure_Double_5_HashZeroOrNaN final
 
 public:
     [[nodiscard]]
-    static bool contains(const double value) noexcept
+    static bool contains(const double key) noexcept
     {
-        if (value < 1.0 || value > 5.0)
+        if (key < 1.0 || key > 5.0)
             return false;
 
-        const uint64_t hash = get_hash(value);
+        const uint64_t hash = get_hash(key);
         const size_t index = hash % 5;
         int8_t i = buckets[index] - static_cast<int8_t>(1);
 
         while (i >= 0)
         {
-            const auto& [hash_code, next, value1] = entries[i];
+            const auto& [hash_code, next, key1] = entries[i];
 
-            if (hash_code == hash && value1 == value)
+            if (hash_code == hash && key1 == key)
                 return true;
 
             i = next;

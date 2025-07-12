@@ -18,7 +18,6 @@ public abstract class OutputWriter<T> : IOutputWriter
     protected string ValueTypeName { get; private set; } = null!;
     protected GeneratorConfig<T> GeneratorConfig { get; private set; } = null!;
     protected string HashSource { get; private set; } = null!;
-
     protected string EarlyExits => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
     protected string HashSizeType => _map.GetTypeName(typeof(ulong));
     protected static DataType HashSizeDataType => DataType.UInt64;

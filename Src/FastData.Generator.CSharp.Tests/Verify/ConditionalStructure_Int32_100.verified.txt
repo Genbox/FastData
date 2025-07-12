@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 internal static class ConditionalStructure_Int32_100
 {
     
-    public static bool Contains(int value)
+    public static bool Contains(int key)
     {
-        if (value < 0 || value > 99)
+        if (key < 0 || key > 99)
             return false;
 
-        switch (value)
+        switch (key)
         {
             case 0:
             case 1:

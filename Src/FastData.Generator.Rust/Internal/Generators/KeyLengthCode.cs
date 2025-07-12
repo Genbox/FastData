@@ -21,9 +21,9 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx) 
                      ];
 
                      {{MethodAttribute}}
-                     {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
+                     {{MethodModifier}}fn contains(key: {{KeyTypeName}}) -> bool {
                  {{EarlyExits}}
-                         return Self::ENTRIES[(value.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize] == value;
+                         return Self::ENTRIES[(key.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize] == key;
                      }
                  """;
     }
@@ -41,9 +41,9 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx) 
                      ];
 
                      {{MethodAttribute}}
-                     {{MethodModifier}}fn contains(value: &{{KeyTypeName}}) -> bool {
+                     {{MethodModifier}}fn contains(key: &{{KeyTypeName}}) -> bool {
                  {{EarlyExits}}
-                         let idx = (value.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize;
+                         let idx = (key.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize;
                          let bucket = &Self::ENTRIES[idx];
 
                          if bucket.is_empty() {
@@ -51,7 +51,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx) 
                          }
 
                          for item in bucket.iter() {
-                             if item == value {
+                             if item == key {
                                  true
                              }
                          }

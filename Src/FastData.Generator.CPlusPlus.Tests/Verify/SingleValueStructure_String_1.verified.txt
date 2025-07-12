@@ -10,9 +10,9 @@ class SingleValueStructure_String_1 final
 {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::string_view value) noexcept
+    static constexpr bool contains(const std::string_view key) noexcept
     {
-        return value == "value]";
+        return key == "value]";
     }
 
     static constexpr size_t item_count = 1;

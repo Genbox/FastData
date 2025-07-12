@@ -10,12 +10,12 @@ pub struct ConditionalStructure_String_13;
 
 impl ConditionalStructure_String_13 {
     #[must_use]
-    pub fn contains(value: &str) -> bool {
-        if value.len() != 2 as usize {
+    pub fn contains(key: &str) -> bool {
+        if key.len() != 2 as usize {
             return false;
         }
 
-        if value == "æ" || value == "à" || value == "ä" || value == "ö" || value == "ü" || value == "ß" || value == "é" || value == "è" || value == "ê" || value == "ç" || value == "ñ" || value == "ø" || value == "å" {
+        if key == "æ" || key == "à" || key == "ä" || key == "ö" || key == "ü" || key == "ß" || key == "é" || key == "è" || key == "ê" || key == "ç" || key == "ñ" || key == "ø" || key == "å" {
             return true;
         }
 

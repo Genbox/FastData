@@ -10,12 +10,12 @@ class ConditionalStructure_Double_4 final
 {
 public:
     [[nodiscard]]
-    static bool contains(const double value) noexcept
+    static bool contains(const double key) noexcept
     {
-        if (value < std::numeric_limits<double>::lowest() || value > std::numeric_limits<double>::max())
+        if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())
             return false;
 
-        if (value == std::numeric_limits<double>::lowest() || value == 0.0 || value == 1.0 || value == std::numeric_limits<double>::max())
+        if (key == std::numeric_limits<double>::lowest() || key == 0.0 || key == 1.0 || key == std::numeric_limits<double>::max())
             return true;
 
         return false;

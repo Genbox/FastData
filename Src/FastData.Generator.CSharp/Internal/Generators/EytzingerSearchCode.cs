@@ -7,19 +7,19 @@ internal sealed class EytzingerSearchCode<TKey, TValue>(EytzingerSearchContext<T
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}{{KeyTypeName}}[] _entries = new {{KeyTypeName}}[] {
+              {{FieldModifier}}{{KeyTypeName}}[] _keys = new {{KeyTypeName}}[] {
           {{FormatColumns(ctx.Keys, ToValueLabel)}}
               };
 
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} key)
               {
           {{EarlyExits}}
 
                   int i = 0;
-                  while (i < _entries.Length)
+                  while (i < _keys.Length)
                   {
-                      int comparison = {{GetCompareFunction("_entries[i]", "value")}};
+                      int comparison = {{GetCompareFunction("_keys[i]", "key")}};
 
                       if (comparison == 0)
                           return true;

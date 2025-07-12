@@ -8,14 +8,14 @@ using System.Runtime.InteropServices;
 
 internal static class BinarySearchStructure_UInt64_4
 {
-    private static readonly ulong[] _entries = new ulong[] {
+    private static readonly ulong[] _keys = new ulong[] {
         ulong.MinValue, 1ul, 2ul, ulong.MaxValue
     };
 
     
-    public static bool Contains(ulong value)
+    public static bool Contains(ulong key)
     {
-        if (value < ulong.MinValue || value > ulong.MaxValue)
+        if (key < ulong.MinValue || key > ulong.MaxValue)
             return false;
 
         int lo = 0;
@@ -23,7 +23,7 @@ internal static class BinarySearchStructure_UInt64_4
         while (lo <= hi)
         {
             int i = lo + ((hi - lo) >> 1);
-            int order = _entries[i].CompareTo(value);
+            int order = _keys[i].CompareTo(key);
 
             if (order == 0)
                 return true;

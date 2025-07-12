@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 internal static class ArrayStructure_String_100
 {
-    private static readonly string[] _entries = new string[] {
+    private static readonly string[] _keys = new string[] {
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
         "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", 
         "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", 
@@ -22,14 +22,14 @@ internal static class ArrayStructure_String_100
     };
 
     
-    public static bool Contains(string value)
+    public static bool Contains(string key)
     {
-        if (value.Length < 1u || value.Length > 2u)
+        if (key.Length < 1u || key.Length > 2u)
             return false;
 
         for (int i = 0; i < 100; i++)
         {
-            if (StringComparer.Ordinal.Equals(value, _entries[i]))
+            if (StringComparer.Ordinal.Equals(key, _keys[i]))
                return true;
         }
         return false;

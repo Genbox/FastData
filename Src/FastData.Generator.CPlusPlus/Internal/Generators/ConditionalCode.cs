@@ -9,11 +9,11 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
         $$"""
           public:
               {{MethodAttribute}}
-              {{MethodModifier}}bool contains(const {{KeyTypeName}} value){{PostMethodModifier}}
+              {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
               {
           {{EarlyExits}}
 
-                  if ({{FormatList(ctx.Keys, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}})
+                  if ({{FormatList(ctx.Keys, x => GetEqualFunction("key", ToValueLabel(x)), " || ")}})
                       return true;
 
                   return false;

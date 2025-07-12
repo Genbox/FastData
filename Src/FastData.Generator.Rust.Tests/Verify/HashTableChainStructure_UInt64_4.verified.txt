@@ -14,7 +14,7 @@ impl HashTableChainStructure_UInt64_4 {
     ];
 
     const ENTRIES: [E; 4] = [
-        E { next: -1, value: u64::MIN }, E { next: -1, value: 1 }, E { next: -1, value: 2 }, E { next: -1, value: u64::MAX }
+        E { next: -1, key: u64::MIN }, E { next: -1, key: 1 }, E { next: -1, key: 2 }, E { next: -1, key: u64::MAX }
     ];
 
     #[inline(always)]
@@ -23,18 +23,18 @@ impl HashTableChainStructure_UInt64_4 {
     }
 
     #[must_use]
-    pub fn contains(value: u64) -> bool {
-        if value < u64::MIN || value > u64::MAX {
+    pub fn contains(key: u64) -> bool {
+        if key < u64::MIN || key > u64::MAX {
             return false;
         }
 
-        let hash = unsafe { Self::get_hash(value) };
+        let hash = unsafe { Self::get_hash(key) };
         let index = hash % 4;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.value == value {
+            if entry.key == key {
                 return true;
             }
             i = entry.next;
@@ -50,5 +50,5 @@ impl HashTableChainStructure_UInt64_4 {
 struct E {
     
     next: i8,
-    value: u64,
+    key: u64,
 }

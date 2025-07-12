@@ -8,10 +8,10 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
     public override string Generate() =>
         $$"""
               {{MethodAttribute}}
-              {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
+              {{MethodModifier}}fn contains(key: {{KeyTypeName}}) -> bool {
           {{EarlyExits}}
 
-                  if {{FormatList(ctx.Keys, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}} {
+                  if {{FormatList(ctx.Keys, x => GetEqualFunction("key", ToValueLabel(x)), " || ")}} {
                       return true;
                   }
 

@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 internal static class ConditionalStructure_Single_100
 {
     
-    public static bool Contains(float value)
+    public static bool Contains(float key)
     {
-        if (value < 0f || value > 99f)
+        if (key < 0f || key > 99f)
             return false;
 
-        switch (value)
+        switch (key)
         {
             case 0f:
             case 1f:

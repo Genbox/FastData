@@ -12,10 +12,10 @@ class HashTableChainStructure_Int32_100 final
     {
         
         int8_t next;
-        int32_t value;
+        int32_t key;
 
-        e(const int8_t next, const int32_t value)
-           : next(next), value(value) {}
+        e(const int8_t next, const int32_t key)
+           : next(next), key(key) {}
     };
 
     static constexpr std::array<int8_t, 100> buckets = {
@@ -51,20 +51,20 @@ class HashTableChainStructure_Int32_100 final
 
 public:
     [[nodiscard]]
-    static bool contains(const int32_t value) noexcept
+    static bool contains(const int32_t key) noexcept
     {
-        if (value < 0 || value > 99)
+        if (key < 0 || key > 99)
             return false;
 
-        const uint64_t hash = get_hash(value);
+        const uint64_t hash = get_hash(key);
         const size_t index = hash % 100;
         int8_t i = buckets[index] - static_cast<int8_t>(1);
 
         while (i >= 0)
         {
-            const auto& [next, value1] = entries[i];
+            const auto& [next, key1] = entries[i];
 
-            if (value1 == value)
+            if (key1 == key)
                 return true;
 
             i = next;

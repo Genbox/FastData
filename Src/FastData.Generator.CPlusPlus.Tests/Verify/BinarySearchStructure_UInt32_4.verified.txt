@@ -8,15 +8,15 @@
 
 class BinarySearchStructure_UInt32_4 final
 {
-    static constexpr std::array<uint32_t, 4> entries = {
+    static constexpr std::array<uint32_t, 4> keys = {
         0, 1u, 2u, std::numeric_limits<uint32_t>::max()
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const uint32_t value) noexcept
+    static bool contains(const uint32_t key) noexcept
     {
-        if (value < 0 || value > std::numeric_limits<uint32_t>::max())
+        if (key < 0 || key > std::numeric_limits<uint32_t>::max())
             return false;
 
         size_t lo = 0;
@@ -25,10 +25,10 @@ public:
         {
             const size_t mid = lo + ((hi - lo) >> 1);
 
-            if (entries[mid] == value)
+            if (keys[mid] == key)
                 return true;
 
-            if (entries[mid] < value)
+            if (keys[mid] < key)
                 lo = mid + 1;
             else
                 hi = mid - 1;

@@ -14,7 +14,7 @@ impl HashTableChainStructure_String_3 {
     ];
 
     const ENTRIES: [E; 3] = [
-        E { hash_code: 18225461187723808291, next: -1, value: "a" }, E { hash_code: 16750939634977259983, next: 0, value: "item" }, E { hash_code: 9198652691199425319, next: -1, value: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+        E { hash_code: 18225461187723808291, next: -1, key: "a" }, E { hash_code: 16750939634977259983, next: 0, key: "item" }, E { hash_code: 9198652691199425319, next: -1, key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
     ];
 
     #[inline]
@@ -34,18 +34,18 @@ impl HashTableChainStructure_String_3 {
     }
 
     #[must_use]
-    pub fn contains(value: &str) -> bool {
-        if value.len() < 1 as usize || value.len() > 255 as usize {
+    pub fn contains(key: &str) -> bool {
+        if key.len() < 1 as usize || key.len() > 255 as usize {
             return false;
         }
 
-        let hash = unsafe { Self::get_hash(value) };
+        let hash = unsafe { Self::get_hash(key) };
         let index = hash % 3;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.hash_code == hash && entry.value == value {
+            if entry.hash_code == hash && entry.key == key {
                 return true;
             }
             i = entry.next;
@@ -61,5 +61,5 @@ impl HashTableChainStructure_String_3 {
 struct E {
     hash_code: u64,
     next: i8,
-    value: &'static str,
+    key: &'static str,
 }

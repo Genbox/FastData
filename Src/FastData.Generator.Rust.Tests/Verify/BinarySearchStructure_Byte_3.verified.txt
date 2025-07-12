@@ -9,13 +9,13 @@ use std::ptr;
 pub struct BinarySearchStructure_Byte_3;
 
 impl BinarySearchStructure_Byte_3 {
-    const ENTRIES: [u8; 3] = [
+    const KEYS: [u8; 3] = [
         u8::MIN, 1, u8::MAX
     ];
 
     #[must_use]
-    pub fn contains(value: u8) -> bool {
-        if value < u8::MIN || value > u8::MAX {
+    pub fn contains(key: u8) -> bool {
+        if key < u8::MIN || key > u8::MAX {
             return false;
         }
 
@@ -23,12 +23,12 @@ impl BinarySearchStructure_Byte_3 {
         let mut hi: usize = 2;
         while lo <= hi {
             let i = lo + ((hi - lo) >> 1);
-            let entry = Self::ENTRIES[i];
+            let entry = Self::KEYS[i];
 
-            if entry == value {
+            if entry == key {
                 return true;
             }
-            if entry < value {
+            if entry < key {
                 lo = i + 1;
             } else {
                 hi = i - 1;

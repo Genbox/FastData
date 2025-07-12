@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 internal partial class StaticData
 {
     
-    public bool Contains(string value)
+    public bool Contains(string key)
     {
-        if (value.Length != 5u)
+        if (key.Length != 5u)
             return false;
 
-        switch (value)
+        switch (key)
         {
             case "item1":
             case "item2":

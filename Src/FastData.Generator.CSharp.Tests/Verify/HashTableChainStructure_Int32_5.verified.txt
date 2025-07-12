@@ -17,12 +17,12 @@ internal static class HashTableChainStructure_Int32_5
     };
 
     
-    public static bool Contains(int value)
+    public static bool Contains(int key)
     {
-        if (value < int.MinValue || value > int.MaxValue)
+        if (key < int.MinValue || key > int.MaxValue)
             return false;
 
-        ulong hash = Hash(value);
+        ulong hash = Hash(key);
         uint index = (uint)(hash % 5);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
@@ -30,7 +30,7 @@ internal static class HashTableChainStructure_Int32_5
         {
             ref E entry = ref _entries[i];
 
-            if (value == entry.Value)
+            if (key == entry.Key)
                 return true;
 
             i = entry.Next;
@@ -51,13 +51,13 @@ internal static class HashTableChainStructure_Int32_5
     {
         
         internal readonly sbyte Next;
-        internal readonly int Value;
+        internal readonly int Key;
 
-        internal E(sbyte next, int value)
+        internal E(sbyte next, int key)
         {
             
             Next = next;
-            Value = value;
+            Key = key;
         }
     }
 

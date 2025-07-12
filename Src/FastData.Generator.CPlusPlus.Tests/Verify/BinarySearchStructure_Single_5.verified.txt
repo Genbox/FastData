@@ -8,15 +8,15 @@
 
 class BinarySearchStructure_Single_5 final
 {
-    static constexpr std::array<float, 5> entries = {
+    static constexpr std::array<float, 5> keys = {
         std::numeric_limits<float>::lowest(), -1.0f, 0.0f, 1.0f, std::numeric_limits<float>::max()
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const float value) noexcept
+    static bool contains(const float key) noexcept
     {
-        if (value < std::numeric_limits<float>::lowest() || value > std::numeric_limits<float>::max())
+        if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())
             return false;
 
         size_t lo = 0;
@@ -25,10 +25,10 @@ public:
         {
             const size_t mid = lo + ((hi - lo) >> 1);
 
-            if (entries[mid] == value)
+            if (keys[mid] == key)
                 return true;
 
-            if (entries[mid] < value)
+            if (keys[mid] < key)
                 lo = mid + 1;
             else
                 hi = mid - 1;

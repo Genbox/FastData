@@ -8,20 +8,41 @@
 
 class ArrayStructure_String_3 final
 {
-    static constexpr std::array<std::string_view, 3> entries = {
+    static constexpr std::array<uint8_t, 3> values = {
+        42, 42, 42
+    };
+
+    static constexpr std::array<std::string_view, 3> keys = {
         "a", "item", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const std::string_view value) noexcept
+    static bool try_lookup(const std::string_view key, uint8_t& value) noexcept
     {
-        if (const size_t len = value.length(); len < 1u || len > 255u)
+        if (const size_t len = key.length(); len < 1u || len > 255u)
             return false;
 
         for (size_t i = 0; i < 3; i++)
         {
-            if (entries[i] == value)
+            if (keys[i] == key)
+            {
+                value = values[i];
+                return true;
+            }
+        }
+        return false;
+    }
+
+    [[nodiscard]]
+    static bool contains(const std::string_view key) noexcept
+    {
+        if (const size_t len = key.length(); len < 1u || len > 255u)
+            return false;
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            if (keys[i] == key)
                return true;
         }
         return false;

@@ -10,10 +10,10 @@ pub struct ConditionalStructure_Byte_3;
 
 impl ConditionalStructure_Byte_3 {
     #[must_use]
-    pub fn contains(value: u8) -> bool {
+    pub fn contains(key: u8) -> bool {
 
 
-        if value == u8::MIN || value == 1 || value == u8::MAX {
+        if key == u8::MIN || key == 1 || key == u8::MAX {
             return true;
         }
 

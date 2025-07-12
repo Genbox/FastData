@@ -10,9 +10,9 @@ class SingleValueStructure_Double_1 final
 {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const double value) noexcept
+    static constexpr bool contains(const double key) noexcept
     {
-        return value == 1.0;
+        return key == 1.0;
     }
 
     static constexpr size_t item_count = 1;

@@ -8,24 +8,24 @@
 
 class EytzingerSearchStructure_Char_3 final
 {
-    static constexpr std::array<char, 3> entries = {
+    static constexpr std::array<char, 3> keys = {
         97, 0, 127
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const char value) noexcept
+    static bool contains(const char key) noexcept
     {
-        if (value < 0 || value > 127)
+        if (key < 0 || key > 127)
             return false;
 
         size_t i = 0;
-        while (i < entries.size())
+        while (i < keys.size())
         {
-            if (entries[i] == value)
+            if (keys[i] == key)
                 return true;
 
-            if (entries[i] < value)
+            if (keys[i] < key)
                 i = 2 * i + 2;
             else
                 i = 2 * i + 1;

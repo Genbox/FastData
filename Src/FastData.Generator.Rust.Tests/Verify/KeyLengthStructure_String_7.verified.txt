@@ -14,11 +14,11 @@ impl KeyLengthStructure_String_7 {
     ];
 
     #[must_use]
-    pub fn contains(value: &str) -> bool {
-        if 1012u64 & (1u64 << (value.len() - 1)) == 0 {
+    pub fn contains(key: &str) -> bool {
+        if 1012u64 & (1u64 << (key.len() - 1)) == 0 {
             return false;
         }
-        return Self::ENTRIES[(value.len() - 3) as usize] == value;
+        return Self::ENTRIES[(key.len() - 3) as usize] == key;
     }
 
     pub const ITEM_COUNT: usize = 7;

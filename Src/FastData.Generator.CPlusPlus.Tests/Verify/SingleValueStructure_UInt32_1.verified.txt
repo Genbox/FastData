@@ -10,9 +10,9 @@ class SingleValueStructure_UInt32_1 final
 {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const uint32_t value) noexcept
+    static constexpr bool contains(const uint32_t key) noexcept
     {
-        return value == 1u;
+        return key == 1u;
     }
 
     static constexpr size_t item_count = 1;

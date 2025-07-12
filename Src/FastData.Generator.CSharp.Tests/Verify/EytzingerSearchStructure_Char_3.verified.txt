@@ -8,20 +8,20 @@ using System.Runtime.InteropServices;
 
 internal static class EytzingerSearchStructure_Char_3
 {
-    private static readonly char[] _entries = new char[] {
+    private static readonly char[] _keys = new char[] {
         'a', char.MinValue, ''
     };
 
     
-    public static bool Contains(char value)
+    public static bool Contains(char key)
     {
-        if (value < char.MinValue || value > '')
+        if (key < char.MinValue || key > '')
             return false;
 
         int i = 0;
-        while (i < _entries.Length)
+        while (i < _keys.Length)
         {
-            int comparison = _entries[i].CompareTo(value);
+            int comparison = _keys[i].CompareTo(key);
 
             if (comparison == 0)
                 return true;

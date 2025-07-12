@@ -8,7 +8,7 @@
 
 class EytzingerSearchStructure_Int32_100 final
 {
-    static constexpr std::array<int32_t, 100> entries = {
+    static constexpr std::array<int32_t, 100> keys = {
         63, 31, 84, 15, 47, 76, 92, 7, 23, 39, 
         55, 71, 80, 88, 96, 3, 11, 19, 27, 35, 
         43, 51, 59, 67, 74, 78, 82, 86, 90, 94, 
@@ -23,18 +23,18 @@ class EytzingerSearchStructure_Int32_100 final
 
 public:
     [[nodiscard]]
-    static bool contains(const int32_t value) noexcept
+    static bool contains(const int32_t key) noexcept
     {
-        if (value < 0 || value > 99)
+        if (key < 0 || key > 99)
             return false;
 
         size_t i = 0;
-        while (i < entries.size())
+        while (i < keys.size())
         {
-            if (entries[i] == value)
+            if (keys[i] == key)
                 return true;
 
-            if (entries[i] < value)
+            if (keys[i] < key)
                 i = 2 * i + 2;
             else
                 i = 2 * i + 1;

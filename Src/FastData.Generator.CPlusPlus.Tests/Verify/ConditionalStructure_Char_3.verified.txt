@@ -10,11 +10,11 @@ class ConditionalStructure_Char_3 final
 {
 public:
     [[nodiscard]]
-    static bool contains(const char value) noexcept
+    static bool contains(const char key) noexcept
     {
 
 
-        if (value == 0 || value == 97 || value == 127)
+        if (key == 0 || key == 97 || key == 127)
             return true;
 
         return false;

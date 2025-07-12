@@ -8,15 +8,15 @@ using System.Runtime.InteropServices;
 
 internal static class BinarySearchStructure_String_13
 {
-    private static readonly string[] _entries = new string[] {
+    private static readonly string[] _keys = new string[] {
         "ß", "à", "ä", "å", "æ", "ç", "è", "é", "ê", "ñ", 
         "ö", "ø", "ü"
     };
 
     
-    public static bool Contains(string value)
+    public static bool Contains(string key)
     {
-        if (value.Length != 1u)
+        if (key.Length != 1u)
             return false;
 
         int lo = 0;
@@ -24,7 +24,7 @@ internal static class BinarySearchStructure_String_13
         while (lo <= hi)
         {
             int i = lo + ((hi - lo) >> 1);
-            int order = StringComparer.Ordinal.Compare(_entries[i], value);
+            int order = StringComparer.Ordinal.Compare(_keys[i], key);
 
             if (order == 0)
                 return true;

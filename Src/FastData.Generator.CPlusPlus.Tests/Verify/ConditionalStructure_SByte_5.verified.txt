@@ -10,12 +10,12 @@ class ConditionalStructure_SByte_5 final
 {
 public:
     [[nodiscard]]
-    static bool contains(const int8_t value) noexcept
+    static bool contains(const int8_t key) noexcept
     {
-        if (value < std::numeric_limits<int8_t>::lowest() || value > std::numeric_limits<int8_t>::max())
+        if (key < std::numeric_limits<int8_t>::lowest() || key > std::numeric_limits<int8_t>::max())
             return false;
 
-        if (value == std::numeric_limits<int8_t>::lowest() || value == -1 || value == 0 || value == 1 || value == std::numeric_limits<int8_t>::max())
+        if (key == std::numeric_limits<int8_t>::lowest() || key == -1 || key == 0 || key == 1 || key == std::numeric_limits<int8_t>::max())
             return true;
 
         return false;

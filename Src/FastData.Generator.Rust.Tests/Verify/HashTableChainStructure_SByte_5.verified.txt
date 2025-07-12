@@ -14,7 +14,7 @@ impl HashTableChainStructure_SByte_5 {
     ];
 
     const ENTRIES: [E; 5] = [
-        E { next: -1, value: i8::MIN }, E { next: -1, value: -1 }, E { next: 1, value: 0 }, E { next: -1, value: 1 }, E { next: -1, value: i8::MAX }
+        E { next: -1, key: i8::MIN }, E { next: -1, key: -1 }, E { next: 1, key: 0 }, E { next: -1, key: 1 }, E { next: -1, key: i8::MAX }
     ];
 
     #[inline(always)]
@@ -23,18 +23,18 @@ impl HashTableChainStructure_SByte_5 {
     }
 
     #[must_use]
-    pub fn contains(value: i8) -> bool {
-        if value < i8::MIN || value > i8::MAX {
+    pub fn contains(key: i8) -> bool {
+        if key < i8::MIN || key > i8::MAX {
             return false;
         }
 
-        let hash = unsafe { Self::get_hash(value) };
+        let hash = unsafe { Self::get_hash(key) };
         let index = hash % 5;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.value == value {
+            if entry.key == key {
                 return true;
             }
             i = entry.next;
@@ -50,5 +50,5 @@ impl HashTableChainStructure_SByte_5 {
 struct E {
     
     next: i8,
-    value: i8,
+    key: i8,
 }

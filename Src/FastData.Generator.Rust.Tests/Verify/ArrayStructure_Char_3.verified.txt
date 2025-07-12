@@ -9,18 +9,18 @@ use std::ptr;
 pub struct ArrayStructure_Char_3;
 
 impl ArrayStructure_Char_3 {
-    const ENTRIES: [char; 3] = [
+    const KEYS: [char; 3] = [
         char::MIN, 'a', ''
     ];
 
     #[must_use]
-    pub fn contains(value: char) -> bool {
-        if value < char::MIN || value > '' {
+    pub fn contains(key: char) -> bool {
+        if key < char::MIN || key > '' {
             return false;
         }
 
-        for entry in Self::ENTRIES.iter() {
-            if *entry == value {
+        for entry in Self::KEYS.iter() {
+            if *entry == key {
                 return true;
             }
         }

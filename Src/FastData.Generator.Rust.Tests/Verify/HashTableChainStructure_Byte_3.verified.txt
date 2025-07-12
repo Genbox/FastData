@@ -14,7 +14,7 @@ impl HashTableChainStructure_Byte_3 {
     ];
 
     const ENTRIES: [E; 3] = [
-        E { next: -1, value: u8::MIN }, E { next: -1, value: 1 }, E { next: 0, value: u8::MAX }
+        E { next: -1, key: u8::MIN }, E { next: -1, key: 1 }, E { next: 0, key: u8::MAX }
     ];
 
     #[inline(always)]
@@ -23,18 +23,18 @@ impl HashTableChainStructure_Byte_3 {
     }
 
     #[must_use]
-    pub fn contains(value: u8) -> bool {
-        if value < u8::MIN || value > u8::MAX {
+    pub fn contains(key: u8) -> bool {
+        if key < u8::MIN || key > u8::MAX {
             return false;
         }
 
-        let hash = unsafe { Self::get_hash(value) };
+        let hash = unsafe { Self::get_hash(key) };
         let index = hash % 3;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.value == value {
+            if entry.key == key {
                 return true;
             }
             i = entry.next;
@@ -50,5 +50,5 @@ impl HashTableChainStructure_Byte_3 {
 struct E {
     
     next: i8,
-    value: u8,
+    key: u8,
 }

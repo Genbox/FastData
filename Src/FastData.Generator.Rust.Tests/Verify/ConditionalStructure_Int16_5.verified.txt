@@ -10,12 +10,12 @@ pub struct ConditionalStructure_Int16_5;
 
 impl ConditionalStructure_Int16_5 {
     #[must_use]
-    pub fn contains(value: i16) -> bool {
-        if value < i16::MIN || value > i16::MAX {
+    pub fn contains(key: i16) -> bool {
+        if key < i16::MIN || key > i16::MAX {
             return false;
         }
 
-        if value == i16::MIN || value == -1 || value == 0 || value == 1 || value == i16::MAX {
+        if key == i16::MIN || key == -1 || key == 0 || key == 1 || key == i16::MAX {
             return true;
         }
 

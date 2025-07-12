@@ -8,16 +8,16 @@
 
 class BinarySearchStructure_String_13 final
 {
-    static constexpr std::array<std::u32string_view, 13> entries = {
+    static constexpr std::array<std::u32string_view, 13> keys = {
         U"ß", U"à", U"ä", U"å", U"æ", U"ç", U"è", U"é", U"ê", U"ñ", 
         U"ö", U"ø", U"ü"
     };
 
 public:
     [[nodiscard]]
-    static bool contains(const std::u32string_view value) noexcept
+    static bool contains(const std::u32string_view key) noexcept
     {
-        if (value.length() != 1u)
+        if (key.length() != 1u)
             return false;
 
         size_t lo = 0;
@@ -26,10 +26,10 @@ public:
         {
             const size_t mid = lo + ((hi - lo) >> 1);
 
-            if (entries[mid] == value)
+            if (keys[mid] == key)
                 return true;
 
-            if (entries[mid] < value)
+            if (keys[mid] < key)
                 lo = mid + 1;
             else
                 hi = mid - 1;

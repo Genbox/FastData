@@ -12,10 +12,10 @@ class HashTableChainStructure_String_13 final
     {
         uint64_t hash_code;
         int8_t next;
-        std::u32string_view value;
+        std::u32string_view key;
 
-        e(const uint64_t hash_code, const int8_t next, const std::u32string_view value)
-           : hash_code(hash_code), next(next), value(value) {}
+        e(const uint64_t hash_code, const int8_t next, const std::u32string_view key)
+           : hash_code(hash_code), next(next), key(key) {}
     };
 
     static constexpr std::array<int8_t, 13> buckets = {
@@ -40,20 +40,20 @@ class HashTableChainStructure_String_13 final
 
 public:
     [[nodiscard]]
-    static bool contains(const std::u32string_view value) noexcept
+    static bool contains(const std::u32string_view key) noexcept
     {
-        if (value.length() != 1u)
+        if (key.length() != 1u)
             return false;
 
-        const uint64_t hash = get_hash(value);
+        const uint64_t hash = get_hash(key);
         const size_t index = hash % 13;
         int8_t i = buckets[index] - static_cast<int8_t>(1);
 
         while (i >= 0)
         {
-            const auto& [hash_code, next, value1] = entries[i];
+            const auto& [hash_code, next, key1] = entries[i];
 
-            if (hash_code == hash && value1 == value)
+            if (hash_code == hash && key1 == key)
                 return true;
 
             i = next;

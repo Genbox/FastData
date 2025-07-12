@@ -17,12 +17,12 @@ internal static class HashTableChainStructure_Byte_3
     };
 
     
-    public static bool Contains(byte value)
+    public static bool Contains(byte key)
     {
-        if (value < byte.MinValue || value > byte.MaxValue)
+        if (key < byte.MinValue || key > byte.MaxValue)
             return false;
 
-        ulong hash = Hash(value);
+        ulong hash = Hash(key);
         uint index = (uint)(hash % 3);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
@@ -30,7 +30,7 @@ internal static class HashTableChainStructure_Byte_3
         {
             ref E entry = ref _entries[i];
 
-            if (value == entry.Value)
+            if (key == entry.Key)
                 return true;
 
             i = entry.Next;
@@ -51,13 +51,13 @@ internal static class HashTableChainStructure_Byte_3
     {
         
         internal readonly sbyte Next;
-        internal readonly byte Value;
+        internal readonly byte Key;
 
-        internal E(sbyte next, byte value)
+        internal E(sbyte next, byte key)
         {
             
             Next = next;
-            Value = value;
+            Key = key;
         }
     }
 

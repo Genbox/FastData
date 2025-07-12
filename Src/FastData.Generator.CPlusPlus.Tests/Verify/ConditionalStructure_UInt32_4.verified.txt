@@ -10,12 +10,12 @@ class ConditionalStructure_UInt32_4 final
 {
 public:
     [[nodiscard]]
-    static bool contains(const uint32_t value) noexcept
+    static bool contains(const uint32_t key) noexcept
     {
-        if (value < 0 || value > std::numeric_limits<uint32_t>::max())
+        if (key < 0 || key > std::numeric_limits<uint32_t>::max())
             return false;
 
-        if (value == 0 || value == 1u || value == 2u || value == std::numeric_limits<uint32_t>::max())
+        if (key == 0 || key == 1u || key == 2u || key == std::numeric_limits<uint32_t>::max())
             return true;
 
         return false;

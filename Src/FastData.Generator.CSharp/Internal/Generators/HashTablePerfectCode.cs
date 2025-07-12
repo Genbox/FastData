@@ -13,15 +13,15 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                 };
 
                 {{MethodAttribute}}
-                {{MethodModifier}}bool Contains({{KeyTypeName}} value)
+                {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                 {
             {{EarlyExits}}
 
-                    {{HashSizeType}} hash = Hash(value);
+                    {{HashSizeType}} hash = Hash(key);
                     {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                     ref E entry = ref _entries[index];
 
-                    return {{GetEqualFunction("hash", "entry.HashCode")}} && {{GetEqualFunction("value", "entry.Value")}};
+                    return {{GetEqualFunction("hash", "entry.HashCode")}} && {{GetEqualFunction("key", "entry.Key")}};
                 }
 
             {{HashSource}}
@@ -29,13 +29,13 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                 [StructLayout(LayoutKind.Auto)]
                 private struct E
                 {
-                    internal E({{KeyTypeName}} value, {{HashSizeType}} hashCode)
+                    internal E({{KeyTypeName}} key, {{HashSizeType}} hashCode)
                     {
-                        Value = value;
+                        Key = key;
                         HashCode = hashCode;
                     }
 
-                    internal {{KeyTypeName}} Value;
+                    internal {{KeyTypeName}} Key;
                     internal {{HashSizeType}} HashCode;
                 }
             """
@@ -45,14 +45,14 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                 };
 
                 {{MethodAttribute}}
-                {{MethodModifier}}bool Contains({{KeyTypeName}} value)
+                {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                 {
             {{EarlyExits}}
 
-                    {{HashSizeType}} hash = Hash(value);
+                    {{HashSizeType}} hash = Hash(key);
                     {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
 
-                    return {{GetEqualFunction("value", "_entries[index]")}};
+                    return {{GetEqualFunction("key", "_entries[index]")}};
                 }
 
             {{HashSource}}

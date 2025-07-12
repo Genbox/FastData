@@ -8,12 +8,12 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}{{KeyTypeName}}[] _entries = new {{KeyTypeName}}[] {
+              {{FieldModifier}}{{KeyTypeName}}[] _keys = new {{KeyTypeName}}[] {
           {{FormatColumns(ctx.Keys, ToValueLabel)}}
               };
 
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} key)
               {
           {{EarlyExits}}
 
@@ -22,7 +22,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                   while (lo <= hi)
                   {
                       int i = lo + ((hi - lo) >> 1);
-                      int order = {{GetCompareFunction("_entries[i]", "value")}};
+                      int order = {{GetCompareFunction("_keys[i]", "key")}};
 
                       if (order == 0)
                           return true;

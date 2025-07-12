@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 internal static class ConditionalStructure_Double_4
 {
     
-    public static bool Contains(double value)
+    public static bool Contains(double key)
     {
-        if (value < double.MinValue || value > double.MaxValue)
+        if (key < double.MinValue || key > double.MaxValue)
             return false;
 
-        switch (value)
+        switch (key)
         {
             case double.MinValue:
             case 0.0:

@@ -8,14 +8,14 @@ using System.Runtime.InteropServices;
 
 internal static class BinarySearchStructure_Char_3
 {
-    private static readonly char[] _entries = new char[] {
+    private static readonly char[] _keys = new char[] {
         char.MinValue, 'a', ''
     };
 
     
-    public static bool Contains(char value)
+    public static bool Contains(char key)
     {
-        if (value < char.MinValue || value > '')
+        if (key < char.MinValue || key > '')
             return false;
 
         int lo = 0;
@@ -23,7 +23,7 @@ internal static class BinarySearchStructure_Char_3
         while (lo <= hi)
         {
             int i = lo + ((hi - lo) >> 1);
-            int order = _entries[i].CompareTo(value);
+            int order = _keys[i].CompareTo(key);
 
             if (order == 0)
                 return true;

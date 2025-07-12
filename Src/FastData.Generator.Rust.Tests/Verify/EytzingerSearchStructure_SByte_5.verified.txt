@@ -9,24 +9,24 @@ use std::ptr;
 pub struct EytzingerSearchStructure_SByte_5;
 
 impl EytzingerSearchStructure_SByte_5 {
-    const ENTRIES: [i8; 5] = [
+    const KEYS: [i8; 5] = [
         1, -1, i8::MAX, i8::MIN, 0
     ];
 
     #[must_use]
-    pub fn contains(value: i8) -> bool {
-        if value < i8::MIN || value > i8::MAX {
+    pub fn contains(key: i8) -> bool {
+        if key < i8::MIN || key > i8::MAX {
             return false;
         }
 
         let mut i: usize = 0;
-        while i < Self::ENTRIES.len() {
-            let entry = Self::ENTRIES[i];
+        while i < Self::KEYS.len() {
+            let entry = Self::KEYS[i];
 
-            if entry == value {
+            if entry == key {
                 return true;
             }
-            if entry < value {
+            if entry < key {
                 i = 2 * i + 2;
             } else {
                 i = 2 * i + 1;

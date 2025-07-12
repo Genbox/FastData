@@ -8,20 +8,20 @@ using System.Runtime.InteropServices;
 
 internal static class EytzingerSearchStructure_Byte_3
 {
-    private static readonly byte[] _entries = new byte[] {
+    private static readonly byte[] _keys = new byte[] {
         1, byte.MinValue, byte.MaxValue
     };
 
     
-    public static bool Contains(byte value)
+    public static bool Contains(byte key)
     {
-        if (value < byte.MinValue || value > byte.MaxValue)
+        if (key < byte.MinValue || key > byte.MaxValue)
             return false;
 
         int i = 0;
-        while (i < _entries.Length)
+        while (i < _keys.Length)
         {
-            int comparison = _entries[i].CompareTo(value);
+            int comparison = _keys[i].CompareTo(key);
 
             if (comparison == 0)
                 return true;

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 internal static class BinarySearchStructure_Single_100
 {
-    private static readonly float[] _entries = new float[] {
+    private static readonly float[] _keys = new float[] {
         0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 
         10f, 11f, 12f, 13f, 14f, 15f, 16f, 17f, 18f, 19f, 
         20f, 21f, 22f, 23f, 24f, 25f, 26f, 27f, 28f, 29f, 
@@ -22,9 +22,9 @@ internal static class BinarySearchStructure_Single_100
     };
 
     
-    public static bool Contains(float value)
+    public static bool Contains(float key)
     {
-        if (value < 0f || value > 99f)
+        if (key < 0f || key > 99f)
             return false;
 
         int lo = 0;
@@ -32,7 +32,7 @@ internal static class BinarySearchStructure_Single_100
         while (lo <= hi)
         {
             int i = lo + ((hi - lo) >> 1);
-            int order = _entries[i].CompareTo(value);
+            int order = _keys[i].CompareTo(key);
 
             if (order == 0)
                 return true;

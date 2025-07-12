@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 internal static class ConditionalStructure_Single_5
 {
     
-    public static bool Contains(float value)
+    public static bool Contains(float key)
     {
-        if (value < float.MinValue || value > float.MaxValue)
+        if (key < float.MinValue || key > float.MaxValue)
             return false;
 
-        switch (value)
+        switch (key)
         {
             case float.MinValue:
             case -1f:

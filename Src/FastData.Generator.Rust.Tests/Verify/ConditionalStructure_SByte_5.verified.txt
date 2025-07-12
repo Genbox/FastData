@@ -10,12 +10,12 @@ pub struct ConditionalStructure_SByte_5;
 
 impl ConditionalStructure_SByte_5 {
     #[must_use]
-    pub fn contains(value: i8) -> bool {
-        if value < i8::MIN || value > i8::MAX {
+    pub fn contains(key: i8) -> bool {
+        if key < i8::MIN || key > i8::MAX {
             return false;
         }
 
-        if value == i8::MIN || value == -1 || value == 0 || value == 1 || value == i8::MAX {
+        if key == i8::MIN || key == -1 || key == 0 || key == 1 || key == i8::MAX {
             return true;
         }
 

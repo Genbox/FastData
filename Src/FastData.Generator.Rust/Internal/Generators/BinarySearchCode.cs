@@ -8,24 +8,24 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 {
     public override string Generate() =>
         $$"""
-              {{FieldModifier}}const ENTRIES: [{{TypeNameWithLifetime}}; {{ctx.Keys.Length.ToStringInvariant()}}] = [
+              {{FieldModifier}}const KEYS: [{{TypeNameWithLifetime}}; {{ctx.Keys.Length.ToStringInvariant()}}] = [
           {{FormatColumns(ctx.Keys, ToValueLabel)}}
               ];
 
               {{MethodAttribute}}
-              {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
+              {{MethodModifier}}fn contains(key: {{KeyTypeName}}) -> bool {
           {{EarlyExits}}
 
                   let mut lo: usize = 0;
                   let mut hi: usize = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
                   while lo <= hi {
                       let i = lo + ((hi - lo) >> 1);
-                      let entry = Self::ENTRIES[i];
+                      let entry = Self::KEYS[i];
 
-                      if entry == value {
+                      if entry == key {
                           return true;
                       }
-                      if entry < value {
+                      if entry < key {
                           lo = i + 1;
                       } else {
                           hi = i - 1;

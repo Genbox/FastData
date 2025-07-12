@@ -10,12 +10,12 @@ pub struct ConditionalStructure_Double_4;
 
 impl ConditionalStructure_Double_4 {
     #[must_use]
-    pub fn contains(value: f64) -> bool {
-        if value < f64::MIN || value > f64::MAX {
+    pub fn contains(key: f64) -> bool {
+        if key < f64::MIN || key > f64::MAX {
             return false;
         }
 
-        if value == f64::MIN || value == 0.0 || value == 1.0 || value == f64::MAX {
+        if key == f64::MIN || key == 0.0 || key == 1.0 || key == f64::MAX {
             return true;
         }
 

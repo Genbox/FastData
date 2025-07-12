@@ -14,26 +14,26 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
         {
             shared.Add("ph-struct-" + genCfg.DataType, CodeType.Class, $$"""
                                                                          {{FieldModifier}}struct E {
-                                                                             value: {{TypeNameWithLifetime}},
+                                                                             key: {{TypeNameWithLifetime}},
                                                                              hash_code: {{HashSizeType}},
                                                                          }
                                                                          """);
 
             return $$"""
                          {{FieldModifier}}const ENTRIES: [E; {{ctx.Data.Length.ToStringInvariant()}}] = [
-                     {{FormatColumns(ctx.Data, x => $"E {{ value: {ToValueLabel(x.Key)}, hash_code: {x.Value.ToStringInvariant()} }}")}}
+                     {{FormatColumns(ctx.Data, x => $"E {{ key: {ToValueLabel(x.Key)}, hash_code: {x.Value.ToStringInvariant()} }}")}}
                          ];
 
                      {{HashSource}}
 
                          {{MethodAttribute}}
-                         {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
+                         {{MethodModifier}}fn contains(key: {{KeyTypeName}}) -> bool {
                      {{EarlyExits}}
-                             let hash = unsafe { Self::get_hash(value) };
+                             let hash = unsafe { Self::get_hash(key) };
                              let index = ({{GetModFunction("hash", (ulong)ctx.Data.Length)}}) as usize;
                              let entry = &Self::ENTRIES[index];
 
-                             return {{GetEqualFunction("hash", "entry.hash_code")}} && {{GetEqualFunction("value", "entry.value")}};
+                             return {{GetEqualFunction("hash", "entry.hash_code")}} && {{GetEqualFunction("key", "entry.key")}};
                          }
                      """;
         }
@@ -46,12 +46,12 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                  {{HashSource}}
 
                      {{MethodAttribute}}
-                     {{MethodModifier}}fn contains(value: {{KeyTypeName}}) -> bool {
+                     {{MethodModifier}}fn contains(key: {{KeyTypeName}}) -> bool {
                  {{EarlyExits}}
-                         let hash = unsafe { Self::get_hash(value) };
+                         let hash = unsafe { Self::get_hash(key) };
                          let index = ({{GetModFunction("hash", (ulong)ctx.Data.Length)}}) as usize;
 
-                         return {{GetEqualFunction("value", "Self::ENTRIES[index]")}};
+                         return {{GetEqualFunction("key", "Self::ENTRIES[index]")}};
                      }
                  """;
     }

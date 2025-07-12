@@ -9,18 +9,18 @@ use std::ptr;
 pub struct ArrayStructure_Single_5;
 
 impl ArrayStructure_Single_5 {
-    const ENTRIES: [f32; 5] = [
+    const KEYS: [f32; 5] = [
         f32::MIN, -1.0, 0.0, 1.0, f32::MAX
     ];
 
     #[must_use]
-    pub fn contains(value: f32) -> bool {
-        if value < f32::MIN || value > f32::MAX {
+    pub fn contains(key: f32) -> bool {
+        if key < f32::MIN || key > f32::MAX {
             return false;
         }
 
-        for entry in Self::ENTRIES.iter() {
-            if *entry == value {
+        for entry in Self::KEYS.iter() {
+            if *entry == key {
                 return true;
             }
         }

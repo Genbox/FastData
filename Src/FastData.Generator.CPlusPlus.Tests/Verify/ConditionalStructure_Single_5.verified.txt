@@ -10,12 +10,12 @@ class ConditionalStructure_Single_5 final
 {
 public:
     [[nodiscard]]
-    static bool contains(const float value) noexcept
+    static bool contains(const float key) noexcept
     {
-        if (value < std::numeric_limits<float>::lowest() || value > std::numeric_limits<float>::max())
+        if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())
             return false;
 
-        if (value == std::numeric_limits<float>::lowest() || value == -1.0f || value == 0.0f || value == 1.0f || value == std::numeric_limits<float>::max())
+        if (key == std::numeric_limits<float>::lowest() || key == -1.0f || key == 0.0f || key == 1.0f || key == std::numeric_limits<float>::max())
             return true;
 
         return false;

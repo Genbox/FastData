@@ -9,13 +9,13 @@ use std::ptr;
 pub struct BinarySearchStructure_SByte_5;
 
 impl BinarySearchStructure_SByte_5 {
-    const ENTRIES: [i8; 5] = [
+    const KEYS: [i8; 5] = [
         i8::MIN, -1, 0, 1, i8::MAX
     ];
 
     #[must_use]
-    pub fn contains(value: i8) -> bool {
-        if value < i8::MIN || value > i8::MAX {
+    pub fn contains(key: i8) -> bool {
+        if key < i8::MIN || key > i8::MAX {
             return false;
         }
 
@@ -23,12 +23,12 @@ impl BinarySearchStructure_SByte_5 {
         let mut hi: usize = 4;
         while lo <= hi {
             let i = lo + ((hi - lo) >> 1);
-            let entry = Self::ENTRIES[i];
+            let entry = Self::KEYS[i];
 
-            if entry == value {
+            if entry == key {
                 return true;
             }
-            if entry < value {
+            if entry < key {
                 lo = i + 1;
             } else {
                 hi = i - 1;

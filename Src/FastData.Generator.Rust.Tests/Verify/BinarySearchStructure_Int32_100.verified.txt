@@ -9,7 +9,7 @@ use std::ptr;
 pub struct BinarySearchStructure_Int32_100;
 
 impl BinarySearchStructure_Int32_100 {
-    const ENTRIES: [i32; 100] = [
+    const KEYS: [i32; 100] = [
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 
@@ -23,8 +23,8 @@ impl BinarySearchStructure_Int32_100 {
     ];
 
     #[must_use]
-    pub fn contains(value: i32) -> bool {
-        if value < 0 || value > 99 {
+    pub fn contains(key: i32) -> bool {
+        if key < 0 || key > 99 {
             return false;
         }
 
@@ -32,12 +32,12 @@ impl BinarySearchStructure_Int32_100 {
         let mut hi: usize = 99;
         while lo <= hi {
             let i = lo + ((hi - lo) >> 1);
-            let entry = Self::ENTRIES[i];
+            let entry = Self::KEYS[i];
 
-            if entry == value {
+            if entry == key {
                 return true;
             }
-            if entry < value {
+            if entry < key {
                 lo = i + 1;
             } else {
                 hi = i - 1;

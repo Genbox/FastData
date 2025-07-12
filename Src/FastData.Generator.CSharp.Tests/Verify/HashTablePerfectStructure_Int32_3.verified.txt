@@ -13,15 +13,15 @@ internal static class HashTablePerfectStructure_Int32_3
     };
 
     
-    public static bool Contains(int value)
+    public static bool Contains(int key)
     {
-        if (value < 1 || value > 3)
+        if (key < 1 || key > 3)
             return false;
 
-        ulong hash = Hash(value);
+        ulong hash = Hash(key);
         uint index = (uint)(hash % 3);
 
-        return value == _entries[index];
+        return key == _entries[index];
     }
 
 

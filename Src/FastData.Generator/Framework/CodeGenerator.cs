@@ -23,7 +23,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         map.OverrideEncoding(genCfg.Flags.HasFlag(GeneratorFlags.AllAreASCII) ? GeneratorEncoding.ASCII : Encoding);
 
         string keyTypeName = map.GetTypeName(typeof(TKey));
-        string valueTypeName = map.GetTypeName(typeof(TKey));
+        string valueTypeName = map.GetTypeName(typeof(TValue));
 
         StringBuilder sb = new StringBuilder();
         AppendHeader(sb, genCfg, context);

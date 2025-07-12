@@ -16,11 +16,11 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
     private string GenerateIf(ReadOnlySpan<TKey> data) =>
         $$"""
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} key)
               {
           {{EarlyExits}}
 
-                  if ({{FormatList(data, x => GetEqualFunction("value", ToValueLabel(x)), " || ")}})
+                  if ({{FormatList(data, x => GetEqualFunction("key", ToValueLabel(x)), " || ")}})
                       return true;
 
                   return false;
@@ -30,11 +30,11 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
     private string GenerateSwitch(ReadOnlySpan<TKey> data) =>
         $$"""
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{KeyTypeName}} value)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} key)
               {
           {{EarlyExits}}
 
-                  switch (value)
+                  switch (key)
                   {
           {{FormatList(data, x => $"            case {ToValueLabel(x)}:", "\n")}}
                           return true;

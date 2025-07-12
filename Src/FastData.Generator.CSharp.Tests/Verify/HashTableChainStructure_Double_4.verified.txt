@@ -17,12 +17,12 @@ internal static class HashTableChainStructure_Double_4
     };
 
     
-    public static bool Contains(double value)
+    public static bool Contains(double key)
     {
-        if (value < double.MinValue || value > double.MaxValue)
+        if (key < double.MinValue || key > double.MaxValue)
             return false;
 
-        ulong hash = Hash(value);
+        ulong hash = Hash(key);
         uint index = (uint)(hash & 3);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
@@ -30,7 +30,7 @@ internal static class HashTableChainStructure_Double_4
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && value == entry.Value)
+            if (entry.HashCode == hash && key == entry.Key)
                 return true;
 
             i = entry.Next;
@@ -56,13 +56,13 @@ internal static class HashTableChainStructure_Double_4
     {
         internal readonly ulong HashCode;
         internal readonly sbyte Next;
-        internal readonly double Value;
+        internal readonly double Key;
 
-        internal E(ulong hashCode, sbyte next, double value)
+        internal E(ulong hashCode, sbyte next, double key)
         {
             HashCode = hashCode;
             Next = next;
-            Value = value;
+            Key = key;
         }
     }
 
