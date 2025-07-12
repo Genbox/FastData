@@ -8,9 +8,8 @@
 
 class ArrayStructure_SByte_5 final
 {
-    static constexpr std::array<uint8_t, 5> values = {
-        42, 42, 42, 42, 42
-    };
+
+    static std::array<uint8_t, 5> values;
 
     static constexpr std::array<int8_t, 5> keys = {
         std::numeric_limits<int8_t>::lowest(), -1, 0, 1, std::numeric_limits<int8_t>::max()
@@ -18,7 +17,7 @@ class ArrayStructure_SByte_5 final
 
 public:
     [[nodiscard]]
-    static bool try_lookup(const int8_t key, uint8_t& value) noexcept
+    static bool try_lookup(const int8_t key, uint8_t*& value) noexcept
     {
         if (key < std::numeric_limits<int8_t>::lowest() || key > std::numeric_limits<int8_t>::max())
             return false;
@@ -27,7 +26,7 @@ public:
         {
             if (keys[i] == key)
             {
-                value = values[i];
+                value = &values[i];
                 return true;
             }
         }
@@ -58,4 +57,7 @@ public:
     ArrayStructure_SByte_5& operator=(const ArrayStructure_SByte_5&) = delete;
     ArrayStructure_SByte_5(ArrayStructure_SByte_5&&) = delete;
     ArrayStructure_SByte_5& operator=(ArrayStructure_SByte_5&&) = delete;
+};
+std::array<uint8_t, 5> ArrayStructure_SByte_5::values = {
+        42, 42, 42, 42, 42
 };

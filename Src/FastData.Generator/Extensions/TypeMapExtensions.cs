@@ -1,12 +1,12 @@
 using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generators;
 
 namespace Genbox.FastData.Generator.Extensions;
 
 public static class TypeMapExtensions
 {
-    public static string GetTypeName(this TypeMap map, Type type) => map.Get(type).Name;
-
     public static string ToValueLabel(this TypeMap map, object value, Type type)
     {
         ITypeDef s = map.Get(type);
@@ -17,6 +17,20 @@ public static class TypeMapExtensions
     {
         ITypeDef<T> s = map.Get<T>();
         return s.Print(value);
+    }
+
+    public static string PrintValues(this TypeMap map, ValueSpec spec)
+    {
+        ITypeDef s = map.Get<object>();
+        ObjectTypeDef def = (ObjectTypeDef)s;
+        return def.PrintValues(map, spec);
+    }
+
+    public static string GetObjectDeclaration(this TypeMap map, ValueSpec spec)
+    {
+        ITypeDef s = map.Get<object>();
+        ObjectTypeDef def = (ObjectTypeDef)s;
+        return def.GetDeclaration(spec, map);
     }
 
     public static string GetSmallestUIntType(this TypeMap map, ulong value) => value switch

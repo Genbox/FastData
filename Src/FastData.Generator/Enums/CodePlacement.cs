@@ -1,9 +1,8 @@
 namespace Genbox.FastData.Generator.Enums;
 
-public enum CodeType
+public enum CodePlacement
 {
     Unknown = 0,
-    Method,
-    Class,
-    Directive
+    Before,
+    After
 }

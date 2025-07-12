@@ -8,10 +8,8 @@
 
 class ArrayStructure_String_13 final
 {
-    static constexpr std::array<uint8_t, 13> values = {
-        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-        42, 42, 42
-    };
+
+    static std::array<uint8_t, 13> values;
 
     static constexpr std::array<std::u32string_view, 13> keys = {
         U"æ", U"à", U"ä", U"ö", U"ü", U"ß", U"é", U"è", U"ê", U"ç", 
@@ -20,7 +18,7 @@ class ArrayStructure_String_13 final
 
 public:
     [[nodiscard]]
-    static bool try_lookup(const std::u32string_view key, uint8_t& value) noexcept
+    static bool try_lookup(const std::u32string_view key, uint8_t*& value) noexcept
     {
         if (key.length() != 1u)
             return false;
@@ -29,7 +27,7 @@ public:
         {
             if (keys[i] == key)
             {
-                value = values[i];
+                value = &values[i];
                 return true;
             }
         }
@@ -60,4 +58,8 @@ public:
     ArrayStructure_String_13& operator=(const ArrayStructure_String_13&) = delete;
     ArrayStructure_String_13(ArrayStructure_String_13&&) = delete;
     ArrayStructure_String_13& operator=(ArrayStructure_String_13&&) = delete;
+};
+std::array<uint8_t, 13> ArrayStructure_String_13::values = {
+        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
+        42, 42, 42
 };

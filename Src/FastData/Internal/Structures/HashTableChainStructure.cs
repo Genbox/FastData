@@ -1,4 +1,5 @@
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Contexts.Misc;
 using Genbox.FastData.Generators.Extensions;
@@ -9,7 +10,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class HashTableChainStructure<TKey, TValue>(HashData hashData, DataType dataType) : IStructure<TKey, TValue, HashTableChainContext<TKey, TValue>>
 {
-    public HashTableChainContext<TKey, TValue> Create(TKey[] data, TValue[]? values)
+    public HashTableChainContext<TKey, TValue> Create(TKey[] data, ValueSpec<TValue>? valueSpec)
     {
         ulong size = (ulong)(data.Length * hashData.CapacityFactor);
 
@@ -29,6 +30,6 @@ internal sealed class HashTableChainStructure<TKey, TValue>(HashData hashData, D
             bucket = i + 1;
         }
 
-        return new HashTableChainContext<TKey, TValue>(buckets, entries, !dataType.IsIdentityHash(), values);
+        return new HashTableChainContext<TKey, TValue>(buckets, entries, !dataType.IsIdentityHash(), valueSpec);
     }
 }

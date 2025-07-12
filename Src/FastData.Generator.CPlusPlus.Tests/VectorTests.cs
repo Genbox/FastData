@@ -1,7 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
-using Genbox.FastData.Generator.CPlusPlus.Shared;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generators;
@@ -13,7 +11,7 @@ using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Tests;
 
-public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<VectorTests.CPlusPlusContext>
+public class VectorTests(CPlusPlusContext context) : IClassFixture<CPlusPlusContext>
 {
     [Theory]
     [ClassData(typeof(TestVectorTheoryData))]
@@ -50,20 +48,5 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
         string executable = context.Compiler.Compile(spec.Identifier, source);
 
         Assert.Equal(1, RunProcess(executable));
-    }
-
-    [SuppressMessage("Design", "CA1034:Nested types should not be visible")]
-    [SuppressMessage("Maintainability", "CA1515:Consider making public types internal")]
-    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    public sealed class CPlusPlusContext
-    {
-        public CPlusPlusContext()
-        {
-            string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "CPlusPlus");
-            Directory.CreateDirectory(rootDir);
-            Compiler = new CPlusPlusCompiler(false, rootDir);
-        }
-
-        public CPlusPlusCompiler Compiler { get; }
     }
 }

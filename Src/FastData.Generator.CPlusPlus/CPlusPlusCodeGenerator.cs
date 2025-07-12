@@ -23,16 +23,16 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(map, userCfg.GeneratorOptions), new CPlusPlusHashDef(), map);
     }
 
-    public override string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
+    public override string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context)
     {
         //C++ generator does not support chars outside ASCII
         if (genCfg.DataType == DataType.Char && (char)(object)genCfg.Constants.MaxValue > 127)
             throw new InvalidOperationException("C++ generator does not support chars outside ASCII. Please use a different data type or reduce the max value to 127 or lower.");
 
-        return base.Generate<TKey, TValue>(genCfg, context);
+        return base.Generate(genCfg, context);
     }
 
-    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext context)
+    protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext<TValue> context)
     {
         base.AppendHeader(sb, genCfg, context);
 
@@ -67,10 +67,10 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     """);
     }
 
-    protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context) => context switch
+    protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context) => context switch
     {
         SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x),
-        ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x),
+        ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, Shared, _cfg.ClassName),
         BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x),
         ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x),
         EytzingerSearchContext<TKey, TValue> x => new EytzingerSearchCode<TKey, TValue>(x),

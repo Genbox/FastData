@@ -10,7 +10,7 @@ internal sealed class HashTableChainCode<TKey, TValue>(HashTableChainContext<TKe
 {
     public override string Generate()
     {
-        shared.Add("chain-struct-" + genCfg.DataType, CodeType.Class, $$"""
+        shared.Add("chain-struct-" + genCfg.DataType, CodePlacement.After, $$"""
                                                                         {{FieldModifier}}struct E {
                                                                             {{(ctx.StoreHashCode ? $"hash_code: {HashSizeType}," : "")}}
                                                                             next: {{GetSmallestSignedType(ctx.Buckets.Length)}},

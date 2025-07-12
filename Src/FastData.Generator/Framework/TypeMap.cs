@@ -1,10 +1,11 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generator.Framework;
 
-public sealed class TypeMap
+public sealed class TypeMap : ITypeMap
 {
     private readonly ITypeDef?[] _index = new ITypeDef?[19];
     private GeneratorEncoding _encoding;
@@ -31,16 +32,18 @@ public sealed class TypeMap
 
     public ITypeDef<T> Get<T>() => (ITypeDef<T>)Get(typeof(T));
 
-    public ITypeDef Get(Type t)
+    public ITypeDef Get(Type type)
     {
-        ITypeDef? res = _index[(int)Type.GetTypeCode(t)];
+        ITypeDef? res = _index[(int)Type.GetTypeCode(type)];
 
         if (res == null)
-            throw new InvalidOperationException("No type spec was found for " + t.Name);
+            throw new InvalidOperationException("No type spec was found for " + type.Name);
 
         if (res is DynamicStringTypeDef dyn)
             res = dyn.Get(_encoding).StringTypeDef;
 
         return res;
     }
+
+    public string GetTypeName(Type type) => Get(type).Name;
 }

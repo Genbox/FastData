@@ -1,18 +1,28 @@
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
+using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx) : CPlusPlusOutputWriter<TKey>
+internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, SharedCode shared, string className) : CPlusPlusOutputWriter<TKey>
 {
     public override string Generate()
     {
-        if (ctx.Values != null)
+        if (ctx.ValueSpec != null)
+        {
+            string typeName = ctx.ValueSpec.IsCustomType ? $"{className}::{ValueTypeName}" : ValueTypeName;
+
+            //Reference types need to be initialized outside the class. For simplicity, we do it always
+            shared.Add("values", CodePlacement.After, $$"""
+                                                        std::array<{{typeName}}, {{ctx.ValueSpec.Values.Length.ToStringInvariant()}}> {{className}}::values = {
+                                                        {{(ctx.ValueSpec.IsCustomType ? PrintValues(ctx.ValueSpec) : FormatColumns(ctx.ValueSpec.Values, ToValueLabel))}}
+                                                        };
+                                                        """);
+
             return $$"""
-                         {{FieldModifier}}std::array<{{ValueTypeName}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
-                     {{FormatColumns(ctx.Values, ToValueLabel)}}
-                         };
+                     {{GetObjectDeclaration(ctx.ValueSpec)}}
+                         static std::array<{{ValueTypeName}}, {{ctx.ValueSpec.Values.Length.ToStringInvariant()}}> values;
 
                          {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
                      {{FormatColumns(ctx.Keys, ToValueLabel)}}
@@ -20,7 +30,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx) : 
 
                      public:
                          {{MethodAttribute}}
-                         {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, {{ValueTypeName}}& value){{PostMethodModifier}}
+                         {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, {{ValueTypeName}}*& value){{PostMethodModifier}}
                          {
                      {{EarlyExits}}
 
@@ -28,7 +38,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx) : 
                              {
                                  if ({{GetEqualFunction("keys[i]", "key")}})
                                  {
-                                     value = values[i];
+                                     value = &values[i];
                                      return true;
                                  }
                              }
@@ -48,6 +58,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx) : 
                              return false;
                          }
                      """;
+        }
 
         return $$"""
                  {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {

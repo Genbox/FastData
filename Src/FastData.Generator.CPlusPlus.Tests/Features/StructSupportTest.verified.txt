@@ -1,0 +1,68 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class StructSupportTest final
+{
+struct X {
+    const int32_t Age;
+    const std::u32string_view Name;
+
+    X(int32_t age, std::u32string_view name) : Age(age), Name(name) { }
+};
+    static std::array<X, 3> values;
+
+    static constexpr std::array<int32_t, 3> keys = {
+        1, 2, 3
+    };
+
+public:
+    [[nodiscard]]
+    static bool try_lookup(const int32_t key, X*& value) noexcept
+    {
+        if (key < 1 || key > 3)
+            return false;
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            if (keys[i] == key)
+            {
+                value = &values[i];
+                return true;
+            }
+        }
+        return false;
+    }
+
+    [[nodiscard]]
+    static bool contains(const int32_t key) noexcept
+    {
+        if (key < 1 || key > 3)
+            return false;
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            if (keys[i] == key)
+               return true;
+        }
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr int32_t min_value = 1;
+    static constexpr int32_t max_value = 3;
+
+public:
+    StructSupportTest() = delete;
+    StructSupportTest(const StructSupportTest&) = delete;
+    StructSupportTest& operator=(const StructSupportTest&) = delete;
+    StructSupportTest(StructSupportTest&&) = delete;
+    StructSupportTest& operator=(StructSupportTest&&) = delete;
+};
+std::array<StructSupportTest::X, 3> StructSupportTest::values = {
+X(1, U"Bob"), X(2, U"Billy"), X(3, U"Bibi")
+};

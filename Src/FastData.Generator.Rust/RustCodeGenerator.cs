@@ -23,7 +23,7 @@ public sealed class RustCodeGenerator : CodeGenerator
         return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(map, userCfg.GeneratorOptions), new RustHashDef(), map);
     }
 
-    protected override void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext context)
+    protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext<TValue> context)
     {
         base.AppendHeader(sb, genCfg, context);
 
@@ -48,7 +48,7 @@ public sealed class RustCodeGenerator : CodeGenerator
         sb.Append('}');
     }
 
-    protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context) => context switch
+    protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context) => context switch
     {
         SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x),
         ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x),

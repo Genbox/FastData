@@ -8,9 +8,8 @@
 
 class ArrayStructure_Byte_3 final
 {
-    static constexpr std::array<uint8_t, 3> values = {
-        42, 42, 42
-    };
+
+    static std::array<uint8_t, 3> values;
 
     static constexpr std::array<uint8_t, 3> keys = {
         0, 1, std::numeric_limits<uint8_t>::max()
@@ -18,7 +17,7 @@ class ArrayStructure_Byte_3 final
 
 public:
     [[nodiscard]]
-    static bool try_lookup(const uint8_t key, uint8_t& value) noexcept
+    static bool try_lookup(const uint8_t key, uint8_t*& value) noexcept
     {
         if (key < 0 || key > std::numeric_limits<uint8_t>::max())
             return false;
@@ -27,7 +26,7 @@ public:
         {
             if (keys[i] == key)
             {
-                value = values[i];
+                value = &values[i];
                 return true;
             }
         }
@@ -58,4 +57,7 @@ public:
     ArrayStructure_Byte_3& operator=(const ArrayStructure_Byte_3&) = delete;
     ArrayStructure_Byte_3(ArrayStructure_Byte_3&&) = delete;
     ArrayStructure_Byte_3& operator=(ArrayStructure_Byte_3&&) = delete;
+};
+std::array<uint8_t, 3> ArrayStructure_Byte_3::values = {
+        42, 42, 42
 };

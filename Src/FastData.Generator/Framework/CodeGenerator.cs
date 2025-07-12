@@ -15,7 +15,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 
     public GeneratorEncoding Encoding => langDef.Encoding;
 
-    public virtual string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
+    public virtual string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context)
     {
         Shared.Clear();
 
@@ -23,25 +23,34 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         map.OverrideEncoding(genCfg.Flags.HasFlag(GeneratorFlags.AllAreASCII) ? GeneratorEncoding.ASCII : Encoding);
 
         string keyTypeName = map.GetTypeName(typeof(TKey));
-        string valueTypeName = map.GetTypeName(typeof(TValue));
+
+        Type valueType = typeof(TValue);
+        string valueTypeName = Type.GetTypeCode(valueType) == TypeCode.Object ? typeof(TValue).Name : map.GetTypeName(valueType);
 
         StringBuilder sb = new StringBuilder();
-        AppendHeader(sb, genCfg, context);
-        AppendBody<TKey, TValue>(sb, genCfg, keyTypeName, valueTypeName, context);
-        AppendFooter(sb, genCfg, keyTypeName);
 
-        foreach (string classCode in Shared.GetType(CodeType.Class))
+        foreach (string code in Shared.GetType(CodePlacement.Before))
         {
             sb.AppendLine();
-            sb.AppendLine(classCode);
+            sb.AppendLine(code);
+        }
+
+        AppendHeader(sb, genCfg, context);
+        AppendBody(sb, genCfg, keyTypeName, valueTypeName, context);
+        AppendFooter(sb, genCfg, keyTypeName);
+
+        foreach (string code in Shared.GetType(CodePlacement.After))
+        {
+            sb.AppendLine();
+            sb.AppendLine(code);
         }
 
         return sb.ToString();
     }
 
-    protected abstract OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context);
+    protected abstract OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context);
 
-    protected virtual void AppendHeader<T>(StringBuilder sb, GeneratorConfig<T> genCfg, IContext context)
+    protected virtual void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext<TValue> context)
     {
         string subType = context.GetType().Name.Replace("Context`1", "").Replace("Context`2", "");
 
@@ -54,14 +63,14 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 #endif
     }
 
-    protected virtual void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext context)
+    protected virtual void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext<TValue> context)
     {
-        OutputWriter<TKey>? writer = GetOutputWriter<TKey, TValue>(genCfg, context);
+        OutputWriter<TKey>? writer = GetOutputWriter(genCfg, context);
 
         if (writer == null)
             throw new NotSupportedException("The context type is not supported: " + context.GetType().Name);
 
-        writer.Initialize(langDef, earlyExitDef, map, hashDef, genCfg, keyTypeName, valueTypeName, compiler);
+        writer.Initialize(langDef, earlyExitDef, map, hashDef, genCfg, keyTypeName, valueTypeName, context.ValueSpec, compiler);
         sb.AppendLine(writer.Generate());
     }
 

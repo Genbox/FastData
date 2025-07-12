@@ -8,18 +8,8 @@
 
 class ArrayStructure_String_100 final
 {
-    static constexpr std::array<uint8_t, 100> values = {
-        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-        42, 42, 42, 42, 42, 42, 42, 42, 42, 42
-    };
+
+    static std::array<uint8_t, 100> values;
 
     static constexpr std::array<std::string_view, 100> keys = {
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
@@ -36,7 +26,7 @@ class ArrayStructure_String_100 final
 
 public:
     [[nodiscard]]
-    static bool try_lookup(const std::string_view key, uint8_t& value) noexcept
+    static bool try_lookup(const std::string_view key, uint8_t*& value) noexcept
     {
         if (const size_t len = key.length(); len < 1u || len > 2u)
             return false;
@@ -45,7 +35,7 @@ public:
         {
             if (keys[i] == key)
             {
-                value = values[i];
+                value = &values[i];
                 return true;
             }
         }
@@ -76,4 +66,16 @@ public:
     ArrayStructure_String_100& operator=(const ArrayStructure_String_100&) = delete;
     ArrayStructure_String_100(ArrayStructure_String_100&&) = delete;
     ArrayStructure_String_100& operator=(ArrayStructure_String_100&&) = delete;
+};
+std::array<uint8_t, 100> ArrayStructure_String_100::values = {
+        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
+        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
+        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
+        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
+        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
+        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
+        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
+        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
+        42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
+        42, 42, 42, 42, 42, 42, 42, 42, 42, 42
 };

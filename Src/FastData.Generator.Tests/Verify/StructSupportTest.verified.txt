@@ -1,0 +1,40 @@
+﻿{
+  "Keys": [
+    1,
+    2,
+    3
+  ],
+  "ValueSpec": {
+    "Values": [
+      {
+        "Age": 1,
+        "Name": "Bob"
+      },
+      {
+        "Age": 2,
+        "Name": "Billy"
+      },
+      {
+        "Age": 3,
+        "Name": "Bibi"
+      }
+    ],
+    "Type": "Genbox.FastData.Generator.Tests.GeneratorTests+X, Genbox.FastData.Generator.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "Array": [
+      {
+        "Age": 1,
+        "Name": "Bob"
+      },
+      {
+        "Age": 2,
+        "Name": "Billy"
+      },
+      {
+        "Age": 3,
+        "Name": "Bibi"
+      }
+    ],
+    "HasReferenceType": false,
+    "IsCustomType": true
+  }
+}

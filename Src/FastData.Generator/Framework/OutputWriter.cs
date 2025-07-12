@@ -8,7 +8,7 @@ using Genbox.FastData.Generators.StringHash.Framework;
 
 namespace Genbox.FastData.Generator.Framework;
 
-public abstract class OutputWriter<T> : IOutputWriter
+public abstract class OutputWriter<TKey> : IOutputWriter
 {
     private IEarlyExitDef _earlyExitDef = null!;
     private ILanguageDef _langDef = null!;
@@ -16,16 +16,16 @@ public abstract class OutputWriter<T> : IOutputWriter
 
     protected string KeyTypeName { get; private set; } = null!;
     protected string ValueTypeName { get; private set; } = null!;
-    protected GeneratorConfig<T> GeneratorConfig { get; private set; } = null!;
+    protected GeneratorConfig<TKey> GeneratorConfig { get; private set; } = null!;
     protected string HashSource { get; private set; } = null!;
-    protected string EarlyExits => _earlyExitDef.GetEarlyExits<T>(GeneratorConfig.EarlyExits);
+    protected string EarlyExits => _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits);
     protected string HashSizeType => _map.GetTypeName(typeof(ulong));
     protected static DataType HashSizeDataType => DataType.UInt64;
     protected string ArraySizeType => _langDef.ArraySizeType;
 
     public abstract string Generate();
 
-    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<T> genCfg, string keyTypeName, string valueTypeName, ExpressionCompiler? compiler)
+    internal void Initialize<TValue>(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, ValueSpec<TValue>? valueSpec, ExpressionCompiler? compiler)
     {
         _langDef = langDef;
         _earlyExitDef = earlyExitDef;
@@ -73,7 +73,9 @@ public abstract class OutputWriter<T> : IOutputWriter
     protected virtual string GetEqualFunction(string value1, string value2, DataType dataType = DataType.Null) => $"{value1} == {value2}";
     protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";
 
-    protected string ToValueLabel<T2>(T2 value) => _map.ToValueLabel(value);
+    protected string ToValueLabel<T>(T value) => _map.ToValueLabel(value); //Uses its own generics here, not TKey. We need T so we can change the type in generators
+    protected string PrintValues(ValueSpec valueSpec) => _map.PrintValues(valueSpec);
+    protected string GetObjectDeclaration(ValueSpec value) => value.IsCustomType ? _map.GetObjectDeclaration(value) : ""; //We don't have declarations for primitives
     protected string GetSmallestSignedType(long value) => _map.GetSmallestIntType(value);
     protected string GetSmallestUnsignedType(long value) => _map.GetSmallestUIntType((ulong)value);
 }

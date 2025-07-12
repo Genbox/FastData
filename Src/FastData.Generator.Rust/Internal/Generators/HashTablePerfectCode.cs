@@ -12,7 +12,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
     {
         if (ctx.StoreHashCode)
         {
-            shared.Add("ph-struct-" + genCfg.DataType, CodeType.Class, $$"""
+            shared.Add("ph-struct-" + genCfg.DataType, CodePlacement.After, $$"""
                                                                          {{FieldModifier}}struct E {
                                                                              key: {{TypeNameWithLifetime}},
                                                                              hash_code: {{HashSizeType}},
