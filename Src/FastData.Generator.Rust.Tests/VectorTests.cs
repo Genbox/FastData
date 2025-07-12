@@ -24,7 +24,7 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
 
         await Verify(spec.Source)
               .UseFileName(spec.Identifier)
-              .UseDirectory("Verify")
+              .UseDirectory("Vectors")
               .DisableDiff();
 
         RustLanguageDef langDef = new RustLanguageDef();

@@ -23,7 +23,7 @@ public class VectorTests
 
         await Verify(spec.Source)
               .UseFileName(spec.Identifier)
-              .UseDirectory("Verify")
+              .UseDirectory("Vectors")
               .DisableDiff();
 
         CSharpLanguageDef langDef = new CSharpLanguageDef();

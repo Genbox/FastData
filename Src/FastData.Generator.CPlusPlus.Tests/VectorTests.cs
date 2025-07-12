@@ -24,7 +24,7 @@ public class VectorTests(VectorTests.CPlusPlusContext context) : IClassFixture<V
 
         await Verify(spec.Source)
               .UseFileName(spec.Identifier)
-              .UseDirectory("Verify")
+              .UseDirectory("Vectors")
               .DisableDiff();
 
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
