@@ -5,8 +5,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class ConditionalStructure<TKey, TValue> : IStructure<TKey, TValue, ConditionalContext<TKey, TValue>>
 {
-    public ConditionalContext<TKey, TValue> Create(TKey[] data, TValue[]? values)
+    public ConditionalContext<TKey, TValue> Create(TKey[] keys, TValue[]? values)
     {
-        return new ConditionalContext<TKey, TValue>(data, values);
+        return new ConditionalContext<TKey, TValue>(keys, values);
     }
 }

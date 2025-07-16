@@ -1,0 +1,75 @@
+﻿
+struct Person {
+    const int32_t Age;
+    const std::u32string_view Name;
+    const Person* Other;
+
+    Person(const int32_t age, const std::u32string_view name, const Person* other) : Age(age), Name(name), Other(other) { }
+};
+
+// This file is auto-generated. Do not edit manually.
+// Structure: Conditional
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ConditionalStructure_Int32_3 final
+{
+public:
+    [[nodiscard]]
+    static bool contains(const int32_t key) noexcept
+    {
+
+
+        if (key == 1 || key == 2 || key == 3)
+            return true;
+
+        return false;
+    }
+    static std::array<Person*, 3> values;
+
+    [[nodiscard]]
+    static bool try_lookup(const int32_t key, const Person*& value) noexcept
+    {
+
+
+        if (key == 1)
+        {
+            value = values[0];
+            return true;
+        }
+        if (key == 2)
+        {
+            value = values[1];
+            return true;
+        }
+        if (key == 3)
+        {
+            value = values[2];
+            return true;
+        }
+
+
+        value = nullptr;
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 3;
+
+public:
+    ConditionalStructure_Int32_3() = delete;
+    ConditionalStructure_Int32_3(const ConditionalStructure_Int32_3&) = delete;
+    ConditionalStructure_Int32_3& operator=(const ConditionalStructure_Int32_3&) = delete;
+    ConditionalStructure_Int32_3(ConditionalStructure_Int32_3&&) = delete;
+    ConditionalStructure_Int32_3& operator=(ConditionalStructure_Int32_3&&) = delete;
+};
+std::array<Person*, 3> ConditionalStructure_Int32_3::values = {
+    new Person(1, U"Bob", new Person(4, U"Anna", nullptr)),
+    new Person(2, U"Billy", nullptr),
+    new Person(3, U"Bibi", nullptr),
+
+};

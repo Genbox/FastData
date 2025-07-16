@@ -3,25 +3,25 @@ using Xunit.Abstractions;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public class TestVector<T>(Type type, T[] values, string? postfix = null) : ITestVector, IXunitSerializable
+public class TestVector<TKey>(Type type, TKey[] keys, string? postfix = null) : ITestVector, IXunitSerializable
 {
-    private readonly DataType _dataType = Enum.Parse<DataType>(typeof(T).Name);
+    private readonly DataType _dataType = Enum.Parse<DataType>(typeof(TKey).Name);
 
-    public T[] Values { get; private set; } = values;
+    public TKey[] Keys { get; private set; } = keys;
     public Type Type { get; private set; } = type;
 
-    public string Identifier => $"{Type.Name.Replace("`1", "", StringComparison.Ordinal).Replace("`2", "", StringComparison.Ordinal)}_{_dataType}_{Values.Length}" + (postfix != null ? $"_{postfix}" : "");
+    public string Identifier => $"{Type.Name.Replace("`1", "", StringComparison.Ordinal).Replace("`2", "", StringComparison.Ordinal)}_{_dataType}_{Keys.Length}" + (postfix != null ? $"_{postfix}" : "");
 
     public void Serialize(IXunitSerializationInfo info)
     {
         info.AddValue(nameof(Type), Type);
-        info.AddValue(nameof(Values), Values);
+        info.AddValue(nameof(Keys), Keys);
     }
 
     public void Deserialize(IXunitSerializationInfo info)
     {
         Type = info.GetValue<Type>(nameof(Type));
-        Values = info.GetValue<T[]>(nameof(Values));
+        Keys = info.GetValue<TKey[]>(nameof(Keys));
     }
 
     public override string ToString() => Identifier;

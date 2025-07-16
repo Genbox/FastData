@@ -28,13 +28,6 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         string valueTypeName = Type.GetTypeCode(valueType) == TypeCode.Object ? typeof(TValue).Name : map.GetTypeName(valueType);
 
         StringBuilder sb = new StringBuilder();
-
-        foreach (string code in Shared.GetType(CodePlacement.Before))
-        {
-            sb.AppendLine();
-            sb.AppendLine(code);
-        }
-
         AppendHeader(sb, genCfg, context);
         AppendBody(sb, genCfg, keyTypeName, valueTypeName, context);
         AppendFooter(sb, genCfg, keyTypeName);
@@ -45,7 +38,15 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
             sb.AppendLine(code);
         }
 
-        return sb.ToString();
+        StringBuilder sb2 = new StringBuilder();
+        foreach (string code in Shared.GetType(CodePlacement.Before))
+        {
+            sb2.AppendLine();
+            sb2.AppendLine(code);
+        }
+
+        sb2.Append(sb);
+        return sb2.ToString();
     }
 
     protected abstract OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context);

@@ -1,0 +1,35 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (KeyLength)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class KeyLengthStructure_String_3 final
+{
+    static constexpr std::array<std::string_view, 3> entries = {
+        "a", "aa", "aaa"
+    };
+
+public:
+    [[nodiscard]]
+    static bool contains(const std::string_view key) noexcept
+    {
+        if (const size_t len = key.length(); len < 1u || len > 3u)
+            return false;
+
+        return key == entries[key.length() - 1];
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr size_t min_key_length = 1;
+    static constexpr size_t max_key_length = 3;
+
+public:
+    KeyLengthStructure_String_3() = delete;
+    KeyLengthStructure_String_3(const KeyLengthStructure_String_3&) = delete;
+    KeyLengthStructure_String_3& operator=(const KeyLengthStructure_String_3&) = delete;
+    KeyLengthStructure_String_3(KeyLengthStructure_String_3&&) = delete;
+    KeyLengthStructure_String_3& operator=(KeyLengthStructure_String_3&&) = delete;
+};

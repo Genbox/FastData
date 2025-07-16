@@ -5,7 +5,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, SharedCode shared, string className) : CPlusPlusOutputWriter<TKey, TValue>(ctx.Values, className)
+internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, SharedCode shared, string className) : CPlusPlusOutputWriter<TKey, TValue>(ctx.Values)
 {
     public override string Generate()
     {
@@ -41,13 +41,13 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
                                                         """);
 
             if (ObjectType.IsCustomType)
-                sb.AppendLine(GetObjectDeclarations(ObjectType));
+                shared.Add("classes", CodePlacement.Before, GetObjectDeclarations(ObjectType));
 
             sb.Append($$"""
                             static std::array<{{TypeName}}, {{ctx.Values.Length.ToStringInvariant()}}> values;
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, {{ValueTypeName}}{{(ObjectType.IsCustomType ? "*&" : "")}} value){{PostMethodModifier}}
+                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
                             {
                         {{EarlyExits}}
 
@@ -55,10 +55,12 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
                                 {
                                     if ({{GetEqualFunction("keys[i]", "key")}})
                                     {
-                                        value = values[i];
+                                        value = {{(ObjectType.IsCustomType ? "" : "&")}}values[i];
                                         return true;
                                     }
                                 }
+
+                                value = nullptr;
                                 return false;
                             }
                         """);

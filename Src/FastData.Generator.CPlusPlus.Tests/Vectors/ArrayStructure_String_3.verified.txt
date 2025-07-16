@@ -26,24 +26,7 @@ public:
         }
         return false;
     }
-    static std::array<uint8_t, 3> values;
 
-    [[nodiscard]]
-    static bool try_lookup(const std::string_view key, uint8_t value) noexcept
-    {
-        if (const size_t len = key.length(); len < 1u || len > 255u)
-            return false;
-
-        for (size_t i = 0; i < 3; i++)
-        {
-            if (keys[i] == key)
-            {
-                value = values[i];
-                return true;
-            }
-        }
-        return false;
-    }
 
     static constexpr size_t item_count = 3;
     static constexpr size_t min_key_length = 1;
@@ -55,7 +38,4 @@ public:
     ArrayStructure_String_3& operator=(const ArrayStructure_String_3&) = delete;
     ArrayStructure_String_3(ArrayStructure_String_3&&) = delete;
     ArrayStructure_String_3& operator=(ArrayStructure_String_3&&) = delete;
-};
-std::array<uint8_t, 3> ArrayStructure_String_3::values = {
-        42, 42, 42
 };

@@ -9,17 +9,17 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class HashTableChainStructure<TKey, TValue>(HashData hashData, DataType dataType) : IStructure<TKey, TValue, HashTableChainContext<TKey, TValue>>
 {
-    public HashTableChainContext<TKey, TValue> Create(TKey[] data, TValue[]? values)
+    public HashTableChainContext<TKey, TValue> Create(TKey[] keys, TValue[]? values)
     {
-        ulong size = (ulong)(data.Length * hashData.CapacityFactor);
+        ulong size = (ulong)(keys.Length * hashData.CapacityFactor);
 
         int[] buckets = new int[size];
-        HashTableEntry<TKey>[] entries = new HashTableEntry<TKey>[data.Length];
+        HashTableEntry<TKey>[] entries = new HashTableEntry<TKey>[keys.Length];
 
-        for (int i = 0; i < data.Length; i++)
+        for (int i = 0; i < keys.Length; i++)
         {
             ulong hashCode = hashData.HashCodes[i];
-            TKey value = data[i];
+            TKey value = keys[i];
             ref int bucket = ref buckets[hashCode % size];
 
             ref HashTableEntry<TKey> entry = ref entries[i];

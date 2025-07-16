@@ -37,6 +37,7 @@ public:
         return false;
     }
 
+
     static constexpr size_t item_count = 5;
     static constexpr int16_t min_key = std::numeric_limits<int16_t>::lowest();
     static constexpr int16_t max_key = std::numeric_limits<int16_t>::max();

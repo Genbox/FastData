@@ -7,6 +7,25 @@ namespace Genbox.FastData.InternalShared.Helpers;
 
 public static class TestVectorHelper
 {
+    public static IEnumerable<ITestVector> GetSimpleTestVectors()
+    {
+        foreach (ITestVector testVector in GenerateTestVectors([[1]], typeof(SingleValueStructure<,>)))
+            yield return testVector;
+
+        foreach (ITestVector testVector in GenerateTestVectors([["a", "aa", "aaa"]], typeof(KeyLengthStructure<,>)))
+            yield return testVector;
+
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]],
+                     typeof(ArrayStructure<,>),
+                     typeof(BinarySearchStructure<,>),
+                     typeof(ConditionalStructure<,>),
+                     typeof(HashTableChainStructure<,>),
+                     typeof(HashTablePerfectStructure<,>)))
+        {
+            yield return testVector;
+        }
+    }
+
     public static IEnumerable<ITestVector> GetTestVectors()
     {
         foreach (ITestVector testVector in GenerateTestVectors(GetSingleValues(), null, typeof(SingleValueStructure<,>)))

@@ -26,24 +26,7 @@ public:
         }
         return false;
     }
-    static std::array<uint8_t, 5> values;
 
-    [[nodiscard]]
-    static bool try_lookup(const int16_t key, uint8_t value) noexcept
-    {
-        if (key < std::numeric_limits<int16_t>::lowest() || key > std::numeric_limits<int16_t>::max())
-            return false;
-
-        for (size_t i = 0; i < 5; i++)
-        {
-            if (keys[i] == key)
-            {
-                value = values[i];
-                return true;
-            }
-        }
-        return false;
-    }
 
     static constexpr size_t item_count = 5;
     static constexpr int16_t min_key = std::numeric_limits<int16_t>::lowest();
@@ -55,7 +38,4 @@ public:
     ArrayStructure_Int16_5& operator=(const ArrayStructure_Int16_5&) = delete;
     ArrayStructure_Int16_5(ArrayStructure_Int16_5&&) = delete;
     ArrayStructure_Int16_5& operator=(ArrayStructure_Int16_5&&) = delete;
-};
-std::array<uint8_t, 5> ArrayStructure_Int16_5::values = {
-        42, 42, 42, 42, 42
 };

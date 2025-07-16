@@ -2,6 +2,9 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.InternalShared;
+using Genbox.FastData.InternalShared.TestClasses;
+using Genbox.FastData.InternalShared.TestClasses.TheoryData;
 using static Genbox.FastData.Generator.Helpers.FormatHelper;
 using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
@@ -9,20 +12,21 @@ namespace Genbox.FastData.Generator.CPlusPlus.Tests;
 
 public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusContext>
 {
-    [Fact]
-    public async Task StructSupportTest()
+    [Theory]
+    [ClassData(typeof(SimpleTestVectorTheoryData))]
+    public async Task ObjectSupportTest<T>(TestVector<T> vector)
     {
-        int[] values = [1, 2, 3];
-        const string id = nameof(StructSupportTest);
-
-        string genSource = FastDataGenerator.GenerateKeyed(values, [
+        Person[] values =
+        [
             new Person { Age = 1, Name = "Bob", Other = new Person { Name = "Anna", Age = 4 } },
             new Person { Age = 2, Name = "Billy" },
             new Person { Age = 3, Name = "Bibi" },
-        ], new FastDataConfig { StructureType = StructureType.Array }, CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)));
+        ];
 
-        await Verify(genSource)
-              .UseFileName(id)
+        GeneratorSpec spec = Generate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), vector, values);
+
+        await Verify(spec.Source)
+              .UseFileName(spec.Identifier)
               .UseDirectory("Features")
               .DisableDiff();
 
@@ -33,20 +37,21 @@ public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCon
                               #include <string>
                               #include <iostream>
 
-                              {{genSource}}
+                              {{spec.Source}}
 
-                              int main(int argc, char* argv[])
+                              int main()
                               {
-                              {{FormatList(values, x => $"""
-                                                         if (!{id}::contains({map.ToValueLabel(x)}))
-                                                             return false;
-                                                         """, "\n")}}
+                                  const Person* res;
+                              {{FormatList(vector.Keys, x => $"""
+                                                                  if (!{spec.Identifier}::try_lookup({map.ToValueLabel(x)}, res))
+                                                                      return 0;
+                                                              """, "\n")}}
 
                                   return 1;
                               }
                               """;
 
-        string executable = context.Compiler.Compile(id, testSource);
+        string executable = context.Compiler.Compile(spec.Identifier, testSource);
         Assert.Equal(1, RunProcess(executable));
     }
 

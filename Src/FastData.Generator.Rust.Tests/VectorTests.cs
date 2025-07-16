@@ -17,9 +17,9 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
 {
     [Theory]
     [ClassData(typeof(TestVectorTheoryData))]
-    public async Task Test<T>(TestVector<T> data)
+    public async Task Test<T>(TestVector<T> vector)
     {
-        GeneratorSpec spec = Generate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), data);
+        GeneratorSpec spec = Generate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), vector);
         Assert.NotEmpty(spec.Source);
 
         await Verify(spec.Source)
@@ -36,9 +36,9 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
               {{spec.Source}}
 
               fn main() {
-              {{FormatList(data.Values, x => $$"""
-                                               if !{{spec.Identifier}}::contains({{map.ToValueLabel(x)}}) {
-                                                   std::process::exit(0);
+              {{FormatList(vector.Keys, x => $$"""
+                                                   if !{{spec.Identifier}}::contains({{map.ToValueLabel(x)}}) {
+                                                       std::process::exit(0);
                                                }
                                                """, "\n")}}
 

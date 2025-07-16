@@ -1,0 +1,108 @@
+﻿
+struct Person {
+    const int32_t Age;
+    const std::u32string_view Name;
+    const Person* Other;
+
+    Person(const int32_t age, const std::u32string_view name, const Person* other) : Age(age), Name(name), Other(other) { }
+};
+
+// This file is auto-generated. Do not edit manually.
+// Structure: HashTable (HashTableChain)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashTableChainStructure_Int32_3 final
+{
+    struct e
+    {
+        
+        int8_t next;
+        int32_t key;
+
+        e(const int8_t next, const int32_t key)
+           : next(next), key(key) {}
+    };
+
+    static constexpr std::array<int8_t, 3> buckets = {
+        3, 1, 2
+     };
+
+    inline static const std::array<e, 3> entries = {
+        e(-1, 1), e(-1, 2), e(-1, 3)
+    };
+
+    static constexpr uint64_t get_hash(const int32_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const int32_t key) noexcept
+    {
+        if (key < 1 || key > 3)
+            return false;
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 3;
+        int8_t i = buckets[index] - static_cast<int8_t>(1);
+
+        while (i >= 0)
+        {
+            const auto& [next, key1] = entries[i];
+
+            if (key1 == key)
+                return true;
+
+            i = next;
+        }
+
+        return false;
+    }
+    static std::array<Person*, 3> values;
+
+    [[nodiscard]]
+    static bool try_lookup(const int32_t key, const Person*& value) noexcept
+    {
+        if (key < 1 || key > 3)
+            return false;
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 3;
+        int8_t i = buckets[index] - static_cast<int8_t>(1);
+
+        while (i >= 0)
+        {
+            const auto& [next, key1] = entries[i];
+
+            if (key1 == key)
+                return true;
+
+            i = next;
+        }
+
+        value = nullptr;
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 3;
+
+public:
+    HashTableChainStructure_Int32_3() = delete;
+    HashTableChainStructure_Int32_3(const HashTableChainStructure_Int32_3&) = delete;
+    HashTableChainStructure_Int32_3& operator=(const HashTableChainStructure_Int32_3&) = delete;
+    HashTableChainStructure_Int32_3(HashTableChainStructure_Int32_3&&) = delete;
+    HashTableChainStructure_Int32_3& operator=(HashTableChainStructure_Int32_3&&) = delete;
+};
+std::array<Person*, 3> HashTableChainStructure_Int32_3::values = {
+    new Person(1, U"Bob", new Person(4, U"Anna", nullptr)),
+    new Person(2, U"Billy", nullptr),
+    new Person(3, U"Bibi", nullptr),
+
+};

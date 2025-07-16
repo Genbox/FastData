@@ -26,24 +26,7 @@ public:
         }
         return false;
     }
-    static std::array<uint8_t, 4> values;
 
-    [[nodiscard]]
-    static bool try_lookup(const double key, uint8_t value) noexcept
-    {
-        if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())
-            return false;
-
-        for (size_t i = 0; i < 4; i++)
-        {
-            if (keys[i] == key)
-            {
-                value = values[i];
-                return true;
-            }
-        }
-        return false;
-    }
 
     static constexpr size_t item_count = 4;
     static constexpr double min_key = std::numeric_limits<double>::lowest();
@@ -55,7 +38,4 @@ public:
     ArrayStructure_Double_4& operator=(const ArrayStructure_Double_4&) = delete;
     ArrayStructure_Double_4(ArrayStructure_Double_4&&) = delete;
     ArrayStructure_Double_4& operator=(ArrayStructure_Double_4&&) = delete;
-};
-std::array<uint8_t, 4> ArrayStructure_Double_4::values = {
-        42, 42, 42, 42
 };

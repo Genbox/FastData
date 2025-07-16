@@ -16,9 +16,9 @@ public class VectorTests
 {
     [Theory]
     [ClassData(typeof(TestVectorTheoryData))]
-    public async Task Test<T>(TestVector<T> data)
+    public async Task Test<T>(TestVector<T> vector)
     {
-        GeneratorSpec spec = Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), data);
+        GeneratorSpec spec = Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), vector);
         Assert.NotEmpty(spec.Source);
 
         await Verify(spec.Source)
@@ -36,9 +36,9 @@ public class VectorTests
                            {
                                public static bool Contains()
                                {
-                           {{FormatList(data.Values, x => $"""
-                                                           if (!{spec.Identifier}.Contains({map.ToValueLabel(x)}))
-                                                               return false;
+                           {{FormatList(vector.Keys, x => $"""
+                                                               if (!{spec.Identifier}.Contains({map.ToValueLabel(x)}))
+                                                                   return false;
                                                            """, "\n")}};
 
                                    return true;

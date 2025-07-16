@@ -4,7 +4,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, string className) : CPlusPlusOutputWriter<TKey, TValue>(ctx.Values, className)
+internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, string className) : CPlusPlusOutputWriter<TKey, TValue>(ctx.Values)
 {
     public override string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
 

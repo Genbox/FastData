@@ -15,9 +15,9 @@ public class VectorTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCont
 {
     [Theory]
     [ClassData(typeof(TestVectorTheoryData))]
-    public async Task Test<T>(TestVector<T> data)
+    public async Task Test<T>(TestVector<T> vector)
     {
-        GeneratorSpec spec = Generate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), data);
+        GeneratorSpec spec = Generate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), vector);
         Assert.NotEmpty(spec.Source);
 
         await Verify(spec.Source)
@@ -34,11 +34,11 @@ public class VectorTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCont
 
                           {{spec.Source}}
 
-                          int main(int argc, char* argv[])
+                          int main()
                           {
-                          {{FormatList(data.Values, x => $"""
-                                                          if (!{spec.Identifier}::contains({map.ToValueLabel(x)}))
-                                                              return false;
+                          {{FormatList(vector.Keys, x => $"""
+                                                              if (!{spec.Identifier}::contains({map.ToValueLabel(x)}))
+                                                                  return 0;
                                                           """, "\n")}}
 
                               return 1;

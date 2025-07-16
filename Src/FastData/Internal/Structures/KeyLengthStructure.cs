@@ -6,7 +6,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class KeyLengthStructure<TKey, TValue>(StringProperties props) : IStructure<TKey, TValue, KeyLengthContext<TValue>>
 {
-    public KeyLengthContext<TValue> Create(TKey[] data, TValue[]? values)
+    public KeyLengthContext<TValue> Create(TKey[] keys, TValue[]? values)
     {
         if (typeof(TKey) != typeof(string))
             throw new InvalidCastException("This structure only works on strings");
@@ -21,7 +21,7 @@ internal sealed class KeyLengthStructure<TKey, TValue>(StringProperties props) :
         //We don't have to use HashSets to deduplicate within a bucket as all items are unique
         List<string>?[] lengths = new List<string>?[maxLen + 1]; //We need a place for zero
 
-        foreach (TKey value in data)
+        foreach (TKey value in keys)
         {
             string str = (string)(object)value;
 

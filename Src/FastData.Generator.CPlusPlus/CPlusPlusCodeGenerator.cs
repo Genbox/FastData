@@ -71,9 +71,9 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     {
         SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, _cfg.ClassName),
         ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, Shared, _cfg.ClassName),
-        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, _cfg.ClassName),
-        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, _cfg.ClassName),
-        HashTableChainContext<TKey, TValue> x => new HashTableChainCode<TKey, TValue>(x, _cfg.ClassName),
+        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, Shared, _cfg.ClassName),
+        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, Shared, _cfg.ClassName),
+        HashTableChainContext<TKey, TValue> x => new HashTableChainCode<TKey, TValue>(x, Shared, _cfg.ClassName),
         HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, _cfg.ClassName),
         KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, _cfg.ClassName),
         _ => null
