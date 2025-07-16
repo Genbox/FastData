@@ -8,31 +8,11 @@
 
 class ArrayStructure_Char_3 final
 {
-
-    static std::array<uint8_t, 3> values;
-
-    static constexpr std::array<char, 3> keys = {
+static constexpr std::array<char, 3> keys = {
         0, 97, 127
-    };
+};
 
 public:
-    [[nodiscard]]
-    static bool try_lookup(const char key, uint8_t*& value) noexcept
-    {
-        if (key < 0 || key > 127)
-            return false;
-
-        for (size_t i = 0; i < 3; i++)
-        {
-            if (keys[i] == key)
-            {
-                value = &values[i];
-                return true;
-            }
-        }
-        return false;
-    }
-
     [[nodiscard]]
     static bool contains(const char key) noexcept
     {
@@ -46,10 +26,28 @@ public:
         }
         return false;
     }
+    static std::array<uint8_t, 3> values;
+
+    [[nodiscard]]
+    static bool try_lookup(const char key, uint8_t value) noexcept
+    {
+        if (key < 0 || key > 127)
+            return false;
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            if (keys[i] == key)
+            {
+                value = values[i];
+                return true;
+            }
+        }
+        return false;
+    }
 
     static constexpr size_t item_count = 3;
-    static constexpr char min_value = 0;
-    static constexpr char max_value = 127;
+    static constexpr char min_key = 0;
+    static constexpr char max_key = 127;
 
 public:
     ArrayStructure_Char_3() = delete;

@@ -15,6 +15,6 @@ impl SingleValueStructure_Int16_1 {
     }
 
     pub const ITEM_COUNT: usize = 1;
-    pub const MIN_VALUE: i16 = 1;
-    pub const MAX_VALUE: i16 = 1;
+    pub const MIN_KEY: i16 = 1;
+    pub const MAX_KEY: i16 = 1;
 }

@@ -58,8 +58,8 @@ public:
     }
 
     static constexpr size_t item_count = 5;
-    static constexpr float min_value = 1.0f;
-    static constexpr float max_value = 5.0f;
+    static constexpr float min_key = 1.0f;
+    static constexpr float max_key = 5.0f;
 
 public:
     HashTableChainStructure_Single_5_HashZeroOrNaN() = delete;

@@ -15,6 +15,6 @@ impl SingleValueStructure_Double_1 {
     }
 
     pub const ITEM_COUNT: usize = 1;
-    pub const MIN_VALUE: f64 = 1.0;
-    pub const MAX_VALUE: f64 = 1.0;
+    pub const MIN_KEY: f64 = 1.0;
+    pub const MAX_KEY: f64 = 1.0;
 }

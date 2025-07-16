@@ -37,6 +37,6 @@ impl EytzingerSearchStructure_Char_3 {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_VALUE: char = char::MIN;
-    pub const MAX_VALUE: char = '';
+    pub const MIN_KEY: char = char::MIN;
+    pub const MAX_KEY: char = '';
 }

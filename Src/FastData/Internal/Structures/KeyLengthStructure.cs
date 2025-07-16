@@ -1,4 +1,3 @@
-using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -7,7 +6,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class KeyLengthStructure<TKey, TValue>(StringProperties props) : IStructure<TKey, TValue, KeyLengthContext<TValue>>
 {
-    public KeyLengthContext<TValue> Create(TKey[] data, ValueSpec<TValue>? valueSpec)
+    public KeyLengthContext<TValue> Create(TKey[] data, TValue[]? values)
     {
         if (typeof(TKey) != typeof(string))
             throw new InvalidCastException("This structure only works on strings");
@@ -31,6 +30,6 @@ internal sealed class KeyLengthStructure<TKey, TValue>(StringProperties props) :
             item.Add(str);
         }
 
-        return new KeyLengthContext<TValue>(lengths, props.LengthData.Unique, props.LengthData.Min, maxLen, valueSpec);
+        return new KeyLengthContext<TValue>(lengths, props.LengthData.Unique, props.LengthData.Min, maxLen, values);
     }
 }

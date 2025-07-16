@@ -27,6 +27,6 @@ internal static class ConditionalStructure_UInt16_4
     }
 
     public const uint ItemCount = 4;
-    public const ushort MinValue = ushort.MinValue;
-    public const ushort MaxValue = ushort.MaxValue;
+    public const ushort MinKey = ushort.MinValue;
+    public const ushort MaxKey = ushort.MaxValue;
 }

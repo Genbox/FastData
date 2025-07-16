@@ -15,6 +15,6 @@ impl SingleValueStructure_Byte_1 {
     }
 
     pub const ITEM_COUNT: usize = 1;
-    pub const MIN_VALUE: u8 = 1;
-    pub const MAX_VALUE: u8 = 1;
+    pub const MIN_KEY: u8 = 1;
+    pub const MAX_KEY: u8 = 1;
 }

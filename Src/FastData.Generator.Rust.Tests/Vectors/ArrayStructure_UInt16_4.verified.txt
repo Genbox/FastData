@@ -28,6 +28,6 @@ impl ArrayStructure_UInt16_4 {
     }
 
     pub const ITEM_COUNT: usize = 4;
-    pub const MIN_VALUE: u16 = u16::MIN;
-    pub const MAX_VALUE: u16 = u16::MAX;
+    pub const MIN_KEY: u16 = u16::MIN;
+    pub const MAX_KEY: u16 = u16::MAX;
 }

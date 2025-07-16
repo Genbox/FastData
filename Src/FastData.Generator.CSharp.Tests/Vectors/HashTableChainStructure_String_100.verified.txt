@@ -91,6 +91,6 @@ internal static class HashTableChainStructure_String_100
     }
 
     public const uint ItemCount = 100;
-    public const uint MinLength = 1;
-    public const uint MaxLength = 2;
+    public const uint MinKeyLength = 1;
+    public const uint MaxKeyLength = 2;
 }

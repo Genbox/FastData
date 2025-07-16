@@ -28,6 +28,6 @@ impl ArrayStructure_UInt32_4 {
     }
 
     pub const ITEM_COUNT: usize = 4;
-    pub const MIN_VALUE: u32 = u32::MIN;
-    pub const MAX_VALUE: u32 = u32::MAX;
+    pub const MIN_KEY: u32 = u32::MIN;
+    pub const MAX_KEY: u32 = u32::MAX;
 }

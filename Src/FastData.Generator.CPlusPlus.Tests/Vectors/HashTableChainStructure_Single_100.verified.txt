@@ -78,8 +78,8 @@ public:
     }
 
     static constexpr size_t item_count = 100;
-    static constexpr float min_value = 0.0f;
-    static constexpr float max_value = 99.0f;
+    static constexpr float min_key = 0.0f;
+    static constexpr float max_key = 99.0f;
 
 public:
     HashTableChainStructure_Single_100() = delete;

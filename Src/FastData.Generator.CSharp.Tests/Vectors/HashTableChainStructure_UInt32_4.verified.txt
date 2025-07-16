@@ -62,6 +62,6 @@ internal static class HashTableChainStructure_UInt32_4
     }
 
     public const uint ItemCount = 4;
-    public const uint MinValue = uint.MinValue;
-    public const uint MaxValue = uint.MaxValue;
+    public const uint MinKey = uint.MinValue;
+    public const uint MaxKey = uint.MaxValue;
 }

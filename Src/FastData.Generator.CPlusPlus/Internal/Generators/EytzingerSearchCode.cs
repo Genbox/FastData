@@ -4,7 +4,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class EytzingerSearchCode<TKey, TValue>(EytzingerSearchContext<TKey, TValue> ctx) : CPlusPlusOutputWriter<TKey>
+internal sealed class EytzingerSearchCode<TKey, TValue>(EytzingerSearchContext<TKey, TValue> ctx, string className) : CPlusPlusOutputWriter<TKey, TValue>(ctx.Values, className)
 {
     public override string Generate() =>
         $$"""

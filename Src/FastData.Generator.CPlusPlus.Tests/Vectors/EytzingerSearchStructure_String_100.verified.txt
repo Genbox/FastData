@@ -44,8 +44,8 @@ public:
     }
 
     static constexpr size_t item_count = 100;
-    static constexpr size_t min_length = 1;
-    static constexpr size_t max_length = 2;
+    static constexpr size_t min_key_length = 1;
+    static constexpr size_t max_key_length = 2;
 
 public:
     EytzingerSearchStructure_String_100() = delete;

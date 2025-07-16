@@ -28,6 +28,6 @@ impl ArrayStructure_Single_5 {
     }
 
     pub const ITEM_COUNT: usize = 5;
-    pub const MIN_VALUE: f32 = f32::MIN;
-    pub const MAX_VALUE: f32 = f32::MAX;
+    pub const MIN_KEY: f32 = f32::MIN;
+    pub const MAX_KEY: f32 = f32::MAX;
 }

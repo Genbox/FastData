@@ -8,31 +8,11 @@
 
 class ArrayStructure_UInt64_4 final
 {
-
-    static std::array<uint8_t, 4> values;
-
-    static constexpr std::array<uint64_t, 4> keys = {
+static constexpr std::array<uint64_t, 4> keys = {
         0, 1ull, 2ull, std::numeric_limits<uint64_t>::max()
-    };
+};
 
 public:
-    [[nodiscard]]
-    static bool try_lookup(const uint64_t key, uint8_t*& value) noexcept
-    {
-        if (key < 0 || key > std::numeric_limits<uint64_t>::max())
-            return false;
-
-        for (size_t i = 0; i < 4; i++)
-        {
-            if (keys[i] == key)
-            {
-                value = &values[i];
-                return true;
-            }
-        }
-        return false;
-    }
-
     [[nodiscard]]
     static bool contains(const uint64_t key) noexcept
     {
@@ -46,10 +26,28 @@ public:
         }
         return false;
     }
+    static std::array<uint8_t, 4> values;
+
+    [[nodiscard]]
+    static bool try_lookup(const uint64_t key, uint8_t value) noexcept
+    {
+        if (key < 0 || key > std::numeric_limits<uint64_t>::max())
+            return false;
+
+        for (size_t i = 0; i < 4; i++)
+        {
+            if (keys[i] == key)
+            {
+                value = values[i];
+                return true;
+            }
+        }
+        return false;
+    }
 
     static constexpr size_t item_count = 4;
-    static constexpr uint64_t min_value = 0;
-    static constexpr uint64_t max_value = std::numeric_limits<uint64_t>::max();
+    static constexpr uint64_t min_key = 0;
+    static constexpr uint64_t max_key = std::numeric_limits<uint64_t>::max();
 
 public:
     ArrayStructure_UInt64_4() = delete;

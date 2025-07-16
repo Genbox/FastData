@@ -69,14 +69,14 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
     protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context) => context switch
     {
-        SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x),
+        SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, _cfg.ClassName),
         ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, Shared, _cfg.ClassName),
-        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x),
-        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x),
-        EytzingerSearchContext<TKey, TValue> x => new EytzingerSearchCode<TKey, TValue>(x),
-        HashTableChainContext<TKey, TValue> x => new HashTableChainCode<TKey, TValue>(x),
-        HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x),
-        KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x),
+        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, _cfg.ClassName),
+        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, _cfg.ClassName),
+        EytzingerSearchContext<TKey, TValue> x => new EytzingerSearchCode<TKey, TValue>(x, _cfg.ClassName),
+        HashTableChainContext<TKey, TValue> x => new HashTableChainCode<TKey, TValue>(x, _cfg.ClassName),
+        HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, _cfg.ClassName),
+        KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, _cfg.ClassName),
         _ => null
     };
 }

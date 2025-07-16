@@ -28,6 +28,6 @@ internal static class ConditionalStructure_Single_5
     }
 
     public const uint ItemCount = 5;
-    public const float MinValue = float.MinValue;
-    public const float MaxValue = float.MaxValue;
+    public const float MinKey = float.MinValue;
+    public const float MaxKey = float.MaxValue;
 }

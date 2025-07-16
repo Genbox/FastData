@@ -23,6 +23,6 @@ impl ConditionalStructure_Double_4 {
     }
 
     pub const ITEM_COUNT: usize = 4;
-    pub const MIN_VALUE: f64 = f64::MIN;
-    pub const MAX_VALUE: f64 = f64::MAX;
+    pub const MIN_KEY: f64 = f64::MIN;
+    pub const MAX_KEY: f64 = f64::MAX;
 }

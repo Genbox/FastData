@@ -110,24 +110,22 @@ public static class TestHelper
         byte[] values = new byte[vector.Values.Length];
         Array.Fill(values, (byte)42);
 
-        ValueSpec<byte> valueSpec = new ValueSpec<byte>(values);
-
         if (vector.Type == typeof(SingleValueStructure<,>))
-            return Generate(generator, vector, props, dataType, StructureType.Auto, new SingleValueStructure<T, byte>(), valueSpec);
+            return Generate(generator, vector, props, dataType, StructureType.Auto, new SingleValueStructure<T, byte>(), values);
         if (vector.Type == typeof(ArrayStructure<,>))
-            return Generate(generator, vector, props, dataType, StructureType.Array, new ArrayStructure<T, byte>(), valueSpec);
+            return Generate(generator, vector, props, dataType, StructureType.Array, new ArrayStructure<T, byte>(), values);
         if (vector.Type == typeof(ConditionalStructure<,>))
-            return Generate(generator, vector, props, dataType, StructureType.Conditional, new ConditionalStructure<T, byte>(), valueSpec);
+            return Generate(generator, vector, props, dataType, StructureType.Conditional, new ConditionalStructure<T, byte>(), values);
         if (vector.Type == typeof(BinarySearchStructure<,>))
-            return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new BinarySearchStructure<T, byte>(dataType, StringComparison.Ordinal), valueSpec);
+            return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new BinarySearchStructure<T, byte>(dataType, StringComparison.Ordinal), values);
         if (vector.Type == typeof(EytzingerSearchStructure<,>))
-            return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new EytzingerSearchStructure<T, byte>(dataType, StringComparison.Ordinal), valueSpec);
+            return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new EytzingerSearchStructure<T, byte>(dataType, StringComparison.Ordinal), values);
         if (vector.Type == typeof(HashTableChainStructure<,>))
-            return Generate(generator, vector, props, dataType, StructureType.HashTable, new HashTableChainStructure<T, byte>(GetHashData(vector, dataType, encoding), dataType), valueSpec);
+            return Generate(generator, vector, props, dataType, StructureType.HashTable, new HashTableChainStructure<T, byte>(GetHashData(vector, dataType, encoding), dataType), values);
         if (vector.Type == typeof(HashTablePerfectStructure<,>))
-            return Generate(generator, vector, props, dataType, StructureType.HashTable, new HashTablePerfectStructure<T, byte>(GetHashData(vector, dataType, encoding), dataType), valueSpec);
+            return Generate(generator, vector, props, dataType, StructureType.HashTable, new HashTablePerfectStructure<T, byte>(GetHashData(vector, dataType, encoding), dataType), values);
         if (vector.Type == typeof(KeyLengthStructure<,>))
-            return Generate(generator, vector, props, dataType, StructureType.Auto, new KeyLengthStructure<T, byte>((StringProperties)props), valueSpec);
+            return Generate(generator, vector, props, dataType, StructureType.Auto, new KeyLengthStructure<T, byte>((StringProperties)props), values);
 
         throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
     }
@@ -153,9 +151,9 @@ public static class TestHelper
         return hashData;
     }
 
-    private static GeneratorSpec Generate<TKey, TValue, TContext>(ICodeGenerator generator, TestVector<TKey> vector, IProperties props, DataType dataType, StructureType structureType, IStructure<TKey, TValue, TContext> structure, ValueSpec<TValue>? value) where TContext : IContext<TValue>
+    private static GeneratorSpec Generate<TKey, TValue, TContext>(ICodeGenerator generator, TestVector<TKey> vector, IProperties props, DataType dataType, StructureType structureType, IStructure<TKey, TValue, TContext> structure, TValue[]? values) where TContext : IContext<TValue>
     {
-        TContext context = structure.Create(vector.Values, value);
+        TContext context = structure.Create(vector.Values, values);
 
         GeneratorConfig<TKey> genCfg;
         HashDetails hashDetails = new HashDetails();

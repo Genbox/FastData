@@ -15,6 +15,6 @@ impl SingleValueStructure_String_1 {
     }
 
     pub const ITEM_COUNT: usize = 1;
-    pub const MIN_LENGTH: usize = 6;
-    pub const MAX_LENGTH: usize = 6;
+    pub const MIN_KEY_LENGTH: usize = 6;
+    pub const MAX_KEY_LENGTH: usize = 6;
 }

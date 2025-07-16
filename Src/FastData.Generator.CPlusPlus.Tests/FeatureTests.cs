@@ -16,9 +16,9 @@ public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCon
         const string id = nameof(StructSupportTest);
 
         string genSource = FastDataGenerator.GenerateKeyed(values, [
-            new X { Age = 1, Name = "Bob" },
-            new X { Age = 2, Name = "Billy" },
-            new X { Age = 3, Name = "Bibi" },
+            new Person { Age = 1, Name = "Bob", Other = new Person { Name = "Anna", Age = 4 } },
+            new Person { Age = 2, Name = "Billy" },
+            new Person { Age = 3, Name = "Bibi" },
         ], new FastDataConfig { StructureType = StructureType.Array }, CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)));
 
         await Verify(genSource)
@@ -50,9 +50,10 @@ public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCon
         Assert.Equal(1, RunProcess(executable));
     }
 
-    internal struct X
+    internal class Person
     {
         public int Age { get; set; }
         public string Name { get; set; }
+        public Person Other { get; set; }
     }
 }

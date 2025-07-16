@@ -8,10 +8,7 @@
 
 class ArrayStructure_String_100 final
 {
-
-    static std::array<uint8_t, 100> values;
-
-    static constexpr std::array<std::string_view, 100> keys = {
+static constexpr std::array<std::string_view, 100> keys = {
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
         "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", 
         "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", 
@@ -22,26 +19,9 @@ class ArrayStructure_String_100 final
         "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", 
         "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", 
         "90", "91", "92", "93", "94", "95", "96", "97", "98", "99"
-    };
+};
 
 public:
-    [[nodiscard]]
-    static bool try_lookup(const std::string_view key, uint8_t*& value) noexcept
-    {
-        if (const size_t len = key.length(); len < 1u || len > 2u)
-            return false;
-
-        for (size_t i = 0; i < 100; i++)
-        {
-            if (keys[i] == key)
-            {
-                value = &values[i];
-                return true;
-            }
-        }
-        return false;
-    }
-
     [[nodiscard]]
     static bool contains(const std::string_view key) noexcept
     {
@@ -55,10 +35,28 @@ public:
         }
         return false;
     }
+    static std::array<uint8_t, 100> values;
+
+    [[nodiscard]]
+    static bool try_lookup(const std::string_view key, uint8_t value) noexcept
+    {
+        if (const size_t len = key.length(); len < 1u || len > 2u)
+            return false;
+
+        for (size_t i = 0; i < 100; i++)
+        {
+            if (keys[i] == key)
+            {
+                value = values[i];
+                return true;
+            }
+        }
+        return false;
+    }
 
     static constexpr size_t item_count = 100;
-    static constexpr size_t min_length = 1;
-    static constexpr size_t max_length = 2;
+    static constexpr size_t min_key_length = 1;
+    static constexpr size_t max_key_length = 2;
 
 public:
     ArrayStructure_String_100() = delete;

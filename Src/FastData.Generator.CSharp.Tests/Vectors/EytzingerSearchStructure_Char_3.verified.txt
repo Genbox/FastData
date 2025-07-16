@@ -36,6 +36,6 @@ internal static class EytzingerSearchStructure_Char_3
     }
 
     public const uint ItemCount = 3;
-    public const char MinValue = char.MinValue;
-    public const char MaxValue = '';
+    public const char MinKey = char.MinValue;
+    public const char MaxKey = '';
 }

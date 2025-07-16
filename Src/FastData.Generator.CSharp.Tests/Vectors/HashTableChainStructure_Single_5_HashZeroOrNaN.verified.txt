@@ -62,6 +62,6 @@ internal static class HashTableChainStructure_Single_5_HashZeroOrNaN
     }
 
     public const uint ItemCount = 5;
-    public const float MinValue = 1f;
-    public const float MaxValue = 5f;
+    public const float MinKey = 1f;
+    public const float MaxKey = 5f;
 }

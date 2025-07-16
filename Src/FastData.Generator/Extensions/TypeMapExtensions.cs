@@ -19,18 +19,18 @@ public static class TypeMapExtensions
         return s.Print(value);
     }
 
-    public static string PrintValues(this TypeMap map, ValueSpec spec)
+    public static string PrintValues(this TypeMap map, ObjectType objectType)
     {
         ITypeDef s = map.Get<object>();
         ObjectTypeDef def = (ObjectTypeDef)s;
-        return def.PrintValues(map, spec);
+        return def.PrintValues(objectType);
     }
 
-    public static string GetObjectDeclaration(this TypeMap map, ValueSpec spec)
+    public static string GetDeclarations(this TypeMap map, ObjectType objectType)
     {
         ITypeDef s = map.Get<object>();
         ObjectTypeDef def = (ObjectTypeDef)s;
-        return def.GetDeclaration(spec, map);
+        return def.GetDeclarations(objectType);
     }
 
     public static string GetSmallestUIntType(this TypeMap map, ulong value) => value switch

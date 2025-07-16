@@ -62,8 +62,8 @@ impl HashTableChainStructure_Int32_100 {
     }
 
     pub const ITEM_COUNT: usize = 100;
-    pub const MIN_VALUE: i32 = 0;
-    pub const MAX_VALUE: i32 = 99;
+    pub const MIN_KEY: i32 = 0;
+    pub const MAX_KEY: i32 = 99;
 }
 struct E {
     

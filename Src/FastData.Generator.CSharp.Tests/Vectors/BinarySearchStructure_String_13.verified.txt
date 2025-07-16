@@ -38,6 +38,6 @@ internal static class BinarySearchStructure_String_13
     }
 
     public const uint ItemCount = 13;
-    public const uint MinLength = 1;
-    public const uint MaxLength = 1;
+    public const uint MinKeyLength = 1;
+    public const uint MaxKeyLength = 1;
 }

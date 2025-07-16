@@ -37,6 +37,6 @@ internal static class BinarySearchStructure_Int64_5
     }
 
     public const uint ItemCount = 5;
-    public const long MinValue = long.MinValue;
-    public const long MaxValue = long.MaxValue;
+    public const long MinKey = long.MinValue;
+    public const long MaxKey = long.MaxValue;
 }

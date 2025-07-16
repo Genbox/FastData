@@ -15,6 +15,6 @@ impl SingleValueStructure_Char_1 {
     }
 
     pub const ITEM_COUNT: usize = 1;
-    pub const MIN_VALUE: char = 'a';
-    pub const MAX_VALUE: char = 'a';
+    pub const MIN_KEY: char = 'a';
+    pub const MAX_KEY: char = 'a';
 }

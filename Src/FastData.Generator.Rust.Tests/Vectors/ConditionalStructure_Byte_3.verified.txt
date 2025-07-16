@@ -21,6 +21,6 @@ impl ConditionalStructure_Byte_3 {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_VALUE: u8 = u8::MIN;
-    pub const MAX_VALUE: u8 = u8::MAX;
+    pub const MIN_KEY: u8 = u8::MIN;
+    pub const MAX_KEY: u8 = u8::MAX;
 }

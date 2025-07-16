@@ -15,6 +15,6 @@ internal static class SingleValueStructure_Double_1
     }
 
     public const uint ItemCount = 1;
-    public const double MinValue = 1.0;
-    public const double MaxValue = 1.0;
+    public const double MinKey = 1.0;
+    public const double MaxKey = 1.0;
 }

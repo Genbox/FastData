@@ -37,6 +37,6 @@ internal static class BinarySearchStructure_UInt64_4
     }
 
     public const uint ItemCount = 4;
-    public const ulong MinValue = ulong.MinValue;
-    public const ulong MaxValue = ulong.MaxValue;
+    public const ulong MinKey = ulong.MinValue;
+    public const ulong MaxKey = ulong.MaxValue;
 }

@@ -15,6 +15,6 @@ internal static class SingleValueStructure_UInt16_1
     }
 
     public const uint ItemCount = 1;
-    public const ushort MinValue = 1;
-    public const ushort MaxValue = 1;
+    public const ushort MinKey = 1;
+    public const ushort MaxKey = 1;
 }

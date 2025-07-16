@@ -44,8 +44,8 @@ impl HashTableChainStructure_Double_5_HashZeroOrNaN {
     }
 
     pub const ITEM_COUNT: usize = 5;
-    pub const MIN_VALUE: f64 = 1.0;
-    pub const MAX_VALUE: f64 = 5.0;
+    pub const MIN_KEY: f64 = 1.0;
+    pub const MAX_KEY: f64 = 5.0;
 }
 struct E {
     hash_code: u64,

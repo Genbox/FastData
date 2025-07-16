@@ -123,6 +123,6 @@ internal static class ConditionalStructure_Single_100
     }
 
     public const uint ItemCount = 100;
-    public const float MinValue = 0f;
-    public const float MaxValue = 99f;
+    public const float MinKey = 0f;
+    public const float MaxKey = 99f;
 }

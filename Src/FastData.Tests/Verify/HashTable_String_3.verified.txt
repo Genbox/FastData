@@ -14,5 +14,5 @@
     }
   ],
   "StoreHashCode": true,
-  "ValueSpec": null
+  "Values": null
 }

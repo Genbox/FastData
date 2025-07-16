@@ -15,6 +15,6 @@ internal static class SingleValueStructure_UInt64_1
     }
 
     public const uint ItemCount = 1;
-    public const ulong MinValue = 1ul;
-    public const ulong MaxValue = 1ul;
+    public const ulong MinKey = 1ul;
+    public const ulong MaxKey = 1ul;
 }

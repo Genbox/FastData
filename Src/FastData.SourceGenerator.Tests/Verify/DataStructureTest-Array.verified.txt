@@ -27,6 +27,6 @@ internal static class StaticData
     }
 
     public const uint ItemCount = 3;
-    public const uint MinLength = 5;
-    public const uint MaxLength = 5;
+    public const uint MinKeyLength = 5;
+    public const uint MaxKeyLength = 5;
 }

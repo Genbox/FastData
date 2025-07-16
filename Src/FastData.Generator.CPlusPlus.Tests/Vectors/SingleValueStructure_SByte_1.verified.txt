@@ -16,8 +16,8 @@ public:
     }
 
     static constexpr size_t item_count = 1;
-    static constexpr int8_t min_value = 1;
-    static constexpr int8_t max_value = 1;
+    static constexpr int8_t min_key = 1;
+    static constexpr int8_t max_key = 1;
 
 public:
     SingleValueStructure_SByte_1() = delete;

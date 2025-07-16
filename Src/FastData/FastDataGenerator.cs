@@ -23,17 +23,12 @@ public static partial class FastDataGenerator
 {
     private const StringComparison DefaultStringComparison = StringComparison.Ordinal;
 
-    private static ValueSpec<TValue> CreateValueSpec<TValue>(TValue[] values)
-    {
-        return new ValueSpec<TValue>(values);
-    }
-
     public static string GenerateKeyed<TKey, TValue>(TKey[] keys, TValue[] values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         if (keys is string[] strArr)
-            return GenerateInternalString(strArr, CreateValueSpec(values), fdCfg, generator, factory);
+            return GenerateInternalString(strArr, values, fdCfg, generator, factory);
 
-        return GenerateInternal(keys, CreateValueSpec(values), fdCfg, generator, factory);
+        return GenerateInternal(keys, values, fdCfg, generator, factory);
     }
 
     /// <summary>Generate source code for the provided data.</summary>
@@ -51,12 +46,12 @@ public static partial class FastDataGenerator
         return GenerateInternal<TKey, byte>(keys, null, fdCfg, generator, factory);
     }
 
-    private static string GenerateInternal<TKey, TValue>(TKey[] keys, ValueSpec<TValue>? valueSpec, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
+    private static string GenerateInternal<TKey, TValue>(TKey[] keys, TValue[]? values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        if (keys.Length == 0 || valueSpec?.Values.Length == 0)
+        if (keys.Length == 0 || values?.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
 
-        if (valueSpec != null && keys.Length != valueSpec.Values.Length)
+        if (values != null && keys.Length != values.Length)
             throw new InvalidOperationException("The number of values does not match the number of keys.");
 
         Type type = typeof(TKey);
@@ -93,21 +88,21 @@ public static partial class FastDataGenerator
             case StructureType.Auto:
             {
                 if (keys.Length == 1)
-                    return GenerateWrapper(generator, genCfg, new SingleValueStructure<TKey, TValue>(), keys, valueSpec);
+                    return GenerateWrapper(generator, genCfg, new SingleValueStructure<TKey, TValue>(), keys, values);
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
                 if (keys.Length < 400)
-                    return GenerateWrapper(generator, genCfg, new ConditionalStructure<TKey, TValue>(), keys, valueSpec);
+                    return GenerateWrapper(generator, genCfg, new ConditionalStructure<TKey, TValue>(), keys, values);
 
                 goto case StructureType.HashTable;
             }
             case StructureType.Array:
-                return GenerateWrapper(generator, genCfg, new ArrayStructure<TKey, TValue>(), keys, valueSpec);
+                return GenerateWrapper(generator, genCfg, new ArrayStructure<TKey, TValue>(), keys, values);
             case StructureType.Conditional:
-                return GenerateWrapper(generator, genCfg, new ConditionalStructure<TKey, TValue>(), keys, valueSpec);
+                return GenerateWrapper(generator, genCfg, new ConditionalStructure<TKey, TValue>(), keys, values);
             case StructureType.BinarySearch:
-                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<TKey, TValue>(dataType, DefaultStringComparison), keys, valueSpec);
+                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<TKey, TValue>(dataType, DefaultStringComparison), keys, values);
             case StructureType.HashTable:
             {
                 HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(dataType, valProps.HasZeroOrNaN);
@@ -116,21 +111,21 @@ public static partial class FastDataGenerator
                 HashData hashData = HashData.Create(keys, fdCfg.HashCapacityFactor, hashFunc);
 
                 if (hashData.HashCodesPerfect)
-                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<TKey, TValue>(hashData, dataType), keys, valueSpec);
+                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<TKey, TValue>(hashData, dataType), keys, values);
 
-                return GenerateWrapper(generator, genCfg, new HashTableChainStructure<TKey, TValue>(hashData, dataType), keys, valueSpec);
+                return GenerateWrapper(generator, genCfg, new HashTableChainStructure<TKey, TValue>(hashData, dataType), keys, values);
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
         }
     }
 
-    private static string GenerateInternalString<TValue>(string[] keys, ValueSpec<TValue>? valueSpec, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
+    private static string GenerateInternalString<TValue>(string[] keys, TValue[]? values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        if (keys.Length == 0 || valueSpec?.Values.Length == 0)
+        if (keys.Length == 0 || values?.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
 
-        if (valueSpec != null && keys.Length != valueSpec.Values.Length)
+        if (values != null && keys.Length != values.Length)
             throw new InvalidOperationException("The number of values does not match the number of keys.");
 
         factory ??= NullLoggerFactory.Instance;
@@ -162,26 +157,26 @@ public static partial class FastDataGenerator
             case StructureType.Auto:
             {
                 if (keys.Length == 1)
-                    return GenerateWrapper(generator, genCfg, new SingleValueStructure<string, TValue>(), keys, valueSpec);
+                    return GenerateWrapper(generator, genCfg, new SingleValueStructure<string, TValue>(), keys, values);
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
 
                 // If strings have unique lengths, we prefer to use a KeyLengthStructure.
                 if (strProps.LengthData.Unique)
-                    return GenerateWrapper(generator, genCfg, new KeyLengthStructure<string, TValue>(strProps), keys, valueSpec);
+                    return GenerateWrapper(generator, genCfg, new KeyLengthStructure<string, TValue>(strProps), keys, values);
 
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
                 if (keys.Length < 400)
-                    return GenerateWrapper(generator, genCfg, new ConditionalStructure<string, TValue>(), keys, valueSpec);
+                    return GenerateWrapper(generator, genCfg, new ConditionalStructure<string, TValue>(), keys, values);
 
                 goto case StructureType.HashTable;
             }
             case StructureType.Array:
-                return GenerateWrapper(generator, genCfg, new ArrayStructure<string, TValue>(), keys, valueSpec);
+                return GenerateWrapper(generator, genCfg, new ArrayStructure<string, TValue>(), keys, values);
             case StructureType.Conditional:
-                return GenerateWrapper(generator, genCfg, new ConditionalStructure<string, TValue>(), keys, valueSpec);
+                return GenerateWrapper(generator, genCfg, new ConditionalStructure<string, TValue>(), keys, values);
             case StructureType.BinarySearch:
-                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<string, TValue>(dataType, DefaultStringComparison), keys, valueSpec);
+                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<string, TValue>(dataType, DefaultStringComparison), keys, values);
             case StructureType.HashTable:
             {
                 StringHashFunc hashFunc;
@@ -210,18 +205,18 @@ public static partial class FastDataGenerator
                 });
 
                 if (hashData.HashCodesPerfect)
-                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<string, TValue>(hashData, dataType), keys, valueSpec);
+                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<string, TValue>(hashData, dataType), keys, values);
 
-                return GenerateWrapper(generator, genCfg, new HashTableChainStructure<string, TValue>(hashData, dataType), keys, valueSpec);
+                return GenerateWrapper(generator, genCfg, new HashTableChainStructure<string, TValue>(hashData, dataType), keys, values);
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
         }
     }
 
-    private static string GenerateWrapper<TKey, TValue, TContext>(ICodeGenerator generator, GeneratorConfig<TKey> genCfg, IStructure<TKey, TValue, TContext> structure, TKey[] keys, ValueSpec<TValue>? valueSpec) where TContext : IContext<TValue>
+    private static string GenerateWrapper<TKey, TValue, TContext>(ICodeGenerator generator, GeneratorConfig<TKey> genCfg, IStructure<TKey, TValue, TContext> structure, TKey[] keys, TValue[]? values) where TContext : IContext<TValue>
     {
-        TContext res = structure.Create(keys, valueSpec);
+        TContext res = structure.Create(keys, values);
         return generator.Generate(genCfg, res);
     }
 

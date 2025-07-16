@@ -48,6 +48,6 @@ impl BinarySearchStructure_Single_100 {
     }
 
     pub const ITEM_COUNT: usize = 100;
-    pub const MIN_VALUE: f32 = 0.0;
-    pub const MAX_VALUE: f32 = 99.0;
+    pub const MIN_KEY: f32 = 0.0;
+    pub const MAX_KEY: f32 = 99.0;
 }

@@ -8,31 +8,11 @@
 
 class ArrayStructure_Double_4 final
 {
-
-    static std::array<uint8_t, 4> values;
-
-    static constexpr std::array<double, 4> keys = {
+static constexpr std::array<double, 4> keys = {
         std::numeric_limits<double>::lowest(), 0.0, 1.0, std::numeric_limits<double>::max()
-    };
+};
 
 public:
-    [[nodiscard]]
-    static bool try_lookup(const double key, uint8_t*& value) noexcept
-    {
-        if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())
-            return false;
-
-        for (size_t i = 0; i < 4; i++)
-        {
-            if (keys[i] == key)
-            {
-                value = &values[i];
-                return true;
-            }
-        }
-        return false;
-    }
-
     [[nodiscard]]
     static bool contains(const double key) noexcept
     {
@@ -46,10 +26,28 @@ public:
         }
         return false;
     }
+    static std::array<uint8_t, 4> values;
+
+    [[nodiscard]]
+    static bool try_lookup(const double key, uint8_t value) noexcept
+    {
+        if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())
+            return false;
+
+        for (size_t i = 0; i < 4; i++)
+        {
+            if (keys[i] == key)
+            {
+                value = values[i];
+                return true;
+            }
+        }
+        return false;
+    }
 
     static constexpr size_t item_count = 4;
-    static constexpr double min_value = std::numeric_limits<double>::lowest();
-    static constexpr double max_value = std::numeric_limits<double>::max();
+    static constexpr double min_key = std::numeric_limits<double>::lowest();
+    static constexpr double max_key = std::numeric_limits<double>::max();
 
 public:
     ArrayStructure_Double_4() = delete;

@@ -36,6 +36,6 @@ internal static class ArrayStructure_Int32_100
     }
 
     public const uint ItemCount = 100;
-    public const int MinValue = 0;
-    public const int MaxValue = 99;
+    public const int MinKey = 0;
+    public const int MaxKey = 99;
 }

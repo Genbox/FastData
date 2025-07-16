@@ -12,24 +12,24 @@ public abstract class OutputWriter<TKey> : IOutputWriter
 {
     private IEarlyExitDef _earlyExitDef = null!;
     private ILanguageDef _langDef = null!;
-    private TypeMap _map = null!;
 
+    protected TypeMap TypeMap { get; private set; } = null!;
     protected string KeyTypeName { get; private set; } = null!;
     protected string ValueTypeName { get; private set; } = null!;
     protected GeneratorConfig<TKey> GeneratorConfig { get; private set; } = null!;
     protected string HashSource { get; private set; } = null!;
     protected string EarlyExits => _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits);
-    protected string HashSizeType => _map.GetTypeName(typeof(ulong));
+    protected string HashSizeType => TypeMap.GetTypeName(typeof(ulong));
     protected static DataType HashSizeDataType => DataType.UInt64;
     protected string ArraySizeType => _langDef.ArraySizeType;
 
     public abstract string Generate();
 
-    internal void Initialize<TValue>(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, ValueSpec<TValue>? valueSpec, ExpressionCompiler? compiler)
+    internal void Initialize<TValue>(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, TValue[]? values, ExpressionCompiler? compiler)
     {
         _langDef = langDef;
         _earlyExitDef = earlyExitDef;
-        _map = map;
+        TypeMap = map;
         GeneratorConfig = genCfg;
         KeyTypeName = keyTypeName;
         ValueTypeName = valueTypeName;
@@ -51,7 +51,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
                 for (int i = 0; i < fdState.Length; i++)
                 {
                     State state = fdState[i];
-                    genState[i] = new StateInfo(state.Name, _map.GetTypeName(state.Type), GetValues(state.Values, _map, state.Type).ToArray());
+                    genState[i] = new StateInfo(state.Name, TypeMap.GetTypeName(state.Type), GetValues(state.Values, TypeMap, state.Type).ToArray());
                 }
             }
 
@@ -73,9 +73,9 @@ public abstract class OutputWriter<TKey> : IOutputWriter
     protected virtual string GetEqualFunction(string value1, string value2, DataType dataType = DataType.Null) => $"{value1} == {value2}";
     protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";
 
-    protected string ToValueLabel<T>(T value) => _map.ToValueLabel(value); //Uses its own generics here, not TKey. We need T so we can change the type in generators
-    protected string PrintValues(ValueSpec valueSpec) => _map.PrintValues(valueSpec);
-    protected string GetObjectDeclaration(ValueSpec value) => value.IsCustomType ? _map.GetObjectDeclaration(value) : ""; //We don't have declarations for primitives
-    protected string GetSmallestSignedType(long value) => _map.GetSmallestIntType(value);
-    protected string GetSmallestUnsignedType(long value) => _map.GetSmallestUIntType((ulong)value);
+    protected string ToValueLabel<T>(T value) => TypeMap.ToValueLabel(value); //Uses its own generics here, not TKey. We need T so we can change the type in generators
+    protected string PrintValues(ObjectType objectType) => TypeMap.PrintValues(objectType);
+    protected string GetObjectDeclarations(ObjectType objectType) => objectType.IsCustomType ? TypeMap.GetDeclarations(objectType) : ""; //We don't have declarations for primitives
+    protected string GetSmallestSignedType(long value) => TypeMap.GetSmallestIntType(value);
+    protected string GetSmallestUnsignedType(long value) => TypeMap.GetSmallestUIntType((ulong)value);
 }

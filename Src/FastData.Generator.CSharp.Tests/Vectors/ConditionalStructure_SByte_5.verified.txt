@@ -28,6 +28,6 @@ internal static class ConditionalStructure_SByte_5
     }
 
     public const uint ItemCount = 5;
-    public const sbyte MinValue = sbyte.MinValue;
-    public const sbyte MaxValue = sbyte.MaxValue;
+    public const sbyte MinKey = sbyte.MinValue;
+    public const sbyte MaxKey = sbyte.MaxValue;
 }

@@ -15,6 +15,6 @@ impl SingleValueStructure_Int32_1 {
     }
 
     pub const ITEM_COUNT: usize = 1;
-    pub const MIN_VALUE: i32 = 1;
-    pub const MAX_VALUE: i32 = 1;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 1;
 }

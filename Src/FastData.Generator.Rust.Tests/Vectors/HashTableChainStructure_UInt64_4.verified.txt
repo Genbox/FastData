@@ -44,8 +44,8 @@ impl HashTableChainStructure_UInt64_4 {
     }
 
     pub const ITEM_COUNT: usize = 4;
-    pub const MIN_VALUE: u64 = u64::MIN;
-    pub const MAX_VALUE: u64 = u64::MAX;
+    pub const MIN_KEY: u64 = u64::MIN;
+    pub const MAX_KEY: u64 = u64::MAX;
 }
 struct E {
     

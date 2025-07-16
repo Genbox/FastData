@@ -39,6 +39,6 @@ impl BinarySearchStructure_Int32_5 {
     }
 
     pub const ITEM_COUNT: usize = 5;
-    pub const MIN_VALUE: i32 = i32::MIN;
-    pub const MAX_VALUE: i32 = i32::MAX;
+    pub const MIN_KEY: i32 = i32::MIN;
+    pub const MAX_KEY: i32 = i32::MAX;
 }

@@ -15,6 +15,6 @@ internal static class SingleValueStructure_SByte_1
     }
 
     public const uint ItemCount = 1;
-    public const sbyte MinValue = 1;
-    public const sbyte MaxValue = 1;
+    public const sbyte MinKey = 1;
+    public const sbyte MaxKey = 1;
 }

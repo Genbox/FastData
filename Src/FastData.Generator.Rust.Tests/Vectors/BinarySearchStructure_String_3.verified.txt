@@ -39,6 +39,6 @@ impl BinarySearchStructure_String_3 {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_LENGTH: usize = 1;
-    pub const MAX_LENGTH: usize = 255;
+    pub const MIN_KEY_LENGTH: usize = 1;
+    pub const MAX_KEY_LENGTH: usize = 255;
 }

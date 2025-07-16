@@ -7,7 +7,7 @@ namespace Genbox.FastData.Generators.Contexts;
 /// <param name="buckets">The array of bucket indices.</param>
 /// <param name="entries">The array of hash set entries.</param>
 /// <param name="storeHashCode">If set to true, you should only generate a hash set that checks the value.</param>
-public sealed class HashTableChainContext<TKey, TValue>(int[] buckets, HashTableEntry<TKey>[] entries, bool storeHashCode, ValueSpec<TValue>? valueSpec) : IContext<TValue>
+public sealed class HashTableChainContext<TKey, TValue>(int[] buckets, HashTableEntry<TKey>[] entries, bool storeHashCode, TValue[]? values) : IContext<TValue>
 {
     /// <summary>Gets the array of bucket indices.</summary>
     public int[] Buckets { get; } = buckets;
@@ -17,5 +17,5 @@ public sealed class HashTableChainContext<TKey, TValue>(int[] buckets, HashTable
 
     /// <summary>Indicates whether the hash set should store the hash code or only the value.</summary>
     public bool StoreHashCode { get; } = storeHashCode;
-    public ValueSpec<TValue>? ValueSpec { get; } = valueSpec;
+    public TValue[]? Values { get; } = values;
 }

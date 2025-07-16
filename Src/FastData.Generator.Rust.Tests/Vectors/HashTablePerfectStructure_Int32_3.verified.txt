@@ -30,6 +30,6 @@ impl HashTablePerfectStructure_Int32_3 {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_VALUE: i32 = 1;
-    pub const MAX_VALUE: i32 = 3;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 3;
 }

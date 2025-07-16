@@ -15,6 +15,6 @@ internal static class SingleValueStructure_UInt32_1
     }
 
     public const uint ItemCount = 1;
-    public const uint MinValue = 1u;
-    public const uint MaxValue = 1u;
+    public const uint MinKey = 1u;
+    public const uint MaxKey = 1u;
 }

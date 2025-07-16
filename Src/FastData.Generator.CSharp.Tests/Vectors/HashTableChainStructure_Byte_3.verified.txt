@@ -62,6 +62,6 @@ internal static class HashTableChainStructure_Byte_3
     }
 
     public const uint ItemCount = 3;
-    public const byte MinValue = byte.MinValue;
-    public const byte MaxValue = byte.MaxValue;
+    public const byte MinKey = byte.MinValue;
+    public const byte MaxKey = byte.MaxValue;
 }

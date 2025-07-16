@@ -16,8 +16,8 @@ public:
     }
 
     static constexpr size_t item_count = 1;
-    static constexpr uint16_t min_value = 1;
-    static constexpr uint16_t max_value = 1;
+    static constexpr uint16_t min_key = 1;
+    static constexpr uint16_t max_key = 1;
 
 public:
     SingleValueStructure_UInt16_1() = delete;

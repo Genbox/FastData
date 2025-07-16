@@ -28,6 +28,6 @@ internal static class ConditionalStructure_Int32_5
     }
 
     public const uint ItemCount = 5;
-    public const int MinValue = int.MinValue;
-    public const int MaxValue = int.MaxValue;
+    public const int MinKey = int.MinValue;
+    public const int MaxKey = int.MaxValue;
 }

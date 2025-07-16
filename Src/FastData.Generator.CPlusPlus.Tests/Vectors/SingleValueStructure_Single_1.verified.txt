@@ -16,8 +16,8 @@ public:
     }
 
     static constexpr size_t item_count = 1;
-    static constexpr float min_value = 1.0f;
-    static constexpr float max_value = 1.0f;
+    static constexpr float min_key = 1.0f;
+    static constexpr float max_key = 1.0f;
 
 public:
     SingleValueStructure_Single_1() = delete;

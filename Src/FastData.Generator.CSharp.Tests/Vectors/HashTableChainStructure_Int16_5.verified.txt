@@ -62,6 +62,6 @@ internal static class HashTableChainStructure_Int16_5
     }
 
     public const uint ItemCount = 5;
-    public const short MinValue = short.MinValue;
-    public const short MaxValue = short.MaxValue;
+    public const short MinKey = short.MinValue;
+    public const short MaxKey = short.MaxValue;
 }

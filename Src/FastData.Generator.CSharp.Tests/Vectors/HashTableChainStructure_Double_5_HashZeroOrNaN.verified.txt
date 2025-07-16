@@ -62,6 +62,6 @@ internal static class HashTableChainStructure_Double_5_HashZeroOrNaN
     }
 
     public const uint ItemCount = 5;
-    public const double MinValue = 1.0;
-    public const double MaxValue = 5.0;
+    public const double MinKey = 1.0;
+    public const double MaxKey = 5.0;
 }

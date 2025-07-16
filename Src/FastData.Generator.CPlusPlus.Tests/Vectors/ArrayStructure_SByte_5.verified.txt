@@ -8,31 +8,11 @@
 
 class ArrayStructure_SByte_5 final
 {
-
-    static std::array<uint8_t, 5> values;
-
-    static constexpr std::array<int8_t, 5> keys = {
+static constexpr std::array<int8_t, 5> keys = {
         std::numeric_limits<int8_t>::lowest(), -1, 0, 1, std::numeric_limits<int8_t>::max()
-    };
+};
 
 public:
-    [[nodiscard]]
-    static bool try_lookup(const int8_t key, uint8_t*& value) noexcept
-    {
-        if (key < std::numeric_limits<int8_t>::lowest() || key > std::numeric_limits<int8_t>::max())
-            return false;
-
-        for (size_t i = 0; i < 5; i++)
-        {
-            if (keys[i] == key)
-            {
-                value = &values[i];
-                return true;
-            }
-        }
-        return false;
-    }
-
     [[nodiscard]]
     static bool contains(const int8_t key) noexcept
     {
@@ -46,10 +26,28 @@ public:
         }
         return false;
     }
+    static std::array<uint8_t, 5> values;
+
+    [[nodiscard]]
+    static bool try_lookup(const int8_t key, uint8_t value) noexcept
+    {
+        if (key < std::numeric_limits<int8_t>::lowest() || key > std::numeric_limits<int8_t>::max())
+            return false;
+
+        for (size_t i = 0; i < 5; i++)
+        {
+            if (keys[i] == key)
+            {
+                value = values[i];
+                return true;
+            }
+        }
+        return false;
+    }
 
     static constexpr size_t item_count = 5;
-    static constexpr int8_t min_value = std::numeric_limits<int8_t>::lowest();
-    static constexpr int8_t max_value = std::numeric_limits<int8_t>::max();
+    static constexpr int8_t min_key = std::numeric_limits<int8_t>::lowest();
+    static constexpr int8_t max_key = std::numeric_limits<int8_t>::max();
 
 public:
     ArrayStructure_SByte_5() = delete;

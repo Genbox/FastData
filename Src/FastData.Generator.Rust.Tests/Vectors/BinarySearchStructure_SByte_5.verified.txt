@@ -39,6 +39,6 @@ impl BinarySearchStructure_SByte_5 {
     }
 
     pub const ITEM_COUNT: usize = 5;
-    pub const MIN_VALUE: i8 = i8::MIN;
-    pub const MAX_VALUE: i8 = i8::MAX;
+    pub const MIN_KEY: i8 = i8::MIN;
+    pub const MAX_KEY: i8 = i8::MAX;
 }

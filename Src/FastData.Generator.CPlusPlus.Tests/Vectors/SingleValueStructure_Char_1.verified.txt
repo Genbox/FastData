@@ -16,8 +16,8 @@ public:
     }
 
     static constexpr size_t item_count = 1;
-    static constexpr char min_value = 97;
-    static constexpr char max_value = 97;
+    static constexpr char min_key = 97;
+    static constexpr char max_key = 97;
 
 public:
     SingleValueStructure_Char_1() = delete;

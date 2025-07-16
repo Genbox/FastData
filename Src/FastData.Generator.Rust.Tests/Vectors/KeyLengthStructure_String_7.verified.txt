@@ -22,6 +22,6 @@ impl KeyLengthStructure_String_7 {
     }
 
     pub const ITEM_COUNT: usize = 7;
-    pub const MIN_LENGTH: usize = 3;
-    pub const MAX_LENGTH: usize = 10;
+    pub const MIN_KEY_LENGTH: usize = 3;
+    pub const MAX_KEY_LENGTH: usize = 10;
 }

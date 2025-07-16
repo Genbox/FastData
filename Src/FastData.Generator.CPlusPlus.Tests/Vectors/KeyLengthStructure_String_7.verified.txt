@@ -23,8 +23,8 @@ public:
     }
 
     static constexpr size_t item_count = 7;
-    static constexpr size_t min_length = 3;
-    static constexpr size_t max_length = 10;
+    static constexpr size_t min_key_length = 3;
+    static constexpr size_t max_key_length = 10;
 
 public:
     KeyLengthStructure_String_7() = delete;

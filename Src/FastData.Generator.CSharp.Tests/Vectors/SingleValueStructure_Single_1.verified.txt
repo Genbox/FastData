@@ -15,6 +15,6 @@ internal static class SingleValueStructure_Single_1
     }
 
     public const uint ItemCount = 1;
-    public const float MinValue = 1f;
-    public const float MaxValue = 1f;
+    public const float MinKey = 1f;
+    public const float MaxKey = 1f;
 }
