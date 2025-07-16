@@ -118,8 +118,6 @@ public static class TestHelper
             return Generate(generator, vector, props, dataType, StructureType.Conditional, new ConditionalStructure<T, byte>(), values);
         if (vector.Type == typeof(BinarySearchStructure<,>))
             return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new BinarySearchStructure<T, byte>(dataType, StringComparison.Ordinal), values);
-        if (vector.Type == typeof(EytzingerSearchStructure<,>))
-            return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new EytzingerSearchStructure<T, byte>(dataType, StringComparison.Ordinal), values);
         if (vector.Type == typeof(HashTableChainStructure<,>))
             return Generate(generator, vector, props, dataType, StructureType.HashTable, new HashTableChainStructure<T, byte>(GetHashData(vector, dataType, encoding), dataType), values);
         if (vector.Type == typeof(HashTablePerfectStructure<,>))

@@ -54,7 +54,6 @@ public sealed class RustCodeGenerator : CodeGenerator
         ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x),
         BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x),
         ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x),
-        EytzingerSearchContext<TKey, TValue> x => new EytzingerSearchCode<TKey, TValue>(x),
         HashTableChainContext<TKey, TValue> x => new HashTableChainCode<TKey, TValue>(x, genCfg, Shared),
         HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, genCfg, Shared),
         KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x),

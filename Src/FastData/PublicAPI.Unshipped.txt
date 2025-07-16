@@ -63,10 +63,6 @@ Genbox.FastData.Generators.Contexts.ConditionalContext<T>
 Genbox.FastData.Generators.Contexts.ConditionalContext<T>.ConditionalContext() -> void
 Genbox.FastData.Generators.Contexts.ConditionalContext<T>.ConditionalContext(System.ReadOnlySpan<T> data) -> void
 Genbox.FastData.Generators.Contexts.ConditionalContext<T>.Data.get -> System.ReadOnlySpan<T>
-Genbox.FastData.Generators.Contexts.EytzingerSearchContext<T>
-Genbox.FastData.Generators.Contexts.EytzingerSearchContext<T>.Data.get -> T[]!
-Genbox.FastData.Generators.Contexts.EytzingerSearchContext<T>.EytzingerSearchContext() -> void
-Genbox.FastData.Generators.Contexts.EytzingerSearchContext<T>.EytzingerSearchContext(T[]! data) -> void
 Genbox.FastData.Generators.Contexts.HashSetChainContext<T>
 Genbox.FastData.Generators.Contexts.HashSetChainContext<T>.StoreHashCode.get -> bool
 Genbox.FastData.Generators.Contexts.HashSetLinearContext<T>

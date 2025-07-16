@@ -18,7 +18,6 @@ public static class TestVectorHelper
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
-                     typeof(EytzingerSearchStructure<,>),
                      typeof(HashTableChainStructure<,>)))
         {
             yield return testVector;
@@ -34,7 +33,6 @@ public static class TestVectorHelper
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
-                     typeof(EytzingerSearchStructure<,>),
                      typeof(HashTableChainStructure<,>)))
         {
             yield return testVector;
@@ -56,7 +54,6 @@ public static class TestVectorHelper
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
-                     typeof(EytzingerSearchStructure<,>),
                      typeof(HashTableChainStructure<,>)))
         {
             yield return testVector;
