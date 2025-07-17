@@ -10,6 +10,9 @@ public sealed class SharedCode
 
     public void Add(string id, CodePlacement type, string value)
     {
+        if (string.IsNullOrWhiteSpace(value)) //Don't add empty strings
+            return;
+
         CodeKey key = new CodeKey(id, type);
 
         if (_cache.ContainsKey(key))

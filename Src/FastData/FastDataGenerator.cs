@@ -113,7 +113,7 @@ public static partial class FastDataGenerator
                 if (hashData.HashCodesPerfect)
                     return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<TKey, TValue>(hashData, dataType), keys, values);
 
-                return GenerateWrapper(generator, genCfg, new HashTableChainStructure<TKey, TValue>(hashData, dataType), keys, values);
+                return GenerateWrapper(generator, genCfg, new HashTableStructure<TKey, TValue>(hashData, dataType), keys, values);
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
@@ -207,7 +207,7 @@ public static partial class FastDataGenerator
                 if (hashData.HashCodesPerfect)
                     return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<string, TValue>(hashData, dataType), keys, values);
 
-                return GenerateWrapper(generator, genCfg, new HashTableChainStructure<string, TValue>(hashData, dataType), keys, values);
+                return GenerateWrapper(generator, genCfg, new HashTableStructure<string, TValue>(hashData, dataType), keys, values);
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");

@@ -7,5 +7,5 @@ public class NullTypeDef(string nullLabel) : ITypeDef
 {
     public DataType DataType => DataType.Null;
     public string Name => throw new InvalidOperationException("Null does not have a name");
-    public Func<object, string> PrintObj { get; } = _ => nullLabel;
+    public Func<TypeMap, object, string> PrintObj { get; } = (_, _) => nullLabel;
 }

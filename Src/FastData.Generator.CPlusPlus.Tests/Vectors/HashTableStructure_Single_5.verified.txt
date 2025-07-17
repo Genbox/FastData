@@ -1,0 +1,72 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashTable
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashTableStructure_Single_5 final
+{
+    struct e
+    {
+        float key;
+        int8_t next;
+        uint64_t hash_code;
+        
+        e(const uint64_t hash_code, const int8_t next, const float key)
+           : hash_code(hash_code), next(next), key(key) {}
+    };
+
+    static constexpr std::array<int8_t, 5> buckets = {
+        3, 4, 1, 0, 5
+     };
+
+    inline static const std::array<e, 5> entries = {
+        e(4286578687, -1, std::numeric_limits<float>::lowest()), e(3212836864, -1, -1.0f), e(0, -1, 0.0f), e(1065353216, -1, 1.0f), e(2139095039, 1, std::numeric_limits<float>::max())
+    };
+
+    static uint64_t get_hash(const float value) noexcept
+    {
+        uint32_t bits;
+        std::memcpy(&bits, &value, sizeof(bits));
+        if (((bits - 1) & ~0x80000000u) >= 0x7F800000u)
+            bits &= 0x7F800000u;
+        return bits;
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const float key) noexcept
+    {
+        if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())
+            return false;
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 5;
+        int8_t i = buckets[index] - static_cast<int8_t>(1);
+
+        while (i >= 0)
+        {
+            const auto& entry = entries[i];
+
+            if (entry.hash_code == hash && entry.key == key)
+                return true;
+
+            i = entry.next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr float min_key = std::numeric_limits<float>::lowest();
+    static constexpr float max_key = std::numeric_limits<float>::max();
+
+public:
+    HashTableStructure_Single_5() = delete;
+    HashTableStructure_Single_5(const HashTableStructure_Single_5&) = delete;
+    HashTableStructure_Single_5& operator=(const HashTableStructure_Single_5&) = delete;
+    HashTableStructure_Single_5(HashTableStructure_Single_5&&) = delete;
+    HashTableStructure_Single_5& operator=(HashTableStructure_Single_5&&) = delete;
+};

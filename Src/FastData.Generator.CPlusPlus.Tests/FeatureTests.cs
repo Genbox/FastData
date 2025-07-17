@@ -25,8 +25,10 @@ public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCon
 
         GeneratorSpec spec = Generate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), vector, values);
 
+        string id = $"{nameof(ObjectSupportTest)}-{spec.Identifier}";
+
         await Verify(spec.Source)
-              .UseFileName(spec.Identifier)
+              .UseFileName(id)
               .UseDirectory("Features")
               .DisableDiff();
 
@@ -51,7 +53,7 @@ public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCon
                               }
                               """;
 
-        string executable = context.Compiler.Compile(spec.Identifier, testSource);
+        string executable = context.Compiler.Compile(id, testSource);
         Assert.Equal(1, RunProcess(executable));
     }
 

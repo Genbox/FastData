@@ -6,10 +6,10 @@ public interface ITypeDef
 {
     DataType DataType { get; }
     string Name { get; }
-    Func<object, string> PrintObj { get; }
+    Func<TypeMap, object, string> PrintObj { get; }
 }
 
 public interface ITypeDef<in T> : ITypeDef
 {
-    Func<T, string> Print { get; }
+    Func<TypeMap, T, string> Print { get; }
 }

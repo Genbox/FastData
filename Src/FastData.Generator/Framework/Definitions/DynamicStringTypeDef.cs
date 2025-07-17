@@ -18,6 +18,6 @@ public class DynamicStringTypeDef(params StringType[] types) : ITypeDef<string>
 
     public DataType DataType => DataType.String;
     public string Name => throw new InvalidOperationException("DynamicStringTypeDef does not support Name");
-    public Func<object, string> PrintObj => throw new InvalidOperationException("DynamicStringTypeDef does not support PrintObj");
-    public Func<string, string> Print => throw new InvalidOperationException("DynamicStringTypeDef does not support Print");
+    public Func<TypeMap, object, string> PrintObj => throw new InvalidOperationException("DynamicStringTypeDef does not support PrintObj");
+    public Func<TypeMap, string, string> Print => throw new InvalidOperationException("DynamicStringTypeDef does not support Print");
 }

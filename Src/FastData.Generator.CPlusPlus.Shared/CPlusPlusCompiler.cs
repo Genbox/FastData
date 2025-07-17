@@ -84,7 +84,7 @@ public sealed class CPlusPlusCompiler
 
     private int CompileMSVC(string src, string dst) =>
         RunProcess("cmd.exe", $"""
-                               /c ""{_path}" -arch=x86 && cl.exe "{src}" {(_release ? "/O2 /GL /GS-" : "/O1")} /utf-8 /std:c++20 /DNDEBUG /permissive- /MD /DBENCHMARK_STATIC_DEFINE /I "{_includesPath}" /Fe:"{dst}" "{_libsPath}\benchmark.lib" shlwapi.lib"
+                               /c ""{_path}" -arch=x86 && cl.exe "{src}" {(_release ? "/O2 /GL /GS-" : "/O1")} /utf-8 /std:c++17 /DNDEBUG /permissive- /MD /DBENCHMARK_STATIC_DEFINE /I "{_includesPath}" /Fe:"{dst}" "{_libsPath}\benchmark.lib" shlwapi.lib"
                                """);
 
     public string Compile(string fileId, string source)

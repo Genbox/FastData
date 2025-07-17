@@ -10,27 +10,20 @@ public static class TypeMapExtensions
     public static string ToValueLabel(this TypeMap map, object value, Type type)
     {
         ITypeDef s = map.Get(type);
-        return s.PrintObj(value);
+        return s.PrintObj(map, value);
     }
 
     public static string ToValueLabel<T>(this TypeMap map, T value)
     {
         ITypeDef<T> s = map.Get<T>();
-        return s.Print(value);
+        return s.Print(map, value);
     }
 
-    public static string PrintValues(this TypeMap map, ObjectType objectType)
+    public static string GetDeclarations<TValue>(this TypeMap map)
     {
         ITypeDef s = map.Get<object>();
         ObjectTypeDef def = (ObjectTypeDef)s;
-        return def.PrintValues(objectType);
-    }
-
-    public static string GetDeclarations(this TypeMap map, ObjectType objectType)
-    {
-        ITypeDef s = map.Get<object>();
-        ObjectTypeDef def = (ObjectTypeDef)s;
-        return def.GetDeclarations(objectType);
+        return def.PrintDeclaration(map, typeof(TValue)); //TODO: Enumerate all types
     }
 
     public static string GetSmallestUIntType(this TypeMap map, ulong value) => value switch

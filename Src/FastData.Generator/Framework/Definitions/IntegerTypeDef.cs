@@ -7,8 +7,8 @@ public class IntegerTypeDef<T>(string name, T minValue, T maxValue, string minVa
 {
     public DataType DataType => (DataType)Type.GetTypeCode(typeof(T));
     public string Name { get; } = name;
-    public Func<T, string> Print { get; } = x => PrintInternal(x, minValue, minValueStr, maxValue, maxValueStr, print);
-    public Func<object, string> PrintObj { get; } = x => PrintInternal((T)x, minValue, minValueStr, maxValue, maxValueStr, print);
+    public Func<TypeMap, T, string> Print { get; } = (_, x) => PrintInternal(x, minValue, minValueStr, maxValue, maxValueStr, print);
+    public Func<TypeMap, object, string> PrintObj { get; } = (_, x) => PrintInternal((T)x, minValue, minValueStr, maxValue, maxValueStr, print);
 
     private static string PrintInternal(T value, T MinValue, string minValueStr, T MaxValue, string maxValueStr, Func<T, string>? print)
     {

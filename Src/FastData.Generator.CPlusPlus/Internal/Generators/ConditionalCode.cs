@@ -5,39 +5,36 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TValue> ctx, SharedCode shared, string className) : CPlusPlusOutputWriter<TKey, TValue>(ctx.Values)
+internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TValue> ctx, SharedCode shared) : CPlusPlusOutputWriter<TKey>
 {
     public override string Generate()
     {
+        bool customType = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
 
-        sb.AppendLine($$"""
-                        public:
-                            {{MethodAttribute}}
-                            {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
-                            {
-                        {{EarlyExits}}
+        sb.Append($$"""
+                    public:
+                        {{MethodAttribute}}
+                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
+                        {
+                    {{EarlyExits}}
 
-                                if ({{FormatList(ctx.Keys, x => GetEqualFunction("key", ToValueLabel(x)), " || ")}})
-                                    return true;
+                            if ({{FormatList(ctx.Keys, x => GetEqualFunction("key", ToValueLabel(x)), " || ")}})
+                                return true;
 
-                                return false;
-                            }
-                        """);
+                            return false;
+                        }
+                    """);
 
-        if (ctx.Values != null && ObjectType != null)
+        if (ctx.Values != null)
         {
-            shared.Add("values", CodePlacement.After, $$"""
-                                                        std::array<{{TypeName}}, {{ctx.Values.Length.ToStringInvariant()}}> {{className}}::values = {
-                                                        {{ValueString}}
-                                                        };
-                                                        """);
-
-            if (ObjectType.IsCustomType)
-                shared.Add("classes", CodePlacement.Before, GetObjectDeclarations(ObjectType));
+            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
-                            static std::array<{{TypeName}}, {{ctx.Values.Length.ToStringInvariant()}}> values;
+
+                            static inline std::array<{{ValueTypeName}}{{(customType ? "*" : "")}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
+                            {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
 
                             {{MethodAttribute}}
                             {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
@@ -60,7 +57,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                     temp.AppendLine($$"""
                                               if (key == {{ToValueLabel(ctx.Keys[i])}})
                                               {
-                                                  value = {{(ObjectType.IsCustomType ? "" : "&")}}values[{{i.ToStringInvariant()}}];
+                                                  value = {{(customType ? "" : "&")}}values[{{i.ToStringInvariant()}}];
                                                   return true;
                                               }
                                       """);

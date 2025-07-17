@@ -20,7 +20,6 @@ public:
         return false;
     }
 
-
     static constexpr size_t item_count = 3;
     static constexpr uint8_t min_key = 0;
     static constexpr uint8_t max_key = std::numeric_limits<uint8_t>::max();

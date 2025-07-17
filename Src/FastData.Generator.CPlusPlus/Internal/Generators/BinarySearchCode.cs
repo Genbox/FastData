@@ -5,55 +5,52 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, TValue> ctx, SharedCode shared, string className) : CPlusPlusOutputWriter<TKey, TValue>(ctx.Values)
+internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, TValue> ctx, SharedCode shared) : CPlusPlusOutputWriter<TKey>
 {
     public override string Generate()
     {
+        bool customType = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
 
-        sb.AppendLine($$"""
-                            {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
-                        {{FormatColumns(ctx.Keys, ToValueLabel)}}
-                            };
+        sb.Append($$"""
+                        {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
+                    {{FormatColumns(ctx.Keys, ToValueLabel)}}
+                        };
 
-                        public:
-                            {{MethodAttribute}}
-                            {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
+                    public:
+                        {{MethodAttribute}}
+                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
+                        {
+                    {{EarlyExits}}
+
+                            {{ArraySizeType}} lo = 0;
+                            {{ArraySizeType}} hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
+                            while (lo <= hi)
                             {
-                        {{EarlyExits}}
+                                const size_t mid = lo + ((hi - lo) >> 1);
 
-                                {{ArraySizeType}} lo = 0;
-                                {{ArraySizeType}} hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
-                                while (lo <= hi)
-                                {
-                                    const size_t mid = lo + ((hi - lo) >> 1);
+                                if ({{GetEqualFunction("keys[mid]", "key")}})
+                                    return true;
 
-                                    if ({{GetEqualFunction("keys[mid]", "key")}})
-                                        return true;
-
-                                    if (keys[mid] < key)
-                                        lo = mid + 1;
-                                    else
-                                        hi = mid - 1;
-                                }
-
-                                return false;
+                                if (keys[mid] < key)
+                                    lo = mid + 1;
+                                else
+                                    hi = mid - 1;
                             }
-                        """);
 
-        if (ctx.Values != null && ObjectType != null)
+                            return false;
+                        }
+                    """);
+
+        if (ctx.Values != null)
         {
-            shared.Add("values", CodePlacement.After, $$"""
-                                                        std::array<{{TypeName}}, {{ctx.Values.Length.ToStringInvariant()}}> {{className}}::values = {
-                                                        {{ValueString}}
-                                                        };
-                                                        """);
-
-            if (ObjectType.IsCustomType)
-                shared.Add("classes", CodePlacement.Before, GetObjectDeclarations(ObjectType));
+            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
-                            static std::array<{{TypeName}}, {{ctx.Values.Length.ToStringInvariant()}}> values;
+
+                            static inline std::array<{{ValueTypeName}}{{(customType ? "*" : "")}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
+                            {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
 
                             {{MethodAttribute}}
                             {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
@@ -68,7 +65,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 
                                     if ({{GetEqualFunction("keys[mid]", "key")}})
                                     {
-                                        value = {{(ObjectType.IsCustomType ? "" : "&")}}values[mid];
+                                        value = {{(customType ? "" : "&")}}values[mid];
                                         return true;
                                     }
 

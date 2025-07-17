@@ -36,7 +36,6 @@ public:
         return false;
     }
 
-
     static constexpr size_t item_count = 100;
     static constexpr int32_t min_key = 0;
     static constexpr int32_t max_key = 99;

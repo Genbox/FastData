@@ -11,18 +11,18 @@ public class StringTypeDef : ITypeDef<string>
 
         if (print != null)
         {
-            Print = print;
-            PrintObj = x => print(x.ToString());
+            Print = (_, x) => print(x);
+            PrintObj = (_, x) => print(x.ToString());
         }
         else
         {
-            Print = static x => $"\"{x}\"";
-            PrintObj = static x => $"\"{x}\"";
+            Print = static (_, x) => $"\"{x}\"";
+            PrintObj = static (_, x) => $"\"{x}\"";
         }
     }
 
     public DataType DataType => DataType.String;
     public string Name { get; }
-    public Func<object, string> PrintObj { get; }
-    public Func<string, string> Print { get; }
+    public Func<TypeMap, object, string> PrintObj { get; }
+    public Func<TypeMap, string, string> Print { get; }
 }

@@ -74,8 +74,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
     protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";
 
     protected string ToValueLabel<T>(T value) => TypeMap.ToValueLabel(value); //Uses its own generics here, not TKey. We need T so we can change the type in generators
-    protected string PrintValues(ObjectType objectType) => TypeMap.PrintValues(objectType);
-    protected string GetObjectDeclarations(ObjectType objectType) => objectType.IsCustomType ? TypeMap.GetDeclarations(objectType) : ""; //We don't have declarations for primitives
+    protected string GetObjectDeclarations<TValue>() => typeof(TValue).IsPrimitive ? "" : TypeMap.GetDeclarations<TValue>(); //We don't have declarations for primitives
     protected string GetSmallestSignedType(long value) => TypeMap.GetSmallestIntType(value);
     protected string GetSmallestUnsignedType(long value) => TypeMap.GetSmallestUIntType((ulong)value);
 }

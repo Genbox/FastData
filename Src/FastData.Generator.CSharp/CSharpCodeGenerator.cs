@@ -73,7 +73,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
         ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, _cfg),
         BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, _cfg),
         ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, _cfg),
-        HashTableChainContext<TKey, TValue> x => new HashTableChainCode<TKey, TValue>(x, _cfg),
+        HashTableContext<TKey, TValue> x => new HashTableCode<TKey, TValue>(x, _cfg),
         HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, _cfg),
         KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, _cfg),
         _ => null

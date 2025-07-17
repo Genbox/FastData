@@ -36,18 +36,24 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     {
         base.AppendHeader(sb, genCfg, context);
 
-        sb.AppendLine("#pragma once"); //Add include guard
+        sb.AppendLine("""
+                      #pragma once
+                      #include <array>
+                      #include <cstdint>
+                      #include <limits>
+                      #include <string_view>
 
-        sb.Append($$"""
-                    #include <array>
-                    #include <cstdint>
-                    #include <limits>
-                    #include <string_view>
+                      """);
+    }
 
-                    class {{_cfg.ClassName}} final
-                    {
+    protected override void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext<TValue> context)
+    {
+        sb.AppendLine($$"""
+                        class {{_cfg.ClassName}} final
+                        {
+                        """);
 
-                    """);
+        base.AppendBody(sb, genCfg, keyTypeName, valueTypeName, context);
     }
 
     protected override void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)
@@ -69,13 +75,13 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
     protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context) => context switch
     {
-        SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, _cfg.ClassName),
-        ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, Shared, _cfg.ClassName),
-        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, Shared, _cfg.ClassName),
-        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, Shared, _cfg.ClassName),
-        HashTableChainContext<TKey, TValue> x => new HashTableChainCode<TKey, TValue>(x, Shared, _cfg.ClassName),
-        HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, _cfg.ClassName),
-        KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, _cfg.ClassName),
+        SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, Shared),
+        ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, Shared),
+        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, Shared),
+        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, Shared),
+        HashTableContext<TKey, TValue> x => new HashTableCode<TKey, TValue>(x, Shared),
+        HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, Shared),
+        KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x),
         _ => null
     };
 }

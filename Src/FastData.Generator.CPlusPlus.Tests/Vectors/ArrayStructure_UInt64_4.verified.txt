@@ -27,7 +27,6 @@ public:
         return false;
     }
 
-
     static constexpr size_t item_count = 4;
     static constexpr uint64_t min_key = 0;
     static constexpr uint64_t max_key = std::numeric_limits<uint64_t>::max();

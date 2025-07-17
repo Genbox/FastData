@@ -1,0 +1,68 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashTable
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashTableStructure_Int16_5 final
+{
+    struct e
+    {
+        int16_t key;
+        int8_t next;
+        
+        
+        e(const int8_t next, const int16_t key)
+           : next(next), key(key) {}
+    };
+
+    static constexpr std::array<int8_t, 5> buckets = {
+        3, 4, 5, 1, 0
+     };
+
+    inline static const std::array<e, 5> entries = {
+        e(-1, std::numeric_limits<int16_t>::lowest()), e(-1, -1), e(1, 0), e(-1, 1), e(-1, std::numeric_limits<int16_t>::max())
+    };
+
+    static constexpr uint64_t get_hash(const int16_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const int16_t key) noexcept
+    {
+        if (key < std::numeric_limits<int16_t>::lowest() || key > std::numeric_limits<int16_t>::max())
+            return false;
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 5;
+        int8_t i = buckets[index] - static_cast<int8_t>(1);
+
+        while (i >= 0)
+        {
+            const auto& entry = entries[i];
+
+            if (entry.key == key)
+                return true;
+
+            i = entry.next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int16_t min_key = std::numeric_limits<int16_t>::lowest();
+    static constexpr int16_t max_key = std::numeric_limits<int16_t>::max();
+
+public:
+    HashTableStructure_Int16_5() = delete;
+    HashTableStructure_Int16_5(const HashTableStructure_Int16_5&) = delete;
+    HashTableStructure_Int16_5& operator=(const HashTableStructure_Int16_5&) = delete;
+    HashTableStructure_Int16_5(HashTableStructure_Int16_5&&) = delete;
+    HashTableStructure_Int16_5& operator=(HashTableStructure_Int16_5&&) = delete;
+};

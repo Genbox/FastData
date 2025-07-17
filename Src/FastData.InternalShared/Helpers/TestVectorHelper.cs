@@ -19,7 +19,7 @@ public static class TestVectorHelper
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
-                     typeof(HashTableChainStructure<,>),
+                     typeof(HashTableStructure<,>),
                      typeof(HashTablePerfectStructure<,>)))
         {
             yield return testVector;
@@ -37,13 +37,13 @@ public static class TestVectorHelper
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
-                     typeof(HashTableChainStructure<,>)))
+                     typeof(HashTableStructure<,>)))
         {
             yield return testVector;
         }
 
         foreach (ITestVector testVector in GenerateTestVectors(GetFloatSpecialCases(), "HashZeroOrNaN",
-                     typeof(HashTableChainStructure<,>)))
+                     typeof(HashTableStructure<,>)))
         {
             yield return testVector;
         }
@@ -52,7 +52,7 @@ public static class TestVectorHelper
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
-                     typeof(HashTableChainStructure<,>)))
+                     typeof(HashTableStructure<,>)))
         {
             yield return testVector;
         }
@@ -73,7 +73,7 @@ public static class TestVectorHelper
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
-                     typeof(HashTableChainStructure<,>)))
+                     typeof(HashTableStructure<,>)))
         {
             yield return testVector;
         }

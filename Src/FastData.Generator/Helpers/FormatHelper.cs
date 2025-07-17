@@ -7,10 +7,20 @@ public static class FormatHelper
 {
     public static string FormatColumns<T>(T[] items, Func<T, string> Render, int indent = 8, int columns = 10)
     {
+        return FormatColumns(items.AsReadOnlySpan(), (_, y) => Render(y), indent, columns);
+    }
+
+    public static string FormatColumns<T>(T[] items, Func<int, T, string> Render, int indent = 8, int columns = 10)
+    {
         return FormatColumns(items.AsReadOnlySpan(), Render, indent, columns);
     }
 
     public static string FormatColumns<T>(ReadOnlySpan<T> items, Func<T, string> Render, int indent = 8, int columns = 10)
+    {
+        return FormatColumns(items, (_, y) => Render(y), indent, columns);
+    }
+
+    public static string FormatColumns<T>(ReadOnlySpan<T> items, Func<int, T, string> Render, int indent = 8, int columns = 10)
     {
         StringBuilder sb = new StringBuilder();
         int count = 0;
@@ -33,8 +43,7 @@ public static class FormatHelper
                 }
             }
 
-            sb.Append(Render(item));
-            count++;
+            sb.Append(Render(count++, item));
         }
 
         return sb.ToString();

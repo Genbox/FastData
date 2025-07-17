@@ -2,9 +2,10 @@
 using Genbox.FastData.Generator.Compat;
 #endif
 
+using System.Reflection;
+using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Framework.Interfaces;
-using Genbox.FastData.Generator.Framework.Models;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
@@ -29,7 +30,7 @@ internal class CPlusPlusLanguageDef : ILanguageDef
         new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "std::numeric_limits<float>::lowest()", "std::numeric_limits<float>::max()", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo) + "f"),
         new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "std::numeric_limits<double>::lowest()", "std::numeric_limits<double>::max()", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
 
-        new ObjectTypeDef(PrintObjectDeclarations, PrintValues),
+        new ObjectTypeDef(PrintDeclaration, PrintValue),
 
         //Support reduction from UTF16 to ASCII
         new DynamicStringTypeDef(
@@ -37,62 +38,73 @@ internal class CPlusPlusLanguageDef : ILanguageDef
             new StringType(GeneratorEncoding.ASCII, "std::string_view", static x => $"\"{x}\""))
     };
 
-    private static string PrintObjectDeclarations(TypeModel type)
+    private static string PrintDeclaration(TypeMap map, Type type)
     {
+        PropertyInfo[] properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+
+        string name = type.Name;
         return $$"""
-                 struct {{type.Name}} {
-                 {{RenderFields(type.Properties)}}
-                 {{RenderCtor(type.Name, type.Properties)}}
+                 struct {{name}} {
+                 {{RenderFields(map, properties)}}
+                 {{RenderCtor(map, name, properties)}}
                  };
                  """;
     }
 
-    private static string PrintValues(ITypeReference elemType, IEnumerable<IValueModel> values)
+    private static string PrintValue(TypeMap map, object? value)
     {
-        string RenderVal(IValueModel v) => v switch
-        {
-            PrimitiveValue pv => pv.Value.ToString()!,
-            ArrayValue av => "{ " + string.Join(", ", av.Items.Select(RenderVal)) + " }",
-            ObjectValue ov => "new " + ov.TypeName + "(" + string.Join(", ", ov.Properties.Values.Select(RenderVal)) + ")",
-            _ => throw new NotSupportedException("")
-        };
+        if (value == null)
+            return map.GetNull();
 
-        StringBuilder sb = new StringBuilder();
-        foreach (IValueModel v in values)
-            sb.AppendLine($"    {RenderVal(v)},");
-        return sb.ToString();
+        Type type = value.GetType();
+
+        if (type.IsPrimitive || type == typeof(string))
+            return map.Get(type).PrintObj(map, value);
+
+        if (type.IsArray)
+            return $"{{ {string.Join(", ", ((Array)value).Cast<object>().Select(x => PrintValue(map, x)))} }}";
+
+        PropertyInfo[] props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        return $"new {type.Name}({string.Join(", ", props.Select(p => $"{PrintValue(map, p.GetValue(value))}"))})";
     }
 
-    private static string RenderType(ITypeReference tr) => tr switch
+    private static string RenderType(TypeMap map, Type type)
     {
-        PrimitiveType p => p.Name,
-        CustomType c => c.Name + "*",
-        ArrayType a => $"std::vector<{RenderType(a.ElementType)}>",
-        _ => throw new NotSupportedException("")
-    };
+        if (type.IsArray)
+            return $"std::vector<{RenderType(map, type.GetElementType())}>";
 
-    private static string RenderFields(IReadOnlyList<PropertyModel> properties)
+        if (Type.GetTypeCode(type) == TypeCode.Object)
+            return type.Name + "*";
+
+        return map.GetTypeName(type);
+    }
+
+    private static string RenderFields(TypeMap map, PropertyInfo[] properties)
     {
         // int Age;
         // std::string Name;
         StringBuilder sb = new StringBuilder();
 
-        foreach (PropertyModel property in properties)
-            sb.AppendLine($"    const {RenderType(property.Type)} {property.Name};");
+        foreach (PropertyInfo property in properties)
+        {
+            if (Type.GetTypeCode(property.PropertyType) == TypeCode.Object)
+                sb.AppendLine($"   const {RenderType(map, property.PropertyType)} {property.Name.ToLowerInvariant()};");
+            else
+                sb.AppendLine($"    {RenderType(map, property.PropertyType)} {property.Name.ToLowerInvariant()};");
+        }
 
         return sb.ToString();
     }
 
-    private static string RenderCtor(string name, IReadOnlyList<PropertyModel> properties)
+    private static string RenderCtor(TypeMap map, string name, PropertyInfo[] properties)
     {
         // ValueStruct(const int32_t age, const std::string& name) : Age(age), Name(name) { }
         StringBuilder sb = new StringBuilder();
         sb.Append($"    {name}(");
-        sb.AppendJoin(", ", properties.Select(x => $"const {RenderType(x.Type)} {x.Name.ToLowerInvariant()}"));
+        sb.AppendJoin(", ", properties.Select(x => $"const {RenderType(map, x.PropertyType)} {x.Name.ToLowerInvariant()}"));
         sb.Append(") : ");
-        sb.AppendJoin(", ", properties.Select(x => $"{x.Name}({x.Name.ToLowerInvariant()})"));
+        sb.AppendJoin(", ", properties.Select(x => $"{x.Name.ToLowerInvariant()}({x.Name.ToLowerInvariant()})"));
         sb.Append(" { }");
-
         return sb.ToString();
     }
 }

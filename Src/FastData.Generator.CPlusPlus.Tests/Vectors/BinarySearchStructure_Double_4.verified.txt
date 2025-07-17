@@ -37,7 +37,6 @@ public:
         return false;
     }
 
-
     static constexpr size_t item_count = 4;
     static constexpr double min_key = std::numeric_limits<double>::lowest();
     static constexpr double max_key = std::numeric_limits<double>::max();

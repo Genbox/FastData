@@ -1,0 +1,95 @@
+using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
+using Genbox.FastData.Generator.Enums;
+using Genbox.FastData.Generator.Extensions;
+using Genbox.FastData.Generators.Contexts;
+
+namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
+
+internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue> ctx, SharedCode shared) : CPlusPlusOutputWriter<TKey>
+{
+    public override string Generate()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append($$"""
+                        struct e
+                        {
+                            {{KeyTypeName}} key;
+                            {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
+                            {{(ctx.StoreHashCode ? $"{HashSizeType} hash_code;" : "")}}
+                            {{(ctx.Values != null ? $"const {ValueTypeName}* value;" : "")}}
+                            e({{(ctx.StoreHashCode ? $"const {HashSizeType} hash_code, " : "")}}const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{KeyTypeName}} key{{(ctx.Values != null ? $", const {ValueTypeName}* value" : "")}})
+                               : {{(ctx.StoreHashCode ? "hash_code(hash_code), " : "")}}next(next), key(key){{(ctx.Values != null ? ", value(value)" : "")}} {}
+                        };
+
+                        {{FieldModifier}}std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length.ToStringInvariant()}}> buckets = {
+                    {{FormatColumns(ctx.Buckets, static x => x.ToStringInvariant())}}
+                         };
+
+                        {{GetFieldModifier(false)}}std::array<e, {{ctx.Entries.Length.ToStringInvariant()}}> entries = {
+                    {{FormatColumns(ctx.Entries, (i, x) => $"e({(ctx.StoreHashCode ? $"{x.Hash.ToStringInvariant()}, " : "")}{x.Next.ToStringInvariant()}, {ToValueLabel(x.Key)}{(ctx.Values != null ? $", {ToValueLabel(ctx.Values[i])}" : "")})")}}
+                        };
+
+                    {{HashSource}}
+
+                    public:
+                        {{MethodAttribute}}
+                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
+                        {
+                    {{EarlyExits}}
+
+                            const {{HashSizeType}} hash = get_hash(key);
+                            const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
+                            {{GetSmallestSignedType(ctx.Buckets.Length)}} i = buckets[index] - static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(1);
+
+                            while (i >= 0)
+                            {
+                                const auto& entry = entries[i];
+
+                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash")} && " : "")}}{{GetEqualFunction("entry.key", "key")}})
+                                    return true;
+
+                                i = entry.next;
+                            }
+
+                            return false;
+                        }
+                    """);
+
+        if (ctx.Values != null)
+        {
+            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
+
+            sb.Append($$"""
+
+                            {{MethodAttribute}}
+                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
+                            {
+                        {{EarlyExits}}
+
+                                const {{HashSizeType}} hash = get_hash(key);
+                                const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
+                                {{GetSmallestSignedType(ctx.Buckets.Length)}} i = buckets[index] - static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(1);
+
+                                while (i >= 0)
+                                {
+                                    const auto& entry = entries[i];
+
+                                    if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash")} && " : "")}}{{GetEqualFunction("entry.key", "key")}})
+                                    {
+                                        value = entry.value;
+                                        return true;
+                                    }
+
+                                    i = entry.next;
+                                }
+
+                                value = nullptr;
+                                return false;
+                            }
+                        """);
+        }
+
+        return sb.ToString();
+    }
+}

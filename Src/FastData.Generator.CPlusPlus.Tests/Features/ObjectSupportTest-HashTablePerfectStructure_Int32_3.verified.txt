@@ -1,0 +1,79 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashTable (HashTablePerfect)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+struct Person {
+    int32_t age;
+    std::u32string_view name;
+   const Person* other;
+
+    Person(const int32_t age, const std::u32string_view name, const Person* other) : age(age), name(name), other(other) { }
+};
+class HashTablePerfectStructure_Int32_3 final
+{
+struct e
+{
+    int32_t key;
+    
+    const Person* value;
+
+    e(const int32_t key, const Person* value)
+    : key(key), value(value) {}
+};
+inline static const std::array<e, 3> entries = {
+            e(3, new Person(1, U"Bob", new Person(4, U"Anna", nullptr))), e(1, new Person(2, U"Billy", nullptr)), e(2, new Person(3, U"Bibi", nullptr))
+};
+
+    static constexpr uint64_t get_hash(const int32_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static bool contains(const int32_t key) noexcept
+    {
+        if (key < 1 || key > 3)
+            return false;
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 3;
+        const auto& entry = entries[index];
+
+        return key == entry.key;
+    }
+    [[nodiscard]]
+    static bool try_lookup(const int32_t key, const Person*& value) noexcept
+    {
+        if (key < 1 || key > 3)
+            return false;
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 3;
+        const auto& entry = entries[index];
+
+        if (key == entry.key)
+        {
+            value = entry.value;
+            return true;
+        }
+
+        value = nullptr;
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 3;
+
+public:
+    HashTablePerfectStructure_Int32_3() = delete;
+    HashTablePerfectStructure_Int32_3(const HashTablePerfectStructure_Int32_3&) = delete;
+    HashTablePerfectStructure_Int32_3& operator=(const HashTablePerfectStructure_Int32_3&) = delete;
+    HashTablePerfectStructure_Int32_3(HashTablePerfectStructure_Int32_3&&) = delete;
+    HashTablePerfectStructure_Int32_3& operator=(HashTablePerfectStructure_Int32_3&&) = delete;
+};

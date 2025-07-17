@@ -71,7 +71,11 @@ public static class TestHelper
         };
 
         process.Start();
-        process.WaitForExit();
+        bool exited = process.WaitForExit(5000);
+
+        if (!exited)
+            process.Kill();
+
         return process.ExitCode;
     }
 
@@ -117,8 +121,8 @@ public static class TestHelper
             return Generate(generator, vector, props, dataType, StructureType.Conditional, new ConditionalStructure<TKey, TValue>(), values);
         if (vector.Type == typeof(BinarySearchStructure<,>))
             return Generate(generator, vector, props, dataType, StructureType.BinarySearch, new BinarySearchStructure<TKey, TValue>(dataType, StringComparison.Ordinal), values);
-        if (vector.Type == typeof(HashTableChainStructure<,>))
-            return Generate(generator, vector, props, dataType, StructureType.HashTable, new HashTableChainStructure<TKey, TValue>(GetHashData(vector, dataType, encoding), dataType), values);
+        if (vector.Type == typeof(HashTableStructure<,>))
+            return Generate(generator, vector, props, dataType, StructureType.HashTable, new HashTableStructure<TKey, TValue>(GetHashData(vector, dataType, encoding), dataType), values);
         if (vector.Type == typeof(HashTablePerfectStructure<,>))
             return Generate(generator, vector, props, dataType, StructureType.HashTable, new HashTablePerfectStructure<TKey, TValue>(GetHashData(vector, dataType, encoding), dataType), values);
         if (vector.Type == typeof(KeyLengthStructure<,>))

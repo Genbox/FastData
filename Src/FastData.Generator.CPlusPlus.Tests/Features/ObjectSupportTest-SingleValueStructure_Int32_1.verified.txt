@@ -1,0 +1,49 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (SingleValue)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+struct Person {
+    int32_t age;
+    std::u32string_view name;
+   const Person* other;
+
+    Person(const int32_t age, const std::u32string_view name, const Person* other) : age(age), name(name), other(other) { }
+};
+class SingleValueStructure_Int32_1 final
+{
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept
+    {
+        return key == 1;
+    }
+    static inline auto stored_value = new Person(1, U"Bob", new Person(4, U"Anna", nullptr));
+
+    [[nodiscard]]
+    static bool try_lookup(const int32_t key, const Person*& value) noexcept
+    {
+        if (key == 1)
+        {
+            value = stored_value;
+            return true;
+        }
+
+        value = nullptr;
+        return false;
+    }
+
+    static constexpr size_t item_count = 1;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 1;
+
+public:
+    SingleValueStructure_Int32_1() = delete;
+    SingleValueStructure_Int32_1(const SingleValueStructure_Int32_1&) = delete;
+    SingleValueStructure_Int32_1& operator=(const SingleValueStructure_Int32_1&) = delete;
+    SingleValueStructure_Int32_1(SingleValueStructure_Int32_1&&) = delete;
+    SingleValueStructure_Int32_1& operator=(SingleValueStructure_Int32_1&&) = delete;
+};

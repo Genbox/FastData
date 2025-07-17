@@ -8,6 +8,7 @@
 
 class HashTablePerfectStructure_Int32_3 final
 {
+
 inline static const std::array<int32_t, 3> entries = {
             3, 1, 2
 };
@@ -26,8 +27,9 @@ public:
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;
+        const auto& entry = entries[index];
 
-        return key == entries[index];
+        return key == entry;
     }
 
     static constexpr size_t item_count = 3;
