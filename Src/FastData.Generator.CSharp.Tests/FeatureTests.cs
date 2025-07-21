@@ -2,7 +2,6 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
-using Genbox.FastData.Generators;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Helpers;
 using Genbox.FastData.InternalShared.TestClasses;
@@ -12,22 +11,30 @@ using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.CSharp.Tests;
 
-public class VectorTests
+public class FeatureTests
 {
     [Theory]
-    [ClassData(typeof(TestVectorTheoryData))]
-    public async Task Test<T>(TestVector<T> vector)
+    [ClassData(typeof(SimpleTestVectorTheoryData))]
+    public async Task ObjectSupportTest<T>(TestVector<T> vector)
     {
-        GeneratorSpec spec = Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), vector);
-        Assert.NotEmpty(spec.Source);
+        Person[] values =
+        [
+            new Person { Age = 1, Name = "Bob", Other = new Person { Name = "Anna", Age = 4 } },
+            new Person { Age = 2, Name = "Billy" },
+            new Person { Age = 3, Name = "Bibi" },
+        ];
+
+        GeneratorSpec spec = Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), vector, values);
+
+        string id = $"{nameof(ObjectSupportTest)}-{spec.Identifier}";
 
         await Verify(spec.Source)
-              .UseFileName(spec.Identifier)
-              .UseDirectory("Vectors")
+              .UseFileName(id)
+              .UseDirectory("Features")
               .DisableDiff();
 
         CSharpLanguageDef langDef = new CSharpLanguageDef();
-        TypeMap map = new TypeMap(langDef.TypeDefinitions, spec.Flags.HasFlag(GeneratorFlags.AllAreASCII) ? GeneratorEncoding.ASCII : langDef.Encoding);
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.ASCII);
 
         string wrapper = $$"""
                            {{spec.Source}}
@@ -37,7 +44,7 @@ public class VectorTests
                                public static bool Run()
                                {
                            {{FormatList(vector.Keys, x => $"""
-                                                               if (!{spec.Identifier}.Contains({map.ToValueLabel(x)}))
+                                                               if (!{spec.Identifier}.TryLookup({map.ToValueLabel(x)}, out _))
                                                                    return false;
                                                            """, "\n")}}
 
@@ -48,5 +55,12 @@ public class VectorTests
 
         Func<bool> contains = CompilationHelper.GetDelegate<Func<bool>>(wrapper, types => types.First(x => x.Name == "Wrapper"), false);
         Assert.True(contains());
+    }
+
+    internal class Person
+    {
+        public int Age { get; set; }
+        public string Name { get; set; }
+        public Person Other { get; set; }
     }
 }

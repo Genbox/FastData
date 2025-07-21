@@ -8,13 +8,36 @@ using System.Runtime.InteropServices;
 
 internal static class HashTableStructure_UInt32_4
 {
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
+    {
+        internal uint Key;
+        internal sbyte Next;
+        
+        
+        internal E(uint key, sbyte next )
+        {
+            Key = key;
+            Next = next;
+            
+            
+        }
+    };
+
     private static readonly sbyte[] _buckets = new sbyte[] {
         1, 2, 3, 4
      };
 
     private static readonly E[] _entries = {
-        new E(-1, uint.MinValue), new E(-1, 1u), new E(-1, 2u), new E(-1, uint.MaxValue)
+        new E(uint.MinValue, -1), new E(1u, -1), new E(2u, -1), new E(uint.MaxValue, -1)
     };
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong Hash(uint value)
+    {
+        return (ulong)value;
+    }
 
     
     public static bool Contains(uint key)
@@ -30,7 +53,7 @@ internal static class HashTableStructure_UInt32_4
         {
             ref E entry = ref _entries[i];
 
-            if (key == entry.Key)
+            if (entry.Key == key)
                 return true;
 
             i = entry.Next;
@@ -38,31 +61,6 @@ internal static class HashTableStructure_UInt32_4
 
         return false;
     }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong Hash(uint value)
-    {
-        return (ulong)value;
-    }
-
-    [StructLayout(LayoutKind.Auto)]
-    private readonly struct E
-    {
-        
-        internal readonly sbyte Next;
-        internal readonly uint Key;
-        
-
-        internal E(sbyte next, uint key)
-        {
-            
-            Next = next;
-            Key = key;
-            
-        }
-    }
-
 
     public const uint ItemCount = 4;
     public const uint MinKey = uint.MinValue;

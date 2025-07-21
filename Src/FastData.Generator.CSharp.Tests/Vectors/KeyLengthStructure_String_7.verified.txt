@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 internal static class KeyLengthStructure_String_7
 {
-    private static readonly string[] _entries = new string[] {
+    private static readonly string[] _keys = {
         "aaa", "", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"
     };
 
@@ -18,7 +18,7 @@ internal static class KeyLengthStructure_String_7
         if ((1012UL & (1UL << (key.Length - 1))) == 0)
             return false;
 
-        return StringComparer.Ordinal.Equals(key, _entries[key.Length - 3]);
+        return StringComparer.Ordinal.Equals(key, _keys[key.Length - 3]);
     }
 
     public const uint ItemCount = 7;

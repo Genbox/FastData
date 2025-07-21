@@ -8,38 +8,31 @@ using System.Runtime.InteropServices;
 
 internal static class HashTableStructure_String_13
 {
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
+    {
+        internal string Key;
+        internal sbyte Next;
+        internal ulong HashCode;
+        
+        internal E(string key, sbyte next, ulong hashCode )
+        {
+            Key = key;
+            Next = next;
+            HashCode = hashCode;
+            
+        }
+    };
+
     private static readonly sbyte[] _buckets = new sbyte[] {
         6, 13, 10, 0, 11, 2, 12, 3, 7, 0, 
         0, 0, 0
      };
 
     private static readonly E[] _entries = {
-        new E(18225460979434644138, -1, "æ"), new E(18225460988831147784, -1, "à"), new E(18225460982566812020, -1, "ä"), new E(18225461004491987194, -1, "ö"), new E(18225461020152826604, 0, "ü"), new E(18225461065569260893, 3, "ß"), new E(18225460999793735371, 4, "é"), new E(18225461001359819312, -1, "è"), new E(18225460998227651430, -1, "ê"), new E(18225460977868560197, 8, "ç"), 
-        new E(18225461012322406899, -1, "ñ"), new E(18225461026417162368, -1, "ø"), new E(18225460981000728079, 7, "å")
+        new E("æ", -1, 18225460979434644138), new E("à", -1, 18225460988831147784), new E("ä", -1, 18225460982566812020), new E("ö", -1, 18225461004491987194), new E("ü", 0, 18225461020152826604), new E("ß", 3, 18225461065569260893), new E("é", 4, 18225460999793735371), new E("è", -1, 18225461001359819312), new E("ê", -1, 18225460998227651430), new E("ç", 8, 18225460977868560197), 
+        new E("ñ", -1, 18225461012322406899), new E("ø", -1, 18225461026417162368), new E("å", 7, 18225460981000728079)
     };
-
-    
-    public static bool Contains(string key)
-    {
-        if (key.Length != 1u)
-            return false;
-
-        ulong hash = Hash(key);
-        uint index = (uint)(hash % 13);
-        sbyte i = (sbyte)(_buckets[index] - 1);
-
-        while (i >= 0)
-        {
-            ref E entry = ref _entries[i];
-
-            if (entry.HashCode == hash && StringComparer.Ordinal.Equals(key, entry.Key))
-                return true;
-
-            i = entry.Next;
-        }
-
-        return false;
-    }
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -59,23 +52,28 @@ internal static class HashTableStructure_String_13
         return 352654597 + (hash * 1566083941);
     }
 
-    [StructLayout(LayoutKind.Auto)]
-    private readonly struct E
+    
+    public static bool Contains(string key)
     {
-        internal readonly ulong HashCode;
-        internal readonly sbyte Next;
-        internal readonly string Key;
-        
+        if (key.Length != 1u)
+            return false;
 
-        internal E(ulong hashCode, sbyte next, string key)
+        ulong hash = Hash(key);
+        uint index = (uint)(hash % 13);
+        sbyte i = (sbyte)(_buckets[index] - 1);
+
+        while (i >= 0)
         {
-            HashCode = hashCode;
-            Next = next;
-            Key = key;
-            
-        }
-    }
+            ref E entry = ref _entries[i];
 
+            if (StringComparer.Ordinal.Equals(entry.HashCode, hash) && StringComparer.Ordinal.Equals(entry.Key, key))
+                return true;
+
+            i = entry.Next;
+        }
+
+        return false;
+    }
 
     public const uint ItemCount = 13;
     public const uint MinKeyLength = 1;

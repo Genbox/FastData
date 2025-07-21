@@ -1,10 +1,11 @@
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Enums;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TValue> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<TKey>(cfg)
+internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TValue> ctx, CSharpCodeGeneratorConfig cfg, SharedCode shared) : CSharpOutputWriter<TKey>(cfg)
 {
     public override string Generate() => cfg.ConditionalBranchType switch
     {
@@ -13,34 +14,129 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
         _ => throw new InvalidOperationException("Invalid branch type: " + cfg.ConditionalBranchType)
     };
 
-    private string GenerateIf(ReadOnlySpan<TKey> data) =>
-        $$"""
-              {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{KeyTypeName}} key)
-              {
-          {{EarlyExits}}
+    private string GenerateIf(ReadOnlySpan<TKey> data)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append($$"""
+                        {{MethodAttribute}}
+                        {{MethodModifier}}bool Contains({{KeyTypeName}} key)
+                        {
+                    {{EarlyExits}}
 
-                  if ({{FormatList(data, x => GetEqualFunction("key", ToValueLabel(x)), " || ")}})
-                      return true;
+                            if ({{FormatList(data, x => GetEqualFunction("key", ToValueLabel(x)), " || ")}})
+                                return true;
 
-                  return false;
-              }
-          """;
+                            return false;
+                        }
+                    """);
 
-    private string GenerateSwitch(ReadOnlySpan<TKey> data) =>
-        $$"""
-              {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{KeyTypeName}} key)
-              {
-          {{EarlyExits}}
+        if (ctx.Values != null)
+        {
+            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
 
-                  switch (key)
-                  {
-          {{FormatList(data, x => $"            case {ToValueLabel(x)}:", "\n")}}
-                          return true;
-                      default:
-                          return false;
-                  }
-              }
-          """;
+            sb.Append($$"""
+
+                            {{FieldModifier}}{{ValueTypeName}}[] _values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                            {{MethodAttribute}}
+                            {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
+                            {
+                                value = default;
+
+                        {{EarlyExits}}
+
+                        {{GenerateBranches()}}
+
+                                value = default;
+                                return false;
+                            }
+                        """);
+        }
+
+        return sb.ToString();
+
+        string GenerateBranches()
+        {
+            StringBuilder temp = new StringBuilder();
+
+            for (int i = 0; i < ctx.Keys.Length; i++)
+            {
+                temp.AppendLine($$"""
+                                          if (key == {{ToValueLabel(ctx.Keys[i])}})
+                                          {
+                                              value = _values[{{i.ToStringInvariant()}}];
+                                              return true;
+                                          }
+                                  """);
+            }
+
+            return temp.ToString();
+        }
+    }
+
+    private string GenerateSwitch(ReadOnlySpan<TKey> data)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append($$"""
+                        {{MethodAttribute}}
+                        {{MethodModifier}}bool Contains({{KeyTypeName}} key)
+                        {
+                    {{EarlyExits}}
+
+                            switch (key)
+                            {
+                    {{FormatList(data, x => $"            case {ToValueLabel(x)}:", "\n")}}
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+                    """);
+
+        if (ctx.Values != null)
+        {
+            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
+
+            sb.Append($$"""
+
+                            {{FieldModifier}}{{ValueTypeName}}[] _values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                            {{MethodAttribute}}
+                            {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
+                            {
+                                value = default;
+                        {{EarlyExits}}
+                                switch (key)
+                                {
+                        {{GenerateSwitches()}}
+                                }
+                                value = default;
+                                return false;
+                            }
+                        """);
+        }
+
+        return sb.ToString();
+
+        string GenerateSwitches()
+        {
+            StringBuilder temp = new StringBuilder();
+
+            for (int i = 0; i < ctx.Keys.Length; i++)
+            {
+                temp.AppendLine($"""
+                                             case {ToValueLabel(ctx.Keys[i])}:
+                                                 value = _values[{i.ToStringInvariant()}];
+                                                 return true;
+                                 """);
+            }
+
+            return temp.ToString();
+        }
+    }
 }

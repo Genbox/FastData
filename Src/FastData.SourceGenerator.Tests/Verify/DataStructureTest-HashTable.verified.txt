@@ -8,22 +8,23 @@ using System.Runtime.InteropServices;
 
 internal static class StaticData
 {
+[StructLayout(LayoutKind.Auto)]
+private struct E
+{
+    internal string Key;
+    internal ulong HashCode;
+    
+
+    internal E(string key, ulong hashCode)
+    {
+        Key = key;
+        HashCode = hashCode;
+        
+    }
+}
     private static readonly E[] _entries = {
         new E("item1", 17825845005562073391), new E("item3", 17825845002429905509), new E("item2", 17825845003995989450)
     };
-
-    
-    public static bool Contains(string key)
-    {
-        if (key.Length != 5u)
-            return false;
-
-        ulong hash = Hash(key);
-        uint index = (uint)(hash % 3);
-        ref E entry = ref _entries[index];
-
-        return StringComparer.Ordinal.Equals(hash, entry.HashCode) && StringComparer.Ordinal.Equals(key, entry.Key);
-    }
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -43,17 +44,17 @@ internal static class StaticData
         return 352654597 + (hash * 1566083941);
     }
 
-    [StructLayout(LayoutKind.Auto)]
-    private struct E
+    
+    public static bool Contains(string key)
     {
-        internal E(string key, ulong hashCode)
-        {
-            Key = key;
-            HashCode = hashCode;
-        }
+        if (key.Length != 5u)
+            return false;
 
-        internal string Key;
-        internal ulong HashCode;
+        ulong hash = Hash(key);
+        uint index = (uint)(hash % 3);
+        ref var entry = ref _entries[index];
+
+        return StringComparer.Ordinal.Equals(hash, entry.HashCode) && StringComparer.Ordinal.Equals(key, entry.Key);
     }
 
     public const uint ItemCount = 3;

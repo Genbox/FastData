@@ -8,13 +8,36 @@ using System.Runtime.InteropServices;
 
 internal static class HashTableStructure_SByte_5
 {
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
+    {
+        internal sbyte Key;
+        internal sbyte Next;
+        
+        
+        internal E(sbyte key, sbyte next )
+        {
+            Key = key;
+            Next = next;
+            
+            
+        }
+    };
+
     private static readonly sbyte[] _buckets = new sbyte[] {
         3, 4, 5, 1, 0
      };
 
     private static readonly E[] _entries = {
-        new E(-1, sbyte.MinValue), new E(-1, -1), new E(1, 0), new E(-1, 1), new E(-1, sbyte.MaxValue)
+        new E(sbyte.MinValue, -1), new E(-1, -1), new E(0, 1), new E(1, -1), new E(sbyte.MaxValue, -1)
     };
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong Hash(sbyte value)
+    {
+        return (ulong)value;
+    }
 
     
     public static bool Contains(sbyte key)
@@ -30,7 +53,7 @@ internal static class HashTableStructure_SByte_5
         {
             ref E entry = ref _entries[i];
 
-            if (key == entry.Key)
+            if (entry.Key == key)
                 return true;
 
             i = entry.Next;
@@ -38,31 +61,6 @@ internal static class HashTableStructure_SByte_5
 
         return false;
     }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong Hash(sbyte value)
-    {
-        return (ulong)value;
-    }
-
-    [StructLayout(LayoutKind.Auto)]
-    private readonly struct E
-    {
-        
-        internal readonly sbyte Next;
-        internal readonly sbyte Key;
-        
-
-        internal E(sbyte next, sbyte key)
-        {
-            
-            Next = next;
-            Key = key;
-            
-        }
-    }
-
 
     public const uint ItemCount = 5;
     public const sbyte MinKey = sbyte.MinValue;

@@ -8,13 +8,36 @@ using System.Runtime.InteropServices;
 
 internal static class HashTableStructure_Double_5_HashZeroOrNaN
 {
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
+    {
+        internal double Key;
+        internal sbyte Next;
+        internal ulong HashCode;
+        
+        internal E(double key, sbyte next, ulong hashCode )
+        {
+            Key = key;
+            Next = next;
+            HashCode = hashCode;
+            
+        }
+    };
+
     private static readonly sbyte[] _buckets = new sbyte[] {
         4, 0, 3, 1, 5
      };
 
     private static readonly E[] _entries = {
-        new E(4607182418800017408, -1, 1.0), new E(4611686018427387904, -1, 2.0), new E(4613937818241073152, -1, 3.0), new E(4616189618054758400, -1, 4.0), new E(4617315517961601024, 1, 5.0)
+        new E(1.0, -1, 4607182418800017408), new E(2.0, -1, 4611686018427387904), new E(3.0, -1, 4613937818241073152), new E(4.0, -1, 4616189618054758400), new E(5.0, 1, 4617315517961601024)
     };
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong Hash(double value)
+    {
+        return Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
+    }
 
     
     public static bool Contains(double key)
@@ -30,7 +53,7 @@ internal static class HashTableStructure_Double_5_HashZeroOrNaN
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && key == entry.Key)
+            if (entry.HashCode == hash && entry.Key == key)
                 return true;
 
             i = entry.Next;
@@ -38,31 +61,6 @@ internal static class HashTableStructure_Double_5_HashZeroOrNaN
 
         return false;
     }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong Hash(double value)
-    {
-        return Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
-    }
-
-    [StructLayout(LayoutKind.Auto)]
-    private readonly struct E
-    {
-        internal readonly ulong HashCode;
-        internal readonly sbyte Next;
-        internal readonly double Key;
-        
-
-        internal E(ulong hashCode, sbyte next, double key)
-        {
-            HashCode = hashCode;
-            Next = next;
-            Key = key;
-            
-        }
-    }
-
 
     public const uint ItemCount = 5;
     public const double MinKey = 1.0;

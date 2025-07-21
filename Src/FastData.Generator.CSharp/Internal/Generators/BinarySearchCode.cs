@@ -1,38 +1,86 @@
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
+using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, TValue> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<TKey>(cfg)
+internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, TValue> ctx, CSharpCodeGeneratorConfig cfg, SharedCode shared) : CSharpOutputWriter<TKey>(cfg)
 {
-    public override string Generate() =>
-        $$"""
-              {{FieldModifier}}{{KeyTypeName}}[] _keys = new {{KeyTypeName}}[] {
-          {{FormatColumns(ctx.Keys, ToValueLabel)}}
-              };
+    public override string Generate()
+    {
+        StringBuilder sb = new StringBuilder();
 
-              {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{KeyTypeName}} key)
-              {
-          {{EarlyExits}}
+        sb.Append($$"""
+                        {{FieldModifier}}{{KeyTypeName}}[] _keys = new {{KeyTypeName}}[] {
+                    {{FormatColumns(ctx.Keys, ToValueLabel)}}
+                        };
 
-                  int lo = 0;
-                  int hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
-                  while (lo <= hi)
-                  {
-                      int i = lo + ((hi - lo) >> 1);
-                      int order = {{GetCompareFunction("_keys[i]", "key")}};
+                        {{MethodAttribute}}
+                        {{MethodModifier}}bool Contains({{KeyTypeName}} key)
+                        {
+                    {{EarlyExits}}
 
-                      if (order == 0)
-                          return true;
-                      if (order < 0)
-                          lo = i + 1;
-                      else
-                          hi = i - 1;
-                  }
+                            int lo = 0;
+                            int hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
+                            while (lo <= hi)
+                            {
+                                int i = lo + ((hi - lo) >> 1);
+                                int order = {{GetCompareFunction("_keys[i]", "key")}};
 
-                  return ~lo >= 0;
-              }
-          """;
+                                if (order == 0)
+                                    return true;
+                                if (order < 0)
+                                    lo = i + 1;
+                                else
+                                    hi = i - 1;
+                            }
+
+                            return ~lo >= 0;
+                        }
+                    """);
+
+        if (ctx.Values != null)
+        {
+            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
+
+            sb.Append($$"""
+
+                            {{FieldModifier}}{{ValueTypeName}}[] _values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                            {{MethodAttribute}}
+                            {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
+                            {
+                                value = default;
+
+                        {{EarlyExits}}
+
+                                int lo = 0;
+                                int hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
+                                while (lo <= hi)
+                                {
+                                    int i = lo + ((hi - lo) >> 1);
+                                    int order = {{GetCompareFunction("_keys[i]", "key")}};
+
+                                    if (order == 0)
+                                    {
+                                        value = _values[i];
+                                        return true;
+                                    }
+                                    if (order < 0)
+                                        lo = i + 1;
+                                    else
+                                        hi = i - 1;
+                                }
+
+                                value = default;
+                                return false;
+                            }
+                        """);
+        }
+
+        return sb.ToString();
+    }
 }

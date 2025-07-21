@@ -5,23 +5,67 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<TKey>(cfg)
+internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, CSharpCodeGeneratorConfig cfg, SharedCode shared) : CSharpOutputWriter<TKey>(cfg)
 {
     public override string Generate()
     {
-        return $$"""
-                     {{FieldModifier}}{{KeyTypeName}}[] _entries = new {{KeyTypeName}}[] {
-                 {{FormatColumns(ctx.Lengths, ToValueLabel)}}
-                     };
+        StringBuilder sb = new StringBuilder();
 
-                     {{MethodAttribute}}
-                     {{MethodModifier}}bool Contains({{KeyTypeName}} key)
-                     {
-                 {{EarlyExits}}
+        if (ctx.Values != null)
+        {
+            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
 
-                         return {{GetEqualFunction("key", $"_entries[key.Length - {ctx.MinLength.ToStringInvariant()}]")}};
-                     }
-                 """;
+            sb.Append($$"""
+                            {{FieldModifier}}int[] _offsets = {
+                        {{FormatColumns(ctx.ValueOffsets, static x => x.ToStringInvariant())}}
+                            };
 
+                        """);
+
+            sb.Append($$"""
+                            {{FieldModifier}}{{ValueTypeName}}[] _values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                        """);
+        }
+
+        sb.Append($$"""
+                        {{FieldModifier}}{{KeyTypeName}}[] _keys = {
+                    {{FormatColumns(ctx.Lengths, ToValueLabel)}}
+                        };
+
+                        {{MethodAttribute}}
+                        {{MethodModifier}}bool Contains({{KeyTypeName}} key)
+                        {
+                    {{EarlyExits}}
+
+                            return {{GetEqualFunction("key", $"_keys[key.Length - {ctx.MinLength.ToStringInvariant()}]")}};
+                        }
+                    """);
+
+        if (ctx.Values != null)
+        {
+            sb.Append($$"""
+                        {{MethodAttribute}}
+                        {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
+                        {
+                            value = default;
+                        {{EarlyExits}}
+
+                            int idx = key.Length - {{ctx.MinLength.ToStringInvariant()}};
+                            if ({{GetEqualFunction("key", "_keys[idx]")}})
+                            {
+                                value = _values[_offsets[idx]];
+                                return true;
+                            }
+
+                            value = default;
+                            return false;
+                        }
+                        """);
+        }
+
+        return sb.ToString();
     }
 }

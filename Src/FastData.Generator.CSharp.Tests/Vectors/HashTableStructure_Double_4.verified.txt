@@ -8,13 +8,41 @@ using System.Runtime.InteropServices;
 
 internal static class HashTableStructure_Double_4
 {
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
+    {
+        internal double Key;
+        internal sbyte Next;
+        internal ulong HashCode;
+        
+        internal E(double key, sbyte next, ulong hashCode )
+        {
+            Key = key;
+            Next = next;
+            HashCode = hashCode;
+            
+        }
+    };
+
     private static readonly sbyte[] _buckets = new sbyte[] {
         3, 0, 0, 4
      };
 
     private static readonly E[] _entries = {
-        new E(18442240474082181119, -1, double.MinValue), new E(0, -1, 0.0), new E(4607182418800017408, 1, 1.0), new E(9218868437227405311, 0, double.MaxValue)
+        new E(double.MinValue, -1, 18442240474082181119), new E(0.0, -1, 0), new E(1.0, 1, 4607182418800017408), new E(double.MaxValue, 0, 9218868437227405311)
     };
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong Hash(double value)
+    {
+        ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
+
+        if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
+            bits &= 0x7FF0_0000_0000_0000;
+
+        return bits;
+    }
 
     
     public static bool Contains(double key)
@@ -30,7 +58,7 @@ internal static class HashTableStructure_Double_4
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && key == entry.Key)
+            if (entry.HashCode == hash && entry.Key == key)
                 return true;
 
             i = entry.Next;
@@ -38,36 +66,6 @@ internal static class HashTableStructure_Double_4
 
         return false;
     }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong Hash(double value)
-    {
-        ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
-
-        if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
-            bits &= 0x7FF0_0000_0000_0000;
-
-        return bits;
-    }
-
-    [StructLayout(LayoutKind.Auto)]
-    private readonly struct E
-    {
-        internal readonly ulong HashCode;
-        internal readonly sbyte Next;
-        internal readonly double Key;
-        
-
-        internal E(ulong hashCode, sbyte next, double key)
-        {
-            HashCode = hashCode;
-            Next = next;
-            Key = key;
-            
-        }
-    }
-
 
     public const uint ItemCount = 4;
     public const double MinKey = double.MinValue;

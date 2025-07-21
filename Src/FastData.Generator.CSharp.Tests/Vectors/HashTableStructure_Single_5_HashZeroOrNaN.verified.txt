@@ -8,13 +8,36 @@ using System.Runtime.InteropServices;
 
 internal static class HashTableStructure_Single_5_HashZeroOrNaN
 {
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
+    {
+        internal float Key;
+        internal sbyte Next;
+        internal ulong HashCode;
+        
+        internal E(float key, sbyte next, ulong hashCode )
+        {
+            Key = key;
+            Next = next;
+            HashCode = hashCode;
+            
+        }
+    };
+
     private static readonly sbyte[] _buckets = new sbyte[] {
         0, 1, 4, 3, 5
      };
 
     private static readonly E[] _entries = {
-        new E(1065353216, -1, 1f), new E(1073741824, -1, 2f), new E(1077936128, -1, 3f), new E(1082130432, -1, 4f), new E(1084227584, 1, 5f)
+        new E(1f, -1, 1065353216), new E(2f, -1, 1073741824), new E(3f, -1, 1077936128), new E(4f, -1, 1082130432), new E(5f, 1, 1084227584)
     };
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong Hash(float value)
+    {
+        return (ulong)Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
+    }
 
     
     public static bool Contains(float key)
@@ -30,7 +53,7 @@ internal static class HashTableStructure_Single_5_HashZeroOrNaN
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && key == entry.Key)
+            if (entry.HashCode == hash && entry.Key == key)
                 return true;
 
             i = entry.Next;
@@ -38,31 +61,6 @@ internal static class HashTableStructure_Single_5_HashZeroOrNaN
 
         return false;
     }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong Hash(float value)
-    {
-        return (ulong)Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
-    }
-
-    [StructLayout(LayoutKind.Auto)]
-    private readonly struct E
-    {
-        internal readonly ulong HashCode;
-        internal readonly sbyte Next;
-        internal readonly float Key;
-        
-
-        internal E(ulong hashCode, sbyte next, float key)
-        {
-            HashCode = hashCode;
-            Next = next;
-            Key = key;
-            
-        }
-    }
-
 
     public const uint ItemCount = 5;
     public const float MinKey = 1f;

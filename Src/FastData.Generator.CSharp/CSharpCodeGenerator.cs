@@ -37,7 +37,10 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                   using System.Runtime.InteropServices;
 
                   """);
+    }
 
+    protected override void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext<TValue> context)
+    {
         string cn = _cfg.ClassName;
         string? ns = _cfg.Namespace != null ? $"namespace {_cfg.Namespace};\n\n" : null;
         string visibility = _cfg.ClassVisibility.ToString().ToLowerInvariant();
@@ -58,6 +61,8 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                         {{ns}}{{attr}}{{visibility}}{{partial}}{{type}} {{cn}}
                         {
                         """);
+
+        base.AppendBody(sb, genCfg, keyTypeName, valueTypeName, context);
     }
 
     protected override void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)
@@ -69,13 +74,13 @@ public sealed class CSharpCodeGenerator : CodeGenerator
 
     protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context) => context switch
     {
-        SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, _cfg),
-        ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, _cfg),
-        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, _cfg),
-        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, _cfg),
-        HashTableContext<TKey, TValue> x => new HashTableCode<TKey, TValue>(x, _cfg),
-        HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, _cfg),
-        KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, _cfg),
+        SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, _cfg, Shared),
+        ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, _cfg, Shared),
+        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, _cfg, Shared),
+        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, _cfg, Shared),
+        HashTableContext<TKey, TValue> x => new HashTableCode<TKey, TValue>(x, _cfg, Shared),
+        HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, _cfg, Shared),
+        KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, _cfg, Shared),
         _ => null
     };
 }

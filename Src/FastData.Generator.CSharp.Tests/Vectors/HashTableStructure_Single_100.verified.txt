@@ -8,6 +8,22 @@ using System.Runtime.InteropServices;
 
 internal static class HashTableStructure_Single_100
 {
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
+    {
+        internal float Key;
+        internal sbyte Next;
+        internal ulong HashCode;
+        
+        internal E(float key, sbyte next, ulong hashCode )
+        {
+            Key = key;
+            Next = next;
+            HashCode = hashCode;
+            
+        }
+    };
+
     private static readonly sbyte[] _buckets = new sbyte[] {
         78, 0, 0, 0, 85, 0, 0, 0, 92, 0, 
         0, 0, 99, 0, 0, 0, 81, 0, 0, 0, 
@@ -22,17 +38,29 @@ internal static class HashTableStructure_Single_100
      };
 
     private static readonly E[] _entries = {
-        new E(0, -1, 0f), new E(1065353216, -1, 1f), new E(1073741824, -1, 2f), new E(1077936128, -1, 3f), new E(1082130432, -1, 4f), new E(1084227584, -1, 5f), new E(1086324736, -1, 6f), new E(1088421888, -1, 7f), new E(1090519040, -1, 8f), new E(1091567616, 1, 9f), 
-        new E(1092616192, -1, 10f), new E(1093664768, -1, 11f), new E(1094713344, -1, 12f), new E(1095761920, -1, 13f), new E(1096810496, -1, 14f), new E(1097859072, -1, 15f), new E(1098907648, -1, 16f), new E(1099431936, 6, 17f), new E(1099956224, 2, 18f), new E(1100480512, -1, 19f), 
-        new E(1101004800, 0, 20f), new E(1101529088, 7, 21f), new E(1102053376, -1, 22f), new E(1102577664, -1, 23f), new E(1103101952, -1, 24f), new E(1103626240, 8, 25f), new E(1104150528, 3, 26f), new E(1104674816, 9, 27f), new E(1105199104, -1, 28f), new E(1105723392, 10, 29f), 
-        new E(1106247680, -1, 30f), new E(1106771968, 11, 31f), new E(1107296256, -1, 32f), new E(1107558400, 20, 33f), new E(1107820544, 12, 34f), new E(1108082688, 21, 35f), new E(1108344832, 4, 36f), new E(1108606976, 22, 37f), new E(1108869120, 13, 38f), new E(1109131264, 23, 39f), 
-        new E(1109393408, -1, 40f), new E(1109655552, 24, 41f), new E(1109917696, 14, 42f), new E(1110179840, 25, 43f), new E(1110441984, 5, 44f), new E(1110704128, 26, 45f), new E(1110966272, 15, 46f), new E(1111228416, 27, 47f), new E(1111490560, -1, 48f), new E(1111752704, 28, 49f), 
-        new E(1112014848, 16, 50f), new E(1112276992, 29, 51f), new E(1112539136, 17, 52f), new E(1112801280, 30, 53f), new E(1113063424, 18, 54f), new E(1113325568, 31, 55f), new E(1113587712, 19, 56f), new E(1113849856, 32, 57f), new E(1114112000, 33, 58f), new E(1114374144, 34, 59f), 
-        new E(1114636288, 35, 60f), new E(1114898432, 36, 61f), new E(1115160576, 37, 62f), new E(1115422720, 38, 63f), new E(1115684864, 39, 64f), new E(1115815936, 52, 65f), new E(1115947008, 40, 66f), new E(1116078080, 53, 67f), new E(1116209152, 41, 68f), new E(1116340224, 54, 69f), 
-        new E(1116471296, 42, 70f), new E(1116602368, 55, 71f), new E(1116733440, 43, 72f), new E(1116864512, 56, 73f), new E(1116995584, 44, 74f), new E(1117126656, 57, 75f), new E(1117257728, 45, 76f), new E(1117388800, 58, 77f), new E(1117519872, 46, 78f), new E(1117650944, 59, 79f), 
-        new E(1117782016, 47, 80f), new E(1117913088, 60, 81f), new E(1118044160, 48, 82f), new E(1118175232, 61, 83f), new E(1118306304, 49, 84f), new E(1118437376, 62, 85f), new E(1118568448, 50, 86f), new E(1118699520, 63, 87f), new E(1118830592, 51, 88f), new E(1118961664, 64, 89f), 
-        new E(1119092736, 65, 90f), new E(1119223808, 66, 91f), new E(1119354880, 67, 92f), new E(1119485952, 68, 93f), new E(1119617024, 69, 94f), new E(1119748096, 70, 95f), new E(1119879168, 71, 96f), new E(1120010240, 72, 97f), new E(1120141312, 73, 98f), new E(1120272384, 74, 99f)
+        new E(0f, -1, 0), new E(1f, -1, 1065353216), new E(2f, -1, 1073741824), new E(3f, -1, 1077936128), new E(4f, -1, 1082130432), new E(5f, -1, 1084227584), new E(6f, -1, 1086324736), new E(7f, -1, 1088421888), new E(8f, -1, 1090519040), new E(9f, 1, 1091567616), 
+        new E(10f, -1, 1092616192), new E(11f, -1, 1093664768), new E(12f, -1, 1094713344), new E(13f, -1, 1095761920), new E(14f, -1, 1096810496), new E(15f, -1, 1097859072), new E(16f, -1, 1098907648), new E(17f, 6, 1099431936), new E(18f, 2, 1099956224), new E(19f, -1, 1100480512), 
+        new E(20f, 0, 1101004800), new E(21f, 7, 1101529088), new E(22f, -1, 1102053376), new E(23f, -1, 1102577664), new E(24f, -1, 1103101952), new E(25f, 8, 1103626240), new E(26f, 3, 1104150528), new E(27f, 9, 1104674816), new E(28f, -1, 1105199104), new E(29f, 10, 1105723392), 
+        new E(30f, -1, 1106247680), new E(31f, 11, 1106771968), new E(32f, -1, 1107296256), new E(33f, 20, 1107558400), new E(34f, 12, 1107820544), new E(35f, 21, 1108082688), new E(36f, 4, 1108344832), new E(37f, 22, 1108606976), new E(38f, 13, 1108869120), new E(39f, 23, 1109131264), 
+        new E(40f, -1, 1109393408), new E(41f, 24, 1109655552), new E(42f, 14, 1109917696), new E(43f, 25, 1110179840), new E(44f, 5, 1110441984), new E(45f, 26, 1110704128), new E(46f, 15, 1110966272), new E(47f, 27, 1111228416), new E(48f, -1, 1111490560), new E(49f, 28, 1111752704), 
+        new E(50f, 16, 1112014848), new E(51f, 29, 1112276992), new E(52f, 17, 1112539136), new E(53f, 30, 1112801280), new E(54f, 18, 1113063424), new E(55f, 31, 1113325568), new E(56f, 19, 1113587712), new E(57f, 32, 1113849856), new E(58f, 33, 1114112000), new E(59f, 34, 1114374144), 
+        new E(60f, 35, 1114636288), new E(61f, 36, 1114898432), new E(62f, 37, 1115160576), new E(63f, 38, 1115422720), new E(64f, 39, 1115684864), new E(65f, 52, 1115815936), new E(66f, 40, 1115947008), new E(67f, 53, 1116078080), new E(68f, 41, 1116209152), new E(69f, 54, 1116340224), 
+        new E(70f, 42, 1116471296), new E(71f, 55, 1116602368), new E(72f, 43, 1116733440), new E(73f, 56, 1116864512), new E(74f, 44, 1116995584), new E(75f, 57, 1117126656), new E(76f, 45, 1117257728), new E(77f, 58, 1117388800), new E(78f, 46, 1117519872), new E(79f, 59, 1117650944), 
+        new E(80f, 47, 1117782016), new E(81f, 60, 1117913088), new E(82f, 48, 1118044160), new E(83f, 61, 1118175232), new E(84f, 49, 1118306304), new E(85f, 62, 1118437376), new E(86f, 50, 1118568448), new E(87f, 63, 1118699520), new E(88f, 51, 1118830592), new E(89f, 64, 1118961664), 
+        new E(90f, 65, 1119092736), new E(91f, 66, 1119223808), new E(92f, 67, 1119354880), new E(93f, 68, 1119485952), new E(94f, 69, 1119617024), new E(95f, 70, 1119748096), new E(96f, 71, 1119879168), new E(97f, 72, 1120010240), new E(98f, 73, 1120141312), new E(99f, 74, 1120272384)
     };
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong Hash(float value)
+    {
+        uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
+
+        if (((bits - 1) & ~(0x8000_0000)) >= 0x7FF0_0000)
+            bits &= 0x7FF0_0000;
+
+        return (ulong)bits;
+    }
 
     
     public static bool Contains(float key)
@@ -48,7 +76,7 @@ internal static class HashTableStructure_Single_100
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && key == entry.Key)
+            if (entry.HashCode == hash && entry.Key == key)
                 return true;
 
             i = entry.Next;
@@ -56,36 +84,6 @@ internal static class HashTableStructure_Single_100
 
         return false;
     }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong Hash(float value)
-    {
-        uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
-
-        if (((bits - 1) & ~(0x8000_0000)) >= 0x7FF0_0000)
-            bits &= 0x7FF0_0000;
-
-        return (ulong)bits;
-    }
-
-    [StructLayout(LayoutKind.Auto)]
-    private readonly struct E
-    {
-        internal readonly ulong HashCode;
-        internal readonly sbyte Next;
-        internal readonly float Key;
-        
-
-        internal E(ulong hashCode, sbyte next, float key)
-        {
-            HashCode = hashCode;
-            Next = next;
-            Key = key;
-            
-        }
-    }
-
 
     public const uint ItemCount = 100;
     public const float MinKey = 0f;

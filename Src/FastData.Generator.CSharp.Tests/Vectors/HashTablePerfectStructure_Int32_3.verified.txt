@@ -8,9 +8,17 @@ using System.Runtime.InteropServices;
 
 internal static class HashTablePerfectStructure_Int32_3
 {
+
     private static readonly int[] _entries = {
         3, 1, 2
     };
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong Hash(int value)
+    {
+        return (ulong)value;
+    }
 
     
     public static bool Contains(int key)
@@ -20,15 +28,9 @@ internal static class HashTablePerfectStructure_Int32_3
 
         ulong hash = Hash(key);
         uint index = (uint)(hash % 3);
+        ref var entry = ref _entries[index];
 
-        return key == _entries[index];
-    }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong Hash(int value)
-    {
-        return (ulong)value;
+        return key == entry;
     }
 
     public const uint ItemCount = 3;
