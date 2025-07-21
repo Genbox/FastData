@@ -12,6 +12,5 @@ public sealed class CSharpCodeGeneratorConfig(string className)
     public ClassVisibility ClassVisibility { get; set; } = ClassVisibility.Internal;
     public ClassType ClassType { get; set; } = ClassType.Static;
     public CSharpOptions GeneratorOptions { get; set; }
-    public BranchType KeyLengthUniqBranchType { get; set; } = BranchType.If;
     public BranchType ConditionalBranchType { get; set; } = BranchType.Switch;
 }

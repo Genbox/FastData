@@ -6,14 +6,9 @@ namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
 internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx) : RustOutputWriter<TKey>
 {
-    public override string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
-
-    private string GenerateUniq()
+    public override string Generate()
     {
-        string?[] lengths = ctx.Lengths
-                               .Skip((int)ctx.MinLength)
-                               .Select(x => x?.FirstOrDefault())
-                               .ToArray();
+        string?[] lengths = ctx.Lengths;
 
         return $$"""
                      {{FieldModifier}}const ENTRIES: [{{KeyTypeName}}; {{lengths.Length.ToStringInvariant()}}] = [
@@ -27,39 +22,4 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx) 
                      }
                  """;
     }
-
-    private string GenerateNormal()
-    {
-        List<string>?[] lengths = ctx.Lengths
-                                     .Skip((int)ctx.MinLength)
-                                     .Take((int)(ctx.MaxLength - ctx.MinLength + 1))
-                                     .ToArray();
-
-        return $$"""
-                     {{FieldModifier}}const ENTRIES: [Vec<{{KeyTypeName}}>; {{lengths.Length}}] = [
-                 {{FormatList(lengths, RenderMany, ",\n")}}
-                     ];
-
-                     {{MethodAttribute}}
-                     {{MethodModifier}}fn contains(key: &{{KeyTypeName}}) -> bool {
-                 {{EarlyExits}}
-                         let idx = (key.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize;
-                         let bucket = &Self::ENTRIES[idx];
-
-                         if bucket.is_empty() {
-                             false
-                         }
-
-                         for item in bucket.iter() {
-                             if item == key {
-                                 true
-                             }
-                         }
-
-                         false
-                     }
-                 """;
-    }
-
-    private string RenderMany(List<string>? x) => x == null ? "Vec::new()" : $"vec![{string.Join(", ", x.Select(ToValueLabel))}]";
 }

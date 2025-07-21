@@ -8,7 +8,7 @@
 
 class KeyLengthStructure_String_7 final
 {
-    static constexpr std::array<std::string_view, 8> entries = {
+    static constexpr std::array<std::string_view, 8> keys = {
         "aaa", "", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"
     };
 
@@ -19,7 +19,7 @@ public:
         if ((1012ULL & (1ULL << (key.length() - 1))) == 0)
             return false;
 
-        return key == entries[key.length() - 3];
+        return key == keys[key.length() - 3];
     }
 
     static constexpr size_t item_count = 7;

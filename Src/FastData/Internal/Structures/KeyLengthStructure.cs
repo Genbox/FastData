@@ -11,25 +11,26 @@ internal sealed class KeyLengthStructure<TKey, TValue>(StringProperties props) :
         if (typeof(TKey) != typeof(string))
             throw new InvalidCastException("This structure only works on strings");
 
-        //idx 0: ""
-        //idx 1: "a", "b"
-        //idx 2: null
-        //idx 3: "aaa", "bbb"
+        if (!props.LengthData.Unique)
+            throw new InvalidOperationException("We can only use this structure when all lengths are unique");
 
+        uint minLen = props.LengthData.Min;
         uint maxLen = props.LengthData.Max;
+        int range = (int)(maxLen - minLen + 1); //+1 because we need a place for zero
 
-        //We don't have to use HashSets to deduplicate within a bucket as all items are unique
-        List<string>?[] lengths = new List<string>?[maxLen + 1]; //We need a place for zero
+        string?[] lengths = new string?[range];
+        int[] offsets = values == null ? [] : new int[range];
 
-        foreach (TKey value in keys)
+        for (int i = 0; i < keys.Length; i++)
         {
-            string str = (string)(object)value;
+            string str = (string)(object)keys[i]!;
+            int idx = str.Length - (int)minLen;
+            lengths[idx] = str;
 
-            ref List<string>? item = ref lengths[str.Length];
-            item ??= new List<string>();
-            item.Add(str);
+            if (values != null)
+                offsets[idx] = i;
         }
 
-        return new KeyLengthContext<TValue>(lengths, props.LengthData.Unique, props.LengthData.Min, maxLen, values);
+        return new KeyLengthContext<TValue>(lengths, minLen, values, offsets);
     }
 }

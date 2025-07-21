@@ -1,62 +1,71 @@
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
+using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx) : CPlusPlusOutputWriter<TKey>
+internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, SharedCode shared) : CPlusPlusOutputWriter<TKey>
 {
-    public override string Generate() => ctx.LengthsAreUniq ? GenerateUniq() : GenerateNormal();
-
-    private string GenerateUniq()
+    public override string Generate()
     {
-        string?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Select(x => x?.FirstOrDefault()).ToArray();
+        StringBuilder sb = new StringBuilder();
 
-        return $$"""
-                     {{FieldModifier}}std::array<{{KeyTypeName}}, {{lengths.Length.ToStringInvariant()}}> entries = {
-                 {{FormatColumns(lengths, ToValueLabel)}}
-                     };
+        if (ctx.Values != null)
+        {
+            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
 
-                 public:
-                     {{MethodAttribute}}
-                     {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
-                     {
-                 {{EarlyExits}}
+            sb.Append($$"""
+                            {{FieldModifier}}std::array<int32_t, {{ctx.ValueOffsets.Length}}> offsets = {
+                        {{FormatColumns(ctx.ValueOffsets, static x => x.ToStringInvariant())}}
+                            };
 
-                         return {{GetEqualFunction("key", $"entries[key.length() - {ctx.MinLength.ToStringInvariant()}]")}};
-                     }
-                 """;
+                        """);
+
+            sb.Append($$"""
+                            static inline std::array<{{ValueTypeName}}*, {{ctx.Values.Length}}> values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                        """);
+        }
+
+        sb.Append($$"""
+                        {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Lengths.Length.ToStringInvariant()}}> keys = {
+                    {{FormatColumns(ctx.Lengths, ToValueLabel)}}
+                        };
+
+                    public:
+                        {{MethodAttribute}}
+                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
+                        {
+                    {{EarlyExits}}
+
+                            return {{GetEqualFunction("key", $"keys[key.length() - {ctx.MinLength.ToStringInvariant()}]")}};
+                        }
+                    """);
+
+        if (ctx.Values != null)
+        {
+            sb.Append($$"""
+                        {{MethodAttribute}}
+                        {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
+                        {
+                        {{EarlyExits}}
+
+                            size_t idx = key.length() - {{ctx.MinLength.ToStringInvariant()}};
+                            if ({{GetEqualFunction("key", "keys[idx]")}})
+                            {
+                                value = values[offsets[idx]];
+                                return true;
+                            }
+
+                            value = nullptr;
+                            return false;
+                        }
+                        """);
+        }
+
+        return sb.ToString();
     }
-
-    private string GenerateNormal()
-    {
-        List<string>?[] lengths = ctx.Lengths.Skip((int)ctx.MinLength).Take((int)(ctx.MaxLength - ctx.MinLength + 1)).ToArray();
-
-        return $$"""
-                     {{FieldModifier}}std:array<std:vector<{{KeyTypeName}}>, {{lengths.Length.ToStringInvariant()}}> entries = {
-                 {{FormatList(lengths, RenderMany, ",\n")}}
-                     };
-
-                 public:
-                     {{MethodAttribute}}
-                     {{MethodModifier}}bool contains(const {{KeyTypeName}}& key){{PostMethodModifier}}
-                     {
-                 {{EarlyExits}}
-                         std::vector<{{KeyTypeName}}> bucket = entries[key.length() - {{ctx.MinLength.ToStringInvariant()}}];
-
-                         if (bucket == nullptr)
-                             return false;
-
-                         foreach ({{KeyTypeName}} str in bucket)
-                         {
-                             if ({{GetEqualFunction("str", "key")}})
-                                 return true;
-                         }
-
-                         return false;
-                     }
-                 """;
-    }
-
-    private string RenderMany(List<string>? x) => x == null ? "        \"\"" : $"new [] {{ {string.Join(",", x.Select(ToValueLabel))} }}";
 }

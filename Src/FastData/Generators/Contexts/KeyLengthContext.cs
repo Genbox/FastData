@@ -4,21 +4,15 @@ namespace Genbox.FastData.Generators.Contexts;
 
 /// <summary>Provides a context for key length-based data structures.</summary>
 /// <param name="lengths">An array of lists containing string lengths.</param>
-/// <param name="lengthsAreUniq">Indicates whether all lengths are unique.</param>
 /// <param name="minLength">The minimum string length.</param>
-/// <param name="maxLength">The maximum string length.</param>
-public sealed class KeyLengthContext<TValue>(List<string>?[] lengths, bool lengthsAreUniq, uint minLength, uint maxLength, TValue[]? values) : IContext<TValue>
+public sealed class KeyLengthContext<TValue>(string?[] lengths, uint minLength, TValue[]? values, int[] valueOffsets) : IContext<TValue>
 {
     /// <summary>Gets the array of lists containing string lengths.</summary>
-    public List<string>?[] Lengths { get; } = lengths;
-
-    /// <summary>Gets a value indicating whether all lengths are unique.</summary>
-    public bool LengthsAreUniq { get; } = lengthsAreUniq;
+    public string?[] Lengths { get; } = lengths;
 
     /// <summary>Gets the minimum string length.</summary>
     public uint MinLength { get; } = minLength;
 
-    /// <summary>Gets the maximum string length.</summary>
-    public uint MaxLength { get; } = maxLength;
     public TValue[]? Values { get; } = values;
+    public int[] ValueOffsets { get; } = valueOffsets;
 }
