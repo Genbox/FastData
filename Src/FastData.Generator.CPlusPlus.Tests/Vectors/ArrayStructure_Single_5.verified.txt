@@ -14,7 +14,7 @@ static constexpr std::array<float, 5> keys = {
 
 public:
     [[nodiscard]]
-    static bool contains(const float key) noexcept
+    static constexpr bool contains(const float key) noexcept
     {
         if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())
             return false;

@@ -14,8 +14,8 @@ class HashTableStructure_Double_4 final
         int8_t next;
         uint64_t hash_code;
         
-        e(const uint64_t hash_code, const int8_t next, const double key)
-           : hash_code(hash_code), next(next), key(key) {}
+        e(const double key, const int8_t next, const uint64_t hash_code)
+           : key(key), next(next), hash_code(hash_code) {}
     };
 
     static constexpr std::array<int8_t, 4> buckets = {
@@ -23,7 +23,7 @@ class HashTableStructure_Double_4 final
      };
 
     inline static const std::array<e, 4> entries = {
-        e(18442240474082181119, -1, std::numeric_limits<double>::lowest()), e(0, -1, 0.0), e(4607182418800017408, 1, 1.0), e(9218868437227405311, 0, std::numeric_limits<double>::max())
+        e(std::numeric_limits<double>::lowest(), -1, 18442240474082181119), e(0.0, -1, 0), e(1.0, 1, 4607182418800017408), e(std::numeric_limits<double>::max(), 0, 9218868437227405311)
     };
 
     static uint64_t get_hash(const double value) noexcept
@@ -37,14 +37,14 @@ class HashTableStructure_Double_4 final
 
 public:
     [[nodiscard]]
-    static bool contains(const double key) noexcept
+    static constexpr bool contains(const double key) noexcept
     {
         if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())
             return false;
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 4;
-        int8_t i = buckets[index] - static_cast<int8_t>(1);
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
         while (i >= 0)
         {

@@ -28,7 +28,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                             {{(ctx.StoreHashCode ? $"{HashSizeType} hash_code;" : "")}}
                             {{(ctx.Values != null ? $"{(customType ? $"const {ValueTypeName}*" : ValueTypeName)} value;" : "")}}
 
-                            e(const {{KeyTypeName}} key{{(ctx.StoreHashCode ? $", const {HashSizeType} hash_code" : "")}}{{(ctx.Values != null ? $", const {ValueTypeName}{(customType ? "*" : "")} value" : "")}})
+                            constexpr e(const {{KeyTypeName}} key{{(ctx.StoreHashCode ? $", const {HashSizeType} hash_code" : "")}}{{(ctx.Values != null ? $", const {ValueTypeName}{(customType ? "*" : "")} value" : "")}}) noexcept
                             : key(key){{(ctx.StoreHashCode ? ", hash_code(hash_code)" : "")}}{{(ctx.Values != null ? ", value(value)" : "")}} {}
                         };
                         """);

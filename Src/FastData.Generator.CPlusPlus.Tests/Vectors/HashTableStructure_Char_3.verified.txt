@@ -14,8 +14,8 @@ class HashTableStructure_Char_3 final
         int8_t next;
         
         
-        e(const int8_t next, const char key)
-           : next(next), key(key) {}
+        e(const char key, const int8_t next)
+           : key(key), next(next) {}
     };
 
     static constexpr std::array<int8_t, 3> buckets = {
@@ -23,7 +23,7 @@ class HashTableStructure_Char_3 final
      };
 
     inline static const std::array<e, 3> entries = {
-        e(-1, 0), e(-1, 97), e(1, 127)
+        e(0, -1), e(97, -1), e(127, 1)
     };
 
     static constexpr uint64_t get_hash(const char value) noexcept
@@ -33,14 +33,14 @@ class HashTableStructure_Char_3 final
 
 public:
     [[nodiscard]]
-    static bool contains(const char key) noexcept
+    static constexpr bool contains(const char key) noexcept
     {
         if (key < 0 || key > 127)
             return false;
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;
-        int8_t i = buckets[index] - static_cast<int8_t>(1);
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
         while (i >= 0)
         {

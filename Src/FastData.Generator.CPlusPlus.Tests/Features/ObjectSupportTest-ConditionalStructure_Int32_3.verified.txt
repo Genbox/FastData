@@ -11,13 +11,13 @@ struct Person {
     std::u32string_view name;
    const Person* other;
 
-    Person(const int32_t age, const std::u32string_view name, const Person* other) : age(age), name(name), other(other) { }
+    constexpr Person(const int32_t age, const std::u32string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
 class ConditionalStructure_Int32_3 final
 {
 public:
     [[nodiscard]]
-    static bool contains(const int32_t key) noexcept
+    static constexpr bool contains(const int32_t key) noexcept
     {
 
 
@@ -26,14 +26,13 @@ public:
 
         return false;
     }
-    static inline std::array<Person*, 3> values = {
-            new Person(1, U"Bob", new Person(4, U"Anna", nullptr)), new Person(2, U"Billy", nullptr), new Person(3, U"Bibi", nullptr)
+    inline static const std::array<Person*, 3> values = {
+        new Person(1, U"Bob", new Person(4, U"Anna", nullptr)), new Person(2, U"Billy", nullptr), new Person(3, U"Bibi", nullptr)
     };
 
     [[nodiscard]]
-    static bool try_lookup(const int32_t key, const Person*& value) noexcept
+    static constexpr bool try_lookup(const int32_t key, const Person*& value) noexcept
     {
-
 
         if (key == 1)
         {
@@ -50,7 +49,6 @@ public:
             value = values[2];
             return true;
         }
-
 
         value = nullptr;
         return false;

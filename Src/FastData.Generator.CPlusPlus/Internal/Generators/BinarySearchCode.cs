@@ -48,7 +48,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 
             sb.Append($$"""
 
-                            static inline std::array<{{ValueTypeName}}{{(customType ? "*" : "")}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
+                            {{GetFieldModifier(false)}}std::array<{{ValueTypeName}}{{(customType ? "*" : "")}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
                             {{FormatColumns(ctx.Values, ToValueLabel)}}
                             };
 

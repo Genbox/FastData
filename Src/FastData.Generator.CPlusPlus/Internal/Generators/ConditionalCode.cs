@@ -32,17 +32,15 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 
             sb.Append($$"""
 
-                            static inline std::array<{{ValueTypeName}}{{(customType ? "*" : "")}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
-                            {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            {{GetFieldModifier(false)}}std::array<{{ValueTypeName}}{{(customType ? "*" : "")}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
                             };
 
                             {{MethodAttribute}}
                             {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
                             {
                         {{EarlyExits}}
-
                         {{GenerateBranches()}}
-
                                 value = nullptr;
                                 return false;
                             }

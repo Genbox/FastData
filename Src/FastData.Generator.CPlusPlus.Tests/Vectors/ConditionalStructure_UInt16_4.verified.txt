@@ -10,7 +10,7 @@ class ConditionalStructure_UInt16_4 final
 {
 public:
     [[nodiscard]]
-    static bool contains(const uint16_t key) noexcept
+    static constexpr bool contains(const uint16_t key) noexcept
     {
         if (key < 0 || key > std::numeric_limits<uint16_t>::max())
             return false;

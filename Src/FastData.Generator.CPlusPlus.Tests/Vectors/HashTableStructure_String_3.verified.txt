@@ -14,8 +14,8 @@ class HashTableStructure_String_3 final
         int8_t next;
         uint64_t hash_code;
         
-        e(const uint64_t hash_code, const int8_t next, const std::string_view key)
-           : hash_code(hash_code), next(next), key(key) {}
+        e(const std::string_view key, const int8_t next, const uint64_t hash_code)
+           : key(key), next(next), hash_code(hash_code) {}
     };
 
     static constexpr std::array<int8_t, 3> buckets = {
@@ -23,7 +23,7 @@ class HashTableStructure_String_3 final
      };
 
     inline static const std::array<e, 3> entries = {
-        e(18225461187723808291, -1, "a"), e(16750939634977259983, 0, "item"), e(9198652691199425319, -1, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        e("a", -1, 18225461187723808291), e("item", 0, 16750939634977259983), e("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", -1, 9198652691199425319)
     };
 
     static constexpr uint64_t get_hash(const std::string_view value) noexcept
@@ -38,14 +38,14 @@ class HashTableStructure_String_3 final
 
 public:
     [[nodiscard]]
-    static bool contains(const std::string_view key) noexcept
+    static constexpr bool contains(const std::string_view key) noexcept
     {
         if (const size_t len = key.length(); len < 1u || len > 255u)
             return false;
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;
-        int8_t i = buckets[index] - static_cast<int8_t>(1);
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
         while (i >= 0)
         {

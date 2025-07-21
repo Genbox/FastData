@@ -14,7 +14,7 @@ class BinarySearchStructure_Double_4 final
 
 public:
     [[nodiscard]]
-    static bool contains(const double key) noexcept
+    static constexpr bool contains(const double key) noexcept
     {
         if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())
             return false;

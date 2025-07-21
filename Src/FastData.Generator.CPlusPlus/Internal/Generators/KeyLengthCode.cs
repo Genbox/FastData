@@ -23,7 +23,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                         """);
 
             sb.Append($$"""
-                            static inline std::array<{{ValueTypeName}}*, {{ctx.Values.Length}}> values = {
+                            {{GetFieldModifier(false)}}std::array<{{ValueTypeName}}*, {{ctx.Values.Length}}> values = {
                         {{FormatColumns(ctx.Values, ToValueLabel)}}
                             };
 
@@ -48,6 +48,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
         if (ctx.Values != null)
         {
             sb.Append($$"""
+
                         {{MethodAttribute}}
                         {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
                         {

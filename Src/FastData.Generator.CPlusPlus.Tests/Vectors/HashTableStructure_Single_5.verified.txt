@@ -14,8 +14,8 @@ class HashTableStructure_Single_5 final
         int8_t next;
         uint64_t hash_code;
         
-        e(const uint64_t hash_code, const int8_t next, const float key)
-           : hash_code(hash_code), next(next), key(key) {}
+        e(const float key, const int8_t next, const uint64_t hash_code)
+           : key(key), next(next), hash_code(hash_code) {}
     };
 
     static constexpr std::array<int8_t, 5> buckets = {
@@ -23,7 +23,7 @@ class HashTableStructure_Single_5 final
      };
 
     inline static const std::array<e, 5> entries = {
-        e(4286578687, -1, std::numeric_limits<float>::lowest()), e(3212836864, -1, -1.0f), e(0, -1, 0.0f), e(1065353216, -1, 1.0f), e(2139095039, 1, std::numeric_limits<float>::max())
+        e(std::numeric_limits<float>::lowest(), -1, 4286578687), e(-1.0f, -1, 3212836864), e(0.0f, -1, 0), e(1.0f, -1, 1065353216), e(std::numeric_limits<float>::max(), 1, 2139095039)
     };
 
     static uint64_t get_hash(const float value) noexcept
@@ -37,14 +37,14 @@ class HashTableStructure_Single_5 final
 
 public:
     [[nodiscard]]
-    static bool contains(const float key) noexcept
+    static constexpr bool contains(const float key) noexcept
     {
         if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())
             return false;
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 5;
-        int8_t i = buckets[index] - static_cast<int8_t>(1);
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
         while (i >= 0)
         {

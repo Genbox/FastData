@@ -14,7 +14,7 @@ class BinarySearchStructure_String_3 final
 
 public:
     [[nodiscard]]
-    static bool contains(const std::string_view key) noexcept
+    static constexpr bool contains(const std::string_view key) noexcept
     {
         if (const size_t len = key.length(); len < 1u || len > 255u)
             return false;

@@ -18,8 +18,8 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                             {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
                             {{(ctx.StoreHashCode ? $"{HashSizeType} hash_code;" : "")}}
                             {{(ctx.Values != null ? $"const {ValueTypeName}* value;" : "")}}
-                            e({{(ctx.StoreHashCode ? $"const {HashSizeType} hash_code, " : "")}}const {{GetSmallestSignedType(ctx.Buckets.Length)}} next, const {{KeyTypeName}} key{{(ctx.Values != null ? $", const {ValueTypeName}* value" : "")}})
-                               : {{(ctx.StoreHashCode ? "hash_code(hash_code), " : "")}}next(next), key(key){{(ctx.Values != null ? ", value(value)" : "")}} {}
+                            e(const {{KeyTypeName}} key, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next{{(ctx.StoreHashCode ? $", const {HashSizeType} hash_code" : "")}}{{(ctx.Values != null ? $", const {ValueTypeName}* value" : "")}})
+                               : key(key), next(next){{(ctx.StoreHashCode ? ", hash_code(hash_code)" : "")}}{{(ctx.Values != null ? ", value(value)" : "")}} {}
                         };
 
                         {{FieldModifier}}std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length.ToStringInvariant()}}> buckets = {
@@ -27,7 +27,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                          };
 
                         {{GetFieldModifier(false)}}std::array<e, {{ctx.Entries.Length.ToStringInvariant()}}> entries = {
-                    {{FormatColumns(ctx.Entries, (i, x) => $"e({(ctx.StoreHashCode ? $"{x.Hash.ToStringInvariant()}, " : "")}{x.Next.ToStringInvariant()}, {ToValueLabel(x.Key)}{(ctx.Values != null ? $", {ToValueLabel(ctx.Values[i])}" : "")})")}}
+                    {{FormatColumns(ctx.Entries, (i, x) => $"e({ToValueLabel(x.Key)}, {x.Next.ToStringInvariant()}{(ctx.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : "")}{(ctx.Values != null ? $", {ToValueLabel(ctx.Values[i])}" : "")})")}}
                         };
 
                     {{HashSource}}
@@ -40,7 +40,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
 
                             const {{HashSizeType}} hash = get_hash(key);
                             const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
-                            {{GetSmallestSignedType(ctx.Buckets.Length)}} i = buckets[index] - static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(1);
+                            {{GetSmallestSignedType(ctx.Buckets.Length)}} i = static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(buckets[index] - 1);
 
                             while (i >= 0)
                             {
@@ -69,7 +69,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
 
                                 const {{HashSizeType}} hash = get_hash(key);
                                 const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
-                                {{GetSmallestSignedType(ctx.Buckets.Length)}} i = buckets[index] - static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(1);
+                                {{GetSmallestSignedType(ctx.Buckets.Length)}} i = static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(buckets[index] - 1);
 
                                 while (i >= 0)
                                 {

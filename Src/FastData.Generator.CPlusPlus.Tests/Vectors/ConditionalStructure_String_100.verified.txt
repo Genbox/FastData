@@ -10,7 +10,7 @@ class ConditionalStructure_String_100 final
 {
 public:
     [[nodiscard]]
-    static bool contains(const std::string_view key) noexcept
+    static constexpr bool contains(const std::string_view key) noexcept
     {
         if (const size_t len = key.length(); len < 1u || len > 2u)
             return false;

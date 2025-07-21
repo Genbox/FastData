@@ -38,7 +38,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
 
             sb.Append($$"""
 
-                            static inline std::array<{{ValueTypeName}}{{(customType ? "*" : "")}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
+                            {{GetFieldModifier(false)}}std::array<{{ValueTypeName}}{{(customType ? "*" : "")}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
                             {{FormatColumns(ctx.Values, ToValueLabel)}}
                             };
 

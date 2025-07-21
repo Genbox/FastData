@@ -13,7 +13,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
         sb.Append($$"""
                     public:
                         {{MethodAttribute}}
-                        {{MethodModifier}}constexpr bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
+                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
                         {
                             return {{GetEqualFunction("key", ToValueLabel(ctx.Item))}};
                         }
@@ -25,7 +25,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
 
             sb.Append($$"""
 
-                            static inline auto stored_value = {{ToValueLabel(ctx.Values[0])}};
+                            static inline const auto stored_value = {{ToValueLabel(ctx.Values[0])}};
 
                             {{MethodAttribute}}
                             {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}

@@ -23,7 +23,7 @@ static constexpr std::array<float, 100> keys = {
 
 public:
     [[nodiscard]]
-    static bool contains(const float key) noexcept
+    static constexpr bool contains(const float key) noexcept
     {
         if (key < 0.0f || key > 99.0f)
             return false;

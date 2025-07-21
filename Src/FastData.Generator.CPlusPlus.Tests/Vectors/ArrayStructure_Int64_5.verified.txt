@@ -14,7 +14,7 @@ static constexpr std::array<int64_t, 5> keys = {
 
 public:
     [[nodiscard]]
-    static bool contains(const int64_t key) noexcept
+    static constexpr bool contains(const int64_t key) noexcept
     {
         if (key < std::numeric_limits<int64_t>::lowest() || key > std::numeric_limits<int64_t>::max())
             return false;

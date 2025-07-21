@@ -100,9 +100,9 @@ internal class CPlusPlusLanguageDef : ILanguageDef
     {
         // ValueStruct(const int32_t age, const std::string& name) : Age(age), Name(name) { }
         StringBuilder sb = new StringBuilder();
-        sb.Append($"    {name}(");
+        sb.Append($"    constexpr {name}(");
         sb.AppendJoin(", ", properties.Select(x => $"const {RenderType(map, x.PropertyType)} {x.Name.ToLowerInvariant()}"));
-        sb.Append(") : ");
+        sb.Append(") noexcept : ");
         sb.AppendJoin(", ", properties.Select(x => $"{x.Name.ToLowerInvariant()}({x.Name.ToLowerInvariant()})"));
         sb.Append(" { }");
         return sb.ToString();

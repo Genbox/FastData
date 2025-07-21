@@ -14,8 +14,8 @@ class HashTableStructure_Double_5_HashZeroOrNaN final
         int8_t next;
         uint64_t hash_code;
         
-        e(const uint64_t hash_code, const int8_t next, const double key)
-           : hash_code(hash_code), next(next), key(key) {}
+        e(const double key, const int8_t next, const uint64_t hash_code)
+           : key(key), next(next), hash_code(hash_code) {}
     };
 
     static constexpr std::array<int8_t, 5> buckets = {
@@ -23,7 +23,7 @@ class HashTableStructure_Double_5_HashZeroOrNaN final
      };
 
     inline static const std::array<e, 5> entries = {
-        e(4607182418800017408, -1, 1.0), e(4611686018427387904, -1, 2.0), e(4613937818241073152, -1, 3.0), e(4616189618054758400, -1, 4.0), e(4617315517961601024, 1, 5.0)
+        e(1.0, -1, 4607182418800017408), e(2.0, -1, 4611686018427387904), e(3.0, -1, 4613937818241073152), e(4.0, -1, 4616189618054758400), e(5.0, 1, 4617315517961601024)
     };
 
     static uint64_t get_hash(const double value) noexcept
@@ -35,14 +35,14 @@ class HashTableStructure_Double_5_HashZeroOrNaN final
 
 public:
     [[nodiscard]]
-    static bool contains(const double key) noexcept
+    static constexpr bool contains(const double key) noexcept
     {
         if (key < 1.0 || key > 5.0)
             return false;
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 5;
-        int8_t i = buckets[index] - static_cast<int8_t>(1);
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
         while (i >= 0)
         {
