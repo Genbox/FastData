@@ -160,9 +160,10 @@ public static partial class FastDataGenerator
                     return GenerateWrapper(generator, genCfg, new SingleValueStructure<string, TValue>(), keys, values);
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
+                double density = (double)keys.Length / (strProps.LengthData.Max - strProps.LengthData.Min + 1);
 
-                // If strings have unique lengths, we prefer to use a KeyLengthStructure.
-                if (strProps.LengthData.Unique)
+                // Use KeyLengthStructure only when string lengths are unique and density >= 75%
+                if (strProps.LengthData.Unique  && density >= 0.75)
                     return GenerateWrapper(generator, genCfg, new KeyLengthStructure<string, TValue>(strProps), keys, values);
 
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
