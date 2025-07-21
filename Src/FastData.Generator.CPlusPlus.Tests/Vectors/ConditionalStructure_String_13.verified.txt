@@ -24,11 +24,4 @@ public:
     static constexpr size_t item_count = 13;
     static constexpr size_t min_key_length = 1;
     static constexpr size_t max_key_length = 1;
-
-public:
-    ConditionalStructure_String_13() = delete;
-    ConditionalStructure_String_13(const ConditionalStructure_String_13&) = delete;
-    ConditionalStructure_String_13& operator=(const ConditionalStructure_String_13&) = delete;
-    ConditionalStructure_String_13(ConditionalStructure_String_13&&) = delete;
-    ConditionalStructure_String_13& operator=(ConditionalStructure_String_13&&) = delete;
 };

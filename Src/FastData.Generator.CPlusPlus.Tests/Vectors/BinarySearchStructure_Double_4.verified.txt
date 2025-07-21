@@ -40,11 +40,4 @@ public:
     static constexpr size_t item_count = 4;
     static constexpr double min_key = std::numeric_limits<double>::lowest();
     static constexpr double max_key = std::numeric_limits<double>::max();
-
-public:
-    BinarySearchStructure_Double_4() = delete;
-    BinarySearchStructure_Double_4(const BinarySearchStructure_Double_4&) = delete;
-    BinarySearchStructure_Double_4& operator=(const BinarySearchStructure_Double_4&) = delete;
-    BinarySearchStructure_Double_4(BinarySearchStructure_Double_4&&) = delete;
-    BinarySearchStructure_Double_4& operator=(BinarySearchStructure_Double_4&&) = delete;
 };

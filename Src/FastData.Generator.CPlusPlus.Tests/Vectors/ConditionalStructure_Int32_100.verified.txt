@@ -24,11 +24,4 @@ public:
     static constexpr size_t item_count = 100;
     static constexpr int32_t min_key = 0;
     static constexpr int32_t max_key = 99;
-
-public:
-    ConditionalStructure_Int32_100() = delete;
-    ConditionalStructure_Int32_100(const ConditionalStructure_Int32_100&) = delete;
-    ConditionalStructure_Int32_100& operator=(const ConditionalStructure_Int32_100&) = delete;
-    ConditionalStructure_Int32_100(ConditionalStructure_Int32_100&&) = delete;
-    ConditionalStructure_Int32_100& operator=(ConditionalStructure_Int32_100&&) = delete;
 };

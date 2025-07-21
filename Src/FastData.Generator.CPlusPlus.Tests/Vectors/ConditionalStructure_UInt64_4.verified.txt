@@ -24,11 +24,4 @@ public:
     static constexpr size_t item_count = 4;
     static constexpr uint64_t min_key = 0;
     static constexpr uint64_t max_key = std::numeric_limits<uint64_t>::max();
-
-public:
-    ConditionalStructure_UInt64_4() = delete;
-    ConditionalStructure_UInt64_4(const ConditionalStructure_UInt64_4&) = delete;
-    ConditionalStructure_UInt64_4& operator=(const ConditionalStructure_UInt64_4&) = delete;
-    ConditionalStructure_UInt64_4(ConditionalStructure_UInt64_4&&) = delete;
-    ConditionalStructure_UInt64_4& operator=(ConditionalStructure_UInt64_4&&) = delete;
 };

@@ -23,11 +23,4 @@ public:
     static constexpr size_t item_count = 3;
     static constexpr uint8_t min_key = 0;
     static constexpr uint8_t max_key = std::numeric_limits<uint8_t>::max();
-
-public:
-    ConditionalStructure_Byte_3() = delete;
-    ConditionalStructure_Byte_3(const ConditionalStructure_Byte_3&) = delete;
-    ConditionalStructure_Byte_3& operator=(const ConditionalStructure_Byte_3&) = delete;
-    ConditionalStructure_Byte_3(ConditionalStructure_Byte_3&&) = delete;
-    ConditionalStructure_Byte_3& operator=(ConditionalStructure_Byte_3&&) = delete;
 };

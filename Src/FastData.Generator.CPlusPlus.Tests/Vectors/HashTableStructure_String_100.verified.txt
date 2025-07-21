@@ -81,11 +81,4 @@ public:
     static constexpr size_t item_count = 100;
     static constexpr size_t min_key_length = 1;
     static constexpr size_t max_key_length = 2;
-
-public:
-    HashTableStructure_String_100() = delete;
-    HashTableStructure_String_100(const HashTableStructure_String_100&) = delete;
-    HashTableStructure_String_100& operator=(const HashTableStructure_String_100&) = delete;
-    HashTableStructure_String_100(HashTableStructure_String_100&&) = delete;
-    HashTableStructure_String_100& operator=(HashTableStructure_String_100&&) = delete;
 };

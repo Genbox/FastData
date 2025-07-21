@@ -40,11 +40,4 @@ public:
     static constexpr size_t item_count = 3;
     static constexpr char min_key = 0;
     static constexpr char max_key = 127;
-
-public:
-    BinarySearchStructure_Char_3() = delete;
-    BinarySearchStructure_Char_3(const BinarySearchStructure_Char_3&) = delete;
-    BinarySearchStructure_Char_3& operator=(const BinarySearchStructure_Char_3&) = delete;
-    BinarySearchStructure_Char_3(BinarySearchStructure_Char_3&&) = delete;
-    BinarySearchStructure_Char_3& operator=(BinarySearchStructure_Char_3&&) = delete;
 };

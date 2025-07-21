@@ -24,11 +24,4 @@ public:
     static constexpr size_t item_count = 5;
     static constexpr int8_t min_key = std::numeric_limits<int8_t>::lowest();
     static constexpr int8_t max_key = std::numeric_limits<int8_t>::max();
-
-public:
-    ConditionalStructure_SByte_5() = delete;
-    ConditionalStructure_SByte_5(const ConditionalStructure_SByte_5&) = delete;
-    ConditionalStructure_SByte_5& operator=(const ConditionalStructure_SByte_5&) = delete;
-    ConditionalStructure_SByte_5(ConditionalStructure_SByte_5&&) = delete;
-    ConditionalStructure_SByte_5& operator=(ConditionalStructure_SByte_5&&) = delete;
 };

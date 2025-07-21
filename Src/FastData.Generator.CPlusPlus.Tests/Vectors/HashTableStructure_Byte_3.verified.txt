@@ -58,11 +58,4 @@ public:
     static constexpr size_t item_count = 3;
     static constexpr uint8_t min_key = 0;
     static constexpr uint8_t max_key = std::numeric_limits<uint8_t>::max();
-
-public:
-    HashTableStructure_Byte_3() = delete;
-    HashTableStructure_Byte_3(const HashTableStructure_Byte_3&) = delete;
-    HashTableStructure_Byte_3& operator=(const HashTableStructure_Byte_3&) = delete;
-    HashTableStructure_Byte_3(HashTableStructure_Byte_3&&) = delete;
-    HashTableStructure_Byte_3& operator=(HashTableStructure_Byte_3&&) = delete;
 };

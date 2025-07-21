@@ -18,11 +18,4 @@ public:
     static constexpr size_t item_count = 1;
     static constexpr uint64_t min_key = 1ull;
     static constexpr uint64_t max_key = 1ull;
-
-public:
-    SingleValueStructure_UInt64_1() = delete;
-    SingleValueStructure_UInt64_1(const SingleValueStructure_UInt64_1&) = delete;
-    SingleValueStructure_UInt64_1& operator=(const SingleValueStructure_UInt64_1&) = delete;
-    SingleValueStructure_UInt64_1(SingleValueStructure_UInt64_1&&) = delete;
-    SingleValueStructure_UInt64_1& operator=(SingleValueStructure_UInt64_1&&) = delete;
 };

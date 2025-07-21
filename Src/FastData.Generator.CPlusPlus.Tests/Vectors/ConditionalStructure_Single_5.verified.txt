@@ -24,11 +24,4 @@ public:
     static constexpr size_t item_count = 5;
     static constexpr float min_key = std::numeric_limits<float>::lowest();
     static constexpr float max_key = std::numeric_limits<float>::max();
-
-public:
-    ConditionalStructure_Single_5() = delete;
-    ConditionalStructure_Single_5(const ConditionalStructure_Single_5&) = delete;
-    ConditionalStructure_Single_5& operator=(const ConditionalStructure_Single_5&) = delete;
-    ConditionalStructure_Single_5(ConditionalStructure_Single_5&&) = delete;
-    ConditionalStructure_Single_5& operator=(ConditionalStructure_Single_5&&) = delete;
 };

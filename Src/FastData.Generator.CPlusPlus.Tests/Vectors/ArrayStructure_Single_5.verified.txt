@@ -30,11 +30,4 @@ public:
     static constexpr size_t item_count = 5;
     static constexpr float min_key = std::numeric_limits<float>::lowest();
     static constexpr float max_key = std::numeric_limits<float>::max();
-
-public:
-    ArrayStructure_Single_5() = delete;
-    ArrayStructure_Single_5(const ArrayStructure_Single_5&) = delete;
-    ArrayStructure_Single_5& operator=(const ArrayStructure_Single_5&) = delete;
-    ArrayStructure_Single_5(ArrayStructure_Single_5&&) = delete;
-    ArrayStructure_Single_5& operator=(ArrayStructure_Single_5&&) = delete;
 };

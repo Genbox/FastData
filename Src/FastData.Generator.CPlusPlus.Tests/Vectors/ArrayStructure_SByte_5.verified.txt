@@ -30,11 +30,4 @@ public:
     static constexpr size_t item_count = 5;
     static constexpr int8_t min_key = std::numeric_limits<int8_t>::lowest();
     static constexpr int8_t max_key = std::numeric_limits<int8_t>::max();
-
-public:
-    ArrayStructure_SByte_5() = delete;
-    ArrayStructure_SByte_5(const ArrayStructure_SByte_5&) = delete;
-    ArrayStructure_SByte_5& operator=(const ArrayStructure_SByte_5&) = delete;
-    ArrayStructure_SByte_5(ArrayStructure_SByte_5&&) = delete;
-    ArrayStructure_SByte_5& operator=(ArrayStructure_SByte_5&&) = delete;
 };

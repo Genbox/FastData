@@ -69,11 +69,4 @@ public:
     static constexpr size_t item_count = 3;
     static constexpr int32_t min_key = 1;
     static constexpr int32_t max_key = 3;
-
-public:
-    HashTablePerfectStructure_Int32_3() = delete;
-    HashTablePerfectStructure_Int32_3(const HashTablePerfectStructure_Int32_3&) = delete;
-    HashTablePerfectStructure_Int32_3& operator=(const HashTablePerfectStructure_Int32_3&) = delete;
-    HashTablePerfectStructure_Int32_3(HashTablePerfectStructure_Int32_3&&) = delete;
-    HashTablePerfectStructure_Int32_3& operator=(HashTablePerfectStructure_Int32_3&&) = delete;
 };

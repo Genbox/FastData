@@ -59,11 +59,4 @@ public:
     static constexpr size_t item_count = 3;
     static constexpr int32_t min_key = 1;
     static constexpr int32_t max_key = 3;
-
-public:
-    ArrayStructure_Int32_3() = delete;
-    ArrayStructure_Int32_3(const ArrayStructure_Int32_3&) = delete;
-    ArrayStructure_Int32_3& operator=(const ArrayStructure_Int32_3&) = delete;
-    ArrayStructure_Int32_3(ArrayStructure_Int32_3&&) = delete;
-    ArrayStructure_Int32_3& operator=(ArrayStructure_Int32_3&&) = delete;
 };

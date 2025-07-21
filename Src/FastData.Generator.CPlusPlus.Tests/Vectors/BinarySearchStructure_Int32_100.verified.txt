@@ -49,11 +49,4 @@ public:
     static constexpr size_t item_count = 100;
     static constexpr int32_t min_key = 0;
     static constexpr int32_t max_key = 99;
-
-public:
-    BinarySearchStructure_Int32_100() = delete;
-    BinarySearchStructure_Int32_100(const BinarySearchStructure_Int32_100&) = delete;
-    BinarySearchStructure_Int32_100& operator=(const BinarySearchStructure_Int32_100&) = delete;
-    BinarySearchStructure_Int32_100(BinarySearchStructure_Int32_100&&) = delete;
-    BinarySearchStructure_Int32_100& operator=(BinarySearchStructure_Int32_100&&) = delete;
 };

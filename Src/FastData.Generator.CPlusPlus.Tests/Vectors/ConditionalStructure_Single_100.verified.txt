@@ -24,11 +24,4 @@ public:
     static constexpr size_t item_count = 100;
     static constexpr float min_key = 0.0f;
     static constexpr float max_key = 99.0f;
-
-public:
-    ConditionalStructure_Single_100() = delete;
-    ConditionalStructure_Single_100(const ConditionalStructure_Single_100&) = delete;
-    ConditionalStructure_Single_100& operator=(const ConditionalStructure_Single_100&) = delete;
-    ConditionalStructure_Single_100(ConditionalStructure_Single_100&&) = delete;
-    ConditionalStructure_Single_100& operator=(ConditionalStructure_Single_100&&) = delete;
 };

@@ -18,11 +18,4 @@ public:
     static constexpr size_t item_count = 1;
     static constexpr float min_key = 1.0f;
     static constexpr float max_key = 1.0f;
-
-public:
-    SingleValueStructure_Single_1() = delete;
-    SingleValueStructure_Single_1(const SingleValueStructure_Single_1&) = delete;
-    SingleValueStructure_Single_1& operator=(const SingleValueStructure_Single_1&) = delete;
-    SingleValueStructure_Single_1(SingleValueStructure_Single_1&&) = delete;
-    SingleValueStructure_Single_1& operator=(SingleValueStructure_Single_1&&) = delete;
 };

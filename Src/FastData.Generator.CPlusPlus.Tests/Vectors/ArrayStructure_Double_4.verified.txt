@@ -30,11 +30,4 @@ public:
     static constexpr size_t item_count = 4;
     static constexpr double min_key = std::numeric_limits<double>::lowest();
     static constexpr double max_key = std::numeric_limits<double>::max();
-
-public:
-    ArrayStructure_Double_4() = delete;
-    ArrayStructure_Double_4(const ArrayStructure_Double_4&) = delete;
-    ArrayStructure_Double_4& operator=(const ArrayStructure_Double_4&) = delete;
-    ArrayStructure_Double_4(ArrayStructure_Double_4&&) = delete;
-    ArrayStructure_Double_4& operator=(ArrayStructure_Double_4&&) = delete;
 };

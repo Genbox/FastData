@@ -91,11 +91,4 @@ public:
     static constexpr size_t item_count = 3;
     static constexpr int32_t min_key = 1;
     static constexpr int32_t max_key = 3;
-
-public:
-    HashTableStructure_Int32_3() = delete;
-    HashTableStructure_Int32_3(const HashTableStructure_Int32_3&) = delete;
-    HashTableStructure_Int32_3& operator=(const HashTableStructure_Int32_3&) = delete;
-    HashTableStructure_Int32_3(HashTableStructure_Int32_3&&) = delete;
-    HashTableStructure_Int32_3& operator=(HashTableStructure_Int32_3&&) = delete;
 };

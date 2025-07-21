@@ -59,18 +59,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     protected override void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)
     {
         base.AppendFooter(sb, genCfg, typeName);
-
-        string cn = _cfg.ClassName;
-        sb.Append($$"""
-
-                    public:
-                        {{cn}}() = delete;
-                        {{cn}}(const {{cn}}&) = delete;
-                        {{cn}}& operator=(const {{cn}}&) = delete;
-                        {{cn}}({{cn}}&&) = delete;
-                        {{cn}}& operator=({{cn}}&&) = delete;
-                    };
-                    """);
+        sb.Append("};");
     }
 
     protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context) => context switch

@@ -62,11 +62,4 @@ public:
     static constexpr size_t item_count = 5;
     static constexpr float min_key = std::numeric_limits<float>::lowest();
     static constexpr float max_key = std::numeric_limits<float>::max();
-
-public:
-    HashTableStructure_Single_5() = delete;
-    HashTableStructure_Single_5(const HashTableStructure_Single_5&) = delete;
-    HashTableStructure_Single_5& operator=(const HashTableStructure_Single_5&) = delete;
-    HashTableStructure_Single_5(HashTableStructure_Single_5&&) = delete;
-    HashTableStructure_Single_5& operator=(HashTableStructure_Single_5&&) = delete;
 };

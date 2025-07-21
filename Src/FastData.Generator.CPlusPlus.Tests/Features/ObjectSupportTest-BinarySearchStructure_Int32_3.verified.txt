@@ -78,11 +78,4 @@ public:
     static constexpr size_t item_count = 3;
     static constexpr int32_t min_key = 1;
     static constexpr int32_t max_key = 3;
-
-public:
-    BinarySearchStructure_Int32_3() = delete;
-    BinarySearchStructure_Int32_3(const BinarySearchStructure_Int32_3&) = delete;
-    BinarySearchStructure_Int32_3& operator=(const BinarySearchStructure_Int32_3&) = delete;
-    BinarySearchStructure_Int32_3(BinarySearchStructure_Int32_3&&) = delete;
-    BinarySearchStructure_Int32_3& operator=(BinarySearchStructure_Int32_3&&) = delete;
 };

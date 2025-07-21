@@ -60,11 +60,4 @@ public:
     static constexpr size_t item_count = 5;
     static constexpr float min_key = 1.0f;
     static constexpr float max_key = 5.0f;
-
-public:
-    HashTableStructure_Single_5_HashZeroOrNaN() = delete;
-    HashTableStructure_Single_5_HashZeroOrNaN(const HashTableStructure_Single_5_HashZeroOrNaN&) = delete;
-    HashTableStructure_Single_5_HashZeroOrNaN& operator=(const HashTableStructure_Single_5_HashZeroOrNaN&) = delete;
-    HashTableStructure_Single_5_HashZeroOrNaN(HashTableStructure_Single_5_HashZeroOrNaN&&) = delete;
-    HashTableStructure_Single_5_HashZeroOrNaN& operator=(HashTableStructure_Single_5_HashZeroOrNaN&&) = delete;
 };

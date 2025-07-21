@@ -58,11 +58,4 @@ public:
     static constexpr size_t item_count = 5;
     static constexpr int8_t min_key = std::numeric_limits<int8_t>::lowest();
     static constexpr int8_t max_key = std::numeric_limits<int8_t>::max();
-
-public:
-    HashTableStructure_SByte_5() = delete;
-    HashTableStructure_SByte_5(const HashTableStructure_SByte_5&) = delete;
-    HashTableStructure_SByte_5& operator=(const HashTableStructure_SByte_5&) = delete;
-    HashTableStructure_SByte_5(HashTableStructure_SByte_5&&) = delete;
-    HashTableStructure_SByte_5& operator=(HashTableStructure_SByte_5&&) = delete;
 };

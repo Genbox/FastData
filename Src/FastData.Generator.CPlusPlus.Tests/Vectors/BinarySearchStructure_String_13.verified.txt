@@ -41,11 +41,4 @@ public:
     static constexpr size_t item_count = 13;
     static constexpr size_t min_key_length = 1;
     static constexpr size_t max_key_length = 1;
-
-public:
-    BinarySearchStructure_String_13() = delete;
-    BinarySearchStructure_String_13(const BinarySearchStructure_String_13&) = delete;
-    BinarySearchStructure_String_13& operator=(const BinarySearchStructure_String_13&) = delete;
-    BinarySearchStructure_String_13(BinarySearchStructure_String_13&&) = delete;
-    BinarySearchStructure_String_13& operator=(BinarySearchStructure_String_13&&) = delete;
 };

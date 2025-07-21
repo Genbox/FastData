@@ -30,11 +30,4 @@ public:
     static constexpr size_t item_count = 3;
     static constexpr size_t min_key_length = 1;
     static constexpr size_t max_key_length = 255;
-
-public:
-    ArrayStructure_String_3() = delete;
-    ArrayStructure_String_3(const ArrayStructure_String_3&) = delete;
-    ArrayStructure_String_3& operator=(const ArrayStructure_String_3&) = delete;
-    ArrayStructure_String_3(ArrayStructure_String_3&&) = delete;
-    ArrayStructure_String_3& operator=(ArrayStructure_String_3&&) = delete;
 };

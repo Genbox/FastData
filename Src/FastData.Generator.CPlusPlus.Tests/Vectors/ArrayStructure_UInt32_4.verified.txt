@@ -30,11 +30,4 @@ public:
     static constexpr size_t item_count = 4;
     static constexpr uint32_t min_key = 0;
     static constexpr uint32_t max_key = std::numeric_limits<uint32_t>::max();
-
-public:
-    ArrayStructure_UInt32_4() = delete;
-    ArrayStructure_UInt32_4(const ArrayStructure_UInt32_4&) = delete;
-    ArrayStructure_UInt32_4& operator=(const ArrayStructure_UInt32_4&) = delete;
-    ArrayStructure_UInt32_4(ArrayStructure_UInt32_4&&) = delete;
-    ArrayStructure_UInt32_4& operator=(ArrayStructure_UInt32_4&&) = delete;
 };

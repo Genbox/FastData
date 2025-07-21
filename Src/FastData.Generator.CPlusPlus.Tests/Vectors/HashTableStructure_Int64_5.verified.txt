@@ -58,11 +58,4 @@ public:
     static constexpr size_t item_count = 5;
     static constexpr int64_t min_key = std::numeric_limits<int64_t>::lowest();
     static constexpr int64_t max_key = std::numeric_limits<int64_t>::max();
-
-public:
-    HashTableStructure_Int64_5() = delete;
-    HashTableStructure_Int64_5(const HashTableStructure_Int64_5&) = delete;
-    HashTableStructure_Int64_5& operator=(const HashTableStructure_Int64_5&) = delete;
-    HashTableStructure_Int64_5(HashTableStructure_Int64_5&&) = delete;
-    HashTableStructure_Int64_5& operator=(HashTableStructure_Int64_5&&) = delete;
 };

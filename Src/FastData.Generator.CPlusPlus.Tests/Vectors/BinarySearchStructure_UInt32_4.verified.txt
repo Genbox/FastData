@@ -40,11 +40,4 @@ public:
     static constexpr size_t item_count = 4;
     static constexpr uint32_t min_key = 0;
     static constexpr uint32_t max_key = std::numeric_limits<uint32_t>::max();
-
-public:
-    BinarySearchStructure_UInt32_4() = delete;
-    BinarySearchStructure_UInt32_4(const BinarySearchStructure_UInt32_4&) = delete;
-    BinarySearchStructure_UInt32_4& operator=(const BinarySearchStructure_UInt32_4&) = delete;
-    BinarySearchStructure_UInt32_4(BinarySearchStructure_UInt32_4&&) = delete;
-    BinarySearchStructure_UInt32_4& operator=(BinarySearchStructure_UInt32_4&&) = delete;
 };

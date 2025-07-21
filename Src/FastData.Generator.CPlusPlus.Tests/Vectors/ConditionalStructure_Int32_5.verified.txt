@@ -24,11 +24,4 @@ public:
     static constexpr size_t item_count = 5;
     static constexpr int32_t min_key = std::numeric_limits<int32_t>::lowest();
     static constexpr int32_t max_key = std::numeric_limits<int32_t>::max();
-
-public:
-    ConditionalStructure_Int32_5() = delete;
-    ConditionalStructure_Int32_5(const ConditionalStructure_Int32_5&) = delete;
-    ConditionalStructure_Int32_5& operator=(const ConditionalStructure_Int32_5&) = delete;
-    ConditionalStructure_Int32_5(ConditionalStructure_Int32_5&&) = delete;
-    ConditionalStructure_Int32_5& operator=(ConditionalStructure_Int32_5&&) = delete;
 };

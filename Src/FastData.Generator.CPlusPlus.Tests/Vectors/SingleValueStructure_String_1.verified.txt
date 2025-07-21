@@ -18,11 +18,4 @@ public:
     static constexpr size_t item_count = 1;
     static constexpr size_t min_key_length = 6;
     static constexpr size_t max_key_length = 6;
-
-public:
-    SingleValueStructure_String_1() = delete;
-    SingleValueStructure_String_1(const SingleValueStructure_String_1&) = delete;
-    SingleValueStructure_String_1& operator=(const SingleValueStructure_String_1&) = delete;
-    SingleValueStructure_String_1(SingleValueStructure_String_1&&) = delete;
-    SingleValueStructure_String_1& operator=(SingleValueStructure_String_1&&) = delete;
 };

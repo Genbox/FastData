@@ -18,11 +18,4 @@ public:
     static constexpr size_t item_count = 1;
     static constexpr uint8_t min_key = 1;
     static constexpr uint8_t max_key = 1;
-
-public:
-    SingleValueStructure_Byte_1() = delete;
-    SingleValueStructure_Byte_1(const SingleValueStructure_Byte_1&) = delete;
-    SingleValueStructure_Byte_1& operator=(const SingleValueStructure_Byte_1&) = delete;
-    SingleValueStructure_Byte_1(SingleValueStructure_Byte_1&&) = delete;
-    SingleValueStructure_Byte_1& operator=(SingleValueStructure_Byte_1&&) = delete;
 };

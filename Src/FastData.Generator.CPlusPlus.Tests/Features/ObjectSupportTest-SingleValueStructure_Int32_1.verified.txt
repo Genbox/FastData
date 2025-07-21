@@ -39,11 +39,4 @@ public:
     static constexpr size_t item_count = 1;
     static constexpr int32_t min_key = 1;
     static constexpr int32_t max_key = 1;
-
-public:
-    SingleValueStructure_Int32_1() = delete;
-    SingleValueStructure_Int32_1(const SingleValueStructure_Int32_1&) = delete;
-    SingleValueStructure_Int32_1& operator=(const SingleValueStructure_Int32_1&) = delete;
-    SingleValueStructure_Int32_1(SingleValueStructure_Int32_1&&) = delete;
-    SingleValueStructure_Int32_1& operator=(SingleValueStructure_Int32_1&&) = delete;
 };
