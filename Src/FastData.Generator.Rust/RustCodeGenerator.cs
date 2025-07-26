@@ -27,18 +27,27 @@ public sealed class RustCodeGenerator : CodeGenerator
     {
         base.AppendHeader(sb, genCfg, context);
 
-        sb.Append($$"""
-                    #![allow(unused_parens)]
-                    #![allow(missing_docs)]
-                    #![allow(unused_imports)]
-                    #![allow(unused_unsafe)]
-                    use std::ptr;
+        sb.Append($"""
+                   #![allow(unused_parens)]
+                   #![allow(missing_docs)]
+                   #![allow(unused_imports)]
+                   #![allow(unused_unsafe)]
+                   use std::ptr;
 
-                    pub struct {{_cfg.ClassName}};
+                   pub struct {_cfg.ClassName};
+
+                   """);
+    }
+
+    protected override void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext<TValue> context)
+    {
+        sb.Append($$"""
 
                     impl {{_cfg.ClassName}} {
 
                     """);
+
+        base.AppendBody(sb, genCfg, keyTypeName, valueTypeName, context);
     }
 
     protected override void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)
@@ -50,13 +59,13 @@ public sealed class RustCodeGenerator : CodeGenerator
 
     protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context) => context switch
     {
-        SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x),
-        ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x),
-        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x),
-        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x),
+        SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, Shared),
+        ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, Shared),
+        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, Shared),
+        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, Shared),
         HashTableContext<TKey, TValue> x => new HashTableCode<TKey, TValue>(x, genCfg, Shared),
         HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, genCfg, Shared),
-        KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x),
+        KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, Shared),
         _ => null
     };
 }

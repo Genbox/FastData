@@ -68,4 +68,5 @@ impl HashTableStructure_Int32_100 {
     
     next: i8,
     key: i32,
+    
 }

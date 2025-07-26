@@ -9,9 +9,10 @@ use std::ptr;
 pub struct HashTablePerfectStructure_Int32_3;
 
 impl HashTablePerfectStructure_Int32_3 {
-    const ENTRIES: [i32; 3] = [
-        3, 1, 2
-    ];
+
+const ENTRIES: [i32; 3] = [
+            3, 1, 2
+];
 
     #[inline(always)]
     fn get_hash(value: i32) -> u64 {
@@ -25,8 +26,9 @@ impl HashTablePerfectStructure_Int32_3 {
         }
         let hash = unsafe { Self::get_hash(key) };
         let index = (hash % 3) as usize;
+        let entry = Self::ENTRIES[index];
 
-        return key == Self::ENTRIES[index];
+        return key == entry;
     }
 
     pub const ITEM_COUNT: usize = 3;

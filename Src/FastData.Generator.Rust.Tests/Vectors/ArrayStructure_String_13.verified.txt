@@ -9,13 +9,13 @@ use std::ptr;
 pub struct ArrayStructure_String_13;
 
 impl ArrayStructure_String_13 {
-    const KEYS: [&str; 13] = [
+    const KEYS: [&'static str; 13] = [
         "æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", 
         "ñ", "ø", "å"
     ];
 
     #[must_use]
-    pub fn contains(key: &str) -> bool {
+    pub fn contains(key: &'static str) -> bool {
         if key.len() != 2 as usize {
             return false;
         }

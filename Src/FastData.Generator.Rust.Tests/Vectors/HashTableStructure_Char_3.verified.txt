@@ -50,4 +50,5 @@ impl HashTableStructure_Char_3 {
     
     next: i8,
     key: char,
+    
 }

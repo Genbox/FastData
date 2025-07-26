@@ -50,4 +50,5 @@ impl HashTableStructure_Byte_3 {
     
     next: i8,
     key: u8,
+    
 }

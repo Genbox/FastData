@@ -55,4 +55,5 @@ impl HashTableStructure_Double_4 {
     hash_code: u64,
     next: i8,
     key: f64,
+    
 }

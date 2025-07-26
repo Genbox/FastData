@@ -50,4 +50,5 @@ impl HashTableStructure_UInt32_4 {
     
     next: i8,
     key: u32,
+    
 }

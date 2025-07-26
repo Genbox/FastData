@@ -1,9 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
-using Genbox.FastData.Generator.Rust.Shared;
 using Genbox.FastData.Generators;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.TestClasses;
@@ -13,7 +11,7 @@ using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.Rust.Tests;
 
-public class VectorTests(VectorTests.RustContext context) : IClassFixture<VectorTests.RustContext>
+public class VectorTests(RustContext context) : IClassFixture<RustContext>
 {
     [Theory]
     [ClassData(typeof(TestVectorTheoryData))]
@@ -47,13 +45,5 @@ public class VectorTests(VectorTests.RustContext context) : IClassFixture<Vector
               """);
 
         Assert.Equal(1, RunProcess(executable));
-    }
-
-    // ReSharper disable once ClassNeverInstantiated.Global
-    [SuppressMessage("Design", "CA1034:Nested types should not be visible")]
-    [SuppressMessage("Maintainability", "CA1515:Consider making public types internal")]
-    public sealed class RustContext
-    {
-        public RustCompiler Compiler { get; } = new RustCompiler(false, Path.Combine(Path.GetTempPath(), "FastData", "Rust"));
     }
 }

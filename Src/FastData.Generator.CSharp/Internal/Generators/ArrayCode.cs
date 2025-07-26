@@ -19,7 +19,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                         {
-                    {{EarlyExits}}
+                    {{GetEarlyExits(MethodType.Contains)}}
 
                             for (int i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
                             {
@@ -32,7 +32,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
 
         if (ctx.Values != null)
         {
-            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
 
@@ -45,7 +45,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
                             {
                                 value = default;
 
-                        {{EarlyExits}}
+                        {{GetEarlyExits(MethodType.TryLookup)}}
 
                                 for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
                                 {

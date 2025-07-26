@@ -50,4 +50,5 @@ impl HashTableStructure_UInt16_4 {
     
     next: i8,
     key: u16,
+    
 }

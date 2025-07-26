@@ -19,7 +19,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                         {
-                    {{EarlyExits}}
+                    {{GetEarlyExits(MethodType.Contains)}}
 
                             int lo = 0;
                             int hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
@@ -42,7 +42,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 
         if (ctx.Values != null)
         {
-            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
 
@@ -55,7 +55,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                             {
                                 value = default;
 
-                        {{EarlyExits}}
+                        {{GetEarlyExits(MethodType.TryLookup)}}
 
                                 int lo = 0;
                                 int hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};

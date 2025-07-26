@@ -20,7 +20,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
 
         if (ctx.Values != null)
         {
-            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
 

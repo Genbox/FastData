@@ -10,43 +10,78 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
 {
     public override string Generate()
     {
-        shared.Add("chain-struct-" + genCfg.DataType, CodePlacement.After, $$"""
-                                                                        {{FieldModifier}}struct E {
-                                                                            {{(ctx.StoreHashCode ? $"hash_code: {HashSizeType}," : "")}}
-                                                                            next: {{GetSmallestSignedType(ctx.Buckets.Length)}},
-                                                                            key: {{TypeNameWithLifetime}},
-                                                                        }
-                                                                        """);
+        bool customKey = !typeof(TKey).IsPrimitive;
+        bool customValue = !typeof(TValue).IsPrimitive;
 
-        return $$"""
-                     {{FieldModifier}}const BUCKETS: [{{GetSmallestSignedType(ctx.Buckets.Length)}}; {{ctx.Buckets.Length.ToStringInvariant()}}] = [
-                 {{FormatColumns(ctx.Buckets, static x => x.ToStringInvariant())}}
-                     ];
+        shared.Add(CodePlacement.After, $$"""
+                                          {{FieldModifier}}struct E {
+                                              {{(ctx.StoreHashCode ? $"hash_code: {HashSizeType}," : "")}}
+                                              next: {{GetSmallestSignedType(ctx.Buckets.Length)}},
+                                              key: {{GetKeyTypeName(customKey)}},
+                                              {{(ctx.Values != null ? $"value: {GetValueTypeName(customValue)}," : "")}}
+                                          }
+                                          """);
 
-                     {{FieldModifier}}const ENTRIES: [E; {{ctx.Entries.Length}}] = [
-                 {{FormatColumns(ctx.Entries, x => $"E {{ {(ctx.StoreHashCode ? $"hash_code: {x.Hash}, " : "")}next: {x.Next.ToStringInvariant()}, key: {ToValueLabel(x.Key)} }}")}}
-                     ];
+        StringBuilder sb = new StringBuilder();
 
-                 {{HashSource}}
+        sb.Append($$"""
+                        {{FieldModifier}}const BUCKETS: [{{GetSmallestSignedType(ctx.Buckets.Length)}}; {{ctx.Buckets.Length.ToStringInvariant()}}] = [
+                    {{FormatColumns(ctx.Buckets, (_, x) => x.ToStringInvariant())}}
+                        ];
 
-                     {{MethodAttribute}}
-                     {{MethodModifier}}fn contains(key: {{KeyTypeName}}) -> bool {
-                 {{EarlyExits}}
+                        {{FieldModifier}}const ENTRIES: [E; {{ctx.Entries.Length}}] = [
+                    {{FormatColumns(ctx.Entries, (i, x) => $"E {{ {(ctx.StoreHashCode ? $"hash_code: {x.Hash}, " : "")}next: {x.Next.ToStringInvariant()}, key: {ToValueLabel(x.Key)}{(ctx.Values != null ? $", value: {ToValueLabel(ctx.Values[i])}" : "")} }}")}}
+                        ];
 
-                         let hash = unsafe { Self::get_hash(key) };
-                         let index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
-                         let mut i: {{GetSmallestSignedType(ctx.Buckets.Length)}} = (Self::BUCKETS[index as usize] as {{GetSmallestSignedType(ctx.Buckets.Length)}}) - 1;
+                    {{HashSource}}
 
-                         while i >= 0 {
-                             let entry = &Self::ENTRIES[i as usize];
-                             if {{(ctx.StoreHashCode ? GetEqualFunction("entry.hash_code", "hash") + " && " : "")}}{{GetEqualFunction("entry.key", "key")}} {
-                                 return true;
-                             }
-                             i = entry.next;
-                         }
+                        {{MethodAttribute}}
+                        {{MethodModifier}}fn contains(key: {{GetKeyTypeName(customKey)}}) -> bool {
+                    {{GetEarlyExits(MethodType.Contains)}}
 
-                         false
-                     }
-                 """;
+                            let hash = unsafe { Self::get_hash(key) };
+                            let index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
+                            let mut i: {{GetSmallestSignedType(ctx.Buckets.Length)}} = (Self::BUCKETS[index as usize] as {{GetSmallestSignedType(ctx.Buckets.Length)}}) - 1;
+
+                            while i >= 0 {
+                                let entry = &Self::ENTRIES[i as usize];
+                                if {{(ctx.StoreHashCode ? GetEqualFunction("entry.hash_code", "hash") + " && " : "")}}{{GetEqualFunction("entry.key", "key")}} {
+                                    return true;
+                                }
+                                i = entry.next;
+                            }
+
+                            false
+                        }
+                    """);
+
+        if (ctx.Values != null)
+        {
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
+
+            sb.Append($$"""
+
+                            {{MethodAttribute}}
+                            {{MethodModifier}}fn try_lookup(key: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
+                        {{GetEarlyExits(MethodType.TryLookup)}}
+
+                                let hash = unsafe { Self::get_hash(key) };
+                                let index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
+                                let mut i: {{GetSmallestSignedType(ctx.Buckets.Length)}} = (Self::BUCKETS[index as usize] as {{GetSmallestSignedType(ctx.Buckets.Length)}}) - 1;
+
+                                while i >= 0 {
+                                    let entry = &Self::ENTRIES[i as usize];
+                                    if {{(ctx.StoreHashCode ? GetEqualFunction("entry.hash_code", "hash") + " && " : "")}}{{GetEqualFunction("entry.key", "key")}} {
+                                        return Some(entry.value);
+                                    }
+                                    i = entry.next;
+                                }
+
+                                None
+                            }
+                        """);
+        }
+
+        return sb.ToString();
     }
 }

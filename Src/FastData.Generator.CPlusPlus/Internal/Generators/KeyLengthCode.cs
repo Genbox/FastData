@@ -13,7 +13,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
 
         if (ctx.Values != null)
         {
-            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
                             {{FieldModifier}}std::array<int32_t, {{ctx.ValueOffsets.Length}}> offsets = {
@@ -39,7 +39,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                         {{MethodAttribute}}
                         {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
                         {
-                    {{EarlyExits}}
+                    {{GetEarlyExits(MethodType.Contains)}}
 
                             return {{GetEqualFunction("key", $"keys[key.length() - {ctx.MinLength.ToStringInvariant()}]")}};
                         }
@@ -52,7 +52,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                         {{MethodAttribute}}
                         {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
                         {
-                        {{EarlyExits}}
+                        {{GetEarlyExits(MethodType.TryLookup)}}
 
                             size_t idx = key.length() - {{ctx.MinLength.ToStringInvariant()}};
                             if ({{GetEqualFunction("key", "keys[idx]")}})

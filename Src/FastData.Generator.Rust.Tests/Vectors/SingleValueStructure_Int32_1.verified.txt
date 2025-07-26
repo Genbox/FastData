@@ -11,7 +11,7 @@ pub struct SingleValueStructure_Int32_1;
 impl SingleValueStructure_Int32_1 {
     #[must_use]
     pub fn contains(key: i32) -> bool {
-         1 == key
+        key == 1
     }
 
     pub const ITEM_COUNT: usize = 1;

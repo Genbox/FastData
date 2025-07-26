@@ -9,7 +9,7 @@ internal class RustHashDef : IHashDef
     public string GetHashSource(DataType dataType, string typeName, HashInfo info) =>
         $$"""
               {{(dataType == DataType.String ? "#[inline]" : "#[inline(always)]")}}
-              {{(dataType == DataType.String ? "unsafe " : "")}}fn get_hash(value: {{typeName}}) -> u64 {
+              {{(dataType == DataType.String ? "unsafe " : "")}}fn get_hash(value: {{(dataType == DataType.String ? "&" : "")}}{{typeName}}) -> u64 {
           {{GetHash(dataType, info)}}
               }
           """;

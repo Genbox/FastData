@@ -10,7 +10,7 @@ pub struct ConditionalStructure_String_3;
 
 impl ConditionalStructure_String_3 {
     #[must_use]
-    pub fn contains(key: &str) -> bool {
+    pub fn contains(key: &'static str) -> bool {
 
 
         if key == "a" || key == "item" || key == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" {

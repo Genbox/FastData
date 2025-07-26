@@ -53,7 +53,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                         {
-                    {{EarlyExits}}
+                    {{GetEarlyExits(MethodType.Contains)}}
 
                             {{HashSizeType}} hash = Hash(key);
                             {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
@@ -65,7 +65,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
 
         if (ctx.Values != null)
         {
-            shared.Add("classes", CodePlacement.Before, GetObjectDeclarations<TValue>());
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
 
@@ -73,7 +73,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
                             {
                                value = default;
-                        {{EarlyExits}}
+                        {{GetEarlyExits(MethodType.TryLookup)}}
 
                                 {{HashSizeType}} hash = Hash(key);
                                 {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};

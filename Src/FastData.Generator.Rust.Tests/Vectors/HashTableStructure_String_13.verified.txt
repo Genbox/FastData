@@ -36,7 +36,7 @@ impl HashTableStructure_String_13 {
     }
 
     #[must_use]
-    pub fn contains(key: &str) -> bool {
+    pub fn contains(key: &'static str) -> bool {
         if key.len() != 2 as usize {
             return false;
         }
@@ -63,4 +63,5 @@ impl HashTableStructure_String_13 {
     hash_code: u64,
     next: i8,
     key: &'static str,
+    
 }

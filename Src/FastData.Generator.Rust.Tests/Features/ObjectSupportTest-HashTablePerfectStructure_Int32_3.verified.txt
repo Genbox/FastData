@@ -1,0 +1,71 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashTable (HashTablePerfect)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashTablePerfectStructure_Int32_3;
+pub struct e {
+    pub key: i32,
+    
+    pub value: &'static Person,
+}
+impl e {
+    pub const fn new (key: i32, value: &'static Person) -> Self { Self { key, value  } }
+}
+pub struct Person {
+    pub age: i32,
+    pub name: &'static str,
+    pub other: Option<&'static Person>,
+
+}
+
+impl Person {
+    pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
+}
+
+impl HashTablePerfectStructure_Int32_3 {
+
+const ENTRIES: [e; 3] = [
+            e::new(3, &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None)))), e::new(1, &Person::new(2, "Billy", None)), e::new(2, &Person::new(3, "Bibi", None))
+];
+
+    #[inline(always)]
+    fn get_hash(value: i32) -> u64 {
+        value as u64
+    }
+
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+        if key < 1 || key > 3 {
+            return false;
+        }
+        let hash = unsafe { Self::get_hash(key) };
+        let index = (hash % 3) as usize;
+        let entry = &Self::ENTRIES[index];
+
+        return key == entry.key;
+    }
+    #[must_use]
+    pub fn try_lookup(key: i32) -> Option<&'static Person> {
+        if key < 1 || key > 3 {
+            return None;
+        }
+
+        let hash = unsafe { Self::get_hash(key) };
+        let index = (hash % 3) as usize;
+        let entry = &Self::ENTRIES[index];
+
+        if (key == entry.key) {
+            return Some(entry.value);
+        }
+
+        None
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 3;
+}

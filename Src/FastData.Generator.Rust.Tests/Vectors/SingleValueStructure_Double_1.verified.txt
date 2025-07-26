@@ -11,7 +11,7 @@ pub struct SingleValueStructure_Double_1;
 impl SingleValueStructure_Double_1 {
     #[must_use]
     pub fn contains(key: f64) -> bool {
-         1.0 == key
+        key == 1.0
     }
 
     pub const ITEM_COUNT: usize = 1;

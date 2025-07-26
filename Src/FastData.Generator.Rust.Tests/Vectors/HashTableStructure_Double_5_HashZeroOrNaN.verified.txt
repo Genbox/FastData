@@ -50,4 +50,5 @@ impl HashTableStructure_Double_5_HashZeroOrNaN {
     hash_code: u64,
     next: i8,
     key: f64,
+    
 }

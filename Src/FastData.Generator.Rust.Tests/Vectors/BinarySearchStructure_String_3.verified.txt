@@ -14,7 +14,7 @@ impl BinarySearchStructure_String_3 {
     ];
 
     #[must_use]
-    pub fn contains(key: &str) -> bool {
+    pub fn contains(key: &'static str) -> bool {
         if key.len() < 1 as usize || key.len() > 255 as usize {
             return false;
         }

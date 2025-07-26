@@ -6,40 +6,27 @@ namespace Genbox.FastData.Generator;
 
 public sealed class SharedCode
 {
-    private readonly Dictionary<CodeKey, string> _cache = new Dictionary<CodeKey, string>();
+    private readonly HashSet<(CodePlacement, string)> _cache = new HashSet<(CodePlacement, string)>();
 
-    public void Add(string id, CodePlacement type, string value)
+    public void Add(CodePlacement type, string value)
     {
         if (string.IsNullOrWhiteSpace(value)) //Don't add empty strings
             return;
 
-        CodeKey key = new CodeKey(id, type);
+        var key = (type, value);
 
-        if (_cache.ContainsKey(key))
-            return;
-
-        _cache.Add(key, value);
+        if (!_cache.Add(key))
+            throw new InvalidOperationException("This code snippet already exists");
     }
 
     public IEnumerable<string> GetType(CodePlacement type)
     {
-        foreach (KeyValuePair<CodeKey, string> kvp in _cache)
+        foreach ((CodePlacement, string) kvp in _cache)
         {
-            if (kvp.Key.Type == type)
-                yield return kvp.Value;
+            if (kvp.Item1 == type)
+                yield return kvp.Item2;
         }
     }
 
     public void Clear() => _cache.Clear();
-
-    private readonly struct CodeKey(string id, CodePlacement type) : IEquatable<CodeKey>
-    {
-        private readonly string _id = id;
-
-        public bool Equals(CodeKey other) => _id == other._id && Type == other.Type;
-        public override bool Equals(object? obj) => obj is CodeKey other && Equals(other);
-        public override int GetHashCode() => unchecked((_id.GetHashCode() * 397) ^ (int)Type);
-
-        public CodePlacement Type { get; } = type;
-    }
 }

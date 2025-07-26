@@ -9,7 +9,7 @@ use std::ptr;
 pub struct ArrayStructure_String_100;
 
 impl ArrayStructure_String_100 {
-    const KEYS: [&str; 100] = [
+    const KEYS: [&'static str; 100] = [
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
         "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", 
         "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", 
@@ -23,7 +23,7 @@ impl ArrayStructure_String_100 {
     ];
 
     #[must_use]
-    pub fn contains(key: &str) -> bool {
+    pub fn contains(key: &'static str) -> bool {
         if key.len() < 1 as usize || key.len() > 2 as usize {
             return false;
         }

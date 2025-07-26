@@ -1,0 +1,37 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (SingleValue)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct SingleValueStructure_Int32_1;
+pub struct Person {
+    pub age: i32,
+    pub name: &'static str,
+    pub other: Option<&'static Person>,
+
+}
+
+impl Person {
+    pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
+}
+pub static STORED_VALUE: &'static Person = &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None)));
+
+impl SingleValueStructure_Int32_1 {
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+        key == 1
+    }    #[must_use]
+    pub fn try_lookup(key: i32) -> Option<&'static Person> {
+        if (key == 1) {
+            return Some(STORED_VALUE);
+        }
+        None
+    }
+
+    pub const ITEM_COUNT: usize = 1;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 1;
+}

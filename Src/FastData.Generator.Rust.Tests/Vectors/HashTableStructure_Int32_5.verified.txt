@@ -50,4 +50,5 @@ impl HashTableStructure_Int32_5 {
     
     next: i8,
     key: i32,
+    
 }
