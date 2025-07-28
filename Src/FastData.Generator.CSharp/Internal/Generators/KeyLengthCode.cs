@@ -20,9 +20,6 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                         {{FormatColumns(ctx.ValueOffsets, static x => x.ToStringInvariant())}}
                             };
 
-                        """);
-
-            sb.Append($$"""
                             {{FieldModifier}}{{ValueTypeName}}[] _values = {
                         {{FormatColumns(ctx.Values, ToValueLabel)}}
                             };
@@ -47,22 +44,21 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
         if (ctx.Values != null)
         {
             sb.Append($$"""
-                        {{MethodAttribute}}
-                        {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
-                        {
-                            value = default;
+                            {{MethodAttribute}}
+                            {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
+                            {
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
-                            int idx = key.Length - {{ctx.MinLength.ToStringInvariant()}};
-                            if ({{GetEqualFunction("key", "_keys[idx]")}})
-                            {
-                                value = _values[_offsets[idx]];
-                                return true;
-                            }
+                                int idx = key.Length - {{ctx.MinLength.ToStringInvariant()}};
+                                if ({{GetEqualFunction("key", "_keys[idx]")}})
+                                {
+                                    value = _values[_offsets[idx]];
+                                    return true;
+                                }
 
-                            value = default;
-                            return false;
-                        }
+                                value = default;
+                                return false;
+                            }
                         """);
         }
 

@@ -7,16 +7,32 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TValue> ctx, CSharpCodeGeneratorConfig cfg, SharedCode shared) : CSharpOutputWriter<TKey>(cfg)
 {
-    public override string Generate() => cfg.ConditionalBranchType switch
-    {
-        BranchType.If => GenerateIf(ctx.Keys),
-        BranchType.Switch => GenerateSwitch(ctx.Keys),
-        _ => throw new InvalidOperationException("Invalid branch type: " + cfg.ConditionalBranchType)
-    };
-
-    private string GenerateIf(ReadOnlySpan<TKey> data)
+    public override string Generate()
     {
         StringBuilder sb = new StringBuilder();
+
+        if (ctx.Values != null)
+        {
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
+
+            sb.Append($$"""
+                            {{FieldModifier}}{{ValueTypeName}}[] _values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                        """);
+        }
+
+        return cfg.ConditionalBranchType switch
+        {
+            BranchType.If => GenerateIf(sb, ctx.Keys),
+            BranchType.Switch => GenerateSwitch(sb, ctx.Keys),
+            _ => throw new InvalidOperationException("Invalid branch type: " + cfg.ConditionalBranchType)
+        };
+    }
+
+    private string GenerateIf(StringBuilder sb, ReadOnlySpan<TKey> data)
+    {
         sb.Append($$"""
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
@@ -32,19 +48,11 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 
         if (ctx.Values != null)
         {
-            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-
             sb.Append($$"""
-
-                            {{FieldModifier}}{{ValueTypeName}}[] _values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
-                            };
 
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
                             {
-                                value = default;
-
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
                         {{GenerateBranches()}}
@@ -76,10 +84,8 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
         }
     }
 
-    private string GenerateSwitch(ReadOnlySpan<TKey> data)
+    private string GenerateSwitch(StringBuilder sb, ReadOnlySpan<TKey> data)
     {
-        StringBuilder sb = new StringBuilder();
-
         sb.Append($$"""
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
@@ -98,14 +104,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 
         if (ctx.Values != null)
         {
-            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-
             sb.Append($$"""
-
-                            {{FieldModifier}}{{ValueTypeName}}[] _values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
-                            };
-
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
                             {

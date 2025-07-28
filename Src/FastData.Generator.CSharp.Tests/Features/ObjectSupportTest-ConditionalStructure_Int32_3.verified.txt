@@ -21,6 +21,9 @@ public class Person
 
 internal static class ConditionalStructure_Int32_3
 {
+    private static readonly Person[] _values = {
+        new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
+    };
     
     public static bool Contains(int key)
     {
@@ -35,12 +38,7 @@ internal static class ConditionalStructure_Int32_3
             default:
                 return false;
         }
-    }
-    private static readonly Person[] _values = {
-        new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
-    };
-
-    
+    }    
     public static bool TryLookup(int key, out Person? value)
     {
         value = default;

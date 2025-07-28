@@ -24,6 +24,7 @@ internal static class KeyLengthStructure_String_3
     private static readonly int[] _offsets = {
         0, 1, 2
     };
+
     private static readonly Person[] _values = {
         new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
     };
@@ -38,23 +39,25 @@ internal static class KeyLengthStructure_String_3
             return false;
 
         return StringComparer.Ordinal.Equals(key, _keys[key.Length - 1]);
-    }
-public static bool TryLookup(string key, out Person value)
-{
-    value = default;
-        if (key.Length < 1u || key.Length > 3u)
-            return false;
-
-    int idx = key.Length - 1;
-    if (StringComparer.Ordinal.Equals(key, _keys[idx]))
+    }    
+    public static bool TryLookup(string key, out Person value)
     {
-        value = _values[_offsets[idx]];
-        return true;
-    }
+        if (key.Length < 1u || key.Length > 3u)
+        {
+            value = default;
+            return false;
+        }
 
-    value = default;
-    return false;
-}
+        int idx = key.Length - 1;
+        if (StringComparer.Ordinal.Equals(key, _keys[idx]))
+        {
+            value = _values[_offsets[idx]];
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
 
     public const uint ItemCount = 3;
     public const uint MinKeyLength = 1;

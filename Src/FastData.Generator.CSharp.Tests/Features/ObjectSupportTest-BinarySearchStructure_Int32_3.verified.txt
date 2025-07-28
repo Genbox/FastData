@@ -21,6 +21,9 @@ public class Person
 
 internal static class BinarySearchStructure_Int32_3
 {
+    private static readonly Person[] _values = {
+        new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
+    };
     private static readonly int[] _keys = new int[] {
         1, 2, 3
     };
@@ -48,17 +51,14 @@ internal static class BinarySearchStructure_Int32_3
 
         return ~lo >= 0;
     }
-    private static readonly Person[] _values = {
-        new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
-    };
-
     
     public static bool TryLookup(int key, out Person? value)
     {
-        value = default;
-
         if (key < 1 || key > 3)
+        {
+            value = default;
             return false;
+        }
 
         int lo = 0;
         int hi = 2;

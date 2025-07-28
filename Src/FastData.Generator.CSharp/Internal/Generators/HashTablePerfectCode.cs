@@ -72,7 +72,6 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
                             {
-                               value = default;
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
                                 {{HashSizeType}} hash = Hash(key);

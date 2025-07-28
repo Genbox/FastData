@@ -10,21 +10,42 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
 {
     protected override bool IsEnabled => !options.HasFlag(CSharpOptions.DisableEarlyExits);
 
-    protected override string GetMaskEarlyExit(MethodType methodType, ulong bitSet) =>
-        $"""
-                 if (({bitSet}UL & (1UL << (key.Length - 1))) == 0)
-                     return false;
-         """;
+    protected override string GetMaskEarlyExit(MethodType methodType, ulong bitSet) => methodType == MethodType.Contains
+        ? $"""
+                   if (({bitSet}UL & (1UL << (key.Length - 1))) == 0)
+                       return false;
+           """
+        : $$"""
+                    if (({{bitSet}}UL & (1UL << (key.Length - 1))) == 0)
+                    {
+                        value = default;
+                        return false;
+                    }
+            """;
 
-    protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) =>
-        $"""
-                 if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
-                     return false;
-         """;
+    protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) => methodType == MethodType.Contains
+        ? $"""
+                   if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
+                       return false;
+           """
+        : $$"""
+                    if ({{(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")}})
+                    {
+                        value = default;
+                        return false;
+                    }
+            """;
 
-    protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
-        $"""
-                 if ({(min.Equals(max) ? $"key.Length != {map.ToValueLabel(max)}" : $"key.Length < {map.ToValueLabel(min)} || key.Length > {map.ToValueLabel(max)}")})
-                     return false;
-         """;
+    protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) => methodType == MethodType.Contains
+        ? $"""
+                   if ({(min.Equals(max) ? $"key.Length != {map.ToValueLabel(max)}" : $"key.Length < {map.ToValueLabel(min)} || key.Length > {map.ToValueLabel(max)}")})
+                       return false;
+           """
+        : $$"""
+                    if ({{(min.Equals(max) ? $"key.Length != {map.ToValueLabel(max)}" : $"key.Length < {map.ToValueLabel(min)} || key.Length > {map.ToValueLabel(max)}")}})
+                    {
+                        value = default;
+                        return false;
+                    }
+            """;
 }

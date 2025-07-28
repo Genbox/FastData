@@ -21,13 +21,11 @@ public class Person
 
 internal static class SingleValueStructure_Int32_1
 {
-    
+    private static readonly Person _storedValue = new Person(1, "Bob", new Person(4, "Anna", null));    
     public static bool Contains(int key)
     {
         return key == 1;
     }
-    private static readonly Person _storedValue = new Person(1, "Bob", new Person(4, "Anna", null));
-
     
     public static bool TryLookup(int key, out Person value)
     {

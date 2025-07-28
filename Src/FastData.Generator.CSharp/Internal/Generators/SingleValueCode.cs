@@ -10,6 +10,12 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
     {
         StringBuilder sb = new StringBuilder();
 
+        if (ctx.Values != null)
+        {
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
+            sb.Append($"    private static readonly {ValueTypeName} _storedValue = {ToValueLabel(ctx.Values[0])};");
+        }
+
         sb.Append($$"""
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
@@ -20,11 +26,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
 
         if (ctx.Values != null)
         {
-            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-
             sb.Append($$"""
-
-                            private static readonly {{ValueTypeName}} _storedValue = {{ToValueLabel(ctx.Values[0])}};
 
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
@@ -40,6 +42,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
                             }
                         """);
         }
+
         return sb.ToString();
     }
 }

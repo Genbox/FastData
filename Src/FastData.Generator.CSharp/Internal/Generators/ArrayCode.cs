@@ -11,6 +11,18 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
     {
         StringBuilder sb = new StringBuilder();
 
+        if (ctx.Values != null)
+        {
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
+
+            sb.Append($$"""
+                            {{FieldModifier}}{{ValueTypeName}}[] _values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                        """);
+        }
+
         sb.Append($$"""
                         {{FieldModifier}}{{KeyTypeName}}[] _keys = new {{KeyTypeName}}[] {
                     {{FormatColumns(ctx.Keys, ToValueLabel)}}
@@ -32,19 +44,11 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
 
         if (ctx.Values != null)
         {
-            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-
             sb.Append($$"""
-
-                            {{FieldModifier}}{{ValueTypeName}}[] _values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
-                            };
 
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
                             {
-                                value = default;
-
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
                                 for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)

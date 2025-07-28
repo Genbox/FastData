@@ -11,6 +11,18 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
     {
         StringBuilder sb = new StringBuilder();
 
+        if (ctx.Values != null)
+        {
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
+
+            sb.Append($$"""
+                            {{FieldModifier}}{{ValueTypeName}}[] _values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                        """);
+        }
+
         sb.Append($$"""
                         {{FieldModifier}}{{KeyTypeName}}[] _keys = new {{KeyTypeName}}[] {
                     {{FormatColumns(ctx.Keys, ToValueLabel)}}
@@ -42,19 +54,11 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 
         if (ctx.Values != null)
         {
-            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-
             sb.Append($$"""
-
-                            {{FieldModifier}}{{ValueTypeName}}[] _values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
-                            };
 
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
                             {
-                                value = default;
-
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
                                 int lo = 0;
