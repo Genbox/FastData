@@ -6,10 +6,8 @@
 #include <limits>
 #include <string_view>
 
-class HashTableStructure_Int32_100 final
-{
-    struct e
-    {
+class HashTableStructure_Int32_100 final {
+    struct e {
         int32_t key;
         int8_t next;
         
@@ -51,8 +49,7 @@ class HashTableStructure_Int32_100 final
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const int32_t key) noexcept
-    {
+    static constexpr bool contains(const int32_t key) noexcept {
         if (key < 0 || key > 99)
             return false;
 
@@ -60,8 +57,7 @@ public:
         const size_t index = hash % 100;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
-        while (i >= 0)
-        {
+        while (i >= 0) {
             const auto& entry = entries[i];
 
             if (entry.key == key)

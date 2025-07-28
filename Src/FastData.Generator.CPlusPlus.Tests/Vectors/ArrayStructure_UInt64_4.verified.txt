@@ -6,23 +6,21 @@
 #include <limits>
 #include <string_view>
 
-class ArrayStructure_UInt64_4 final
-{
-static constexpr std::array<uint64_t, 4> keys = {
+class ArrayStructure_UInt64_4 final {
+    static constexpr std::array<uint64_t, 4> keys = {
         0, 1ull, 2ull, std::numeric_limits<uint64_t>::max()
-};
+    };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const uint64_t key) noexcept
-    {
+    static constexpr bool contains(const uint64_t key) noexcept {
         if (key < 0 || key > std::numeric_limits<uint64_t>::max())
             return false;
 
         for (size_t i = 0; i < 4; i++)
         {
             if (keys[i] == key)
-               return true;
+                return true;
         }
         return false;
     }

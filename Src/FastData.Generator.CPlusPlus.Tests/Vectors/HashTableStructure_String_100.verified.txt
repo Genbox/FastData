@@ -6,10 +6,8 @@
 #include <limits>
 #include <string_view>
 
-class HashTableStructure_String_100 final
-{
-    struct e
-    {
+class HashTableStructure_String_100 final {
+    struct e {
         std::string_view key;
         int8_t next;
         uint64_t hash_code;
@@ -56,8 +54,7 @@ class HashTableStructure_String_100 final
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::string_view key) noexcept
-    {
+    static constexpr bool contains(const std::string_view key) noexcept {
         if (const size_t len = key.length(); len < 1u || len > 2u)
             return false;
 
@@ -65,8 +62,7 @@ public:
         const size_t index = hash % 100;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
-        while (i >= 0)
-        {
+        while (i >= 0) {
             const auto& entry = entries[i];
 
             if (entry.hash_code == hash && entry.key == key)

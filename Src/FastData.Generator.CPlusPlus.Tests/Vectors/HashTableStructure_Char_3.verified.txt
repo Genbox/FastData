@@ -6,10 +6,8 @@
 #include <limits>
 #include <string_view>
 
-class HashTableStructure_Char_3 final
-{
-    struct e
-    {
+class HashTableStructure_Char_3 final {
+    struct e {
         char key;
         int8_t next;
         
@@ -33,8 +31,7 @@ class HashTableStructure_Char_3 final
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const char key) noexcept
-    {
+    static constexpr bool contains(const char key) noexcept {
         if (key < 0 || key > 127)
             return false;
 
@@ -42,8 +39,7 @@ public:
         const size_t index = hash % 3;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
-        while (i >= 0)
-        {
+        while (i >= 0) {
             const auto& entry = entries[i];
 
             if (entry.key == key)

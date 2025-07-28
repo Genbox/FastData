@@ -6,12 +6,11 @@
 #include <limits>
 #include <string_view>
 
-class HashTablePerfectStructure_Int32_3 final
-{
+class HashTablePerfectStructure_Int32_3 final {
 
-inline static const std::array<int32_t, 3> entries = {
-            3, 1, 2
-};
+    inline static const std::array<int32_t, 3> entries = {
+        3, 1, 2
+    };
 
     static constexpr uint64_t get_hash(const int32_t value) noexcept
     {
@@ -20,8 +19,7 @@ inline static const std::array<int32_t, 3> entries = {
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const int32_t key) noexcept
-    {
+    static constexpr bool contains(const int32_t key) noexcept {
         if (key < 1 || key > 3)
             return false;
 

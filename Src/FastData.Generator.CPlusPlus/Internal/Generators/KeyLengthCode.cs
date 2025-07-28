@@ -9,6 +9,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
 {
     public override string Generate()
     {
+        bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
 
         if (ctx.Values != null)
@@ -20,10 +21,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                         {{FormatColumns(ctx.ValueOffsets, static x => x.ToStringInvariant())}}
                             };
 
-                        """);
-
-            sb.Append($$"""
-                            {{GetFieldModifier(false)}}std::array<{{ValueTypeName}}*, {{ctx.Values.Length}}> values = {
+                            {{GetFieldModifier(customValue)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length}}> values = {
                         {{FormatColumns(ctx.Values, ToValueLabel)}}
                             };
 
@@ -37,8 +35,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
 
                     public:
                         {{MethodAttribute}}
-                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
-                        {
+                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
                     {{GetEarlyExits(MethodType.Contains)}}
 
                             return {{GetEqualFunction("key", $"keys[key.length() - {ctx.MinLength.ToStringInvariant()}]")}};
@@ -47,23 +44,22 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
 
         if (ctx.Values != null)
         {
+            string ptr = customValue ? "" : "&";
             sb.Append($$"""
 
-                        {{MethodAttribute}}
-                        {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
-                        {
+                            {{MethodAttribute}}
+                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{GetValueTypeName(customValue)}}& value){{PostMethodModifier}} {
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
-                            size_t idx = key.length() - {{ctx.MinLength.ToStringInvariant()}};
-                            if ({{GetEqualFunction("key", "keys[idx]")}})
-                            {
-                                value = values[offsets[idx]];
-                                return true;
-                            }
+                                size_t idx = key.length() - {{ctx.MinLength.ToStringInvariant()}};
+                                if ({{GetEqualFunction("key", "keys[idx]")}}) {
+                                    value = {{ptr}}values[offsets[idx]];
+                                    return true;
+                                }
 
-                            value = nullptr;
-                            return false;
-                        }
+                                value = nullptr;
+                                return false;
+                            }
                         """);
         }
 

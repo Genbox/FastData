@@ -9,15 +9,15 @@
 struct Person {
     int32_t age;
     std::string_view name;
-   const Person* other;
+    const Person* other;
 
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
-class KeyLengthStructure_String_3 final
-{
+class KeyLengthStructure_String_3 final {
     static constexpr std::array<int32_t, 3> offsets = {
         0, 1, 2
     };
+
     inline static const std::array<Person*, 3> values = {
         new Person(1, "Bob", new Person(4, "Anna", nullptr)), new Person(2, "Billy", nullptr), new Person(3, "Bibi", nullptr)
     };
@@ -27,29 +27,26 @@ class KeyLengthStructure_String_3 final
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::string_view key) noexcept
-    {
+    static constexpr bool contains(const std::string_view key) noexcept {
         if (const size_t len = key.length(); len < 1u || len > 3u)
             return false;
 
         return key == keys[key.length() - 1];
     }
-[[nodiscard]]
-static constexpr bool try_lookup(const std::string_view key, const Person*& value) noexcept
-{
+    [[nodiscard]]
+    static constexpr bool try_lookup(const std::string_view key, const Person*& value) noexcept {
         if (const size_t len = key.length(); len < 1u || len > 3u)
             return false;
 
-    size_t idx = key.length() - 1;
-    if (key == keys[idx])
-    {
-        value = values[offsets[idx]];
-        return true;
-    }
+        size_t idx = key.length() - 1;
+        if (key == keys[idx]) {
+            value = values[offsets[idx]];
+            return true;
+        }
 
-    value = nullptr;
-    return false;
-}
+        value = nullptr;
+        return false;
+    }
 
     static constexpr size_t item_count = 3;
     static constexpr size_t min_key_length = 1;

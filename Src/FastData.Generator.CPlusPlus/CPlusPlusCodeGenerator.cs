@@ -49,8 +49,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     protected override void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext<TValue> context)
     {
         sb.AppendLine($$"""
-                        class {{_cfg.ClassName}} final
-                        {
+                        class {{_cfg.ClassName}} final {
                         """);
 
         base.AppendBody(sb, genCfg, keyTypeName, valueTypeName, context);

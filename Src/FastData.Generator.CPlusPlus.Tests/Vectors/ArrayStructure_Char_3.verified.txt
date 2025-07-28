@@ -6,23 +6,21 @@
 #include <limits>
 #include <string_view>
 
-class ArrayStructure_Char_3 final
-{
-static constexpr std::array<char, 3> keys = {
+class ArrayStructure_Char_3 final {
+    static constexpr std::array<char, 3> keys = {
         0, 97, 127
-};
+    };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const char key) noexcept
-    {
+    static constexpr bool contains(const char key) noexcept {
         if (key < 0 || key > 127)
             return false;
 
         for (size_t i = 0; i < 3; i++)
         {
             if (keys[i] == key)
-               return true;
+                return true;
         }
         return false;
     }

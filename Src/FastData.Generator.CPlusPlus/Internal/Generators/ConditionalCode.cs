@@ -9,16 +9,24 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 {
     public override string Generate()
     {
-        bool customType = !typeof(TValue).IsPrimitive;
+        bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+
+        if (ctx.Values != null)
+        {
+            sb.Append($$"""
+                            {{GetFieldModifier(customValue)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                        """);
+        }
 
         sb.Append($$"""
                     public:
                         {{MethodAttribute}}
-                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
-                        {
+                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
                     {{GetEarlyExits(MethodType.Contains)}}
-
                             if ({{FormatList(ctx.Keys, x => GetEqualFunction("key", ToValueLabel(x)), " || ")}})
                                 return true;
 
@@ -32,13 +40,8 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 
             sb.Append($$"""
 
-                            {{GetFieldModifier(false)}}std::array<{{ValueTypeName}}{{(customType ? "*" : "")}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
-                            };
-
                             {{MethodAttribute}}
-                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
-                            {
+                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{GetValueTypeName(customValue)}}& value){{PostMethodModifier}} {
                         {{GetEarlyExits(MethodType.TryLookup)}}
                         {{GenerateBranches()}}
                                 value = nullptr;
@@ -48,14 +51,14 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 
             string GenerateBranches()
             {
+                string ptr = customValue ? "" : "&";
                 StringBuilder temp = new StringBuilder();
 
                 for (int i = 0; i < ctx.Keys.Length; i++)
                 {
                     temp.AppendLine($$"""
-                                              if (key == {{ToValueLabel(ctx.Keys[i])}})
-                                              {
-                                                  value = {{(customType ? "" : "&")}}values[{{i.ToStringInvariant()}}];
+                                              if (key == {{ToValueLabel(ctx.Keys[i])}}) {
+                                                  value = {{ptr}}values[{{i.ToStringInvariant()}}];
                                                   return true;
                                               }
                                       """);

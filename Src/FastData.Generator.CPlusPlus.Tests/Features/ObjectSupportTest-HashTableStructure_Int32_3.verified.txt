@@ -9,14 +9,12 @@
 struct Person {
     int32_t age;
     std::u32string_view name;
-   const Person* other;
+    const Person* other;
 
     constexpr Person(const int32_t age, const std::u32string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
-class HashTableStructure_Int32_3 final
-{
-    struct e
-    {
+class HashTableStructure_Int32_3 final {
+    struct e {
         int32_t key;
         int8_t next;
         
@@ -40,8 +38,7 @@ class HashTableStructure_Int32_3 final
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const int32_t key) noexcept
-    {
+    static constexpr bool contains(const int32_t key) noexcept {
         if (key < 1 || key > 3)
             return false;
 
@@ -49,8 +46,7 @@ public:
         const size_t index = hash % 3;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
-        while (i >= 0)
-        {
+        while (i >= 0) {
             const auto& entry = entries[i];
 
             if (entry.key == key)
@@ -62,8 +58,7 @@ public:
         return false;
     }
     [[nodiscard]]
-    static constexpr bool try_lookup(const int32_t key, const Person*& value) noexcept
-    {
+    static constexpr bool try_lookup(const int32_t key, const Person*& value) noexcept {
         if (key < 1 || key > 3)
             return false;
 
@@ -71,12 +66,10 @@ public:
         const size_t index = hash % 3;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
-        while (i >= 0)
-        {
+        while (i >= 0) {
             const auto& entry = entries[i];
 
-            if (entry.key == key)
-            {
+            if (entry.key == key) {
                 value = entry.value;
                 return true;
             }

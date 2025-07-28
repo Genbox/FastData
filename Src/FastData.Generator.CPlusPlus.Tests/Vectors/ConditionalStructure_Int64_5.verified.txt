@@ -6,15 +6,12 @@
 #include <limits>
 #include <string_view>
 
-class ConditionalStructure_Int64_5 final
-{
+class ConditionalStructure_Int64_5 final {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const int64_t key) noexcept
-    {
+    static constexpr bool contains(const int64_t key) noexcept {
         if (key < std::numeric_limits<int64_t>::lowest() || key > std::numeric_limits<int64_t>::max())
             return false;
-
         if (key == std::numeric_limits<int64_t>::lowest() || key == -1ll || key == 0ll || key == 1ll || key == std::numeric_limits<int64_t>::max())
             return true;
 

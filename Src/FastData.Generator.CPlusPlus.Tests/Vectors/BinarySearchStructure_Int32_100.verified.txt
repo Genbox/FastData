@@ -6,8 +6,7 @@
 #include <limits>
 #include <string_view>
 
-class BinarySearchStructure_Int32_100 final
-{
+class BinarySearchStructure_Int32_100 final {
     static constexpr std::array<int32_t, 100> keys = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
@@ -23,21 +22,20 @@ class BinarySearchStructure_Int32_100 final
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const int32_t key) noexcept
-    {
+    static constexpr bool contains(const int32_t key) noexcept {
         if (key < 0 || key > 99)
             return false;
 
-        size_t lo = 0;
-        size_t hi = 99;
-        while (lo <= hi)
-        {
-            const size_t mid = lo + ((hi - lo) >> 1);
+        int32_t lo = 0;
+        int32_t hi = 99;
+        while (lo <= hi) {
+            const int32_t mid = lo + ((hi - lo) >> 1);
+            const int32_t mid_key = keys[mid];
 
-            if (keys[mid] == key)
+            if (mid_key == key)
                 return true;
 
-            if (keys[mid] < key)
+            if (mid_key < key)
                 lo = mid + 1;
             else
                 hi = mid - 1;

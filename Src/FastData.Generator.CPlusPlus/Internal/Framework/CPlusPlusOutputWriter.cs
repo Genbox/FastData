@@ -8,5 +8,6 @@ internal abstract class CPlusPlusOutputWriter<TKey> : OutputWriter<TKey>
     protected string MethodModifier => "static constexpr ";
     protected string PostMethodModifier => " noexcept";
     protected string MethodAttribute => "[[nodiscard]]";
-    protected string GetFieldModifier(bool value) => value ? FieldModifier : "inline static const ";
+    protected string GetFieldModifier(bool customType) => customType ? "inline static const " : FieldModifier;
+    protected string GetValueTypeName(bool customType) => customType ? ValueTypeName + "*" : ValueTypeName;
 }

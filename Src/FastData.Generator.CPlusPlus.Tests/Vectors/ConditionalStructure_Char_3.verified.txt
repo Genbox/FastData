@@ -6,13 +6,10 @@
 #include <limits>
 #include <string_view>
 
-class ConditionalStructure_Char_3 final
-{
+class ConditionalStructure_Char_3 final {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const char key) noexcept
-    {
-
+    static constexpr bool contains(const char key) noexcept {
 
         if (key == 0 || key == 97 || key == 127)
             return true;

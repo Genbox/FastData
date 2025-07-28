@@ -9,8 +9,18 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 {
     public override string Generate()
     {
-        bool customType = !typeof(TValue).IsPrimitive;
+        bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+
+        if (ctx.Values != null)
+        {
+            sb.Append($$"""
+                            {{GetFieldModifier(customValue)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                        """);
+        }
 
         sb.Append($$"""
                         {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
@@ -19,20 +29,19 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 
                     public:
                         {{MethodAttribute}}
-                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
-                        {
+                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
                     {{GetEarlyExits(MethodType.Contains)}}
 
-                            {{ArraySizeType}} lo = 0;
-                            {{ArraySizeType}} hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
-                            while (lo <= hi)
-                            {
-                                const size_t mid = lo + ((hi - lo) >> 1);
+                            int32_t lo = 0;
+                            int32_t hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
+                            while (lo <= hi) {
+                                const int32_t mid = lo + ((hi - lo) >> 1);
+                                const {{KeyTypeName}} mid_key = keys[mid];
 
-                                if ({{GetEqualFunction("keys[mid]", "key")}})
+                                if ({{GetEqualFunction("mid_key", "key")}})
                                     return true;
 
-                                if (keys[mid] < key)
+                                if (mid_key < key)
                                     lo = mid + 1;
                                 else
                                     hi = mid - 1;
@@ -44,32 +53,28 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 
         if (ctx.Values != null)
         {
+            string ptr = customValue ? "" : "&";
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
 
-                            {{GetFieldModifier(false)}}std::array<{{ValueTypeName}}{{(customType ? "*" : "")}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
-                            {{FormatColumns(ctx.Values, ToValueLabel)}}
-                            };
-
                             {{MethodAttribute}}
-                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
-                            {
+                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{GetValueTypeName(customValue)}}& value){{PostMethodModifier}} {
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
-                                {{ArraySizeType}} lo = 0;
-                                {{ArraySizeType}} hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
-                                while (lo <= hi)
-                                {
-                                    const size_t mid = lo + ((hi - lo) >> 1);
+                                int32_t lo = 0;
+                                int32_t hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
+                                while (lo <= hi) {
+                                    const int32_t mid = lo + ((hi - lo) >> 1);
+                                    const {{KeyTypeName}} mid_key = keys[mid];
 
-                                    if ({{GetEqualFunction("keys[mid]", "key")}})
+                                    if ({{GetEqualFunction("mid_key", "key")}})
                                     {
-                                        value = {{(customType ? "" : "&")}}values[mid];
+                                        value = {{ptr}}values[mid];
                                         return true;
                                     }
 
-                                    if (keys[mid] < key)
+                                    if (mid_key < key)
                                         lo = mid + 1;
                                     else
                                         hi = mid - 1;

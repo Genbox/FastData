@@ -6,12 +6,10 @@
 #include <limits>
 #include <string_view>
 
-class SingleValueStructure_SByte_1 final
-{
+class SingleValueStructure_SByte_1 final {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const int8_t key) noexcept
-    {
+    static constexpr bool contains(const int8_t key) noexcept {
         return key == 1;
     }
 

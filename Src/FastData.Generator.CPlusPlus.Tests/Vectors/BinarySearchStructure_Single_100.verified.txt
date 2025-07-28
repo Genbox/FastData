@@ -6,8 +6,7 @@
 #include <limits>
 #include <string_view>
 
-class BinarySearchStructure_Single_100 final
-{
+class BinarySearchStructure_Single_100 final {
     static constexpr std::array<float, 100> keys = {
         0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 
         10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 
@@ -23,21 +22,20 @@ class BinarySearchStructure_Single_100 final
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const float key) noexcept
-    {
+    static constexpr bool contains(const float key) noexcept {
         if (key < 0.0f || key > 99.0f)
             return false;
 
-        size_t lo = 0;
-        size_t hi = 99;
-        while (lo <= hi)
-        {
-            const size_t mid = lo + ((hi - lo) >> 1);
+        int32_t lo = 0;
+        int32_t hi = 99;
+        while (lo <= hi) {
+            const int32_t mid = lo + ((hi - lo) >> 1);
+            const float mid_key = keys[mid];
 
-            if (keys[mid] == key)
+            if (mid_key == key)
                 return true;
 
-            if (keys[mid] < key)
+            if (mid_key < key)
                 lo = mid + 1;
             else
                 hi = mid - 1;

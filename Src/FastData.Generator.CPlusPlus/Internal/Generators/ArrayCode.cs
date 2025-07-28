@@ -9,24 +9,33 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
 {
     public override string Generate()
     {
-        bool customType = !typeof(TValue).IsPrimitive;
+        bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
 
+        if (ctx.Values != null)
+        {
+            sb.Append($$"""
+                            {{GetFieldModifier(customValue)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                        """);
+        }
+
         sb.Append($$"""
-                    {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
+                        {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
                     {{FormatColumns(ctx.Keys, ToValueLabel)}}
-                    };
+                        };
 
                     public:
                         {{MethodAttribute}}
-                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
-                        {
+                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
                     {{GetEarlyExits(MethodType.Contains)}}
 
                             for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
                             {
                                 if ({{GetEqualFunction("keys[i]", "key")}})
-                                   return true;
+                                    return true;
                             }
                             return false;
                         }
@@ -34,24 +43,18 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
 
         if (ctx.Values != null)
         {
+            string ptr = customValue ? "" : "&";
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
 
-                            {{GetFieldModifier(false)}}std::array<{{ValueTypeName}}{{(customType ? "*" : "")}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
-                            {{FormatColumns(ctx.Values, ToValueLabel)}}
-                            };
-
                             {{MethodAttribute}}
-                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
-                            {
+                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{GetValueTypeName(customValue)}}& value){{PostMethodModifier}} {
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
-                                for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
-                                {
-                                    if ({{GetEqualFunction("keys[i]", "key")}})
-                                    {
-                                        value = {{(customType ? "" : "&")}}values[i];
+                                for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++) {
+                                    if ({{GetEqualFunction("keys[i]", "key")}}) {
+                                        value = {{ptr}}values[i];
                                         return true;
                                     }
                                 }

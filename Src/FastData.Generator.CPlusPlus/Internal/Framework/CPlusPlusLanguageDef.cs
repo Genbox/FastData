@@ -88,7 +88,7 @@ internal class CPlusPlusLanguageDef : ILanguageDef
         foreach (PropertyInfo property in properties)
         {
             if (Type.GetTypeCode(property.PropertyType) == TypeCode.Object)
-                sb.AppendLine($"   const {RenderType(map, property.PropertyType)} {property.Name.ToLowerInvariant()};");
+                sb.AppendLine($"    const {RenderType(map, property.PropertyType)} {property.Name.ToLowerInvariant()};");
             else
                 sb.AppendLine($"    {RenderType(map, property.PropertyType)} {property.Name.ToLowerInvariant()};");
         }

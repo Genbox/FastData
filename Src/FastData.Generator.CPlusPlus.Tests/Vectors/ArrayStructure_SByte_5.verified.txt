@@ -6,23 +6,21 @@
 #include <limits>
 #include <string_view>
 
-class ArrayStructure_SByte_5 final
-{
-static constexpr std::array<int8_t, 5> keys = {
+class ArrayStructure_SByte_5 final {
+    static constexpr std::array<int8_t, 5> keys = {
         std::numeric_limits<int8_t>::lowest(), -1, 0, 1, std::numeric_limits<int8_t>::max()
-};
+    };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const int8_t key) noexcept
-    {
+    static constexpr bool contains(const int8_t key) noexcept {
         if (key < std::numeric_limits<int8_t>::lowest() || key > std::numeric_limits<int8_t>::max())
             return false;
 
         for (size_t i = 0; i < 5; i++)
         {
             if (keys[i] == key)
-               return true;
+                return true;
         }
         return false;
     }

@@ -6,10 +6,8 @@
 #include <limits>
 #include <string_view>
 
-class HashTableStructure_Double_4 final
-{
-    struct e
-    {
+class HashTableStructure_Double_4 final {
+    struct e {
         double key;
         int8_t next;
         uint64_t hash_code;
@@ -37,8 +35,7 @@ class HashTableStructure_Double_4 final
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const double key) noexcept
-    {
+    static constexpr bool contains(const double key) noexcept {
         if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())
             return false;
 
@@ -46,8 +43,7 @@ public:
         const size_t index = hash % 4;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
-        while (i >= 0)
-        {
+        while (i >= 0) {
             const auto& entry = entries[i];
 
             if (entry.hash_code == hash && entry.key == key)

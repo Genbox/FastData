@@ -6,10 +6,8 @@
 #include <limits>
 #include <string_view>
 
-class HashTableStructure_Double_5_HashZeroOrNaN final
-{
-    struct e
-    {
+class HashTableStructure_Double_5_HashZeroOrNaN final {
+    struct e {
         double key;
         int8_t next;
         uint64_t hash_code;
@@ -35,8 +33,7 @@ class HashTableStructure_Double_5_HashZeroOrNaN final
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const double key) noexcept
-    {
+    static constexpr bool contains(const double key) noexcept {
         if (key < 1.0 || key > 5.0)
             return false;
 
@@ -44,8 +41,7 @@ public:
         const size_t index = hash % 5;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
-        while (i >= 0)
-        {
+        while (i >= 0) {
             const auto& entry = entries[i];
 
             if (entry.hash_code == hash && entry.key == key)

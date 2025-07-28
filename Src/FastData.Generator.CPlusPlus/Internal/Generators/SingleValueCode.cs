@@ -8,31 +8,31 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
 {
     public override string Generate()
     {
+        bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+
+        if (ctx.Values != null)
+            sb.Append($"      static inline const auto stored_value = {ToValueLabel(ctx.Values[0])};");
 
         sb.Append($$"""
                     public:
                         {{MethodAttribute}}
-                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}}
-                        {
+                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
                             return {{GetEqualFunction("key", ToValueLabel(ctx.Item))}};
                         }
                     """);
 
         if (ctx.Values != null)
         {
+            string ptr = customValue ? "" : "&";
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
 
-                            static inline const auto stored_value = {{ToValueLabel(ctx.Values[0])}};
-
                             {{MethodAttribute}}
-                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}}
-                            {
-                                if ({{GetEqualFunction("key", ToValueLabel(ctx.Item))}})
-                                {
-                                    value = stored_value;
+                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{GetValueTypeName(customValue)}}& value){{PostMethodModifier}} {
+                                if ({{GetEqualFunction("key", ToValueLabel(ctx.Item))}}) {
+                                    value = {{ptr}}stored_value;
                                     return true;
                                 }
 

@@ -6,12 +6,10 @@
 #include <limits>
 #include <string_view>
 
-class SingleValueStructure_Char_1 final
-{
+class SingleValueStructure_Char_1 final {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const char key) noexcept
-    {
+    static constexpr bool contains(const char key) noexcept {
         return key == 97;
     }
 

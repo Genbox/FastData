@@ -6,16 +6,14 @@
 #include <limits>
 #include <string_view>
 
-class KeyLengthStructure_String_7 final
-{
+class KeyLengthStructure_String_7 final {
     static constexpr std::array<std::string_view, 8> keys = {
         "aaa", "", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::string_view key) noexcept
-    {
+    static constexpr bool contains(const std::string_view key) noexcept {
         if ((1012ULL & (1ULL << (key.length() - 1))) == 0)
             return false;
 

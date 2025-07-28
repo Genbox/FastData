@@ -6,10 +6,8 @@
 #include <limits>
 #include <string_view>
 
-class HashTableStructure_String_13 final
-{
-    struct e
-    {
+class HashTableStructure_String_13 final {
+    struct e {
         std::u32string_view key;
         int8_t next;
         uint64_t hash_code;
@@ -40,8 +38,7 @@ class HashTableStructure_String_13 final
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u32string_view key) noexcept
-    {
+    static constexpr bool contains(const std::u32string_view key) noexcept {
         if (key.length() != 1u)
             return false;
 
@@ -49,8 +46,7 @@ public:
         const size_t index = hash % 13;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
-        while (i >= 0)
-        {
+        while (i >= 0) {
             const auto& entry = entries[i];
 
             if (entry.hash_code == hash && entry.key == key)
