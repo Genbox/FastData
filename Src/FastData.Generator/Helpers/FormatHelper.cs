@@ -22,6 +22,9 @@ public static class FormatHelper
 
     public static string FormatColumns<T>(ReadOnlySpan<T> items, Func<int, T, string> Render, int indent = 8, int columns = 10)
     {
+        if (items.Length == 0)
+            return string.Empty;
+
         StringBuilder sb = new StringBuilder();
         int count = 0;
 
@@ -49,16 +52,19 @@ public static class FormatHelper
         return sb.ToString();
     }
 
-    public static string FormatList<T>(T[] data, Func<T, string> render, string delim = ", ")
+    public static string FormatList<T>(T[] items, Func<T, string> render, string delim = ", ")
     {
-        return FormatList(data.AsReadOnlySpan(), render, delim);
+        return FormatList(items.AsReadOnlySpan(), render, delim);
     }
 
-    public static string FormatList<T>(ReadOnlySpan<T> data, Func<T, string> render, string delim = ", ")
+    public static string FormatList<T>(ReadOnlySpan<T> items, Func<T, string> render, string delim = ", ")
     {
+        if (items.Length == 0)
+            return string.Empty;
+
         StringBuilder sb = new StringBuilder();
 
-        foreach (T item in data)
+        foreach (T item in items)
         {
             sb.Append(render(item));
             sb.Append(delim);

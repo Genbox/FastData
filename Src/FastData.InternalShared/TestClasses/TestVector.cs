@@ -3,11 +3,12 @@ using Xunit.Abstractions;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public class TestVector<TKey>(Type type, TKey[] keys, string? postfix = null) : ITestVector, IXunitSerializable
+public class TestVector<TKey>(Type type, TKey[] keys, TKey[] notPresent, string? postfix = null) : ITestVector, IXunitSerializable
 {
     private readonly DataType _dataType = Enum.Parse<DataType>(typeof(TKey).Name);
 
     public TKey[] Keys { get; private set; } = keys;
+    public TKey[] NotPresent { get; } = notPresent;
     public Type Type { get; private set; } = type;
 
     public string Identifier => $"{Type.Name.Replace("`1", "", StringComparison.Ordinal).Replace("`2", "", StringComparison.Ordinal)}_{_dataType}_{Keys.Length}" + (postfix != null ? $"_{postfix}" : "");

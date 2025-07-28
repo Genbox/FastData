@@ -41,6 +41,11 @@ public class VectorTests
                                                                    return false;
                                                            """, "\n")}}
 
+                           {{FormatList(vector.NotPresent, x => $"""
+                                                                     if ({spec.Identifier}.Contains({map.ToValueLabel(x)}))
+                                                                         return false;
+                                                                 """, "\n")}}
+
                                    return true;
                                }
                            }

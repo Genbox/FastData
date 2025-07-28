@@ -40,6 +40,12 @@ public class VectorTests(RustContext context) : IClassFixture<RustContext>
                                                }
                                                """, "\n")}}
 
+              {{FormatList(vector.NotPresent, x => $$"""
+                                                         if {{spec.Identifier}}::contains({{map.ToValueLabel(x)}}) {
+                                                             std::process::exit(0);
+                                                     }
+                                                     """, "\n")}}
+
                   std::process::exit(1);
               }
               """);

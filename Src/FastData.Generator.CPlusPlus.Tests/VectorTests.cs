@@ -41,6 +41,11 @@ public class VectorTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCont
                                                                   return 0;
                                                           """, "\n")}}
 
+                          {{FormatList(vector.NotPresent, x => $"""
+                                                                    if ({spec.Identifier}::contains({map.ToValueLabel(x)}))
+                                                                        return 0;
+                                                                """, "\n")}}
+
                               return 1;
                           }
                           """;

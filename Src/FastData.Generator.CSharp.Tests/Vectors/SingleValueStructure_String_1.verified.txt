@@ -11,10 +11,10 @@ internal static class SingleValueStructure_String_1
     
     public static bool Contains(string key)
     {
-        return StringComparer.Ordinal.Equals(key, "value]");
+        return StringComparer.Ordinal.Equals(key, "value");
     }
 
     public const uint ItemCount = 1;
-    public const uint MinKeyLength = 6;
-    public const uint MaxKeyLength = 6;
+    public const uint MinKeyLength = 5;
+    public const uint MaxKeyLength = 5;
 }
