@@ -6,24 +6,24 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-pub struct HashTableStructure_Single_5_HashZeroOrNaN;
+pub struct HashTableStructure_Double_5;
 
-impl HashTableStructure_Single_5_HashZeroOrNaN {
+impl HashTableStructure_Double_5 {
     const BUCKETS: [i8; 5] = [
-        0, 1, 4, 3, 5
+        4, 0, 3, 1, 5
     ];
 
     const ENTRIES: [E; 5] = [
-        E { hash_code: 1065353216, next: -1, key: 1.0 }, E { hash_code: 1073741824, next: -1, key: 2.0 }, E { hash_code: 1077936128, next: -1, key: 3.0 }, E { hash_code: 1082130432, next: -1, key: 4.0 }, E { hash_code: 1084227584, next: 1, key: 5.0 }
+        E { hash_code: 4607182418800017408, next: -1, key: 1.0 }, E { hash_code: 4611686018427387904, next: -1, key: 2.0 }, E { hash_code: 4613937818241073152, next: -1, key: 3.0 }, E { hash_code: 4616189618054758400, next: -1, key: 4.0 }, E { hash_code: 4617315517961601024, next: 1, key: 5.0 }
     ];
 
     #[inline(always)]
-    fn get_hash(value: f32) -> u64 {
-        value.to_bits() as u64
+    fn get_hash(value: f64) -> u64 {
+        value.to_bits()
     }
 
     #[must_use]
-    pub fn contains(key: f32) -> bool {
+    pub fn contains(key: f64) -> bool {
         if key < 1.0 || key > 5.0 {
             return false;
         }
@@ -44,11 +44,11 @@ impl HashTableStructure_Single_5_HashZeroOrNaN {
     }
 
     pub const ITEM_COUNT: usize = 5;
-    pub const MIN_KEY: f32 = 1.0;
-    pub const MAX_KEY: f32 = 5.0;
+    pub const MIN_KEY: f64 = 1.0;
+    pub const MAX_KEY: f64 = 5.0;
 }struct E {
     hash_code: u64,
     next: i8,
-    key: f32,
+    key: f64,
     
 }

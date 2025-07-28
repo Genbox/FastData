@@ -35,22 +35,57 @@ public class FeatureTests(RustContext context) : IClassFixture<RustContext>
         RustLanguageDef langDef = new RustLanguageDef();
         TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.ASCII);
 
-        string testSource = $$"""
-                              #![allow(non_camel_case_types)]
-                              {{spec.Source}}
+        string source = $$"""
+                          #![allow(non_camel_case_types)]
+                          {{spec.Source}}
 
-                              fn main() {
-                              {{FormatList(vector.Keys, x => $$"""
-                                                                  if ({{spec.Identifier}}::try_lookup({{map.ToValueLabel(x)}}).is_none()) {
-                                                                         std::process::exit(0);
-                                                                     }
-                                                              """, "\n")}}
+                          fn main() {
+                          {{FormatList(vector.Keys, x => $$"""
+                                                               if ({{spec.Identifier}}::try_lookup({{map.ToValueLabel(x)}}).is_none()) {
+                                                                      std::process::exit(0);
+                                                                  }
+                                                           """, "\n")}}
 
-                                  std::process::exit(1);
-                              }
-                              """;
+                              std::process::exit(1);
+                          }
+                          """;
 
-        string executable = context.Compiler.Compile(id, testSource);
+        string executable = context.Compiler.Compile(id, source);
+        Assert.Equal(1, RunProcess(executable));
+    }
+
+    [Theory]
+    [ClassData(typeof(FloatNaNZeroTestVectorTheoryData))]
+    public async Task FloatNaNOrZeroHashSupportTest<T>(TestVector<T> vector)
+    {
+        GeneratorSpec spec = Generate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), vector);
+
+        string id = $"{nameof(FloatNaNOrZeroHashSupportTest)}-{spec.Identifier}";
+
+        await Verify(spec.Source)
+              .UseFileName(id)
+              .UseDirectory("Features")
+              .DisableDiff();
+
+        RustLanguageDef langDef = new RustLanguageDef();
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.ASCII);
+
+        string source = $$"""
+                          #![allow(non_camel_case_types)]
+                          {{spec.Source}}
+
+                          fn main() {
+                          {{FormatList(vector.Keys, x => $$"""
+                                                               if (!{{spec.Identifier}}::contains({{map.ToValueLabel(x)}})) {
+                                                                      std::process::exit(0);
+                                                                  }
+                                                           """, "\n")}}
+
+                              std::process::exit(1);
+                          }
+                          """;
+
+        string executable = context.Compiler.Compile(id, source);
         Assert.Equal(1, RunProcess(executable));
     }
 

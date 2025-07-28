@@ -7,6 +7,12 @@ namespace Genbox.FastData.InternalShared.Helpers;
 
 public static class TestVectorHelper
 {
+    public static IEnumerable<ITestVector> GetFloatNaNZeroTestVectors()
+    {
+        foreach (ITestVector testVector in GenerateTestVectors(GetFloatSpecialCases(), null, typeof(HashTableStructure<,>)))
+            yield return testVector;
+    }
+
     public static IEnumerable<ITestVector> GetSimpleTestVectors()
     {
         foreach (ITestVector testVector in GenerateTestVectors([[1]], typeof(SingleValueStructure<,>)))
@@ -37,12 +43,6 @@ public static class TestVectorHelper
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
-                     typeof(HashTableStructure<,>)))
-        {
-            yield return testVector;
-        }
-
-        foreach (ITestVector testVector in GenerateTestVectors(GetFloatSpecialCases(), "HashZeroOrNaN",
                      typeof(HashTableStructure<,>)))
         {
             yield return testVector;

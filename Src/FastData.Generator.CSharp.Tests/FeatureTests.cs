@@ -36,24 +36,61 @@ public class FeatureTests
         CSharpLanguageDef langDef = new CSharpLanguageDef();
         TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.ASCII);
 
-        string wrapper = $$"""
-                           {{spec.Source}}
+        string source = $$"""
+                          {{spec.Source}}
 
-                           public static class Wrapper
-                           {
-                               public static bool Run()
-                               {
-                           {{FormatList(vector.Keys, x => $"""
-                                                               if (!{spec.Identifier}.TryLookup({map.ToValueLabel(x)}, out _))
-                                                                   return false;
-                                                           """, "\n")}}
+                          public static class Wrapper
+                          {
+                              public static bool Run()
+                              {
+                          {{FormatList(vector.Keys, x => $"""
+                                                              if (!{spec.Identifier}.TryLookup({map.ToValueLabel(x)}, out _))
+                                                                  return false;
+                                                          """, "\n")}}
 
-                                   return true;
-                               }
-                           }
-                           """;
+                                  return true;
+                              }
+                          }
+                          """;
 
-        Func<bool> contains = CompilationHelper.GetDelegate<Func<bool>>(wrapper, types => types.First(x => x.Name == "Wrapper"), false);
+        Func<bool> contains = CompilationHelper.GetDelegate<Func<bool>>(source, types => types.First(x => x.Name == "Wrapper"), false);
+        Assert.True(contains());
+    }
+
+    [Theory]
+    [ClassData(typeof(FloatNaNZeroTestVectorTheoryData))]
+    public async Task FloatNaNOrZeroHashSupportTest<T>(TestVector<T> vector)
+    {
+        GeneratorSpec spec = Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), vector);
+
+        string id = $"{nameof(FloatNaNOrZeroHashSupportTest)}-{spec.Identifier}";
+
+        await Verify(spec.Source)
+              .UseFileName(id)
+              .UseDirectory("Features")
+              .DisableDiff();
+
+        CSharpLanguageDef langDef = new CSharpLanguageDef();
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.ASCII);
+
+        string source = $$"""
+                          {{spec.Source}}
+
+                          public static class Wrapper
+                          {
+                              public static bool Run()
+                              {
+                          {{FormatList(vector.Keys, x => $"""
+                                                              if (!{spec.Identifier}.Contains({map.ToValueLabel(x)}))
+                                                                  return false;
+                                                          """, "\n")}}
+
+                                  return true;
+                              }
+                          }
+                          """;
+
+        Func<bool> contains = CompilationHelper.GetDelegate<Func<bool>>(source, types => types.First(x => x.Name == "Wrapper"), false);
         Assert.True(contains());
     }
 

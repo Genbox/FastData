@@ -35,25 +35,62 @@ public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCon
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
         TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.ASCII);
 
-        string testSource = $$"""
-                              #include <string>
-                              #include <iostream>
+        string source = $$"""
+                          #include <string>
+                          #include <iostream>
 
-                              {{spec.Source}}
+                          {{spec.Source}}
 
-                              int main()
-                              {
-                                  const Person* res;
-                              {{FormatList(vector.Keys, x => $"""
-                                                                  if (!{spec.Identifier}::try_lookup({map.ToValueLabel(x)}, res))
-                                                                      return 0;
-                                                              """, "\n")}}
+                          int main()
+                          {
+                              const Person* res;
+                          {{FormatList(vector.Keys, x => $"""
+                                                              if (!{spec.Identifier}::try_lookup({map.ToValueLabel(x)}, res))
+                                                                  return 0;
+                                                          """, "\n")}}
 
-                                  return 1;
-                              }
-                              """;
+                              return 1;
+                          }
+                          """;
 
-        string executable = context.Compiler.Compile(id, testSource);
+        string executable = context.Compiler.Compile(id, source);
+        Assert.Equal(1, RunProcess(executable));
+    }
+
+    [Theory]
+    [ClassData(typeof(FloatNaNZeroTestVectorTheoryData))]
+    public async Task FloatNaNOrZeroHashSupportTest<T>(TestVector<T> vector)
+    {
+        GeneratorSpec spec = Generate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), vector);
+
+        string id = $"{nameof(FloatNaNOrZeroHashSupportTest)}-{spec.Identifier}";
+
+        await Verify(spec.Source)
+              .UseFileName(id)
+              .UseDirectory("Features")
+              .DisableDiff();
+
+        CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.ASCII);
+
+        string source = $$"""
+                          #include <string>
+                          #include <iostream>
+
+                          {{spec.Source}}
+
+                          int main()
+                          {
+                          {{FormatList(vector.Keys, x => $"""
+                                                              if (!{spec.Identifier}::contains({map.ToValueLabel(x)}))
+                                                                  return 0;
+                                                          """, "\n")}}
+
+                              return 1;
+                          }
+                          """;
+
+        string executable = context.Compiler.Compile(id, source);
         Assert.Equal(1, RunProcess(executable));
     }
 

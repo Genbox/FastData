@@ -46,7 +46,6 @@ public class VectorTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCont
                           """;
 
         string executable = context.Compiler.Compile(spec.Identifier, source);
-
         Assert.Equal(1, RunProcess(executable));
     }
 }

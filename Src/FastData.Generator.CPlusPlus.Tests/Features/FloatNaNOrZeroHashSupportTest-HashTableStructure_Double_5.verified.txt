@@ -6,7 +6,7 @@
 #include <limits>
 #include <string_view>
 
-class HashTableStructure_Double_5_HashZeroOrNaN final {
+class HashTableStructure_Double_5 final {
     struct e {
         double key;
         int8_t next;

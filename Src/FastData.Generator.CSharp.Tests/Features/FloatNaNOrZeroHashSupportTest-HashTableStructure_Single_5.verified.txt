@@ -6,16 +6,16 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class HashTableStructure_Double_5_HashZeroOrNaN
+internal static class HashTableStructure_Single_5
 {
     [StructLayout(LayoutKind.Auto)]
     private struct E
     {
-        internal double Key;
+        internal float Key;
         internal sbyte Next;
         internal ulong HashCode;
         
-        internal E(double key, sbyte next, ulong hashCode )
+        internal E(float key, sbyte next, ulong hashCode )
         {
             Key = key;
             Next = next;
@@ -25,24 +25,24 @@ internal static class HashTableStructure_Double_5_HashZeroOrNaN
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
-        4, 0, 3, 1, 5
+        0, 1, 4, 3, 5
      };
 
     private static readonly E[] _entries = {
-        new E(1.0, -1, 4607182418800017408), new E(2.0, -1, 4611686018427387904), new E(3.0, -1, 4613937818241073152), new E(4.0, -1, 4616189618054758400), new E(5.0, 1, 4617315517961601024)
+        new E(1f, -1, 1065353216), new E(2f, -1, 1073741824), new E(3f, -1, 1077936128), new E(4f, -1, 1082130432), new E(5f, 1, 1084227584)
     };
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong Hash(double value)
+    private static ulong Hash(float value)
     {
-        return Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
+        return (ulong)Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
     }
 
     
-    public static bool Contains(double key)
+    public static bool Contains(float key)
     {
-        if (key < 1.0 || key > 5.0)
+        if (key < 1f || key > 5f)
             return false;
 
         ulong hash = Hash(key);
@@ -63,6 +63,6 @@ internal static class HashTableStructure_Double_5_HashZeroOrNaN
     }
 
     public const uint ItemCount = 5;
-    public const double MinKey = 1.0;
-    public const double MaxKey = 5.0;
+    public const float MinKey = 1f;
+    public const float MaxKey = 5f;
 }

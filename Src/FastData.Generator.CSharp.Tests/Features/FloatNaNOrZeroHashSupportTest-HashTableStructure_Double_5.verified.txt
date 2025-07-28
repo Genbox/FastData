@@ -6,16 +6,16 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class HashTableStructure_Single_5_HashZeroOrNaN
+internal static class HashTableStructure_Double_5
 {
     [StructLayout(LayoutKind.Auto)]
     private struct E
     {
-        internal float Key;
+        internal double Key;
         internal sbyte Next;
         internal ulong HashCode;
         
-        internal E(float key, sbyte next, ulong hashCode )
+        internal E(double key, sbyte next, ulong hashCode )
         {
             Key = key;
             Next = next;
@@ -25,24 +25,24 @@ internal static class HashTableStructure_Single_5_HashZeroOrNaN
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
-        0, 1, 4, 3, 5
+        4, 0, 3, 1, 5
      };
 
     private static readonly E[] _entries = {
-        new E(1f, -1, 1065353216), new E(2f, -1, 1073741824), new E(3f, -1, 1077936128), new E(4f, -1, 1082130432), new E(5f, 1, 1084227584)
+        new E(1.0, -1, 4607182418800017408), new E(2.0, -1, 4611686018427387904), new E(3.0, -1, 4613937818241073152), new E(4.0, -1, 4616189618054758400), new E(5.0, 1, 4617315517961601024)
     };
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong Hash(float value)
+    private static ulong Hash(double value)
     {
-        return (ulong)Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
+        return Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
     }
 
     
-    public static bool Contains(float key)
+    public static bool Contains(double key)
     {
-        if (key < 1f || key > 5f)
+        if (key < 1.0 || key > 5.0)
             return false;
 
         ulong hash = Hash(key);
@@ -63,6 +63,6 @@ internal static class HashTableStructure_Single_5_HashZeroOrNaN
     }
 
     public const uint ItemCount = 5;
-    public const float MinKey = 1f;
-    public const float MaxKey = 5f;
+    public const double MinKey = 1.0;
+    public const double MaxKey = 5.0;
 }
