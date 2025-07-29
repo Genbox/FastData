@@ -18,11 +18,10 @@ impl Person {
     pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
 }
 
-    static VALUES: [&'static Person; 3] = [
+impl ArrayStructure_Int32_3 {
+   const VALUES: [&'static Person; 3] = [
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
     ];
-
-impl ArrayStructure_Int32_3 {
     const KEYS: [i32; 3] = [
         1, 2, 3
     ];
@@ -48,7 +47,7 @@ impl ArrayStructure_Int32_3 {
 
         for entry in Self::KEYS.iter() {
             if *entry == key {
-                return Some(VALUES[(key - 1) as usize])
+                return Some(Self::VALUES[(key - 1) as usize])
             }
         }
         None

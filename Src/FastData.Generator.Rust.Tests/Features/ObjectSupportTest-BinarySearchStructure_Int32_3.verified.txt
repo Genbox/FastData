@@ -18,11 +18,10 @@ impl Person {
     pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
 }
 
-    static VALUES: [&'static Person; 3] = [
+impl BinarySearchStructure_Int32_3 {
+   const VALUES: [&'static Person; 3] = [
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
     ];
-
-impl BinarySearchStructure_Int32_3 {
     const KEYS: [i32; 3] = [
         1, 2, 3
     ];
@@ -64,7 +63,7 @@ impl BinarySearchStructure_Int32_3 {
             let entry = Self::KEYS[i];
 
             if entry == key {
-                return Some(VALUES[i]);
+                return Some(Self::VALUES[i]);
             }
             if entry < key {
                 lo = i + 1;

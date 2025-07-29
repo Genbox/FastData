@@ -9,7 +9,14 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
     public override string Generate()
     {
         bool customKey = !typeof(TKey).IsPrimitive;
+        bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+
+        if (ctx.Values != null)
+        {
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
+            sb.Append($"    pub const STORED_VALUE: {GetValueTypeName(customValue)} = {ToValueLabel(ctx.Values[0])};");
+        }
 
         sb.Append($$"""
                         {{MethodAttribute}}
@@ -20,15 +27,11 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
 
         if (ctx.Values != null)
         {
-            bool customValue = !typeof(TValue).IsPrimitive;
-            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-            shared.Add(CodePlacement.Before, $"pub static STORED_VALUE: {GetValueTypeName(customValue)} = {ToValueLabel(ctx.Values[0])};");
-
             sb.Append($$"""
                             {{MethodAttribute}}
                             {{MethodModifier}}fn try_lookup(key: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
                                 if ({{GetEqualFunction("key", ToValueLabel(ctx.Item))}}) {
-                                    return Some(STORED_VALUE);
+                                    return Some(Self::STORED_VALUE);
                                 }
                                 None
                             }

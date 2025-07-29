@@ -10,10 +10,23 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
     public override string Generate()
     {
         bool customKey = !typeof(TKey).IsPrimitive;
+        bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
 
+        if (ctx.Values != null)
+        {
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
+
+            sb.Append($"""
+                          {FieldModifier}VALUES: [{GetValueTypeName(customValue)}; {ctx.Values.Length.ToStringInvariant()}] = [
+                       {FormatColumns(ctx.Values, ToValueLabel)}
+                           ];
+
+                       """);
+        }
+
         sb.Append($$"""
-                        {{FieldModifier}}const KEYS: [{{GetKeyTypeName(customKey)}}; {{ctx.Keys.Length.ToStringInvariant()}}] = [
+                        {{FieldModifier}}KEYS: [{{GetKeyTypeName(customKey)}}; {{ctx.Keys.Length.ToStringInvariant()}}] = [
                     {{FormatColumns(ctx.Keys, ToValueLabel)}}
                         ];
 
@@ -43,16 +56,6 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 
         if (ctx.Values != null)
         {
-            bool customValue = !typeof(TValue).IsPrimitive;
-            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-
-            shared.Add(CodePlacement.Before, $"""
-
-                                                 {FieldModifier} static VALUES: [{GetValueTypeName(customValue)}; {ctx.Values.Length.ToStringInvariant()}] = [
-                                              {FormatColumns(ctx.Values, ToValueLabel)}
-                                                  ];
-                                              """);
-
             sb.Append($$"""
 
                             {{MethodAttribute}}
@@ -66,7 +69,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                                     let entry = Self::KEYS[i];
 
                                     if entry == key {
-                                        return Some(VALUES[i]);
+                                        return Some(Self::VALUES[i]);
                                     }
                                     if entry < key {
                                         lo = i + 1;

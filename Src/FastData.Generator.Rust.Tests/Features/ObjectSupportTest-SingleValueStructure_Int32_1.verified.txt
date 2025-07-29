@@ -17,16 +17,15 @@ pub struct Person {
 impl Person {
     pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
 }
-pub static STORED_VALUE: &'static Person = &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None)));
 
 impl SingleValueStructure_Int32_1 {
-    #[must_use]
+    pub const STORED_VALUE: &'static Person = &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None)));    #[must_use]
     pub fn contains(key: i32) -> bool {
         key == 1
     }    #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
         if (key == 1) {
-            return Some(STORED_VALUE);
+            return Some(Self::STORED_VALUE);
         }
         None
     }

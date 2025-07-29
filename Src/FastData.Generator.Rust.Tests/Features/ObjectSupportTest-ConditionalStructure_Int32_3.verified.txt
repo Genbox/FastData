@@ -18,12 +18,11 @@ impl Person {
     pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
 }
 
-    static VALUES: [&'static Person; 3] = [
-        &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
-    ];
-
 impl ConditionalStructure_Int32_3 {
-    #[must_use]
+
+   const VALUES: [&'static Person; 3] = [
+        &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
+    ];    #[must_use]
     pub fn contains(key: i32) -> bool {
 
 
@@ -36,17 +35,14 @@ impl ConditionalStructure_Int32_3 {
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
 
-        if (key == 1)
-        {
-            return Some(VALUES[0]);
+        if (key == 1) {
+            return Some(Self::VALUES[0]);
         }
-        if (key == 2)
-        {
-            return Some(VALUES[1]);
+        if (key == 2) {
+            return Some(Self::VALUES[1]);
         }
-        if (key == 3)
-        {
-            return Some(VALUES[2]);
+        if (key == 3) {
+            return Some(Self::VALUES[2]);
         }
 
         None

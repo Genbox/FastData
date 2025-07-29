@@ -10,7 +10,20 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
     public override string Generate()
     {
         bool customKey = !typeof(TKey).IsPrimitive;
+        bool customType = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+
+        if (ctx.Values != null)
+        {
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
+
+            sb.Append($"""
+
+                          {FieldModifier}VALUES: [{GetValueTypeName(customType)}; {ctx.Values.Length.ToStringInvariant()}] = [
+                       {FormatColumns(ctx.Values, ToValueLabel)}
+                           ];
+                       """);
+        }
 
         sb.Append($$"""
                         {{MethodAttribute}}
@@ -27,16 +40,6 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 
         if (ctx.Values != null)
         {
-            bool customType = !typeof(TValue).IsPrimitive;
-            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-
-            shared.Add(CodePlacement.Before, $"""
-
-                                                 {FieldModifier} static VALUES: [{GetValueTypeName(customType)}; {ctx.Values.Length.ToStringInvariant()}] = [
-                                              {FormatColumns(ctx.Values, ToValueLabel)}
-                                                  ];
-                                              """);
-
             sb.Append($$"""
 
                             {{MethodAttribute}}
@@ -54,9 +57,8 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                 for (int i = 0; i < ctx.Keys.Length; i++)
                 {
                     temp.AppendLine($$"""
-                                              if (key == {{ToValueLabel(ctx.Keys[i])}})
-                                              {
-                                                  return Some(VALUES[{{i.ToStringInvariant()}}]);
+                                              if (key == {{ToValueLabel(ctx.Keys[i])}}) {
+                                                  return Some(Self::VALUES[{{i.ToStringInvariant()}}]);
                                               }
                                       """);
                 }

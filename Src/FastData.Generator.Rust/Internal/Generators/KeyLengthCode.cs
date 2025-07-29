@@ -13,40 +13,37 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
         bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
 
-        shared.Add(CodePlacement.Before, $"""
+        if (ctx.Values != null)
+        {
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
-                                             {FieldModifier} static KEYS: [{GetKeyTypeName(customKey)}; {ctx.Lengths.Length.ToStringInvariant()}] = [
-                                          {FormatColumns(ctx.Lengths, ToValueLabel)}
-                                              ];
-                                          """);
+            sb.Append($"""
+                          {FieldModifier}VALUES: [{GetValueTypeName(customValue)}; {ctx.Values.Length.ToStringInvariant()}] = [
+                       {FormatColumns(ctx.Values, ToValueLabel)}
+                           ];
+
+                          {FieldModifier}OFFSETS: [i32; {ctx.Values.Length.ToStringInvariant()}] = [
+                       {FormatColumns(ctx.ValueOffsets, static x => x.ToStringInvariant())}
+                           ];
+
+                       """);
+        }
 
         sb.Append($$"""
+                        {{FieldModifier}}KEYS: [{{GetKeyTypeName(customKey)}}; {{ctx.Lengths.Length.ToStringInvariant()}}] = [
+                    {{FormatColumns(ctx.Lengths, ToValueLabel)}}
+                        ];
+
                         {{MethodAttribute}}
                         {{MethodModifier}}fn contains(key: {{GetKeyTypeName(customKey)}}) -> bool {
                     {{GetEarlyExits(MethodType.Contains)}}
 
-                            return {{GetEqualFunction("key", $"KEYS[key.len() - {ctx.MinLength.ToStringInvariant()}]")}};
+                            return {{GetEqualFunction("key", $"Self::KEYS[key.len() - {ctx.MinLength.ToStringInvariant()}]")}};
                         }
                     """);
 
         if (ctx.Values != null)
         {
-            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-
-            shared.Add(CodePlacement.Before, $"""
-
-                                                 {FieldModifier} static VALUES: [{GetValueTypeName(customValue)}; {ctx.Values.Length.ToStringInvariant()}] = [
-                                              {FormatColumns(ctx.Values, ToValueLabel)}
-                                                  ];
-                                              """);
-
-            shared.Add(CodePlacement.Before, $"""
-
-                                                 {FieldModifier} static OFFSETS: [i32; {ctx.Values.Length.ToStringInvariant()}] = [
-                                              {FormatColumns(ctx.ValueOffsets, static x => x.ToStringInvariant())}
-                                                  ];
-                                              """);
-
             sb.Append($$"""
 
                         {{MethodAttribute}}
@@ -54,8 +51,8 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
                             let idx = (key.len() - {{ctx.MinLength.ToStringInvariant()}}) as usize;
-                            if ({{GetEqualFunction("key", "KEYS[idx]")}}) {
-                                return Some(VALUES[OFFSETS[idx] as usize]);
+                            if ({{GetEqualFunction("key", "Self::KEYS[idx]")}}) {
+                                return Some(Self::VALUES[Self::OFFSETS[idx] as usize]);
                             }
                             None
                         }

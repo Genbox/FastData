@@ -14,7 +14,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
         bool customValue = !typeof(TValue).IsPrimitive;
 
         shared.Add(CodePlacement.After, $$"""
-                                          {{FieldModifier}}struct E {
+                                          struct E {
                                               {{(ctx.StoreHashCode ? $"hash_code: {HashSizeType}," : "")}}
                                               next: {{GetSmallestSignedType(ctx.Buckets.Length)}},
                                               key: {{GetKeyTypeName(customKey)}},
@@ -25,11 +25,11 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
         StringBuilder sb = new StringBuilder();
 
         sb.Append($$"""
-                        {{FieldModifier}}const BUCKETS: [{{GetSmallestSignedType(ctx.Buckets.Length)}}; {{ctx.Buckets.Length.ToStringInvariant()}}] = [
+                        {{FieldModifier}}BUCKETS: [{{GetSmallestSignedType(ctx.Buckets.Length)}}; {{ctx.Buckets.Length.ToStringInvariant()}}] = [
                     {{FormatColumns(ctx.Buckets, (_, x) => x.ToStringInvariant())}}
                         ];
 
-                        {{FieldModifier}}const ENTRIES: [E; {{ctx.Entries.Length}}] = [
+                        {{FieldModifier}}ENTRIES: [E; {{ctx.Entries.Length}}] = [
                     {{FormatColumns(ctx.Entries, (i, x) => $"E {{ {(ctx.StoreHashCode ? $"hash_code: {x.Hash}, " : "")}next: {x.Next.ToStringInvariant()}, key: {ToValueLabel(x.Key)}{(ctx.Values != null ? $", value: {ToValueLabel(ctx.Values[i])}" : "")} }}")}}
                         ];
 

@@ -45,7 +45,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
 
         sb.Append($$"""
 
-                    {{FieldModifier}}const ENTRIES: [{{typeName}}; {{ctx.Data.Length.ToStringInvariant()}}] = [
+                    {{FieldModifier}}ENTRIES: [{{typeName}}; {{ctx.Data.Length.ToStringInvariant()}}] = [
                         {{FormatColumns(ctx.Data, printer)}}
                     ];
 

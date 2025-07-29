@@ -10,10 +10,23 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
     public override string Generate()
     {
         bool customKey = !typeof(TKey).IsPrimitive;
+        bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
 
+        if (ctx.Values != null)
+        {
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
+
+            sb.Append($"""
+                          {FieldModifier}VALUES: [{GetValueTypeName(customValue)}; {ctx.Values.Length.ToStringInvariant()}] = [
+                       {FormatColumns(ctx.Values, ToValueLabel)}
+                           ];
+
+                       """);
+        }
+
         sb.Append($$"""
-                        {{FieldModifier}}const KEYS: [{{GetKeyTypeName(customKey)}}; {{ctx.Keys.Length.ToStringInvariant()}}] = [
+                        {{FieldModifier}}KEYS: [{{GetKeyTypeName(customKey)}}; {{ctx.Keys.Length.ToStringInvariant()}}] = [
                     {{FormatColumns(ctx.Keys, ToValueLabel)}}
                         ];
 
@@ -32,17 +45,6 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
 
         if (ctx.Values != null)
         {
-            bool customValue = !typeof(TValue).IsPrimitive;
-
-            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-
-            shared.Add(CodePlacement.Before, $"""
-
-                                                 {FieldModifier} static VALUES: [{GetValueTypeName(customValue)}; {ctx.Values.Length.ToStringInvariant()}] = [
-                                              {FormatColumns(ctx.Values, ToValueLabel)}
-                                                  ];
-                                              """);
-
             sb.Append($$"""
 
                             {{MethodAttribute}}
@@ -51,7 +53,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
 
                                 for entry in Self::KEYS.iter() {
                                     if {{GetEqualFunction("*entry", "key")}} {
-                                        return Some(VALUES[(key - 1) as usize])
+                                        return Some(Self::VALUES[(key - 1) as usize])
                                     }
                                 }
                                 None
