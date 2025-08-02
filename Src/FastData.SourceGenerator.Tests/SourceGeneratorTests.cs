@@ -29,6 +29,34 @@ public class SourceGeneratorTests
         Assert.False(func("dontexist"));
     }
 
+    [Fact]
+    public void ValuesTest()
+    {
+        const string source = """
+                              using Genbox.FastData.SourceGenerator.Attributes;
+
+                              [assembly: FastDataKeyValue<string, int>("StaticData", ["item1", "item2", "item3"], [1, 2, 3])]
+                              """;
+
+        string output = RunGenerator(source);
+        Assert.Contains("StaticData", output, StringComparison.Ordinal); //It must contain the name we gave it
+
+        //Compile the output to code and test
+        Func<string, bool> contains = CompilationHelper.GetDelegate<Func<string, bool>>(output, false);
+        Assert.True(contains("item1")); //It must return true for the 3 items we gave
+        Assert.True(contains("item2"));
+        Assert.True(contains("item3"));
+        Assert.False(contains("dontexist"));
+
+        TryLookupDelegate tryLookup = CompilationHelper.GetDelegate<TryLookupDelegate>(output, t => t[0], m => m.Single(x => x.Name == "TryLookup"), false);
+        Assert.True(tryLookup("item1", out int? value) && value == 1);
+        Assert.True(tryLookup("item2", out value) && value == 2);
+        Assert.True(tryLookup("item3", out value) && value == 3);
+        Assert.False(tryLookup("dontexist", out value) && value == null);
+    }
+
+    private delegate bool TryLookupDelegate(string key, out int? value);
+
     [Theory]
     [InlineData(StructureType.Array)]
     [InlineData(StructureType.Conditional)]

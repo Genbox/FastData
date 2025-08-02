@@ -12,11 +12,11 @@ public static class CompilationHelper
 {
     public static T GetDelegate<T>(string source, bool release) where T : Delegate
     {
-        return GetDelegate<T>(source, static types => types[0], release);
+        return GetDelegate<T>(source, static types => types[0], infos => infos[0], release);
     }
 
     /// <summary>This is used to wrap a hash function and get it as a delegate</summary>
-    public static T GetDelegate<T>(string source, Func<Type[], Type> typeFilter, bool release) where T : Delegate
+    public static T GetDelegate<T>(string source, Func<Type[], Type> typeFilter, Func<MethodInfo[], MethodInfo> methodFilter, bool release) where T : Delegate
     {
         CSharpCompilation compilation = CreateCompilation(source, release, typeof(T), typeof(DisplayAttribute));
 
@@ -26,7 +26,8 @@ public static class CompilationHelper
         Type[] types = assembly.GetTypes();
         Type type = typeFilter(types);
 
-        MethodInfo me = type.GetMethods()[0];
+        MethodInfo[] methods = type.GetMethods();
+        MethodInfo me = methodFilter(methods);
         return me.CreateDelegate<T>();
     }
 

@@ -46,7 +46,7 @@ public class FeatureTests
                           }
                           """;
 
-        Func<bool> contains = CompilationHelper.GetDelegate<Func<bool>>(source, types => types.First(x => x.Name == "Wrapper"), false);
+        Func<bool> contains = CompilationHelper.GetDelegate<Func<bool>>(source, t => t.First(x => x.Name == "Wrapper"), m => m[0], false);
         Assert.True(contains());
     }
 
@@ -83,7 +83,7 @@ public class FeatureTests
                           }
                           """;
 
-        Func<bool> contains = CompilationHelper.GetDelegate<Func<bool>>(source, types => types.First(x => x.Name == "Wrapper"), false);
+        Func<bool> contains = CompilationHelper.GetDelegate<Func<bool>>(source, t => t.First(x => x.Name == "Wrapper"), m => m[0], false);
         Assert.True(contains());
     }
 }

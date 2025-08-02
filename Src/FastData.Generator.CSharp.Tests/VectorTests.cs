@@ -51,7 +51,7 @@ public class VectorTests
                            }
                            """;
 
-        Func<bool> contains = CompilationHelper.GetDelegate<Func<bool>>(wrapper, types => types.First(x => x.Name == "Wrapper"), false);
+        Func<bool> contains = CompilationHelper.GetDelegate<Func<bool>>(wrapper, t => t.First(x => x.Name == "Wrapper"), m => m[0], false);
         Assert.True(contains());
     }
 }

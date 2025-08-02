@@ -15,7 +15,8 @@ namespace Genbox.FastData.SourceGenerator;
 [SuppressMessage("ReSharper", "ReplaceWithStringIsNullOrEmpty")]
 internal class FastDataSourceGenerator : IIncrementalGenerator
 {
-    private static readonly string FastLookupAttr = typeof(FastDataAttribute<>).FullName!;
+    private static readonly string FastDataAttr = typeof(FastDataAttribute<>).FullName!;
+    private static readonly string FastDataKeyValueAttr = typeof(FastDataKeyValueAttribute<,>).FullName!;
 
     private static readonly SymbolDisplayFormat Format = new SymbolDisplayFormat(
         globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
@@ -57,26 +58,26 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
                     if (obj is CombinedConfig combinedCfg)
                     {
-                        object[] data = combinedCfg.Data;
+                        Array keys = combinedCfg.Keys;
+                        Array? values = combinedCfg.Values;
                         FastDataConfig fdCfg = combinedCfg.FDConfig;
                         CSharpCodeGenerator generator = CSharpCodeGenerator.Create(combinedCfg.CSConfig);
 
-                        string source = data[0] switch
+                        Type genType = typeof(FastDataGenerator);
+
+                        string source;
+                        if (values == null)
                         {
-                            char => FastDataGenerator.Generate(Cast<char>(data), fdCfg, generator),
-                            sbyte => FastDataGenerator.Generate(Cast<sbyte>(data), fdCfg, generator),
-                            byte => FastDataGenerator.Generate(Cast<byte>(data), fdCfg, generator),
-                            short => FastDataGenerator.Generate(Cast<short>(data), fdCfg, generator),
-                            ushort => FastDataGenerator.Generate(Cast<ushort>(data), fdCfg, generator),
-                            int => FastDataGenerator.Generate(Cast<int>(data), fdCfg, generator),
-                            uint => FastDataGenerator.Generate(Cast<uint>(data), fdCfg, generator),
-                            long => FastDataGenerator.Generate(Cast<long>(data), fdCfg, generator),
-                            ulong => FastDataGenerator.Generate(Cast<ulong>(data), fdCfg, generator),
-                            float => FastDataGenerator.Generate(Cast<float>(data), fdCfg, generator),
-                            double => FastDataGenerator.Generate(Cast<double>(data), fdCfg, generator),
-                            string => FastDataGenerator.Generate(Cast<string>(data), fdCfg, generator),
-                            _ => throw new InvalidOperationException($"Unsupported data type: {data[0].GetType().Name}")
-                        };
+                            MethodInfo mi = genType.GetMethod(nameof(FastDataGenerator.Generate), BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)!
+                                                   .MakeGenericMethod(keys.GetValue(0).GetType());
+                            source = (string)mi.Invoke(null, [keys, fdCfg, generator, null])!;
+                        }
+                        else
+                        {
+                            MethodInfo mi = genType.GetMethod(nameof(FastDataGenerator.GenerateKeyed), BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)!
+                                                   .MakeGenericMethod(keys.GetValue(0).GetType(), values.GetValue(0).GetType());
+                            source = (string)mi.Invoke(null, [keys, values, fdCfg, generator, null])!;
+                        }
 
                         spc.AddSource(combinedCfg.CSConfig.ClassName + ".g.cs", SourceText.From(source, Encoding.UTF8));
                     }
@@ -91,24 +92,15 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
         });
     }
 
-    private static T[] Cast<T>(object[] data)
-    {
-        T[] newArr = new T[data.Length];
-
-        for (int i = 0; i < data.Length; i++)
-            newArr[i] = (T)data[i];
-
-        return newArr;
-    }
-
     private static IEnumerable<object> Transform(Compilation c, CancellationToken token)
     {
         if (token.IsCancellationRequested)
             yield break;
 
-        ISymbol? symbol = c.GetTypeByMetadataName(FastLookupAttr);
+        ISymbol? fdAttr = c.GetTypeByMetadataName(FastDataAttr);
+        ISymbol? fdKvAttr = c.GetTypeByMetadataName(FastDataKeyValueAttr);
 
-        if (symbol == null)
+        if (fdAttr == null && fdKvAttr == null)
             yield break;
 
         ImmutableArray<AttributeData> ads = c.Assembly.GetAttributes();
@@ -120,11 +112,11 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             if (ad.AttributeClass == null)
                 continue;
 
-            //If it is not one of our Attributes, skip it.
-            if (!AreEqualSymbols(ad.AttributeClass, symbol))
+            //If it is not one of our attributes, skip it.
+            if (!AreEqualSymbols(ad.AttributeClass, fdAttr) && !AreEqualSymbols(ad.AttributeClass, fdKvAttr))
                 continue;
 
-            if (ad.ConstructorArguments.Length != 2)
+            if (ad.ConstructorArguments.Length is not (2 or 3))
                 throw new InvalidOperationException("Expected 2 constructor arguments");
 
             TypedConstant nameType = ad.ConstructorArguments[0];
@@ -137,20 +129,20 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             if (!names.Add(name))
                 throw new InvalidOperationException($"The name '{name}' is duplicated elsewhere");
 
-            TypedConstant ctorArg1 = ad.ConstructorArguments[1];
+            ImmutableArray<TypedConstant> keys = ad.ConstructorArguments[1].Values;
 
-            if (ctorArg1.Values.Length == 0)
-                throw new InvalidOperationException($"There are no values in '{name}'");
+            if (keys.Length == 0)
+                throw new InvalidOperationException($"There are no keys in '{name}'");
 
-            ITypeSymbol genericArg = ad.AttributeClass.TypeArguments[0];
+            ITypeSymbol genericArg0 = ad.AttributeClass.TypeArguments[0];
 
-            if (!Enum.TryParse<DataType>(genericArg.Name, out _))
-                throw new InvalidOperationException($"FastData does not support '{genericArg.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}' as generic argument for '{name}'");
+            if (!Enum.TryParse<DataType>(genericArg0.Name, out _))
+                throw new InvalidOperationException($"FastData does not support '{genericArg0.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}' as generic argument for '{name}'");
 
-            //We uniq the values and throw on duplicates
-            HashSet<object> uniqueValues = new HashSet<object>();
+            //We uniq the keys and throw on duplicates
+            HashSet<object> uniqueKeys = new HashSet<object>();
 
-            foreach (TypedConstant value in ctorArg1.Values)
+            foreach (TypedConstant value in keys)
             {
                 if (value.Value == null)
                     throw new InvalidOperationException("Null value in dataset");
@@ -158,20 +150,29 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                 if (value.Value is string str && str.Length == 0)
                     throw new InvalidOperationException("Empty string values are not supported");
 
-                if (!uniqueValues.Add(value.Value))
+                if (!uniqueKeys.Add(value.Value))
                     throw new InvalidOperationException($"Duplicate value: {value.Value}");
             }
 
-            object[] data = new object[ctorArg1.Values.Length];
-
-            for (int i = 0; i < data.Length; i++)
+            //Copy out the values to avoid hanging on to Roslyn references later on
+            Array keysArr = Array.CreateInstance(ToRuntimeType(genericArg0), keys.Length);
+            for (int i = 0; i < keys.Length; i++)
             {
-                object? value = ctorArg1.Values[i].Value;
+                keysArr.SetValue(keys[i].Value ?? throw new InvalidOperationException("Null key in dataset"), i);
+            }
 
-                if (value == null)
-                    continue;
+            Array? valueArr = null;
 
-                data[i] = value;
+            if (ad.ConstructorArguments.Length == 3) //Lazy check for key/value attribute
+            {
+                ImmutableArray<TypedConstant> values = ad.ConstructorArguments[2].Values;
+                ITypeSymbol genericArg1 = ad.AttributeClass.TypeArguments[1];
+                valueArr = Array.CreateInstance(ToRuntimeType(genericArg1), values.Length);
+
+                for (int i = 0; i < valueArr.Length; i++)
+                {
+                    valueArr.SetValue(values[i].Value ?? throw new InvalidOperationException("Null value in dataset"), i);
+                }
             }
 
             FastDataConfig fdCfg = new FastDataConfig();
@@ -228,8 +229,44 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                 };
             }
 
-            yield return new CombinedConfig(data, fdCfg, csCfg);
+            yield return new CombinedConfig(keysArr, valueArr, fdCfg, csCfg);
         }
+    }
+
+    public static Type? ToRuntimeType(ITypeSymbol symbol)
+    {
+        // handle primitives & string
+        if (symbol.SpecialType != SpecialType.None)
+        {
+            return symbol.SpecialType switch
+            {
+                SpecialType.System_Boolean => typeof(bool),
+                SpecialType.System_Char => typeof(char),
+                SpecialType.System_SByte => typeof(sbyte),
+                SpecialType.System_Byte => typeof(byte),
+                SpecialType.System_Int16 => typeof(short),
+                SpecialType.System_UInt16 => typeof(ushort),
+                SpecialType.System_Int32 => typeof(int),
+                SpecialType.System_UInt32 => typeof(uint),
+                SpecialType.System_Int64 => typeof(long),
+                SpecialType.System_UInt64 => typeof(ulong),
+                SpecialType.System_Single => typeof(float),
+                SpecialType.System_Double => typeof(double),
+                SpecialType.System_String => typeof(string),
+                SpecialType.System_Object => typeof(object),
+                _ => null
+            };
+        }
+
+        // FQN, remove "global::"
+        string metadataName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                                    .Replace("global::", "");
+
+        // fallback: any loaded assembly
+        return AppDomain.CurrentDomain
+                        .GetAssemblies()
+                        .Select(a => a.GetType(metadataName, false))
+                        .FirstOrDefault(t => t != null);
     }
 
     private static void BindValue<T>(Expression<Func<T?>> property, ImmutableArray<KeyValuePair<string, TypedConstant>> namedArgs)
