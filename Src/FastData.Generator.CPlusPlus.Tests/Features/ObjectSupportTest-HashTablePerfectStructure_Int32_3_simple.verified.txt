@@ -6,24 +6,17 @@
 #include <limits>
 #include <string_view>
 
-struct Person {
-    int32_t age;
-    std::u32string_view name;
-    const Person* other;
-
-    constexpr Person(const int32_t age, const std::u32string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
-};
-class HashTablePerfectStructure_Int32_3 final {
+class HashTablePerfectStructure_Int32_3_simple final {
     struct e {
         int32_t key;
         
-        const Person* value;
+        const int32_t value;
 
-        constexpr e(const int32_t key, const Person* value) noexcept
+        constexpr e(const int32_t key, const int32_t value) noexcept
         : key(key), value(value) {}
     };
     inline static const std::array<e, 3> entries = {
-        e(3, new Person(1, U"Bob", new Person(4, U"Anna", nullptr))), e(1, new Person(2, U"Billy", nullptr)), e(2, new Person(3, U"Bibi", nullptr))
+        e(3, 1), e(1, 2), e(2, 3)
     };
 
     static constexpr uint64_t get_hash(const int32_t value) noexcept
@@ -44,7 +37,7 @@ public:
         return key == entry.key;
     }
     [[nodiscard]]
-    static constexpr bool try_lookup(const int32_t key, const Person*& value) noexcept {
+    static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
         if (key < 1 || key > 3)
             return false;
 
@@ -53,7 +46,7 @@ public:
         const auto& entry = entries[index];
 
         if (key == entry.key) {
-            value = entry.value;
+            value = &entry.value;
             return true;
         }
 

@@ -19,7 +19,7 @@ public class Person
 
 };
 
-internal static class HashTableStructure_Int32_3
+internal static class HashTableStructure_Int32_3_complex
 {
     [StructLayout(LayoutKind.Auto)]
     private struct E

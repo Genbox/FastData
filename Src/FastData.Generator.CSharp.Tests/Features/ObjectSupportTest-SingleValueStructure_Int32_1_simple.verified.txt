@@ -5,29 +5,16 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-public class Person
-{
-    public Person(int age, string name, Person other)
-    {
-        Age = age;
-        Name = name;
-        Other = other;
-    }
-    int Age { get; set; }
-    string Name { get; set; }
-    Person Other { get; set; }
 
-};
-
-internal static class SingleValueStructure_Int32_1
+internal static class SingleValueStructure_Int32_1_simple
 {
-    private static readonly Person _storedValue = new Person(1, "Bob", new Person(4, "Anna", null));    
+    private static readonly int _storedValue = 1;    
     public static bool Contains(int key)
     {
         return key == 1;
     }
     
-    public static bool TryLookup(int key, out Person value)
+    public static bool TryLookup(int key, out int value)
     {
         if (key == 1)
         {

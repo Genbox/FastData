@@ -6,16 +6,9 @@
 #include <limits>
 #include <string_view>
 
-struct Person {
-    int32_t age;
-    std::u32string_view name;
-    const Person* other;
-
-    constexpr Person(const int32_t age, const std::u32string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
-};
-class ArrayStructure_Int32_3 final {
-    inline static const std::array<Person*, 3> values = {
-        new Person(1, U"Bob", new Person(4, U"Anna", nullptr)), new Person(2, U"Billy", nullptr), new Person(3, U"Bibi", nullptr)
+class ArrayStructure_Int32_3_simple final {
+    inline static const std::array<int32_t, 3> values = {
+        1, 2, 3
     };
     static constexpr std::array<int32_t, 3> keys = {
         1, 2, 3
@@ -35,13 +28,13 @@ public:
         return false;
     }
     [[nodiscard]]
-    static constexpr bool try_lookup(const int32_t key, const Person*& value) noexcept {
+    static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
         if (key < 1 || key > 3)
             return false;
 
         for (size_t i = 0; i < 3; i++) {
             if (keys[i] == key) {
-                value = values[i];
+                value = &values[i];
                 return true;
             }
         }

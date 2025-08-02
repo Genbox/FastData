@@ -17,11 +17,11 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
-                            {{FieldModifier}}std::array<int32_t, {{ctx.ValueOffsets.Length}}> offsets = {
+                            {{GetFieldModifier(true)}}std::array<int32_t, {{ctx.ValueOffsets.Length}}> offsets = {
                         {{FormatColumns(ctx.ValueOffsets, static x => x.ToStringInvariant())}}
                             };
 
-                            {{GetFieldModifier(customValue)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length}}> values = {
+                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length}}> values = {
                         {{FormatColumns(ctx.Values, ToValueLabel)}}
                             };
 
@@ -29,13 +29,13 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
         }
 
         sb.Append($$"""
-                        {{FieldModifier}}std::array<{{KeyTypeName}}, {{ctx.Lengths.Length.ToStringInvariant()}}> keys = {
+                        {{GetFieldModifier(true)}}std::array<{{KeyTypeName}}, {{ctx.Lengths.Length.ToStringInvariant()}}> keys = {
                     {{FormatColumns(ctx.Lengths, ToValueLabel)}}
                         };
 
                     public:
                         {{MethodAttribute}}
-                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
+                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
                     {{GetEarlyExits(MethodType.Contains)}}
 
                             return {{GetEqualFunction("key", $"keys[key.length() - {ctx.MinLength.ToStringInvariant()}]")}};
@@ -48,7 +48,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{GetValueTypeName(customValue)}}& value){{PostMethodModifier}} {
+                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
                                 size_t idx = key.length() - {{ctx.MinLength.ToStringInvariant()}};

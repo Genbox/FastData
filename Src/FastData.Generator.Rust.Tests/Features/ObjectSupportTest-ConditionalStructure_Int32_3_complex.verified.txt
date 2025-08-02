@@ -1,12 +1,12 @@
 ﻿//! This file is auto-generated. Do not edit manually.
-//! Structure: Array
+//! Structure: Conditional
 #![allow(unused_parens)]
 #![allow(missing_docs)]
 #![allow(unused_imports)]
 #![allow(unused_unsafe)]
 use std::ptr;
 
-pub struct ArrayStructure_Int32_3;
+pub struct ConditionalStructure_Int32_3_complex;
 pub struct Person {
     pub age: i32,
     pub name: &'static str,
@@ -18,38 +18,33 @@ impl Person {
     pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
 }
 
-impl ArrayStructure_Int32_3 {
+impl ConditionalStructure_Int32_3_complex {
+
    const VALUES: [&'static Person; 3] = [
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
-    ];
-    const KEYS: [i32; 3] = [
-        1, 2, 3
-    ];
-
-    #[must_use]
+    ];    #[must_use]
     pub fn contains(key: i32) -> bool {
-        if key < 1 || key > 3 {
-            return false;
+
+
+        if key == 1 || key == 2 || key == 3 {
+            return true;
         }
 
-        for entry in Self::KEYS.iter() {
-            if *entry == key {
-                return true;
-            }
-        }
         false
     }
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
-        if key < 1 || key > 3 {
-            return None;
+
+        if (key == 1) {
+            return Some(Self::VALUES[0]);
+        }
+        if (key == 2) {
+            return Some(Self::VALUES[1]);
+        }
+        if (key == 3) {
+            return Some(Self::VALUES[2]);
         }
 
-        for entry in Self::KEYS.iter() {
-            if *entry == key {
-                return Some(Self::VALUES[(key - 1) as usize])
-            }
-        }
         None
     }
 

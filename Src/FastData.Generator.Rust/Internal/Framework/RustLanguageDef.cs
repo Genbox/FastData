@@ -48,23 +48,6 @@ internal class RustLanguageDef : ILanguageDef
                  """;
     }
 
-    // private static string PrintValue(TypeMap map, object? value)
-    // {
-    //     if (value == null)
-    //         return map.GetNull();
-    //
-    //     Type type = value.GetType();
-    //
-    //     if (type.IsPrimitive || type == typeof(string))
-    //         return map.Get(type).PrintObj(map, value);
-    //
-    //     if (type.IsArray)
-    //         throw new NotSupportedException("Arrays are not yet supported as a type");
-    //
-    //     PropertyInfo[] props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-    //     return $"{RenderType(map, type)}::new({string.Join(", ", props.Select(p => $"{PrintValue(map, p.GetValue(value))}"))})";
-    // }
-
     private static string PrintValue(TypeMap map, object? value)
     {
         if (value == null)
@@ -82,10 +65,12 @@ internal class RustLanguageDef : ILanguageDef
         string args = string.Join(", ", props.Select(p =>
         {
             object? val = p.GetValue(value);
+
             if (val == null)
                 return "None";
 
-            return IsPropertyNullable(p) ? $"Some({PrintValue(map, val)})" : PrintValue(map, val);
+            string inner = PrintValue(map, val);
+            return IsPropertyNullable(p) ? $"Some({inner})" : inner;
         }));
 
         return $"&{type.Name}::new({args})";
@@ -114,14 +99,17 @@ internal class RustLanguageDef : ILanguageDef
         return map.GetTypeName(type);
     }
 
-    private static bool IsPropertyNullable(PropertyInfo property)
+    private static bool IsPropertyNullable(PropertyInfo p)
     {
-        var nullableAttr = property.CustomAttributes
-                                   .FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
+        if (!p.PropertyType.IsValueType && p.PropertyType != typeof(string))
+            return true;
+
+        CustomAttributeData? nullableAttr = p.CustomAttributes
+                                             .FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
 
         if (nullableAttr != null && nullableAttr.ConstructorArguments.Count > 0)
         {
-            var arg = nullableAttr.ConstructorArguments[0];
+            CustomAttributeTypedArgument arg = nullableAttr.ConstructorArguments[0];
             if (arg.ArgumentType == typeof(byte))
                 return (byte)arg.Value == 2;
             if (arg.ArgumentType == typeof(byte[]))
@@ -131,28 +119,13 @@ internal class RustLanguageDef : ILanguageDef
         return false;
     }
 
-    // private static string RenderFields(TypeMap map, PropertyInfo[] properties, bool staticLife = false)
-    // {
-    //     // age: i32,
-    //     // name: &str,
-    //     StringBuilder sb = new StringBuilder();
-    //
-    //     foreach (PropertyInfo property in properties)
-    //         sb.AppendLine($"    pub {property.Name.ToLowerInvariant()}: {RenderType(map, property.PropertyType, staticLife)},");
-    //
-    //     return sb.ToString();
-    // }
-
     private static string RenderFields(TypeMap map, PropertyInfo[] properties, bool staticLife = false)
     {
         StringBuilder sb = new StringBuilder();
-
-        foreach (PropertyInfo property in properties)
+        foreach (PropertyInfo prop in properties)
         {
-            bool isNullable = IsPropertyNullable(property);
-            sb.AppendLine($"    pub {property.Name.ToLowerInvariant()}: {RenderType(map, property.PropertyType, staticLife, isNullable)},");
+            sb.AppendLine($"    pub {prop.Name.ToLowerInvariant()}: {RenderType(map, prop.PropertyType, staticLife, IsPropertyNullable(prop))},");
         }
-
         return sb.ToString();
     }
 
@@ -160,29 +133,14 @@ internal class RustLanguageDef : ILanguageDef
     {
         StringBuilder sb = new StringBuilder();
         sb.Append("    pub const fn new(");
-
-        sb.AppendJoin(", ", properties.Select(x =>
+        sb.AppendJoin(", ", properties.Select(p =>
         {
-            bool isNullable = IsPropertyNullable(x);
-            return $"{x.Name.ToLowerInvariant()}: {RenderType(map, x.PropertyType, true, isNullable)}";
+            bool opt = IsPropertyNullable(p);
+            return $"{p.Name.ToLowerInvariant()}: {RenderType(map, p.PropertyType, true, opt)}";
         }));
-
         sb.Append(") -> Self { Self { ");
-        sb.AppendJoin(", ", properties.Select(x => x.Name.ToLowerInvariant()));
+        sb.AppendJoin(", ", properties.Select(p => p.Name.ToLowerInvariant()));
         sb.Append(" } }");
-
         return sb.ToString();
     }
-
-    // private static string RenderCtor(TypeMap map, PropertyInfo[] properties)
-    // {
-    //     // pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
-    //     StringBuilder sb = new StringBuilder();
-    //     sb.Append("    pub const fn new(");
-    //     sb.AppendJoin(", ", properties.Select(x => $"{x.Name.ToLowerInvariant()}: {RenderType(map, x.PropertyType, true)}"));
-    //     sb.Append(") -> Self { Self { ");
-    //     sb.AppendJoin(", ", properties.Select(x => x.Name.ToLowerInvariant()));
-    //     sb.Append(" } }");
-    //     return sb.ToString();
-    // }
 }

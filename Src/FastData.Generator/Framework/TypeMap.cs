@@ -47,5 +47,13 @@ public sealed class TypeMap : ITypeMap
         return res;
     }
 
-    public string GetTypeName(Type type) => Get(type).Name;
+    public string GetTypeName(Type type)
+    {
+        ITypeDef res = Get(type);
+
+        if (res is ObjectTypeDef)
+            return type.Name;
+
+        return res.Name;
+    }
 }

@@ -13,7 +13,7 @@ struct Person {
 
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
-class KeyLengthStructure_String_3 final {
+class KeyLengthStructure_String_3_complex final {
     static constexpr std::array<int32_t, 3> offsets = {
         0, 1, 2
     };
@@ -34,7 +34,7 @@ public:
         return key == keys[key.length() - 1];
     }
     [[nodiscard]]
-    static constexpr bool try_lookup(const std::string_view key, const Person*& value) noexcept {
+    static bool try_lookup(const std::string_view key, const Person*& value) noexcept {
         if (const size_t len = key.length(); len < 1u || len > 3u)
             return false;
 

@@ -6,30 +6,20 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-pub struct HashTablePerfectStructure_Int32_3;
+pub struct HashTablePerfectStructure_Int32_3_simple;
 pub struct e {
     pub key: i32,
     
-    pub value: &'static Person,
+    pub value: i32,
 }
 impl e {
-    pub const fn new (key: i32, value: &'static Person) -> Self { Self { key, value  } }
-}
-pub struct Person {
-    pub age: i32,
-    pub name: &'static str,
-    pub other: Option<&'static Person>,
-
+    pub const fn new (key: i32, value: i32) -> Self { Self { key, value  } }
 }
 
-impl Person {
-    pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
-}
-
-impl HashTablePerfectStructure_Int32_3 {
+impl HashTablePerfectStructure_Int32_3_simple {
 
 const ENTRIES: [e; 3] = [
-            e::new(3, &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None)))), e::new(1, &Person::new(2, "Billy", None)), e::new(2, &Person::new(3, "Bibi", None))
+            e::new(3, 1), e::new(1, 2), e::new(2, 3)
 ];
 
     #[inline(always)]
@@ -44,12 +34,11 @@ const ENTRIES: [e; 3] = [
         }
         let hash = unsafe { Self::get_hash(key) };
         let index = (hash % 3) as usize;
-        let entry = &Self::ENTRIES[index];
 
-        return key == entry.key;
+        return key == Self::ENTRIES[index].key;
     }
     #[must_use]
-    pub fn try_lookup(key: i32) -> Option<&'static Person> {
+    pub fn try_lookup(key: i32) -> Option<i32> {
         if key < 1 || key > 3 {
             return None;
         }

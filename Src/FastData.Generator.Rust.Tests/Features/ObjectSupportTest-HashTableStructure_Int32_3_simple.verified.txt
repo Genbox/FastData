@@ -6,25 +6,15 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-pub struct HashTableStructure_Int32_3;
-pub struct Person {
-    pub age: i32,
-    pub name: &'static str,
-    pub other: Option<&'static Person>,
+pub struct HashTableStructure_Int32_3_simple;
 
-}
-
-impl Person {
-    pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
-}
-
-impl HashTableStructure_Int32_3 {
+impl HashTableStructure_Int32_3_simple {
     const BUCKETS: [i8; 3] = [
         3, 1, 2
     ];
 
     const ENTRIES: [E; 3] = [
-        E { next: -1, key: 1, value: &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))) }, E { next: -1, key: 2, value: &Person::new(2, "Billy", None) }, E { next: -1, key: 3, value: &Person::new(3, "Bibi", None) }
+        E { next: -1, key: 1, value: 1 }, E { next: -1, key: 2, value: 2 }, E { next: -1, key: 3, value: 3 }
     ];
 
     #[inline(always)]
@@ -53,7 +43,7 @@ impl HashTableStructure_Int32_3 {
         false
     }
     #[must_use]
-    pub fn try_lookup(key: i32) -> Option<&'static Person> {
+    pub fn try_lookup(key: i32) -> Option<i32> {
         if key < 1 || key > 3 {
             return None;
         }
@@ -80,5 +70,5 @@ impl HashTableStructure_Int32_3 {
     
     next: i8,
     key: i32,
-    value: &'static Person,
+    value: i32,
 }

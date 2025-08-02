@@ -1,0 +1,70 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class BinarySearchStructure_Int32_3_simple final {
+    inline static const std::array<int32_t, 3> values = {
+        1, 2, 3
+    };
+    static constexpr std::array<int32_t, 3> keys = {
+        1, 2, 3
+    };
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+        if (key < 1 || key > 3)
+            return false;
+
+        int32_t lo = 0;
+        int32_t hi = 2;
+        while (lo <= hi) {
+            const int32_t mid = lo + ((hi - lo) >> 1);
+            const int32_t mid_key = keys[mid];
+
+            if (mid_key == key)
+                return true;
+
+            if (mid_key < key)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+    [[nodiscard]]
+    static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
+        if (key < 1 || key > 3)
+            return false;
+
+        int32_t lo = 0;
+        int32_t hi = 2;
+        while (lo <= hi) {
+            const int32_t mid = lo + ((hi - lo) >> 1);
+            const int32_t mid_key = keys[mid];
+
+            if (mid_key == key)
+            {
+                value = &values[mid];
+                return true;
+            }
+
+            if (mid_key < key)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        value = nullptr;
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 3;
+};

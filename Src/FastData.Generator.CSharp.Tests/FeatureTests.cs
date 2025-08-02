@@ -14,17 +14,10 @@ namespace Genbox.FastData.Generator.CSharp.Tests;
 public class FeatureTests
 {
     [Theory]
-    [ClassData(typeof(SimpleTestVectorTheoryData))]
-    public async Task ObjectSupportTest<T>(TestVector<T> vector)
+    [ClassData(typeof(ValueTestVectorTheoryData))]
+    public async Task ObjectSupportTest<TKey, TValue>(TestVector<TKey, TValue> vector) where TValue : notnull
     {
-        Person[] values =
-        [
-            new Person { Age = 1, Name = "Bob", Other = new Person { Name = "Anna", Age = 4 } },
-            new Person { Age = 2, Name = "Billy" },
-            new Person { Age = 3, Name = "Bibi" },
-        ];
-
-        GeneratorSpec spec = Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), vector, values);
+        GeneratorSpec spec = Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), vector);
 
         string id = $"{nameof(ObjectSupportTest)}-{spec.Identifier}";
 
@@ -92,12 +85,5 @@ public class FeatureTests
 
         Func<bool> contains = CompilationHelper.GetDelegate<Func<bool>>(source, types => types.First(x => x.Name == "Wrapper"), false);
         Assert.True(contains());
-    }
-
-    internal class Person
-    {
-        public int Age { get; set; }
-        public string Name { get; set; }
-        public Person Other { get; set; }
     }
 }

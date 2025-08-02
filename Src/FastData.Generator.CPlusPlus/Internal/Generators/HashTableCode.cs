@@ -18,15 +18,15 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                             {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
                             {{(ctx.StoreHashCode ? $"{HashSizeType} hash_code;" : "")}}
                             {{(ctx.Values != null ? $"const {GetValueTypeName(customValue)} value;" : "")}}
-                            e(const {{KeyTypeName}} key, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next{{(ctx.StoreHashCode ? $", const {HashSizeType} hash_code" : "")}}{{(ctx.Values != null ? $", const {ValueTypeName}* value" : "")}})
+                            e(const {{KeyTypeName}} key, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next{{(ctx.StoreHashCode ? $", const {HashSizeType} hash_code" : "")}}{{(ctx.Values != null ? $", const {GetValueTypeName(customValue)} value" : "")}})
                                : key(key), next(next){{(ctx.StoreHashCode ? ", hash_code(hash_code)" : "")}}{{(ctx.Values != null ? ", value(value)" : "")}} {}
                         };
 
-                        {{FieldModifier}}std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length.ToStringInvariant()}}> buckets = {
+                        {{GetFieldModifier(true)}}std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length.ToStringInvariant()}}> buckets = {
                     {{FormatColumns(ctx.Buckets, static x => x.ToStringInvariant())}}
                          };
 
-                        {{GetFieldModifier(true)}}std::array<e, {{ctx.Entries.Length.ToStringInvariant()}}> entries = {
+                        {{GetFieldModifier(false)}}std::array<e, {{ctx.Entries.Length.ToStringInvariant()}}> entries = {
                     {{FormatColumns(ctx.Entries, (i, x) => $"e({ToValueLabel(x.Key)}, {x.Next.ToStringInvariant()}{(ctx.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : "")}{(ctx.Values != null ? $", {ToValueLabel(ctx.Values[i])}" : "")})")}}
                         };
 
@@ -34,7 +34,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
 
                     public:
                         {{MethodAttribute}}
-                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
+                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
                     {{GetEarlyExits(MethodType.Contains)}}
 
                             const {{HashSizeType}} hash = get_hash(key);
@@ -62,7 +62,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{GetValueTypeName(customValue)}}& value){{PostMethodModifier}} {
+                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
                                 const {{HashSizeType}} hash = get_hash(key);

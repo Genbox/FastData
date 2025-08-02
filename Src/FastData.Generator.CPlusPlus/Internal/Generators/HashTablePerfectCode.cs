@@ -39,7 +39,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
 
         sb.Append($$"""
 
-                        {{GetFieldModifier(true)}}std::array<{{typeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
+                        {{GetFieldModifier(false)}}std::array<{{typeName}}, {{ctx.Data.Length.ToStringInvariant()}}> entries = {
                     {{FormatColumns(ctx.Data, printer)}}
                         };
 
@@ -47,7 +47,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
 
                     public:
                         {{MethodAttribute}}
-                        {{MethodModifier}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
+                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
                     {{GetEarlyExits(MethodType.Contains)}}
 
                             const {{HashSizeType}} hash = get_hash(key);
@@ -66,7 +66,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}bool try_lookup(const {{KeyTypeName}} key, const {{GetValueTypeName(customValue)}}& value){{PostMethodModifier}} {
+                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
                         {{GetEarlyExits(MethodType.TryLookup)}}
 
                                 const {{HashSizeType}} hash = get_hash(key);

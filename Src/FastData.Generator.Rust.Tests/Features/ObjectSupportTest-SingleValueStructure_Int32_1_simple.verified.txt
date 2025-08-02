@@ -1,0 +1,26 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (SingleValue)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct SingleValueStructure_Int32_1_simple;
+
+impl SingleValueStructure_Int32_1_simple {
+    pub const STORED_VALUE: i32 = 1;    #[must_use]
+    pub fn contains(key: i32) -> bool {
+        key == 1
+    }    #[must_use]
+    pub fn try_lookup(key: i32) -> Option<i32> {
+        if (key == 1) {
+            return Some(Self::STORED_VALUE);
+        }
+        None
+    }
+
+    pub const ITEM_COUNT: usize = 1;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 1;
+}

@@ -1,6 +1,7 @@
 using System.Globalization;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Structures;
+using Genbox.FastData.InternalShared.Code;
 using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.InternalShared.Helpers;
@@ -13,15 +14,42 @@ public static class TestVectorHelper
             yield return testVector;
     }
 
-    public static IEnumerable<ITestVector> GetSimpleTestVectors()
+    public static IEnumerable<ITestVector> GetValueTestVectors()
     {
-        foreach (ITestVector testVector in GenerateTestVectors([[1]], typeof(SingleValueStructure<,>)))
+        // First we try with a simple value
+        int[] simpleValues = [1, 2, 3];
+
+        foreach (ITestVector testVector in GenerateTestVectors([[1]], [simpleValues], "simple", typeof(SingleValueStructure<,>)))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([["a", "aa", "aaa"]], typeof(KeyLengthStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([["a", "aa", "aaa"]], [simpleValues], "simple", typeof(KeyLengthStructure<,>)))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]],
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], [simpleValues], "simple",
+                     typeof(ArrayStructure<,>),
+                     typeof(BinarySearchStructure<,>),
+                     typeof(ConditionalStructure<,>),
+                     typeof(HashTableStructure<,>),
+                     typeof(HashTablePerfectStructure<,>)))
+        {
+            yield return testVector;
+        }
+
+        // Then we try with complex values
+        Person[] complexValues =
+        [
+            new Person { Age = 1, Name = "Bob", Other = new Person { Name = "Anna", Age = 4 } },
+            new Person { Age = 2, Name = "Billy" },
+            new Person { Age = 3, Name = "Bibi" },
+        ];
+
+        foreach (ITestVector testVector in GenerateTestVectors([[1]], [complexValues], "complex", typeof(SingleValueStructure<,>)))
+            yield return testVector;
+
+        foreach (ITestVector testVector in GenerateTestVectors([["a", "aa", "aaa"]], [complexValues], "complex", typeof(KeyLengthStructure<,>)))
+            yield return testVector;
+
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], [complexValues], "complex",
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
@@ -105,87 +133,118 @@ public static class TestVectorHelper
         }
     }
 
-    private static IEnumerable<ITestVector> GenerateTestVectors(IEnumerable<(Type, object[], object[])> data, string? postfix = null, params Type[] dataStructs)
+    private static IEnumerable<ITestVector> GenerateTestVectors(IEnumerable<DataPair> pairs, string? postfix = null, params Type[] dataStructs)
     {
-        foreach ((Type vt, object[] values, object[] notValues) in data)
+        foreach ((object[] keys, object[] notInKeys, object[]? values) in pairs)
         {
+            Type keyType = keys[0].GetType();
+
             foreach (Type st in dataStructs)
             {
                 //Convert object[] to T[]
-                Array arr = Array.CreateInstance(vt, values.Length);
-                for (int i = 0; i < values.Length; i++)
+                Array keysArr = Array.CreateInstance(keyType, keys.Length);
+                for (int i = 0; i < keys.Length; i++)
                 {
-                    arr.SetValue(values[i], i);
+                    keysArr.SetValue(keys[i], i);
                 }
 
-                Array arr2 = Array.CreateInstance(vt, notValues.Length);
-                for (int i = 0; i < notValues.Length; i++)
+                Array notInKeysArr = Array.CreateInstance(keyType, notInKeys.Length);
+                for (int i = 0; i < notInKeys.Length; i++)
                 {
-                    arr2.SetValue(notValues[i], i);
+                    notInKeysArr.SetValue(notInKeys[i], i);
                 }
 
-                //Create an instance of TestVector<T> and give it the type of the structure
-                Type vector = typeof(TestVector<>).MakeGenericType(vt);
-                yield return (ITestVector)Activator.CreateInstance(vector, st, arr, arr2, postfix)!;
+                if (values != null)
+                {
+                    Type valueType = values[0].GetType();
+
+                    Array valuesArr = Array.CreateInstance(valueType, values.Length);
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        valuesArr.SetValue(values[i], i);
+                    }
+
+                    Type vector = typeof(TestVector<,>).MakeGenericType(keyType, valueType);
+                    yield return (ITestVector)Activator.CreateInstance(vector, st, keysArr, notInKeysArr, valuesArr, postfix)!;
+                }
+                else
+                {
+                    Type vector = typeof(TestVector<>).MakeGenericType(keyType);
+                    yield return (ITestVector)Activator.CreateInstance(vector, st, keysArr, notInKeysArr, postfix)!;
+                }
             }
         }
     }
 
-    //This overload is to get some little type safety when only a single type is used
-    private static IEnumerable<ITestVector> GenerateTestVectors<T>(IEnumerable<T[]> data, params Type[] dataStructs)
+    private static IEnumerable<ITestVector> GenerateTestVectors<TKey>(IEnumerable<TKey[]> keySets, params Type[] dataStructs)
     {
-        Type type = typeof(T);
-        return GenerateTestVectors(data.Select(x => (type, x.Cast<object>().ToArray(), Array.Empty<object>())), null, dataStructs);
+        return GenerateTestVectors(keySets.Select(x => new DataPair(x.Cast<object>().ToArray(), [])), null, dataStructs);
     }
 
-    private static IEnumerable<(Type type, object[] value, object[] notValue)> GetEdgeCaseValues() =>
+    private static IEnumerable<ITestVector> GenerateTestVectors<TKey, TValue>(TKey[][] keySets, TValue[][] valueSets, string? postFix = null, params Type[] dataStructs)
+    {
+        if (keySets.Length != valueSets.Length)
+            throw new InvalidOperationException("The number of key sets does not match the number of value sets.");
+
+        return GenerateTestVectors(CreatePairs(), postFix, dataStructs);
+
+        IEnumerable<DataPair> CreatePairs()
+        {
+            for (int i = 0; i < keySets.Length; i++)
+                yield return new DataPair(keySets[i].Cast<object>().ToArray(), [], valueSets[i].Cast<object>().ToArray());
+        }
+    }
+
+    private static DataPair[] GetEdgeCaseValues() =>
     [
 
         // We want to test edge values
-        (typeof(sbyte), [sbyte.MinValue, (sbyte)-1, (sbyte)0, (sbyte)1, sbyte.MaxValue], [(sbyte)-2, (sbyte)2]),
-        (typeof(byte), [(byte)0, (byte)1, byte.MaxValue], [(byte)2, (byte)3]),
+        new DataPair([sbyte.MinValue, (sbyte)-1, (sbyte)0, (sbyte)1, sbyte.MaxValue], [(sbyte)-2, (sbyte)2]),
+        new DataPair([(byte)0, (byte)1, byte.MaxValue], [(byte)2, (byte)3]),
 
         //We keep it within ASCII range as C#'s char does not translate to other languages
-        (typeof(char), ['\0', 'a', (char)127], [(char)1, 'b']),
-        (typeof(double), [double.MinValue, 0.0, 1.0, double.MaxValue], [1.1, 2.0]),
-        (typeof(float), [float.MinValue, -1f, 0f, 1f, float.MaxValue], [1.1f, 2.0f]),
-        (typeof(short), [short.MinValue, (short)-1, (short)0, (short)1, short.MaxValue], [(short)-2, (short)2]),
-        (typeof(ushort), [(ushort)0, (ushort)1, (ushort)2, ushort.MaxValue], [(ushort)3, (ushort)4]),
-        (typeof(int), [int.MinValue, -1, 0, 1, int.MaxValue], [-2, 2]),
-        (typeof(uint), [0U, 1U, 2U, uint.MaxValue], [3U, 4U]),
-        (typeof(long), [long.MinValue, -1L, 0L, 1L, long.MaxValue], [-2L, 2L]),
-        (typeof(ulong), [0UL, 1UL, 2UL, ulong.MaxValue], [3UL, 4UL]),
-        (typeof(string), ["a", "item", new string('a', 255)], ["b", "item2"])
+        new DataPair(['\0', 'a', (char)127], [(char)1, 'b']),
+        new DataPair([double.MinValue, 0.0, 1.0, double.MaxValue], [1.1, 2.0]),
+        new DataPair([float.MinValue, -1f, 0f, 1f, float.MaxValue], [1.1f, 2.0f]),
+        new DataPair([short.MinValue, (short)-1, (short)0, (short)1, short.MaxValue], [(short)-2, (short)2]),
+        new DataPair([(ushort)0, (ushort)1, (ushort)2, ushort.MaxValue], [(ushort)3, (ushort)4]),
+        new DataPair([int.MinValue, -1, 0, 1, int.MaxValue], [-2, 2]),
+        new DataPair([0U, 1U, 2U, uint.MaxValue], [3U, 4U]),
+        new DataPair([long.MinValue, -1L, 0L, 1L, long.MaxValue], [-2L, 2L]),
+        new DataPair([0UL, 1UL, 2UL, ulong.MaxValue], [3UL, 4UL]),
+        new DataPair(["a", "item", new string('a', 255)], ["b", "item2"])
     ];
 
-    private static IEnumerable<(Type type, object[] value, object[] notValue)> GetFloatSpecialCases() =>
+    private static DataPair[] GetFloatSpecialCases() =>
     [
 
         //If we don't have zero or NaN, we can use a simple hash
-        (typeof(float), [1, 2, 3, 4, 5], []),
-        (typeof(double), [1, 2, 3, 4, 5], []),
+        new DataPair([1f, 2f, 3f, 4f, 5f], []),
+        new DataPair([1.0, 2.0, 3.0, 4.0, 5.0], []),
     ];
 
-    private static IEnumerable<(Type type, object[] value, object[] notValue)> GetDataOfSize(int size) =>
+    private static DataPair[] GetDataOfSize(int size) =>
     [
-        (typeof(int), Enumerable.Range(0, size).Select(x => x).Cast<object>().ToArray(), Enumerable.Range(size, size * 2).Select(x => x).Cast<object>().ToArray()),
-        (typeof(float), Enumerable.Range(0, size).Select(x => (float)x).Cast<object>().ToArray(), Enumerable.Range(size, size * 2).Select(x => (float)x).Cast<object>().ToArray()),
-        (typeof(string), Enumerable.Range(0, size).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).Cast<object>().ToArray(), Enumerable.Range(size, size * 2).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).Cast<object>().ToArray())
+        new DataPair(Enumerable.Range(0, size).Select(x => x).Cast<object>().ToArray(), Enumerable.Range(size, size * 2).Select(x => x).Cast<object>().ToArray()),
+        new DataPair(Enumerable.Range(0, size).Select(x => (float)x).Cast<object>().ToArray(), Enumerable.Range(size, size * 2).Select(x => (float)x).Cast<object>().ToArray()),
+        new DataPair(Enumerable.Range(0, size).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).Cast<object>().ToArray(), Enumerable.Range(size, size * 2).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).Cast<object>().ToArray())
     ];
 
-    private static IEnumerable<(Type type, object[] value, object[] notValue)> GetSingleValues() =>
+    private static DataPair[] GetSingleValues() =>
     [
-        (typeof(sbyte), [(sbyte)1], [(sbyte)2]),
-        (typeof(byte), [(byte)1], [(byte)2]),
-        (typeof(char), ['a'], ['b']),
-        (typeof(double), [1.0], [2.0]),
-        (typeof(float), [1f], [2f]),
-        (typeof(short), [(short)1], [(short)2]),
-        (typeof(ushort), [(ushort)1], [(ushort)2]),
-        (typeof(int), [1], [2]),
-        (typeof(uint), [1U], [2U]),
-        (typeof(long), [1L], [2L]),
-        (typeof(ulong), [1UL], [2UL]),
-        (typeof(string), ["value"], ["eulav"])
+        new DataPair([(sbyte)1], [(sbyte)2]),
+        new DataPair([(byte)1], [(byte)2]),
+        new DataPair(['a'], ['b']),
+        new DataPair([1.0], [2.0]),
+        new DataPair([1f], [2f]),
+        new DataPair([(short)1], [(short)2]),
+        new DataPair([(ushort)1], [(ushort)2]),
+        new DataPair([1], [2]),
+        new DataPair([1U], [2U]),
+        new DataPair([1L], [2L]),
+        new DataPair([1UL], [2UL]),
+        new DataPair(["value"], ["eulav"])
     ];
+
+    private record struct DataPair(object[] Keys, object[] NotInKeys, object[]? Values = null);
 }

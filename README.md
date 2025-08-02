@@ -21,7 +21,7 @@ static data. It supports many different languages (C#, C++, Rust, etc.), ready f
 
 ## Getting started
 
-For some guides below you'll need a `dogs.txt`file with the following contents:
+The examples below need a `dogs.txt`file with the content:
 
 ```
 Labrador
@@ -138,9 +138,9 @@ A benchmark of the array versus our generated structure really illustrates the d
 
 ## Features
 
-- **Data analysis:** Optimizes the structure based on the inherent properties of the dataset.
+- **Data analysis:** Optimizes the algorithms on the inherent properties of the dataset.
 - **Multiple structures:** FastData automatically chooses the best data structure for your data.
-- **Fast hashing:** String lookups are fast due to a fast string hash function
+- **Fast hashing:** Strings are analyzed and the hash function is specially tailored to the data.
 - **Zero dependencies:** The generated code has no dependencies, making it easy to integrate into your project.
 - **Minimal memory usage:** The generated data structures are memory-efficient, using only the necessary amount of memory for the dataset.
 - **High-perfromance:** The generated data structures are generated without unnecessary branching or virtualization making the compiler produce optimal code.
@@ -151,7 +151,7 @@ It supports several output programming languages.
 * C++: `FastData cplusplus <input-file>`
 * Rust: `FastData rust <input-file>`
 
-Each output language has different settings. Type `FastData <lang> --help` to see the options.
+Each output language has different settings. Run `FastData <lang> --help` to see the options.
 
 ### Data structures
 
@@ -251,11 +251,10 @@ No, not yet.
 #### Does it support custom equality comparers?
 No, not yet.
 
-#### Does it support keyed lookup?
-No, not yet.
+#### Does it support key/value lookup?
+Yes, you can specify key/value arrays as input data and FastData will generate a efficient key lookup function that returns a value.
 
 #### Are there any best pratcies for using FastData?
-Yes. See below:
 * Put the most often queried items first in the input data. It can speed up query speed for some data structures.
 
 #### Can I use it for dynamic data?

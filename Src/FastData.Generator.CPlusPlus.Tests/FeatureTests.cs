@@ -13,17 +13,10 @@ namespace Genbox.FastData.Generator.CPlusPlus.Tests;
 public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusContext>
 {
     [Theory]
-    [ClassData(typeof(SimpleTestVectorTheoryData))]
-    public async Task ObjectSupportTest<T>(TestVector<T> vector)
+    [ClassData(typeof(ValueTestVectorTheoryData))]
+    public async Task ObjectSupportTest<TKey, TValue>(TestVector<TKey, TValue> vector) where TValue : notnull
     {
-        Person[] values =
-        [
-            new Person { Age = 1, Name = "Bob", Other = new Person { Name = "Anna", Age = 4 } },
-            new Person { Age = 2, Name = "Billy" },
-            new Person { Age = 3, Name = "Bibi" },
-        ];
-
-        GeneratorSpec spec = Generate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), vector, values);
+        GeneratorSpec spec = Generate(id => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id)), vector);
 
         string id = $"{nameof(ObjectSupportTest)}-{spec.Identifier}";
 
@@ -43,7 +36,7 @@ public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCon
 
                           int main()
                           {
-                              const Person* res;
+                              const {{map.GetTypeName(vector.Values[0].GetType())}}* res;
                           {{FormatList(vector.Keys, x => $"""
                                                               if (!{spec.Identifier}::try_lookup({map.ToValueLabel(x)}, res))
                                                                   return 0;
@@ -92,12 +85,5 @@ public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCon
 
         string executable = context.Compiler.Compile(id, source);
         Assert.Equal(1, RunProcess(executable));
-    }
-
-    internal class Person
-    {
-        public int Age { get; set; }
-        public string Name { get; set; }
-        public Person Other { get; set; }
     }
 }

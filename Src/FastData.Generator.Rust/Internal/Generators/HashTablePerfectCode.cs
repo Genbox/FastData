@@ -56,9 +56,8 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                     {{GetEarlyExits(MethodType.Contains)}}
                             let hash = unsafe { Self::get_hash(key) };
                             let index = ({{GetModFunction("hash", (ulong)ctx.Data.Length)}}) as usize;
-                            let entry = {{(customKey || customValue ? "&" : "")}}Self::ENTRIES[index];
 
-                            return {{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "entry.hash_code")} && " : "")}}{{GetEqualFunction("key", ctx.StoreHashCode || ctx.Values != null ? "entry.key" : "entry")}};
+                            return {{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "&Self::ENTRIES[index].hash_code")} && " : "")}}{{GetEqualFunction("key", ctx.StoreHashCode || ctx.Values != null ? "Self::ENTRIES[index].key" : "Self::ENTRIES[index]")}};
                         }
                     """);
 
@@ -74,7 +73,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
 
                                 let hash = unsafe { Self::get_hash(key) };
                                 let index = ({{GetModFunction("hash", (ulong)ctx.Data.Length)}}) as usize;
-                                let entry = {{(customKey || customValue ? "&" : "")}}Self::ENTRIES[index];
+                                let entry = &Self::ENTRIES[index];
 
                                 if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "entry.hash_code")} && " : "")}}{{GetEqualFunction("key", "entry.key")}}) {
                                     return Some(entry.value);

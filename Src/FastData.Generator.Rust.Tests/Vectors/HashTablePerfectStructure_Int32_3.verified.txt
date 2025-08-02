@@ -26,9 +26,8 @@ const ENTRIES: [i32; 3] = [
         }
         let hash = unsafe { Self::get_hash(key) };
         let index = (hash % 3) as usize;
-        let entry = Self::ENTRIES[index];
 
-        return key == entry;
+        return key == Self::ENTRIES[index];
     }
 
     pub const ITEM_COUNT: usize = 3;

@@ -98,8 +98,10 @@ public static class TestHelper
 
     public static GeneratorSpec Generate<TKey>(Func<string, ICodeGenerator> func, TestVector<TKey> vector) => Generate<TKey, byte>(func, vector, null);
 
+    public static GeneratorSpec Generate<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey, TValue> vector) where TValue : notnull => Generate(func, vector, vector.Values);
+
     /// <summary>This variant of Generate bypasses the public API to test more advanced combinations of parameters</summary>
-    public static GeneratorSpec Generate<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey> vector, TValue[]? values)
+    public static GeneratorSpec Generate<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey> vector, TValue[]? values) where TValue : notnull
     {
         DataType dataType = Enum.Parse<DataType>(typeof(TKey).Name);
 

@@ -13,17 +13,10 @@ namespace Genbox.FastData.Generator.Rust.Tests;
 public class FeatureTests(RustContext context) : IClassFixture<RustContext>
 {
     [Theory]
-    [ClassData(typeof(SimpleTestVectorTheoryData))]
-    public async Task ObjectSupportTest<T>(TestVector<T> vector)
+    [ClassData(typeof(ValueTestVectorTheoryData))]
+    public async Task ObjectSupportTest<TKey, TValue>(TestVector<TKey, TValue> vector) where TValue : notnull
     {
-        Person[] values =
-        [
-            new Person { Age = 1, Name = "Bob", Other = new Person { Name = "Anna", Age = 4 } },
-            new Person { Age = 2, Name = "Billy" },
-            new Person { Age = 3, Name = "Bibi" },
-        ];
-
-        GeneratorSpec spec = Generate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), vector, values);
+        GeneratorSpec spec = Generate(id => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id)), vector);
 
         string id = $"{nameof(ObjectSupportTest)}-{spec.Identifier}";
 
@@ -87,12 +80,5 @@ public class FeatureTests(RustContext context) : IClassFixture<RustContext>
 
         string executable = context.Compiler.Compile(id, source);
         Assert.Equal(1, RunProcess(executable));
-    }
-
-    internal class Person
-    {
-        public required int Age { get; set; }
-        public required string Name { get; set; }
-        public Person? Other { get; set; }
     }
 }

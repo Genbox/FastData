@@ -5,28 +5,15 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-public class Person
-{
-    public Person(int age, string name, Person other)
-    {
-        Age = age;
-        Name = name;
-        Other = other;
-    }
-    int Age { get; set; }
-    string Name { get; set; }
-    Person Other { get; set; }
 
-};
-
-internal static class KeyLengthStructure_String_3
+internal static class KeyLengthStructure_String_3_simple
 {
     private static readonly int[] _offsets = {
         0, 1, 2
     };
 
-    private static readonly Person[] _values = {
-        new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
+    private static readonly int[] _values = {
+        1, 2, 3
     };
     private static readonly string[] _keys = {
         "a", "aa", "aaa"
@@ -40,7 +27,7 @@ internal static class KeyLengthStructure_String_3
 
         return StringComparer.Ordinal.Equals(key, _keys[key.Length - 1]);
     }    
-    public static bool TryLookup(string key, out Person value)
+    public static bool TryLookup(string key, out int value)
     {
         if (key.Length < 1u || key.Length > 3u)
         {

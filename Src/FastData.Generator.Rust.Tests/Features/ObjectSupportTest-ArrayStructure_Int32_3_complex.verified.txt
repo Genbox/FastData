@@ -1,12 +1,12 @@
 ﻿//! This file is auto-generated. Do not edit manually.
-//! Structure: BinarySearch
+//! Structure: Array
 #![allow(unused_parens)]
 #![allow(missing_docs)]
 #![allow(unused_imports)]
 #![allow(unused_unsafe)]
 use std::ptr;
 
-pub struct BinarySearchStructure_Int32_3;
+pub struct ArrayStructure_Int32_3_complex;
 pub struct Person {
     pub age: i32,
     pub name: &'static str,
@@ -18,7 +18,7 @@ impl Person {
     pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
 }
 
-impl BinarySearchStructure_Int32_3 {
+impl ArrayStructure_Int32_3_complex {
    const VALUES: [&'static Person; 3] = [
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
     ];
@@ -32,22 +32,11 @@ impl BinarySearchStructure_Int32_3 {
             return false;
         }
 
-        let mut lo: usize = 0;
-        let mut hi: usize = 2;
-        while lo <= hi {
-            let i = lo + ((hi - lo) >> 1);
-            let entry = Self::KEYS[i];
-
-            if entry == key {
+        for entry in Self::KEYS.iter() {
+            if *entry == key {
                 return true;
             }
-            if entry < key {
-                lo = i + 1;
-            } else {
-                hi = i - 1;
-            }
         }
-
         false
     }
     #[must_use]
@@ -56,22 +45,11 @@ impl BinarySearchStructure_Int32_3 {
             return None;
         }
 
-        let mut lo: usize = 0;
-        let mut hi: usize = 2;
-        while lo <= hi {
-            let i = lo + ((hi - lo) >> 1);
-            let entry = Self::KEYS[i];
-
-            if entry == key {
-                return Some(Self::VALUES[i]);
-            }
-            if entry < key {
-                lo = i + 1;
-            } else {
-                hi = i - 1;
+        for entry in Self::KEYS.iter() {
+            if *entry == key {
+                return Some(Self::VALUES[(key - 1) as usize])
             }
         }
-
         None
     }
 

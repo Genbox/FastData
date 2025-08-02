@@ -1,0 +1,47 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (KeyLength)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class KeyLengthStructure_String_3_simple final {
+    static constexpr std::array<int32_t, 3> offsets = {
+        0, 1, 2
+    };
+
+    inline static const std::array<int32_t, 3> values = {
+        1, 2, 3
+    };
+    static constexpr std::array<std::string_view, 3> keys = {
+        "a", "aa", "aaa"
+    };
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const std::string_view key) noexcept {
+        if (const size_t len = key.length(); len < 1u || len > 3u)
+            return false;
+
+        return key == keys[key.length() - 1];
+    }
+    [[nodiscard]]
+    static bool try_lookup(const std::string_view key, const int32_t*& value) noexcept {
+        if (const size_t len = key.length(); len < 1u || len > 3u)
+            return false;
+
+        size_t idx = key.length() - 1;
+        if (key == keys[idx]) {
+            value = &values[offsets[idx]];
+            return true;
+        }
+
+        value = nullptr;
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr size_t min_key_length = 1;
+    static constexpr size_t max_key_length = 3;
+};
