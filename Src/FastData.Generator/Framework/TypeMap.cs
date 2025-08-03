@@ -17,11 +17,11 @@ public sealed class TypeMap : ITypeMap
         for (int i = 0; i < typeSpecs.Count; i++)
         {
             ITypeDef spec = typeSpecs[i];
-            byte idx = (byte)spec.DataType;
+            byte idx = (byte)spec.KeyType;
 
             //Quick check to see if a language has a duplicate definition for a DataType
             if (_index[idx] != null)
-                throw new InvalidOperationException($"Duplicate type spec found for '{spec.DataType}'");
+                throw new InvalidOperationException($"Duplicate type spec found for '{spec.KeyType}'");
 
             _index[idx] = spec;
         }

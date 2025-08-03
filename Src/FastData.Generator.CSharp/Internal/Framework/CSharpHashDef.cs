@@ -9,13 +9,13 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 [SuppressMessage("Roslynator", "RCS1197:Optimize StringBuilder.Append/AppendLine call")]
 internal class CSharpHashDef : IHashDef
 {
-    public string GetHashSource(DataType dataType, string typeName, HashInfo info) =>
+    public string GetHashSource(KeyType keyType, string typeName, HashInfo info) =>
         $$"""
           {{GetState(info.StringHash?.State)}}
               [MethodImpl(MethodImplOptions.AggressiveInlining)]
               private static ulong Hash({{typeName}} value)
               {
-          {{GetHash(dataType, info)}}
+          {{GetHash(keyType, info)}}
               }
           """;
 
@@ -42,9 +42,9 @@ internal class CSharpHashDef : IHashDef
         return sb.ToString();
     }
 
-    private static string GetHash(DataType dataType, HashInfo info)
+    private static string GetHash(KeyType keyType, HashInfo info)
     {
-        if (dataType == DataType.String)
+        if (keyType == KeyType.String)
         {
             return info.StringHash != null
                 ? $"""
@@ -69,10 +69,10 @@ internal class CSharpHashDef : IHashDef
                   """;
         }
 
-        if (dataType.IsIdentityHash())
+        if (keyType.IsIdentityHash())
             return "        return (ulong)value;";
 
-        if (dataType == DataType.Single)
+        if (keyType == KeyType.Single)
         {
             return info.HasZeroOrNaN
                 ? """
@@ -86,7 +86,7 @@ internal class CSharpHashDef : IHashDef
                 : "        return (ulong)Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));";
         }
 
-        if (dataType == DataType.Double)
+        if (keyType == KeyType.Double)
         {
             return info.HasZeroOrNaN
                 ? """

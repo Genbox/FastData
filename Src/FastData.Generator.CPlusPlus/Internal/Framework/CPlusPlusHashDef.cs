@@ -6,21 +6,21 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 internal class CPlusPlusHashDef : IHashDef
 {
-    public string GetHashSource(DataType dataType, string typeName, HashInfo info)
+    public string GetHashSource(KeyType keyType, string typeName, HashInfo info)
     {
-        bool notConst = dataType is DataType.Single or DataType.Double or DataType.Int64 or DataType.UInt64;
+        bool notConst = keyType is KeyType.Single or KeyType.Double or KeyType.Int64 or KeyType.UInt64;
 
         return $$"""
                      static{{(notConst ? " " : " constexpr ")}}uint64_t get_hash(const {{typeName}} value) noexcept
                      {
-                 {{GetHash(dataType, info)}}
+                 {{GetHash(keyType, info)}}
                      }
                  """;
     }
 
-    private static string GetHash(DataType dataType, HashInfo info)
+    private static string GetHash(KeyType keyType, HashInfo info)
     {
-        if (dataType == DataType.String)
+        if (keyType == KeyType.String)
         {
             return """
                        uint64_t hash = 352654597;
@@ -32,10 +32,10 @@ internal class CPlusPlusHashDef : IHashDef
                    """;
         }
 
-        if (dataType.IsIdentityHash())
+        if (keyType.IsIdentityHash())
             return "        return static_cast<uint64_t>(value);";
 
-        if (dataType == DataType.Single)
+        if (keyType == KeyType.Single)
         {
             return info.HasZeroOrNaN
                 ? """
@@ -53,7 +53,7 @@ internal class CPlusPlusHashDef : IHashDef
 
         }
 
-        if (dataType == DataType.Double)
+        if (keyType == KeyType.Double)
         {
             return info.HasZeroOrNaN
                 ? """
@@ -70,6 +70,6 @@ internal class CPlusPlusHashDef : IHashDef
                   """;
         }
 
-        throw new InvalidOperationException("Unsupported data type: " + dataType);
+        throw new InvalidOperationException("Unsupported data type: " + keyType);
     }
 }

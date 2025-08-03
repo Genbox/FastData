@@ -6,7 +6,7 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashTablePerfectStructure<TKey, TValue>(HashData hashData, DataType dataType) : IStructure<TKey, TValue, HashTablePerfectContext<TKey, TValue>>
+internal sealed class HashTablePerfectStructure<TKey, TValue>(HashData hashData, KeyType keyType) : IStructure<TKey, TValue, HashTablePerfectContext<TKey, TValue>>
 {
     public HashTablePerfectContext<TKey, TValue> Create(TKey[] keys, TValue[]? values)
     {
@@ -22,6 +22,6 @@ internal sealed class HashTablePerfectStructure<TKey, TValue>(HashData hashData,
         for (int i = 0; i < keys.Length; i++)
             pairs[hashCodes[i] % size] = new KeyValuePair<TKey, ulong>(keys[i], hashCodes[i]);
 
-        return new HashTablePerfectContext<TKey, TValue>(pairs, !dataType.IsIdentityHash(), values);
+        return new HashTablePerfectContext<TKey, TValue>(pairs, !keyType.IsIdentityHash(), values);
     }
 }

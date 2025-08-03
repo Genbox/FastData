@@ -5,7 +5,7 @@ using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class BinarySearchStructure<TKey, TValue>(DataType dataType, StringComparison comparison) : IStructure<TKey, TValue, BinarySearchContext<TKey, TValue>>
+internal sealed class BinarySearchStructure<TKey, TValue>(KeyType keyType, StringComparison comparison) : IStructure<TKey, TValue, BinarySearchContext<TKey, TValue>>
 {
     public BinarySearchContext<TKey, TValue> Create(TKey[] keys, TValue[]? values)
     {
@@ -22,7 +22,7 @@ internal sealed class BinarySearchStructure<TKey, TValue>(DataType dataType, Str
             values.CopyTo(valuesCopy, 0);
         }
 
-        if (dataType == DataType.String)
+        if (keyType == KeyType.String)
         {
             if (valuesCopy != null)
                 Array.Sort(keysCopy, valuesCopy, StringHelper.GetStringComparer(comparison));

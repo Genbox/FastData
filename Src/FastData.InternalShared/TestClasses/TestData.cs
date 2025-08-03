@@ -9,13 +9,13 @@ namespace Genbox.FastData.InternalShared.TestClasses;
 
 public class TestData<T>(StructureType structureType, T[] values) : ITestData, IXunitSerializable
 {
-    private readonly DataType _dataType = Enum.Parse<DataType>(typeof(T).Name);
+    private readonly KeyType _keyType = Enum.Parse<KeyType>(typeof(T).Name);
     private readonly Random _rng = new Random(42);
 
     public T[] Values { get; private set; } = values;
     public StructureType StructureType { get; private set; } = structureType;
 
-    public string Identifier => $"{StructureType}_{_dataType}_{Values.Length}";
+    public string Identifier => $"{StructureType}_{_keyType}_{Values.Length}";
 
     public void Generate(Func<string, ICodeGenerator> factory, out GeneratorSpec spec)
     {

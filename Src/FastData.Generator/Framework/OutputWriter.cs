@@ -59,7 +59,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
         }
 
         HashInfo hashInfo = new HashInfo(GeneratorConfig.HashDetails.HasZeroOrNaN, stringHash);
-        HashSource = hashDef.GetHashSource(GeneratorConfig.DataType, KeyTypeName, hashInfo);
+        HashSource = hashDef.GetHashSource(GeneratorConfig.KeyType, KeyTypeName, hashInfo);
     }
 
     private static IEnumerable<string> GetValues(Array array, TypeMap map, Type type)
@@ -70,7 +70,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
             yield return map.ToValueLabel(enumerator.Current, type);
     }
 
-    protected virtual string GetEqualFunction(string value1, string value2, DataType dataType = DataType.Null) => $"{value1} == {value2}";
+    protected virtual string GetEqualFunction(string value1, string value2, KeyType keyType = KeyType.Null) => $"{value1} == {value2}";
     protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";
 
     protected string ToValueLabel<T>(T value) => TypeMap.ToValueLabel(value); //Uses its own generics here, not TKey. We need T so we can change the type in generators

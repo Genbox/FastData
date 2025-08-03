@@ -10,22 +10,22 @@ namespace Genbox.FastData.Generators;
 /// <typeparam name="T">The type of data being generated.</typeparam>
 public sealed class GeneratorConfig<T>
 {
-    private GeneratorConfig(StructureType structureType, DataType dataType, HashDetails hashDetails, GeneratorFlags flags)
+    private GeneratorConfig(StructureType structureType, KeyType keyType, HashDetails hashDetails, GeneratorFlags flags)
     {
         StructureType = structureType;
-        DataType = dataType;
+        KeyType = keyType;
         Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.Now);
         HashDetails = hashDetails;
         Flags = flags;
     }
 
-    internal GeneratorConfig(StructureType structureType, DataType dataType, uint itemCount, ValueProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, dataType, hashDetails, flags)
+    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, ValueProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType).ToArray();
         Constants = CreateConstants(props, itemCount);
     }
 
-    internal GeneratorConfig(StructureType structureType, DataType dataType, uint itemCount, StringProperties props, StringComparison stringComparison, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags) : this(structureType, dataType, hashDetails, flags)
+    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringProperties props, StringComparison stringComparison, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType, encoding).ToArray();
         Constants = CreateConstants(props, itemCount);
@@ -39,7 +39,7 @@ public sealed class GeneratorConfig<T>
     public StringComparison StringComparison { get; }
 
     /// <summary>Gets the data type being generated.</summary>
-    public DataType DataType { get; }
+    public KeyType KeyType { get; }
 
     /// <summary>Gets the set of early exit strategies used by the generator to optimize code generation.</summary>
     public IEarlyExit[] EarlyExits { get; }

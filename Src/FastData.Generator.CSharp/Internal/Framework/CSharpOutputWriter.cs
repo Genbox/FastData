@@ -25,18 +25,18 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
 
     internal string GetCompareFunction(string var1, string var2)
     {
-        if (GeneratorConfig.DataType == DataType.String)
+        if (GeneratorConfig.KeyType == KeyType.String)
             return $"StringComparer.{GeneratorConfig.StringComparison}.Compare({var1}, {var2})";
 
         return $"{var1}.CompareTo({var2})";
     }
 
-    protected override string GetEqualFunction(string var1, string var2, DataType dataType = DataType.Null)
+    protected override string GetEqualFunction(string var1, string var2, KeyType keyType = KeyType.Null)
     {
-        if (dataType == DataType.Null)
-            dataType = GeneratorConfig.DataType;
+        if (keyType == KeyType.Null)
+            keyType = GeneratorConfig.KeyType;
 
-        if (dataType == DataType.String)
+        if (keyType == KeyType.String)
             return $"StringComparer.{GeneratorConfig.StringComparison}.Equals({var1}, {var2})";
 
         return $"{var1} == {var2}";

@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Enums;
 
-public enum DataType : byte
+public enum KeyType : byte
 {
     //The names and values in here must match TypeCode
 

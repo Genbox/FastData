@@ -16,7 +16,7 @@ public class DynamicStringTypeDef(params StringType[] types) : ITypeDef<string>
         throw new InvalidOperationException($"No string type found for encoding {encoding}");
     }
 
-    public DataType DataType => DataType.String;
+    public KeyType KeyType => KeyType.String;
     public string Name => throw new InvalidOperationException("DynamicStringTypeDef does not support Name");
     public Func<TypeMap, object, string> PrintObj => throw new InvalidOperationException("DynamicStringTypeDef does not support PrintObj");
     public Func<TypeMap, string, string> Print => throw new InvalidOperationException("DynamicStringTypeDef does not support Print");

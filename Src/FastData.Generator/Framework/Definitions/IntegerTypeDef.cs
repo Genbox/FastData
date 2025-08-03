@@ -5,7 +5,7 @@ namespace Genbox.FastData.Generator.Framework.Definitions;
 
 public class IntegerTypeDef<T>(string name, T minValue, T maxValue, string minValueStr, string maxValueStr, Func<T, string>? print = null) : ITypeDef<T>
 {
-    public DataType DataType => (DataType)Type.GetTypeCode(typeof(T));
+    public KeyType KeyType => (KeyType)Type.GetTypeCode(typeof(T));
     public string Name { get; } = name;
     public Func<TypeMap, T, string> Print { get; } = (_, x) => PrintInternal(x, minValue, minValueStr, maxValue, maxValueStr, print);
     public Func<TypeMap, object, string> PrintObj { get; } = (_, x) => PrintInternal((T)x, minValue, minValueStr, maxValue, maxValueStr, print);

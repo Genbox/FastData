@@ -6,20 +6,20 @@ namespace Genbox.FastData.Internal.Misc;
 
 internal static class PrimitiveHash
 {
-    internal static HashFunc<T> GetHash<T>(DataType dataType, bool hasZeroOrNaN) => dataType switch
+    internal static HashFunc<T> GetHash<T>(KeyType keyType, bool hasZeroOrNaN) => keyType switch
     {
-        DataType.Char => static obj => (char)(object)obj!,
-        DataType.SByte => static obj => unchecked((ulong)(sbyte)(object)obj!),
-        DataType.Byte => static obj => (byte)(object)obj!,
-        DataType.Int16 => static obj => unchecked((ulong)(short)(object)obj!),
-        DataType.UInt16 => static obj => (ushort)(object)obj!,
-        DataType.Int32 => static obj => unchecked((ulong)(int)(object)obj!),
-        DataType.UInt32 => static obj => (uint)(object)obj!,
-        DataType.Single => obj => HashF32((float)(object)obj!, hasZeroOrNaN),
-        DataType.Int64 => static obj => unchecked((ulong)(long)(object)obj!), //Use value directly
-        DataType.UInt64 => static obj => (ulong)(object)obj!, //Use value directly
-        DataType.Double => obj => HashF64((double)(object)obj!, hasZeroOrNaN), //Does not fold to 32bit
-        _ => throw new InvalidOperationException($"Unsupported data type: {dataType}")
+        KeyType.Char => static obj => (char)(object)obj!,
+        KeyType.SByte => static obj => unchecked((ulong)(sbyte)(object)obj!),
+        KeyType.Byte => static obj => (byte)(object)obj!,
+        KeyType.Int16 => static obj => unchecked((ulong)(short)(object)obj!),
+        KeyType.UInt16 => static obj => (ushort)(object)obj!,
+        KeyType.Int32 => static obj => unchecked((ulong)(int)(object)obj!),
+        KeyType.UInt32 => static obj => (uint)(object)obj!,
+        KeyType.Single => obj => HashF32((float)(object)obj!, hasZeroOrNaN),
+        KeyType.Int64 => static obj => unchecked((ulong)(long)(object)obj!), //Use value directly
+        KeyType.UInt64 => static obj => (ulong)(object)obj!, //Use value directly
+        KeyType.Double => obj => HashF64((double)(object)obj!, hasZeroOrNaN), //Does not fold to 32bit
+        _ => throw new InvalidOperationException($"Unsupported data type: {keyType}")
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

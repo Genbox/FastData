@@ -74,14 +74,14 @@ public static partial class FastDataGenerator
         LogUserStructureType(logger, fdCfg.StructureType);
         LogUniqueItems(logger, uniq.Count);
 
-        DataType dataType = (DataType)Enum.Parse(typeof(DataType), type.Name);
-        LogDataType(logger, dataType);
+        KeyType keyType = (KeyType)Enum.Parse(typeof(KeyType), type.Name);
+        LogKeyType(logger, keyType);
 
         HashDetails hashDetails = new HashDetails();
 
         ValueProperties<TKey> valProps = KeyAnalyzer.GetValueProperties(keys);
         LogMinMaxValues(logger, valProps.MinKeyValue, valProps.MaxKeyValue);
-        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(fdCfg.StructureType, dataType, (uint)keys.Length, valProps, hashDetails, GeneratorFlags.None);
+        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(fdCfg.StructureType, keyType, (uint)keys.Length, valProps, hashDetails, GeneratorFlags.None);
 
         switch (fdCfg.StructureType)
         {
@@ -102,18 +102,18 @@ public static partial class FastDataGenerator
             case StructureType.Conditional:
                 return GenerateWrapper(generator, genCfg, new ConditionalStructure<TKey, TValue>(), keys, values);
             case StructureType.BinarySearch:
-                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<TKey, TValue>(dataType, DefaultStringComparison), keys, values);
+                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<TKey, TValue>(keyType, DefaultStringComparison), keys, values);
             case StructureType.HashTable:
             {
-                HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(dataType, valProps.HasZeroOrNaN);
+                HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, valProps.HasZeroOrNaN);
                 hashDetails.HasZeroOrNaN = valProps.HasZeroOrNaN;
 
                 HashData hashData = HashData.Create(keys, fdCfg.HashCapacityFactor, hashFunc);
 
                 if (hashData.HashCodesPerfect)
-                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<TKey, TValue>(hashData, dataType), keys, values);
+                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<TKey, TValue>(hashData, keyType), keys, values);
 
-                return GenerateWrapper(generator, genCfg, new HashTableStructure<TKey, TValue>(hashData, dataType), keys, values);
+                return GenerateWrapper(generator, genCfg, new HashTableStructure<TKey, TValue>(hashData, keyType), keys, values);
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
@@ -143,14 +143,14 @@ public static partial class FastDataGenerator
         LogUserStructureType(logger, fdCfg.StructureType);
         LogUniqueItems(logger, uniq.Count);
 
-        const DataType dataType = DataType.String;
-        LogDataType(logger, dataType);
+        const KeyType keyType = KeyType.String;
+        LogKeyType(logger, keyType);
 
         StringProperties strProps = KeyAnalyzer.GetStringProperties(keys);
         LogMinMaxLength(logger, strProps.LengthData.Min, strProps.LengthData.Max);
 
         HashDetails hashDetails = new HashDetails();
-        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, dataType, (uint)keys.Length, strProps, DefaultStringComparison, hashDetails, generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None);
+        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, keyType, (uint)keys.Length, strProps, DefaultStringComparison, hashDetails, generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None);
 
         switch (fdCfg.StructureType)
         {
@@ -177,7 +177,7 @@ public static partial class FastDataGenerator
             case StructureType.Conditional:
                 return GenerateWrapper(generator, genCfg, new ConditionalStructure<string, TValue>(), keys, values);
             case StructureType.BinarySearch:
-                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<string, TValue>(dataType, DefaultStringComparison), keys, values);
+                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<string, TValue>(keyType, DefaultStringComparison), keys, values);
             case StructureType.HashTable:
             {
                 StringHashFunc hashFunc;
@@ -206,9 +206,9 @@ public static partial class FastDataGenerator
                 });
 
                 if (hashData.HashCodesPerfect)
-                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<string, TValue>(hashData, dataType), keys, values);
+                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<string, TValue>(hashData, keyType), keys, values);
 
-                return GenerateWrapper(generator, genCfg, new HashTableStructure<string, TValue>(hashData, dataType), keys, values);
+                return GenerateWrapper(generator, genCfg, new HashTableStructure<string, TValue>(hashData, keyType), keys, values);
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");

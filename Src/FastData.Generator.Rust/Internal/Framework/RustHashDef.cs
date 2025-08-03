@@ -6,17 +6,17 @@ namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
 internal class RustHashDef : IHashDef
 {
-    public string GetHashSource(DataType dataType, string typeName, HashInfo info) =>
+    public string GetHashSource(KeyType keyType, string typeName, HashInfo info) =>
         $$"""
-              {{(dataType == DataType.String ? "#[inline]" : "#[inline(always)]")}}
-              {{(dataType == DataType.String ? "unsafe " : "")}}fn get_hash(value: {{(dataType == DataType.String ? "&" : "")}}{{typeName}}) -> u64 {
-          {{GetHash(dataType, info)}}
+              {{(keyType == KeyType.String ? "#[inline]" : "#[inline(always)]")}}
+              {{(keyType == KeyType.String ? "unsafe " : "")}}fn get_hash(value: {{(keyType == KeyType.String ? "&" : "")}}{{typeName}}) -> u64 {
+          {{GetHash(keyType, info)}}
               }
           """;
 
-    private static string GetHash(DataType dataType, HashInfo info)
+    private static string GetHash(KeyType keyType, HashInfo info)
     {
-        if (dataType == DataType.String)
+        if (keyType == KeyType.String)
         {
             return """
                            let mut hash: u64 = 352654597;
@@ -34,10 +34,10 @@ internal class RustHashDef : IHashDef
                    """;
         }
 
-        if (dataType.IsIdentityHash())
+        if (keyType.IsIdentityHash())
             return "        value as u64";
 
-        if (dataType == DataType.Single)
+        if (keyType == KeyType.Single)
         {
             return info.HasZeroOrNaN
                 ? """
@@ -51,7 +51,7 @@ internal class RustHashDef : IHashDef
                 : "        value.to_bits() as u64";
         }
 
-        if (dataType == DataType.Double)
+        if (keyType == KeyType.Double)
         {
             return info.HasZeroOrNaN
                 ? """
@@ -65,6 +65,6 @@ internal class RustHashDef : IHashDef
                 : "        value.to_bits()";
         }
 
-        throw new InvalidOperationException("Unsupported data type: " + dataType);
+        throw new InvalidOperationException("Unsupported data type: " + keyType);
     }
 }
