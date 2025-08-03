@@ -1,7 +1,7 @@
 using System.Globalization;
 using BenchmarkDotNet.Order;
 
-namespace Genbox.FastData.Benchmarks.Readme;
+namespace Genbox.FastData.Benchmarks.Docs;
 
 /// <summary>Benchmark used to illustrate the algorithmic complexity differences between Array and HashSet. Needed for the Readme.</summary>
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]

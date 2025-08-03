@@ -3,7 +3,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using Genbox.FastData.Benchmarks.Code;
 
-namespace Genbox.FastData.Benchmarks.Readme;
+namespace Genbox.FastData.Benchmarks.Docs;
 
 /// <summary>Benchmark used in Readme</summary>
 [Config(typeof(CustomConfig))]
