@@ -59,7 +59,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                             {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                             ref var entry = ref _entries[index];
 
-                            return {{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "entry.HashCode")} && " : "")}}{{GetEqualFunction("key", ctx.StoreHashCode || ctx.Values != null ? "entry.Key" : "entry")}};
+                            return {{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "entry.HashCode", KeyType.Int64)} && " : "")}}{{GetEqualFunction("key", ctx.StoreHashCode || ctx.Values != null ? "entry.Key" : "entry")}};
                         }
                     """);
 
@@ -78,7 +78,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                                 {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                                 ref E entry = ref _entries[index];
 
-                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "entry.HashCode")} && " : "")}}{{GetEqualFunction("key", "entry.Key")}})
+                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "entry.HashCode", KeyType.Int64)} && " : "")}}{{GetEqualFunction("key", "entry.Key")}})
                                 {
                                     value = entry.Value;
                                     return true;

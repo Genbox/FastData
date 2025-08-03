@@ -7,7 +7,7 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
 internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue> ctx, CSharpCodeGeneratorConfig cfg, SharedCode shared) : CSharpOutputWriter<TKey>(cfg)
 {
-   public override string Generate()
+    public override string Generate()
     {
         StringBuilder sb = new StringBuilder();
 
@@ -51,7 +51,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                             {
                                 ref E entry = ref _entries[i];
 
-                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash")} && " : "")}}{{GetEqualFunction("entry.Key", "key")}})
+                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.Key", "key")}})
                                     return true;
 
                                 i = entry.Next;
@@ -80,7 +80,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                                 {
                                     ref E entry = ref _entries[i];
 
-                                    if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash")} && " : "")}}{{GetEqualFunction("entry.Key", "key")}})
+                                    if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.Key", "key")}})
                                     {
                                         value = entry.Value;
                                         return true;

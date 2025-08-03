@@ -54,7 +54,7 @@ private struct E
         uint index = (uint)(hash % 3);
         ref var entry = ref _entries[index];
 
-        return StringComparer.Ordinal.Equals(hash, entry.HashCode) && StringComparer.Ordinal.Equals(key, entry.Key);
+        return hash == entry.HashCode && StringComparer.Ordinal.Equals(key, entry.Key);
     }
 
     public const uint ItemCount = 3;

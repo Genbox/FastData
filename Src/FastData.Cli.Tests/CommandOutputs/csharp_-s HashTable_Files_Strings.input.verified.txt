@@ -69,7 +69,7 @@ internal static class MyData
         {
             ref E entry = ref _entries[i];
 
-            if (StringComparer.Ordinal.Equals(entry.HashCode, hash) && StringComparer.Ordinal.Equals(entry.Key, key))
+            if (entry.HashCode == hash && StringComparer.Ordinal.Equals(entry.Key, key))
                 return true;
 
             i = entry.Next;

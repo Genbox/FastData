@@ -44,7 +44,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                             while (i >= 0) {
                                 const auto& entry = entries[i];
 
-                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash")} && " : "")}}{{GetEqualFunction("entry.key", "key")}})
+                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", "key")}})
                                     return true;
 
                                 i = entry.next;
@@ -72,7 +72,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                                 while (i >= 0) {
                                     const auto& entry = entries[i];
 
-                                    if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash")} && " : "")}}{{GetEqualFunction("entry.key", "key")}}) {
+                                    if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", "key")}}) {
                                         value = {{ptr}}entry.value;
                                         return true;
                                     }
