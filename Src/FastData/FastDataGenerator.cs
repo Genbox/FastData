@@ -64,10 +64,10 @@ public static partial class FastDataGenerator
         //Validate that we only have unique data
         HashSet<TKey> uniq = new HashSet<TKey>();
 
-        foreach (TKey val in keys)
+        foreach (TKey key in keys)
         {
-            if (!uniq.Add(val))
-                throw new InvalidOperationException($"Duplicate data found: {val}");
+            if (!uniq.Add(key))
+                throw new InvalidOperationException($"Duplicate data found: {key}");
         }
 
         ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));

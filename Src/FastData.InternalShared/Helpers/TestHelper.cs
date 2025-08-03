@@ -103,6 +103,15 @@ public static class TestHelper
     /// <summary>This variant of Generate bypasses the public API to test more advanced combinations of parameters</summary>
     public static GeneratorSpec Generate<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey> vector, TValue[]? values) where TValue : notnull
     {
+        //Sanity check to avoid duplicate keys
+        HashSet<TKey> uniq = new HashSet<TKey>();
+
+        foreach (TKey key in vector.Keys)
+        {
+            if (!uniq.Add(key))
+                throw new InvalidOperationException($"Duplicate key found: {key}");
+        }
+
         KeyType keyType = Enum.Parse<KeyType>(typeof(TKey).Name);
 
         IProperties props;
