@@ -24,15 +24,17 @@ It supports many output languages (C#, C++, Rust, etc.), ready for inclusion in 
 ### Using the executable
 
 1. [Download](https://github.com/Genbox/FastData/releases/latest) the executable
-2. Run `FastData rust dogs.txt`
+2. Run `FastData <lang> dogs.txt`
+
+`<lang>` can be one of _rust_, _cpp_, or _csharp_.
 
 ### Using the .NET CLI tool
 1. Install the [Genbox.FastData.Cli tool](https://www.nuget.org/packages/Genbox.FastData.Cli/): `dotnet tool install --global Genbox.FastData.Cli`
-2. Run `FastData cpp dogs.txt`
+2. Run `FastData <lang> dogs.txt`
 
 ### Using the PowerShell module
 1. Install the [PowerShell module](https://www.powershellgallery.com/packages/Genbox.FastData/): `Install-Module -Name Genbox.FastData`
-2. Run `Invoke-FastData -Language CSharp -InputFile dogs.txt`
+2. Run `Invoke-FastData -Language <lang> -InputFile dogs.txt`
 
 ### Using the .NET Source Generator
 1. Add the [Genbox.FastData.SourceGenerator](https://www.nuget.org/packages/Genbox.FastData.SourceGenerator/) package to your project
@@ -127,7 +129,9 @@ As a bonus, we also get some metadata about the dataset as constants, which, whe
 - **High-perfromance:** The generated data structures are generated without unnecessary branching or virtualization making the compiler produce optimal code.
 - **Key/Value support:** FastData can produce key/value lookup data structures
 
-It supports several output programming languages.
+For more details about the data structures, see [data structures](Docs/DataStructures.md).
+
+FastData supports several output programming languages.
 
 * C#: `FastData csharp <input-file>`
 * C++: `FastData cpp <input-file>`
@@ -139,6 +143,7 @@ Each output language has different settings. Run `FastData <lang> --help` to see
 
 A benchmark of .NET's `Array`, `HashSet<T>` and `FrozenSet<T>` versus FastData's auto-generated data structure really illustrates the difference.
 
+### Membership queries
 | Method    | Categories |      Mean | Factor |
 |-----------|------------|----------:|-------:|
 | Array     | InSet      | 6.5198 ns |      - |
@@ -151,7 +156,16 @@ A benchmark of .NET's `Array`, `HashSet<T>` and `FrozenSet<T>` versus FastData's
 | FrozenSet | NotInSet   | 1.5816 ns |  4.68x |
 | FastData  | NotInSet   | 0.5284 ns | 14.01x |
 
-Bigger factor means faster query times.
+### Keyed queries
+| Method             | Categories |     Mean | Factor |
+|--------------------|------------|---------:|-------:|
+| Dictionary         | InSet      | 6.890 ns |      - |
+| FrozenDictionary   | InSet      | 1.484 ns |  4.64x |
+| FastData           | InSet      | 1.375 ns |  5.01x |
+|                    |            |          |        |
+| DictionaryNF       | NotInSet   | 5.832 ns |      - |
+| FrozenDictionaryNF | NotInSet   | 1.376 ns |  4.24x |
+| FastDataNF         | NotInSet   | 1.349 ns |  4.32x |
 
 ## FAQ
 
@@ -161,6 +175,9 @@ There are several reasons:
 * Frozen is only available in .NET 8.0+
 * Frozen only provides a few of the optimizations provided in FastData
 * Frozen is only available in C#. FastData can produce data structures in many languages.
+
+#### Does FastData use less memory than runtime structures?
+Yes and no. For some data structures like Array, it uses the same amount of memory. For others, like HashTable, depending on the data, it can use considerably less memory.
 
 #### Does it support case-insensitive lookups?
 No, not yet.
@@ -173,6 +190,7 @@ Yes, you can specify key/value arrays as input data and FastData will generate a
 
 #### Are there any best pratcies for using FastData?
 * Put the most often queried items first in the input data. It can speed up query speed for some data structures.
+* Enable string analysis when using string keys to produce a more efficient hash function.
 
 #### Can I use it for dynamic data?
 No, FastData is designed for static data only. It generates code at compile time, so the data must be known beforehand.
