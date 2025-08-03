@@ -6,8 +6,8 @@
 
 ## Description
 
-FastData is a code generator that analyzes your data and creates high-performance, read-only data structures with key/value and membership queries on
-static data. It supports many different languages (C#, C++, Rust, etc.), ready for inclusion in your project with zero dependencies.
+FastData is a code generator that analyzes your data and creates high-performance, read-only data structures for static data with support for key/value and membership queries.
+It supports many output languages (C#, C++, Rust, etc.), ready for inclusion in your project with zero dependencies.
 
 ## Download
 
@@ -21,29 +21,20 @@ static data. It supports many different languages (C#, C++, Rust, etc.), ready f
 
 ## Getting started
 
-The examples below need a `dogs.txt`file with the content:
-
-```
-Labrador
-German Shepherd
-Golden Retriever
-```
-
 ### Using the executable
 
 1. [Download](https://github.com/Genbox/FastData/releases/latest) the executable
-2. Run `FastData csharp dogs.txt`
+2. Run `FastData rust dogs.txt`
 
 ### Using the .NET CLI tool
-1. install the [Genbox.FastData.Cli tool](https://www.nuget.org/packages/Genbox.FastData.Cli/): `dotnet tool install --global Genbox.FastData.Cli`
-2. Run `FastData csharp dogs.txt`
+1. Install the [Genbox.FastData.Cli tool](https://www.nuget.org/packages/Genbox.FastData.Cli/): `dotnet tool install --global Genbox.FastData.Cli`
+2. Run `FastData cpp dogs.txt`
 
 ### Using the PowerShell module
 1. Install the [PowerShell module](https://www.powershellgallery.com/packages/Genbox.FastData/): `Install-Module -Name Genbox.FastData`
 2. Run `Invoke-FastData -Language CSharp -InputFile dogs.txt`
 
 ### Using the .NET Source Generator
-
 1. Add the [Genbox.FastData.SourceGenerator](https://www.nuget.org/packages/Genbox.FastData.SourceGenerator/) package to your project
 2. Add `FastDataAttribute` as an assembly level attribute.
 
@@ -61,13 +52,9 @@ internal static class Program
     }
 }
 ```
-
-The `Dogs` class is generated at compile time and contains a `Contains()` method that checks if the value exists in the dataset.
-
 ### Using the C# library
-
 1. Add the [Genbox.FastData.Generator.CSharp](https://www.nuget.org/packages/Genbox.FastData.Generator.CSharp/) NuGet package to your project.
-2. Use the `FastDataGenerator.Generate()` method. Give it your data as an array.
+2. Use the `FastDataGenerator.Generate()` method:
 
 ```csharp
 internal static class Program
@@ -85,19 +72,19 @@ internal static class Program
 
 ## Why use FastData?
 
-Imagine a scenario where you have a predefined list of words (e.g., dog breeds) and need to check whether a specific dog breed exists in the set.
-Usually you create an array and look up the value. However, this is far from optimal and lacks several optimizations.
+Generic data structures like arrays, hash tables, etc. are not optimized for your data. If you only need read-only access to a dataset, FastData can provide up to 14x better performance and less memory overhead.
 
+Here is a classic example on just using an array:
 ```csharp
-string[] dogs = { "Labrador", "German Shepherd", "Golden Retriever" };
+string[] dogs = ["Labrador", "German Shepherd", "Golden Retriever"];
 
 if (dogs.Contains("Beagle"))
     Console.WriteLine("It contains Beagle");
 ```
 
-We can do better by analyzing the dataset and generating an optimized data structure.
-Running FastData on the same dataset produces the following code:
+We know our data at compile-time, so why not let a program analyze it and come up with a better way?
 
+FastData produces the following code:
 ```csharp
 internal static class Dogs
 {
@@ -125,116 +112,46 @@ internal static class Dogs
 
 Benefits of the generated code:
 
-- **Fast early exit:** A bitmap of string lengths allows early termination for string lengths that cannot be in the set.
-- **Efficient lookups:** A switch-based data structure which is fast for small datasets.
-- **Additional metadata:** Provides item count and other useful properties.
+- **Early exit:** A single-register bitmap of string lengths allows early termination for string lengths that cannot be in the set.
+- **Efficient lookups:** A switch-based data structure which is faster for small datasets.
 
-A benchmark of the array versus our generated structure really illustrates the difference. It is 13x faster.
-
-| Method   |      Mean |     Error |    StdDev | Ratio |
-|----------|----------:|----------:|----------:|------:|
-| FastData | 0.5311 ns | 0.0170 ns | 0.0026 ns |  0.08 |
-| Array    | 6.9286 ns | 0.1541 ns | 0.0684 ns |  1.00 |
+As a bonus, we also get some metadata about the dataset as constants, which, when used, allows for better code generation by optimizing compiler.
 
 ## Features
 
 - **Data analysis:** Optimizes the algorithms on the inherent properties of the dataset.
-- **Multiple structures:** FastData automatically chooses the best data structure for your data.
+- **Many data structures:** FastData automatically chooses the best data structure for your data.
 - **Fast hashing:** Strings are analyzed and the hash function is specially tailored to the data.
 - **Zero dependencies:** The generated code has no dependencies, making it easy to integrate into your project.
 - **Minimal memory usage:** The generated data structures are memory-efficient, using only the necessary amount of memory for the dataset.
 - **High-perfromance:** The generated data structures are generated without unnecessary branching or virtualization making the compiler produce optimal code.
+- **Key/Value support:** FastData can produce key/value lookup data structures
 
 It supports several output programming languages.
 
 * C#: `FastData csharp <input-file>`
-* C++: `FastData cplusplus <input-file>`
+* C++: `FastData cpp <input-file>`
 * Rust: `FastData rust <input-file>`
 
 Each output language has different settings. Run `FastData <lang> --help` to see the options.
 
-### Data structures
+## Benchmarks
 
-By default, FastData chooses the optimal data structure for your data, but you can also set it manually with
-`FastData -s <type>`. See the details of each structure type below.
+A benchmark of .NET's `Array`, `HashSet<T>` and `FrozenSet<T>` versus FastData's auto-generated data structure really illustrates the difference.
 
-#### Auto
-This is the default option. It automatically selects the best data structure based on the number of items you provide.
+| Method    | Categories |      Mean | Factor |
+|-----------|------------|----------:|-------:|
+| Array     | InSet      | 6.5198 ns |      - |
+| HashSet   | InSet      | 6.2191 ns |  1.05x |
+| FrozenSet | InSet      | 1.6010 ns |  4.07x |
+| FastData  | InSet      | 0.9378 ns |  6.95x |
+|           |            |           |        |
+| Array     | NotInSet   | 7.4015 ns |      - |
+| HashSet   | NotInSet   | 4.6013 ns |  1.61x |
+| FrozenSet | NotInSet   | 1.5816 ns |  4.68x |
+| FastData  | NotInSet   | 0.5284 ns | 14.01x |
 
-#### Array
-
-* Memory: Low
-* Latency: Low
-* Complexity: O(n)
-
-This data structure uses an array as the backing store. It is often faster than a normal array due to efficient early
-exits (value/length range checks).
-It works well for small amounts of data since the array is scanned linearly, but for larger datasets, the O(n)
-complexity hurts performance a lot.
-
-#### BinarySearch
-
-* Memory: Low
-* Latency: Medium
-* Complexity: O(log n)
-
-This data structure sorts your data and does a binary search on it. Since data is sorted at compile time, there is no
-overhead at runtime. Each lookup
-has a higher latency than a simple array, but once the dataset gets to a few hundred items, it beats the array due to a
-lower complexity.
-
-#### Conditional
-
-* Memory: Low
-* Latency: Low
-* Complexity: O(n)
-
-This data structure relies on built-in logic in the programming language. It produces if/switch statements which
-ultimately become machine instructions on the CPU, rather than data
-that resides in memory.
-Latency is therefore incredibly low, but the higher number of instructions bloat the assembly, and at a certain point it
-becomes more efficient to have
-the data reside in memory.
-
-#### HashSet
-
-* Memory: Medium
-* Latency: Medium
-* Complexity: O(1)
-
-This data structure is based on a hash table with separate chaining collision resolution. It uses a separate array for
-buckets to stay cache coherent, but it also uses more
-memory since it needs to keep track of indices.
-
-## How does it work?
-
-The idea behind the project is to generate a data-dependent optimized data structure for read-only lookup. When data is
-known beforehand, the algorithm can select from a set
-of different data structures, indexing, and comparison methods that are tailor-built for the data.
-
-### Compile-time generation
-
-There are many benefits gained from generating data structures at compile time:
-
-* _Data as code_ means you can compile the data into your assembly
-* Enables otherwise time-consuming data analysis (e.g. zero runtime overhead)
-* No defensive copying of data (takes time and needs double the memory)
-* No virtual dispatching (virtual method calls & inheritance) and no unnecessary branching
-* Modulo operations are known constants and compilers optimize it to bitwise operations
-* Data can be stored in smaller data types (e.g. `byte` instead of `int`) in values permit it
-* Data can be encoding reduced. That is, if all characters are ASCII, they can be stored as single bytes, which saves memory and improves performance.
-
-### Data analysis
-
-FastData uses advanced data analysis techniques to generate optimized data structures. Analysis consists of:
-
-* Length bitmaps
-* Entropy mapping
-* Character mapping
-* Encoding analysis
-
-It uses the analysis to create so-called early-exits, which are fast `O(1)` checks on your input before doing any `O(n)`
-checks on the actual dataset.
+Bigger factor means faster query times.
 
 ## FAQ
 

@@ -10,7 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Items", "_Items", "{DDA48C
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		LICENSE.txt = LICENSE.txt
-		README.md = README.md
 		.editorconfig = .editorconfig
 		.globalconfig = .globalconfig
 	EndProjectSection
@@ -129,6 +128,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.SourceGenerator.Attributes", "Src\FastData.SourceGenerator.Attributes\FastData.SourceGenerator.Attributes.csproj", "{8EADDF3D-A395-4D17-AA2E-4006858E6EA6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Cli.Tests", "Src\FastData.Cli.Tests\FastData.Cli.Tests.csproj", "{4EFA6738-D378-4A0F-87A2-5F47642F0EE5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Docs", "_Docs", "{F499974F-DC7E-488D-877B-BB43D4226E1D}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		Docs\DataStructures.md = Docs\DataStructures.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
