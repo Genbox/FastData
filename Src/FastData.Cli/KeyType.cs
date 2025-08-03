@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Cli;
 
-internal enum DataType
+internal enum KeyType
 {
     String = 1,
     Int8,

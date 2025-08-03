@@ -1,0 +1,29 @@
+﻿{
+  Item1:
+// This file is auto-generated. Do not edit manually.
+// Structure: Auto (Conditional)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class MyData final {
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const uint8_t key) noexcept {
+        if (key < 42 || key > 100)
+            return false;
+        if (key == 42 || key == 62 || key == 80 || key == 100)
+            return true;
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 4;
+    static constexpr uint8_t min_key = 42;
+    static constexpr uint8_t max_key = 100;
+};
+,
+  Item2: 
+}

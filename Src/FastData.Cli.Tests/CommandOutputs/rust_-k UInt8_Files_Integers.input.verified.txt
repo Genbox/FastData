@@ -1,0 +1,33 @@
+﻿{
+  Item1:
+//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (Conditional)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct MyData;
+
+impl MyData {
+    #[must_use]
+    pub fn contains(key: u8) -> bool {
+        if key < 42 || key > 100 {
+            return false;
+        }
+
+        if key == 42 || key == 62 || key == 80 || key == 100 {
+            return true;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 4;
+    pub const MIN_KEY: u8 = 42;
+    pub const MAX_KEY: u8 = 100;
+}
+,
+  Item2: 
+}

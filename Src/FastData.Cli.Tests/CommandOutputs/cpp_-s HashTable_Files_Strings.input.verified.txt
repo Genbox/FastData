@@ -1,0 +1,67 @@
+﻿{
+  Item1:
+// This file is auto-generated. Do not edit manually.
+// Structure: HashTable
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class MyData final {
+    struct e {
+        std::string_view key;
+        int8_t next;
+        uint64_t hash_code;
+        
+        e(const std::string_view key, const int8_t next, const uint64_t hash_code)
+           : key(key), next(next), hash_code(hash_code) {}
+    };
+
+    static constexpr std::array<int8_t, 2> buckets = {
+        2, 0
+     };
+
+    inline static const std::array<e, 2> entries = {
+        e("test1", -1, 114), e("test2", 0, 114)
+    };
+
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept
+    {
+    uint64_t hash = 352654597;
+
+    for (char32_t ch : value)
+        hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+
+    return 352654597 + (hash * 1566083941);
+    }
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const std::string_view key) noexcept {
+        if (key.length() != 5u)
+            return false;
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 2;
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
+
+        while (i >= 0) {
+            const auto& entry = entries[i];
+
+            if (entry.hash_code == hash && entry.key == key)
+                return true;
+
+            i = entry.next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 2;
+    static constexpr size_t min_key_length = 5;
+    static constexpr size_t max_key_length = 5;
+};
+,
+  Item2: 
+}
