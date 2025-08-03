@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FastData.Generator.CSharp\FastData.Generator.CSharp.csproj" />
     <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
   </ItemGroup>
 
