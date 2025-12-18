@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(IncludeAnalyzers)' == 'True'">
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="all" />
     <PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
     <PackageReference Include="IDisposableAnalyzers" PrivateAssets="all" />
     <PackageReference Include="Roslynator.Analyzers" PrivateAssets="all" />
@@ -31,7 +32,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" PrivateAssets="all" />
     <PackageReference Include="SharpSource" PrivateAssets="all" />
     <PackageReference Include="Meziantou.Analyzer" PrivateAssets="all" />
-    <PackageReference Include="NetFabric.Hyperlinq.Analyzer" PrivateAssets="all" />
     <PackageReference Include="SonarAnalyzer.CSharp" PrivateAssets="all" />
   </ItemGroup>
 

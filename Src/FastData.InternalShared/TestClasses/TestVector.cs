@@ -1,5 +1,5 @@
 using Genbox.FastData.Enums;
-using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Extensions;
@@ -12,6 +13,7 @@ using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.CSharp.Tests;
 
+[SuppressMessage("Usage", "xUnit1039:The type argument to theory data is not compatible with the type of the corresponding test method parameter")]
 public class VectorTests
 {
     [Theory]

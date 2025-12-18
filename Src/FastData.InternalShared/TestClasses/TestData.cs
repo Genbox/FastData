@@ -3,7 +3,7 @@ using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
-using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 

@@ -32,23 +32,12 @@ indent_style = space
 indent_size = 4
 tab_width = 4
 
-# Verify
-[*.{received,verified}.{txt}]
-charset = "utf-8-bom"
-end_of_line = lf
-indent_size = unset
-indent_style = unset
-insert_final_newline = false
-tab_width = unset
-trim_trailing_whitespace = false
-
 # Analyzer settings
 roslynator_accessibility_modifiers = explicit
 roslynator_enum_has_flag_style = method
 roslynator_object_creation_type_style = explicit
 roslynator_use_var_instead_of_implicit_object_creation = false
 csharp_style_namespace_declarations = file_scoped:error
-dotnet_public_api_analyzer.require_api_files = true # Disable the requirement for projects to have a PublicAPI.Shipped.txt file
 
 # Csharp styles
 csharp_new_line_before_members_in_object_initializers = false
@@ -114,3 +103,13 @@ resharper_parentheses_non_obvious_operations = none, multiplicative, additive, a
 
 # Microsoft .NET properties
 csharp_style_var_for_built_in_types = false:suggestion
+
+# Verify settings
+[*.{received,verified}.{json,txt,xml}]
+charset = utf-8-bom
+end_of_line = lf
+indent_size = unset
+indent_style = unset
+insert_final_newline = false
+tab_width = unset
+trim_trailing_whitespace = false

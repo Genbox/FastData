@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.Emit;
 
 namespace Genbox.FastData.InternalShared.Helpers;
 
+[SuppressMessage("Usage", "MA0040:Forward the CancellationToken parameter to methods that take one")]
 public static class CompilationHelper
 {
     public static T GetDelegate<T>(string source, bool release) where T : Delegate

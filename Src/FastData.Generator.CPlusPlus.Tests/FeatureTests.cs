@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.Extensions;
@@ -10,6 +11,7 @@ using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Tests;
 
+[SuppressMessage("Usage", "xUnit1039:The type argument to theory data is not compatible with the type of the corresponding test method parameter")]
 public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusContext>
 {
     [Theory]

@@ -26,10 +26,6 @@
 # Benchmark.Net artifact folder
 *BenchmarkDotNet.Artifacts/
 
-# FodyWeavers used for IL injection
-*FodyWeavers.*
-
-# Others
-Publish/
+# Verify
 *.received.*
 *.received/

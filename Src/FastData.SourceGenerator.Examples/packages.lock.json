@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net10.0": {
+      "Genbox.FastData.SourceGenerator": {
+        "type": "Direct",
+        "requested": "[0.2.0, )",
+        "resolved": "0.2.0",
+        "contentHash": "Ljrqg8rIyYUfIR/bxWmKuyVo66V/Wb4rCKeT/x6jA7/vectU8GueVEKfnSfRmA3J3Pr6UjEMvU6RAYg22rZWXA=="
+      }
+    }
+  }
+}

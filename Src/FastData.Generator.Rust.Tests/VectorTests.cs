@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
@@ -11,6 +12,7 @@ using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.Rust.Tests;
 
+[SuppressMessage("Usage", "xUnit1039:The type argument to theory data is not compatible with the type of the corresponding test method parameter")]
 public class VectorTests(RustContext context) : IClassFixture<RustContext>
 {
     [Theory]
