@@ -157,27 +157,23 @@ A benchmark of .NET's `Array`, `HashSet<T>` and `FrozenSet<T>` versus FastData's
 | FastData  | NotInSet   | 0.5284 ns | 14.01x |
 
 ### Keyed queries
-| Method             | Categories |     Mean | Factor |
-|--------------------|------------|---------:|-------:|
-| Dictionary         | InSet      | 6.890 ns |      - |
-| FrozenDictionary   | InSet      | 1.484 ns |  4.64x |
-| FastData           | InSet      | 1.375 ns |  5.01x |
-|                    |            |          |        |
-| DictionaryNF       | NotInSet   | 5.832 ns |      - |
-| FrozenDictionaryNF | NotInSet   | 1.376 ns |  4.24x |
-| FastDataNF         | NotInSet   | 1.349 ns |  4.32x |
+| Method           | Categories |     Mean | Factor |
+|------------------|------------|---------:|-------:|
+| Dictionary       | InSet      | 6.890 ns |      - |
+| FrozenDictionary | InSet      | 1.484 ns |  4.64x |
+| FastData         | InSet      | 1.375 ns |  5.01x |
+|                  |            |          |        |
+| Dictionary       | NotInSet   | 5.832 ns |      - |
+| FrozenDictionary | NotInSet   | 1.376 ns |  4.24x |
+| FastData         | NotInSet   | 1.349 ns |  4.32x |
 
-## FAQ
-
-#### Why not use System.Collections.Frozen?
-There are several reasons:
-* Frozen comes with considerable runtime overhead
-* Frozen is only available in .NET 8.0+
-* Frozen only provides a few of the optimizations provided in FastData
-* Frozen is only available in C#. FastData can produce data structures in many languages.
+## General FAQ
 
 #### Does FastData use less memory than runtime structures?
 Yes and no. For some data structures like Array, it uses the same amount of memory. For others, like HashTable, depending on the data, it can use considerably less memory.
+
+#### Does it support key/value lookup?
+Yes, you can specify key/value arrays as input data and FastData will generate a efficient key lookup function that returns a value.
 
 #### Does it support case-insensitive lookups?
 No, not yet.
@@ -185,12 +181,18 @@ No, not yet.
 #### Does it support custom equality comparers?
 No, not yet.
 
-#### Does it support key/value lookup?
-Yes, you can specify key/value arrays as input data and FastData will generate a efficient key lookup function that returns a value.
-
-#### Are there any best pratcies for using FastData?
+#### Are there any best practices for using FastData?
 * Put the most often queried items first in the input data. It can speed up query speed for some data structures.
 * Enable string analysis when using string keys to produce a more efficient hash function.
 
 #### Can I use it for dynamic data?
 No, FastData is designed for static data only. It generates code at compile time, so the data must be known beforehand.
+
+## C# FAQ
+
+#### Why not use System.Collections.Frozen?
+There are several reasons:
+* Frozen comes with considerable runtime overhead
+* Frozen is only available in .NET 8.0+
+* Frozen only provides a few of the optimizations provided in FastData
+* Frozen is only available in C#. FastData can produce data structures in many languages.
