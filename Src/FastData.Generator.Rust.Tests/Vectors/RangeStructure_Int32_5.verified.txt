@@ -1,0 +1,20 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (Range)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct RangeStructure_Int32_5;
+
+impl RangeStructure_Int32_5 {
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+        return key >= Self::MIN_KEY && key <= Self::MAX_KEY;
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 5;
+}

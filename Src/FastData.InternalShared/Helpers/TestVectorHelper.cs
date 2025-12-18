@@ -105,6 +105,12 @@ public static class TestVectorHelper
         {
             yield return testVector;
         }
+
+        // Test range support
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], typeof(RangeStructure<,>)))
+        {
+            yield return testVector;
+        }
     }
 
     public static IEnumerable<ITestData> GetBenchmarkData()

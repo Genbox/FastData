@@ -1,0 +1,19 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (Range)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class RangeStructure_Int32_5 final {
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+        return key >= min_key && key <= max_key;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 5;
+};
