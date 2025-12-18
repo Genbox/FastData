@@ -197,7 +197,6 @@ public static class TestVectorHelper
 
     private static DataPair[] GetEdgeCaseValues() =>
     [
-
         // We want to test edge values
         new DataPair([sbyte.MinValue, (sbyte)-1, (sbyte)0, (sbyte)1, sbyte.MaxValue], [(sbyte)-2, (sbyte)2]),
         new DataPair([(byte)0, (byte)1, byte.MaxValue], [(byte)2, (byte)3]),
@@ -217,7 +216,6 @@ public static class TestVectorHelper
 
     private static DataPair[] GetFloatSpecialCases() =>
     [
-
         //If we don't have zero or NaN, we can use a simple hash
         new DataPair([1f, 2f, 3f, 4f, 5f], []),
         new DataPair([1.0, 2.0, 3.0, 4.0, 5.0], []),

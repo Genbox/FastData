@@ -8,5 +8,6 @@ public sealed class SingleValueContext<TKey, TValue>(TKey item, TValue[]? values
 {
     /// <summary>Gets the value used in the context.</summary>
     public TKey Item { get; } = item;
+
     public TValue[]? Values { get; } = values;
 }

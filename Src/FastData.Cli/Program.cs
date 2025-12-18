@@ -4,7 +4,6 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Parsing;
-using System.Globalization;
 using System.IO.Pipelines;
 using System.Text;
 using Genbox.FastData.Enums;
