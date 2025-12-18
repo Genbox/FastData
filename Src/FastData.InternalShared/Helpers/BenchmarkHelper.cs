@@ -4,7 +4,7 @@ public static class BenchmarkHelper
 {
     public static void RunBenchmark(string program, string args, string workingDir, string bencherArgs)
     {
-        int res;
+        ProcessResult res;
 
         //We check if bencher is available.
         if (TestHelper.TryRunProcess("bencher", "--version"))
@@ -18,7 +18,7 @@ public static class BenchmarkHelper
         else
             res = TestHelper.RunProcess(program, args, workingDir);
 
-        if (res != 0)
-            throw new InvalidOperationException($"Failed to run benchmarks. Return code: {res}");
+        if (res.ExitCode != 0)
+            throw new InvalidOperationException($"Failed to run benchmarks. Return code: {res.ExitCode}\nSTDOUT:\n{res.StandardOutput}\nSTDERR:\n{res.StandardError}");
     }
 }

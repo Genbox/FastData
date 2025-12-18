@@ -49,7 +49,7 @@ public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCon
                           """;
 
         string executable = context.Compiler.Compile(id, source);
-        Assert.Equal(1, RunProcess(executable));
+        Assert.Equal(1, RunProcess(executable).ExitCode);
     }
 
     [Theory]
@@ -86,6 +86,6 @@ public class FeatureTests(CPlusPlusContext context) : IClassFixture<CPlusPlusCon
                           """;
 
         string executable = context.Compiler.Compile(id, source);
-        Assert.Equal(1, RunProcess(executable));
+        Assert.Equal(1, RunProcess(executable).ExitCode);
     }
 }

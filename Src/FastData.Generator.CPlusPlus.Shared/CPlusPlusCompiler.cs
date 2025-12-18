@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Compression;
+using Genbox.FastData.InternalShared.Helpers;
 using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Shared;
@@ -82,7 +83,7 @@ public sealed class CPlusPlusCompiler
         return true;
     }
 
-    private int CompileMSVC(string src, string dst) =>
+    private ProcessResult CompileMSVC(string src, string dst) =>
         RunProcess("cmd.exe", $"""
                                /c ""{_path}" -arch=x86 && cl.exe "{src}" {(_release ? "/O2 /GL /GS-" : "/O1")} /utf-8 /std:c++17 /DNDEBUG /permissive- /MD /DBENCHMARK_STATIC_DEFINE /I "{_includesPath}" /Fe:"{dst}" "{_libsPath}\benchmark.lib" shlwapi.lib"
                                """);
@@ -96,12 +97,12 @@ public sealed class CPlusPlusCompiler
         if (!TryWriteFile(srcFile, source) && File.Exists(dstFile))
             return dstFile;
 
-        int ret = CompileMSVC(srcFile, dstFile);
+        ProcessResult res = CompileMSVC(srcFile, dstFile);
 
-        if (ret != 0)
+        if (res.ExitCode != 0)
         {
             File.Delete(dstFile); // We need to delete the file on failure to avoid returning the cache on next run
-            throw new InvalidOperationException("Failed to compile. Exit code: " + ret);
+            throw new InvalidOperationException($"Failed to compile. Exit code: {res.ExitCode}\nSTDOUT:\n{res.StandardOutput}\nSTDERR:\n{res.StandardError}");
         }
 
         return dstFile;

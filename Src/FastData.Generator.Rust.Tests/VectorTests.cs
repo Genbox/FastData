@@ -52,6 +52,6 @@ public class VectorTests(RustContext context) : IClassFixture<RustContext>
               }
               """);
 
-        Assert.Equal(1, RunProcess(executable));
+        Assert.Equal(1, RunProcess(executable).ExitCode);
     }
 }

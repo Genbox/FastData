@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 using Genbox.FastData.Enums;
@@ -14,6 +15,8 @@ using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.InternalShared.Helpers;
+
+public sealed record ProcessResult(int ExitCode, string StandardOutput, string StandardError, bool TimedOut);
 
 public static class TestHelper
 {
@@ -50,7 +53,7 @@ public static class TestHelper
     {
         try
         {
-            return RunProcess(application, args) == 0;
+            return RunProcess(application, args).ExitCode == 0;
         }
         catch
         {
@@ -58,7 +61,8 @@ public static class TestHelper
         }
     }
 
-    public static int RunProcess(string application, string? args = null, string? workingDir = null)
+    [SuppressMessage("Usage", "MA0040:Forward the CancellationToken parameter to methods that take one")]
+    public static ProcessResult RunProcess(string application, string? args = null, string? workingDir = null, int timeoutMs = 5000)
     {
         using Process process = new Process();
         process.StartInfo = new ProcessStartInfo
@@ -67,16 +71,54 @@ public static class TestHelper
             Arguments = args,
             CreateNoWindow = true,
             UseShellExecute = false,
-            WorkingDirectory = workingDir
+            WorkingDirectory = workingDir,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
         };
 
         process.Start();
-        bool exited = process.WaitForExit(5000);
+
+        Task<string> stdOutTask = process.StandardOutput.ReadToEndAsync();
+        Task<string> stdErrTask = process.StandardError.ReadToEndAsync();
+
+        bool exited = process.WaitForExit(timeoutMs);
 
         if (!exited)
-            process.Kill();
+        {
+            try
+            {
+                process.Kill(entireProcessTree: true);
+            }
+            catch
+            {
+                // Ignore - best effort.
+            }
 
-        return process.ExitCode;
+            try
+            {
+                process.WaitForExit(1000);
+            }
+            catch
+            {
+                // Ignore - best effort.
+            }
+        }
+
+        string stdOut = "";
+        string stdErr = "";
+
+        try { stdOut = stdOutTask.GetAwaiter().GetResult(); }
+        catch
+        {
+            /* best effort */
+        }
+        try { stdErr = stdErrTask.GetAwaiter().GetResult(); }
+        catch
+        {
+            /* best effort */
+        }
+
+        return new ProcessResult(process.ExitCode, stdOut, stdErr, TimedOut: !exited);
     }
 
     /// <summary>This function is here to help avoid write-fatigue</summary>
@@ -138,6 +180,8 @@ public static class TestHelper
             return Generate(generator, vector, props, keyType, StructureType.HashTable, new HashTablePerfectStructure<TKey, TValue>(GetHashData(vector, keyType, encoding), keyType), values);
         if (vector.Type == typeof(KeyLengthStructure<,>))
             return Generate(generator, vector, props, keyType, StructureType.Auto, new KeyLengthStructure<TKey, TValue>((StringProperties)props), values);
+        if (vector.Type == typeof(RangeStructure<,>))
+            return Generate(generator, vector, props, keyType, StructureType.Auto, new RangeStructure<TKey, TValue>(), values);
 
         throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
     }

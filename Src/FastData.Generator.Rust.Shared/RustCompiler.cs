@@ -1,10 +1,11 @@
+using Genbox.FastData.InternalShared.Helpers;
 using static Genbox.FastData.InternalShared.Helpers.TestHelper;
 
 namespace Genbox.FastData.Generator.Rust.Shared;
 
 public sealed class RustCompiler
 {
-    private readonly Func<string, string, int> _compile;
+    private readonly Func<string, string, ProcessResult> _compile;
     private readonly bool _release;
     private readonly string _rootPath;
 
@@ -20,7 +21,7 @@ public sealed class RustCompiler
             throw new InvalidOperationException("No compiler found");
     }
 
-    private int CompileRustC(string src, string dst) =>
+    private ProcessResult CompileRustC(string src, string dst) =>
         RunProcess("rustc.exe", $"{src} -o {dst} {(_release ? "-C opt-level=3" : "")} -C debuginfo=0 -C link-args=/DEBUG:NONE");
 
     public string Compile(string fileId, string source)
@@ -32,12 +33,12 @@ public sealed class RustCompiler
         if (!TryWriteFile(srcFile, source) && File.Exists(dstFile))
             return dstFile;
 
-        int ret = _compile(srcFile, dstFile);
+        ProcessResult res = _compile(srcFile, dstFile);
 
-        if (ret != 0)
+        if (res.ExitCode != 0)
         {
             File.Delete(dstFile); // We need to delete the file on failure to avoid returning the cache on next run
-            throw new InvalidOperationException("Failed to compile. Exit code: " + ret);
+            throw new InvalidOperationException($"Failed to compile. Exit code: {res.ExitCode}\nSTDOUT:\n{res.StandardOutput}\nSTDERR:\n{res.StandardError}");
         }
 
         return dstFile;

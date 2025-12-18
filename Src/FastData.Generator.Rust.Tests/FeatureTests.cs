@@ -46,7 +46,7 @@ public class FeatureTests(RustContext context) : IClassFixture<RustContext>
                           """;
 
         string executable = context.Compiler.Compile(id, source);
-        Assert.Equal(1, RunProcess(executable));
+        Assert.Equal(1, RunProcess(executable).ExitCode);
     }
 
     [Theory]
@@ -81,6 +81,6 @@ public class FeatureTests(RustContext context) : IClassFixture<RustContext>
                           """;
 
         string executable = context.Compiler.Compile(id, source);
-        Assert.Equal(1, RunProcess(executable));
+        Assert.Equal(1, RunProcess(executable).ExitCode);
     }
 }
