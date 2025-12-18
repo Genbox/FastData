@@ -14,7 +14,7 @@ public sealed class GeneratorConfig<T>
     {
         StructureType = structureType;
         KeyType = keyType;
-        Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.Now);
+        Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.UtcNow);
         HashDetails = hashDetails;
         Flags = flags;
     }
