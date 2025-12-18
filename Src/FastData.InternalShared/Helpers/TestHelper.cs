@@ -119,7 +119,7 @@ public static class TestHelper
         if (vector.Keys is string[] arr)
             props = KeyAnalyzer.GetStringProperties(arr);
         else
-            props = KeyAnalyzer.GetValueProperties(vector.Keys);
+            props = KeyAnalyzer.GetProperties(vector.Keys);
 
         ICodeGenerator generator = func(vector.Identifier);
         GeneratorEncoding encoding = generator.Encoding;
@@ -179,7 +179,7 @@ public static class TestHelper
 
             genCfg = new GeneratorConfig<TKey>(structureType, keyType, (uint)vector.Keys.Length, stringProps, StringComparison.Ordinal, hashDetails, generator.Encoding, flags);
         }
-        else if (props is ValueProperties<TKey> valueProps)
+        else if (props is KeyProperties<TKey> valueProps)
         {
             hashDetails.HasZeroOrNaN = valueProps.HasZeroOrNaN;
             genCfg = new GeneratorConfig<TKey>(structureType, keyType, (uint)vector.Keys.Length, valueProps, hashDetails, flags);

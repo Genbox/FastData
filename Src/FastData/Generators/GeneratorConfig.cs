@@ -19,7 +19,7 @@ public sealed class GeneratorConfig<T>
         Flags = flags;
     }
 
-    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, ValueProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags)
+    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, KeyProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType).ToArray();
         Constants = CreateConstants(props, itemCount);
@@ -54,7 +54,7 @@ public sealed class GeneratorConfig<T>
     public HashDetails HashDetails { get; }
     public GeneratorFlags Flags { get; }
 
-    private static Constants<T> CreateConstants(ValueProperties<T> props, uint itemCount)
+    private static Constants<T> CreateConstants(KeyProperties<T> props, uint itemCount)
     {
         Constants<T> constants = new Constants<T>(itemCount);
         constants.MinValue = props.MinKeyValue;
@@ -96,7 +96,7 @@ public sealed class GeneratorConfig<T>
         }
     }
 
-    private static IEnumerable<IEarlyExit> GetEarlyExits(ValueProperties<T> props, uint itemCount, StructureType structureType)
+    private static IEnumerable<IEarlyExit> GetEarlyExits(KeyProperties<T> props, uint itemCount, StructureType structureType)
     {
         //There is no point to using early exists if there is just one item
         if (itemCount == 1)

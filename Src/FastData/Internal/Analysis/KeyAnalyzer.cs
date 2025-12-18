@@ -6,19 +6,19 @@ namespace Genbox.FastData.Internal.Analysis;
 
 internal static class KeyAnalyzer
 {
-    internal static ValueProperties<T> GetValueProperties<T>(T[] keys) => keys switch
+    internal static KeyProperties<T> GetProperties<T>(T[] keys) => keys switch
     {
-        char[] charArr when typeof(T) == typeof(char) => (ValueProperties<T>)(object)GetCharProperties(charArr),
-        sbyte[] sbyteArr when typeof(T) == typeof(sbyte) => (ValueProperties<T>)(object)GetSByteProperties(sbyteArr),
-        byte[] byteArr when typeof(T) == typeof(byte) => (ValueProperties<T>)(object)GetByteProperties(byteArr),
-        short[] shortArr when typeof(T) == typeof(short) => (ValueProperties<T>)(object)GetInt16Properties(shortArr),
-        ushort[] ushortArr when typeof(T) == typeof(ushort) => (ValueProperties<T>)(object)GetUInt16Properties(ushortArr),
-        int[] intArr when typeof(T) == typeof(int) => (ValueProperties<T>)(object)GetInt32Properties(intArr),
-        uint[] uintArr when typeof(T) == typeof(uint) => (ValueProperties<T>)(object)GetUInt32Properties(uintArr),
-        long[] longArr when typeof(T) == typeof(long) => (ValueProperties<T>)(object)GetInt64Properties(longArr),
-        ulong[] ulongArr when typeof(T) == typeof(ulong) => (ValueProperties<T>)(object)GetUInt64Properties(ulongArr),
-        float[] floatArr when typeof(T) == typeof(float) => (ValueProperties<T>)(object)GetSingleProperties(floatArr),
-        double[] doubleArr when typeof(T) == typeof(double) => (ValueProperties<T>)(object)GetDoubleProperties(doubleArr),
+        char[] charArr when typeof(T) == typeof(char) => (KeyProperties<T>)(object)GetCharProperties(charArr),
+        sbyte[] sbyteArr when typeof(T) == typeof(sbyte) => (KeyProperties<T>)(object)GetSByteProperties(sbyteArr),
+        byte[] byteArr when typeof(T) == typeof(byte) => (KeyProperties<T>)(object)GetByteProperties(byteArr),
+        short[] shortArr when typeof(T) == typeof(short) => (KeyProperties<T>)(object)GetInt16Properties(shortArr),
+        ushort[] ushortArr when typeof(T) == typeof(ushort) => (KeyProperties<T>)(object)GetUInt16Properties(ushortArr),
+        int[] intArr when typeof(T) == typeof(int) => (KeyProperties<T>)(object)GetInt32Properties(intArr),
+        uint[] uintArr when typeof(T) == typeof(uint) => (KeyProperties<T>)(object)GetUInt32Properties(uintArr),
+        long[] longArr when typeof(T) == typeof(long) => (KeyProperties<T>)(object)GetInt64Properties(longArr),
+        ulong[] ulongArr when typeof(T) == typeof(ulong) => (KeyProperties<T>)(object)GetUInt64Properties(ulongArr),
+        float[] floatArr when typeof(T) == typeof(float) => (KeyProperties<T>)(object)GetSingleProperties(floatArr),
+        double[] doubleArr when typeof(T) == typeof(double) => (KeyProperties<T>)(object)GetDoubleProperties(doubleArr),
         _ => throw new InvalidOperationException($"Unsupported data type: {typeof(T).Name}")
     };
 
@@ -96,7 +96,7 @@ internal static class KeyAnalyzer
         return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, (uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
     }
 
-    private static ValueProperties<char> GetCharProperties(char[] keys)
+    private static KeyProperties<char> GetCharProperties(char[] keys)
     {
         char min = char.MaxValue;
         char max = char.MinValue;
@@ -107,15 +107,17 @@ internal static class KeyAnalyzer
             max = c > max ? c : max;
         }
 
-        return new ValueProperties<char>(min, max, false);
+        return new KeyProperties<char>(min, max, false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
-    private static ValueProperties<float> GetSingleProperties(float[] keys)
+    private static KeyProperties<float> GetSingleProperties(float[] keys)
     {
         float min = float.MaxValue;
         float max = float.MinValue;
 
         bool hasZeroOrNaN = false;
+        bool hasNaNOrInfinity = false;
+
         foreach (float c in keys)
         {
 #pragma warning disable S1244
@@ -123,19 +125,24 @@ internal static class KeyAnalyzer
 #pragma warning restore S1244
                 hasZeroOrNaN = true;
 
+            if (!hasNaNOrInfinity && (float.IsNaN(c) || float.IsInfinity(c)))
+                hasNaNOrInfinity = true;
+
             min = c < min ? c : min;
             max = c > max ? c : max;
         }
 
-        return new ValueProperties<float>(min, max, hasZeroOrNaN);
+        return new KeyProperties<float>(min, max, hasZeroOrNaN, IsFloatContiguous(keys, min, max, hasNaNOrInfinity));
     }
 
-    private static ValueProperties<double> GetDoubleProperties(double[] keys)
+    private static KeyProperties<double> GetDoubleProperties(double[] keys)
     {
         double min = double.MaxValue;
         double max = double.MinValue;
 
         bool hasZeroOrNaN = false;
+        bool hasNaNOrInfinity = false;
+
         foreach (double c in keys)
         {
 #pragma warning disable S1244
@@ -143,22 +150,20 @@ internal static class KeyAnalyzer
 #pragma warning restore S1244
                 hasZeroOrNaN = true;
 
+            if (!hasNaNOrInfinity && (double.IsNaN(c) || double.IsInfinity(c)))
+                hasNaNOrInfinity = true;
+
             min = c < min ? c : min;
             max = c > max ? c : max;
         }
 
-        return new ValueProperties<double>(min, max, hasZeroOrNaN);
+        return new KeyProperties<double>(min, max, hasZeroOrNaN, IsDoubleContiguous(keys, min, max, hasNaNOrInfinity));
     }
 
-    private static ValueProperties<byte> GetByteProperties(byte[] keys)
+    private static KeyProperties<byte> GetByteProperties(byte[] keys)
     {
         byte min = byte.MaxValue;
         byte max = byte.MinValue;
-
-        byte lastValue = keys[0];
-
-        min = Math.Min(min, lastValue);
-        max = Math.Max(max, lastValue);
 
         foreach (byte val in keys)
         {
@@ -166,18 +171,13 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new ValueProperties<byte>(min, max, false);
+        return new KeyProperties<byte>(min, max, false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
-    private static ValueProperties<sbyte> GetSByteProperties(sbyte[] keys)
+    private static KeyProperties<sbyte> GetSByteProperties(sbyte[] keys)
     {
         sbyte min = sbyte.MaxValue;
         sbyte max = sbyte.MinValue;
-
-        sbyte lastValue = keys[0];
-
-        min = Math.Min(min, lastValue);
-        max = Math.Max(max, lastValue);
 
         foreach (sbyte val in keys)
         {
@@ -185,18 +185,13 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new ValueProperties<sbyte>(min, max, false);
+        return new KeyProperties<sbyte>(min, max, false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
-    private static ValueProperties<short> GetInt16Properties(short[] keys)
+    private static KeyProperties<short> GetInt16Properties(short[] keys)
     {
         short min = short.MaxValue;
         short max = short.MinValue;
-
-        short lastValue = keys[0];
-
-        min = Math.Min(min, lastValue);
-        max = Math.Max(max, lastValue);
 
         foreach (short val in keys)
         {
@@ -204,18 +199,13 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new ValueProperties<short>(min, max, false);
+        return new KeyProperties<short>(min, max, false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
-    private static ValueProperties<ushort> GetUInt16Properties(ushort[] keys)
+    private static KeyProperties<ushort> GetUInt16Properties(ushort[] keys)
     {
         ushort min = ushort.MaxValue;
         ushort max = ushort.MinValue;
-
-        ushort lastValue = keys[0];
-
-        min = Math.Min(min, lastValue);
-        max = Math.Max(max, lastValue);
 
         foreach (ushort val in keys)
         {
@@ -223,18 +213,13 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new ValueProperties<ushort>(min, max, false);
+        return new KeyProperties<ushort>(min, max, false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
-    private static ValueProperties<int> GetInt32Properties(int[] keys)
+    private static KeyProperties<int> GetInt32Properties(int[] keys)
     {
         int min = int.MaxValue;
         int max = int.MinValue;
-
-        int lastValue = keys[0];
-
-        min = Math.Min(min, lastValue);
-        max = Math.Max(max, lastValue);
 
         foreach (int val in keys)
         {
@@ -242,18 +227,13 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new ValueProperties<int>(min, max, false);
+        return new KeyProperties<int>(min, max, false, keys.Length <= 1 || (long)max - min == keys.Length - 1);
     }
 
-    private static ValueProperties<uint> GetUInt32Properties(uint[] keys)
+    private static KeyProperties<uint> GetUInt32Properties(uint[] keys)
     {
         uint min = uint.MaxValue;
         uint max = uint.MinValue;
-
-        uint lastValue = keys[0];
-
-        min = Math.Min(min, lastValue);
-        max = Math.Max(max, lastValue);
 
         foreach (uint val in keys)
         {
@@ -261,18 +241,13 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new ValueProperties<uint>(min, max, false);
+        return new KeyProperties<uint>(min, max, false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1));
     }
 
-    private static ValueProperties<long> GetInt64Properties(long[] keys)
+    private static KeyProperties<long> GetInt64Properties(long[] keys)
     {
         long min = long.MaxValue;
         long max = long.MinValue;
-
-        long lastValue = keys[0];
-
-        min = Math.Min(min, lastValue);
-        max = Math.Max(max, lastValue);
 
         foreach (long val in keys)
         {
@@ -280,18 +255,13 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new ValueProperties<long>(min, max, false);
+        return new KeyProperties<long>(min, max, false, keys.Length <= 1 || unchecked((ulong)(max - min)) == (ulong)(keys.Length - 1));
     }
 
-    private static ValueProperties<ulong> GetUInt64Properties(ulong[] keys)
+    private static KeyProperties<ulong> GetUInt64Properties(ulong[] keys)
     {
         ulong min = ulong.MaxValue;
         ulong max = ulong.MinValue;
-
-        ulong lastValue = keys[0];
-
-        min = Math.Min(min, lastValue);
-        max = Math.Max(max, lastValue);
 
         foreach (ulong val in keys)
         {
@@ -299,6 +269,58 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new ValueProperties<ulong>(min, max, false);
+        return new KeyProperties<ulong>(min, max, false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1));
+    }
+
+    private static bool IsFloatContiguous(float[] keys, float min, float max, bool hasNaNOrInfinity)
+    {
+        if (hasNaNOrInfinity)
+            return false;
+
+        if (keys.Length <= 1)
+            return true;
+
+        float expectedRange = keys.Length - 1;
+        float range = max - min;
+
+        if (Math.Abs(range - expectedRange) > float.Epsilon)
+            return false;
+
+        float[] sorted = (float[])keys.Clone();
+        Array.Sort(sorted);
+
+        for (int i = 1; i < sorted.Length; i++)
+        {
+            if (Math.Abs(sorted[i] - (sorted[i - 1] + 1.0f)) > float.Epsilon)
+                return false;
+        }
+
+        return true;
+    }
+
+    private static bool IsDoubleContiguous(double[] keys, double min, double max, bool hasNaNOrInfinity)
+    {
+        if (hasNaNOrInfinity)
+            return false;
+
+        if (keys.Length <= 1)
+            return true;
+
+        double expectedRange = keys.Length - 1;
+        double range = max - min;
+
+        if (Math.Abs(range - expectedRange) > double.Epsilon)
+            return false;
+
+        double[] sorted = (double[])keys.Clone();
+        Array.Sort(sorted);
+
+        for (int i = 1; i < sorted.Length; i++)
+        {
+            if (Math.Abs(sorted[i] - (sorted[i - 1] + 1.0d)) > double.Epsilon)
+                return false;
+        }
+
+        return true;
     }
 }

@@ -79,9 +79,9 @@ public static partial class FastDataGenerator
 
         HashDetails hashDetails = new HashDetails();
 
-        ValueProperties<TKey> valProps = KeyAnalyzer.GetValueProperties(keys);
-        LogMinMaxValues(logger, valProps.MinKeyValue, valProps.MaxKeyValue);
-        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(fdCfg.StructureType, keyType, (uint)keys.Length, valProps, hashDetails, GeneratorFlags.None);
+        KeyProperties<TKey> props = KeyAnalyzer.GetProperties(keys);
+        LogMinMaxValues(logger, props.MinKeyValue, props.MaxKeyValue);
+        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(fdCfg.StructureType, keyType, (uint)keys.Length, props, hashDetails, GeneratorFlags.None);
 
         switch (fdCfg.StructureType)
         {
@@ -105,8 +105,8 @@ public static partial class FastDataGenerator
                 return GenerateWrapper(generator, genCfg, new BinarySearchStructure<TKey, TValue>(keyType, DefaultStringComparison), keys, values);
             case StructureType.HashTable:
             {
-                HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, valProps.HasZeroOrNaN);
-                hashDetails.HasZeroOrNaN = valProps.HasZeroOrNaN;
+                HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, props.HasZeroOrNaN);
+                hashDetails.HasZeroOrNaN = props.HasZeroOrNaN;
 
                 HashData hashData = HashData.Create(keys, fdCfg.HashCapacityFactor, hashFunc);
 
@@ -163,7 +163,7 @@ public static partial class FastDataGenerator
                 double density = (double)keys.Length / (strProps.LengthData.Max - strProps.LengthData.Min + 1);
 
                 // Use KeyLengthStructure only when string lengths are unique and density >= 75%
-                if (strProps.LengthData.Unique  && density >= 0.75)
+                if (strProps.LengthData.Unique && density >= 0.75)
                     return GenerateWrapper(generator, genCfg, new KeyLengthStructure<string, TValue>(strProps), keys, values);
 
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.

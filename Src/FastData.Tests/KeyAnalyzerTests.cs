@@ -6,6 +6,43 @@ namespace Genbox.FastData.Tests;
 
 public class KeyAnalyzerTests
 {
+    [Fact]
+    public void GetProperties_IsContiguous_AllPrimitiveTypes()
+    {
+        Assert.True(GetProperties(['a', 'b', 'c']).IsContiguous);
+        Assert.False(GetProperties(['a', 'c']).IsContiguous);
+
+        Assert.True(GetProperties(new sbyte[] { -1, 0, 1 }).IsContiguous);
+        Assert.False(GetProperties(new sbyte[] { -1, 1, 2 }).IsContiguous);
+
+        Assert.True(GetProperties(new byte[] { 1, 2, 3 }).IsContiguous);
+        Assert.False(GetProperties(new byte[] { 1, 3, 4 }).IsContiguous);
+
+        Assert.True(GetProperties(new short[] { 10, 11, 12 }).IsContiguous);
+        Assert.False(GetProperties(new short[] { 10, 11, 13 }).IsContiguous);
+
+        Assert.True(GetProperties(new ushort[] { 10, 11, 12 }).IsContiguous);
+        Assert.False(GetProperties(new ushort[] { 10, 11, 13 }).IsContiguous);
+
+        Assert.True(GetProperties([100, 101]).IsContiguous);
+        Assert.False(GetProperties([100, 102]).IsContiguous);
+
+        Assert.True(GetProperties([100u, 101u]).IsContiguous);
+        Assert.False(GetProperties([100u, 102u]).IsContiguous);
+
+        Assert.True(GetProperties([long.MaxValue - 2, long.MaxValue - 1, long.MaxValue]).IsContiguous);
+        Assert.False(GetProperties([1L, 3L, 4L]).IsContiguous);
+
+        Assert.True(GetProperties([1ul, 2ul, 3ul]).IsContiguous);
+        Assert.False(GetProperties([1ul, 2ul, 4ul]).IsContiguous);
+
+        Assert.True(GetProperties([0.5f, 1.5f, 2.5f]).IsContiguous);
+        Assert.False(GetProperties([0f, 0.9f, 2f]).IsContiguous);
+
+        Assert.True(GetProperties([0.5d, 1.5d, 2.5d]).IsContiguous);
+        Assert.False(GetProperties([0d, 0.9d, 2d]).IsContiguous);
+    }
+
     [Theory]
     [InlineData((object)new[] { "a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa" })]
     [InlineData((object)new[] { "aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa" })] //Test inputs that don't start with 1
