@@ -107,7 +107,7 @@ internal static class KeyAnalyzer
             max = c > max ? c : max;
         }
 
-        return new KeyProperties<char>(min, max, false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new KeyProperties<char>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
     private static KeyProperties<float> GetSingleProperties(float[] keys)
@@ -132,7 +132,8 @@ internal static class KeyAnalyzer
             max = c > max ? c : max;
         }
 
-        return new KeyProperties<float>(min, max, hasZeroOrNaN, IsFloatContiguous(keys, min, max, hasNaNOrInfinity));
+        ulong range = ClampRangeToUInt64(max - min);
+        return new KeyProperties<float>(min, max, range, hasZeroOrNaN, IsFloatContiguous(keys, min, max, hasNaNOrInfinity));
     }
 
     private static KeyProperties<double> GetDoubleProperties(double[] keys)
@@ -157,7 +158,8 @@ internal static class KeyAnalyzer
             max = c > max ? c : max;
         }
 
-        return new KeyProperties<double>(min, max, hasZeroOrNaN, IsDoubleContiguous(keys, min, max, hasNaNOrInfinity));
+        ulong range = ClampRangeToUInt64(max - min);
+        return new KeyProperties<double>(min, max, range, hasZeroOrNaN, IsDoubleContiguous(keys, min, max, hasNaNOrInfinity));
     }
 
     private static KeyProperties<byte> GetByteProperties(byte[] keys)
@@ -171,7 +173,7 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<byte>(min, max, false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new KeyProperties<byte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
     private static KeyProperties<sbyte> GetSByteProperties(sbyte[] keys)
@@ -185,7 +187,7 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<sbyte>(min, max, false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new KeyProperties<sbyte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
     private static KeyProperties<short> GetInt16Properties(short[] keys)
@@ -199,7 +201,7 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<short>(min, max, false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new KeyProperties<short>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
     private static KeyProperties<ushort> GetUInt16Properties(ushort[] keys)
@@ -213,7 +215,7 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<ushort>(min, max, false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new KeyProperties<ushort>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
     private static KeyProperties<int> GetInt32Properties(int[] keys)
@@ -227,7 +229,7 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<int>(min, max, false, keys.Length <= 1 || (long)max - min == keys.Length - 1);
+        return new KeyProperties<int>(min, max, (ulong)((long)max - min), false, keys.Length <= 1 || (long)max - min == keys.Length - 1);
     }
 
     private static KeyProperties<uint> GetUInt32Properties(uint[] keys)
@@ -241,7 +243,7 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<uint>(min, max, false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1));
+        return new KeyProperties<uint>(min, max, max - min, false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1));
     }
 
     private static KeyProperties<long> GetInt64Properties(long[] keys)
@@ -255,7 +257,8 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<long>(min, max, false, keys.Length <= 1 || unchecked((ulong)(max - min)) == (ulong)(keys.Length - 1));
+        ulong range = unchecked((ulong)max - (ulong)min);
+        return new KeyProperties<long>(min, max, range, false, keys.Length <= 1 || range == (ulong)(keys.Length - 1));
     }
 
     private static KeyProperties<ulong> GetUInt64Properties(ulong[] keys)
@@ -269,7 +272,7 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<ulong>(min, max, false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1));
+        return new KeyProperties<ulong>(min, max, max - min, false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1));
     }
 
     private static bool IsFloatContiguous(float[] keys, float min, float max, bool hasNaNOrInfinity)
@@ -322,5 +325,16 @@ internal static class KeyAnalyzer
         }
 
         return true;
+    }
+
+    private static ulong ClampRangeToUInt64(double range)
+    {
+        if (double.IsNaN(range) || range <= 0.0d)
+            return 0;
+
+        if (range >= ulong.MaxValue)
+            return ulong.MaxValue;
+
+        return (ulong)range;
     }
 }
