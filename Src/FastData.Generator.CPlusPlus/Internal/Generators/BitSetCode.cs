@@ -1,0 +1,71 @@
+using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
+using Genbox.FastData.Generator.Enums;
+using Genbox.FastData.Generator.Extensions;
+using Genbox.FastData.Generators.Contexts;
+
+namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
+
+internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, SharedCode shared) : CPlusPlusOutputWriter<TKey>
+{
+    public override string Generate()
+    {
+        bool customValue = !typeof(TValue).IsPrimitive;
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append($$"""
+                        {{GetFieldModifier(true)}}std::array<uint64_t, {{ctx.BitSet.Length.ToStringInvariant()}}> bitset = {
+                    {{FormatColumns(ctx.BitSet, ToValueLabel)}}
+                        };
+
+                    """);
+
+        if (ctx.Values != null)
+        {
+            sb.Append($$"""
+                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                        """);
+        }
+
+        sb.Append($$"""
+                    public:
+                        {{MethodAttribute}}
+                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
+                    {{GetEarlyExits(MethodType.Contains)}}
+
+                            const uint64_t offset = static_cast<uint64_t>(key - min_key);
+                            const size_t word = static_cast<size_t>(offset >> 6);
+                            return (bitset[word] & (1ULL << (offset & 63))) != 0;
+                        }
+                    """);
+
+        if (ctx.Values != null)
+        {
+            string ptr = customValue ? "" : "&";
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
+
+            sb.Append($$"""
+
+                            {{MethodAttribute}}
+                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
+                        {{GetEarlyExits(MethodType.TryLookup)}}
+
+                                const uint64_t offset = static_cast<uint64_t>(key - min_key);
+                                const size_t word = static_cast<size_t>(offset >> 6);
+                                if ((bitset[word] & (1ULL << (offset & 63))) == 0)
+                                {
+                                    value = nullptr;
+                                    return false;
+                                }
+
+                                value = {{ptr}}values[static_cast<size_t>(offset)];
+                                return true;
+                            }
+                        """);
+        }
+
+        return sb.ToString();
+    }
+}

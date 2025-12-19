@@ -22,6 +22,8 @@ namespace Genbox.FastData;
 public static partial class FastDataGenerator
 {
     private const StringComparison DefaultStringComparison = StringComparison.Ordinal;
+    private const ulong MaxBitSetRange = 4096;
+    private const double MinBitSetDensity = 0.5;
 
     public static string GenerateKeyed<TKey, TValue>(TKey[] keys, TValue[] values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
@@ -93,6 +95,9 @@ public static partial class FastDataGenerator
                 // RangeStructure handles consecutive keys; keyed lookups are limited to integer-like key types.
                 if (props.IsConsecutive && (values == null || SupportsKeyedRange(keyType)))
                     return GenerateWrapper(generator, genCfg, new RangeStructure<TKey, TValue>(), keys, values);
+
+                if (props.Range <= MaxBitSetRange && (values == null || IsBitSetDense(props.Range, keys.Length)))
+                    return GenerateWrapper(generator, genCfg, new BitSetStructure<TKey, TValue>(props, keyType), keys, values);
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
@@ -224,6 +229,8 @@ public static partial class FastDataGenerator
         TContext res = structure.Create(keys, values);
         return generator.Generate(genCfg, res);
     }
+
+    private static bool IsBitSetDense(ulong range, int itemCount) => itemCount / (double)range >= MinBitSetDensity;
 
     private static bool SupportsKeyedRange(KeyType keyType) => keyType is not (KeyType.Single or KeyType.Double or KeyType.String);
 

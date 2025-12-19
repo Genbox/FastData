@@ -52,6 +52,7 @@ public static class TestVectorHelper
         foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], [complexValues], "complex",
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
+                     typeof(BitSetStructure<,>),
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableStructure<,>),
                      typeof(HashTablePerfectStructure<,>),
@@ -102,7 +103,9 @@ public static class TestVectorHelper
         }
 
         // Test range support. Keys have to be without gaps
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], typeof(RangeStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]],
+                     typeof(RangeStructure<,>),
+                     typeof(BitSetStructure<,>)))
             yield return testVector;
     }
 

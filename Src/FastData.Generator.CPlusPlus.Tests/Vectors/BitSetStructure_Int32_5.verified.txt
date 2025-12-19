@@ -1,6 +1,4 @@
-﻿{
-  Item1:
-// This file is auto-generated. Do not edit manually.
+﻿// This file is auto-generated. Do not edit manually.
 // Structure: Auto (BitSet)
 #pragma once
 #include <array>
@@ -8,14 +6,14 @@
 #include <limits>
 #include <string_view>
 
-class MyData final {
+class BitSetStructure_Int32_5 final {
     static constexpr std::array<uint64_t, 1> bitset = {
-        288230651030667265ull
+        31ull
     };
 public:
     [[nodiscard]]
-    static constexpr bool contains(const uint8_t key) noexcept {
-        if (key < 42 || key > 100)
+    static constexpr bool contains(const int32_t key) noexcept {
+        if (key < 1 || key > 5)
             return false;
 
         const uint64_t offset = static_cast<uint64_t>(key - min_key);
@@ -23,10 +21,7 @@ public:
         return (bitset[word] & (1ULL << (offset & 63))) != 0;
     }
 
-    static constexpr size_t item_count = 4;
-    static constexpr uint8_t min_key = 42;
-    static constexpr uint8_t max_key = 100;
+    static constexpr size_t item_count = 5;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 5;
 };
-,
-  Item2: 
-}

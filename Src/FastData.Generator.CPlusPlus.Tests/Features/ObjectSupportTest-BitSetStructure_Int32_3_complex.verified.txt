@@ -1,0 +1,53 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (BitSet)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+struct Person {
+    int32_t age;
+    std::u32string_view name;
+    const Person* other;
+
+    constexpr Person(const int32_t age, const std::u32string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
+};
+class BitSetStructure_Int32_3_complex final {
+    static constexpr std::array<uint64_t, 1> bitset = {
+        7ull
+    };
+    inline static const std::array<Person*, 3> values = {
+        new Person(1, U"Bob", new Person(4, U"Anna", nullptr)), new Person(2, U"Billy", nullptr), new Person(3, U"Bibi", nullptr)
+    };
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+        if (key < 1 || key > 3)
+            return false;
+
+        const uint64_t offset = static_cast<uint64_t>(key - min_key);
+        const size_t word = static_cast<size_t>(offset >> 6);
+        return (bitset[word] & (1ULL << (offset & 63))) != 0;
+    }
+    [[nodiscard]]
+    static bool try_lookup(const int32_t key, const Person*& value) noexcept {
+        if (key < 1 || key > 3)
+            return false;
+
+        const uint64_t offset = static_cast<uint64_t>(key - min_key);
+        const size_t word = static_cast<size_t>(offset >> 6);
+        if ((bitset[word] & (1ULL << (offset & 63))) == 0)
+        {
+            value = nullptr;
+            return false;
+        }
+
+        value = values[static_cast<size_t>(offset)];
+        return true;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 3;
+};

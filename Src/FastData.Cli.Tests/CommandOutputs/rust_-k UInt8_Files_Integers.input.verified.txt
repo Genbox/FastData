@@ -1,7 +1,7 @@
 ﻿{
   Item1:
 //! This file is auto-generated. Do not edit manually.
-//! Structure: Auto (Conditional)
+//! Structure: Auto (BitSet)
 #![allow(unused_parens)]
 #![allow(missing_docs)]
 #![allow(unused_imports)]
@@ -11,17 +11,19 @@ use std::ptr;
 pub struct MyData;
 
 impl MyData {
+    const BITSET: [u64; 1] = [
+        288230651030667265
+    ];
     #[must_use]
     pub fn contains(key: u8) -> bool {
         if key < 42 || key > 100 {
             return false;
         }
 
-        if key == 42 || key == 62 || key == 80 || key == 100 {
-            return true;
-        }
-
-        false
+        let offset = ((key as u64) - (Self::MIN_KEY as u64)) as usize;
+        let word = offset >> 6;
+        let mask = 1u64 << ((offset & 63) as u32);
+        (Self::BITSET[word] & mask) != 0
     }
 
     pub const ITEM_COUNT: usize = 4;
