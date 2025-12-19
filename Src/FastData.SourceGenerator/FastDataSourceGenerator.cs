@@ -136,7 +136,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
             ITypeSymbol genericArg0 = ad.AttributeClass.TypeArguments[0];
 
-            if (!Enum.TryParse<KeyType>(genericArg0.Name, out _))
+            if (!Enum.TryParse<KeyType>(genericArg0.Name, true, out _))
                 throw new InvalidOperationException($"FastData does not support '{genericArg0.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}' as generic argument for '{name}'");
 
             //We uniq the keys and throw on duplicates

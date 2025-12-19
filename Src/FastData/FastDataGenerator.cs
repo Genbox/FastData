@@ -74,7 +74,7 @@ public static partial class FastDataGenerator
         LogUserStructureType(logger, fdCfg.StructureType);
         LogUniqueItems(logger, uniq.Count);
 
-        KeyType keyType = (KeyType)Enum.Parse(typeof(KeyType), type.Name);
+        KeyType keyType = (KeyType)Enum.Parse(typeof(KeyType), type.Name, false);
         LogKeyType(logger, keyType);
 
         HashDetails hashDetails = new HashDetails();
