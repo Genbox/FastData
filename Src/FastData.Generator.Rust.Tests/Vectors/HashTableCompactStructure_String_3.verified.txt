@@ -39,9 +39,31 @@ impl HashTableCompactStructure_String_3 {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        if key.len() < 1 as usize || key.len() > 255 as usize {
-            return false;
-        }
+    match key.len() >> 6 {
+        0 => {
+            if 9u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
+                return false;
+            }
+        },
+        1 => {
+            if 0u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
+                return false;
+            }
+        },
+        2 => {
+            if 0u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
+                return false;
+            }
+        },
+        3 => {
+            if 4611686018427387904u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
+                return false;
+            }
+        },
+        _ => {
+             return false;
+         }
+    }
 
         let hash = unsafe { Self::get_hash(key) };
         let index = hash % 3;

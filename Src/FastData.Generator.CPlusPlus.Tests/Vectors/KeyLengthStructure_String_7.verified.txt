@@ -14,7 +14,7 @@ class KeyLengthStructure_String_7 final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        if ((1012ULL & (1ULL << (key.length() - 1))) == 0)
+        if (const size_t len = key.length(); len < 3u || len > 10u)
             return false;
 
         return key == keys[key.length() - 3];

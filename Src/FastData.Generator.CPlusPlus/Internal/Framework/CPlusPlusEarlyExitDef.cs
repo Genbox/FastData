@@ -10,21 +10,62 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
 {
     protected override bool IsEnabled => !options.HasFlag(CPlusPlusOptions.DisableEarlyExits);
 
-    protected override string GetMaskEarlyExit(MethodType methodType, ulong bitSet) =>
-        $"""
-                 if (({bitSet}ULL & (1ULL << (key.length() - 1))) == 0)
-                     return false;
-         """;
+    protected override string GetMaskEarlyExit(MethodType methodType, ulong[] bitSet)
+    {
+        if (bitSet.Length == 1)
+            return RenderWord(bitSet[0], methodType);
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append("""
+                          switch (key.length() >> 6)
+                          {
+                  """);
+
+        for (int i = 0; i < bitSet.Length; i++)
+        {
+            sb.Append($"""
+
+                                   case {i.ToStringInvariant()}:
+                           {RenderWord(bitSet[i], methodType)}
+                                   break;
+                       """);
+        }
+
+        sb.Append($$"""
+
+                            default:
+                                {{RenderMethod(methodType)}}
+                        }
+                    """);
+
+        return sb.ToString();
+    }
 
     protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) =>
         $"""
                  if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
-                     return false;
+                     {RenderMethod(methodType)}
          """;
 
     protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
         $"""
                  if ({(min.Equals(max) ? $"key.length() != {map.ToValueLabel(max)}" : $"const size_t len = key.length(); len < {map.ToValueLabel(min)} || len > {map.ToValueLabel(max)}")})
-                     return false;
+                     {RenderMethod(methodType)}
          """;
+
+    private static string RenderWord(ulong word, MethodType methodType) =>
+        $"""
+                 if (({word.ToStringInvariant()}ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+                     {RenderMethod(methodType)}
+         """;
+
+    private static string RenderMethod(MethodType methodType) => methodType == MethodType.TryLookup
+        ? """
+          {
+              value = nullptr;
+              return false;
+          }
+          """
+        : "return false;";
 }

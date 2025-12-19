@@ -53,7 +53,7 @@ public class KeyAnalyzerTests
     {
         StringProperties res = GetStringProperties(data);
         LengthBitArray map = res.LengthData.LengthMap;
-        Assert.Equal(data.Distinct().Count(), map.Count);
+        Assert.Equal(data.Distinct().Count(), map.BitCount);
 
         foreach (string str in data)
         {

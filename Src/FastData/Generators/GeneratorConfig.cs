@@ -2,6 +2,7 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
 using Genbox.FastData.Generators.StringHash.Framework;
+using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Generators;
@@ -10,6 +11,9 @@ namespace Genbox.FastData.Generators;
 /// <typeparam name="T">The type of data being generated.</typeparam>
 public sealed class GeneratorConfig<T>
 {
+    private const int MaxLengthBitSetWords = 4;
+    private const double MaxLengthBitSetDensity = 0.5;
+
     private GeneratorConfig(StructureType structureType, KeyType keyType, HashDetails hashDetails, GeneratorFlags flags)
     {
         StructureType = structureType;
@@ -52,6 +56,7 @@ public sealed class GeneratorConfig<T>
 
     /// <summary>Contains information about the hash function to use.</summary>
     public HashDetails HashDetails { get; }
+
     public GeneratorFlags Flags { get; }
 
     private static Constants<T> CreateConstants(KeyProperties<T> props, uint itemCount)
@@ -85,14 +90,16 @@ public sealed class GeneratorConfig<T>
         // - If lengths are consecutive (5, 6, 7, etc.) we do a range check (2 inst)
         // - If the lengths are non-consecutive (4, 9, 12, etc.) we use a small bitset (4 inst)
 
-        if (props.LengthData.Max <= 64 && !props.LengthData.LengthMap.Consecutive)
-            yield return new LengthBitSetEarlyExit(props.LengthData.LengthMap.FirstValue);
+        LengthData lengthData = props.LengthData;
+
+        if (ShouldUseBitSet(lengthData))
+            yield return new LengthBitSetEarlyExit(lengthData.LengthMap.Values);
         else
         {
-            uint minByteCount = enc == GeneratorEncoding.UTF8 ? props.LengthData.MinUtf8ByteCount : props.LengthData.MinUtf16ByteCount;
-            uint maxByteCount = enc == GeneratorEncoding.UTF8 ? props.LengthData.MaxUtf8ByteCount : props.LengthData.MaxUtf16ByteCount;
+            uint minByteCount = enc == GeneratorEncoding.UTF8 ? lengthData.MinUtf8ByteCount : lengthData.MinUtf16ByteCount;
+            uint maxByteCount = enc == GeneratorEncoding.UTF8 ? lengthData.MaxUtf8ByteCount : lengthData.MaxUtf16ByteCount;
 
-            yield return new MinMaxLengthEarlyExit(props.LengthData.Min, props.LengthData.Max, minByteCount, maxByteCount); //Also handles same lengths
+            yield return new MinMaxLengthEarlyExit(lengthData.Min, lengthData.Max, minByteCount, maxByteCount); //Also handles same lengths
         }
     }
 
@@ -107,5 +114,18 @@ public sealed class GeneratorConfig<T>
             yield break;
 
         yield return new MinMaxValueEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue);
+    }
+
+    private static bool ShouldUseBitSet(LengthData lengthData)
+    {
+        if (lengthData.LengthMap.Consecutive)
+            return false;
+
+        if (lengthData.LengthMap.Values.Length > MaxLengthBitSetWords)
+            return false;
+
+        uint range = lengthData.Max - lengthData.Min + 1;
+        double density = lengthData.LengthMap.BitCount / (double)range;
+        return density <= MaxLengthBitSetDensity;
     }
 }

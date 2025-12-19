@@ -37,7 +37,10 @@ public:
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
         if (key < 1 || key > 3)
-            return false;
+            {
+    value = nullptr;
+    return false;
+}
 
         for (size_t i = 0; i < 3; i++) {
             if (keys[i] == key) {

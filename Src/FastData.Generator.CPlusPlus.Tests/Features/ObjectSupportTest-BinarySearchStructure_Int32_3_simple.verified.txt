@@ -40,7 +40,10 @@ public:
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
         if (key < 1 || key > 3)
-            return false;
+            {
+    value = nullptr;
+    return false;
+}
 
         int32_t lo = 0;
         int32_t hi = 2;

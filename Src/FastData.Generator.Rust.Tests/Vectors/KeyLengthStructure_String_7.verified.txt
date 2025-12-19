@@ -15,7 +15,7 @@ impl KeyLengthStructure_String_7 {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        if 1012u64 & (1u64 << (key.len() - 1)) == 0 {
+        if key.len() < 3 as usize || key.len() > 10 as usize {
             return false;
         }
 

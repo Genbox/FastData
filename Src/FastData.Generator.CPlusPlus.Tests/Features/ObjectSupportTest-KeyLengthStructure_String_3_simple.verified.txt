@@ -29,7 +29,10 @@ public:
     [[nodiscard]]
     static bool try_lookup(const std::string_view key, const int32_t*& value) noexcept {
         if (const size_t len = key.length(); len < 1u || len > 3u)
-            return false;
+            {
+    value = nullptr;
+    return false;
+}
 
         size_t idx = key.length() - 1;
         if (key == keys[idx]) {

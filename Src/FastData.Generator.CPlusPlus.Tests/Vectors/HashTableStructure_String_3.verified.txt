@@ -37,8 +37,27 @@ class HashTableStructure_String_3 final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        if (const size_t len = key.length(); len < 1u || len > 255u)
+        switch (key.length() >> 6)
+        {
+            case 0:
+            if ((9ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
             return false;
+            break;
+            case 1:
+            if ((0ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+            return false;
+            break;
+            case 2:
+            if ((0ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+            return false;
+            break;
+            case 3:
+            if ((4611686018427387904ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+            return false;
+            break;
+        default:
+            return false;
+    }
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;

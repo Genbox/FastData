@@ -15,7 +15,7 @@ internal static class KeyLengthStructure_String_7
     
     public static bool Contains(string key)
     {
-        if ((1012UL & (1UL << (key.Length - 1))) == 0)
+        if (key.Length < 3u || key.Length > 10u)
             return false;
 
         return StringComparer.Ordinal.Equals(key, _keys[key.Length - 3]);

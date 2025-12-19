@@ -5,17 +5,17 @@ namespace Genbox.FastData.Internal.Analysis.Data;
 
 internal sealed class LengthBitArray(int length = 64)
 {
-    private ulong[] _array = new ulong[GetLength(length)];
     private int _length = length;
+    private ulong[] _values = new ulong[GetLength(length)];
 
-    public ulong FirstValue => _array[0];
-    public int Count { get; private set; }
+    internal ulong[] Values => _values;
+    internal int BitCount { get; private set; }
 
-    public bool Consecutive
+    internal bool Consecutive
     {
         get
         {
-            foreach (ulong val in _array)
+            foreach (ulong val in _values)
             {
                 if (!BitHelper.AreBitsConsecutive(val))
                     return false;
@@ -26,16 +26,16 @@ internal sealed class LengthBitArray(int length = 64)
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Get(int index)
+    internal bool Get(int index)
     {
         if (unchecked((uint)index >= (uint)_length))
             throw new ArgumentException("Index out of range: " + index, nameof(index));
 
-        return (_array[index >> 6] & (1UL << ((index & 63) - 1))) != 0; //-1 because we want a length of 1 to set the 0th bit
+        return (_values[index >> 6] & (1UL << ((index & 63) - 1))) != 0; //-1 because we want a length of 1 to set the 0th bit
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool SetTrue(int index)
+    internal bool SetTrue(int index)
     {
         if (index < 0)
             throw new ArgumentException("Index must be non-negative: " + index, nameof(index));
@@ -46,11 +46,11 @@ internal sealed class LengthBitArray(int length = 64)
         unchecked
         {
             ulong mask = 1UL << ((index & 63) - 1); //-1 because we want a length of 1 to set the 0th bit
-            ref ulong slot = ref _array[index >> 6];
+            ref ulong slot = ref _values[index >> 6];
             bool alreadySet = (slot & mask) != 0;
 
             if (!alreadySet)
-                Count++;
+                BitCount++;
 
             slot |= mask;
             return alreadySet;
@@ -61,8 +61,8 @@ internal sealed class LengthBitArray(int length = 64)
     {
         int newSize = GetLength(newLength);
 
-        if (newSize > _array.Length)
-            Array.Resize(ref _array, newSize);
+        if (newSize > _values.Length)
+            Array.Resize(ref _values, newSize);
 
         _length = newLength;
     }

@@ -49,7 +49,7 @@ Input `cow pig cat`
 It will produce: `if (value.Length != 3) return false;`
 
 ### Length bitmap early exit
-FastData can also sometimes produce a bitmap of value lengths. It basically map lengths into a 64bit integer and check if the corresponding bit is set.
+FastData can also sometimes produce a bitmap of value lengths. It basically map lengths into a 64bit integer and check if the corresponding bit is set. For larger ranges, it can emit a multi-word bitset.
 Input: `stable softice sophisticated santa`
 
 It generates this early exit: `if ((4208UL & (1UL << (value.Length - 1))) == 0) return false;`

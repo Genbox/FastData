@@ -32,7 +32,7 @@ public abstract class EarlyExitDef : IEarlyExitDef
         return sb.ToString();
     }
 
-    protected abstract string GetMaskEarlyExit(MethodType methodType, ulong bitSet);
+    protected abstract string GetMaskEarlyExit(MethodType methodType, ulong[] bitSet);
     protected abstract string GetValueEarlyExits<T>(MethodType methodType, T min, T max);
     protected abstract string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte);
 }

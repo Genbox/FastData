@@ -10,42 +10,62 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
 {
     protected override bool IsEnabled => !options.HasFlag(CSharpOptions.DisableEarlyExits);
 
-    protected override string GetMaskEarlyExit(MethodType methodType, ulong bitSet) => methodType == MethodType.Contains
-        ? $"""
-                   if (({bitSet}UL & (1UL << (key.Length - 1))) == 0)
-                       return false;
-           """
-        : $$"""
-                    if (({{bitSet}}UL & (1UL << (key.Length - 1))) == 0)
-                    {
-                        value = default;
-                        return false;
-                    }
-            """;
+    protected override string GetMaskEarlyExit(MethodType methodType, ulong[] bitSet)
+    {
+        if (bitSet.Length == 1)
+            return RenderWord(bitSet[0], methodType);
 
-    protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) => methodType == MethodType.Contains
-        ? $"""
-                   if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
-                       return false;
-           """
-        : $$"""
-                    if ({{(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")}})
-                    {
-                        value = default;
-                        return false;
-                    }
-            """;
+        StringBuilder sb = new StringBuilder();
 
-    protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) => methodType == MethodType.Contains
-        ? $"""
-                   if ({(min.Equals(max) ? $"key.Length != {map.ToValueLabel(max)}" : $"key.Length < {map.ToValueLabel(min)} || key.Length > {map.ToValueLabel(max)}")})
-                       return false;
-           """
-        : $$"""
-                    if ({{(min.Equals(max) ? $"key.Length != {map.ToValueLabel(max)}" : $"key.Length < {map.ToValueLabel(min)} || key.Length > {map.ToValueLabel(max)}")}})
-                    {
-                        value = default;
-                        return false;
-                    }
-            """;
+        sb.Append("""
+                          switch (key.Length >> 6)
+                          {
+                  """);
+
+        for (int i = 0; i < bitSet.Length; i++)
+        {
+            sb.Append($"""
+
+                                   case {i.ToStringInvariant()}:
+                       {RenderWord(bitSet[i], methodType)}
+                                   break;
+                       """);
+        }
+
+        sb.Append($$"""
+
+                                default:
+                                    {{RenderMethod(methodType)}}
+                        }
+                    """);
+
+        return sb.ToString();
+    }
+
+    protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) =>
+        $"""
+                 if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
+         {RenderMethod(methodType)}
+         """;
+
+    protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
+        $"""
+                 if ({(min.Equals(max) ? $"key.Length != {map.ToValueLabel(max)}" : $"key.Length < {map.ToValueLabel(min)} || key.Length > {map.ToValueLabel(max)}")})
+         {RenderMethod(methodType)}
+         """;
+
+    private static string RenderWord(ulong word, MethodType methodType) =>
+        $"""
+                         if (({word.ToStringInvariant()}UL & (1UL << ((key.Length - 1) & 63))) == 0)
+         {RenderMethod(methodType)}
+         """;
+
+    private static string RenderMethod(MethodType methodType) => methodType == MethodType.TryLookup
+        ? """
+                  {
+                      value = default;
+                      return false;
+                  }
+          """
+        : "            return false;";
 }

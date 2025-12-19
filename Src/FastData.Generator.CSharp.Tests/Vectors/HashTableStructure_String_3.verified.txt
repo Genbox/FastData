@@ -53,8 +53,27 @@ internal static class HashTableStructure_String_3
     
     public static bool Contains(string key)
     {
-        if (key.Length < 1u || key.Length > 255u)
+        switch (key.Length >> 6)
+        {
+            case 0:
+                if ((9UL & (1UL << ((key.Length - 1) & 63))) == 0)
             return false;
+            break;
+            case 1:
+                if ((0UL & (1UL << ((key.Length - 1) & 63))) == 0)
+            return false;
+            break;
+            case 2:
+                if ((0UL & (1UL << ((key.Length - 1) & 63))) == 0)
+            return false;
+            break;
+            case 3:
+                if ((4611686018427387904UL & (1UL << ((key.Length - 1) & 63))) == 0)
+            return false;
+            break;
+            default:
+                            return false;
+    }
 
         ulong hash = Hash(key);
         uint index = (uint)(hash % 3);
