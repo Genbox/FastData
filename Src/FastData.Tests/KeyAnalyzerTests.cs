@@ -7,40 +7,40 @@ namespace Genbox.FastData.Tests;
 public class KeyAnalyzerTests
 {
     [Fact]
-    public void GetProperties_IsContiguous_AllPrimitiveTypes()
+    public void GetProperties_IsConsecutive_Test()
     {
-        Assert.True(GetProperties(['a', 'b', 'c']).IsContiguous);
-        Assert.False(GetProperties(['a', 'c']).IsContiguous);
+        Assert.True(GetProperties(['a', 'b', 'c']).IsConsecutive);
+        Assert.False(GetProperties(['a', 'c']).IsConsecutive);
 
-        Assert.True(GetProperties(new sbyte[] { -1, 0, 1 }).IsContiguous);
-        Assert.False(GetProperties(new sbyte[] { -1, 1, 2 }).IsContiguous);
+        Assert.True(GetProperties(new sbyte[] { -1, 0, 1 }).IsConsecutive);
+        Assert.False(GetProperties(new sbyte[] { -1, 1, 2 }).IsConsecutive);
 
-        Assert.True(GetProperties(new byte[] { 1, 2, 3 }).IsContiguous);
-        Assert.False(GetProperties(new byte[] { 1, 3, 4 }).IsContiguous);
+        Assert.True(GetProperties(new byte[] { 1, 2, 3 }).IsConsecutive);
+        Assert.False(GetProperties(new byte[] { 1, 3, 4 }).IsConsecutive);
 
-        Assert.True(GetProperties(new short[] { 10, 11, 12 }).IsContiguous);
-        Assert.False(GetProperties(new short[] { 10, 11, 13 }).IsContiguous);
+        Assert.True(GetProperties(new short[] { 10, 11, 12 }).IsConsecutive);
+        Assert.False(GetProperties(new short[] { 10, 11, 13 }).IsConsecutive);
 
-        Assert.True(GetProperties(new ushort[] { 10, 11, 12 }).IsContiguous);
-        Assert.False(GetProperties(new ushort[] { 10, 11, 13 }).IsContiguous);
+        Assert.True(GetProperties(new ushort[] { 10, 11, 12 }).IsConsecutive);
+        Assert.False(GetProperties(new ushort[] { 10, 11, 13 }).IsConsecutive);
 
-        Assert.True(GetProperties([100, 101]).IsContiguous);
-        Assert.False(GetProperties([100, 102]).IsContiguous);
+        Assert.True(GetProperties([100, 101]).IsConsecutive);
+        Assert.False(GetProperties([100, 102]).IsConsecutive);
 
-        Assert.True(GetProperties([100u, 101u]).IsContiguous);
-        Assert.False(GetProperties([100u, 102u]).IsContiguous);
+        Assert.True(GetProperties([100u, 101u]).IsConsecutive);
+        Assert.False(GetProperties([100u, 102u]).IsConsecutive);
 
-        Assert.True(GetProperties([long.MaxValue - 2, long.MaxValue - 1, long.MaxValue]).IsContiguous);
-        Assert.False(GetProperties([1L, 3L, 4L]).IsContiguous);
+        Assert.True(GetProperties([long.MaxValue - 2, long.MaxValue - 1, long.MaxValue]).IsConsecutive);
+        Assert.False(GetProperties([1L, 3L, 4L]).IsConsecutive);
 
-        Assert.True(GetProperties([1ul, 2ul, 3ul]).IsContiguous);
-        Assert.False(GetProperties([1ul, 2ul, 4ul]).IsContiguous);
+        Assert.True(GetProperties([1ul, 2ul, 3ul]).IsConsecutive);
+        Assert.False(GetProperties([1ul, 2ul, 4ul]).IsConsecutive);
 
-        Assert.True(GetProperties([0.5f, 1.5f, 2.5f]).IsContiguous);
-        Assert.False(GetProperties([0f, 0.9f, 2f]).IsContiguous);
+        Assert.True(GetProperties([0.5f, 1.5f, 2.5f]).IsConsecutive);
+        Assert.False(GetProperties([0f, 0.9f, 2f]).IsConsecutive);
 
-        Assert.True(GetProperties([0.5d, 1.5d, 2.5d]).IsContiguous);
-        Assert.False(GetProperties([0d, 0.9d, 2d]).IsContiguous);
+        Assert.True(GetProperties([0.5d, 1.5d, 2.5d]).IsConsecutive);
+        Assert.False(GetProperties([0d, 0.9d, 2d]).IsConsecutive);
     }
 
     [Theory]

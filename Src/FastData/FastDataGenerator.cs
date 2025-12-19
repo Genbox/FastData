@@ -90,8 +90,8 @@ public static partial class FastDataGenerator
                 if (keys.Length == 1)
                     return GenerateWrapper(generator, genCfg, new SingleValueStructure<TKey, TValue>(), keys, values);
 
-                // RangeStructure handles contiguous keys; keyed lookups are limited to integer-like key types for now.
-                if (props.IsContiguous && (values == null || keyType is not (KeyType.Single or KeyType.Double or KeyType.String)))
+                // RangeStructure handles consecutive keys; keyed lookups are limited to integer-like key types.
+                if (props.IsConsecutive && (values == null || SupportsKeyedRange(keyType)))
                     return GenerateWrapper(generator, genCfg, new RangeStructure<TKey, TValue>(), keys, values);
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
@@ -224,6 +224,8 @@ public static partial class FastDataGenerator
         TContext res = structure.Create(keys, values);
         return generator.Generate(genCfg, res);
     }
+
+    private static bool SupportsKeyedRange(KeyType keyType) => keyType is not (KeyType.Single or KeyType.Double or KeyType.String);
 
     internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, GeneratorEncoding encoding, bool includeDefault)
     {
