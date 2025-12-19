@@ -135,6 +135,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Docs", "_Docs", "{F499974F
 		Docs\DataStructures.md = Docs\DataStructures.md
 		Docs\HowWork.md = Docs\HowWork.md
 		Docs\Optimizations.md = Docs\Optimizations.md
+		AGENTS.md = AGENTS.md
 	EndProjectSection
 EndProject
 Global
