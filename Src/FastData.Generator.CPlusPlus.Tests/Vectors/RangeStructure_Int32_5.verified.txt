@@ -7,7 +7,7 @@
 #include <string_view>
 
 class RangeStructure_Int32_5 final {
-public:
+  public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
         return key >= min_key && key <= max_key;

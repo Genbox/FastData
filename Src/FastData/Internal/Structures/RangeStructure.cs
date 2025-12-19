@@ -7,6 +7,13 @@ internal sealed class RangeStructure<TKey, TValue> : IStructure<TKey, TValue, Ra
 {
     public RangeContext<TKey, TValue> Create(TKey[] keys, TValue[]? values)
     {
-        return new RangeContext<TKey, TValue>();
+        if (values == null)
+            return new RangeContext<TKey, TValue>(values);
+
+        if (keys.Length != values.Length)
+            throw new InvalidOperationException("The number of values does not match the number of keys.");
+
+        Array.Sort(keys, values); // Sort in-place because the structure is already chosen and now have ownership
+        return new RangeContext<TKey, TValue>(values);
     }
 }

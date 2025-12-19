@@ -90,9 +90,8 @@ public static partial class FastDataGenerator
                 if (keys.Length == 1)
                     return GenerateWrapper(generator, genCfg, new SingleValueStructure<TKey, TValue>(), keys, values);
 
-                // RangeStructure is only used for key-only generation (Contains).
-                // For keyed generation we still need a lookup structure.
-                if (values == null && props.IsContiguous)
+                // RangeStructure handles contiguous keys; keyed lookups are limited to integer-like key types for now.
+                if (props.IsContiguous && (values == null || keyType is not (KeyType.Single or KeyType.Double or KeyType.String)))
                     return GenerateWrapper(generator, genCfg, new RangeStructure<TKey, TValue>(), keys, values);
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.

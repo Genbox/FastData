@@ -75,7 +75,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
     protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context) => context switch
     {
         SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, _cfg, Shared),
-        RangeContext<TKey, TValue> => new RangeCode<TKey>(_cfg),
+        RangeContext<TKey, TValue> x => new RangeCode<TKey, TValue>(x, _cfg, Shared),
         ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, _cfg, Shared),
         BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, _cfg, Shared),
         ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, _cfg, Shared),

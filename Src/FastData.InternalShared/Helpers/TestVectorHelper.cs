@@ -54,7 +54,8 @@ public static class TestVectorHelper
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableStructure<,>),
-                     typeof(HashTablePerfectStructure<,>)))
+                     typeof(HashTablePerfectStructure<,>),
+                     typeof(RangeStructure<,>)))
         {
             yield return testVector;
         }
@@ -63,9 +64,7 @@ public static class TestVectorHelper
     public static IEnumerable<ITestVector> GetTestVectors()
     {
         foreach (ITestVector testVector in GenerateTestVectors(GetSingleValues(), null, typeof(SingleValueStructure<,>)))
-        {
             yield return testVector;
-        }
 
         foreach (ITestVector testVector in GenerateTestVectors(GetEdgeCaseValues(), null,
                      typeof(ArrayStructure<,>),
@@ -87,14 +86,10 @@ public static class TestVectorHelper
 
         // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
         foreach (ITestVector testVector in GenerateTestVectors([["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]], typeof(KeyLengthStructure<,>)))
-        {
             yield return testVector;
-        }
 
         foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], typeof(HashTablePerfectStructure<,>)))
-        {
             yield return testVector;
-        }
 
         // Strings with characters that are not in the ASCII range
         foreach (ITestVector testVector in GenerateTestVectors([["æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", "ñ", "ø", "å"]],
@@ -106,11 +101,9 @@ public static class TestVectorHelper
             yield return testVector;
         }
 
-        // Test range support
+        // Test range support. Keys have to be without gaps
         foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], typeof(RangeStructure<,>)))
-        {
             yield return testVector;
-        }
     }
 
     public static IEnumerable<ITestData> GetBenchmarkData()

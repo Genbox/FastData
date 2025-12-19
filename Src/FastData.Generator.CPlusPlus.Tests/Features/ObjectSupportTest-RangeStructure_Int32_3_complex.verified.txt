@@ -1,0 +1,41 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (Range)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+struct Person {
+    int32_t age;
+    std::u32string_view name;
+    const Person* other;
+
+    constexpr Person(const int32_t age, const std::u32string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
+};
+class RangeStructure_Int32_3_complex final {
+    inline static const std::array<Person*, 3> values = {
+        new Person(1, U"Bob", new Person(4, U"Anna", nullptr)), new Person(2, U"Billy", nullptr), new Person(3, U"Bibi", nullptr)
+    };
+  public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+        return key >= min_key && key <= max_key;
+    }
+    [[nodiscard]]
+    static bool try_lookup(const int32_t key, const Person*& value) noexcept {
+        if (key < min_key || key > max_key)
+        {
+            value = nullptr;
+            return false;
+        }
+
+        const size_t index = static_cast<size_t>(key - min_key);
+        value = values[index];
+        return true;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 3;
+};

@@ -1,37 +1,56 @@
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.Enums;
+using Genbox.FastData.Generator.Extensions;
+using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class RangeCode<TKey> : CPlusPlusOutputWriter<TKey>
+internal sealed class RangeCode<TKey, TValue>(RangeContext<TKey, TValue> ctx, SharedCode shared) : CPlusPlusOutputWriter<TKey>
 {
     public override string Generate()
     {
+        bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
 
-        string? nanGuard = GeneratorConfig.KeyType switch
+        if (ctx.Values != null)
         {
-            KeyType.Single or KeyType.Double => """
-                                                if (key != key)
-                                                    return false;
-                                                """,
-            _ => null
-        };
+            sb.Append($$"""
+                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
+                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            };
+
+                        """);
+        }
 
         sb.Append($$"""
-                    public:
+                      public:
                         {{MethodAttribute}}
                         {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
+                            return key >= min_key && key <= max_key;
+                        }
                     """);
 
-        if (nanGuard != null)
-            sb.AppendLine(nanGuard);
+        if (ctx.Values != null)
+        {
+            string ptr = customValue ? "" : "&";
+            shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
-        sb.Append("""
+            sb.Append($$"""
 
-                          return key >= min_key && key <= max_key;
-                      }
-                  """);
+                            {{MethodAttribute}}
+                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
+                                if (key < min_key || key > max_key)
+                                {
+                                    value = nullptr;
+                                    return false;
+                                }
+
+                                const {{ArraySizeType}} index = static_cast<{{ArraySizeType}}>(key - min_key);
+                                value = {{ptr}}values[index];
+                                return true;
+                            }
+                        """);
+        }
 
         return sb.ToString();
     }

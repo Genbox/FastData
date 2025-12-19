@@ -1,0 +1,42 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (Range)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct RangeStructure_Int32_3_complex;
+pub struct Person {
+    pub age: i32,
+    pub name: &'static str,
+    pub other: Option<&'static Person>,
+
+}
+
+impl Person {
+    pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
+}
+
+impl RangeStructure_Int32_3_complex {
+   const VALUES: [&'static Person; 3] = [
+        &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
+    ];
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+        return key >= Self::MIN_KEY && key <= Self::MAX_KEY;
+    }
+    #[must_use]
+    pub fn try_lookup(key: i32) -> Option<&'static Person> {
+        if key < Self::MIN_KEY || key > Self::MAX_KEY {
+            return None;
+        }
+
+        let index = ((key as i64) - (Self::MIN_KEY as i64)) as usize;
+        Some(Self::VALUES[index])
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 3;
+}
