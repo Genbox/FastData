@@ -1,0 +1,60 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (HashTableCompact)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashTableCompactStructure_Int32_5 final {
+    struct e {
+        int32_t key;
+        
+        
+        e(const int32_t key)
+           : key(key) {}
+    };
+
+    static constexpr std::array<uint8_t, 5> bucket_starts = {
+        0, 2, 3, 4, 5
+     };
+
+    static constexpr std::array<uint8_t, 5> bucket_counts = {
+        2, 1, 1, 1, 0
+     };
+
+    inline static const std::array<e, 5> entries = {
+        e(-1), e(0), e(1), e(std::numeric_limits<int32_t>::max()), e(std::numeric_limits<int32_t>::lowest())
+    };
+
+    static constexpr uint64_t get_hash(const int32_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+        if (key < std::numeric_limits<int32_t>::lowest() || key > std::numeric_limits<int32_t>::max())
+            return false;
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 5;
+        const size_t start = static_cast<size_t>(bucket_starts[index]);
+        const size_t count = static_cast<size_t>(bucket_counts[index]);
+        const size_t end = start + count;
+
+        for (size_t i = start; i < end; i++) {
+            const auto& entry = entries[i];
+
+            if (entry.key == key)
+                return true;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int32_t min_key = std::numeric_limits<int32_t>::lowest();
+    static constexpr int32_t max_key = std::numeric_limits<int32_t>::max();
+};

@@ -71,7 +71,8 @@ public static class TestVectorHelper
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
-                     typeof(HashTableStructure<,>)))
+                     typeof(HashTableStructure<,>),
+                     typeof(HashTableCompactStructure<,>)))
         {
             yield return testVector;
         }
@@ -80,7 +81,8 @@ public static class TestVectorHelper
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
-                     typeof(HashTableStructure<,>)))
+                     typeof(HashTableStructure<,>),
+                     typeof(HashTableCompactStructure<,>)))
         {
             yield return testVector;
         }
@@ -97,6 +99,7 @@ public static class TestVectorHelper
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
+                     typeof(HashTableCompactStructure<,>),
                      typeof(HashTableStructure<,>)))
         {
             yield return testVector;

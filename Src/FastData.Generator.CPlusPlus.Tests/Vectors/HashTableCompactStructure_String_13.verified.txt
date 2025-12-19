@@ -1,0 +1,68 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (HashTableCompact)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashTableCompactStructure_String_13 final {
+    struct e {
+        std::u32string_view key;
+        uint64_t hash_code;
+        
+        e(const std::u32string_view key, const uint64_t hash_code)
+           : key(key), hash_code(hash_code) {}
+    };
+
+    static constexpr std::array<uint8_t, 13> bucket_starts = {
+        0, 2, 4, 6, 6, 7, 8, 9, 10, 13, 
+        13, 13, 13
+     };
+
+    static constexpr std::array<uint8_t, 13> bucket_counts = {
+        2, 2, 2, 0, 1, 1, 1, 1, 3, 0, 
+        0, 0, 0
+     };
+
+    inline static const std::array<e, 13> entries = {
+        e(U"ö", 18225461004491987194), e(U"ß", 18225461065569260893), e(U"è", 18225461001359819312), e(U"å", 18225460981000728079), e(U"ê", 18225460998227651430), e(U"ç", 18225460977868560197), e(U"ñ", 18225461012322406899), e(U"à", 18225460988831147784), e(U"ø", 18225461026417162368), e(U"ä", 18225460982566812020), 
+        e(U"æ", 18225460979434644138), e(U"ü", 18225461020152826604), e(U"é", 18225460999793735371)
+    };
+
+    static constexpr uint64_t get_hash(const std::u32string_view value) noexcept
+    {
+    uint64_t hash = 352654597;
+
+    for (char32_t ch : value)
+        hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+
+    return 352654597 + (hash * 1566083941);
+    }
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const std::u32string_view key) noexcept {
+        if (key.length() != 1u)
+            return false;
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 13;
+        const size_t start = static_cast<size_t>(bucket_starts[index]);
+        const size_t count = static_cast<size_t>(bucket_counts[index]);
+        const size_t end = start + count;
+
+        for (size_t i = start; i < end; i++) {
+            const auto& entry = entries[i];
+
+            if (entry.hash_code == hash && entry.key == key)
+                return true;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 13;
+    static constexpr size_t min_key_length = 1;
+    static constexpr size_t max_key_length = 1;
+};

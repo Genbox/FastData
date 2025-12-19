@@ -1,0 +1,96 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (HashTableCompact)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashTableCompactStructure_String_100;
+
+impl HashTableCompactStructure_String_100 {
+    const BUCKET_STARTS: [u8; 100] = [
+        0, 4, 5, 7, 7, 7, 7, 8, 11, 12, 
+        12, 12, 12, 14, 16, 17, 18, 18, 18, 21, 
+        23, 24, 24, 24, 27, 28, 31, 33, 33, 33, 
+        34, 36, 38, 38, 38, 38, 38, 40, 42, 42, 
+        42, 42, 44, 45, 46, 46, 46, 46, 46, 49, 
+        52, 52, 53, 53, 53, 55, 56, 57, 57, 57, 
+        61, 63, 65, 65, 65, 68, 69, 72, 73, 73, 
+        73, 74, 76, 78, 79, 79, 79, 79, 82, 84, 
+        85, 85, 85, 87, 88, 89, 91, 91, 91, 91, 
+        93, 96, 96, 97, 97, 97, 99, 100, 100, 100
+    ];
+
+    const BUCKET_COUNTS: [u8; 100] = [
+        4, 1, 2, 0, 0, 0, 1, 3, 1, 0, 
+        0, 0, 2, 2, 1, 1, 0, 0, 3, 2, 
+        1, 0, 0, 3, 1, 3, 2, 0, 0, 1, 
+        2, 2, 0, 0, 0, 0, 2, 2, 0, 0, 
+        0, 2, 1, 1, 0, 0, 0, 0, 3, 3, 
+        0, 1, 0, 0, 2, 1, 1, 0, 0, 4, 
+        2, 2, 0, 0, 3, 1, 3, 1, 0, 0, 
+        1, 2, 2, 1, 0, 0, 0, 3, 2, 1, 
+        0, 0, 2, 1, 1, 2, 0, 0, 0, 2, 
+        3, 0, 1, 0, 0, 2, 1, 0, 0, 0
+    ];
+
+    const ENTRIES: [E; 100] = [
+        E { hash_code: 18225461107853527300, key: "4" }, E { hash_code: 11144406308198181600, key: "46" }, E { hash_code: 11144406151589787500, key: "53" }, E { hash_code: 11144406308198181600, key: "68" }, E { hash_code: 11144406716946090201, key: "90" }, E { hash_code: 11144406342652028302, key: "19" }, E { hash_code: 11144406499260422402, key: "22" }, E { hash_code: 11144406881384904006, key: "88" }, E { hash_code: 11144406350482448007, key: "16" }, E { hash_code: 11144406507090842107, key: "25" }, 
+        E { hash_code: 11144406350482448007, key: "30" }, E { hash_code: 11144406289405174308, key: "64" }, E { hash_code: 11144406358312867712, key: "13" }, E { hash_code: 11144406358312867712, key: "35" }, E { hash_code: 11144406297235594013, key: "41" }, E { hash_code: 11144406140627199913, key: "72" }, E { hash_code: 11144406862591896714, key: "84" }, E { hash_code: 11144406488297834815, key: "29" }, E { hash_code: 18225461104721359418, key: "6" }, E { hash_code: 11144406305066013718, key: "44" }, 
+        E { hash_code: 11144406148457619618, key: "51" }, E { hash_code: 11144406870422316419, key: "83" }, E { hash_code: 11144406713813922319, key: "96" }, E { hash_code: 11144406339519860420, key: "39" }, E { hash_code: 18225461112551779123, key: "1" }, E { hash_code: 11144406156288039323, key: "56" }, E { hash_code: 11144406156288039323, key: "78" }, E { hash_code: 11144406721644342024, key: "93" }, E { hash_code: 11144406347350280125, key: "14" }, E { hash_code: 11144406503958674225, key: "27" }, 
+        E { hash_code: 11144406347350280125, key: "32" }, E { hash_code: 11144406286273006426, key: "48" }, E { hash_code: 11144406286273006426, key: "66" }, E { hash_code: 11144406729474761729, key: "98" }, E { hash_code: 11144406355180699830, key: "11" }, E { hash_code: 11144406355180699830, key: "37" }, E { hash_code: 11144406294103426131, key: "61" }, E { hash_code: 11144406137495032031, key: "74" }, E { hash_code: 11144406301933845836, key: "42" }, E { hash_code: 11144406145325451736, key: "71" }, 
+        E { hash_code: 11144406867290148537, key: "81" }, E { hash_code: 11144406710681754437, key: "94" }, E { hash_code: 18225461109419611241, key: "3" }, E { hash_code: 11144406153155871441, key: "54" }, E { hash_code: 11144406718512174142, key: "91" }, E { hash_code: 11144406500826506343, key: "21" }, E { hash_code: 11144406352048531948, key: "17" }, E { hash_code: 11144406508656926048, key: "24" }, E { hash_code: 11144406352048531948, key: "31" }, E { hash_code: 11144406134362864149, key: "58" }, 
+        E { hash_code: 11144406290971258249, key: "63" }, E { hash_code: 11144406134362864149, key: "76" }, E { hash_code: 18225461125080450651, key: "9" }, E { hash_code: 11144406298801677954, key: "40" }, E { hash_code: 11144406142193283854, key: "73" }, E { hash_code: 11144406864157980655, key: "87" }, E { hash_code: 11144406489863918756, key: "28" }, E { hash_code: 18225461106287443359, key: "5" }, E { hash_code: 11144406306632097659, key: "47" }, E { hash_code: 11144406150023703559, key: "52" }, 
+        E { hash_code: 11144406306632097659, key: "69" }, E { hash_code: 11144406871988400360, key: "82" }, E { hash_code: 11144406715380006260, key: "97" }, E { hash_code: 11144406341085944361, key: "18" }, E { hash_code: 11144406497694338461, key: "23" }, E { hash_code: 18225461114117863064, key: "0" }, E { hash_code: 11144406157854123264, key: "57" }, E { hash_code: 11144406157854123264, key: "79" }, E { hash_code: 11144406879818820065, key: "89" }, E { hash_code: 11144406348916364066, key: "15" }, 
+        E { hash_code: 11144406505524758166, key: "26" }, E { hash_code: 11144406348916364066, key: "33" }, E { hash_code: 11144406287839090367, key: "65" }, E { hash_code: 11144406731040845670, key: "99" }, E { hash_code: 11144406356746783771, key: "12" }, E { hash_code: 11144406356746783771, key: "34" }, E { hash_code: 11144406295669510072, key: "60" }, E { hash_code: 11144406139061115972, key: "75" }, E { hash_code: 11144406861025812773, key: "85" }, E { hash_code: 18225461103155275477, key: "7" }, 
+        E { hash_code: 11144406303499929777, key: "45" }, E { hash_code: 11144406146891535677, key: "50" }, E { hash_code: 11144406868856232478, key: "80" }, E { hash_code: 11144406712247838378, key: "95" }, E { hash_code: 11144406337953776479, key: "38" }, E { hash_code: 18225461110985695182, key: "2" }, E { hash_code: 11144406154721955382, key: "55" }, E { hash_code: 11144406720078258083, key: "92" }, E { hash_code: 11144406502392590284, key: "20" }, E { hash_code: 11144406284706922485, key: "49" }, 
+        E { hash_code: 11144406284706922485, key: "67" }, E { hash_code: 11144406353614615889, key: "10" }, E { hash_code: 11144406353614615889, key: "36" }, E { hash_code: 11144406135928948090, key: "59" }, E { hash_code: 11144406292537342190, key: "62" }, E { hash_code: 11144406135928948090, key: "77" }, E { hash_code: 18225461126646534592, key: "8" }, E { hash_code: 11144406300367761895, key: "43" }, E { hash_code: 11144406143759367795, key: "70" }, E { hash_code: 11144406865724064596, key: "86" }
+    ];
+
+    #[inline]
+    unsafe fn get_hash(value: &str) -> u64 {
+        let mut hash: u64 = 352654597;
+
+        let mut ptr = value.as_ptr();
+        let mut len = value.len();
+
+         while len > 0 {
+                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
+                ptr = ptr.add(1);
+                len -= 1;
+         }
+
+        hash.wrapping_mul(1566083941).wrapping_add(352654597)
+    }
+
+    #[must_use]
+    pub fn contains(key: &'static str) -> bool {
+        if key.len() < 1 as usize || key.len() > 2 as usize {
+            return false;
+        }
+
+        let hash = unsafe { Self::get_hash(key) };
+        let index = hash % 100;
+        let start = Self::BUCKET_STARTS[index as usize] as usize;
+        let count = Self::BUCKET_COUNTS[index as usize] as usize;
+        let end = start + count;
+
+        for i in start..end {
+            let entry = &Self::ENTRIES[i];
+            if entry.hash_code == hash && entry.key == key {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 100;
+    pub const MIN_KEY_LENGTH: usize = 1;
+    pub const MAX_KEY_LENGTH: usize = 2;
+}struct E {
+    hash_code: u64,
+    key: &'static str,
+    
+}

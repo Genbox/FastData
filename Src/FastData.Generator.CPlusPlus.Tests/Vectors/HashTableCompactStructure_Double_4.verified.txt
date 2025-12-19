@@ -1,0 +1,64 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (HashTableCompact)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashTableCompactStructure_Double_4 final {
+    struct e {
+        double key;
+        uint64_t hash_code;
+        
+        e(const double key, const uint64_t hash_code)
+           : key(key), hash_code(hash_code) {}
+    };
+
+    static constexpr std::array<uint8_t, 4> bucket_starts = {
+        0, 2, 2, 2
+     };
+
+    static constexpr std::array<uint8_t, 4> bucket_counts = {
+        2, 0, 0, 2
+     };
+
+    inline static const std::array<e, 4> entries = {
+        e(0.0, 0), e(1.0, 4607182418800017408), e(std::numeric_limits<double>::lowest(), 18442240474082181119), e(std::numeric_limits<double>::max(), 9218868437227405311)
+    };
+
+    static uint64_t get_hash(const double value) noexcept
+    {
+        uint64_t bits;
+        std::memcpy(&bits, &value, sizeof(bits));
+        if (((bits - 1) & ~0x8000000000000000ull) >= 0x7FF0000000000000ull)
+            bits &= 0x7FF0000000000000ull;
+        return bits;
+    }
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const double key) noexcept {
+        if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())
+            return false;
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 4;
+        const size_t start = static_cast<size_t>(bucket_starts[index]);
+        const size_t count = static_cast<size_t>(bucket_counts[index]);
+        const size_t end = start + count;
+
+        for (size_t i = start; i < end; i++) {
+            const auto& entry = entries[i];
+
+            if (entry.hash_code == hash && entry.key == key)
+                return true;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 4;
+    static constexpr double min_key = std::numeric_limits<double>::lowest();
+    static constexpr double max_key = std::numeric_limits<double>::max();
+};

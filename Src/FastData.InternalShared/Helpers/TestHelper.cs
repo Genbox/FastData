@@ -184,6 +184,8 @@ public static class TestHelper
             return Generate(generator, vector, props, keyType, StructureType.Auto, new RangeStructure<TKey, TValue>(), values);
         if (vector.Type == typeof(BitSetStructure<,>))
             return Generate(generator, vector, props, keyType, StructureType.Auto, new BitSetStructure<TKey, TValue>((KeyProperties<TKey>)props, keyType), values);
+        if (vector.Type == typeof(HashTableCompactStructure<,>))
+            return Generate(generator, vector, props, keyType, StructureType.Auto, new HashTableCompactStructure<TKey, TValue>(GetHashData(vector, keyType, encoding), keyType), values);
 
         throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
     }

@@ -1,0 +1,65 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Auto (HashTableCompact)
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class HashTableCompactStructure_String_3 final {
+    struct e {
+        std::string_view key;
+        uint64_t hash_code;
+        
+        e(const std::string_view key, const uint64_t hash_code)
+           : key(key), hash_code(hash_code) {}
+    };
+
+    static constexpr std::array<uint8_t, 3> bucket_starts = {
+        0, 1, 3
+     };
+
+    static constexpr std::array<uint8_t, 3> bucket_counts = {
+        1, 2, 0
+     };
+
+    inline static const std::array<e, 3> entries = {
+        e("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 9198652691199425319), e("a", 18225461187723808291), e("item", 16750939634977259983)
+    };
+
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept
+    {
+    uint64_t hash = 352654597;
+
+    for (char32_t ch : value)
+        hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+
+    return 352654597 + (hash * 1566083941);
+    }
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const std::string_view key) noexcept {
+        if (const size_t len = key.length(); len < 1u || len > 255u)
+            return false;
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 3;
+        const size_t start = static_cast<size_t>(bucket_starts[index]);
+        const size_t count = static_cast<size_t>(bucket_counts[index]);
+        const size_t end = start + count;
+
+        for (size_t i = start; i < end; i++) {
+            const auto& entry = entries[i];
+
+            if (entry.hash_code == hash && entry.key == key)
+                return true;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr size_t min_key_length = 1;
+    static constexpr size_t max_key_length = 255;
+};

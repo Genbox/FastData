@@ -1,0 +1,63 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (HashTableCompact)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashTableCompactStructure_Double_4;
+
+impl HashTableCompactStructure_Double_4 {
+    const BUCKET_STARTS: [u8; 4] = [
+        0, 2, 2, 2
+    ];
+
+    const BUCKET_COUNTS: [u8; 4] = [
+        2, 0, 0, 2
+    ];
+
+    const ENTRIES: [E; 4] = [
+        E { hash_code: 0, key: 0.0 }, E { hash_code: 4607182418800017408, key: 1.0 }, E { hash_code: 18442240474082181119, key: f64::MIN }, E { hash_code: 9218868437227405311, key: f64::MAX }
+    ];
+
+    #[inline(always)]
+    fn get_hash(value: f64) -> u64 {
+        let mut bits = value.to_bits();
+
+        if ((bits.wrapping_sub(1)) & !0x8000_0000_0000_0000) >= 0x7FF0_0000_0000_0000 {
+            bits &= 0x7FF0_0000_0000_0000;
+        }
+        bits
+    }
+
+    #[must_use]
+    pub fn contains(key: f64) -> bool {
+        if key < f64::MIN || key > f64::MAX {
+            return false;
+        }
+
+        let hash = unsafe { Self::get_hash(key) };
+        let index = hash % 4;
+        let start = Self::BUCKET_STARTS[index as usize] as usize;
+        let count = Self::BUCKET_COUNTS[index as usize] as usize;
+        let end = start + count;
+
+        for i in start..end {
+            let entry = &Self::ENTRIES[i];
+            if entry.hash_code == hash && entry.key == key {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 4;
+    pub const MIN_KEY: f64 = f64::MIN;
+    pub const MAX_KEY: f64 = f64::MAX;
+}struct E {
+    hash_code: u64,
+    key: f64,
+    
+}

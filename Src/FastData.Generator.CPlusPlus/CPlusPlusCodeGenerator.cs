@@ -70,6 +70,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, Shared),
         ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, Shared),
         HashTableContext<TKey, TValue> x => new HashTableCode<TKey, TValue>(x, Shared),
+        HashTableCompactContext<TKey, TValue> x => new HashTableCompactCode<TKey, TValue>(x, Shared),
         HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, Shared),
         KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, Shared),
         _ => null

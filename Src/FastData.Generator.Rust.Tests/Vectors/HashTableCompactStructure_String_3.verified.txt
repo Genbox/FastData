@@ -1,0 +1,69 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (HashTableCompact)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashTableCompactStructure_String_3;
+
+impl HashTableCompactStructure_String_3 {
+    const BUCKET_STARTS: [u8; 3] = [
+        0, 1, 3
+    ];
+
+    const BUCKET_COUNTS: [u8; 3] = [
+        1, 2, 0
+    ];
+
+    const ENTRIES: [E; 3] = [
+        E { hash_code: 9198652691199425319, key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }, E { hash_code: 18225461187723808291, key: "a" }, E { hash_code: 16750939634977259983, key: "item" }
+    ];
+
+    #[inline]
+    unsafe fn get_hash(value: &str) -> u64 {
+        let mut hash: u64 = 352654597;
+
+        let mut ptr = value.as_ptr();
+        let mut len = value.len();
+
+         while len > 0 {
+                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
+                ptr = ptr.add(1);
+                len -= 1;
+         }
+
+        hash.wrapping_mul(1566083941).wrapping_add(352654597)
+    }
+
+    #[must_use]
+    pub fn contains(key: &'static str) -> bool {
+        if key.len() < 1 as usize || key.len() > 255 as usize {
+            return false;
+        }
+
+        let hash = unsafe { Self::get_hash(key) };
+        let index = hash % 3;
+        let start = Self::BUCKET_STARTS[index as usize] as usize;
+        let count = Self::BUCKET_COUNTS[index as usize] as usize;
+        let end = start + count;
+
+        for i in start..end {
+            let entry = &Self::ENTRIES[i];
+            if entry.hash_code == hash && entry.key == key {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_KEY_LENGTH: usize = 1;
+    pub const MAX_KEY_LENGTH: usize = 255;
+}struct E {
+    hash_code: u64,
+    key: &'static str,
+    
+}

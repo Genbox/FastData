@@ -1,0 +1,58 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Auto (HashTableCompact)
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct HashTableCompactStructure_Char_3;
+
+impl HashTableCompactStructure_Char_3 {
+    const BUCKET_STARTS: [u8; 3] = [
+        0, 1, 3
+    ];
+
+    const BUCKET_COUNTS: [u8; 3] = [
+        1, 2, 0
+    ];
+
+    const ENTRIES: [E; 3] = [
+        E { key: char::MIN }, E { key: 'a' }, E { key: '' }
+    ];
+
+    #[inline(always)]
+    fn get_hash(value: char) -> u64 {
+        value as u64
+    }
+
+    #[must_use]
+    pub fn contains(key: char) -> bool {
+        if key < char::MIN || key > '' {
+            return false;
+        }
+
+        let hash = unsafe { Self::get_hash(key) };
+        let index = hash % 3;
+        let start = Self::BUCKET_STARTS[index as usize] as usize;
+        let count = Self::BUCKET_COUNTS[index as usize] as usize;
+        let end = start + count;
+
+        for i in start..end {
+            let entry = &Self::ENTRIES[i];
+            if entry.key == key {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_KEY: char = char::MIN;
+    pub const MAX_KEY: char = '';
+}struct E {
+    
+    key: char,
+    
+}
