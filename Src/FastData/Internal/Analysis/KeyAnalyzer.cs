@@ -53,45 +53,73 @@ internal static class KeyAnalyzer
             uniq &= !lengthMap.SetTrue(str.Length);
         }
 
-        //Build a forward and reverse map of merged entropy
-        //We can derive common substrings from it, as well as high-entropy substring hash functions
-        int[] left = new int[maxStr.Length];
-        int[] right = new int[maxStr.Length];
-        bool flag = true;
+        // The code beneath there calculate entropy maps that cna be used to derive the longest common substrings or longest prefix/suffix strings.
+        // It works by adding characters to an accumulator, and then potentially removing the value from it again if the characters are the same.
+        // If the accumulator for an offset contains 0 after all strings have been accumulated, it is highly likely that all the characters were the same.
+        // However, there is a risk that an accumulator is 0, even if the characters are not the same. So we do a sanity check at the end to ensure we did it right.
+
+        // int[]? map = null;
+        int[]? left = null;
+        int[]? right = null;
+
         bool allAscii = true;
 
-        foreach (string str in keys)
-        {
-            for (int i = 0; i < str.Length; i++)
+        // Special case: If all strings have the same length, we can build an entropy map in O(n) with O(1) memory
+        // TODO: For now FastData only supports prefix/suffix
+        // if (minLength == maxStr.Length)
+        // {
+        //     map = new int[minLength];
+        //
+        //     foreach (string str in keys)
+        //     {
+        //         for (int i = 0; i < str.Length; i++)
+        //         {
+        //             char c = str[i];
+        //             map[i] ^= c;
+        //
+        //             if (c > 127)
+        //                 allAscii = false;
+        //         }
+        //     }
+        // }
+        // else
+        // {
+            //Build a forward and reverse map of merged entropy
+            //We can derive common prefix/suffix from it that can be used later for high-entropy hash/equality functions
+            left = new int[maxStr.Length];
+            right = new int[maxStr.Length];
+
+            foreach (string str in keys)
             {
-                char c = str[i];
-                char rc = str[str.Length - 1 - i];
+                for (int i = 0; i < str.Length; i++)
+                {
+                    char lc = str[i];
+                    char rc = str[str.Length - 1 - i];
 
-                left[i] += flag ? c : -c;
-                right[i] += flag ? rc : -rc;
+                    left[i] ^= lc;
+                    right[i] ^= rc;
 
-                if (c > 127)
-                    allAscii = false;
+                    if (lc > 127)
+                        allAscii = false;
+                }
             }
 
-            flag = !flag;
-        }
-
-        //Odd number of items. We need it to be even
-        if (keys.Length % 2 != 0)
-        {
-            for (int i = 0; i < maxStr.Length; i++)
+            //Odd number of items. We need it to be even
+            if (keys.Length % 2 != 0)
             {
-                //For best mixing, we take the longest string
-                char c = maxStr[i];
-                char rc = maxStr[maxStr.Length - 1 - i];
+                for (int i = 0; i < maxStr.Length; i++)
+                {
+                    //For best mixing, we take the longest string
+                    char lc = maxStr[i];
+                    char rc = maxStr[maxStr.Length - 1 - i];
 
-                left[i] += flag ? c : -c;
-                right[i] += flag ? rc : -rc;
+                    left[i] ^= lc;
+                    right[i] ^= rc;
 
-                //We do not add to characterMap here since it does not need the duplicate
+                    //We do not add to characterMap here since it does not need the duplicate
+                }
             }
-        }
+        // }
 
         return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, (uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
     }
@@ -133,7 +161,7 @@ internal static class KeyAnalyzer
         }
 
         ulong range = ClampRangeToUInt64(max - min);
-        return new KeyProperties<float>(min, max, range, hasZeroOrNaN, IsFloatContiguous(keys, min, max, hasNaNOrInfinity));
+        return new KeyProperties<float>(min, max, range, hasZeroOrNaN, IsFloatConsecutive(keys, min, max, hasNaNOrInfinity));
     }
 
     private static KeyProperties<double> GetDoubleProperties(double[] keys)
@@ -159,7 +187,7 @@ internal static class KeyAnalyzer
         }
 
         ulong range = ClampRangeToUInt64(max - min);
-        return new KeyProperties<double>(min, max, range, hasZeroOrNaN, IsDoubleContiguous(keys, min, max, hasNaNOrInfinity));
+        return new KeyProperties<double>(min, max, range, hasZeroOrNaN, IsDoubleConsecutive(keys, min, max, hasNaNOrInfinity));
     }
 
     private static KeyProperties<byte> GetByteProperties(byte[] keys)
@@ -275,7 +303,7 @@ internal static class KeyAnalyzer
         return new KeyProperties<ulong>(min, max, max - min, false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1));
     }
 
-    private static bool IsFloatContiguous(float[] keys, float min, float max, bool hasNaNOrInfinity)
+    private static bool IsFloatConsecutive(float[] keys, float min, float max, bool hasNaNOrInfinity)
     {
         if (hasNaNOrInfinity)
             return false;
@@ -301,7 +329,7 @@ internal static class KeyAnalyzer
         return true;
     }
 
-    private static bool IsDoubleContiguous(double[] keys, double min, double max, bool hasNaNOrInfinity)
+    private static bool IsDoubleConsecutive(double[] keys, double min, double max, bool hasNaNOrInfinity)
     {
         if (hasNaNOrInfinity)
             return false;
