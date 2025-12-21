@@ -60,9 +60,10 @@ impl HashTableCompactStructure_String_3 {
                 return false;
             }
         },
+
         _ => {
              return false;
-         }
+        }
     }
 
         let hash = unsafe { Self::get_hash(key) };

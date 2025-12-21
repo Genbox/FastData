@@ -12,34 +12,33 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
 
     protected override string GetMaskEarlyExit(MethodType methodType, ulong[] bitSet)
     {
-        if (bitSet.Length == 1)
-            return RenderWord(bitSet[0], methodType);
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.Append("""
-                          switch (key.length() >> 6)
-                          {
-                  """);
-
-        for (int i = 0; i < bitSet.Length; i++)
-        {
-            sb.Append($"""
-
-                                   case {i.ToStringInvariant()}:
-                           {RenderWord(bitSet[i], methodType)}
-                                   break;
-                       """);
-        }
-
-        sb.Append($$"""
-
+        return bitSet.Length == 1
+            ? RenderWord(bitSet[0], methodType)
+            : $$"""
+                        switch (key.length() >> 6)
+                        {
+                {{RenderCases()}}
                             default:
                                 {{RenderMethod(methodType)}}
                         }
-                    """);
+                """;
 
-        return sb.ToString();
+        string RenderCases()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < bitSet.Length; i++)
+            {
+                sb.Append($"""
+                                       case {i.ToStringInvariant()}:
+                               {RenderWord(bitSet[i], methodType)}
+                                       break;
+
+                           """);
+            }
+
+            return sb.ToString();
+        }
     }
 
     protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) =>

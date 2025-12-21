@@ -62,7 +62,7 @@ private struct E
     public static bool TryLookup(int key, out Person value)
     {
         if (key < 1 || key > 3)
-        {
+            {
             value = default;
             return false;
         }

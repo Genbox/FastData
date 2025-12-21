@@ -18,24 +18,25 @@ internal static class BinarySearchStructure_String_3
         switch (key.Length >> 6)
         {
             case 0:
-                if ((9UL & (1UL << ((key.Length - 1) & 63))) == 0)
-            return false;
+                    if ((9UL & (1UL << ((key.Length - 1) & 63))) == 0)
+                    return false;
             break;
             case 1:
-                if ((0UL & (1UL << ((key.Length - 1) & 63))) == 0)
-            return false;
+                    if ((0UL & (1UL << ((key.Length - 1) & 63))) == 0)
+                    return false;
             break;
             case 2:
-                if ((0UL & (1UL << ((key.Length - 1) & 63))) == 0)
-            return false;
+                    if ((0UL & (1UL << ((key.Length - 1) & 63))) == 0)
+                    return false;
             break;
             case 3:
-                if ((4611686018427387904UL & (1UL << ((key.Length - 1) & 63))) == 0)
-            return false;
+                    if ((4611686018427387904UL & (1UL << ((key.Length - 1) & 63))) == 0)
+                    return false;
             break;
+
             default:
-                            return false;
-    }
+                return false;
+        }
 
         int lo = 0;
         int hi = 2;

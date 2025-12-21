@@ -58,9 +58,10 @@ public:
             if ((4611686018427387904ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
             return false;
             break;
-        default:
-            return false;
-    }
+
+            default:
+                return false;
+        }
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;

@@ -36,9 +36,10 @@ impl ArrayStructure_String_3 {
                 return false;
             }
         },
+
         _ => {
              return false;
-         }
+        }
     }
 
         for entry in Self::KEYS.iter() {

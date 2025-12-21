@@ -30,7 +30,7 @@ internal static class KeyLengthStructure_String_3_simple
     public static bool TryLookup(string key, out int value)
     {
         if (key.Length < 1u || key.Length > 3u)
-        {
+            {
             value = default;
             return false;
         }

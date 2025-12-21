@@ -32,9 +32,10 @@ public:
             if ((4611686018427387904ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
             return false;
             break;
-        default:
-            return false;
-    }
+
+            default:
+                return false;
+        }
 
         int32_t lo = 0;
         int32_t hi = 2;
