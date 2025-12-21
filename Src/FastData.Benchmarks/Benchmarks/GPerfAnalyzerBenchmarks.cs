@@ -8,12 +8,12 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [MemoryDiagnoser]
-public class AnalyzerBenchmarks
+public class GPerfAnalyzerBenchmarks
 {
     private readonly GPerfAnalyzer _analyzer;
     private readonly string[] _data;
 
-    public AnalyzerBenchmarks()
+    public GPerfAnalyzerBenchmarks()
     {
         Random rng = new Random(42);
         _data = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(rng, 50)).ToArray();
