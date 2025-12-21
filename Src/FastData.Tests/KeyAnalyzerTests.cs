@@ -67,11 +67,13 @@ public class KeyAnalyzerTests
     [Theory]
     [InlineData(new[] { "item1", "item2", "item3", "item4" }, 4, 0)]
     [InlineData(new[] { "1item", "2item", "3item", "4item" }, 0, 4)]
-    [InlineData(new[] { "a", "aa", "aaa", "aaaaa" }, 1, 1)]
-    public void GetStringProperties_EntropyData_Test(string[] data, int leftZero, int rightZero)
+    [InlineData(new[] { "a", "ab", "abc" }, 0, 0)] // The shortest string would become empty, so we don't support it
+    [InlineData(new[] { "aa", "aaa", "aaaaa" }, 0, 0)] // If all strings consist of the same character, they will be reduced to nothing, so we don't support it
+    [InlineData(new[] { "hello world" }, 0, 0)] // One key should result in no prefix/suffix calculation
+    public void GetStringProperties_DeltaData_Test(string[] data, int leftZero, int rightZero)
     {
         StringProperties res = GetStringProperties(data);
-        Assert.Equal(res.DeltaData.LeftZeroCount, leftZero);
-        Assert.Equal(res.DeltaData.RightZeroCount, rightZero);
+        Assert.Equal(leftZero, res.DeltaData.LeftZeroCount);
+        Assert.Equal(rightZero, res.DeltaData.RightZeroCount);
     }
 }

@@ -117,7 +117,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
             o.WriteLine($"{segment}. res: {string.Join(",", input.Select(x => SegmentHelper.InsertSegmentBounds(x, segment)))}");
         }
 
-        Assert.Equal(res[0], expected);
+        Assert.Equal(expected, res[0]);
     }
 
     [Theory]

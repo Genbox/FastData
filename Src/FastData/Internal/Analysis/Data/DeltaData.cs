@@ -1,14 +1,12 @@
 using System.Runtime.InteropServices;
-using Genbox.FastData.Internal.Enums;
-using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.Data;
 
 [StructLayout(LayoutKind.Auto)]
-internal readonly record struct DeltaData(int[] Left, int[] Right)
+internal readonly record struct DeltaData(int[]? Left, int[]? Right)
 {
-    internal int LeftZeroCount => CountZero(Left);
-    internal int RightZeroCount => CountZero(Right);
+    internal int LeftZeroCount => Left == null ? 0 : CountZero(Left);
+    internal int RightZeroCount => Right == null ? 0 : CountZero(Right);
 
     //TODO: See the todo in KeyAnalyzer about supporting prefix/suffix only
     // internal IEnumerable<ArraySegment> GetSegments()
@@ -35,11 +33,8 @@ internal readonly record struct DeltaData(int[] Left, int[] Right)
     //     }
     // }
 
-    private static int CountZero(int[]? data)
+    internal static int CountZero(int[] data)
     {
-        if (data == null)
-            throw new InvalidOperationException("Cannot count map data");
-
         int count;
         for (count = 0; count < data.Length; count++)
         {

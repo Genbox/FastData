@@ -67,26 +67,32 @@ internal sealed class DeltaGenerator : ISegmentGenerator
 
     public IEnumerable<ArraySegment> Generate(StringProperties props)
     {
-        // We start from the left, which is faster due to not having to do right-align checks
-        foreach (ArraySegment segment in CalculateSegments(props.DeltaData.Left))
+        if (props.DeltaData.Left != null)
         {
-            // Left Alignment: offset + length <= Min
-            int maxLength = (int)(props.LengthData.Min - segment.Offset);
-            int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
+            // We start from the left, which is faster due to not having to do right-align checks
+            foreach (ArraySegment segment in CalculateSegments(props.DeltaData.Left))
+            {
+                // Left Alignment: offset + length <= Min
+                int maxLength = (int)(props.LengthData.Min - segment.Offset);
+                int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
 
-            if (length > 0)
-                yield return new ArraySegment(segment.Offset, length, Alignment.Left);
+                if (length > 0)
+                    yield return new ArraySegment(segment.Offset, length, Alignment.Left);
+            }
         }
 
-        // Process right-aligned segments
-        foreach (ArraySegment segment in CalculateSegments(props.DeltaData.Right))
+        if (props.DeltaData.Right != null)
         {
-            // Right Alignment: offset + length <= Min
-            int maxLength = (int)(props.LengthData.Min - segment.Offset);
-            int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
+            // Process right-aligned segments
+            foreach (ArraySegment segment in CalculateSegments(props.DeltaData.Right))
+            {
+                // Right Alignment: offset + length <= Min
+                int maxLength = (int)(props.LengthData.Min - segment.Offset);
+                int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
 
-            if (length > 0)
-                yield return new ArraySegment(segment.Offset, length, Alignment.Right);
+                if (length > 0)
+                    yield return new ArraySegment(segment.Offset, length, Alignment.Right);
+            }
         }
     }
 

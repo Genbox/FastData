@@ -35,6 +35,7 @@ internal static class KeyAnalyzer
         int minUtf16ByteLength = int.MaxValue;
         int maxUtf16ByteLength = int.MinValue;
         bool uniq = true;
+        bool allAscii = true;
 
         foreach (string str in keys)
         {
@@ -51,6 +52,12 @@ internal static class KeyAnalyzer
 
             minLength = Math.Min(minLength, str.Length); //Track the smallest string. It might be more than what lengthmap supports
             uniq &= !lengthMap.SetTrue(str.Length);
+
+            foreach (char c in str)
+            {
+                if (c > 127)
+                    allAscii = false;
+            }
         }
 
         // The code beneath there calculate entropy maps that cna be used to derive the longest common substrings or longest prefix/suffix strings.
@@ -62,28 +69,29 @@ internal static class KeyAnalyzer
         int[]? left = null;
         int[]? right = null;
 
-        bool allAscii = true;
-
-        // Special case: If all strings have the same length, we can build an entropy map in O(n) with O(1) memory
-        // TODO: For now FastData only supports prefix/suffix
-        // if (minLength == maxStr.Length)
-        // {
-        //     map = new int[minLength];
-        //
-        //     foreach (string str in keys)
-        //     {
-        //         for (int i = 0; i < str.Length; i++)
-        //         {
-        //             char c = str[i];
-        //             map[i] ^= c;
-        //
-        //             if (c > 127)
-        //                 allAscii = false;
-        //         }
-        //     }
-        // }
-        // else
-        // {
+        // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough
+        if (keys.Length > 1 && minLength > 1)
+        {
+            // Special case: If all strings have the same length, we can build an entropy map in O(n) with O(1) memory
+            // TODO: For now FastData only supports prefix/suffix
+            // if (minLength == maxStr.Length)
+            // {
+            //     map = new int[minLength];
+            //
+            //     foreach (string str in keys)
+            //     {
+            //         for (int i = 0; i < str.Length; i++)
+            //         {
+            //             char c = str[i];
+            //             map[i] ^= c;
+            //
+            //             if (c > 127)
+            //                 allAscii = false;
+            //         }
+            //     }
+            // }
+            // else
+            // {
             //Build a forward and reverse map of merged entropy
             //We can derive common prefix/suffix from it that can be used later for high-entropy hash/equality functions
             left = new int[maxStr.Length];
@@ -98,9 +106,6 @@ internal static class KeyAnalyzer
 
                     left[i] ^= lc;
                     right[i] ^= rc;
-
-                    if (lc > 127)
-                        allAscii = false;
                 }
             }
 
@@ -119,7 +124,16 @@ internal static class KeyAnalyzer
                     //We do not add to characterMap here since it does not need the duplicate
                 }
             }
-        // }
+
+            // Make sure that we handle the case where all characters in the inputs are the same
+            if (DeltaData.CountZero(left) == minLength || DeltaData.CountZero(right) == minLength)
+            {
+                left = null;
+                right = null;
+            }
+
+            // }
+        }
 
         return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, (uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
     }
