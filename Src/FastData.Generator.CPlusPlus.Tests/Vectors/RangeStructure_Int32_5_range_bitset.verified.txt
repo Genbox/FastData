@@ -6,7 +6,7 @@
 #include <limits>
 #include <string_view>
 
-class RangeStructure_Int32_5 final {
+class RangeStructure_Int32_5_range_bitset final {
   public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {

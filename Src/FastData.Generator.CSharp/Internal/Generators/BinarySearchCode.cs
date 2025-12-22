@@ -31,14 +31,14 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                         {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
                             int lo = 0;
                             int hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
                             while (lo <= hi)
                             {
                                 int i = lo + ((hi - lo) >> 1);
-                                int order = {{GetCompareFunction("_keys[i]", "key")}};
+                                int order = {{GetCompareFunction("_keys[i]", LookupKeyName)}};
 
                                 if (order == 0)
                                     return true;
@@ -59,14 +59,14 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
                             {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 int lo = 0;
                                 int hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
                                 while (lo <= hi)
                                 {
                                     int i = lo + ((hi - lo) >> 1);
-                                    int order = {{GetCompareFunction("_keys[i]", "key")}};
+                                    int order = {{GetCompareFunction("_keys[i]", LookupKeyName)}};
 
                                     if (order == 0)
                                     {

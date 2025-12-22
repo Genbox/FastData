@@ -33,7 +33,7 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
                     public:
                         {{MethodAttribute}}
                         {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
                             const uint64_t offset = static_cast<uint64_t>(key - min_key);
                             const size_t word = static_cast<size_t>(offset >> 6);
@@ -50,7 +50,7 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
 
                             {{MethodAttribute}}
                             {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 const uint64_t offset = static_cast<uint64_t>(key - min_key);
                                 const size_t word = static_cast<size_t>(offset >> 6);

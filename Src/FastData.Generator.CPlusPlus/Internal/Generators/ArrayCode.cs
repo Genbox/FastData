@@ -30,11 +30,11 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
                     public:
                         {{MethodAttribute}}
                         {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
                             for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
                             {
-                                if ({{GetEqualFunction("keys[i]", "key")}})
+                                if ({{GetEqualFunction("keys[i]", LookupKeyName)}})
                                     return true;
                             }
                             return false;
@@ -50,10 +50,10 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
 
                             {{MethodAttribute}}
                             {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++) {
-                                    if ({{GetEqualFunction("keys[i]", "key")}}) {
+                                    if ({{GetEqualFunction("keys[i]", LookupKeyName)}}) {
                                         value = {{ptr}}values[i];
                                         return true;
                                     }

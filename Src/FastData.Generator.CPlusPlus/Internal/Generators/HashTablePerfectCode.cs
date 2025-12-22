@@ -48,13 +48,13 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                     public:
                         {{MethodAttribute}}
                         {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
-                            const {{HashSizeType}} hash = get_hash(key);
+                            const {{HashSizeType}} hash = get_hash({{LookupKeyName}});
                             const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                             const auto& entry = entries[index];
 
-                            return {{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "entry.hash_code", KeyType.Int64)} && " : "")}}{{GetEqualFunction("key", ctx.StoreHashCode || ctx.Values != null ? "entry.key" : "entry")}};
+                            return {{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "entry.hash_code", KeyType.Int64)} && " : "")}}{{GetEqualFunction(LookupKeyName, ctx.StoreHashCode || ctx.Values != null ? "entry.key" : "entry")}};
                         }
                     """);
 
@@ -67,13 +67,13 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
 
                             {{MethodAttribute}}
                             {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                const {{HashSizeType}} hash = get_hash(key);
+                                const {{HashSizeType}} hash = get_hash({{LookupKeyName}});
                                 const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Data.Length)}};
                                 const auto& entry = entries[index];
 
-                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "entry.hash_code", KeyType.Int64)} && " : "")}}{{GetEqualFunction("key", "entry.key")}}) {
+                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "entry.hash_code", KeyType.Int64)} && " : "")}}{{GetEqualFunction(LookupKeyName, "entry.key")}}) {
                                     value = {{ptr}}entry.value;
                                     return true;
                                 }

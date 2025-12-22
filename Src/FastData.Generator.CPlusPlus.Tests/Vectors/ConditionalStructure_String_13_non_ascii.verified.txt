@@ -6,7 +6,7 @@
 #include <limits>
 #include <string_view>
 
-class ConditionalStructure_String_13 final {
+class ConditionalStructure_String_13_non_ascii final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::u32string_view key) noexcept {

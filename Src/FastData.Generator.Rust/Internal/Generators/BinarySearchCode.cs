@@ -32,7 +32,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 
                         {{MethodAttribute}}
                         {{MethodModifier}}fn contains(key: {{GetKeyTypeName(customKey)}}) -> bool {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
                             let mut lo: usize = 0;
                             let mut hi: usize = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
@@ -40,10 +40,10 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                                 let i = lo + ((hi - lo) >> 1);
                                 let entry = Self::KEYS[i];
 
-                                if entry == key {
+                                if entry == {{LookupKeyName}} {
                                     return true;
                                 }
-                                if entry < key {
+                                if entry < {{LookupKeyName}} {
                                     lo = i + 1;
                                 } else {
                                     hi = i - 1;
@@ -60,7 +60,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 
                             {{MethodAttribute}}
                             {{MethodModifier}}fn try_lookup(key: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 let mut lo: usize = 0;
                                 let mut hi: usize = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
@@ -68,10 +68,10 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                                     let i = lo + ((hi - lo) >> 1);
                                     let entry = Self::KEYS[i];
 
-                                    if entry == key {
+                                    if entry == {{LookupKeyName}} {
                                         return Some(Self::VALUES[i]);
                                     }
-                                    if entry < key {
+                                    if entry < {{LookupKeyName}} {
                                         lo = i + 1;
                                     } else {
                                         hi = i - 1;

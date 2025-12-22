@@ -24,6 +24,7 @@ const ENTRIES: [i32; 3] = [
         if key < 1 || key > 3 {
             return false;
         }
+
         let hash = unsafe { Self::get_hash(key) };
         let index = (hash % 3) as usize;
 

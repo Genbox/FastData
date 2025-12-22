@@ -37,15 +37,15 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
 
                         {{MethodAttribute}}
                         {{MethodModifier}}fn contains(key: {{GetKeyTypeName(customKey)}}) -> bool {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
-                            let hash = unsafe { Self::get_hash(key) };
+                            let hash = unsafe { Self::get_hash({{LookupKeyName}}) };
                             let index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                             let mut i: {{GetSmallestSignedType(ctx.Buckets.Length)}} = (Self::BUCKETS[index as usize] as {{GetSmallestSignedType(ctx.Buckets.Length)}}) - 1;
 
                             while i >= 0 {
                                 let entry = &Self::ENTRIES[i as usize];
-                                if {{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", "key")}} {
+                                if {{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", LookupKeyName)}} {
                                     return true;
                                 }
                                 i = entry.next;
@@ -63,15 +63,15 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
 
                             {{MethodAttribute}}
                             {{MethodModifier}}fn try_lookup(key: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                let hash = unsafe { Self::get_hash(key) };
+                                let hash = unsafe { Self::get_hash({{LookupKeyName}}) };
                                 let index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                                 let mut i: {{GetSmallestSignedType(ctx.Buckets.Length)}} = (Self::BUCKETS[index as usize] as {{GetSmallestSignedType(ctx.Buckets.Length)}}) - 1;
 
                                 while i >= 0 {
                                     let entry = &Self::ENTRIES[i as usize];
-                                    if {{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", "key")}} {
+                                    if {{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", LookupKeyName)}} {
                                         return Some(entry.value);
                                     }
                                     i = entry.next;

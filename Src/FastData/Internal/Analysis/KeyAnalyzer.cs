@@ -22,7 +22,7 @@ internal static class KeyAnalyzer
         _ => throw new InvalidOperationException($"Unsupported data type: {typeof(T).Name}")
     };
 
-    internal static StringProperties GetStringProperties(string[] keys)
+    internal static StringProperties GetStringProperties(string[] keys, bool enableTrimming)
     {
         //Contains a map of unique lengths
         LengthBitArray lengthMap = new LengthBitArray();
@@ -70,7 +70,7 @@ internal static class KeyAnalyzer
         int[]? right = null;
 
         // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough
-        if (keys.Length > 1 && minLength > 1)
+        if (enableTrimming && keys.Length > 1 && minLength > 1)
         {
             // Special case: If all strings have the same length, we can build an entropy map in O(n) with O(1) memory
             // TODO: For now FastData only supports prefix/suffix

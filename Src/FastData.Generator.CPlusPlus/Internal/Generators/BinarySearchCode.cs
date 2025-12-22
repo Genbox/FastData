@@ -30,7 +30,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                     public:
                         {{MethodAttribute}}
                         {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
                             int32_t lo = 0;
                             int32_t hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
@@ -38,10 +38,10 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                                 const int32_t mid = lo + ((hi - lo) >> 1);
                                 const {{KeyTypeName}} mid_key = keys[mid];
 
-                                if ({{GetEqualFunction("mid_key", "key")}})
+                                if ({{GetEqualFunction("mid_key", LookupKeyName)}})
                                     return true;
 
-                                if (mid_key < key)
+                                if (mid_key < {{LookupKeyName}})
                                     lo = mid + 1;
                                 else
                                     hi = mid - 1;
@@ -60,7 +60,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 
                             {{MethodAttribute}}
                             {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 int32_t lo = 0;
                                 int32_t hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
@@ -68,13 +68,13 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                                     const int32_t mid = lo + ((hi - lo) >> 1);
                                     const {{KeyTypeName}} mid_key = keys[mid];
 
-                                    if ({{GetEqualFunction("mid_key", "key")}})
+                                    if ({{GetEqualFunction("mid_key", LookupKeyName)}})
                                     {
                                         value = {{ptr}}values[mid];
                                         return true;
                                     }
 
-                                    if (mid_key < key)
+                                    if (mid_key < {{LookupKeyName}})
                                         lo = mid + 1;
                                     else
                                         hi = mid - 1;

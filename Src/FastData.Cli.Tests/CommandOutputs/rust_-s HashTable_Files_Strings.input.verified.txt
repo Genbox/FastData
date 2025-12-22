@@ -45,6 +45,7 @@ const ENTRIES: [e; 2] = [
         if key.len() != 5 as usize {
             return false;
         }
+
         let hash = unsafe { Self::get_hash(key) };
         let index = (hash % 2) as usize;
 

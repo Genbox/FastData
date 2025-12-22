@@ -6,9 +6,9 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-pub struct RangeStructure_Int32_5;
+pub struct RangeStructure_Int32_5_range_bitset;
 
-impl RangeStructure_Int32_5 {
+impl RangeStructure_Int32_5_range_bitset {
     #[must_use]
     pub fn contains(key: i32) -> bool {
         return key >= Self::MIN_KEY && key <= Self::MAX_KEY;

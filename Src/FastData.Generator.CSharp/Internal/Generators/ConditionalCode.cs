@@ -37,9 +37,9 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                         {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
-                            if ({{FormatList(data, x => GetEqualFunction("key", ToValueLabel(x)), " || ")}})
+                            if ({{FormatList(data, x => GetEqualFunction(LookupKeyName, ToValueLabel(x)), " || ")}})
                                 return true;
 
                             return false;
@@ -53,7 +53,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
                             {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
                         {{GenerateBranches()}}
 
@@ -72,7 +72,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
             for (int i = 0; i < ctx.Keys.Length; i++)
             {
                 temp.AppendLine($$"""
-                                          if (key == {{ToValueLabel(ctx.Keys[i])}})
+                                          if ({{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Keys[i]))}})
                                           {
                                               value = _values[{{i.ToStringInvariant()}}];
                                               return true;
@@ -90,9 +90,9 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                         {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
-                            switch (key)
+                            switch ({{LookupKeyName}})
                             {
                     {{FormatList(data, x => $"            case {ToValueLabel(x)}:", "\n")}}
                                     return true;
@@ -109,8 +109,8 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
                             {
                                 value = default;
-                        {{GetEarlyExits(MethodType.TryLookup)}}
-                                switch (key)
+                        {{GetMethodHeader(MethodType.TryLookup)}}
+                                switch ({{LookupKeyName}})
                                 {
                         {{GenerateSwitches()}}
                                 }

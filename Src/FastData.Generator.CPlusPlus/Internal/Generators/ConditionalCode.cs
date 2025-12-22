@@ -26,8 +26,8 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                     public:
                         {{MethodAttribute}}
                         {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
-                    {{GetEarlyExits(MethodType.Contains)}}
-                            if ({{FormatList(ctx.Keys, x => GetEqualFunction("key", ToValueLabel(x)), " || ")}})
+                    {{GetMethodHeader(MethodType.Contains)}}
+                            if ({{FormatList(ctx.Keys, x => GetEqualFunction(LookupKeyName, ToValueLabel(x)), " || ")}})
                                 return true;
 
                             return false;
@@ -42,7 +42,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 
                             {{MethodAttribute}}
                             {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
                         {{GenerateBranches()}}
                                 value = nullptr;
                                 return false;
@@ -57,7 +57,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                 for (int i = 0; i < ctx.Keys.Length; i++)
                 {
                     temp.AppendLine($$"""
-                                              if (key == {{ToValueLabel(ctx.Keys[i])}}) {
+                                              if ({{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Keys[i]))}}) {
                                                   value = {{ptr}}values[{{i.ToStringInvariant()}}];
                                                   return true;
                                               }

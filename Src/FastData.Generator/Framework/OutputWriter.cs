@@ -19,11 +19,19 @@ public abstract class OutputWriter<TKey> : IOutputWriter
     protected string ValueTypeName { get; private set; } = null!;
     protected GeneratorConfig<TKey> GeneratorConfig { get; private set; } = null!;
     protected string HashSource { get; private set; } = null!;
-    protected string GetEarlyExits(MethodType methodType) => _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType);
     protected string HashSizeType => TypeMap.GetTypeName(typeof(ulong));
     protected string ArraySizeType => _langDef.ArraySizeType;
+    protected string TrimPrefix => GeneratorConfig.TrimPrefix;
+    protected string TrimSuffix => GeneratorConfig.TrimSuffix;
+    protected int TotalTrimLength => TrimPrefix.Length + TrimSuffix.Length;
+    protected string LookupKeyName => TotalTrimLength == 0 ? "key" : "trimmedKey";
 
     public abstract string Generate();
+
+    protected virtual string GetMethodHeader(MethodType methodType)
+    {
+        return _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType);
+    }
 
     internal void Initialize<TValue>(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, TValue[]? values, ExpressionCompiler? compiler)
     {
@@ -62,6 +70,23 @@ public abstract class OutputWriter<TKey> : IOutputWriter
         HashSource = hashDef.GetHashSource(GeneratorConfig.KeyType, KeyTypeName, hashInfo);
     }
 
+    protected string GetEqualFunction(string value1, string value2, KeyType keyTypeOverride = KeyType.Null)
+    {
+        if (keyTypeOverride == KeyType.Null)
+            keyTypeOverride = GeneratorConfig.KeyType;
+
+        return GetEqualFunctionInternal(value1, value2, keyTypeOverride);
+    }
+
+    protected virtual string GetEqualFunctionInternal(string value1, string value2, KeyType keyType) => $"{value1} == {value2}";
+
+    protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";
+
+    protected string ToValueLabel<T>(T value) => TypeMap.ToValueLabel(value); //Uses its own generics here, not TKey. We need T so we can change the type in generators
+    protected string GetObjectDeclarations<TValue>() => typeof(TValue).IsPrimitive ? "" : TypeMap.GetDeclarations<TValue>(); //We don't have declarations for primitives
+    protected string GetSmallestSignedType(long value) => TypeMap.GetSmallestIntType(value);
+    protected string GetSmallestUnsignedType(long value) => TypeMap.GetSmallestUIntType((ulong)value);
+
     private static IEnumerable<string> GetValues(Array array, TypeMap map, Type type)
     {
         IEnumerator enumerator = array.GetEnumerator();
@@ -69,12 +94,4 @@ public abstract class OutputWriter<TKey> : IOutputWriter
         while (enumerator.MoveNext())
             yield return map.ToValueLabel(enumerator.Current, type);
     }
-
-    protected virtual string GetEqualFunction(string value1, string value2, KeyType keyType = KeyType.Null) => $"{value1} == {value2}";
-    protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";
-
-    protected string ToValueLabel<T>(T value) => TypeMap.ToValueLabel(value); //Uses its own generics here, not TKey. We need T so we can change the type in generators
-    protected string GetObjectDeclarations<TValue>() => typeof(TValue).IsPrimitive ? "" : TypeMap.GetDeclarations<TValue>(); //We don't have declarations for primitives
-    protected string GetSmallestSignedType(long value) => TypeMap.GetSmallestIntType(value);
-    protected string GetSmallestUnsignedType(long value) => TypeMap.GetSmallestUIntType((ulong)value);
 }

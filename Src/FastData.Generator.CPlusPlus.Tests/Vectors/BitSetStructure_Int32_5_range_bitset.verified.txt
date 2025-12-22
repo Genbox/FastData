@@ -6,7 +6,7 @@
 #include <limits>
 #include <string_view>
 
-class BitSetStructure_Int32_5 final {
+class BitSetStructure_Int32_5_range_bitset final {
     static constexpr std::array<uint64_t, 1> bitset = {
         31ull
     };

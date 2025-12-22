@@ -35,9 +35,9 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                         {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
-                            return {{GetEqualFunction("key", $"_keys[key.Length - {ctx.MinLength.ToStringInvariant()}]")}};
+                            return {{GetEqualFunction(LookupKeyName, $"_keys[{LookupKeyName}.Length - {ctx.MinLength.ToStringInvariant()}]")}};
                         }
                     """);
 
@@ -47,10 +47,10 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
                             {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                int idx = key.Length - {{ctx.MinLength.ToStringInvariant()}};
-                                if ({{GetEqualFunction("key", "_keys[idx]")}})
+                                int idx = {{LookupKeyName}}.Length - {{ctx.MinLength.ToStringInvariant()}};
+                                if ({{GetEqualFunction(LookupKeyName, "_keys[idx]")}})
                                 {
                                     value = _values[_offsets[idx]];
                                     return true;

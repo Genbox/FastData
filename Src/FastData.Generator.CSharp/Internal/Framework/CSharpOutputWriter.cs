@@ -1,4 +1,6 @@
 using Genbox.FastData.Generator.CSharp.Enums;
+using Genbox.FastData.Generator.Enums;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generators.Helpers;
 
@@ -31,15 +33,43 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
         return $"{var1}.CompareTo({var2})";
     }
 
-    protected override string GetEqualFunction(string var1, string var2, KeyType keyType = KeyType.Null)
+    protected override string GetEqualFunctionInternal(string var1, string var2, KeyType keyType)
     {
-        if (keyType == KeyType.Null)
-            keyType = GeneratorConfig.KeyType;
-
         if (keyType == KeyType.String)
             return $"StringComparer.{GeneratorConfig.StringComparison}.Equals({var1}, {var2})";
 
         return $"{var1} == {var2}";
+    }
+
+    protected override string GetMethodHeader(MethodType methodType)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append(base.GetMethodHeader(methodType));
+
+        if (TotalTrimLength != 0)
+            sb.Append($"""
+
+                               if (!({GetTrimMatchCondition()}))
+                                   return false;
+
+                               string trimmedKey = key.Substring({TrimPrefix.Length.ToStringInvariant()}, key.Length - {TotalTrimLength.ToStringInvariant()});
+                       """);
+
+        return sb.ToString();
+    }
+
+    private string GetTrimMatchCondition()
+    {
+        string prefixCheck = $"key.StartsWith({ToValueLabel(TrimPrefix)}, StringComparison.{GeneratorConfig.StringComparison})";
+        string suffixCheck = $"key.EndsWith({ToValueLabel(TrimSuffix)}, StringComparison.{GeneratorConfig.StringComparison})";
+
+        if (TrimPrefix.Length == 0)
+            return suffixCheck;
+
+        if (TrimSuffix.Length == 0)
+            return prefixCheck;
+
+        return $"{prefixCheck} && {suffixCheck}";
     }
 
     protected override string GetModFunction(string variable, ulong value)

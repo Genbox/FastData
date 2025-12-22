@@ -1,0 +1,35 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ArrayStructure_String_3_prefix_suffix final {
+    static constexpr std::array<std::string_view, 3> keys = {
+        "text", "fetch", "fix"
+    };
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const std::string_view key) noexcept {
+        if (const size_t len = key.length(); len < 6u || len > 8u)
+            return false;
+        if (!(key.compare(0, 3, "pre") == 0))
+            return false;
+
+        const auto trimmedKey = key.substr(3, key.length() - 3);
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            if (keys[i] == trimmedKey)
+                return true;
+        }
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr size_t min_key_length = 6;
+    static constexpr size_t max_key_length = 8;
+};

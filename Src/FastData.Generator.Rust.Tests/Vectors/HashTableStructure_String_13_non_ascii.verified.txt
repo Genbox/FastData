@@ -6,9 +6,9 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-pub struct HashTableStructure_String_13;
+pub struct HashTableStructure_String_13_non_ascii;
 
-impl HashTableStructure_String_13 {
+impl HashTableStructure_String_13_non_ascii {
     const BUCKETS: [i8; 13] = [
         0, 0, 13, 10, 0, 4, 0, 0, 7, 3, 
         12, 2, 11

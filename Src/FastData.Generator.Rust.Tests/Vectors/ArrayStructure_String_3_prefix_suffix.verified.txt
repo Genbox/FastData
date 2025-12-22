@@ -1,0 +1,38 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Array
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct ArrayStructure_String_3_prefix_suffix;
+
+impl ArrayStructure_String_3_prefix_suffix {
+    const KEYS: [&'static str; 3] = [
+        "text", "fetch", "fix"
+    ];
+
+    #[must_use]
+    pub fn contains(key: &'static str) -> bool {
+        if key.len() < 6 as usize || key.len() > 8 as usize {
+            return false;
+        }
+        if !(key.starts_with("pre")) {
+            return false;
+        }
+
+        let trimmedKey = &key[3..key.len() - 0];
+
+        for entry in Self::KEYS.iter() {
+            if *entry == trimmedKey {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_KEY_LENGTH: usize = 6;
+    pub const MAX_KEY_LENGTH: usize = 8;
+}

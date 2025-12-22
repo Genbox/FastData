@@ -155,11 +155,27 @@ public static partial class FastDataGenerator
         const KeyType keyType = KeyType.String;
         LogKeyType(logger, keyType);
 
-        StringProperties strProps = KeyAnalyzer.GetStringProperties(keys);
+        StringProperties strProps = KeyAnalyzer.GetStringProperties(keys, fdCfg.EnableTrimming);
+
+        string? trimPrefix = null;
+        string? trimSuffix = null;
+
+        // If we can remove prefix/suffix from the keys, we do so.
+        if (strProps.DeltaData.LeftZeroCount > 0 || strProps.DeltaData.RightZeroCount > 0)
+        {
+            if (strProps.DeltaData.LeftZeroCount > 0)
+                trimPrefix = keys[0].Substring(0, strProps.DeltaData.LeftZeroCount);
+
+            if (strProps.DeltaData.RightZeroCount > 0)
+                trimSuffix = keys[0].Substring(strProps.DeltaData.RightZeroCount);
+
+            keys = SubStringKeys(keys, strProps);
+        }
+
         LogMinMaxLength(logger, strProps.LengthData.Min, strProps.LengthData.Max);
 
         HashDetails hashDetails = new HashDetails();
-        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, keyType, (uint)keys.Length, strProps, DefaultStringComparison, hashDetails, generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None);
+        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, keyType, (uint)keys.Length, strProps, DefaultStringComparison, hashDetails, generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None, trimPrefix, trimSuffix);
 
         switch (fdCfg.StructureType)
         {
@@ -222,6 +238,24 @@ public static partial class FastDataGenerator
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
         }
+    }
+
+    internal static string[] SubStringKeys(string[] keys, StringProperties props)
+    {
+        int prefix = props.DeltaData.LeftZeroCount;
+        int suffix = props.DeltaData.RightZeroCount;
+
+        Debug.Assert(prefix > 0 || suffix > 0, "Don't call this method if there is nothing to trim");
+
+        string[] modified = new string[keys.Length];
+
+        for (int i = 0; i < keys.Length; i++)
+        {
+            string key = keys[i];
+            modified[i] = key.Substring(prefix, key.Length - prefix - suffix);
+        }
+
+        return modified;
     }
 
     private static string GenerateWrapper<TKey, TValue, TContext>(ICodeGenerator generator, GeneratorConfig<TKey> genCfg, IStructure<TKey, TValue, TContext> structure, TKey[] keys, TValue[]? values) where TContext : IContext<TValue>

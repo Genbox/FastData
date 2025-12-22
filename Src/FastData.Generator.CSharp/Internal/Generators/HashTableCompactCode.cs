@@ -43,9 +43,9 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                         {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
-                            {{HashSizeType}} hash = Hash(key);
+                            {{HashSizeType}} hash = Hash({{LookupKeyName}});
                             {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.BucketStarts.Length)}};
                             int start = (int)_bucketStarts[index];
                             int count = (int)_bucketCounts[index];
@@ -55,7 +55,7 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
                             {
                                 ref E entry = ref _entries[i];
 
-                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.Key", "key")}})
+                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.Key", LookupKeyName)}})
                                     return true;
                             }
 
@@ -72,9 +72,9 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
                             {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                {{HashSizeType}} hash = Hash(key);
+                                {{HashSizeType}} hash = Hash({{LookupKeyName}});
                                 {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.BucketStarts.Length)}};
                                 int start = (int)_bucketStarts[index];
                                 int count = (int)_bucketCounts[index];
@@ -84,7 +84,7 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
                                 {
                                     ref E entry = ref _entries[i];
 
-                                    if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.Key", "key")}})
+                                    if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.Key", LookupKeyName)}})
                                     {
                                         value = entry.Value;
                                         return true;

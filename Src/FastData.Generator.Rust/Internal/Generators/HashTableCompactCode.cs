@@ -40,9 +40,9 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
 
                         {{MethodAttribute}}
                         {{MethodModifier}}fn contains(key: {{GetKeyTypeName(customKey)}}) -> bool {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
-                            let hash = unsafe { Self::get_hash(key) };
+                            let hash = unsafe { Self::get_hash({{LookupKeyName}}) };
                             let index = {{GetModFunction("hash", (ulong)ctx.BucketStarts.Length)}};
                             let start = Self::BUCKET_STARTS[index as usize] as usize;
                             let count = Self::BUCKET_COUNTS[index as usize] as usize;
@@ -50,7 +50,7 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
 
                             for i in start..end {
                                 let entry = &Self::ENTRIES[i];
-                                if {{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", "key")}} {
+                                if {{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", LookupKeyName)}} {
                                     return true;
                                 }
                             }
@@ -67,9 +67,9 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
 
                             {{MethodAttribute}}
                             {{MethodModifier}}fn try_lookup(key: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                let hash = unsafe { Self::get_hash(key) };
+                                let hash = unsafe { Self::get_hash({{LookupKeyName}}) };
                                 let index = {{GetModFunction("hash", (ulong)ctx.BucketStarts.Length)}};
                                 let start = Self::BUCKET_STARTS[index as usize] as usize;
                                 let count = Self::BUCKET_COUNTS[index as usize] as usize;
@@ -77,7 +77,7 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
 
                                 for i in start..end {
                                     let entry = &Self::ENTRIES[i];
-                                    if {{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", "key")}} {
+                                    if {{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", LookupKeyName)}} {
                                         return Some(entry.value);
                                     }
                                 }

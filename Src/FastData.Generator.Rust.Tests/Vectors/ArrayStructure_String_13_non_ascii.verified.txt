@@ -1,24 +1,30 @@
 ﻿//! This file is auto-generated. Do not edit manually.
-//! Structure: Conditional
+//! Structure: Array
 #![allow(unused_parens)]
 #![allow(missing_docs)]
 #![allow(unused_imports)]
 #![allow(unused_unsafe)]
 use std::ptr;
 
-pub struct ConditionalStructure_String_13;
+pub struct ArrayStructure_String_13_non_ascii;
 
-impl ConditionalStructure_String_13 {
+impl ArrayStructure_String_13_non_ascii {
+    const KEYS: [&'static str; 13] = [
+        "æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", 
+        "ñ", "ø", "å"
+    ];
+
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
         if key.len() != 2 as usize {
             return false;
         }
 
-        if key == "æ" || key == "à" || key == "ä" || key == "ö" || key == "ü" || key == "ß" || key == "é" || key == "è" || key == "ê" || key == "ç" || key == "ñ" || key == "ø" || key == "å" {
-            return true;
+        for entry in Self::KEYS.iter() {
+            if *entry == key {
+                return true;
+            }
         }
-
         false
     }
 

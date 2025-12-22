@@ -35,16 +35,16 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                     public:
                         {{MethodAttribute}}
                         {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
-                            const {{HashSizeType}} hash = get_hash(key);
+                            const {{HashSizeType}} hash = get_hash({{LookupKeyName}});
                             const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                             {{GetSmallestSignedType(ctx.Buckets.Length)}} i = static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(buckets[index] - 1);
 
                             while (i >= 0) {
                                 const auto& entry = entries[i];
 
-                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", "key")}})
+                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", LookupKeyName)}})
                                     return true;
 
                                 i = entry.next;
@@ -63,16 +63,16 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
 
                             {{MethodAttribute}}
                             {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                const {{HashSizeType}} hash = get_hash(key);
+                                const {{HashSizeType}} hash = get_hash({{LookupKeyName}});
                                 const {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                                 {{GetSmallestSignedType(ctx.Buckets.Length)}} i = static_cast<{{GetSmallestSignedType(ctx.Buckets.Length)}}>(buckets[index] - 1);
 
                                 while (i >= 0) {
                                     const auto& entry = entries[i];
 
-                                    if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", "key")}}) {
+                                    if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.hash_code", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.key", LookupKeyName)}}) {
                                         value = {{ptr}}entry.value;
                                         return true;
                                     }

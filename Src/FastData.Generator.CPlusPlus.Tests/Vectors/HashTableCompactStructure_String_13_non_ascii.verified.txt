@@ -6,7 +6,7 @@
 #include <limits>
 #include <string_view>
 
-class HashTableCompactStructure_String_13 final {
+class HashTableCompactStructure_String_13_non_ascii final {
     struct e {
         std::u32string_view key;
         uint64_t hash_code;

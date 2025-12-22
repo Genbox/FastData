@@ -1,0 +1,35 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class ArrayStructure_String_2_prefix_suffix final {
+    static constexpr std::array<std::string_view, 2> keys = {
+        "suf", "pre"
+    };
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const std::string_view key) noexcept {
+        if (key.length() != 6u)
+            return false;
+        if (!(key.compare(key.length() - 3, 3, "fix") == 0))
+            return false;
+
+        const auto trimmedKey = key.substr(0, key.length() - 3);
+
+        for (size_t i = 0; i < 2; i++)
+        {
+            if (keys[i] == trimmedKey)
+                return true;
+        }
+        return false;
+    }
+
+    static constexpr size_t item_count = 2;
+    static constexpr size_t min_key_length = 6;
+    static constexpr size_t max_key_length = 6;
+};

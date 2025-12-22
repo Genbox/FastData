@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class BinarySearchStructure_String_13
+internal static class BinarySearchStructure_String_13_non_ascii
 {
     private static readonly string[] _keys = new string[] {
         "ß", "à", "ä", "å", "æ", "ç", "è", "é", "ê", "ñ", 

@@ -6,9 +6,9 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-pub struct BitSetStructure_Int32_5;
+pub struct BitSetStructure_Int32_5_range_bitset;
 
-impl BitSetStructure_Int32_5 {
+impl BitSetStructure_Int32_5_range_bitset {
     const BITSET: [u64; 1] = [
         31
     ];

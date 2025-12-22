@@ -21,6 +21,8 @@ public sealed class GeneratorConfig<T>
         Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.UtcNow);
         HashDetails = hashDetails;
         Flags = flags;
+        TrimPrefix = string.Empty;
+        TrimSuffix = string.Empty;
     }
 
     internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, KeyProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags)
@@ -29,11 +31,15 @@ public sealed class GeneratorConfig<T>
         Constants = CreateConstants(props, itemCount);
     }
 
-    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringProperties props, StringComparison stringComparison, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags)
+    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringProperties props, StringComparison stringComparison, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string? trimPrefix, string? trimSuffix) : this(structureType, keyType, hashDetails, flags)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType, encoding).ToArray();
         Constants = CreateConstants(props, itemCount);
         StringComparison = stringComparison;
+
+        // We use an empty string instead of null to simplify calculations later in the pipeline
+        TrimPrefix = trimPrefix ?? string.Empty;
+        TrimSuffix = trimSuffix ?? string.Empty;
     }
 
     /// <summary>Gets the structure type that the generator will create.</summary>
@@ -58,6 +64,9 @@ public sealed class GeneratorConfig<T>
     public HashDetails HashDetails { get; }
 
     public GeneratorFlags Flags { get; }
+
+    public string TrimPrefix { get; }
+    public string TrimSuffix { get; }
 
     private static Constants<T> CreateConstants(KeyProperties<T> props, uint itemCount)
     {

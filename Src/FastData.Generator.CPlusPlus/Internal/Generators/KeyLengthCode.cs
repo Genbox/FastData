@@ -36,9 +36,9 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                     public:
                         {{MethodAttribute}}
                         {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
-                            return {{GetEqualFunction("key", $"keys[key.length() - {ctx.MinLength.ToStringInvariant()}]")}};
+                            return {{GetEqualFunction(LookupKeyName, $"keys[{LookupKeyName}.length() - {ctx.MinLength.ToStringInvariant()}]")}};
                         }
                     """);
 
@@ -49,10 +49,10 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
 
                             {{MethodAttribute}}
                             {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                size_t idx = key.length() - {{ctx.MinLength.ToStringInvariant()}};
-                                if ({{GetEqualFunction("key", "keys[idx]")}}) {
+                                size_t idx = {{LookupKeyName}}.length() - {{ctx.MinLength.ToStringInvariant()}};
+                                if ({{GetEqualFunction(LookupKeyName, "keys[idx]")}}) {
                                     value = {{ptr}}values[offsets[idx]];
                                     return true;
                                 }

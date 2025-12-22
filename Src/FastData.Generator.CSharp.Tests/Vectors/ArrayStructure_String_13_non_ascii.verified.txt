@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class ArrayStructure_String_13
+internal static class ArrayStructure_String_13_non_ascii
 {
     private static readonly string[] _keys = new string[] {
         "æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", 

@@ -6,9 +6,9 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-pub struct HashTableCompactStructure_String_13;
+pub struct HashTableCompactStructure_String_13_non_ascii;
 
-impl HashTableCompactStructure_String_13 {
+impl HashTableCompactStructure_String_13_non_ascii {
     const BUCKET_STARTS: [u8; 13] = [
         0, 0, 0, 2, 4, 4, 5, 5, 5, 7, 
         8, 10, 11

@@ -33,7 +33,7 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                         {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
                             ulong offset = (ulong)(key - MinKey);
                             int word = (int)(offset >> 6);
@@ -48,7 +48,7 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
                             {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 ulong offset = (ulong)(key - MinKey);
                                 int word = (int)(offset >> 6);

@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class ConditionalStructure_String_13
+internal static class ConditionalStructure_String_13_non_ascii
 {
     
     public static bool Contains(string key)

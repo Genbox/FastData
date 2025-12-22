@@ -6,9 +6,9 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-pub struct BinarySearchStructure_String_13;
+pub struct BinarySearchStructure_String_13_non_ascii;
 
-impl BinarySearchStructure_String_13 {
+impl BinarySearchStructure_String_13_non_ascii {
     const KEYS: [&'static str; 13] = [
         "ß", "à", "ä", "å", "æ", "ç", "è", "é", "ê", "ñ", 
         "ö", "ø", "ü"

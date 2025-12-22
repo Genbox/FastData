@@ -35,7 +35,7 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
         sb.Append($$"""
                         {{MethodAttribute}}
                         {{MethodModifier}}fn contains(key: {{GetKeyTypeName(customKey)}}) -> bool {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
                             let offset = {{GetOffsetExpression()}};
                             let word = offset >> 6;
@@ -50,7 +50,7 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
 
                             {{MethodAttribute}}
                             {{MethodModifier}}fn try_lookup(key: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 let offset = {{GetOffsetExpression()}};
                                 let word = offset >> 6;

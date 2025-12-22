@@ -31,11 +31,11 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                         {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
                             for (int i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
                             {
-                                if ({{GetEqualFunction("key", "_keys[i]")}})
+                                if ({{GetEqualFunction(LookupKeyName, "_keys[i]")}})
                                    return true;
                             }
                             return false;
@@ -49,11 +49,11 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
                             {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
                                 {
-                                    if ({{GetEqualFunction("_keys[i]", "key")}})
+                                    if ({{GetEqualFunction("_keys[i]", LookupKeyName)}})
                                     {
                                         value = _values[i];
                                         return true;

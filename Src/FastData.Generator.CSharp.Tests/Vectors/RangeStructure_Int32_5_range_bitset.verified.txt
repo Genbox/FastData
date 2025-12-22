@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class RangeStructure_Int32_5
+internal static class RangeStructure_Int32_5_range_bitset
 {
     
     public static bool Contains(int key)

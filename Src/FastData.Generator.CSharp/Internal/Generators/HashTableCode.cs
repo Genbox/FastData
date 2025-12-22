@@ -41,9 +41,9 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                         {{MethodAttribute}}
                         {{MethodModifier}}bool Contains({{KeyTypeName}} key)
                         {
-                    {{GetEarlyExits(MethodType.Contains)}}
+                    {{GetMethodHeader(MethodType.Contains)}}
 
-                            {{HashSizeType}} hash = Hash(key);
+                            {{HashSizeType}} hash = Hash({{LookupKeyName}});
                             {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                             {{GetSmallestSignedType(ctx.Buckets.Length)}} i = ({{GetSmallestSignedType(ctx.Buckets.Length)}})(_buckets[index] - 1);
 
@@ -51,7 +51,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                             {
                                 ref E entry = ref _entries[i];
 
-                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.Key", "key")}})
+                                if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.Key", LookupKeyName)}})
                                     return true;
 
                                 i = entry.Next;
@@ -70,9 +70,9 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                             {{MethodAttribute}}
                             {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
                             {
-                        {{GetEarlyExits(MethodType.TryLookup)}}
+                        {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                {{HashSizeType}} hash = Hash(key);
+                                {{HashSizeType}} hash = Hash({{LookupKeyName}});
                                 {{ArraySizeType}} index = {{GetModFunction("hash", (ulong)ctx.Buckets.Length)}};
                                 {{GetSmallestSignedType(ctx.Buckets.Length)}} i = ({{GetSmallestSignedType(ctx.Buckets.Length)}})(_buckets[index] - 1);
 
@@ -80,7 +80,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                                 {
                                     ref E entry = ref _entries[i];
 
-                                    if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.Key", "key")}})
+                                    if ({{(ctx.StoreHashCode ? $"{GetEqualFunction("entry.HashCode", "hash", KeyType.Int64)} && " : "")}}{{GetEqualFunction("entry.Key", LookupKeyName)}})
                                     {
                                         value = entry.Value;
                                         return true;

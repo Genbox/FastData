@@ -17,12 +17,12 @@ internal sealed class RangeCode<TKey, TValue>(RangeContext<TKey, TValue> ctx, Sh
         {
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
-            sb.Append($$"""
-                           {{FieldModifier}}VALUES: [{{GetValueTypeName(customValue)}}; {{ctx.Values.Length.ToStringInvariant()}}] = [
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
-                            ];
+            sb.Append($"""
+                          {FieldModifier}VALUES: [{GetValueTypeName(customValue)}; {ctx.Values.Length.ToStringInvariant()}] = [
+                       {FormatColumns(ctx.Values, ToValueLabel)}
+                           ];
 
-                        """);
+                       """);
         }
 
         sb.Append($$"""

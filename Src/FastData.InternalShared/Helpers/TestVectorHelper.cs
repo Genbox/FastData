@@ -88,14 +88,14 @@ public static class TestVectorHelper
         }
 
         // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
-        foreach (ITestVector testVector in GenerateTestVectors([["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]], typeof(KeyLengthStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]], null, typeof(KeyLengthStructure<,>)))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], typeof(HashTablePerfectStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], null, typeof(HashTablePerfectStructure<,>)))
             yield return testVector;
 
         // Strings with characters that are not in the ASCII range
-        foreach (ITestVector testVector in GenerateTestVectors([["æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", "ñ", "ø", "å"]],
+        foreach (ITestVector testVector in GenerateTestVectors([["æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", "ñ", "ø", "å"]], "non_ascii",
                      typeof(ArrayStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
@@ -105,10 +105,12 @@ public static class TestVectorHelper
             yield return testVector;
         }
 
-        // Test range support. Keys have to be without gaps
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]],
-                     typeof(RangeStructure<,>),
-                     typeof(BitSetStructure<,>)))
+        // Test range/bitset support. Keys have to be without gaps for range to kick in.
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "range_bitset", typeof(RangeStructure<,>), typeof(BitSetStructure<,>)))
+            yield return testVector;
+
+        // Test prefix/suffix support
+        foreach (ITestVector testVector in GenerateTestVectors([["pretext", "prefetch", "prefix"], ["suffix", "prefix"]], "prefix_suffix", typeof(ArrayStructure<,>)))
             yield return testVector;
     }
 
@@ -181,9 +183,9 @@ public static class TestVectorHelper
         }
     }
 
-    private static IEnumerable<ITestVector> GenerateTestVectors<TKey>(IEnumerable<TKey[]> keySets, params Type[] dataStructs)
+    private static IEnumerable<ITestVector> GenerateTestVectors<TKey>(IEnumerable<TKey[]> keySets, string? postfix = null, params Type[] dataStructs)
     {
-        return GenerateTestVectors(keySets.Select(x => new DataPair(x.Cast<object>().ToArray(), [])), null, dataStructs);
+        return GenerateTestVectors(keySets.Select(x => new DataPair(x.Cast<object>().ToArray(), [])), postfix, dataStructs);
     }
 
     private static IEnumerable<ITestVector> GenerateTestVectors<TKey, TValue>(TKey[][] keySets, TValue[][] valueSets, string? postFix = null, params Type[] dataStructs)

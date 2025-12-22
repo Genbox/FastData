@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class BitSetStructure_Int32_5
+internal static class BitSetStructure_Int32_5_range_bitset
 {
     private static readonly ulong[] _bitset = new ulong[] {
         31ul
