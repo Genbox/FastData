@@ -17,11 +17,18 @@ internal sealed class HashTablePerfectStructure<TKey, TValue>(HashData hashData,
 
         ulong[] hashCodes = hashData.HashCodes;
         KeyValuePair<TKey, ulong>[] pairs = new KeyValuePair<TKey, ulong>[size];
+        TValue[]? denseValues = values == null ? null : new TValue[size];
 
         //We need to reorder the data to match hashes
         for (int i = 0; i < keys.Length; i++)
-            pairs[hashCodes[i] % size] = new KeyValuePair<TKey, ulong>(keys[i], hashCodes[i]);
+        {
+            ulong index = hashCodes[i] % size;
+            pairs[index] = new KeyValuePair<TKey, ulong>(keys[i], hashCodes[i]);
 
-        return new HashTablePerfectContext<TKey, TValue>(pairs, !keyType.IsIdentityHash(), values);
+            if (denseValues != null)
+                denseValues[index] = values![i];
+        }
+
+        return new HashTablePerfectContext<TKey, TValue>(pairs, !keyType.IsIdentityHash(), denseValues);
     }
 }

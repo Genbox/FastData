@@ -16,7 +16,7 @@ class HashTablePerfectStructure_Int32_3_simple final {
         : key(key), value(value) {}
     };
     inline static const std::array<e, 3> entries = {
-        e(3, 1), e(1, 2), e(2, 3)
+        e(3, 3), e(1, 1), e(2, 2)
     };
 
     static constexpr uint64_t get_hash(const int32_t value) noexcept

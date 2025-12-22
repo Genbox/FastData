@@ -19,7 +19,7 @@ impl e {
 impl HashTablePerfectStructure_Int32_3_simple {
 
 const ENTRIES: [e; 3] = [
-            e::new(3, 1), e::new(1, 2), e::new(2, 3)
+            e::new(3, 3), e::new(1, 1), e::new(2, 2)
 ];
 
     #[inline(always)]

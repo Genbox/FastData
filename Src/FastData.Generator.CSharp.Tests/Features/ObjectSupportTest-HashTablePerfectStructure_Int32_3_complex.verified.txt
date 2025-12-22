@@ -36,7 +36,7 @@ private struct E
     }
 }
     private static readonly E[] _entries = {
-        new E(3, new Person(1, "Bob", new Person(4, "Anna", null))), new E(1, new Person(2, "Billy", null)), new E(2, new Person(3, "Bibi", null))
+        new E(3, new Person(3, "Bibi", null)), new E(1, new Person(1, "Bob", new Person(4, "Anna", null))), new E(2, new Person(2, "Billy", null))
     };
 
 

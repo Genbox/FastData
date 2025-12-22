@@ -29,7 +29,7 @@ impl Person {
 impl HashTablePerfectStructure_Int32_3_complex {
 
 const ENTRIES: [e; 3] = [
-            e::new(3, &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None)))), e::new(1, &Person::new(2, "Billy", None)), e::new(2, &Person::new(3, "Bibi", None))
+            e::new(3, &Person::new(3, "Bibi", None)), e::new(1, &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None)))), e::new(2, &Person::new(2, "Billy", None))
 ];
 
     #[inline(always)]
