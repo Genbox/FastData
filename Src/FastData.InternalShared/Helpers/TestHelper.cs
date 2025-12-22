@@ -16,7 +16,7 @@ using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.InternalShared.Helpers;
 
-public sealed record ProcessResult(int ExitCode, string StandardOutput, string StandardError, bool TimedOut);
+public sealed record ProcessResult(int ExitCode, string StandardOutput, string StandardError);
 
 public static class TestHelper
 {
@@ -118,7 +118,7 @@ public static class TestHelper
             /* best effort */
         }
 
-        return new ProcessResult(process.ExitCode, stdOut, stdErr, TimedOut: !exited);
+        return new ProcessResult(process.ExitCode, stdOut, stdErr);
     }
 
     /// <summary>This function is here to help avoid write-fatigue</summary>
