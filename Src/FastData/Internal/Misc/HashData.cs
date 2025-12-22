@@ -7,7 +7,13 @@ internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUn
 {
     internal static HashData Create<T>(T[] data, int capacityFactor, HashFunc<T> func)
     {
-        ulong size = (ulong)(data.Length * capacityFactor);
+        if (capacityFactor <= 0)
+            throw new InvalidOperationException("HashCapacityFactor must be greater than 0.");
+
+        ulong size = checked((ulong)data.Length * (ulong)capacityFactor);
+
+        if (size == 0)
+            throw new InvalidOperationException("HashCapacityFactor results in zero-sized hash table.");
 
         ulong[] hashCodes = new ulong[size];
         HashSet<ulong> uniqSet = new HashSet<ulong>();
