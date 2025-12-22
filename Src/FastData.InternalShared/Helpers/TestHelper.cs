@@ -171,7 +171,7 @@ public static class TestHelper
                     trimPrefix = strKeys[0].Substring(0, strProps.DeltaData.LeftZeroCount);
 
                 if (strProps.DeltaData.RightZeroCount > 0)
-                    trimSuffix = strKeys[0].Substring(strProps.DeltaData.RightZeroCount);
+                    trimSuffix = strKeys[0].Substring(strKeys[0].Length - strProps.DeltaData.RightZeroCount);
 
                 keys = (TKey[])(object)FastDataGenerator.SubStringKeys(strKeys, strProps);
             }

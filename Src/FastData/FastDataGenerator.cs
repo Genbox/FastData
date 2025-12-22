@@ -167,7 +167,7 @@ public static partial class FastDataGenerator
                 trimPrefix = keys[0].Substring(0, strProps.DeltaData.LeftZeroCount);
 
             if (strProps.DeltaData.RightZeroCount > 0)
-                trimSuffix = keys[0].Substring(strProps.DeltaData.RightZeroCount);
+                trimSuffix = keys[0].Substring(keys[0].Length - strProps.DeltaData.RightZeroCount);
 
             keys = SubStringKeys(keys, strProps);
         }
