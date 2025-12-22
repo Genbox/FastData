@@ -3,7 +3,7 @@ using Genbox.FastData.Generators.StringHash.Framework;
 namespace Genbox.FastData.Internal.Misc;
 
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
-internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUnique, bool HashCodesPerfect)
+internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUnique, bool HashCodesPerfect, ulong MinHashCode, ulong MaxHashCode)
 {
     internal static HashData Create<T>(T[] data, int capacityFactor, HashFunc<T> func)
     {
@@ -21,11 +21,16 @@ internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUn
 
         bool uniq = true;
         bool perfect = true;
+        ulong minHashCode = ulong.MaxValue;
+        ulong maxHashCode = ulong.MinValue;
 
         for (int i = 0; i < data.Length; i++)
         {
             ulong hash = func(data[i]);
             hashCodes[i] = hash;
+
+            minHashCode = hash < minHashCode ? hash : minHashCode;
+            maxHashCode = hash > maxHashCode ? hash : maxHashCode;
 
             if (uniq && !uniqSet.Add(hash)) //The unique check is first so that when it is false, we don't try the other conditions
                 uniq = false;
@@ -34,6 +39,6 @@ internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUn
                 perfect = false;
         }
 
-        return new HashData(hashCodes, capacityFactor, uniq, perfect);
+        return new HashData(hashCodes, capacityFactor, uniq, perfect, minHashCode, maxHashCode);
     }
 }
