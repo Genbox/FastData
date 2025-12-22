@@ -50,7 +50,7 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
             sb.Append($"""
 
                                if (!({GetTrimMatchCondition()}))
-                                   return false;
+                                   {CSharpEarlyExitDef.RenderExit(methodType)}
 
                                string trimmedKey = key.Substring({TrimPrefix.Length.ToStringInvariant()}, key.Length - {TotalTrimLength.ToStringInvariant()});
                        """);

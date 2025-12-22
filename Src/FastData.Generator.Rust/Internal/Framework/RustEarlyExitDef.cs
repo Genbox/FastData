@@ -18,7 +18,7 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
                     match key.len() >> 6 {
                 {{RenderCases()}}
                         _ => {
-                             {{RenderMethod(methodType)}}
+                             {{RenderExit(methodType)}}
                         }
                     }
                 """;
@@ -44,23 +44,23 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
     protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) =>
         $$"""
                   if {{(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")}} {
-                      {{RenderMethod(methodType)}}
+                      {{RenderExit(methodType)}}
                   }
           """;
 
     protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
         $$"""
                   if {{(minByte.Equals(maxByte) ? $"key.len() != {map.ToValueLabel(maxByte)} as usize" : $"key.len() < {map.ToValueLabel(minByte)} as usize || key.len() > {map.ToValueLabel(maxByte)} as usize")}} {
-                      {{RenderMethod(methodType)}}
+                      {{RenderExit(methodType)}}
                   }
           """;
 
     private static string RenderWord(ulong word, MethodType methodType) =>
         $$"""
                       if {{word.ToStringInvariant()}}u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
-                          {{RenderMethod(methodType)}}
+                          {{RenderExit(methodType)}}
                       }
           """;
 
-    private static string RenderMethod(MethodType methodType) => methodType == MethodType.TryLookup ? "return None;" : "return false;";
+    internal static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup ? "return None;" : "return false;";
 }

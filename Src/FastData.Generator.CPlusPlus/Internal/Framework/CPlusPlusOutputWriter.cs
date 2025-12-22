@@ -21,7 +21,7 @@ internal abstract class CPlusPlusOutputWriter<TKey> : OutputWriter<TKey>
             sb.Append($"""
 
                                if (!({GetTrimMatchCondition()}))
-                                   return false;
+                                   {CPlusPlusEarlyExitDef.RenderExit(methodType)}
 
                                const auto trimmedKey = key.substr({TrimPrefix.Length.ToStringInvariant()}, key.length() - {TotalTrimLength.ToStringInvariant()});
                        """);

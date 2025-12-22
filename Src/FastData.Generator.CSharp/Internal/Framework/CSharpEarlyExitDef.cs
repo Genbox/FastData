@@ -19,7 +19,7 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
                         {
                 {{RenderCases()}}
                             default:
-                                {{RenderMethod(methodType)}}
+                                {{RenderExit(methodType)}}
                         }
                 """;
 
@@ -44,22 +44,22 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
     protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) =>
         $"""
                  if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
-                     {RenderMethod(methodType)}
+                     {RenderExit(methodType)}
          """;
 
     protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
         $"""
                  if ({(min.Equals(max) ? $"key.Length != {map.ToValueLabel(max)}" : $"key.Length < {map.ToValueLabel(min)} || key.Length > {map.ToValueLabel(max)}")})
-                     {RenderMethod(methodType)}
+                     {RenderExit(methodType)}
          """;
 
     private static string RenderWord(ulong word, MethodType methodType) =>
         $"""
                          if (({word.ToStringInvariant()}UL & (1UL << ((key.Length - 1) & 63))) == 0)
-                             {RenderMethod(methodType)}
+                             {RenderExit(methodType)}
          """;
 
-    private static string RenderMethod(MethodType methodType) => methodType == MethodType.TryLookup
+    internal static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup
         ? """
           {
                       value = default;

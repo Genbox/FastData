@@ -19,7 +19,7 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
                         {
                 {{RenderCases()}}
                             default:
-                                {{RenderMethod(methodType)}}
+                                {{RenderExit(methodType)}}
                         }
                 """;
 
@@ -44,22 +44,22 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
     protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) =>
         $"""
                  if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
-                     {RenderMethod(methodType)}
+                     {RenderExit(methodType)}
          """;
 
     protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
         $"""
                  if ({(min.Equals(max) ? $"key.length() != {map.ToValueLabel(max)}" : $"const size_t len = key.length(); len < {map.ToValueLabel(min)} || len > {map.ToValueLabel(max)}")})
-                     {RenderMethod(methodType)}
+                     {RenderExit(methodType)}
          """;
 
     private static string RenderWord(ulong word, MethodType methodType) =>
         $"""
                  if (({word.ToStringInvariant()}ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
-                     {RenderMethod(methodType)}
+                     {RenderExit(methodType)}
          """;
 
-    private static string RenderMethod(MethodType methodType) => methodType == MethodType.TryLookup
+    internal static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup
         ? """
           {
               value = nullptr;

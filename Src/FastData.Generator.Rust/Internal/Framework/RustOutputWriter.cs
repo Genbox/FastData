@@ -21,7 +21,7 @@ internal abstract class RustOutputWriter<T> : OutputWriter<T>
             sb.Append($$"""
 
                                 if !({{GetTrimMatchCondition()}}) {
-                                    return false;
+                                    {{RustEarlyExitDef.RenderExit(methodType)}}
                                 }
 
                                 let trimmedKey = &key[{{TrimPrefix.Length.ToStringInvariant()}}..key.len() - {{TrimSuffix.Length.ToStringInvariant()}}];
