@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis.Data;
 
@@ -8,6 +7,9 @@ internal sealed class LengthBitArray(int length = 64)
     private int _length = length;
     private ulong[] _values = new ulong[GetLength(length)];
 
+    public int Min { get; private set; } = int.MaxValue;
+    public int Max { get; private set; } = int.MinValue;
+
     internal ulong[] Values => _values;
     internal int BitCount { get; private set; }
 
@@ -15,13 +17,10 @@ internal sealed class LengthBitArray(int length = 64)
     {
         get
         {
-            foreach (ulong val in _values)
-            {
-                if (!BitHelper.AreBitsConsecutive(val))
-                    return false;
-            }
+            if (BitCount == 0)
+                return false;
 
-            return true;
+            return BitCount == Max - Min + 1;
         }
     }
 
@@ -31,7 +30,8 @@ internal sealed class LengthBitArray(int length = 64)
         if (unchecked((uint)index >= (uint)_length))
             throw new ArgumentException("Index out of range: " + index, nameof(index));
 
-        return (_values[index >> 6] & (1UL << ((index & 63) - 1))) != 0; //-1 because we want a length of 1 to set the 0th bit
+        GetPosition(index, out int wordIndex, out ulong mask);
+        return (_values[wordIndex] & mask) != 0;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -45,12 +45,16 @@ internal sealed class LengthBitArray(int length = 64)
 
         unchecked
         {
-            ulong mask = 1UL << ((index & 63) - 1); //-1 because we want a length of 1 to set the 0th bit
-            ref ulong slot = ref _values[index >> 6];
+            GetPosition(index, out int wordIndex, out ulong mask);
+            ref ulong slot = ref _values[wordIndex];
             bool alreadySet = (slot & mask) != 0;
 
             if (!alreadySet)
+            {
                 BitCount++;
+                Min = Math.Min(Min, index);
+                Max = Math.Max(Max, index);
+            }
 
             slot |= mask;
             return alreadySet;
@@ -73,5 +77,14 @@ internal sealed class LengthBitArray(int length = 64)
             throw new InvalidOperationException("Length must be greater than zero.");
 
         return (n + 63) >> 6;
+    }
+
+    private static void GetPosition(int index, out int wordIndex, out ulong mask)
+    {
+        int remainder = index & 63;
+        int bitIndex = remainder == 0 ? 63 : remainder - 1; //-1 because we want a length of 1 to set the 0th bit
+
+        wordIndex = index >> 6;
+        mask = 1UL << bitIndex;
     }
 }

@@ -29,7 +29,6 @@ internal static class KeyAnalyzer
 
         //We need to know the longest string for optimal mixing. Probably not 100% necessary.
         string maxStr = keys[0];
-        int minLength = int.MaxValue;
         int minUtf8ByteLength = int.MaxValue;
         int maxUtf8ByteLength = int.MinValue;
         int minUtf16ByteLength = int.MaxValue;
@@ -50,7 +49,6 @@ internal static class KeyAnalyzer
             minUtf16ByteLength = Math.Min(utf16ByteCount, minUtf16ByteLength);
             maxUtf16ByteLength = Math.Max(utf16ByteCount, maxUtf16ByteLength);
 
-            minLength = Math.Min(minLength, str.Length); //Track the smallest string. It might be more than what lengthmap supports
             uniq &= !lengthMap.SetTrue(str.Length);
 
             foreach (char c in str)
@@ -70,7 +68,7 @@ internal static class KeyAnalyzer
         int[]? right = null;
 
         // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough
-        if (enableTrimming && keys.Length > 1 && minLength > 1)
+        if (enableTrimming && keys.Length > 1 && lengthMap.Min > 1)
         {
             // Special case: If all strings have the same length, we can build an entropy map in O(n) with O(1) memory
             // TODO: For now FastData only supports prefix/suffix
@@ -126,7 +124,7 @@ internal static class KeyAnalyzer
             }
 
             // Make sure that we handle the case where all characters in the inputs are the same
-            if (DeltaData.CountZero(left) == minLength || DeltaData.CountZero(right) == minLength)
+            if (DeltaData.CountZero(left) == lengthMap.Min || DeltaData.CountZero(right) == lengthMap.Min)
             {
                 left = null;
                 right = null;
@@ -135,7 +133,7 @@ internal static class KeyAnalyzer
             // }
         }
 
-        return new StringProperties(new LengthData((uint)minLength, (uint)maxStr.Length, (uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
+        return new StringProperties(new LengthData((uint)lengthMap.Min, (uint)maxStr.Length, (uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
     }
 
     private static KeyProperties<char> GetCharProperties(char[] keys)
