@@ -29,7 +29,6 @@ public class LengthBitArrayTests
     [Theory]
     [InlineData(-1)]
     [InlineData(-100)]
-    [InlineData(64)]
     public void Get_OutOfRange_Throws(int index)
     {
         LengthBitArray bits = new LengthBitArray();

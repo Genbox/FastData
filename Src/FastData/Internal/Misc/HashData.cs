@@ -15,9 +15,12 @@ internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUn
         if (size == 0)
             throw new InvalidOperationException("HashCapacityFactor results in zero-sized hash table.");
 
+        if (size > int.MaxValue)
+            throw new InvalidOperationException("HashCapacityFactor results in a hash table that is too large.");
+
         ulong[] hashCodes = new ulong[size];
         HashSet<ulong> uniqSet = new HashSet<ulong>();
-        HashSet<ulong> perfectSet = new HashSet<ulong>(); //TODO: Use direct addressing
+        SwitchingBitSet perfectTracker = new SwitchingBitSet((int)size, false);
 
         bool uniq = true;
         bool perfect = true;
@@ -29,13 +32,13 @@ internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUn
             ulong hash = func(data[i]);
             hashCodes[i] = hash;
 
-            minHashCode = hash < minHashCode ? hash : minHashCode;
-            maxHashCode = hash > maxHashCode ? hash : maxHashCode;
+            minHashCode = Math.Min(minHashCode, hash);
+            maxHashCode = Math.Max(maxHashCode, hash);
 
             if (uniq && !uniqSet.Add(hash)) //The unique check is first so that when it is false, we don't try the other conditions
                 uniq = false;
 
-            if (perfect && !perfectSet.Add(hash % size))
+            if (perfect && !perfectTracker.Add((int)(hash % size)))
                 perfect = false;
         }
 

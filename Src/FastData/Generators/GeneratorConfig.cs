@@ -127,6 +127,9 @@ public sealed class GeneratorConfig<T>
 
     private static bool ShouldUseBitSet(LengthData lengthData)
     {
+        if (!lengthData.LengthMap.HasBitSet)
+            return false;
+
         if (lengthData.LengthMap.Consecutive)
             return false;
 
