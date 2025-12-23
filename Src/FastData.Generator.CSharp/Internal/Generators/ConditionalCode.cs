@@ -10,14 +10,16 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
     public override string Generate()
     {
         StringBuilder sb = new StringBuilder();
+        ReadOnlySpan<TKey> keys = ctx.Keys.Span;
+        ReadOnlySpan<TValue> values = ctx.Values.Span;
 
-        if (ctx.Values != null)
+        if (!values.IsEmpty)
         {
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
                             {{FieldModifier}}{{ValueTypeName}}[] _values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                        {{FormatColumns(values, ToValueLabel)}}
                             };
 
                         """);
@@ -25,8 +27,8 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 
         return cfg.ConditionalBranchType switch
         {
-            BranchType.If => GenerateIf(sb, ctx.Keys),
-            BranchType.Switch => GenerateSwitch(sb, ctx.Keys),
+            BranchType.If => GenerateIf(sb, keys),
+            BranchType.Switch => GenerateSwitch(sb, keys),
             _ => throw new InvalidOperationException("Invalid branch type: " + cfg.ConditionalBranchType)
         };
     }
@@ -46,7 +48,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             sb.Append($$"""
 
@@ -55,7 +57,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                             {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
-                        {{GenerateBranches()}}
+                        {{GenerateBranches(data)}}
 
                                 value = default;
                                 return false;
@@ -65,14 +67,14 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 
         return sb.ToString();
 
-        string GenerateBranches()
+        string GenerateBranches(ReadOnlySpan<TKey> span)
         {
             StringBuilder temp = new StringBuilder();
 
-            for (int i = 0; i < ctx.Keys.Length; i++)
+            for (int i = 0; i < span.Length; i++)
             {
                 temp.AppendLine($$"""
-                                          if ({{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Keys[i]))}})
+                                          if ({{GetEqualFunction(LookupKeyName, ToValueLabel(span[i]))}})
                                           {
                                               value = _values[{{i.ToStringInvariant()}}];
                                               return true;
@@ -102,7 +104,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             sb.Append($$"""
                             {{MethodAttribute}}
@@ -112,7 +114,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                         {{GetMethodHeader(MethodType.TryLookup)}}
                                 switch ({{LookupKeyName}})
                                 {
-                        {{GenerateSwitches()}}
+                        {{GenerateSwitches(data)}}
                                 }
                                 value = default;
                                 return false;
@@ -122,14 +124,14 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 
         return sb.ToString();
 
-        string GenerateSwitches()
+        string GenerateSwitches(ReadOnlySpan<TKey> span)
         {
             StringBuilder temp = new StringBuilder();
 
-            for (int i = 0; i < ctx.Keys.Length; i++)
+            for (int i = 0; i < span.Length; i++)
             {
                 temp.AppendLine($"""
-                                             case {ToValueLabel(ctx.Keys[i])}:
+                                             case {ToValueLabel(span[i])}:
                                                  value = _values[{i.ToStringInvariant()}];
                                                  return true;
                                  """);

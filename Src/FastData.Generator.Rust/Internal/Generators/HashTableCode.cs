@@ -12,13 +12,14 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
     {
         bool customKey = !typeof(TKey).IsPrimitive;
         bool customValue = !typeof(TValue).IsPrimitive;
+        ReadOnlyMemory<TValue> values = ctx.Values;
 
         shared.Add(CodePlacement.After, $$"""
                                           struct E {
                                               {{(ctx.StoreHashCode ? $"hash_code: {HashSizeType}," : "")}}
                                               next: {{GetSmallestSignedType(ctx.Buckets.Length)}},
                                               key: {{GetKeyTypeName(customKey)}},
-                                              {{(ctx.Values != null ? $"value: {GetValueTypeName(customValue)}," : "")}}
+                                              {{(!values.IsEmpty ? $"value: {GetValueTypeName(customValue)}," : "")}}
                                           }
                                           """);
 
@@ -30,7 +31,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                         ];
 
                         {{FieldModifier}}ENTRIES: [E; {{ctx.Entries.Length}}] = [
-                    {{FormatColumns(ctx.Entries, (i, x) => $"E {{ {(ctx.StoreHashCode ? $"hash_code: {x.Hash}, " : "")}next: {x.Next.ToStringInvariant()}, key: {ToValueLabel(x.Key)}{(ctx.Values != null ? $", value: {ToValueLabel(ctx.Values[i])}" : "")} }}")}}
+                    {{FormatColumns(ctx.Entries, (i, x) => $"E {{ {(ctx.StoreHashCode ? $"hash_code: {x.Hash}, " : "")}next: {x.Next.ToStringInvariant()}, key: {ToValueLabel(x.Key)}{(!ctx.Values.IsEmpty ? $", value: {ToValueLabel(values.Span[i])}" : "")} }}")}}
                         ];
 
                     {{HashSource}}
@@ -55,7 +56,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 

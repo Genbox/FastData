@@ -68,15 +68,18 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                         string source;
                         if (values == null)
                         {
-                            MethodInfo mi = genType.GetMethod(nameof(FastDataGenerator.Generate), BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)!
-                                                   .MakeGenericMethod(keys.GetValue(0).GetType());
-                            source = (string)mi.Invoke(null, [keys, fdCfg, generator, null])!;
+                            object keyMemory = CreateReadOnlyMemory(keys);
+                            MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.Generate), 1, 4, 1)
+                                .MakeGenericMethod(keys.GetValue(0).GetType());
+                            source = (string)mi.Invoke(null, [keyMemory, fdCfg, generator, null])!;
                         }
                         else
                         {
-                            MethodInfo mi = genType.GetMethod(nameof(FastDataGenerator.GenerateKeyed), BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)!
-                                                   .MakeGenericMethod(keys.GetValue(0).GetType(), values.GetValue(0).GetType());
-                            source = (string)mi.Invoke(null, [keys, values, fdCfg, generator, null])!;
+                            object keyMemory = CreateReadOnlyMemory(keys);
+                            object valueMemory = CreateReadOnlyMemory(values);
+                            MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.GenerateKeyed), 2, 5, 2)
+                                .MakeGenericMethod(keys.GetValue(0).GetType(), values.GetValue(0).GetType());
+                            source = (string)mi.Invoke(null, [keyMemory, valueMemory, fdCfg, generator, null])!;
                         }
 
                         spc.AddSource(combinedCfg.CSConfig.ClassName + ".g.cs", SourceText.From(source, Encoding.UTF8));
@@ -312,5 +315,47 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
         }
 
         return true;
+    }
+
+    private static object CreateReadOnlyMemory(Array array)
+    {
+        Type elementType = array.GetType().GetElementType() ?? throw new InvalidOperationException("Array element type is missing.");
+        Type romType = typeof(ReadOnlyMemory<>).MakeGenericType(elementType);
+        return Activator.CreateInstance(romType, array) ?? throw new InvalidOperationException("Unable to create ReadOnlyMemory instance.");
+    }
+
+    private static MethodInfo GetGenerateMethod(Type genType, string name, int genericArgCount, int paramCount, int memoryParamCount)
+    {
+        var methods = genType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
+        MethodInfo? method = Array.Find(methods, m =>
+        {
+            if (m.Name != name || !m.IsGenericMethodDefinition)
+                return false;
+
+            if (m.GetGenericArguments().Length != genericArgCount)
+                return false;
+
+            ParameterInfo[] parms = m.GetParameters();
+
+            if (parms.Length != paramCount)
+                return false;
+
+            int memoryParams = 0;
+
+            for (int i = 0; i < parms.Length; i++)
+            {
+                Type type = parms[i].ParameterType;
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ReadOnlyMemory<>))
+                    memoryParams++;
+            }
+
+            return memoryParams == memoryParamCount;
+        });
+
+        if (method == null)
+            throw new InvalidOperationException($"Unable to find '{name}' overload that accepts ReadOnlyMemory arguments.");
+
+        return method;
     }
 }

@@ -33,12 +33,14 @@ public class FastDataGeneratorTests
         FastDataGenerator.GenerateKeyed(keys, values, config, generator);
 
         HashTablePerfectContext<int, string> ctx = Assert.IsType<HashTablePerfectContext<int, string>>(generator.Context);
-        Assert.NotNull(ctx.Values);
+        ReadOnlySpan<string> ctxValues = ctx.Values.Span;
+
+        Assert.False(ctxValues.IsEmpty);
 
         for (int i = 0; i < ctx.Data.Length; i++)
         {
             KeyValuePair<int, ulong> entry = ctx.Data[i];
-            string value = ctx.Values![i];
+            string value = ctxValues[i];
             Assert.Equal($"v{entry.Key}", value);
         }
     }

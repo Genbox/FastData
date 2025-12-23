@@ -17,13 +17,14 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
 
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
                             {{FieldModifier}}{{ValueTypeName}}[] _values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                        {{FormatColumns(values, ToValueLabel)}}
                             };
 
                         """);
@@ -41,7 +42,7 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             sb.Append($$"""
 

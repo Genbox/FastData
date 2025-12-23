@@ -19,11 +19,12 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
 
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             sb.Append($$"""
-                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{values.Length.ToStringInvariant()}}> values = {
+                        {{FormatColumns(values, ToValueLabel)}}
                             };
 
                         """);
@@ -41,7 +42,7 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             string ptr = customValue ? "" : "&";
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());

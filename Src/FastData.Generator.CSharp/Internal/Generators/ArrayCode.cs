@@ -10,14 +10,16 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
     public override string Generate()
     {
         StringBuilder sb = new StringBuilder();
+        ReadOnlySpan<TKey> keys = ctx.Keys.Span;
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
                             {{FieldModifier}}{{ValueTypeName}}[] _values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                        {{FormatColumns(values, ToValueLabel)}}
                             };
 
                         """);
@@ -25,7 +27,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
 
         sb.Append($$"""
                         {{FieldModifier}}{{KeyTypeName}}[] _keys = new {{KeyTypeName}}[] {
-                    {{FormatColumns(ctx.Keys, ToValueLabel)}}
+                    {{FormatColumns(keys, ToValueLabel)}}
                         };
 
                         {{MethodAttribute}}
@@ -33,7 +35,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
                         {
                     {{GetMethodHeader(MethodType.Contains)}}
 
-                            for (int i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
+                            for (int i = 0; i < {{keys.Length.ToStringInvariant()}}; i++)
                             {
                                 if ({{GetEqualFunction(LookupKeyName, "_keys[i]")}})
                                    return true;
@@ -42,7 +44,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             sb.Append($$"""
 
@@ -51,7 +53,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
                             {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
+                                for ({{ArraySizeType}} i = 0; i < {{keys.Length.ToStringInvariant()}}; i++)
                                 {
                                     if ({{GetEqualFunction("_keys[i]", LookupKeyName)}})
                                     {

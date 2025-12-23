@@ -10,6 +10,7 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
     public override string Generate()
     {
         StringBuilder sb = new StringBuilder();
+        ReadOnlyMemory<TValue> values = ctx.Values;
 
         sb.Append($$"""
                         [StructLayout(LayoutKind.Auto)]
@@ -17,12 +18,12 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
                         {
                             internal {{KeyTypeName}} Key;
                             {{(ctx.StoreHashCode ? $"internal {HashSizeType} HashCode;" : "")}}
-                            {{(ctx.Values != null ? $"internal {ValueTypeName} Value;" : "")}}
-                            internal E({{KeyTypeName}} key{{(ctx.StoreHashCode ? $", {HashSizeType} hashCode" : "")}}{{(ctx.Values != null ? $", {ValueTypeName} value" : "")}})
+                            {{(!values.IsEmpty ? $"internal {ValueTypeName} Value;" : "")}}
+                            internal E({{KeyTypeName}} key{{(ctx.StoreHashCode ? $", {HashSizeType} hashCode" : "")}}{{(!values.IsEmpty ? $", {ValueTypeName} value" : "")}})
                             {
                                 Key = key;
                                 {{(ctx.StoreHashCode ? "HashCode = hashCode;" : "")}}
-                                {{(ctx.Values != null ? "Value = value;" : "")}}
+                                {{(!values.IsEmpty ? "Value = value;" : "")}}
                             }
                         };
 
@@ -35,7 +36,7 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
                          };
 
                         {{FieldModifier}}E[] _entries = {
-                    {{FormatColumns(ctx.Entries, (i, x) => $"new E({ToValueLabel(x.Key)}{(ctx.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : "")}{(ctx.Values != null ? $", {ToValueLabel(ctx.Values[i])}" : "")})")}}
+                    {{FormatColumns(ctx.Entries, (i, x) => $"new E({ToValueLabel(x.Key)}{(ctx.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : "")}{(!ctx.Values.IsEmpty ? $", {ToValueLabel(values.Span[i])}" : "")})")}}
                         };
 
                     {{HashSource}}
@@ -63,7 +64,7 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 

@@ -12,8 +12,9 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
         bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
@@ -21,8 +22,8 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                         {{FormatColumns(ctx.ValueOffsets, static x => x.ToStringInvariant())}}
                             };
 
-                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length}}> values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{values.Length}}> values = {
+                        {{FormatColumns(values, ToValueLabel)}}
                             };
 
                         """);
@@ -42,7 +43,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             string ptr = customValue ? "" : "&";
             sb.Append($$"""

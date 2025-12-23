@@ -13,16 +13,17 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
         bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($"""
-                          {FieldModifier}VALUES: [{GetValueTypeName(customValue)}; {ctx.Values.Length.ToStringInvariant()}] = [
-                       {FormatColumns(ctx.Values, ToValueLabel)}
+                          {FieldModifier}VALUES: [{GetValueTypeName(customValue)}; {values.Length.ToStringInvariant()}] = [
+                       {FormatColumns(values, ToValueLabel)}
                            ];
 
-                          {FieldModifier}OFFSETS: [i32; {ctx.Values.Length.ToStringInvariant()}] = [
+                          {FieldModifier}OFFSETS: [i32; {values.Length.ToStringInvariant()}] = [
                        {FormatColumns(ctx.ValueOffsets, static x => x.ToStringInvariant())}
                            ];
 
@@ -42,7 +43,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             sb.Append($$"""
 

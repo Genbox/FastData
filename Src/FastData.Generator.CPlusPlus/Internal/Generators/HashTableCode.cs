@@ -11,15 +11,16 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
     {
         bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+        ReadOnlyMemory<TValue> values = ctx.Values;
 
         sb.Append($$"""
                         struct e {
                             {{KeyTypeName}} key;
                             {{GetSmallestSignedType(ctx.Buckets.Length)}} next;
                             {{(ctx.StoreHashCode ? $"{HashSizeType} hash_code;" : "")}}
-                            {{(ctx.Values != null ? $"const {GetValueTypeName(customValue)} value;" : "")}}
-                            e(const {{KeyTypeName}} key, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next{{(ctx.StoreHashCode ? $", const {HashSizeType} hash_code" : "")}}{{(ctx.Values != null ? $", const {GetValueTypeName(customValue)} value" : "")}})
-                               : key(key), next(next){{(ctx.StoreHashCode ? ", hash_code(hash_code)" : "")}}{{(ctx.Values != null ? ", value(value)" : "")}} {}
+                            {{(ctx.Values.IsEmpty ? "" : $"const {GetValueTypeName(customValue)} value;")}}
+                            e(const {{KeyTypeName}} key, const {{GetSmallestSignedType(ctx.Buckets.Length)}} next{{(ctx.StoreHashCode ? $", const {HashSizeType} hash_code" : "")}}{{(!ctx.Values.IsEmpty ? $", const {GetValueTypeName(customValue)} value" : "")}})
+                               : key(key), next(next){{(ctx.StoreHashCode ? ", hash_code(hash_code)" : "")}}{{(ctx.Values.IsEmpty ? "" : ", value(value)")}} {}
                         };
 
                         {{GetFieldModifier(true)}}std::array<{{GetSmallestSignedType(ctx.Buckets.Length)}}, {{ctx.Buckets.Length.ToStringInvariant()}}> buckets = {
@@ -27,7 +28,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                          };
 
                         {{GetFieldModifier(false)}}std::array<e, {{ctx.Entries.Length.ToStringInvariant()}}> entries = {
-                    {{FormatColumns(ctx.Entries, (i, x) => $"e({ToValueLabel(x.Key)}, {x.Next.ToStringInvariant()}{(ctx.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : "")}{(ctx.Values != null ? $", {ToValueLabel(ctx.Values[i])}" : "")})")}}
+                    {{FormatColumns(ctx.Entries, (i, x) => $"e({ToValueLabel(x.Key)}, {x.Next.ToStringInvariant()}{(ctx.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : "")}{(!ctx.Values.IsEmpty ? $", {ToValueLabel(values.Span[i])}" : "")})")}}
                         };
 
                     {{HashSource}}
@@ -54,7 +55,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             string ptr = customValue ? "" : "&";
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());

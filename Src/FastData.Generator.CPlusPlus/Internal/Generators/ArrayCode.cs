@@ -11,20 +11,22 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
     {
         bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+        ReadOnlySpan<TKey> keys = ctx.Keys.Span;
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             sb.Append($$"""
-                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{values.Length.ToStringInvariant()}}> values = {
+                        {{FormatColumns(values, ToValueLabel)}}
                             };
 
                         """);
         }
 
         sb.Append($$"""
-                        {{GetFieldModifier(true)}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
-                    {{FormatColumns(ctx.Keys, ToValueLabel)}}
+                        {{GetFieldModifier(true)}}std::array<{{KeyTypeName}}, {{keys.Length.ToStringInvariant()}}> keys = {
+                    {{FormatColumns(keys, ToValueLabel)}}
                         };
 
                     public:
@@ -32,7 +34,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
                         {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
                     {{GetMethodHeader(MethodType.Contains)}}
 
-                            for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++)
+                            for ({{ArraySizeType}} i = 0; i < {{keys.Length.ToStringInvariant()}}; i++)
                             {
                                 if ({{GetEqualFunction("keys[i]", LookupKeyName)}})
                                     return true;
@@ -41,7 +43,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             string ptr = customValue ? "" : "&";
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
@@ -52,7 +54,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
                             {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                for ({{ArraySizeType}} i = 0; i < {{ctx.Keys.Length.ToStringInvariant()}}; i++) {
+                                for ({{ArraySizeType}} i = 0; i < {{keys.Length.ToStringInvariant()}}; i++) {
                                     if ({{GetEqualFunction("keys[i]", LookupKeyName)}}) {
                                         value = {{ptr}}values[i];
                                         return true;

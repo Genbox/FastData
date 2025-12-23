@@ -12,28 +12,29 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
     {
         bool customKey = !typeof(TKey).IsPrimitive;
         bool customValue = !typeof(TValue).IsPrimitive;
+        ReadOnlyMemory<TValue> values = ctx.Values;
 
         StringBuilder sb = new StringBuilder();
         string typeName;
         Func<int, KeyValuePair<TKey, ulong>, string> printer;
 
         //If we need to store additional values (hash codes or values), we need a struct. Else we just use the key directly
-        if (ctx.StoreHashCode || ctx.Values != null)
+        if (ctx.StoreHashCode || !ctx.Values.IsEmpty)
         {
             typeName = "e";
-            printer = (i, x) => $"e::new({ToValueLabel(x.Key)}{(ctx.StoreHashCode ? $", {x.Value.ToStringInvariant()}" : "")}{(ctx.Values != null ? $", {ToValueLabel(ctx.Values[i])}" : "")})";
+            printer = (i, x) => $"e::new({ToValueLabel(x.Key)}{(ctx.StoreHashCode ? $", {x.Value.ToStringInvariant()}" : "")}{(!ctx.Values.IsEmpty ? $", {ToValueLabel(values.Span[i])}" : "")})";
 
             shared.Add(CodePlacement.Before, $$"""
                                                pub struct e {
                                                    pub key: {{GetKeyTypeName(customKey)}},
                                                    {{(ctx.StoreHashCode ? $"pub hash_code: {HashSizeType}," : "")}}
-                                                   {{(ctx.Values != null ? $"pub value: {GetValueTypeName(customValue)}," : "")}}
+                                                   {{(!ctx.Values.IsEmpty ? $"pub value: {GetValueTypeName(customValue)}," : "")}}
                                                }
                                                """);
 
             shared.Add(CodePlacement.Before, $$"""
                                                impl e {
-                                                   pub const fn new (key: {{KeyTypeName}}{{(ctx.StoreHashCode ? $", hash_code: {HashSizeType}" : "")}}{{(ctx.Values != null ? $", value: {GetValueTypeName(customValue)}" : "")}}) -> Self { Self { key{{(ctx.StoreHashCode ? ", hash_code" : "")}}{{(ctx.Values != null ? ", value" : "")}}  } }
+                                                   pub const fn new (key: {{KeyTypeName}}{{(ctx.StoreHashCode ? $", hash_code: {HashSizeType}" : "")}}{{(!ctx.Values.IsEmpty ? $", value: {GetValueTypeName(customValue)}" : "")}}) -> Self { Self { key{{(ctx.StoreHashCode ? ", hash_code" : "")}}{{(!ctx.Values.IsEmpty ? ", value" : "")}}  } }
                                                }
                                                """);
         }
@@ -58,11 +59,11 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                             let hash = unsafe { Self::get_hash({{LookupKeyName}}) };
                             let index = ({{GetModFunction("hash", (ulong)ctx.Data.Length)}}) as usize;
 
-                            return {{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "&Self::ENTRIES[index].hash_code", KeyType.Int64)} && " : "")}}{{GetEqualFunction(LookupKeyName, ctx.StoreHashCode || ctx.Values != null ? "Self::ENTRIES[index].key" : "Self::ENTRIES[index]")}};
+                            return {{(ctx.StoreHashCode ? $"{GetEqualFunction("hash", "&Self::ENTRIES[index].hash_code", KeyType.Int64)} && " : "")}}{{GetEqualFunction(LookupKeyName, ctx.StoreHashCode || !ctx.Values.IsEmpty ? "Self::ENTRIES[index].key" : "Self::ENTRIES[index]")}};
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 

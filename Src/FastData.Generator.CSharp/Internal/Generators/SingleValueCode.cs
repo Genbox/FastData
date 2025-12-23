@@ -10,10 +10,11 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
     {
         StringBuilder sb = new StringBuilder();
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-            sb.Append($"    private static readonly {ValueTypeName} _storedValue = {ToValueLabel(ctx.Values[0])};");
+            sb.Append($"    private static readonly {ValueTypeName} _storedValue = {ToValueLabel(values[0])};");
         }
 
         sb.Append($$"""
@@ -24,7 +25,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             sb.Append($$"""
 

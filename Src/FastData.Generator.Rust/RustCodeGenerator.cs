@@ -60,7 +60,7 @@ public sealed class RustCodeGenerator : CodeGenerator
     protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context) => context switch
     {
         SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, Shared),
-        RangeContext<TKey, TValue> x => new RangeCode<TKey, TValue>(x, Shared),
+        RangeContext<TKey, TValue> x => new RangeCode<TKey, TValue>(x),
         BitSetContext<TKey, TValue> x => new BitSetCode<TKey, TValue>(x, Shared),
         ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, Shared),
         BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, Shared),

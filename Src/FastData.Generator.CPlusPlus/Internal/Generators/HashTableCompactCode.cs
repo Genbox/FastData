@@ -11,14 +11,15 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
     {
         bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+        ReadOnlyMemory<TValue> values = ctx.Values;
 
         sb.Append($$"""
                         struct e {
                             {{KeyTypeName}} key;
                             {{(ctx.StoreHashCode ? $"{HashSizeType} hash_code;" : "")}}
-                            {{(ctx.Values != null ? $"const {GetValueTypeName(customValue)} value;" : "")}}
-                            e(const {{KeyTypeName}} key{{(ctx.StoreHashCode ? $", const {HashSizeType} hash_code" : "")}}{{(ctx.Values != null ? $", const {GetValueTypeName(customValue)} value" : "")}})
-                               : key(key){{(ctx.StoreHashCode ? ", hash_code(hash_code)" : "")}}{{(ctx.Values != null ? ", value(value)" : "")}} {}
+                            {{(!values.IsEmpty ? $"const {GetValueTypeName(customValue)} value;" : "")}}
+                            e(const {{KeyTypeName}} key{{(ctx.StoreHashCode ? $", const {HashSizeType} hash_code" : "")}}{{(!values.IsEmpty ? $", const {GetValueTypeName(customValue)} value" : "")}})
+                               : key(key){{(ctx.StoreHashCode ? ", hash_code(hash_code)" : "")}}{{(!values.IsEmpty ? ", value(value)" : "")}} {}
                         };
 
                         {{GetFieldModifier(true)}}std::array<{{GetSmallestUnsignedType(ctx.Entries.Length)}}, {{ctx.BucketStarts.Length.ToStringInvariant()}}> bucket_starts = {
@@ -30,7 +31,7 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
                          };
 
                         {{GetFieldModifier(false)}}std::array<e, {{ctx.Entries.Length.ToStringInvariant()}}> entries = {
-                    {{FormatColumns(ctx.Entries, (i, x) => $"e({ToValueLabel(x.Key)}{(ctx.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : "")}{(ctx.Values != null ? $", {ToValueLabel(ctx.Values[i])}" : "")})")}}
+                    {{FormatColumns(ctx.Entries, (i, x) => $"e({ToValueLabel(x.Key)}{(ctx.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : "")}{(!ctx.Values.IsEmpty ? $", {ToValueLabel(values.Span[i])}" : "")})")}}
                         };
 
                     {{HashSource}}
@@ -57,7 +58,7 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             string ptr = customValue ? "" : "&";
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());

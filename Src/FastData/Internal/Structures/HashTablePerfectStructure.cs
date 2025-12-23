@@ -8,34 +8,36 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class HashTablePerfectStructure<TKey, TValue>(HashData hashData, KeyType keyType) : IStructure<TKey, TValue, HashTablePerfectContext<TKey, TValue>>
 {
-    public HashTablePerfectContext<TKey, TValue> Create(TKey[] keys, TValue[]? values)
+    public HashTablePerfectContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         if (!hashData.HashCodesPerfect)
             throw new InvalidOperationException("HashSetPerfectStructure can only be created with a perfect hash function.");
 
-        ulong size = (ulong)(keys.Length * hashData.CapacityFactor);
-        bool hasEmptySlots = size != (ulong)keys.Length;
+        ReadOnlySpan<TKey> keySpan = keys.Span;
+        ReadOnlySpan<TValue> valueSpan = values.Span;
+        ulong size = (ulong)(keySpan.Length * hashData.CapacityFactor);
+        bool hasEmptySlots = size != (ulong)keySpan.Length;
         bool storeHashCode = !keyType.IsIdentityHash() || hasEmptySlots;
         ulong[] hashCodes = hashData.HashCodes;
         KeyValuePair<TKey, ulong>[] pairs = new KeyValuePair<TKey, ulong>[size];
-        TValue[]? denseValues = values == null ? null : new TValue[size];
+        TValue[]? denseValues = values.IsEmpty ? null : new TValue[size];
 
         if (storeHashCode && hasEmptySlots)
         {
-            ulong sentinel = GetSentinel(hashData, hashCodes, keys.Length);
+            ulong sentinel = GetSentinel(hashData, hashCodes, keySpan.Length);
 
             for (ulong i = 0; i < size; i++)
                 pairs[i] = new KeyValuePair<TKey, ulong>(default!, sentinel);
         }
 
         //We need to reorder the data to match hashes
-        for (int i = 0; i < keys.Length; i++)
+        for (int i = 0; i < keySpan.Length; i++)
         {
             ulong index = hashCodes[i] % size;
-            pairs[index] = new KeyValuePair<TKey, ulong>(keys[i], hashCodes[i]);
+            pairs[index] = new KeyValuePair<TKey, ulong>(keySpan[i], hashCodes[i]);
 
             if (denseValues != null)
-                denseValues[index] = values![i];
+                denseValues[index] = valueSpan[i];
         }
 
         return new HashTablePerfectContext<TKey, TValue>(pairs, storeHashCode, denseValues);

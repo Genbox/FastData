@@ -10,14 +10,16 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
     public override string Generate()
     {
         StringBuilder sb = new StringBuilder();
+        ReadOnlySpan<TKey> keys = ctx.Keys.Span;
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($$"""
                             {{FieldModifier}}{{ValueTypeName}}[] _values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                        {{FormatColumns(values, ToValueLabel)}}
                             };
 
                         """);
@@ -25,7 +27,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
 
         sb.Append($$"""
                         {{FieldModifier}}{{KeyTypeName}}[] _keys = new {{KeyTypeName}}[] {
-                    {{FormatColumns(ctx.Keys, ToValueLabel)}}
+                    {{FormatColumns(keys, ToValueLabel)}}
                         };
 
                         {{MethodAttribute}}
@@ -34,7 +36,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                     {{GetMethodHeader(MethodType.Contains)}}
 
                             int lo = 0;
-                            int hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
+                            int hi = {{(keys.Length - 1).ToStringInvariant()}};
                             while (lo <= hi)
                             {
                                 int i = lo + ((hi - lo) >> 1);
@@ -52,7 +54,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             sb.Append($$"""
 
@@ -62,7 +64,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 int lo = 0;
-                                int hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
+                                int hi = {{(keys.Length - 1).ToStringInvariant()}};
                                 while (lo <= hi)
                                 {
                                     int i = lo + ((hi - lo) >> 1);

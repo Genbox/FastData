@@ -11,12 +11,14 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
     {
         bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+        ReadOnlySpan<TKey> keys = ctx.Keys.Span;
+        ReadOnlySpan<TValue> values = ctx.Values.Span;
 
-        if (ctx.Values != null)
+        if (!values.IsEmpty)
         {
             sb.Append($$"""
-                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{values.Length.ToStringInvariant()}}> values = {
+                        {{FormatColumns(values, ToValueLabel)}}
                             };
 
                         """);
@@ -27,14 +29,14 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                         {{MethodAttribute}}
                         {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
                     {{GetMethodHeader(MethodType.Contains)}}
-                            if ({{FormatList(ctx.Keys, x => GetEqualFunction(LookupKeyName, ToValueLabel(x)), " || ")}})
+                            if ({{FormatList(keys, x => GetEqualFunction(LookupKeyName, ToValueLabel(x)), " || ")}})
                                 return true;
 
                             return false;
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!values.IsEmpty)
         {
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
@@ -43,21 +45,21 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
                             {{MethodAttribute}}
                             {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
                         {{GetMethodHeader(MethodType.TryLookup)}}
-                        {{GenerateBranches()}}
+                        {{GenerateBranches(keys)}}
                                 value = nullptr;
                                 return false;
                             }
                         """);
 
-            string GenerateBranches()
+            string GenerateBranches(ReadOnlySpan<TKey> data)
             {
                 string ptr = customValue ? "" : "&";
                 StringBuilder temp = new StringBuilder();
 
-                for (int i = 0; i < ctx.Keys.Length; i++)
+                for (int i = 0; i < data.Length; i++)
                 {
                     temp.AppendLine($$"""
-                                              if ({{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Keys[i]))}}) {
+                                              if ({{GetEqualFunction(LookupKeyName, ToValueLabel(data[i]))}}) {
                                                   value = {{ptr}}values[{{i.ToStringInvariant()}}];
                                                   return true;
                                               }

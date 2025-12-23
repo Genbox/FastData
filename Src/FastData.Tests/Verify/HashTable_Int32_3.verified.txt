@@ -14,5 +14,5 @@
     }
   ],
   "StoreHashCode": false,
-  "Values": null
+  "Values": []
 }

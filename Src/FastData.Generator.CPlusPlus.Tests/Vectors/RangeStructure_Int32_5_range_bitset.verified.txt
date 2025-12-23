@@ -10,7 +10,7 @@ class RangeStructure_Int32_5_range_bitset final {
   public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-        return key >= min_key && key <= max_key;
+        return key >= 1 && key <= 5;
     }
 
     static constexpr size_t item_count = 5;

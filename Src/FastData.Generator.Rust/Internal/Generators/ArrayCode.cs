@@ -12,22 +12,24 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
         bool customKey = !typeof(TKey).IsPrimitive;
         bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+        ReadOnlySpan<TKey> keys = ctx.Keys.Span;
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($"""
-                          {FieldModifier}VALUES: [{GetValueTypeName(customValue)}; {ctx.Values.Length.ToStringInvariant()}] = [
-                       {FormatColumns(ctx.Values, ToValueLabel)}
+                          {FieldModifier}VALUES: [{GetValueTypeName(customValue)}; {values.Length.ToStringInvariant()}] = [
+                       {FormatColumns(values, ToValueLabel)}
                            ];
 
                        """);
         }
 
         sb.Append($$"""
-                        {{FieldModifier}}KEYS: [{{GetKeyTypeName(customKey)}}; {{ctx.Keys.Length.ToStringInvariant()}}] = [
-                    {{FormatColumns(ctx.Keys, ToValueLabel)}}
+                        {{FieldModifier}}KEYS: [{{GetKeyTypeName(customKey)}}; {{keys.Length.ToStringInvariant()}}] = [
+                    {{FormatColumns(keys, ToValueLabel)}}
                         ];
 
                         {{MethodAttribute}}
@@ -43,7 +45,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             sb.Append($$"""
 

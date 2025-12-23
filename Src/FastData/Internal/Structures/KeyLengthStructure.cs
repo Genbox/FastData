@@ -6,7 +6,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class KeyLengthStructure<TKey, TValue>(StringProperties props) : IStructure<TKey, TValue, KeyLengthContext<TValue>>
 {
-    public KeyLengthContext<TValue> Create(TKey[] keys, TValue[]? values)
+    public KeyLengthContext<TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         if (typeof(TKey) != typeof(string))
             throw new InvalidCastException("This structure only works on strings");
@@ -19,15 +19,16 @@ internal sealed class KeyLengthStructure<TKey, TValue>(StringProperties props) :
         int range = (int)(maxLen - minLen + 1); //+1 because we need a place for zero
 
         string?[] lengths = new string?[range];
-        int[] offsets = values == null ? [] : new int[range];
+        int[] offsets = values.IsEmpty ? [] : new int[range];
+        ReadOnlySpan<TKey> keySpan = keys.Span;
 
-        for (int i = 0; i < keys.Length; i++)
+        for (int i = 0; i < keySpan.Length; i++)
         {
-            string str = (string)(object)keys[i]!;
+            string str = (string)(object)keySpan[i]!;
             int idx = str.Length - (int)minLen;
             lengths[idx] = str;
 
-            if (values != null)
+            if (!values.IsEmpty)
                 offsets[idx] = i;
         }
 

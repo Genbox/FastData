@@ -22,5 +22,5 @@
     }
   ],
   "StoreHashCode": true,
-  "Values": null
+  "Values": []
 }

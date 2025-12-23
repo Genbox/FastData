@@ -12,10 +12,11 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
         bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
-            sb.Append($"    pub const STORED_VALUE: {GetValueTypeName(customValue)} = {ToValueLabel(ctx.Values[0])};");
+            sb.Append($"    pub const STORED_VALUE: {GetValueTypeName(customValue)} = {ToValueLabel(values[0])};");
         }
 
         sb.Append($$"""
@@ -25,7 +26,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             sb.Append($$"""
                             {{MethodAttribute}}

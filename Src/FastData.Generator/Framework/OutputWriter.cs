@@ -33,7 +33,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
         return _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType);
     }
 
-    internal void Initialize<TValue>(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, TValue[]? values, ExpressionCompiler? compiler)
+    internal void Initialize<TValue>(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, ReadOnlyMemory<TValue> values, ExpressionCompiler? compiler)
     {
         _langDef = langDef;
         _earlyExitDef = earlyExitDef;

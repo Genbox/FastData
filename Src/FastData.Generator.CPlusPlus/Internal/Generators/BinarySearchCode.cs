@@ -11,20 +11,22 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
     {
         bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+        ReadOnlySpan<TKey> keys = ctx.Keys.Span;
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             sb.Append($$"""
-                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{ctx.Values.Length.ToStringInvariant()}}> values = {
-                        {{FormatColumns(ctx.Values, ToValueLabel)}}
+                            {{GetFieldModifier(false)}}std::array<{{GetValueTypeName(customValue)}}, {{values.Length.ToStringInvariant()}}> values = {
+                        {{FormatColumns(values, ToValueLabel)}}
                             };
 
                         """);
         }
 
         sb.Append($$"""
-                        {{GetFieldModifier(true)}}std::array<{{KeyTypeName}}, {{ctx.Keys.Length.ToStringInvariant()}}> keys = {
-                    {{FormatColumns(ctx.Keys, ToValueLabel)}}
+                        {{GetFieldModifier(true)}}std::array<{{KeyTypeName}}, {{keys.Length.ToStringInvariant()}}> keys = {
+                    {{FormatColumns(keys, ToValueLabel)}}
                         };
 
                     public:
@@ -33,7 +35,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                     {{GetMethodHeader(MethodType.Contains)}}
 
                             int32_t lo = 0;
-                            int32_t hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
+                            int32_t hi = {{(keys.Length - 1).ToStringInvariant()}};
                             while (lo <= hi) {
                                 const int32_t mid = lo + ((hi - lo) >> 1);
                                 const {{KeyTypeName}} mid_key = keys[mid];
@@ -51,7 +53,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             string ptr = customValue ? "" : "&";
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
@@ -63,7 +65,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 int32_t lo = 0;
-                                int32_t hi = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
+                                int32_t hi = {{(keys.Length - 1).ToStringInvariant()}};
                                 while (lo <= hi) {
                                     const int32_t mid = lo + ((hi - lo) >> 1);
                                     const {{KeyTypeName}} mid_key = keys[mid];

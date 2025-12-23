@@ -12,22 +12,24 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
         bool customKey = !typeof(TKey).IsPrimitive;
         bool customValue = !typeof(TValue).IsPrimitive;
         StringBuilder sb = new StringBuilder();
+        ReadOnlySpan<TKey> keys = ctx.Keys.Span;
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
+            ReadOnlySpan<TValue> values = ctx.Values.Span;
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 
             sb.Append($"""
-                          {FieldModifier}VALUES: [{GetValueTypeName(customValue)}; {ctx.Values.Length.ToStringInvariant()}] = [
-                       {FormatColumns(ctx.Values, ToValueLabel)}
+                          {FieldModifier}VALUES: [{GetValueTypeName(customValue)}; {values.Length.ToStringInvariant()}] = [
+                       {FormatColumns(values, ToValueLabel)}
                            ];
 
                        """);
         }
 
         sb.Append($$"""
-                        {{FieldModifier}}KEYS: [{{GetKeyTypeName(customKey)}}; {{ctx.Keys.Length.ToStringInvariant()}}] = [
-                    {{FormatColumns(ctx.Keys, ToValueLabel)}}
+                        {{FieldModifier}}KEYS: [{{GetKeyTypeName(customKey)}}; {{keys.Length.ToStringInvariant()}}] = [
+                    {{FormatColumns(keys, ToValueLabel)}}
                         ];
 
                         {{MethodAttribute}}
@@ -35,7 +37,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                     {{GetMethodHeader(MethodType.Contains)}}
 
                             let mut lo: usize = 0;
-                            let mut hi: usize = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
+                            let mut hi: usize = {{(keys.Length - 1).ToStringInvariant()}};
                             while lo <= hi {
                                 let i = lo + ((hi - lo) >> 1);
                                 let entry = Self::KEYS[i];
@@ -54,7 +56,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                         }
                     """);
 
-        if (ctx.Values != null)
+        if (!ctx.Values.IsEmpty)
         {
             sb.Append($$"""
 
@@ -63,7 +65,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 let mut lo: usize = 0;
-                                let mut hi: usize = {{(ctx.Keys.Length - 1).ToStringInvariant()}};
+                                let mut hi: usize = {{(keys.Length - 1).ToStringInvariant()}};
                                 while lo <= hi {
                                     let i = lo + ((hi - lo) >> 1);
                                     let entry = Self::KEYS[i];

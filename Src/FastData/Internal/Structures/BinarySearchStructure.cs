@@ -7,31 +7,29 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class BinarySearchStructure<TKey, TValue>(KeyType keyType, StringComparison comparison) : IStructure<TKey, TValue, BinarySearchContext<TKey, TValue>>
 {
-    public BinarySearchContext<TKey, TValue> Create(TKey[] keys, TValue[]? values)
+    public BinarySearchContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         TKey[] keysCopy = new TKey[keys.Length];
-        keys.CopyTo(keysCopy, 0);
+        keys.Span.CopyTo(keysCopy);
 
-        TValue[]? valuesCopy;
+        TValue[] valuesCopy = Array.Empty<TValue>();
 
-        if (values == null)
-            valuesCopy = null;
-        else
+        if (!values.IsEmpty)
         {
             valuesCopy = new TValue[values.Length];
-            values.CopyTo(valuesCopy, 0);
+            values.Span.CopyTo(valuesCopy);
         }
 
         if (keyType == KeyType.String)
         {
-            if (valuesCopy != null)
+            if (!values.IsEmpty)
                 Array.Sort(keysCopy, valuesCopy, StringHelper.GetStringComparer(comparison));
             else
                 Array.Sort(keysCopy, StringHelper.GetStringComparer(comparison));
         }
         else
         {
-            if (valuesCopy != null)
+            if (!values.IsEmpty)
                 Array.Sort(keysCopy, valuesCopy);
             else
                 Array.Sort(keysCopy);

@@ -5,7 +5,7 @@ namespace Genbox.FastData.Internal.Misc;
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
 internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUnique, bool HashCodesPerfect, ulong MinHashCode, ulong MaxHashCode)
 {
-    internal static HashData Create<T>(T[] data, int capacityFactor, HashFunc<T> func)
+    internal static HashData Create<T>(ReadOnlySpan<T> data, int capacityFactor, HashFunc<T> func)
     {
         if (capacityFactor <= 0)
             throw new InvalidOperationException("HashCapacityFactor must be greater than 0.");

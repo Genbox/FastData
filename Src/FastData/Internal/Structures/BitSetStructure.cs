@@ -7,20 +7,22 @@ namespace Genbox.FastData.Internal.Structures;
 
 internal sealed class BitSetStructure<TKey, TValue>(KeyProperties<TKey> props, KeyType keyType) : IStructure<TKey, TValue, BitSetContext<TKey, TValue>>
 {
-    public BitSetContext<TKey, TValue> Create(TKey[] keys, TValue[]? values)
+    public BitSetContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         int range = (int)props.Range + 1;
         ulong[] bitset = new ulong[(range + 63) / 64];
-        TValue[]? denseValues = values == null ? null : new TValue[range];
+        TValue[]? denseValues = values.IsEmpty ? null : new TValue[range];
+        ReadOnlySpan<TKey> keySpan = keys.Span;
+        ReadOnlySpan<TValue> valueSpan = values.Span;
 
-        for (int i = 0; i < keys.Length; i++)
+        for (int i = 0; i < keySpan.Length; i++)
         {
-            ulong offset = GetOffset(keyType, keys[i], props.MinKeyValue);
+            ulong offset = GetOffset(keyType, keySpan[i], props.MinKeyValue);
             int word = (int)(offset >> 6);
             bitset[word] |= 1UL << (int)(offset & 63);
 
             if (denseValues != null)
-                denseValues[(int)offset] = values![i];
+                denseValues[(int)offset] = valueSpan[i];
         }
 
         return new BitSetContext<TKey, TValue>(bitset, denseValues);

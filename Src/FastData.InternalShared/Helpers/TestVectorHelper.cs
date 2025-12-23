@@ -19,7 +19,7 @@ public static class TestVectorHelper
         // First we try with a simple value
         int[] simpleValues = [1, 2, 3];
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1]], [simpleValues], "simple", typeof(SingleValueStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1]], [[simpleValues[0]]], "simple", typeof(SingleValueStructure<,>)))
             yield return testVector;
 
         foreach (ITestVector testVector in GenerateTestVectors([["a", "aa", "aaa"]], [simpleValues], "simple", typeof(KeyLengthStructure<,>)))
@@ -43,7 +43,7 @@ public static class TestVectorHelper
             new Person { Age = 3, Name = "Bibi" },
         ];
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1]], [complexValues], "complex", typeof(SingleValueStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1]], [[complexValues[0]]], "complex", typeof(SingleValueStructure<,>)))
             yield return testVector;
 
         foreach (ITestVector testVector in GenerateTestVectors([["a", "aa", "aaa"]], [complexValues], "complex", typeof(KeyLengthStructure<,>)))
@@ -55,8 +55,7 @@ public static class TestVectorHelper
                      typeof(BitSetStructure<,>),
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableStructure<,>),
-                     typeof(HashTablePerfectStructure<,>),
-                     typeof(RangeStructure<,>)))
+                     typeof(HashTablePerfectStructure<,>)))
         {
             yield return testVector;
         }
