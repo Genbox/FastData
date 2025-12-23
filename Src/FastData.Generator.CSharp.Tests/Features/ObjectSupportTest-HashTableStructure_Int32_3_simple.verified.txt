@@ -42,7 +42,7 @@ internal static class HashTableStructure_Int32_3_simple
     
     public static bool Contains(int key)
     {
-        if (key < 1 || key > 3)
+        if (((uint)key & 4294967292u) != 0)
             return false;
 
         ulong hash = Hash(key);
@@ -64,7 +64,7 @@ internal static class HashTableStructure_Int32_3_simple
     
     public static bool TryLookup(int key, out int value)
     {
-        if (key < 1 || key > 3)
+        if (((uint)key & 4294967292u) != 0)
             {
             value = default;
             return false;

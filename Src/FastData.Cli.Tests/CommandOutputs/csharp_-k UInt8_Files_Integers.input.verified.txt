@@ -13,7 +13,7 @@ internal static class MyData
     
     public static bool Contains(byte key)
     {
-        if (key < 42 || key > 100)
+        if (((byte)key & 129) != 0)
             return false;
 
         switch (key)

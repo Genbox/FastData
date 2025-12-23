@@ -35,7 +35,7 @@ class HashTableCompactStructure_Char_3 final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const char key) noexcept {
-        if (key < 0 || key > 127)
+        if ((static_cast<uint16_t>(key) & 65408) != 0)
             return false;
 
         const uint64_t hash = get_hash(key);

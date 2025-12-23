@@ -39,7 +39,7 @@ class HashTableStructure_Int32_3_complex final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-        if (key < 1 || key > 3)
+        if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
             return false;
 
         const uint64_t hash = get_hash(key);
@@ -59,7 +59,7 @@ public:
     }
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
-        if (key < 1 || key > 3)
+        if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
             {
     value = nullptr;
     return false;

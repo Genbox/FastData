@@ -11,7 +11,7 @@ internal static class ConditionalStructure_Int32_100
     
     public static bool Contains(int key)
     {
-        if (key < 0 || key > 99)
+        if (((uint)key & 4294967168u) != 0)
             return false;
 
         switch (key)

@@ -21,7 +21,7 @@ const ENTRIES: [i32; 3] = [
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if key < 1 || key > 3 {
+        if (key as u32 & 4294967292) != 0 {
             return false;
         }
 

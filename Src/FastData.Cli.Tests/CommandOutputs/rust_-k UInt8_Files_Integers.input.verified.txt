@@ -13,7 +13,7 @@ pub struct MyData;
 impl MyData {
     #[must_use]
     pub fn contains(key: u8) -> bool {
-        if key < 42 || key > 100 {
+        if (key as u8 & 129) != 0 {
             return false;
         }
 

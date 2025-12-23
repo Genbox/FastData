@@ -62,7 +62,7 @@ class HashTableCompactStructure_Int32_100 final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-        if (key < 0 || key > 99)
+        if ((static_cast<uint32_t>(key) & 4294967168u) != 0)
             return false;
 
         const uint64_t hash = get_hash(key);

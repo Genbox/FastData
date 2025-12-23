@@ -58,6 +58,12 @@ Input: `stable softice sophisticated santa`
 
 It generates this early exit: `if ((4208UL & (1UL << (value.Length - 1))) == 0) return false;`
 
+### Value bitmask early exit
+For integer keys, FastData can build a bitmask of all bits that appear in the dataset. If an input has any bit set that never appears in any key, it cannot be in the dataset.
+Input: `2 4 6 8`
+
+It generates this early exit: `if ((key & 1) != 0) return false;`
+
 ## Structure specializations
 
 ### Hash table

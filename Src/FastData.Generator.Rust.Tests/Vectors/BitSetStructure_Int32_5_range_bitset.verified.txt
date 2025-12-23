@@ -14,7 +14,7 @@ impl BitSetStructure_Int32_5_range_bitset {
     ];
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if key < 1 || key > 5 {
+        if (key as u32 & 4294967288) != 0 {
             return false;
         }
 

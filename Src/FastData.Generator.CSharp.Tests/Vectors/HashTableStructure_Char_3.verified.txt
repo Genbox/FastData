@@ -42,7 +42,7 @@ internal static class HashTableStructure_Char_3
     
     public static bool Contains(char key)
     {
-        if (key < char.MinValue || key > '')
+        if (((ushort)key & 65408) != 0)
             return false;
 
         ulong hash = Hash(key);

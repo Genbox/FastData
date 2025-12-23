@@ -55,7 +55,7 @@ impl HashTableCompactStructure_Int32_100 {
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if key < 0 || key > 99 {
+        if (key as u32 & 4294967168) != 0 {
             return false;
         }
 

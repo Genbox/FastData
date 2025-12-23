@@ -30,7 +30,7 @@ internal static class BitSetStructure_Int32_3_complex
     
     public static bool Contains(int key)
     {
-        if (key < 1 || key > 3)
+        if (((uint)key & 4294967292u) != 0)
             return false;
 
         ulong offset = (ulong)(key - MinKey);
@@ -40,7 +40,7 @@ internal static class BitSetStructure_Int32_3_complex
     
     public static bool TryLookup(int key, out Person value)
     {
-        if (key < 1 || key > 3)
+        if (((uint)key & 4294967292u) != 0)
             {
             value = default;
             return false;

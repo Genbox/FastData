@@ -23,6 +23,8 @@ public abstract class EarlyExitDef : IEarlyExitDef
                 sb.Append(GetLengthEarlyExits(methodType, minLength, maxLength, minByteCount, maxByteCount));
             else if (spec is MinMaxValueEarlyExit<T>(var minValue, var maxValue))
                 sb.Append(GetValueEarlyExits(methodType, minValue, maxValue));
+            else if (spec is ValueBitMaskEarlyExit(var mask))
+                sb.Append(GetValueBitMaskEarlyExit<T>(methodType, mask));
             else if (spec is LengthBitSetEarlyExit(var bitSet))
                 sb.Append(GetMaskEarlyExit(methodType, bitSet));
             else
@@ -34,5 +36,6 @@ public abstract class EarlyExitDef : IEarlyExitDef
 
     protected abstract string GetMaskEarlyExit(MethodType methodType, ulong[] bitSet);
     protected abstract string GetValueEarlyExits<T>(MethodType methodType, T min, T max);
+    protected abstract string GetValueBitMaskEarlyExit<T>(MethodType methodType, ulong mask);
     protected abstract string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte);
 }

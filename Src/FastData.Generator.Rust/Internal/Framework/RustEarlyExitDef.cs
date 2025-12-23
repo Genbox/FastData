@@ -2,6 +2,7 @@ using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Definitions;
+using Genbox.FastData.Generator.Helpers;
 using Genbox.FastData.Generator.Rust.Enums;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Framework;
@@ -47,6 +48,20 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
                       {{RenderExit(methodType)}}
                   }
           """;
+
+    protected override string GetValueBitMaskEarlyExit<T>(MethodType methodType, ulong mask)
+    {
+        Type unsignedType = TypeHelper.GetUnsignedType(typeof(T));
+        string unsignedTypeName = map.GetTypeName(unsignedType);
+        object maskValue = TypeHelper.ConvertValueToType(mask, unsignedType);
+        string maskLiteral = map.ToValueLabel(maskValue, unsignedType);
+
+        return $$"""
+                         if (key as {{unsignedTypeName}} & {{maskLiteral}}) != 0 {
+                             {{RenderExit(methodType)}}
+                         }
+                 """;
+    }
 
     protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
         $$"""

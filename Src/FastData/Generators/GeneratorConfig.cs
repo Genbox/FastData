@@ -4,6 +4,7 @@ using Genbox.FastData.Generators.EarlyExits;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
+using System.Numerics;
 
 namespace Genbox.FastData.Generators;
 
@@ -13,6 +14,7 @@ public sealed class GeneratorConfig<T>
 {
     private const int MaxLengthBitSetWords = 4;
     private const double MaxLengthBitSetDensity = 0.5;
+    private const double MinValueBitMaskDensity = 0.25;
 
     private GeneratorConfig(StructureType structureType, KeyType keyType, HashDetails hashDetails, GeneratorFlags flags)
     {
@@ -122,7 +124,10 @@ public sealed class GeneratorConfig<T>
         if (structureType == StructureType.Conditional && itemCount <= 3)
             yield break;
 
-        yield return new MinMaxValueEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue);
+        if (TryGetValueBitMask(props, out ulong mask))
+            yield return new ValueBitMaskEarlyExit(mask);
+        else
+            yield return new MinMaxValueEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue);
     }
 
     private static bool ShouldUseBitSet(LengthData lengthData)
@@ -139,5 +144,44 @@ public sealed class GeneratorConfig<T>
         uint range = lengthData.LengthMap.Max - lengthData.LengthMap.Min + 1;
         double density = lengthData.LengthMap.BitCount / (double)range;
         return density <= MaxLengthBitSetDensity;
+    }
+
+    private static bool TryGetValueBitMask(NumericKeyProperties<T> props, out ulong mask)
+    {
+        Type keyType = typeof(T);
+
+        ulong fullMask = Type.GetTypeCode(keyType) switch
+        {
+            TypeCode.SByte => byte.MaxValue,
+            TypeCode.Byte => byte.MaxValue,
+            TypeCode.Int16 or TypeCode.UInt16 or TypeCode.Char => ushort.MaxValue,
+            TypeCode.Int32 => uint.MaxValue,
+            TypeCode.UInt32 => uint.MaxValue,
+            TypeCode.Int64 => ulong.MaxValue,
+            TypeCode.UInt64 => ulong.MaxValue,
+            _ => 0 // We don't support masks for float/double
+        };
+
+        if (fullMask == 0 || props.BitMask == fullMask)
+        {
+            mask = 0;
+            return false;
+        }
+
+        mask = fullMask ^ props.BitMask; // Invert the mask
+        if (mask == 0)
+            return false;
+
+        int bitWidth = fullMask switch
+        {
+            byte.MaxValue => 8,
+            ushort.MaxValue => 16,
+            uint.MaxValue => 32,
+            _ => 64
+        };
+
+        int missingBits = BitOperations.PopCount(mask);
+        double density = missingBits / (double)bitWidth;
+        return density >= MinValueBitMaskDensity;
     }
 }

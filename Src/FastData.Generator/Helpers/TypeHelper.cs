@@ -2,30 +2,23 @@ namespace Genbox.FastData.Generator.Helpers;
 
 public static class TypeHelper
 {
-    public static IEnumerable<Type> GetCustomTypes(Type type)
+    public static Type GetUnsignedType(Type type)
     {
-        HashSet<Type> uniq = new HashSet<Type>();
-        Queue<Type> queue = new Queue<Type>();
+        if (type == typeof(sbyte) || type == typeof(byte)) return typeof(byte);
+        if (type == typeof(short) || type == typeof(ushort) || type == typeof(char)) return typeof(ushort);
+        if (type == typeof(int) || type == typeof(uint)) return typeof(uint);
+        if (type == typeof(long) || type == typeof(ulong)) return typeof(ulong);
 
-        queue.Enqueue(type);
+        throw new InvalidOperationException($"Unsupported type: {type.Name}");
+    }
 
-        while (queue.Count > 0)
-        {
-            Type t = queue.Dequeue();
+    public static object ConvertValueToType(ulong value, Type type)
+    {
+        if (type == typeof(byte)) return (byte)value;
+        if (type == typeof(ushort)) return (ushort)value;
+        if (type == typeof(uint)) return (uint)value;
+        if (type == typeof(ulong)) return value;
 
-            if (Type.GetTypeCode(t) != TypeCode.Object)
-                continue;
-
-            if (t.IsArray)
-            {
-                Type elementType = t.GetElementType()!;
-                if (uniq.Add(elementType))
-                    queue.Enqueue(elementType);
-
-                continue;
-            }
-
-            yield return t;
-        }
+        throw new InvalidOperationException($"Unsupported type: {type.Name}");
     }
 }

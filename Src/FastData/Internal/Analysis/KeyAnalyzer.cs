@@ -152,14 +152,16 @@ internal static class KeyAnalyzer
     {
         char min = char.MaxValue;
         char max = char.MinValue;
+        ushort mask = 0;
 
         foreach (char c in keys)
         {
             min = c < min ? c : min;
             max = c > max ? c : max;
+            mask |= c;
         }
 
-        return new NumericKeyProperties<char>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new NumericKeyProperties<char>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1, mask);
     }
 
     private static NumericKeyProperties<float> GetSingleProperties(ReadOnlySpan<float> keys)
@@ -185,7 +187,7 @@ internal static class KeyAnalyzer
         }
 
         ulong range = ClampRangeToUInt64(max - min);
-        return new NumericKeyProperties<float>(min, max, range, hasZeroOrNaN, IsFloatConsecutive(keys, min, max, hasNaNOrInfinity));
+        return new NumericKeyProperties<float>(min, max, range, hasZeroOrNaN, IsFloatConsecutive(keys, min, max, hasNaNOrInfinity), 0);
     }
 
     private static NumericKeyProperties<double> GetDoubleProperties(ReadOnlySpan<double> keys)
@@ -211,120 +213,136 @@ internal static class KeyAnalyzer
         }
 
         ulong range = ClampRangeToUInt64(max - min);
-        return new NumericKeyProperties<double>(min, max, range, hasZeroOrNaN, IsDoubleConsecutive(keys, min, max, hasNaNOrInfinity));
+        return new NumericKeyProperties<double>(min, max, range, hasZeroOrNaN, IsDoubleConsecutive(keys, min, max, hasNaNOrInfinity), 0);
     }
 
     private static NumericKeyProperties<byte> GetByteProperties(ReadOnlySpan<byte> keys)
     {
         byte min = byte.MaxValue;
         byte max = byte.MinValue;
+        byte mask = 0;
 
         foreach (byte val in keys)
         {
             min = Math.Min(min, val);
             max = Math.Max(max, val);
+            mask |= val;
         }
 
-        return new NumericKeyProperties<byte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new NumericKeyProperties<byte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1, mask);
     }
 
     private static NumericKeyProperties<sbyte> GetSByteProperties(ReadOnlySpan<sbyte> keys)
     {
         sbyte min = sbyte.MaxValue;
         sbyte max = sbyte.MinValue;
+        byte mask = 0;
 
         foreach (sbyte val in keys)
         {
             min = Math.Min(min, val);
             max = Math.Max(max, val);
+            mask |= unchecked((byte)val);
         }
 
-        return new NumericKeyProperties<sbyte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new NumericKeyProperties<sbyte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1, mask);
     }
 
     private static NumericKeyProperties<short> GetInt16Properties(ReadOnlySpan<short> keys)
     {
         short min = short.MaxValue;
         short max = short.MinValue;
+        ushort mask = 0;
 
         foreach (short val in keys)
         {
             min = Math.Min(min, val);
             max = Math.Max(max, val);
+            mask |= unchecked((ushort)val);
         }
 
-        return new NumericKeyProperties<short>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new NumericKeyProperties<short>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1, mask);
     }
 
     private static NumericKeyProperties<ushort> GetUInt16Properties(ReadOnlySpan<ushort> keys)
     {
         ushort min = ushort.MaxValue;
         ushort max = ushort.MinValue;
+        ushort mask = 0;
 
         foreach (ushort val in keys)
         {
             min = Math.Min(min, val);
             max = Math.Max(max, val);
+            mask |= val;
         }
 
-        return new NumericKeyProperties<ushort>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new NumericKeyProperties<ushort>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1, mask);
     }
 
     private static NumericKeyProperties<int> GetInt32Properties(ReadOnlySpan<int> keys)
     {
         int min = int.MaxValue;
         int max = int.MinValue;
+        uint mask = 0;
 
         foreach (int val in keys)
         {
             min = Math.Min(min, val);
             max = Math.Max(max, val);
+            mask |= unchecked((uint)val);
         }
 
-        return new NumericKeyProperties<int>(min, max, (ulong)((long)max - min), false, keys.Length <= 1 || (long)max - min == keys.Length - 1);
+        return new NumericKeyProperties<int>(min, max, (ulong)((long)max - min), false, keys.Length <= 1 || (long)max - min == keys.Length - 1, mask);
     }
 
     private static NumericKeyProperties<uint> GetUInt32Properties(ReadOnlySpan<uint> keys)
     {
         uint min = uint.MaxValue;
         uint max = uint.MinValue;
+        uint mask = 0;
 
         foreach (uint val in keys)
         {
             min = Math.Min(min, val);
             max = Math.Max(max, val);
+            mask |= val;
         }
 
-        return new NumericKeyProperties<uint>(min, max, max - min, false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1));
+        return new NumericKeyProperties<uint>(min, max, max - min, false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1), mask);
     }
 
     private static NumericKeyProperties<long> GetInt64Properties(ReadOnlySpan<long> keys)
     {
         long min = long.MaxValue;
         long max = long.MinValue;
+        ulong mask = 0;
 
         foreach (long val in keys)
         {
             min = Math.Min(min, val);
             max = Math.Max(max, val);
+            mask |= unchecked((ulong)val);
         }
 
         ulong range = unchecked((ulong)max - (ulong)min);
-        return new NumericKeyProperties<long>(min, max, range, false, keys.Length <= 1 || range == (ulong)(keys.Length - 1));
+        return new NumericKeyProperties<long>(min, max, range, false, keys.Length <= 1 || range == (ulong)(keys.Length - 1), mask);
     }
 
     private static NumericKeyProperties<ulong> GetUInt64Properties(ReadOnlySpan<ulong> keys)
     {
         ulong min = ulong.MaxValue;
         ulong max = ulong.MinValue;
+        ulong mask = 0;
 
         foreach (ulong val in keys)
         {
             min = Math.Min(min, val);
             max = Math.Max(max, val);
+            mask |= val;
         }
 
-        return new NumericKeyProperties<ulong>(min, max, max - min, false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1));
+        return new NumericKeyProperties<ulong>(min, max, max - min, false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1), mask);
     }
 
     private static bool IsFloatConsecutive(ReadOnlySpan<float> keys, float min, float max, bool hasNaNOrInfinity)

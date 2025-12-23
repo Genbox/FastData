@@ -28,7 +28,7 @@ impl HashTableCompactStructure_Char_3 {
 
     #[must_use]
     pub fn contains(key: char) -> bool {
-        if key < char::MIN || key > '' {
+        if (key as u16 & 65408) != 0 {
             return false;
         }
 
