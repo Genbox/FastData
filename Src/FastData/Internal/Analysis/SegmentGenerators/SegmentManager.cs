@@ -7,7 +7,7 @@ namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
 internal static class SegmentManager
 {
-    internal static IEnumerable<ArraySegment> Generate(StringProperties props)
+    internal static IEnumerable<ArraySegment> Generate(StringKeyProperties props)
     {
         HashSet<ArraySegment> uniq = new HashSet<ArraySegment>();
 

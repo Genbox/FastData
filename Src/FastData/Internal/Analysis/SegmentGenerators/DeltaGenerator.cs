@@ -9,7 +9,7 @@ namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 /// <summary>This generator uses the delta map from string analysis to provide segments that avoids areas with identical characters and instead try and target areas of high deltas (differences in characters). It is suitable for large strings where brute-force is infeasible.</summary>
 internal sealed class DeltaGenerator : ISegmentGenerator
 {
-    public bool IsAppropriate(StringProperties props) => true;
+    public bool IsAppropriate(StringKeyProperties props) => true;
 
     /*
     The idea behind this generator is to read the delta maps made during string analysis and derive
@@ -65,7 +65,7 @@ internal sealed class DeltaGenerator : ISegmentGenerator
     As we can see, there are no interesting segments for this particular input when it is right-aligned.
     */
 
-    public IEnumerable<ArraySegment> Generate(StringProperties props)
+    public IEnumerable<ArraySegment> Generate(StringKeyProperties props)
     {
         if (props.DeltaData.Left != null)
         {

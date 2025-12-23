@@ -5,7 +5,7 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class BitSetStructure<TKey, TValue>(KeyProperties<TKey> props, KeyType keyType) : IStructure<TKey, TValue, BitSetContext<TKey, TValue>>
+internal sealed class BitSetStructure<TKey, TValue>(NumericKeyProperties<TKey> props, KeyType keyType) : IStructure<TKey, TValue, BitSetContext<TKey, TValue>>
 {
     public BitSetContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

@@ -22,7 +22,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         for (int len = 1; len < maxLen; len++)
         {
             string[] data = GenerateStrings(rng, len, 1);
-            StringProperties props = KeyAnalyzer.GetStringProperties(data, false);
+            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false);
             int[] coverage = new int[len]; // Track how many times each index is covered
 
             foreach (ArraySegment segment in generator.Generate(props))
@@ -54,7 +54,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         {
             string[] data = GenerateStrings(rng, i, 1);
 
-            StringProperties props = KeyAnalyzer.GetStringProperties(data, false);
+            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false);
             Assert.True(gen.IsAppropriate(props));
             Assert.Equal(counts[i - 1], gen.Generate(props).Count());
         }
@@ -71,7 +71,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         {
             string[] data = GenerateStrings(rng, i, 1);
 
-            StringProperties props = KeyAnalyzer.GetStringProperties(data, false);
+            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false);
             Assert.True(gen.IsAppropriate(props));
 
             int max = Math.Min(i * 2, 16);
@@ -90,7 +90,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         {
             string[] data = GenerateStrings(rng, i, 2);
 
-            StringProperties props = KeyAnalyzer.GetStringProperties(data, true);
+            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, true);
             Assert.True(gen.IsAppropriate(props));
             Assert.NotEmpty(gen.Generate(props));
         }
@@ -104,7 +104,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     [InlineData(new[] { "aaxbb", "aanbb" }, 2, 1)] //Test single char difference
     public void DeltaGeneratorPatternTest(string[] input, uint offset, int length)
     {
-        StringProperties props = KeyAnalyzer.GetStringProperties(input, true);
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(input, true);
 
         DeltaGenerator gen = new DeltaGenerator();
         Assert.True(gen.IsAppropriate(props)); //We allow delta always
@@ -124,7 +124,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     [InlineData((object)new[] { "aa", "aaaaaaaaaaaaaa" })] //We don't support inputs where characters don't differ
     public void DeltaGeneratorFailureTest(string[] input)
     {
-        StringProperties props = KeyAnalyzer.GetStringProperties(input, false);
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(input, false);
 
         DeltaGenerator gen = new DeltaGenerator();
         Assert.Empty(gen.Generate(props));

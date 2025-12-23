@@ -27,7 +27,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
  */
 
 /// <summary>Finds the least number of positions in a string that hashes to a unique value for all inputs.</summary>
-internal sealed partial class GPerfAnalyzer(int dataLength, StringProperties props, GPerfAnalyzerConfig config, Simulator sim, ILogger<GPerfAnalyzer> logger) : IStringHashAnalyzer
+internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties props, GPerfAnalyzerConfig config, Simulator sim, ILogger<GPerfAnalyzer> logger) : IStringHashAnalyzer
 {
     private readonly FastSet _emulator = new FastSet(dataLength);
     public bool IsAppropriate() => props.CharacterData.AllAscii;

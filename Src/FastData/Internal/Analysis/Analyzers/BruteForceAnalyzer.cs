@@ -10,7 +10,7 @@ using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed partial class BruteForceAnalyzer(StringProperties props, BruteForceAnalyzerConfig config, Simulator sim, ILogger<BruteForceAnalyzer> logger) : IStringHashAnalyzer
+internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, BruteForceAnalyzerConfig config, Simulator sim, ILogger<BruteForceAnalyzer> logger) : IStringHashAnalyzer
 {
     private static readonly ulong[] Seeds =
     [

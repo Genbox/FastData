@@ -25,13 +25,13 @@ public sealed class GeneratorConfig<T>
         TrimSuffix = string.Empty;
     }
 
-    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, KeyProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags)
+    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, NumericKeyProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType).ToArray();
         Constants = CreateConstants(props, itemCount);
     }
 
-    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringProperties props, StringComparison stringComparison, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string? trimPrefix, string? trimSuffix) : this(structureType, keyType, hashDetails, flags)
+    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringKeyProperties props, StringComparison stringComparison, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string? trimPrefix, string? trimSuffix) : this(structureType, keyType, hashDetails, flags)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType, encoding).ToArray();
         Constants = CreateConstants(props, itemCount);
@@ -68,7 +68,7 @@ public sealed class GeneratorConfig<T>
     public string TrimPrefix { get; }
     public string TrimSuffix { get; }
 
-    private static Constants<T> CreateConstants(KeyProperties<T> props, uint itemCount)
+    private static Constants<T> CreateConstants(NumericKeyProperties<T> props, uint itemCount)
     {
         Constants<T> constants = new Constants<T>(itemCount);
         constants.MinValue = props.MinKeyValue;
@@ -76,7 +76,7 @@ public sealed class GeneratorConfig<T>
         return constants;
     }
 
-    private static Constants<T> CreateConstants(StringProperties props, uint itemCount)
+    private static Constants<T> CreateConstants(StringKeyProperties props, uint itemCount)
     {
         Constants<T> constants = new Constants<T>(itemCount);
         constants.MinStringLength = props.LengthData.LengthMap.Min;
@@ -84,7 +84,7 @@ public sealed class GeneratorConfig<T>
         return constants;
     }
 
-    private static IEnumerable<IEarlyExit> GetEarlyExits(StringProperties props, uint itemCount, StructureType structureType, GeneratorEncoding enc)
+    private static IEnumerable<IEarlyExit> GetEarlyExits(StringKeyProperties props, uint itemCount, StructureType structureType, GeneratorEncoding enc)
     {
         //There is no point to using early exists if there is just one item
         if (itemCount == 1)
@@ -112,7 +112,7 @@ public sealed class GeneratorConfig<T>
         }
     }
 
-    private static IEnumerable<IEarlyExit> GetEarlyExits(KeyProperties<T> props, uint itemCount, StructureType structureType)
+    private static IEnumerable<IEarlyExit> GetEarlyExits(NumericKeyProperties<T> props, uint itemCount, StructureType structureType)
     {
         //There is no point to using early exists if there is just one item
         if (itemCount == 1)

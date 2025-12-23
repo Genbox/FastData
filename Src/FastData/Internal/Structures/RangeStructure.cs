@@ -4,7 +4,7 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class RangeStructure<TKey, TValue>(KeyProperties<TKey> props) : IStructure<TKey, TValue, RangeContext<TKey, TValue>>
+internal sealed class RangeStructure<TKey, TValue>(NumericKeyProperties<TKey> props) : IStructure<TKey, TValue, RangeContext<TKey, TValue>>
 {
     public RangeContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

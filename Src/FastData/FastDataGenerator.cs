@@ -30,7 +30,7 @@ public static partial class FastDataGenerator
         if (typeof(TKey) == typeof(string))
             return GenerateStringInternal((ReadOnlyMemory<string>)(object)keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
 
-        return GenerateInternal(keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
+        return GenerateNumericInternal(keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
     }
 
     public static string Generate<TKey>(TKey[] keys, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
@@ -38,7 +38,7 @@ public static partial class FastDataGenerator
         if (typeof(TKey) == typeof(string))
             return GenerateStringInternal((string[])(object)keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
 
-        return GenerateInternal((ReadOnlyMemory<TKey>)keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
+        return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
     }
 
     public static string GenerateKeyed<TKey, TValue>(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
@@ -46,7 +46,7 @@ public static partial class FastDataGenerator
         if (typeof(TKey) == typeof(string))
             return GenerateStringInternal((ReadOnlyMemory<string>)(object)keys, values, fdCfg, generator, factory);
 
-        return GenerateInternal(keys, values, fdCfg, generator, factory);
+        return GenerateNumericInternal(keys, values, fdCfg, generator, factory);
     }
 
     public static string GenerateKeyed<TKey, TValue>(TKey[] keys, TValue[] values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
@@ -54,7 +54,7 @@ public static partial class FastDataGenerator
         if (typeof(TKey) == typeof(string))
             return GenerateStringInternal((ReadOnlyMemory<string>)(object)keys, (ReadOnlyMemory<TValue>)values, fdCfg, generator, factory);
 
-        return GenerateInternal((ReadOnlyMemory<TKey>)keys, (ReadOnlyMemory<TValue>)values, fdCfg, generator, factory);
+        return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, (ReadOnlyMemory<TValue>)values, fdCfg, generator, factory);
     }
 
     public static string Generate(ReadOnlyMemory<string> keys, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
@@ -102,7 +102,7 @@ public static partial class FastDataGenerator
         const KeyType keyType = KeyType.String;
         LogKeyType(logger, keyType);
 
-        StringProperties strProps = KeyAnalyzer.GetStringProperties(keySpan, fdCfg.EnableTrimming);
+        StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(keySpan, fdCfg.EnableTrimming);
 
         string? trimPrefix = null;
         string? trimSuffix = null;
@@ -188,7 +188,7 @@ public static partial class FastDataGenerator
         }
     }
 
-    private static string GenerateInternal<TKey, TValue>(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
+    private static string GenerateNumericInternal<TKey, TValue>(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         if (keys.IsEmpty)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
@@ -224,7 +224,7 @@ public static partial class FastDataGenerator
 
         HashDetails hashDetails = new HashDetails();
 
-        KeyProperties<TKey> props = KeyAnalyzer.GetProperties(keys);
+        NumericKeyProperties<TKey> props = KeyAnalyzer.GetNumericProperties(keys);
         LogMinMaxValues(logger, props.MinKeyValue, props.MaxKeyValue);
         GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(fdCfg.StructureType, keyType, (uint)keySpan.Length, props, hashDetails, GeneratorFlags.None);
 
@@ -272,7 +272,7 @@ public static partial class FastDataGenerator
         }
     }
 
-    internal static string[] SubStringKeys(ReadOnlySpan<string> keys, StringProperties props)
+    internal static string[] SubStringKeys(ReadOnlySpan<string> keys, StringKeyProperties props)
     {
         int prefix = props.DeltaData.LeftZeroCount;
         int suffix = props.DeltaData.RightZeroCount;
@@ -298,7 +298,7 @@ public static partial class FastDataGenerator
 
     private static bool IsBitSetDense(ulong range, int itemCount) => itemCount / (double)range >= MinBitSetDensity;
 
-    internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, GeneratorEncoding encoding, bool includeDefault)
+    internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringKeyProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, GeneratorEncoding encoding, bool includeDefault)
     {
         Simulator sim = new Simulator(data.Length, encoding);
 

@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed partial class GeneticAnalyzer(StringProperties props, GeneticAnalyzerConfig config, Simulator sim, ILogger<GeneticAnalyzer> logger) : IStringHashAnalyzer
+internal sealed partial class GeneticAnalyzer(StringKeyProperties props, GeneticAnalyzerConfig config, Simulator sim, ILogger<GeneticAnalyzer> logger) : IStringHashAnalyzer
 {
     /*
      This is a genetic algorithm that determines the best configuration from a random population, that via evolution is biased

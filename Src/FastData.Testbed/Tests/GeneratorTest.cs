@@ -12,7 +12,7 @@ internal static class GeneratorTest
     public static void TestGenerators()
     {
         string[] data = ["cake", "fish", "horse", "internet", "word", "what"];
-        StringProperties props = KeyAnalyzer.GetStringProperties(data, false);
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false);
 
         TestGenerators(data, props, new BruteForceGenerator(8));
         TestGenerators(data, props, new EdgeGramGenerator(8));
@@ -20,7 +20,7 @@ internal static class GeneratorTest
         TestGenerators(data, props, new DeltaGenerator());
     }
 
-    private static void TestGenerators(string[] data, StringProperties props, ISegmentGenerator generator)
+    private static void TestGenerators(string[] data, StringKeyProperties props, ISegmentGenerator generator)
     {
         Console.WriteLine($"### {generator.GetType().Name}. Appropriate: {generator.IsAppropriate(props)}");
         ArraySegment[] segments = generator.Generate(props).ToArray();

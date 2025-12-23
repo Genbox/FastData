@@ -8,9 +8,9 @@ namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 /// <summary>Returns segments with offset [0..max-1] and length [1..max-1]</summary>
 internal sealed class BruteForceGenerator(int maxLength) : ISegmentGenerator
 {
-    public bool IsAppropriate(StringProperties props) => true;
+    public bool IsAppropriate(StringKeyProperties props) => true;
 
-    public IEnumerable<ArraySegment> Generate(StringProperties props)
+    public IEnumerable<ArraySegment> Generate(StringKeyProperties props)
     {
         int max = (int)Math.Min(props.LengthData.LengthMap.Min, maxLength); //We cannot segment above the shortest string.
 

@@ -8,9 +8,9 @@ namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 /// <summary>Returns segments with offset [0..n-1] and lengths [offset-n]</summary>
 internal sealed class OffsetGenerator : ISegmentGenerator
 {
-    public bool IsAppropriate(StringProperties props) => true;
+    public bool IsAppropriate(StringKeyProperties props) => true;
 
-    public IEnumerable<ArraySegment> Generate(StringProperties props)
+    public IEnumerable<ArraySegment> Generate(StringKeyProperties props)
     {
         //Generates:
         //[test]

@@ -4,7 +4,7 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class KeyLengthStructure<TKey, TValue>(StringProperties props) : IStructure<TKey, TValue, KeyLengthContext<TValue>>
+internal sealed class KeyLengthStructure<TKey, TValue>(StringKeyProperties props) : IStructure<TKey, TValue, KeyLengthContext<TValue>>
 {
     public KeyLengthContext<TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

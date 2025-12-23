@@ -199,7 +199,7 @@ public static class TestHelper
         {
             ReadOnlyMemory<string> stringMemory = CastMemory<TKey, string>(keyMemory);
             ReadOnlySpan<string> stringSpan = stringMemory.Span;
-            StringProperties strProps = KeyAnalyzer.GetStringProperties(stringSpan, true); // Enable trimming
+            StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(stringSpan, true); // Enable trimming
 
             if (strProps.DeltaData.LeftZeroCount > 0 || strProps.DeltaData.RightZeroCount > 0)
             {
@@ -217,7 +217,7 @@ public static class TestHelper
             props = strProps;
         }
         else
-            props = KeyAnalyzer.GetProperties(keyMemory);
+            props = KeyAnalyzer.GetNumericProperties(keyMemory);
 
         ICodeGenerator generator = func(vector.Identifier);
         GeneratorEncoding encoding = generator.Encoding;
@@ -235,11 +235,11 @@ public static class TestHelper
         if (vector.Type == typeof(HashTablePerfectStructure<,>))
             return Generate(generator, vector, props, keyType, StructureType.HashTable, new HashTablePerfectStructure<TKey, TValue>(GetHashData(keySpan, keyType, encoding), keyType), keyMemory, values, trimPrefix, trimSuffix);
         if (vector.Type == typeof(KeyLengthStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.Auto, new KeyLengthStructure<TKey, TValue>((StringProperties)props), keyMemory, values, trimPrefix, trimSuffix);
+            return Generate(generator, vector, props, keyType, StructureType.Auto, new KeyLengthStructure<TKey, TValue>((StringKeyProperties)props), keyMemory, values, trimPrefix, trimSuffix);
         if (vector.Type == typeof(RangeStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.Auto, new RangeStructure<TKey, TValue>((KeyProperties<TKey>)props), keyMemory, values, trimPrefix, trimSuffix);
+            return Generate(generator, vector, props, keyType, StructureType.Auto, new RangeStructure<TKey, TValue>((NumericKeyProperties<TKey>)props), keyMemory, values, trimPrefix, trimSuffix);
         if (vector.Type == typeof(BitSetStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.Auto, new BitSetStructure<TKey, TValue>((KeyProperties<TKey>)props, keyType), keyMemory, values, trimPrefix, trimSuffix);
+            return Generate(generator, vector, props, keyType, StructureType.Auto, new BitSetStructure<TKey, TValue>((NumericKeyProperties<TKey>)props, keyType), keyMemory, values, trimPrefix, trimSuffix);
         if (vector.Type == typeof(HashTableCompactStructure<,>))
             return Generate(generator, vector, props, keyType, StructureType.Auto, new HashTableCompactStructure<TKey, TValue>(GetHashData(keySpan, keyType, encoding), keyType), keyMemory, values, trimPrefix, trimSuffix);
 
@@ -278,14 +278,14 @@ public static class TestHelper
 
         GeneratorFlags flags = GeneratorFlags.None;
 
-        if (props is StringProperties stringProps)
+        if (props is StringKeyProperties stringProps)
         {
             if (stringProps.CharacterData.AllAscii)
                 flags = GeneratorFlags.AllAreASCII;
 
             genCfg = new GeneratorConfig<TKey>(structureType, keyType, (uint)keys.Length, stringProps, StringComparison.Ordinal, hashDetails, generator.Encoding, flags, trimPrefix, trimSuffix);
         }
-        else if (props is KeyProperties<TKey> valueProps)
+        else if (props is NumericKeyProperties<TKey> valueProps)
         {
             hashDetails.HasZeroOrNaN = valueProps.HasZeroOrNaN;
             genCfg = new GeneratorConfig<TKey>(structureType, keyType, (uint)keys.Length, valueProps, hashDetails, flags);

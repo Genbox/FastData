@@ -6,35 +6,35 @@ namespace Genbox.FastData.Internal.Analysis;
 
 internal static class KeyAnalyzer
 {
-    internal static KeyProperties<T> GetProperties<T>(ReadOnlyMemory<T> segment)
+    internal static NumericKeyProperties<T> GetNumericProperties<T>(ReadOnlyMemory<T> keys)
     {
         if (typeof(T) == typeof(char))
-            return (KeyProperties<T>)(object)GetCharProperties(((ReadOnlyMemory<char>)(object)segment).Span);
+            return (NumericKeyProperties<T>)(object)GetCharProperties(((ReadOnlyMemory<char>)(object)keys).Span);
         if (typeof(T) == typeof(sbyte))
-            return (KeyProperties<T>)(object)GetSByteProperties(((ReadOnlyMemory<sbyte>)(object)segment).Span);
+            return (NumericKeyProperties<T>)(object)GetSByteProperties(((ReadOnlyMemory<sbyte>)(object)keys).Span);
         if (typeof(T) == typeof(byte))
-            return (KeyProperties<T>)(object)GetByteProperties(((ReadOnlyMemory<byte>)(object)segment).Span);
+            return (NumericKeyProperties<T>)(object)GetByteProperties(((ReadOnlyMemory<byte>)(object)keys).Span);
         if (typeof(T) == typeof(short))
-            return (KeyProperties<T>)(object)GetInt16Properties(((ReadOnlyMemory<short>)(object)segment).Span);
+            return (NumericKeyProperties<T>)(object)GetInt16Properties(((ReadOnlyMemory<short>)(object)keys).Span);
         if (typeof(T) == typeof(ushort))
-            return (KeyProperties<T>)(object)GetUInt16Properties(((ReadOnlyMemory<ushort>)(object)segment).Span);
+            return (NumericKeyProperties<T>)(object)GetUInt16Properties(((ReadOnlyMemory<ushort>)(object)keys).Span);
         if (typeof(T) == typeof(int))
-            return (KeyProperties<T>)(object)GetInt32Properties(((ReadOnlyMemory<int>)(object)segment).Span);
+            return (NumericKeyProperties<T>)(object)GetInt32Properties(((ReadOnlyMemory<int>)(object)keys).Span);
         if (typeof(T) == typeof(uint))
-            return (KeyProperties<T>)(object)GetUInt32Properties(((ReadOnlyMemory<uint>)(object)segment).Span);
+            return (NumericKeyProperties<T>)(object)GetUInt32Properties(((ReadOnlyMemory<uint>)(object)keys).Span);
         if (typeof(T) == typeof(long))
-            return (KeyProperties<T>)(object)GetInt64Properties(((ReadOnlyMemory<long>)(object)segment).Span);
+            return (NumericKeyProperties<T>)(object)GetInt64Properties(((ReadOnlyMemory<long>)(object)keys).Span);
         if (typeof(T) == typeof(ulong))
-            return (KeyProperties<T>)(object)GetUInt64Properties(((ReadOnlyMemory<ulong>)(object)segment).Span);
+            return (NumericKeyProperties<T>)(object)GetUInt64Properties(((ReadOnlyMemory<ulong>)(object)keys).Span);
         if (typeof(T) == typeof(float))
-            return (KeyProperties<T>)(object)GetSingleProperties(((ReadOnlyMemory<float>)(object)segment).Span);
+            return (NumericKeyProperties<T>)(object)GetSingleProperties(((ReadOnlyMemory<float>)(object)keys).Span);
         if (typeof(T) == typeof(double))
-            return (KeyProperties<T>)(object)GetDoubleProperties(((ReadOnlyMemory<double>)(object)segment).Span);
+            return (NumericKeyProperties<T>)(object)GetDoubleProperties(((ReadOnlyMemory<double>)(object)keys).Span);
 
         throw new InvalidOperationException($"Unsupported data type: {typeof(T).Name}");
     }
 
-    internal static StringProperties GetStringProperties(ReadOnlySpan<string> keys, bool enableTrimming)
+    internal static StringKeyProperties GetStringProperties(ReadOnlySpan<string> keys, bool enableTrimming)
     {
         //Contains a map of unique lengths
         LengthBitArray lengthMap = new LengthBitArray();
@@ -145,10 +145,10 @@ internal static class KeyAnalyzer
             // }
         }
 
-        return new StringProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
+        return new StringKeyProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
     }
 
-    private static KeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys)
+    private static NumericKeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys)
     {
         char min = char.MaxValue;
         char max = char.MinValue;
@@ -159,10 +159,10 @@ internal static class KeyAnalyzer
             max = c > max ? c : max;
         }
 
-        return new KeyProperties<char>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new NumericKeyProperties<char>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
-    private static KeyProperties<float> GetSingleProperties(ReadOnlySpan<float> keys)
+    private static NumericKeyProperties<float> GetSingleProperties(ReadOnlySpan<float> keys)
     {
         float min = float.MaxValue;
         float max = float.MinValue;
@@ -185,10 +185,10 @@ internal static class KeyAnalyzer
         }
 
         ulong range = ClampRangeToUInt64(max - min);
-        return new KeyProperties<float>(min, max, range, hasZeroOrNaN, IsFloatConsecutive(keys, min, max, hasNaNOrInfinity));
+        return new NumericKeyProperties<float>(min, max, range, hasZeroOrNaN, IsFloatConsecutive(keys, min, max, hasNaNOrInfinity));
     }
 
-    private static KeyProperties<double> GetDoubleProperties(ReadOnlySpan<double> keys)
+    private static NumericKeyProperties<double> GetDoubleProperties(ReadOnlySpan<double> keys)
     {
         double min = double.MaxValue;
         double max = double.MinValue;
@@ -211,10 +211,10 @@ internal static class KeyAnalyzer
         }
 
         ulong range = ClampRangeToUInt64(max - min);
-        return new KeyProperties<double>(min, max, range, hasZeroOrNaN, IsDoubleConsecutive(keys, min, max, hasNaNOrInfinity));
+        return new NumericKeyProperties<double>(min, max, range, hasZeroOrNaN, IsDoubleConsecutive(keys, min, max, hasNaNOrInfinity));
     }
 
-    private static KeyProperties<byte> GetByteProperties(ReadOnlySpan<byte> keys)
+    private static NumericKeyProperties<byte> GetByteProperties(ReadOnlySpan<byte> keys)
     {
         byte min = byte.MaxValue;
         byte max = byte.MinValue;
@@ -225,10 +225,10 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<byte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new NumericKeyProperties<byte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
-    private static KeyProperties<sbyte> GetSByteProperties(ReadOnlySpan<sbyte> keys)
+    private static NumericKeyProperties<sbyte> GetSByteProperties(ReadOnlySpan<sbyte> keys)
     {
         sbyte min = sbyte.MaxValue;
         sbyte max = sbyte.MinValue;
@@ -239,10 +239,10 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<sbyte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new NumericKeyProperties<sbyte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
-    private static KeyProperties<short> GetInt16Properties(ReadOnlySpan<short> keys)
+    private static NumericKeyProperties<short> GetInt16Properties(ReadOnlySpan<short> keys)
     {
         short min = short.MaxValue;
         short max = short.MinValue;
@@ -253,10 +253,10 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<short>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new NumericKeyProperties<short>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
-    private static KeyProperties<ushort> GetUInt16Properties(ReadOnlySpan<ushort> keys)
+    private static NumericKeyProperties<ushort> GetUInt16Properties(ReadOnlySpan<ushort> keys)
     {
         ushort min = ushort.MaxValue;
         ushort max = ushort.MinValue;
@@ -267,10 +267,10 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<ushort>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
+        return new NumericKeyProperties<ushort>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1);
     }
 
-    private static KeyProperties<int> GetInt32Properties(ReadOnlySpan<int> keys)
+    private static NumericKeyProperties<int> GetInt32Properties(ReadOnlySpan<int> keys)
     {
         int min = int.MaxValue;
         int max = int.MinValue;
@@ -281,10 +281,10 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<int>(min, max, (ulong)((long)max - min), false, keys.Length <= 1 || (long)max - min == keys.Length - 1);
+        return new NumericKeyProperties<int>(min, max, (ulong)((long)max - min), false, keys.Length <= 1 || (long)max - min == keys.Length - 1);
     }
 
-    private static KeyProperties<uint> GetUInt32Properties(ReadOnlySpan<uint> keys)
+    private static NumericKeyProperties<uint> GetUInt32Properties(ReadOnlySpan<uint> keys)
     {
         uint min = uint.MaxValue;
         uint max = uint.MinValue;
@@ -295,10 +295,10 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<uint>(min, max, max - min, false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1));
+        return new NumericKeyProperties<uint>(min, max, max - min, false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1));
     }
 
-    private static KeyProperties<long> GetInt64Properties(ReadOnlySpan<long> keys)
+    private static NumericKeyProperties<long> GetInt64Properties(ReadOnlySpan<long> keys)
     {
         long min = long.MaxValue;
         long max = long.MinValue;
@@ -310,10 +310,10 @@ internal static class KeyAnalyzer
         }
 
         ulong range = unchecked((ulong)max - (ulong)min);
-        return new KeyProperties<long>(min, max, range, false, keys.Length <= 1 || range == (ulong)(keys.Length - 1));
+        return new NumericKeyProperties<long>(min, max, range, false, keys.Length <= 1 || range == (ulong)(keys.Length - 1));
     }
 
-    private static KeyProperties<ulong> GetUInt64Properties(ReadOnlySpan<ulong> keys)
+    private static NumericKeyProperties<ulong> GetUInt64Properties(ReadOnlySpan<ulong> keys)
     {
         ulong min = ulong.MaxValue;
         ulong max = ulong.MinValue;
@@ -324,7 +324,7 @@ internal static class KeyAnalyzer
             max = Math.Max(max, val);
         }
 
-        return new KeyProperties<ulong>(min, max, max - min, false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1));
+        return new NumericKeyProperties<ulong>(min, max, max - min, false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1));
     }
 
     private static bool IsFloatConsecutive(ReadOnlySpan<float> keys, float min, float max, bool hasNaNOrInfinity)

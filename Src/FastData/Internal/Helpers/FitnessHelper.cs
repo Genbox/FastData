@@ -7,7 +7,7 @@ namespace Genbox.FastData.Internal.Helpers;
 
 internal static class FitnessHelper
 {
-    internal static double CalculateFitness(StringProperties props, ArraySegment segment, Expression expression)
+    internal static double CalculateFitness(StringKeyProperties props, ArraySegment segment, Expression expression)
     {
         //The length of segment is a factor
         int minLen = (int)props.LengthData.LengthMap.Min;

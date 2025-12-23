@@ -8,9 +8,9 @@ namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 /// <summary>Creates edge-grams with offsets of 0 and lengths [1..max]</summary>
 internal sealed class EdgeGramGenerator(int maxLength) : ISegmentGenerator
 {
-    public bool IsAppropriate(StringProperties props) => true;
+    public bool IsAppropriate(StringKeyProperties props) => true;
 
-    public IEnumerable<ArraySegment> Generate(StringProperties props)
+    public IEnumerable<ArraySegment> Generate(StringKeyProperties props)
     {
         int len;
 
