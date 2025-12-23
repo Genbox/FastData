@@ -7,8 +7,8 @@ internal sealed class LengthBitArray(int length = 64)
 {
     private readonly SwitchingBitSet _tracker = new SwitchingBitSet(length, true);
 
-    public int Min { get; private set; } = int.MaxValue;
-    public int Max { get; private set; } = int.MinValue;
+    public uint Min { get; private set; } = uint.MaxValue;
+    public uint Max { get; private set; } = uint.MinValue;
 
     internal ulong[] Values => _tracker.BitSet;
     internal int BitCount { get; private set; }
@@ -26,16 +26,11 @@ internal sealed class LengthBitArray(int length = 64)
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal bool Get(int index) => _tracker.Contains(index);
+    internal bool Get(uint index) => _tracker.Contains(index);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal bool SetTrue(int index)
+    internal bool SetTrue(uint index)
     {
-        if (index < 0)
-            throw new ArgumentException("Index must be non-negative: " + index, nameof(index));
-
-        unchecked
-        {
             bool added = _tracker.Add(index);
 
             if (added)
@@ -46,6 +41,5 @@ internal sealed class LengthBitArray(int length = 64)
             }
 
             return !added;
-        }
     }
 }

@@ -79,8 +79,8 @@ public sealed class GeneratorConfig<T>
     private static Constants<T> CreateConstants(StringProperties props, uint itemCount)
     {
         Constants<T> constants = new Constants<T>(itemCount);
-        constants.MinStringLength = props.LengthData.Min;
-        constants.MaxStringLength = props.LengthData.Max;
+        constants.MinStringLength = props.LengthData.LengthMap.Min;
+        constants.MaxStringLength = props.LengthData.LengthMap.Max;
         return constants;
     }
 
@@ -108,7 +108,7 @@ public sealed class GeneratorConfig<T>
             uint minByteCount = enc == GeneratorEncoding.UTF8 ? lengthData.MinUtf8ByteCount : lengthData.MinUtf16ByteCount;
             uint maxByteCount = enc == GeneratorEncoding.UTF8 ? lengthData.MaxUtf8ByteCount : lengthData.MaxUtf16ByteCount;
 
-            yield return new MinMaxLengthEarlyExit(lengthData.Min, lengthData.Max, minByteCount, maxByteCount); //Also handles same lengths
+            yield return new MinMaxLengthEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, minByteCount, maxByteCount); //Also handles same lengths
         }
     }
 
@@ -136,7 +136,7 @@ public sealed class GeneratorConfig<T>
         if (lengthData.LengthMap.Values.Length > MaxLengthBitSetWords)
             return false;
 
-        uint range = lengthData.Max - lengthData.Min + 1;
+        uint range = lengthData.LengthMap.Max - lengthData.LengthMap.Min + 1;
         double density = lengthData.LengthMap.BitCount / (double)range;
         return density <= MaxLengthBitSetDensity;
     }

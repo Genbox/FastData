@@ -12,7 +12,7 @@ internal sealed class BruteForceGenerator(int maxLength) : ISegmentGenerator
 
     public IEnumerable<ArraySegment> Generate(StringProperties props)
     {
-        int max = (int)Math.Min(props.LengthData.Min, maxLength); //We cannot segment above the shortest string.
+        int max = (int)Math.Min(props.LengthData.LengthMap.Min, maxLength); //We cannot segment above the shortest string.
 
         //Generates:
         //[t]est

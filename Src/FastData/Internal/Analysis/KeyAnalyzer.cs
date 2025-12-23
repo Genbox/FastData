@@ -61,7 +61,7 @@ internal static class KeyAnalyzer
             minUtf16ByteLength = Math.Min(utf16ByteCount, minUtf16ByteLength);
             maxUtf16ByteLength = Math.Max(utf16ByteCount, maxUtf16ByteLength);
 
-            uniq &= !lengthMap.SetTrue(str.Length);
+            uniq &= !lengthMap.SetTrue((uint)str.Length);
 
             foreach (char c in str)
             {
@@ -145,7 +145,7 @@ internal static class KeyAnalyzer
             // }
         }
 
-        return new StringProperties(new LengthData((uint)lengthMap.Min, (uint)maxStr.Length, (uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
+        return new StringProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
     }
 
     private static KeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys)

@@ -10,7 +10,7 @@ internal static class FitnessHelper
     internal static double CalculateFitness(StringProperties props, ArraySegment segment, Expression expression)
     {
         //The length of segment is a factor
-        int minLen = (int)props.LengthData.Min;
+        int minLen = (int)props.LengthData.LengthMap.Min;
         int segLen = segment.Length;
         double segFit;
 

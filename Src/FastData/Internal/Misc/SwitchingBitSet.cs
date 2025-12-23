@@ -6,7 +6,7 @@ internal sealed class SwitchingBitSet
     private readonly int _maxBitSetWords;
     private readonly bool _offByOneMode; // "Off by one mode" is needed for length bitarrays as we occupy the first bit as length = 1
     private ulong[]? _bits;
-    private HashSet<int>? _set;
+    private HashSet<uint>? _set;
 
     internal SwitchingBitSet(int length, bool offByOneMode, int maxBitSetWords = 131072)
     {
@@ -21,17 +21,14 @@ internal sealed class SwitchingBitSet
         if (wordLength <= maxBitSetWords)
             _bits = new ulong[wordLength];
         else
-            _set = new HashSet<int>();
+            _set = new HashSet<uint>();
     }
 
     internal bool IsBitSet => _bits != null;
     internal ulong[] BitSet => _bits ?? [];
 
-    internal bool Add(int index)
+    internal bool Add(uint index)
     {
-        if (index < 0)
-            throw new ArgumentException("Index must be non-negative: " + index, nameof(index));
-
         if (_bits != null)
         {
             EnsureCapacityForIndex(index);
@@ -39,7 +36,7 @@ internal sealed class SwitchingBitSet
             if (_bits == null)
                 return _set!.Add(index);
 
-            GetPosition(index, out int wordIndex, out ulong mask);
+            GetPosition(index, out uint wordIndex, out ulong mask);
 
             if ((_bits[wordIndex] & mask) != 0)
                 return false;
@@ -51,14 +48,11 @@ internal sealed class SwitchingBitSet
         return _set!.Add(index);
     }
 
-    internal bool Contains(int index)
+    internal bool Contains(uint index)
     {
-        if (index < 0)
-            throw new ArgumentException("Index must be non-negative: " + index, nameof(index));
-
         if (_bits != null)
         {
-            GetPosition(index, out int wordIndex, out ulong mask);
+            GetPosition(index, out uint wordIndex, out ulong mask);
 
             if (wordIndex >= _bits.Length)
                 return false;
@@ -71,25 +65,25 @@ internal sealed class SwitchingBitSet
 
     private static int GetWordLength(int length) => (int)(((long)length + 63) >> 6);
 
-    private void GetPosition(int index, out int wordIndex, out ulong mask)
+    private void GetPosition(uint index, out uint wordIndex, out ulong mask)
     {
         wordIndex = index >> 6;
 
         if (_offByOneMode)
         {
-            ulong remainder = (ulong)(index & 63);
+            ulong remainder = index & 63;
             int bitIndex = remainder == 0 ? 63 : (int)remainder - 1;
             mask = 1UL << bitIndex;
         }
         else
         {
-            mask = 1UL << (index & 63);
+            mask = 1UL << ((int)index & 63);
         }
     }
 
     private void SwitchToSet()
     {
-        HashSet<int> set = new HashSet<int>();
+        HashSet<uint> set = new HashSet<uint>();
 
         for (int wordIndex = 0; wordIndex < _bits!.Length; wordIndex++)
         {
@@ -110,17 +104,17 @@ internal sealed class SwitchingBitSet
         _bits = null;
     }
 
-    private int GetIndex(int wordIndex, int bitIndex)
+    private uint GetIndex(int wordIndex, int bitIndex)
     {
         if (_offByOneMode)
-            return (int)(((ulong)wordIndex << 6) + (bitIndex == 63 ? 0UL : (uint)bitIndex + 1));
+            return (uint)(((ulong)wordIndex << 6) + (bitIndex == 63 ? 0UL : (uint)bitIndex + 1));
 
-        return (int)(((ulong)wordIndex << 6) + (uint)bitIndex);
+        return (uint)(((ulong)wordIndex << 6) + (uint)bitIndex);
     }
 
-    private void EnsureCapacityForIndex(int index)
+    private void EnsureCapacityForIndex(uint index)
     {
-        int wordLength = (index >> 6) + 1;
+        uint wordLength = (index >> 6) + 1;
         if (wordLength <= _bits!.Length)
             return;
 
@@ -130,6 +124,6 @@ internal sealed class SwitchingBitSet
             return;
         }
 
-        Array.Resize(ref _bits, wordLength);
+        Array.Resize(ref _bits, (int)wordLength);
     }
 }

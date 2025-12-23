@@ -18,7 +18,7 @@ internal sealed class OffsetGenerator : ISegmentGenerator
         //te[st]
         //tes[t]
 
-        for (uint offset = 0; offset < props.LengthData.Min; offset++)
+        for (uint offset = 0; offset < props.LengthData.LengthMap.Min; offset++)
         {
             yield return new ArraySegment(offset, -1, Alignment.Left);
         }

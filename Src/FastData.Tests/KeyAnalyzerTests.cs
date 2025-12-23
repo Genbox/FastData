@@ -57,11 +57,11 @@ public class KeyAnalyzerTests
 
         foreach (string str in data)
         {
-            Assert.True(map.Get(str.Length));
+            Assert.True(map.Get((uint)str.Length));
         }
 
-        Assert.Equal((uint)data.Min(x => x.Length), res.LengthData.Min);
-        Assert.Equal((uint)data.Max(x => x.Length), res.LengthData.Max);
+        Assert.Equal((uint)data.Min(x => x.Length), res.LengthData.LengthMap.Min);
+        Assert.Equal((uint)data.Max(x => x.Length), res.LengthData.LengthMap.Max);
     }
 
     [Theory]

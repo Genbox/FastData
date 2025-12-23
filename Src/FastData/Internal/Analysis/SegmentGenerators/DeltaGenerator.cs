@@ -73,7 +73,7 @@ internal sealed class DeltaGenerator : ISegmentGenerator
             foreach (ArraySegment segment in CalculateSegments(props.DeltaData.Left))
             {
                 // Left Alignment: offset + length <= Min
-                int maxLength = (int)(props.LengthData.Min - segment.Offset);
+                int maxLength = (int)(props.LengthData.LengthMap.Min - segment.Offset);
                 int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
 
                 if (length > 0)
@@ -87,7 +87,7 @@ internal sealed class DeltaGenerator : ISegmentGenerator
             foreach (ArraySegment segment in CalculateSegments(props.DeltaData.Right))
             {
                 // Right Alignment: offset + length <= Min
-                int maxLength = (int)(props.LengthData.Min - segment.Offset);
+                int maxLength = (int)(props.LengthData.LengthMap.Min - segment.Offset);
                 int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
 
                 if (length > 0)

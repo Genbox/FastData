@@ -22,26 +22,8 @@ public class LengthBitArrayTests
     public void CustomLength_AllBitsFalseWithinRange()
     {
         LengthBitArray bits = new LengthBitArray(128);
-        for (int i = 0; i < 128; i += 15)
+        for (uint i = 0; i < 128; i += 15)
             Assert.False(bits.Get(i));
-    }
-
-    [Theory]
-    [InlineData(-1)]
-    [InlineData(-100)]
-    public void Get_OutOfRange_Throws(int index)
-    {
-        LengthBitArray bits = new LengthBitArray();
-        Assert.Throws<ArgumentException>(() => bits.Get(index));
-    }
-
-    [Theory]
-    [InlineData(-1)]
-    [InlineData(-50)]
-    public void SetTrue_NegativeIndex_Throws(int index)
-    {
-        LengthBitArray bits = new LengthBitArray();
-        Assert.Throws<ArgumentException>(() => bits.SetTrue(index));
     }
 
     [Fact]

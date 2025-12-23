@@ -14,8 +14,8 @@ internal sealed class KeyLengthStructure<TKey, TValue>(StringProperties props) :
         if (!props.LengthData.Unique)
             throw new InvalidOperationException("We can only use this structure when all lengths are unique");
 
-        uint minLen = props.LengthData.Min;
-        uint maxLen = props.LengthData.Max;
+        uint minLen = props.LengthData.LengthMap.Min;
+        uint maxLen = props.LengthData.LengthMap.Max;
         int range = (int)(maxLen - minLen + 1); //+1 because we need a place for zero
 
         string?[] lengths = new string?[range];

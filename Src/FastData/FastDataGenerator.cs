@@ -120,7 +120,7 @@ public static partial class FastDataGenerator
             keySpan = keyMemory.Span;
         }
 
-        LogMinMaxLength(logger, strProps.LengthData.Min, strProps.LengthData.Max);
+        LogMinMaxLength(logger, strProps.LengthData.LengthMap.Min, strProps.LengthData.LengthMap.Max);
 
         HashDetails hashDetails = new HashDetails();
         GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, keyType, (uint)keySpan.Length, strProps, DefaultStringComparison, hashDetails, generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None, trimPrefix, trimSuffix);
@@ -133,7 +133,7 @@ public static partial class FastDataGenerator
                     return GenerateWrapper(generator, genCfg, new SingleValueStructure<string, TValue>(), keyMemory, values);
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
-                double density = (double)keySpan.Length / (strProps.LengthData.Max - strProps.LengthData.Min + 1);
+                double density = (double)keySpan.Length / (strProps.LengthData.LengthMap.Max - strProps.LengthData.LengthMap.Min + 1);
 
                 // Use KeyLengthStructure only when string lengths are unique and density >= 75%
                 if (strProps.LengthData.Unique && density >= 0.75)
@@ -346,7 +346,7 @@ public static partial class FastDataGenerator
         perfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
         notPerfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
 
-        string test = new string('a', (int)props.LengthData.Max);
+        string test = new string('a', (int)props.LengthData.LengthMap.Max);
         byte[] testBytes = encoding == GeneratorEncoding.UTF8 ? Encoding.UTF8.GetBytes(test) : Encoding.Unicode.GetBytes(test);
 
         //We start with the perfect results (if any)

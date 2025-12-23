@@ -38,7 +38,7 @@ internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUn
             if (uniq && !uniqSet.Add(hash)) //The unique check is first so that when it is false, we don't try the other conditions
                 uniq = false;
 
-            if (perfect && !perfectTracker.Add((int)(hash % size)))
+            if (perfect && !perfectTracker.Add((uint)(hash % size)))
                 perfect = false;
         }
 
