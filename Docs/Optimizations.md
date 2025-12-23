@@ -12,7 +12,7 @@ But since there is just one element, we don't have to do all that. FastData will
 This trick pertains to all types of lookup structures, but I'll use binary search as the example.
 
 Binary search works by segmenting an array in half on each iteration of a lookup. It works on any input data, as long as we can establish a concept of `greater than`, `equal` and `less than` between elements.
-However, if we can determine the input set is contiguous, then we don't need to do the binary search at all.
+However, if we can determine the input set is consecutive, then we don't need to do the binary search at all.
 
 Let's say the input is 42, 43, 44, 45.
 - A check if 100 is in the list, is just `is 100 >= 45?`
@@ -26,6 +26,10 @@ Can we do better? Let's say you have an input like this: `house car fish`
 
 In this case, each of the input strings have a unique length. So why not use their length as their hash? That's exactly what `KeyLengthStructure` does.
 If the programming language cache the string length, we can get constant lookup time.
+
+### Reduction to bitmap lookup
+If a sequence of numbers is a short range, but cannot get optimized via the range reduction above, then it might be a good fit for a bitmap instead. Let's say you have the numbers in range 10-100 and 300-900.
+Range reduction only works if the numbers are consecutive (until I add support for multi-ranges), and there are too many numbers to use conditionals efficiently, so instead we use a bitmap.
 
 ## Early exits
 An early exit is a lightweight check we can perform before the actual lookup to speed up the process. They have to be **really** fast, otherwise they will add unwanted overhead to each call.
