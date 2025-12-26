@@ -2,6 +2,7 @@
 // Structure: BinarySearch
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -36,6 +37,7 @@ public:
             default:
                 return false;
         }
+
 
 
         int32_t lo = 0;

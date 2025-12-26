@@ -60,6 +60,10 @@ internal static class MyData
     {
         if (key.Length != 5u)
             return false;
+        ulong first = (ulong)key[0] | ((ulong)key[1] << 16) | ((ulong)key[2] << 32) | ((ulong)key[3] << 48);
+
+        if ((first & 18414092482483257227UL) != 0)
+            return false;
 
 
         ulong hash = Hash(key);

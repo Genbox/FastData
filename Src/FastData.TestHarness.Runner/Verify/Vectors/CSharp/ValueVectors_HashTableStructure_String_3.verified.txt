@@ -75,6 +75,10 @@ internal static class HashTableStructure_String_3
             default:
                 return false;
         }
+        ulong first = (ulong)key[0];
+
+        if ((first & 65430UL) != 0)
+            return false;
 
 
         ulong hash = Hash(key);

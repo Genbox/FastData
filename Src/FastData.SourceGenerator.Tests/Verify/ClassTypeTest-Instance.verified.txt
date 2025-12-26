@@ -13,6 +13,10 @@ internal partial class StaticData
     {
         if (key.Length != 5u)
             return false;
+        ulong first = (ulong)key[0] | ((ulong)key[1] << 16) | ((ulong)key[2] << 32) | ((ulong)key[3] << 48);
+
+        if ((first & 18416062867448790934UL) != 0)
+            return false;
 
 
         switch (key)

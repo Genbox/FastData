@@ -4,6 +4,7 @@
 // Structure: Auto (Conditional)
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -14,6 +15,7 @@ public:
     static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 5u)
              return false;
+
 
         if (key == "test1" || key == "test2")
             return true;

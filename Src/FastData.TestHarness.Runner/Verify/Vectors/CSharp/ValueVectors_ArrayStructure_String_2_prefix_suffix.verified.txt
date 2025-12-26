@@ -17,6 +17,10 @@ internal static class ArrayStructure_String_2_prefix_suffix
     {
         if (key.Length != 6u)
             return false;
+        ulong first = (ulong)key[0] | ((ulong)key[1] << 16) | ((ulong)key[2] << 32) | ((ulong)key[3] << 48);
+
+        if ((first & 18418033183695634316UL) != 0)
+            return false;
         if (!(key.EndsWith("fix", StringComparison.Ordinal)))
             return false;
         string trimmedKey = key.Substring(0, key.Length - 3);

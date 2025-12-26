@@ -67,6 +67,45 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
                       {RenderExit(methodType)}
          """;
 
+    protected override string GetStringBitMaskEarlyExit(MethodType methodType, ulong mask, int byteCount, bool ignoreCase, GeneratorEncoding encoding)
+    {
+        if (mask == 0 || byteCount <= 0)
+            return string.Empty;
+
+        if (encoding != GeneratorEncoding.UTF8 && encoding != GeneratorEncoding.ASCII)
+            return string.Empty;
+
+        if (!ignoreCase)
+        {
+            return $"""
+                uint64_t first = 0;
+                std::memcpy(&first, key.data(), {byteCount});
+
+                if ((first & {mask.ToStringInvariant()}ULL) != 0)
+                    {RenderExit(methodType)}
+""";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.Append("                uint64_t first = 0;");
+
+        for (int i = 0; i < byteCount; i++)
+        {
+            sb.Append($"""
+                uint32_t c{i} = static_cast<uint32_t>(key[{i}]);
+                c{i} = to_lower_ascii(c{i});
+                first |= static_cast<uint64_t>(c{i}) << {i * 8};
+""");
+        }
+
+        sb.Append($"""
+
+                if ((first & {mask.ToStringInvariant()}ULL) != 0)
+                    {RenderExit(methodType)}
+""");
+        return sb.ToString();
+    }
+
     protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
     {
         string prefixCheck = ignoreCase ? $"case_insensitive_starts_with(key, {map.ToValueLabel(prefix)})" : $"key.compare(0, {prefix.Length.ToStringInvariant()}, {map.ToValueLabel(prefix)}) == 0";

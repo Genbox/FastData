@@ -2,6 +2,7 @@
 // Structure: Auto (HashTableCompact)
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -62,6 +63,7 @@ public:
             default:
                 return false;
         }
+
 
 
         const uint64_t hash = get_hash(key);

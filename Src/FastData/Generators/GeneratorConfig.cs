@@ -15,26 +15,28 @@ public sealed class GeneratorConfig<T>
     private const int MaxLengthBitSetWords = 4;
     private const double MaxLengthBitSetDensity = 0.5;
     private const double MinValueBitMaskDensity = 0.25;
+    private const double MinStringBitMaskDensity = 0.25;
 
-    private GeneratorConfig(StructureType structureType, KeyType keyType, HashDetails hashDetails, GeneratorFlags flags)
+    private GeneratorConfig(StructureType structureType, KeyType keyType, HashDetails hashDetails, GeneratorFlags flags, GeneratorEncoding encoding)
     {
         StructureType = structureType;
         KeyType = keyType;
         Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.UtcNow);
         HashDetails = hashDetails;
         Flags = flags;
+        Encoding = encoding;
         IgnoreCase = false;
         TrimPrefix = string.Empty;
         TrimSuffix = string.Empty;
     }
 
-    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, NumericKeyProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags)
+    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, NumericKeyProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags, GeneratorEncoding.Unknown)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType).ToArray();
         Constants = CreateConstants(props, itemCount);
     }
 
-    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringKeyProperties props, bool ignoreCase, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string trimPrefix, string trimSuffix) : this(structureType, keyType, hashDetails, flags)
+    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringKeyProperties props, bool ignoreCase, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string trimPrefix, string trimSuffix) : this(structureType, keyType, hashDetails, flags, encoding)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType, encoding).ToArray();
         Constants = CreateConstants(props, itemCount);
@@ -50,6 +52,9 @@ public sealed class GeneratorConfig<T>
 
     /// <summary>Gets the data type being generated.</summary>
     public KeyType KeyType { get; }
+
+    /// <summary>Gets the encoding used for string keys.</summary>
+    public GeneratorEncoding Encoding { get; }
 
     /// <summary>Gets a value indicating whether string keys should be treated as case-insensitive.</summary>
     public bool IgnoreCase { get; }
@@ -105,7 +110,7 @@ public sealed class GeneratorConfig<T>
 
         LengthData lengthData = props.LengthData;
 
-        if (ShouldUseBitSet(lengthData))
+        if (ShouldApplyBitSet(lengthData))
             yield return new LengthBitSetEarlyExit(lengthData.LengthMap.Values);
         else
         {
@@ -114,6 +119,9 @@ public sealed class GeneratorConfig<T>
 
             yield return new MinMaxLengthEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, minByteCount, maxByteCount); //Also handles same lengths
         }
+
+        if (ShouldApplyStringBitMask(props.CharacterData.StringBitMask, props.CharacterData.StringBitMaskBytes, out ulong mask))
+            yield return new StringBitMaskEarlyExit(mask, props.CharacterData.StringBitMaskBytes);
 
         if (props.DeltaData.Prefix.Length != 0 || props.DeltaData.Suffix.Length != 0)
             yield return new PrefixSuffixEarlyExit(props.DeltaData.Prefix, props.DeltaData.Suffix);
@@ -129,13 +137,13 @@ public sealed class GeneratorConfig<T>
         if (structureType == StructureType.Conditional && itemCount <= 3)
             yield break;
 
-        if (TryGetValueBitMask(props, out ulong mask))
+        if (ShouldApplyValueBitMask(props, out ulong mask))
             yield return new ValueBitMaskEarlyExit(mask);
         else
             yield return new MinMaxValueEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue);
     }
 
-    private static bool ShouldUseBitSet(LengthData lengthData)
+    private static bool ShouldApplyBitSet(LengthData lengthData)
     {
         if (!lengthData.LengthMap.HasBitSet)
             return false;
@@ -151,7 +159,7 @@ public sealed class GeneratorConfig<T>
         return density <= MaxLengthBitSetDensity;
     }
 
-    private static bool TryGetValueBitMask(NumericKeyProperties<T> props, out ulong mask)
+    private static bool ShouldApplyValueBitMask(NumericKeyProperties<T> props, out ulong mask)
     {
         Type keyType = typeof(T);
 
@@ -188,5 +196,18 @@ public sealed class GeneratorConfig<T>
         int missingBits = BitOperations.PopCount(mask);
         double density = missingBits / (double)bitWidth;
         return density >= MinValueBitMaskDensity;
+    }
+
+    private static bool ShouldApplyStringBitMask(ulong mask, int byteCount, out ulong stringMask)
+    {
+        stringMask = mask;
+
+        if (mask == 0 || byteCount <= 0)
+            return false;
+
+        int missingBits = BitOperations.PopCount(mask);
+        int bitWidth = byteCount * 8;
+        double density = missingBits / (double)bitWidth;
+        return density >= MinStringBitMaskDensity;
     }
 }

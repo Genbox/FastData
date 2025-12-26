@@ -16,6 +16,12 @@ impl MyData {
         if key.len() != 5 as usize {
             return false;
         }
+        let bytes = key.as_bytes();
+        let first = (bytes[0] as u64) | (bytes[1] as u64) << 8 | (bytes[2] as u64) << 16 | (bytes[3] as u64) << 24 | (bytes[4] as u64) << 32;
+
+        if (first & 878514576011u64) != 0 {
+            return false;
+        }
 
 
         if key == "test1" || key == "test2" {

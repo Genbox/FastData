@@ -15,5 +15,5 @@ public class KeyAnalyzerBenchmarks
     }
 
     [Benchmark]
-    public object GetStringProperties() => KeyAnalyzer.GetStringProperties(_data, true);
+    public object GetStringProperties() => KeyAnalyzer.GetStringProperties(_data, true, false);
 }

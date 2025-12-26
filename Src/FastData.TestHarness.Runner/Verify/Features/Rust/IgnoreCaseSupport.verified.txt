@@ -111,9 +111,25 @@ impl IgnoreCaseSupport {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        if key.len() < 5 as usize || key.len() > 7 as usize {
+        let len = key.len();
+        if len < 5 as usize || len > 7 as usize {
             return false;
         }
+      let mut first: u64 = 0;
+      let bytes = key.as_bytes();                let mut b0 = bytes[0];
+                b0 = to_lower_ascii(b0);
+                first |= (b0 as u64) << 0;                let mut b1 = bytes[1];
+                b1 = to_lower_ascii(b1);
+                first |= (b1 as u64) << 8;                let mut b2 = bytes[2];
+                b2 = to_lower_ascii(b2);
+                first |= (b2 as u64) << 16;                let mut b3 = bytes[3];
+                b3 = to_lower_ascii(b3);
+                first |= (b3 as u64) << 24;                let mut b4 = bytes[4];
+                b4 = to_lower_ascii(b4);
+                first |= (b4 as u64) << 32;
+                if (first & 620648890780u64) != 0 {
+                    return false;
+                }
 
 
         let mut lo: usize = 0;

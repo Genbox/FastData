@@ -51,7 +51,7 @@ public class KeyAnalyzerTests
     [InlineData((object)new[] { "a", "a", "aaa", "aaa" })] //Test duplicates
     public void GetStringProperties_LengthMap_Test(string[] data)
     {
-        StringKeyProperties res = GetStringProperties(data, false);
+        StringKeyProperties res = GetStringProperties(data, false, false);
         LengthBitArray map = res.LengthData.LengthMap;
         Assert.Equal(data.Distinct().Count(), map.BitCount);
 
@@ -72,7 +72,7 @@ public class KeyAnalyzerTests
     [InlineData(new[] { "hello world" }, 0, 0)] // One key should result in no prefix/suffix calculation
     public void GetStringProperties_DeltaData_Test(string[] data, int leftZero, int rightZero)
     {
-        StringKeyProperties res = GetStringProperties(data, true);
+        StringKeyProperties res = GetStringProperties(data, true, false);
         Assert.Equal(leftZero, res.DeltaData.Prefix.Length);
         Assert.Equal(rightZero, res.DeltaData.Suffix.Length);
     }

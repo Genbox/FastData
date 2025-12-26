@@ -2,6 +2,7 @@
 // Structure: Auto (BitSet)
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>

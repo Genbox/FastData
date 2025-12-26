@@ -63,12 +63,80 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
                  """;
     }
 
-    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
-        $$"""
-                  if {{(minByte.Equals(maxByte) ? $"key.len() != {map.ToValueLabel(maxByte)} as usize" : $"key.len() < {map.ToValueLabel(minByte)} as usize || key.len() > {map.ToValueLabel(maxByte)} as usize")}} {
-                      {{RenderExit(methodType)}}
-                  }
-          """;
+    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte)
+    {
+        if (minByte.Equals(maxByte))
+        {
+            return $$"""
+                             if key.len() != {{map.ToValueLabel(maxByte)}} as usize {
+                                 {{RenderExit(methodType)}}
+                             }
+                     """;
+        }
+
+        return $$"""
+                         let len = key.len();
+                         if len < {{map.ToValueLabel(minByte)}} as usize || len > {{map.ToValueLabel(maxByte)}} as usize {
+                             {{RenderExit(methodType)}}
+                         }
+                 """;
+    }
+
+    protected override string GetStringBitMaskEarlyExit(MethodType methodType, ulong mask, int byteCount, bool ignoreCase, GeneratorEncoding encoding)
+    {
+        if (mask == 0 || byteCount <= 0)
+            return string.Empty;
+
+        if (encoding != GeneratorEncoding.UTF8 && encoding != GeneratorEncoding.ASCII)
+            return string.Empty;
+
+        if (!ignoreCase)
+        {
+            StringBuilder expr = new StringBuilder();
+
+            for (int i = 0; i < byteCount; i++)
+            {
+                if (i > 0)
+                    expr.Append(" | ");
+
+                expr.Append($"(bytes[{i}] as u64)");
+                if (i > 0)
+                    expr.Append($" << {i * 8}");
+            }
+
+            return $$"""
+                             let bytes = key.as_bytes();
+                             let first = {{expr}};
+
+                             if (first & {{mask.ToStringInvariant()}}u64) != 0 {
+                                 {{RenderExit(methodType)}}
+                             }
+                     """;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.Append("""
+                        let mut first: u64 = 0;
+                        let bytes = key.as_bytes();
+                  """);
+
+        for (int i = 0; i < byteCount; i++)
+        {
+            sb.Append($"""
+                                       let mut b{i} = bytes[{i}];
+                                       b{i} = to_lower_ascii(b{i});
+                                       first |= (b{i} as u64) << {i * 8};
+                       """);
+        }
+
+        sb.Append($$"""
+
+                                    if (first & {{mask.ToStringInvariant()}}u64) != 0 {
+                                        {{RenderExit(methodType)}}
+                                    }
+                    """);
+        return sb.ToString();
+    }
 
     protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
     {

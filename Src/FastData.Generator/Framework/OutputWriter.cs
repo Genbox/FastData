@@ -3,7 +3,6 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Abstracts;
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
-using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Framework.Interfaces;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.StringHash.Framework;
@@ -32,7 +31,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
 
     protected virtual string GetMethodHeader(MethodType methodType)
     {
-        return _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType, GeneratorConfig.IgnoreCase);
+        return _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType, GeneratorConfig.IgnoreCase, GeneratorConfig.Encoding);
     }
 
     internal void Initialize<TValue>(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, ReadOnlyMemory<TValue> values, ExpressionCompiler? compiler, SharedCode shared)

@@ -2,6 +2,7 @@
 // Structure: Auto (KeyLength)
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -25,6 +26,7 @@ public:
              return false;
 
 
+
         return key == keys[key.length() - 1];
     }
     [[nodiscard]]
@@ -34,6 +36,7 @@ public:
     value = nullptr;
     return false;
 }
+
 
 
         size_t idx = key.length() - 1;

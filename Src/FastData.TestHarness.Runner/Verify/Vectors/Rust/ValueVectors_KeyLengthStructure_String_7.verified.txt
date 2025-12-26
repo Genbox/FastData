@@ -15,7 +15,14 @@ impl KeyLengthStructure_String_7 {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        if key.len() < 3 as usize || key.len() > 10 as usize {
+        let len = key.len();
+        if len < 3 as usize || len > 10 as usize {
+            return false;
+        }
+        let bytes = key.as_bytes();
+        let first = (bytes[0] as u64) | (bytes[1] as u64) << 8 | (bytes[2] as u64) << 16;
+
+        if (first & 10395294u64) != 0 {
             return false;
         }
 

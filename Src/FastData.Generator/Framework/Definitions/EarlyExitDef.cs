@@ -1,4 +1,5 @@
 using System.Text;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Framework.Interfaces;
 using Genbox.FastData.Generators.Abstracts;
@@ -10,7 +11,7 @@ public abstract class EarlyExitDef : IEarlyExitDef
 {
     protected abstract bool IsEnabled { get; }
 
-    public string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, bool ignoreCase)
+    public string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, bool ignoreCase, GeneratorEncoding encoding)
     {
         if (!IsEnabled)
             return string.Empty;
@@ -27,6 +28,8 @@ public abstract class EarlyExitDef : IEarlyExitDef
                 sb.AppendLine(GetValueBitMaskEarlyExit<T>(methodType, mask));
             else if (spec is LengthBitSetEarlyExit(var bitSet))
                 sb.AppendLine(GetMaskEarlyExit(methodType, bitSet));
+            else if (spec is StringBitMaskEarlyExit(var stringMask, var byteCount))
+                sb.AppendLine(GetStringBitMaskEarlyExit(methodType, stringMask, byteCount, ignoreCase, encoding));
             else if (spec is PrefixSuffixEarlyExit(var prefix, var suffix))
                 sb.AppendLine(GetPrefixSuffixEarlyExit(methodType, prefix, suffix, ignoreCase));
             else
@@ -40,5 +43,6 @@ public abstract class EarlyExitDef : IEarlyExitDef
     protected abstract string GetValueEarlyExit<T>(MethodType methodType, T min, T max);
     protected abstract string GetValueBitMaskEarlyExit<T>(MethodType methodType, ulong mask);
     protected abstract string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte);
+    protected abstract string GetStringBitMaskEarlyExit(MethodType methodType, ulong mask, int byteCount, bool ignoreCase, GeneratorEncoding encoding);
     protected abstract string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase);
 }

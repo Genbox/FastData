@@ -2,6 +2,7 @@
 // Structure: HashTable
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -41,6 +42,7 @@ public:
     static constexpr bool contains(const std::u32string_view key) noexcept {
          if (key.length() != 1u)
              return false;
+
 
 
         const uint64_t hash = get_hash(key);

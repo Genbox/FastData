@@ -2,6 +2,7 @@
 // Structure: BinarySearch
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -17,6 +18,7 @@ public:
     static constexpr bool contains(const std::u32string_view key) noexcept {
          if (key.length() != 1u)
              return false;
+
 
 
         int32_t lo = 0;

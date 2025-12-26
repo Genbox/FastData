@@ -194,12 +194,14 @@ public static class TestHelper
             keyType = Enum.Parse<KeyType>(type.Name);
         }
 
+        ICodeGenerator generator = func(vector.Identifier);
+
         IProperties props;
         if (typeof(TKey) == typeof(string))
         {
             ReadOnlyMemory<string> stringMemory = CastMemory<TKey, string>(keyMemory);
             ReadOnlySpan<string> stringSpan = stringMemory.Span;
-            StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(stringSpan, true); // Enable trimming
+            StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(stringSpan, true, ignoreCase, generator.Encoding); // Enable trimming
 
             if (strProps.DeltaData.Prefix.Length > 0 || strProps.DeltaData.Suffix.Length > 0)
             {
@@ -216,7 +218,6 @@ public static class TestHelper
         else
             props = KeyAnalyzer.GetNumericProperties(keyMemory);
 
-        ICodeGenerator generator = func(vector.Identifier);
         GeneratorEncoding encoding = generator.Encoding;
 
         if (vector.Type == typeof(SingleValueStructure<,>))

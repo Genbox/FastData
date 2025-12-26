@@ -111,9 +111,31 @@ impl PrefixSuffixTrimming_IgnoreCase {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        if key.len() < 11 as usize || key.len() > 13 as usize {
+        let len = key.len();
+        if len < 11 as usize || len > 13 as usize {
             return false;
         }
+      let mut first: u64 = 0;
+      let bytes = key.as_bytes();                let mut b0 = bytes[0];
+                b0 = to_lower_ascii(b0);
+                first |= (b0 as u64) << 0;                let mut b1 = bytes[1];
+                b1 = to_lower_ascii(b1);
+                first |= (b1 as u64) << 8;                let mut b2 = bytes[2];
+                b2 = to_lower_ascii(b2);
+                first |= (b2 as u64) << 16;                let mut b3 = bytes[3];
+                b3 = to_lower_ascii(b3);
+                first |= (b3 as u64) << 24;                let mut b4 = bytes[4];
+                b4 = to_lower_ascii(b4);
+                first |= (b4 as u64) << 32;                let mut b5 = bytes[5];
+                b5 = to_lower_ascii(b5);
+                first |= (b5 as u64) << 40;                let mut b6 = bytes[6];
+                b6 = to_lower_ascii(b6);
+                first |= (b6 as u64) << 48;                let mut b7 = bytes[7];
+                b7 = to_lower_ascii(b7);
+                first |= (b7 as u64) << 56;
+                if (first & 10412760500786597263u64) != 0 {
+                    return false;
+                }
         if !(case_insensitive_starts_with(key, "Pre") && case_insensitive_ends_with(key, "Suf")) {
             return false;
         }

@@ -39,6 +39,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         sb.AppendLine("""
                       #pragma once
                       #include <array>
+                      #include <cstring>
                       #include <cstdint>
                       #include <limits>
                       #include <string_view>

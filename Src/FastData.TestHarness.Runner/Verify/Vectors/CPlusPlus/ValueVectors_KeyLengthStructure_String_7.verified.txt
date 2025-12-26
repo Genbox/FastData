@@ -2,6 +2,7 @@
 // Structure: Auto (KeyLength)
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -16,6 +17,7 @@ public:
     static constexpr bool contains(const std::string_view key) noexcept {
          if (const size_t len = key.length(); len < 3u || len > 10u)
              return false;
+
 
 
         return key == keys[key.length() - 3];

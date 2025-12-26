@@ -2,6 +2,7 @@
 // Structure: Auto (HashTableCompact)
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -69,6 +70,7 @@ public:
     static constexpr bool contains(const std::string_view key) noexcept {
          if (const size_t len = key.length(); len < 1u || len > 2u)
              return false;
+
 
 
         const uint64_t hash = get_hash(key);

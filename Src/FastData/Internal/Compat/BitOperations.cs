@@ -30,11 +30,14 @@ internal static class BitOperations
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static int PopCount(ulong value)
     {
-        value -= (value >> 1) & 0x_55555555_55555555ul;
-        value = (value & 0x_33333333_33333333ul) + ((value >> 2) & 0x_33333333_33333333ul);
-        value = (((value + (value >> 4)) & 0x_0F0F0F0F_0F0F0F0Ful) * 0x_01010101_01010101ul) >> 56;
+        unchecked
+        {
+            value -= (value >> 1) & 0x_55555555_55555555ul;
+            value = (value & 0x_33333333_33333333ul) + ((value >> 2) & 0x_33333333_33333333ul);
+            value = (((value + (value >> 4)) & 0x_0F0F0F0F_0F0F0F0Ful) * 0x_01010101_01010101ul) >> 56;
 
-        return (int)value;
+            return (int)value;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

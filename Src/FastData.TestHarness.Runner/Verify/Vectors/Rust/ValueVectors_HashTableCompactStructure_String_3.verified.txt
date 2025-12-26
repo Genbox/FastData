@@ -65,6 +65,12 @@ impl HashTableCompactStructure_String_3 {
              return false;
         }
     }
+        let bytes = key.as_bytes();
+        let first = (bytes[0] as u64);
+
+        if (first & 150u64) != 0 {
+            return false;
+        }
 
 
         let hash = unsafe { Self::get_hash(key) };

@@ -22,7 +22,12 @@ internal static class KeyLengthStructure_String_3_simple
     
     public static bool Contains(string key)
     {
-        if (key.Length < 1u || key.Length > 3u)
+        int len = key.Length;
+        if (len < 1u || len > 3u)
+            return false;
+        ulong first = (ulong)key[0];
+
+        if ((first & 65438UL) != 0)
             return false;
 
 
@@ -30,7 +35,15 @@ internal static class KeyLengthStructure_String_3_simple
     }    
     public static bool TryLookup(string key, out int value)
     {
-        if (key.Length < 1u || key.Length > 3u)
+        int len = key.Length;
+        if (len < 1u || len > 3u)
+            {
+            value = default;
+            return false;
+        }
+        ulong first = (ulong)key[0];
+
+        if ((first & 65438UL) != 0)
             {
             value = default;
             return false;

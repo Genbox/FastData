@@ -62,11 +62,78 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
                 """;
     }
 
-    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
-        $"""
-                 if ({(min.Equals(max) ? $"key.Length != {map.ToValueLabel(max)}" : $"key.Length < {map.ToValueLabel(min)} || key.Length > {map.ToValueLabel(max)}")})
-                     {RenderExit(methodType)}
-         """;
+    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte)
+    {
+        if (min.Equals(max))
+        {
+            return $"""
+                            if (key.Length != {map.ToValueLabel(max)})
+                                {RenderExit(methodType)}
+                    """;
+        }
+
+        return $"""
+                        int len = key.Length;
+                        if (len < {map.ToValueLabel(min)} || len > {map.ToValueLabel(max)})
+                            {RenderExit(methodType)}
+                """;
+    }
+
+    protected override string GetStringBitMaskEarlyExit(MethodType methodType, ulong mask, int byteCount, bool ignoreCase, GeneratorEncoding encoding)
+    {
+        if (mask == 0 || byteCount <= 0 || encoding != GeneratorEncoding.UTF16)
+            return string.Empty;
+
+        int charCount = byteCount / 2;
+        if (charCount == 0)
+            return string.Empty;
+
+        if (!ignoreCase)
+        {
+            string firstExpr = charCount switch
+            {
+                1 => "(ulong)key[0]",
+                2 => "(ulong)key[0] | ((ulong)key[1] << 16)",
+                3 => "(ulong)key[0] | ((ulong)key[1] << 16) | ((ulong)key[2] << 32)",
+                4 => "(ulong)key[0] | ((ulong)key[1] << 16) | ((ulong)key[2] << 32) | ((ulong)key[3] << 48)",
+                _ => string.Empty
+            };
+
+            if (firstExpr.Length == 0)
+                return string.Empty;
+
+            return $"""
+                            ulong first = {firstExpr};
+
+                            if ((first & {mask.ToStringInvariant()}UL) != 0)
+                                {RenderExit(methodType)}
+                    """;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.Append("                ulong first = 0;");
+
+        for (int i = 0; i < charCount; i++)
+        {
+            string varName = $"c{i}";
+            sb.Append($"""
+                                       uint {varName} = key[{i}];
+                                       if ({varName} - 'A' <= 'Z' - 'A') {varName} |= 0x20u;
+                       """);
+
+            if (i == 0)
+                sb.Append($"                first |= {varName};");
+            else
+                sb.Append($"                first |= (ulong){varName} << {i * 16};");
+        }
+
+        sb.Append($"""
+
+                                   if ((first & {mask.ToStringInvariant()}UL) != 0)
+                                       {RenderExit(methodType)}
+                   """);
+        return sb.ToString();
+    }
 
     protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
     {

@@ -1,4 +1,5 @@
 using System.Text;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -35,7 +36,7 @@ internal static class KeyAnalyzer
         throw new InvalidOperationException($"Unsupported data type: {typeof(T).Name}");
     }
 
-    internal static StringKeyProperties GetStringProperties(ReadOnlySpan<string> keys, bool enableTrimming)
+    internal static StringKeyProperties GetStringProperties(ReadOnlySpan<string> keys, bool enableTrimming, bool ignoreCase, GeneratorEncoding encoding = GeneratorEncoding.Unknown)
     {
         //Contains a map of unique lengths
         LengthBitArray lengthMap = new LengthBitArray();
@@ -82,6 +83,12 @@ internal static class KeyAnalyzer
                     charClass |= CharacterClass.Whitespace;
             }
         }
+
+        ulong stringBitMask = 0;
+        int stringBitMaskBytes = 0;
+
+        if (encoding != GeneratorEncoding.Unknown)
+            stringBitMask = GetStringBitMask(keys, encoding, ignoreCase, minUtf8ByteLength, minUtf16ByteLength, allAscii, out stringBitMaskBytes);
 
         // The code beneath there calculate entropy maps that cna be used to derive the longest common substrings or longest prefix/suffix strings.
         // It works by adding characters to an accumulator, and then potentially removing the value from it again if the characters are the same.
@@ -145,7 +152,7 @@ internal static class KeyAnalyzer
             }
         }
 
-        return new StringKeyProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniqLen, lengthMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass));
+        return new StringKeyProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniqLen, lengthMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskBytes));
     }
 
     private static int CountZero(int[] data)
@@ -157,6 +164,109 @@ internal static class KeyAnalyzer
                 break;
         }
         return count;
+    }
+
+    private static ulong GetStringBitMask(ReadOnlySpan<string> keys, GeneratorEncoding encoding, bool ignoreCase, int minUtf8ByteLength, int minUtf16ByteLength, bool allAscii, out int byteCount)
+    {
+        ulong union = 0;
+
+        int minByteCount;
+        int baseBytes;
+        switch (encoding)
+        {
+            case GeneratorEncoding.ASCII:
+            case GeneratorEncoding.UTF8:
+                minByteCount = minUtf8ByteLength;
+                baseBytes = 1;
+                break;
+            case GeneratorEncoding.UTF16:
+                minByteCount = minUtf16ByteLength;
+                baseBytes = 2;
+                break;
+            default:
+                byteCount = 0;
+                return 0;
+        }
+
+        if (minByteCount < baseBytes)
+        {
+            byteCount = 0;
+            return 0;
+        }
+
+        byteCount = Math.Min(minByteCount, 8);
+        if (byteCount == 0)
+            return 0;
+
+        if (encoding == GeneratorEncoding.UTF16)
+        {
+            int charCount = byteCount / 2;
+            foreach (string key in keys)
+                union |= GetFirst64BitsUtf16(key, ignoreCase, charCount);
+        }
+        else if (allAscii)
+        {
+            foreach (string key in keys)
+                union |= GetFirst64BitsAscii(key, ignoreCase, byteCount);
+        }
+        else
+        {
+            foreach (string key in keys)
+                union |= GetFirst64BitsUtf8(key, ignoreCase, byteCount);
+        }
+
+        ulong mask = ~union;
+        ulong fullMask = byteCount == 8 ? ulong.MaxValue : (1UL << (byteCount * 8)) - 1;
+        return mask & fullMask;
+    }
+
+    private static ulong GetFirst64BitsUtf8(string value, bool ignoreCase, int byteCount)
+    {
+        byte[] bytes = Encoding.UTF8.GetBytes(value);
+        ulong result = 0;
+
+        for (int i = 0; i < byteCount; i++)
+        {
+            uint b = bytes[i];
+            if (ignoreCase && b - 'A' <= 'Z' - 'A')
+                b |= 0x20u;
+
+            result |= (ulong)b << (i * 8);
+        }
+
+        return result;
+    }
+
+    private static ulong GetFirst64BitsAscii(string value, bool ignoreCase, int byteCount)
+    {
+        ulong result = 0;
+
+        for (int i = 0; i < byteCount; i++)
+        {
+            uint b = value[i];
+            if (ignoreCase && b - 'A' <= 'Z' - 'A')
+                b |= 0x20u;
+
+            result |= (ulong)b << (i * 8);
+        }
+
+        return result;
+    }
+
+    private static ulong GetFirst64BitsUtf16(string value, bool ignoreCase, int charCount)
+    {
+        ulong result = 0;
+
+        for (int i = 0; i < charCount; i++)
+        {
+            uint c = value[i];
+            if (ignoreCase && c - 'A' <= 'Z' - 'A')
+                c |= 0x20u;
+
+            result |= (ulong)c << (i * 16);
+        }
+
+        return result;
     }
 
     private static NumericKeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys)

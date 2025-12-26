@@ -101,7 +101,7 @@ public static partial class FastDataGenerator
         const KeyType keyType = KeyType.String;
         LogKeyType(logger, keyType);
 
-        StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(keySpan, fdCfg.EnableTrimming);
+        StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(keySpan, fdCfg.EnableTrimming, fdCfg.IgnoreCase, generator.Encoding);
 
         string trimPrefix = string.Empty;
         string trimSuffix = string.Empty;

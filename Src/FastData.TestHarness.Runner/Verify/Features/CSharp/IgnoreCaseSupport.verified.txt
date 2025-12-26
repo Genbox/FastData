@@ -15,8 +15,16 @@ internal static class IgnoreCaseSupport
     
     public static bool Contains(string key)
     {
-        if (key.Length < 5u || key.Length > 7u)
+        int len = key.Length;
+        if (len < 5u || len > 7u)
             return false;
+                ulong first = 0;                uint c0 = key[0];
+                if (c0 - 'A' <= 'Z' - 'A') c0 |= 0x20u;                first |= c0;                uint c1 = key[1];
+                if (c1 - 'A' <= 'Z' - 'A') c1 |= 0x20u;                first |= (ulong)c1 << 16;                uint c2 = key[2];
+                if (c2 - 'A' <= 'Z' - 'A') c2 |= 0x20u;                first |= (ulong)c2 << 32;                uint c3 = key[3];
+                if (c3 - 'A' <= 'Z' - 'A') c3 |= 0x20u;                first |= (ulong)c3 << 48;
+                if ((first & 18411277741304446876UL) != 0)
+                    return false;
 
 
         int lo = 0;

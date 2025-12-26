@@ -15,7 +15,14 @@ impl ArrayStructure_String_3_prefix_suffix {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        if key.len() < 6 as usize || key.len() > 8 as usize {
+        let len = key.len();
+        if len < 6 as usize || len > 8 as usize {
+            return false;
+        }
+        let bytes = key.as_bytes();
+        let first = (bytes[0] as u64) | (bytes[1] as u64) << 8 | (bytes[2] as u64) << 16 | (bytes[3] as u64) << 24 | (bytes[4] as u64) << 32 | (bytes[5] as u64) << 40;
+
+        if (first & 144665397071247u64) != 0 {
             return false;
         }
         if !(key.starts_with("pre")) {

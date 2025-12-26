@@ -41,6 +41,12 @@ impl ArrayStructure_String_3 {
              return false;
         }
     }
+        let bytes = key.as_bytes();
+        let first = (bytes[0] as u64);
+
+        if (first & 150u64) != 0 {
+            return false;
+        }
 
 
         for entry in Self::KEYS.iter() {

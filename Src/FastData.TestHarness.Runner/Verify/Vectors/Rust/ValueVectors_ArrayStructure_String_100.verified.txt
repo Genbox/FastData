@@ -24,7 +24,14 @@ impl ArrayStructure_String_100 {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        if key.len() < 1 as usize || key.len() > 2 as usize {
+        let len = key.len();
+        if len < 1 as usize || len > 2 as usize {
+            return false;
+        }
+        let bytes = key.as_bytes();
+        let first = (bytes[0] as u64);
+
+        if (first & 192u64) != 0 {
             return false;
         }
 

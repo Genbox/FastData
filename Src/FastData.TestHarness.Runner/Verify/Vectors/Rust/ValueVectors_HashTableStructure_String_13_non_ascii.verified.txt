@@ -40,6 +40,12 @@ impl HashTableStructure_String_13_non_ascii {
         if key.len() != 2 as usize {
             return false;
         }
+        let bytes = key.as_bytes();
+        let first = (bytes[0] as u64) | (bytes[1] as u64) << 8;
+
+        if (first & 16444u64) != 0 {
+            return false;
+        }
 
 
         let hash = unsafe { Self::get_hash(key) };

@@ -2,6 +2,7 @@
 // Structure: BinarySearch
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -93,6 +94,7 @@ public:
     static constexpr bool contains(const std::string_view key) noexcept {
          if (const size_t len = key.length(); len < 11u || len > 13u)
              return false;
+
         if (!(case_insensitive_starts_with(key, "Pre") && case_insensitive_ends_with(key, "Suf")))
             return false;
         const auto trimmedKey = key.substr(3, key.length() - 6);

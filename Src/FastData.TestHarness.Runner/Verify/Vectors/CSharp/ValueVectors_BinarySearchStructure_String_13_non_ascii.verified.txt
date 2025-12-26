@@ -18,6 +18,10 @@ internal static class BinarySearchStructure_String_13_non_ascii
     {
         if (key.Length != 1u)
             return false;
+        ulong first = (ulong)key[0];
+
+        if ((first & 65280UL) != 0)
+            return false;
 
 
         int lo = 0;

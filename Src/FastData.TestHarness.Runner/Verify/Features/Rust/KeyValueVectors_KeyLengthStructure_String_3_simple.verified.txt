@@ -22,7 +22,14 @@ impl KeyLengthStructure_String_3_simple {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        if key.len() < 1 as usize || key.len() > 3 as usize {
+        let len = key.len();
+        if len < 1 as usize || len > 3 as usize {
+            return false;
+        }
+        let bytes = key.as_bytes();
+        let first = (bytes[0] as u64);
+
+        if (first & 158u64) != 0 {
             return false;
         }
 
@@ -31,7 +38,14 @@ impl KeyLengthStructure_String_3_simple {
     }
 #[must_use]
 pub fn try_lookup(key: &'static str) -> Option<i32> {
-        if key.len() < 1 as usize || key.len() > 3 as usize {
+        let len = key.len();
+        if len < 1 as usize || len > 3 as usize {
+            return None;
+        }
+        let bytes = key.as_bytes();
+        let first = (bytes[0] as u64);
+
+        if (first & 158u64) != 0 {
             return None;
         }
 

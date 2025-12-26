@@ -2,6 +2,7 @@
 // Structure: Conditional
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -12,6 +13,7 @@ public:
     static constexpr bool contains(const std::u32string_view key) noexcept {
          if (key.length() != 1u)
              return false;
+
 
         if (key == U"æ" || key == U"à" || key == U"ä" || key == U"ö" || key == U"ü" || key == U"ß" || key == U"é" || key == U"è" || key == U"ê" || key == U"ç" || key == U"ñ" || key == U"ø" || key == U"å")
             return true;

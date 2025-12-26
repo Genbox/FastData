@@ -2,6 +2,7 @@
 // Structure: Array
 #pragma once
 #include <array>
+#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -16,6 +17,7 @@ public:
     static constexpr bool contains(const std::string_view key) noexcept {
          if (const size_t len = key.length(); len < 6u || len > 8u)
              return false;
+
         if (!(key.compare(0, 3, "pre") == 0))
             return false;
         const auto trimmedKey = key.substr(3, key.length() - 3);
