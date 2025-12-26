@@ -180,6 +180,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
             FastDataConfig fdCfg = new FastDataConfig();
             BindValue(() => fdCfg.StructureType, ad.NamedArguments);
+            BindValue(() => fdCfg.IgnoreCase, ad.NamedArguments);
 
             CSharpCodeGeneratorConfig csCfg = new CSharpCodeGeneratorConfig(name);
             BindValue(() => csCfg.Namespace, ad.NamedArguments);

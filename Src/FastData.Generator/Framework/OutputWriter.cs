@@ -14,6 +14,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
     private IEarlyExitDef _earlyExitDef = null!;
     private ILanguageDef _langDef = null!;
 
+    protected SharedCode Shared { get; private set; } = null!;
     protected TypeMap TypeMap { get; private set; } = null!;
     protected string KeyTypeName { get; private set; } = null!;
     protected string ValueTypeName { get; private set; } = null!;
@@ -33,10 +34,11 @@ public abstract class OutputWriter<TKey> : IOutputWriter
         return _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType);
     }
 
-    internal void Initialize<TValue>(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, ReadOnlyMemory<TValue> values, ExpressionCompiler? compiler)
+    internal void Initialize<TValue>(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, ReadOnlyMemory<TValue> values, ExpressionCompiler? compiler, SharedCode shared)
     {
         _langDef = langDef;
         _earlyExitDef = earlyExitDef;
+        Shared = shared;
         TypeMap = map;
         GeneratorConfig = genCfg;
         KeyTypeName = keyTypeName;
@@ -68,6 +70,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
 
         HashInfo hashInfo = new HashInfo(GeneratorConfig.HashDetails.HasZeroOrNaN, stringHash);
         HashSource = hashDef.GetHashSource(GeneratorConfig.KeyType, KeyTypeName, hashInfo);
+        RegisterSharedCode();
     }
 
     protected string GetEqualFunction(string value1, string value2, KeyType keyTypeOverride = KeyType.Null)
@@ -94,4 +97,6 @@ public abstract class OutputWriter<TKey> : IOutputWriter
         while (enumerator.MoveNext())
             yield return map.ToValueLabel(enumerator.Current, type);
     }
+
+    protected virtual void RegisterSharedCode() {}
 }

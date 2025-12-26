@@ -28,7 +28,7 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
     internal string GetCompareFunction(string var1, string var2)
     {
         if (GeneratorConfig.KeyType == KeyType.String)
-            return $"StringComparer.{GeneratorConfig.StringComparison}.Compare({var1}, {var2})";
+            return $"StringComparer.{GetStringComparer(GeneratorConfig.IgnoreCase)}.Compare({var1}, {var2})";
 
         return $"{var1}.CompareTo({var2})";
     }
@@ -36,7 +36,7 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
     protected override string GetEqualFunctionInternal(string var1, string var2, KeyType keyType)
     {
         if (keyType == KeyType.String)
-            return $"StringComparer.{GeneratorConfig.StringComparison}.Equals({var1}, {var2})";
+            return $"StringComparer.{GetStringComparer(GeneratorConfig.IgnoreCase)}.Equals({var1}, {var2})";
 
         return $"{var1} == {var2}";
     }
@@ -60,8 +60,8 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
 
     private string GetTrimMatchCondition()
     {
-        string prefixCheck = $"key.StartsWith({ToValueLabel(TrimPrefix)}, StringComparison.{GeneratorConfig.StringComparison})";
-        string suffixCheck = $"key.EndsWith({ToValueLabel(TrimSuffix)}, StringComparison.{GeneratorConfig.StringComparison})";
+        string prefixCheck = $"key.StartsWith({ToValueLabel(TrimPrefix)}, StringComparison.{GetStringComparer(GeneratorConfig.IgnoreCase)})";
+        string suffixCheck = $"key.EndsWith({ToValueLabel(TrimSuffix)}, StringComparison.{GetStringComparer(GeneratorConfig.IgnoreCase)})";
 
         if (TrimPrefix.Length == 0)
             return suffixCheck;
@@ -86,4 +86,10 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
 
         return $"({ArraySizeType})({variable} % {value})";
     }
+
+    private static string GetStringComparer(bool ignoreCase) => ignoreCase switch
+    {
+        true => nameof(StringComparer.OrdinalIgnoreCase),
+        false => nameof(StringComparer.Ordinal),
+    };
 }

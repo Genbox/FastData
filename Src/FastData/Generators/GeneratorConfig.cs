@@ -23,6 +23,7 @@ public sealed class GeneratorConfig<T>
         Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.UtcNow);
         HashDetails = hashDetails;
         Flags = flags;
+        IgnoreCase = false;
         TrimPrefix = string.Empty;
         TrimSuffix = string.Empty;
     }
@@ -33,11 +34,11 @@ public sealed class GeneratorConfig<T>
         Constants = CreateConstants(props, itemCount);
     }
 
-    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringKeyProperties props, StringComparison stringComparison, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string? trimPrefix, string? trimSuffix) : this(structureType, keyType, hashDetails, flags)
+    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringKeyProperties props, bool ignoreCase, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string? trimPrefix, string? trimSuffix) : this(structureType, keyType, hashDetails, flags)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType, encoding).ToArray();
         Constants = CreateConstants(props, itemCount);
-        StringComparison = stringComparison;
+        IgnoreCase = ignoreCase;
 
         // We use an empty string instead of null to simplify calculations later in the pipeline
         TrimPrefix = trimPrefix ?? string.Empty;
@@ -47,11 +48,11 @@ public sealed class GeneratorConfig<T>
     /// <summary>Gets the structure type that the generator will create.</summary>
     public StructureType StructureType { get; }
 
-    /// <summary>Gets the string comparison mode to use.</summary>
-    public StringComparison StringComparison { get; }
-
     /// <summary>Gets the data type being generated.</summary>
     public KeyType KeyType { get; }
+
+    /// <summary>Gets a value indicating whether string keys should be treated as case-insensitive.</summary>
+    public bool IgnoreCase { get; }
 
     /// <summary>Gets the set of early exit strategies used by the generator to optimize code generation.</summary>
     public IEarlyExit[] EarlyExits { get; }

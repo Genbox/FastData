@@ -41,11 +41,12 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                             while lo <= hi {
                                 let i = lo + ((hi - lo) >> 1);
                                 let entry = Self::KEYS[i];
+                                let order = {{GetCompareFunction("entry", LookupKeyName)}};
 
-                                if entry == {{LookupKeyName}} {
+                                if order == 0 {
                                     return true;
                                 }
-                                if entry < {{LookupKeyName}} {
+                                if order < 0 {
                                     lo = i + 1;
                                 } else {
                                     hi = i - 1;
@@ -69,11 +70,12 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                                 while lo <= hi {
                                     let i = lo + ((hi - lo) >> 1);
                                     let entry = Self::KEYS[i];
+                                    let order = {{GetCompareFunction("entry", LookupKeyName)}};
 
-                                    if entry == {{LookupKeyName}} {
+                                    if order == 0 {
                                         return Some(Self::VALUES[i]);
                                     }
-                                    if entry < {{LookupKeyName}} {
+                                    if order < 0 {
                                         lo = i + 1;
                                     } else {
                                         hi = i - 1;

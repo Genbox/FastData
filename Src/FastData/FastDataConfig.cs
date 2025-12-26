@@ -1,4 +1,4 @@
-﻿using Genbox.FastData.Enums;
+using Genbox.FastData.Enums;
 using JetBrains.Annotations;
 
 namespace Genbox.FastData;
@@ -14,6 +14,9 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
 
     /// <summary>Enable support for trimming duplicate prefix/suffix</summary>
     public bool EnableTrimming { get; set; }
+
+    /// <summary>Enable case-insensitive lookups for ASCII string keys (OrdinalIgnoreCase).</summary>
+    public bool IgnoreCase { get; set; }
 
     /// <summary>Configuration for analyzers. Set to null to disable analysis.</summary>
     public StringAnalyzerConfig? StringAnalyzerConfig { get; set; } = new StringAnalyzerConfig();

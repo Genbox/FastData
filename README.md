@@ -176,7 +176,7 @@ Yes and no. For some data structures like Array, it uses the same amount of memo
 Yes, you can specify key/value arrays as input data and FastData will generate a efficient key lookup function that returns a value.
 
 #### Does it support case-insensitive lookups?
-No, not yet.
+Yes. Set `FastDataConfig.IgnoreCase = true` (or `IgnoreCase = true` on the source generator attribute, or `--ignore-case` in the CLI) to use OrdinalIgnoreCase on ASCII string keys.
 
 #### Does it support custom equality comparers?
 No, not yet.

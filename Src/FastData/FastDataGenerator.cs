@@ -21,7 +21,6 @@ namespace Genbox.FastData;
 [SuppressMessage("ApiDesign", "RS0026:Do not add multiple public overloads with optional parameters")]
 public static partial class FastDataGenerator
 {
-    private const StringComparison DefaultStringComparison = StringComparison.Ordinal;
     private const ulong MaxBitSetRange = 4096;
     private const double MinBitSetDensity = 0.5;
 
@@ -123,7 +122,7 @@ public static partial class FastDataGenerator
         LogMinMaxLength(logger, strProps.LengthData.LengthMap.Min, strProps.LengthData.LengthMap.Max);
 
         HashDetails hashDetails = new HashDetails();
-        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, keyType, (uint)keySpan.Length, strProps, DefaultStringComparison, hashDetails, generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None, trimPrefix, trimSuffix);
+        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, keyType, (uint)keySpan.Length, strProps, fdCfg.IgnoreCase, hashDetails, generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None, trimPrefix, trimSuffix);
 
         switch (fdCfg.StructureType)
         {
@@ -150,7 +149,7 @@ public static partial class FastDataGenerator
             case StructureType.Conditional:
                 return GenerateWrapper(generator, genCfg, new ConditionalStructure<string, TValue>(), keyMemory, values);
             case StructureType.BinarySearch:
-                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<string, TValue>(keyType, DefaultStringComparison), keyMemory, values);
+                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<string, TValue>(keyType, fdCfg.IgnoreCase), keyMemory, values);
             case StructureType.HashTable:
             {
                 StringHashFunc hashFunc;
@@ -254,7 +253,7 @@ public static partial class FastDataGenerator
             case StructureType.Conditional:
                 return GenerateWrapper(generator, genCfg, new ConditionalStructure<TKey, TValue>(), keys, values);
             case StructureType.BinarySearch:
-                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<TKey, TValue>(keyType, DefaultStringComparison), keys, values);
+                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<TKey, TValue>(keyType, fdCfg.IgnoreCase), keys, values);
             case StructureType.HashTable:
             {
                 HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, props.HasZeroOrNaN);

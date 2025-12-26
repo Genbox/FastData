@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 
 namespace Genbox.FastData.SourceGenerator.Attributes;
 
@@ -15,6 +15,7 @@ public sealed class FastDataAttribute<TKey> : Attribute
     public string Name { get; }
     public TKey[] Keys { get; }
     public StructureType StructureType { get; set; }
+    public bool IgnoreCase { get; set; }
     public string? Namespace { get; set; }
     public ClassVisibility ClassVisibility { get; set; }
     public ClassType ClassType { get; set; }

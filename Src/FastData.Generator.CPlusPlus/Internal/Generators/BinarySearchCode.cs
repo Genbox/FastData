@@ -39,11 +39,11 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                             while (lo <= hi) {
                                 const int32_t mid = lo + ((hi - lo) >> 1);
                                 const {{KeyTypeName}} mid_key = keys[mid];
+                                const int32_t order = {{GetCompareFunction("mid_key", LookupKeyName)}};
 
-                                if ({{GetEqualFunction("mid_key", LookupKeyName)}})
+                                if (order == 0)
                                     return true;
-
-                                if (mid_key < {{LookupKeyName}})
+                                if (order < 0)
                                     lo = mid + 1;
                                 else
                                     hi = mid - 1;
@@ -69,14 +69,15 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                                 while (lo <= hi) {
                                     const int32_t mid = lo + ((hi - lo) >> 1);
                                     const {{KeyTypeName}} mid_key = keys[mid];
+                                    const int32_t order = {{GetCompareFunction("mid_key", LookupKeyName)}};
 
-                                    if ({{GetEqualFunction("mid_key", LookupKeyName)}})
+                                    if (order == 0)
                                     {
                                         value = {{ptr}}values[mid];
                                         return true;
                                     }
 
-                                    if (mid_key < {{LookupKeyName}})
+                                    if (order < 0)
                                         lo = mid + 1;
                                     else
                                         hi = mid - 1;

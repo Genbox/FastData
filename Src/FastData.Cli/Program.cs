@@ -3,8 +3,10 @@ using System.Buffers.Text;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
+using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.IO.Pipelines;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus;
@@ -29,6 +31,9 @@ internal static class Program
 
         Option<StructureType> structureTypeOpt = new Option<StructureType>("--structure-type", description: "The type of data structure to produce.", getDefaultValue: () => StructureType.Auto);
         structureTypeOpt.AddAlias("-s");
+
+        Option<bool> ignoreCaseOpt = new Option<bool>("--ignore-case", "Use case-insensitive lookups for ASCII string keys.");
+        ignoreCaseOpt.AddAlias("-ic");
 
         Argument<FileInfo> keysFileArg = new Argument<FileInfo>("keys-file", "The file to read keys from");
 
@@ -83,9 +88,20 @@ internal static class Program
         rootCmd.AddGlobalOption(outputFileOpt);
         rootCmd.AddGlobalOption(keyTypeOpt);
         rootCmd.AddGlobalOption(structureTypeOpt);
+        rootCmd.AddGlobalOption(ignoreCaseOpt);
 
-        csharpCmd.SetHandler(async (outputFile, keyType, structureType, inputFile, cn, ns, cv, ct) =>
+        csharpCmd.SetHandler(async context =>
         {
+            FileInfo? outputFile = context.ParseResult.GetValueForOption(outputFileOpt);
+            KeyType keyType = context.ParseResult.GetValueForOption(keyTypeOpt);
+            StructureType structureType = context.ParseResult.GetValueForOption(structureTypeOpt);
+            bool ignoreCase = context.ParseResult.GetValueForOption(ignoreCaseOpt);
+            FileInfo inputFile = context.ParseResult.GetValueForArgument(keysFileArg);
+            string? cn = context.ParseResult.GetValueForOption(classNameOpt);
+            string? ns = context.ParseResult.GetValueForOption(namespaceOpt);
+            ClassVisibility cv = context.ParseResult.GetValueForOption(classVisibilityOpt);
+            ClassType ct = context.ParseResult.GetValueForOption(classTypeOpt);
+
             CSharpCodeGeneratorConfig genCfg = new CSharpCodeGeneratorConfig(cn);
             genCfg.Namespace = ns;
             genCfg.ClassVisibility = cv;
@@ -93,24 +109,38 @@ internal static class Program
 
             CSharpCodeGenerator generator = CSharpCodeGenerator.Create(genCfg);
 
-            await GenerateAsync(inputFile, keyType, structureType, generator, outputFile).ConfigureAwait(false);
-        }, outputFileOpt, keyTypeOpt, structureTypeOpt, keysFileArg, classNameOpt, namespaceOpt, classVisibilityOpt, classTypeOpt);
+            await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile).ConfigureAwait(false);
+        });
 
-        cppCmd.SetHandler(async (outputFile, keyType, structureType, inputFile, cn) =>
+        cppCmd.SetHandler(async context =>
         {
+            FileInfo? outputFile = context.ParseResult.GetValueForOption(outputFileOpt);
+            KeyType keyType = context.ParseResult.GetValueForOption(keyTypeOpt);
+            StructureType structureType = context.ParseResult.GetValueForOption(structureTypeOpt);
+            bool ignoreCase = context.ParseResult.GetValueForOption(ignoreCaseOpt);
+            FileInfo inputFile = context.ParseResult.GetValueForArgument(keysFileArg);
+            string? cn = context.ParseResult.GetValueForOption(classNameOpt);
+
             CPlusPlusCodeGeneratorConfig genCfg = new CPlusPlusCodeGeneratorConfig(cn);
             CPlusPlusCodeGenerator generator = CPlusPlusCodeGenerator.Create(genCfg);
 
-            await GenerateAsync(inputFile, keyType, structureType, generator, outputFile).ConfigureAwait(false);
-        }, outputFileOpt, keyTypeOpt, structureTypeOpt, keysFileArg, classNameOpt);
+            await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile).ConfigureAwait(false);
+        });
 
-        rustCmd.SetHandler(async (outputFile, keyType, structureType, inputFile, cn) =>
+        rustCmd.SetHandler(async context =>
         {
+            FileInfo? outputFile = context.ParseResult.GetValueForOption(outputFileOpt);
+            KeyType keyType = context.ParseResult.GetValueForOption(keyTypeOpt);
+            StructureType structureType = context.ParseResult.GetValueForOption(structureTypeOpt);
+            bool ignoreCase = context.ParseResult.GetValueForOption(ignoreCaseOpt);
+            FileInfo inputFile = context.ParseResult.GetValueForArgument(keysFileArg);
+            string? cn = context.ParseResult.GetValueForOption(classNameOpt);
+
             RustCodeGeneratorConfig genCfg = new RustCodeGeneratorConfig(cn);
             RustCodeGenerator generator = RustCodeGenerator.Create(genCfg);
 
-            await GenerateAsync(inputFile, keyType, structureType, generator, outputFile).ConfigureAwait(false);
-        }, outputFileOpt, keyTypeOpt, structureTypeOpt, keysFileArg, classNameOpt);
+            await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile).ConfigureAwait(false);
+        });
 
         Parser parser = new CommandLineBuilder(rootCmd)
                         .UseDefaults()
@@ -138,10 +168,16 @@ internal static class Program
         }
     }
 
-    private static async Task GenerateAsync(FileInfo inputFile, KeyType keyType, StructureType structureType, ICodeGenerator generator, FileInfo? outputFile)
+    private static async Task GenerateAsync(FileInfo inputFile, KeyType keyType, StructureType structureType, bool ignoreCase, ICodeGenerator generator, FileInfo? outputFile)
     {
         string fi = inputFile.FullName;
-        FastDataConfig config = new FastDataConfig(structureType);
+        FastDataConfig config = new FastDataConfig(structureType)
+        {
+            IgnoreCase = ignoreCase
+        };
+
+        if (ignoreCase && keyType != KeyType.String)
+            throw new InvalidOperationException("IgnoreCase is only supported for string keys.");
 
         string source = keyType switch
         {
@@ -260,7 +296,8 @@ internal static class Program
     private static async Task<T[]> ParseFileAsync<T>(string filePath, Action<PooledArray<T>, ReadOnlySpan<byte>> func, CancellationToken token = default)
     {
         PooledArray<T> pool = new PooledArray<T>();
-        await using FileStream stream = File.OpenRead(filePath);
+        FileStream stream = File.OpenRead(filePath);
+        await using ConfiguredAsyncDisposable stream1 = stream.ConfigureAwait(false);
         PipeReader reader = PipeReader.Create(stream);
 
         while (true)

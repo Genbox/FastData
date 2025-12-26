@@ -72,7 +72,11 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         if (writer == null)
             throw new NotSupportedException("The context type is not supported: " + context.GetType().Name);
 
-        writer.Initialize(langDef, earlyExitDef, map, hashDef, genCfg, keyTypeName, valueTypeName, context.Values, compiler);
+        writer.Initialize(langDef, earlyExitDef, map, hashDef, genCfg, keyTypeName, valueTypeName, context.Values, compiler, Shared);
+
+        foreach (string code in Shared.GetType(CodePlacement.InClass))
+            sb.AppendLine(code);
+
         sb.AppendLine(writer.Generate());
     }
 

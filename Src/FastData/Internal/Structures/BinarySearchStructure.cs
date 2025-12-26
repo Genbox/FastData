@@ -5,7 +5,7 @@ using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class BinarySearchStructure<TKey, TValue>(KeyType keyType, StringComparison comparison) : IStructure<TKey, TValue, BinarySearchContext<TKey, TValue>>
+internal sealed class BinarySearchStructure<TKey, TValue>(KeyType keyType, bool ignoreCase) : IStructure<TKey, TValue, BinarySearchContext<TKey, TValue>>
 {
     public BinarySearchContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
@@ -23,9 +23,9 @@ internal sealed class BinarySearchStructure<TKey, TValue>(KeyType keyType, Strin
         if (keyType == KeyType.String)
         {
             if (!values.IsEmpty)
-                Array.Sort(keysCopy, valuesCopy, StringHelper.GetStringComparer(comparison));
+                Array.Sort(keysCopy, valuesCopy, StringHelper.GetStringComparer(ignoreCase));
             else
-                Array.Sort(keysCopy, StringHelper.GetStringComparer(comparison));
+                Array.Sort(keysCopy, StringHelper.GetStringComparer(ignoreCase));
         }
         else
         {
