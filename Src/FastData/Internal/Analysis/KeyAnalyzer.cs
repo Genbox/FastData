@@ -45,7 +45,7 @@ internal static class KeyAnalyzer
         int maxUtf8ByteLength = int.MinValue;
         int minUtf16ByteLength = int.MaxValue;
         int maxUtf16ByteLength = int.MinValue;
-        bool uniq = true;
+        bool uniqLen = true;
         bool allAscii = true;
 
         foreach (string str in keys)
@@ -61,7 +61,7 @@ internal static class KeyAnalyzer
             minUtf16ByteLength = Math.Min(utf16ByteCount, minUtf16ByteLength);
             maxUtf16ByteLength = Math.Max(utf16ByteCount, maxUtf16ByteLength);
 
-            uniq &= !lengthMap.SetTrue((uint)str.Length);
+            uniqLen &= !lengthMap.SetTrue((uint)str.Length);
 
             foreach (char c in str)
             {
@@ -82,26 +82,6 @@ internal static class KeyAnalyzer
         // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough
         if (enableTrimming && keys.Length > 1 && lengthMap.Min > 1)
         {
-            // Special case: If all strings have the same length, we can build an entropy map in O(n) with O(1) memory
-            // TODO: For now FastData only supports prefix/suffix
-            // if (minLength == maxStr.Length)
-            // {
-            //     map = new int[minLength];
-            //
-            //     foreach (string str in keys)
-            //     {
-            //         for (int i = 0; i < str.Length; i++)
-            //         {
-            //             char c = str[i];
-            //             map[i] ^= c;
-            //
-            //             if (c > 127)
-            //                 allAscii = false;
-            //         }
-            //     }
-            // }
-            // else
-            // {
             //Build a forward and reverse map of merged entropy
             //We can derive common prefix/suffix from it that can be used later for high-entropy hash/equality functions
             left = new int[maxStr.Length];
@@ -141,11 +121,9 @@ internal static class KeyAnalyzer
                 left = null;
                 right = null;
             }
-
-            // }
         }
 
-        return new StringKeyProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniq, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
+        return new StringKeyProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniqLen, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
     }
 
     private static NumericKeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys)
