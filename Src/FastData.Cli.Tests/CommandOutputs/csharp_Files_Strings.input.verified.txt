@@ -29,6 +29,11 @@ internal static class MyData
     public const uint ItemCount = 2;
     public const uint MinKeyLength = 5;
     public const uint MaxKeyLength = 5;
+    public const bool HasNumber = true;
+    public const bool HasUppercase = false;
+    public const bool HasLowercase = true;
+    public const bool HasSymbol = false;
+    public const bool HasWhitespace = false;
 }
 ,
   Item2: 

@@ -94,6 +94,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         {
             sb.AppendLine(constDef.MinLengthTemplate(langDef.ArraySizeType, genCfg.Constants.MinStringLength.ToStringInvariant()));
             sb.AppendLine(constDef.MaxLengthTemplate(langDef.ArraySizeType, genCfg.Constants.MaxStringLength.ToStringInvariant()));
+            sb.AppendLine(constDef.CharacterClassesTemplate(genCfg.Constants.CharacterClasses));
         }
     }
 }

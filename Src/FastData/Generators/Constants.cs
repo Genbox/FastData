@@ -18,4 +18,7 @@ public sealed class Constants<T>(uint itemCount)
 
     /// <summary>Gets or sets the maximum string length, if applicable.</summary>
     public uint MaxStringLength { get; set; }
+
+    /// <summary>If the value type is a string, this will contain the type of characters that exist in the dataset.</summary>
+    public CharacterClass CharacterClasses { get; set; }
 }

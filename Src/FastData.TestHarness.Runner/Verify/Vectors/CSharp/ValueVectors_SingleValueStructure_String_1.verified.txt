@@ -17,4 +17,9 @@ internal static class SingleValueStructure_String_1
     public const uint ItemCount = 1;
     public const uint MinKeyLength = 5;
     public const uint MaxKeyLength = 5;
+    public const bool HasNumber = false;
+    public const bool HasUppercase = false;
+    public const bool HasLowercase = true;
+    public const bool HasSymbol = false;
+    public const bool HasWhitespace = false;
 }

@@ -115,4 +115,9 @@ public:
     static constexpr size_t item_count = 3;
     static constexpr size_t min_key_length = 5;
     static constexpr size_t max_key_length = 7;
+    static constexpr bool has_number = false;
+    static constexpr bool has_uppercase = true;
+    static constexpr bool has_lowercase = true;
+    static constexpr bool has_symbol = false;
+    static constexpr bool has_whitespace = false;
 };

@@ -1,4 +1,5 @@
 using System.Text;
+using Genbox.FastData.Generators;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
 
@@ -47,6 +48,7 @@ internal static class KeyAnalyzer
         int maxUtf16ByteLength = int.MinValue;
         bool uniqLen = true;
         bool allAscii = true;
+        CharacterClass charClass = CharacterClass.Unknown;
 
         foreach (string str in keys)
         {
@@ -65,8 +67,19 @@ internal static class KeyAnalyzer
 
             foreach (char c in str)
             {
-                if (c > 127)
+                if ((uint)c > '\x007f')
                     allAscii = false;
+
+                if (char.IsLower(c))
+                    charClass |= CharacterClass.Lowercase;
+                else if (char.IsUpper(c))
+                    charClass |= CharacterClass.Uppercase;
+                else if (char.IsNumber(c))
+                    charClass |= CharacterClass.Number;
+                else if (char.IsSymbol(c))
+                    charClass |= CharacterClass.Symbol;
+                else if (char.IsWhiteSpace(c))
+                    charClass |= CharacterClass.Whitespace;
             }
         }
 
@@ -123,7 +136,7 @@ internal static class KeyAnalyzer
             }
         }
 
-        return new StringKeyProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniqLen, lengthMap), new DeltaData(left, right), new CharacterData(allAscii));
+        return new StringKeyProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniqLen, lengthMap), new DeltaData(left, right), new CharacterData(allAscii, charClass));
     }
 
     private static NumericKeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys)

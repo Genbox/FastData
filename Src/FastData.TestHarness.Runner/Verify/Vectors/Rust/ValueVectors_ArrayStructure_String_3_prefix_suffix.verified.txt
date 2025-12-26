@@ -35,4 +35,9 @@ impl ArrayStructure_String_3_prefix_suffix {
     pub const ITEM_COUNT: usize = 3;
     pub const MIN_KEY_LENGTH: usize = 6;
     pub const MAX_KEY_LENGTH: usize = 8;
+    pub const HAS_NUMBER: bool = false;
+    pub const HAS_UPPERCASE: bool = false;
+    pub const HAS_LOWERCASE: bool = true;
+    pub const HAS_SYMBOL: bool = false;
+    pub const HAS_WHITESPACE: bool = false;
 }

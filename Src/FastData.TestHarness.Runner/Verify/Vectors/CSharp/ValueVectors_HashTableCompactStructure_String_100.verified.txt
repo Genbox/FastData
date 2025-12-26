@@ -105,4 +105,9 @@ internal static class HashTableCompactStructure_String_100
     public const uint ItemCount = 100;
     public const uint MinKeyLength = 1;
     public const uint MaxKeyLength = 2;
+    public const bool HasNumber = true;
+    public const bool HasUppercase = false;
+    public const bool HasLowercase = false;
+    public const bool HasSymbol = false;
+    public const bool HasWhitespace = false;
 }

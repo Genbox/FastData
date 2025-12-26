@@ -27,6 +27,11 @@ impl MyData {
     pub const ITEM_COUNT: usize = 2;
     pub const MIN_KEY_LENGTH: usize = 5;
     pub const MAX_KEY_LENGTH: usize = 5;
+    pub const HAS_NUMBER: bool = true;
+    pub const HAS_UPPERCASE: bool = false;
+    pub const HAS_LOWERCASE: bool = true;
+    pub const HAS_SYMBOL: bool = false;
+    pub const HAS_WHITESPACE: bool = false;
 }
 ,
   Item2: 

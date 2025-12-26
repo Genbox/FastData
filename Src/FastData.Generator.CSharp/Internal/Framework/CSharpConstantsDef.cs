@@ -1,4 +1,5 @@
 using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generators;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
@@ -10,4 +11,13 @@ internal class CSharpConstantsDef : IConstantsDef
     public Func<string, string, string> MinValueTemplate => (type, value) => $"    public const {type} MinKey = {value};";
     public Func<string, string, string> MaxValueTemplate => (type, value) => $"    public const {type} MaxKey = {value};";
     public Func<string, string, string> ItemCountTemplate => (type, value) => $"    public const {type} ItemCount = {value};";
+
+    public Func<CharacterClass, string> CharacterClassesTemplate => value =>
+        $"""
+             public const bool HasNumber = {(value.HasFlag(CharacterClass.Number) ? "true" : "false")};
+             public const bool HasUppercase = {(value.HasFlag(CharacterClass.Uppercase) ? "true" : "false")};
+             public const bool HasLowercase = {(value.HasFlag(CharacterClass.Lowercase) ? "true" : "false")};
+             public const bool HasSymbol = {(value.HasFlag(CharacterClass.Symbol) ? "true" : "false")};
+             public const bool HasWhitespace = {(value.HasFlag(CharacterClass.Whitespace) ? "true" : "false")};
+         """;
 }

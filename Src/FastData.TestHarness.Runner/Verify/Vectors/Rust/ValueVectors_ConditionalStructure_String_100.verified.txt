@@ -25,4 +25,9 @@ impl ConditionalStructure_String_100 {
     pub const ITEM_COUNT: usize = 100;
     pub const MIN_KEY_LENGTH: usize = 1;
     pub const MAX_KEY_LENGTH: usize = 2;
+    pub const HAS_NUMBER: bool = true;
+    pub const HAS_UPPERCASE: bool = false;
+    pub const HAS_LOWERCASE: bool = false;
+    pub const HAS_SYMBOL: bool = false;
+    pub const HAS_WHITESPACE: bool = false;
 }

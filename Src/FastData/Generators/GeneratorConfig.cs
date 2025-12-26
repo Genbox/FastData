@@ -84,6 +84,7 @@ public sealed class GeneratorConfig<T>
         Constants<T> constants = new Constants<T>(itemCount);
         constants.MinStringLength = props.LengthData.LengthMap.Min;
         constants.MaxStringLength = props.LengthData.LengthMap.Max;
+        constants.CharacterClasses = props.CharacterData.CharacterClasses;
         return constants;
     }
 
