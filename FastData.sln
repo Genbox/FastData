@@ -85,7 +85,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.CSharp",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.CSharp.Benchmarks", "Src\FastData.Generator.CSharp.Benchmarks\FastData.Generator.CSharp.Benchmarks.csproj", "{8487D5BA-10A7-49F4-948C-91DFCD253576}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.CSharp.Tests", "Src\FastData.Generator.CSharp.Tests\FastData.Generator.CSharp.Tests.csproj", "{5B5968C0-8344-4C43-81B9-257341E7CB59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.CSharp.TestHarness", "Src\FastData.Generator.CSharp.TestHarness\FastData.Generator.CSharp.TestHarness.csproj", "{5B5968C0-8344-4C43-81B9-257341E7CB59}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceGenerator", "SourceGenerator", "{B9FFA687-707F-4F18-A7F1-92CD0B9A258A}"
 EndProject
@@ -95,7 +95,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.CPlusPlus", "Src\FastData.Generator.CPlusPlus\FastData.Generator.CPlusPlus.csproj", "{42582813-5EEB-40BF-AD39-7779AB5CB49F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.CPlusPlus.Tests", "Src\FastData.Generator.CPlusPlus.Tests\FastData.Generator.CPlusPlus.Tests.csproj", "{BB90472C-EDB4-4096-BBF1-31155DF4ECBF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.CPlusPlus.TestHarness", "Src\FastData.Generator.CPlusPlus.TestHarness\FastData.Generator.CPlusPlus.TestHarness.csproj", "{BB90472C-EDB4-4096-BBF1-31155DF4ECBF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Cli", "Src\FastData.Cli\FastData.Cli.csproj", "{8E43F76D-2D1C-49FC-84DF-45E0B73E80F1}"
 EndProject
@@ -115,15 +115,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Scripts", "_Scripts", "{62
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.Rust", "Src\FastData.Generator.Rust\FastData.Generator.Rust.csproj", "{8880847E-5007-4845-91D5-CCEB1A96B97C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.Rust.Tests", "Src\FastData.Generator.Rust.Tests\FastData.Generator.Rust.Tests.csproj", "{3A4ECC21-F50D-428B-A4D6-D465A918B862}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.Rust.TestHarness", "Src\FastData.Generator.Rust.TestHarness\FastData.Generator.Rust.TestHarness.csproj", "{3A4ECC21-F50D-428B-A4D6-D465A918B862}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.CPlusPlus.Benchmarks", "Src\FastData.Generator.CPlusPlus.Benchmarks\FastData.Generator.CPlusPlus.Benchmarks.csproj", "{CF626B57-369C-40A2-8D4A-888D732BC175}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.CPlusPlus.Shared", "Src\FastData.Generator.CPlusPlus.Shared\FastData.Generator.CPlusPlus.Shared.csproj", "{9E8DD07A-0453-41BB-8F35-527A92B5E52E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.Rust.Benchmarks", "Src\FastData.Generator.Rust.Benchmarks\FastData.Generator.Rust.Benchmarks.csproj", "{58AE6356-6FC2-4942-AF52-E8DB0DDDA5F5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.Generator.Rust.Shared", "Src\FastData.Generator.Rust.Shared\FastData.Generator.Rust.Shared.csproj", "{EAC5FF10-F7A3-4F9E-AD29-D921492DC8D9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.SourceGenerator.Attributes", "Src\FastData.SourceGenerator.Attributes\FastData.SourceGenerator.Attributes.csproj", "{8EADDF3D-A395-4D17-AA2E-4006858E6EA6}"
 EndProject
@@ -137,6 +133,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Docs", "_Docs", "{F499974F
 		Docs\Optimizations.md = Docs\Optimizations.md
 		AGENTS.md = AGENTS.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastData.TestHarness.Runner", "Src\FastData.TestHarness.Runner\FastData.TestHarness.Runner.csproj", "{8FA635E5-D07F-46B5-AB47-C651DBBD0E08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -227,18 +225,10 @@ Global
 		{CF626B57-369C-40A2-8D4A-888D732BC175}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF626B57-369C-40A2-8D4A-888D732BC175}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF626B57-369C-40A2-8D4A-888D732BC175}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9E8DD07A-0453-41BB-8F35-527A92B5E52E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9E8DD07A-0453-41BB-8F35-527A92B5E52E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9E8DD07A-0453-41BB-8F35-527A92B5E52E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9E8DD07A-0453-41BB-8F35-527A92B5E52E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{58AE6356-6FC2-4942-AF52-E8DB0DDDA5F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{58AE6356-6FC2-4942-AF52-E8DB0DDDA5F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58AE6356-6FC2-4942-AF52-E8DB0DDDA5F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58AE6356-6FC2-4942-AF52-E8DB0DDDA5F5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EAC5FF10-F7A3-4F9E-AD29-D921492DC8D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EAC5FF10-F7A3-4F9E-AD29-D921492DC8D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EAC5FF10-F7A3-4F9E-AD29-D921492DC8D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EAC5FF10-F7A3-4F9E-AD29-D921492DC8D9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8EADDF3D-A395-4D17-AA2E-4006858E6EA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8EADDF3D-A395-4D17-AA2E-4006858E6EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EADDF3D-A395-4D17-AA2E-4006858E6EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -247,6 +237,10 @@ Global
 		{4EFA6738-D378-4A0F-87A2-5F47642F0EE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EFA6738-D378-4A0F-87A2-5F47642F0EE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EFA6738-D378-4A0F-87A2-5F47642F0EE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FA635E5-D07F-46B5-AB47-C651DBBD0E08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FA635E5-D07F-46B5-AB47-C651DBBD0E08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FA635E5-D07F-46B5-AB47-C651DBBD0E08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FA635E5-D07F-46B5-AB47-C651DBBD0E08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{24810DE3-EAFF-4FA9-8813-209C15AC75EC} = {B774BCA8-4D2D-44E7-903F-0FFC349FCC85}
@@ -270,9 +264,7 @@ Global
 		{8880847E-5007-4845-91D5-CCEB1A96B97C} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
 		{3A4ECC21-F50D-428B-A4D6-D465A918B862} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
 		{CF626B57-369C-40A2-8D4A-888D732BC175} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
-		{9E8DD07A-0453-41BB-8F35-527A92B5E52E} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
 		{58AE6356-6FC2-4942-AF52-E8DB0DDDA5F5} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
-		{EAC5FF10-F7A3-4F9E-AD29-D921492DC8D9} = {08D0B91C-BF98-4679-BFD2-4684959CD355}
 		{8EADDF3D-A395-4D17-AA2E-4006858E6EA6} = {B9FFA687-707F-4F18-A7F1-92CD0B9A258A}
 		{4EFA6738-D378-4A0F-87A2-5F47642F0EE5} = {929CD776-13A7-47E7-884B-A9B3A02BC4F1}
 	EndGlobalSection

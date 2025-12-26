@@ -51,9 +51,10 @@
           "Genbox.FastData.Generator": "[1.0.0, )"
         }
       },
-      "Genbox.FastData.Generator.Rust.Shared": {
+      "Genbox.FastData.Generator.Rust.TestHarness": {
         "type": "Project",
         "dependencies": {
+          "Genbox.FastData.Generator.Rust": "[1.0.0, )",
           "Genbox.FastData.InternalShared": "[1.0.0, )"
         }
       },

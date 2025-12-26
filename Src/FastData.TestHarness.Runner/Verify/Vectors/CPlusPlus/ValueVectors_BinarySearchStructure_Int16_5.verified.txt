@@ -1,0 +1,41 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class BinarySearchStructure_Int16_5 final {
+    static constexpr std::array<int16_t, 5> keys = {
+        std::numeric_limits<int16_t>::lowest(), -1, 0, 1, std::numeric_limits<int16_t>::max()
+    };
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int16_t key) noexcept {
+        if (key < std::numeric_limits<int16_t>::lowest() || key > std::numeric_limits<int16_t>::max())
+            return false;
+
+        int32_t lo = 0;
+        int32_t hi = 4;
+        while (lo <= hi) {
+            const int32_t mid = lo + ((hi - lo) >> 1);
+            const int16_t mid_key = keys[mid];
+            const int32_t order = mid_key < key ? -1 : (mid_key > key ? 1 : 0);
+
+            if (order == 0)
+                return true;
+            if (order < 0)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int16_t min_key = std::numeric_limits<int16_t>::lowest();
+    static constexpr int16_t max_key = std::numeric_limits<int16_t>::max();
+};

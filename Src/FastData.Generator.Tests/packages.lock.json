@@ -228,6 +228,59 @@
           "Genbox.FastData": "[1.0.0, )"
         }
       },
+      "Genbox.FastData.Generator.CPlusPlus": {
+        "type": "Project",
+        "dependencies": {
+          "Genbox.FastData.Generator": "[1.0.0, )"
+        }
+      },
+      "Genbox.FastData.Generator.CPlusPlus.Shared": {
+        "type": "Project",
+        "dependencies": {
+          "Genbox.FastData.InternalShared": "[1.0.0, )"
+        }
+      },
+      "Genbox.FastData.Generator.CPlusPlus.TestHarness": {
+        "type": "Project",
+        "dependencies": {
+          "Genbox.FastData.Generator.CPlusPlus": "[1.0.0, )",
+          "Genbox.FastData.Generator.CPlusPlus.Shared": "[1.0.0, )",
+          "Genbox.FastData.InternalShared": "[1.0.0, )"
+        }
+      },
+      "Genbox.FastData.Generator.CSharp": {
+        "type": "Project",
+        "dependencies": {
+          "Genbox.FastData.Generator": "[1.0.0, )"
+        }
+      },
+      "Genbox.FastData.Generator.CSharp.TestHarness": {
+        "type": "Project",
+        "dependencies": {
+          "Genbox.FastData.Generator.CSharp": "[1.0.0, )",
+          "Genbox.FastData.InternalShared": "[1.0.0, )"
+        }
+      },
+      "Genbox.FastData.Generator.Rust": {
+        "type": "Project",
+        "dependencies": {
+          "Genbox.FastData.Generator": "[1.0.0, )"
+        }
+      },
+      "Genbox.FastData.Generator.Rust.Shared": {
+        "type": "Project",
+        "dependencies": {
+          "Genbox.FastData.InternalShared": "[1.0.0, )"
+        }
+      },
+      "Genbox.FastData.Generator.Rust.TestHarness": {
+        "type": "Project",
+        "dependencies": {
+          "Genbox.FastData.Generator.Rust": "[1.0.0, )",
+          "Genbox.FastData.Generator.Rust.Shared": "[1.0.0, )",
+          "Genbox.FastData.InternalShared": "[1.0.0, )"
+        }
+      },
       "Genbox.FastData.InternalShared": {
         "type": "Project",
         "dependencies": {

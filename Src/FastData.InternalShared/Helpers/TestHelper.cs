@@ -138,17 +138,16 @@ public static class TestHelper
         return true;
     }
 
-    public static GeneratorSpec Generate<TKey>(Func<string, ICodeGenerator> func, TestVector<TKey> vector) => GenerateInternal(func, vector, ReadOnlyMemory<byte>.Empty);
+    public static GeneratorSpec Generate<TKey>(Func<string, ICodeGenerator> func, TestVector<TKey> vector, bool ignoreCase = false) => GenerateInternal(func, vector, ReadOnlyMemory<byte>.Empty, ignoreCase);
 
-    public static GeneratorSpec Generate<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey, TValue> vector) where TValue : notnull => GenerateInternal(func, vector, (ReadOnlyMemory<TValue>)vector.Values);
+    public static GeneratorSpec Generate<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey, TValue> vector, bool ignoreCase = false) where TValue : notnull => GenerateInternal(func, vector, (ReadOnlyMemory<TValue>)vector.Values, ignoreCase);
 
-    private static GeneratorSpec GenerateInternal<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey> vector, ReadOnlyMemory<TValue> values) where TValue : notnull
+    private static GeneratorSpec GenerateInternal<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey> vector, ReadOnlyMemory<TValue> values, bool ignoreCase) where TValue : notnull
     {
         ReadOnlyMemory<TKey> keyMemory = vector.Keys;
         ReadOnlySpan<TKey> keySpan = keyMemory.Span;
         string? trimPrefix = null;
         string? trimSuffix = null;
-        bool ignoreCase = false;
 
         if (keyMemory.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");

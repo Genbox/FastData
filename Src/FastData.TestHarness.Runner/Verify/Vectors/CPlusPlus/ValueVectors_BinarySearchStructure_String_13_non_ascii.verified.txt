@@ -1,0 +1,42 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class BinarySearchStructure_String_13_non_ascii final {
+    static constexpr std::array<std::u32string_view, 13> keys = {
+        U"ß", U"à", U"ä", U"å", U"æ", U"ç", U"è", U"é", U"ê", U"ñ", 
+        U"ö", U"ø", U"ü"
+    };
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const std::u32string_view key) noexcept {
+        if (key.length() != 1u)
+            return false;
+
+        int32_t lo = 0;
+        int32_t hi = 12;
+        while (lo <= hi) {
+            const int32_t mid = lo + ((hi - lo) >> 1);
+            const std::u32string_view mid_key = keys[mid];
+            const int32_t order = mid_key.compare(key);
+
+            if (order == 0)
+                return true;
+            if (order < 0)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 13;
+    static constexpr size_t min_key_length = 1;
+    static constexpr size_t max_key_length = 1;
+};

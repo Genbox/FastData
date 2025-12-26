@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
-using Genbox.FastData.Generator.CPlusPlus.Shared;
+using Genbox.FastData.Generator.CPlusPlus.TestHarness;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Helpers;

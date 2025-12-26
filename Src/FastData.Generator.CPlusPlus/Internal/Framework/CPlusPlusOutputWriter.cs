@@ -1,4 +1,3 @@
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;

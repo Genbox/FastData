@@ -1,0 +1,45 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: BinarySearch
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct BinarySearchStructure_Byte_3;
+
+impl BinarySearchStructure_Byte_3 {
+    const KEYS: [u8; 3] = [
+        u8::MIN, 1, u8::MAX
+    ];
+
+    #[must_use]
+    pub fn contains(key: u8) -> bool {
+        if key < u8::MIN || key > u8::MAX {
+            return false;
+        }
+
+        let mut lo: usize = 0;
+        let mut hi: usize = 2;
+        while lo <= hi {
+            let i = lo + ((hi - lo) >> 1);
+            let entry = Self::KEYS[i];
+            let order = if entry < key { -1 } else if entry > key { 1 } else { 0 };
+
+            if order == 0 {
+                return true;
+            }
+            if order < 0 {
+                lo = i + 1;
+            } else {
+                hi = i - 1;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_KEY: u8 = u8::MIN;
+    pub const MAX_KEY: u8 = u8::MAX;
+}

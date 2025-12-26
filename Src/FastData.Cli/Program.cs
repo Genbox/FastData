@@ -3,7 +3,6 @@ using System.Buffers.Text;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;

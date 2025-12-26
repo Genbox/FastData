@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FastData.Generator.CPlusPlus.Shared\FastData.Generator.CPlusPlus.Shared.csproj" />
+    <ProjectReference Include="..\FastData.Generator.CPlusPlus.TestHarness\FastData.Generator.CPlusPlus.TestHarness.csproj" />
   </ItemGroup>
 
 </Project>
