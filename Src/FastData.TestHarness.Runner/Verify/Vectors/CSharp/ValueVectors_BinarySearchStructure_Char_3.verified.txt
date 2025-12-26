@@ -18,6 +18,7 @@ internal static class BinarySearchStructure_Char_3
         if (((ushort)key & 65408) != 0)
             return false;
 
+
         int lo = 0;
         int hi = 2;
         while (lo <= hi)

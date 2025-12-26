@@ -32,6 +32,7 @@ impl BinarySearchStructure_Int32_3_complex {
             return false;
         }
 
+
         let mut lo: usize = 0;
         let mut hi: usize = 2;
         while lo <= hi {
@@ -56,6 +57,7 @@ impl BinarySearchStructure_Int32_3_complex {
         if (key as u32 & 4294967292) != 0 {
             return None;
         }
+
 
         let mut lo: usize = 0;
         let mut hi: usize = 2;

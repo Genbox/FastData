@@ -12,6 +12,7 @@ public:
     static constexpr bool contains(const float key) noexcept {
         if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())
             return false;
+
         if (key == std::numeric_limits<float>::lowest() || key == -1.0f || key == 0.0f || key == 1.0f || key == std::numeric_limits<float>::max())
             return true;
 

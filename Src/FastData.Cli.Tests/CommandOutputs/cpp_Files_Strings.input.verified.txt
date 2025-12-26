@@ -12,8 +12,9 @@ class MyData final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        if (key.length() != 5u)
-            return false;
+         if (key.length() != 5u)
+             return false;
+
         if (key == "test1" || key == "test2")
             return true;
 

@@ -14,6 +14,7 @@ internal static class ConditionalStructure_String_100
         if (key.Length < 1u || key.Length > 2u)
             return false;
 
+
         switch (key)
         {
             case "0":

@@ -91,8 +91,9 @@ class IgnoreCaseSupport final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        if (const size_t len = key.length(); len < 5u || len > 7u)
-            return false;
+         if (const size_t len = key.length(); len < 5u || len > 7u)
+             return false;
+
 
         int32_t lo = 0;
         int32_t hi = 2;

@@ -45,6 +45,7 @@ internal static class HashTableStructure_SByte_5
         if (key < sbyte.MinValue || key > sbyte.MaxValue)
             return false;
 
+
         ulong hash = Hash(key);
         uint index = (uint)(hash % 5);
         sbyte i = (sbyte)(_buckets[index] - 1);

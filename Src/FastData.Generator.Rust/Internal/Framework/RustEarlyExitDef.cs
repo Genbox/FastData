@@ -42,7 +42,7 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
         }
     }
 
-    protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) =>
+    protected override string GetValueEarlyExit<T>(MethodType methodType, T min, T max) =>
         $$"""
                   if {{(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")}} {
                       {{RenderExit(methodType)}}
@@ -63,12 +63,30 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
                  """;
     }
 
-    protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
+    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
         $$"""
                   if {{(minByte.Equals(maxByte) ? $"key.len() != {map.ToValueLabel(maxByte)} as usize" : $"key.len() < {map.ToValueLabel(minByte)} as usize || key.len() > {map.ToValueLabel(maxByte)} as usize")}} {
                       {{RenderExit(methodType)}}
                   }
           """;
+
+    protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
+    {
+        string prefixCheck = ignoreCase ? $"case_insensitive_starts_with(key, {map.ToValueLabel(prefix)})" : $"key.starts_with({map.ToValueLabel(prefix)})";
+        string suffixCheck = ignoreCase ? $"case_insensitive_ends_with(key, {map.ToValueLabel(suffix)})" : $"key.ends_with({map.ToValueLabel(suffix)})";
+
+        string condition;
+        if (prefix.Length == 0)
+            condition = suffixCheck;
+        else
+            condition = suffix.Length == 0 ? prefixCheck : $"{prefixCheck} && {suffixCheck}";
+
+        return $$"""
+                         if !({{condition}}) {
+                             {{RenderExit(methodType)}}
+                         }
+                 """;
+    }
 
     private static string RenderWord(ulong word, MethodType methodType) =>
         $$"""
@@ -77,5 +95,5 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
                       }
           """;
 
-    internal static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup ? "return None;" : "return false;";
+    private static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup ? "return None;" : "return false;";
 }

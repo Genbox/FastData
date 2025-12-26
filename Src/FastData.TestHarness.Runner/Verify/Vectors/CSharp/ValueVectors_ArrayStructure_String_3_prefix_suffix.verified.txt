@@ -19,7 +19,6 @@ internal static class ArrayStructure_String_3_prefix_suffix
             return false;
         if (!(key.StartsWith("pre", StringComparison.Ordinal)))
             return false;
-
         string trimmedKey = key.Substring(3, key.Length - 3);
 
         for (int i = 0; i < 3; i++)

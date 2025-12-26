@@ -28,6 +28,7 @@ impl HashTableStructure_UInt64_4 {
             return false;
         }
 
+
         let hash = unsafe { Self::get_hash(key) };
         let index = hash % 4;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;

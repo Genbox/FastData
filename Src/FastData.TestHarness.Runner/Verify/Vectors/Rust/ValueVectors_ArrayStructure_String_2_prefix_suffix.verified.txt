@@ -21,7 +21,6 @@ impl ArrayStructure_String_2_prefix_suffix {
         if !(key.ends_with("fix")) {
             return false;
         }
-
         let trimmedKey = &key[0..key.len() - 3];
 
         for entry in Self::KEYS.iter() {

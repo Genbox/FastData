@@ -26,6 +26,7 @@ public:
         if (key < 0.0f || key > 99.0f)
             return false;
 
+
         for (size_t i = 0; i < 100; i++)
         {
             if (keys[i] == key)

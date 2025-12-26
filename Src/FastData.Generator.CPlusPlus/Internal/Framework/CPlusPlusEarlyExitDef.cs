@@ -42,7 +42,7 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         }
     }
 
-    protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) =>
+    protected override string GetValueEarlyExit<T>(MethodType methodType, T min, T max) =>
         $"""
                  if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
                      {RenderExit(methodType)}
@@ -61,11 +61,28 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
                 """;
     }
 
-    protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
+    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
         $"""
-                 if ({(min.Equals(max) ? $"key.length() != {map.ToValueLabel(max)}" : $"const size_t len = key.length(); len < {map.ToValueLabel(min)} || len > {map.ToValueLabel(max)}")})
-                     {RenderExit(methodType)}
+                  if ({(min.Equals(max) ? $"key.length() != {map.ToValueLabel(max)}" : $"const size_t len = key.length(); len < {map.ToValueLabel(min)} || len > {map.ToValueLabel(max)}")})
+                      {RenderExit(methodType)}
          """;
+
+    protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
+    {
+        string prefixCheck = ignoreCase ? $"case_insensitive_starts_with(key, {map.ToValueLabel(prefix)})" : $"key.compare(0, {prefix.Length.ToStringInvariant()}, {map.ToValueLabel(prefix)}) == 0";
+        string suffixCheck = ignoreCase ? $"case_insensitive_ends_with(key, {map.ToValueLabel(suffix)})" : $"key.compare(key.length() - {suffix.Length.ToStringInvariant()}, {suffix.Length.ToStringInvariant()}, {map.ToValueLabel(suffix)}) == 0";
+
+        string condition;
+        if (prefix.Length == 0)
+            condition = suffixCheck;
+        else
+            condition = suffix.Length == 0 ? prefixCheck : $"{prefixCheck} && {suffixCheck}";
+
+        return $"""
+                        if (!({condition}))
+                            {RenderExit(methodType)}
+                """;
+    }
 
     private static string RenderWord(ulong word, MethodType methodType) =>
         $"""
@@ -73,7 +90,7 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
                      {RenderExit(methodType)}
          """;
 
-    internal static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup
+    private static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup
         ? """
           {
               value = nullptr;

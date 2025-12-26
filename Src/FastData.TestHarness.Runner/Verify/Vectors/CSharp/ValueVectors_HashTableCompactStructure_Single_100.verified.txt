@@ -79,6 +79,7 @@ internal static class HashTableCompactStructure_Single_100
         if (key < 0f || key > 99f)
             return false;
 
+
         ulong hash = Hash(key);
         uint index = (uint)(hash % 100);
         int start = (int)_bucketStarts[index];

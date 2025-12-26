@@ -14,6 +14,7 @@ internal static class ConditionalStructure_Double_4
         if (key < double.MinValue || key > double.MaxValue)
             return false;
 
+
         switch (key)
         {
             case double.MinValue:

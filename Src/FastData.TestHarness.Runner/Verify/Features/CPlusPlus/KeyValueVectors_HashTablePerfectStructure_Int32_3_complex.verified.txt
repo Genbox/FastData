@@ -37,6 +37,7 @@ public:
         if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
             return false;
 
+
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;
         const auto& entry = entries[index];
@@ -50,6 +51,7 @@ public:
     value = nullptr;
     return false;
 }
+
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;

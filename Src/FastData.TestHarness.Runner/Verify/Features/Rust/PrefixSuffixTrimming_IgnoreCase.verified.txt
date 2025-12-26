@@ -1,0 +1,150 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: BinarySearch
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct PrefixSuffixTrimming_IgnoreCase;
+#[inline(always)]
+fn to_lower_ascii(value: u8) -> u8 {
+    let upper = value.wrapping_sub(b'A');
+    if upper <= (b'Z' - b'A') { value | 0x20 } else { value }
+}
+
+#[inline(always)]
+fn case_insensitive_equals(a: &str, b: &str) -> bool {
+    let a_bytes = a.as_bytes();
+    let b_bytes = b.as_bytes();
+
+    if a_bytes.len() != b_bytes.len() {
+        return false;
+    }
+
+    let len = a_bytes.len();
+    let mut i = 0;
+    while i < len {
+        if to_lower_ascii(a_bytes[i]) != to_lower_ascii(b_bytes[i]) {
+            return false;
+        }
+
+        i += 1;
+    }
+
+    true
+}
+
+#[inline(always)]
+fn case_insensitive_compare(a: &str, b: &str) -> i32 {
+    let a_bytes = a.as_bytes();
+    let b_bytes = b.as_bytes();
+    let a_len = a_bytes.len();
+    let b_len = b_bytes.len();
+    let len = if a_len < b_len { a_len } else { b_len };
+
+    let mut i = 0;
+    while i < len {
+        let ca = to_lower_ascii(a_bytes[i]);
+        let cb = to_lower_ascii(b_bytes[i]);
+
+        if ca != cb {
+            return if ca < cb { -1 } else { 1 };
+        }
+
+        i += 1;
+    }
+
+    if a_len == b_len { 0 } else if a_len < b_len { -1 } else { 1 }
+}
+
+#[inline(always)]
+fn case_insensitive_starts_with(value: &str, prefix: &str) -> bool {
+    let value_bytes = value.as_bytes();
+    let prefix_bytes = prefix.as_bytes();
+    let prefix_len = prefix_bytes.len();
+
+    if prefix_len > value_bytes.len() {
+        return false;
+    }
+
+    let mut i = 0;
+    while i < prefix_len {
+        if to_lower_ascii(value_bytes[i]) != to_lower_ascii(prefix_bytes[i]) {
+            return false;
+        }
+
+        i += 1;
+    }
+
+    true
+}
+
+#[inline(always)]
+fn case_insensitive_ends_with(value: &str, suffix: &str) -> bool {
+    let value_bytes = value.as_bytes();
+    let suffix_bytes = suffix.as_bytes();
+    let suffix_len = suffix_bytes.len();
+    let value_len = value_bytes.len();
+
+    if suffix_len > value_len {
+        return false;
+    }
+
+    let offset = value_len - suffix_len;
+    let mut i = 0;
+    while i < suffix_len {
+        if to_lower_ascii(value_bytes[offset + i]) != to_lower_ascii(suffix_bytes[i]) {
+            return false;
+        }
+
+        i += 1;
+    }
+
+    true
+}
+
+impl PrefixSuffixTrimming_IgnoreCase {
+    const KEYS: [&'static str; 3] = [
+        "Alpha", "Bravo", "Charlie"
+    ];
+
+    #[must_use]
+    pub fn contains(key: &'static str) -> bool {
+        if key.len() < 11 as usize || key.len() > 13 as usize {
+            return false;
+        }
+        if !(case_insensitive_starts_with(key, "Pre") && case_insensitive_ends_with(key, "Suf")) {
+            return false;
+        }
+        let trimmedKey = &key[3..key.len() - 3];
+
+        let mut lo: usize = 0;
+        let mut hi: usize = 2;
+        while lo <= hi {
+            let i = lo + ((hi - lo) >> 1);
+            let entry = Self::KEYS[i];
+            let order = case_insensitive_compare(entry, trimmedKey);
+
+            if order == 0 {
+                return true;
+            }
+            if order < 0 {
+                lo = i + 1;
+            } else {
+                hi = i - 1;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_KEY_LENGTH: usize = 11;
+    pub const MAX_KEY_LENGTH: usize = 13;
+    pub const HAS_NUMBER: bool = false;
+    pub const HAS_UPPERCASE: bool = true;
+    pub const HAS_LOWERCASE: bool = true;
+    pub const HAS_SYMBOL: bool = false;
+    pub const HAS_WHITESPACE: bool = false;
+}

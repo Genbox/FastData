@@ -73,7 +73,7 @@ public class KeyAnalyzerTests
     public void GetStringProperties_DeltaData_Test(string[] data, int leftZero, int rightZero)
     {
         StringKeyProperties res = GetStringProperties(data, true);
-        Assert.Equal(leftZero, res.DeltaData.LeftZeroCount);
-        Assert.Equal(rightZero, res.DeltaData.RightZeroCount);
+        Assert.Equal(leftZero, res.DeltaData.Prefix.Length);
+        Assert.Equal(rightZero, res.DeltaData.Suffix.Length);
     }
 }

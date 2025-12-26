@@ -28,6 +28,7 @@ impl HashTableStructure_Int32_3_simple {
             return false;
         }
 
+
         let hash = unsafe { Self::get_hash(key) };
         let index = hash % 3;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
@@ -47,6 +48,7 @@ impl HashTableStructure_Int32_3_simple {
         if (key as u32 & 4294967292) != 0 {
             return None;
         }
+
 
         let hash = unsafe { Self::get_hash(key) };
         let index = hash % 3;

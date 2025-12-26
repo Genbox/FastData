@@ -146,8 +146,8 @@ public static class TestHelper
     {
         ReadOnlyMemory<TKey> keyMemory = vector.Keys;
         ReadOnlySpan<TKey> keySpan = keyMemory.Span;
-        string? trimPrefix = null;
-        string? trimSuffix = null;
+        string trimPrefix = string.Empty;
+        string trimSuffix = string.Empty;
 
         if (keyMemory.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
@@ -201,13 +201,10 @@ public static class TestHelper
             ReadOnlySpan<string> stringSpan = stringMemory.Span;
             StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(stringSpan, true); // Enable trimming
 
-            if (strProps.DeltaData.LeftZeroCount > 0 || strProps.DeltaData.RightZeroCount > 0)
+            if (strProps.DeltaData.Prefix.Length > 0 || strProps.DeltaData.Suffix.Length > 0)
             {
-                if (strProps.DeltaData.LeftZeroCount > 0)
-                    trimPrefix = stringSpan[0].Substring(0, strProps.DeltaData.LeftZeroCount);
-
-                if (strProps.DeltaData.RightZeroCount > 0)
-                    trimSuffix = stringSpan[0].Substring(stringSpan[0].Length - strProps.DeltaData.RightZeroCount);
+                trimPrefix = strProps.DeltaData.Prefix;
+                trimSuffix = strProps.DeltaData.Suffix;
 
                 stringMemory = FastDataGenerator.SubStringKeys(stringSpan, strProps);
                 keyMemory = CastMemory<string, TKey>(stringMemory);

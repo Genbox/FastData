@@ -17,6 +17,7 @@ internal static class BitSetStructure_Int32_5_range_bitset
         if (((uint)key & 4294967288u) != 0)
             return false;
 
+
         ulong offset = (ulong)(key - MinKey);
         int word = (int)(offset >> 6);
         return (_bitset[word] & (1UL << (int)(offset & 63))) != 0;

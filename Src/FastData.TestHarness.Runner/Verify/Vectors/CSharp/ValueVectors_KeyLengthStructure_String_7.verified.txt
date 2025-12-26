@@ -18,6 +18,7 @@ internal static class KeyLengthStructure_String_7
         if (key.Length < 3u || key.Length > 10u)
             return false;
 
+
         return StringComparer.Ordinal.Equals(key, _keys[key.Length - 3]);
     }
 

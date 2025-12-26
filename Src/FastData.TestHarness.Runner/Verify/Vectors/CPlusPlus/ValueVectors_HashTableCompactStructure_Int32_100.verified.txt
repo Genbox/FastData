@@ -65,6 +65,7 @@ public:
         if ((static_cast<uint32_t>(key) & 4294967168u) != 0)
             return false;
 
+
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 100;
         const size_t start = static_cast<size_t>(bucket_starts[index]);

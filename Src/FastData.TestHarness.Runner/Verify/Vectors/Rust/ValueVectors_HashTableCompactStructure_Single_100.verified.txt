@@ -64,6 +64,7 @@ impl HashTableCompactStructure_Single_100 {
             return false;
         }
 
+
         let hash = unsafe { Self::get_hash(key) };
         let index = hash % 100;
         let start = Self::BUCKET_STARTS[index as usize] as usize;

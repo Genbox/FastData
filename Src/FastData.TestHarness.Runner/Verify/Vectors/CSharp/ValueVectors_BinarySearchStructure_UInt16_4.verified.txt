@@ -18,6 +18,7 @@ internal static class BinarySearchStructure_UInt16_4
         if (key < ushort.MinValue || key > ushort.MaxValue)
             return false;
 
+
         int lo = 0;
         int hi = 3;
         while (lo <= hi)

@@ -17,6 +17,7 @@ public:
         if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())
             return false;
 
+
         for (size_t i = 0; i < 5; i++)
         {
             if (keys[i] == key)

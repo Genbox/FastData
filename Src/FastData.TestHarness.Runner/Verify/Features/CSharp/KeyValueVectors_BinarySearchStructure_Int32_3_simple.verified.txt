@@ -21,6 +21,7 @@ internal static class BinarySearchStructure_Int32_3_simple
         if (((uint)key & 4294967292u) != 0)
             return false;
 
+
         int lo = 0;
         int hi = 2;
         while (lo <= hi)
@@ -46,6 +47,7 @@ internal static class BinarySearchStructure_Int32_3_simple
             value = default;
             return false;
         }
+
 
         int lo = 0;
         int hi = 2;

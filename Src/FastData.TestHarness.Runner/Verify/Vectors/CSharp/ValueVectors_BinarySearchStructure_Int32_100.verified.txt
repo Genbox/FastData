@@ -27,6 +27,7 @@ internal static class BinarySearchStructure_Int32_100
         if (((uint)key & 4294967168u) != 0)
             return false;
 
+
         int lo = 0;
         int hi = 99;
         while (lo <= hi)

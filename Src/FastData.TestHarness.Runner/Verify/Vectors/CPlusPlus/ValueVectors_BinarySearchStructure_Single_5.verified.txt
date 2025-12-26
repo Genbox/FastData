@@ -17,6 +17,7 @@ public:
         if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())
             return false;
 
+
         int32_t lo = 0;
         int32_t hi = 4;
         while (lo <= hi) {

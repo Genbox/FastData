@@ -47,6 +47,7 @@ internal static class HashTableCompactStructure_Int64_5
         if (key < long.MinValue || key > long.MaxValue)
             return false;
 
+
         ulong hash = Hash(key);
         uint index = (uint)(hash % 5);
         int start = (int)_bucketStarts[index];

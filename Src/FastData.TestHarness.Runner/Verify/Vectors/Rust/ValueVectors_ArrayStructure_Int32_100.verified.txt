@@ -28,6 +28,7 @@ impl ArrayStructure_Int32_100 {
             return false;
         }
 
+
         for entry in Self::KEYS.iter() {
             if *entry == key {
                 return true;

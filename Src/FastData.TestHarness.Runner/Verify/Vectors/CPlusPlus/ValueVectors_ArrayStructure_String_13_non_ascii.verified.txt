@@ -15,8 +15,9 @@ class ArrayStructure_String_13_non_ascii final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::u32string_view key) noexcept {
-        if (key.length() != 1u)
-            return false;
+         if (key.length() != 1u)
+             return false;
+
 
         for (size_t i = 0; i < 13; i++)
         {

@@ -15,6 +15,7 @@ impl ConditionalStructure_Int16_5 {
             return false;
         }
 
+
         if key == i16::MIN || key == -1 || key == 0 || key == 1 || key == i16::MAX {
             return true;
         }

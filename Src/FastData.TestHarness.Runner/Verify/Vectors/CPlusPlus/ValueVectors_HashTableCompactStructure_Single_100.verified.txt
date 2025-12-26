@@ -69,6 +69,7 @@ public:
         if (key < 0.0f || key > 99.0f)
             return false;
 
+
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 100;
         const size_t start = static_cast<size_t>(bucket_starts[index]);

@@ -18,6 +18,7 @@ internal static class StaticData
         if (key.Length != 5u)
             return false;
 
+
         int lo = 0;
         int hi = 2;
         while (lo <= hi)

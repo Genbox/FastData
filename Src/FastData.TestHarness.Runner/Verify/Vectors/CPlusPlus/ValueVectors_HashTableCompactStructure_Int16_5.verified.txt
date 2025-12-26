@@ -38,6 +38,7 @@ public:
         if (key < std::numeric_limits<int16_t>::lowest() || key > std::numeric_limits<int16_t>::max())
             return false;
 
+
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 5;
         const size_t start = static_cast<size_t>(bucket_starts[index]);

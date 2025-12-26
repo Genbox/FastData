@@ -1,0 +1,54 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: BinarySearch
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct PrefixSuffixTrimming_Ordinal;
+
+impl PrefixSuffixTrimming_Ordinal {
+    const KEYS: [&'static str; 3] = [
+        "Alpha", "Bravo", "Charlie"
+    ];
+
+    #[must_use]
+    pub fn contains(key: &'static str) -> bool {
+        if key.len() < 11 as usize || key.len() > 13 as usize {
+            return false;
+        }
+        if !(key.starts_with("Pre") && key.ends_with("Suf")) {
+            return false;
+        }
+        let trimmedKey = &key[3..key.len() - 3];
+
+        let mut lo: usize = 0;
+        let mut hi: usize = 2;
+        while lo <= hi {
+            let i = lo + ((hi - lo) >> 1);
+            let entry = Self::KEYS[i];
+            let order = if entry < trimmedKey { -1 } else if entry > trimmedKey { 1 } else { 0 };
+
+            if order == 0 {
+                return true;
+            }
+            if order < 0 {
+                lo = i + 1;
+            } else {
+                hi = i - 1;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_KEY_LENGTH: usize = 11;
+    pub const MAX_KEY_LENGTH: usize = 13;
+    pub const HAS_NUMBER: bool = false;
+    pub const HAS_UPPERCASE: bool = true;
+    pub const HAS_LOWERCASE: bool = true;
+    pub const HAS_SYMBOL: bool = false;
+    pub const HAS_WHITESPACE: bool = false;
+}

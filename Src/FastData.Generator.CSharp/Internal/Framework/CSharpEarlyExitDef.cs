@@ -4,6 +4,7 @@ using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Helpers;
+using static Genbox.FastData.Generator.CSharp.Internal.StringHelper;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
@@ -42,7 +43,7 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
         }
     }
 
-    protected override string GetValueEarlyExits<T>(MethodType methodType, T min, T max) =>
+    protected override string GetValueEarlyExit<T>(MethodType methodType, T min, T max) =>
         $"""
                  if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
                      {RenderExit(methodType)}
@@ -61,11 +62,29 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
                 """;
     }
 
-    protected override string GetLengthEarlyExits(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
+    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
         $"""
                  if ({(min.Equals(max) ? $"key.Length != {map.ToValueLabel(max)}" : $"key.Length < {map.ToValueLabel(min)} || key.Length > {map.ToValueLabel(max)}")})
                      {RenderExit(methodType)}
          """;
+
+    protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
+    {
+        string comparer = GetStringComparer(ignoreCase);
+        string prefixCheck = $"key.StartsWith({map.ToValueLabel(prefix)}, StringComparison.{comparer})";
+        string suffixCheck = $"key.EndsWith({map.ToValueLabel(suffix)}, StringComparison.{comparer})";
+
+        string condition;
+        if (prefix.Length == 0)
+            condition = suffixCheck;
+        else
+            condition = suffix.Length == 0 ? prefixCheck : $"{prefixCheck} && {suffixCheck}";
+
+        return $"""
+                        if (!({condition}))
+                            {RenderExit(methodType)}
+                """;
+    }
 
     private static string RenderWord(ulong word, MethodType methodType) =>
         $"""
@@ -73,7 +92,7 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
                              {RenderExit(methodType)}
          """;
 
-    internal static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup
+    private static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup
         ? """
           {
                       value = default;

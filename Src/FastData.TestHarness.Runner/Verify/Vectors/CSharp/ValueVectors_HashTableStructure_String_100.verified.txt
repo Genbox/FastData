@@ -74,6 +74,7 @@ internal static class HashTableStructure_String_100
         if (key.Length < 1u || key.Length > 2u)
             return false;
 
+
         ulong hash = Hash(key);
         uint index = (uint)(hash % 100);
         sbyte i = (sbyte)(_buckets[index] - 1);

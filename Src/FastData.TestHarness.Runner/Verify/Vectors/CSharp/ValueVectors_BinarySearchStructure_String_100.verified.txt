@@ -27,6 +27,7 @@ internal static class BinarySearchStructure_String_100
         if (key.Length < 1u || key.Length > 2u)
             return false;
 
+
         int lo = 0;
         int hi = 99;
         while (lo <= hi)

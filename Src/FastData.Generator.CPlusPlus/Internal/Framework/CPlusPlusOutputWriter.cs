@@ -31,29 +31,9 @@ internal abstract class CPlusPlusOutputWriter<TKey> : OutputWriter<TKey>
         sb.Append(base.GetMethodHeader(methodType));
 
         if (TotalTrimLength != 0)
-            sb.Append($"""
-
-                               if (!({GetTrimMatchCondition()}))
-                                   {CPlusPlusEarlyExitDef.RenderExit(methodType)}
-
-                               const auto trimmedKey = key.substr({TrimPrefix.Length.ToStringInvariant()}, key.length() - {TotalTrimLength.ToStringInvariant()});
-                       """);
+            sb.Append($"        const auto trimmedKey = key.substr({TrimPrefix.Length.ToStringInvariant()}, key.length() - {TotalTrimLength.ToStringInvariant()});");
 
         return sb.ToString();
-    }
-
-    private string GetTrimMatchCondition()
-    {
-        string prefixCheck = GeneratorConfig.IgnoreCase ? $"case_insensitive_starts_with(key, {ToValueLabel(TrimPrefix)})" : $"key.compare(0, {TrimPrefix.Length.ToStringInvariant()}, {ToValueLabel(TrimPrefix)}) == 0";
-        string suffixCheck = GeneratorConfig.IgnoreCase ? $"case_insensitive_ends_with(key, {ToValueLabel(TrimSuffix)})" : $"key.compare(key.length() - {TrimSuffix.Length.ToStringInvariant()}, {TrimSuffix.Length.ToStringInvariant()}, {ToValueLabel(TrimSuffix)}) == 0";
-
-        if (TrimPrefix.Length == 0)
-            return suffixCheck;
-
-        if (TrimSuffix.Length == 0)
-            return prefixCheck;
-
-        return $"{prefixCheck} && {suffixCheck}";
     }
 
     protected override string GetEqualFunctionInternal(string value1, string value2, KeyType keyType)

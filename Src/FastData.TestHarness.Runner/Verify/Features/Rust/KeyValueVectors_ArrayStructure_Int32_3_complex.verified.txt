@@ -32,6 +32,7 @@ impl ArrayStructure_Int32_3_complex {
             return false;
         }
 
+
         for entry in Self::KEYS.iter() {
             if *entry == key {
                 return true;
@@ -44,6 +45,7 @@ impl ArrayStructure_Int32_3_complex {
         if (key as u32 & 4294967292) != 0 {
             return None;
         }
+
 
         for entry in Self::KEYS.iter() {
             if *entry == key {

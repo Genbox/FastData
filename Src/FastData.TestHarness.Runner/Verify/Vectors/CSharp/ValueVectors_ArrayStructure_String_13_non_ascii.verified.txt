@@ -19,6 +19,7 @@ internal static class ArrayStructure_String_13_non_ascii
         if (key.Length != 1u)
             return false;
 
+
         for (int i = 0; i < 13; i++)
         {
             if (StringComparer.Ordinal.Equals(key, _keys[i]))

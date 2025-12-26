@@ -28,6 +28,7 @@ impl HashTableStructure_Double_5 {
             return false;
         }
 
+
         let hash = unsafe { Self::get_hash(key) };
         let index = hash % 5;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;

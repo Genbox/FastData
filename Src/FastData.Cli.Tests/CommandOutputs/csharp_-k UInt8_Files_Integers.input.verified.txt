@@ -16,6 +16,7 @@ internal static class MyData
         if (((byte)key & 129) != 0)
             return false;
 
+
         switch (key)
         {
             case 42:

@@ -39,8 +39,9 @@ class MyData final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        if (key.length() != 5u)
-            return false;
+         if (key.length() != 5u)
+             return false;
+
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 2;

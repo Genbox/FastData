@@ -37,6 +37,7 @@ public:
                 return false;
         }
 
+
         int32_t lo = 0;
         int32_t hi = 2;
         while (lo <= hi) {

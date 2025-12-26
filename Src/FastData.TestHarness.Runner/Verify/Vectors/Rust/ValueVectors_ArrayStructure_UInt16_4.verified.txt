@@ -19,6 +19,7 @@ impl ArrayStructure_UInt16_4 {
             return false;
         }
 
+
         for entry in Self::KEYS.iter() {
             if *entry == key {
                 return true;

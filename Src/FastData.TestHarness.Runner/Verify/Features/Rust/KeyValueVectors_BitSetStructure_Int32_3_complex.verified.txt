@@ -31,6 +31,7 @@ impl BitSetStructure_Int32_3_complex {
             return false;
         }
 
+
         let offset = ((key as i64) - (Self::MIN_KEY as i64)) as usize;
         let word = offset >> 6;
         let mask = 1u64 << ((offset & 63) as u32);
@@ -41,6 +42,7 @@ impl BitSetStructure_Int32_3_complex {
         if (key as u32 & 4294967292) != 0 {
             return None;
         }
+
 
         let offset = ((key as i64) - (Self::MIN_KEY as i64)) as usize;
         let word = offset >> 6;

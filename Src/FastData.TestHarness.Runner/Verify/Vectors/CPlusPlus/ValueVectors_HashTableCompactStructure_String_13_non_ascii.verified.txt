@@ -43,8 +43,9 @@ class HashTableCompactStructure_String_13_non_ascii final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::u32string_view key) noexcept {
-        if (key.length() != 1u)
-            return false;
+         if (key.length() != 1u)
+             return false;
+
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 13;

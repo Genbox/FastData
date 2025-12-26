@@ -17,6 +17,7 @@ impl MyData {
             return false;
         }
 
+
         if key == "test1" || key == "test2" {
             return true;
         }

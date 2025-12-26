@@ -19,6 +19,7 @@ impl KeyLengthStructure_String_7 {
             return false;
         }
 
+
         return key == Self::KEYS[key.len() - 3];
     }
 

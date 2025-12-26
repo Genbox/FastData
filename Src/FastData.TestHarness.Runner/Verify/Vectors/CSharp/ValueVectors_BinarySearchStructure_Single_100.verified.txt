@@ -27,6 +27,7 @@ internal static class BinarySearchStructure_Single_100
         if (key < 0f || key > 99f)
             return false;
 
+
         int lo = 0;
         int hi = 99;
         while (lo <= hi)

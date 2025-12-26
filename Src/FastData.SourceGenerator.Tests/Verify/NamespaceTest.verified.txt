@@ -16,6 +16,7 @@ internal static class StaticData
         if (key.Length != 5u)
             return false;
 
+
         switch (key)
         {
             case "item1":

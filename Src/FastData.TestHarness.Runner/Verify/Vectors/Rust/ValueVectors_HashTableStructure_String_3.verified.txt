@@ -62,6 +62,7 @@ impl HashTableStructure_String_3 {
         }
     }
 
+
         let hash = unsafe { Self::get_hash(key) };
         let index = hash % 3;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;

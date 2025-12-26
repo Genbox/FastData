@@ -26,30 +26,9 @@ internal abstract class RustOutputWriter<T> : OutputWriter<T>
         sb.Append(base.GetMethodHeader(methodType));
 
         if (TotalTrimLength != 0)
-            sb.Append($$"""
-
-                                if !({{GetTrimMatchCondition()}}) {
-                                    {{RustEarlyExitDef.RenderExit(methodType)}}
-                                }
-
-                                let trimmedKey = &key[{{TrimPrefix.Length.ToStringInvariant()}}..key.len() - {{TrimSuffix.Length.ToStringInvariant()}}];
-                        """);
+            sb.Append($"        let trimmedKey = &key[{TrimPrefix.Length.ToStringInvariant()}..key.len() - {TrimSuffix.Length.ToStringInvariant()}];");
 
         return sb.ToString();
-    }
-
-    private string GetTrimMatchCondition()
-    {
-        string pre = GeneratorConfig.IgnoreCase ? $"case_insensitive_starts_with(key, {ToValueLabel(TrimPrefix)})" : $"key.starts_with({ToValueLabel(TrimPrefix)})";
-        string suf = GeneratorConfig.IgnoreCase ? $"case_insensitive_ends_with(key, {ToValueLabel(TrimSuffix)})" : $"key.ends_with({ToValueLabel(TrimSuffix)})";
-
-        if (TrimPrefix.Length == 0)
-            return suf;
-
-        if (TrimSuffix.Length == 0)
-            return pre;
-
-        return $"{pre} && {suf}";
     }
 
     protected override string GetEqualFunctionInternal(string value1, string value2, KeyType keyType)

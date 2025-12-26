@@ -14,6 +14,7 @@ public:
     static constexpr bool contains(const uint8_t key) noexcept {
         if ((static_cast<uint8_t>(key) & 129) != 0)
             return false;
+
         if (key == 42 || key == 62 || key == 80 || key == 100)
             return true;
 

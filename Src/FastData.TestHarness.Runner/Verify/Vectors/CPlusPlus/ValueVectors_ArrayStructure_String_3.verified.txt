@@ -37,6 +37,7 @@ public:
                 return false;
         }
 
+
         for (size_t i = 0; i < 3; i++)
         {
             if (keys[i] == key)

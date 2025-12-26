@@ -3,6 +3,7 @@ using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generators.Helpers;
+using static Genbox.FastData.Generator.CSharp.Internal.StringHelper;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
@@ -47,29 +48,9 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
         sb.Append(base.GetMethodHeader(methodType));
 
         if (TotalTrimLength != 0)
-            sb.Append($"""
-
-                               if (!({GetTrimMatchCondition()}))
-                                   {CSharpEarlyExitDef.RenderExit(methodType)}
-
-                               string trimmedKey = key.Substring({TrimPrefix.Length.ToStringInvariant()}, key.Length - {TotalTrimLength.ToStringInvariant()});
-                       """);
+            sb.Append($"        string trimmedKey = key.Substring({TrimPrefix.Length.ToStringInvariant()}, key.Length - {TotalTrimLength.ToStringInvariant()});");
 
         return sb.ToString();
-    }
-
-    private string GetTrimMatchCondition()
-    {
-        string prefixCheck = $"key.StartsWith({ToValueLabel(TrimPrefix)}, StringComparison.{GetStringComparer(GeneratorConfig.IgnoreCase)})";
-        string suffixCheck = $"key.EndsWith({ToValueLabel(TrimSuffix)}, StringComparison.{GetStringComparer(GeneratorConfig.IgnoreCase)})";
-
-        if (TrimPrefix.Length == 0)
-            return suffixCheck;
-
-        if (TrimSuffix.Length == 0)
-            return prefixCheck;
-
-        return $"{prefixCheck} && {suffixCheck}";
     }
 
     protected override string GetModFunction(string variable, ulong value)
@@ -86,10 +67,4 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
 
         return $"({ArraySizeType})({variable} % {value})";
     }
-
-    private static string GetStringComparer(bool ignoreCase) => ignoreCase switch
-    {
-        true => nameof(StringComparer.OrdinalIgnoreCase),
-        false => nameof(StringComparer.Ordinal),
-    };
 }

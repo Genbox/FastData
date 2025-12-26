@@ -21,18 +21,20 @@ class KeyLengthStructure_String_3_simple final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        if (const size_t len = key.length(); len < 1u || len > 3u)
-            return false;
+         if (const size_t len = key.length(); len < 1u || len > 3u)
+             return false;
+
 
         return key == keys[key.length() - 1];
     }
     [[nodiscard]]
     static bool try_lookup(const std::string_view key, const int32_t*& value) noexcept {
-        if (const size_t len = key.length(); len < 1u || len > 3u)
-            {
+         if (const size_t len = key.length(); len < 1u || len > 3u)
+             {
     value = nullptr;
     return false;
 }
+
 
         size_t idx = key.length() - 1;
         if (key == keys[idx]) {

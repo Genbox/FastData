@@ -34,15 +34,15 @@ public sealed class GeneratorConfig<T>
         Constants = CreateConstants(props, itemCount);
     }
 
-    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringKeyProperties props, bool ignoreCase, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string? trimPrefix, string? trimSuffix) : this(structureType, keyType, hashDetails, flags)
+    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringKeyProperties props, bool ignoreCase, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string trimPrefix, string trimSuffix) : this(structureType, keyType, hashDetails, flags)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType, encoding).ToArray();
         Constants = CreateConstants(props, itemCount);
         IgnoreCase = ignoreCase;
 
         // We use an empty string instead of null to simplify calculations later in the pipeline
-        TrimPrefix = trimPrefix ?? string.Empty;
-        TrimSuffix = trimSuffix ?? string.Empty;
+        TrimPrefix = trimPrefix;
+        TrimSuffix = trimSuffix;
     }
 
     /// <summary>Gets the structure type that the generator will create.</summary>
@@ -114,6 +114,9 @@ public sealed class GeneratorConfig<T>
 
             yield return new MinMaxLengthEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, minByteCount, maxByteCount); //Also handles same lengths
         }
+
+        if (props.DeltaData.Prefix.Length != 0 || props.DeltaData.Suffix.Length != 0)
+            yield return new PrefixSuffixEarlyExit(props.DeltaData.Prefix, props.DeltaData.Suffix);
     }
 
     private static IEnumerable<IEarlyExit> GetEarlyExits(NumericKeyProperties<T> props, uint itemCount, StructureType structureType)

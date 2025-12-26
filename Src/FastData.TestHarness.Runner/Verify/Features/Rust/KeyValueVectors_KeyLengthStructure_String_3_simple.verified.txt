@@ -26,6 +26,7 @@ impl KeyLengthStructure_String_3_simple {
             return false;
         }
 
+
         return key == Self::KEYS[key.len() - 1];
     }
 #[must_use]
@@ -33,6 +34,7 @@ pub fn try_lookup(key: &'static str) -> Option<i32> {
         if key.len() < 1 as usize || key.len() > 3 as usize {
             return None;
         }
+
 
     let idx = (key.len() - 1) as usize;
     if (key == Self::KEYS[idx]) {

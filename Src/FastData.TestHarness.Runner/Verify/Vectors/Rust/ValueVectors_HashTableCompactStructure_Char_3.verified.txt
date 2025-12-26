@@ -32,6 +32,7 @@ impl HashTableCompactStructure_Char_3 {
             return false;
         }
 
+
         let hash = unsafe { Self::get_hash(key) };
         let index = hash % 3;
         let start = Self::BUCKET_STARTS[index as usize] as usize;

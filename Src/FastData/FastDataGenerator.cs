@@ -103,18 +103,14 @@ public static partial class FastDataGenerator
 
         StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(keySpan, fdCfg.EnableTrimming);
 
-        string? trimPrefix = null;
-        string? trimSuffix = null;
+        string trimPrefix = string.Empty;
+        string trimSuffix = string.Empty;
 
         // If we can remove prefix/suffix from the keys, we do so.
-        if (strProps.DeltaData.LeftZeroCount > 0 || strProps.DeltaData.RightZeroCount > 0)
+        if (strProps.DeltaData.Prefix.Length > 0 || strProps.DeltaData.Suffix.Length > 0)
         {
-            if (strProps.DeltaData.LeftZeroCount > 0)
-                trimPrefix = keySpan[0].Substring(0, strProps.DeltaData.LeftZeroCount);
-
-            if (strProps.DeltaData.RightZeroCount > 0)
-                trimSuffix = keySpan[0].Substring(keySpan[0].Length - strProps.DeltaData.RightZeroCount);
-
+            trimPrefix = strProps.DeltaData.Prefix;
+            trimSuffix = strProps.DeltaData.Suffix;
             keyMemory = SubStringKeys(keySpan, strProps);
             keySpan = keyMemory.Span;
         }
@@ -273,8 +269,8 @@ public static partial class FastDataGenerator
 
     internal static string[] SubStringKeys(ReadOnlySpan<string> keys, StringKeyProperties props)
     {
-        int prefix = props.DeltaData.LeftZeroCount;
-        int suffix = props.DeltaData.RightZeroCount;
+        int prefix = props.DeltaData.Prefix.Length;
+        int suffix = props.DeltaData.Suffix.Length;
 
         Debug.Assert(prefix > 0 || suffix > 0, "Don't call this method if there is nothing to trim");
 

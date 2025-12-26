@@ -18,6 +18,7 @@ internal static class BinarySearchStructure_Int32_5
         if (key < int.MinValue || key > int.MaxValue)
             return false;
 
+
         int lo = 0;
         int hi = 4;
         while (lo <= hi)

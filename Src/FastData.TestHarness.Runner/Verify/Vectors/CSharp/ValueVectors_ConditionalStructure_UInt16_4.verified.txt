@@ -14,6 +14,7 @@ internal static class ConditionalStructure_UInt16_4
         if (key < ushort.MinValue || key > ushort.MaxValue)
             return false;
 
+
         switch (key)
         {
             case ushort.MinValue:

@@ -15,8 +15,9 @@ class BinarySearchStructure_String_13_non_ascii final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::u32string_view key) noexcept {
-        if (key.length() != 1u)
-            return false;
+         if (key.length() != 1u)
+             return false;
+
 
         int32_t lo = 0;
         int32_t hi = 12;

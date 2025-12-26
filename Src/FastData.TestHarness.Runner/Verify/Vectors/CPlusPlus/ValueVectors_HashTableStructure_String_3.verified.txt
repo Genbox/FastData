@@ -60,6 +60,7 @@ public:
                 return false;
         }
 
+
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);

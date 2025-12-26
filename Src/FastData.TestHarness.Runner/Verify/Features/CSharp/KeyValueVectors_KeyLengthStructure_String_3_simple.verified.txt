@@ -25,6 +25,7 @@ internal static class KeyLengthStructure_String_3_simple
         if (key.Length < 1u || key.Length > 3u)
             return false;
 
+
         return StringComparer.Ordinal.Equals(key, _keys[key.Length - 1]);
     }    
     public static bool TryLookup(string key, out int value)
@@ -34,6 +35,7 @@ internal static class KeyLengthStructure_String_3_simple
             value = default;
             return false;
         }
+
 
         int idx = key.Length - 1;
         if (StringComparer.Ordinal.Equals(key, _keys[idx]))

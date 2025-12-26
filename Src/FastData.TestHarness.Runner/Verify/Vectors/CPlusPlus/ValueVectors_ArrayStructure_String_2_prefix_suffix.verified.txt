@@ -14,11 +14,10 @@ class ArrayStructure_String_2_prefix_suffix final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        if (key.length() != 6u)
-            return false;
+         if (key.length() != 6u)
+             return false;
         if (!(key.compare(key.length() - 3, 3, "fix") == 0))
             return false;
-
         const auto trimmedKey = key.substr(0, key.length() - 3);
 
         for (size_t i = 0; i < 2; i++)

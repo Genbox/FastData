@@ -18,6 +18,7 @@ internal static class BinarySearchStructure_SByte_5
         if (key < sbyte.MinValue || key > sbyte.MaxValue)
             return false;
 
+
         int lo = 0;
         int hi = 4;
         while (lo <= hi)

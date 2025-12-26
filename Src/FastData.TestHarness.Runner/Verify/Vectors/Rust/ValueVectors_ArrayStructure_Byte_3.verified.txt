@@ -19,6 +19,7 @@ impl ArrayStructure_Byte_3 {
             return false;
         }
 
+
         for entry in Self::KEYS.iter() {
             if *entry == key {
                 return true;

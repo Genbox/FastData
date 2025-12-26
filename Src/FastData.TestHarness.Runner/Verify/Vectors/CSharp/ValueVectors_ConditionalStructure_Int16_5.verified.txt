@@ -14,6 +14,7 @@ internal static class ConditionalStructure_Int16_5
         if (key < short.MinValue || key > short.MaxValue)
             return false;
 
+
         switch (key)
         {
             case short.MinValue:

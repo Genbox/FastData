@@ -18,6 +18,7 @@ internal static class ArrayStructure_Int64_5
         if (key < long.MinValue || key > long.MaxValue)
             return false;
 
+
         for (int i = 0; i < 5; i++)
         {
             if (key == _keys[i])

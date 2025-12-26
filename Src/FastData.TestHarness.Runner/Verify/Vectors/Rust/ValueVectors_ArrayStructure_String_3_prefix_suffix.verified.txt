@@ -21,7 +21,6 @@ impl ArrayStructure_String_3_prefix_suffix {
         if !(key.starts_with("pre")) {
             return false;
         }
-
         let trimmedKey = &key[3..key.len() - 0];
 
         for entry in Self::KEYS.iter() {

@@ -26,6 +26,7 @@ public:
         if (key < 0.0f || key > 99.0f)
             return false;
 
+
         int32_t lo = 0;
         int32_t hi = 99;
         while (lo <= hi) {

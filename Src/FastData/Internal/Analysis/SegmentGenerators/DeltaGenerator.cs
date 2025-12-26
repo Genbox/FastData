@@ -67,10 +67,10 @@ internal sealed class DeltaGenerator : ISegmentGenerator
 
     public IEnumerable<ArraySegment> Generate(StringKeyProperties props)
     {
-        if (props.DeltaData.Left != null)
+        if (props.DeltaData.LeftMap != null)
         {
             // We start from the left, which is faster due to not having to do right-align checks
-            foreach (ArraySegment segment in CalculateSegments(props.DeltaData.Left))
+            foreach (ArraySegment segment in CalculateSegments(props.DeltaData.LeftMap))
             {
                 // Left Alignment: offset + length <= Min
                 int maxLength = (int)(props.LengthData.LengthMap.Min - segment.Offset);
@@ -81,10 +81,10 @@ internal sealed class DeltaGenerator : ISegmentGenerator
             }
         }
 
-        if (props.DeltaData.Right != null)
+        if (props.DeltaData.RightMap != null)
         {
             // Process right-aligned segments
-            foreach (ArraySegment segment in CalculateSegments(props.DeltaData.Right))
+            foreach (ArraySegment segment in CalculateSegments(props.DeltaData.RightMap))
             {
                 // Right Alignment: offset + length <= Min
                 int maxLength = (int)(props.LengthData.LengthMap.Min - segment.Offset);

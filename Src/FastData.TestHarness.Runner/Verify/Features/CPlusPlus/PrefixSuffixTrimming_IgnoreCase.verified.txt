@@ -1,0 +1,126 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearch
+#pragma once
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+static inline uint32_t to_lower_ascii(uint32_t c) noexcept
+{
+    if (c - 'A' <= 'Z' - 'A')
+        c |= 0x20u;
+
+    return c;
+}
+
+static inline bool case_insensitive_equals(std::string_view a, std::string_view b) noexcept
+{
+    if (a.size() != b.size())
+        return false;
+
+    size_t len = a.size();
+    for (size_t i = 0; i < len; i++)
+    {
+        if (to_lower_ascii(static_cast<uint32_t>(a[i])) != to_lower_ascii(static_cast<uint32_t>(b[i])))
+            return false;
+    }
+
+    return true;
+}
+
+static inline int case_insensitive_compare(std::string_view a, std::string_view b) noexcept
+{
+    size_t a_len = a.size();
+    size_t b_len = b.size();
+    size_t len = a_len < b_len ? a_len : b_len;
+
+    for (size_t i = 0; i < len; i++)
+    {
+        uint32_t ca = to_lower_ascii(static_cast<uint32_t>(a[i]));
+        uint32_t cb = to_lower_ascii(static_cast<uint32_t>(b[i]));
+
+        if (ca != cb)
+            return ca < cb ? -1 : 1;
+    }
+
+    if (a_len == b_len)
+        return 0;
+
+    return a_len < b_len ? -1 : 1;
+}
+
+static inline bool case_insensitive_starts_with(std::string_view value, std::string_view prefix) noexcept
+{
+    size_t prefix_len = prefix.size();
+    if (prefix_len > value.size())
+        return false;
+
+    for (size_t i = 0; i < prefix_len; i++)
+    {
+        if (to_lower_ascii(static_cast<uint32_t>(value[i])) != to_lower_ascii(static_cast<uint32_t>(prefix[i])))
+            return false;
+    }
+
+    return true;
+}
+
+static inline bool case_insensitive_ends_with(std::string_view value, std::string_view suffix) noexcept
+{
+    size_t suffix_len = suffix.size();
+    size_t value_len = value.size();
+
+    if (suffix_len > value_len)
+        return false;
+
+    size_t offset = value_len - suffix_len;
+
+    for (size_t i = 0; i < suffix_len; i++)
+    {
+        if (to_lower_ascii(static_cast<uint32_t>(value[offset + i])) != to_lower_ascii(static_cast<uint32_t>(suffix[i])))
+            return false;
+    }
+
+    return true;
+}
+class PrefixSuffixTrimming_IgnoreCase final {
+    static constexpr std::array<std::string_view, 3> keys = {
+        "Alpha", "Bravo", "Charlie"
+    };
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const std::string_view key) noexcept {
+         if (const size_t len = key.length(); len < 11u || len > 13u)
+             return false;
+        if (!(case_insensitive_starts_with(key, "Pre") && case_insensitive_ends_with(key, "Suf")))
+            return false;
+        const auto trimmedKey = key.substr(3, key.length() - 6);
+
+        int32_t lo = 0;
+        int32_t hi = 2;
+        while (lo <= hi) {
+            const int32_t mid = lo + ((hi - lo) >> 1);
+            const std::string_view mid_key = keys[mid];
+            const int32_t order = case_insensitive_compare(mid_key, trimmedKey);
+
+            if (order == 0)
+                return true;
+            if (order < 0)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr size_t min_key_length = 11;
+    static constexpr size_t max_key_length = 13;
+    static constexpr bool has_number = false;
+    static constexpr bool has_uppercase = true;
+    static constexpr bool has_lowercase = true;
+    static constexpr bool has_symbol = false;
+    static constexpr bool has_whitespace = false;
+};

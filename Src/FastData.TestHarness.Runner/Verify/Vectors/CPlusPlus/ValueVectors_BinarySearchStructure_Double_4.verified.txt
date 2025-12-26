@@ -17,6 +17,7 @@ public:
         if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())
             return false;
 
+
         int32_t lo = 0;
         int32_t hi = 3;
         while (lo <= hi) {

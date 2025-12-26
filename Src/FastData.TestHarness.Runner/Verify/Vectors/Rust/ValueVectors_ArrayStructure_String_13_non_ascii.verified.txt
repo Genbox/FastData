@@ -20,6 +20,7 @@ impl ArrayStructure_String_13_non_ascii {
             return false;
         }
 
+
         for entry in Self::KEYS.iter() {
             if *entry == key {
                 return true;

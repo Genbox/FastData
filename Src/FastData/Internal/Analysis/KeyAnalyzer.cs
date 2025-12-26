@@ -88,12 +88,13 @@ internal static class KeyAnalyzer
         // If the accumulator for an offset contains 0 after all strings have been accumulated, it is highly likely that all the characters were the same.
         // However, there is a risk that an accumulator is 0, even if the characters are not the same. So we do a sanity check at the end to ensure we did it right.
 
-        // int[]? map = null;
+        string prefix = string.Empty;
+        string suffix = string.Empty;
         int[]? left = null;
         int[]? right = null;
 
-        // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough
-        if (enableTrimming && keys.Length > 1 && lengthMap.Min > 1)
+        // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough, but not too long!
+        if (enableTrimming && keys.Length > 1 && lengthMap.Min > 1 && maxStr.Length <= ushort.MaxValue)
         {
             //Build a forward and reverse map of merged entropy
             //We can derive common prefix/suffix from it that can be used later for high-entropy hash/equality functions
@@ -128,15 +129,34 @@ internal static class KeyAnalyzer
                 }
             }
 
+            int leftCount = CountZero(left);
+            int rightCount = CountZero(right);
+
             // Make sure that we handle the case where all characters in the inputs are the same
-            if (DeltaData.CountZero(left) == lengthMap.Min || DeltaData.CountZero(right) == lengthMap.Min)
+            if (leftCount == lengthMap.Min || rightCount == lengthMap.Min)
             {
-                left = null;
-                right = null;
+                prefix = string.Empty;
+                suffix = string.Empty;
+            }
+            else
+            {
+                prefix = keys[0].Substring(0, leftCount);
+                suffix = keys[0].Substring(keys[0].Length - rightCount, rightCount);
             }
         }
 
-        return new StringKeyProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniqLen, lengthMap), new DeltaData(left, right), new CharacterData(allAscii, charClass));
+        return new StringKeyProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniqLen, lengthMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass));
+    }
+
+    private static int CountZero(int[] data)
+    {
+        int count;
+        for (count = 0; count < data.Length; count++)
+        {
+            if (data[count] != 0)
+                break;
+        }
+        return count;
     }
 
     private static NumericKeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys)
