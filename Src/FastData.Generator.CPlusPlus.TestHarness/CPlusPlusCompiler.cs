@@ -42,7 +42,7 @@ public sealed class CPlusPlusCompiler
         if (File.Exists(dst))
             return;
 
-        const string ns = "Genbox.FastData.Generator.CPlusPlus.Shared.Resources.";
+        const string ns = "Genbox.FastData.Generator.CPlusPlus.TestHarness.Resources.";
         using Stream? stream = typeof(CPlusPlusCompiler).Assembly.GetManifestResourceStream(ns + name + ".gz");
 
         if (stream == null)
