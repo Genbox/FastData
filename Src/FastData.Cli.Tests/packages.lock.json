@@ -24,15 +24,15 @@
       },
       "Verify.XunitV3": {
         "type": "Direct",
-        "requested": "[31.9.0, )",
-        "resolved": "31.9.0",
-        "contentHash": "fpHlQfKYSSddwpvNLAAyxUQ///3hgj/5P+FOGwYYtElB/8iERA0vU6+v0DJeXDkSSPGj+woNuSH3OlVyAAM71Q==",
+        "requested": "[31.9.3, )",
+        "resolved": "31.9.3",
+        "contentHash": "STslW9NSMfiD6rU8UFrxaRChUd8cm8HlXQk4Y2xPvlLaErJcLxjYu+nBaS/ZQtRv68DE02/mVg0a5/4oWERD2Q==",
         "dependencies": {
           "Argon": "0.33.0",
-          "DiffEngine": "18.0.0",
+          "DiffEngine": "18.2.0",
           "Microsoft.Bcl.AsyncInterfaces": "10.0.1",
           "SimpleInfoName": "3.1.2",
-          "Verify": "31.9.0",
+          "Verify": "31.9.3",
           "xunit.v3.extensibility.core": "3.2.1"
         }
       },
@@ -54,8 +54,8 @@
       },
       "DiffEngine": {
         "type": "Transitive",
-        "resolved": "18.0.0",
-        "contentHash": "ecUmReBkj6ptmwDFlZsGDpVtP9x3CLVqDiIPlXGrxH7s66wJt5/5rBUtWCS5JWMp0GR8p99NtQMUMKmNd5fM5A==",
+        "resolved": "18.2.0",
+        "contentHash": "HL24HqxiS9/YzMpn54omqUk3Xwk275MiY3f9QMoDy88NT4Q4VPGnxPutoUR+qZAFP699pAm+2sqUhqF+aWvmVQ==",
         "dependencies": {
           "EmptyFiles": "8.17.1"
         }
@@ -100,8 +100,8 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "9.0.6",
-        "contentHash": "0Zn6nR/6g+90MxskZyOOMPQvnPnrrGu6bytPwkV+azDcTtCSuQ1+GJUrg8Klmnrjk1i6zMpw2lXijl+tw7Q3kA=="
+        "resolved": "10.0.1",
+        "contentHash": "oIy8fQxxbUsSrrOvgBqlVgOeCtDmrcynnTG+FQufcUWBrwyPfwlUkCDB2vaiBeYPyT+20u9/HeuHeBf+H4F/8g=="
       },
       "Microsoft.Testing.Extensions.Telemetry": {
         "type": "Transitive",
@@ -157,13 +157,18 @@
         "resolved": "3.1.2",
         "contentHash": "/OoEZQxSW6DeTJ9nfrg8BLCOCWpxBiWHV4NkG3t+Xpe8tvzm7yCwKwxkhpauMl3fg9OjlIjJMKX61H6VavLkrw=="
       },
+      "System.Interactive.Async": {
+        "type": "Transitive",
+        "resolved": "7.0.0",
+        "contentHash": "Ckj+tg2BVOZ0oLp7FAbjfvRyA/BMkUhVxROLd+x22zncRR6KD7CdFzAYp+9Mo2cedxAMo2X9ZNyhZu68jdDITw=="
+      },
       "Verify": {
         "type": "Transitive",
-        "resolved": "31.9.0",
-        "contentHash": "iElfPuZoLorV76tTX3W+JlFBq1U4Hc/LOrGFrj0/m9MvtFoQkE9FFkFN28ckVJJVVutBotzCebYZV/iaSAB3Jw==",
+        "resolved": "31.9.3",
+        "contentHash": "EYUGcT5EjAzcAsp0r5DzWIhm1CjFk8EyNO42O8Ta/zsOxGPeeX1z6KysaDuo26EDP10CRVLlrMiFdB5fcRcTYw==",
         "dependencies": {
           "Argon": "0.33.0",
-          "DiffEngine": "18.0.0",
+          "DiffEngine": "18.2.0",
           "SimpleInfoName": "3.1.2"
         }
       },
@@ -219,7 +224,7 @@
       "Genbox.FastData": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "[9.0.6, )"
+          "Microsoft.Extensions.Logging.Abstractions": "[10.0.1, )"
         }
       },
       "Genbox.FastData.Cli": {
@@ -228,9 +233,9 @@
           "Genbox.FastData.Generator.CPlusPlus": "[1.0.0, )",
           "Genbox.FastData.Generator.CSharp": "[1.0.0, )",
           "Genbox.FastData.Generator.Rust": "[1.0.0, )",
-          "Spectre.Console": "[0.50.0, )",
-          "System.CommandLine": "[2.0.0-beta4.22272.1, )",
-          "System.Linq.Async": "[6.0.3, )"
+          "Spectre.Console": "[0.54.0, )",
+          "System.CommandLine": "[2.0.1, )",
+          "System.Linq.Async": "[7.0.0, )"
         }
       },
       "Genbox.FastData.Generator": {
@@ -261,7 +266,7 @@
         "type": "Project",
         "dependencies": {
           "Microsoft.CodeAnalysis.CSharp": "[4.10.0, )",
-          "Newtonsoft.Json": "[13.0.3, )",
+          "Newtonsoft.Json": "[13.0.4, )",
           "xunit.v3.extensibility.core": "[3.2.1, )"
         }
       },
@@ -277,36 +282,39 @@
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "CentralTransitive",
-        "requested": "[9.0.6, )",
-        "resolved": "9.0.6",
-        "contentHash": "LFnyBNK7WtFmKdnHu3v0HOYQ8BcjYuy0jdC9pgCJ/rbLKoJEG9/dBzSKMEeeWDbDeoWS0TIxOC8a9CM5ufca3A==",
+        "requested": "[10.0.1, )",
+        "resolved": "10.0.1",
+        "contentHash": "YkmyiPIWAXVb+lPIrM0LE5bbtLOJkCiRTFiHpkVOvhI7uTvCfoOHLEN0LcsY56GpSD7NqX3gJNpsaDe87/B3zg==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.6"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.1"
         }
       },
       "Newtonsoft.Json": {
         "type": "CentralTransitive",
-        "requested": "[13.0.3, )",
-        "resolved": "13.0.3",
-        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
+        "requested": "[13.0.4, )",
+        "resolved": "13.0.4",
+        "contentHash": "pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A=="
       },
       "Spectre.Console": {
         "type": "CentralTransitive",
-        "requested": "[0.50.0, )",
-        "resolved": "0.50.0",
-        "contentHash": "gkwYncFqMjlPF6Yz8KeVsKWpdfv15sr6uKm+vXVa/8Q4tvx52LPzMQOO5m+bXwI3AGGFeY3cok3ZJbguYizswg=="
+        "requested": "[0.54.0, )",
+        "resolved": "0.54.0",
+        "contentHash": "StDXCFayfy0yB1xzUHT2tgEpV1/HFTiS4JgsAQS49EYTfMixSwwucaQs/bIOCwXjWwIQTMuxjUIxcB5XsJkFJA=="
       },
       "System.CommandLine": {
         "type": "CentralTransitive",
-        "requested": "[2.0.0-beta4.22272.1, )",
-        "resolved": "2.0.0-beta4.22272.1",
-        "contentHash": "1uqED/q2H0kKoLJ4+hI2iPSBSEdTuhfCYADeJrAqERmiGQ2NNacYKRNEQ+gFbU4glgVyK8rxI+ZOe1onEtr/Pg=="
+        "requested": "[2.0.1, )",
+        "resolved": "2.0.1",
+        "contentHash": "GLc43eDFq8KbpxIb7UhTwV0vC5CzB0NspJvfFbfhoW4O057xCJXuO18KLpVn9x3JykQn2mRske6+I6JXHwqmDg=="
       },
       "System.Linq.Async": {
         "type": "CentralTransitive",
-        "requested": "[6.0.3, )",
-        "resolved": "6.0.3",
-        "contentHash": "hSHiq2m1ky7zUQgTp+/2h1K3lABIQ+GltRixoclHPg/Sc1vnfeS6g/Uy5moOVZKrZJdQiFPFZd6OobBp3tZcFg=="
+        "requested": "[7.0.0, )",
+        "resolved": "7.0.0",
+        "contentHash": "A2Wci92Oyuodi8YLMQCJJ0vHqzgRFgEUG1K6tQNcoxHd3w05B1LvGzXvxQnGYPIL4Cr4hicHytpk2F2Jx8TZHg==",
+        "dependencies": {
+          "System.Interactive.Async": "7.0.0"
+        }
       },
       "xunit.v3.extensibility.core": {
         "type": "CentralTransitive",
