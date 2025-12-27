@@ -27,7 +27,7 @@ internal static class Program
                       edition = "2024"
 
                       [dev-dependencies]
-                      criterion = "0.5.1"
+                      criterion = "0.8.1"
 
                       """);
 

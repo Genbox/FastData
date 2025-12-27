@@ -25,7 +25,7 @@ internal static class Program
               </PropertyGroup>
 
               <ItemGroup>
-                <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+                <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
               </ItemGroup>
             </Project>
             """);
