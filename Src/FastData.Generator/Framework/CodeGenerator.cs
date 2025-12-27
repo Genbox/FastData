@@ -19,8 +19,9 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
     {
         Shared.Clear();
 
+        // TODO: Reenable encoding reduction optimization
         // If we can reduce the encoding to ASCII, we do so
-        map.OverrideEncoding(genCfg.Flags.HasFlag(GeneratorFlags.AllAreASCII) ? GeneratorEncoding.ASCII : Encoding);
+        // map.OverrideEncoding(genCfg.Flags.HasFlag(GeneratorFlags.AllAreASCII) ? GeneratorEncoding.ASCII : Encoding);
 
         string keyTypeName = map.GetTypeName(typeof(TKey));
 
