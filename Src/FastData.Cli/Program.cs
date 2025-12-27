@@ -1,9 +1,8 @@
 using System.Buffers;
 using System.Buffers.Text;
 using System.CommandLine;
-using System.CommandLine.Builder;
 using System.CommandLine.Help;
-using System.CommandLine.Parsing;
+using System.CommandLine.Invocation;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -22,36 +21,67 @@ internal static class Program
     internal static async Task<int> Main(string[] args)
     {
         //FastData options
-        Option<FileInfo?> outputFileOpt = new Option<FileInfo?>("--output-file", "The file to write the generated code to.");
-        outputFileOpt.AddAlias("-o");
+        Option<FileInfo?> outputFileOpt = new Option<FileInfo?>("--output-file", "-o")
+        {
+            Description = "The file to write the generated code to.",
+            Recursive = true
+        };
 
-        Option<KeyType> keyTypeOpt = new Option<KeyType>("--key-type", description: "The type of data in the input file.", getDefaultValue: () => KeyType.String);
-        keyTypeOpt.AddAlias("-k");
+        Option<KeyType> keyTypeOpt = new Option<KeyType>("--key-type", "-k")
+        {
+            Description = "The type of data in the input file.",
+            DefaultValueFactory = _ => KeyType.String,
+            HelpName = "bool|char|double|int16|int32|int64|int8|single|string|uint16|uint32|uint64|uint8",
+            Recursive = true
+        };
 
-        Option<StructureType> structureTypeOpt = new Option<StructureType>("--structure-type", description: "The type of data structure to produce.", getDefaultValue: () => StructureType.Auto);
-        structureTypeOpt.AddAlias("-s");
+        Option<StructureType> structureTypeOpt = new Option<StructureType>("--structure-type", "-s")
+        {
+            Description = "The type of data structure to produce.",
+            DefaultValueFactory = _ => StructureType.Auto,
+            Recursive = true
+        };
 
-        Option<bool> ignoreCaseOpt = new Option<bool>("--ignore-case", "Use case-insensitive lookups for ASCII string keys.");
-        ignoreCaseOpt.AddAlias("-ic");
+        Option<bool> ignoreCaseOpt = new Option<bool>("--ignore-case", "-ic")
+        {
+            Description = "Use case-insensitive lookups for ASCII string keys.",
+            Recursive = true
+        };
 
-        Argument<FileInfo> keysFileArg = new Argument<FileInfo>("keys-file", "The file to read keys from");
+        Argument<FileInfo> keysFileArg = new Argument<FileInfo>("keys-file")
+        {
+            Description = "The file to read keys from"
+        };
 
         //TODO: Add support for inputting a structure definition + CSV (for simple data) and JSON (for complex data) inputs
         // Argument<FileInfo> valuesFileArg = new Argument<FileInfo>("values-file", "The file to read values from");
 
         //Options common for all generators
-        Option<string> classNameOpt = new Option<string>("--class-name", description: "The class name.", getDefaultValue: () => "MyData");
-        classNameOpt.AddAlias("-cn");
+        Option<string> classNameOpt = new Option<string>("--class-name", "-cn")
+        {
+            Description = "The class name.",
+            DefaultValueFactory = _ => "MyData"
+        };
 
         //CSharp section
-        Option<string?> namespaceOpt = new Option<string?>("--namespace", "The namespace the generated class resides in.");
-        namespaceOpt.AddAlias("-ns");
+        Option<string?> namespaceOpt = new Option<string?>("--namespace", "-ns")
+        {
+            Description = "The namespace the generated class resides in."
+        };
 
-        Option<ClassVisibility> classVisibilityOpt = new Option<ClassVisibility>("--class-visibility", description: "The visibility of the generated class.", getDefaultValue: () => ClassVisibility.Internal);
-        classVisibilityOpt.AddAlias("-cv");
+        Option<ClassVisibility> classVisibilityOpt = new Option<ClassVisibility>("--class-visibility", "-cv")
+        {
+            Description = "The visibility of the generated class.",
+            DefaultValueFactory = _ => ClassVisibility.Internal,
+            HelpName = "public|internal"
+        };
 
-        Option<ClassType> classTypeOpt = new Option<ClassType>("--class-type", description: "The type of the generated class.", getDefaultValue: () => ClassType.Static);
-        classTypeOpt.AddAlias("-ct");
+        Option<ClassType> classTypeOpt = new Option<ClassType>("--class-type", "-ct")
+        {
+            Description = "The type of the generated class.",
+            DefaultValueFactory = _ => ClassType.Static,
+            HelpName = "instance|static|struct"
+        };
 
         Command csharpCmd = new Command("csharp", "Generate a C# data structure")
         {
@@ -84,22 +114,25 @@ internal static class Program
             rustCmd
         };
 
-        rootCmd.AddGlobalOption(outputFileOpt);
-        rootCmd.AddGlobalOption(keyTypeOpt);
-        rootCmd.AddGlobalOption(structureTypeOpt);
-        rootCmd.AddGlobalOption(ignoreCaseOpt);
+        rootCmd.Options.Add(outputFileOpt);
+        rootCmd.Options.Add(keyTypeOpt);
+        rootCmd.Options.Add(structureTypeOpt);
+        rootCmd.Options.Add(ignoreCaseOpt);
 
-        csharpCmd.SetHandler(async context =>
+        HelpOption helpOption = rootCmd.Options.OfType<HelpOption>().First();
+        helpOption.Action = new CustomHelpAction(rootCmd);
+
+        csharpCmd.SetAction(async (pr, token) =>
         {
-            FileInfo? outputFile = context.ParseResult.GetValueForOption(outputFileOpt);
-            KeyType keyType = context.ParseResult.GetValueForOption(keyTypeOpt);
-            StructureType structureType = context.ParseResult.GetValueForOption(structureTypeOpt);
-            bool ignoreCase = context.ParseResult.GetValueForOption(ignoreCaseOpt);
-            FileInfo inputFile = context.ParseResult.GetValueForArgument(keysFileArg);
-            string? cn = context.ParseResult.GetValueForOption(classNameOpt);
-            string? ns = context.ParseResult.GetValueForOption(namespaceOpt);
-            ClassVisibility cv = context.ParseResult.GetValueForOption(classVisibilityOpt);
-            ClassType ct = context.ParseResult.GetValueForOption(classTypeOpt);
+            FileInfo? outputFile = pr.GetValue(outputFileOpt);
+            KeyType keyType = pr.GetValue(keyTypeOpt);
+            StructureType structureType = pr.GetValue(structureTypeOpt);
+            bool ignoreCase = pr.GetValue(ignoreCaseOpt);
+            FileInfo inputFile = pr.GetValue(keysFileArg);
+            string? cn = pr.GetValue(classNameOpt);
+            string? ns = pr.GetValue(namespaceOpt);
+            ClassVisibility cv = pr.GetValue(classVisibilityOpt);
+            ClassType ct = pr.GetValue(classTypeOpt);
 
             CSharpCodeGeneratorConfig genCfg = new CSharpCodeGeneratorConfig(cn);
             genCfg.Namespace = ns;
@@ -108,57 +141,48 @@ internal static class Program
 
             CSharpCodeGenerator generator = CSharpCodeGenerator.Create(genCfg);
 
-            await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile).ConfigureAwait(false);
+            await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile, token).ConfigureAwait(false);
         });
 
-        cppCmd.SetHandler(async context =>
+        cppCmd.SetAction(async (pr, token) =>
         {
-            FileInfo? outputFile = context.ParseResult.GetValueForOption(outputFileOpt);
-            KeyType keyType = context.ParseResult.GetValueForOption(keyTypeOpt);
-            StructureType structureType = context.ParseResult.GetValueForOption(structureTypeOpt);
-            bool ignoreCase = context.ParseResult.GetValueForOption(ignoreCaseOpt);
-            FileInfo inputFile = context.ParseResult.GetValueForArgument(keysFileArg);
-            string? cn = context.ParseResult.GetValueForOption(classNameOpt);
+            FileInfo? outputFile = pr.GetValue(outputFileOpt);
+            KeyType keyType = pr.GetValue(keyTypeOpt);
+            StructureType structureType = pr.GetValue(structureTypeOpt);
+            bool ignoreCase = pr.GetValue(ignoreCaseOpt);
+            FileInfo inputFile = pr.GetValue(keysFileArg);
+            string? cn = pr.GetValue(classNameOpt);
 
             CPlusPlusCodeGeneratorConfig genCfg = new CPlusPlusCodeGeneratorConfig(cn);
             CPlusPlusCodeGenerator generator = CPlusPlusCodeGenerator.Create(genCfg);
 
-            await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile).ConfigureAwait(false);
+            await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile, token).ConfigureAwait(false);
         });
 
-        rustCmd.SetHandler(async context =>
+        rustCmd.SetAction(async (pr, token) =>
         {
-            FileInfo? outputFile = context.ParseResult.GetValueForOption(outputFileOpt);
-            KeyType keyType = context.ParseResult.GetValueForOption(keyTypeOpt);
-            StructureType structureType = context.ParseResult.GetValueForOption(structureTypeOpt);
-            bool ignoreCase = context.ParseResult.GetValueForOption(ignoreCaseOpt);
-            FileInfo inputFile = context.ParseResult.GetValueForArgument(keysFileArg);
-            string? cn = context.ParseResult.GetValueForOption(classNameOpt);
+            FileInfo? outputFile = pr.GetValue(outputFileOpt);
+            KeyType keyType = pr.GetValue(keyTypeOpt);
+            StructureType structureType = pr.GetValue(structureTypeOpt);
+            bool ignoreCase = pr.GetValue(ignoreCaseOpt);
+            FileInfo inputFile = pr.GetValue(keysFileArg);
+            string? cn = pr.GetValue(classNameOpt);
 
             RustCodeGeneratorConfig genCfg = new RustCodeGeneratorConfig(cn);
             RustCodeGenerator generator = RustCodeGenerator.Create(genCfg);
 
-            await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile).ConfigureAwait(false);
+            await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile, token).ConfigureAwait(false);
         });
-
-        Parser parser = new CommandLineBuilder(rootCmd)
-                        .UseDefaults()
-                        .UseHelp(ctx =>
-                        {
-                            //Manual help output to avoid printing Unknown from the enums
-                            ctx.HelpBuilder.CustomizeSymbol(classVisibilityOpt, "-cv, --class-visibility <public|internal>");
-                            ctx.HelpBuilder.CustomizeSymbol(classTypeOpt, "-ct, --class-type <instance|static|struct>");
-                            ctx.HelpBuilder.CustomizeSymbol(keyTypeOpt, "-k, --key-type <bool|char|double|int16|int32|int64|int8|single|string|uint16|uint32|uint64|uint8>");
-                            ctx.HelpBuilder.CustomizeLayout(_ => HelpBuilder.Default
-                                                                            .GetLayout()
-                                                                            .Skip(1) // Skip the default command description section.
-                                                                            .Prepend(_ => AnsiConsole.Write(new FigletText(rootCmd.Description!).Color(Color.Red1))));
-                        })
-                        .Build();
 
         try
         {
-            return await parser.InvokeAsync(args).ConfigureAwait(false);
+            ParserConfiguration parserConfig = new ParserConfiguration();
+            InvocationConfiguration invocationConfig = new InvocationConfiguration
+            {
+                EnableDefaultExceptionHandler = false
+            };
+            ParseResult parseResult = rootCmd.Parse(args, parserConfig);
+            return await parseResult.InvokeAsync(invocationConfig, CancellationToken.None).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -167,7 +191,7 @@ internal static class Program
         }
     }
 
-    private static async Task GenerateAsync(FileInfo inputFile, KeyType keyType, StructureType structureType, bool ignoreCase, ICodeGenerator generator, FileInfo? outputFile)
+    private static async Task GenerateAsync(FileInfo inputFile, KeyType keyType, StructureType structureType, bool ignoreCase, ICodeGenerator generator, FileInfo? outputFile, CancellationToken token)
     {
         string fi = inputFile.FullName;
         FastDataConfig config = new FastDataConfig(structureType)
@@ -180,90 +204,90 @@ internal static class Program
 
         string source = keyType switch
         {
-            KeyType.String => FastDataGenerator.Generate(await ParseFileAsync<string>(fi, static (x, y) => x.Add(Encoding.UTF8.GetString(y)), CancellationToken.None).ConfigureAwait(false), config, generator),
+            KeyType.String => FastDataGenerator.Generate(await ParseFileAsync<string>(fi, static (x, y) => x.Add(Encoding.UTF8.GetString(y)), token).ConfigureAwait(false), config, generator),
             KeyType.Int8 => FastDataGenerator.Generate(await ParseFileAsync<sbyte>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out sbyte value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, CancellationToken.None).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), config, generator),
             KeyType.UInt8 => FastDataGenerator.Generate(await ParseFileAsync<byte>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out byte value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, CancellationToken.None).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), config, generator),
             KeyType.Int16 => FastDataGenerator.Generate(await ParseFileAsync<short>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out short value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, CancellationToken.None).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), config, generator),
             KeyType.UInt16 => FastDataGenerator.Generate(await ParseFileAsync<ushort>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out ushort value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, CancellationToken.None).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), config, generator),
             KeyType.Int32 => FastDataGenerator.Generate(await ParseFileAsync<int>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out int value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, CancellationToken.None).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), config, generator),
             KeyType.UInt32 => FastDataGenerator.Generate(await ParseFileAsync<uint>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out uint value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, CancellationToken.None).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), config, generator),
             KeyType.Int64 => FastDataGenerator.Generate(await ParseFileAsync<long>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out long value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, CancellationToken.None).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), config, generator),
             KeyType.UInt64 => FastDataGenerator.Generate(await ParseFileAsync<ulong>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out ulong value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, CancellationToken.None).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), config, generator),
             KeyType.Single => FastDataGenerator.Generate(await ParseFileAsync<float>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out float value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, CancellationToken.None).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), config, generator),
             KeyType.Double => FastDataGenerator.Generate(await ParseFileAsync<double>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out double value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, CancellationToken.None).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), config, generator),
             KeyType.Char => FastDataGenerator.Generate(await ParseFileAsync<char>(fi, static (x, y) =>
             {
                 Span<char> chars = stackalloc char[1];
                 Encoding.UTF8.GetChars(y, chars);
                 x.Add(chars[0]);
-            }, CancellationToken.None).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), config, generator),
             _ => throw new ArgumentOutOfRangeException(nameof(keyType), keyType, null)
         };
 
         if (outputFile == null)
             Console.WriteLine(source);
         else
-            await File.WriteAllTextAsync(outputFile.FullName, source).ConfigureAwait(false);
+            await File.WriteAllTextAsync(outputFile.FullName, source, token).ConfigureAwait(false);
     }
 
     private sealed class PooledArray<T>(int initialCapacity = 1024)
@@ -334,5 +358,16 @@ internal static class Program
 
         await reader.CompleteAsync().ConfigureAwait(false);
         return pool.ToArray();
+    }
+
+    private sealed class CustomHelpAction(RootCommand rootCmd) : SynchronousCommandLineAction
+    {
+        private readonly RootCommand _rootCmd = rootCmd;
+
+        public override int Invoke(ParseResult parseResult)
+        {
+            AnsiConsole.Write(new FigletText(_rootCmd.Description!).Color(Color.Red1));
+            return new HelpAction().Invoke(parseResult);
+        }
     }
 }
