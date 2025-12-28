@@ -63,7 +63,7 @@ public class FastDataGeneratorTests
     public void Generate_Trimming_UsesSuffixFromEnd()
     {
         string[] keys = ["prefooSUF", "prebarSUF"];
-        FastDataConfig config = new FastDataConfig(StructureType.Array) { EnableTrimming = true };
+        FastDataConfig config = new FastDataConfig(StructureType.Array) { EnablePrefixSuffixTrimming = true };
         TrimCaptureGenerator generator = new TrimCaptureGenerator();
 
         FastDataGenerator.Generate(keys, config, generator);

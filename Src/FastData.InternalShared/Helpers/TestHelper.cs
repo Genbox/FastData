@@ -138,11 +138,11 @@ public static class TestHelper
         return true;
     }
 
-    public static GeneratorSpec Generate<TKey>(Func<string, ICodeGenerator> func, TestVector<TKey> vector, bool ignoreCase = false) => GenerateInternal(func, vector, ReadOnlyMemory<byte>.Empty, ignoreCase);
+    public static GeneratorSpec Generate<TKey>(Func<string, ICodeGenerator> func, TestVector<TKey> vector) => GenerateInternal(func, vector, ReadOnlyMemory<byte>.Empty);
 
-    public static GeneratorSpec Generate<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey, TValue> vector, bool ignoreCase = false) where TValue : notnull => GenerateInternal(func, vector, (ReadOnlyMemory<TValue>)vector.Values, ignoreCase);
+    public static GeneratorSpec Generate<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey, TValue> vector) where TValue : notnull => GenerateInternal(func, vector, (ReadOnlyMemory<TValue>)vector.Values);
 
-    private static GeneratorSpec GenerateInternal<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey> vector, ReadOnlyMemory<TValue> values, bool ignoreCase) where TValue : notnull
+    private static GeneratorSpec GenerateInternal<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey> vector, ReadOnlyMemory<TValue> values) where TValue : notnull
     {
         ReadOnlyMemory<TKey> keyMemory = vector.Keys;
 
@@ -198,11 +198,18 @@ public static class TestHelper
         IProperties props;
         string trimPrefix = string.Empty;
         string trimSuffix = string.Empty;
+
+        FastDataConfig config = new FastDataConfig
+        {
+            IgnoreCase = false,
+            EnablePrefixSuffixTrimming = true
+        };
+
         if (typeof(TKey) == typeof(string))
         {
             ReadOnlyMemory<string> stringMemory = CastMemory<TKey, string>(keyMemory);
             ReadOnlySpan<string> stringSpan = stringMemory.Span;
-            StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(stringSpan, true, ignoreCase, generator.Encoding); // Enable trimming
+            StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(stringSpan, config.EnablePrefixSuffixTrimming, config.IgnoreCase, generator.Encoding); // Enable trimming
 
             if (strProps.DeltaData.Prefix.Length > 0 || strProps.DeltaData.Suffix.Length > 0)
             {
@@ -220,7 +227,7 @@ public static class TestHelper
             props = KeyAnalyzer.GetNumericProperties(keyMemory);
 
         GeneratorEncoding encoding = generator.Encoding;
-        TempState<TKey, TValue> state = new TempState<TKey, TValue>(keyMemory, values, keyType, vector, generator, props, trimPrefix, trimSuffix, ignoreCase);
+        TempState<TKey, TValue> state = new TempState<TKey, TValue>(keyMemory, values, keyType, vector, generator, props, trimPrefix, trimSuffix, config);
 
         if (vector.Type == typeof(SingleValueStructure<,>))
             return Generate(state, new SingleValueStructure<TKey, TValue>());
@@ -229,7 +236,7 @@ public static class TestHelper
         if (vector.Type == typeof(ConditionalStructure<,>))
             return Generate(state, new ConditionalStructure<TKey, TValue>());
         if (vector.Type == typeof(BinarySearchStructure<,>))
-            return Generate(state, new BinarySearchStructure<TKey, TValue>(keyType, ignoreCase));
+            return Generate(state, new BinarySearchStructure<TKey, TValue>(keyType, config.IgnoreCase));
         if (vector.Type == typeof(HashTableStructure<,>))
             return Generate(state, new HashTableStructure<TKey, TValue>(GetHashData(keySpan, keyType, encoding), keyType));
         if (vector.Type == typeof(HashTablePerfectStructure<,>))
@@ -283,12 +290,12 @@ public static class TestHelper
             if (stringProps.CharacterData.AllAscii)
                 flags = GeneratorFlags.AllAreASCII;
 
-            genCfg = new GeneratorConfig<TKey>(state.Vector.Type, state.KeyType, (uint)state.Keys.Length, stringProps, state.IgnoreCase, hashDetails, state.Generator.Encoding, flags, state.TrimPrefix, state.TrimSuffix);
+            genCfg = new GeneratorConfig<TKey>(state.Vector.Type, state.KeyType, (uint)state.Keys.Length, stringProps, hashDetails, state.Generator.Encoding, flags, state.TrimPrefix, state.TrimSuffix, state.Config);
         }
         else if (state.KeyProperties is NumericKeyProperties<TKey> valueProps)
         {
             hashDetails.HasZeroOrNaN = valueProps.HasZeroOrNaN;
-            genCfg = new GeneratorConfig<TKey>(state.Vector.Type, state.KeyType, (uint)state.Keys.Length, valueProps, hashDetails, flags);
+            genCfg = new GeneratorConfig<TKey>(state.Vector.Type, state.KeyType, (uint)state.Keys.Length, valueProps, hashDetails, flags, state.Config);
         }
         else
             throw new InvalidOperationException("Bug");
@@ -297,5 +304,5 @@ public static class TestHelper
         return new GeneratorSpec(state.Vector.Identifier, source, flags);
     }
 
-    private readonly record struct TempState<TKey, TValue>(ReadOnlyMemory<TKey> Keys, ReadOnlyMemory<TValue> Values, KeyType KeyType, TestVector<TKey> Vector, ICodeGenerator Generator, IProperties KeyProperties, string TrimPrefix, string TrimSuffix, bool IgnoreCase);
+    private readonly record struct TempState<TKey, TValue>(ReadOnlyMemory<TKey> Keys, ReadOnlyMemory<TValue> Values, KeyType KeyType, TestVector<TKey> Vector, ICodeGenerator Generator, IProperties KeyProperties, string TrimPrefix, string TrimSuffix, FastDataConfig Config);
 }

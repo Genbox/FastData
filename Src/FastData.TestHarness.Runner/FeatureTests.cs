@@ -53,7 +53,7 @@ public class FeatureTests
         string[] keys = ["PreAlphaSuf", "PreBravoSuf", "PreCharlieSuf"];
         FastDataConfig config = new FastDataConfig(StructureType.BinarySearch)
         {
-            EnableTrimming = true,
+            EnablePrefixSuffixTrimming = true,
             IgnoreCase = ignoreCase
         };
 

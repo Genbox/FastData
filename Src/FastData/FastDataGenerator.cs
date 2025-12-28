@@ -21,9 +21,6 @@ namespace Genbox.FastData;
 [SuppressMessage("ApiDesign", "RS0026:Do not add multiple public overloads with optional parameters")]
 public static partial class FastDataGenerator
 {
-    private const ulong MaxBitSetRange = 4096;
-    private const double MinBitSetDensity = 0.5;
-
     public static string Generate<TKey>(ReadOnlyMemory<TKey> keys, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         if (typeof(TKey) == typeof(string))
@@ -101,7 +98,7 @@ public static partial class FastDataGenerator
         const KeyType keyType = KeyType.String;
         LogKeyType(logger, keyType);
 
-        StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(keySpan, fdCfg.EnableTrimming, fdCfg.IgnoreCase, generator.Encoding);
+        StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(keySpan, fdCfg.EnablePrefixSuffixTrimming, fdCfg.IgnoreCase, generator.Encoding);
 
         string trimPrefix = string.Empty;
         string trimSuffix = string.Empty;
@@ -130,12 +127,12 @@ public static partial class FastDataGenerator
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
                 double density = (double)keySpan.Length / (strProps.LengthData.LengthMap.Max - strProps.LengthData.LengthMap.Min + 1);
 
-                // Use KeyLengthStructure only when string lengths are unique and density >= 75%
-                if (strProps.LengthData.Unique && density >= 0.75)
+                // Use KeyLengthStructure only when string lengths are unique and density >= threshold
+                if (strProps.LengthData.Unique && density >= fdCfg.KeyLengthStructureMinDensity)
                     return GenerateWrapper(tempState, new KeyLengthStructure<string, TValue>(strProps));
 
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
-                if (keySpan.Length < 400)
+                if (keySpan.Length < fdCfg.ConditionalStructureMaxItemCount)
                     return GenerateWrapper(tempState, new ConditionalStructure<string, TValue>());
 
                 goto case StructureType.HashTable;
@@ -152,7 +149,7 @@ public static partial class FastDataGenerator
 
                 if (fdCfg.StringAnalyzerConfig != null)
                 {
-                    Candidate candidate = GetBestHash(keySpan, strProps, fdCfg.StringAnalyzerConfig, factory, generator.Encoding, true);
+                    Candidate candidate = GetBestHash(keySpan, strProps, fdCfg.StringAnalyzerConfig, factory, generator.Encoding, true, fdCfg);
                     LogStringHashFitness(logger, candidate.Fitness);
 
                     Expression<StringHashFunc> expression = candidate.StringHash.GetExpression();
@@ -223,7 +220,7 @@ public static partial class FastDataGenerator
         HashDetails hashDetails = new HashDetails();
         hashDetails.HasZeroOrNaN = props.HasZeroOrNaN;
 
-        TempNumericState<TKey, TValue> tempState = new TempNumericState<TKey, TValue>(keys, values, generator, props, hashDetails, keyType);
+        TempNumericState<TKey, TValue> tempState = new TempNumericState<TKey, TValue>(keys, values, fdCfg, generator, props, hashDetails, keyType);
 
         switch (fdCfg.StructureType)
         {
@@ -236,12 +233,12 @@ public static partial class FastDataGenerator
                 if (props.IsConsecutive && values.IsEmpty)
                     return GenerateWrapper(tempState, new RangeStructure<TKey, TValue>(props));
 
-                if (props.Range <= MaxBitSetRange && IsBitSetDense(props.Range, keySpan.Length))
+                if (props.Range <= fdCfg.BitSetStructureMaxRange && keySpan.Length / (double)props.Range >= fdCfg.BitSetStructureMinDensity)
                     return GenerateWrapper(tempState, new BitSetStructure<TKey, TValue>(props, keyType));
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
-                if (keySpan.Length < 400)
+                if (keySpan.Length < fdCfg.ConditionalStructureMaxItemCount)
                     return GenerateWrapper(tempState, new ConditionalStructure<TKey, TValue>());
 
                 goto case StructureType.HashTable;
@@ -290,20 +287,18 @@ public static partial class FastDataGenerator
     {
         TContext res = structure.Create(state.Keys, state.Values);
         StringKeyProperties strProps = state.StringKeyProperties;
-        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(structure.GetType(), KeyType.String, (uint)state.Keys.Length, strProps, state.Config.IgnoreCase, state.HashDetails, state.Generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None, state.TrimPrefix, state.TrimSuffix);
+        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(structure.GetType(), KeyType.String, (uint)state.Keys.Length, strProps, state.HashDetails, state.Generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None, state.TrimPrefix, state.TrimSuffix, state.Config);
         return state.Generator.Generate(genCfg, res);
     }
 
     private static string GenerateWrapper<TKey, TValue, TContext>(in TempNumericState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext<TValue>
     {
         TContext res = structure.Create(state.Keys, state.Values);
-        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(structure.GetType(), state.KeyType, (uint)state.Keys.Length, state.NumericKeyProperties, state.HashDetails, GeneratorFlags.None);
+        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(structure.GetType(), state.KeyType, (uint)state.Keys.Length, state.NumericKeyProperties, state.HashDetails, GeneratorFlags.None, state.Config);
         return state.Generator.Generate(genCfg, res);
     }
 
-    private static bool IsBitSetDense(ulong range, int itemCount) => itemCount / (double)range >= MinBitSetDensity;
-
-    internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringKeyProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, GeneratorEncoding encoding, bool includeDefault)
+    internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringKeyProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, GeneratorEncoding encoding, bool includeDefault, FastDataConfig fdCfg)
     {
         Simulator sim = new Simulator(data.Length, encoding);
 
@@ -378,7 +373,7 @@ public static partial class FastDataGenerator
                 //If the not-perfect is faster, it has to be so by 25% before we pick it over a perfect hash.
                 //E.g. we still want the perfect, even if it is 25% slower
 
-                double threshold = p.Time + (p.Time * 0.25);
+                double threshold = p.Time + (p.Time * fdCfg.PerfectHashMaxSlowdownFactor);
 
                 if (np.Time < threshold)
                     return np;
@@ -420,5 +415,5 @@ public static partial class FastDataGenerator
     }
 
     private readonly record struct TempStringState<TKey, TValue>(ReadOnlyMemory<TKey> Keys, ReadOnlyMemory<TValue> Values, FastDataConfig Config, ICodeGenerator Generator, StringKeyProperties StringKeyProperties, HashDetails HashDetails, string TrimPrefix, string TrimSuffix);
-    private readonly record struct TempNumericState<TKey, TValue>(ReadOnlyMemory<TKey> Keys, ReadOnlyMemory<TValue> Values, ICodeGenerator Generator, NumericKeyProperties<TKey> NumericKeyProperties, HashDetails HashDetails, KeyType KeyType);
+    private readonly record struct TempNumericState<TKey, TValue>(ReadOnlyMemory<TKey> Keys, ReadOnlyMemory<TValue> Values, FastDataConfig Config, ICodeGenerator Generator, NumericKeyProperties<TKey> NumericKeyProperties, HashDetails HashDetails, KeyType KeyType);
 }

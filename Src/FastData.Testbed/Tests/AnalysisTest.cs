@@ -46,6 +46,8 @@ internal static class AnalysisTest
         GeneticAnalyzerConfig gcfg = new GeneticAnalyzerConfig();
         cfg.GeneticAnalyzerConfig = gcfg;
 
+        FastDataConfig fdCfg = new FastDataConfig();
+
         Stopwatch sw = Stopwatch.StartNew();
 
         for (int i = 1; i < 100; i++)
@@ -57,7 +59,7 @@ internal static class AnalysisTest
                 gcfg.PopulationSize = j;
 
                 sw.Restart();
-                Candidate cand = FastDataGenerator.GetBestHash(Data, props, cfg, NullLoggerFactory.Instance, GeneratorEncoding.UTF16, false);
+                Candidate cand = FastDataGenerator.GetBestHash(Data, props, cfg, NullLoggerFactory.Instance, GeneratorEncoding.UTF16, false, fdCfg);
 
                 sw.Stop();
                 Console.WriteLine($"{i.ToString(),-10}{j.ToString(),-10}{sw.ElapsedMilliseconds,-10:N0}{cand.Collisions,-10:N0}");
