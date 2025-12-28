@@ -4,6 +4,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using Genbox.FastData.Generator.CSharp;
+using Genbox.FastData.Internal.Extensions;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Helpers;
@@ -64,6 +65,6 @@ internal static class Program
 
         TestVector<string> vector = new TestVector<string>(type, data, []);
         GeneratorSpec spec = TestHelper.Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), vector);
-        File.WriteAllText("Gen-" + type.Name.Replace("`2", "", StringComparison.Ordinal) + "-" + size + ".cs", spec.Source);
+        File.WriteAllText("Gen-" + type.GetCleanName() + "-" + size + ".cs", spec.Source);
     }
 }

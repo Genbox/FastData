@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: Auto (BitSet)
+// Structure: BitSet
 #pragma once
 #include <array>
 #include <cstring>

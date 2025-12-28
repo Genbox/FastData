@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: Auto (KeyLength)
+// Structure: KeyLength
 #pragma once
 #include <array>
 #include <cstring>
@@ -8,13 +8,13 @@
 #include <string_view>
 
 class KeyLengthStructure_String_7 final {
-    static constexpr std::array<std::string_view, 8> keys = {
-        "aaa", "", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"
+    static constexpr std::array<std::u32string_view, 8> keys = {
+        U"aaa", U"", U"aaaaa", U"aaaaaa", U"aaaaaaa", U"aaaaaaaa", U"aaaaaaaaa", U"aaaaaaaaaa"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::string_view key) noexcept {
+    static constexpr bool contains(const std::u32string_view key) noexcept {
          if (const size_t len = key.length(); len < 3u || len > 10u)
              return false;
 

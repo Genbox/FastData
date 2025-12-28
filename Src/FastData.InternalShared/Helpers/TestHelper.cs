@@ -145,15 +145,14 @@ public static class TestHelper
     private static GeneratorSpec GenerateInternal<TKey, TValue>(Func<string, ICodeGenerator> func, TestVector<TKey> vector, ReadOnlyMemory<TValue> values, bool ignoreCase) where TValue : notnull
     {
         ReadOnlyMemory<TKey> keyMemory = vector.Keys;
-        ReadOnlySpan<TKey> keySpan = keyMemory.Span;
-        string trimPrefix = string.Empty;
-        string trimSuffix = string.Empty;
 
         if (keyMemory.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
 
         if (!values.IsEmpty && keyMemory.Length != values.Length)
             throw new InvalidOperationException("The number of values does not match the number of keys.");
+
+        ReadOnlySpan<TKey> keySpan = keyMemory.Span;
 
         //Sanity check to avoid duplicate keys in the original input
         if (typeof(TKey) == typeof(string))
@@ -197,6 +196,8 @@ public static class TestHelper
         ICodeGenerator generator = func(vector.Identifier);
 
         IProperties props;
+        string trimPrefix = string.Empty;
+        string trimSuffix = string.Empty;
         if (typeof(TKey) == typeof(string))
         {
             ReadOnlyMemory<string> stringMemory = CastMemory<TKey, string>(keyMemory);
@@ -219,27 +220,28 @@ public static class TestHelper
             props = KeyAnalyzer.GetNumericProperties(keyMemory);
 
         GeneratorEncoding encoding = generator.Encoding;
+        TempState<TKey, TValue> state = new TempState<TKey, TValue>(keyMemory, values, keyType, vector, generator, props, trimPrefix, trimSuffix, ignoreCase);
 
         if (vector.Type == typeof(SingleValueStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.Auto, new SingleValueStructure<TKey, TValue>(), keyMemory, values, trimPrefix, trimSuffix, ignoreCase);
+            return Generate(state, new SingleValueStructure<TKey, TValue>());
         if (vector.Type == typeof(ArrayStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.Array, new ArrayStructure<TKey, TValue>(), keyMemory, values, trimPrefix, trimSuffix, ignoreCase);
+            return Generate(state, new ArrayStructure<TKey, TValue>());
         if (vector.Type == typeof(ConditionalStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.Conditional, new ConditionalStructure<TKey, TValue>(), keyMemory, values, trimPrefix, trimSuffix, ignoreCase);
+            return Generate(state, new ConditionalStructure<TKey, TValue>());
         if (vector.Type == typeof(BinarySearchStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.BinarySearch, new BinarySearchStructure<TKey, TValue>(keyType, ignoreCase), keyMemory, values, trimPrefix, trimSuffix, ignoreCase);
+            return Generate(state, new BinarySearchStructure<TKey, TValue>(keyType, ignoreCase));
         if (vector.Type == typeof(HashTableStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.HashTable, new HashTableStructure<TKey, TValue>(GetHashData(keySpan, keyType, encoding), keyType), keyMemory, values, trimPrefix, trimSuffix, ignoreCase);
+            return Generate(state, new HashTableStructure<TKey, TValue>(GetHashData(keySpan, keyType, encoding), keyType));
         if (vector.Type == typeof(HashTablePerfectStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.HashTable, new HashTablePerfectStructure<TKey, TValue>(GetHashData(keySpan, keyType, encoding), keyType), keyMemory, values, trimPrefix, trimSuffix, ignoreCase);
+            return Generate(state, new HashTablePerfectStructure<TKey, TValue>(GetHashData(keySpan, keyType, encoding), keyType));
         if (vector.Type == typeof(KeyLengthStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.Auto, new KeyLengthStructure<TKey, TValue>((StringKeyProperties)props), keyMemory, values, trimPrefix, trimSuffix, ignoreCase);
+            return Generate(state, new KeyLengthStructure<TKey, TValue>((StringKeyProperties)props));
         if (vector.Type == typeof(RangeStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.Auto, new RangeStructure<TKey, TValue>((NumericKeyProperties<TKey>)props), keyMemory, values, trimPrefix, trimSuffix, ignoreCase);
+            return Generate(state, new RangeStructure<TKey, TValue>((NumericKeyProperties<TKey>)props));
         if (vector.Type == typeof(BitSetStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.Auto, new BitSetStructure<TKey, TValue>((NumericKeyProperties<TKey>)props, keyType), keyMemory, values, trimPrefix, trimSuffix, ignoreCase);
+            return Generate(state, new BitSetStructure<TKey, TValue>((NumericKeyProperties<TKey>)props, keyType));
         if (vector.Type == typeof(HashTableCompactStructure<,>))
-            return Generate(generator, vector, props, keyType, StructureType.Auto, new HashTableCompactStructure<TKey, TValue>(GetHashData(keySpan, keyType, encoding), keyType), keyMemory, values, trimPrefix, trimSuffix, ignoreCase);
+            return Generate(state, new HashTableCompactStructure<TKey, TValue>(GetHashData(keySpan, keyType, encoding), keyType));
 
         throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
     }
@@ -267,31 +269,33 @@ public static class TestHelper
 
     private static ReadOnlyMemory<TTo> CastMemory<TFrom, TTo>(ReadOnlyMemory<TFrom> memory) => (ReadOnlyMemory<TTo>)(object)memory;
 
-    private static GeneratorSpec Generate<TKey, TValue, TContext>(ICodeGenerator generator, TestVector<TKey> vector, IProperties props, KeyType keyType, StructureType structureType, IStructure<TKey, TValue, TContext> structure, ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, string? trimPrefix, string? trimSuffix, bool ignoreCase) where TContext : IContext<TValue>
+    private static GeneratorSpec Generate<TKey, TValue, TContext>(in TempState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext<TValue>
     {
-        TContext context = structure.Create(keys, values);
+        TContext context = structure.Create(state.Keys, state.Values);
 
         GeneratorConfig<TKey> genCfg;
         HashDetails hashDetails = new HashDetails();
 
         GeneratorFlags flags = GeneratorFlags.None;
 
-        if (props is StringKeyProperties stringProps)
+        if (state.KeyProperties is StringKeyProperties stringProps)
         {
             if (stringProps.CharacterData.AllAscii)
                 flags = GeneratorFlags.AllAreASCII;
 
-            genCfg = new GeneratorConfig<TKey>(structureType, keyType, (uint)keys.Length, stringProps, ignoreCase, hashDetails, generator.Encoding, flags, trimPrefix, trimSuffix);
+            genCfg = new GeneratorConfig<TKey>(state.Vector.Type, state.KeyType, (uint)state.Keys.Length, stringProps, state.IgnoreCase, hashDetails, state.Generator.Encoding, flags, state.TrimPrefix, state.TrimSuffix);
         }
-        else if (props is NumericKeyProperties<TKey> valueProps)
+        else if (state.KeyProperties is NumericKeyProperties<TKey> valueProps)
         {
             hashDetails.HasZeroOrNaN = valueProps.HasZeroOrNaN;
-            genCfg = new GeneratorConfig<TKey>(structureType, keyType, (uint)keys.Length, valueProps, hashDetails, flags);
+            genCfg = new GeneratorConfig<TKey>(state.Vector.Type, state.KeyType, (uint)state.Keys.Length, valueProps, hashDetails, flags);
         }
         else
             throw new InvalidOperationException("Bug");
 
-        string source = generator.Generate(genCfg, context);
-        return new GeneratorSpec(vector.Identifier, source, flags);
+        string source = state.Generator.Generate(genCfg, context);
+        return new GeneratorSpec(state.Vector.Identifier, source, flags);
     }
+
+    private readonly record struct TempState<TKey, TValue>(ReadOnlyMemory<TKey> Keys, ReadOnlyMemory<TValue> Values, KeyType KeyType, TestVector<TKey> Vector, ICodeGenerator Generator, IProperties KeyProperties, string TrimPrefix, string TrimSuffix, bool IgnoreCase);
 }

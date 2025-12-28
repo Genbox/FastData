@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: Auto (Range)
+// Structure: Range
 #pragma once
 #include <array>
 #include <cstring>

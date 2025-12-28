@@ -118,34 +118,34 @@ public static partial class FastDataGenerator
         LogMinMaxLength(logger, strProps.LengthData.LengthMap.Min, strProps.LengthData.LengthMap.Max);
 
         HashDetails hashDetails = new HashDetails();
-        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(fdCfg.StructureType, keyType, (uint)keySpan.Length, strProps, fdCfg.IgnoreCase, hashDetails, generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None, trimPrefix, trimSuffix);
+        TempStringState<string, TValue> tempState = new TempStringState<string, TValue>(keyMemory, values, fdCfg, generator, strProps, hashDetails, trimPrefix, trimSuffix);
 
         switch (fdCfg.StructureType)
         {
             case StructureType.Auto:
             {
                 if (keySpan.Length == 1)
-                    return GenerateWrapper(generator, genCfg, new SingleValueStructure<string, TValue>(), keyMemory, values);
+                    return GenerateWrapper(tempState, new SingleValueStructure<string, TValue>());
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
                 double density = (double)keySpan.Length / (strProps.LengthData.LengthMap.Max - strProps.LengthData.LengthMap.Min + 1);
 
                 // Use KeyLengthStructure only when string lengths are unique and density >= 75%
                 if (strProps.LengthData.Unique && density >= 0.75)
-                    return GenerateWrapper(generator, genCfg, new KeyLengthStructure<string, TValue>(strProps), keyMemory, values);
+                    return GenerateWrapper(tempState, new KeyLengthStructure<string, TValue>(strProps));
 
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
                 if (keySpan.Length < 400)
-                    return GenerateWrapper(generator, genCfg, new ConditionalStructure<string, TValue>(), keyMemory, values);
+                    return GenerateWrapper(tempState, new ConditionalStructure<string, TValue>());
 
                 goto case StructureType.HashTable;
             }
             case StructureType.Array:
-                return GenerateWrapper(generator, genCfg, new ArrayStructure<string, TValue>(), keyMemory, values);
+                return GenerateWrapper(tempState, new ArrayStructure<string, TValue>());
             case StructureType.Conditional:
-                return GenerateWrapper(generator, genCfg, new ConditionalStructure<string, TValue>(), keyMemory, values);
+                return GenerateWrapper(tempState, new ConditionalStructure<string, TValue>());
             case StructureType.BinarySearch:
-                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<string, TValue>(keyType, fdCfg.IgnoreCase), keyMemory, values);
+                return GenerateWrapper(tempState, new BinarySearchStructure<string, TValue>(keyType, fdCfg.IgnoreCase));
             case StructureType.HashTable:
             {
                 StringHashFunc hashFunc;
@@ -174,9 +174,9 @@ public static partial class FastDataGenerator
                 });
 
                 if (hashData.HashCodesPerfect)
-                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<string, TValue>(hashData, keyType), keyMemory, values);
+                    return GenerateWrapper(tempState, new HashTablePerfectStructure<string, TValue>(hashData, keyType));
 
-                return GenerateWrapper(generator, genCfg, new HashTableStructure<string, TValue>(hashData, keyType), keyMemory, values);
+                return GenerateWrapper(tempState, new HashTableStructure<string, TValue>(hashData, keyType));
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
@@ -217,50 +217,51 @@ public static partial class FastDataGenerator
         KeyType keyType = (KeyType)Enum.Parse(typeof(KeyType), type.Name, false);
         LogKeyType(logger, keyType);
 
-        HashDetails hashDetails = new HashDetails();
-
         NumericKeyProperties<TKey> props = KeyAnalyzer.GetNumericProperties(keys);
         LogMinMaxValues(logger, props.MinKeyValue, props.MaxKeyValue);
-        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(fdCfg.StructureType, keyType, (uint)keySpan.Length, props, hashDetails, GeneratorFlags.None);
+
+        HashDetails hashDetails = new HashDetails();
+        hashDetails.HasZeroOrNaN = props.HasZeroOrNaN;
+
+        TempNumericState<TKey, TValue> tempState = new TempNumericState<TKey, TValue>(keys, values, generator, props, hashDetails, keyType);
 
         switch (fdCfg.StructureType)
         {
             case StructureType.Auto:
             {
                 if (keySpan.Length == 1)
-                    return GenerateWrapper(generator, genCfg, new SingleValueStructure<TKey, TValue>(), keys, values);
+                    return GenerateWrapper(tempState, new SingleValueStructure<TKey, TValue>());
 
                 // RangeStructure handles consecutive keys, but does not support values
                 if (props.IsConsecutive && values.IsEmpty)
-                    return GenerateWrapper(generator, genCfg, new RangeStructure<TKey, TValue>(props), keys, values);
+                    return GenerateWrapper(tempState, new RangeStructure<TKey, TValue>(props));
 
                 if (props.Range <= MaxBitSetRange && IsBitSetDense(props.Range, keySpan.Length))
-                    return GenerateWrapper(generator, genCfg, new BitSetStructure<TKey, TValue>(props, keyType), keys, values);
+                    return GenerateWrapper(tempState, new BitSetStructure<TKey, TValue>(props, keyType));
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
                 if (keySpan.Length < 400)
-                    return GenerateWrapper(generator, genCfg, new ConditionalStructure<TKey, TValue>(), keys, values);
+                    return GenerateWrapper(tempState, new ConditionalStructure<TKey, TValue>());
 
                 goto case StructureType.HashTable;
             }
             case StructureType.Array:
-                return GenerateWrapper(generator, genCfg, new ArrayStructure<TKey, TValue>(), keys, values);
+                return GenerateWrapper(tempState, new ArrayStructure<TKey, TValue>());
             case StructureType.Conditional:
-                return GenerateWrapper(generator, genCfg, new ConditionalStructure<TKey, TValue>(), keys, values);
+                return GenerateWrapper(tempState, new ConditionalStructure<TKey, TValue>());
             case StructureType.BinarySearch:
-                return GenerateWrapper(generator, genCfg, new BinarySearchStructure<TKey, TValue>(keyType, fdCfg.IgnoreCase), keys, values);
+                return GenerateWrapper(tempState, new BinarySearchStructure<TKey, TValue>(keyType, fdCfg.IgnoreCase));
             case StructureType.HashTable:
             {
                 HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, props.HasZeroOrNaN);
-                hashDetails.HasZeroOrNaN = props.HasZeroOrNaN;
 
                 HashData hashData = HashData.Create(keySpan, fdCfg.HashCapacityFactor, hashFunc);
 
                 if (hashData.HashCodesPerfect)
-                    return GenerateWrapper(generator, genCfg, new HashTablePerfectStructure<TKey, TValue>(hashData, keyType), keys, values);
+                    return GenerateWrapper(tempState, new HashTablePerfectStructure<TKey, TValue>(hashData, keyType));
 
-                return GenerateWrapper(generator, genCfg, new HashTableStructure<TKey, TValue>(hashData, keyType), keys, values);
+                return GenerateWrapper(tempState, new HashTableStructure<TKey, TValue>(hashData, keyType));
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
@@ -285,10 +286,19 @@ public static partial class FastDataGenerator
         return modified;
     }
 
-    private static string GenerateWrapper<TKey, TValue, TContext>(ICodeGenerator generator, GeneratorConfig<TKey> genCfg, IStructure<TKey, TValue, TContext> structure, ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values) where TContext : IContext<TValue>
+    private static string GenerateWrapper<TKey, TValue, TContext>(in TempStringState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext<TValue>
     {
-        TContext res = structure.Create(keys, values);
-        return generator.Generate(genCfg, res);
+        TContext res = structure.Create(state.Keys, state.Values);
+        StringKeyProperties strProps = state.StringKeyProperties;
+        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(structure.GetType(), KeyType.String, (uint)state.Keys.Length, strProps, state.Config.IgnoreCase, state.HashDetails, state.Generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None, state.TrimPrefix, state.TrimSuffix);
+        return state.Generator.Generate(genCfg, res);
+    }
+
+    private static string GenerateWrapper<TKey, TValue, TContext>(in TempNumericState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext<TValue>
+    {
+        TContext res = structure.Create(state.Keys, state.Values);
+        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(structure.GetType(), state.KeyType, (uint)state.Keys.Length, state.NumericKeyProperties, state.HashDetails, GeneratorFlags.None);
+        return state.Generator.Generate(genCfg, res);
     }
 
     private static bool IsBitSetDense(ulong range, int itemCount) => itemCount / (double)range >= MinBitSetDensity;
@@ -408,4 +418,7 @@ public static partial class FastDataGenerator
 
         candidate.Time = sw.ElapsedTicks / (double)iterations;
     }
+
+    private readonly record struct TempStringState<TKey, TValue>(ReadOnlyMemory<TKey> Keys, ReadOnlyMemory<TValue> Values, FastDataConfig Config, ICodeGenerator Generator, StringKeyProperties StringKeyProperties, HashDetails HashDetails, string TrimPrefix, string TrimSuffix);
+    private readonly record struct TempNumericState<TKey, TValue>(ReadOnlyMemory<TKey> Keys, ReadOnlyMemory<TValue> Values, ICodeGenerator Generator, NumericKeyProperties<TKey> NumericKeyProperties, HashDetails HashDetails, KeyType KeyType);
 }

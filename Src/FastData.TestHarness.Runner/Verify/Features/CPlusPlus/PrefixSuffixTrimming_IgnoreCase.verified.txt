@@ -15,7 +15,7 @@ static inline uint32_t to_lower_ascii(uint32_t c) noexcept
     return c;
 }
 
-static inline bool case_insensitive_equals(std::string_view a, std::string_view b) noexcept
+static inline bool case_insensitive_equals(std::u32string_view a, std::u32string_view b) noexcept
 {
     if (a.size() != b.size())
         return false;
@@ -30,7 +30,7 @@ static inline bool case_insensitive_equals(std::string_view a, std::string_view 
     return true;
 }
 
-static inline int case_insensitive_compare(std::string_view a, std::string_view b) noexcept
+static inline int case_insensitive_compare(std::u32string_view a, std::u32string_view b) noexcept
 {
     size_t a_len = a.size();
     size_t b_len = b.size();
@@ -51,7 +51,7 @@ static inline int case_insensitive_compare(std::string_view a, std::string_view 
     return a_len < b_len ? -1 : 1;
 }
 
-static inline bool case_insensitive_starts_with(std::string_view value, std::string_view prefix) noexcept
+static inline bool case_insensitive_starts_with(std::u32string_view value, std::u32string_view prefix) noexcept
 {
     size_t prefix_len = prefix.size();
     if (prefix_len > value.size())
@@ -66,7 +66,7 @@ static inline bool case_insensitive_starts_with(std::string_view value, std::str
     return true;
 }
 
-static inline bool case_insensitive_ends_with(std::string_view value, std::string_view suffix) noexcept
+static inline bool case_insensitive_ends_with(std::u32string_view value, std::u32string_view suffix) noexcept
 {
     size_t suffix_len = suffix.size();
     size_t value_len = value.size();
@@ -85,17 +85,17 @@ static inline bool case_insensitive_ends_with(std::string_view value, std::strin
     return true;
 }
 class PrefixSuffixTrimming_IgnoreCase final {
-    static constexpr std::array<std::string_view, 3> keys = {
-        "Alpha", "Bravo", "Charlie"
+    static constexpr std::array<std::u32string_view, 3> keys = {
+        U"Alpha", U"Bravo", U"Charlie"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::string_view key) noexcept {
+    static constexpr bool contains(const std::u32string_view key) noexcept {
          if (const size_t len = key.length(); len < 11u || len > 13u)
              return false;
 
-        if (!(case_insensitive_starts_with(key, "Pre") && case_insensitive_ends_with(key, "Suf")))
+        if (!(case_insensitive_starts_with(key, U"Pre") && case_insensitive_ends_with(key, U"Suf")))
             return false;
         const auto trimmedKey = key.substr(3, key.length() - 6);
 
@@ -103,7 +103,7 @@ public:
         int32_t hi = 2;
         while (lo <= hi) {
             const int32_t mid = lo + ((hi - lo) >> 1);
-            const std::string_view mid_key = keys[mid];
+            const std::u32string_view mid_key = keys[mid];
             const int32_t order = case_insensitive_compare(mid_key, trimmedKey);
 
             if (order == 0)

@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: Auto (KeyLength)
+// Structure: KeyLength
 #pragma once
 #include <array>
 #include <cstring>
@@ -9,10 +9,10 @@
 
 struct Person {
     int32_t age;
-    std::string_view name;
+    std::u32string_view name;
     const Person* other;
 
-    constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
+    constexpr Person(const int32_t age, const std::u32string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
 class KeyLengthStructure_String_3_complex final {
     static constexpr std::array<int32_t, 3> offsets = {
@@ -20,15 +20,15 @@ class KeyLengthStructure_String_3_complex final {
     };
 
     inline static const std::array<Person*, 3> values = {
-        new Person(1, "Bob", new Person(4, "Anna", nullptr)), new Person(2, "Billy", nullptr), new Person(3, "Bibi", nullptr)
+        new Person(1, U"Bob", new Person(4, U"Anna", nullptr)), new Person(2, U"Billy", nullptr), new Person(3, U"Bibi", nullptr)
     };
-    static constexpr std::array<std::string_view, 3> keys = {
-        "a", "aa", "aaa"
+    static constexpr std::array<std::u32string_view, 3> keys = {
+        U"a", U"aa", U"aaa"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::string_view key) noexcept {
+    static constexpr bool contains(const std::u32string_view key) noexcept {
          if (const size_t len = key.length(); len < 1u || len > 3u)
              return false;
 
@@ -37,7 +37,7 @@ public:
         return key == keys[key.length() - 1];
     }
     [[nodiscard]]
-    static bool try_lookup(const std::string_view key, const Person*& value) noexcept {
+    static bool try_lookup(const std::u32string_view key, const Person*& value) noexcept {
          if (const size_t len = key.length(); len < 1u || len > 3u)
              {
     value = nullptr;

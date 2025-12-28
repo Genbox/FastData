@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: HashTable (HashTablePerfect)
+// Structure: HashTablePerfect
 #pragma once
 #include <array>
 #include <cstring>

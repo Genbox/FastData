@@ -5,6 +5,7 @@ using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
 using System.Numerics;
+using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Generators;
 
@@ -17,7 +18,7 @@ public sealed class GeneratorConfig<T>
     private const double MinValueBitMaskDensity = 0.25;
     private const double MinStringBitMaskDensity = 0.25;
 
-    private GeneratorConfig(StructureType structureType, KeyType keyType, HashDetails hashDetails, GeneratorFlags flags, GeneratorEncoding encoding)
+    private GeneratorConfig(Type structureType, KeyType keyType, HashDetails hashDetails, GeneratorFlags flags, GeneratorEncoding encoding)
     {
         StructureType = structureType;
         KeyType = keyType;
@@ -30,13 +31,13 @@ public sealed class GeneratorConfig<T>
         TrimSuffix = string.Empty;
     }
 
-    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, NumericKeyProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags, GeneratorEncoding.Unknown)
+    internal GeneratorConfig(Type structureType, KeyType keyType, uint itemCount, NumericKeyProperties<T> props, HashDetails hashDetails, GeneratorFlags flags) : this(structureType, keyType, hashDetails, flags, GeneratorEncoding.Unknown)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType).ToArray();
         Constants = CreateConstants(props, itemCount);
     }
 
-    internal GeneratorConfig(StructureType structureType, KeyType keyType, uint itemCount, StringKeyProperties props, bool ignoreCase, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string trimPrefix, string trimSuffix) : this(structureType, keyType, hashDetails, flags, encoding)
+    internal GeneratorConfig(Type structureType, KeyType keyType, uint itemCount, StringKeyProperties props, bool ignoreCase, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string trimPrefix, string trimSuffix) : this(structureType, keyType, hashDetails, flags, encoding)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType, encoding).ToArray();
         Constants = CreateConstants(props, itemCount);
@@ -48,7 +49,7 @@ public sealed class GeneratorConfig<T>
     }
 
     /// <summary>Gets the structure type that the generator will create.</summary>
-    public StructureType StructureType { get; }
+    public Type StructureType { get; }
 
     /// <summary>Gets the data type being generated.</summary>
     public KeyType KeyType { get; }
@@ -93,14 +94,14 @@ public sealed class GeneratorConfig<T>
         return constants;
     }
 
-    private static IEnumerable<IEarlyExit> GetEarlyExits(StringKeyProperties props, uint itemCount, StructureType structureType, GeneratorEncoding enc)
+    private static IEnumerable<IEarlyExit> GetEarlyExits(StringKeyProperties props, uint itemCount, Type structureType, GeneratorEncoding enc)
     {
         //There is no point to using early exists if there is just one item
         if (itemCount == 1)
             yield break;
 
         //Conditional structures are not very useful with less than 3 items as checks costs more than the benefits
-        if (structureType == StructureType.Conditional && itemCount <= 3)
+        if (structureType == typeof(ConditionalStructure<,>) && itemCount <= 3)
             yield break;
 
         //Logic:
@@ -127,14 +128,14 @@ public sealed class GeneratorConfig<T>
             yield return new PrefixSuffixEarlyExit(props.DeltaData.Prefix, props.DeltaData.Suffix);
     }
 
-    private static IEnumerable<IEarlyExit> GetEarlyExits(NumericKeyProperties<T> props, uint itemCount, StructureType structureType)
+    private static IEnumerable<IEarlyExit> GetEarlyExits(NumericKeyProperties<T> props, uint itemCount, Type structureType)
     {
         //There is no point to using early exists if there is just one item
         if (itemCount == 1)
             yield break;
 
         //Conditional structures are not very useful with less than 3 items as checks costs more than the benefits
-        if (structureType == StructureType.Conditional && itemCount <= 3)
+        if (structureType == typeof(ConditionalStructure<,>) && itemCount <= 3)
             yield break;
 
         if (ShouldApplyValueBitMask(props, out ulong mask))

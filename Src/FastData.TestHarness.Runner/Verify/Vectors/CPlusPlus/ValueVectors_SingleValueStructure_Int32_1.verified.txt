@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: Auto (SingleValue)
+// Structure: SingleValue
 #pragma once
 #include <array>
 #include <cstring>

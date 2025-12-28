@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: Auto (HashTableCompact)
+// Structure: HashTableCompact
 #pragma once
 #include <array>
 #include <cstring>
@@ -9,10 +9,10 @@
 
 class HashTableCompactStructure_String_3 final {
     struct e {
-        std::string_view key;
+        std::u32string_view key;
         uint64_t hash_code;
         
-        e(const std::string_view key, const uint64_t hash_code)
+        e(const std::u32string_view key, const uint64_t hash_code)
            : key(key), hash_code(hash_code) {}
     };
 
@@ -25,10 +25,10 @@ class HashTableCompactStructure_String_3 final {
      };
 
     inline static const std::array<e, 3> entries = {
-        e("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 9198652691199425319), e("a", 18225461187723808291), e("item", 16750939634977259983)
+        e(U"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 9198652691199425319), e(U"a", 18225461187723808291), e(U"item", 16750939634977259983)
     };
 
-    static constexpr uint64_t get_hash(const std::string_view value) noexcept
+    static constexpr uint64_t get_hash(const std::u32string_view value) noexcept
     {
     uint64_t hash = 352654597;
 
@@ -40,7 +40,7 @@ class HashTableCompactStructure_String_3 final {
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::string_view key) noexcept {
+    static constexpr bool contains(const std::u32string_view key) noexcept {
         switch (key.length() >> 6)
         {
             case 0:

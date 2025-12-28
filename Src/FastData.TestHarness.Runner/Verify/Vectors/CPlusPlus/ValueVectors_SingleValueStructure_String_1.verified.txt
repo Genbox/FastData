@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: Auto (SingleValue)
+// Structure: SingleValue
 #pragma once
 #include <array>
 #include <cstring>
@@ -10,8 +10,8 @@
 class SingleValueStructure_String_1 final {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::string_view key) noexcept {
-        return key == "value";
+    static constexpr bool contains(const std::u32string_view key) noexcept {
+        return key == U"value";
     }
 
     static constexpr size_t item_count = 1;

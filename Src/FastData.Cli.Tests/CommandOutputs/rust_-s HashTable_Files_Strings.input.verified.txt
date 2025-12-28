@@ -1,7 +1,7 @@
 ﻿{
   Item1:
 //! This file is auto-generated. Do not edit manually.
-//! Structure: HashTable (HashTablePerfect)
+//! Structure: HashTablePerfect
 #![allow(unused_parens)]
 #![allow(missing_docs)]
 #![allow(unused_imports)]
