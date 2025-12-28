@@ -94,6 +94,82 @@ public class FastDataGeneratorTests
     }
 
     [Fact]
+    public void Generate_Overloads_String_Work()
+    {
+        string[] keys = ["a", "b", "c"];
+        int[] values = [1, 2, 3];
+
+        FastDataConfig config = new FastDataConfig(StructureType.Array);
+        config.DeduplicationMode = DeduplicationMode.Disabled;
+
+        ContextCaptureGenerator generator = new ContextCaptureGenerator();
+        FastDataGenerator.Generate((ReadOnlyMemory<string>)keys, config, generator);
+        AssertKeysOnly(generator, keys);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.Generate(keys, config, generator);
+        AssertKeysOnly(generator, keys);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.Generate<string>((ReadOnlyMemory<string>)keys, config, generator);
+        AssertKeysOnly(generator, keys);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.GenerateKeyed((ReadOnlyMemory<string>)keys, (ReadOnlyMemory<int>)values, config, generator);
+        AssertKeysAndValues(generator, keys, values);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.GenerateKeyed(keys, values, config, generator);
+        AssertKeysAndValues(generator, keys, values);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.GenerateKeyed<string, int>((ReadOnlyMemory<string>)keys, (ReadOnlyMemory<int>)values, config, generator);
+        AssertKeysAndValues(generator, keys, values);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.GenerateKeyed(keys, values, config, generator);
+        AssertKeysAndValues(generator, keys, values);
+    }
+
+    [Fact]
+    public void Generate_Overloads_Int32_Work()
+    {
+        int[] keys = [1, 2, 3];
+        string[] values = ["v1", "v2", "v3"];
+
+        FastDataConfig config = new FastDataConfig(StructureType.Array);
+        config.DeduplicationMode = DeduplicationMode.Disabled;
+
+        ContextCaptureGenerator generator = new ContextCaptureGenerator();
+        FastDataGenerator.Generate((ReadOnlyMemory<int>)keys, config, generator);
+        AssertKeysOnly(generator, keys);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.Generate(keys, config, generator);
+        AssertKeysOnly(generator, keys);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.Generate<int>((ReadOnlyMemory<int>)keys, config, generator);
+        AssertKeysOnly(generator, keys);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.GenerateKeyed((ReadOnlyMemory<int>)keys, (ReadOnlyMemory<string>)values, config, generator);
+        AssertKeysAndValues(generator, keys, values);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.GenerateKeyed(keys, values, config, generator);
+        AssertKeysAndValues(generator, keys, values);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.GenerateKeyed<int, string>((ReadOnlyMemory<int>)keys, (ReadOnlyMemory<string>)values, config, generator);
+        AssertKeysAndValues(generator, keys, values);
+
+        generator = new ContextCaptureGenerator();
+        FastDataGenerator.GenerateKeyed<int, string>(keys, values, config, generator);
+        AssertKeysAndValues(generator, keys, values);
+    }
+
+    [Fact]
     public void GenerateKeyed_HashTablePerfect_ReordersValuesToMatchSlots()
     {
         int[] keys = [2, 0, 1];
@@ -207,5 +283,19 @@ public class FastDataGeneratorTests
             TrimSuffix = genCfg.TrimSuffix;
             return string.Empty;
         }
+    }
+
+    private static void AssertKeysOnly<TKey>(ContextCaptureGenerator generator, ReadOnlySpan<TKey> keys)
+    {
+        ArrayContext<TKey, byte> ctx = Assert.IsType<ArrayContext<TKey, byte>>(generator.Context);
+        Assert.True(ctx.Values.IsEmpty);
+        Assert.True(ctx.Keys.Span.SequenceEqual(keys));
+    }
+
+    private static void AssertKeysAndValues<TKey, TValue>(ContextCaptureGenerator generator, ReadOnlySpan<TKey> keys, ReadOnlySpan<TValue> values)
+    {
+        ArrayContext<TKey, TValue> ctx = Assert.IsType<ArrayContext<TKey, TValue>>(generator.Context);
+        Assert.True(ctx.Keys.Span.SequenceEqual(keys));
+        Assert.True(ctx.Values.Span.SequenceEqual(values));
     }
 }

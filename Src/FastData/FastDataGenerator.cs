@@ -32,7 +32,7 @@ public static partial class FastDataGenerator
     public static string Generate<TKey>(TKey[] keys, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         if (typeof(TKey) == typeof(string))
-            return GenerateStringInternal((string[])(object)keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
+            return GenerateStringInternal(new ReadOnlyMemory<string>((string[])(object)keys), ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
 
         return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
     }
@@ -48,7 +48,7 @@ public static partial class FastDataGenerator
     public static string GenerateKeyed<TKey, TValue>(TKey[] keys, TValue[] values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         if (typeof(TKey) == typeof(string))
-            return GenerateStringInternal((ReadOnlyMemory<string>)(object)keys, (ReadOnlyMemory<TValue>)values, fdCfg, generator, factory);
+            return GenerateStringInternal(new ReadOnlyMemory<string>((string[])(object)keys), new ReadOnlyMemory<TValue>(values), fdCfg, generator, factory);
 
         return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, (ReadOnlyMemory<TValue>)values, fdCfg, generator, factory);
     }
@@ -60,7 +60,7 @@ public static partial class FastDataGenerator
 
     public static string Generate(string[] keys, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        return GenerateStringInternal((ReadOnlyMemory<string>)keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
+        return GenerateStringInternal(new ReadOnlyMemory<string>(keys), ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
     }
 
     public static string GenerateKeyed<TValue>(ReadOnlyMemory<string> keys, ReadOnlyMemory<TValue> values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
