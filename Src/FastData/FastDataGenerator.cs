@@ -260,7 +260,7 @@ public static partial class FastDataGenerator
         }
     }
 
-    private static void DeduplicateKeys<TKey, TValue>(FastDataConfig fdCfg, ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, IEqualityComparer<TKey> equalityComparer, IComparer<TKey> sortComparer, out ReadOnlyMemory<TKey> newKeys, out ReadOnlyMemory<TValue> newValues, out int uniqueCount)
+    internal static void DeduplicateKeys<TKey, TValue>(FastDataConfig fdCfg, ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, IEqualityComparer<TKey> equalityComparer, IComparer<TKey> sortComparer, out ReadOnlyMemory<TKey> newKeys, out ReadOnlyMemory<TValue> newValues, out int uniqueCount)
     {
         if (fdCfg.DeduplicationMode == DeduplicationMode.Disabled)
         {
