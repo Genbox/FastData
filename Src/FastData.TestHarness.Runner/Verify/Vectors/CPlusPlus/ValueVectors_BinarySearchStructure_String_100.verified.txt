@@ -8,32 +8,36 @@
 #include <string_view>
 
 class BinarySearchStructure_String_100 final {
-    static constexpr std::array<std::u16string_view, 100> keys = {
-        u"0", u"1", u"10", u"11", u"12", u"13", u"14", u"15", u"16", u"17", 
-        u"18", u"19", u"2", u"20", u"21", u"22", u"23", u"24", u"25", u"26", 
-        u"27", u"28", u"29", u"3", u"30", u"31", u"32", u"33", u"34", u"35", 
-        u"36", u"37", u"38", u"39", u"4", u"40", u"41", u"42", u"43", u"44", 
-        u"45", u"46", u"47", u"48", u"49", u"5", u"50", u"51", u"52", u"53", 
-        u"54", u"55", u"56", u"57", u"58", u"59", u"6", u"60", u"61", u"62", 
-        u"63", u"64", u"65", u"66", u"67", u"68", u"69", u"7", u"70", u"71", 
-        u"72", u"73", u"74", u"75", u"76", u"77", u"78", u"79", u"8", u"80", 
-        u"81", u"82", u"83", u"84", u"85", u"86", u"87", u"88", u"89", u"9", 
-        u"90", u"91", u"92", u"93", u"94", u"95", u"96", u"97", u"98", u"99"
+    static constexpr std::array<std::string_view, 100> keys = {
+        u8"0", u8"1", u8"10", u8"11", u8"12", u8"13", u8"14", u8"15", u8"16", u8"17", 
+        u8"18", u8"19", u8"2", u8"20", u8"21", u8"22", u8"23", u8"24", u8"25", u8"26", 
+        u8"27", u8"28", u8"29", u8"3", u8"30", u8"31", u8"32", u8"33", u8"34", u8"35", 
+        u8"36", u8"37", u8"38", u8"39", u8"4", u8"40", u8"41", u8"42", u8"43", u8"44", 
+        u8"45", u8"46", u8"47", u8"48", u8"49", u8"5", u8"50", u8"51", u8"52", u8"53", 
+        u8"54", u8"55", u8"56", u8"57", u8"58", u8"59", u8"6", u8"60", u8"61", u8"62", 
+        u8"63", u8"64", u8"65", u8"66", u8"67", u8"68", u8"69", u8"7", u8"70", u8"71", 
+        u8"72", u8"73", u8"74", u8"75", u8"76", u8"77", u8"78", u8"79", u8"8", u8"80", 
+        u8"81", u8"82", u8"83", u8"84", u8"85", u8"86", u8"87", u8"88", u8"89", u8"9", 
+        u8"90", u8"91", u8"92", u8"93", u8"94", u8"95", u8"96", u8"97", u8"98", u8"99"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u16string_view key) noexcept {
+    static constexpr bool contains(const std::string_view key) noexcept {
          if (const size_t len = key.length(); len < 1u || len > 2u)
              return false;
+                uint64_t first = 0;
+                std::memcpy(&first, key.data(), 1);
 
+                if ((first & 192ULL) != 0)
+                    return false;
 
 
         int32_t lo = 0;
         int32_t hi = 99;
         while (lo <= hi) {
             const int32_t mid = lo + ((hi - lo) >> 1);
-            const std::u16string_view mid_key = keys[mid];
+            const std::string_view mid_key = keys[mid];
             const int32_t order = mid_key.compare(key);
 
             if (order == 0)

@@ -11,7 +11,6 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 internal class CPlusPlusLanguageDef : ILanguageDef
 {
-    public GeneratorEncoding Encoding => GeneratorEncoding.UTF16;
     public string ArraySizeType => "size_t";
 
     public IList<ITypeDef> TypeDefinitions => new List<ITypeDef>

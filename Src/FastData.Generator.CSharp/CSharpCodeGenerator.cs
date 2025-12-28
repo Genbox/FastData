@@ -20,10 +20,12 @@ public sealed class CSharpCodeGenerator : CodeGenerator
     public static CSharpCodeGenerator Create(CSharpCodeGeneratorConfig userCfg)
     {
         CSharpLanguageDef langDef = new CSharpLanguageDef();
-        TypeMap map = new TypeMap(langDef.TypeDefinitions, langDef.Encoding);
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF16);
 
         return new CSharpCodeGenerator(userCfg, langDef, new CSharpConstantsDef(), new CSharpEarlyExitDef(map, userCfg.GeneratorOptions), new CSharpHashDef(), map, new CSharpExpressionCompiler(map));
     }
+
+    public override GeneratorEncoding Encoding => GeneratorEncoding.UTF16;
 
     protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext<TValue> context)
     {

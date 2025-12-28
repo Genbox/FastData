@@ -15,27 +15,26 @@ public sealed class GeneratorConfig<T>
 {
     private readonly FastDataConfig _cfg;
 
-    private GeneratorConfig(Type structureType, KeyType keyType, HashDetails hashDetails, GeneratorFlags flags, GeneratorEncoding encoding, FastDataConfig cfg)
+    private GeneratorConfig(Type structureType, KeyType keyType, HashDetails hashDetails, GeneratorEncoding encoding, FastDataConfig cfg)
     {
         _cfg = cfg;
         StructureType = structureType;
         KeyType = keyType;
         Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.UtcNow);
         HashDetails = hashDetails;
-        Flags = flags;
         Encoding = encoding;
         IgnoreCase = false;
         TrimPrefix = string.Empty;
         TrimSuffix = string.Empty;
     }
 
-    internal GeneratorConfig(Type structureType, KeyType keyType, uint itemCount, NumericKeyProperties<T> props, HashDetails hashDetails, GeneratorFlags flags, FastDataConfig cfg) : this(structureType, keyType, hashDetails, flags, GeneratorEncoding.Unknown, cfg)
+    internal GeneratorConfig(Type structureType, KeyType keyType, uint itemCount, NumericKeyProperties<T> props, HashDetails hashDetails, FastDataConfig cfg) : this(structureType, keyType, hashDetails, GeneratorEncoding.Unknown, cfg)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType).ToArray();
         Constants = CreateConstants(props, itemCount);
     }
 
-    internal GeneratorConfig(Type structureType, KeyType keyType, uint itemCount, StringKeyProperties props, HashDetails hashDetails, GeneratorEncoding encoding, GeneratorFlags flags, string trimPrefix, string trimSuffix, FastDataConfig cfg) : this(structureType, keyType, hashDetails, flags, encoding, cfg)
+    internal GeneratorConfig(Type structureType, KeyType keyType, uint itemCount, StringKeyProperties props, HashDetails hashDetails, GeneratorEncoding encoding, string trimPrefix, string trimSuffix, FastDataConfig cfg) : this(structureType, keyType, hashDetails, encoding, cfg)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType, encoding).ToArray();
         Constants = CreateConstants(props, itemCount);
@@ -69,8 +68,6 @@ public sealed class GeneratorConfig<T>
 
     /// <summary>Contains information about the hash function to use.</summary>
     public HashDetails HashDetails { get; }
-
-    public GeneratorFlags Flags { get; }
 
     public string TrimPrefix { get; }
     public string TrimSuffix { get; }
@@ -112,12 +109,7 @@ public sealed class GeneratorConfig<T>
         if (ShouldApplyBitSet(lengthData))
             yield return new LengthBitSetEarlyExit(lengthData.LengthMap.Values);
         else
-        {
-            uint minByteCount = enc == GeneratorEncoding.UTF8 ? lengthData.MinUtf8ByteCount : lengthData.MinUtf16ByteCount;
-            uint maxByteCount = enc == GeneratorEncoding.UTF8 ? lengthData.MaxUtf8ByteCount : lengthData.MaxUtf16ByteCount;
-
-            yield return new MinMaxLengthEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, minByteCount, maxByteCount); //Also handles same lengths
-        }
+            yield return new MinMaxLengthEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, lengthData.MinByteCount , lengthData.MaxByteCount ); //Also handles same lengths
 
         if (ShouldApplyStringBitMask(props.CharacterData.StringBitMask, props.CharacterData.StringBitMaskBytes, out ulong mask))
             yield return new StringBitMaskEarlyExit(mask, props.CharacterData.StringBitMaskBytes);

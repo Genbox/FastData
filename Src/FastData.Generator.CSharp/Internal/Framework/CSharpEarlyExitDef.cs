@@ -62,7 +62,7 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
                 """;
     }
 
-    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte)
+    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding)
     {
         if (min.Equals(max))
         {

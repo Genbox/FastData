@@ -3,7 +3,6 @@ using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Helpers;
-using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.TestClasses;
@@ -25,7 +24,7 @@ public sealed class CPlusPlusTestHarness : TestHarnessBase
 
     public override ICodeGenerator CreateGenerator(string id) => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id));
 
-    public override ITestRenderer CreateRenderer(GeneratorSpec spec) => new CPlusPlusRenderer(spec);
+    public override ITestRenderer CreateRenderer(GeneratorSpec spec) => new CPlusPlusRenderer();
 
     public override string RenderContainsProgram<T>(GeneratorSpec spec, ITestRenderer renderer, T[] present, T[] notPresent)
     {
@@ -80,27 +79,24 @@ public sealed class CPlusPlusTestHarness : TestHarnessBase
                  """;
     }
 
-    private sealed class CPlusPlusRenderer : ITestRenderer
-    {
-        private readonly TypeMap _map;
-
-        public CPlusPlusRenderer(GeneratorSpec spec)
-        {
-            CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
-            Encoding = langDef.Encoding;
-            _map = new TypeMap(langDef.TypeDefinitions, Encoding);
-        }
-
-        public GeneratorEncoding Encoding { get; }
-
-        public string ToValueLabel<T>(T value) => _map.ToValueLabel(value);
-
-        public string GetTypeName(Type type) => _map.GetTypeName(type);
-    }
-
     public override int Run(string fileId, string source)
     {
         string executable = _compiler.Compile(fileId, source);
         return RunProcess(executable).ExitCode;
+    }
+
+    private sealed class CPlusPlusRenderer : ITestRenderer
+    {
+        private readonly TypeMap _map;
+
+        public CPlusPlusRenderer()
+        {
+            CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
+            _map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
+        }
+
+        public string ToValueLabel<T>(T value) => _map.ToValueLabel(value);
+
+        public string GetTypeName(Type type) => _map.GetTypeName(type);
     }
 }

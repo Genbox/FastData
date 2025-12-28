@@ -10,7 +10,6 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
 internal class CSharpLanguageDef : ILanguageDef
 {
-    public GeneratorEncoding Encoding => GeneratorEncoding.UTF16;
     public string ArraySizeType => "uint";
 
     public IList<ITypeDef> TypeDefinitions => new List<ITypeDef>

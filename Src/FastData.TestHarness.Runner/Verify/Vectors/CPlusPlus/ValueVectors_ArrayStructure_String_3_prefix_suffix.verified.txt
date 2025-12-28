@@ -8,17 +8,21 @@
 #include <string_view>
 
 class ArrayStructure_String_3_prefix_suffix final {
-    static constexpr std::array<std::u16string_view, 3> keys = {
-        u"text", u"fetch", u"fix"
+    static constexpr std::array<std::string_view, 3> keys = {
+        u8"text", u8"fetch", u8"fix"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u16string_view key) noexcept {
+    static constexpr bool contains(const std::string_view key) noexcept {
          if (const size_t len = key.length(); len < 6u || len > 8u)
              return false;
+                uint64_t first = 0;
+                std::memcpy(&first, key.data(), 6);
 
-        if (!(key.compare(0, 3, u"pre") == 0))
+                if ((first & 144665397071247ULL) != 0)
+                    return false;
+        if (!(key.compare(0, 3, u8"pre") == 0))
             return false;
         const auto trimmedKey = key.substr(3, key.length() - 3);
 

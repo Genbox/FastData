@@ -1,3 +1,4 @@
+using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.InternalShared.Helpers;
 
@@ -15,5 +16,5 @@ public class KeyAnalyzerBenchmarks
     }
 
     [Benchmark]
-    public object GetStringProperties() => KeyAnalyzer.GetStringProperties(_data, true, false);
+    public object GetStringProperties() => KeyAnalyzer.GetStringProperties(_data, true, false, GeneratorEncoding.UTF16);
 }

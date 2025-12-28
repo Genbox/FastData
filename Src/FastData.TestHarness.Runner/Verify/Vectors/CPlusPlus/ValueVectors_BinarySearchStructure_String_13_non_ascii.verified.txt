@@ -8,24 +8,28 @@
 #include <string_view>
 
 class BinarySearchStructure_String_13_non_ascii final {
-    static constexpr std::array<std::u16string_view, 13> keys = {
-        u"ß", u"à", u"ä", u"å", u"æ", u"ç", u"è", u"é", u"ê", u"ñ", 
-        u"ö", u"ø", u"ü"
+    static constexpr std::array<std::string_view, 13> keys = {
+        u8"ß", u8"à", u8"ä", u8"å", u8"æ", u8"ç", u8"è", u8"é", u8"ê", u8"ñ", 
+        u8"ö", u8"ø", u8"ü"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u16string_view key) noexcept {
-         if (key.length() != 1u)
+    static constexpr bool contains(const std::string_view key) noexcept {
+         if (key.length() != 2u)
              return false;
+                uint64_t first = 0;
+                std::memcpy(&first, key.data(), 2);
 
+                if ((first & 16444ULL) != 0)
+                    return false;
 
 
         int32_t lo = 0;
         int32_t hi = 12;
         while (lo <= hi) {
             const int32_t mid = lo + ((hi - lo) >> 1);
-            const std::u16string_view mid_key = keys[mid];
+            const std::string_view mid_key = keys[mid];
             const int32_t order = mid_key.compare(key);
 
             if (order == 0)

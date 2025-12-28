@@ -166,6 +166,7 @@ public static partial class FastDataGenerator
 
                 HashData hashData = HashData.Create(keySpan, fdCfg.HashCapacityFactor, x =>
                 {
+                    //TODO: Optimize this. Maybe reuse the same buffer. Benchmark it
                     byte[] bytes = generator.Encoding == GeneratorEncoding.UTF8 ? Encoding.UTF8.GetBytes(x) : Encoding.Unicode.GetBytes(x);
                     return hashFunc(bytes, bytes.Length);
                 });
@@ -287,14 +288,14 @@ public static partial class FastDataGenerator
     {
         TContext res = structure.Create(state.Keys, state.Values);
         StringKeyProperties strProps = state.StringKeyProperties;
-        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(structure.GetType(), KeyType.String, (uint)state.Keys.Length, strProps, state.HashDetails, state.Generator.Encoding, strProps.CharacterData.AllAscii ? GeneratorFlags.AllAreASCII : GeneratorFlags.None, state.TrimPrefix, state.TrimSuffix, state.Config);
+        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(structure.GetType(), KeyType.String, (uint)state.Keys.Length, strProps, state.HashDetails, state.Generator.Encoding, state.TrimPrefix, state.TrimSuffix, state.Config);
         return state.Generator.Generate(genCfg, res);
     }
 
     private static string GenerateWrapper<TKey, TValue, TContext>(in TempNumericState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext<TValue>
     {
         TContext res = structure.Create(state.Keys, state.Values);
-        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(structure.GetType(), state.KeyType, (uint)state.Keys.Length, state.NumericKeyProperties, state.HashDetails, GeneratorFlags.None, state.Config);
+        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(structure.GetType(), state.KeyType, (uint)state.Keys.Length, state.NumericKeyProperties, state.HashDetails, state.Config);
         return state.Generator.Generate(genCfg, res);
     }
 

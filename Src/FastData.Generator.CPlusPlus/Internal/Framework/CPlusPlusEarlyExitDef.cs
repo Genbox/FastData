@@ -61,11 +61,35 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
                 """;
     }
 
-    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte) =>
-        $"""
-                  if ({(min.Equals(max) ? $"key.length() != {map.ToValueLabel(max)}" : $"const size_t len = key.length(); len < {map.ToValueLabel(min)} || len > {map.ToValueLabel(max)}")})
-                      {RenderExit(methodType)}
-         """;
+    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding)
+    {
+        uint minLen;
+        uint maxLen;
+
+        switch (encoding)
+        {
+            case GeneratorEncoding.ASCII:
+            case GeneratorEncoding.UTF8:
+                minLen = minByte;
+                maxLen = maxByte;
+                break;
+            case GeneratorEncoding.UTF32:
+                minLen = minByte / 4;
+                maxLen = maxByte / 4;
+                break;
+            case GeneratorEncoding.UTF16:
+                minLen = min;
+                maxLen = max;
+                break;
+            default:
+                throw new InvalidOperationException("Unsupported encoding: " + encoding);
+        }
+
+        return $"""
+                         if ({(minLen.Equals(maxLen) ? $"key.length() != {map.ToValueLabel(maxLen)}" : $"const size_t len = key.length(); len < {map.ToValueLabel(minLen)} || len > {map.ToValueLabel(maxLen)}")})
+                             {RenderExit(methodType)}
+                """;
+    }
 
     protected override string GetStringBitMaskEarlyExit(MethodType methodType, ulong mask, int byteCount, bool ignoreCase, GeneratorEncoding encoding)
     {
@@ -78,12 +102,12 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         if (!ignoreCase)
         {
             return $"""
-                uint64_t first = 0;
-                std::memcpy(&first, key.data(), {byteCount});
+                                    uint64_t first = 0;
+                                    std::memcpy(&first, key.data(), {byteCount});
 
-                if ((first & {mask.ToStringInvariant()}ULL) != 0)
-                    {RenderExit(methodType)}
-""";
+                                    if ((first & {mask.ToStringInvariant()}ULL) != 0)
+                                        {RenderExit(methodType)}
+                    """;
         }
 
         StringBuilder sb = new StringBuilder();
@@ -92,17 +116,17 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         for (int i = 0; i < byteCount; i++)
         {
             sb.Append($"""
-                uint32_t c{i} = static_cast<uint32_t>(key[{i}]);
-                c{i} = to_lower_ascii(c{i});
-                first |= static_cast<uint64_t>(c{i}) << {i * 8};
-""");
+                                       uint32_t c{i} = static_cast<uint32_t>(key[{i}]);
+                                       c{i} = to_lower_ascii(c{i});
+                                       first |= static_cast<uint64_t>(c{i}) << {i * 8};
+                       """);
         }
 
         sb.Append($"""
 
-                if ((first & {mask.ToStringInvariant()}ULL) != 0)
-                    {RenderExit(methodType)}
-""");
+                                   if ((first & {mask.ToStringInvariant()}ULL) != 0)
+                                       {RenderExit(methodType)}
+                   """);
         return sb.ToString();
     }
 

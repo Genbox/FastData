@@ -9,10 +9,10 @@
 
 class HashTableCompactStructure_String_3 final {
     struct e {
-        std::u16string_view key;
+        std::string_view key;
         uint64_t hash_code;
         
-        e(const std::u16string_view key, const uint64_t hash_code)
+        e(const std::string_view key, const uint64_t hash_code)
            : key(key), hash_code(hash_code) {}
     };
 
@@ -25,14 +25,14 @@ class HashTableCompactStructure_String_3 final {
      };
 
     inline static const std::array<e, 3> entries = {
-        e(u"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 9198652691199425319), e(u"a", 18225461187723808291), e(u"item", 16750939634977259983)
+        e(u8"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 9198652691199425319), e(u8"a", 18225461187723808291), e(u8"item", 16750939634977259983)
     };
 
-    static constexpr uint64_t get_hash(const std::u16string_view value) noexcept
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept
     {
     uint64_t hash = 352654597;
 
-    for (char32_t ch : value)
+    for (unsigned char ch : value)
         hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
 
     return 352654597 + (hash * 1566083941);
@@ -40,7 +40,7 @@ class HashTableCompactStructure_String_3 final {
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u16string_view key) noexcept {
+    static constexpr bool contains(const std::string_view key) noexcept {
         switch (key.length() >> 6)
         {
             case 0:
@@ -63,7 +63,11 @@ public:
             default:
                 return false;
         }
+                uint64_t first = 0;
+                std::memcpy(&first, key.data(), 1);
 
+                if ((first & 150ULL) != 0)
+                    return false;
 
 
         const uint64_t hash = get_hash(key);

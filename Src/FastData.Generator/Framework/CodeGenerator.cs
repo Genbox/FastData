@@ -14,7 +14,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 {
     protected SharedCode Shared { get; } = new SharedCode();
 
-    public GeneratorEncoding Encoding => langDef.Encoding;
+    public abstract GeneratorEncoding Encoding { get; }
 
     public virtual string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context)
     {

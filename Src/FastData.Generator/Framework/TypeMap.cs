@@ -7,13 +7,12 @@ namespace Genbox.FastData.Generator.Framework;
 
 public sealed class TypeMap : ITypeMap
 {
+    private readonly GeneratorEncoding _encoding;
     private readonly ITypeDef?[] _index = new ITypeDef?[19];
-    private GeneratorEncoding _encoding;
 
     public TypeMap(IList<ITypeDef> typeSpecs, GeneratorEncoding encoding)
     {
-        _encoding = encoding; // This is the generator's default encoding
-
+        _encoding = encoding;
         for (int i = 0; i < typeSpecs.Count; i++)
         {
             ITypeDef spec = typeSpecs[i];
@@ -26,9 +25,6 @@ public sealed class TypeMap : ITypeMap
             _index[idx] = spec;
         }
     }
-
-    /// <summary>This is used to override the encoding for dynamic string types. After string analysis, we know if all strings are ASCII, and if that is the case, we can change the encoding in the TypeMap and get more memory efficient code.</summary>
-    public void OverrideEncoding(GeneratorEncoding encoding) => _encoding = encoding;
 
     public string GetNull() => _index[0].PrintObj(this, null);
 

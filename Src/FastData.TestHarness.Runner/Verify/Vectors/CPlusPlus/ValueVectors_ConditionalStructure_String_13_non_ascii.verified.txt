@@ -10,12 +10,16 @@
 class ConditionalStructure_String_13_non_ascii final {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u16string_view key) noexcept {
-         if (key.length() != 1u)
+    static constexpr bool contains(const std::string_view key) noexcept {
+         if (key.length() != 2u)
              return false;
+                uint64_t first = 0;
+                std::memcpy(&first, key.data(), 2);
 
+                if ((first & 16444ULL) != 0)
+                    return false;
 
-        if (key == u"æ" || key == u"à" || key == u"ä" || key == u"ö" || key == u"ü" || key == u"ß" || key == u"é" || key == u"è" || key == u"ê" || key == u"ç" || key == u"ñ" || key == u"ø" || key == u"å")
+        if (key == u8"æ" || key == u8"à" || key == u8"ä" || key == u8"ö" || key == u8"ü" || key == u8"ß" || key == u8"é" || key == u8"è" || key == u8"ê" || key == u8"ç" || key == u8"ñ" || key == u8"ø" || key == u8"å")
             return true;
 
         return false;

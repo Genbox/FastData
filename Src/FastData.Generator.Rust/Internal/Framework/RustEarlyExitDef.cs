@@ -63,7 +63,7 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
                  """;
     }
 
-    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte)
+    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding)
     {
         if (minByte.Equals(maxByte))
         {

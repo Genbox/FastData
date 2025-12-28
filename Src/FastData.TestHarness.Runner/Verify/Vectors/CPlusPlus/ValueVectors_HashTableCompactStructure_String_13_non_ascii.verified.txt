@@ -9,33 +9,33 @@
 
 class HashTableCompactStructure_String_13_non_ascii final {
     struct e {
-        std::u16string_view key;
+        std::string_view key;
         uint64_t hash_code;
         
-        e(const std::u16string_view key, const uint64_t hash_code)
+        e(const std::string_view key, const uint64_t hash_code)
            : key(key), hash_code(hash_code) {}
     };
 
     static constexpr std::array<uint8_t, 13> bucket_starts = {
-        0, 2, 4, 6, 6, 7, 8, 9, 10, 13, 
-        13, 13, 13
+        0, 0, 0, 2, 4, 4, 5, 5, 5, 7, 
+        8, 10, 11
      };
 
     static constexpr std::array<uint8_t, 13> bucket_counts = {
-        2, 2, 2, 0, 1, 1, 1, 1, 3, 0, 
-        0, 0, 0
+        0, 0, 2, 2, 0, 1, 0, 0, 2, 1, 
+        2, 1, 2
      };
 
     inline static const std::array<e, 13> entries = {
-        e(u"ö", 18225461004491987194), e(u"ß", 18225461065569260893), e(u"è", 18225461001359819312), e(u"å", 18225460981000728079), e(u"ê", 18225460998227651430), e(u"ç", 18225460977868560197), e(u"ñ", 18225461012322406899), e(u"à", 18225460988831147784), e(u"ø", 18225461026417162368), e(u"ä", 18225460982566812020), 
-        e(u"æ", 18225460979434644138), e(u"ü", 18225461020152826604), e(u"é", 18225460999793735371)
+        e(u8"è", 11144404032678215327), e(u8"å", 11144404053037306560), e(u8"ê", 11144404029546047445), e(u8"ç", 11144404049905138678), e(u8"ö", 11144404023281711681), e(u8"ü", 11144404013885208035), e(u8"é", 11144404034244299268), e(u8"ä", 11144404051471222619), e(u8"æ", 11144404048339054737), e(u8"ø", 11144404007620872271), 
+        e(u8"à", 11144404045206886855), e(u8"ß", 11144404062433810206), e(u8"ñ", 11144404021715627740)
     };
 
-    static constexpr uint64_t get_hash(const std::u16string_view value) noexcept
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept
     {
     uint64_t hash = 352654597;
 
-    for (char32_t ch : value)
+    for (unsigned char ch : value)
         hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
 
     return 352654597 + (hash * 1566083941);
@@ -43,10 +43,14 @@ class HashTableCompactStructure_String_13_non_ascii final {
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u16string_view key) noexcept {
-         if (key.length() != 1u)
+    static constexpr bool contains(const std::string_view key) noexcept {
+         if (key.length() != 2u)
              return false;
+                uint64_t first = 0;
+                std::memcpy(&first, key.data(), 2);
 
+                if ((first & 16444ULL) != 0)
+                    return false;
 
 
         const uint64_t hash = get_hash(key);

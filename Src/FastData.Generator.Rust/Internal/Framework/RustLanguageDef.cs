@@ -11,7 +11,6 @@ namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
 internal class RustLanguageDef : ILanguageDef
 {
-    public GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
     public string ArraySizeType => "usize";
 
     public IList<ITypeDef> TypeDefinitions => new List<ITypeDef>

@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.InternalShared;
@@ -74,7 +75,7 @@ internal static class Program
     private static string PrintQueries(ITestData data, string identifier)
     {
         CSharpLanguageDef langDef = new CSharpLanguageDef();
-        TypeMap map = new TypeMap(langDef.TypeDefinitions, langDef.Encoding);
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF16);
 
         StringBuilder sb = new StringBuilder();
 

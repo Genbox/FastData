@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.InternalShared;
@@ -70,7 +71,7 @@ internal static class Program
     private static string PrintQueries(ITestData data, string identifier)
     {
         RustLanguageDef langDef = new RustLanguageDef();
-        TypeMap map = new TypeMap(langDef.TypeDefinitions, langDef.Encoding);
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
 
         StringBuilder sb = new StringBuilder();
 

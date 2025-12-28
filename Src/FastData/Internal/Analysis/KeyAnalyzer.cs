@@ -36,17 +36,15 @@ internal static class KeyAnalyzer
         throw new InvalidOperationException($"Unsupported data type: {typeof(T).Name}");
     }
 
-    internal static StringKeyProperties GetStringProperties(ReadOnlySpan<string> keys, bool enableTrimming, bool ignoreCase, GeneratorEncoding encoding = GeneratorEncoding.Unknown)
+    internal static StringKeyProperties GetStringProperties(ReadOnlySpan<string> keys, bool enableTrimming, bool ignoreCase, GeneratorEncoding encoding)
     {
         //Contains a map of unique lengths
         LengthBitArray lengthMap = new LengthBitArray();
 
         //We need to know the longest string for optimal mixing. Probably not 100% necessary.
         string maxStr = keys[0];
-        int minUtf8ByteLength = int.MaxValue;
-        int maxUtf8ByteLength = int.MinValue;
-        int minUtf16ByteLength = int.MaxValue;
-        int maxUtf16ByteLength = int.MinValue;
+        int minByteCount = int.MaxValue;
+        int maxByteCount = int.MinValue;
         bool uniqLen = true;
         bool allAscii = true;
         CharacterClass charClass = CharacterClass.Unknown;
@@ -56,13 +54,18 @@ internal static class KeyAnalyzer
             if (str.Length > maxStr.Length)
                 maxStr = str;
 
-            int utf8ByteCount = Encoding.UTF8.GetByteCount(str);
-            minUtf8ByteLength = Math.Min(utf8ByteCount, minUtf8ByteLength);
-            maxUtf8ByteLength = Math.Max(utf8ByteCount, maxUtf8ByteLength);
+            //TODO: Remove branch by rewriting delegate
+            int byteCount = encoding switch
+            {
+                GeneratorEncoding.ASCII => Encoding.ASCII.GetByteCount(str),
+                GeneratorEncoding.UTF8 => Encoding.UTF8.GetByteCount(str),
+                GeneratorEncoding.UTF16 => Encoding.Unicode.GetByteCount(str),
+                GeneratorEncoding.UTF32 => Encoding.UTF32.GetByteCount(str),
+                _ => throw new InvalidOperationException($"Unsupported encoding: {encoding}")
+            };
 
-            int utf16ByteCount = Encoding.Unicode.GetByteCount(str);
-            minUtf16ByteLength = Math.Min(utf16ByteCount, minUtf16ByteLength);
-            maxUtf16ByteLength = Math.Max(utf16ByteCount, maxUtf16ByteLength);
+            minByteCount = Math.Min(byteCount, minByteCount);
+            maxByteCount = Math.Max(byteCount, maxByteCount);
 
             uniqLen &= !lengthMap.SetTrue((uint)str.Length);
 
@@ -84,17 +87,13 @@ internal static class KeyAnalyzer
             }
         }
 
-        ulong stringBitMask = 0;
-        int stringBitMaskBytes = 0;
-
-        if (encoding != GeneratorEncoding.Unknown)
-            stringBitMask = GetStringBitMask(keys, encoding, ignoreCase, minUtf8ByteLength, minUtf16ByteLength, allAscii, out stringBitMaskBytes);
+        byte stringBitMaskLen = (byte)Math.Min(minByteCount, 8); // Make up to 8 bytes mask, but no longer than the smallest string for perf.
+        ulong stringBitMask = GetStringBitMask(keys, encoding, ignoreCase, stringBitMaskLen);
 
         // The code beneath there calculate entropy maps that cna be used to derive the longest common substrings or longest prefix/suffix strings.
         // It works by adding characters to an accumulator, and then potentially removing the value from it again if the characters are the same.
         // If the accumulator for an offset contains 0 after all strings have been accumulated, it is highly likely that all the characters were the same.
         // However, there is a risk that an accumulator is 0, even if the characters are not the same. So we do a sanity check at the end to ensure we did it right.
-
         string prefix = string.Empty;
         string suffix = string.Empty;
         int[]? left = null;
@@ -152,7 +151,7 @@ internal static class KeyAnalyzer
             }
         }
 
-        return new StringKeyProperties(new LengthData((uint)minUtf8ByteLength, (uint)maxUtf8ByteLength, (uint)minUtf16ByteLength, (uint)maxUtf16ByteLength, uniqLen, lengthMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskBytes));
+        return new StringKeyProperties(new LengthData((uint)minByteCount, (uint)maxByteCount, uniqLen, lengthMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskLen));
     }
 
     private static int CountZero(int[] data)
@@ -166,58 +165,48 @@ internal static class KeyAnalyzer
         return count;
     }
 
-    private static ulong GetStringBitMask(ReadOnlySpan<string> keys, GeneratorEncoding encoding, bool ignoreCase, int minUtf8ByteLength, int minUtf16ByteLength, bool allAscii, out int byteCount)
+    private static ulong GetStringBitMask(ReadOnlySpan<string> keys, GeneratorEncoding encoding, bool ignoreCase, int byteCount)
     {
         ulong union = 0;
 
-        int minByteCount;
-        int baseBytes;
-        switch (encoding)
+        if (encoding == GeneratorEncoding.ASCII)
         {
-            case GeneratorEncoding.ASCII:
-            case GeneratorEncoding.UTF8:
-                minByteCount = minUtf8ByteLength;
-                baseBytes = 1;
-                break;
-            case GeneratorEncoding.UTF16:
-                minByteCount = minUtf16ByteLength;
-                baseBytes = 2;
-                break;
-            default:
-                byteCount = 0;
-                return 0;
+            foreach (string key in keys)
+                union |= GetFirst64BitsAscii(key, ignoreCase, byteCount);
         }
-
-        if (minByteCount < baseBytes)
+        else if (encoding == GeneratorEncoding.UTF8)
         {
-            byteCount = 0;
-            return 0;
+            foreach (string key in keys)
+                union |= GetFirst64BitsUtf8(key, ignoreCase, byteCount);
         }
-
-        byteCount = Math.Min(minByteCount, 8);
-        if (byteCount == 0)
-            return 0;
-
-        if (encoding == GeneratorEncoding.UTF16)
+        else if (encoding == GeneratorEncoding.UTF16)
         {
             int charCount = byteCount / 2;
             foreach (string key in keys)
                 union |= GetFirst64BitsUtf16(key, ignoreCase, charCount);
         }
-        else if (allAscii)
-        {
-            foreach (string key in keys)
-                union |= GetFirst64BitsAscii(key, ignoreCase, byteCount);
-        }
         else
-        {
-            foreach (string key in keys)
-                union |= GetFirst64BitsUtf8(key, ignoreCase, byteCount);
-        }
+            return 0;
 
         ulong mask = ~union;
         ulong fullMask = byteCount == 8 ? ulong.MaxValue : (1UL << (byteCount * 8)) - 1;
         return mask & fullMask;
+    }
+
+    private static ulong GetFirst64BitsAscii(string value, bool ignoreCase, int byteCount)
+    {
+        ulong result = 0;
+
+        for (int i = 0; i < byteCount; i++)
+        {
+            uint b = value[i];
+            if (ignoreCase && b - 'A' <= 'Z' - 'A')
+                b |= 0x20u;
+
+            result |= (ulong)b << (i * 8);
+        }
+
+        return result;
     }
 
     private static ulong GetFirst64BitsUtf8(string value, bool ignoreCase, int byteCount)
@@ -228,22 +217,6 @@ internal static class KeyAnalyzer
         for (int i = 0; i < byteCount; i++)
         {
             uint b = bytes[i];
-            if (ignoreCase && b - 'A' <= 'Z' - 'A')
-                b |= 0x20u;
-
-            result |= (ulong)b << (i * 8);
-        }
-
-        return result;
-    }
-
-    private static ulong GetFirst64BitsAscii(string value, bool ignoreCase, int byteCount)
-    {
-        ulong result = 0;
-
-        for (int i = 0; i < byteCount; i++)
-        {
-            uint b = value[i];
             if (ignoreCase && b - 'A' <= 'Z' - 'A')
                 b |= 0x20u;
 

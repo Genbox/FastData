@@ -3,7 +3,6 @@ using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Helpers;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
-using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.TestClasses;
@@ -25,7 +24,7 @@ public sealed class RustTestHarness : TestHarnessBase
 
     public override ICodeGenerator CreateGenerator(string id) => RustCodeGenerator.Create(new RustCodeGeneratorConfig(id));
 
-    public override ITestRenderer CreateRenderer(GeneratorSpec spec) => new RustRenderer(spec);
+    public override ITestRenderer CreateRenderer(GeneratorSpec spec) => new RustRenderer();
 
     public override string RenderContainsProgram<T>(GeneratorSpec spec, ITestRenderer renderer, T[] present, T[] notPresent)
     {
@@ -79,14 +78,11 @@ public sealed class RustTestHarness : TestHarnessBase
     {
         private readonly TypeMap _map;
 
-        public RustRenderer(GeneratorSpec spec)
+        public RustRenderer()
         {
             RustLanguageDef langDef = new RustLanguageDef();
-            Encoding = spec.Flags.HasFlag(GeneratorFlags.AllAreASCII) ? GeneratorEncoding.ASCII : langDef.Encoding;
-            _map = new TypeMap(langDef.TypeDefinitions, Encoding);
+            _map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
         }
-
-        public GeneratorEncoding Encoding { get; }
 
         public string ToValueLabel<T>(T value) => _map.ToValueLabel(value);
 

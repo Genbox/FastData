@@ -7,15 +7,15 @@
 #include <limits>
 #include <string_view>
 
-static constexpr char16_t to_lower_ascii(char16_t c) noexcept
+static constexpr uint32_t to_lower_ascii(uint32_t c) noexcept
 {
-    if (c - u'A' <= u'Z' - u'A')
-        c = static_cast<char16_t>(c | u'\x20');
+    if (c - 'A' <= 'Z' - 'A')
+        c |= 0x20u;
 
     return c;
 }
 
-static constexpr bool case_insensitive_equals(std::u16string_view a, std::u16string_view b) noexcept
+static constexpr bool case_insensitive_equals(std::string_view a, std::string_view b) noexcept
 {
     if (a.size() != b.size())
         return false;
@@ -23,14 +23,14 @@ static constexpr bool case_insensitive_equals(std::u16string_view a, std::u16str
     size_t len = a.size();
     for (size_t i = 0; i < len; i++)
     {
-        if (to_lower_ascii(a[i]) != to_lower_ascii(b[i]))
+        if (to_lower_ascii(static_cast<uint32_t>(a[i])) != to_lower_ascii(static_cast<uint32_t>(b[i])))
             return false;
     }
 
     return true;
 }
 
-static constexpr int case_insensitive_compare(std::u16string_view a, std::u16string_view b) noexcept
+static constexpr int case_insensitive_compare(std::string_view a, std::string_view b) noexcept
 {
     size_t a_len = a.size();
     size_t b_len = b.size();
@@ -38,8 +38,8 @@ static constexpr int case_insensitive_compare(std::u16string_view a, std::u16str
 
     for (size_t i = 0; i < len; i++)
     {
-        auto ca = to_lower_ascii(a[i]);
-        auto cb = to_lower_ascii(b[i]);
+        uint32_t ca = to_lower_ascii(static_cast<uint32_t>(a[i]));
+        uint32_t cb = to_lower_ascii(static_cast<uint32_t>(b[i]));
 
         if (ca != cb)
             return ca < cb ? -1 : 1;
@@ -51,7 +51,7 @@ static constexpr int case_insensitive_compare(std::u16string_view a, std::u16str
     return a_len < b_len ? -1 : 1;
 }
 
-static constexpr bool case_insensitive_starts_with(std::u16string_view value, std::u16string_view prefix) noexcept
+static constexpr bool case_insensitive_starts_with(std::string_view value, std::string_view prefix) noexcept
 {
     size_t prefix_len = prefix.size();
     if (prefix_len > value.size())
@@ -59,14 +59,14 @@ static constexpr bool case_insensitive_starts_with(std::u16string_view value, st
 
     for (size_t i = 0; i < prefix_len; i++)
     {
-        if (to_lower_ascii(value[i]) != to_lower_ascii(prefix[i]))
+        if (to_lower_ascii(static_cast<uint32_t>(value[i])) != to_lower_ascii(static_cast<uint32_t>(prefix[i])))
             return false;
     }
 
     return true;
 }
 
-static constexpr bool case_insensitive_ends_with(std::u16string_view value, std::u16string_view suffix) noexcept
+static constexpr bool case_insensitive_ends_with(std::string_view value, std::string_view suffix) noexcept
 {
     size_t suffix_len = suffix.size();
     size_t value_len = value.size();
@@ -78,24 +78,42 @@ static constexpr bool case_insensitive_ends_with(std::u16string_view value, std:
 
     for (size_t i = 0; i < suffix_len; i++)
     {
-        if (to_lower_ascii(value[offset + i]) != to_lower_ascii(suffix[i]))
+        if (to_lower_ascii(static_cast<uint32_t>(value[offset + i])) != to_lower_ascii(static_cast<uint32_t>(suffix[i])))
             return false;
     }
 
     return true;
 }
 class PrefixSuffixTrimming_IgnoreCase final {
-    static constexpr std::array<std::u16string_view, 3> keys = {
-        u"Alpha", u"Bravo", u"Charlie"
+    static constexpr std::array<std::string_view, 3> keys = {
+        u8"Alpha", u8"Bravo", u8"Charlie"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u16string_view key) noexcept {
+    static constexpr bool contains(const std::string_view key) noexcept {
          if (const size_t len = key.length(); len < 11u || len > 13u)
              return false;
-
-        if (!(case_insensitive_starts_with(key, u"Pre") && case_insensitive_ends_with(key, u"Suf")))
+                uint64_t first = 0;                uint32_t c0 = static_cast<uint32_t>(key[0]);
+                c0 = to_lower_ascii(c0);
+                first |= static_cast<uint64_t>(c0) << 0;                uint32_t c1 = static_cast<uint32_t>(key[1]);
+                c1 = to_lower_ascii(c1);
+                first |= static_cast<uint64_t>(c1) << 8;                uint32_t c2 = static_cast<uint32_t>(key[2]);
+                c2 = to_lower_ascii(c2);
+                first |= static_cast<uint64_t>(c2) << 16;                uint32_t c3 = static_cast<uint32_t>(key[3]);
+                c3 = to_lower_ascii(c3);
+                first |= static_cast<uint64_t>(c3) << 24;                uint32_t c4 = static_cast<uint32_t>(key[4]);
+                c4 = to_lower_ascii(c4);
+                first |= static_cast<uint64_t>(c4) << 32;                uint32_t c5 = static_cast<uint32_t>(key[5]);
+                c5 = to_lower_ascii(c5);
+                first |= static_cast<uint64_t>(c5) << 40;                uint32_t c6 = static_cast<uint32_t>(key[6]);
+                c6 = to_lower_ascii(c6);
+                first |= static_cast<uint64_t>(c6) << 48;                uint32_t c7 = static_cast<uint32_t>(key[7]);
+                c7 = to_lower_ascii(c7);
+                first |= static_cast<uint64_t>(c7) << 56;
+                if ((first & 10412760500786597263ULL) != 0)
+                    return false;
+        if (!(case_insensitive_starts_with(key, u8"Pre") && case_insensitive_ends_with(key, u8"Suf")))
             return false;
         const auto trimmedKey = key.substr(3, key.length() - 6);
 
@@ -103,7 +121,7 @@ public:
         int32_t hi = 2;
         while (lo <= hi) {
             const int32_t mid = lo + ((hi - lo) >> 1);
-            const std::u16string_view mid_key = keys[mid];
+            const std::string_view mid_key = keys[mid];
             const int32_t order = case_insensitive_compare(mid_key, trimmedKey);
 
             if (order == 0)

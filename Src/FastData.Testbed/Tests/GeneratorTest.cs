@@ -1,3 +1,4 @@
+using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -12,7 +13,7 @@ internal static class GeneratorTest
     public static void TestGenerators()
     {
         string[] data = ["cake", "fish", "horse", "internet", "word", "what"];
-        StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, false);
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, false, GeneratorEncoding.UTF16);
 
         TestGenerators(data, props, new BruteForceGenerator(8));
         TestGenerators(data, props, new EdgeGramGenerator(8));

@@ -4,4 +4,4 @@ using Genbox.FastData.Generators;
 namespace Genbox.FastData.Internal.Analysis.Data;
 
 [StructLayout(LayoutKind.Auto)]
-internal record struct CharacterData(bool AllAscii, CharacterClass CharacterClasses, ulong StringBitMask, int StringBitMaskBytes);
+internal record struct CharacterData(bool AllAscii, CharacterClass CharacterClasses, ulong StringBitMask, byte StringBitMaskBytes);

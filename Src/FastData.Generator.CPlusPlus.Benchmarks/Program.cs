@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.CPlusPlus.TestHarness;
 using Genbox.FastData.Generator.Framework;
@@ -52,7 +53,7 @@ internal static class Program
     private static string PrintQueries(ITestData data, string identifier)
     {
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
-        TypeMap map = new TypeMap(langDef.TypeDefinitions, langDef.Encoding);
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
 
         StringBuilder sb = new StringBuilder();
 

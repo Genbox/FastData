@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generators;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.InternalShared.TestHarness;
@@ -36,7 +35,7 @@ public class FeatureTests
 
         const string className = nameof(IgnoreCaseSupport);
         string source = FastDataGenerator.Generate(keys, config, harness.CreateGenerator(className));
-        GeneratorSpec spec = new GeneratorSpec(className, source, GeneratorFlags.AllAreASCII);
+        GeneratorSpec spec = new GeneratorSpec(className, source);
 
         await TestHarnessRunnerHelper.VerifyFeatureAsync(harness, className, spec.Source);
 
@@ -60,7 +59,7 @@ public class FeatureTests
         string caseLabel = ignoreCase ? "IgnoreCase" : "Ordinal";
         string className = $"{nameof(PrefixSuffixTrimming)}_{caseLabel}";
         string source = FastDataGenerator.Generate(keys, config, harness.CreateGenerator(className));
-        GeneratorSpec spec = new GeneratorSpec(className, source, GeneratorFlags.AllAreASCII);
+        GeneratorSpec spec = new GeneratorSpec(className, source);
 
         await TestHarnessRunnerHelper.VerifyFeatureAsync(harness, className, spec.Source);
 

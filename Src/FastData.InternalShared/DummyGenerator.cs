@@ -8,7 +8,7 @@ namespace Genbox.FastData.InternalShared;
 
 public readonly struct DummyGenerator : ICodeGenerator
 {
-    public GeneratorEncoding Encoding => GeneratorEncoding.Unknown;
+    public GeneratorEncoding Encoding => GeneratorEncoding.UTF16;
 
     public string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context)
     {

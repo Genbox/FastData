@@ -1,3 +1,4 @@
+using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
 using static Genbox.FastData.Internal.Analysis.KeyAnalyzer;
@@ -51,7 +52,7 @@ public class KeyAnalyzerTests
     [InlineData((object)new[] { "a", "a", "aaa", "aaa" })] //Test duplicates
     public void GetStringProperties_LengthMap_Test(string[] data)
     {
-        StringKeyProperties res = GetStringProperties(data, false, false);
+        StringKeyProperties res = GetStringProperties(data, false, false, GeneratorEncoding.UTF16);
         LengthBitArray map = res.LengthData.LengthMap;
         Assert.Equal(data.Distinct().Count(), map.BitCount);
 
@@ -72,7 +73,7 @@ public class KeyAnalyzerTests
     [InlineData(new[] { "hello world" }, 0, 0)] // One key should result in no prefix/suffix calculation
     public void GetStringProperties_DeltaData_Test(string[] data, int leftZero, int rightZero)
     {
-        StringKeyProperties res = GetStringProperties(data, true, false);
+        StringKeyProperties res = GetStringProperties(data, true, false, GeneratorEncoding.UTF16);
         Assert.Equal(leftZero, res.DeltaData.Prefix.Length);
         Assert.Equal(rightZero, res.DeltaData.Suffix.Length);
     }

@@ -12,12 +12,16 @@
 class MyData final {
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u16string_view key) noexcept {
+    static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 5u)
              return false;
+                uint64_t first = 0;
+                std::memcpy(&first, key.data(), 5);
 
+                if ((first & 878514576011ULL) != 0)
+                    return false;
 
-        if (key == u"test1" || key == u"test2")
+        if (key == u8"test1" || key == u8"test2")
             return true;
 
         return false;

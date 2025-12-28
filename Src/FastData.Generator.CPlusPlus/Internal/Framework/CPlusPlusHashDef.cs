@@ -25,7 +25,7 @@ internal class CPlusPlusHashDef : IHashDef
             return """
                        uint64_t hash = 352654597;
 
-                       for (char32_t ch : value)
+                       for (unsigned char ch : value)
                            hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
 
                        return 352654597 + (hash * 1566083941);

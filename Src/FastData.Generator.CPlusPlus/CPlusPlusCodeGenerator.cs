@@ -18,10 +18,12 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     public static CPlusPlusCodeGenerator Create(CPlusPlusCodeGeneratorConfig userCfg)
     {
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
-        TypeMap map = new TypeMap(langDef.TypeDefinitions, langDef.Encoding);
+        TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
 
         return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(map, userCfg.GeneratorOptions), new CPlusPlusHashDef(), map);
     }
+
+    public override GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
 
     public override string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context)
     {

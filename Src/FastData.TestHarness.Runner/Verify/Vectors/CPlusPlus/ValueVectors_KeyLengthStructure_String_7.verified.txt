@@ -8,16 +8,20 @@
 #include <string_view>
 
 class KeyLengthStructure_String_7 final {
-    static constexpr std::array<std::u16string_view, 8> keys = {
-        u"aaa", u"", u"aaaaa", u"aaaaaa", u"aaaaaaa", u"aaaaaaaa", u"aaaaaaaaa", u"aaaaaaaaaa"
+    static constexpr std::array<std::string_view, 8> keys = {
+        u8"aaa", u8"", u8"aaaaa", u8"aaaaaa", u8"aaaaaaa", u8"aaaaaaaa", u8"aaaaaaaaa", u8"aaaaaaaaaa"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u16string_view key) noexcept {
+    static constexpr bool contains(const std::string_view key) noexcept {
          if (const size_t len = key.length(); len < 3u || len > 10u)
              return false;
+                uint64_t first = 0;
+                std::memcpy(&first, key.data(), 3);
 
+                if ((first & 10395294ULL) != 0)
+                    return false;
 
 
         return key == keys[key.length() - 3];
