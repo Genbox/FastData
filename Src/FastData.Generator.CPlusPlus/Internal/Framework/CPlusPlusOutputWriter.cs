@@ -31,7 +31,7 @@ internal abstract class CPlusPlusOutputWriter<TKey> : OutputWriter<TKey>
         sb.Append(base.GetMethodHeader(methodType));
 
         if (TotalTrimLength != 0)
-            sb.Append($"        const auto trimmedKey = key.substr({TrimPrefix.Length.ToStringInvariant()}, key.length() - {TotalTrimLength.ToStringInvariant()});");
+            sb.Append($"        const auto {TrimmedKeyName} = {InputKeyName}.substr({TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.length() - {TotalTrimLength.ToStringInvariant()});");
 
         return sb.ToString();
     }
