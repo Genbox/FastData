@@ -96,8 +96,8 @@ public sealed class GeneratorConfig<T>
 
     private static IEnumerable<IEarlyExit> GetEarlyExits(StringKeyProperties props, uint itemCount, Type structureType, GeneratorEncoding enc)
     {
-        //There is no point to using early exists if there is just one item
-        if (itemCount == 1)
+        //These don't support early exits
+        if (structureType == typeof(SingleValueStructure<,>))
             yield break;
 
         //Conditional structures are not very useful with less than 3 items as checks costs more than the benefits
@@ -130,6 +130,10 @@ public sealed class GeneratorConfig<T>
 
     private static IEnumerable<IEarlyExit> GetEarlyExits(NumericKeyProperties<T> props, uint itemCount, Type structureType)
     {
+        //These don't support early exits
+        if (structureType == typeof(SingleValueStructure<,>) || structureType == typeof(BitSetStructure<,>) || structureType == typeof(RangeStructure<,>))
+            yield break;
+
         //There is no point to using early exists if there is just one item
         if (itemCount == 1)
             yield break;

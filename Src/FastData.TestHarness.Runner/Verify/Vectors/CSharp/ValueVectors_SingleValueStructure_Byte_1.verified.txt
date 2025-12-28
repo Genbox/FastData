@@ -11,6 +11,8 @@ internal static class SingleValueStructure_Byte_1
     
     public static bool Contains(byte key)
     {
+
+
         return key == 1;
     }
 

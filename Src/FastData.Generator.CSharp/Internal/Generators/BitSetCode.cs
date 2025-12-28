@@ -32,11 +32,11 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
 
         sb.Append($$"""
                         {{MethodAttribute}}
-                        {{MethodModifier}}bool Contains({{KeyTypeName}} key)
+                        {{MethodModifier}}bool Contains({{KeyTypeName}} {{InputKeyName}})
                         {
                     {{GetMethodHeader(MethodType.Contains)}}
 
-                            ulong offset = (ulong)(key - MinKey);
+                            ulong offset = (ulong)({{LookupKeyName}} - MinKey);
                             int word = (int)(offset >> 6);
                             return (_bitset[word] & (1UL << (int)(offset & 63))) != 0;
                         }
@@ -47,11 +47,11 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
+                            {{MethodModifier}}bool TryLookup({{KeyTypeName}} {{InputKeyName}}, out {{ValueTypeName}} value)
                             {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                ulong offset = (ulong)(key - MinKey);
+                                ulong offset = (ulong)({{LookupKeyName}} - MinKey);
                                 int word = (int)(offset >> 6);
                                 if ((_bitset[word] & (1UL << (int)(offset & 63))) == 0)
                                 {

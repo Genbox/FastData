@@ -11,6 +11,8 @@ internal static class SingleValueStructure_UInt16_1
     
     public static bool Contains(ushort key)
     {
+
+
         return key == 1;
     }
 

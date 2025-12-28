@@ -11,6 +11,8 @@ internal static class SingleValueStructure_UInt32_1
     
     public static bool Contains(uint key)
     {
+
+
         return key == 1u;
     }
 

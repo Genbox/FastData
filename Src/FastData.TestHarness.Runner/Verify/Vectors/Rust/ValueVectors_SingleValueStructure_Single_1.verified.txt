@@ -11,6 +11,8 @@ pub struct SingleValueStructure_Single_1;
 impl SingleValueStructure_Single_1 {
     #[must_use]
     pub fn contains(key: f32) -> bool {
+
+
         key == 1.0
     }
 

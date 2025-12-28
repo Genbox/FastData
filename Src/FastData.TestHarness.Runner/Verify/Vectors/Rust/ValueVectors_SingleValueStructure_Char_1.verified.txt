@@ -11,6 +11,8 @@ pub struct SingleValueStructure_Char_1;
 impl SingleValueStructure_Char_1 {
     #[must_use]
     pub fn contains(key: char) -> bool {
+
+
         key == 'a'
     }
 

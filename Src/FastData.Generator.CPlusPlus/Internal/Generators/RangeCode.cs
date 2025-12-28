@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
+using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
@@ -11,8 +12,10 @@ internal sealed class RangeCode<TKey, TValue>(RangeContext<TKey, TValue> ctx) : 
         $$"""
             public:
               {{MethodAttribute}}
-              {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
-                  return key >= {{ctx.Min}} && key <= {{ctx.Max}};
+              {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} {{InputKeyName}}){{PostMethodModifier}} {
+          {{GetMethodHeader(MethodType.Contains)}}
+
+                  return {{LookupKeyName}} >= {{ctx.Min}} && {{LookupKeyName}} <= {{ctx.Max}};
               }
           """;
 }

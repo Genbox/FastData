@@ -11,6 +11,8 @@ internal static class SingleValueStructure_Double_1
     
     public static bool Contains(double key)
     {
+
+
         return key == 1.0;
     }
 

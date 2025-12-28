@@ -11,6 +11,8 @@ class SingleValueStructure_String_1 final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::u32string_view key) noexcept {
+
+
         return key == U"value";
     }
 

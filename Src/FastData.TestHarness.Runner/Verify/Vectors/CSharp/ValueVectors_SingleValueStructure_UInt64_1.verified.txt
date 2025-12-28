@@ -11,6 +11,8 @@ internal static class SingleValueStructure_UInt64_1
     
     public static bool Contains(ulong key)
     {
+
+
         return key == 1ul;
     }
 

@@ -11,6 +11,8 @@ internal static class SingleValueStructure_Int64_1
     
     public static bool Contains(long key)
     {
+
+
         return key == 1l;
     }
 

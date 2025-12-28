@@ -26,7 +26,7 @@ internal abstract class RustOutputWriter<T> : OutputWriter<T>
         sb.Append(base.GetMethodHeader(methodType));
 
         if (TotalTrimLength != 0)
-            sb.Append($"        let trimmedKey = &key[{TrimPrefix.Length.ToStringInvariant()}..key.len() - {TrimSuffix.Length.ToStringInvariant()}];");
+            sb.Append($"        let {TrimmedKeyName} = &{InputKeyName}[{TrimPrefix.Length.ToStringInvariant()}..{InputKeyName}.len() - {TrimSuffix.Length.ToStringInvariant()}];");
 
         return sb.ToString();
     }

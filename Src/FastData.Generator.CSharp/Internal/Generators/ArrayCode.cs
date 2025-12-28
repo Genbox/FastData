@@ -31,7 +31,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
                         };
 
                         {{MethodAttribute}}
-                        {{MethodModifier}}bool Contains({{KeyTypeName}} key)
+                        {{MethodModifier}}bool Contains({{KeyTypeName}} {{InputKeyName}})
                         {
                     {{GetMethodHeader(MethodType.Contains)}}
 
@@ -49,7 +49,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, CS
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}}? value)
+                            {{MethodModifier}}bool TryLookup({{KeyTypeName}} {{InputKeyName}}, out {{ValueTypeName}}? value)
                             {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 

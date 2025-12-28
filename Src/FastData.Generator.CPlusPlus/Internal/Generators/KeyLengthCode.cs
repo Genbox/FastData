@@ -36,7 +36,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
 
                     public:
                         {{MethodAttribute}}
-                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
+                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} {{InputKeyName}}){{PostMethodModifier}} {
                     {{GetMethodHeader(MethodType.Contains)}}
 
                             return {{GetEqualFunction(LookupKeyName, $"keys[{LookupKeyName}.length() - {ctx.MinLength.ToStringInvariant()}]")}};
@@ -49,7 +49,7 @@ internal sealed class KeyLengthCode<TKey, TValue>(KeyLengthContext<TValue> ctx, 
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
+                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} {{InputKeyName}}, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 size_t idx = {{LookupKeyName}}.length() - {{ctx.MinLength.ToStringInvariant()}};

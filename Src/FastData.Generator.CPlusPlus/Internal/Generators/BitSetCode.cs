@@ -33,10 +33,10 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
         sb.Append($$"""
                     public:
                         {{MethodAttribute}}
-                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
+                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} {{InputKeyName}}){{PostMethodModifier}} {
                     {{GetMethodHeader(MethodType.Contains)}}
 
-                            const uint64_t offset = static_cast<uint64_t>(key - min_key);
+                            const uint64_t offset = static_cast<uint64_t>({{LookupKeyName}} - min_key);
                             const size_t word = static_cast<size_t>(offset >> 6);
                             return (bitset[word] & (1ULL << (offset & 63))) != 0;
                         }
@@ -50,10 +50,10 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
+                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} {{InputKeyName}}, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                const uint64_t offset = static_cast<uint64_t>(key - min_key);
+                                const uint64_t offset = static_cast<uint64_t>({{LookupKeyName}} - min_key);
                                 const size_t word = static_cast<size_t>(offset >> 6);
                                 if ((bitset[word] & (1ULL << (offset & 63))) == 0)
                                 {

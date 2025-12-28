@@ -53,7 +53,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                     {{HashSource}}
 
                         {{MethodAttribute}}
-                        {{MethodModifier}}fn contains(key: {{KeyTypeName}}) -> bool {
+                        {{MethodModifier}}fn contains({{InputKeyName}}: {{KeyTypeName}}) -> bool {
                     {{GetMethodHeader(MethodType.Contains)}}
 
                             let hash = unsafe { Self::get_hash({{LookupKeyName}}) };
@@ -70,7 +70,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}fn try_lookup(key: {{KeyTypeName}}) -> Option<{{GetValueTypeName(customValue)}}> {
+                            {{MethodModifier}}fn try_lookup({{InputKeyName}}: {{KeyTypeName}}) -> Option<{{GetValueTypeName(customValue)}}> {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 let hash = unsafe { Self::get_hash({{LookupKeyName}}) };

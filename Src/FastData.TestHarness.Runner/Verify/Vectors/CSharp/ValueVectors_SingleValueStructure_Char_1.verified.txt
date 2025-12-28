@@ -11,6 +11,8 @@ internal static class SingleValueStructure_Char_1
     
     public static bool Contains(char key)
     {
+
+
         return key == 'a';
     }
 

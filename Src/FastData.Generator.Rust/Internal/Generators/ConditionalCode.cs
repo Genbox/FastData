@@ -29,7 +29,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
 
         sb.Append($$"""
                         {{MethodAttribute}}
-                        {{MethodModifier}}fn contains(key: {{GetKeyTypeName(customKey)}}) -> bool {
+                        {{MethodModifier}}fn contains({{InputKeyName}}: {{GetKeyTypeName(customKey)}}) -> bool {
                     {{GetMethodHeader(MethodType.Contains)}}
 
                             if {{FormatList(keys, x => GetEqualFunction(LookupKeyName, ToValueLabel(x)), " || ")}} {
@@ -45,7 +45,7 @@ internal sealed class ConditionalCode<TKey, TValue>(ConditionalContext<TKey, TVa
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}fn try_lookup(key: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customType)}}> {
+                            {{MethodModifier}}fn try_lookup({{InputKeyName}}: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customType)}}> {
                         {{GetMethodHeader(MethodType.TryLookup)}}
                         {{GenerateBranches(keys)}}
                                 None

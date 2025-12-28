@@ -21,8 +21,10 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
 
         sb.Append($$"""
                         {{MethodAttribute}}
-                        {{MethodModifier}}fn contains(key: {{GetKeyTypeName(customKey)}}) -> bool {
-                            {{GetEqualFunction("key", ToValueLabel(ctx.Item))}}
+                        {{MethodModifier}}fn contains({{InputKeyName}}: {{GetKeyTypeName(customKey)}}) -> bool {
+                    {{GetMethodHeader(MethodType.Contains)}}
+
+                            {{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Item))}}
                         }
                     """);
 
@@ -30,8 +32,10 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
         {
             sb.Append($$"""
                             {{MethodAttribute}}
-                            {{MethodModifier}}fn try_lookup(key: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
-                                if ({{GetEqualFunction("key", ToValueLabel(ctx.Item))}}) {
+                            {{MethodModifier}}fn try_lookup({{InputKeyName}}: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
+                        {{GetMethodHeader(MethodType.TryLookup)}}
+
+                                if ({{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Item))}}) {
                                     return Some(Self::STORED_VALUE);
                                 }
                                 None

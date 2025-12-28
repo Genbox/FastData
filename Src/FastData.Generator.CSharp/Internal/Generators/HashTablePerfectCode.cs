@@ -52,7 +52,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
                     {{HashSource}}
 
                         {{MethodAttribute}}
-                        {{MethodModifier}}bool Contains({{KeyTypeName}} key)
+                        {{MethodModifier}}bool Contains({{KeyTypeName}} {{InputKeyName}})
                         {
                     {{GetMethodHeader(MethodType.Contains)}}
 
@@ -71,7 +71,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}bool TryLookup({{KeyTypeName}} key, out {{ValueTypeName}} value)
+                            {{MethodModifier}}bool TryLookup({{KeyTypeName}} {{InputKeyName}}, out {{ValueTypeName}} value)
                             {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 

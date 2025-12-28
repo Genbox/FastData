@@ -11,6 +11,8 @@ internal static class SingleValueStructure_String_1
     
     public static bool Contains(string key)
     {
+
+
         return StringComparer.Ordinal.Equals(key, "value");
     }
 

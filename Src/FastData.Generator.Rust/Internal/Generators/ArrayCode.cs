@@ -33,7 +33,7 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
                         ];
 
                         {{MethodAttribute}}
-                        {{MethodModifier}}fn contains(key: {{GetKeyTypeName(customKey)}}) -> bool {
+                        {{MethodModifier}}fn contains({{InputKeyName}}: {{GetKeyTypeName(customKey)}}) -> bool {
                     {{GetMethodHeader(MethodType.Contains)}}
 
                             for entry in Self::KEYS.iter() {
@@ -50,12 +50,12 @@ internal sealed class ArrayCode<TKey, TValue>(ArrayContext<TKey, TValue> ctx, Sh
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}fn try_lookup(key: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
+                            {{MethodModifier}}fn try_lookup({{InputKeyName}}: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 for entry in Self::KEYS.iter() {
                                     if {{GetEqualFunction("*entry", LookupKeyName)}} {
-                                        return Some(Self::VALUES[(key - 1) as usize])
+                                        return Some(Self::VALUES[({{LookupKeyName}} - 1) as usize])
                                     }
                                 }
                                 None

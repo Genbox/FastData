@@ -38,7 +38,7 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
 
                     public:
                         {{MethodAttribute}}
-                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
+                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} {{InputKeyName}}){{PostMethodModifier}} {
                     {{GetMethodHeader(MethodType.Contains)}}
 
                             const {{HashSizeType}} hash = get_hash({{LookupKeyName}});
@@ -66,7 +66,7 @@ internal sealed class HashTableCompactCode<TKey, TValue>(HashTableCompactContext
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
+                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} {{InputKeyName}}, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 const {{HashSizeType}} hash = get_hash({{LookupKeyName}});

@@ -11,6 +11,8 @@ class SingleValueStructure_UInt32_1 final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const uint32_t key) noexcept {
+
+
         return key == 1u;
     }
 

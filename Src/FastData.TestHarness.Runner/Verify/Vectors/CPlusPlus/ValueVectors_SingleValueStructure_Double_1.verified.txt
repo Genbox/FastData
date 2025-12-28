@@ -11,6 +11,8 @@ class SingleValueStructure_Double_1 final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const double key) noexcept {
+
+
         return key == 1.0;
     }
 

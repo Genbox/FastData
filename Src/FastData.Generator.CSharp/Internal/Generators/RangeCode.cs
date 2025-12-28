@@ -1,4 +1,5 @@
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
+using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
@@ -8,9 +9,11 @@ internal sealed class RangeCode<TKey, TValue>(RangeContext<TKey, TValue> ctx, CS
     public override string Generate() =>
         $$"""
               {{MethodAttribute}}
-              {{MethodModifier}}bool Contains({{KeyTypeName}} key)
+              {{MethodModifier}}bool Contains({{KeyTypeName}} {{InputKeyName}})
               {
-                  return key >= {{ctx.Min}} && key <= {{ctx.Max}};
+          {{GetMethodHeader(MethodType.Contains)}}
+
+                  return {{LookupKeyName}} >= {{ctx.Min}} && {{LookupKeyName}} <= {{ctx.Max}};
               }
           """;
 }

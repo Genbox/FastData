@@ -11,6 +11,8 @@ internal static class SingleValueStructure_Single_1
     
     public static bool Contains(float key)
     {
+
+
         return key == 1f;
     }
 

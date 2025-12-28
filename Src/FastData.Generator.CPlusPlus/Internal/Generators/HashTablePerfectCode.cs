@@ -48,7 +48,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
 
                     public:
                         {{MethodAttribute}}
-                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} key){{PostMethodModifier}} {
+                        {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} {{InputKeyName}}){{PostMethodModifier}} {
                     {{GetMethodHeader(MethodType.Contains)}}
 
                             const {{HashSizeType}} hash = get_hash({{LookupKeyName}});
@@ -67,7 +67,7 @@ internal sealed class HashTablePerfectCode<TKey, TValue>(HashTablePerfectContext
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} key, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
+                            {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} {{InputKeyName}}, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 const {{HashSizeType}} hash = get_hash({{LookupKeyName}});

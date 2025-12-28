@@ -11,6 +11,8 @@ pub struct SingleValueStructure_Int64_1;
 impl SingleValueStructure_Int64_1 {
     #[must_use]
     pub fn contains(key: i64) -> bool {
+
+
         key == 1
     }
 

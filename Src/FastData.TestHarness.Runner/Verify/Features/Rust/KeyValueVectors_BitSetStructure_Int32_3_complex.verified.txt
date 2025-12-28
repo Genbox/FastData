@@ -27,9 +27,6 @@ impl BitSetStructure_Int32_3_complex {
     ];
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if (key as u32 & 4294967292) != 0 {
-            return false;
-        }
 
 
         let offset = ((key as i64) - (Self::MIN_KEY as i64)) as usize;
@@ -39,9 +36,6 @@ impl BitSetStructure_Int32_3_complex {
     }
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
-        if (key as u32 & 4294967292) != 0 {
-            return None;
-        }
 
 
         let offset = ((key as i64) - (Self::MIN_KEY as i64)) as usize;

@@ -11,6 +11,8 @@ internal static class SingleValueStructure_Int32_1
     
     public static bool Contains(int key)
     {
+
+
         return key == 1;
     }
 

@@ -11,6 +11,8 @@ internal static class RangeStructure_Int32_5_range_bitset
     
     public static bool Contains(int key)
     {
+
+
         return key >= 1 && key <= 5;
     }
 

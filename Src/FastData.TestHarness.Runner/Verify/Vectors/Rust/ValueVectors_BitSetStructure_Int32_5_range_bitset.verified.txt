@@ -14,9 +14,6 @@ impl BitSetStructure_Int32_5_range_bitset {
     ];
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if (key as u32 & 4294967288) != 0 {
-            return false;
-        }
 
 
         let offset = ((key as i64) - (Self::MIN_KEY as i64)) as usize;

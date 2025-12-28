@@ -11,6 +11,8 @@ pub struct SingleValueStructure_Byte_1;
 impl SingleValueStructure_Byte_1 {
     #[must_use]
     pub fn contains(key: u8) -> bool {
+
+
         key == 1
     }
 

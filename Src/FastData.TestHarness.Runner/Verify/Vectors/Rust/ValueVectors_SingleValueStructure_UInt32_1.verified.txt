@@ -11,6 +11,8 @@ pub struct SingleValueStructure_UInt32_1;
 impl SingleValueStructure_UInt32_1 {
     #[must_use]
     pub fn contains(key: u32) -> bool {
+
+
         key == 1
     }
 

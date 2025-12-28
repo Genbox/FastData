@@ -48,7 +48,7 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
         sb.Append(base.GetMethodHeader(methodType));
 
         if (TotalTrimLength != 0)
-            sb.Append($"        string trimmedKey = key.Substring({TrimPrefix.Length.ToStringInvariant()}, key.Length - {TotalTrimLength.ToStringInvariant()});");
+            sb.Append($"        string {TrimmedKeyName} = {InputKeyName}.Substring({TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.Length - {TotalTrimLength.ToStringInvariant()});");
 
         return sb.ToString();
     }

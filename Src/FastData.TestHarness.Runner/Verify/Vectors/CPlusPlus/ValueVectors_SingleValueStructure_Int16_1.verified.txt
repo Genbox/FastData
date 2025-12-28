@@ -11,6 +11,8 @@ class SingleValueStructure_Int16_1 final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const int16_t key) noexcept {
+
+
         return key == 1;
     }
 

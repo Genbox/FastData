@@ -25,7 +25,9 @@ public abstract class OutputWriter<TKey> : IOutputWriter
     protected string TrimPrefix => GeneratorConfig.TrimPrefix;
     protected string TrimSuffix => GeneratorConfig.TrimSuffix;
     protected int TotalTrimLength => TrimPrefix.Length + TrimSuffix.Length;
-    protected string LookupKeyName => TotalTrimLength == 0 ? "key" : "trimmedKey";
+    protected virtual string InputKeyName => "key";
+    protected virtual string TrimmedKeyName => "trimmedKey";
+    protected string LookupKeyName => TotalTrimLength == 0 ? InputKeyName : TrimmedKeyName;
 
     public abstract string Generate();
 

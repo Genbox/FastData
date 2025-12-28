@@ -33,7 +33,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
                         ];
 
                         {{MethodAttribute}}
-                        {{MethodModifier}}fn contains(key: {{GetKeyTypeName(customKey)}}) -> bool {
+                        {{MethodModifier}}fn contains({{InputKeyName}}: {{GetKeyTypeName(customKey)}}) -> bool {
                     {{GetMethodHeader(MethodType.Contains)}}
 
                             let mut lo: usize = 0;
@@ -62,7 +62,7 @@ internal sealed class BinarySearchCode<TKey, TValue>(BinarySearchContext<TKey, T
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}fn try_lookup(key: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
+                            {{MethodModifier}}fn try_lookup({{InputKeyName}}: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 let mut lo: usize = 0;

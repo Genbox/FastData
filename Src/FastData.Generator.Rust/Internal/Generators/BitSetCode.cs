@@ -35,7 +35,7 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
 
         sb.Append($$"""
                         {{MethodAttribute}}
-                        {{MethodModifier}}fn contains(key: {{GetKeyTypeName(customKey)}}) -> bool {
+                        {{MethodModifier}}fn contains({{InputKeyName}}: {{GetKeyTypeName(customKey)}}) -> bool {
                     {{GetMethodHeader(MethodType.Contains)}}
 
                             let offset = {{GetOffsetExpression()}};
@@ -50,7 +50,7 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
             sb.Append($$"""
 
                             {{MethodAttribute}}
-                            {{MethodModifier}}fn try_lookup(key: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
+                            {{MethodModifier}}fn try_lookup({{InputKeyName}}: {{GetKeyTypeName(customKey)}}) -> Option<{{GetValueTypeName(customValue)}}> {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
                                 let offset = {{GetOffsetExpression()}};
@@ -70,9 +70,9 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
 
     private string GetOffsetExpression() => GeneratorConfig.KeyType switch
     {
-        KeyType.Char => "(key as u32 - Self::MIN_KEY as u32) as usize",
-        KeyType.SByte or KeyType.Int16 or KeyType.Int32 or KeyType.Int64 => "((key as i64) - (Self::MIN_KEY as i64)) as usize",
-        KeyType.Byte or KeyType.UInt16 or KeyType.UInt32 or KeyType.UInt64 => "((key as u64) - (Self::MIN_KEY as u64)) as usize",
-        _ => "(key - Self::MIN_KEY) as usize"
+        KeyType.Char => $"({LookupKeyName} as u32 - Self::MIN_KEY as u32) as usize",
+        KeyType.SByte or KeyType.Int16 or KeyType.Int32 or KeyType.Int64 => $"(({LookupKeyName} as i64) - (Self::MIN_KEY as i64)) as usize",
+        KeyType.Byte or KeyType.UInt16 or KeyType.UInt32 or KeyType.UInt64 => $"(({LookupKeyName} as u64) - (Self::MIN_KEY as u64)) as usize",
+        _ => $"({LookupKeyName} - Self::MIN_KEY) as usize"
     };
 }
