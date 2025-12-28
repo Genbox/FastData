@@ -8,22 +8,22 @@
 #include <string_view>
 
 class ArrayStructure_String_100 final {
-    static constexpr std::array<std::u32string_view, 100> keys = {
-        U"0", U"1", U"2", U"3", U"4", U"5", U"6", U"7", U"8", U"9", 
-        U"10", U"11", U"12", U"13", U"14", U"15", U"16", U"17", U"18", U"19", 
-        U"20", U"21", U"22", U"23", U"24", U"25", U"26", U"27", U"28", U"29", 
-        U"30", U"31", U"32", U"33", U"34", U"35", U"36", U"37", U"38", U"39", 
-        U"40", U"41", U"42", U"43", U"44", U"45", U"46", U"47", U"48", U"49", 
-        U"50", U"51", U"52", U"53", U"54", U"55", U"56", U"57", U"58", U"59", 
-        U"60", U"61", U"62", U"63", U"64", U"65", U"66", U"67", U"68", U"69", 
-        U"70", U"71", U"72", U"73", U"74", U"75", U"76", U"77", U"78", U"79", 
-        U"80", U"81", U"82", U"83", U"84", U"85", U"86", U"87", U"88", U"89", 
-        U"90", U"91", U"92", U"93", U"94", U"95", U"96", U"97", U"98", U"99"
+    static constexpr std::array<std::u16string_view, 100> keys = {
+        u"0", u"1", u"2", u"3", u"4", u"5", u"6", u"7", u"8", u"9", 
+        u"10", u"11", u"12", u"13", u"14", u"15", u"16", u"17", u"18", u"19", 
+        u"20", u"21", u"22", u"23", u"24", u"25", u"26", u"27", u"28", u"29", 
+        u"30", u"31", u"32", u"33", u"34", u"35", u"36", u"37", u"38", u"39", 
+        u"40", u"41", u"42", u"43", u"44", u"45", u"46", u"47", u"48", u"49", 
+        u"50", u"51", u"52", u"53", u"54", u"55", u"56", u"57", u"58", u"59", 
+        u"60", u"61", u"62", u"63", u"64", u"65", u"66", u"67", u"68", u"69", 
+        u"70", u"71", u"72", u"73", u"74", u"75", u"76", u"77", u"78", u"79", 
+        u"80", u"81", u"82", u"83", u"84", u"85", u"86", u"87", u"88", u"89", 
+        u"90", u"91", u"92", u"93", u"94", u"95", u"96", u"97", u"98", u"99"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u32string_view key) noexcept {
+    static constexpr bool contains(const std::u16string_view key) noexcept {
          if (const size_t len = key.length(); len < 1u || len > 2u)
              return false;
 

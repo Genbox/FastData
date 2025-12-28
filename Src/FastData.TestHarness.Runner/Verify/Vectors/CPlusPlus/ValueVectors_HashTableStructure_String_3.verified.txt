@@ -9,11 +9,11 @@
 
 class HashTableStructure_String_3 final {
     struct e {
-        std::u32string_view key;
+        std::u16string_view key;
         int8_t next;
         uint64_t hash_code;
         
-        e(const std::u32string_view key, const int8_t next, const uint64_t hash_code)
+        e(const std::u16string_view key, const int8_t next, const uint64_t hash_code)
            : key(key), next(next), hash_code(hash_code) {}
     };
 
@@ -22,10 +22,10 @@ class HashTableStructure_String_3 final {
      };
 
     inline static const std::array<e, 3> entries = {
-        e(U"a", -1, 18225461187723808291), e(U"item", 0, 16750939634977259983), e(U"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", -1, 9198652691199425319)
+        e(u"a", -1, 18225461187723808291), e(u"item", 0, 16750939634977259983), e(u"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", -1, 9198652691199425319)
     };
 
-    static constexpr uint64_t get_hash(const std::u32string_view value) noexcept
+    static constexpr uint64_t get_hash(const std::u16string_view value) noexcept
     {
     uint64_t hash = 352654597;
 
@@ -37,7 +37,7 @@ class HashTableStructure_String_3 final {
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u32string_view key) noexcept {
+    static constexpr bool contains(const std::u16string_view key) noexcept {
         switch (key.length() >> 6)
         {
             case 0:

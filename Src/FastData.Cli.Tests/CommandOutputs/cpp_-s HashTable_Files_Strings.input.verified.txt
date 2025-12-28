@@ -11,11 +11,11 @@
 
 class MyData final {
     struct e {
-        std::u32string_view key;
+        std::u16string_view key;
         int8_t next;
         uint64_t hash_code;
         
-        e(const std::u32string_view key, const int8_t next, const uint64_t hash_code)
+        e(const std::u16string_view key, const int8_t next, const uint64_t hash_code)
            : key(key), next(next), hash_code(hash_code) {}
     };
 
@@ -24,10 +24,10 @@ class MyData final {
      };
 
     inline static const std::array<e, 2> entries = {
-        e(U"test1", -1, 114), e(U"test2", 0, 114)
+        e(u"test1", -1, 114), e(u"test2", 0, 114)
     };
 
-    static constexpr uint64_t get_hash(const std::u32string_view value) noexcept
+    static constexpr uint64_t get_hash(const std::u16string_view value) noexcept
     {
     uint64_t hash = 352654597;
 
@@ -39,7 +39,7 @@ class MyData final {
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u32string_view key) noexcept {
+    static constexpr bool contains(const std::u16string_view key) noexcept {
          if (key.length() != 5u)
              return false;
 

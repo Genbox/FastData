@@ -9,11 +9,11 @@
 
 class HashTableStructure_String_13_non_ascii final {
     struct e {
-        std::u32string_view key;
+        std::u16string_view key;
         int8_t next;
         uint64_t hash_code;
         
-        e(const std::u32string_view key, const int8_t next, const uint64_t hash_code)
+        e(const std::u16string_view key, const int8_t next, const uint64_t hash_code)
            : key(key), next(next), hash_code(hash_code) {}
     };
 
@@ -23,11 +23,11 @@ class HashTableStructure_String_13_non_ascii final {
      };
 
     inline static const std::array<e, 13> entries = {
-        e(U"æ", -1, 18225460979434644138), e(U"à", -1, 18225460988831147784), e(U"ä", -1, 18225460982566812020), e(U"ö", -1, 18225461004491987194), e(U"ü", 0, 18225461020152826604), e(U"ß", 3, 18225461065569260893), e(U"é", 4, 18225460999793735371), e(U"è", -1, 18225461001359819312), e(U"ê", -1, 18225460998227651430), e(U"ç", 8, 18225460977868560197), 
-        e(U"ñ", -1, 18225461012322406899), e(U"ø", -1, 18225461026417162368), e(U"å", 7, 18225460981000728079)
+        e(u"æ", -1, 18225460979434644138), e(u"à", -1, 18225460988831147784), e(u"ä", -1, 18225460982566812020), e(u"ö", -1, 18225461004491987194), e(u"ü", 0, 18225461020152826604), e(u"ß", 3, 18225461065569260893), e(u"é", 4, 18225460999793735371), e(u"è", -1, 18225461001359819312), e(u"ê", -1, 18225460998227651430), e(u"ç", 8, 18225460977868560197), 
+        e(u"ñ", -1, 18225461012322406899), e(u"ø", -1, 18225461026417162368), e(u"å", 7, 18225460981000728079)
     };
 
-    static constexpr uint64_t get_hash(const std::u32string_view value) noexcept
+    static constexpr uint64_t get_hash(const std::u16string_view value) noexcept
     {
     uint64_t hash = 352654597;
 
@@ -39,7 +39,7 @@ class HashTableStructure_String_13_non_ascii final {
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u32string_view key) noexcept {
+    static constexpr bool contains(const std::u16string_view key) noexcept {
          if (key.length() != 1u)
              return false;
 

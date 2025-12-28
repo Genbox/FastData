@@ -8,13 +8,13 @@
 #include <string_view>
 
 class KeyLengthStructure_String_7 final {
-    static constexpr std::array<std::u32string_view, 8> keys = {
-        U"aaa", U"", U"aaaaa", U"aaaaaa", U"aaaaaaa", U"aaaaaaaa", U"aaaaaaaaa", U"aaaaaaaaaa"
+    static constexpr std::array<std::u16string_view, 8> keys = {
+        u"aaa", u"", u"aaaaa", u"aaaaaa", u"aaaaaaa", u"aaaaaaaa", u"aaaaaaaaa", u"aaaaaaaaaa"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u32string_view key) noexcept {
+    static constexpr bool contains(const std::u16string_view key) noexcept {
          if (const size_t len = key.length(); len < 3u || len > 10u)
              return false;
 

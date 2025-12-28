@@ -8,14 +8,14 @@
 #include <string_view>
 
 class ArrayStructure_String_13_non_ascii final {
-    static constexpr std::array<std::u32string_view, 13> keys = {
-        U"æ", U"à", U"ä", U"ö", U"ü", U"ß", U"é", U"è", U"ê", U"ç", 
-        U"ñ", U"ø", U"å"
+    static constexpr std::array<std::u16string_view, 13> keys = {
+        u"æ", u"à", u"ä", u"ö", u"ü", u"ß", u"é", u"è", u"ê", u"ç", 
+        u"ñ", u"ø", u"å"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u32string_view key) noexcept {
+    static constexpr bool contains(const std::u16string_view key) noexcept {
          if (key.length() != 1u)
              return false;
 

@@ -7,15 +7,15 @@
 #include <limits>
 #include <string_view>
 
-static inline uint32_t to_lower_ascii(uint32_t c) noexcept
+static constexpr char16_t to_lower_ascii(char16_t c) noexcept
 {
-    if (c - 'A' <= 'Z' - 'A')
-        c |= 0x20u;
+    if (c - u'A' <= u'Z' - u'A')
+        c = static_cast<char16_t>(c | u'\x20');
 
     return c;
 }
 
-static inline bool case_insensitive_equals(std::u32string_view a, std::u32string_view b) noexcept
+static constexpr bool case_insensitive_equals(std::u16string_view a, std::u16string_view b) noexcept
 {
     if (a.size() != b.size())
         return false;
@@ -23,14 +23,14 @@ static inline bool case_insensitive_equals(std::u32string_view a, std::u32string
     size_t len = a.size();
     for (size_t i = 0; i < len; i++)
     {
-        if (to_lower_ascii(static_cast<uint32_t>(a[i])) != to_lower_ascii(static_cast<uint32_t>(b[i])))
+        if (to_lower_ascii(a[i]) != to_lower_ascii(b[i]))
             return false;
     }
 
     return true;
 }
 
-static inline int case_insensitive_compare(std::u32string_view a, std::u32string_view b) noexcept
+static constexpr int case_insensitive_compare(std::u16string_view a, std::u16string_view b) noexcept
 {
     size_t a_len = a.size();
     size_t b_len = b.size();
@@ -38,8 +38,8 @@ static inline int case_insensitive_compare(std::u32string_view a, std::u32string
 
     for (size_t i = 0; i < len; i++)
     {
-        uint32_t ca = to_lower_ascii(static_cast<uint32_t>(a[i]));
-        uint32_t cb = to_lower_ascii(static_cast<uint32_t>(b[i]));
+        auto ca = to_lower_ascii(a[i]);
+        auto cb = to_lower_ascii(b[i]);
 
         if (ca != cb)
             return ca < cb ? -1 : 1;
@@ -51,7 +51,7 @@ static inline int case_insensitive_compare(std::u32string_view a, std::u32string
     return a_len < b_len ? -1 : 1;
 }
 
-static inline bool case_insensitive_starts_with(std::u32string_view value, std::u32string_view prefix) noexcept
+static constexpr bool case_insensitive_starts_with(std::u16string_view value, std::u16string_view prefix) noexcept
 {
     size_t prefix_len = prefix.size();
     if (prefix_len > value.size())
@@ -59,14 +59,14 @@ static inline bool case_insensitive_starts_with(std::u32string_view value, std::
 
     for (size_t i = 0; i < prefix_len; i++)
     {
-        if (to_lower_ascii(static_cast<uint32_t>(value[i])) != to_lower_ascii(static_cast<uint32_t>(prefix[i])))
+        if (to_lower_ascii(value[i]) != to_lower_ascii(prefix[i]))
             return false;
     }
 
     return true;
 }
 
-static inline bool case_insensitive_ends_with(std::u32string_view value, std::u32string_view suffix) noexcept
+static constexpr bool case_insensitive_ends_with(std::u16string_view value, std::u16string_view suffix) noexcept
 {
     size_t suffix_len = suffix.size();
     size_t value_len = value.size();
@@ -78,20 +78,20 @@ static inline bool case_insensitive_ends_with(std::u32string_view value, std::u3
 
     for (size_t i = 0; i < suffix_len; i++)
     {
-        if (to_lower_ascii(static_cast<uint32_t>(value[offset + i])) != to_lower_ascii(static_cast<uint32_t>(suffix[i])))
+        if (to_lower_ascii(value[offset + i]) != to_lower_ascii(suffix[i]))
             return false;
     }
 
     return true;
 }
 class IgnoreCaseSupport final {
-    static constexpr std::array<std::u32string_view, 3> keys = {
-        U"Alpha", U"bravo", U"CHARLIE"
+    static constexpr std::array<std::u16string_view, 3> keys = {
+        u"Alpha", u"bravo", u"CHARLIE"
     };
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const std::u32string_view key) noexcept {
+    static constexpr bool contains(const std::u16string_view key) noexcept {
          if (const size_t len = key.length(); len < 5u || len > 7u)
              return false;
 
@@ -101,7 +101,7 @@ public:
         int32_t hi = 2;
         while (lo <= hi) {
             const int32_t mid = lo + ((hi - lo) >> 1);
-            const std::u32string_view mid_key = keys[mid];
+            const std::u16string_view mid_key = keys[mid];
             const int32_t order = case_insensitive_compare(mid_key, key);
 
             if (order == 0)

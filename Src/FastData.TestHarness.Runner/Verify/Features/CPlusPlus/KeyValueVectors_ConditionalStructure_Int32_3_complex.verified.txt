@@ -9,14 +9,14 @@
 
 struct Person {
     int32_t age;
-    std::u32string_view name;
+    std::u16string_view name;
     const Person* other;
 
-    constexpr Person(const int32_t age, const std::u32string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
+    constexpr Person(const int32_t age, const std::u16string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
 class ConditionalStructure_Int32_3_complex final {
     inline static const std::array<Person*, 3> values = {
-        new Person(1, U"Bob", new Person(4, U"Anna", nullptr)), new Person(2, U"Billy", nullptr), new Person(3, U"Bibi", nullptr)
+        new Person(1, u"Bob", new Person(4, u"Anna", nullptr)), new Person(2, u"Billy", nullptr), new Person(3, u"Bibi", nullptr)
     };
 public:
     [[nodiscard]]

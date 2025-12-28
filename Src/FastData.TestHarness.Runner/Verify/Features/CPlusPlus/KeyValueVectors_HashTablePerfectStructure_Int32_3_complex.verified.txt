@@ -9,10 +9,10 @@
 
 struct Person {
     int32_t age;
-    std::u32string_view name;
+    std::u16string_view name;
     const Person* other;
 
-    constexpr Person(const int32_t age, const std::u32string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
+    constexpr Person(const int32_t age, const std::u16string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
 class HashTablePerfectStructure_Int32_3_complex final {
     struct e {
@@ -24,7 +24,7 @@ class HashTablePerfectStructure_Int32_3_complex final {
         : key(key), value(value) {}
     };
     inline static const std::array<e, 3> entries = {
-        e(3, new Person(3, U"Bibi", nullptr)), e(1, new Person(1, U"Bob", new Person(4, U"Anna", nullptr))), e(2, new Person(2, U"Billy", nullptr))
+        e(3, new Person(3, u"Bibi", nullptr)), e(1, new Person(1, u"Bob", new Person(4, u"Anna", nullptr))), e(2, new Person(2, u"Billy", nullptr))
     };
 
     static constexpr uint64_t get_hash(const int32_t value) noexcept

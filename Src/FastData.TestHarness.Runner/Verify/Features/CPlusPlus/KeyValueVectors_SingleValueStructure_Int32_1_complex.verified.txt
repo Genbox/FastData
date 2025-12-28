@@ -9,13 +9,13 @@
 
 struct Person {
     int32_t age;
-    std::u32string_view name;
+    std::u16string_view name;
     const Person* other;
 
-    constexpr Person(const int32_t age, const std::u32string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
+    constexpr Person(const int32_t age, const std::u16string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
 class SingleValueStructure_Int32_1_complex final {
-      static inline const auto stored_value = new Person(1, U"Bob", new Person(4, U"Anna", nullptr));public:
+      static inline const auto stored_value = new Person(1, u"Bob", new Person(4, u"Anna", nullptr));public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 

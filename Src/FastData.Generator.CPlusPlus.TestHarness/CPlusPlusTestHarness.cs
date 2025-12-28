@@ -87,7 +87,7 @@ public sealed class CPlusPlusTestHarness : TestHarnessBase
         public CPlusPlusRenderer(GeneratorSpec spec)
         {
             CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
-            Encoding = spec.Flags.HasFlag(GeneratorFlags.AllAreASCII) ? GeneratorEncoding.ASCII : langDef.Encoding;
+            Encoding = langDef.Encoding;
             _map = new TypeMap(langDef.TypeDefinitions, Encoding);
         }
 
