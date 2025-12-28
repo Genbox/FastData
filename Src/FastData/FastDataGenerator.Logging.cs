@@ -5,8 +5,11 @@ namespace Genbox.FastData;
 
 public static partial class FastDataGenerator
 {
-    [LoggerMessage(LogLevel.Information, "There are {Count} unique items")]
-    internal static partial void LogUniqueItems(ILogger logger, int count);
+    [LoggerMessage(LogLevel.Information, "There are {Count} keys")]
+    internal static partial void LogNumberOfKeys(ILogger logger, int count);
+
+    [LoggerMessage(LogLevel.Information, "There are {Count} keys, but only {UniqueCount} unique")]
+    internal static partial void LogNumberOfUniqueKeys(ILogger logger, int count, int uniqueCount);
 
     [LoggerMessage(LogLevel.Information, "Data consists of {KeyType}")]
     internal static partial void LogKeyType(ILogger logger, KeyType keyType);

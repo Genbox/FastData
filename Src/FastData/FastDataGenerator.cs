@@ -76,24 +76,21 @@ public static partial class FastDataGenerator
         if (!values.IsEmpty && keys.Length != values.Length)
             throw new InvalidOperationException("The number of values does not match the number of keys.");
 
-        ReadOnlyMemory<string> keyMemory = keys;
-        ReadOnlySpan<string> keySpan = keyMemory.Span;
-
         factory ??= NullLoggerFactory.Instance;
-
-        //Validate that we only have unique data
-        HashSet<string> uniq = new HashSet<string>(StringComparer.Ordinal);
-
-        for (int i = 0; i < keySpan.Length; i++)
-        {
-            string val = keySpan[i];
-            if (!uniq.Add(val))
-                throw new InvalidOperationException($"Duplicate data found: {val}");
-        }
 
         ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));
         LogUserStructureType(logger, fdCfg.StructureType);
-        LogUniqueItems(logger, uniq.Count);
+
+        int oldCount = keys.Length;
+
+        DeduplicateKeys(fdCfg, keys, values, StringComparer.Ordinal, StringComparer.Ordinal, out keys, out values, out int newCount);
+
+        if (oldCount == newCount)
+            LogNumberOfKeys(logger, newCount);
+        else
+            LogNumberOfUniqueKeys(logger, oldCount, newCount);
+
+        ReadOnlySpan<string> keySpan = keys.Span;
 
         const KeyType keyType = KeyType.String;
         LogKeyType(logger, keyType);
@@ -108,14 +105,14 @@ public static partial class FastDataGenerator
         {
             trimPrefix = strProps.DeltaData.Prefix;
             trimSuffix = strProps.DeltaData.Suffix;
-            keyMemory = SubStringKeys(keySpan, strProps);
-            keySpan = keyMemory.Span;
+            keys = SubStringKeys(keySpan, strProps);
+            keySpan = keys.Span;
         }
 
         LogMinMaxLength(logger, strProps.LengthData.LengthMap.Min, strProps.LengthData.LengthMap.Max);
 
         HashDetails hashDetails = new HashDetails();
-        TempStringState<string, TValue> tempState = new TempStringState<string, TValue>(keyMemory, values, fdCfg, generator, strProps, hashDetails, trimPrefix, trimSuffix);
+        TempStringState<string, TValue> tempState = new TempStringState<string, TValue>(keys, values, fdCfg, generator, strProps, hashDetails, trimPrefix, trimSuffix);
 
         switch (fdCfg.StructureType)
         {
@@ -189,28 +186,25 @@ public static partial class FastDataGenerator
         if (!values.IsEmpty && keys.Length != values.Length)
             throw new InvalidOperationException("The number of values does not match the number of keys.");
 
-        ReadOnlySpan<TKey> keySpan = keys.Span;
-
         Type type = typeof(TKey);
 
         if (type != typeof(char) && type != typeof(sbyte) && type != typeof(byte) && type != typeof(short) && type != typeof(ushort) && type != typeof(int) && type != typeof(uint) && type != typeof(long) && type != typeof(ulong) && type != typeof(float) && type != typeof(double))
             throw new InvalidOperationException($"Unsupported data type: {type.Name}");
 
         factory ??= NullLoggerFactory.Instance;
-
-        //Validate that we only have unique data
-        HashSet<TKey> uniq = new HashSet<TKey>();
-
-        for (int i = 0; i < keySpan.Length; i++)
-        {
-            TKey key = keySpan[i];
-            if (!uniq.Add(key))
-                throw new InvalidOperationException($"Duplicate data found: {key}");
-        }
-
         ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));
+
+        int oldCount = keys.Length;
+        DeduplicateKeys(fdCfg, keys, values, EqualityComparer<TKey>.Default, Comparer<TKey>.Default, out keys, out values, out int newCount);
+
+        if (oldCount == newCount)
+            LogNumberOfKeys(logger, newCount);
+        else
+            LogNumberOfUniqueKeys(logger, oldCount, newCount);
+
+        ReadOnlySpan<TKey> keySpan = keys.Span;
+
         LogUserStructureType(logger, fdCfg.StructureType);
-        LogUniqueItems(logger, uniq.Count);
 
         KeyType keyType = (KeyType)Enum.Parse(typeof(KeyType), type.Name, false);
         LogKeyType(logger, keyType);
@@ -264,6 +258,113 @@ public static partial class FastDataGenerator
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
         }
+    }
+
+    private static void DeduplicateKeys<TKey, TValue>(FastDataConfig fdCfg, ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, IEqualityComparer<TKey> equalityComparer, IComparer<TKey> sortComparer, out ReadOnlyMemory<TKey> newKeys, out ReadOnlyMemory<TValue> newValues, out int uniqueCount)
+    {
+        if (fdCfg.DeduplicationMode == DeduplicationMode.Disabled)
+        {
+            TKey[] keyCopy = new TKey[keys.Length];
+            keys.CopyTo(keyCopy);
+            newKeys = keyCopy;
+
+            TValue[] valueCopy = new TValue[values.Length];
+            values.CopyTo(valueCopy);
+            newValues = valueCopy;
+
+            uniqueCount = keyCopy.Length;
+            return;
+        }
+
+        ReadOnlySpan<TKey> keySpan = keys.Span;
+        ReadOnlySpan<TValue> valueSpan = values.Span;
+        bool hasValues = !values.IsEmpty;
+
+        if (fdCfg.DeduplicationMode is DeduplicationMode.HashSet or DeduplicationMode.HashSetThrowOnDup)
+        {
+            HashSet<TKey> uniq = new HashSet<TKey>(equalityComparer);
+            TKey[] keyCopy = new TKey[keys.Length];
+            TValue[] valueCopy = hasValues ? new TValue[values.Length] : [];
+
+            int offset = 0;
+            for (int i = 0; i < keySpan.Length; i++)
+            {
+                TKey key = keySpan[i];
+
+                if (!uniq.Add(key))
+                {
+                    if (fdCfg.DeduplicationMode == DeduplicationMode.HashSetThrowOnDup)
+                        throw new InvalidOperationException($"Duplicate key found: {key}");
+
+                    continue;
+                }
+
+                keyCopy[offset] = key;
+
+                if (hasValues)
+                    valueCopy[offset] = valueSpan[i];
+
+                offset++;
+            }
+
+            newKeys = keyCopy.AsMemory(0, offset);
+            newValues = hasValues ? valueCopy.AsMemory(0, offset) : ReadOnlyMemory<TValue>.Empty;
+            uniqueCount = offset;
+            return;
+        }
+
+        if (fdCfg.DeduplicationMode is DeduplicationMode.Sort or DeduplicationMode.SortThrowOnDup)
+        {
+            int[] map = new int[keys.Length];
+
+            for (int i = 0; i < keys.Length; i++)
+                map[i] = i;
+
+            TKey[] keyCopy = new TKey[keys.Length];
+            keys.CopyTo(keyCopy);
+            Array.Sort(keyCopy, map, sortComparer);
+
+            TValue[] valueCopy = hasValues ? new TValue[values.Length] : [];
+
+            // Handle the first key/value manually to avoid branching inside the for loop below
+            int firstIndex = map[0];
+            TKey last = keySpan[firstIndex]!;
+
+            keyCopy[0] = last;
+
+            if (hasValues)
+                valueCopy[0] = valueSpan[firstIndex];
+
+            int offset = 1;
+            for (int i = 1; i < keys.Length; i++)
+            {
+                int sourceIndex = map[i];
+                TKey key = keySpan[sourceIndex]!;
+
+                if (equalityComparer.Equals(key, last))
+                {
+                    if (fdCfg.DeduplicationMode == DeduplicationMode.SortThrowOnDup)
+                        throw new InvalidOperationException($"Duplicate key found: {key}");
+
+                    continue;
+                }
+
+                keyCopy[offset] = key;
+
+                if (hasValues)
+                    valueCopy[offset] = valueSpan[sourceIndex];
+
+                last = key;
+                offset++;
+            }
+
+            newKeys = keyCopy.AsMemory(0, offset);
+            newValues = hasValues ? valueCopy.AsMemory(0, offset) : ReadOnlyMemory<TValue>.Empty;
+            uniqueCount = offset;
+            return;
+        }
+
+        throw new InvalidOperationException("Unsupported deduplication mode: " + fdCfg.DeduplicationMode);
     }
 
     internal static string[] SubStringKeys(ReadOnlySpan<string> keys, StringKeyProperties props)

@@ -9,11 +9,82 @@ namespace Genbox.FastData.Tests;
 
 public class FastDataGeneratorTests
 {
-    [Fact]
-    public void Generate_ThrowOnDuplicate()
+    [Theory]
+    [InlineData(DeduplicationMode.HashSetThrowOnDup)]
+    [InlineData(DeduplicationMode.SortThrowOnDup)]
+    public void Generate_ThrowOnDuplicate(DeduplicationMode mode)
     {
         FastDataConfig config = new FastDataConfig();
+        config.DeduplicationMode = mode;
+
         Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate(["item", "item"], config, new DummyGenerator()));
+        Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate([1, 2, 2], config, new DummyGenerator()));
+    }
+
+    [Theory]
+    [InlineData(DeduplicationMode.Disabled)]
+    [InlineData(DeduplicationMode.HashSet)]
+    [InlineData(DeduplicationMode.Sort)]
+    public void Generate_NoThrowOnDuplicates(DeduplicationMode mode)
+    {
+        FastDataConfig config = new FastDataConfig();
+        config.DeduplicationMode = mode;
+
+        FastDataGenerator.Generate(["item", "item"], config, new DummyGenerator());
+        FastDataGenerator.Generate([1, 2, 2], config, new DummyGenerator());
+    }
+
+    [Theory]
+    [InlineData(DeduplicationMode.HashSet)]
+    [InlineData(DeduplicationMode.Sort)]
+    public void GenerateKeyed_StringDeduplication_RemovesDuplicates(DeduplicationMode mode)
+    {
+        string[] keys = ["b", "a", "b", "c"];
+        string[] values = ["vb", "va", "vb", "vc"];
+
+        FastDataConfig config = new FastDataConfig(StructureType.Array);
+        config.DeduplicationMode = mode;
+
+        ContextCaptureGenerator generator = new ContextCaptureGenerator();
+        FastDataGenerator.GenerateKeyed(keys, values, config, generator);
+
+        ArrayContext<string, string> ctx = Assert.IsType<ArrayContext<string, string>>(generator.Context);
+        if (mode == DeduplicationMode.HashSet)
+        {
+            Assert.True(ctx.Keys.Span.SequenceEqual(["b", "a", "c"]));
+            Assert.True(ctx.Values.Span.SequenceEqual(["vb", "va", "vc"]));
+        }
+        else
+        {
+            Assert.True(ctx.Keys.Span.SequenceEqual(["a", "b", "c"]));
+            Assert.True(ctx.Values.Span.SequenceEqual(["va", "vb", "vc"]));
+        }
+    }
+
+    [Theory]
+    [InlineData(DeduplicationMode.HashSet)]
+    [InlineData(DeduplicationMode.Sort)]
+    public void GenerateKeyed_NumericDeduplication_RemovesDuplicates(DeduplicationMode mode)
+    {
+        int[] keys = [3, 1, 3, 2];
+        string[] values = ["v3", "v1", "v3", "v2"];
+        FastDataConfig config = new FastDataConfig(StructureType.Array);
+        config.DeduplicationMode = mode;
+        ContextCaptureGenerator generator = new ContextCaptureGenerator();
+
+        FastDataGenerator.GenerateKeyed(keys, values, config, generator);
+
+        ArrayContext<int, string> ctx = Assert.IsType<ArrayContext<int, string>>(generator.Context);
+        if (mode == DeduplicationMode.HashSet)
+        {
+            Assert.True(ctx.Keys.Span.SequenceEqual([3, 1, 2]));
+            Assert.True(ctx.Values.Span.SequenceEqual(["v3", "v1", "v2"]));
+        }
+        else
+        {
+            Assert.True(ctx.Keys.Span.SequenceEqual([1, 2, 3]));
+            Assert.True(ctx.Values.Span.SequenceEqual(["v1", "v2", "v3"]));
+        }
     }
 
     [Fact]
