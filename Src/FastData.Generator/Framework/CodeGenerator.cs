@@ -20,10 +20,6 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
     {
         Shared.Clear();
 
-        // TODO: Reenable encoding reduction optimization
-        // If we can reduce the encoding to ASCII, we do so
-        // map.OverrideEncoding(genCfg.Flags.HasFlag(GeneratorFlags.AllAreASCII) ? GeneratorEncoding.ASCII : Encoding);
-
         string keyTypeName = map.GetTypeName(typeof(TKey));
 
         Type valueType = typeof(TValue);
@@ -72,7 +68,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         if (writer == null)
             throw new NotSupportedException("The context type is not supported: " + context.GetType().Name);
 
-        writer.Initialize(langDef, earlyExitDef, map, hashDef, genCfg, keyTypeName, valueTypeName, context.Values, compiler, Shared);
+        writer.Initialize(langDef, earlyExitDef, map, hashDef, genCfg, keyTypeName, valueTypeName, compiler, Shared);
 
         foreach (string code in Shared.GetType(CodePlacement.InClass))
             sb.AppendLine(code);

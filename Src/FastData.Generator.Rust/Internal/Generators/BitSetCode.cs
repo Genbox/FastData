@@ -68,7 +68,7 @@ internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, 
         return sb.ToString();
     }
 
-    private string GetOffsetExpression() => GeneratorConfig.KeyType switch
+    private string GetOffsetExpression() => KeyType switch
     {
         KeyType.Char => $"({LookupKeyName} as u32 - Self::MIN_KEY as u32) as usize",
         KeyType.SByte or KeyType.Int16 or KeyType.Int32 or KeyType.Int64 => $"(({LookupKeyName} as i64) - (Self::MIN_KEY as i64)) as usize",

@@ -28,8 +28,8 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
 
     internal string GetCompareFunction(string var1, string var2)
     {
-        if (GeneratorConfig.KeyType == KeyType.String)
-            return $"StringComparer.{GetStringComparer(GeneratorConfig.IgnoreCase)}.Compare({var1}, {var2})";
+        if (KeyType == KeyType.String)
+            return $"StringComparer.{GetStringComparer(IgnoreCase)}.Compare({var1}, {var2})";
 
         return $"{var1}.CompareTo({var2})";
     }
@@ -37,7 +37,7 @@ internal abstract class CSharpOutputWriter<T>(CSharpCodeGeneratorConfig cfg) : O
     protected override string GetEqualFunctionInternal(string var1, string var2, KeyType keyType)
     {
         if (keyType == KeyType.String)
-            return $"StringComparer.{GetStringComparer(GeneratorConfig.IgnoreCase)}.Equals({var1}, {var2})";
+            return $"StringComparer.{GetStringComparer(IgnoreCase)}.Equals({var1}, {var2})";
 
         return $"{var1} == {var2}";
     }

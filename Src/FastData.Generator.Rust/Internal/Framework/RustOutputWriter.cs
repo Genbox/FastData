@@ -14,7 +14,7 @@ internal abstract class RustOutputWriter<T> : OutputWriter<T>
 
     protected string GetCompareFunction(string var1, string var2)
     {
-        if (GeneratorConfig.KeyType == KeyType.String && GeneratorConfig.IgnoreCase)
+        if (KeyType == KeyType.String && IgnoreCase)
             return $"case_insensitive_compare({var1}, {var2})";
 
         return $"if {var1} < {var2} {{ -1 }} else if {var1} > {var2} {{ 1 }} else {{ 0 }}";
@@ -33,7 +33,7 @@ internal abstract class RustOutputWriter<T> : OutputWriter<T>
 
     protected override string GetEqualFunctionInternal(string value1, string value2, KeyType keyType)
     {
-        if (keyType == KeyType.String && GeneratorConfig.IgnoreCase)
+        if (keyType == KeyType.String && IgnoreCase)
             return $"case_insensitive_equals({value1}, {value2})";
 
         return $"{value1} == {value2}";
@@ -41,7 +41,7 @@ internal abstract class RustOutputWriter<T> : OutputWriter<T>
 
     protected override void RegisterSharedCode()
     {
-        if (GeneratorConfig.KeyType != KeyType.String || !GeneratorConfig.IgnoreCase)
+        if (KeyType != KeyType.String || !IgnoreCase)
             return;
 
         Shared.Add(CodePlacement.Before, """

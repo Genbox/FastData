@@ -13,47 +13,50 @@ public abstract class OutputWriter<TKey> : IOutputWriter
 {
     private IEarlyExitDef _earlyExitDef = null!;
     private ILanguageDef _langDef = null!;
+    private GeneratorConfig<TKey> _generatorConfig = null!;
+    private TypeMap _typeMap = null!;
 
     protected SharedCode Shared { get; private set; } = null!;
-    protected TypeMap TypeMap { get; private set; } = null!;
+    protected KeyType KeyType => _generatorConfig.KeyType;
+    protected bool IgnoreCase => _generatorConfig.IgnoreCase;
+    protected GeneratorEncoding Encoding => _generatorConfig.Encoding;
     protected string KeyTypeName { get; private set; } = null!;
     protected string ValueTypeName { get; private set; } = null!;
-    protected GeneratorConfig<TKey> GeneratorConfig { get; private set; } = null!;
     protected string HashSource { get; private set; } = null!;
-    protected string HashSizeType => TypeMap.GetTypeName(typeof(ulong));
+    protected string HashSizeType => _typeMap.GetTypeName(typeof(ulong));
     protected string ArraySizeType => _langDef.ArraySizeType;
-    protected string TrimPrefix => GeneratorConfig.TrimPrefix;
-    protected string TrimSuffix => GeneratorConfig.TrimSuffix;
+    protected string TrimPrefix => _generatorConfig.TrimPrefix;
+    protected string TrimSuffix => _generatorConfig.TrimSuffix;
     protected int TotalTrimLength => TrimPrefix.Length + TrimSuffix.Length;
-    protected virtual string InputKeyName => "key";
-    protected virtual string TrimmedKeyName => "trimmedKey";
+    protected static string InputKeyName => "key";
+    protected static string TrimmedKeyName => "trimmedKey";
     protected string LookupKeyName => TotalTrimLength == 0 ? InputKeyName : TrimmedKeyName;
 
     public abstract string Generate();
 
     protected virtual string GetMethodHeader(MethodType methodType)
     {
-        return _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType, GeneratorConfig.IgnoreCase, GeneratorConfig.Encoding);
+        return _earlyExitDef.GetEarlyExits<TKey>(_generatorConfig.EarlyExits, methodType, _generatorConfig.IgnoreCase, _generatorConfig.Encoding);
     }
 
-    internal void Initialize<TValue>(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, ReadOnlyMemory<TValue> values, ExpressionCompiler? compiler, SharedCode shared)
+    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, ExpressionCompiler? compiler, SharedCode shared)
     {
         _langDef = langDef;
         _earlyExitDef = earlyExitDef;
+        _typeMap = map;
+        _generatorConfig = genCfg;
         Shared = shared;
-        TypeMap = map;
-        GeneratorConfig = genCfg;
         KeyTypeName = keyTypeName;
         ValueTypeName = valueTypeName;
 
         //If there is no compiler, or there is no specialized string hash, we give null to the hash definition
         StringHashInfo? stringHash = null;
 
-        if (GeneratorConfig.HashDetails.StringHash != null && compiler != null)
+        if (_generatorConfig.HashDetails.StringHash != null && compiler != null)
         {
             //We convert state from State to StateInfo such that consumers can use it directly
             StateInfo[]? genState = null;
-            State[]? fdState = GeneratorConfig.HashDetails.StringHash.State;
+            State[]? fdState = _generatorConfig.HashDetails.StringHash.State;
 
             if (fdState != null)
             {
@@ -63,22 +66,22 @@ public abstract class OutputWriter<TKey> : IOutputWriter
                 for (int i = 0; i < fdState.Length; i++)
                 {
                     State state = fdState[i];
-                    genState[i] = new StateInfo(state.Name, TypeMap.GetTypeName(state.Type), GetValues(state.Values, TypeMap, state.Type).ToArray());
+                    genState[i] = new StateInfo(state.Name, _typeMap.GetTypeName(state.Type), GetValues(state.Values, _typeMap, state.Type).ToArray());
                 }
             }
 
-            stringHash = new StringHashInfo(compiler.GetCode(GeneratorConfig.HashDetails.StringHash.Expression), GeneratorConfig.HashDetails.StringHash.Functions, genState);
+            stringHash = new StringHashInfo(compiler.GetCode(_generatorConfig.HashDetails.StringHash.Expression), _generatorConfig.HashDetails.StringHash.Functions, genState);
         }
 
-        HashInfo hashInfo = new HashInfo(GeneratorConfig.HashDetails.HasZeroOrNaN, stringHash);
-        HashSource = hashDef.GetHashSource(GeneratorConfig.KeyType, KeyTypeName, hashInfo);
+        HashInfo hashInfo = new HashInfo(_generatorConfig.HashDetails.HasZeroOrNaN, stringHash);
+        HashSource = hashDef.GetHashSource(_generatorConfig.KeyType, KeyTypeName, hashInfo);
         RegisterSharedCode();
     }
 
     protected string GetEqualFunction(string value1, string value2, KeyType keyTypeOverride = KeyType.Null)
     {
         if (keyTypeOverride == KeyType.Null)
-            keyTypeOverride = GeneratorConfig.KeyType;
+            keyTypeOverride = _generatorConfig.KeyType;
 
         return GetEqualFunctionInternal(value1, value2, keyTypeOverride);
     }
@@ -87,10 +90,10 @@ public abstract class OutputWriter<TKey> : IOutputWriter
 
     protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";
 
-    protected string ToValueLabel<T>(T value) => TypeMap.ToValueLabel(value); //Uses its own generics here, not TKey. We need T so we can change the type in generators
-    protected string GetObjectDeclarations<TValue>() => typeof(TValue).IsPrimitive ? "" : TypeMap.GetDeclarations<TValue>(); //We don't have declarations for primitives
-    protected string GetSmallestSignedType(long value) => TypeMap.GetSmallestIntType(value);
-    protected string GetSmallestUnsignedType(long value) => TypeMap.GetSmallestUIntType((ulong)value);
+    protected string ToValueLabel<T>(T value) => _typeMap.ToValueLabel(value); //Uses its own generics here, not TKey. We need T so we can change the type in generators
+    protected string GetObjectDeclarations<TValue>() => typeof(TValue).IsPrimitive ? "" : _typeMap.GetDeclarations<TValue>(); //We don't have declarations for primitives
+    protected string GetSmallestSignedType(long value) => _typeMap.GetSmallestIntType(value);
+    protected string GetSmallestUnsignedType(long value) => _typeMap.GetSmallestUIntType((ulong)value);
 
     private static IEnumerable<string> GetValues(Array array, TypeMap map, Type type)
     {
