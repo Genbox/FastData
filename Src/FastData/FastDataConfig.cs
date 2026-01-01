@@ -50,4 +50,7 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
 
     /// <summary>Maximum relative slowdown allowed for a perfect hash before preferring a faster non-perfect hash.</summary>
     public double PerfectHashMaxSlowdownFactor { get; set; } = 0.25;
+
+    /// <summary>When enabled, data structures will be generated with the smallest possible internal data types to lower memory.</summary>
+    public bool TypeReductionEnabled { get; set; } = true; //TODO: Evaluate default value
 }

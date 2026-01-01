@@ -92,8 +92,8 @@ public abstract class OutputWriter<TKey> : IOutputWriter
 
     protected string ToValueLabel<T>(T value) => _typeMap.ToValueLabel(value); //Uses its own generics here, not TKey. We need T so we can change the type in generators
     protected string GetObjectDeclarations<TValue>() => typeof(TValue).IsPrimitive ? "" : _typeMap.GetDeclarations<TValue>(); //We don't have declarations for primitives
-    protected string GetSmallestSignedType(long value) => _typeMap.GetSmallestIntType(value);
-    protected string GetSmallestUnsignedType(long value) => _typeMap.GetSmallestUIntType((ulong)value);
+    protected string GetSmallestSignedType(long value) => _generatorConfig.TypeReductionEnabled ? _typeMap.GetSmallestIntType(value) : _typeMap.Get<int>().Name;
+    protected string GetSmallestUnsignedType(long value) => _generatorConfig.TypeReductionEnabled ? _typeMap.GetSmallestUIntType((ulong)value) : _typeMap.Get<uint>().Name;
 
     private static IEnumerable<string> GetValues(Array array, TypeMap map, Type type)
     {

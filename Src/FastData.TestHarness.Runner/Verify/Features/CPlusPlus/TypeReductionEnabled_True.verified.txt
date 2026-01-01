@@ -1,0 +1,59 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashTable
+#pragma once
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class TypeReductionEnabled_True final {
+    struct e {
+        uint8_t key;
+        int8_t next;
+        
+        
+        e(const uint8_t key, const int8_t next)
+           : key(key), next(next) {}
+    };
+
+    static constexpr std::array<int8_t, 3> buckets = {
+        3, 2, 0
+     };
+
+    inline static const std::array<e, 3> entries = {
+        e(0, -1), e(1, -1), e(std::numeric_limits<uint8_t>::max(), 0)
+    };
+
+    static constexpr uint64_t get_hash(const uint8_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const uint8_t key) noexcept {
+        if (key < 0 || key > std::numeric_limits<uint8_t>::max())
+            return false;
+
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 3;
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
+
+        while (i >= 0) {
+            const auto& entry = entries[i];
+
+            if (entry.key == key)
+                return true;
+
+            i = entry.next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr uint8_t min_key = 0;
+    static constexpr uint8_t max_key = std::numeric_limits<uint8_t>::max();
+};

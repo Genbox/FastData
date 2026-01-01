@@ -72,6 +72,8 @@ public sealed class GeneratorConfig<T>
     public string TrimPrefix { get; }
     public string TrimSuffix { get; }
 
+    public bool TypeReductionEnabled => _cfg.TypeReductionEnabled;
+
     private static Constants<T> CreateConstants(NumericKeyProperties<T> props, uint itemCount)
     {
         Constants<T> constants = new Constants<T>(itemCount);
@@ -109,7 +111,7 @@ public sealed class GeneratorConfig<T>
         if (ShouldApplyBitSet(lengthData))
             yield return new LengthBitSetEarlyExit(lengthData.LengthMap.Values);
         else
-            yield return new MinMaxLengthEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, lengthData.MinByteCount , lengthData.MaxByteCount ); //Also handles same lengths
+            yield return new MinMaxLengthEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, lengthData.MinByteCount, lengthData.MaxByteCount); //Also handles same lengths
 
         if (ShouldApplyStringBitMask(props.CharacterData.StringBitMask, props.CharacterData.StringBitMaskBytes, out ulong mask))
             yield return new StringBitMaskEarlyExit(mask, props.CharacterData.StringBitMaskBytes);

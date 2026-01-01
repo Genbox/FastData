@@ -69,4 +69,26 @@ public class FeatureTests
         int exitCode = TestHarnessRunnerHelper.RunContainsProgram(harness, spec, lookups, notPresent, className);
         TestHarnessRunnerHelper.AssertSuccessExitCode(exitCode);
     }
+
+    [Theory]
+    [ClassData(typeof(HarnessBoolTheoryData))]
+    public async Task TypeReductionEnabled(ITestHarness harness, bool typeReductionEnabled)
+    {
+        FastDataConfig config = new FastDataConfig(StructureType.HashTable)
+        {
+            TypeReductionEnabled = typeReductionEnabled
+        };
+
+        string className = $"{nameof(TypeReductionEnabled)}_{typeReductionEnabled}";
+        byte[] keys = [byte.MinValue, 1, byte.MaxValue];
+
+        string source = FastDataGenerator.Generate(keys, config, harness.CreateGenerator(className));
+        GeneratorSpec spec = new GeneratorSpec(className, source);
+
+        await TestHarnessRunnerHelper.VerifyFeatureAsync(harness, className, spec.Source);
+
+        byte[] notPresent = [2, 4];
+        int exitCode = TestHarnessRunnerHelper.RunContainsProgram(harness, spec, keys, notPresent, className);
+        TestHarnessRunnerHelper.AssertSuccessExitCode(exitCode);
+    }
 }
