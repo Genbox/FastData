@@ -44,7 +44,7 @@ internal sealed class BitSetStructure<TKey, TValue>(NumericKeyProperties<TKey> p
         KeyType.Byte => static key => (byte)(object)key,
         KeyType.UInt16 => static key => (ushort)(object)key,
         KeyType.UInt32 => static key => (uint)(object)key,
-        KeyType.UInt64 => static key => (long)(object)key,
+        KeyType.UInt64 => static key => (long)(ulong)(object)key,
         KeyType.Char => static key => (ushort)(object)key,
         _ => throw new InvalidOperationException($"Unsupported key type: {keyType}")
     };

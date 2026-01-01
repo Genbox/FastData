@@ -53,4 +53,7 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
 
     /// <summary>When enabled, data structures will be generated with the smallest possible internal data types to lower memory.</summary>
     public bool TypeReductionEnabled { get; set; } = true; //TODO: Evaluate default value
+
+    /// <summary>Enable approximate matching using a Bloom filter for primitive keys.</summary>
+    public bool AllowApproximateMatching { get; set; }
 }

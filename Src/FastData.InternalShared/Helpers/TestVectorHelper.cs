@@ -78,6 +78,7 @@ public static class TestVectorHelper
 
         foreach (ITestVector testVector in GenerateTestVectors(GetDataOfSize(100), null,
                      typeof(ArrayStructure<,>),
+                     typeof(BloomFilterStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableStructure<,>),
@@ -96,6 +97,7 @@ public static class TestVectorHelper
         // Strings with characters that are not in the ASCII range
         foreach (ITestVector testVector in GenerateTestVectors([["æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", "ñ", "ø", "å"]], "non_ascii",
                      typeof(ArrayStructure<,>),
+                     typeof(BloomFilterStructure<,>),
                      typeof(BinarySearchStructure<,>),
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableCompactStructure<,>),

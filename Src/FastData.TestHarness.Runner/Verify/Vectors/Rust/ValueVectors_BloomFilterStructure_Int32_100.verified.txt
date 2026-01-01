@@ -1,0 +1,41 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: BloomFilter
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct BloomFilterStructure_Int32_100;
+
+impl BloomFilterStructure_Int32_100 {
+    const BLOOM: [u64; 23] = [
+        70369021001761, 140738042003523, 281476084007045, 562952168014089, 1125904336028177, 2251808672056353, 4503617344112705, 9007234688225409, 18014400656974081, 36028801313948161, 
+        72057602627896321, 144115205255792641, 288230410511585281, 576460821023170561, 1152921642046341121, 2305843284092682241, 4611686568185364481, 9223373136370728961, 2199031906305, 4398063812611, 
+        8796127625221, 17592255250441, 35184510500881
+    ];
+
+    #[inline(always)]
+    fn get_hash(value: i32) -> u64 {
+        value as u64
+    }
+
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+        if (key as u32 & 4294967168) != 0 {
+            return false;
+        }
+
+
+        let hash = unsafe { Self::get_hash(key) };
+        let index = hash % 23;
+        let shift1 = (hash as u32) & 63;
+        let shift2 = ((hash >> 8) as u32) & 63;
+        let mask = (1u64 << shift1) | (1u64 << shift2);
+        (Self::BLOOM[index as usize] & mask) == mask
+    }
+
+    pub const ITEM_COUNT: usize = 100;
+    pub const MIN_KEY: i32 = 0;
+    pub const MAX_KEY: i32 = 99;
+}

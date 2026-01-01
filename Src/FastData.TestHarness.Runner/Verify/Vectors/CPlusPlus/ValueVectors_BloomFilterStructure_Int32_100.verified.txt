@@ -1,0 +1,40 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BloomFilter
+#pragma once
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class BloomFilterStructure_Int32_100 final {
+    static constexpr std::array<uint64_t, 23> bloom = {
+        70369021001761ull, 140738042003523ull, 281476084007045ull, 562952168014089ull, 1125904336028177ull, 2251808672056353ull, 4503617344112705ull, 9007234688225409ull, 18014400656974081ull, 36028801313948161ull, 
+        72057602627896321ull, 144115205255792641ull, 288230410511585281ull, 576460821023170561ull, 1152921642046341121ull, 2305843284092682241ull, 4611686568185364481ull, 9223373136370728961ull, 2199031906305ull, 4398063812611ull, 
+        8796127625221ull, 17592255250441ull, 35184510500881ull
+    };
+
+    static constexpr uint64_t get_hash(const int32_t value) noexcept
+    {
+        return static_cast<uint64_t>(value);
+    }
+
+          public:
+              [[nodiscard]]
+              static constexpr bool contains(const int32_t key) noexcept {
+        if ((static_cast<uint32_t>(key) & 4294967168u) != 0)
+            return false;
+
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 23;
+        const uint32_t shift1 = static_cast<uint32_t>(hash) & 63u;
+        const uint32_t shift2 = static_cast<uint32_t>(hash >> 8) & 63u;
+        const uint64_t mask = (1ULL << shift1) | (1ULL << shift2);
+        return (bloom[index] & mask) == mask;
+    }
+
+    static constexpr size_t item_count = 100;
+    static constexpr int32_t min_key = 0;
+    static constexpr int32_t max_key = 99;
+};

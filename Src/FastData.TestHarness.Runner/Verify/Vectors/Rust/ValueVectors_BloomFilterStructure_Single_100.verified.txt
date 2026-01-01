@@ -1,0 +1,46 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: BloomFilter
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct BloomFilterStructure_Single_100;
+
+impl BloomFilterStructure_Single_100 {
+    const BLOOM: [u64; 23] = [
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1
+    ];
+
+    #[inline(always)]
+    fn get_hash(value: f32) -> u64 {
+        let mut bits = value.to_bits();
+
+        if ((bits.wrapping_sub(1)) & !0x8000_0000) >= 0x7F80_0000 {
+            bits &= 0x7F80_0000;
+        }
+        bits as u64
+    }
+
+    #[must_use]
+    pub fn contains(key: f32) -> bool {
+        if key < 0.0 || key > 99.0 {
+            return false;
+        }
+
+
+        let hash = unsafe { Self::get_hash(key) };
+        let index = hash % 23;
+        let shift1 = (hash as u32) & 63;
+        let shift2 = ((hash >> 8) as u32) & 63;
+        let mask = (1u64 << shift1) | (1u64 << shift2);
+        (Self::BLOOM[index as usize] & mask) == mask
+    }
+
+    pub const ITEM_COUNT: usize = 100;
+    pub const MIN_KEY: f32 = 0.0;
+    pub const MAX_KEY: f32 = 99.0;
+}

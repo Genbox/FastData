@@ -1,0 +1,61 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: BloomFilter
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct BloomFilterStructure_String_13_non_ascii;
+
+impl BloomFilterStructure_String_13_non_ascii {
+    const BLOOM: [u64; 10] = [
+        70369012875265, 288230376151744770, u64::MIN, u64::MIN, u64::MIN, 9007783405944960, 1082130432, 4611967495551713280, 594475150812906512, 134217856
+    ];
+
+    #[inline]
+    unsafe fn get_hash(value: &str) -> u64 {
+        let mut hash: u64 = 352654597;
+
+        let mut ptr = value.as_ptr();
+        let mut len = value.len();
+
+         while len > 0 {
+                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
+                ptr = ptr.add(1);
+                len -= 1;
+         }
+
+        hash.wrapping_mul(1566083941).wrapping_add(352654597)
+    }
+
+    #[must_use]
+    pub fn contains(key: &'static str) -> bool {
+        if key.len() != 2 as usize {
+            return false;
+        }
+        let bytes = key.as_bytes();
+        let first = (bytes[0] as u64) | (bytes[1] as u64) << 8;
+
+        if (first & 16444u64) != 0 {
+            return false;
+        }
+
+
+        let hash = unsafe { Self::get_hash(key) };
+        let index = hash % 10;
+        let shift1 = (hash as u32) & 63;
+        let shift2 = ((hash >> 8) as u32) & 63;
+        let mask = (1u64 << shift1) | (1u64 << shift2);
+        (Self::BLOOM[index as usize] & mask) == mask
+    }
+
+    pub const ITEM_COUNT: usize = 13;
+    pub const MIN_KEY_LENGTH: usize = 1;
+    pub const MAX_KEY_LENGTH: usize = 1;
+    pub const HAS_NUMBER: bool = false;
+    pub const HAS_UPPERCASE: bool = false;
+    pub const HAS_LOWERCASE: bool = true;
+    pub const HAS_SYMBOL: bool = false;
+    pub const HAS_WHITESPACE: bool = false;
+}

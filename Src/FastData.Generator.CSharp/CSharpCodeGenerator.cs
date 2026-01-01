@@ -79,6 +79,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
         SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, _cfg, Shared),
         RangeContext<TKey, TValue> x => new RangeCode<TKey, TValue>(x, _cfg),
         BitSetContext<TKey, TValue> x => new BitSetCode<TKey, TValue>(x, _cfg, Shared),
+        BloomFilterContext<TKey, TValue> x => new BloomFilterCode<TKey, TValue>(x, _cfg),
         ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, _cfg, Shared),
         BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, _cfg, Shared),
         ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, _cfg, Shared),

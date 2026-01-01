@@ -1,0 +1,44 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BloomFilter
+#pragma once
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class BloomFilterStructure_Single_100 final {
+    static constexpr std::array<uint64_t, 23> bloom = {
+        1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 
+        1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 
+        1ull, 1ull, 1ull
+    };
+
+    static uint64_t get_hash(const float value) noexcept
+    {
+        uint32_t bits;
+        std::memcpy(&bits, &value, sizeof(bits));
+        if (((bits - 1) & ~0x80000000u) >= 0x7F800000u)
+            bits &= 0x7F800000u;
+        return bits;
+    }
+
+          public:
+              [[nodiscard]]
+              static constexpr bool contains(const float key) noexcept {
+        if (key < 0.0f || key > 99.0f)
+            return false;
+
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 23;
+        const uint32_t shift1 = static_cast<uint32_t>(hash) & 63u;
+        const uint32_t shift2 = static_cast<uint32_t>(hash >> 8) & 63u;
+        const uint64_t mask = (1ULL << shift1) | (1ULL << shift2);
+        return (bloom[index] & mask) == mask;
+    }
+
+    static constexpr size_t item_count = 100;
+    static constexpr float min_key = 0.0f;
+    static constexpr float max_key = 99.0f;
+};

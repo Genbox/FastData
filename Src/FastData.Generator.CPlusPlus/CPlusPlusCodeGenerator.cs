@@ -69,6 +69,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, Shared),
         RangeContext<TKey, TValue> x => new RangeCode<TKey, TValue>(x),
         BitSetContext<TKey, TValue> x => new BitSetCode<TKey, TValue>(x, Shared),
+        BloomFilterContext<TKey, TValue> x => new BloomFilterCode<TKey, TValue>(x),
         ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, Shared),
         BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, Shared),
         ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, Shared),

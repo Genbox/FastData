@@ -1,0 +1,64 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: BloomFilter
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct BloomFilterStructure_String_100;
+
+impl BloomFilterStructure_String_100 {
+    const BLOOM: [u64; 23] = [
+        10133101846175744, 2305860740986699928, 576460891889876992, 2328361007652536341, 108386557731308048, 9223376439196254720, 9232382199804727552, 2268415000582, 68720525312, 4614096147992042497, 
+        18155413023244292, 2305843009213694080, 14450503128371429376, 2824095783714816, 17314611264, 8882014389064, 2323857547326394377, 288230377361899681, 3026454408845214208, 565157566628112, 
+        288254840285429792, 361484261993218048, 9009398350348352
+    ];
+
+    #[inline]
+    unsafe fn get_hash(value: &str) -> u64 {
+        let mut hash: u64 = 352654597;
+
+        let mut ptr = value.as_ptr();
+        let mut len = value.len();
+
+         while len > 0 {
+                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
+                ptr = ptr.add(1);
+                len -= 1;
+         }
+
+        hash.wrapping_mul(1566083941).wrapping_add(352654597)
+    }
+
+    #[must_use]
+    pub fn contains(key: &'static str) -> bool {
+        let len = key.len();
+        if len < 1 as usize || len > 2 as usize {
+            return false;
+        }
+        let bytes = key.as_bytes();
+        let first = (bytes[0] as u64);
+
+        if (first & 192u64) != 0 {
+            return false;
+        }
+
+
+        let hash = unsafe { Self::get_hash(key) };
+        let index = hash % 23;
+        let shift1 = (hash as u32) & 63;
+        let shift2 = ((hash >> 8) as u32) & 63;
+        let mask = (1u64 << shift1) | (1u64 << shift2);
+        (Self::BLOOM[index as usize] & mask) == mask
+    }
+
+    pub const ITEM_COUNT: usize = 100;
+    pub const MIN_KEY_LENGTH: usize = 1;
+    pub const MAX_KEY_LENGTH: usize = 2;
+    pub const HAS_NUMBER: bool = true;
+    pub const HAS_UPPERCASE: bool = false;
+    pub const HAS_LOWERCASE: bool = false;
+    pub const HAS_SYMBOL: bool = false;
+    pub const HAS_WHITESPACE: bool = false;
+}

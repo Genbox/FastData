@@ -114,10 +114,45 @@ public static partial class FastDataGenerator
         HashDetails hashDetails = new HashDetails();
         TempStringState<string, TValue> tempState = new TempStringState<string, TValue>(keys, values, fdCfg, generator, strProps, hashDetails, trimPrefix, trimSuffix);
 
+        HashData GetStringHashData(ReadOnlySpan<string> keys2)
+        {
+            StringHashFunc hashFunc;
+
+            if (fdCfg.StringAnalyzerConfig != null)
+            {
+                Candidate candidate = GetBestHash(keys2, strProps, fdCfg.StringAnalyzerConfig, factory, generator.Encoding, true, fdCfg);
+                LogStringHashFitness(logger, candidate.Fitness);
+
+                Expression<StringHashFunc> expression = candidate.StringHash.GetExpression();
+                hashDetails.StringHash = new StringHashDetails(expression, candidate.StringHash.Functions, candidate.StringHash.State);
+
+                hashFunc = expression.Compile();
+            }
+            else
+            {
+                hashFunc = DefaultStringHash.GetInstance(generator.Encoding).GetExpression().Compile();
+
+                //We do not set hashDetails.StringHash here, as the user requested it to be disabled
+            }
+
+            return HashData.Create(keys2, fdCfg.HashCapacityFactor, x =>
+            {
+                //TODO: Optimize this. Maybe reuse the same buffer. Benchmark it
+                byte[] bytes = generator.Encoding == GeneratorEncoding.UTF8 ? Encoding.UTF8.GetBytes(x) : Encoding.Unicode.GetBytes(x);
+                return hashFunc(bytes, bytes.Length);
+            });
+        }
+
         switch (fdCfg.StructureType)
         {
             case StructureType.Auto:
             {
+                if (fdCfg.AllowApproximateMatching && values.IsEmpty)
+                {
+                    HashData bloomHashData = GetStringHashData(keySpan);
+                    return GenerateWrapper(tempState, new BloomFilterStructure<string, TValue>(bloomHashData));
+                }
+
                 if (keySpan.Length == 1)
                     return GenerateWrapper(tempState, new SingleValueStructure<string, TValue>());
 
@@ -142,31 +177,7 @@ public static partial class FastDataGenerator
                 return GenerateWrapper(tempState, new BinarySearchStructure<string, TValue>(keyType, fdCfg.IgnoreCase));
             case StructureType.HashTable:
             {
-                StringHashFunc hashFunc;
-
-                if (fdCfg.StringAnalyzerConfig != null)
-                {
-                    Candidate candidate = GetBestHash(keySpan, strProps, fdCfg.StringAnalyzerConfig, factory, generator.Encoding, true, fdCfg);
-                    LogStringHashFitness(logger, candidate.Fitness);
-
-                    Expression<StringHashFunc> expression = candidate.StringHash.GetExpression();
-                    hashDetails.StringHash = new StringHashDetails(expression, candidate.StringHash.Functions, candidate.StringHash.State);
-
-                    hashFunc = expression.Compile();
-                }
-                else
-                {
-                    hashFunc = DefaultStringHash.GetInstance(generator.Encoding).GetExpression().Compile();
-
-                    //We do not set hashDetails.StringHash here, as the user requested it to be disabled
-                }
-
-                HashData hashData = HashData.Create(keySpan, fdCfg.HashCapacityFactor, x =>
-                {
-                    //TODO: Optimize this. Maybe reuse the same buffer. Benchmark it
-                    byte[] bytes = generator.Encoding == GeneratorEncoding.UTF8 ? Encoding.UTF8.GetBytes(x) : Encoding.Unicode.GetBytes(x);
-                    return hashFunc(bytes, bytes.Length);
-                });
+                HashData hashData = GetStringHashData(keySpan);
 
                 if (hashData.HashCodesPerfect)
                     return GenerateWrapper(tempState, new HashTablePerfectStructure<string, TValue>(hashData, keyType));
@@ -228,7 +239,14 @@ public static partial class FastDataGenerator
                 if (props.IsConsecutive && values.IsEmpty)
                     return GenerateWrapper(tempState, new RangeStructure<TKey, TValue>(props));
 
-                if ((keyType != KeyType.Single && keyType != KeyType.Double) && props.Range <= fdCfg.BitSetStructureMaxRange && keySpan.Length / (double)props.Range >= fdCfg.BitSetStructureMinDensity)
+                if (fdCfg.AllowApproximateMatching)
+                {
+                    HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, props.HasZeroOrNaN);
+                    HashData bloomHashData = HashData.Create(keySpan, fdCfg.HashCapacityFactor, hashFunc);
+                    return GenerateWrapper(tempState, new BloomFilterStructure<TKey, TValue>(bloomHashData));
+                }
+
+                if (keyType != KeyType.Single && keyType != KeyType.Double && props.Range <= fdCfg.BitSetStructureMaxRange && keySpan.Length / (double)props.Range >= fdCfg.BitSetStructureMinDensity)
                     return GenerateWrapper(tempState, new BitSetStructure<TKey, TValue>(props, keyType));
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
@@ -247,7 +265,6 @@ public static partial class FastDataGenerator
             case StructureType.HashTable:
             {
                 HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, props.HasZeroOrNaN);
-
                 HashData hashData = HashData.Create(keySpan, fdCfg.HashCapacityFactor, hashFunc);
 
                 if (hashData.HashCodesPerfect)

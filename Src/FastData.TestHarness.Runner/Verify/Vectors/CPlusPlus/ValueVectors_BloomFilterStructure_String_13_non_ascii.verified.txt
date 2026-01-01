@@ -1,0 +1,53 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BloomFilter
+#pragma once
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class BloomFilterStructure_String_13_non_ascii final {
+    static constexpr std::array<uint64_t, 10> bloom = {
+        70369012875265ull, 288230376151744770ull, 0, 0, 0, 9007783405944960ull, 1082130432ull, 4611967495551713280ull, 594475150812906512ull, 134217856ull
+    };
+
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept
+    {
+    uint64_t hash = 352654597;
+
+    for (unsigned char ch : value)
+        hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+
+    return 352654597 + (hash * 1566083941);
+    }
+
+          public:
+              [[nodiscard]]
+              static constexpr bool contains(const std::string_view key) noexcept {
+         if (key.length() != 2u)
+             return false;
+                uint64_t first = 0;
+                std::memcpy(&first, key.data(), 2);
+
+                if ((first & 16444ULL) != 0)
+                    return false;
+
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 10;
+        const uint32_t shift1 = static_cast<uint32_t>(hash) & 63u;
+        const uint32_t shift2 = static_cast<uint32_t>(hash >> 8) & 63u;
+        const uint64_t mask = (1ULL << shift1) | (1ULL << shift2);
+        return (bloom[index] & mask) == mask;
+    }
+
+    static constexpr size_t item_count = 13;
+    static constexpr size_t min_key_length = 1;
+    static constexpr size_t max_key_length = 1;
+    static constexpr bool has_number = false;
+    static constexpr bool has_uppercase = false;
+    static constexpr bool has_lowercase = true;
+    static constexpr bool has_symbol = false;
+    static constexpr bool has_whitespace = false;
+};
