@@ -228,7 +228,7 @@ public static partial class FastDataGenerator
                 if (props.IsConsecutive && values.IsEmpty)
                     return GenerateWrapper(tempState, new RangeStructure<TKey, TValue>(props));
 
-                if (props.Range <= fdCfg.BitSetStructureMaxRange && keySpan.Length / (double)props.Range >= fdCfg.BitSetStructureMinDensity)
+                if ((keyType != KeyType.Single && keyType != KeyType.Double) && props.Range <= fdCfg.BitSetStructureMaxRange && keySpan.Length / (double)props.Range >= fdCfg.BitSetStructureMinDensity)
                     return GenerateWrapper(tempState, new BitSetStructure<TKey, TValue>(props, keyType));
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.

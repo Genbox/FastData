@@ -170,6 +170,21 @@ public class FastDataGeneratorTests
     }
 
     [Fact]
+    public void Generate_Auto_UsesBitSetForNegativeRanges()
+    {
+        int[] keys = [-2, -1, 0, 2];
+        FastDataConfig config = new FastDataConfig();
+
+        ContextCaptureGenerator generator = new ContextCaptureGenerator();
+        FastDataGenerator.Generate(keys, config, generator);
+
+        BitSetContext<int, byte> ctx = Assert.IsType<BitSetContext<int, byte>>(generator.Context);
+        Assert.True(ctx.Values.IsEmpty);
+        Assert.Single(ctx.BitSet);
+        Assert.Equal(23UL, ctx.BitSet[0]);
+    }
+
+    [Fact]
     public void GenerateKeyed_HashTablePerfect_ReordersValuesToMatchSlots()
     {
         int[] keys = [2, 0, 1];
