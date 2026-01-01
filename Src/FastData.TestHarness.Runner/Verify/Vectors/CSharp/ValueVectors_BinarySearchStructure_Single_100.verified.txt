@@ -27,23 +27,40 @@ internal static class BinarySearchStructure_Single_100
         if (key < 0f || key > 99f)
             return false;
 
-
         int lo = 0;
         int hi = 99;
-        while (lo <= hi)
+        while (lo <= hi && key >= _keys[lo] && key <= _keys[hi])
         {
-            int i = lo + ((hi - lo) >> 1);
-            int order = _keys[i].CompareTo(key);
+            float loKey = _keys[lo];
+            float hiKey = _keys[hi];
 
-            if (order == 0)
+            if (loKey == hiKey)
+            {
+                if (loKey == key)
+                    return true;
+
+                break;
+            }
+
+            double range = (double)hiKey - (double)loKey;
+            double offset = (double)key - (double)loKey;
+            int i = lo + (int)((offset * (hi - lo)) / range);
+
+            if (i < lo)
+                i = lo;
+            else if (i > hi)
+                i = hi;
+
+            float midKey = _keys[i];
+            if (midKey == key)
                 return true;
-            if (order < 0)
+            if (midKey < key)
                 lo = i + 1;
             else
                 hi = i - 1;
         }
 
-        return ~lo >= 0;
+        return false;
     }
 
     public const uint ItemCount = 100;

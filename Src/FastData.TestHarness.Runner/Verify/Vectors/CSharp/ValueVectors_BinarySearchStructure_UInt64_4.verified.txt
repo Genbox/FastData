@@ -18,7 +18,6 @@ internal static class BinarySearchStructure_UInt64_4
         if (key < ulong.MinValue || key > ulong.MaxValue)
             return false;
 
-
         int lo = 0;
         int hi = 3;
         while (lo <= hi)

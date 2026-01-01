@@ -43,7 +43,6 @@ public:
                 if ((first & 150ULL) != 0)
                     return false;
 
-
         int32_t lo = 0;
         int32_t hi = 2;
         while (lo <= hi) {

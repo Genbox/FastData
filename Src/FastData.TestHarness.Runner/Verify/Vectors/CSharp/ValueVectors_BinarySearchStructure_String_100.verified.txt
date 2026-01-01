@@ -32,7 +32,6 @@ internal static class BinarySearchStructure_String_100
         if ((first & 65472UL) != 0)
             return false;
 
-
         int lo = 0;
         int hi = 99;
         while (lo <= hi)

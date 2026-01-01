@@ -28,7 +28,6 @@ public:
         if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
             return false;
 
-
         int32_t lo = 0;
         int32_t hi = 2;
         while (lo <= hi) {
@@ -53,7 +52,6 @@ public:
     value = nullptr;
     return false;
 }
-
 
         int32_t lo = 0;
         int32_t hi = 2;

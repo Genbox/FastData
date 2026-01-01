@@ -24,7 +24,6 @@ public:
                 if ((first & 16444ULL) != 0)
                     return false;
 
-
         int32_t lo = 0;
         int32_t hi = 12;
         while (lo <= hi) {

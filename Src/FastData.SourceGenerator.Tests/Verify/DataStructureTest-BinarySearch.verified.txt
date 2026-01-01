@@ -22,7 +22,6 @@ internal static class StaticData
         if ((first & 18416062867448790934UL) != 0)
             return false;
 
-
         int lo = 0;
         int hi = 2;
         while (lo <= hi)

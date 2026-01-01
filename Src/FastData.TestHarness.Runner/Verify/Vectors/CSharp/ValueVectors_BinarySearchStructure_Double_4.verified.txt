@@ -18,7 +18,6 @@ internal static class BinarySearchStructure_Double_4
         if (key < double.MinValue || key > double.MaxValue)
             return false;
 
-
         int lo = 0;
         int hi = 3;
         while (lo <= hi)

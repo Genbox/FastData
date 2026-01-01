@@ -25,7 +25,6 @@ internal static class PrefixSuffixTrimming_Ordinal
         if (!(key.StartsWith("Pre", StringComparison.Ordinal) && key.EndsWith("Suf", StringComparison.Ordinal)))
             return false;
         string trimmedKey = key.Substring(3, key.Length - 6);
-
         int lo = 0;
         int hi = 2;
         while (lo <= hi)

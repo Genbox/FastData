@@ -116,7 +116,6 @@ public:
         if (!(case_insensitive_starts_with(key, u8"Pre") && case_insensitive_ends_with(key, u8"Suf")))
             return false;
         const auto trimmedKey = key.substr(3, key.length() - 6);
-
         int32_t lo = 0;
         int32_t hi = 2;
         while (lo <= hi) {

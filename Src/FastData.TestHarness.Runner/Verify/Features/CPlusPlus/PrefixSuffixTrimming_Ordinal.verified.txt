@@ -25,7 +25,6 @@ public:
         if (!(key.compare(0, 3, u8"Pre") == 0 && key.compare(key.length() - 3, 3, u8"Suf") == 0))
             return false;
         const auto trimmedKey = key.substr(3, key.length() - 6);
-
         int32_t lo = 0;
         int32_t hi = 2;
         while (lo <= hi) {

@@ -32,7 +32,6 @@ public:
                 if ((first & 192ULL) != 0)
                     return false;
 
-
         int32_t lo = 0;
         int32_t hi = 99;
         while (lo <= hi) {

@@ -108,7 +108,6 @@ public:
                 if ((first & 620648890780ULL) != 0)
                     return false;
 
-
         int32_t lo = 0;
         int32_t hi = 2;
         while (lo <= hi) {

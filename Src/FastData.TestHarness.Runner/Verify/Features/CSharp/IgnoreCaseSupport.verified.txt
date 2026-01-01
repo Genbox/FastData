@@ -26,7 +26,6 @@ internal static class IgnoreCaseSupport
                 if ((first & 18411277741304446876UL) != 0)
                     return false;
 
-
         int lo = 0;
         int hi = 2;
         while (lo <= hi)

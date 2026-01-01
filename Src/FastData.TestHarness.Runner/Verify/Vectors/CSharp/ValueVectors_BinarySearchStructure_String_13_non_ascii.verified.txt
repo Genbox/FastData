@@ -23,7 +23,6 @@ internal static class BinarySearchStructure_String_13_non_ascii
         if ((first & 65280UL) != 0)
             return false;
 
-
         int lo = 0;
         int hi = 12;
         while (lo <= hi)

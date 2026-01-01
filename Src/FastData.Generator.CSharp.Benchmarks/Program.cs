@@ -69,7 +69,7 @@ internal static class Program
                       """);
 
         TestHelper.TryWriteFile(Path.Combine(rootDir, "Program.cs"), sb.ToString());
-        BenchmarkHelper.RunBenchmark("dotnet", "run -c release", rootDir, @"--adapter c_sharp_dot_net --file BenchmarkDotNet.Artifacts\results\CSharp.Program-report-brief-compressed.json --testbed CSharp");
+        // BenchmarkHelper.RunBenchmark("dotnet", "run -c release", rootDir, @"--adapter c_sharp_dot_net --file BenchmarkDotNet.Artifacts\results\CSharp.Program-report-brief-compressed.json --testbed CSharp");
     }
 
     private static string PrintQueries(ITestData data, string identifier)

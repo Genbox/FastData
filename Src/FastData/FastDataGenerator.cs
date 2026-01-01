@@ -174,7 +174,7 @@ public static partial class FastDataGenerator
             case StructureType.Conditional:
                 return GenerateWrapper(tempState, new ConditionalStructure<string, TValue>());
             case StructureType.BinarySearch:
-                return GenerateWrapper(tempState, new BinarySearchStructure<string, TValue>(keyType, fdCfg.IgnoreCase));
+                return GenerateWrapper(tempState, new BinarySearchStructure<string, TValue>(keyType, fdCfg.IgnoreCase, null));
             case StructureType.HashTable:
             {
                 HashData hashData = GetStringHashData(keySpan);
@@ -261,7 +261,7 @@ public static partial class FastDataGenerator
             case StructureType.Conditional:
                 return GenerateWrapper(tempState, new ConditionalStructure<TKey, TValue>());
             case StructureType.BinarySearch:
-                return GenerateWrapper(tempState, new BinarySearchStructure<TKey, TValue>(keyType, fdCfg.IgnoreCase));
+                return GenerateWrapper(tempState, new BinarySearchStructure<TKey, TValue>(keyType, fdCfg.IgnoreCase, props));
             case StructureType.HashTable:
             {
                 HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, props.HasZeroOrNaN);

@@ -27,17 +27,32 @@ public:
         if (key < 0.0f || key > 99.0f)
             return false;
 
-
         int32_t lo = 0;
         int32_t hi = 99;
-        while (lo <= hi) {
-            const int32_t mid = lo + ((hi - lo) >> 1);
-            const float mid_key = keys[mid];
-            const int32_t order = mid_key < key ? -1 : (mid_key > key ? 1 : 0);
+        while (lo <= hi && key >= keys[lo] && key <= keys[hi]) {
+            const float lo_key = keys[lo];
+            const float hi_key = keys[hi];
 
-            if (order == 0)
+            if (lo_key == hi_key) {
+                if (lo_key == key)
+                    return true;
+
+                break;
+            }
+
+            const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
+            const double offset = static_cast<double>(key) - static_cast<double>(lo_key);
+            int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+
+            if (mid < lo)
+                mid = lo;
+            else if (mid > hi)
+                mid = hi;
+
+            const float mid_key = keys[mid];
+            if (mid_key == key)
                 return true;
-            if (order < 0)
+            if (mid_key < key)
                 lo = mid + 1;
             else
                 hi = mid - 1;

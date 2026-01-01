@@ -1,4 +1,5 @@
 ﻿{
+  "UseInterpolation": false,
   "Keys": [
     "item1",
     "item2",

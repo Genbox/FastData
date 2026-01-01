@@ -26,7 +26,6 @@ impl BinarySearchStructure_String_13_non_ascii {
             return false;
         }
 
-
         let mut lo: usize = 0;
         let mut hi: usize = 12;
         while lo <= hi {

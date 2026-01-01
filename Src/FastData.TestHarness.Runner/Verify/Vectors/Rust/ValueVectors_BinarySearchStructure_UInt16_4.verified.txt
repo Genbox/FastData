@@ -19,7 +19,6 @@ impl BinarySearchStructure_UInt16_4 {
             return false;
         }
 
-
         let mut lo: usize = 0;
         let mut hi: usize = 3;
         while lo <= hi {

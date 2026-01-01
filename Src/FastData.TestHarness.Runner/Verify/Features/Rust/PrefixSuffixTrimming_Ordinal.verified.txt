@@ -29,7 +29,6 @@ impl PrefixSuffixTrimming_Ordinal {
             return false;
         }
         let trimmedKey = &key[3..key.len() - 3];
-
         let mut lo: usize = 0;
         let mut hi: usize = 2;
         while lo <= hi {

@@ -1,4 +1,5 @@
 ﻿{
+  "UseInterpolation": false,
   "Keys": [
     -2147483648,
     0,
