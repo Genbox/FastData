@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
@@ -75,6 +76,16 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
         return $"""
                         int len = key.Length;
                         if (len < {map.ToValueLabel(min)} || len > {map.ToValueLabel(max)})
+                            {RenderExit(methodType)}
+                """;
+    }
+
+    protected override string GetLengthDivisorEarlyExit(MethodType methodType, uint charDivisor, uint byteDivisor)
+    {
+        Debug.Assert(charDivisor > 1);
+
+        return $"""
+                        if ((key.Length % {map.ToValueLabel(charDivisor)}) != 0)
                             {RenderExit(methodType)}
                 """;
     }

@@ -107,5 +107,15 @@ public class KeyAnalyzerTests
         Assert.True(lengthData.LengthMap.HasEven);
         Assert.False(lengthData.LengthMap.HasOdd);
         Assert.True(data.AllAscii);
+        Assert.Equal(2u, lengthData.CharDivisor);
+        Assert.Equal(4u, lengthData.ByteDivisor);
+    }
+
+    [Fact]
+    public void GetStringProperties_CommonDivisor_None_Test()
+    {
+        (LengthData lengthData, _, _) = GetStringProperties(new[] { "abc", "abcd" }, false, false, GeneratorEncoding.UTF16);
+        Assert.Equal(0u, lengthData.CharDivisor);
+        Assert.Equal(0u, lengthData.ByteDivisor);
     }
 }

@@ -113,6 +113,9 @@ public sealed class GeneratorConfig<T>
         else
             yield return new MinMaxLengthEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, lengthData.MinByteCount, lengthData.MaxByteCount); //Also handles same lengths
 
+        // if (lengthData.CharDivisor > 1 || lengthData.ByteDivisor > 1)
+            // yield return new LengthDivisorEarlyExit(lengthData.CharDivisor, lengthData.ByteDivisor);
+
         if (ShouldApplyCharRange(props.CharacterData.FirstCharMin, props.CharacterData.LastCharMin, props.LengthData.LengthMap.Min, props.CharacterData.AllAscii, enc, IgnoreCase))
             yield return new CharRangeEarlyExit(props.CharacterData.FirstCharMin, props.CharacterData.FirstCharMax, props.CharacterData.LastCharMin, props.CharacterData.LastCharMax);
         else if (ShouldApplyStringBitMask(props.CharacterData.StringBitMask, props.CharacterData.StringBitMaskBytes, out ulong mask))

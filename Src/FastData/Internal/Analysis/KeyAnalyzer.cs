@@ -3,6 +3,7 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Analysis;
 
@@ -52,6 +53,8 @@ internal static class KeyAnalyzer
         char firstCharMax = char.MinValue;
         char lastCharMin = char.MaxValue;
         char lastCharMax = char.MinValue;
+        uint lengthGcd = 0;
+        uint byteGcd = 0;
 
         foreach (string str in keys)
         {
@@ -73,6 +76,8 @@ internal static class KeyAnalyzer
 
             int length = str.Length;
             uniqLen &= !lengthMap.SetTrue((uint)length);
+            lengthGcd = UpdateGcd(lengthGcd, (uint)length);
+            byteGcd = UpdateGcd(byteGcd, (uint)byteCount);
 
             // Code under here is for first/last char analysis
             char firstChar = str[0];
@@ -171,7 +176,10 @@ internal static class KeyAnalyzer
             }
         }
 
-        return new StringKeyProperties(new LengthData((uint)minByteCount, (uint)maxByteCount, uniqLen, lengthMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskLen, firstCharMin, firstCharMax, lastCharMin, lastCharMax));
+        uint charDivisor = lengthGcd <= 1 ? 0u : lengthGcd;
+        uint byteDivisor = byteGcd <= 1 ? 0u : byteGcd;
+
+        return new StringKeyProperties(new LengthData((uint)minByteCount, (uint)maxByteCount, uniqLen, lengthMap, charDivisor, byteDivisor), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskLen, firstCharMin, firstCharMax, lastCharMin, lastCharMax));
     }
 
     private static int CountZero(int[] data)
@@ -183,6 +191,21 @@ internal static class KeyAnalyzer
                 break;
         }
         return count;
+    }
+
+    private static uint UpdateGcd(uint current, uint value)
+    {
+        if (current == 0)
+            return value;
+
+        while (value != 0)
+        {
+            uint remainder = current % value;
+            current = value;
+            value = remainder;
+        }
+
+        return current;
     }
 
     private static ulong GetStringBitMask(ReadOnlySpan<string> keys, GeneratorEncoding encoding, bool ignoreCase, int byteCount)
