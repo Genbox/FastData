@@ -94,19 +94,11 @@ public:
     static constexpr bool contains(const std::string_view key) noexcept {
          if (const size_t len = key.length(); len < 5u || len > 7u)
              return false;
-                uint64_t first = 0;                uint32_t c0 = static_cast<uint32_t>(key[0]);
-                c0 = to_lower_ascii(c0);
-                first |= static_cast<uint64_t>(c0) << 0;                uint32_t c1 = static_cast<uint32_t>(key[1]);
-                c1 = to_lower_ascii(c1);
-                first |= static_cast<uint64_t>(c1) << 8;                uint32_t c2 = static_cast<uint32_t>(key[2]);
-                c2 = to_lower_ascii(c2);
-                first |= static_cast<uint64_t>(c2) << 16;                uint32_t c3 = static_cast<uint32_t>(key[3]);
-                c3 = to_lower_ascii(c3);
-                first |= static_cast<uint64_t>(c3) << 24;                uint32_t c4 = static_cast<uint32_t>(key[4]);
-                c4 = to_lower_ascii(c4);
-                first |= static_cast<uint64_t>(c4) << 32;
-                if ((first & 620648890780ULL) != 0)
-                    return false;
+        uint32_t firstChar = to_lower_ascii(static_cast<uint32_t>(key.front()));
+        uint32_t lastChar = to_lower_ascii(static_cast<uint32_t>(key.back()));
+
+        if (firstChar < 97u || firstChar > 99u || lastChar < 97u || lastChar > 111u)
+            return false;
 
         int32_t lo = 0;
         int32_t hi = 2;

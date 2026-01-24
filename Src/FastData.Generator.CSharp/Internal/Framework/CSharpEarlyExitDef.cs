@@ -135,6 +135,14 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
         return sb.ToString();
     }
 
+    protected override string GetCharRangeEarlyExit(MethodType methodType, char firstMin, char firstMax, char lastMin, char lastMax, bool ignoreCase, GeneratorEncoding encoding) =>
+        $"""
+                 char firstChar = {(ignoreCase ? "(char)(key[0] | 0x20)" : "key[0]")};
+                 char lastChar = {(ignoreCase ? "(char)(key[key.Length - 1] | 0x20)" : "key[key.Length - 1]")};
+                 if (firstChar < {map.ToValueLabel(firstMin)} || firstChar > {map.ToValueLabel(firstMax)} || lastChar < {map.ToValueLabel(lastMin)} || lastChar > {map.ToValueLabel(lastMax)})
+                     {RenderExit(methodType)}
+         """;
+
     protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
     {
         string comparer = GetStringComparer(ignoreCase);

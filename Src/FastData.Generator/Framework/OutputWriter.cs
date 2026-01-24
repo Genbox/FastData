@@ -36,7 +36,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
 
     protected virtual string GetMethodHeader(MethodType methodType)
     {
-        return _earlyExitDef.GetEarlyExits<TKey>(_generatorConfig.EarlyExits, methodType, _generatorConfig.IgnoreCase, _generatorConfig.Encoding);
+        return _earlyExitDef.GetEarlyExits<TKey>(_generatorConfig.EarlyExits, methodType, _generatorConfig.IgnoreCase, _generatorConfig.Encoding, Shared);
     }
 
     internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, ExpressionCompiler? compiler, SharedCode shared)

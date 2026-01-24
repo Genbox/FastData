@@ -138,6 +138,18 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
         return sb.ToString();
     }
 
+    protected override string GetCharRangeEarlyExit(MethodType methodType, char firstMin, char firstMax, char lastMin, char lastMax, bool ignoreCase, GeneratorEncoding encoding) =>
+        $$"""
+                  let bytes = key.as_bytes();
+                  let len = bytes.len();
+                  {{(ignoreCase ? "let first_char = to_lower_ascii(bytes[0]);" : "let first_char = bytes[0];")}}
+                  {{(ignoreCase ? "let last_char = to_lower_ascii(bytes[len - 1]);" : "let last_char = bytes[len - 1];")}}
+
+                  if first_char < {{map.ToValueLabel((byte)firstMin)}}u8 || first_char > {{map.ToValueLabel((byte)firstMax)}}u8 || last_char < {{map.ToValueLabel((byte)lastMin)}}u8 || last_char > {{map.ToValueLabel((byte)lastMax)}}u8 {
+                      {{RenderExit(methodType)}}
+                  }
+          """;
+
     protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
     {
         string prefixCheck = ignoreCase ? $"case_insensitive_starts_with(key, {map.ToValueLabel(prefix)})" : $"key.starts_with({map.ToValueLabel(prefix)})";

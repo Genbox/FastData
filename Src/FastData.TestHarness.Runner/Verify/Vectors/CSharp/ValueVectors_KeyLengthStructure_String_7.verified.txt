@@ -18,9 +18,9 @@ internal static class KeyLengthStructure_String_7
         int len = key.Length;
         if (len < 3u || len > 10u)
             return false;
-        ulong first = (ulong)key[0] | ((ulong)key[1] << 16) | ((ulong)key[2] << 32);
-
-        if ((first & 281058358525854UL) != 0)
+        char firstChar = key[0];
+        char lastChar = key[key.Length - 1];
+        if (firstChar < 'a' || firstChar > 'a' || lastChar < 'a' || lastChar > 'a')
             return false;
 
 

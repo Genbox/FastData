@@ -11,7 +11,7 @@ public abstract class EarlyExitDef : IEarlyExitDef
 {
     protected abstract bool IsEnabled { get; }
 
-    public string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, bool ignoreCase, GeneratorEncoding encoding)
+    public string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, bool ignoreCase, GeneratorEncoding encoding, SharedCode shared)
     {
         if (!IsEnabled)
             return string.Empty;
@@ -30,6 +30,8 @@ public abstract class EarlyExitDef : IEarlyExitDef
                 sb.AppendLine(GetMaskEarlyExit(methodType, bitSet));
             else if (spec is StringBitMaskEarlyExit(var stringMask, var byteCount))
                 sb.AppendLine(GetStringBitMaskEarlyExit(methodType, stringMask, byteCount, ignoreCase, encoding));
+            else if (spec is CharRangeEarlyExit(var firstMin, var firstMax, var lastMin, var lastMax))
+                sb.AppendLine(GetCharRangeEarlyExit(methodType, firstMin, firstMax, lastMin, lastMax, ignoreCase, encoding));
             else if (spec is PrefixSuffixEarlyExit(var prefix, var suffix))
                 sb.AppendLine(GetPrefixSuffixEarlyExit(methodType, prefix, suffix, ignoreCase));
             else
@@ -44,5 +46,6 @@ public abstract class EarlyExitDef : IEarlyExitDef
     protected abstract string GetValueBitMaskEarlyExit<T>(MethodType methodType, ulong mask);
     protected abstract string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding);
     protected abstract string GetStringBitMaskEarlyExit(MethodType methodType, ulong mask, int byteCount, bool ignoreCase, GeneratorEncoding encoding);
+    protected abstract string GetCharRangeEarlyExit(MethodType methodType, char firstMin, char firstMax, char lastMin, char lastMax, bool ignoreCase, GeneratorEncoding encoding);
     protected abstract string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase);
 }

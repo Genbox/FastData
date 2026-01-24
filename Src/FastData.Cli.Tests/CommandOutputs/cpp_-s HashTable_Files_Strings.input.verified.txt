@@ -37,11 +37,11 @@ public:
     static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 5u)
              return false;
-                uint64_t first = 0;
-                std::memcpy(&first, key.data(), 5);
+        uint32_t firstChar = static_cast<uint32_t>(key.front());
+        uint32_t lastChar = static_cast<uint32_t>(key.back());
 
-                if ((first & 878514576011ULL) != 0)
-                    return false;
+        if (firstChar < 116u || firstChar > 116u || lastChar < 49u || lastChar > 50u)
+            return false;
 
 
         const uint64_t hash = get_hash(key);

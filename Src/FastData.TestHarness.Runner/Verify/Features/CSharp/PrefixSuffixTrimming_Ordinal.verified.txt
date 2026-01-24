@@ -18,9 +18,9 @@ internal static class PrefixSuffixTrimming_Ordinal
         int len = key.Length;
         if (len < 11u || len > 13u)
             return false;
-        ulong first = (ulong)key[0] | ((ulong)key[1] << 16) | ((ulong)key[2] << 32) | ((ulong)key[3] << 48);
-
-        if ((first & 18427884816470769583UL) != 0)
+        char firstChar = key[0];
+        char lastChar = key[key.Length - 1];
+        if (firstChar < 'P' || firstChar > 'P' || lastChar < 'f' || lastChar > 'f')
             return false;
         if (!(key.StartsWith("Pre", StringComparison.Ordinal) && key.EndsWith("Suf", StringComparison.Ordinal)))
             return false;

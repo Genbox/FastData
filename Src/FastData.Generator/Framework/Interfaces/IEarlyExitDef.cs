@@ -6,5 +6,5 @@ namespace Genbox.FastData.Generator.Framework.Interfaces;
 
 public interface IEarlyExitDef
 {
-    string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, bool ignoreCase, GeneratorEncoding encoding);
+    string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, bool ignoreCase, GeneratorEncoding encoding, SharedCode shared);
 }

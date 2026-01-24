@@ -57,9 +57,9 @@ internal static class HashTableStructure_String_13_non_ascii
     {
         if (key.Length != 1u)
             return false;
-        ulong first = (ulong)key[0];
-
-        if ((first & 65280UL) != 0)
+        char firstChar = key[0];
+        char lastChar = key[key.Length - 1];
+        if (firstChar < 'ß' || firstChar > 'ü' || lastChar < 'ß' || lastChar > 'ü')
             return false;
 
 

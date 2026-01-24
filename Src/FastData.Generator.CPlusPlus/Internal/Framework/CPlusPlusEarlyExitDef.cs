@@ -130,6 +130,15 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         return sb.ToString();
     }
 
+    protected override string GetCharRangeEarlyExit(MethodType methodType, char firstMin, char firstMax, char lastMin, char lastMax, bool ignoreCase, GeneratorEncoding encoding) =>
+        $"""
+                 {(ignoreCase ? "uint32_t firstChar = to_lower_ascii(static_cast<uint32_t>(key.front()));" : "uint32_t firstChar = static_cast<uint32_t>(key.front());")}
+                 {(ignoreCase ? "uint32_t lastChar = to_lower_ascii(static_cast<uint32_t>(key.back()));" : "uint32_t lastChar = static_cast<uint32_t>(key.back());")}
+
+                 if (firstChar < {map.ToValueLabel((uint)firstMin)} || firstChar > {map.ToValueLabel((uint)firstMax)} || lastChar < {map.ToValueLabel((uint)lastMin)} || lastChar > {map.ToValueLabel((uint)lastMax)})
+                     {RenderExit(methodType)}
+         """;
+
     protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
     {
         string prefixCheck = ignoreCase ? $"case_insensitive_starts_with(key, {map.ToValueLabel(prefix)})" : $"key.compare(0, {prefix.Length.ToStringInvariant()}, {map.ToValueLabel(prefix)}) == 0";

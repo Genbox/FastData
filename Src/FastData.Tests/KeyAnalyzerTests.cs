@@ -77,4 +77,35 @@ public class KeyAnalyzerTests
         Assert.Equal(leftZero, res.DeltaData.Prefix.Length);
         Assert.Equal(rightZero, res.DeltaData.Suffix.Length);
     }
+
+    [Fact]
+    public void GetStringProperties_CharRange_Test()
+    {
+        StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, false, false, GeneratorEncoding.UTF16);
+        CharacterData data = res.CharacterData;
+        Assert.Equal('A', data.FirstCharMin);
+        Assert.Equal('b', data.FirstCharMax);
+        Assert.Equal('a', data.LastCharMin);
+        Assert.Equal('y', data.LastCharMax);
+    }
+
+    [Fact]
+    public void GetStringProperties_CharRange_IgnoreCase_Test()
+    {
+        StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, false, true, GeneratorEncoding.UTF16);
+        CharacterData data = res.CharacterData;
+        Assert.Equal('a', data.FirstCharMin);
+        Assert.Equal('c', data.FirstCharMax);
+        Assert.Equal('a', data.LastCharMin);
+        Assert.Equal('y', data.LastCharMax);
+    }
+
+    [Fact]
+    public void GetStringProperties_AsciiEarlyExitData_Test()
+    {
+        (LengthData lengthData, _, CharacterData data) = GetStringProperties(new[] { "ab", "ac", "bd" }, false, true, GeneratorEncoding.UTF16);
+        Assert.True(lengthData.LengthMap.HasEven);
+        Assert.False(lengthData.LengthMap.HasOdd);
+        Assert.True(data.AllAscii);
+    }
 }

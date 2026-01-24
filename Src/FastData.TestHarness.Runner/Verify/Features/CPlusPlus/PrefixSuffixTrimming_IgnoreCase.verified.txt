@@ -94,25 +94,11 @@ public:
     static constexpr bool contains(const std::string_view key) noexcept {
          if (const size_t len = key.length(); len < 11u || len > 13u)
              return false;
-                uint64_t first = 0;                uint32_t c0 = static_cast<uint32_t>(key[0]);
-                c0 = to_lower_ascii(c0);
-                first |= static_cast<uint64_t>(c0) << 0;                uint32_t c1 = static_cast<uint32_t>(key[1]);
-                c1 = to_lower_ascii(c1);
-                first |= static_cast<uint64_t>(c1) << 8;                uint32_t c2 = static_cast<uint32_t>(key[2]);
-                c2 = to_lower_ascii(c2);
-                first |= static_cast<uint64_t>(c2) << 16;                uint32_t c3 = static_cast<uint32_t>(key[3]);
-                c3 = to_lower_ascii(c3);
-                first |= static_cast<uint64_t>(c3) << 24;                uint32_t c4 = static_cast<uint32_t>(key[4]);
-                c4 = to_lower_ascii(c4);
-                first |= static_cast<uint64_t>(c4) << 32;                uint32_t c5 = static_cast<uint32_t>(key[5]);
-                c5 = to_lower_ascii(c5);
-                first |= static_cast<uint64_t>(c5) << 40;                uint32_t c6 = static_cast<uint32_t>(key[6]);
-                c6 = to_lower_ascii(c6);
-                first |= static_cast<uint64_t>(c6) << 48;                uint32_t c7 = static_cast<uint32_t>(key[7]);
-                c7 = to_lower_ascii(c7);
-                first |= static_cast<uint64_t>(c7) << 56;
-                if ((first & 10412760500786597263ULL) != 0)
-                    return false;
+        uint32_t firstChar = to_lower_ascii(static_cast<uint32_t>(key.front()));
+        uint32_t lastChar = to_lower_ascii(static_cast<uint32_t>(key.back()));
+
+        if (firstChar < 112u || firstChar > 112u || lastChar < 102u || lastChar > 102u)
+            return false;
         if (!(case_insensitive_starts_with(key, u8"Pre") && case_insensitive_ends_with(key, u8"Suf")))
             return false;
         const auto trimmedKey = key.substr(3, key.length() - 6);

@@ -37,11 +37,11 @@ public:
             default:
                 return false;
         }
-                uint64_t first = 0;
-                std::memcpy(&first, key.data(), 1);
+        uint32_t firstChar = static_cast<uint32_t>(key.front());
+        uint32_t lastChar = static_cast<uint32_t>(key.back());
 
-                if ((first & 150ULL) != 0)
-                    return false;
+        if (firstChar < 97u || firstChar > 105u || lastChar < 97u || lastChar > 109u)
+            return false;
 
 
         for (size_t i = 0; i < 3; i++)

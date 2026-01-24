@@ -48,6 +48,10 @@ internal static class KeyAnalyzer
         bool uniqLen = true;
         bool allAscii = true;
         CharacterClass charClass = CharacterClass.Unknown;
+        char firstCharMin = char.MaxValue;
+        char firstCharMax = char.MinValue;
+        char lastCharMin = char.MaxValue;
+        char lastCharMax = char.MinValue;
 
         foreach (string str in keys)
         {
@@ -67,7 +71,23 @@ internal static class KeyAnalyzer
             minByteCount = Math.Min(byteCount, minByteCount);
             maxByteCount = Math.Max(byteCount, maxByteCount);
 
-            uniqLen &= !lengthMap.SetTrue((uint)str.Length);
+            int length = str.Length;
+            uniqLen &= !lengthMap.SetTrue((uint)length);
+
+            // Code under here is for first/last char analysis
+            char firstChar = str[0];
+            char lastChar = str[str.Length - 1];
+
+            if (ignoreCase)
+            {
+                firstChar = char.ToLowerInvariant(firstChar);
+                lastChar = char.ToLowerInvariant(lastChar);
+            }
+
+            firstCharMin = firstChar < firstCharMin ? firstChar : firstCharMin;
+            firstCharMax = firstChar > firstCharMax ? firstChar : firstCharMax;
+            lastCharMin = lastChar < lastCharMin ? lastChar : lastCharMin;
+            lastCharMax = lastChar > lastCharMax ? lastChar : lastCharMax;
 
             foreach (char c in str)
             {
@@ -151,7 +171,7 @@ internal static class KeyAnalyzer
             }
         }
 
-        return new StringKeyProperties(new LengthData((uint)minByteCount, (uint)maxByteCount, uniqLen, lengthMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskLen));
+        return new StringKeyProperties(new LengthData((uint)minByteCount, (uint)maxByteCount, uniqLen, lengthMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskLen, firstCharMin, firstCharMax, lastCharMin, lastCharMax));
     }
 
     private static int CountZero(int[] data)

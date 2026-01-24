@@ -20,9 +20,11 @@ impl KeyLengthStructure_String_7 {
             return false;
         }
         let bytes = key.as_bytes();
-        let first = (bytes[0] as u64) | (bytes[1] as u64) << 8 | (bytes[2] as u64) << 16;
+        let len = bytes.len();
+        let first_char = bytes[0];
+        let last_char = bytes[len - 1];
 
-        if (first & 10395294u64) != 0 {
+        if first_char < 97u8 || first_char > 97u8 || last_char < 97u8 || last_char > 97u8 {
             return false;
         }
 

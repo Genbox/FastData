@@ -113,7 +113,9 @@ public sealed class GeneratorConfig<T>
         else
             yield return new MinMaxLengthEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, lengthData.MinByteCount, lengthData.MaxByteCount); //Also handles same lengths
 
-        if (ShouldApplyStringBitMask(props.CharacterData.StringBitMask, props.CharacterData.StringBitMaskBytes, out ulong mask))
+        if (ShouldApplyCharRange(props.CharacterData.FirstCharMin, props.CharacterData.LastCharMin, props.LengthData.LengthMap.Min, props.CharacterData.AllAscii, enc, IgnoreCase))
+            yield return new CharRangeEarlyExit(props.CharacterData.FirstCharMin, props.CharacterData.FirstCharMax, props.CharacterData.LastCharMin, props.CharacterData.LastCharMax);
+        else if (ShouldApplyStringBitMask(props.CharacterData.StringBitMask, props.CharacterData.StringBitMaskBytes, out ulong mask))
             yield return new StringBitMaskEarlyExit(mask, props.CharacterData.StringBitMaskBytes);
 
         if (props.DeltaData.Prefix.Length != 0 || props.DeltaData.Suffix.Length != 0)
@@ -206,5 +208,22 @@ public sealed class GeneratorConfig<T>
         int bitWidth = byteCount * 8;
         double density = missingBits / (double)bitWidth;
         return density >= _cfg.StringBitMaskMinDensity;
+    }
+
+    private static bool ShouldApplyCharRange(char firstMin, char lastMin, uint minLength, bool allAscii, GeneratorEncoding encoding, bool ignoreCase)
+    {
+        if (firstMin == char.MaxValue || lastMin == char.MaxValue)
+            return false;
+
+        if (minLength == 0)
+            return false;
+
+        if (ignoreCase && !allAscii)
+            return false;
+
+        if (encoding is GeneratorEncoding.ASCII or GeneratorEncoding.UTF8)
+            return allAscii;
+
+        return true;
     }
 }

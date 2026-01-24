@@ -17,9 +17,11 @@ impl MyData {
             return false;
         }
         let bytes = key.as_bytes();
-        let first = (bytes[0] as u64) | (bytes[1] as u64) << 8 | (bytes[2] as u64) << 16 | (bytes[3] as u64) << 24 | (bytes[4] as u64) << 32;
+        let len = bytes.len();
+        let first_char = bytes[0];
+        let last_char = bytes[len - 1];
 
-        if (first & 878514576011u64) != 0 {
+        if first_char < 116u8 || first_char > 116u8 || last_char < 49u8 || last_char > 50u8 {
             return false;
         }
 

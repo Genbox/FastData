@@ -37,9 +37,11 @@ impl KeyLengthStructure_String_3_complex {
             return false;
         }
         let bytes = key.as_bytes();
-        let first = (bytes[0] as u64);
+        let len = bytes.len();
+        let first_char = bytes[0];
+        let last_char = bytes[len - 1];
 
-        if (first & 158u64) != 0 {
+        if first_char < 97u8 || first_char > 97u8 || last_char < 97u8 || last_char > 97u8 {
             return false;
         }
 
@@ -53,9 +55,11 @@ pub fn try_lookup(key: &'static str) -> Option<&'static Person> {
             return None;
         }
         let bytes = key.as_bytes();
-        let first = (bytes[0] as u64);
+        let len = bytes.len();
+        let first_char = bytes[0];
+        let last_char = bytes[len - 1];
 
-        if (first & 158u64) != 0 {
+        if first_char < 97u8 || first_char > 97u8 || last_char < 97u8 || last_char > 97u8 {
             return None;
         }
 

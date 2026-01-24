@@ -17,11 +17,11 @@ public:
     static constexpr bool contains(const std::string_view key) noexcept {
          if (const size_t len = key.length(); len < 11u || len > 13u)
              return false;
-                uint64_t first = 0;
-                std::memcpy(&first, key.data(), 8);
+        uint32_t firstChar = static_cast<uint32_t>(key.front());
+        uint32_t lastChar = static_cast<uint32_t>(key.back());
 
-                if ((first & 10412760501323468207ULL) != 0)
-                    return false;
+        if (firstChar < 80u || firstChar > 80u || lastChar < 102u || lastChar > 102u)
+            return false;
         if (!(key.compare(0, 3, u8"Pre") == 0 && key.compare(key.length() - 3, 3, u8"Suf") == 0))
             return false;
         const auto trimmedKey = key.substr(3, key.length() - 6);
