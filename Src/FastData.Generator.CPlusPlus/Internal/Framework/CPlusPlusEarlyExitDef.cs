@@ -5,6 +5,7 @@ using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Helpers;
+using Genbox.FastData.Generators.EarlyExits;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
@@ -141,14 +142,42 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         return sb.ToString();
     }
 
-    protected override string GetCharRangeEarlyExit(MethodType methodType, char firstMin, char firstMax, char lastMin, char lastMax, bool ignoreCase, GeneratorEncoding encoding) =>
+    protected override string GetCharRangeEarlyExit(MethodType methodType, CharPosition position, char min, char max, bool ignoreCase, GeneratorEncoding encoding) =>
         $"""
-                 {(ignoreCase ? "uint32_t firstChar = to_lower_ascii(static_cast<uint32_t>(key.front()));" : "uint32_t firstChar = static_cast<uint32_t>(key.front());")}
-                 {(ignoreCase ? "uint32_t lastChar = to_lower_ascii(static_cast<uint32_t>(key.back()));" : "uint32_t lastChar = static_cast<uint32_t>(key.back());")}
-
-                 if (firstChar < {map.ToValueLabel((uint)firstMin)} || firstChar > {map.ToValueLabel((uint)firstMax)} || lastChar < {map.ToValueLabel((uint)lastMin)} || lastChar > {map.ToValueLabel((uint)lastMax)})
+                 uint32_t valueChar = {(position == CharPosition.First ?
+                     ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.front()))" : "static_cast<uint32_t>(key.front())" :
+                     ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.back()))" : "static_cast<uint32_t>(key.back())")};
+                 if (valueChar < {map.ToValueLabel((uint)min)} || valueChar > {map.ToValueLabel((uint)max)})
                      {RenderExit(methodType)}
          """;
+
+    protected override string GetCharEqualsEarlyExit(MethodType methodType, CharPosition position, char value, bool ignoreCase, GeneratorEncoding encoding) =>
+        $"""
+                 uint32_t valueChar = {(position == CharPosition.First ?
+                     ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.front()))" : "static_cast<uint32_t>(key.front())" :
+                     ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.back()))" : "static_cast<uint32_t>(key.back())")};
+                 if (valueChar != {map.ToValueLabel((uint)value)})
+                     {RenderExit(methodType)}
+         """;
+
+    protected override string GetCharBitmapEarlyExit(MethodType methodType, CharPosition position, ulong low, ulong high, bool ignoreCase, GeneratorEncoding encoding) =>
+        $$"""
+                  uint32_t valueChar = {{(position == CharPosition.First ?
+                      ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.front()))" : "static_cast<uint32_t>(key.front())" :
+                      ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.back()))" : "static_cast<uint32_t>(key.back())")}};
+                  if (valueChar > 0x7F)
+                      {{RenderExit(methodType)}}
+                  if (valueChar < 64)
+                  {
+                      if (((1ULL << valueChar) & {{low.ToStringInvariant()}}ULL) == 0)
+                          {{RenderExit(methodType)}}
+                  }
+                  else
+                  {
+                      if (((1ULL << (valueChar - 64)) & {{high.ToStringInvariant()}}ULL) == 0)
+                          {{RenderExit(methodType)}}
+                  }
+          """;
 
     protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
     {

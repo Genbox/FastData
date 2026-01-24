@@ -5,6 +5,7 @@ using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Helpers;
 using Genbox.FastData.Generator.Rust.Enums;
+using Genbox.FastData.Generators.EarlyExits;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
@@ -150,15 +151,48 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
         return sb.ToString();
     }
 
-    protected override string GetCharRangeEarlyExit(MethodType methodType, char firstMin, char firstMax, char lastMin, char lastMax, bool ignoreCase, GeneratorEncoding encoding) =>
+    protected override string GetCharRangeEarlyExit(MethodType methodType, CharPosition position, char min, char max, bool ignoreCase, GeneratorEncoding encoding) =>
         $$"""
                   let bytes = key.as_bytes();
                   let len = bytes.len();
-                  {{(ignoreCase ? "let first_char = to_lower_ascii(bytes[0]);" : "let first_char = bytes[0];")}}
-                  {{(ignoreCase ? "let last_char = to_lower_ascii(bytes[len - 1]);" : "let last_char = bytes[len - 1];")}}
-
-                  if first_char < {{map.ToValueLabel((byte)firstMin)}}u8 || first_char > {{map.ToValueLabel((byte)firstMax)}}u8 || last_char < {{map.ToValueLabel((byte)lastMin)}}u8 || last_char > {{map.ToValueLabel((byte)lastMax)}}u8 {
+                  let value_char = {{(position == CharPosition.First
+                      ? ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]"
+                      : ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}};
+                  if value_char < {{map.ToValueLabel((byte)min)}}u8 || value_char > {{map.ToValueLabel((byte)max)}}u8 {
                       {{RenderExit(methodType)}}
+                  }
+          """;
+
+    protected override string GetCharEqualsEarlyExit(MethodType methodType, CharPosition position, char value, bool ignoreCase, GeneratorEncoding encoding) =>
+        $$"""
+                  let bytes = key.as_bytes();
+                  let len = bytes.len();
+                  let value_char = {{(position == CharPosition.First
+                      ? ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]"
+                      : ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}};
+                  if value_char != {{map.ToValueLabel((byte)value)}} {
+                      {{RenderExit(methodType)}}
+                  }
+          """;
+
+    protected override string GetCharBitmapEarlyExit(MethodType methodType, CharPosition position, ulong low, ulong high, bool ignoreCase, GeneratorEncoding encoding) =>
+        $$"""
+                  let bytes = key.as_bytes();
+                  let len = bytes.len();
+                  let value_char = {{(position == CharPosition.First ?
+                      ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]" :
+                      ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}} as u32;
+                  if value_char > 0x7F {
+                      {{RenderExit(methodType)}}
+                  }
+                  if value_char < 64 {
+                      if (((1u64 << value_char) & {{low.ToStringInvariant()}}u64) == 0) {
+                          {{RenderExit(methodType)}}
+                      }
+                  } else {
+                      if (((1u64 << (value_char - 64)) & {{high.ToStringInvariant()}}u64) == 0) {
+                          {{RenderExit(methodType)}}
+                      }
                   }
           """;
 

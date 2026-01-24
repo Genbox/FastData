@@ -5,6 +5,7 @@ using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Helpers;
+using Genbox.FastData.Generators.EarlyExits;
 using static Genbox.FastData.Generator.CSharp.Internal.StringHelper;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
@@ -146,13 +147,42 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
         return sb.ToString();
     }
 
-    protected override string GetCharRangeEarlyExit(MethodType methodType, char firstMin, char firstMax, char lastMin, char lastMax, bool ignoreCase, GeneratorEncoding encoding) =>
+    protected override string GetCharRangeEarlyExit(MethodType methodType, CharPosition position, char min, char max, bool ignoreCase, GeneratorEncoding encoding) =>
         $"""
-                 char firstChar = {(ignoreCase ? "(char)(key[0] | 0x20)" : "key[0]")};
-                 char lastChar = {(ignoreCase ? "(char)(key[key.Length - 1] | 0x20)" : "key[key.Length - 1]")};
-                 if (firstChar < {map.ToValueLabel(firstMin)} || firstChar > {map.ToValueLabel(firstMax)} || lastChar < {map.ToValueLabel(lastMin)} || lastChar > {map.ToValueLabel(lastMax)})
+                 char valueChar = {(position == CharPosition.First ?
+                     ignoreCase ? "(char)(key[0] | 0x20)" : "key[0]" :
+                     ignoreCase ? "(char)(key[key.Length - 1] | 0x20)" : "key[key.Length - 1]")};
+                 if (valueChar < {map.ToValueLabel(min)} || valueChar > {map.ToValueLabel(max)})
                      {RenderExit(methodType)}
          """;
+
+    protected override string GetCharEqualsEarlyExit(MethodType methodType, CharPosition position, char value, bool ignoreCase, GeneratorEncoding encoding) =>
+        $"""
+                 char valueChar = {(position == CharPosition.First ?
+                     ignoreCase ? "(char)(key[0] | 0x20)" : "key[0]" :
+                     ignoreCase ? "(char)(key[key.Length - 1] | 0x20)" : "key[key.Length - 1]")};
+                 if (valueChar != {map.ToValueLabel(value)})
+                     {RenderExit(methodType)}
+         """;
+
+    protected override string GetCharBitmapEarlyExit(MethodType methodType, CharPosition position, ulong low, ulong high, bool ignoreCase, GeneratorEncoding encoding) =>
+        $$"""
+                  uint valueChar = {{(position == CharPosition.First ?
+                      ignoreCase ? "(uint)(key[0] | 0x20)" : "key[0]" :
+                      ignoreCase ? "(uint)(key[key.Length - 1] | 0x20)" : "key[key.Length - 1]")}};
+                  if (valueChar > 0x7F)
+                      {{RenderExit(methodType)}}
+                  if (valueChar < 64)
+                  {
+                      if (((1UL << (int)valueChar) & {{low.ToStringInvariant()}}UL) == 0)
+                          {{RenderExit(methodType)}}
+                  }
+                  else
+                  {
+                      if (((1UL << (int)(valueChar - 64)) & {{high.ToStringInvariant()}}UL) == 0)
+                          {{RenderExit(methodType)}}
+                  }
+          """;
 
     protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
     {

@@ -42,6 +42,9 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
     /// <summary>Minimum missing-bit density required to use the string bitmask early exit for string keys.</summary>
     public double StringBitMaskMinDensity { get; set; } = 0.25;
 
+    /// <summary>Minimum density required to use range checks for ASCII character maps.</summary>
+    public double CharMapMinDensity { get; set; } = 0.45;
+
     /// <summary>Minimum length density required to use KeyLengthStructure in Auto mode.</summary>
     public double KeyLengthStructureMinDensity { get; set; } = 0.75;
 

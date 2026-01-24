@@ -83,10 +83,10 @@ public class KeyAnalyzerTests
     {
         StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, false, false, GeneratorEncoding.UTF16);
         CharacterData data = res.CharacterData;
-        Assert.Equal('A', data.FirstCharMin);
-        Assert.Equal('b', data.FirstCharMax);
-        Assert.Equal('a', data.LastCharMin);
-        Assert.Equal('y', data.LastCharMax);
+        Assert.Equal('A', data.FirstCharMap.Min);
+        Assert.Equal('b', data.FirstCharMap.Max);
+        Assert.Equal('a', data.LastCharMap.Min);
+        Assert.Equal('y', data.LastCharMap.Max);
     }
 
     [Fact]
@@ -94,10 +94,10 @@ public class KeyAnalyzerTests
     {
         StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, false, true, GeneratorEncoding.UTF16);
         CharacterData data = res.CharacterData;
-        Assert.Equal('a', data.FirstCharMin);
-        Assert.Equal('c', data.FirstCharMax);
-        Assert.Equal('a', data.LastCharMin);
-        Assert.Equal('y', data.LastCharMax);
+        Assert.Equal('a', data.FirstCharMap.Min);
+        Assert.Equal('c', data.FirstCharMap.Max);
+        Assert.Equal('a', data.LastCharMap.Min);
+        Assert.Equal('y', data.LastCharMap.Max);
     }
 
     [Fact]

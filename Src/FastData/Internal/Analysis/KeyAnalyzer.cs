@@ -49,10 +49,8 @@ internal static class KeyAnalyzer
         bool uniqLen = true;
         bool allAscii = true;
         CharacterClass charClass = CharacterClass.Unknown;
-        char firstCharMin = char.MaxValue;
-        char firstCharMax = char.MinValue;
-        char lastCharMin = char.MaxValue;
-        char lastCharMax = char.MinValue;
+        AsciiMap firstCharMap = new AsciiMap();
+        AsciiMap lastCharMap = new AsciiMap();
         uint lengthGcd = 0;
         uint byteGcd = 0;
 
@@ -89,10 +87,8 @@ internal static class KeyAnalyzer
                 lastChar = char.ToLowerInvariant(lastChar);
             }
 
-            firstCharMin = firstChar < firstCharMin ? firstChar : firstCharMin;
-            firstCharMax = firstChar > firstCharMax ? firstChar : firstCharMax;
-            lastCharMin = lastChar < lastCharMin ? lastChar : lastCharMin;
-            lastCharMax = lastChar > lastCharMax ? lastChar : lastCharMax;
+            firstCharMap.Add(firstChar);
+            lastCharMap.Add(lastChar);
 
             foreach (char c in str)
             {
@@ -179,7 +175,7 @@ internal static class KeyAnalyzer
         uint charDivisor = lengthGcd <= 1 ? 0u : lengthGcd;
         uint byteDivisor = byteGcd <= 1 ? 0u : byteGcd;
 
-        return new StringKeyProperties(new LengthData((uint)minByteCount, (uint)maxByteCount, uniqLen, lengthMap, charDivisor, byteDivisor), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskLen, firstCharMin, firstCharMax, lastCharMin, lastCharMax));
+        return new StringKeyProperties(new LengthData((uint)minByteCount, (uint)maxByteCount, uniqLen, lengthMap, charDivisor, byteDivisor), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskLen, firstCharMap, lastCharMap));
     }
 
     private static int CountZero(int[] data)

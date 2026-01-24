@@ -32,8 +32,12 @@ public abstract class EarlyExitDef : IEarlyExitDef
                 sb.AppendLine(GetStringBitMaskEarlyExit(methodType, stringMask, byteCount, ignoreCase, encoding));
             else if (spec is LengthDivisorEarlyExit(var charDivisor, var byteDivisor))
                 sb.AppendLine(GetLengthDivisorEarlyExit(methodType, charDivisor, byteDivisor));
-            else if (spec is CharRangeEarlyExit(var firstMin, var firstMax, var lastMin, var lastMax))
-                sb.AppendLine(GetCharRangeEarlyExit(methodType, firstMin, firstMax, lastMin, lastMax, ignoreCase, encoding));
+            else if (spec is CharRangeEarlyExit(var rangePosition, var min, var max))
+                sb.AppendLine(GetCharRangeEarlyExit(methodType, rangePosition, min, max, ignoreCase, encoding));
+            else if (spec is CharEqualsEarlyExit(var equalsPosition, var value))
+                sb.AppendLine(GetCharEqualsEarlyExit(methodType, equalsPosition, value, ignoreCase, encoding));
+            else if (spec is CharBitmapEarlyExit(var bitmapPosition, var low, var high))
+                sb.AppendLine(GetCharBitmapEarlyExit(methodType, bitmapPosition, low, high, ignoreCase, encoding));
             else if (spec is PrefixSuffixEarlyExit(var prefix, var suffix))
                 sb.AppendLine(GetPrefixSuffixEarlyExit(methodType, prefix, suffix, ignoreCase));
             else
@@ -49,6 +53,8 @@ public abstract class EarlyExitDef : IEarlyExitDef
     protected abstract string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding);
     protected abstract string GetStringBitMaskEarlyExit(MethodType methodType, ulong mask, int byteCount, bool ignoreCase, GeneratorEncoding encoding);
     protected abstract string GetLengthDivisorEarlyExit(MethodType methodType, uint charDivisor, uint byteDivisor);
-    protected abstract string GetCharRangeEarlyExit(MethodType methodType, char firstMin, char firstMax, char lastMin, char lastMax, bool ignoreCase, GeneratorEncoding encoding);
+    protected abstract string GetCharRangeEarlyExit(MethodType methodType, CharPosition position, char min, char max, bool ignoreCase, GeneratorEncoding encoding);
+    protected abstract string GetCharEqualsEarlyExit(MethodType methodType, CharPosition position, char value, bool ignoreCase, GeneratorEncoding encoding);
+    protected abstract string GetCharBitmapEarlyExit(MethodType methodType, CharPosition position, ulong low, ulong high, bool ignoreCase, GeneratorEncoding encoding);
     protected abstract string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase);
 }

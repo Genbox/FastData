@@ -114,10 +114,28 @@ public sealed class GeneratorConfig<T>
             yield return new MinMaxLengthEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, lengthData.MinByteCount, lengthData.MaxByteCount); //Also handles same lengths
 
         // if (lengthData.CharDivisor > 1 || lengthData.ByteDivisor > 1)
-            // yield return new LengthDivisorEarlyExit(lengthData.CharDivisor, lengthData.ByteDivisor);
+        // yield return new LengthDivisorEarlyExit(lengthData.CharDivisor, lengthData.ByteDivisor);
 
-        if (ShouldApplyCharRange(props.CharacterData.FirstCharMin, props.CharacterData.LastCharMin, props.LengthData.LengthMap.Min, props.CharacterData.AllAscii, enc, IgnoreCase))
-            yield return new CharRangeEarlyExit(props.CharacterData.FirstCharMin, props.CharacterData.FirstCharMax, props.CharacterData.LastCharMin, props.CharacterData.LastCharMax);
+        if (ShouldApplyCharMap(props.LengthData.LengthMap.Min, props.CharacterData.AllAscii, enc, IgnoreCase))
+        {
+            AsciiMap firstMap = props.CharacterData.FirstCharMap;
+            AsciiMap lastMap = props.CharacterData.LastCharMap;
+            CharMapStrategy firstStrategy = GetCharMapStrategy(firstMap);
+            CharMapStrategy lastStrategy = GetCharMapStrategy(lastMap);
+
+            if (firstStrategy == CharMapStrategy.Equals)
+                yield return new CharEqualsEarlyExit(CharPosition.First, firstMap.Min);
+            else if (lastStrategy == CharMapStrategy.Equals)
+                yield return new CharEqualsEarlyExit(CharPosition.Last, lastMap.Min);
+            else if (firstStrategy == CharMapStrategy.Range)
+                yield return new CharRangeEarlyExit(CharPosition.First, firstMap.Min, firstMap.Max);
+            else if (lastStrategy == CharMapStrategy.Range)
+                yield return new CharRangeEarlyExit(CharPosition.Last, lastMap.Min, lastMap.Max);
+            else if (firstStrategy == CharMapStrategy.Bitmap)
+                yield return new CharBitmapEarlyExit(CharPosition.First, firstMap.Low, firstMap.High);
+            else if (lastStrategy == CharMapStrategy.Bitmap)
+                yield return new CharBitmapEarlyExit(CharPosition.Last, lastMap.Low, lastMap.High);
+        }
         else if (ShouldApplyStringBitMask(props.CharacterData.StringBitMask, props.CharacterData.StringBitMaskBytes, out ulong mask))
             yield return new StringBitMaskEarlyExit(mask, props.CharacterData.StringBitMaskBytes);
 
@@ -213,11 +231,8 @@ public sealed class GeneratorConfig<T>
         return density >= _cfg.StringBitMaskMinDensity;
     }
 
-    private static bool ShouldApplyCharRange(char firstMin, char lastMin, uint minLength, bool allAscii, GeneratorEncoding encoding, bool ignoreCase)
+    private static bool ShouldApplyCharMap(uint minLength, bool allAscii, GeneratorEncoding encoding, bool ignoreCase)
     {
-        if (firstMin == char.MaxValue || lastMin == char.MaxValue)
-            return false;
-
         if (minLength == 0)
             return false;
 
@@ -228,5 +243,20 @@ public sealed class GeneratorConfig<T>
             return allAscii;
 
         return true;
+    }
+
+    private CharMapStrategy GetCharMapStrategy(AsciiMap map)
+    {
+        if (map.BitCount == 1)
+            return CharMapStrategy.Equals;
+
+        return map.Density >= _cfg.CharMapMinDensity ? CharMapStrategy.Range : CharMapStrategy.Bitmap;
+    }
+
+    private enum CharMapStrategy
+    {
+        Equals,
+        Range,
+        Bitmap
     }
 }
