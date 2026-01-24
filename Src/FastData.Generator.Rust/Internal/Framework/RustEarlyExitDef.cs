@@ -13,7 +13,7 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
 {
     protected override bool IsEnabled => !options.HasFlag(RustOptions.DisableEarlyExits);
 
-    protected override string GetMaskEarlyExit(MethodType methodType, ulong[] bitSet)
+    protected override string GetLengthBitmapEarlyExit(MethodType methodType, ulong[] bitSet)
     {
         return bitSet.Length == 1
             ? RenderWord(bitSet[0], methodType)
@@ -65,24 +65,20 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
                  """;
     }
 
-    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding)
-    {
-        if (minByte.Equals(maxByte))
-        {
-            return $$"""
-                             if key.len() != {{map.ToValueLabel(maxByte)}} as usize {
-                                 {{RenderExit(methodType)}}
-                             }
-                     """;
-        }
+    protected override string GetLengthEqualEarlyExit(MethodType methodType, uint length, uint byteCount, GeneratorEncoding encoding) =>
+        $$"""
+                         if key.len() != {{map.ToValueLabel(byteCount)}} as usize {
+                             {{RenderExit(methodType)}}
+                         }
+                 """;
 
-        return $$"""
+    protected override string GetLengthRangeEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding) =>
+        $$"""
                          let len = key.len();
                          if len < {{map.ToValueLabel(minByte)}} as usize || len > {{map.ToValueLabel(maxByte)}} as usize {
                              {{RenderExit(methodType)}}
                          }
                  """;
-    }
 
     protected override string GetLengthDivisorEarlyExit(MethodType methodType, uint charDivisor, uint byteDivisor)
     {
@@ -196,7 +192,7 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
                   }
           """;
 
-    protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
+    protected override string GetStringPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
     {
         string prefixCheck = ignoreCase ? $"case_insensitive_starts_with(key, {map.ToValueLabel(prefix)})" : $"key.starts_with({map.ToValueLabel(prefix)})";
         string suffixCheck = ignoreCase ? $"case_insensitive_ends_with(key, {map.ToValueLabel(suffix)})" : $"key.ends_with({map.ToValueLabel(suffix)})";

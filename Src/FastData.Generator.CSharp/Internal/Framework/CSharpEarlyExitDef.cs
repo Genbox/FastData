@@ -14,7 +14,7 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
 {
     protected override bool IsEnabled => !options.HasFlag(CSharpOptions.DisableEarlyExits);
 
-    protected override string GetMaskEarlyExit(MethodType methodType, ulong[] bitSet)
+    protected override string GetLengthBitmapEarlyExit(MethodType methodType, ulong[] bitSet)
     {
         return bitSet.Length == 1
             ? RenderWord(bitSet[0], methodType)
@@ -64,22 +64,18 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
                 """;
     }
 
-    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding)
-    {
-        if (min.Equals(max))
-        {
-            return $"""
-                            if (key.Length != {map.ToValueLabel(max)})
-                                {RenderExit(methodType)}
-                    """;
-        }
+    protected override string GetLengthEqualEarlyExit(MethodType methodType, uint length, uint byteCount, GeneratorEncoding encoding) =>
+        $"""
+                        if (key.Length != {map.ToValueLabel(length)})
+                            {RenderExit(methodType)}
+                """;
 
-        return $"""
+    protected override string GetLengthRangeEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding) =>
+        $"""
                         int len = key.Length;
                         if (len < {map.ToValueLabel(min)} || len > {map.ToValueLabel(max)})
                             {RenderExit(methodType)}
                 """;
-    }
 
     protected override string GetLengthDivisorEarlyExit(MethodType methodType, uint charDivisor, uint byteDivisor)
     {
@@ -184,7 +180,7 @@ internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExi
                   }
           """;
 
-    protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
+    protected override string GetStringPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
     {
         string comparer = GetStringComparer(ignoreCase);
         string prefixCheck = $"key.StartsWith({map.ToValueLabel(prefix)}, StringComparison.{comparer})";

@@ -103,15 +103,18 @@ public sealed class GeneratorConfig<T>
 
         //Logic:
         // - If all lengths are the same, we check against that (1 inst)
-        // - If lengths are consecutive (5, 6, 7, etc.) we do a range check (2 inst)
-        // - If the lengths are non-consecutive (4, 9, 12, etc.) we use a small bitset (4 inst)
+        // - If lengths are dense, we do a range check (2 inst)
+        // - If the lengths are sparse, we use a bitset (4 inst)
 
         LengthData lengthData = props.LengthData;
 
-        if (ShouldApplyBitSet(lengthData))
-            yield return new LengthBitSetEarlyExit(lengthData.LengthMap.Values);
+        MapStrategy lengthStrategy = GetLengthMapStrategy(lengthData.LengthMap);
+        if (lengthStrategy == MapStrategy.Equals)
+            yield return new LengthEqualEarlyExit(lengthData.LengthMap.Min, lengthData.MinByteCount);
+        else if (lengthStrategy == MapStrategy.Range)
+            yield return new LengthRangeEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, lengthData.MinByteCount, lengthData.MaxByteCount);
         else
-            yield return new MinMaxLengthEarlyExit(lengthData.LengthMap.Min, lengthData.LengthMap.Max, lengthData.MinByteCount, lengthData.MaxByteCount); //Also handles same lengths
+            yield return new LengthBitmapEarlyExit(lengthData.LengthMap.Values);
 
         // if (lengthData.CharDivisor > 1 || lengthData.ByteDivisor > 1)
         // yield return new LengthDivisorEarlyExit(lengthData.CharDivisor, lengthData.ByteDivisor);
@@ -120,27 +123,27 @@ public sealed class GeneratorConfig<T>
         {
             AsciiMap firstMap = props.CharacterData.FirstCharMap;
             AsciiMap lastMap = props.CharacterData.LastCharMap;
-            CharMapStrategy firstStrategy = GetCharMapStrategy(firstMap);
-            CharMapStrategy lastStrategy = GetCharMapStrategy(lastMap);
+            MapStrategy firstStrategy = GetCharMapStrategy(firstMap);
+            MapStrategy lastStrategy = GetCharMapStrategy(lastMap);
 
-            if (firstStrategy == CharMapStrategy.Equals)
+            if (firstStrategy == MapStrategy.Equals)
                 yield return new CharEqualsEarlyExit(CharPosition.First, firstMap.Min);
-            else if (lastStrategy == CharMapStrategy.Equals)
+            else if (lastStrategy == MapStrategy.Equals)
                 yield return new CharEqualsEarlyExit(CharPosition.Last, lastMap.Min);
-            else if (firstStrategy == CharMapStrategy.Range)
+            else if (firstStrategy == MapStrategy.Range)
                 yield return new CharRangeEarlyExit(CharPosition.First, firstMap.Min, firstMap.Max);
-            else if (lastStrategy == CharMapStrategy.Range)
+            else if (lastStrategy == MapStrategy.Range)
                 yield return new CharRangeEarlyExit(CharPosition.Last, lastMap.Min, lastMap.Max);
-            else if (firstStrategy == CharMapStrategy.Bitmap)
+            else if (firstStrategy == MapStrategy.Bitmap)
                 yield return new CharBitmapEarlyExit(CharPosition.First, firstMap.Low, firstMap.High);
-            else if (lastStrategy == CharMapStrategy.Bitmap)
+            else if (lastStrategy == MapStrategy.Bitmap)
                 yield return new CharBitmapEarlyExit(CharPosition.Last, lastMap.Low, lastMap.High);
         }
         else if (ShouldApplyStringBitMask(props.CharacterData.StringBitMask, props.CharacterData.StringBitMaskBytes, out ulong mask))
             yield return new StringBitMaskEarlyExit(mask, props.CharacterData.StringBitMaskBytes);
 
         if (props.DeltaData.Prefix.Length != 0 || props.DeltaData.Suffix.Length != 0)
-            yield return new PrefixSuffixEarlyExit(props.DeltaData.Prefix, props.DeltaData.Suffix);
+            yield return new StringPrefixSuffixEarlyExit(props.DeltaData.Prefix, props.DeltaData.Suffix);
     }
 
     private IEnumerable<IEarlyExit> GetEarlyExits(NumericKeyProperties<T> props, uint itemCount, Type structureType)
@@ -160,23 +163,17 @@ public sealed class GeneratorConfig<T>
         if (ShouldApplyValueBitMask(props, out ulong mask))
             yield return new ValueBitMaskEarlyExit(mask);
         else
-            yield return new MinMaxValueEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue);
+            yield return new ValueRangeEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue);
     }
 
-    private bool ShouldApplyBitSet(LengthData lengthData)
+    private MapStrategy GetLengthMapStrategy(LengthBitArray map)
     {
-        if (!lengthData.LengthMap.HasBitSet)
-            return false;
+        if (map.BitCount <= 1)
+            return MapStrategy.Equals;
 
-        if (lengthData.LengthMap.Consecutive)
-            return false;
-
-        if (lengthData.LengthMap.Values.Length > _cfg.StringLengthBitSetMaxWords)
-            return false;
-
-        uint range = lengthData.LengthMap.Max - lengthData.LengthMap.Min + 1;
-        double density = lengthData.LengthMap.BitCount / (double)range;
-        return density <= _cfg.StringLengthBitSetMaxDensity;
+        ulong range = (ulong)map.Max - map.Min + 1;
+        double density = map.BitCount / (double)range;
+        return density >= _cfg.LengthMapMinDensity ? MapStrategy.Range : MapStrategy.Bitmap;
     }
 
     private bool ShouldApplyValueBitMask(NumericKeyProperties<T> props, out ulong mask)
@@ -245,15 +242,15 @@ public sealed class GeneratorConfig<T>
         return true;
     }
 
-    private CharMapStrategy GetCharMapStrategy(AsciiMap map)
+    private MapStrategy GetCharMapStrategy(AsciiMap map)
     {
         if (map.BitCount == 1)
-            return CharMapStrategy.Equals;
+            return MapStrategy.Equals;
 
-        return map.Density >= _cfg.CharMapMinDensity ? CharMapStrategy.Range : CharMapStrategy.Bitmap;
+        return map.Density >= _cfg.CharMapMinDensity ? MapStrategy.Range : MapStrategy.Bitmap;
     }
 
-    private enum CharMapStrategy
+    private enum MapStrategy
     {
         Equals,
         Range,

@@ -13,7 +13,18 @@ internal struct AsciiMap()
     public char Max = char.MinValue;
 
     public int BitCount => BitOperations.PopCount(Low) + BitOperations.PopCount(High);
-    public int Density => BitCount / 128;
+    // Density is calculated over the observed value range (Min..Max), not the full ASCII range.
+    public float Density
+    {
+        get
+        {
+            if (BitCount == 0 || Max < Min)
+                return 0f;
+
+            uint range = (uint)(Max - Min + 1);
+            return BitCount / (float)range;
+        }
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(char value)

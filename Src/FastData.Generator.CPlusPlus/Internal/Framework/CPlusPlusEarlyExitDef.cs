@@ -13,7 +13,7 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
 {
     protected override bool IsEnabled => !options.HasFlag(CPlusPlusOptions.DisableEarlyExits);
 
-    protected override string GetMaskEarlyExit(MethodType methodType, ulong[] bitSet)
+    protected override string GetLengthBitmapEarlyExit(MethodType methodType, ulong[] bitSet)
     {
         return bitSet.Length == 1
             ? RenderWord(bitSet[0], methodType)
@@ -63,7 +63,23 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
                 """;
     }
 
-    protected override string GetLengthEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding)
+    protected override string GetLengthEqualEarlyExit(MethodType methodType, uint length, uint byteCount, GeneratorEncoding encoding)
+    {
+        uint lengthValue = encoding switch
+        {
+            GeneratorEncoding.ASCII or GeneratorEncoding.UTF8 => byteCount,
+            GeneratorEncoding.UTF32 => byteCount / 4,
+            GeneratorEncoding.UTF16 => length,
+            _ => throw new InvalidOperationException("Unsupported encoding: " + encoding)
+        };
+
+        return $"""
+                         if (key.length() != {map.ToValueLabel(lengthValue)})
+                             {RenderExit(methodType)}
+                """;
+    }
+
+    protected override string GetLengthRangeEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding)
     {
         uint minLen;
         uint maxLen;
@@ -88,7 +104,8 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         }
 
         return $"""
-                         if ({(minLen.Equals(maxLen) ? $"key.length() != {map.ToValueLabel(maxLen)}" : $"const size_t len = key.length(); len < {map.ToValueLabel(minLen)} || len > {map.ToValueLabel(maxLen)}")})
+                         const size_t len = key.length();
+                         if (len < {map.ToValueLabel(minLen)} || len > {map.ToValueLabel(maxLen)})
                              {RenderExit(methodType)}
                 """;
     }
@@ -179,7 +196,7 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
                   }
           """;
 
-    protected override string GetPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
+    protected override string GetStringPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
     {
         string prefixCheck = ignoreCase ? $"case_insensitive_starts_with(key, {map.ToValueLabel(prefix)})" : $"key.compare(0, {prefix.Length.ToStringInvariant()}, {map.ToValueLabel(prefix)}) == 0";
         string suffixCheck = ignoreCase ? $"case_insensitive_ends_with(key, {map.ToValueLabel(suffix)})" : $"key.compare(key.length() - {suffix.Length.ToStringInvariant()}, {suffix.Length.ToStringInvariant()}, {map.ToValueLabel(suffix)}) == 0";

@@ -30,11 +30,8 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
     /// <summary>Minimum density (item count / range) required to use BitSetStructure in Auto mode.</summary>
     public double BitSetStructureMinDensity { get; set; } = 0.5;
 
-    /// <summary>Maximum number of words allowed for string length bitset early exits.</summary>
-    public int StringLengthBitSetMaxWords { get; set; } = 4;
-
-    /// <summary>Maximum density allowed for string length bitset early exits.</summary>
-    public double StringLengthBitSetMaxDensity { get; set; } = 0.5;
+    /// <summary>Minimum density required to use range checks for length maps.</summary>
+    public double LengthMapMinDensity { get; set; } = 0.45;
 
     /// <summary>Minimum missing-bit density required to use the value bitmask early exit for numeric keys.</summary>
     public double ValueBitMaskMinDensity { get; set; } = 0.25;

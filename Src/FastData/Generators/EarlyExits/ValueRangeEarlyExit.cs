@@ -6,4 +6,4 @@ namespace Genbox.FastData.Generators.EarlyExits;
 /// <typeparam name="T">The type of the value to check.</typeparam>
 /// <param name="MinValue">The minimum valid value.</param>
 /// <param name="MaxValue">The maximum valid value.</param>
-public sealed record MinMaxValueEarlyExit<T>(T MinValue, T MaxValue) : IEarlyExit;
+public sealed record ValueRangeEarlyExit<T>(T MinValue, T MaxValue) : IEarlyExit;
