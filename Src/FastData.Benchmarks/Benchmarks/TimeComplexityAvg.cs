@@ -3,7 +3,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
-public class TimeComplexity
+public class TimeComplexityAvg
 {
     private int[] _data = null!;
     private int[] _eytzinger = null!;
@@ -12,30 +12,86 @@ public class TimeComplexity
     private int[] _k16Children = null!;
     private byte[] _k16KeyCounts = null!;
 
-    [Params(1, 50, 100)]
-    public int Query { get; set; }
-
     [GlobalSetup]
     public void Setup()
     {
-        _data = Enumerable.Range(1, 100).ToArray();
+        _data = Enumerable.Range(1, 10000).ToArray();
         _eytzinger = BuildEytzinger(_data);
         _hashSet = new HashSet<int>(_data);
         BuildK16Tree(_data, out _k16Keys, out _k16Children, out _k16KeyCounts);
     }
 
-    [Benchmark]public bool SwitchLookup() => SwitchSearch(Query);
-    [Benchmark]public bool LinearLookup() => _data.Contains(Query);
-    [Benchmark]public int BinarySearchLookup() => _data.BinarySearch(Query);
-    [Benchmark]public int InterpolationSearchLookup() => InterpolationSearch(_data, Query);
-    [Benchmark]public int EytzingerLookup() => EytzingerSearch(_eytzinger, Query);
-    [Benchmark]public bool HashSetLookup() => _hashSet.Contains(Query);
-    [Benchmark]public int K16LookupLinearCount() => K16SearchLinearCount(_k16Keys, _k16Children, _k16KeyCounts, Query);
-    [Benchmark]public int K16LookupBranchlessUnrolled() => K16SearchBranchlessUnrolled(_k16Keys, _k16Children, Query);
-    [Benchmark]public int K16LookupBranchLean() => K16SearchBranchLean(_k16Keys, _k16Children, Query);
-    [Benchmark]public int K16LookupBinaryNode() => K16SearchBinaryNode(_k16Keys, _k16Children, Query);
-    [Benchmark]public int K16LookupSimd128() => K16SearchSimd128(_k16Keys, _k16Children, Query);
-    [Benchmark]public int K16LookupSimd256() => K16SearchSimd256(_k16Keys, _k16Children, Query);
+    [Benchmark]public void SwitchLookup()
+    {
+        for (int i = 0; i < 10000; i++)
+            SwitchSearch(Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void LinearLookup()
+    {
+        for (int i = 0; i < 10000; i++)
+            _data.Contains(Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void BinarySearchLookup()
+    {
+        for (int i = 0; i < 10000; i++)
+            _data.BinarySearch(Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void InterpolationSearchLookup()
+    {
+        for (int i = 0; i < 10000; i++)
+            InterpolationSearch(_data, Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void EytzingerLookup()
+    {
+        for (int i = 0; i < 10000; i++)
+            EytzingerSearch(_eytzinger, Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void HashSetLookup()
+    {
+        for (int i = 0; i < 10000; i++)
+            _hashSet.Contains(Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void K16LookupLinearCount()
+    {
+        for (int i = 0; i < 10000; i++)
+            K16SearchLinearCount(_k16Keys, _k16Children, _k16KeyCounts, Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void K16LookupBranchlessUnrolled()
+    {
+        for (int i = 0; i < 10000; i++)
+            K16SearchBranchlessUnrolled(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void K16LookupBranchLean()
+    {
+        for (int i = 0; i < 10000; i++)
+            K16SearchBranchLean(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void K16LookupBinaryNode()
+    {
+        for (int i = 0; i < 10000; i++)
+            K16SearchBinaryNode(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void K16LookupSimd128()
+    {
+        for (int i = 0; i < 10000; i++)
+            K16SearchSimd128(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void K16LookupSimd256()
+    {
+        for (int i = 0; i < 10000; i++)
+            K16SearchSimd256(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+    }
 
     private static int[] BuildEytzinger(int[] sorted)
     {
@@ -243,41 +299,41 @@ public class TimeComplexity
             int k15 = keys[keyBase + 15];
 
             int eq = (value == k0 ? 1 : 0)
-                | (value == k1 ? 1 : 0)
-                | (value == k2 ? 1 : 0)
-                | (value == k3 ? 1 : 0)
-                | (value == k4 ? 1 : 0)
-                | (value == k5 ? 1 : 0)
-                | (value == k6 ? 1 : 0)
-                | (value == k7 ? 1 : 0)
-                | (value == k8 ? 1 : 0)
-                | (value == k9 ? 1 : 0)
-                | (value == k10 ? 1 : 0)
-                | (value == k11 ? 1 : 0)
-                | (value == k12 ? 1 : 0)
-                | (value == k13 ? 1 : 0)
-                | (value == k14 ? 1 : 0)
-                | (value == k15 ? 1 : 0);
+                     | (value == k1 ? 1 : 0)
+                     | (value == k2 ? 1 : 0)
+                     | (value == k3 ? 1 : 0)
+                     | (value == k4 ? 1 : 0)
+                     | (value == k5 ? 1 : 0)
+                     | (value == k6 ? 1 : 0)
+                     | (value == k7 ? 1 : 0)
+                     | (value == k8 ? 1 : 0)
+                     | (value == k9 ? 1 : 0)
+                     | (value == k10 ? 1 : 0)
+                     | (value == k11 ? 1 : 0)
+                     | (value == k12 ? 1 : 0)
+                     | (value == k13 ? 1 : 0)
+                     | (value == k14 ? 1 : 0)
+                     | (value == k15 ? 1 : 0);
 
             if (eq != 0)
                 return node;
 
             int childSlot = (value > k0 ? 1 : 0)
-                + (value > k1 ? 1 : 0)
-                + (value > k2 ? 1 : 0)
-                + (value > k3 ? 1 : 0)
-                + (value > k4 ? 1 : 0)
-                + (value > k5 ? 1 : 0)
-                + (value > k6 ? 1 : 0)
-                + (value > k7 ? 1 : 0)
-                + (value > k8 ? 1 : 0)
-                + (value > k9 ? 1 : 0)
-                + (value > k10 ? 1 : 0)
-                + (value > k11 ? 1 : 0)
-                + (value > k12 ? 1 : 0)
-                + (value > k13 ? 1 : 0)
-                + (value > k14 ? 1 : 0)
-                + (value > k15 ? 1 : 0);
+                            + (value > k1 ? 1 : 0)
+                            + (value > k2 ? 1 : 0)
+                            + (value > k3 ? 1 : 0)
+                            + (value > k4 ? 1 : 0)
+                            + (value > k5 ? 1 : 0)
+                            + (value > k6 ? 1 : 0)
+                            + (value > k7 ? 1 : 0)
+                            + (value > k8 ? 1 : 0)
+                            + (value > k9 ? 1 : 0)
+                            + (value > k10 ? 1 : 0)
+                            + (value > k11 ? 1 : 0)
+                            + (value > k12 ? 1 : 0)
+                            + (value > k13 ? 1 : 0)
+                            + (value > k14 ? 1 : 0)
+                            + (value > k15 ? 1 : 0);
 
             node = children[childBase + childSlot];
         }
@@ -369,9 +425,9 @@ public class TimeComplexity
             Vector128<int> eq3 = Sse2.CompareEqual(valueVector, v3);
 
             ulong eqMask = (ulong)Sse2.MoveMask(eq0.AsByte())
-                | ((ulong)Sse2.MoveMask(eq1.AsByte()) << 16)
-                | ((ulong)Sse2.MoveMask(eq2.AsByte()) << 32)
-                | ((ulong)Sse2.MoveMask(eq3.AsByte()) << 48);
+                           | ((ulong)Sse2.MoveMask(eq1.AsByte()) << 16)
+                           | ((ulong)Sse2.MoveMask(eq2.AsByte()) << 32)
+                           | ((ulong)Sse2.MoveMask(eq3.AsByte()) << 48);
 
             if (eqMask != 0)
                 return node;
@@ -387,9 +443,9 @@ public class TimeComplexity
             uint mask3 = (uint)Sse2.MoveMask(gt3.AsByte());
 
             int childSlot = (System.Numerics.BitOperations.PopCount(mask0)
-                + System.Numerics.BitOperations.PopCount(mask1)
-                + System.Numerics.BitOperations.PopCount(mask2)
-                + System.Numerics.BitOperations.PopCount(mask3)) / 4;
+                             + System.Numerics.BitOperations.PopCount(mask1)
+                             + System.Numerics.BitOperations.PopCount(mask2)
+                             + System.Numerics.BitOperations.PopCount(mask3)) / 4;
 
             node = children[childBase + childSlot];
         }
@@ -416,7 +472,7 @@ public class TimeComplexity
             Vector256<int> eq0 = Avx2.CompareEqual(valueVector, v0);
             Vector256<int> eq1 = Avx2.CompareEqual(valueVector, v1);
             ulong eqMask = (ulong)Avx2.MoveMask(eq0.AsByte())
-                | ((ulong)Avx2.MoveMask(eq1.AsByte()) << 32);
+                           | ((ulong)Avx2.MoveMask(eq1.AsByte()) << 32);
 
             if (eqMask != 0)
                 return node;
@@ -427,7 +483,7 @@ public class TimeComplexity
             uint mask1 = (uint)Avx2.MoveMask(gt1.AsByte());
 
             int childSlot = (System.Numerics.BitOperations.PopCount(mask0)
-                + System.Numerics.BitOperations.PopCount(mask1)) / 4;
+                             + System.Numerics.BitOperations.PopCount(mask1)) / 4;
 
             node = children[childBase + childSlot];
         }
