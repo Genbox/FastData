@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Algorithm Visualizer</title>
+  <link href="styles.css" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/p5@1.11.1/lib/p5.min.js"></script>
+  <script defer src="sketch.js" type="module"></script>
+</head>
+<body>
+  <div aria-hidden="true" id="vizLayer"></div>
+  <main class="layout">
+    <section class="panel controls">
+      <h1>Algorithm Visualizer</h1>
+      <label for="algorithmSelect">Algorithm</label>
+      <select id="algorithmSelect">
+        <option value="linear">Linear Search</option>
+        <option value="binary">Binary Search</option>
+        <option value="interpolation">Interpolation Search</option>
+        <option value="sixteenAry">16-ary Search</option>
+        <option value="eytzinger">Eytzinger Search</option>
+      </select>
+
+      <div class="row two-col">
+        <div>
+          <label for="targetInput">Target</label>
+          <input id="targetInput" type="number" value="42">
+        </div>
+        <div>
+          <label for="sizeInput">Array Size</label>
+          <input id="sizeInput" max="28" min="8" type="number" value="16">
+        </div>
+      </div>
+
+      <label for="speedInput">Speed</label>
+      <input id="speedInput" max="8" min="1" type="range" value="4">
+
+      <div class="row button-row">
+        <button id="newDataBtn" type="button">New Data</button>
+        <button id="resetBtn" type="button">Reset</button>
+      </div>
+      <div class="row button-row">
+        <button id="playPauseBtn" type="button">Pause</button>
+        <button id="stepBtn" type="button">Step</button>
+      </div>
+
+      <p class="status" id="statusLine">Ready.</p>
+      <p class="comparison" id="comparisonLine">Comparison details will appear here.</p>
+    </section>
+
+    <section class="panel explanation">
+      <h2 id="algorithmTitle">Linear Search</h2>
+      <p id="algorithmDescription"></p>
+      <p class="badge" id="complexityBadge"></p>
+      <ol class="pseudocode" id="pseudocodeList"></ol>
+      <div class="legend">
+        <span><i class="dot unvisited"></i>Unvisited</span>
+        <span><i class="dot checking"></i>Checking</span>
+        <span><i class="dot bound"></i>Bounds</span>
+        <span><i class="dot pivot"></i>Pivots</span>
+        <span><i class="dot found"></i>Found</span>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -14,7 +14,7 @@ public static class TestVectorHelper
             yield return testVector;
     }
 
-    public static IEnumerable<ITestVector> GetValueTestVectors()
+    public static IEnumerable<ITestVector> GetKeyValueTestVectors()
     {
         // First we try with a simple value
         int[] simpleValues = [1, 2, 3];
@@ -61,7 +61,7 @@ public static class TestVectorHelper
         }
     }
 
-    public static IEnumerable<ITestVector> GetTestVectors()
+    public static IEnumerable<ITestVector> GetValueTestVectors()
     {
         foreach (ITestVector testVector in GenerateTestVectors(GetSingleValues(), null, typeof(SingleValueStructure<,>)))
             yield return testVector;

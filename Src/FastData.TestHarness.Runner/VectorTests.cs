@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.InternalShared;
+using Genbox.FastData.InternalShared.Helpers;
 using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.InternalShared.TestHarness;
 using Genbox.FastData.TestHarness.Runner.Code;
@@ -11,7 +12,7 @@ namespace Genbox.FastData.TestHarness.Runner;
 public class VectorTests
 {
     [Theory]
-    [ClassData(typeof(ValueTestVectors))]
+    [ClassData(typeof(KeyValueTestVectors))]
     public async Task KeyValueVectors<TKey, TValue>(ITestHarness harness, TestVector<TKey, TValue> vector) where TValue : notnull
     {
         GeneratorSpec spec = Generate(harness.CreateGenerator, vector);
@@ -25,7 +26,7 @@ public class VectorTests
     }
 
     [Theory]
-    [ClassData(typeof(TestVectors))]
+    [ClassData(typeof(ValueTestVectors))]
     public async Task ValueVectors<T>(ITestHarness harness, TestVector<T> vector)
     {
         GeneratorSpec spec = Generate(harness.CreateGenerator, vector);
@@ -36,5 +37,15 @@ public class VectorTests
         await TestHarnessRunnerHelper.VerifyVectorAsync(harness, snapshotId, spec.Source);
         int exitCode = TestHarnessRunnerHelper.RunContainsProgram(harness, spec, vector.Keys, vector.NotPresent, snapshotId);
         TestHarnessRunnerHelper.AssertSuccessExitCode(exitCode);
+    }
+
+    private sealed class ValueTestVectors : HarnessVectorTheoryData
+    {
+        public ValueTestVectors() => AddVectors(TestVectorHelper.GetValueTestVectors().ToArray());
+    }
+
+    private sealed class KeyValueTestVectors : HarnessVectorTheoryData
+    {
+        public KeyValueTestVectors() => AddVectors(TestVectorHelper.GetKeyValueTestVectors().ToArray());
     }
 }

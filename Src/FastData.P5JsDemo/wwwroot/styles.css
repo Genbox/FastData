@@ -1,0 +1,222 @@
+:root {
+  --bg-1: #0d1c24;
+  --bg-2: #142f3d;
+  --bg-3: #2f5963;
+  --text: #ecf4f1;
+  --muted: #bcd1c9;
+  --accent: #f4b942;
+  --good: #6dd18c;
+  --warn: #6cb6ff;
+  --bad: #ea7f72;
+  --bound: #82f0d1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  color: var(--text);
+  background: radial-gradient(1000px 620px at 90% -20%, rgb(255 200 95 / 18%), transparent 60%),
+  linear-gradient(130deg, var(--bg-1), var(--bg-2) 52%, var(--bg-3));
+}
+
+#vizLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.layout {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.panel {
+  width: min(26rem, calc(100vw - 2rem));
+  border-radius: 0.8rem;
+  padding: 0.9rem 1rem;
+  background: rgb(8 18 24 / 70%);
+  border: 1px solid rgb(240 255 250 / 14%);
+  backdrop-filter: blur(5px);
+}
+
+.controls {
+  flex: 0 1 26rem;
+}
+
+.explanation {
+  flex: 0 1 25rem;
+}
+
+h1,
+h2 {
+  margin: 0;
+  color: var(--accent);
+}
+
+h1 {
+  font-size: clamp(1.2rem, 2.3vw, 1.7rem);
+}
+
+h2 {
+  font-size: 1.1rem;
+}
+
+.subtitle {
+  margin: 0.35rem 0 0.9rem;
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+
+label {
+  display: block;
+  margin: 0.65rem 0 0.28rem;
+  color: var(--muted);
+  font-size: 0.84rem;
+  letter-spacing: 0.03em;
+}
+
+input,
+select,
+button {
+  width: 100%;
+  border: 1px solid rgb(240 255 250 / 20%);
+  border-radius: 0.5rem;
+  font: inherit;
+}
+
+input,
+select {
+  color: var(--text);
+  background: rgb(8 23 30 / 84%);
+  padding: 0.45rem 0.6rem;
+}
+
+button {
+  color: #0f2222;
+  background: linear-gradient(180deg, #f6c96c, #e7ab2c);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem 0.7rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.two-col > div {
+  flex: 1;
+}
+
+.button-row {
+  margin-top: 0.65rem;
+}
+
+.status,
+.comparison {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+}
+
+.status {
+  color: #fff0cd;
+}
+
+.comparison {
+  color: var(--muted);
+  min-height: 1.3rem;
+}
+
+.badge {
+  margin: 0.5rem 0 0.65rem;
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 20%);
+  font-size: 0.78rem;
+  color: #fbf0d0;
+}
+
+.pseudocode {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.pseudocode li.active {
+  color: #fff3d9;
+}
+
+.legend {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.dot {
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-right: 0.3rem;
+  border-radius: 999px;
+}
+
+.dot.unvisited {
+  background: #48627b;
+}
+
+.dot.checking {
+  background: var(--warn);
+}
+
+.dot.bound {
+  background: var(--bound);
+}
+
+.dot.pivot {
+  background: #d8bbff;
+}
+
+.dot.found {
+  background: var(--good);
+}
+
+canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@media (max-width: 980px) {
+  .layout {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .panel {
+    width: 100%;
+  }
+}
