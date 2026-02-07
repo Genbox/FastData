@@ -2,6 +2,28 @@ import { drawSearchArray, drawSearchTree } from "./renderers.js";
 
 const STORAGE_KEY = "fastdata.demo.preferences.v1";
 const DEFAULT_SEED = 42;
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 3;
+
+function createDefaultCamera() {
+  return {
+    zoom: 1,
+    panX: 0,
+    panY: 0
+  };
+}
+
+function normalizeCamera(value) {
+  if (!value || typeof value !== "object") {
+    return createDefaultCamera();
+  }
+
+  return {
+    zoom: clamp(Number(value.zoom), MIN_ZOOM, MAX_ZOOM),
+    panX: Number(value.panX),
+    panY: Number(value.panY)
+  };
+}
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -24,13 +46,20 @@ export class VisualizationEngine {
     this.playing = false;
     this.accumulatorMs = 0;
     this.lastTimestampMs = 0;
+    this.canvas = null;
+    this.draggingCamera = false;
+    this.lastPointerPosition = null;
     this.ui = null;
     this.prefs = {
       algorithm: "linear",
       viewMode: "array",
       speed: 4,
       datasetMode: "random",
-      seed: DEFAULT_SEED
+      seed: DEFAULT_SEED,
+      cameraByView: {
+        array: createDefaultCamera(),
+        tree: createDefaultCamera()
+      }
     };
   }
 
@@ -104,6 +133,98 @@ export class VisualizationEngine {
     this.ui.playPauseBtn.textContent = "Play";
   }
 
+  attachCanvas(canvas) {
+    this.canvas = canvas;
+
+    this.canvas.addEventListener("wheel", (event) => this.onCanvasWheel(event), { passive: false });
+    this.canvas.addEventListener("pointerdown", (event) => this.onCanvasPointerDown(event));
+    this.canvas.addEventListener("pointermove", (event) => this.onCanvasPointerMove(event));
+    this.canvas.addEventListener("pointerup", (event) => this.onCanvasPointerUp(event));
+    this.canvas.addEventListener("pointercancel", (event) => this.onCanvasPointerUp(event));
+    this.canvas.addEventListener("dblclick", (event) => {
+      event.preventDefault();
+      this.resetView();
+    });
+  }
+
+  onCanvasWheel(event) {
+    if (!this.canvas) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const pointer = this.getPointerPosition(event);
+    if (!pointer) {
+      return;
+    }
+
+    const factor = event.deltaY < 0 ? 1.1 : 1 / 1.1;
+    this.zoomAt(pointer.x, pointer.y, factor);
+    this.savePreferences();
+  }
+
+  onCanvasPointerDown(event) {
+    if (!this.canvas || event.button !== 0) {
+      return;
+    }
+
+    const pointer = this.getPointerPosition(event);
+    if (!pointer) {
+      return;
+    }
+
+    this.draggingCamera = true;
+    this.lastPointerPosition = pointer;
+    this.canvas.classList.add("is-panning");
+    this.canvas.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  }
+
+  onCanvasPointerMove(event) {
+    if (!this.canvas || !this.draggingCamera) {
+      return;
+    }
+
+    const pointer = this.getPointerPosition(event);
+    if (!pointer || !this.lastPointerPosition) {
+      return;
+    }
+
+    const dx = pointer.x - this.lastPointerPosition.x;
+    const dy = pointer.y - this.lastPointerPosition.y;
+    this.lastPointerPosition = pointer;
+    this.panBy(dx, dy);
+    event.preventDefault();
+  }
+
+  onCanvasPointerUp(event) {
+    if (!this.canvas) {
+      return;
+    }
+
+    this.draggingCamera = false;
+    this.lastPointerPosition = null;
+    this.canvas.classList.remove("is-panning");
+    this.savePreferences();
+
+    if (this.canvas.hasPointerCapture(event.pointerId)) {
+      this.canvas.releasePointerCapture(event.pointerId);
+    }
+  }
+
+  getPointerPosition(event) {
+    if (!this.canvas) {
+      return null;
+    }
+
+    const rect = this.canvas.getBoundingClientRect();
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+  }
+
   loadPreferences() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -125,6 +246,11 @@ export class VisualizationEngine {
         this.prefs.viewMode = parsed.viewMode;
       }
 
+      if (parsed.cameraByView && typeof parsed.cameraByView === "object") {
+        this.prefs.cameraByView.array = normalizeCamera(parsed.cameraByView.array);
+        this.prefs.cameraByView.tree = normalizeCamera(parsed.cameraByView.tree);
+      }
+
       this.prefs.speed = clamp(Number(parsed.speed), 1, 8);
       this.prefs.seed = Number(parsed.seed);
     } catch {
@@ -135,6 +261,9 @@ export class VisualizationEngine {
   }
 
   applyPreferences() {
+    this.prefs.cameraByView.array = normalizeCamera(this.prefs.cameraByView.array);
+    this.prefs.cameraByView.tree = normalizeCamera(this.prefs.cameraByView.tree);
+
     this.ui.algorithmSelect.value = this.prefs.algorithm;
     if (!this.ui.algorithmSelect.value) {
       this.ui.algorithmSelect.value = "linear";
@@ -187,6 +316,12 @@ export class VisualizationEngine {
       if (!this.ui.resetBtn.disabled) {
         this.reset();
       }
+      return;
+    }
+
+    if (event.key === "0") {
+      event.preventDefault();
+      this.resetView();
       return;
     }
 
@@ -287,6 +422,10 @@ export class VisualizationEngine {
   }
 
   getCurrentViewMode() {
+    if (!this.ui || !this.ui.viewModeInput) {
+      return this.prefs.viewMode === "tree" ? "tree" : "array";
+    }
+
     const mode = this.ui.viewModeInput.value;
     if (mode === "tree") {
       return "tree";
@@ -294,6 +433,65 @@ export class VisualizationEngine {
 
     this.ui.viewModeInput.value = "array";
     return "array";
+  }
+
+  getEffectiveViewMode() {
+    const mode = this.getCurrentViewMode();
+    if (mode === "tree" && this.algorithmSupportsTreeView()) {
+      return "tree";
+    }
+
+    return "array";
+  }
+
+  getActiveCamera() {
+    const mode = this.getEffectiveViewMode();
+    if (mode === "tree") {
+      return this.prefs.cameraByView.tree;
+    }
+
+    return this.prefs.cameraByView.array;
+  }
+
+  zoomBy(factor) {
+    if (factor === 0 || !this.canvas) {
+      return;
+    }
+
+    const rect = this.canvas.getBoundingClientRect();
+    this.zoomAt(rect.width * 0.5, rect.height * 0.5, factor);
+    this.savePreferences();
+  }
+
+  zoomAt(screenX, screenY, factor) {
+    const camera = this.getActiveCamera();
+    const oldZoom = camera.zoom;
+    const newZoom = clamp(oldZoom * factor, MIN_ZOOM, MAX_ZOOM);
+
+    if (newZoom === oldZoom) {
+      return;
+    }
+
+    const worldX = (screenX - camera.panX) / oldZoom;
+    const worldY = (screenY - camera.panY) / oldZoom;
+
+    camera.zoom = newZoom;
+    camera.panX = screenX - worldX * newZoom;
+    camera.panY = screenY - worldY * newZoom;
+  }
+
+  panBy(dx, dy) {
+    const camera = this.getActiveCamera();
+    camera.panX += dx;
+    camera.panY += dy;
+  }
+
+  resetView() {
+    const camera = this.getActiveCamera();
+    camera.zoom = 1;
+    camera.panX = 0;
+    camera.panY = 0;
+    this.savePreferences();
   }
 
   getCurrentSize() {
@@ -483,12 +681,19 @@ export class VisualizationEngine {
       return;
     }
 
-    const mode = this.getCurrentViewMode();
-    if (mode === "tree" && this.algorithmSupportsTreeView()) {
+    const mode = this.getEffectiveViewMode();
+    const camera = this.getActiveCamera();
+
+    p.push();
+    p.translate(camera.panX, camera.panY);
+    p.scale(camera.zoom);
+
+    if (mode === "tree") {
       drawSearchTree(p, this.model, this.currentAlgorithm.id);
-      return;
+    } else {
+      drawSearchArray(p, this.model);
     }
 
-    drawSearchArray(p, this.model);
+    p.pop();
   }
 }

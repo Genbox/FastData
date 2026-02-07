@@ -34,7 +34,7 @@ body {
   inset: 0;
   z-index: 1;
   overflow: hidden;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .layout {
@@ -46,6 +46,7 @@ body {
   align-items: flex-start;
   justify-content: space-between;
   padding: 1rem;
+  pointer-events: none;
 }
 
 .panel {
@@ -55,6 +56,7 @@ body {
   background: rgb(8 18 24 / 70%);
   border: 1px solid rgb(240 255 250 / 14%);
   backdrop-filter: blur(5px);
+  pointer-events: auto;
 }
 
 .controls {
@@ -229,7 +231,13 @@ canvas {
   position: fixed;
   inset: 0;
   z-index: 1;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+}
+
+canvas.is-panning {
+  cursor: grabbing;
 }
 
 @media (max-width: 980px) {

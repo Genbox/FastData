@@ -19,6 +19,7 @@ new p5(p => {
   p.setup = () => {
     const canvas = p.createCanvas(p.windowWidth, p.windowHeight);
     canvas.parent("vizLayer");
+    engine.attachCanvas(canvas.elt);
     p.frameRate(15);
   };
 
