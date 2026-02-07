@@ -1,9 +1,9 @@
-import {VisualizationEngine} from "./core/engine.js";
-import {createLinearSearch} from "./algorithms/linear-search.js";
-import {createBinarySearch} from "./algorithms/binary-search.js";
-import {createInterpolationSearch} from "./algorithms/interpolation-search.js";
-import {createSixteenArySearch} from "./algorithms/sixteen-ary-search.js";
-import {createEytzingerSearch} from "./algorithms/eytzinger-search.js";
+import { VisualizationEngine } from "./core/engine.js";
+import { createLinearSearch } from "./algorithms/linear-search.js";
+import { createBinarySearch } from "./algorithms/binary-search.js";
+import { createInterpolationSearch } from "./algorithms/interpolation-search.js";
+import { createSixteenArySearch } from "./algorithms/sixteen-ary-search.js";
+import { createEytzingerSearch } from "./algorithms/eytzinger-search.js";
 
 const engine = new VisualizationEngine({
   linear: createLinearSearch,

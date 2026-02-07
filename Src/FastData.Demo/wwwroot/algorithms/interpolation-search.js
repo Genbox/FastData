@@ -4,13 +4,11 @@ function baseModel(data, target) {
   return {
     data,
     target,
-    visited: new Array(data.length).fill(false),
     checkIndex: null,
     foundIndex: null,
     low: 0,
     high: data.length - 1,
     mid: null,
-    pivotIndices: [],
     comparisons: 0,
     done: false,
     outcome: "idle",
@@ -35,7 +33,7 @@ export function createInterpolationSearch() {
       "return -1"
     ],
     createModel(options) {
-      const data = buildSortedUniqueArray(options.size);
+      const data = buildSortedUniqueArray(options.size, options.datasetMode, options.seed);
       return baseModel(data, options.target);
     },
     resetModel(model) {
@@ -75,7 +73,6 @@ export function createInterpolationSearch() {
         model.comparisons += 1;
         model.checkIndex = model.low;
         model.mid = model.low;
-        model.visited[model.low] = true;
         model.comparisonText = `All values in range are ${lowValue}.`;
 
         if (lowValue === model.target) {
@@ -101,7 +98,6 @@ export function createInterpolationSearch() {
 
       model.mid = probe;
       model.checkIndex = probe;
-      model.visited[probe] = true;
       model.comparisons += 1;
 
       const value = model.data[probe];

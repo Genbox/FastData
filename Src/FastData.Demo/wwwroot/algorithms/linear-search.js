@@ -4,12 +4,10 @@ function baseModel(data, target) {
   return {
     data,
     target,
-    visited: new Array(data.length).fill(false),
     checkIndex: null,
     foundIndex: null,
     currentIndex: 0,
     comparisons: 0,
-    pivotIndices: [],
     done: false,
     outcome: "idle",
     status: "Start scanning from index 0.",
@@ -30,7 +28,7 @@ export function createLinearSearch() {
       "return -1"
     ],
     createModel(options) {
-      const data = buildRandomArray(options.size);
+      const data = buildRandomArray(options.size, options.datasetMode, options.seed);
       return baseModel(data, options.target);
     },
     resetModel(model) {
@@ -53,7 +51,6 @@ export function createLinearSearch() {
 
       const i = model.currentIndex;
       model.checkIndex = i;
-      model.visited[i] = true;
       model.comparisons += 1;
       model.activeLine = 1;
 

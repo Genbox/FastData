@@ -4,13 +4,11 @@ function baseModel(data, target) {
   return {
     data,
     target,
-    visited: new Array(data.length).fill(false),
     checkIndex: null,
     foundIndex: null,
     low: 0,
     high: data.length - 1,
     mid: null,
-    pivotIndices: [],
     mode: "partition",
     linearCursor: null,
     comparisons: 0,
@@ -54,7 +52,7 @@ export function createSixteenArySearch() {
       "return -1"
     ],
     createModel(options) {
-      const data = buildSortedUniqueArray(options.size);
+      const data = buildSortedUniqueArray(options.size, options.datasetMode, options.seed);
       return baseModel(data, options.target);
     },
     resetModel(model) {
@@ -71,7 +69,6 @@ export function createSixteenArySearch() {
         model.status = "Target not found. Interval is empty.";
         model.comparisonText = "low > high";
         model.checkIndex = null;
-        model.pivotIndices = [];
         model.activeLine = 5;
         return;
       }
@@ -82,7 +79,6 @@ export function createSixteenArySearch() {
         if (model.mode !== "linear") {
           model.mode = "linear";
           model.linearCursor = model.low;
-          model.pivotIndices = [];
           model.status = "Small interval detected. Finish with linear scan.";
           model.comparisonText = `Scanning indices ${model.low}..${model.high}`;
           model.activeLine = 4;
@@ -101,7 +97,6 @@ export function createSixteenArySearch() {
 
         const i = model.linearCursor;
         model.checkIndex = i;
-        model.visited[i] = true;
         model.comparisons += 1;
         model.comparisonText = `Linear tail: arr[${i}] = ${model.data[i]} vs ${model.target}`;
         model.activeLine = 4;
@@ -122,7 +117,6 @@ export function createSixteenArySearch() {
 
       model.mode = "partition";
       const pivots = computePivots(model.low, model.high);
-      model.pivotIndices = pivots;
       model.activeLine = 2;
 
       let chosenSegment = pivots.length;
@@ -131,7 +125,6 @@ export function createSixteenArySearch() {
       for (let i = 0; i < pivots.length; i += 1) {
         const pivotIndex = pivots[i];
         const pivotValue = model.data[pivotIndex];
-        model.visited[pivotIndex] = true;
         model.comparisons += 1;
         lastCheckedPivot = pivotIndex;
 

@@ -1,16 +1,14 @@
-import {buildSortedUniqueArray} from "./common.js";
+import { buildSortedUniqueArray } from "./common.js";
 
 function baseModel(data, target) {
   return {
     data,
     target,
-    visited: new Array(data.length).fill(false),
     checkIndex: null,
     foundIndex: null,
     low: 0,
     high: data.length - 1,
     mid: null,
-    pivotIndices: [],
     comparisons: 0,
     done: false,
     outcome: "idle",
@@ -35,7 +33,7 @@ export function createBinarySearch() {
       "return -1"
     ],
     createModel(options) {
-      const data = buildSortedUniqueArray(options.size);
+      const data = buildSortedUniqueArray(options.size, options.datasetMode, options.seed);
       return baseModel(data, options.target);
     },
     resetModel(model) {
@@ -60,7 +58,6 @@ export function createBinarySearch() {
       model.activeLine = 1;
       model.mid = Math.floor((model.low + model.high) / 2);
       model.checkIndex = model.mid;
-      model.visited[model.mid] = true;
       model.comparisons += 1;
 
       const value = model.data[model.mid];

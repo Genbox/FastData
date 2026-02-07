@@ -10,11 +10,11 @@
 </head>
 <body>
 <div aria-hidden="true" id="vizLayer"></div>
+
 <main class="layout">
   <section class="panel controls">
-    <h1>Algorithm Visualizer</h1>
     <label for="algorithmSelect">Algorithm</label>
-    <select id="algorithmSelect">
+    <select id="algorithmSelect" aria-label="Select algorithm">
       <option value="linear">Linear Search</option>
       <option value="binary">Binary Search</option>
       <option value="interpolation">Interpolation Search</option>
@@ -25,23 +25,42 @@
     <div class="row two-col">
       <div>
         <label for="targetInput">Target</label>
-        <input id="targetInput" type="number" value="42">
+        <input id="targetInput" type="number" value="42" aria-label="Target value">
       </div>
       <div>
         <label for="sizeInput">Array Size</label>
-        <input id="sizeInput" max="256" min="8" type="number" value="16">
+        <input id="sizeInput" max="256" min="8" type="number" value="16" aria-label="Array size">
       </div>
     </div>
 
     <label for="speedInput">Speed</label>
-    <input id="speedInput" max="8" min="1" type="range" value="4">
+    <input id="speedInput" max="8" min="1" type="range" value="4" aria-label="Animation speed">
+
+    <details class="advanced-panel">
+      <summary>Advanced options</summary>
+      <div class="row two-col">
+        <div>
+          <label for="datasetModeInput">Dataset Mode</label>
+          <select id="datasetModeInput" aria-label="Dataset mode">
+            <option value="random">Random</option>
+            <option value="uniform">Uniform</option>
+            <option value="clustered">Clustered</option>
+            <option value="nearlySorted">Nearly Sorted</option>
+          </select>
+        </div>
+        <div>
+          <label for="seedInput">Seed</label>
+          <input id="seedInput" type="number" value="42" aria-label="Random seed">
+        </div>
+      </div>
+    </details>
 
     <div class="row button-row">
-      <button id="resetBtn" type="button">Reset</button>
+      <button id="resetBtn" type="button" aria-label="Reset simulation">Reset</button>
     </div>
     <div class="row button-row">
-      <button id="playPauseBtn" type="button">Play</button>
-      <button id="stepBtn" type="button">Step</button>
+      <button id="playPauseBtn" type="button" aria-label="Play or pause simulation">Play</button>
+      <button id="stepBtn" type="button" aria-label="Run one step">Step</button>
     </div>
   </section>
 
@@ -50,13 +69,11 @@
     <p id="algorithmDescription"></p>
     <p class="badge" id="complexityBadge"></p>
     <ol class="pseudocode" id="pseudocodeList"></ol>
-    <p class="status" id="statusLine">Ready.</p>
-    <p class="comparison" id="comparisonLine">Comparison details will appear here.</p>
+    <p class="status" id="statusLine" role="status" aria-live="polite">Ready.</p>
+    <p class="comparison" id="comparisonLine" role="status" aria-live="polite">Comparison details will appear here.</p>
     <div class="legend">
-      <span><i class="dot unvisited"></i>Unvisited</span>
       <span><i class="dot checking"></i>Checking</span>
       <span><i class="dot bound"></i>Bounds</span>
-      <span><i class="dot pivot"></i>Pivots</span>
       <span><i class="dot found"></i>Found</span>
     </div>
   </section>

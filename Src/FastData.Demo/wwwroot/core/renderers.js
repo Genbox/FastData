@@ -1,10 +1,9 @@
 const COLORS = {
   unvisited: "#4a6578",
-  visited: "#3a4758",
   checking: "#71b7ff",
   found: "#6dd18c",
-  bound: "#82f0d1",
-  pivot: "#d8bbff",
+  bound: "#2f6f4f",
+  boundText: "#f2a6d8",
   text: "#ecf4f1",
   muted: "#bcd1c9",
   bad: "#ea7f72"
@@ -44,16 +43,8 @@ function getCellColor(index, model) {
     return COLORS.checking;
   }
 
-  if (Array.isArray(model.pivotIndices) && model.pivotIndices.includes(index)) {
-    return COLORS.pivot;
-  }
-
   if (model.low !== undefined && model.high !== undefined && index >= model.low && index <= model.high) {
     return index === model.mid ? COLORS.checking : COLORS.bound;
-  }
-
-  if (model.visited[index]) {
-    return COLORS.visited;
   }
 
   return COLORS.unvisited;
@@ -67,7 +58,7 @@ function drawBounds(p, x, y, model) {
   p.textAlign(p.CENTER, p.TOP);
   p.textSize(13);
 
-  p.fill(COLORS.bound);
+  p.fill(COLORS.boundText);
   p.text(`low: ${model.low}`, x(model.low), y + 8);
   p.text(`high: ${model.high}`, x(model.high), y + 30);
 
@@ -97,7 +88,7 @@ export function drawSearchArray(p, model) {
       p.fill("#09151c");
       p.textAlign(p.CENTER, p.CENTER);
       p.textSize(Math.max(9, layout.cellWidth * 0.24));
-      p.text(String(value), x + layout.cellWidth * 0.5, baseY + layout.cellHeight * 0.42);
+      p.text(String(value), x + layout.cellWidth * 0.5, baseY + layout.cellHeight * 0.5);
     }
 
     if (layout.showIndexes && i % layout.indexLabelStride === 0) {
@@ -112,7 +103,6 @@ export function drawSearchArray(p, model) {
   p.fill(COLORS.text);
   p.textAlign(p.CENTER, p.CENTER);
   p.textSize(22);
-  p.text(`Target: ${model.target}`, centerX, baseY - 86);
 
   p.fill(model.outcome === "not_found" ? COLORS.bad : COLORS.muted);
   p.textSize(15);
@@ -120,13 +110,6 @@ export function drawSearchArray(p, model) {
 
   const getCenter = index => layout.startX + index * (layout.cellWidth + layout.gap) + layout.cellWidth * 0.5;
   drawBounds(p, getCenter, baseY + layout.cellHeight + 28, model);
-
-  if (Array.isArray(model.pivotIndices) && model.pivotIndices.length > 0) {
-    p.fill(COLORS.pivot);
-    p.textSize(13);
-    p.textAlign(p.CENTER, p.TOP);
-    p.text("pivot markers", centerX, baseY + layout.cellHeight + 52);
-  }
 
   p.pop();
 }

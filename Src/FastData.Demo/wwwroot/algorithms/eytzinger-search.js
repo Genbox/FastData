@@ -1,16 +1,14 @@
-import {buildSortedUniqueArray, toEytzinger} from "./common.js";
+import { buildSortedUniqueArray, toEytzinger } from "./common.js";
 
 function baseModel(data, target) {
   return {
     data,
     target,
-    visited: new Array(data.length).fill(false),
     checkIndex: null,
     foundIndex: null,
     low: undefined,
     high: undefined,
     mid: null,
-    pivotIndices: [],
     currentIndex: 0,
     comparisons: 0,
     done: false,
@@ -36,7 +34,7 @@ export function createEytzingerSearch() {
       "return -1"
     ],
     createModel(options) {
-      const sorted = buildSortedUniqueArray(options.size);
+      const sorted = buildSortedUniqueArray(options.size, options.datasetMode, options.seed);
       const data = toEytzinger(sorted);
       return baseModel(data, options.target);
     },
@@ -61,7 +59,6 @@ export function createEytzingerSearch() {
       const i = model.currentIndex;
       const node = model.data[i];
       model.checkIndex = i;
-      model.visited[i] = true;
       model.comparisons += 1;
       model.comparisonText = `Visit node ${i} with value ${node}. Compare to ${model.target}.`;
       model.activeLine = 2;
