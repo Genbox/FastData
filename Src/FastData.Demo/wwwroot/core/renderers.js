@@ -84,6 +84,43 @@ function drawMinMaxSideLabels(p, layout, baseY, model) {
   p.text(`max: ${model.data[bounds.high]}`, rightX, centerY);
 }
 
+function drawComparisonsAndStatus(p, model, anchorY) {
+  const centerX = p.width * 0.5;
+  p.fill(COLORS.text);
+  p.textAlign(p.CENTER, p.CENTER);
+  p.textSize(22);
+
+  p.fill(COLORS.muted);
+  p.textSize(15);
+  p.text(`Comparisons: ${model.comparisons}`, centerX, anchorY - 56);
+
+  let statusLabel = "Ready";
+  let statusColor = COLORS.muted;
+
+  if (model.outcome === "found") {
+    statusLabel = "Found";
+    statusColor = COLORS.found;
+  } else if (model.outcome === "not_found") {
+    statusLabel = "Not found";
+    statusColor = COLORS.bad;
+  } else if (model.comparisons > 0) {
+    statusLabel = "Searching";
+    statusColor = COLORS.checking;
+  }
+
+  p.textSize(16);
+  p.textAlign(p.LEFT, p.CENTER);
+  const statusPrefix = "Status: ";
+  const prefixWidth = p.textWidth(statusPrefix);
+  const statusWidth = p.textWidth(statusLabel);
+  const statusStartX = centerX - (prefixWidth + statusWidth) * 0.5;
+
+  p.fill(COLORS.muted);
+  p.text(statusPrefix, statusStartX, anchorY - 34);
+  p.fill(statusColor);
+  p.text(statusLabel, statusStartX + prefixWidth, anchorY - 34);
+}
+
 export function drawSearchArray(p, model) {
   const layout = getLayout(p.width, p.height, model.data.length);
   const baseY = layout.top;
@@ -115,40 +152,7 @@ export function drawSearchArray(p, model) {
     }
   }
 
-  const centerX = p.width * 0.5;
-  p.fill(COLORS.text);
-  p.textAlign(p.CENTER, p.CENTER);
-  p.textSize(22);
-
-  p.fill(COLORS.muted);
-  p.textSize(15);
-  p.text(`Comparisons: ${model.comparisons}`, centerX, baseY - 56);
-
-  let statusLabel = "Ready";
-  let statusColor = COLORS.muted;
-
-  if (model.outcome === "found") {
-    statusLabel = "Found";
-    statusColor = COLORS.found;
-  } else if (model.outcome === "not_found") {
-    statusLabel = "Not found";
-    statusColor = COLORS.bad;
-  } else if (model.comparisons > 0) {
-    statusLabel = "Searching";
-    statusColor = COLORS.checking;
-  }
-
-  p.textSize(16);
-  p.textAlign(p.LEFT, p.CENTER);
-  const statusPrefix = "Status: ";
-  const prefixWidth = p.textWidth(statusPrefix);
-  const statusWidth = p.textWidth(statusLabel);
-  const statusStartX = centerX - (prefixWidth + statusWidth) * 0.5;
-
-  p.fill(COLORS.muted);
-  p.text(statusPrefix, statusStartX, baseY - 34);
-  p.fill(statusColor);
-  p.text(statusLabel, statusStartX + prefixWidth, baseY - 34);
+  drawComparisonsAndStatus(p, model, baseY);
 
   drawMinMaxSideLabels(p, layout, baseY, model);
 
@@ -172,13 +176,6 @@ function getTreeViewport(width, height) {
     width: Math.max(120, width - sidePadding * 2),
     height: Math.max(120, bottom - top)
   };
-}
-
-function drawTreeHeader(p, viewport, title) {
-  p.fill(COLORS.muted);
-  p.textAlign(p.CENTER, p.CENTER);
-  p.textSize(15);
-  p.text(title, viewport.left + viewport.width * 0.5, viewport.top - 22);
 }
 
 function pickNodeColor(node, state) {
@@ -309,7 +306,7 @@ function drawBinaryTree(p, model) {
     label: `i=${node.index}`
   }));
 
-  drawTreeHeader(p, viewport, "Binary decision tree");
+  drawComparisonsAndStatus(p, model, viewport.top);
 
   drawGenericTree(
     p,
@@ -341,7 +338,7 @@ function drawInterpolationTree(p, model) {
     label: `i=${node.index}`
   }));
 
-  drawTreeHeader(p, viewport, "Interpolation on binary-style tree");
+  drawComparisonsAndStatus(p, model, viewport.top);
 
   drawGenericTree(
     p,
@@ -400,7 +397,7 @@ function buildEytzingerTree(data, viewport) {
 function drawEytzingerTree(p, model) {
   const viewport = getTreeViewport(p.width, p.height);
   const tree = buildEytzingerTree(model.data, viewport);
-  drawTreeHeader(p, viewport, "Eytzinger heap-layout tree");
+  drawComparisonsAndStatus(p, model, viewport.top);
 
   drawGenericTree(
     p,
@@ -531,7 +528,7 @@ function buildK16TreeLayout(model, viewport) {
 function drawK16Tree(p, model) {
   const viewport = getTreeViewport(p.width, p.height);
   const layout = buildK16TreeLayout(model, viewport);
-  drawTreeHeader(p, viewport, "16-ary (K16) node tree");
+  drawComparisonsAndStatus(p, model, viewport.top);
 
   if (layout.nodes.length === 0) {
     return;
