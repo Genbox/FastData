@@ -1,4 +1,4 @@
-import { drawSearchArray } from "./renderers.js";
+import { drawSearchArray, drawSearchTree } from "./renderers.js";
 
 const STORAGE_KEY = "fastdata.demo.preferences.v1";
 const DEFAULT_SEED = 42;
@@ -27,6 +27,7 @@ export class VisualizationEngine {
     this.ui = null;
     this.prefs = {
       algorithm: "linear",
+      viewMode: "array",
       speed: 4,
       datasetMode: "random",
       seed: DEFAULT_SEED
@@ -36,6 +37,7 @@ export class VisualizationEngine {
   attachUi(doc) {
     this.ui = {
       algorithmSelect: doc.getElementById("algorithmSelect"),
+      viewModeInput: doc.getElementById("viewModeInput"),
       targetInput: doc.getElementById("targetInput"),
       sizeInput: doc.getElementById("sizeInput"),
       speedInput: doc.getElementById("speedInput"),
@@ -59,6 +61,17 @@ export class VisualizationEngine {
       this.prefs.algorithm = this.ui.algorithmSelect.value;
       this.savePreferences();
       this.selectAlgorithm(this.ui.algorithmSelect.value);
+    });
+
+    this.ui.viewModeInput.addEventListener("change", () => {
+      this.prefs.viewMode = this.getCurrentViewMode();
+      if (this.prefs.viewMode === "tree" && !this.algorithmSupportsTreeView()) {
+        this.prefs.viewMode = "array";
+      }
+
+      this.ui.viewModeInput.value = this.prefs.viewMode;
+      this.savePreferences();
+      this.renderInfo();
     });
 
     this.ui.targetInput.addEventListener("change", () => this.reset());
@@ -108,6 +121,10 @@ export class VisualizationEngine {
         this.prefs.datasetMode = parsed.datasetMode;
       }
 
+      if (typeof parsed.viewMode === "string") {
+        this.prefs.viewMode = parsed.viewMode;
+      }
+
       this.prefs.speed = clamp(Number(parsed.speed), 1, 8);
       this.prefs.seed = Number(parsed.seed);
     } catch {
@@ -125,6 +142,12 @@ export class VisualizationEngine {
     }
 
     this.ui.speedInput.value = String(clamp(this.prefs.speed, 1, 8));
+    this.ui.viewModeInput.value = this.prefs.viewMode;
+    if (!this.ui.viewModeInput.value) {
+      this.ui.viewModeInput.value = "array";
+      this.prefs.viewMode = "array";
+    }
+
     this.ui.datasetModeInput.value = this.prefs.datasetMode;
     if (!this.ui.datasetModeInput.value) {
       this.ui.datasetModeInput.value = "random";
@@ -224,7 +247,32 @@ export class VisualizationEngine {
     this.ui.algorithmTitle.textContent = this.currentAlgorithm.title;
     this.ui.algorithmDescription.textContent = this.currentAlgorithm.description;
     this.ui.complexityBadge.textContent = this.currentAlgorithm.complexity;
+    this.updateViewModeAvailability();
     this.generateData();
+  }
+
+  algorithmSupportsTreeView() {
+    return Boolean(this.currentAlgorithm && this.currentAlgorithm.supportsTreeView);
+  }
+
+  updateViewModeAvailability() {
+    const supportsTree = this.algorithmSupportsTreeView();
+    const treeOption = this.ui.viewModeInput.querySelector('option[value="tree"]');
+
+    if (treeOption) {
+      treeOption.disabled = !supportsTree;
+    }
+
+    if (!supportsTree) {
+      this.prefs.viewMode = "array";
+      this.ui.viewModeInput.value = "array";
+      this.savePreferences();
+      return;
+    }
+
+    const currentMode = this.getCurrentViewMode();
+    this.prefs.viewMode = currentMode;
+    this.ui.viewModeInput.value = currentMode;
   }
 
   getSpeedIntervalMs() {
@@ -236,6 +284,16 @@ export class VisualizationEngine {
     const normalized = clamp(raw, 1, 8);
     this.ui.speedInput.value = String(normalized);
     return normalized;
+  }
+
+  getCurrentViewMode() {
+    const mode = this.ui.viewModeInput.value;
+    if (mode === "tree") {
+      return "tree";
+    }
+
+    this.ui.viewModeInput.value = "array";
+    return "array";
   }
 
   getCurrentSize() {
@@ -422,6 +480,12 @@ export class VisualizationEngine {
 
   draw(p) {
     if (!this.model) {
+      return;
+    }
+
+    const mode = this.getCurrentViewMode();
+    if (mode === "tree" && this.algorithmSupportsTreeView()) {
+      drawSearchTree(p, this.model, this.currentAlgorithm.id);
       return;
     }
 

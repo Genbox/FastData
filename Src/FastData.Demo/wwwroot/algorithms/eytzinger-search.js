@@ -1,4 +1,4 @@
-import { buildSortedUniqueArray, toEytzinger } from "./common.js";
+import {buildSortedUniqueArray, toEytzinger} from "./common.js";
 
 function baseModel(data, target) {
   return {
@@ -11,6 +11,7 @@ function baseModel(data, target) {
     mid: null,
     currentIndex: 0,
     comparisons: 0,
+    visitedIndices: [],
     done: false,
     outcome: "idle",
     status: "Start at root index 0 in Eytzinger layout.",
@@ -25,6 +26,7 @@ export function createEytzingerSearch() {
     title: "Eytzinger Search",
     description: "Searches a binary-search-tree layout stored in array (breadth-friendly memory order).",
     complexity: "Worst-case: O(log n)",
+    supportsTreeView: true,
     pseudocode: [
       "i = 0",
       "while i < n",
@@ -60,6 +62,11 @@ export function createEytzingerSearch() {
       const node = model.data[i];
       model.checkIndex = i;
       model.comparisons += 1;
+
+      if (model.visitedIndices.length === 0 || model.visitedIndices[model.visitedIndices.length - 1] !== i) {
+        model.visitedIndices.push(i);
+      }
+
       model.comparisonText = `Visit node ${i} with value ${node}. Compare to ${model.target}.`;
       model.activeLine = 2;
 

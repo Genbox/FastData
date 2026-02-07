@@ -1,4 +1,4 @@
-import { buildSortedUniqueArray } from "./common.js";
+import {buildSortedUniqueArray} from "./common.js";
 
 function baseModel(data, target) {
   return {
@@ -10,6 +10,7 @@ function baseModel(data, target) {
     high: data.length - 1,
     mid: null,
     comparisons: 0,
+    visitedIndices: [],
     done: false,
     outcome: "idle",
     status: "Start with low = 0 and high = n - 1.",
@@ -24,6 +25,7 @@ export function createBinarySearch() {
     title: "Binary Search",
     description: "Works on sorted arrays by repeatedly halving the search interval.",
     complexity: "Worst-case: O(log n)",
+    supportsTreeView: true,
     pseudocode: [
       "while low <= high",
       "  mid = floor((low + high) / 2)",
@@ -59,6 +61,10 @@ export function createBinarySearch() {
       model.mid = Math.floor((model.low + model.high) / 2);
       model.checkIndex = model.mid;
       model.comparisons += 1;
+
+      if (model.visitedIndices.length === 0 || model.visitedIndices[model.visitedIndices.length - 1] !== model.mid) {
+        model.visitedIndices.push(model.mid);
+      }
 
       const value = model.data[model.mid];
       model.comparisonText = `Compare arr[${model.mid}] = ${value} with target ${model.target}`;

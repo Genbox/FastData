@@ -1,4 +1,4 @@
-import { buildSortedUniqueArray } from "./common.js";
+import {buildSortedUniqueArray} from "./common.js";
 
 function baseModel(data, target) {
   return {
@@ -10,6 +10,8 @@ function baseModel(data, target) {
     high: data.length - 1,
     mid: null,
     comparisons: 0,
+    visitedIndices: [],
+    history: [],
     done: false,
     outcome: "idle",
     status: "Estimate a probe position from the value distribution.",
@@ -24,6 +26,7 @@ export function createInterpolationSearch() {
     title: "Interpolation Search",
     description: "On sorted data, estimates where the target should be and probes there first.",
     complexity: "Average: O(log log n), worst-case: O(n)",
+    supportsTreeView: false,
     pseudocode: [
       "while low <= high and target within [arr[low], arr[high]]",
       "  probe = low + ((target-arr[low])*(high-low))/(arr[high]-arr[low])",
@@ -75,7 +78,18 @@ export function createInterpolationSearch() {
         model.mid = model.low;
         model.comparisonText = `All values in range are ${lowValue}.`;
 
+        if (model.visitedIndices.length === 0 || model.visitedIndices[model.visitedIndices.length - 1] !== model.low) {
+          model.visitedIndices.push(model.low);
+        }
+
         if (lowValue === model.target) {
+          model.history.push({
+            index: model.low,
+            low: model.low,
+            high: model.high,
+            direction: "found"
+          });
+
           model.done = true;
           model.outcome = "found";
           model.foundIndex = model.low;
@@ -87,6 +101,12 @@ export function createInterpolationSearch() {
         model.done = true;
         model.outcome = "not_found";
         model.status = "Target not found in uniform range.";
+        model.history.push({
+          index: model.low,
+          low: model.low,
+          high: model.high,
+          direction: "not_found"
+        });
         model.activeLine = 5;
         return;
       }
@@ -100,10 +120,23 @@ export function createInterpolationSearch() {
       model.checkIndex = probe;
       model.comparisons += 1;
 
+      if (model.visitedIndices.length === 0 || model.visitedIndices[model.visitedIndices.length - 1] !== probe) {
+        model.visitedIndices.push(probe);
+      }
+
       const value = model.data[probe];
+      const entry = {
+        index: probe,
+        low: model.low,
+        high: model.high,
+        direction: "found"
+      };
+
       model.comparisonText = `Probe index ${probe}: arr[${probe}] = ${value}, target = ${model.target}`;
 
       if (value === model.target) {
+        entry.direction = "found";
+        model.history.push(entry);
         model.done = true;
         model.outcome = "found";
         model.foundIndex = probe;
@@ -113,12 +146,16 @@ export function createInterpolationSearch() {
       }
 
       if (value < model.target) {
+        entry.direction = "right";
+        model.history.push(entry);
         model.low = probe + 1;
         model.status = `Target is larger than ${value}. Move low to ${model.low}.`;
         model.activeLine = 3;
         return;
       }
 
+      entry.direction = "left";
+      model.history.push(entry);
       model.high = probe - 1;
       model.status = `Target is smaller than ${value}. Move high to ${model.high}.`;
       model.activeLine = 4;

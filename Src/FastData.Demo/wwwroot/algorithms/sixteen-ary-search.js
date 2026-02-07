@@ -1,4 +1,4 @@
-import { buildSortedUniqueArray } from "./common.js";
+import {buildSortedUniqueArray} from "./common.js";
 
 function countK16Nodes(length) {
   if (length <= 0) {
@@ -121,8 +121,11 @@ function baseModel(data, target) {
     scanCursor: 0,
     childSlot: 0,
     phase: "enter_node",
+    activeKeySlot: null,
+    visitedNodes: [],
     checkIndex: null,
     foundIndex: null,
+    foundNode: null,
     low: undefined,
     high: undefined,
     mid: null,
@@ -141,6 +144,7 @@ export function createSixteenArySearch() {
     title: "16-ary Search",
     description: "K16 tree search: linearly scan up to 16 keys in a node, then descend to one child.",
     complexity: "O(log17 n) nodes, up to 16 key checks per node",
+    supportsTreeView: false,
     pseudocode: [
       "node = root",
       "while node != -1",
@@ -168,16 +172,22 @@ export function createSixteenArySearch() {
           model.status = "Reached empty child. Target not found.";
           model.comparisonText = "node == -1";
           model.checkIndex = null;
+          model.activeKeySlot = null;
           model.activeLine = 5;
           return;
         }
 
         const node = model.node;
+        if (model.visitedNodes.length === 0 || model.visitedNodes[model.visitedNodes.length - 1] !== node) {
+          model.visitedNodes.push(node);
+        }
+
         model.keyBase = node * 16;
         model.childBase = node * 17;
         model.keyCount = model.tree.keyCounts[node];
         model.scanCursor = 0;
         model.childSlot = 0;
+        model.activeKeySlot = null;
         model.phase = "scan_keys";
 
         const start = model.tree.rangeStart[node];
@@ -196,6 +206,7 @@ export function createSixteenArySearch() {
       if (model.phase === "scan_keys") {
         if (model.scanCursor >= model.keyCount) {
           model.phase = "descend";
+          model.activeKeySlot = null;
           model.status = `No match in node ${model.node}. Descend child slot ${model.childSlot}.`;
           model.comparisonText = `child slot = ${model.childSlot}`;
           model.activeLine = 4;
@@ -206,6 +217,7 @@ export function createSixteenArySearch() {
         const key = model.tree.keys[model.keyBase + model.scanCursor];
         const keyIndex = model.valueToIndex.get(key) ?? null;
         model.checkIndex = keyIndex;
+        model.activeKeySlot = model.scanCursor;
         model.comparisons += 1;
         model.activeLine = 2;
         model.comparisonText = `Compare key ${key} with target ${model.target}`;
@@ -214,6 +226,7 @@ export function createSixteenArySearch() {
           model.done = true;
           model.outcome = "found";
           model.foundIndex = keyIndex;
+          model.foundNode = model.node;
           model.status = `Found in node ${model.node}.`;
           model.activeLine = 3;
           return;
@@ -227,6 +240,7 @@ export function createSixteenArySearch() {
         }
 
         model.phase = "descend";
+        model.activeKeySlot = null;
         model.status = `Target < ${key}. Descend child slot ${model.childSlot}.`;
         model.activeLine = 4;
         return;
@@ -235,6 +249,7 @@ export function createSixteenArySearch() {
       const nextNode = model.tree.children[model.childBase + model.childSlot];
       model.node = nextNode;
       model.phase = "enter_node";
+      model.activeKeySlot = null;
       model.checkIndex = null;
       model.status = `Descend to child ${nextNode}.`;
       model.comparisonText = "";
