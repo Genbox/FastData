@@ -7,9 +7,9 @@
 - Documentation is under `Docs/`, and build/publish scripts are in `Scripts/`.
 
 ## Build, Test, and Development Commands
-- `dotnet build FastData.sln -c Debug` builds the full solution.
+- `dotnet build FastData.slnx -c Debug` builds the full solution.
 - `pwsh Scripts/Build.ps1` runs the scripted build (Debug by default).
-- `dotnet test FastData.sln -c Debug` runs all test projects.
+- `dotnet test FastData.slnx -c Debug` runs all test projects.
 - `dotnet run -c Release --project Src/FastData.Benchmarks/FastData.Benchmarks.csproj` runs BenchmarkDotNet benchmarks.
 
 ## Coding Style & Naming Conventions
