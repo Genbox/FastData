@@ -11,15 +11,16 @@ const COLORS = {
 };
 
 function getLayout(width, height, length) {
-  const sidePadding = width < 980 ? 24 : 300;
-  const rightPadding = width < 980 ? 24 : 300;
+  const sidePadding = width < 980 ? 20 : 292;
+  const rightPadding = width < 980 ? 20 : 292;
   const top = height < 760 ? height * 0.48 : height * 0.56;
-  const gap = 8;
+  const gap = length > 80 ? 1 : length > 50 ? 2 : length > 30 ? 4 : 8;
   const available = Math.max(200, width - sidePadding - rightPadding);
   const rawCellWidth = (available - gap * (length - 1)) / length;
-  const cellWidth = Math.max(18, Math.min(62, rawCellWidth));
+  const cellWidth = Math.max(2, Math.min(62, rawCellWidth));
   const rowWidth = cellWidth * length + gap * (length - 1);
   const startX = (width - rowWidth) * 0.5;
+  const maxVisibleIndexes = width < 980 ? 14 : 26;
 
   return {
     top,
@@ -27,7 +28,10 @@ function getLayout(width, height, length) {
     cellWidth,
     rowWidth,
     startX,
-    cellHeight: Math.max(56, Math.min(130, height * 0.18))
+    cellHeight: Math.max(24, Math.min(130, Math.max(cellWidth * 2.8, height * 0.16))),
+    showValues: cellWidth >= 16,
+    showIndexes: cellWidth >= 10,
+    indexLabelStride: Math.max(1, Math.ceil(length / maxVisibleIndexes))
   };
 }
 
@@ -89,14 +93,19 @@ export function drawSearchArray(p, model) {
     p.fill(fillColor);
     p.rect(x, baseY, layout.cellWidth, layout.cellHeight, radius);
 
-    p.fill("#09151c");
-    p.textAlign(p.CENTER, p.CENTER);
-    p.textSize(Math.max(12, layout.cellWidth * 0.3));
-    p.text(String(value), x + layout.cellWidth * 0.5, baseY + layout.cellHeight * 0.42);
+    if (layout.showValues) {
+      p.fill("#09151c");
+      p.textAlign(p.CENTER, p.CENTER);
+      p.textSize(Math.max(9, layout.cellWidth * 0.24));
+      p.text(String(value), x + layout.cellWidth * 0.5, baseY + layout.cellHeight * 0.42);
+    }
 
-    p.fill(COLORS.muted);
-    p.textSize(12);
-    p.text(String(i), x + layout.cellWidth * 0.5, baseY + layout.cellHeight + 18);
+    if (layout.showIndexes && i % layout.indexLabelStride === 0) {
+      p.fill(COLORS.muted);
+      p.textAlign(p.CENTER, p.CENTER);
+      p.textSize(11);
+      p.text(String(i), x + layout.cellWidth * 0.5, baseY + layout.cellHeight + 15);
+    }
   }
 
   const centerX = p.width * 0.5;

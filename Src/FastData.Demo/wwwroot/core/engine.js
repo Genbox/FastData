@@ -12,6 +12,7 @@ export class VisualizationEngine {
     this.playing = false;
     this.accumulatorMs = 0;
     this.lastTimestampMs = 0;
+    this.hasActiveState = false;
     this.ui = null;
   }
 
@@ -24,7 +25,6 @@ export class VisualizationEngine {
       playPauseBtn: doc.getElementById("playPauseBtn"),
       stepBtn: doc.getElementById("stepBtn"),
       resetBtn: doc.getElementById("resetBtn"),
-      newDataBtn: doc.getElementById("newDataBtn"),
       statusLine: doc.getElementById("statusLine"),
       comparisonLine: doc.getElementById("comparisonLine"),
       algorithmTitle: doc.getElementById("algorithmTitle"),
@@ -42,16 +42,21 @@ export class VisualizationEngine {
 
     this.ui.sizeInput.addEventListener("change", () => this.generateData());
 
-    this.ui.newDataBtn.addEventListener("click", () => this.generateData());
-
     this.ui.resetBtn.addEventListener("click", () => this.reset());
 
     this.ui.playPauseBtn.addEventListener("click", () => {
+      if (!this.playing) {
+        this.hasActiveState = true;
+        this.setResetDisabled(false);
+      }
+
       this.playing = !this.playing;
       this.ui.playPauseBtn.textContent = this.playing ? "Pause" : "Play";
     });
 
     this.ui.stepBtn.addEventListener("click", () => {
+      this.hasActiveState = true;
+      this.setResetDisabled(false);
       this.playing = false;
       this.ui.playPauseBtn.textContent = "Play";
       this.step();
@@ -76,7 +81,11 @@ export class VisualizationEngine {
   }
 
   getCurrentSize() {
-    return clamp(Number(this.ui.sizeInput.value), 8, 28);
+    const raw = Number(this.ui.sizeInput.value);
+    const safe = Number.isFinite(raw) ? raw : 16;
+    const normalized = clamp(safe, 8, 256);
+    this.ui.sizeInput.value = String(normalized);
+    return normalized;
   }
 
   getCurrentTarget() {
@@ -91,8 +100,11 @@ export class VisualizationEngine {
     });
 
     this.accumulatorMs = 0;
+    this.hasActiveState = false;
     this.playing = false;
     this.ui.playPauseBtn.textContent = "Play";
+    this.setRunControlsDisabled(false);
+    this.setResetDisabled(true);
     this.renderInfo();
   }
 
@@ -104,8 +116,11 @@ export class VisualizationEngine {
     this.model.target = this.getCurrentTarget();
     this.model = this.currentAlgorithm.resetModel(this.model);
     this.accumulatorMs = 0;
+    this.hasActiveState = false;
     this.playing = false;
     this.ui.playPauseBtn.textContent = "Play";
+    this.setRunControlsDisabled(false);
+    this.setResetDisabled(true);
     this.renderInfo();
   }
 
@@ -116,6 +131,25 @@ export class VisualizationEngine {
 
     this.currentAlgorithm.step(this.model);
     this.renderInfo();
+
+    if (this.model.done) {
+      this.completeRun();
+    }
+  }
+
+  completeRun() {
+    this.playing = false;
+    this.ui.playPauseBtn.textContent = "Play";
+    this.setRunControlsDisabled(true);
+  }
+
+  setRunControlsDisabled(disabled) {
+    this.ui.playPauseBtn.disabled = disabled;
+    this.ui.stepBtn.disabled = disabled;
+  }
+
+  setResetDisabled(disabled) {
+    this.ui.resetBtn.disabled = disabled;
   }
 
   update(timestampMs) {
@@ -127,7 +161,19 @@ export class VisualizationEngine {
     const delta = timestampMs - this.lastTimestampMs;
     this.lastTimestampMs = timestampMs;
 
-    if (!this.model || !this.playing || this.model.done) {
+    if (!this.model) {
+      return;
+    }
+
+    if (this.model.done) {
+      if (this.playing) {
+        this.completeRun();
+      }
+
+      return;
+    }
+
+    if (!this.playing) {
       return;
     }
 
@@ -137,6 +183,10 @@ export class VisualizationEngine {
     while (this.accumulatorMs >= intervalMs && !this.model.done) {
       this.accumulatorMs -= intervalMs;
       this.step();
+    }
+
+    if (this.model.done && this.playing) {
+      this.completeRun();
     }
   }
 

@@ -13,13 +13,21 @@ export function buildRandomArray(size, min = 10, max = 99) {
 }
 
 export function buildSortedUniqueArray(size, min = 8, max = 99) {
-  const values = new Set();
+  const adjustedMax = Math.max(max, min + size * 2);
+  const pool = [];
 
-  while (values.size < size) {
-    values.add(randomInt(min, max));
+  for (let value = min; value <= adjustedMax; value += 1) {
+    pool.push(value);
   }
 
-  return [...values].sort((a, b) => a - b);
+  for (let i = pool.length - 1; i > 0; i -= 1) {
+    const j = randomInt(0, i);
+    const tmp = pool[i];
+    pool[i] = pool[j];
+    pool[j] = tmp;
+  }
+
+  return pool.slice(0, size).sort((a, b) => a - b);
 }
 
 export function toEytzinger(sorted) {

@@ -116,6 +116,13 @@ button {
   padding: 0.5rem 0.7rem;
 }
 
+button:disabled {
+  color: #9da9ad;
+  background: linear-gradient(180deg, #6f7b81, #5d676d);
+  border-color: rgb(220 230 235 / 20%);
+  cursor: not-allowed;
+}
+
 .row {
   display: flex;
   gap: 0.6rem;
