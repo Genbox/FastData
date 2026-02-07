@@ -61,7 +61,7 @@ export function createInterpolationSearch() {
         model.checkIndex = null;
         model.mid = null;
         model.status = "Target is outside the current value range.";
-        model.comparisonText = `range is [${model.data[model.low]}, ${model.data[model.high]}]`;
+        model.comparisonText = "Target outside current bounds.";
         model.activeLine = 5;
         return;
       }

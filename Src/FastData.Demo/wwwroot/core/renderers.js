@@ -3,7 +3,6 @@ const COLORS = {
   checking: "#71b7ff",
   found: "#6dd18c",
   bound: "#2f6f4f",
-  boundText: "#f2a6d8",
   text: "#ecf4f1",
   muted: "#bcd1c9",
   bad: "#ea7f72"
@@ -50,22 +49,39 @@ function getCellColor(index, model) {
   return COLORS.unvisited;
 }
 
-function drawBounds(p, x, y, model) {
+function getVisibleBounds(model) {
   if (model.low === undefined || model.high === undefined) {
+    return null;
+  }
+
+  if (!Array.isArray(model.data) || model.data.length === 0 || model.low > model.high) {
+    return null;
+  }
+
+  const last = model.data.length - 1;
+  const low = Math.max(0, Math.min(last, model.low));
+  const high = Math.max(0, Math.min(last, model.high));
+  return { low, high };
+}
+
+function drawMinMaxSideLabels(p, layout, baseY, model) {
+  const bounds = getVisibleBounds(model);
+  if (!bounds) {
     return;
   }
 
-  p.textAlign(p.CENTER, p.TOP);
-  p.textSize(13);
+  const leftX = layout.startX - 14;
+  const rightX = layout.startX + layout.rowWidth + 14;
+  const centerY = baseY + layout.cellHeight * 0.5;
 
-  p.fill(COLORS.boundText);
-  p.text(`low: ${model.low}`, x(model.low), y + 8);
-  p.text(`high: ${model.high}`, x(model.high), y + 30);
+  p.textSize(14);
+  p.fill(COLORS.text);
 
-  if (model.mid !== null && model.mid !== undefined) {
-    p.fill(COLORS.text);
-    p.text(`mid: ${model.mid}`, x(model.mid), y - 30);
-  }
+  p.textAlign(p.RIGHT, p.CENTER);
+  p.text(`min: ${model.data[bounds.low]}`, leftX, centerY);
+
+  p.textAlign(p.LEFT, p.CENTER);
+  p.text(`max: ${model.data[bounds.high]}`, rightX, centerY);
 }
 
 export function drawSearchArray(p, model) {
@@ -104,12 +120,37 @@ export function drawSearchArray(p, model) {
   p.textAlign(p.CENTER, p.CENTER);
   p.textSize(22);
 
-  p.fill(model.outcome === "not_found" ? COLORS.bad : COLORS.muted);
+  p.fill(COLORS.muted);
   p.textSize(15);
   p.text(`Comparisons: ${model.comparisons}`, centerX, baseY - 56);
 
-  const getCenter = index => layout.startX + index * (layout.cellWidth + layout.gap) + layout.cellWidth * 0.5;
-  drawBounds(p, getCenter, baseY + layout.cellHeight + 28, model);
+  let statusLabel = "Ready";
+  let statusColor = COLORS.muted;
+
+  if (model.outcome === "found") {
+    statusLabel = "Found";
+    statusColor = COLORS.found;
+  } else if (model.outcome === "not_found") {
+    statusLabel = "Not found";
+    statusColor = COLORS.bad;
+  } else if (model.comparisons > 0) {
+    statusLabel = "Searching";
+    statusColor = COLORS.checking;
+  }
+
+  p.textSize(16);
+  p.textAlign(p.LEFT, p.CENTER);
+  const statusPrefix = "Status: ";
+  const prefixWidth = p.textWidth(statusPrefix);
+  const statusWidth = p.textWidth(statusLabel);
+  const statusStartX = centerX - (prefixWidth + statusWidth) * 0.5;
+
+  p.fill(COLORS.muted);
+  p.text(statusPrefix, statusStartX, baseY - 34);
+  p.fill(statusColor);
+  p.text(statusLabel, statusStartX + prefixWidth, baseY - 34);
+
+  drawMinMaxSideLabels(p, layout, baseY, model);
 
   p.pop();
 }

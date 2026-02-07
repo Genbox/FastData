@@ -159,6 +159,12 @@ button:focus-visible {
   font-size: 0.9rem;
 }
 
+.bounds-info {
+  margin: 0.55rem 0 0;
+  font-size: 0.86rem;
+  color: #f2a6d8;
+}
+
 .status {
   color: #fff0cd;
 }

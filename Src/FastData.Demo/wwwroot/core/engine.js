@@ -46,6 +46,7 @@ export class VisualizationEngine {
       resetBtn: doc.getElementById("resetBtn"),
       statusLine: doc.getElementById("statusLine"),
       comparisonLine: doc.getElementById("comparisonLine"),
+      boundsLine: doc.getElementById("boundsLine"),
       algorithmTitle: doc.getElementById("algorithmTitle"),
       algorithmDescription: doc.getElementById("algorithmDescription"),
       complexityBadge: doc.getElementById("complexityBadge"),
@@ -107,13 +108,8 @@ export class VisualizationEngine {
         this.prefs.datasetMode = parsed.datasetMode;
       }
 
-      if (Number.isFinite(parsed.speed)) {
-        this.prefs.speed = clamp(Number(parsed.speed), 1, 8);
-      }
-
-      if (Number.isFinite(parsed.seed)) {
-        this.prefs.seed = Number(parsed.seed);
-      }
+      this.prefs.speed = clamp(Number(parsed.speed), 1, 8);
+      this.prefs.seed = Number(parsed.seed);
     } catch {
       this.prefs.seed = DEFAULT_SEED;
     }
@@ -237,32 +233,29 @@ export class VisualizationEngine {
 
   getCurrentSpeed() {
     const raw = Number(this.ui.speedInput.value);
-    const safe = Number.isFinite(raw) ? raw : 4;
-    const normalized = clamp(safe, 1, 8);
+    const normalized = clamp(raw, 1, 8);
     this.ui.speedInput.value = String(normalized);
     return normalized;
   }
 
   getCurrentSize() {
     const raw = Number(this.ui.sizeInput.value);
-    const safe = Number.isFinite(raw) ? raw : 16;
-    const normalized = clamp(safe, 8, 256);
+    const normalized = clamp(raw, 8, 256);
     this.ui.sizeInput.value = String(normalized);
     return normalized;
   }
 
   getCurrentTarget() {
     const raw = Number(this.ui.targetInput.value);
-    const safe = Number.isFinite(raw) ? raw : 42;
-    this.ui.targetInput.value = String(safe);
-    return safe;
+    this.ui.targetInput.value = String(raw);
+    return raw;
   }
 
   getCurrentSeed() {
     const raw = Number(this.ui.seedInput.value);
-    const safe = Number.isFinite(raw) ? Math.trunc(raw) : DEFAULT_SEED;
-    this.ui.seedInput.value = String(safe);
-    return safe;
+    const normalized = Math.trunc(raw);
+    this.ui.seedInput.value = String(normalized);
+    return normalized;
   }
 
   getDatasetMode() {
@@ -382,6 +375,10 @@ export class VisualizationEngine {
     this.ui.statusLine.textContent = this.model.status;
     this.ui.comparisonLine.textContent = this.model.comparisonText;
 
+    const boundsText = this.getBoundsText();
+    this.ui.boundsLine.textContent = boundsText ?? "";
+    this.ui.boundsLine.hidden = boundsText === null;
+
     this.ui.pseudocodeList.innerHTML = "";
     for (let i = 0; i < this.currentAlgorithm.pseudocode.length; i += 1) {
       const line = document.createElement("li");
@@ -393,6 +390,34 @@ export class VisualizationEngine {
 
       this.ui.pseudocodeList.appendChild(line);
     }
+  }
+
+  getBoundsText() {
+    if (this.model.comparisons <= 0) {
+      return null;
+    }
+
+    if (this.model.low === undefined || this.model.high === undefined) {
+      return null;
+    }
+
+    if (!Array.isArray(this.model.data) || this.model.data.length === 0 || this.model.low > this.model.high) {
+      return null;
+    }
+
+    const last = this.model.data.length - 1;
+    const low = clamp(this.model.low, 0, last);
+    const high = clamp(this.model.high, 0, last);
+    const minValue = this.model.data[low];
+    const maxValue = this.model.data[high];
+
+    let midText = "-";
+    if (this.model.mid !== undefined && this.model.mid !== null) {
+      const midIndex = clamp(this.model.mid, 0, last);
+      midText = `${this.model.data[midIndex]} (i=${midIndex})`;
+    }
+
+    return `Min: ${minValue}  Mid: ${midText}  Max: ${maxValue}`;
   }
 
   draw(p) {
