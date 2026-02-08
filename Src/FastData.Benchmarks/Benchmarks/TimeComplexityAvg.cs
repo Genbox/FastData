@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
@@ -91,6 +92,154 @@ public class TimeComplexityAvg
     {
         for (int i = 0; i < 10000; i++)
             K16SearchSimd256(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void CompressedBloom()
+    {
+        for (int i = 0; i < 10000; i++)
+            CompressedBloomFilterStructure_Int32_100.Contains(Random.Shared.Next(1, _data.Length));
+    }
+
+    [Benchmark]public void EliasFanoEncoded()
+    {
+        for (int i = 0; i < 10000; i++)
+            EliasFanoSetStructure_Int32_100.Contains(Random.Shared.Next(1, _data.Length));
+    }
+
+    private static class EliasFanoSetStructure_Int32_100
+    {
+        private const ulong _efMinValue = 2147483648ul;
+        private const ulong _efMaxValue = 2147483747ul;
+        private const int _efLowerBitCount = 0;
+        private const int _efItemCount = 100;
+        private static readonly ulong[] _efHighBits =
+        [
+            6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 85ul
+        ];
+
+        public static bool Contains(int key)
+        {
+            ulong mapped = (uint)(key ^ int.MinValue);
+
+            if (mapped is < _efMinValue or > _efMaxValue)
+                return false;
+
+            ulong target = mapped - _efMinValue;
+            int low = 0;
+            int high = _efItemCount - 1;
+
+            while (low <= high)
+            {
+                int mid = low + ((high - low) >> 1);
+                ulong value = GetValueAt(mid);
+
+                if (value == target)
+                    return true;
+
+                if (value < target)
+                    low = mid + 1;
+                else
+                    high = mid - 1;
+            }
+
+            return false;
+        }
+
+        private static ulong GetValueAt(int index)
+        {
+            int selectedBit = Select1(index);
+            ulong high = (ulong)(selectedBit - index);
+            return (high << _efLowerBitCount) | 0UL;
+        }
+
+        private static int Select1(int index)
+        {
+            int remaining = index;
+
+            for (int i = 0; i < _efHighBits.Length; i++)
+            {
+                ulong word = _efHighBits[i];
+                int count = CountBits(word);
+
+                if (remaining < count)
+                    return (i << 6) + SelectInWord(word, remaining);
+
+                remaining -= count;
+            }
+
+            throw new InvalidOperationException("Elias-Fano select out of range.");
+        }
+
+        private static int SelectInWord(ulong word, int rank)
+        {
+            for (int bit = 0; bit < 64; bit++)
+            {
+                if (((word >> bit) & 1UL) == 0)
+                    continue;
+
+                if (rank == 0)
+                    return bit;
+
+                rank--;
+            }
+
+            throw new InvalidOperationException("Elias-Fano word rank out of range.");
+        }
+
+        private static int CountBits(ulong value)
+        {
+            value -= (value >> 1) & 0x5555555555555555UL;
+            value = (value & 0x3333333333333333UL) + ((value >> 2) & 0x3333333333333333UL);
+            value = (value + (value >> 4)) & 0x0F0F0F0F0F0F0F0FUL;
+            return (int)((value * 0x0101010101010101UL) >> 56);
+        }
+    }
+
+    private static class CompressedBloomFilterStructure_Int32_100
+    {
+        private static readonly int[] _compressedIndices =
+        [
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15
+        ];
+
+        private static readonly ulong[] _compressedWords =
+        [
+            281479271743489ul, 562958543486979ul, 1125917086973957ul, 2251834173947913ul, 4503668347895825ul, 9007336695791649ul, 18014673391583297ul, 36029346783166593ul, 72058693566333185ul, 144117387132666369ul,
+            288234774265332737ul, 576469548530665473ul, 1152939097061330945ul, 2305878194122661889ul, 4611756388245323777ul, 9223512776490647553ul
+        ];
+
+        public static bool Contains(int key)
+        {
+            ulong hash = (ulong)key;
+            uint index = (uint)(hash & 15);
+            int target = (int)index;
+            int low = 0;
+            int high = _compressedIndices.Length - 1;
+            ulong word = 0;
+
+            while (low <= high)
+            {
+                int mid = low + ((high - low) >> 1);
+                int value = _compressedIndices[mid];
+
+                if (value == target)
+                {
+                    word = _compressedWords[mid];
+                    break;
+                }
+
+                if (value < target)
+                    low = mid + 1;
+                else
+                    high = mid - 1;
+            }
+
+            uint shift1 = (uint)(hash & 63UL);
+            uint shift2 = (uint)((hash >> 8) & 63UL);
+            ulong mask = (1UL << (int)shift1) | (1UL << (int)shift2);
+            return (word & mask) == mask;
+        }
     }
 
     private static int[] BuildEytzinger(int[] sorted)
@@ -442,10 +591,10 @@ public class TimeComplexityAvg
             uint mask2 = (uint)Sse2.MoveMask(gt2.AsByte());
             uint mask3 = (uint)Sse2.MoveMask(gt3.AsByte());
 
-            int childSlot = (System.Numerics.BitOperations.PopCount(mask0)
-                             + System.Numerics.BitOperations.PopCount(mask1)
-                             + System.Numerics.BitOperations.PopCount(mask2)
-                             + System.Numerics.BitOperations.PopCount(mask3)) / 4;
+            int childSlot = (BitOperations.PopCount(mask0)
+                             + BitOperations.PopCount(mask1)
+                             + BitOperations.PopCount(mask2)
+                             + BitOperations.PopCount(mask3)) / 4;
 
             node = children[childBase + childSlot];
         }
@@ -482,8 +631,8 @@ public class TimeComplexityAvg
             uint mask0 = (uint)Avx2.MoveMask(gt0.AsByte());
             uint mask1 = (uint)Avx2.MoveMask(gt1.AsByte());
 
-            int childSlot = (System.Numerics.BitOperations.PopCount(mask0)
-                             + System.Numerics.BitOperations.PopCount(mask1)) / 4;
+            int childSlot = (BitOperations.PopCount(mask0)
+                             + BitOperations.PopCount(mask1)) / 4;
 
             node = children[childBase + childSlot];
         }
