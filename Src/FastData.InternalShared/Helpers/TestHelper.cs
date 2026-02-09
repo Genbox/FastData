@@ -250,6 +250,8 @@ public static class TestHelper
             return Generate(state, new HashTableCompactStructure<TKey, TValue>(GetHashData(keySpan, keyType, generator.Encoding), keyType));
         if (vector.Type == typeof(BloomFilterStructure<,>))
             return Generate(state, new BloomFilterStructure<TKey, TValue>(GetHashData(keySpan, keyType, generator.Encoding)));
+        if (vector.Type == typeof(EliasFanoStructure<,>))
+            return Generate(state, new EliasFanoStructure<TKey, TValue>((NumericKeyProperties<TKey>)props, config));
 
         throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
     }

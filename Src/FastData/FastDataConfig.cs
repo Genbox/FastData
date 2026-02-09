@@ -6,6 +6,8 @@ namespace Genbox.FastData;
 [PublicAPI]
 public sealed class FastDataConfig(StructureType structureType = StructureType.Auto)
 {
+    private int _skipQuantum = 128;
+
     /// <summary>The type of structure to create. Defaults to Auto.</summary>
     public StructureType StructureType { get; set; } = structureType;
 
@@ -24,11 +26,17 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
     /// <summary>Configuration for analyzers. Set to null to disable analysis.</summary>
     public StringAnalyzerConfig? StringAnalyzerConfig { get; set; } = new StringAnalyzerConfig();
 
-    /// <summary>Maximum numeric key range (max - min) to allow BitSetStructure in Auto mode.</summary>
+    /// <summary>Maximum numeric key range to allow BitSetStructure in Auto mode.</summary>
     public ulong BitSetStructureMaxRange { get; set; } = 4096;
 
-    /// <summary>Minimum density (item count / range) required to use BitSetStructure in Auto mode.</summary>
+    /// <summary>Minimum density required to use BitSetStructure in Auto mode.</summary>
     public double BitSetStructureMinDensity { get; set; } = 0.5;
+
+    /// <summary>Minimum item count required to use EliasFanoStructure in Auto mode.</summary>
+    public int EliasFanoStructureMinItemCount { get; set; } = 256;
+
+    /// <summary>Maximum density allowed to use EliasFanoStructure in Auto mode.</summary>
+    public double EliasFanoStructureMaxDensity { get; set; } = 1.0 / 12.0;
 
     /// <summary>Minimum density required to use range checks for length maps.</summary>
     public double LengthMapMinDensity { get; set; } = 0.45;
@@ -50,6 +58,22 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
 
     /// <summary>Maximum relative slowdown allowed for a perfect hash before preferring a faster non-perfect hash.</summary>
     public double PerfectHashMaxSlowdownFactor { get; set; } = 0.25;
+
+    /// <summary>Sample rate for Elias-Fano zero-select index. Must be a power of two.</summary>
+    public int SkipQuantum
+    {
+        get => _skipQuantum;
+        set
+        {
+            if (value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "SkipQuantum must be greater than 0.");
+
+            if ((value & (value - 1)) != 0)
+                throw new ArgumentException("SkipQuantum must be a power of two.", nameof(value));
+
+            _skipQuantum = value;
+        }
+    }
 
     /// <summary>When enabled, data structures will be generated with the smallest possible internal data types to lower memory.</summary>
     public bool TypeReductionEnabled { get; set; } = true; //TODO: Evaluate default value

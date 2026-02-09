@@ -44,6 +44,14 @@ public class KeyAnalyzerTests
         Assert.False(GetNumericProperties<double>(new[] { 0d, 0.9d, 2d }).IsConsecutive);
     }
 
+    [Fact]
+    public void GetProperties_Density_Test()
+    {
+        Assert.Equal(1.0d, GetNumericProperties<int>(new[] { 10, 11, 12 }).Density);
+        Assert.Equal(2.0d / 101.0d, GetNumericProperties<int>(new[] { 0, 100 }).Density, 12);
+        Assert.Equal(1.0d, GetNumericProperties<int>(new[] { 42 }).Density);
+    }
+
     [Theory]
     [InlineData((object)new[] { "a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa" })]
     [InlineData((object)new[] { "aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa" })] //Test inputs that don't start with 1

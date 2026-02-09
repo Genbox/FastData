@@ -293,7 +293,8 @@ internal static class KeyAnalyzer
             mask |= c;
         }
 
-        return new NumericKeyProperties<char>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        ulong range = (ulong)(max - min);
+        return new NumericKeyProperties<char>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
     }
 
     private static NumericKeyProperties<float> GetSingleProperties(ReadOnlySpan<float> keys)
@@ -319,7 +320,7 @@ internal static class KeyAnalyzer
         }
 
         ulong range = ClampRangeToUInt64(max - min);
-        return new NumericKeyProperties<float>(min, max, range, hasZeroOrNaN, IsFloatConsecutive(keys, min, max, hasNaNOrInfinity), 0, static v => (long)v);
+        return new NumericKeyProperties<float>(min, max, range, CalculateDensity(keys.Length, range), hasZeroOrNaN, IsFloatConsecutive(keys, min, max, hasNaNOrInfinity), 0, static v => (long)v);
     }
 
     private static NumericKeyProperties<double> GetDoubleProperties(ReadOnlySpan<double> keys)
@@ -345,7 +346,7 @@ internal static class KeyAnalyzer
         }
 
         ulong range = ClampRangeToUInt64(max - min);
-        return new NumericKeyProperties<double>(min, max, range, hasZeroOrNaN, IsDoubleConsecutive(keys, min, max, hasNaNOrInfinity), 0, static v => (long)v);
+        return new NumericKeyProperties<double>(min, max, range, CalculateDensity(keys.Length, range), hasZeroOrNaN, IsDoubleConsecutive(keys, min, max, hasNaNOrInfinity), 0, static v => (long)v);
     }
 
     private static NumericKeyProperties<byte> GetByteProperties(ReadOnlySpan<byte> keys)
@@ -361,7 +362,8 @@ internal static class KeyAnalyzer
             mask |= val;
         }
 
-        return new NumericKeyProperties<byte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        ulong range = (ulong)(max - min);
+        return new NumericKeyProperties<byte>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
     }
 
     private static NumericKeyProperties<sbyte> GetSByteProperties(ReadOnlySpan<sbyte> keys)
@@ -377,7 +379,8 @@ internal static class KeyAnalyzer
             mask |= unchecked((byte)val);
         }
 
-        return new NumericKeyProperties<sbyte>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        ulong range = (ulong)(max - min);
+        return new NumericKeyProperties<sbyte>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
     }
 
     private static NumericKeyProperties<short> GetInt16Properties(ReadOnlySpan<short> keys)
@@ -393,7 +396,8 @@ internal static class KeyAnalyzer
             mask |= unchecked((ushort)val);
         }
 
-        return new NumericKeyProperties<short>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        ulong range = (ulong)(max - min);
+        return new NumericKeyProperties<short>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
     }
 
     private static NumericKeyProperties<ushort> GetUInt16Properties(ReadOnlySpan<ushort> keys)
@@ -409,7 +413,8 @@ internal static class KeyAnalyzer
             mask |= val;
         }
 
-        return new NumericKeyProperties<ushort>(min, max, (ulong)(max - min), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        ulong range = (ulong)(max - min);
+        return new NumericKeyProperties<ushort>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
     }
 
     private static NumericKeyProperties<int> GetInt32Properties(ReadOnlySpan<int> keys)
@@ -425,7 +430,8 @@ internal static class KeyAnalyzer
             mask |= unchecked((uint)val);
         }
 
-        return new NumericKeyProperties<int>(min, max, (ulong)((long)max - min), false, keys.Length <= 1 || (long)max - min == keys.Length - 1, mask, static v => v);
+        ulong range = (ulong)((long)max - min);
+        return new NumericKeyProperties<int>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || (long)max - min == keys.Length - 1, mask, static v => v);
     }
 
     private static NumericKeyProperties<uint> GetUInt32Properties(ReadOnlySpan<uint> keys)
@@ -441,7 +447,8 @@ internal static class KeyAnalyzer
             mask |= val;
         }
 
-        return new NumericKeyProperties<uint>(min, max, max - min, false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1), mask, static v => v);
+        ulong range = max - min;
+        return new NumericKeyProperties<uint>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1), mask, static v => v);
     }
 
     private static NumericKeyProperties<long> GetInt64Properties(ReadOnlySpan<long> keys)
@@ -458,7 +465,7 @@ internal static class KeyAnalyzer
         }
 
         ulong range = unchecked((ulong)max - (ulong)min);
-        return new NumericKeyProperties<long>(min, max, range, false, keys.Length <= 1 || range == (ulong)(keys.Length - 1), mask, static v => v);
+        return new NumericKeyProperties<long>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || range == (ulong)(keys.Length - 1), mask, static v => v);
     }
 
     private static NumericKeyProperties<ulong> GetUInt64Properties(ReadOnlySpan<ulong> keys)
@@ -474,7 +481,8 @@ internal static class KeyAnalyzer
             mask |= val;
         }
 
-        return new NumericKeyProperties<ulong>(min, max, max - min, false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1), mask, static v => (long)v);
+        ulong range = max - min;
+        return new NumericKeyProperties<ulong>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1), mask, static v => (long)v);
     }
 
     private static bool IsFloatConsecutive(ReadOnlySpan<float> keys, float min, float max, bool hasNaNOrInfinity)
@@ -540,5 +548,13 @@ internal static class KeyAnalyzer
             return ulong.MaxValue;
 
         return (ulong)range;
+    }
+
+    private static double CalculateDensity(int keyCount, ulong range)
+    {
+        if (keyCount <= 0)
+            return 0;
+
+        return keyCount / (range + 1.0d);
     }
 }

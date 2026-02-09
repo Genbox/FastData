@@ -246,13 +246,17 @@ public static partial class FastDataGenerator
                     return GenerateWrapper(tempState, new BloomFilterStructure<TKey, TValue>(bloomHashData));
                 }
 
-                if (keyType != KeyType.Single && keyType != KeyType.Double && props.Range <= fdCfg.BitSetStructureMaxRange && keySpan.Length / (double)props.Range >= fdCfg.BitSetStructureMinDensity)
+                if (keyType != KeyType.Single && keyType != KeyType.Double && props.Range <= fdCfg.BitSetStructureMaxRange && props.Density >= fdCfg.BitSetStructureMinDensity)
                     return GenerateWrapper(tempState, new BitSetStructure<TKey, TValue>(props, keyType));
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
                 if (keySpan.Length < fdCfg.ConditionalStructureMaxItemCount)
                     return GenerateWrapper(tempState, new ConditionalStructure<TKey, TValue>());
+
+                // TODO: Elias-Fano currently does not normalize against MinKeyValue, so negative domains may be handled sub-optimally.
+                if (values.IsEmpty && IsIntegralKeyType(keyType) && !props.IsConsecutive && keySpan.Length >= fdCfg.EliasFanoStructureMinItemCount && props.Density <= fdCfg.EliasFanoStructureMaxDensity)
+                    return GenerateWrapper(tempState, new EliasFanoStructure<TKey, TValue>(props, fdCfg));
 
                 goto case StructureType.HashTable;
             }
@@ -510,6 +514,17 @@ public static partial class FastDataGenerator
         notPerfect.Sort(static (a, b) => a.Time.CompareTo(b.Time));
         return notPerfect[0];
     }
+
+    private static bool IsIntegralKeyType(KeyType keyType) => keyType is
+        KeyType.Char or
+        KeyType.SByte or
+        KeyType.Byte or
+        KeyType.Int16 or
+        KeyType.UInt16 or
+        KeyType.Int32 or
+        KeyType.UInt32 or
+        KeyType.Int64 or
+        KeyType.UInt64;
 
     private static void Benchmark(byte[] data, int iterations, Candidate candidate)
     {

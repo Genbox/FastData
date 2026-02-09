@@ -34,6 +34,36 @@ public class FastDataGeneratorTests
         FastDataGenerator.Generate([1, 2, 2], config, new DummyGenerator());
     }
 
+    [Fact]
+    public void FastDataConfig_SkipQuantum_DefaultValueIs128()
+    {
+        FastDataConfig config = new FastDataConfig();
+        Assert.Equal(128, config.SkipQuantum);
+    }
+
+    [Fact]
+    public void FastDataConfig_SkipQuantum_ThrowsOnZeroOrNegative()
+    {
+        FastDataConfig config = new FastDataConfig();
+        Assert.Throws<ArgumentOutOfRangeException>(() => config.SkipQuantum = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => config.SkipQuantum = -2);
+    }
+
+    [Fact]
+    public void FastDataConfig_SkipQuantum_ThrowsWhenNotPowerOfTwo()
+    {
+        FastDataConfig config = new FastDataConfig();
+        Assert.Throws<ArgumentException>(() => config.SkipQuantum = 3);
+    }
+
+    [Fact]
+    public void FastDataConfig_SkipQuantum_AcceptsPowerOfTwo()
+    {
+        FastDataConfig config = new FastDataConfig();
+        config.SkipQuantum = 64;
+        Assert.Equal(64, config.SkipQuantum);
+    }
+
     [Theory]
     [InlineData(DeduplicationMode.HashSet)]
     [InlineData(DeduplicationMode.Sort)]
@@ -182,6 +212,35 @@ public class FastDataGeneratorTests
         Assert.True(ctx.Values.IsEmpty);
         Assert.Single(ctx.BitSet);
         Assert.Equal(23UL, ctx.BitSet[0]);
+    }
+
+    [Fact]
+    public void Generate_Auto_UsesEliasFanoForSparseIntegralSet()
+    {
+        int[] keys = Enumerable.Range(0, 1000).Select(static x => x * 100).ToArray();
+        FastDataConfig config = new FastDataConfig();
+
+        ContextCaptureGenerator generator = new ContextCaptureGenerator();
+        FastDataGenerator.Generate(keys, config, generator);
+
+        EliasFanoContext<int, byte> ctx = Assert.IsType<EliasFanoContext<int, byte>>(generator.Context);
+        Assert.Equal(keys.Length, ctx.Data.Length);
+    }
+
+    [Fact]
+    public void GenerateKeyed_Auto_DoesNotUseEliasFano()
+    {
+        int[] keys = Enumerable.Range(0, 1000).Select(static x => x * 100).ToArray();
+        string[] values = keys.Select(static x => x.ToString()).ToArray();
+        FastDataConfig config = new FastDataConfig();
+
+        ContextCaptureGenerator generator = new ContextCaptureGenerator();
+        FastDataGenerator.GenerateKeyed(keys, values, config, generator);
+
+        Assert.NotNull(generator.Context);
+        object context = generator.Context!;
+        Assert.False(context is EliasFanoContext<int, string>);
+        Assert.True(context is HashTableContext<int, string> or HashTablePerfectContext<int, string>);
     }
 
     [Fact]

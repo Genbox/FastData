@@ -16,6 +16,44 @@ internal static class BitOperations
     ];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int Log2(ulong value)
+    {
+        if (value == 0)
+            throw new ArgumentOutOfRangeException(nameof(value));
+
+        int result = 0;
+
+        if (value >= 1UL << 32)
+        {
+            value >>= 32;
+            result += 32;
+        }
+        if (value >= 1UL << 16)
+        {
+            value >>= 16;
+            result += 16;
+        }
+        if (value >= 1UL << 8)
+        {
+            value >>= 8;
+            result += 8;
+        }
+        if (value >= 1UL << 4)
+        {
+            value >>= 4;
+            result += 4;
+        }
+        if (value >= 1UL << 2)
+        {
+            value >>= 2;
+            result += 2;
+        }
+        if (value >= 1UL << 1) { result += 1; }
+
+        return result;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static uint RotateLeft(uint value, int offset) => (value << offset) | (value >> (32 - offset));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

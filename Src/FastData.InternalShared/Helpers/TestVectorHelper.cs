@@ -87,6 +87,9 @@ public static class TestVectorHelper
             yield return testVector;
         }
 
+        foreach (ITestVector testVector in GenerateTestVectors([Enumerable.Range(0, 100).ToArray()], null, typeof(EliasFanoStructure<,>)))
+            yield return testVector;
+
         // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
         foreach (ITestVector testVector in GenerateTestVectors([["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]], null, typeof(KeyLengthStructure<,>)))
             yield return testVector;
