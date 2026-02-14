@@ -134,7 +134,7 @@ internal sealed class EliasFanoCode<TKey, TValue>(EliasFanoContext<TKey, TValue>
                                        window &= window - 1;
                                        rank++;
 
-                                       if ((ulong)rank >= (ulong)ItemCount)
+                                       if ((ulong)rank >= ItemCount)
                                            return false;
                                    }
                        """)}}

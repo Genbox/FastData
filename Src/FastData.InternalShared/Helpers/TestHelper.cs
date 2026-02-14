@@ -252,6 +252,8 @@ public static class TestHelper
             return Generate(state, new BloomFilterStructure<TKey, TValue>(GetHashData(keySpan, keyType, generator.Encoding)));
         if (vector.Type == typeof(EliasFanoStructure<,>))
             return Generate(state, new EliasFanoStructure<TKey, TValue>((NumericKeyProperties<TKey>)props, config));
+        if (vector.Type == typeof(RrrBitVectorStructure<,>))
+            return Generate(state, new RrrBitVectorStructure<TKey, TValue>());
 
         throw new InvalidOperationException("Unsupported structure type: " + vector.Type.Name);
     }

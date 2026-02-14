@@ -26,17 +26,23 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
     /// <summary>Configuration for analyzers. Set to null to disable analysis.</summary>
     public StringAnalyzerConfig? StringAnalyzerConfig { get; set; } = new StringAnalyzerConfig();
 
-    /// <summary>Maximum numeric key range to allow BitSetStructure in Auto mode.</summary>
+    /// <summary>Maximum numeric key range (max - min) to allow BitSetStructure in Auto mode.</summary>
     public ulong BitSetStructureMaxRange { get; set; } = 4096;
 
-    /// <summary>Minimum density required to use BitSetStructure in Auto mode.</summary>
+    /// <summary>Minimum density (item count / (range + 1)) required to use BitSetStructure in Auto mode.</summary>
     public double BitSetStructureMinDensity { get; set; } = 0.5;
 
     /// <summary>Minimum item count required to use EliasFanoStructure in Auto mode.</summary>
     public int EliasFanoStructureMinItemCount { get; set; } = 256;
 
-    /// <summary>Maximum density allowed to use EliasFanoStructure in Auto mode.</summary>
+    /// <summary>Maximum density (item count / (range + 1)) allowed to use EliasFanoStructure in Auto mode.</summary>
     public double EliasFanoStructureMaxDensity { get; set; } = 1.0 / 12.0;
+
+    /// <summary>Minimum item count required to use RrrBitVectorStructure in Auto mode.</summary>
+    public int RrrBitVectorStructureMinItemCount { get; set; } = 512;
+
+    /// <summary>Maximum density (item count / (range + 1)) allowed to use RrrBitVectorStructure in Auto mode.</summary>
+    public double RrrBitVectorStructureMaxDensity { get; set; } = 1.0 / 64.0;
 
     /// <summary>Minimum density required to use range checks for length maps.</summary>
     public double LengthMapMinDensity { get; set; } = 0.45;

@@ -215,9 +215,22 @@ public class FastDataGeneratorTests
     }
 
     [Fact]
+    public void Generate_Auto_UsesRrrBitVectorForVerySparseIntegralSet()
+    {
+        int[] keys = Enumerable.Range(0, 1000).Select(static x => x * 200).ToArray();
+        FastDataConfig config = new FastDataConfig();
+
+        ContextCaptureGenerator generator = new ContextCaptureGenerator();
+        FastDataGenerator.Generate(keys, config, generator);
+
+        RrrBitVectorContext<int, byte> ctx = Assert.IsType<RrrBitVectorContext<int, byte>>(generator.Context);
+        Assert.Equal(1000, ctx.Classes.Sum(static x => x));
+    }
+
+    [Fact]
     public void Generate_Auto_UsesEliasFanoForSparseIntegralSet()
     {
-        int[] keys = Enumerable.Range(0, 1000).Select(static x => x * 100).ToArray();
+        int[] keys = Enumerable.Range(0, 1000).Select(static x => x * 20).ToArray();
         FastDataConfig config = new FastDataConfig();
 
         ContextCaptureGenerator generator = new ContextCaptureGenerator();
@@ -230,7 +243,7 @@ public class FastDataGeneratorTests
     [Fact]
     public void GenerateKeyed_Auto_DoesNotUseEliasFano()
     {
-        int[] keys = Enumerable.Range(0, 1000).Select(static x => x * 100).ToArray();
+        int[] keys = Enumerable.Range(0, 1000).Select(static x => x * 20).ToArray();
         string[] values = keys.Select(static x => x.ToString()).ToArray();
         FastDataConfig config = new FastDataConfig();
 

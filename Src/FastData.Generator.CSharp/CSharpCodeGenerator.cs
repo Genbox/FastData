@@ -87,6 +87,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
         HashTableCompactContext<TKey, TValue> x => new HashTableCompactCode<TKey, TValue>(x, _cfg, Shared),
         HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, _cfg, Shared),
         EliasFanoContext<TKey, TValue> x => new EliasFanoCode<TKey, TValue>(x, _cfg),
+        RrrBitVectorContext<TKey, TValue> x => new RrrBitVectorCode<TKey, TValue>(x, _cfg),
         KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, _cfg, Shared),
         _ => null
     };

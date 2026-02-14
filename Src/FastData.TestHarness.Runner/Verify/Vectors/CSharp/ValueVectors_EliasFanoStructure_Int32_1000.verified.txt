@@ -6,23 +6,26 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class EliasFanoStructure_Int32_100
+internal static class EliasFanoStructure_Int32_1000
 {
     private const int _lowerBitCount = 0;
     private static readonly ulong[] _upperBits = new ulong[] {
-        6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 85ul
+        6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 
+        6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 
+        6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 
+        6148914691236517205ul, 21845ul
     };
     
 
     private const int _sampleRateShift = 7;
     private static readonly int[] _samplePositions = new int[] {
-        0
+        0, 257, 513, 769, 1025, 1281, 1537, 1793
     };
 
     
     public static bool Contains(int key)
     {
-        if (((uint)key & 4294967168u) != 0)
+        if (((uint)key & 4294966272u) != 0)
             return false;
 
 
@@ -90,7 +93,7 @@ internal static class EliasFanoStructure_Int32_100
 
         for (; wordIndex < _upperBits.Length; wordIndex++)
         {
-            int validBits = wordIndex == _upperBits.Length - 1 ? 7 : 64;
+            int validBits = wordIndex == _upperBits.Length - 1 ? 15 : 64;
             ulong validMask = validBits == 64 ? ulong.MaxValue : (1UL << validBits) - 1;
             ulong zeros = ~_upperBits[wordIndex] & validMask;
 
@@ -141,7 +144,7 @@ internal static class EliasFanoStructure_Int32_100
         return System.Numerics.BitOperations.TrailingZeroCount(value);
     }
 
-    public const uint ItemCount = 100;
+    public const uint ItemCount = 1000;
     public const int MinKey = 0;
-    public const int MaxKey = 99;
+    public const int MaxKey = 999;
 }

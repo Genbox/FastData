@@ -87,7 +87,7 @@ public static class TestVectorHelper
             yield return testVector;
         }
 
-        foreach (ITestVector testVector in GenerateTestVectors([Enumerable.Range(0, 100).ToArray()], null, typeof(EliasFanoStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors(GetNaturallySparseIntData(1000), "natural_sparse", typeof(EliasFanoStructure<,>), typeof(RrrBitVectorStructure<,>)))
             yield return testVector;
 
         // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
@@ -238,6 +238,33 @@ public static class TestVectorHelper
         new DataPair(Enumerable.Range(0, size).Select(x => (float)x).Cast<object>().ToArray(), Enumerable.Range(size, size * 2).Select(x => (float)x).Cast<object>().ToArray()),
         new DataPair(Enumerable.Range(0, size).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).Cast<object>().ToArray(), Enumerable.Range(size, size * 2).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).Cast<object>().ToArray())
     ];
+
+    private static DataPair[] GetNaturallySparseIntData(int size)
+    {
+        int[] keys = new int[size];
+        int value = 10_000;
+
+        for (int i = 0; i < size; i++)
+        {
+            value += 7 + (i % 11);
+
+            if (i % 31 == 0)
+                value += 120;
+
+            if (i % 127 == 0)
+                value += 1600;
+
+            keys[i] = value;
+        }
+
+        int notPresentCount = Math.Min(256, size);
+        int[] notPresent = new int[notPresentCount];
+
+        for (int i = 0; i < notPresentCount; i++)
+            notPresent[i] = keys[i] - 1;
+
+        return [new DataPair(keys.Cast<object>().ToArray(), notPresent.Cast<object>().ToArray())];
+    }
 
     private static DataPair[] GetSingleValues() =>
     [
