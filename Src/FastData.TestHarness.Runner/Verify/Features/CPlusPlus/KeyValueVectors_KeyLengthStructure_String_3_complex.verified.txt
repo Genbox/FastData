@@ -29,12 +29,11 @@ class KeyLengthStructure_String_3_complex final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-         if (const size_t len = key.length(); len < 1u || len > 3u)
+         const size_t len = key.length();
+         if (len < 1u || len > 3u)
              return false;
-        uint32_t firstChar = static_cast<uint32_t>(key.front());
-        uint32_t lastChar = static_cast<uint32_t>(key.back());
-
-        if (firstChar < 97u || firstChar > 97u || lastChar < 97u || lastChar > 97u)
+        uint32_t valueChar = static_cast<uint32_t>(key.front());
+        if (valueChar != 97u)
             return false;
 
 
@@ -42,15 +41,14 @@ public:
     }
     [[nodiscard]]
     static bool try_lookup(const std::string_view key, const Person*& value) noexcept {
-         if (const size_t len = key.length(); len < 1u || len > 3u)
+         const size_t len = key.length();
+         if (len < 1u || len > 3u)
              {
     value = nullptr;
     return false;
 }
-        uint32_t firstChar = static_cast<uint32_t>(key.front());
-        uint32_t lastChar = static_cast<uint32_t>(key.back());
-
-        if (firstChar < 97u || firstChar > 97u || lastChar < 97u || lastChar > 97u)
+        uint32_t valueChar = static_cast<uint32_t>(key.front());
+        if (valueChar != 97u)
             {
     value = nullptr;
     return false;

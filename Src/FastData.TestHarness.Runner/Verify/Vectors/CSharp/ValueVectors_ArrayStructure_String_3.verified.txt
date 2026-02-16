@@ -37,10 +37,19 @@ internal static class ArrayStructure_String_3
             default:
                 return false;
         }
-        char firstChar = key[0];
-        char lastChar = key[key.Length - 1];
-        if (firstChar < 'a' || firstChar > 'i' || lastChar < 'a' || lastChar > 'm')
+        uint valueChar = key[0];
+        if (valueChar > 0x7F)
             return false;
+        if (valueChar < 64)
+        {
+            if (((1UL << (int)valueChar) & 0UL) == 0)
+                return false;
+        }
+        else
+        {
+            if (((1UL << (int)(valueChar - 64)) & 2207613190144UL) == 0)
+                return false;
+        }
 
 
         for (int i = 0; i < 3; i++)

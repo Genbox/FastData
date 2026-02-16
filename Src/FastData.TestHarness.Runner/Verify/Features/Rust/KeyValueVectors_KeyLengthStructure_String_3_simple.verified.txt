@@ -28,10 +28,8 @@ impl KeyLengthStructure_String_3_simple {
         }
         let bytes = key.as_bytes();
         let len = bytes.len();
-        let first_char = bytes[0];
-        let last_char = bytes[len - 1];
-
-        if first_char < 97u8 || first_char > 97u8 || last_char < 97u8 || last_char > 97u8 {
+        let value_char = bytes[0];
+        if value_char != 97 {
             return false;
         }
 
@@ -46,10 +44,8 @@ pub fn try_lookup(key: &'static str) -> Option<i32> {
         }
         let bytes = key.as_bytes();
         let len = bytes.len();
-        let first_char = bytes[0];
-        let last_char = bytes[len - 1];
-
-        if first_char < 97u8 || first_char > 97u8 || last_char < 97u8 || last_char > 97u8 {
+        let value_char = bytes[0];
+        if value_char != 97 {
             return None;
         }
 

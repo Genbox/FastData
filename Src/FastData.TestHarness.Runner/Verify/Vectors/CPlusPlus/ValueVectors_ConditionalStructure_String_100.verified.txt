@@ -11,12 +11,11 @@ class ConditionalStructure_String_100 final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-         if (const size_t len = key.length(); len < 1u || len > 2u)
+         const size_t len = key.length();
+         if (len < 1u || len > 2u)
              return false;
-        uint32_t firstChar = static_cast<uint32_t>(key.front());
-        uint32_t lastChar = static_cast<uint32_t>(key.back());
-
-        if (firstChar < 48u || firstChar > 57u || lastChar < 48u || lastChar > 57u)
+        uint32_t valueChar = static_cast<uint32_t>(key.front());
+        if (valueChar < 48u || valueChar > 57u)
             return false;
 
         if (key == u8"0" || key == u8"1" || key == u8"2" || key == u8"3" || key == u8"4" || key == u8"5" || key == u8"6" || key == u8"7" || key == u8"8" || key == u8"9" || key == u8"10" || key == u8"11" || key == u8"12" || key == u8"13" || key == u8"14" || key == u8"15" || key == u8"16" || key == u8"17" || key == u8"18" || key == u8"19" || key == u8"20" || key == u8"21" || key == u8"22" || key == u8"23" || key == u8"24" || key == u8"25" || key == u8"26" || key == u8"27" || key == u8"28" || key == u8"29" || key == u8"30" || key == u8"31" || key == u8"32" || key == u8"33" || key == u8"34" || key == u8"35" || key == u8"36" || key == u8"37" || key == u8"38" || key == u8"39" || key == u8"40" || key == u8"41" || key == u8"42" || key == u8"43" || key == u8"44" || key == u8"45" || key == u8"46" || key == u8"47" || key == u8"48" || key == u8"49" || key == u8"50" || key == u8"51" || key == u8"52" || key == u8"53" || key == u8"54" || key == u8"55" || key == u8"56" || key == u8"57" || key == u8"58" || key == u8"59" || key == u8"60" || key == u8"61" || key == u8"62" || key == u8"63" || key == u8"64" || key == u8"65" || key == u8"66" || key == u8"67" || key == u8"68" || key == u8"69" || key == u8"70" || key == u8"71" || key == u8"72" || key == u8"73" || key == u8"74" || key == u8"75" || key == u8"76" || key == u8"77" || key == u8"78" || key == u8"79" || key == u8"80" || key == u8"81" || key == u8"82" || key == u8"83" || key == u8"84" || key == u8"85" || key == u8"86" || key == u8"87" || key == u8"88" || key == u8"89" || key == u8"90" || key == u8"91" || key == u8"92" || key == u8"93" || key == u8"94" || key == u8"95" || key == u8"96" || key == u8"97" || key == u8"98" || key == u8"99")

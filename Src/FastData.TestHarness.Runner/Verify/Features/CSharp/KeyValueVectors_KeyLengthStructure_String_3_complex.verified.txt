@@ -38,9 +38,8 @@ internal static class KeyLengthStructure_String_3_complex
         int len = key.Length;
         if (len < 1u || len > 3u)
             return false;
-        char firstChar = key[0];
-        char lastChar = key[key.Length - 1];
-        if (firstChar < 'a' || firstChar > 'a' || lastChar < 'a' || lastChar > 'a')
+        char valueChar = key[0];
+        if (valueChar != 'a')
             return false;
 
 
@@ -54,9 +53,8 @@ internal static class KeyLengthStructure_String_3_complex
             value = default;
             return false;
         }
-        char firstChar = key[0];
-        char lastChar = key[key.Length - 1];
-        if (firstChar < 'a' || firstChar > 'a' || lastChar < 'a' || lastChar > 'a')
+        char valueChar = key[0];
+        if (valueChar != 'a')
             {
             value = default;
             return false;

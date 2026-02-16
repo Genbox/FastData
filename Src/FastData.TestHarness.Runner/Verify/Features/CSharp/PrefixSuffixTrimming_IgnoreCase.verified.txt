@@ -18,9 +18,8 @@ internal static class PrefixSuffixTrimming_IgnoreCase
         int len = key.Length;
         if (len < 11u || len > 13u)
             return false;
-        char firstChar = (char)(key[0] | 0x20);
-        char lastChar = (char)(key[key.Length - 1] | 0x20);
-        if (firstChar < 'p' || firstChar > 'p' || lastChar < 'f' || lastChar > 'f')
+        char valueChar = (char)(key[0] | 0x20);
+        if (valueChar != 'p')
             return false;
         if (!(key.StartsWith("Pre", StringComparison.OrdinalIgnoreCase) && key.EndsWith("Suf", StringComparison.OrdinalIgnoreCase)))
             return false;

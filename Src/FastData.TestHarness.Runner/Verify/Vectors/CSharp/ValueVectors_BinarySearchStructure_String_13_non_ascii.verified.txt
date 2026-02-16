@@ -18,10 +18,19 @@ internal static class BinarySearchStructure_String_13_non_ascii
     {
         if (key.Length != 1u)
             return false;
-        char firstChar = key[0];
-        char lastChar = key[key.Length - 1];
-        if (firstChar < 'ß' || firstChar > 'ü' || lastChar < 'ß' || lastChar > 'ü')
+        uint valueChar = key[0];
+        if (valueChar > 0x7F)
             return false;
+        if (valueChar < 64)
+        {
+            if (((1UL << (int)valueChar) & 0UL) == 0)
+                return false;
+        }
+        else
+        {
+            if (((1UL << (int)(valueChar - 64)) & 0UL) == 0)
+                return false;
+        }
 
         int lo = 0;
         int hi = 12;

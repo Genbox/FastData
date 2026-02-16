@@ -18,9 +18,8 @@ internal static class ArrayStructure_String_3_prefix_suffix
         int len = key.Length;
         if (len < 6u || len > 8u)
             return false;
-        char firstChar = key[0];
-        char lastChar = key[key.Length - 1];
-        if (firstChar < 'p' || firstChar > 'p' || lastChar < 'h' || lastChar > 'x')
+        char valueChar = key[0];
+        if (valueChar != 'p')
             return false;
         if (!(key.StartsWith("pre", StringComparison.Ordinal)))
             return false;

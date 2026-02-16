@@ -1,9 +1,9 @@
 ﻿{
-  "UseInterpolation": false,
   "Keys": [
     -2147483648,
     0,
     2147483647
   ],
-  "Values": []
+  "Values": [],
+  "UseInterpolation": false
 }

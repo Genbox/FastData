@@ -117,10 +117,8 @@ impl PrefixSuffixTrimming_IgnoreCase {
         }
         let bytes = key.as_bytes();
         let len = bytes.len();
-        let first_char = to_lower_ascii(bytes[0]);
-        let last_char = to_lower_ascii(bytes[len - 1]);
-
-        if first_char < 112u8 || first_char > 112u8 || last_char < 102u8 || last_char > 102u8 {
+        let value_char = to_lower_ascii(bytes[0]);
+        if value_char != 112 {
             return false;
         }
         if !(case_insensitive_starts_with(key, "Pre") && case_insensitive_ends_with(key, "Suf")) {

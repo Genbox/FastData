@@ -60,11 +60,19 @@ public:
             default:
                 return false;
         }
-        uint32_t firstChar = static_cast<uint32_t>(key.front());
-        uint32_t lastChar = static_cast<uint32_t>(key.back());
-
-        if (firstChar < 97u || firstChar > 105u || lastChar < 97u || lastChar > 109u)
+        uint32_t valueChar = static_cast<uint32_t>(key.front());
+        if (valueChar > 0x7F)
             return false;
+        if (valueChar < 64)
+        {
+            if (((1ULL << valueChar) & 0ULL) == 0)
+                return false;
+        }
+        else
+        {
+            if (((1ULL << (valueChar - 64)) & 2207613190144ULL) == 0)
+                return false;
+        }
 
 
         const uint64_t hash = get_hash(key);

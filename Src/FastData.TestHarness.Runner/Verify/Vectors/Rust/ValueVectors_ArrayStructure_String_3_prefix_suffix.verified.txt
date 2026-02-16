@@ -21,10 +21,8 @@ impl ArrayStructure_String_3_prefix_suffix {
         }
         let bytes = key.as_bytes();
         let len = bytes.len();
-        let first_char = bytes[0];
-        let last_char = bytes[len - 1];
-
-        if first_char < 112u8 || first_char > 112u8 || last_char < 104u8 || last_char > 120u8 {
+        let value_char = bytes[0];
+        if value_char != 112 {
             return false;
         }
         if !(key.starts_with("pre")) {

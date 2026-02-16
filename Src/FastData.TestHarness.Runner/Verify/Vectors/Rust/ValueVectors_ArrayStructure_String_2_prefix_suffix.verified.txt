@@ -20,10 +20,8 @@ impl ArrayStructure_String_2_prefix_suffix {
         }
         let bytes = key.as_bytes();
         let len = bytes.len();
-        let first_char = bytes[0];
-        let last_char = bytes[len - 1];
-
-        if first_char < 112u8 || first_char > 115u8 || last_char < 120u8 || last_char > 120u8 {
+        let value_char = bytes[len - 1];
+        if value_char != 120 {
             return false;
         }
         if !(key.ends_with("fix")) {

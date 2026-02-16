@@ -117,10 +117,8 @@ impl IgnoreCaseSupport {
         }
         let bytes = key.as_bytes();
         let len = bytes.len();
-        let first_char = to_lower_ascii(bytes[0]);
-        let last_char = to_lower_ascii(bytes[len - 1]);
-
-        if first_char < 97u8 || first_char > 99u8 || last_char < 97u8 || last_char > 111u8 {
+        let value_char = to_lower_ascii(bytes[0]);
+        if value_char < 97u8 || value_char > 99u8 {
             return false;
         }
 

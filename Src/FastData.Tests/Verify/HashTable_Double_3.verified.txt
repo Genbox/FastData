@@ -1,9 +1,4 @@
 ﻿{
-  "Buckets": [
-    3,
-    0,
-    1
-  ],
   "Entries": [
     {
       "Hash": 18442240474082181119,
@@ -21,6 +16,11 @@
       "Key": 1.7976931348623157E+308
     }
   ],
-  "StoreHashCode": true,
-  "Values": []
+  "Values": [],
+  "Buckets": [
+    3,
+    0,
+    1
+  ],
+  "StoreHashCode": true
 }

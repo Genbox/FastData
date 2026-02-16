@@ -38,9 +38,8 @@ internal static class BloomFilterStructure_String_100
         int len = key.Length;
         if (len < 1u || len > 2u)
             return false;
-        char firstChar = key[0];
-        char lastChar = key[key.Length - 1];
-        if (firstChar < '0' || firstChar > '9' || lastChar < '0' || lastChar > '9')
+        char valueChar = key[0];
+        if (valueChar < '0' || valueChar > '9')
             return false;
 
 

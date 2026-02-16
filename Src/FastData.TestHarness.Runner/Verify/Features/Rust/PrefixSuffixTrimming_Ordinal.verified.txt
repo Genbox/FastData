@@ -21,10 +21,8 @@ impl PrefixSuffixTrimming_Ordinal {
         }
         let bytes = key.as_bytes();
         let len = bytes.len();
-        let first_char = bytes[0];
-        let last_char = bytes[len - 1];
-
-        if first_char < 80u8 || first_char > 80u8 || last_char < 102u8 || last_char > 102u8 {
+        let value_char = bytes[0];
+        if value_char != 80 {
             return false;
         }
         if !(key.starts_with("Pre") && key.ends_with("Suf")) {

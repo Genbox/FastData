@@ -13,6 +13,6 @@
       "Value": 17825845003995989450
     }
   ],
-  "StoreHashCode": true,
-  "Values": []
+  "Values": [],
+  "StoreHashCode": true
 }

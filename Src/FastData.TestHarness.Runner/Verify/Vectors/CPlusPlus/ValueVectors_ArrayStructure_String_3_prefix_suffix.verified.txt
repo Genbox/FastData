@@ -15,12 +15,11 @@ class ArrayStructure_String_3_prefix_suffix final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-         if (const size_t len = key.length(); len < 6u || len > 8u)
+         const size_t len = key.length();
+         if (len < 6u || len > 8u)
              return false;
-        uint32_t firstChar = static_cast<uint32_t>(key.front());
-        uint32_t lastChar = static_cast<uint32_t>(key.back());
-
-        if (firstChar < 112u || firstChar > 112u || lastChar < 104u || lastChar > 120u)
+        uint32_t valueChar = static_cast<uint32_t>(key.front());
+        if (valueChar != 112u)
             return false;
         if (!(key.compare(0, 3, u8"pre") == 0))
             return false;

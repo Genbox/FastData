@@ -18,9 +18,8 @@ internal static class IgnoreCaseSupport
         int len = key.Length;
         if (len < 5u || len > 7u)
             return false;
-        char firstChar = (char)(key[0] | 0x20);
-        char lastChar = (char)(key[key.Length - 1] | 0x20);
-        if (firstChar < 'a' || firstChar > 'c' || lastChar < 'a' || lastChar > 'o')
+        char valueChar = (char)(key[0] | 0x20);
+        if (valueChar < 'a' || valueChar > 'c')
             return false;
 
         int lo = 0;

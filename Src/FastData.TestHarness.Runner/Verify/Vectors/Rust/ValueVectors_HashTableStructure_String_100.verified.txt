@@ -59,10 +59,8 @@ impl HashTableStructure_String_100 {
         }
         let bytes = key.as_bytes();
         let len = bytes.len();
-        let first_char = bytes[0];
-        let last_char = bytes[len - 1];
-
-        if first_char < 48u8 || first_char > 57u8 || last_char < 48u8 || last_char > 57u8 {
+        let value_char = bytes[0];
+        if value_char < 48u8 || value_char > 57u8 {
             return false;
         }
 

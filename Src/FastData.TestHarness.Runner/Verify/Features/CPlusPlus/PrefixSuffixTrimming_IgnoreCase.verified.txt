@@ -92,12 +92,11 @@ class PrefixSuffixTrimming_IgnoreCase final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-         if (const size_t len = key.length(); len < 11u || len > 13u)
+         const size_t len = key.length();
+         if (len < 11u || len > 13u)
              return false;
-        uint32_t firstChar = to_lower_ascii(static_cast<uint32_t>(key.front()));
-        uint32_t lastChar = to_lower_ascii(static_cast<uint32_t>(key.back()));
-
-        if (firstChar < 112u || firstChar > 112u || lastChar < 102u || lastChar > 102u)
+        uint32_t valueChar = to_lower_ascii(static_cast<uint32_t>(key.front()));
+        if (valueChar != 112u)
             return false;
         if (!(case_insensitive_starts_with(key, u8"Pre") && case_insensitive_ends_with(key, u8"Suf")))
             return false;

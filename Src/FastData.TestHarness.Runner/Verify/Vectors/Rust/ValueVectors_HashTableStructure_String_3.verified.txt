@@ -63,11 +63,18 @@ impl HashTableStructure_String_3 {
     }
         let bytes = key.as_bytes();
         let len = bytes.len();
-        let first_char = bytes[0];
-        let last_char = bytes[len - 1];
-
-        if first_char < 97u8 || first_char > 105u8 || last_char < 97u8 || last_char > 109u8 {
+        let value_char = bytes[0] as u32;
+        if value_char > 0x7F {
             return false;
+        }
+        if value_char < 64 {
+            if (((1u64 << value_char) & 0u64) == 0) {
+                return false;
+            }
+        } else {
+            if (((1u64 << (value_char - 64)) & 2207613190144u64) == 0) {
+                return false;
+            }
         }
 
 
