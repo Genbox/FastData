@@ -2,10 +2,13 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generators.Contexts;
 
-public sealed class EliasFanoContext<TKey, TValue>(ReadOnlyMemory<TKey> data, int lowerBitCount, ulong lowerMask, ulong[] upperBits, ulong[] lowerBits, int upperBitLength, int sampleRateShift, int[] samplePositions) : IContext<TValue>
+public sealed class EliasFanoContext<TKey>(ReadOnlyMemory<TKey> keys, int lowerBitCount, ulong lowerMask, ulong[] upperBits, ulong[] lowerBits, int upperBitLength, int sampleRateShift, int[] samplePositions) : EliasFanoContext(lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions)
 {
-    public ReadOnlyMemory<TKey> Data { get; } = data;
-    public ReadOnlyMemory<TValue> Values { get; } = Array.Empty<TValue>();
+    public ReadOnlyMemory<TKey> Keys { get; } = keys;
+}
+
+public abstract class EliasFanoContext(int lowerBitCount, ulong lowerMask, ulong[] upperBits, ulong[] lowerBits, int upperBitLength, int sampleRateShift, int[] samplePositions) : IContext
+{
     public int LowerBitCount { get; } = lowerBitCount;
     public ulong LowerMask { get; } = lowerMask;
     public ulong[] UpperBits { get; } = upperBits;

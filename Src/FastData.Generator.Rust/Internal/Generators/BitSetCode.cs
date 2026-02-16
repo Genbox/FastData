@@ -5,7 +5,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, SharedCode shared) : RustOutputWriter<TKey>
+internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TValue> ctx, SharedCode shared) : RustOutputWriter<TKey>
 {
     public override string Generate()
     {

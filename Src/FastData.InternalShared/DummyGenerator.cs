@@ -10,7 +10,7 @@ public readonly struct DummyGenerator : ICodeGenerator
 {
     public GeneratorEncoding Encoding => GeneratorEncoding.UTF16;
 
-    public string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context)
+    public string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
     {
         JsonSerializerSettings settings = new JsonSerializerSettings { Formatting = Formatting.Indented };
         settings.Converters.Add(new ReadOnlyMemoryJsonConverter());

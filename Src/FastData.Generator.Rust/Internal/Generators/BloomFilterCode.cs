@@ -5,7 +5,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Generators;
 
-internal sealed class BloomFilterCode<TKey, TValue>(BloomFilterContext<TKey, TValue> ctx) : RustOutputWriter<TKey>
+internal sealed class BloomFilterCode<TKey>(BloomFilterContext ctx) : RustOutputWriter<TKey>
 {
     public override string Generate() =>
         $$"""

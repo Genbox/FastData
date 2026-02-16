@@ -104,6 +104,11 @@
         "resolved": "4.2.0",
         "contentHash": "gmoWVOvKgbME8TYR+gwMf7osROiWAURterc6Rt2dQyX7wtjZYpqFiA/pY6ztjGQKKV62GGCyOcmtP1UKMHgSmA=="
       },
+      "System.CodeDom": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "CPc6tWO1LAer3IzfZufDBRL+UZQcj5uS207NHALQzP84Vp/z6wF0Aa0YZImOQY8iStY0A2zI/e3ihKNPfUm8XA=="
+      },
       "xunit.v3.common": {
         "type": "Transitive",
         "resolved": "3.2.1",
@@ -127,7 +132,8 @@
       "Genbox.FastData.Generator.CSharp": {
         "type": "Project",
         "dependencies": {
-          "Genbox.FastData.Generator": "[1.0.0, )"
+          "Genbox.FastData.Generator": "[1.0.0, )",
+          "Mono.TextTemplating": "[3.0.0, )"
         }
       },
       "Genbox.FastData.InternalShared": {
@@ -155,6 +161,15 @@
         "contentHash": "YkmyiPIWAXVb+lPIrM0LE5bbtLOJkCiRTFiHpkVOvhI7uTvCfoOHLEN0LcsY56GpSD7NqX3gJNpsaDe87/B3zg==",
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.1"
+        }
+      },
+      "Mono.TextTemplating": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "YqueG52R/Xej4VVbKuRIodjiAhV0HR/XVbLbNrJhCZnzjnSjgMJ/dCdV0akQQxavX6hp/LC6rqLGLcXeQYU7XA==",
+        "dependencies": {
+          "System.CodeDom": "6.0.0"
         }
       },
       "Newtonsoft.Json": {

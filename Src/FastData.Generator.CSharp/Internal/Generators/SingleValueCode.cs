@@ -23,7 +23,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
                         {
                     {{GetMethodHeader(MethodType.Contains)}}
 
-                            return {{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Item))}};
+                            return {{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Key))}};
                         }
                     """);
 
@@ -36,7 +36,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
                             {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                if ({{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Item))}})
+                                if ({{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Key))}})
                                 {
                                     value = _storedValue;
                                     return true;

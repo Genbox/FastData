@@ -6,7 +6,7 @@ using Genbox.FastData.Generators.Contexts;
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
 [SuppressMessage("Major Code Smell", "S2326:Unused type parameters should be removed")]
-internal sealed class RangeCode<TKey, TValue>(RangeContext<TKey, TValue> ctx) : CPlusPlusOutputWriter<TKey>
+internal sealed class RangeCode<TKey, TValue>(RangeContext<TKey> ctx) : CPlusPlusOutputWriter<TKey>
 {
     public override string Generate() =>
         $$"""

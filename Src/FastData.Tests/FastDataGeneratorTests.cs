@@ -208,7 +208,7 @@ public class FastDataGeneratorTests
         ContextCaptureGenerator generator = new ContextCaptureGenerator();
         FastDataGenerator.Generate(keys, config, generator);
 
-        BitSetContext<int, byte> ctx = Assert.IsType<BitSetContext<int, byte>>(generator.Context);
+        BitSetContext<byte> ctx = Assert.IsType<BitSetContext<byte>>(generator.Context);
         Assert.True(ctx.Values.IsEmpty);
         Assert.Single(ctx.BitSet);
         Assert.Equal(23UL, ctx.BitSet[0]);
@@ -223,7 +223,7 @@ public class FastDataGeneratorTests
         ContextCaptureGenerator generator = new ContextCaptureGenerator();
         FastDataGenerator.Generate(keys, config, generator);
 
-        RrrBitVectorContext<int, byte> ctx = Assert.IsType<RrrBitVectorContext<int, byte>>(generator.Context);
+        RrrBitVectorContext ctx = Assert.IsType<RrrBitVectorContext>(generator.Context);
         Assert.Equal(1000, ctx.Classes.Sum(static x => x));
     }
 
@@ -236,8 +236,8 @@ public class FastDataGeneratorTests
         ContextCaptureGenerator generator = new ContextCaptureGenerator();
         FastDataGenerator.Generate(keys, config, generator);
 
-        EliasFanoContext<int, byte> ctx = Assert.IsType<EliasFanoContext<int, byte>>(generator.Context);
-        Assert.Equal(keys.Length, ctx.Data.Length);
+        EliasFanoContext<int> ctx = Assert.IsType<EliasFanoContext<int>>(generator.Context);
+        Assert.Equal(keys.Length, ctx.Keys.Length);
     }
 
     [Fact]
@@ -252,7 +252,7 @@ public class FastDataGeneratorTests
 
         Assert.NotNull(generator.Context);
         object context = generator.Context!;
-        Assert.False(context is EliasFanoContext<int, string>);
+        Assert.False(context is EliasFanoContext<int>);
         Assert.True(context is HashTableContext<int, string> or HashTablePerfectContext<int, string>);
     }
 
@@ -348,9 +348,9 @@ public class FastDataGeneratorTests
     {
         public GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
 
-        public object? Context { get; private set; }
+        public IContext? Context { get; private set; }
 
-        public string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context)
+        public string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
         {
             Context = context;
             return string.Empty;
@@ -364,7 +364,7 @@ public class FastDataGeneratorTests
         public string TrimPrefix { get; private set; } = string.Empty;
         public string TrimSuffix { get; private set; } = string.Empty;
 
-        public string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context)
+        public string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
         {
             TrimPrefix = genCfg.TrimPrefix;
             TrimSuffix = genCfg.TrimSuffix;

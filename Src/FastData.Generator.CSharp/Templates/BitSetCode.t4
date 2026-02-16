@@ -1,0 +1,58 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.BitSetContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateData.BitSetTemplateData" name="Data" #>
+
+<#= Common.FieldModifier #>ulong[] _bitset = new ulong[] {
+<#= FormatHelper.FormatColumns(Context.BitSet, x => Model.ToValueLabel(x)) #>
+    };
+
+<#
+    if (Data.ValueCount > 0)
+    {
+        Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
+#><#= Common.FieldModifier #><#= Common.ValueTypeName #>[] _values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
+    };
+
+<#
+    }
+#>
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+{
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+    ulong offset = (ulong)(<#= Common.LookupKeyName #> - MinKey);
+    int word = (int)(offset >> 6);
+    return (_bitset[word] & (1UL << (int)(offset & 63))) != 0;
+}
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool TryLookup(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Common.ValueTypeName #> value)
+{
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+
+    ulong offset = (ulong)(<#= Common.LookupKeyName #> - MinKey);
+    int word = (int)(offset >> 6);
+    if ((_bitset[word] & (1UL << (int)(offset & 63))) == 0)
+    {
+        value = default;
+        return false;
+    }
+
+    value = _values[(int)offset];
+    return true;
+}
+<#
+    }
+#>

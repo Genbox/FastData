@@ -4,11 +4,11 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class BloomFilterStructure<TKey, TValue>(HashData hashData) : IStructure<TKey, TValue, BloomFilterContext<TKey, TValue>>
+internal sealed class BloomFilterStructure<TKey, TValue>(HashData hashData) : IStructure<TKey, TValue, BloomFilterContext>
 {
     private const int BitsPerKey = 10;
 
-    public BloomFilterContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
+    public BloomFilterContext Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         int capacity = keys.Length;
         int bits = checked(capacity * BitsPerKey);
@@ -28,6 +28,6 @@ internal sealed class BloomFilterStructure<TKey, TValue>(HashData hashData) : IS
             bitset[(int)index] |= mask;
         }
 
-        return new BloomFilterContext<TKey, TValue>(bitset);
+        return new BloomFilterContext(bitset);
     }
 }

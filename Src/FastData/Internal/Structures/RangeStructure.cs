@@ -4,10 +4,10 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class RangeStructure<TKey, TValue>(NumericKeyProperties<TKey> props) : IStructure<TKey, TValue, RangeContext<TKey, TValue>>
+internal sealed class RangeStructure<TKey, TValue>(NumericKeyProperties<TKey> props) : IStructure<TKey, TValue, RangeContext<TKey>>
 {
-    public RangeContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
+    public RangeContext<TKey> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
-        return new RangeContext<TKey, TValue>(props.MinKeyValue, props.MaxKeyValue);
+        return new RangeContext<TKey>(props.MinKeyValue, props.MaxKeyValue);
     }
 }

@@ -5,9 +5,9 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey> props, FastDataConfig cfg) : IStructure<TKey, TValue, EliasFanoContext<TKey, TValue>>
+internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey> props, FastDataConfig cfg) : IStructure<TKey, TValue, EliasFanoContext<TKey>>
 {
-    public EliasFanoContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
+    public EliasFanoContext<TKey> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         //We need the data to be sorted
         TKey[] keysSorted = new TKey[keys.Length];
@@ -64,7 +64,7 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
         int sampleRateShift = BitOperations.TrailingZeroCount((uint)skipQuantum);
         int[] samplePositions = BuildSamples(upperBits, upperBitLength, skipQuantum);
 
-        return new EliasFanoContext<TKey, TValue>(keysSorted, lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions);
+        return new EliasFanoContext<TKey>(keysSorted, lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions);
     }
 
     private static int[] BuildSamples(ulong[] words, int bitLength, int sampleRate)

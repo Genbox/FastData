@@ -1,0 +1,129 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+<#@ import namespace="System.Linq" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.HashTablePerfectContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateData.HashTablePerfectTemplateData" name="Data" #>
+
+<#
+    string[] valueLabels = Data.Values.Select(Model.ToValueLabel).ToArray();
+    bool useEntryStruct = Context.StoreHashCode || Data.ValueCount > 0;
+    string entryTypeName = useEntryStruct ? "E" : Common.KeyTypeName;
+#>
+<#
+    if (useEntryStruct)
+    {
+#>[StructLayout(LayoutKind.Auto)]
+private struct E
+{
+    internal <#= Common.KeyTypeName #> Key;
+<#
+        if (Context.StoreHashCode)
+        {
+#>    internal <#= Common.HashSizeType #> HashCode;
+<#
+        }
+#><#
+        if (Data.ValueCount > 0)
+        {
+#>    internal <#= Common.ValueTypeName #> Value;
+
+<#
+        }
+#>    internal E(<#= Common.KeyTypeName #> key<#
+        if (Context.StoreHashCode)
+        {
+#>, <#= Common.HashSizeType #> hashCode<#
+        }
+#><#
+        if (Data.ValueCount > 0)
+        {
+#>, <#= Common.ValueTypeName #> value<#
+        }
+#>)
+    {
+        Key = key;
+<#
+        if (Context.StoreHashCode)
+        {
+#>        HashCode = hashCode;
+<#
+        }
+#><#
+        if (Data.ValueCount > 0)
+        {
+#>        Value = value;
+<#
+        }
+#>    }
+}
+<#
+    }
+#>
+
+<#= Common.FieldModifier #><#= entryTypeName #>[] _entries = {
+<#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
+    {
+        if (!useEntryStruct)
+            return Model.ToValueLabel(x.Key);
+
+        string hashPart = Context.StoreHashCode ? $", {Model.ToValueLabel(x.Hash)}" : "";
+        string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
+        return $"new E({Model.ToValueLabel(x.Key)}{hashPart}{valuePart})";
+    }) #>
+    };
+
+<#= Model.HashSource #>
+
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+{
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+    <#= Common.HashSizeType #> hash = Hash(<#= Common.LookupKeyName #>);
+    <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Data.Entries.Length) #>;
+    ref var entry = ref _entries[index];
+
+    return <#
+    if (useEntryStruct && Context.StoreHashCode)
+    {
+#><#= Model.GetEqualFunctionByType("hash", "entry.HashCode", KeyType.Int64) #> && <#
+    }
+#><#= Model.GetEqualFunction(Common.LookupKeyName, useEntryStruct ? "entry.Key" : "entry") #>;
+}
+<#
+    if (Data.ValueCount > 0)
+    {
+        Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
+#>
+
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool TryLookup(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Common.ValueTypeName #> value)
+{
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+
+    <#= Common.HashSizeType #> hash = Hash(<#= Common.LookupKeyName #>);
+    <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Data.Entries.Length) #>;
+    ref E entry = ref _entries[index];
+
+    if (<#
+        if (Context.StoreHashCode)
+        {
+#><#= Model.GetEqualFunctionByType("hash", "entry.HashCode", KeyType.Int64) #> && <#
+        }
+#><#= Model.GetEqualFunction(Common.LookupKeyName, "entry.Key") #>)
+    {
+        value = entry.Value;
+        return true;
+    }
+
+    value = default;
+    return false;
+}
+<#
+    }
+#>

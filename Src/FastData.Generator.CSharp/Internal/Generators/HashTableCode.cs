@@ -20,12 +20,12 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                             internal {{GetSmallestSignedType(ctx.Buckets.Length)}} Next;
                             {{(ctx.StoreHashCode ? $"internal {HashSizeType} HashCode;" : "")}}
                             {{(!values.IsEmpty ? $"internal {ValueTypeName} Value;" : "")}}
-                            internal E({{KeyTypeName}} key, {{GetSmallestSignedType(ctx.Buckets.Length)}} next{{(ctx.StoreHashCode ? $", {HashSizeType} hashCode" : "")}} {{(!ctx.Values.IsEmpty ? $", {ValueTypeName} value" : "")}})
+                            internal E({{KeyTypeName}} key, {{GetSmallestSignedType(ctx.Buckets.Length)}} next{{(ctx.StoreHashCode ? $", {HashSizeType} hashCode" : "")}} {{(!values.IsEmpty ? $", {ValueTypeName} value" : "")}})
                             {
                                 Key = key;
                                 Next = next;
                                 {{(ctx.StoreHashCode ? "HashCode = hashCode;" : "")}}
-                                {{(!ctx.Values.IsEmpty ? "Value = value;" : "")}}
+                                {{(!values.IsEmpty ? "Value = value;" : "")}}
                             }
                         };
 
@@ -34,7 +34,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                          };
 
                         {{FieldModifier}}E[] _entries = {
-                    {{FormatColumns(ctx.Entries, (i, x) => $"new E({ToValueLabel(x.Key)}, {x.Next.ToStringInvariant()}{(ctx.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : "")}{(!ctx.Values.IsEmpty ? $", {ToValueLabel(values.Span[i])}" : "")})")}}
+                    {{FormatColumns(ctx.Entries, (i, x) => $"new E({ToValueLabel(x.Key)}, {x.Next.ToStringInvariant()}{(ctx.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : "")}{(!values.IsEmpty ? $", {ToValueLabel(values.Span[i])}" : "")})")}}
                         };
 
                     {{HashSource}}
@@ -62,7 +62,7 @@ internal sealed class HashTableCode<TKey, TValue>(HashTableContext<TKey, TValue>
                         }
                     """);
 
-        if (!ctx.Values.IsEmpty)
+        if (!values.IsEmpty)
         {
             shared.Add(CodePlacement.Before, GetObjectDeclarations<TValue>());
 

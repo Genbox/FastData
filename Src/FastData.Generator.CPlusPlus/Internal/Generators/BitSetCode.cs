@@ -5,7 +5,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TKey, TValue> ctx, SharedCode shared) : CPlusPlusOutputWriter<TKey>
+internal sealed class BitSetCode<TKey, TValue>(BitSetContext<TValue> ctx, SharedCode shared) : CPlusPlusOutputWriter<TKey>
 {
     public override string Generate()
     {

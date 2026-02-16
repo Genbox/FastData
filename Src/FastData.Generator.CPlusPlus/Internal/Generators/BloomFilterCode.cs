@@ -5,7 +5,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
 
-internal sealed class BloomFilterCode<TKey, TValue>(BloomFilterContext<TKey, TValue> ctx) : CPlusPlusOutputWriter<TKey>
+internal sealed class BloomFilterCode<TKey>(BloomFilterContext ctx) : CPlusPlusOutputWriter<TKey>
 {
     public override string Generate() =>
         $$"""

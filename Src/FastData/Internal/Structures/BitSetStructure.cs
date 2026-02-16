@@ -5,9 +5,9 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class BitSetStructure<TKey, TValue>(NumericKeyProperties<TKey> props, KeyType keyType) : IStructure<TKey, TValue, BitSetContext<TKey, TValue>>
+internal sealed class BitSetStructure<TKey, TValue>(NumericKeyProperties<TKey> props, KeyType keyType) : IStructure<TKey, TValue, BitSetContext<TValue>>
 {
-    public BitSetContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
+    public BitSetContext<TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         if (keyType is KeyType.Single or KeyType.Double)
             throw new InvalidOperationException("Floating point values are not supported for BitSets");
@@ -31,6 +31,6 @@ internal sealed class BitSetStructure<TKey, TValue>(NumericKeyProperties<TKey> p
                 denseValues[(int)offset] = valueSpan[i];
         }
 
-        return new BitSetContext<TKey, TValue>(bitset, denseValues);
+        return new BitSetContext<TValue>(bitset, denseValues);
     }
 }

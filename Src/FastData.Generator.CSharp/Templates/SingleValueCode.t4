@@ -1,0 +1,48 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateData.SingleValueTemplateData" name="Data" #>
+
+<#
+    string itemLabel = Model.ToValueLabel(Data.Item);
+#>
+<#
+    if (Data.Value != null)
+    {
+        Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
+#>    private static readonly <#= Common.ValueTypeName #> _storedValue = <#= Model.ToValueLabel(Data.Value) #>;
+<#
+    }
+#>
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+{
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+    return <#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>;
+}
+<#
+    if (Data.Value != null)
+    {
+#>
+
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool TryLookup(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Common.ValueTypeName #> value)
+{
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+
+    if (<#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>)
+    {
+        value = _storedValue;
+        return true;
+    }
+
+    value = default;
+    return false;
+}
+<#
+    }
+#>

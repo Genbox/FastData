@@ -281,7 +281,7 @@ public static class TestHelper
 
     private static ReadOnlyMemory<TTo> CastMemory<TFrom, TTo>(ReadOnlyMemory<TFrom> memory) => (ReadOnlyMemory<TTo>)(object)memory;
 
-    private static GeneratorSpec Generate<TKey, TValue, TContext>(in TempState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext<TValue>
+    private static GeneratorSpec Generate<TKey, TValue, TContext>(in TempState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext
     {
         TContext context = structure.Create(state.Keys, state.Values);
 
@@ -300,7 +300,7 @@ public static class TestHelper
         else
             throw new InvalidOperationException("Bug");
 
-        string source = state.Generator.Generate(genCfg, context);
+        string source = state.Generator.Generate<TKey, TValue>(genCfg, context);
         return new GeneratorSpec(state.Vector.Identifier, source);
     }
 

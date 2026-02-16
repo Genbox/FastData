@@ -3,11 +3,11 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValue, RrrBitVectorContext<TKey, TValue>>
+internal sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValue, RrrBitVectorContext>
 {
     private const int BlockSize = 15;
 
-    public RrrBitVectorContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
+    public RrrBitVectorContext Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         ReadOnlySpan<TKey> span = keys.Span;
         ulong[] mapped = new ulong[span.Length];
@@ -55,7 +55,7 @@ internal sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TVa
                 offsets[block] = RankMask(mask, classValue);
         }
 
-        return new RrrBitVectorContext<TKey, TValue>(minValue, maxValue, BlockSize, classes, offsets);
+        return new RrrBitVectorContext(minValue, maxValue, BlockSize, classes, offsets);
     }
 
     private static uint RankMask(ushort mask, int classValue)

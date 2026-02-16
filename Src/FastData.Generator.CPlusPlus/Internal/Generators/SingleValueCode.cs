@@ -13,8 +13,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
 
         if (!ctx.Values.IsEmpty)
         {
-            ReadOnlySpan<TValue> values = ctx.Values.Span;
-            sb.Append($"      static inline const auto stored_value = {ToValueLabel(values[0])};");
+            sb.Append($"      static inline const auto stored_value = {ToValueLabel(ctx.Values.Span[0])};");
         }
 
         sb.Append($$"""
@@ -23,7 +22,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
                         {{GetMethodModifier(true)}}bool contains(const {{KeyTypeName}} {{InputKeyName}}){{PostMethodModifier}} {
                     {{GetMethodHeader(MethodType.Contains)}}
 
-                            return {{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Item))}};
+                            return {{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Key))}};
                         }
                     """);
 
@@ -38,7 +37,7 @@ internal sealed class SingleValueCode<TKey, TValue>(SingleValueContext<TKey, TVa
                             {{GetMethodModifier(false)}}bool try_lookup(const {{KeyTypeName}} {{InputKeyName}}, const {{ValueTypeName}}*& value){{PostMethodModifier}} {
                         {{GetMethodHeader(MethodType.TryLookup)}}
 
-                                if ({{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Item))}}) {
+                                if ({{GetEqualFunction(LookupKeyName, ToValueLabel(ctx.Key))}}) {
                                     value = {{ptr}}stored_value;
                                     return true;
                                 }

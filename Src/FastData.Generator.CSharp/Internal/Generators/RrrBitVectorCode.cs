@@ -5,7 +5,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Generators;
 
-internal sealed class RrrBitVectorCode<TKey, TValue>(RrrBitVectorContext<TKey, TValue> ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<TKey>(cfg)
+internal sealed class RrrBitVectorCode<TKey>(RrrBitVectorContext ctx, CSharpCodeGeneratorConfig cfg) : CSharpOutputWriter<TKey>(cfg)
 {
     public override string Generate()
     {
@@ -13,85 +13,85 @@ internal sealed class RrrBitVectorCode<TKey, TValue>(RrrBitVectorContext<TKey, T
         string mapSource = GetMapSource();
 
         return $$"""
-                      private const ulong _rrrMinValue = {{ToValueLabel(ctx.MinValue)}};
-                      private const ulong _rrrMaxValue = {{ToValueLabel(ctx.MaxValue)}};
-                      private const int _rrrBlockSize = {{ctx.BlockSize.ToStringInvariant()}};
-                      {{FieldModifier}}byte[] _rrrClasses = new byte[] {
-                  {{FormatColumns(ctx.Classes, static x => ((int)x).ToStringInvariant())}}
-                      };
-                      {{FieldModifier}}uint[] _rrrOffsets = new uint[] {
-                  {{FormatColumns(ctx.Offsets, ToValueLabel)}}
-                      };
+                     private const ulong _rrrMinValue = {{ToValueLabel(ctx.MinValue)}};
+                     private const ulong _rrrMaxValue = {{ToValueLabel(ctx.MaxValue)}};
+                     private const int _rrrBlockSize = {{ctx.BlockSize.ToStringInvariant()}};
+                     {{FieldModifier}}byte[] _rrrClasses = new byte[] {
+                 {{FormatColumns(ctx.Classes, static x => ((int)x).ToStringInvariant())}}
+                     };
+                     {{FieldModifier}}uint[] _rrrOffsets = new uint[] {
+                 {{FormatColumns(ctx.Offsets, ToValueLabel)}}
+                     };
 
-                                {{MethodAttribute}}
-                                {{MethodModifier}}bool Contains({{KeyTypeName}} {{InputKeyName}})
-                      {
-                  {{GetMethodHeader(MethodType.Contains)}}
+                               {{MethodAttribute}}
+                               {{MethodModifier}}bool Contains({{KeyTypeName}} {{InputKeyName}})
+                     {
+                 {{GetMethodHeader(MethodType.Contains)}}
 
-                          ulong mapped = {{mapSource}};
+                         ulong mapped = {{mapSource}};
 
-                          if (mapped < _rrrMinValue || mapped > _rrrMaxValue)
-                              return false;
+                         if (mapped < _rrrMinValue || mapped > _rrrMaxValue)
+                             return false;
 
-                          ulong normalized = mapped - _rrrMinValue;
-                          int blockIndex = (int)(normalized / (ulong)_rrrBlockSize);
-                          int bitInBlock = (int)(normalized % (ulong)_rrrBlockSize);
-                          int classValue = _rrrClasses[blockIndex];
+                         ulong normalized = mapped - _rrrMinValue;
+                         int blockIndex = (int)(normalized / (ulong)_rrrBlockSize);
+                         int bitInBlock = (int)(normalized % (ulong)_rrrBlockSize);
+                         int classValue = _rrrClasses[blockIndex];
 
-                          if (classValue == 0)
-                              return false;
+                         if (classValue == 0)
+                             return false;
 
-                          uint rank = _rrrOffsets[blockIndex];
-                          return DecodeBit(classValue, rank, bitInBlock);
-                      }
+                         uint rank = _rrrOffsets[blockIndex];
+                         return DecodeBit(classValue, rank, bitInBlock);
+                     }
 
-                      {{helperModifier}}bool DecodeBit(int classValue, uint rank, int targetBit)
-                      {
-                          int remaining = classValue;
+                     {{helperModifier}}bool DecodeBit(int classValue, uint rank, int targetBit)
+                     {
+                         int remaining = classValue;
 
-                          for (int bit = _rrrBlockSize - 1; bit >= 0; bit--)
-                          {
-                              if (remaining == 0)
-                                  return false;
+                         for (int bit = _rrrBlockSize - 1; bit >= 0; bit--)
+                         {
+                             if (remaining == 0)
+                                 return false;
 
-                              int comb = Binomial(bit, remaining);
-                              bool isSet;
+                             int comb = Binomial(bit, remaining);
+                             bool isSet;
 
-                              if (rank >= (uint)comb)
-                              {
-                                  rank -= (uint)comb;
-                                  remaining--;
-                                  isSet = true;
-                              }
-                              else
-                                  isSet = false;
+                             if (rank >= (uint)comb)
+                             {
+                                 rank -= (uint)comb;
+                                 remaining--;
+                                 isSet = true;
+                             }
+                             else
+                                 isSet = false;
 
-                              if (bit == targetBit)
-                                  return isSet;
-                          }
+                             if (bit == targetBit)
+                                 return isSet;
+                         }
 
-                          return false;
-                      }
+                         return false;
+                     }
 
-                      {{helperModifier}}int Binomial(int n, int k)
-                      {
-                          if (k < 0 || k > n)
-                              return 0;
+                     {{helperModifier}}int Binomial(int n, int k)
+                     {
+                         if (k < 0 || k > n)
+                             return 0;
 
-                          if (k == 0 || k == n)
-                              return 1;
+                         if (k == 0 || k == n)
+                             return 1;
 
-                          if (k > n - k)
-                              k = n - k;
+                         if (k > n - k)
+                             k = n - k;
 
-                          int result = 1;
+                         int result = 1;
 
-                          for (int i = 1; i <= k; i++)
-                              result = checked(result * (n - (k - i)) / i);
+                         for (int i = 1; i <= k; i++)
+                             result = checked(result * (n - (k - i)) / i);
 
-                          return result;
-                      }
-                  """;
+                         return result;
+                     }
+                 """;
     }
 
     private string GetMapSource()

@@ -1,0 +1,57 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.KeyLengthContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateData.KeyLengthTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+        Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
+#><#= Common.FieldModifier #>int[] _offsets = {
+<#= FormatHelper.FormatColumns(Context.ValueOffsets, x => Model.ToValueLabel(x)) #>
+    };
+
+<#= Common.FieldModifier #><#= Common.ValueTypeName #>[] _values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
+    };
+
+<#
+    }
+#><#= Common.FieldModifier #><#= Common.KeyTypeName #>[] _keys = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, Model.ToValueLabel) #>
+    };
+
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+{
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+    return <#= Model.GetEqualFunction(Common.LookupKeyName, $"_keys[{Common.LookupKeyName}.Length - {Context.MinLength}]") #>;
+}
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool TryLookup(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Common.ValueTypeName #> value)
+{
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+
+    int idx = <#= Common.LookupKeyName #>.Length - <#= Context.MinLength #>;
+    if (<#= Model.GetEqualFunction(Common.LookupKeyName, "_keys[idx]") #>)
+    {
+        value = _values[_offsets[idx]];
+        return true;
+    }
+
+    value = default;
+    return false;
+}
+<#
+    }
+#>

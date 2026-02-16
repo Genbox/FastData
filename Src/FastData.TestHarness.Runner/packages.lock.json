@@ -157,6 +157,11 @@
         "resolved": "3.1.2",
         "contentHash": "/OoEZQxSW6DeTJ9nfrg8BLCOCWpxBiWHV4NkG3t+Xpe8tvzm7yCwKwxkhpauMl3fg9OjlIjJMKX61H6VavLkrw=="
       },
+      "System.CodeDom": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "CPc6tWO1LAer3IzfZufDBRL+UZQcj5uS207NHALQzP84Vp/z6wF0Aa0YZImOQY8iStY0A2zI/e3ihKNPfUm8XA=="
+      },
       "Verify": {
         "type": "Transitive",
         "resolved": "31.9.3",
@@ -244,7 +249,8 @@
       "Genbox.FastData.Generator.CSharp": {
         "type": "Project",
         "dependencies": {
-          "Genbox.FastData.Generator": "[1.0.0, )"
+          "Genbox.FastData.Generator": "[1.0.0, )",
+          "Mono.TextTemplating": "[3.0.0, )"
         }
       },
       "Genbox.FastData.Generator.CSharp.TestHarness": {
@@ -292,6 +298,15 @@
         "contentHash": "YkmyiPIWAXVb+lPIrM0LE5bbtLOJkCiRTFiHpkVOvhI7uTvCfoOHLEN0LcsY56GpSD7NqX3gJNpsaDe87/B3zg==",
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.1"
+        }
+      },
+      "Mono.TextTemplating": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "YqueG52R/Xej4VVbKuRIodjiAhV0HR/XVbLbNrJhCZnzjnSjgMJ/dCdV0akQQxavX6hp/LC6rqLGLcXeQYU7XA==",
+        "dependencies": {
+          "System.CodeDom": "6.0.0"
         }
       },
       "Newtonsoft.Json": {

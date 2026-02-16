@@ -1,0 +1,126 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="System.Linq" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.CSharpCodeGeneratorConfig" name="Cfg" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateData.ArrayTemplateData" name="Data" #>
+
+<#
+    object[] keys = Data.Keys.ToArray();
+#>
+<#
+    if (Data.ValueCount > 0)
+    {
+        Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
+#><#= Common.FieldModifier #><#= Common.ValueTypeName #>[] _values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
+    };
+
+<#
+    }
+#>
+<#
+    if (Cfg.ConditionalBranchType == BranchType.If)
+    {
+#><#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+{
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+<#
+        if (keys.Length == 0)
+        {
+#>    return false;
+<#
+        }
+        else
+        {
+#>    if (<#= FormatHelper.FormatList(keys, x => Model.GetEqualFunction(Common.LookupKeyName, Model.ToValueLabel(x)), " || ") #>)
+        return true;
+
+<#
+        }
+#>
+
+    return false;
+}
+<#
+        if (Data.ValueCount > 0)
+        {
+#>
+
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool TryLookup(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Common.ValueTypeName #>? value)
+{
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+<#
+            for (int i = 0; i < keys.Length; i++)
+            {
+#>    if (<#= Model.GetEqualFunction(Common.LookupKeyName, Model.ToValueLabel(keys[i])) #>)
+    {
+        value = _values[<#= i.ToString(CultureInfo.InvariantCulture) #>];
+        return true;
+    }
+
+<#
+            }
+#>
+    value = default;
+    return false;
+}
+<#
+        }
+#>
+<#
+    }
+    else
+    {
+#><#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+{
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+    switch (<#= Common.LookupKeyName #>)
+    {
+<#= FormatHelper.FormatList(keys, x => $"            case {Model.ToValueLabel(x)}:", "\n") #>
+        return true;
+        default:
+            return false;
+    }
+}
+<#
+        if (Data.ValueCount > 0)
+        {
+#>
+
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>bool TryLookup(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Common.ValueTypeName #>? value)
+{
+    value = default;
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+    switch (<#= Common.LookupKeyName #>)
+    {
+<#
+            for (int i = 0; i < keys.Length; i++)
+            {
+#>        case <#= Model.ToValueLabel(keys[i]) #>:
+            value = _values[<#= i.ToString(CultureInfo.InvariantCulture) #>];
+            return true;
+<#
+            }
+#>
+    }
+    value = default;
+    return false;
+}
+<#
+        }
+#>
+<#
+    }
+#>

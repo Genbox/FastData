@@ -409,19 +409,19 @@ public static partial class FastDataGenerator
         return modified;
     }
 
-    private static string GenerateWrapper<TKey, TValue, TContext>(in TempStringState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext<TValue>
+    private static string GenerateWrapper<TKey, TValue, TContext>(in TempStringState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext
     {
         TContext res = structure.Create(state.Keys, state.Values);
         StringKeyProperties strProps = state.StringKeyProperties;
         GeneratorConfig<string> genCfg = new GeneratorConfig<string>(structure.GetType(), KeyType.String, (uint)state.Keys.Length, strProps, state.HashDetails, state.Generator.Encoding, state.TrimPrefix, state.TrimSuffix, state.Config);
-        return state.Generator.Generate(genCfg, res);
+        return state.Generator.Generate<string, TValue>(genCfg, res);
     }
 
-    private static string GenerateWrapper<TKey, TValue, TContext>(in TempNumericState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext<TValue>
+    private static string GenerateWrapper<TKey, TValue, TContext>(in TempNumericState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext
     {
         TContext res = structure.Create(state.Keys, state.Values);
         GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(structure.GetType(), state.KeyType, (uint)state.Keys.Length, state.NumericKeyProperties, state.HashDetails, state.Config);
-        return state.Generator.Generate(genCfg, res);
+        return state.Generator.Generate<TKey, TValue>(genCfg, res);
     }
 
     internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringKeyProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, GeneratorEncoding encoding, bool includeDefault, FastDataConfig fdCfg)

@@ -25,18 +25,18 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
     public override GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
 
-    public override string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context)
+    public override string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
     {
         //C++ generator does not support chars outside ASCII
         if (genCfg.KeyType == KeyType.Char && (char)(object)genCfg.Constants.MaxValue > 127)
             throw new InvalidOperationException("C++ generator does not support chars outside ASCII. Please use a different data type or reduce the max value to 127 or lower.");
 
-        return base.Generate(genCfg, context);
+        return base.Generate<TKey, TValue>(genCfg, context);
     }
 
-    protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext<TValue> context)
+    protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext context)
     {
-        base.AppendHeader(sb, genCfg, context);
+        base.AppendHeader<TKey, TValue>(sb, genCfg, context);
 
         sb.AppendLine("""
                       #pragma once
@@ -49,13 +49,13 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                       """);
     }
 
-    protected override void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext<TValue> context)
+    protected override void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext context)
     {
         sb.AppendLine($$"""
                         class {{_cfg.ClassName}} final {
                         """);
 
-        base.AppendBody(sb, genCfg, keyTypeName, valueTypeName, context);
+        base.AppendBody<TKey, TValue>(sb, genCfg, keyTypeName, valueTypeName, context);
     }
 
     protected override void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)
@@ -64,12 +64,12 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         sb.Append("};");
     }
 
-    protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context) => context switch
+    protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context) => context switch
     {
         SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, Shared),
-        RangeContext<TKey, TValue> x => new RangeCode<TKey, TValue>(x),
-        BitSetContext<TKey, TValue> x => new BitSetCode<TKey, TValue>(x, Shared),
-        BloomFilterContext<TKey, TValue> x => new BloomFilterCode<TKey, TValue>(x),
+        RangeContext<TKey> x => new RangeCode<TKey, TValue>(x),
+        BitSetContext<TValue> x => new BitSetCode<TKey, TValue>(x, Shared),
+        BloomFilterContext x => new BloomFilterCode<TKey>(x),
         ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, Shared),
         BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, Shared),
         ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, Shared),

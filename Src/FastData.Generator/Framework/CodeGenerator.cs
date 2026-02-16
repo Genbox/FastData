@@ -16,7 +16,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 
     public abstract GeneratorEncoding Encoding { get; }
 
-    public virtual string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context)
+    public virtual string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
     {
         Shared.Clear();
 
@@ -26,10 +26,10 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         string valueTypeName = Type.GetTypeCode(valueType) == TypeCode.Object ? typeof(TValue).Name : map.GetTypeName(valueType);
 
         StringBuilder header = new StringBuilder();
-        AppendHeader(header, genCfg, context);
+        AppendHeader<TKey, TValue>(header, genCfg, context);
 
         StringBuilder body = new StringBuilder();
-        AppendBody(body, genCfg, keyTypeName, valueTypeName, context);
+        AppendBody<TKey, TValue>(body, genCfg, keyTypeName, valueTypeName, context);
 
         StringBuilder footer = new StringBuilder();
         AppendFooter(footer, genCfg, keyTypeName);
@@ -48,9 +48,9 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         return final.ToString();
     }
 
-    protected abstract OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext<TValue> context);
+    protected abstract OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context);
 
-    protected virtual void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext<TValue> context)
+    protected virtual void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext context)
     {
         sb.Append(constDef.Comment).Append(' ').AppendLine("This file is auto-generated. Do not edit manually.");
         sb.Append(constDef.Comment).Append(' ').AppendLine($"Structure: {genCfg.StructureType.GetCleanName().Replace("Structure", "")}");
@@ -61,9 +61,9 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 #endif
     }
 
-    protected virtual void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext<TValue> context)
+    protected virtual void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext context)
     {
-        OutputWriter<TKey>? writer = GetOutputWriter(genCfg, context);
+        OutputWriter<TKey>? writer = GetOutputWriter<TKey, TValue>(genCfg, context);
 
         if (writer == null)
             throw new NotSupportedException("The context type is not supported: " + context.GetType().Name);

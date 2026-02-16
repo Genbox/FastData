@@ -1,4 +1,4 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <Import Project="../Locals/Directory.Packages.props" Condition="Exists('../Locals/Directory.Packages.props')" />
   <Import Project="Directory.Packages.Analyzers.props" />
@@ -13,5 +13,6 @@
     <PackageVersion Include="JetBrains.Annotations" Version="2025.2.4" />
     <!--benchmark packages-->
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageVersion Include="Mono.TextTemplating" Version="3.0.0" />
   </ItemGroup>
 </Project>
