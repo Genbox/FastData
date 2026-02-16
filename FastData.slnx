@@ -81,6 +81,7 @@
   </Folder>
   <Folder Name="/_Scripts/">
     <File Path="Scripts/Build.ps1" />
+    <File Path="Scripts/Install-Gcc.ps1" />
     <File Path="Scripts/Publish.ps1" />
   </Folder>
   <Project Path="Src/FastData.Benchmarks/FastData.Benchmarks.csproj" />

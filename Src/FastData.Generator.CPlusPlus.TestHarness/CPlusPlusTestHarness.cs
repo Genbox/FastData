@@ -13,13 +13,13 @@ namespace Genbox.FastData.Generator.CPlusPlus.TestHarness;
 
 public sealed class CPlusPlusTestHarness : TestHarnessBase
 {
-    private readonly CPlusPlusCompiler _compiler;
+    private readonly GccCompiler _compiler;
 
     public CPlusPlusTestHarness() : base("CPlusPlus")
     {
         string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "CPlusPlus");
         Directory.CreateDirectory(rootDir);
-        _compiler = new CPlusPlusCompiler(false, rootDir);
+        _compiler = new GccCompiler(false, rootDir, false);
     }
 
     public override ICodeGenerator CreateGenerator(string id) => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id));

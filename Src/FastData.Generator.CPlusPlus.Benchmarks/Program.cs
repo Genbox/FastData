@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
@@ -17,7 +17,7 @@ internal static class Program
         string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "CPlusPlus");
         TestHelper.CreateOrEmptyDirectory(rootDir);
 
-        CPlusPlusCompiler compiler = new CPlusPlusCompiler(true, rootDir);
+        GccCompiler compiler = new GccCompiler(true, rootDir, true);
         StringBuilder sb = new StringBuilder();
         sb.AppendLine("""
                       #include <benchmark/benchmark.h>
