@@ -15,6 +15,7 @@ public class VectorTests
     [ClassData(typeof(KeyValueTestVectors))]
     public async Task KeyValueVectors<TKey, TValue>(ITestHarness harness, TestVector<TKey, TValue> vector) where TValue : notnull
     {
+        TestHarnessRunnerHelper.SkipIfEmptyImplementation(harness, vector.Type);
         GeneratorSpec spec = Generate(harness.CreateGenerator, vector);
         Assert.NotEmpty(spec.Source);
 
@@ -29,6 +30,7 @@ public class VectorTests
     [ClassData(typeof(ValueTestVectors))]
     public async Task ValueVectors<T>(ITestHarness harness, TestVector<T> vector)
     {
+        TestHarnessRunnerHelper.SkipIfEmptyImplementation(harness, vector.Type);
         GeneratorSpec spec = Generate(harness.CreateGenerator, vector);
         Assert.NotEmpty(spec.Source);
 

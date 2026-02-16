@@ -72,6 +72,8 @@ public sealed class RustCodeGenerator : CodeGenerator
         HashTableCompactContext<TKey, TValue> x => new HashTableCompactCode<TKey, TValue>(x, genCfg, Shared),
         HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, genCfg, Shared),
         KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, Shared),
+        EliasFanoContext<TKey> x => new EliasFanoCode<TKey>(x),
+        RrrBitVectorContext x => new RrrBitVectorCode<TKey>(x),
         _ => null
     };
 }

@@ -77,6 +77,8 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         HashTableCompactContext<TKey, TValue> x => new HashTableCompactCode<TKey, TValue>(x, Shared),
         HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, Shared),
         KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, Shared),
+        EliasFanoContext<TKey> x => new EliasFanoCode<TKey>(x),
+        RrrBitVectorContext x => new RrrBitVectorCode<TKey>(x),
         _ => null
     };
 }

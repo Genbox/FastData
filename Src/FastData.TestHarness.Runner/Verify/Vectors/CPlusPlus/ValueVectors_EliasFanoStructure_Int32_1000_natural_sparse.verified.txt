@@ -1,0 +1,23 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: EliasFano
+#pragma once
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class EliasFanoStructure_Int32_1000_natural_sparse final {
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+        if ((static_cast<uint32_t>(key) & 4294901760u) != 0)
+            return false;
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 1000;
+    static constexpr int32_t min_key = 11727;
+    static constexpr int32_t max_key = 38755;
+};
