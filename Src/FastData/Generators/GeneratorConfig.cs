@@ -233,6 +233,9 @@ public sealed class GeneratorConfig<T>
         if (minLength == 0)
             return false;
 
+        if (!allAscii)
+            return false;
+
         if (ignoreCase && !allAscii)
             return false;
 

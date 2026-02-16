@@ -60,9 +60,8 @@ internal static class MyData
     {
         if (key.Length != 5u)
             return false;
-        char firstChar = key[0];
-        char lastChar = key[key.Length - 1];
-        if (firstChar < 't' || firstChar > 't' || lastChar < '1' || lastChar > '2')
+        char valueChar = key[0];
+        if (valueChar != 't')
             return false;
 
 

@@ -174,6 +174,9 @@ internal static class KeyAnalyzer
         uint charDivisor = lengthGcd <= 1 ? 0u : lengthGcd;
         uint byteDivisor = byteGcd <= 1 ? 0u : byteGcd;
 
+        if (charDivisor == 0)
+            byteDivisor = 0;
+
         return new StringKeyProperties(new LengthData((uint)minByteCount, (uint)maxByteCount, uniqLen, lengthMap, charDivisor, byteDivisor), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskLen, firstCharMap, lastCharMap));
     }
 

@@ -15,10 +15,8 @@ public:
     static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 5u)
              return false;
-        uint32_t firstChar = static_cast<uint32_t>(key.front());
-        uint32_t lastChar = static_cast<uint32_t>(key.back());
-
-        if (firstChar < 116u || firstChar > 116u || lastChar < 49u || lastChar > 50u)
+        uint32_t valueChar = static_cast<uint32_t>(key.front());
+        if (valueChar != 116u)
             return false;
 
         if (key == u8"test1" || key == u8"test2")
