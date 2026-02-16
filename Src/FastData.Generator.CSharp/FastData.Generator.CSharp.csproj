@@ -53,15 +53,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>HashTableCode.t4</DependentUpon>
     </Compile>
-    <Compile Update="Templates\HashTableCompactCode.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>HashTableCompactCode.t4</DependentUpon>
-    </Compile>
     <Compile Update="Templates\HashTablePerfectCode.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>HashTablePerfectCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\HashTableCompactCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HashTableCompactCode.t4</DependentUpon>
     </Compile>
     <Compile Update="Templates\KeyLengthCode.cs">
       <AutoGen>True</AutoGen>

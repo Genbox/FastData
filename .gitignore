@@ -29,3 +29,4 @@
 # Verify
 *.received.*
 *.received/
+Src/FastData.Generator.CSharp/Templates/*.cs
