@@ -56,7 +56,7 @@ internal sealed class EliasFanoCode<TKey>(EliasFanoContext<TKey> ctx, CSharpCode
                  {{(hasLowerBits ?
                      """
                                  ulong targetLow = (ulong)value & _lowerMask;
-                                 long lowerBitsOffset = rank * lowerBitCount;
+                                 long lowerBitsOffset = rank * _lowerBitCount;
 
                                  while (true)
                                  {
@@ -82,7 +82,7 @@ internal sealed class EliasFanoCode<TKey>(EliasFanoContext<TKey> ctx, CSharpCode
                                          int startBit = (int)(lowerBitsOffset & 63);
 
                                          ulong currentLow;
-                                         if (startBit + lowerBitCount <= 64)
+                                         if (startBit + _lowerBitCount <= 64)
                                              currentLow = (_lowerBits[wordIndex] >> startBit) & _lowerMask;
                                          else
                                          {
@@ -104,7 +104,7 @@ internal sealed class EliasFanoCode<TKey>(EliasFanoContext<TKey> ctx, CSharpCode
                                      if ((ulong)rank >= ItemCount)
                                          return false;
 
-                                     lowerBitsOffset += lowerBitCount;
+                                     lowerBitsOffset += _lowerBitCount;
                                  }
                      """
                      : """

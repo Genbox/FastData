@@ -59,7 +59,7 @@ internal static class EliasFanoStructure_Int32_1000_natural_sparse
 
         ulong window = _upperBits[currWord] & (ulong.MaxValue << (int)(position & 63));
             ulong targetLow = (ulong)value & _lowerMask;
-            long lowerBitsOffset = rank * lowerBitCount;
+            long lowerBitsOffset = rank * _lowerBitCount;
 
             while (true)
             {
@@ -85,7 +85,7 @@ internal static class EliasFanoStructure_Int32_1000_natural_sparse
                     int startBit = (int)(lowerBitsOffset & 63);
 
                     ulong currentLow;
-                    if (startBit + lowerBitCount <= 64)
+                    if (startBit + _lowerBitCount <= 64)
                         currentLow = (_lowerBits[wordIndex] >> startBit) & _lowerMask;
                     else
                     {
@@ -107,7 +107,7 @@ internal static class EliasFanoStructure_Int32_1000_natural_sparse
                 if ((ulong)rank >= ItemCount)
                     return false;
 
-                lowerBitsOffset += lowerBitCount;
+                lowerBitsOffset += _lowerBitCount;
             }
     }
 
