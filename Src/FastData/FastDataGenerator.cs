@@ -76,6 +76,19 @@ public static partial class FastDataGenerator
         if (!values.IsEmpty && keys.Length != values.Length)
             throw new InvalidOperationException("The number of values does not match the number of keys.");
 
+        ReadOnlySpan<string> keySpan = keys.Span;
+
+        for (int i = 0; i < keySpan.Length; i++)
+        {
+            string? key = keySpan[i];
+
+            if (key is null)
+                throw new InvalidOperationException("Keys cannot contain null values.");
+
+            if (key.Length == 0)
+                throw new InvalidOperationException("Keys cannot contain empty strings.");
+        }
+
         factory ??= NullLoggerFactory.Instance;
 
         ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));
@@ -83,14 +96,15 @@ public static partial class FastDataGenerator
 
         int oldCount = keys.Length;
 
-        DeduplicateKeys(fdCfg, keys, values, StringComparer.Ordinal, StringComparer.Ordinal, out keys, out values, out int newCount);
+        StringComparer comparer = fdCfg.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        DeduplicateKeys(fdCfg, keys, values, comparer, comparer, out keys, out values, out int newCount);
 
         if (oldCount == newCount)
             LogNumberOfKeys(logger, newCount);
         else
             LogNumberOfUniqueKeys(logger, oldCount, newCount);
 
-        ReadOnlySpan<string> keySpan = keys.Span;
+        keySpan = keys.Span;
 
         const KeyType keyType = KeyType.String;
         LogKeyType(logger, keyType);

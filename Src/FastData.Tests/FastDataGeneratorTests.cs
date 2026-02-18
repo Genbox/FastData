@@ -124,6 +124,46 @@ public class FastDataGeneratorTests
     }
 
     [Fact]
+    public void Generate_StringKeys_EmptyString_ThrowsFriendlyException()
+    {
+        FastDataConfig config = new FastDataConfig();
+        Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate([""], config, new DummyGenerator()));
+    }
+
+    [Fact]
+    public void Generate_StringKeys_Null_ThrowsFriendlyException()
+    {
+        string[] keys = [null!];
+        FastDataConfig config = new FastDataConfig();
+        Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate(keys, config, new DummyGenerator()));
+    }
+
+    [Fact]
+    public void Generate_IgnoreCase_DeduplicatesCaseInsensitive()
+    {
+        FastDataConfig config = new FastDataConfig(StructureType.Array)
+        {
+            IgnoreCase = true,
+            DeduplicationMode = DeduplicationMode.SortThrowOnDup
+        };
+
+        Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate(["abc", "ABC"], config, new DummyGenerator()));
+    }
+
+    [Fact(Skip = "Known issue: all-negative sparse inputs can select Elias-Fano and throw during construction.")]
+    public void Generate_Auto_AllNegativeSparse_DoesNotThrow()
+    {
+        int[] keys = Enumerable.Range(1, 1000).Select(static x => -x * 20).ToArray();
+        FastDataConfig config = new FastDataConfig();
+
+        ContextCaptureGenerator generator = new ContextCaptureGenerator();
+        Exception? error = Record.Exception(() => FastDataGenerator.Generate(keys, config, generator));
+
+        Assert.Null(error);
+        Assert.False(generator.Context is EliasFanoContext<int>);
+    }
+
+    [Fact]
     public void Generate_Overloads_String_Work()
     {
         string[] keys = ["a", "b", "c"];
