@@ -13,9 +13,8 @@ internal static class StaticData
     {
         if (key.Length != 5u)
             return false;
-        char firstChar = key[0];
-        char lastChar = key[key.Length - 1];
-        if (firstChar < 'i' || firstChar > 'i' || lastChar < '1' || lastChar > '3')
+        char valueChar = key[0];
+        if (valueChar != 'i')
             return false;
 
 
