@@ -8,6 +8,158 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FastData.Generator\FastData.Generator.csproj" />
+    <PackageReference Include="Mono.TextTemplating" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Templates\**\*.t4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Templates\ArrayCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ArrayCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\BinarySearchCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BinarySearchCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\BitSetCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BitSetCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\BloomFilterCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BloomFilterCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\ConditionalCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConditionalCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\EliasFanoCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EliasFanoCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\HashTableCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HashTableCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\HashTableCompactCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HashTableCompactCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\HashTablePerfectCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HashTablePerfectCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\KeyLengthCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>KeyLengthCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\RangeCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RangeCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\RrrBitVectorCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RrrBitVectorCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\SingleValueCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SingleValueCode.t4</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\Misc\Compat\CallContext.cs">
+      <Link>Internal\Compat\CallContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Misc\Compat\CompilerFeatureRequiredAttribute.cs">
+      <Link>Internal\Compat\CompilerFeatureRequiredAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Misc\Compat\IsExternalInit.cs">
+      <Link>Internal\Compat\IsExternalInit.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Misc\Compat\RequiredMemberAttribute.cs">
+      <Link>Internal\Compat\RequiredMemberAttribute.cs</Link>
+    </Compile>
+    <Compile Update="Templates\BinarySearchCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BinarySearchCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\ArrayCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ArrayCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\BitSetCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BitSetCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\BloomFilterCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BloomFilterCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\ConditionalCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConditionalCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\EliasFanoCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EliasFanoCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\HashTableCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HashTableCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\HashTableCompactCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HashTableCompactCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\HashTablePerfectCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HashTablePerfectCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\KeyLengthCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>KeyLengthCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\RangeCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RangeCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\RrrBitVectorCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RrrBitVectorCode.t4</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\SingleValueCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SingleValueCode.t4</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,12 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+
+<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.CommonDataModel" name="Common" #>
+
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(Common.CustomKey) #>) -> bool {
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+    let _ = <#= Common.InputKeyName #>;
+    false
+}

@@ -1,0 +1,26 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+
+<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.BloomFilterContext" name="Context" #>
+
+<#= Common.FieldModifier #>BLOOM: [u64; <#= Context.BitSet.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.BitSet, x => Model.ToValueLabel(x)) #>
+    ];
+
+<#= Model.HashSource #>
+
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(Common.CustomKey) #>) -> bool {
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+    let hash = unsafe { Self::get_hash(<#= Common.LookupKeyName #>) };
+    let index = <#= Model.GetModFunction("hash", (ulong)Context.BitSet.Length) #>;
+    let shift1 = (hash as u32) & 63;
+    let shift2 = ((hash >> 8) as u32) & 63;
+    let mask = (1u64 << shift1) | (1u64 << shift2);
+    (Self::BLOOM[index as usize] & mask) == mask
+}

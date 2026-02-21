@@ -1,0 +1,59 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.KeyLengthContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateData.KeyLengthTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+        Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
+#>
+<#= Model.GetFieldModifier(true) #>std::array<int32_t, <#= Context.ValueOffsets.Length.ToStringInvariant() #>> offsets = {
+<#= FormatHelper.FormatColumns(Context.ValueOffsets, static x => x.ToStringInvariant()) #>
+    };
+
+<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName(!Common.IsPrimitive) #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
+    };
+
+<#
+    }
+#>
+<#= Model.GetFieldModifier(true) #>std::array<<#= Common.KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, Model.ToValueLabel) #>
+    };
+
+public:
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+        return <#= Model.GetEqualFunction(Common.LookupKeyName, $"keys[{Common.LookupKeyName}.length() - {Context.MinLength.ToStringInvariant()}]") #>;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Common.ValueTypeName #>*& value)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+
+        size_t idx = <#= Common.LookupKeyName #>.length() - <#= Context.MinLength.ToStringInvariant() #>;
+        if (<#= Model.GetEqualFunction(Common.LookupKeyName, "keys[idx]") #>) {
+            value = <#= Common.IsPrimitive ? "&" : "" #>values[offsets[idx]];
+            return true;
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>

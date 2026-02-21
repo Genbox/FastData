@@ -1,0 +1,175 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.BinarySearchContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateData.BinarySearchTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName(!Common.IsPrimitive) #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
+    };
+
+<#
+    }
+#>
+<#= Model.GetFieldModifier(true) #>std::array<<#= Common.KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, Model.ToValueLabel) #>
+    };
+
+public:
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+<#
+    if (Context.UseInterpolation)
+    {
+#>        int32_t lo = 0;
+        int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+        while (lo <= hi && <#= Common.LookupKeyName #> >= keys[lo] && <#= Common.LookupKeyName #> <= keys[hi]) {
+            const <#= Common.KeyTypeName #> lo_key = keys[lo];
+            const <#= Common.KeyTypeName #> hi_key = keys[hi];
+
+            if (lo_key == hi_key) {
+                if (lo_key == <#= Common.LookupKeyName #>)
+                    return true;
+
+                break;
+            }
+
+            const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
+            const double offset = static_cast<double>(<#= Common.LookupKeyName #>) - static_cast<double>(lo_key);
+            int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+
+            if (mid < lo)
+                mid = lo;
+            else if (mid > hi)
+                mid = hi;
+
+            const <#= Common.KeyTypeName #> mid_key = keys[mid];
+            if (mid_key == <#= Common.LookupKeyName #>)
+                return true;
+            if (mid_key < <#= Common.LookupKeyName #>)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+<#
+    }
+    else
+    {
+#>        int32_t lo = 0;
+        int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+        while (lo <= hi) {
+            const int32_t mid = lo + ((hi - lo) >> 1);
+            const <#= Common.KeyTypeName #> mid_key = keys[mid];
+            const int32_t order = <#= Model.GetCompareFunction("mid_key", Common.LookupKeyName) #>;
+
+            if (order == 0)
+                return true;
+            if (order < 0)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+#>    }
+<#
+    }
+    if (Data.ValueCount > 0)
+    {
+        Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
+#>
+
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Common.ValueTypeName #>*& value)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+
+<#
+        if (Context.UseInterpolation)
+        {
+#>        int32_t lo = 0;
+        int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+        while (lo <= hi && <#= Common.LookupKeyName #> >= keys[lo] && <#= Common.LookupKeyName #> <= keys[hi]) {
+            const <#= Common.KeyTypeName #> lo_key = keys[lo];
+            const <#= Common.KeyTypeName #> hi_key = keys[hi];
+
+            if (lo_key == hi_key) {
+                if (lo_key == <#= Common.LookupKeyName #>)
+                {
+                    value = <#= Common.IsPrimitive ? "&" : "" #>values[lo];
+                    return true;
+                }
+
+                break;
+            }
+
+            const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
+            const double offset = static_cast<double>(<#= Common.LookupKeyName #>) - static_cast<double>(lo_key);
+            int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+
+            if (mid < lo)
+                mid = lo;
+            else if (mid > hi)
+                mid = hi;
+
+            const <#= Common.KeyTypeName #> mid_key = keys[mid];
+            if (mid_key == <#= Common.LookupKeyName #>)
+            {
+                value = <#= Common.IsPrimitive ? "&" : "" #>values[mid];
+                return true;
+            }
+
+            if (mid_key < <#= Common.LookupKeyName #>)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+        }
+        else
+        {
+#>        int32_t lo = 0;
+        int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+        while (lo <= hi) {
+            const int32_t mid = lo + ((hi - lo) >> 1);
+            const <#= Common.KeyTypeName #> mid_key = keys[mid];
+            const int32_t order = <#= Model.GetCompareFunction("mid_key", Common.LookupKeyName) #>;
+
+            if (order == 0)
+            {
+                value = <#= Common.IsPrimitive ? "&" : "" #>values[mid];
+                return true;
+            }
+
+            if (order < 0)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        value = nullptr;
+        return false;
+    }
+#>    }
+<#
+        }
+    }
+#>

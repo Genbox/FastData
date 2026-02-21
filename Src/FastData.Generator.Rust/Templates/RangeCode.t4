@@ -1,0 +1,17 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+
+<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateData.RangeTemplateData" name="Data" #>
+
+<#
+    string minLabel = Model.ToValueLabel(Data.Min);
+    string maxLabel = Model.ToValueLabel(Data.Max);
+#>
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(Common.CustomKey) #>) -> bool {
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+    return <#= Common.LookupKeyName #> >= <#= minLabel #> && <#= Common.LookupKeyName #> <= <#= maxLabel #>;
+}

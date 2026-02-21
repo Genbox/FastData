@@ -1,0 +1,12 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
+
+public:
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+        return false;
+    }

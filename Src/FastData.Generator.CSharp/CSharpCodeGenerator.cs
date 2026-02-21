@@ -323,15 +323,9 @@ public sealed class CSharpCodeGenerator : CodeGenerator
             }
         }
 
-        private static IEnumerable<object> ToObjects(ReadOnlyMemory<TKey> keys)
-        {
-            return new MemoryObjectEnumerable<TKey>(keys);
-        }
+        private static IEnumerable<object> ToObjects(ReadOnlyMemory<TKey> keys) => new MemoryObjectEnumerable<TKey>(keys);
 
-        private static IEnumerable<object> ToObjects(ReadOnlyMemory<TValue> values)
-        {
-            return new MemoryObjectEnumerable<TValue>(values);
-        }
+        private static IEnumerable<object> ToObjects(ReadOnlyMemory<TValue> values) => new MemoryObjectEnumerable<TValue>(values);
 
         private sealed class MemoryObjectEnumerable<T>(ReadOnlyMemory<T> memory) : IEnumerable<object>
         {
@@ -345,7 +339,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
 
                 public object Current => memory.Span[_index];
 
-                object? IEnumerator.Current => Current;
+                object IEnumerator.Current => Current;
 
                 public bool MoveNext()
                 {

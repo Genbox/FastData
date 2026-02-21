@@ -1,0 +1,27 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.BloomFilterContext" name="Context" #>
+
+<#= Model.GetFieldModifier(true) #>std::array<uint64_t, <#= Context.BitSet.Length.ToStringInvariant() #>> bloom = {
+<#= FormatHelper.FormatColumns(Context.BitSet, x => Model.ToValueLabel(x)) #>
+    };
+
+<#= Model.HashSource #>
+
+public:
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+        const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
+        const <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Context.BitSet.Length) #>;
+        const uint32_t shift1 = static_cast<uint32_t>(hash) & 63u;
+        const uint32_t shift2 = static_cast<uint32_t>(hash >> 8) & 63u;
+        const uint64_t mask = (1ULL << shift1) | (1ULL << shift2);
+        return (bloom[index] & mask) == mask;
+    }

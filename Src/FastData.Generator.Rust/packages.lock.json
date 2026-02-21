@@ -60,6 +60,15 @@
         "resolved": "6.0.0",
         "contentHash": "+/SsmiySsXJlvQLCGBqaZKNVt3s/Y/HbAdwtop7Km2CnuZbaScoqkWJEBQ5Cy9ebkn6kCYKrHsXgwrFdTgcb3g=="
       },
+      "Mono.TextTemplating": {
+        "type": "Direct",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "YqueG52R/Xej4VVbKuRIodjiAhV0HR/XVbLbNrJhCZnzjnSjgMJ/dCdV0akQQxavX6hp/LC6rqLGLcXeQYU7XA==",
+        "dependencies": {
+          "System.CodeDom": "6.0.0"
+        }
+      },
       "NETStandard.Library": {
         "type": "Direct",
         "requested": "[2.0.3, )",
@@ -147,6 +156,11 @@
         "type": "Transitive",
         "resolved": "4.6.1",
         "contentHash": "N8GXpmiLMtljq7gwvyS+1QvKT/W2J8sNAvx+HVg4NGmsG/H+2k/y9QI23auLJRterrzCiDH+IWAw4V/GPwsMlw=="
+      },
+      "System.CodeDom": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "CPc6tWO1LAer3IzfZufDBRL+UZQcj5uS207NHALQzP84Vp/z6wF0Aa0YZImOQY8iStY0A2zI/e3ihKNPfUm8XA=="
       },
       "System.Diagnostics.DiagnosticSource": {
         "type": "Transitive",
@@ -271,6 +285,15 @@
         "resolved": "6.0.0",
         "contentHash": "+/SsmiySsXJlvQLCGBqaZKNVt3s/Y/HbAdwtop7Km2CnuZbaScoqkWJEBQ5Cy9ebkn6kCYKrHsXgwrFdTgcb3g=="
       },
+      "Mono.TextTemplating": {
+        "type": "Direct",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "YqueG52R/Xej4VVbKuRIodjiAhV0HR/XVbLbNrJhCZnzjnSjgMJ/dCdV0akQQxavX6hp/LC6rqLGLcXeQYU7XA==",
+        "dependencies": {
+          "System.CodeDom": "6.0.0"
+        }
+      },
       "ReflectionAnalyzers": {
         "type": "Direct",
         "requested": "[0.3.1, )",
@@ -327,6 +350,11 @@
         "type": "Transitive",
         "resolved": "8.0.0",
         "contentHash": "dk9JPxTCIevS75HyEQ0E4OVAFhB2N+V9ShCXf8Q6FkUQZDkgLI12y679Nym1YqsiSysuQskT7Z+6nUf3yab6Vw=="
+      },
+      "System.CodeDom": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "CPc6tWO1LAer3IzfZufDBRL+UZQcj5uS207NHALQzP84Vp/z6wF0Aa0YZImOQY8iStY0A2zI/e3ihKNPfUm8XA=="
       },
       "Genbox.FastData": {
         "type": "Project",

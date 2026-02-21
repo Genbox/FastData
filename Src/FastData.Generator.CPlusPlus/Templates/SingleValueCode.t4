@@ -1,0 +1,46 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateData.SingleValueTemplateData" name="Data" #>
+
+<#
+    string itemLabel = Model.ToValueLabel(Data.Item);
+#>
+<#
+    if (Data.Value != null)
+    {
+        Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
+#>      static inline const auto stored_value = <#= Model.ToValueLabel(Data.Value) #>;
+<#
+    }
+#>
+public:
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+        return <#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>;
+    }
+<#
+    if (Data.Value != null)
+    {
+#>
+
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Common.ValueTypeName #>*& value)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+
+        if (<#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>) {
+            value = <#= Common.IsPrimitive ? "&" : "" #>stored_value;
+            return true;
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>

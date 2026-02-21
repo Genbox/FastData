@@ -1,0 +1,175 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+
+<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.BinarySearchContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateData.BinarySearchTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+        Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
+#>
+<#= Common.FieldModifier #>VALUES: [<#= Model.GetValueTypeName(!Common.IsPrimitive) #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
+    ];
+
+<#
+    }
+#>
+<#= Common.FieldModifier #>KEYS: [<#= Model.GetKeyTypeName(Common.CustomKey) #>; <#= Data.KeyCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, Model.ToValueLabel) #>
+    ];
+
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(Common.CustomKey) #>) -> bool {
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+<#
+    if (Context.UseInterpolation)
+    {
+#>    let mut lo: usize = 0;
+    let mut hi: usize = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+    while lo <= hi && <#= Common.LookupKeyName #> >= Self::KEYS[lo] && <#= Common.LookupKeyName #> <= Self::KEYS[hi] {
+        let lo_key = Self::KEYS[lo];
+        let hi_key = Self::KEYS[hi];
+
+        if lo_key == hi_key {
+            if lo_key == <#= Common.LookupKeyName #> {
+                return true;
+            }
+
+            break;
+        }
+
+        let range = (hi_key as f64) - (lo_key as f64);
+        let offset = (<#= Common.LookupKeyName #> as f64) - (lo_key as f64);
+        let mut i = lo + ((offset * (hi - lo) as f64) / range) as usize;
+
+        if i < lo {
+            i = lo;
+        } else if i > hi {
+            i = hi;
+        }
+
+        let entry = Self::KEYS[i];
+        if entry == <#= Common.LookupKeyName #> {
+            return true;
+        }
+        if entry < <#= Common.LookupKeyName #> {
+            lo = i + 1;
+        } else {
+            hi = i - 1;
+        }
+    }
+
+    false
+}
+<#
+    }
+    else
+    {
+#>    let mut lo: usize = 0;
+    let mut hi: usize = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+    while lo <= hi {
+        let i = lo + ((hi - lo) >> 1);
+        let entry = Self::KEYS[i];
+        let order = <#= Model.GetCompareFunction("entry", Common.LookupKeyName) #>;
+
+        if order == 0 {
+            return true;
+        }
+        if order < 0 {
+            lo = i + 1;
+        } else {
+            hi = i - 1;
+        }
+    }
+
+    false
+}
+<#
+    }
+#>
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+<#= Common.MethodAttribute #>
+<#= Common.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(Common.CustomKey) #>) -> Option<<#= Model.GetValueTypeName(!Common.IsPrimitive) #>> {
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+
+<#
+        if (Context.UseInterpolation)
+        {
+#>    let mut lo: usize = 0;
+    let mut hi: usize = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+    while lo <= hi && <#= Common.LookupKeyName #> >= Self::KEYS[lo] && <#= Common.LookupKeyName #> <= Self::KEYS[hi] {
+        let lo_key = Self::KEYS[lo];
+        let hi_key = Self::KEYS[hi];
+
+        if lo_key == hi_key {
+            if lo_key == <#= Common.LookupKeyName #> {
+                return Some(Self::VALUES[lo]);
+            }
+
+            break;
+        }
+
+        let range = (hi_key as f64) - (lo_key as f64);
+        let offset = (<#= Common.LookupKeyName #> as f64) - (lo_key as f64);
+        let mut i = lo + ((offset * (hi - lo) as f64) / range) as usize;
+
+        if i < lo {
+            i = lo;
+        } else if i > hi {
+            i = hi;
+        }
+
+        let entry = Self::KEYS[i];
+        if entry == <#= Common.LookupKeyName #> {
+            return Some(Self::VALUES[i]);
+        }
+        if entry < <#= Common.LookupKeyName #> {
+            lo = i + 1;
+        } else {
+            hi = i - 1;
+        }
+    }
+
+    None
+}
+<#
+        }
+        else
+        {
+#>    let mut lo: usize = 0;
+    let mut hi: usize = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+    while lo <= hi {
+        let i = lo + ((hi - lo) >> 1);
+        let entry = Self::KEYS[i];
+        let order = <#= Model.GetCompareFunction("entry", Common.LookupKeyName) #>;
+
+        if order == 0 {
+            return Some(Self::VALUES[i]);
+        }
+        if order < 0 {
+            lo = i + 1;
+        } else {
+            hi = i - 1;
+        }
+    }
+
+    None
+}
+<#
+        }
+#>
+<#
+    }
+#>

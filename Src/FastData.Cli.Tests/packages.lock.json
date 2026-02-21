@@ -252,7 +252,8 @@
       "Genbox.FastData.Generator.CPlusPlus": {
         "type": "Project",
         "dependencies": {
-          "Genbox.FastData.Generator": "[1.0.0, )"
+          "Genbox.FastData.Generator": "[1.0.0, )",
+          "Mono.TextTemplating": "[3.0.0, )"
         }
       },
       "Genbox.FastData.Generator.CSharp": {
@@ -265,7 +266,8 @@
       "Genbox.FastData.Generator.Rust": {
         "type": "Project",
         "dependencies": {
-          "Genbox.FastData.Generator": "[1.0.0, )"
+          "Genbox.FastData.Generator": "[1.0.0, )",
+          "Mono.TextTemplating": "[3.0.0, )"
         }
       },
       "Genbox.FastData.InternalShared": {

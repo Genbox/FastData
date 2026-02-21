@@ -1,0 +1,122 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+<#@ import namespace="System.Linq" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.HashTablePerfectContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateData.HashTablePerfectTemplateData" name="Data" #>
+
+<#
+    string[] valueLabels = Data.Values.Select(Model.ToValueLabel).ToArray();
+    bool useEntryStruct = Context.StoreHashCode || Data.ValueCount > 0;
+    string entryTypeName = useEntryStruct ? "e" : Common.KeyTypeName;
+#>
+<#
+    if (useEntryStruct)
+    {
+#>struct e {
+    <#= Common.KeyTypeName #> key;
+<#
+        if (Context.StoreHashCode)
+        {
+#>    <#= Common.HashSizeType #> hash_code;
+<#
+        }
+#><#
+        if (Data.ValueCount > 0)
+        {
+#>    const <#= Model.GetValueTypeName(!Common.IsPrimitive) #> value;
+<#
+        }
+#>
+    constexpr e(const <#= Common.KeyTypeName #> key<#
+        if (Context.StoreHashCode)
+        {
+#>, const <#= Common.HashSizeType #> hash_code<#
+        }
+#><#
+        if (Data.ValueCount > 0)
+        {
+#>, const <#= Model.GetValueTypeName(!Common.IsPrimitive) #> value<#
+        }
+#>)<#= Common.PostMethodModifier #>
+    : key(key)<#
+        if (Context.StoreHashCode)
+        {
+#>, hash_code(hash_code)<#
+        }
+#><#
+        if (Data.ValueCount > 0)
+        {
+#>, value(value)<#
+        }
+#> {}
+};
+<#
+    }
+#>
+
+<#= Model.GetFieldModifier(false) #>std::array<<#= entryTypeName #>, <#= Data.Entries.Length.ToStringInvariant() #>> entries = {
+<#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
+    {
+        if (!useEntryStruct)
+            return Model.ToValueLabel(x.Key);
+
+        string hashPart = Context.StoreHashCode ? $", {Model.ToValueLabel(x.Hash)}" : "";
+        string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
+        return $"e({Model.ToValueLabel(x.Key)}{hashPart}{valuePart})";
+    }) #>
+    };
+
+<#= Model.HashSource #>
+
+public:
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+        const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
+        const <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Data.Entries.Length) #>;
+        const auto& entry = entries[index];
+
+        return <#
+    if (useEntryStruct && Context.StoreHashCode)
+    {
+#><#= Model.GetEqualFunctionByType("hash", "entry.hash_code", KeyType.Int64) #> && <#
+    }
+#><#= Model.GetEqualFunction(Common.LookupKeyName, useEntryStruct ? "entry.key" : "entry") #>;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+        Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
+#>
+
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Common.ValueTypeName #>*& value)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+
+        const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
+        const <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Data.Entries.Length) #>;
+        const auto& entry = entries[index];
+
+        if (<#
+        if (Context.StoreHashCode)
+        {
+#><#= Model.GetEqualFunctionByType("hash", "entry.hash_code", KeyType.Int64) #> && <#
+        }
+#><#= Model.GetEqualFunction(Common.LookupKeyName, "entry.key") #>) {
+            value = <#= Common.IsPrimitive ? "&" : "" #>entry.value;
+            return true;
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>

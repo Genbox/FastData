@@ -1,0 +1,60 @@
+<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateData.ArrayTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName(!Common.IsPrimitive) #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
+    };
+
+<#
+    }
+#>
+<#= Model.GetFieldModifier(true) #>std::array<<#= Common.KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, Model.ToValueLabel) #>
+    };
+
+public:
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.Contains) #>
+
+        for (<#= Common.ArraySizeType #> i = 0; i < <#= Data.KeyCount.ToStringInvariant() #>; i++)
+        {
+            if (<#= Model.GetEqualFunction("keys[i]", Common.LookupKeyName) #>)
+                return true;
+        }
+        return false;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+        Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
+#>
+
+    <#= Common.MethodAttribute #>
+    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Common.ValueTypeName #>*& value)<#= Common.PostMethodModifier #> {
+<#= Model.GetMethodHeader(MethodType.TryLookup) #>
+
+        for (<#= Common.ArraySizeType #> i = 0; i < <#= Data.KeyCount.ToStringInvariant() #>; i++) {
+            if (<#= Model.GetEqualFunction("keys[i]", Common.LookupKeyName) #>) {
+                value = <#= Common.IsPrimitive ? "&" : "" #>values[i];
+                return true;
+            }
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>
