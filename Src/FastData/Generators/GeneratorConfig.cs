@@ -101,11 +101,6 @@ public sealed class GeneratorConfig<T>
         if (structureType == typeof(ConditionalStructure<,>) && itemCount <= 3)
             yield break;
 
-        //Logic:
-        // - If all lengths are the same, we check against that (1 inst)
-        // - If lengths are dense, we do a range check (2 inst)
-        // - If the lengths are sparse, we use a bitset (4 inst)
-
         LengthData lengthData = props.LengthData;
 
         MapStrategy lengthStrategy = GetLengthMapStrategy(lengthData.LengthMap);
@@ -148,22 +143,25 @@ public sealed class GeneratorConfig<T>
 
     private IEnumerable<IEarlyExit> GetEarlyExits(NumericKeyProperties<T> props, uint itemCount, Type structureType)
     {
-        //These don't support early exits
-        if (structureType == typeof(SingleValueStructure<,>) || structureType == typeof(BitSetStructure<,>) || structureType == typeof(RangeStructure<,>))
-            yield break;
-
         //There is no point to using early exists if there is just one item
         if (itemCount == 1)
+            yield break;
+
+        //These don't support early exits
+        if (structureType == typeof(SingleValueStructure<,>) || structureType == typeof(BitSetStructure<,>) || structureType == typeof(RangeStructure<,>))
             yield break;
 
         //Conditional structures are not very useful with less than 3 items as checks costs more than the benefits
         if (structureType == typeof(ConditionalStructure<,>) && itemCount <= 3)
             yield break;
 
-        if (ShouldApplyValueBitMask(props, out ulong mask))
-            yield return new ValueBitMaskEarlyExit(mask);
+        //If the min and max keys are equal, the generator can output a single length check conditional, which is better than any other method.
+        if (props.MinKeyValue.Equals(props.MaxKeyValue))
+            yield return new ValueRangeEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue); // 1 op: val.Len != len
+        else if (IsBitMaskViable(props, out ulong mask))
+            yield return new ValueBitMaskEarlyExit(mask); // 2 ops: val & mask != 0
         else
-            yield return new ValueRangeEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue);
+            yield return new ValueRangeEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue); // 3 ops: len < min || len > max
     }
 
     private MapStrategy GetLengthMapStrategy(LengthBitArray map)
@@ -176,7 +174,7 @@ public sealed class GeneratorConfig<T>
         return density >= _cfg.LengthMapMinDensity ? MapStrategy.Range : MapStrategy.Bitmap;
     }
 
-    private bool ShouldApplyValueBitMask(NumericKeyProperties<T> props, out ulong mask)
+    private bool IsBitMaskViable(NumericKeyProperties<T> props, out ulong mask)
     {
         Type keyType = typeof(T);
 
@@ -199,6 +197,7 @@ public sealed class GeneratorConfig<T>
         }
 
         mask = fullMask ^ props.BitMask; // Invert the mask
+
         if (mask == 0)
             return false;
 
