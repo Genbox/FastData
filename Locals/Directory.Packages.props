@@ -22,5 +22,6 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.14.0" />
     <PackageVersion Include="Genbox.FastData.SourceGenerator" Version="0.2.0" />
     <PackageVersion Include="xunit.v3.extensibility.core" Version="3.2.1" />
+    <PackageVersion Include="Mono.TextTemplating" Version="3.0.0" />
   </ItemGroup>
 </Project>

@@ -2,12 +2,12 @@
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.EliasFanoContext" name="Context" #>
 
 private const int _lowerBitCount = <#= Context.LowerBitCount #>;
-<#= Common.FieldModifier #>ulong[] _upperBits = new ulong[] {
+<#= Model.FieldModifier #>ulong[] _upperBits = new ulong[] {
 <#= FormatHelper.FormatColumns(Context.UpperBits, x => Model.ToValueLabel(x)) #>
     };
 <#
@@ -15,7 +15,7 @@ private const int _lowerBitCount = <#= Context.LowerBitCount #>;
     {
 #>
 
-<#= Common.FieldModifier #>ulong[] _lowerBits = new ulong[] {
+<#= Model.FieldModifier #>ulong[] _lowerBits = new ulong[] {
 <#= FormatHelper.FormatColumns(Context.LowerBits, x => Model.ToValueLabel(x)) #>
     };
 
@@ -25,12 +25,12 @@ private const ulong _lowerMask = <#= Model.ToValueLabel(Context.LowerMask) #>;
 #>
 
 private const int _sampleRateShift = <#= Context.SampleRateShift #>;
-<#= Common.FieldModifier #>int[] _samplePositions = new int[] {
+<#= Model.FieldModifier #>int[] _samplePositions = new int[] {
 <#= FormatHelper.FormatColumns(Context.SamplePositions, x => Model.ToValueLabel(x)) #>
     };
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 

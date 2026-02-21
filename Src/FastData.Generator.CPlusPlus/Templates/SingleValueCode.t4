@@ -1,10 +1,10 @@
 <#@ template language="C#" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateData.SingleValueTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.TemplateData.SingleValueTemplateData" name="Data" #>
 
 <#
     string itemLabel = Model.ToValueLabel(Data.Item);
@@ -18,8 +18,8 @@
     }
 #>
 public:
-    <#= Common.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+    <#= Model.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
         return <#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>;
@@ -29,12 +29,12 @@ public:
     {
 #>
 
-    <#= Common.MethodAttribute #>
-    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Common.ValueTypeName #>*& value)<#= Common.PostMethodModifier #> {
+    <#= Model.MethodAttribute #>
+    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
         if (<#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>) {
-            value = <#= Common.IsPrimitive ? "&" : "" #>stored_value;
+            value = <#= Model.IsPrimitive ? "&" : "" #>stored_value;
             return true;
         }
 

@@ -4,22 +4,22 @@
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System.Linq" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.HashTablePerfectContext" name="Context" #>
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateData.HashTablePerfectTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.TemplateData.HashTablePerfectTemplateData" name="Data" #>
 
 <#
     string[] valueLabels = Data.Values.Select(Model.ToValueLabel).ToArray();
     bool useEntryStruct = Context.StoreHashCode || Data.ValueCount > 0;
-    string entryTypeName = useEntryStruct ? "e" : Common.KeyTypeName;
+    string entryTypeName = useEntryStruct ? "e" : Model.KeyTypeName;
 #>
 <#
     if (useEntryStruct)
     {
 #>struct e {
-    <#= Common.KeyTypeName #> key;
+    <#= Model.KeyTypeName #> key;
 <#
         if (Context.StoreHashCode)
         {
@@ -29,11 +29,11 @@
 #><#
         if (Data.ValueCount > 0)
         {
-#>    const <#= Model.GetValueTypeName(!Common.IsPrimitive) #> value;
+#>    const <#= Model.GetValueTypeName(!Model.IsPrimitive) #> value;
 <#
         }
 #>
-    constexpr e(const <#= Common.KeyTypeName #> key<#
+    constexpr e(const <#= Model.KeyTypeName #> key<#
         if (Context.StoreHashCode)
         {
 #>, const <#= Common.HashSizeType #> hash_code<#
@@ -41,9 +41,9 @@
 #><#
         if (Data.ValueCount > 0)
         {
-#>, const <#= Model.GetValueTypeName(!Common.IsPrimitive) #> value<#
+#>, const <#= Model.GetValueTypeName(!Model.IsPrimitive) #> value<#
         }
-#>)<#= Common.PostMethodModifier #>
+#>)<#= Model.PostMethodModifier #>
     : key(key)<#
         if (Context.StoreHashCode)
         {
@@ -75,8 +75,8 @@
 <#= Model.HashSource #>
 
 public:
-    <#= Common.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+    <#= Model.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
         const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
@@ -96,8 +96,8 @@ public:
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
 
-    <#= Common.MethodAttribute #>
-    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Common.ValueTypeName #>*& value)<#= Common.PostMethodModifier #> {
+    <#= Model.MethodAttribute #>
+    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
         const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
@@ -110,7 +110,7 @@ public:
 #><#= Model.GetEqualFunctionByType("hash", "entry.hash_code", KeyType.Int64) #> && <#
         }
 #><#= Model.GetEqualFunction(Common.LookupKeyName, "entry.key") #>) {
-            value = <#= Common.IsPrimitive ? "&" : "" #>entry.value;
+            value = <#= Model.IsPrimitive ? "&" : "" #>entry.value;
             return true;
         }
 

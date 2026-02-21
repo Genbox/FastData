@@ -3,18 +3,18 @@
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 
-<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateModel" name="Model" #>
-<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.BloomFilterContext" name="Context" #>
 
-<#= Common.FieldModifier #>BLOOM: [u64; <#= Context.BitSet.Length.ToStringInvariant() #>] = [
+<#= Model.FieldModifier #>BLOOM: [u64; <#= Context.BitSet.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Context.BitSet, x => Model.ToValueLabel(x)) #>
     ];
 
 <#= Model.HashSource #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(Common.CustomKey) #>) -> bool {
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(!Model.IsPrimitive) #>) -> bool {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
     let hash = unsafe { Self::get_hash(<#= Common.LookupKeyName #>) };

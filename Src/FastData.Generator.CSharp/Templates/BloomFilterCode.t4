@@ -2,18 +2,18 @@
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.BloomFilterContext" name="Context" #>
 
-<#= Common.FieldModifier #>ulong[] _bloom = new ulong[] {
+<#= Model.FieldModifier #>ulong[] _bloom = new ulong[] {
 <#= FormatHelper.FormatColumns(Context.BitSet, x => Model.ToValueLabel(x)) #>
     };
 
 <#= Model.HashSource #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 

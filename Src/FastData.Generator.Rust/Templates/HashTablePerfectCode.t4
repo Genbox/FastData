@@ -5,36 +5,36 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 
-<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
-<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.HashTablePerfectContext" name="Context" #>
-<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateData.HashTablePerfectTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.TemplateData.HashTablePerfectTemplateData" name="Data" #>
 
 <#
     string[] valueLabels = Data.Values.Select(Model.ToValueLabel).ToArray();
     bool useEntryStruct = Context.StoreHashCode || Data.ValueCount > 0;
-    string entryTypeName = useEntryStruct ? "e" : Common.KeyTypeName;
+    string entryTypeName = useEntryStruct ? "e" : Model.KeyTypeName;
 
     if (useEntryStruct)
     {
         StringBuilder structBuilder = new StringBuilder();
         structBuilder.AppendLine("pub struct e {");
-        structBuilder.AppendLine($"    pub key: {Model.GetKeyTypeName(Common.CustomKey)},");
+        structBuilder.AppendLine($"    pub key: {Model.GetKeyTypeName(!Model.IsPrimitive)},");
         if (Context.StoreHashCode)
             structBuilder.AppendLine($"    pub hash_code: {Common.HashSizeType},");
         if (Data.ValueCount > 0)
-            structBuilder.AppendLine($"    pub value: {Model.GetValueTypeName(!Common.IsPrimitive)},");
+            structBuilder.AppendLine($"    pub value: {Model.GetValueTypeName(!Model.IsPrimitive)},");
         structBuilder.AppendLine("}");
         Shared.Add(CodePlacement.Before, structBuilder.ToString());
 
         StringBuilder implBuilder = new StringBuilder();
         implBuilder.AppendLine("impl e {");
-        implBuilder.Append($"    pub const fn new (key: {Common.KeyTypeName}");
+        implBuilder.Append($"    pub const fn new (key: {Model.KeyTypeName}");
         if (Context.StoreHashCode)
             implBuilder.Append($", hash_code: {Common.HashSizeType}");
         if (Data.ValueCount > 0)
-            implBuilder.Append($", value: {Model.GetValueTypeName(!Common.IsPrimitive)}");
+            implBuilder.Append($", value: {Model.GetValueTypeName(!Model.IsPrimitive)}");
         implBuilder.AppendLine(") -> Self { Self { key");
         if (Context.StoreHashCode)
             implBuilder.Append(", hash_code");
@@ -46,7 +46,7 @@
     }
 #>
 
-<#= Common.FieldModifier #>ENTRIES: [<#= entryTypeName #>; <#= Data.Entries.Length.ToStringInvariant() #>] = [
+<#= Model.FieldModifier #>ENTRIES: [<#= entryTypeName #>; <#= Data.Entries.Length.ToStringInvariant() #>] = [
     <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
         if (!useEntryStruct)
@@ -60,8 +60,8 @@
 
 <#= Model.HashSource #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Common.KeyTypeName #>) -> bool {
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.KeyTypeName #>) -> bool {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
     let hash = unsafe { Self::get_hash(<#= Common.LookupKeyName #>) };
@@ -80,8 +80,8 @@
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Common.KeyTypeName #>) -> Option<<#= Model.GetValueTypeName(!Common.IsPrimitive) #>> {
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.KeyTypeName #>) -> Option<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
     let hash = unsafe { Self::get_hash(<#= Common.LookupKeyName #>) };

@@ -4,11 +4,11 @@
 <#@ import namespace="System.Globalization" #>
 <#@ import namespace="System.Linq" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generator.CSharp.CSharpCodeGeneratorConfig" name="Cfg" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateData.ArrayTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateData.ArrayTemplateData" name="Data" #>
 
 <#
     object[] keys = Data.Keys.ToArray();
@@ -17,7 +17,7 @@
     if (Data.ValueCount > 0)
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
-#><#= Common.FieldModifier #><#= Common.ValueTypeName #>[] _values = {
+#><#= Model.FieldModifier #><#= Model.ValueTypeName #>[] _values = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
     };
 
@@ -27,8 +27,8 @@
 <#
     if (Cfg.ConditionalBranchType == BranchType.If)
     {
-#><#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+#><#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
@@ -54,8 +54,8 @@
         {
 #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool TryLookup(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Common.ValueTypeName #>? value)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool TryLookup(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Model.ValueTypeName #>? value)
 {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 <#
@@ -80,8 +80,8 @@
     }
     else
     {
-#><#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+#><#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
@@ -98,8 +98,8 @@
         {
 #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool TryLookup(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Common.ValueTypeName #>? value)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool TryLookup(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Model.ValueTypeName #>? value)
 {
     value = default;
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>

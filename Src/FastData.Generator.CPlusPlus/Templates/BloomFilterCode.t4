@@ -3,8 +3,8 @@
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.BloomFilterContext" name="Context" #>
 
 <#= Model.GetFieldModifier(true) #>std::array<uint64_t, <#= Context.BitSet.Length.ToStringInvariant() #>> bloom = {
@@ -14,8 +14,8 @@
 <#= Model.HashSource #>
 
 public:
-    <#= Common.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+    <#= Model.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
         const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);

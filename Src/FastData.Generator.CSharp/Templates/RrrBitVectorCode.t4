@@ -2,8 +2,8 @@
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.RrrBitVectorContext" name="Context" #>
 
 <#
@@ -20,20 +20,20 @@
         KeyType.Int64 => $"(ulong)({Common.LookupKeyName} ^ long.MinValue)",
         _ => throw new InvalidOperationException("RRR bitvector only supports integral key types.")
         };
-    string helperModifier = Common.FieldModifier.Contains(" static ", StringComparison.Ordinal) ? "private static " : "private ";
+    string helperModifier = Model.FieldModifier.Contains(" static ", StringComparison.Ordinal) ? "private static " : "private ";
 #>
 private const ulong _rrrMinValue = <#= Model.ToValueLabel(Context.MinValue) #>;
 private const ulong _rrrMaxValue = <#= Model.ToValueLabel(Context.MaxValue) #>;
 private const int _rrrBlockSize = <#= Context.BlockSize #>;
-<#= Common.FieldModifier #>byte[] _rrrClasses = new byte[] {
+<#= Model.FieldModifier #>byte[] _rrrClasses = new byte[] {
 <#= FormatHelper.FormatColumns(Context.Classes, x => Model.ToValueLabel(x)) #>
     };
-<#= Common.FieldModifier #>uint[] _rrrOffsets = new uint[] {
+<#= Model.FieldModifier #>uint[] _rrrOffsets = new uint[] {
 <#= FormatHelper.FormatColumns(Context.Offsets, x => Model.ToValueLabel(x)) #>
     };
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 

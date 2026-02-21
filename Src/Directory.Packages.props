@@ -13,6 +13,5 @@
     <PackageVersion Include="JetBrains.Annotations" Version="2025.2.4" />
     <!--benchmark packages-->
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
-    <PackageVersion Include="Mono.TextTemplating" Version="3.0.0" />
   </ItemGroup>
 </Project>

@@ -1,20 +1,19 @@
-using System.Collections;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.CSharp.Internal;
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
+using Genbox.FastData.Generator.CSharp.TemplateData;
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Interfaces;
-using Genbox.FastData.Generator.Helpers;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Helpers;
-using Microsoft.VisualStudio.TextTemplating;
-using Mono.TextTemplating;
-using Genbox.FastData.Generator.CSharp.Internal.Generators;
-using Genbox.FastData.Generator.CSharp.Internal.TemplateData;
+using Genbox.FastData.Generator.Template;
+using Genbox.FastData.Generator.Template.Abstracts;
+using Genbox.FastData.Generator.Template.Extensions;
+using Genbox.FastData.Generator.Template.Helpers;
 
 namespace Genbox.FastData.Generator.CSharp;
 
@@ -34,26 +33,6 @@ public sealed class CSharpCodeGenerator : CodeGenerator
     }
 
     public override GeneratorEncoding Encoding => GeneratorEncoding.UTF16;
-
-    // protected override OutputWriter<TKey> GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context) => new TemplateBasedOutputWriter<TKey, TValue>(genCfg, context, _cfg);
-
-    protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context) => context switch
-    {
-        SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, _cfg, Shared),
-        RangeContext<TKey> x => new RangeCode<TKey>(x, _cfg),
-        BitSetContext<TValue> x => new BitSetCode<TKey, TValue>(x, _cfg, Shared),
-        BloomFilterContext x => new BloomFilterCode<TKey>(x, _cfg),
-        ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, _cfg, Shared),
-        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, _cfg, Shared),
-        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, _cfg, Shared),
-        HashTableContext<TKey, TValue> x => new HashTableCode<TKey, TValue>(x, _cfg, Shared),
-        HashTableCompactContext<TKey, TValue> x => new HashTableCompactCode<TKey, TValue>(x, _cfg, Shared),
-        HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, _cfg, Shared),
-        EliasFanoContext<TKey> x => new EliasFanoCode<TKey>(x, _cfg),
-        RrrBitVectorContext x => new RrrBitVectorCode<TKey>(x, _cfg),
-        KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, _cfg, Shared),
-        _ => null
-    };
 
     protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext context)
     {
@@ -102,91 +81,45 @@ public sealed class CSharpCodeGenerator : CodeGenerator
         sb.Append('}');
     }
 
-    private sealed class TemplateBasedOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context, CSharpCodeGeneratorConfig cfg) : OutputWriter<TKey>
+    protected override OutputWriter<TKey> GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context) => new TemplateBasedOutputWriter<TKey, TValue>(context, _cfg);
+
+    private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context, CSharpCodeGeneratorConfig cfg) : OutputWriter<TKey>
     {
-        private string FieldModifier => cfg.ClassType == ClassType.Static ? "private static readonly " : "private readonly ";
-        private string MethodModifier => cfg.ClassType == ClassType.Static ? "public static " : "public ";
-
-        private string MethodAttribute
-        {
-            get
-            {
-                if (cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableInlining))
-                    return "[MethodImpl(MethodImplOptions.NoInlining)]";
-
-                if (cfg.GeneratorOptions.HasFlag(CSharpOptions.AggressiveInlining))
-                    return "[MethodImpl(MethodImplOptions.AggressiveInlining)]";
-
-                return string.Empty;
-            }
-        }
-
         public override string Generate()
         {
-            ITemplateData? dataModel = CreateContextModel();
-
-            CommonDataModel common = new CommonDataModel
-            {
-                FieldModifier = FieldModifier,
-                MethodModifier = MethodModifier,
-                MethodAttribute = MethodAttribute,
-                KeyTypeName = KeyTypeName,
-                ValueTypeName = ValueTypeName,
-                InputKeyName = InputKeyName,
-                LookupKeyName = LookupKeyName,
-                ArraySizeType = ArraySizeType,
-                HashSizeType = HashSizeType
-            };
-
-            TemplateModel model = new TemplateModel
-            {
-                KeyType = KeyType,
-                HashSource = HashSource,
-                GetMethodHeader = GetMethodHeader,
-                GetEqualFunction = (a, b) => GetEqualFunction(a, b),
-                GetEqualFunctionByType = GetEqualFunction,
-                GetCompareFunction = GetCompareFunction,
-                GetModFunction = GetModFunction,
-                GetSmallestSignedType = GetSmallestSignedType,
-                GetSmallestUnsignedType = GetSmallestUnsignedType,
-                ToValueLabel = ToValueLabel,
-                ValueObjectDeclarations = GetObjectDeclarations<TValue>()
-            };
-
             string raw = context.GetType().Name;
             int idx = raw.IndexOf("Context", StringComparison.Ordinal);
             string name = raw.Substring(0, idx) + "Code.t4";
-            string text = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Templates", name));
+            string source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Templates", "CSharp", name));
 
-            TemplateGenerator generator = new TemplateGenerator();
-            AddTemplateReference(generator, typeof(TemplateModel));
-            AddTemplateReference(generator, typeof(CommonDataModel));
-            AddTemplateReference(generator, typeof(SharedCode));
-            AddTemplateReference(generator, typeof(MethodType));
-            AddTemplateReference(generator, typeof(KeyType));
-            AddTemplateReference(generator, typeof(FormatHelper));
-            AddTemplateReference(generator, typeof(CSharpCodeGeneratorConfig));
-
-            ITextTemplatingSession session = generator.GetOrCreateSession();
-            session["Model"] = model;
-            session["Context"] = context;
-            session["Cfg"] = cfg;
-            session["Common"] = common;
-            session["Shared"] = Shared;
-            if (dataModel != null)
-                session["Data"] = dataModel;
-
-            ParsedTemplate parsed = generator.ParseTemplate(name, text);
-            TemplateSettings settings = TemplatingEngine.GetSettings(generator, parsed);
-            ValueTuple<string, string> result = generator.ProcessTemplateAsync(parsed, name, text, name, settings).GetAwaiter().GetResult();
-
-            if (generator.Errors.HasErrors)
+            return TemplateHelper.Render(this, name, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
             {
-                string errors = string.Join("\n", generator.Errors.Cast<object>().Select(x => x.ToString()));
-                throw new InvalidOperationException("Failed to process template '" + name + "':\n" + errors);
-            }
-
-            return result.Item2;
+                {
+                    "Model", new TemplateModel
+                    {
+                        KeyType = KeyType,
+                        HashSource = HashSource,
+                        FieldModifier = cfg.ClassType == ClassType.Static ? "private static readonly " : "private readonly ",
+                        MethodModifier = cfg.ClassType == ClassType.Static ? "public static " : "public ",
+                        MethodAttribute = GetMethodAttribute(),
+                        KeyTypeName = KeyTypeName,
+                        ValueTypeName = ValueTypeName,
+                        GetMethodHeader = GetMethodHeader,
+                        GetEqualFunction = (a, b) => GetEqualFunction(a, b),
+                        GetEqualFunctionByType = GetEqualFunction,
+                        GetCompareFunction = GetCompareFunction,
+                        GetModFunction = GetModFunction,
+                        GetSmallestSignedType = GetSmallestSignedType,
+                        GetSmallestUnsignedType = GetSmallestUnsignedType,
+                        ToValueLabel = ToValueLabel,
+                        ValueObjectDeclarations = GetObjectDeclarations<TValue>()
+                    }
+                },
+                { "Context", context },
+                { "Cfg", cfg },
+                { "Shared", Shared },
+                { "Data", CreateContextModel() }
+            });
         }
 
         private ITemplateData? CreateContextModel()
@@ -196,27 +129,27 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                 case ArrayContext<TKey, TValue> arrayCtx:
                     return new ArrayTemplateData
                     {
-                        Keys = ToObjects(arrayCtx.Keys),
+                        Keys = arrayCtx.Keys.ToObjects(),
                         KeyCount = arrayCtx.Keys.Length,
-                        Values = ToObjects(arrayCtx.Values),
+                        Values = arrayCtx.Values.ToObjects(),
                         ValueCount = arrayCtx.Values.Length
                     };
 
                 case BinarySearchContext<TKey, TValue> bsCtx:
                     return new BinarySearchTemplateData
                     {
-                        Keys = ToObjects(bsCtx.Keys),
+                        Keys = bsCtx.Keys.ToObjects(),
                         KeyCount = bsCtx.Keys.Length,
-                        Values = ToObjects(bsCtx.Values),
+                        Values = bsCtx.Values.ToObjects(),
                         ValueCount = bsCtx.Values.Length
                     };
 
                 case ConditionalContext<TKey, TValue> conCtx:
                     return new ArrayTemplateData
                     {
-                        Keys = ToObjects(conCtx.Keys),
+                        Keys = conCtx.Keys.ToObjects(),
                         KeyCount = conCtx.Keys.Length,
-                        Values = ToObjects(conCtx.Values),
+                        Values = conCtx.Values.ToObjects(),
                         ValueCount = conCtx.Values.Length
                     };
 
@@ -239,7 +172,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                     {
                         Keys = klCtx.Lengths,
                         KeyCount = klCtx.Lengths.Length,
-                        Values = ToObjects(klCtx.Values),
+                        Values = klCtx.Values.ToObjects(),
                         ValueCount = klCtx.Values.Length
                     };
 
@@ -249,7 +182,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                 case BitSetContext<TValue> bsCtx:
                     return new BitSetTemplateData
                     {
-                        Values = ToObjects(bsCtx.Values),
+                        Values = bsCtx.Values.ToObjects(),
                         ValueCount = bsCtx.Values.Length
                     };
 
@@ -269,7 +202,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                     return new HashTableTemplateData
                     {
                         Entries = hashEntries,
-                        Values = ToObjects(hashCtx.Values),
+                        Values = hashCtx.Values.ToObjects(),
                         ValueCount = hashCtx.Values.Length
                     };
 
@@ -288,7 +221,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                     return new HashTableCompactTemplateData
                     {
                         Entries = compactEntries,
-                        Values = ToObjects(compactCtx.Values),
+                        Values = compactCtx.Values.ToObjects(),
                         ValueCount = compactCtx.Values.Length
                     };
 
@@ -307,7 +240,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                     return new HashTablePerfectTemplateData
                     {
                         Entries = perfectEntries,
-                        Values = ToObjects(perfectCtx.Values),
+                        Values = perfectCtx.Values.ToObjects(),
                         ValueCount = perfectCtx.Values.Length
                     };
 
@@ -323,34 +256,15 @@ public sealed class CSharpCodeGenerator : CodeGenerator
             }
         }
 
-        private static IEnumerable<object> ToObjects(ReadOnlyMemory<TKey> keys) => new MemoryObjectEnumerable<TKey>(keys);
-
-        private static IEnumerable<object> ToObjects(ReadOnlyMemory<TValue> values) => new MemoryObjectEnumerable<TValue>(values);
-
-        private sealed class MemoryObjectEnumerable<T>(ReadOnlyMemory<T> memory) : IEnumerable<object>
+        private string GetMethodAttribute()
         {
-            public IEnumerator<object> GetEnumerator() => new Enumerator(memory);
+            if (cfg.GeneratorOptions.HasFlag(CSharpOptions.DisableInlining))
+                return "[MethodImpl(MethodImplOptions.NoInlining)]";
 
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+            if (cfg.GeneratorOptions.HasFlag(CSharpOptions.AggressiveInlining))
+                return "[MethodImpl(MethodImplOptions.AggressiveInlining)]";
 
-            private sealed class Enumerator(ReadOnlyMemory<T> memory) : IEnumerator<object>
-            {
-                private int _index = -1;
-
-                public object Current => memory.Span[_index];
-
-                object IEnumerator.Current => Current;
-
-                public bool MoveNext()
-                {
-                    _index++;
-                    return _index < memory.Length;
-                }
-
-                public void Dispose() {}
-
-                public void Reset() => throw new NotSupportedException("not supported");
-            }
+            return string.Empty;
         }
 
         private string GetCompareFunction(string var1, string var2)
@@ -392,14 +306,6 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                 return $"({ArraySizeType})({variable} & {value - 1})";
 
             return $"({ArraySizeType})({variable} % {value})";
-        }
-
-        private static void AddTemplateReference(TemplateGenerator generator, Type type)
-        {
-            string location = type.Assembly.Location;
-
-            if (!string.IsNullOrEmpty(location) && !generator.Refs.Exists(x => string.Equals(x, location, StringComparison.OrdinalIgnoreCase)))
-                generator.Refs.Add(location);
         }
     }
 }

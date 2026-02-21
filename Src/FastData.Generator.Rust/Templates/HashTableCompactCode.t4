@@ -2,15 +2,14 @@
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
-<#@ import namespace="Genbox.FastData.Generator.Rust.Internal.TemplateData" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 
-<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
-<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.HashTableCompactContext" name="Context" #>
-<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateData.HashTableCompactTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.TemplateData.HashTableCompactTemplateData" name="Data" #>
 
 <#
     string[] valueLabels = Data.Values.Select(Model.ToValueLabel).ToArray();
@@ -18,34 +17,33 @@
     structBuilder.AppendLine("struct E {");
     if (Context.StoreHashCode)
         structBuilder.AppendLine($"    hash_code: {Common.HashSizeType},");
-    structBuilder.AppendLine($"    key: {Model.GetKeyTypeName(Common.CustomKey)},");
+    structBuilder.AppendLine($"    key: {Model.GetKeyTypeName(!Model.IsPrimitive)},");
     if (Data.ValueCount > 0)
-        structBuilder.AppendLine($"    value: {Model.GetValueTypeName(!Common.IsPrimitive)},");
+        structBuilder.AppendLine($"    value: {Model.GetValueTypeName(!Model.IsPrimitive)},");
     structBuilder.AppendLine("}");
     Shared.Add(CodePlacement.After, structBuilder.ToString());
 #>
-<#= Common.FieldModifier #>BUCKET_STARTS: [<#= Model.GetSmallestUnsignedType(Data.Entries.Length) #>; <#= Context.BucketStarts.Length.ToStringInvariant() #>] = [
+<#= Model.FieldModifier #>BUCKET_STARTS: [<#= Model.GetSmallestUnsignedType(Data.Entries.Length) #>; <#= Context.BucketStarts.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Context.BucketStarts, (_, x) => x.ToStringInvariant()) #>
     ];
 
-<#= Common.FieldModifier #>BUCKET_COUNTS: [<#= Model.GetSmallestUnsignedType(Data.Entries.Length) #>; <#= Context.BucketCounts.Length.ToStringInvariant() #>] = [
+<#= Model.FieldModifier #>BUCKET_COUNTS: [<#= Model.GetSmallestUnsignedType(Data.Entries.Length) #>; <#= Context.BucketCounts.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Context.BucketCounts, (_, x) => x.ToStringInvariant()) #>
     ];
 
-<#= Common.FieldModifier #>ENTRIES: [E; <#= Data.Entries.Length.ToStringInvariant() #>] = [
+<#= Model.FieldModifier #>ENTRIES: [E; <#= Data.Entries.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        HashTableCompactEntryTemplateData entry = (HashTableCompactEntryTemplateData)x;
-        string hashPart = Context.StoreHashCode ? $"hash_code: {entry.Hash}, " : "";
+        string hashPart = Context.StoreHashCode ? $"hash_code: {x.Hash}, " : "";
         string valuePart = Data.ValueCount > 0 ? $", value: {valueLabels[i]}" : "";
-        return $"E {{ {hashPart}key: {Model.ToValueLabel(entry.Key)}{valuePart} }}";
+        return $"E {{ {hashPart}key: {Model.ToValueLabel(x.Key)}{valuePart} }}";
     }) #>
     ];
 
 <#= Model.HashSource #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(Common.CustomKey) #>) -> bool {
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(!Model.IsPrimitive) #>) -> bool {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
     let hash = unsafe { Self::get_hash(<#= Common.LookupKeyName #>) };
@@ -74,8 +72,8 @@
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(Common.CustomKey) #>) -> Option<<#= Model.GetValueTypeName(!Common.IsPrimitive) #>> {
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(!Model.IsPrimitive) #>) -> Option<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
     let hash = unsafe { Self::get_hash(<#= Common.LookupKeyName #>) };

@@ -23,14 +23,14 @@ public abstract class OutputWriter<TKey> : IOutputWriter
     protected string KeyTypeName { get; private set; } = null!;
     protected string ValueTypeName { get; private set; } = null!;
     protected string HashSource { get; private set; } = null!;
-    protected string HashSizeType => _typeMap.GetTypeName(typeof(ulong));
-    protected string ArraySizeType => _langDef.ArraySizeType;
+    public string HashSizeType => _typeMap.GetTypeName(typeof(ulong));
+    public string ArraySizeType => _langDef.ArraySizeType;
     protected string TrimPrefix => _generatorConfig.TrimPrefix;
     protected string TrimSuffix => _generatorConfig.TrimSuffix;
     protected int TotalTrimLength => TrimPrefix.Length + TrimSuffix.Length;
-    protected static string InputKeyName => "key";
+    public string InputKeyName => "key";
     protected static string TrimmedKeyName => "trimmedKey";
-    protected string LookupKeyName => TotalTrimLength == 0 ? InputKeyName : TrimmedKeyName;
+    public string LookupKeyName => TotalTrimLength == 0 ? InputKeyName : TrimmedKeyName;
 
     public abstract string Generate();
 

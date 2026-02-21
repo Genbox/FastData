@@ -3,11 +3,11 @@
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.KeyLengthContext" name="Context" #>
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateData.KeyLengthTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.TemplateData.KeyLengthTemplateData" name="Data" #>
 
 <#
     if (Data.ValueCount > 0)
@@ -18,20 +18,20 @@
 <#= FormatHelper.FormatColumns(Context.ValueOffsets, static x => x.ToStringInvariant()) #>
     };
 
-<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName(!Common.IsPrimitive) #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
     };
 
 <#
     }
 #>
-<#= Model.GetFieldModifier(true) #>std::array<<#= Common.KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
+<#= Model.GetFieldModifier(true) #>std::array<<#= Model.KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
 <#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, Model.ToValueLabel) #>
     };
 
 public:
-    <#= Common.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+    <#= Model.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
         return <#= Model.GetEqualFunction(Common.LookupKeyName, $"keys[{Common.LookupKeyName}.length() - {Context.MinLength.ToStringInvariant()}]") #>;
@@ -41,13 +41,13 @@ public:
     {
 #>
 
-    <#= Common.MethodAttribute #>
-    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Common.ValueTypeName #>*& value)<#= Common.PostMethodModifier #> {
+    <#= Model.MethodAttribute #>
+    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
         size_t idx = <#= Common.LookupKeyName #>.length() - <#= Context.MinLength.ToStringInvariant() #>;
         if (<#= Model.GetEqualFunction(Common.LookupKeyName, "keys[idx]") #>) {
-            value = <#= Common.IsPrimitive ? "&" : "" #>values[offsets[idx]];
+            value = <#= Model.IsPrimitive ? "&" : "" #>values[offsets[idx]];
             return true;
         }
 

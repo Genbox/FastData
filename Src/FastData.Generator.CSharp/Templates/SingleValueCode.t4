@@ -1,10 +1,10 @@
 <#@ template language="C#" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateData.SingleValueTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateData.SingleValueTemplateData" name="Data" #>
 
 <#
     string itemLabel = Model.ToValueLabel(Data.Item);
@@ -13,12 +13,12 @@
     if (Data.Value != null)
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
-#>    private static readonly <#= Common.ValueTypeName #> _storedValue = <#= Model.ToValueLabel(Data.Value) #>;
+#>    private static readonly <#= Model.ValueTypeName #> _storedValue = <#= Model.ToValueLabel(Data.Value) #>;
 <#
     }
 #>
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
@@ -29,8 +29,8 @@
     {
 #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool TryLookup(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Common.ValueTypeName #> value)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool TryLookup(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Model.ValueTypeName #> value)
 {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 

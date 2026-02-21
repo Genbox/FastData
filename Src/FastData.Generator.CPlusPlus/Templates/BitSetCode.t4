@@ -3,11 +3,11 @@
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.BitSetContext" name="Context" #>
-<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.Internal.TemplateData.BitSetTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.TemplateData.BitSetTemplateData" name="Data" #>
 
 <#= Model.GetFieldModifier(true) #>std::array<uint64_t, <#= Context.BitSet.Length.ToStringInvariant() #>> bitset = {
 <#= FormatHelper.FormatColumns(Context.BitSet, x => Model.ToValueLabel(x)) #>
@@ -17,7 +17,7 @@
     if (Data.ValueCount > 0)
     {
 #>
-<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName(!Common.IsPrimitive) #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
     };
 
@@ -25,8 +25,8 @@
     }
 #>
 public:
-    <#= Common.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>)<#= Common.PostMethodModifier #> {
+    <#= Model.MethodAttribute #>
+    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
         const uint64_t offset = static_cast<uint64_t>(<#= Common.LookupKeyName #> - min_key);
@@ -39,8 +39,8 @@ public:
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
 
-    <#= Common.MethodAttribute #>
-    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Common.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Common.ValueTypeName #>*& value)<#= Common.PostMethodModifier #> {
+    <#= Model.MethodAttribute #>
+    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
         const uint64_t offset = static_cast<uint64_t>(<#= Common.LookupKeyName #> - min_key);
@@ -51,7 +51,7 @@ public:
             return false;
         }
 
-        value = <#= Common.IsPrimitive ? "&" : "" #>values[static_cast<size_t>(offset)];
+        value = <#= Model.IsPrimitive ? "&" : "" #>values[static_cast<size_t>(offset)];
         return true;
     }
 <#

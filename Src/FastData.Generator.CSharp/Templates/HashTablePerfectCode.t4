@@ -3,16 +3,16 @@
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System.Linq" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.HashTablePerfectContext" name="Context" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateData.HashTablePerfectTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateData.HashTablePerfectTemplateData" name="Data" #>
 
 <#
     string[] valueLabels = Data.Values.Select(Model.ToValueLabel).ToArray();
     bool useEntryStruct = Context.StoreHashCode || Data.ValueCount > 0;
-    string entryTypeName = useEntryStruct ? "E" : Common.KeyTypeName;
+    string entryTypeName = useEntryStruct ? "E" : Model.KeyTypeName;
 #>
 <#
     if (useEntryStruct)
@@ -20,7 +20,7 @@
 #>[StructLayout(LayoutKind.Auto)]
 private struct E
 {
-    internal <#= Common.KeyTypeName #> Key;
+    internal <#= Model.KeyTypeName #> Key;
 <#
         if (Context.StoreHashCode)
         {
@@ -30,11 +30,11 @@ private struct E
 #><#
         if (Data.ValueCount > 0)
         {
-#>    internal <#= Common.ValueTypeName #> Value;
+#>    internal <#= Model.ValueTypeName #> Value;
 
 <#
         }
-#>    internal E(<#= Common.KeyTypeName #> key<#
+#>    internal E(<#= Model.KeyTypeName #> key<#
         if (Context.StoreHashCode)
         {
 #>, <#= Common.HashSizeType #> hashCode<#
@@ -42,7 +42,7 @@ private struct E
 #><#
         if (Data.ValueCount > 0)
         {
-#>, <#= Common.ValueTypeName #> value<#
+#>, <#= Model.ValueTypeName #> value<#
         }
 #>)
     {
@@ -65,7 +65,7 @@ private struct E
     }
 #>
 
-<#= Common.FieldModifier #><#= entryTypeName #>[] _entries = {
+<#= Model.FieldModifier #><#= entryTypeName #>[] _entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
         if (!useEntryStruct)
@@ -79,8 +79,8 @@ private struct E
 
 <#= Model.HashSource #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
@@ -101,8 +101,8 @@ private struct E
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool TryLookup(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Common.ValueTypeName #> value)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool TryLookup(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Model.ValueTypeName #> value)
 {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 

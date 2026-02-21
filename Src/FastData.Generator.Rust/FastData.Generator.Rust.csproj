@@ -3,17 +3,17 @@
   <Import Project="../../Imports/Library.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0; net10.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FastData.Generator\FastData.Generator.csproj" />
-    <PackageReference Include="Mono.TextTemplating" />
+    <ProjectReference Include="..\FastData.Generator.Template\FastData.Generator.Template.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Templates\**\*.t4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Templates\Rust\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
     </None>
   </ItemGroup>
 
@@ -82,9 +82,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SingleValueCode.t4</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\Misc\Compat\CallContext.cs">
-      <Link>Internal\Compat\CallContext.cs</Link>
     </Compile>
     <Compile Include="..\..\Misc\Compat\CompilerFeatureRequiredAttribute.cs">
       <Link>Internal\Compat\CompilerFeatureRequiredAttribute.cs</Link>

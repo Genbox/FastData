@@ -3,11 +3,11 @@
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 
-<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
-<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.BitSetContext" name="Context" #>
-<#@ parameter type="Genbox.FastData.Generator.Rust.Internal.TemplateData.BitSetTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.TemplateData.BitSetTemplateData" name="Data" #>
 
 <#
     string offsetExpression = Model.KeyType switch
@@ -18,7 +18,7 @@
         _ => $"({Common.LookupKeyName} - Self::MIN_KEY) as usize"
     };
 #>
-<#= Common.FieldModifier #>BITSET: [u64; <#= Context.BitSet.Length.ToStringInvariant() #>] = [
+<#= Model.FieldModifier #>BITSET: [u64; <#= Context.BitSet.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Context.BitSet, x => Model.ToValueLabel(x)) #>
     ];
 
@@ -27,15 +27,15 @@
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
-<#= Common.FieldModifier #>VALUES: [<#= Model.GetValueTypeName(!Common.IsPrimitive) #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
+<#= Model.FieldModifier #>VALUES: [<#= Model.GetValueTypeName(!Model.IsPrimitive) #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
     ];
 
 <#
     }
 #>
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(Common.CustomKey) #>) -> bool {
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(!Model.IsPrimitive) #>) -> bool {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
     let offset = <#= offsetExpression #>;
@@ -48,8 +48,8 @@
     {
 #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(Common.CustomKey) #>) -> Option<<#= Model.GetValueTypeName(!Common.IsPrimitive) #>> {
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(!Model.IsPrimitive) #>) -> Option<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
     let offset = <#= offsetExpression #>;

@@ -1,18 +1,15 @@
-using System.Collections;
-using System.Linq;
 using Genbox.FastData.Generator.CPlusPlus.Internal;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
-using Genbox.FastData.Generator.CPlusPlus.Internal.Generators;
-using Genbox.FastData.Generator.CPlusPlus.Internal.TemplateData;
+using Genbox.FastData.Generator.CPlusPlus.TemplateData;
 using Genbox.FastData.Generator.Enums;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Interfaces;
-using Genbox.FastData.Generator.Helpers;
+using Genbox.FastData.Generator.Template.Extensions;
+using Genbox.FastData.Generator.Template.Helpers;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
-using Microsoft.VisualStudio.TextTemplating;
-using Mono.TextTemplating;
 
 namespace Genbox.FastData.Generator.CPlusPlus;
 
@@ -72,94 +69,47 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         sb.Append("};");
     }
 
-    protected override OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context) => context switch
-    {
-        SingleValueContext<TKey, TValue> x => new SingleValueCode<TKey, TValue>(x, Shared),
-        RangeContext<TKey> x => new RangeCode<TKey, TValue>(x),
-        BitSetContext<TValue> x => new BitSetCode<TKey, TValue>(x, Shared),
-        BloomFilterContext x => new BloomFilterCode<TKey>(x),
-        ArrayContext<TKey, TValue> x => new ArrayCode<TKey, TValue>(x, Shared),
-        BinarySearchContext<TKey, TValue> x => new BinarySearchCode<TKey, TValue>(x, Shared),
-        ConditionalContext<TKey, TValue> x => new ConditionalCode<TKey, TValue>(x, Shared),
-        HashTableContext<TKey, TValue> x => new HashTableCode<TKey, TValue>(x, Shared),
-        HashTableCompactContext<TKey, TValue> x => new HashTableCompactCode<TKey, TValue>(x, Shared),
-        HashTablePerfectContext<TKey, TValue> x => new HashTablePerfectCode<TKey, TValue>(x, Shared),
-        KeyLengthContext<TValue> x => new KeyLengthCode<TKey, TValue>(x, Shared),
-        EliasFanoContext<TKey> x => new EliasFanoCode<TKey>(x),
-        RrrBitVectorContext x => new RrrBitVectorCode<TKey>(x),
-        _ => null
-    };
+    protected override OutputWriter<TKey> GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context) => new TemplateBasedOutputWriter<TKey, TValue>(context);
 
-    private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context) : CPlusPlusOutputWriter<TKey>
+    private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context) : OutputWriter<TKey>
     {
         public override string Generate()
         {
-            ITemplateData? dataModel = CreateContextModel();
-
-            CommonDataModel common = new CommonDataModel
-            {
-                MethodAttribute = MethodAttribute,
-                PostMethodModifier = PostMethodModifier,
-                KeyTypeName = KeyTypeName,
-                ValueTypeName = ValueTypeName,
-                InputKeyName = InputKeyName,
-                LookupKeyName = LookupKeyName,
-                ArraySizeType = ArraySizeType,
-                HashSizeType = HashSizeType,
-                IsPrimitive = typeof(TValue).IsPrimitive
-            };
-
-            TemplateModel model = new TemplateModel
-            {
-                KeyType = KeyType,
-                HashSource = HashSource,
-                GetMethodHeader = GetMethodHeader,
-                GetEqualFunction = (a, b) => GetEqualFunction(a, b),
-                GetEqualFunctionByType = GetEqualFunction,
-                GetCompareFunction = GetCompareFunction,
-                GetModFunction = GetModFunction,
-                GetSmallestSignedType = GetSmallestSignedType,
-                GetSmallestUnsignedType = GetSmallestUnsignedType,
-                ToValueLabel = ToValueLabel,
-                ValueObjectDeclarations = GetObjectDeclarations<TValue>(),
-                GetMethodModifier = GetMethodModifier,
-                GetFieldModifier = GetFieldModifier,
-                GetValueTypeName = GetValueTypeName
-            };
-
             string raw = context.GetType().Name;
             int idx = raw.IndexOf("Context", StringComparison.Ordinal);
             string name = raw.Substring(0, idx) + "Code.t4";
-            string text = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Templates", name));
+            string source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Templates", "CPlusPlus", name));
 
-            TemplateGenerator generator = new TemplateGenerator();
-            AddTemplateReference(generator, typeof(TemplateModel));
-            AddTemplateReference(generator, typeof(CommonDataModel));
-            AddTemplateReference(generator, typeof(SharedCode));
-            AddTemplateReference(generator, typeof(MethodType));
-            AddTemplateReference(generator, typeof(KeyType));
-            AddTemplateReference(generator, typeof(FormatHelper));
-            AddTemplateReference(generator, typeof(CPlusPlusCodeGeneratorConfig));
-
-            ITextTemplatingSession session = generator.GetOrCreateSession();
-            session["Model"] = model;
-            session["Context"] = context;
-            session["Common"] = common;
-            session["Shared"] = Shared;
-            if (dataModel != null)
-                session["Data"] = dataModel;
-
-            ParsedTemplate parsed = generator.ParseTemplate(name, text);
-            TemplateSettings settings = TemplatingEngine.GetSettings(generator, parsed);
-            ValueTuple<string, string> result = generator.ProcessTemplateAsync(parsed, name, text, name, settings).GetAwaiter().GetResult();
-
-            if (generator.Errors.HasErrors)
+            return TemplateHelper.Render(this, name, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
             {
-                string errors = string.Join("\n", generator.Errors.Cast<object>().Select(x => x.ToString()));
-                throw new InvalidOperationException("Failed to process template '" + name + "':\n" + errors);
-            }
-
-            return result.Item2;
+                {
+                    "Model", new TemplateModel
+                    {
+                        KeyType = KeyType,
+                        HashSource = HashSource,
+                        MethodAttribute = "[[nodiscard]]",
+                        PostMethodModifier = " noexcept",
+                        KeyTypeName = KeyTypeName,
+                        ValueTypeName = ValueTypeName,
+                        IsPrimitive = typeof(TValue).IsPrimitive,
+                        GetMethodHeader = GetMethodHeader,
+                        GetEqualFunction = (a, b) => GetEqualFunction(a, b),
+                        GetEqualFunctionByType = GetEqualFunction,
+                        GetCompareFunction = GetCompareFunction,
+                        GetModFunction = GetModFunction,
+                        GetSmallestSignedType = GetSmallestSignedType,
+                        GetSmallestUnsignedType = GetSmallestUnsignedType,
+                        ToValueLabel = ToValueLabel,
+                        ValueObjectDeclarations = GetObjectDeclarations<TValue>(),
+                        GetMethodModifier = constExpr => constExpr ? "static constexpr " : "static ",
+                        GetFieldModifier = constExpr => constExpr ? "static constexpr " : "inline static const ",
+                        GetValueTypeName = customType => customType ? ValueTypeName + "*" : ValueTypeName
+                    }
+                },
+                { "Context", context },
+                { "Shared", Shared },
+                { "Data", CreateContextModel() }
+            });
         }
 
         private ITemplateData? CreateContextModel()
@@ -169,27 +119,27 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                 case ArrayContext<TKey, TValue> arrayCtx:
                     return new ArrayTemplateData
                     {
-                        Keys = ToObjects(arrayCtx.Keys),
+                        Keys = (arrayCtx.Keys).ToObjects(),
                         KeyCount = arrayCtx.Keys.Length,
-                        Values = ToObjects(arrayCtx.Values),
+                        Values = (arrayCtx.Values).ToObjects(),
                         ValueCount = arrayCtx.Values.Length
                     };
 
                 case BinarySearchContext<TKey, TValue> bsCtx:
                     return new BinarySearchTemplateData
                     {
-                        Keys = ToObjects(bsCtx.Keys),
+                        Keys = (bsCtx.Keys).ToObjects(),
                         KeyCount = bsCtx.Keys.Length,
-                        Values = ToObjects(bsCtx.Values),
+                        Values = (bsCtx.Values).ToObjects(),
                         ValueCount = bsCtx.Values.Length
                     };
 
                 case ConditionalContext<TKey, TValue> conCtx:
                     return new ArrayTemplateData
                     {
-                        Keys = ToObjects(conCtx.Keys),
+                        Keys = (conCtx.Keys).ToObjects(),
                         KeyCount = conCtx.Keys.Length,
-                        Values = ToObjects(conCtx.Values),
+                        Values = (conCtx.Values).ToObjects(),
                         ValueCount = conCtx.Values.Length
                     };
 
@@ -212,7 +162,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     {
                         Keys = klCtx.Lengths,
                         KeyCount = klCtx.Lengths.Length,
-                        Values = ToObjects(klCtx.Values),
+                        Values = (klCtx.Values).ToObjects(),
                         ValueCount = klCtx.Values.Length
                     };
 
@@ -222,7 +172,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                 case BitSetContext<TValue> bsCtx:
                     return new BitSetTemplateData
                     {
-                        Values = ToObjects(bsCtx.Values),
+                        Values = (bsCtx.Values).ToObjects(),
                         ValueCount = bsCtx.Values.Length
                     };
 
@@ -242,7 +192,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     return new HashTableTemplateData
                     {
                         Entries = hashEntries,
-                        Values = ToObjects(hashCtx.Values),
+                        Values = (hashCtx.Values).ToObjects(),
                         ValueCount = hashCtx.Values.Length
                     };
 
@@ -261,7 +211,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     return new HashTableCompactTemplateData
                     {
                         Entries = compactEntries,
-                        Values = ToObjects(compactCtx.Values),
+                        Values = (compactCtx.Values).ToObjects(),
                         ValueCount = compactCtx.Values.Length
                     };
 
@@ -280,7 +230,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     return new HashTablePerfectTemplateData
                     {
                         Entries = perfectEntries,
-                        Values = ToObjects(perfectCtx.Values),
+                        Values = (perfectCtx.Values).ToObjects(),
                         ValueCount = perfectCtx.Values.Length
                     };
 
@@ -295,42 +245,292 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
             }
         }
 
-        private static IEnumerable<object> ToObjects(ReadOnlyMemory<TKey> keys) => new MemoryObjectEnumerable<TKey>(keys);
-
-        private static IEnumerable<object> ToObjects(ReadOnlyMemory<TValue> values) => new MemoryObjectEnumerable<TValue>(values);
-
-        private sealed class MemoryObjectEnumerable<T>(ReadOnlyMemory<T> memory) : IEnumerable<object>
+        private string GetCompareFunction(string var1, string var2)
         {
-            public IEnumerator<object> GetEnumerator() => new Enumerator(memory);
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-            private sealed class Enumerator(ReadOnlyMemory<T> memory) : IEnumerator<object>
+            if (KeyType == KeyType.String)
             {
-                private int _index = -1;
+                if (IgnoreCase)
+                    return $"case_insensitive_compare({var1}, {var2})";
 
-                public object Current => memory.Span[_index];
-
-                object IEnumerator.Current => Current;
-
-                public bool MoveNext()
-                {
-                    _index++;
-                    return _index < memory.Length;
-                }
-
-                public void Dispose() {}
-
-                public void Reset() => throw new NotSupportedException("not supported");
+                return $"{var1}.compare({var2})";
             }
+
+            return $"{var1} < {var2} ? -1 : ({var1} > {var2} ? 1 : 0)";
         }
 
-        private static void AddTemplateReference(TemplateGenerator generator, Type type)
+        protected override string GetMethodHeader(MethodType methodType)
         {
-            string location = type.Assembly.Location;
+            StringBuilder sb = new StringBuilder();
+            sb.Append(base.GetMethodHeader(methodType));
 
-            if (!string.IsNullOrEmpty(location) && !generator.Refs.Exists(x => string.Equals(x, location, StringComparison.OrdinalIgnoreCase)))
-                generator.Refs.Add(location);
+            if (TotalTrimLength != 0)
+                sb.Append($"        const auto {TrimmedKeyName} = {InputKeyName}.substr({TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.length() - {TotalTrimLength.ToStringInvariant()});");
+
+            return sb.ToString();
         }
+
+        protected override string GetEqualFunctionInternal(string value1, string value2, KeyType keyType)
+        {
+            if (keyType == KeyType.String && IgnoreCase)
+                return $"case_insensitive_equals({value1}, {value2})";
+
+            return $"{value1} == {value2}";
+        }
+
+        protected override void RegisterSharedCode()
+        {
+            if (KeyType != KeyType.String || !IgnoreCase)
+                return;
+
+            string helpers = Encoding switch
+            {
+                GeneratorEncoding.UTF16 => GetUtf16CaseInsensitiveHelpers(),
+                GeneratorEncoding.UTF32 => GetUtf32CaseInsensitiveHelpers(),
+                GeneratorEncoding.UTF8 or GeneratorEncoding.ASCII => GetAsciiCaseInsensitiveHelpers(),
+                _ => throw new InvalidOperationException($"Unsupported encoding: {Encoding}")
+            };
+
+            Shared.Add(CodePlacement.Before, helpers);
+        }
+
+        private string GetAsciiCaseInsensitiveHelpers() => $$"""
+                                                             static constexpr uint32_t to_lower_ascii(uint32_t c) noexcept
+                                                             {
+                                                                 if (c - 'A' <= 'Z' - 'A')
+                                                                     c |= 0x20u;
+
+                                                                 return c;
+                                                             }
+
+                                                             static constexpr bool case_insensitive_equals({{KeyTypeName}} a, {{KeyTypeName}} b) noexcept
+                                                             {
+                                                                 if (a.size() != b.size())
+                                                                     return false;
+
+                                                                 size_t len = a.size();
+                                                                 for (size_t i = 0; i < len; i++)
+                                                                 {
+                                                                     if (to_lower_ascii(static_cast<uint32_t>(a[i])) != to_lower_ascii(static_cast<uint32_t>(b[i])))
+                                                                         return false;
+                                                                 }
+
+                                                                 return true;
+                                                             }
+
+                                                             static constexpr int case_insensitive_compare({{KeyTypeName}} a, {{KeyTypeName}} b) noexcept
+                                                             {
+                                                                 size_t a_len = a.size();
+                                                                 size_t b_len = b.size();
+                                                                 size_t len = a_len < b_len ? a_len : b_len;
+
+                                                                 for (size_t i = 0; i < len; i++)
+                                                                 {
+                                                                     uint32_t ca = to_lower_ascii(static_cast<uint32_t>(a[i]));
+                                                                     uint32_t cb = to_lower_ascii(static_cast<uint32_t>(b[i]));
+
+                                                                     if (ca != cb)
+                                                                         return ca < cb ? -1 : 1;
+                                                                 }
+
+                                                                 if (a_len == b_len)
+                                                                     return 0;
+
+                                                                 return a_len < b_len ? -1 : 1;
+                                                             }
+
+                                                             static constexpr bool case_insensitive_starts_with({{KeyTypeName}} value, {{KeyTypeName}} prefix) noexcept
+                                                             {
+                                                                 size_t prefix_len = prefix.size();
+                                                                 if (prefix_len > value.size())
+                                                                     return false;
+
+                                                                 for (size_t i = 0; i < prefix_len; i++)
+                                                                 {
+                                                                     if (to_lower_ascii(static_cast<uint32_t>(value[i])) != to_lower_ascii(static_cast<uint32_t>(prefix[i])))
+                                                                         return false;
+                                                                 }
+
+                                                                 return true;
+                                                             }
+
+                                                             static constexpr bool case_insensitive_ends_with({{KeyTypeName}} value, {{KeyTypeName}} suffix) noexcept
+                                                             {
+                                                                 size_t suffix_len = suffix.size();
+                                                                 size_t value_len = value.size();
+
+                                                                 if (suffix_len > value_len)
+                                                                     return false;
+
+                                                                 size_t offset = value_len - suffix_len;
+
+                                                                 for (size_t i = 0; i < suffix_len; i++)
+                                                                 {
+                                                                     if (to_lower_ascii(static_cast<uint32_t>(value[offset + i])) != to_lower_ascii(static_cast<uint32_t>(suffix[i])))
+                                                                         return false;
+                                                                 }
+
+                                                                 return true;
+                                                             }
+                                                             """;
+
+        private string GetUtf16CaseInsensitiveHelpers() => $$"""
+                                                             static constexpr char16_t to_lower_ascii(char16_t c) noexcept
+                                                             {
+                                                                 if (c - u'A' <= u'Z' - u'A')
+                                                                     c = static_cast<char16_t>(c | u'\x20');
+
+                                                                 return c;
+                                                             }
+
+                                                             static constexpr bool case_insensitive_equals({{KeyTypeName}} a, {{KeyTypeName}} b) noexcept
+                                                             {
+                                                                 if (a.size() != b.size())
+                                                                     return false;
+
+                                                                 size_t len = a.size();
+                                                                 for (size_t i = 0; i < len; i++)
+                                                                 {
+                                                                     if (to_lower_ascii(a[i]) != to_lower_ascii(b[i]))
+                                                                         return false;
+                                                                 }
+
+                                                                 return true;
+                                                             }
+
+                                                             static constexpr int case_insensitive_compare({{KeyTypeName}} a, {{KeyTypeName}} b) noexcept
+                                                             {
+                                                                 size_t a_len = a.size();
+                                                                 size_t b_len = b.size();
+                                                                 size_t len = a_len < b_len ? a_len : b_len;
+
+                                                                 for (size_t i = 0; i < len; i++)
+                                                                 {
+                                                                     auto ca = to_lower_ascii(a[i]);
+                                                                     auto cb = to_lower_ascii(b[i]);
+
+                                                                     if (ca != cb)
+                                                                         return ca < cb ? -1 : 1;
+                                                                 }
+
+                                                                 if (a_len == b_len)
+                                                                     return 0;
+
+                                                                 return a_len < b_len ? -1 : 1;
+                                                             }
+
+                                                             static constexpr bool case_insensitive_starts_with({{KeyTypeName}} value, {{KeyTypeName}} prefix) noexcept
+                                                             {
+                                                                 size_t prefix_len = prefix.size();
+                                                                 if (prefix_len > value.size())
+                                                                     return false;
+
+                                                                 for (size_t i = 0; i < prefix_len; i++)
+                                                                 {
+                                                                     if (to_lower_ascii(value[i]) != to_lower_ascii(prefix[i]))
+                                                                         return false;
+                                                                 }
+
+                                                                 return true;
+                                                             }
+
+                                                             static constexpr bool case_insensitive_ends_with({{KeyTypeName}} value, {{KeyTypeName}} suffix) noexcept
+                                                             {
+                                                                 size_t suffix_len = suffix.size();
+                                                                 size_t value_len = value.size();
+
+                                                                 if (suffix_len > value_len)
+                                                                     return false;
+
+                                                                 size_t offset = value_len - suffix_len;
+
+                                                                 for (size_t i = 0; i < suffix_len; i++)
+                                                                 {
+                                                                     if (to_lower_ascii(value[offset + i]) != to_lower_ascii(suffix[i]))
+                                                                         return false;
+                                                                 }
+
+                                                                 return true;
+                                                             }
+                                                             """;
+
+        private string GetUtf32CaseInsensitiveHelpers() => $$"""
+                                                             static constexpr char32_t to_lower_ascii(char32_t c) noexcept
+                                                             {
+                                                                 if (c - U'A' <= U'Z' - U'A')
+                                                                     c = static_cast<char32_t>(c | U'\x20');
+
+                                                                 return c;
+                                                             }
+
+                                                             static constexpr bool case_insensitive_equals({{KeyTypeName}} a, {{KeyTypeName}} b) noexcept
+                                                             {
+                                                                 if (a.size() != b.size())
+                                                                     return false;
+
+                                                                 size_t len = a.size();
+                                                                 for (size_t i = 0; i < len; i++)
+                                                                 {
+                                                                     if (to_lower_ascii(a[i]) != to_lower_ascii(b[i]))
+                                                                         return false;
+                                                                 }
+
+                                                                 return true;
+                                                             }
+
+                                                             static constexpr int case_insensitive_compare({{KeyTypeName}} a, {{KeyTypeName}} b) noexcept
+                                                             {
+                                                                 size_t a_len = a.size();
+                                                                 size_t b_len = b.size();
+                                                                 size_t len = a_len < b_len ? a_len : b_len;
+
+                                                                 for (size_t i = 0; i < len; i++)
+                                                                 {
+                                                                     auto ca = to_lower_ascii(a[i]);
+                                                                     auto cb = to_lower_ascii(b[i]);
+
+                                                                     if (ca != cb)
+                                                                         return ca < cb ? -1 : 1;
+                                                                 }
+
+                                                                 if (a_len == b_len)
+                                                                     return 0;
+
+                                                                 return a_len < b_len ? -1 : 1;
+                                                             }
+
+                                                             static constexpr bool case_insensitive_starts_with({{KeyTypeName}} value, {{KeyTypeName}} prefix) noexcept
+                                                             {
+                                                                 size_t prefix_len = prefix.size();
+                                                                 if (prefix_len > value.size())
+                                                                     return false;
+
+                                                                 for (size_t i = 0; i < prefix_len; i++)
+                                                                 {
+                                                                     if (to_lower_ascii(value[i]) != to_lower_ascii(prefix[i]))
+                                                                         return false;
+                                                                 }
+
+                                                                 return true;
+                                                             }
+
+                                                             static constexpr bool case_insensitive_ends_with({{KeyTypeName}} value, {{KeyTypeName}} suffix) noexcept
+                                                             {
+                                                                 size_t suffix_len = suffix.size();
+                                                                 size_t value_len = value.size();
+
+                                                                 if (suffix_len > value_len)
+                                                                     return false;
+
+                                                                 size_t offset = value_len - suffix_len;
+
+                                                                 for (size_t i = 0; i < suffix_len; i++)
+                                                                 {
+                                                                     if (to_lower_ascii(value[offset + i]) != to_lower_ascii(suffix[i]))
+                                                                         return false;
+                                                                 }
+
+                                                                 return true;
+                                                             }
+                                                             """;
     }
 }

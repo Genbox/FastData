@@ -22,6 +22,7 @@
     <Project Path="Src/FastData.Generator.Rust.Benchmarks/FastData.Generator.Rust.Benchmarks.csproj" />
     <Project Path="Src/FastData.Generator.Rust.TestHarness/FastData.Generator.Rust.TestHarness.csproj" />
     <Project Path="Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj" />
+    <Project Path="Src/FastData.Generator.Template/FastData.Generator.Template.csproj" />
     <Project Path="Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj" />
     <Project Path="Src/FastData.Generator/FastData.Generator.csproj" />
   </Folder>

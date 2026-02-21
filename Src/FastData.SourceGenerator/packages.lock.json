@@ -274,6 +274,12 @@
       "Genbox.FastData.Generator.CSharp": {
         "type": "Project",
         "dependencies": {
+          "Genbox.FastData.Generator.Template": "[1.0.0, )"
+        }
+      },
+      "Genbox.FastData.Generator.Template": {
+        "type": "Project",
+        "dependencies": {
           "Genbox.FastData.Generator": "[1.0.0, )",
           "Mono.TextTemplating": "[3.0.0, )"
         }

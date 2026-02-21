@@ -3,13 +3,13 @@
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System.Linq" #>
-<#@ import namespace="Genbox.FastData.Generator.CSharp.Internal.TemplateData" #>
+<#@ import namespace="Genbox.FastData.Generator.CSharp.TemplateData" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.HashTableContext" name="Context" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateData.HashTableTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateData.HashTableTemplateData" name="Data" #>
 
 <#
     string[] valueLabels = Data.Values.Select(Model.ToValueLabel).ToArray();
@@ -18,7 +18,7 @@
 [StructLayout(LayoutKind.Auto)]
 private struct E
 {
-    internal <#= Common.KeyTypeName #> Key;
+    internal <#= Model.KeyTypeName #> Key;
     internal <#= bucketType #> Next;
 <#
     if (Context.StoreHashCode)
@@ -29,10 +29,10 @@ private struct E
 #><#
     if (Data.ValueCount > 0)
     {
-#>    internal <#= Common.ValueTypeName #> Value;
+#>    internal <#= Model.ValueTypeName #> Value;
 <#
     }
-#>    internal E(<#= Common.KeyTypeName #> key, <#= bucketType #> next<#
+#>    internal E(<#= Model.KeyTypeName #> key, <#= bucketType #> next<#
     if (Context.StoreHashCode)
     {
 #>, <#= Common.HashSizeType #> hashCode<#
@@ -40,7 +40,7 @@ private struct E
 #><#
     if (Data.ValueCount > 0)
     {
-#>, <#= Common.ValueTypeName #> value<#
+#>, <#= Model.ValueTypeName #> value<#
     }
 #>)
     {
@@ -61,24 +61,23 @@ private struct E
 #>    }
 };
 
-<#= Common.FieldModifier #><#= bucketType #>[] _buckets = new <#= bucketType #>[] {
+<#= Model.FieldModifier #><#= bucketType #>[] _buckets = new <#= bucketType #>[] {
 <#= FormatHelper.FormatColumns(Context.Buckets, x => Model.ToValueLabel(x)) #>
      };
 
-<#= Common.FieldModifier #>E[] _entries = {
+<#= Model.FieldModifier #>E[] _entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        HashTableEntryTemplateData entry = (HashTableEntryTemplateData)x;
-        string hashPart = Context.StoreHashCode ? $", {Model.ToValueLabel(entry.Hash)}" : "";
+        string hashPart = Context.StoreHashCode ? $", {Model.ToValueLabel(x.Hash)}" : "";
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
-        return $"new E({Model.ToValueLabel(entry.Key)}, {Model.ToValueLabel(entry.Next)}{hashPart}{valuePart})";
+        return $"new E({Model.ToValueLabel(x.Key)}, {Model.ToValueLabel(x.Next)}{hashPart}{valuePart})";
     }) #>
     };
 
 <#= Model.HashSource #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
@@ -109,8 +108,8 @@ private struct E
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
 
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool TryLookup(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Common.ValueTypeName #> value)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool TryLookup(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Model.ValueTypeName #> value)
 {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 

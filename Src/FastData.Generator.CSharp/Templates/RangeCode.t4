@@ -1,16 +1,16 @@
 <#@ template language="C#" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateModel" name="Model" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.CommonDataModel" name="Common" #>
-<#@ parameter type="Genbox.FastData.Generator.CSharp.Internal.TemplateData.RangeTemplateData" name="Data" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateData.RangeTemplateData" name="Data" #>
 
 <#
     string minLabel = Model.ToValueLabel(Data.Min);
     string maxLabel = Model.ToValueLabel(Data.Max);
 #>
-<#= Common.MethodAttribute #>
-<#= Common.MethodModifier #>bool Contains(<#= Common.KeyTypeName #> <#= Common.InputKeyName #>)
+<#= Model.MethodAttribute #>
+<#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 

@@ -53,8 +53,7 @@
       "Genbox.FastData.Generator.Rust": {
         "type": "Project",
         "dependencies": {
-          "Genbox.FastData.Generator": "[1.0.0, )",
-          "Mono.TextTemplating": "[3.0.0, )"
+          "Genbox.FastData.Generator.Template": "[1.0.0, )"
         }
       },
       "Genbox.FastData.Generator.Rust.TestHarness": {
@@ -62,6 +61,13 @@
         "dependencies": {
           "Genbox.FastData.Generator.Rust": "[1.0.0, )",
           "Genbox.FastData.InternalShared": "[1.0.0, )"
+        }
+      },
+      "Genbox.FastData.Generator.Template": {
+        "type": "Project",
+        "dependencies": {
+          "Genbox.FastData.Generator": "[1.0.0, )",
+          "Mono.TextTemplating": "[3.0.0, )"
         }
       },
       "Genbox.FastData.InternalShared": {

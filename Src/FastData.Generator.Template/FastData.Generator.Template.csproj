@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../Imports/Library.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mono.TextTemplating" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FastData.Generator\FastData.Generator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\Misc\Compat\CompilerFeatureRequiredAttribute.cs">
+      <Link>Internal\Compat\CompilerFeatureRequiredAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Misc\Compat\IsExternalInit.cs">
+      <Link>Internal\Compat\IsExternalInit.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Misc\Compat\RequiredMemberAttribute.cs">
+      <Link>Internal\Compat\RequiredMemberAttribute.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+</Project>
