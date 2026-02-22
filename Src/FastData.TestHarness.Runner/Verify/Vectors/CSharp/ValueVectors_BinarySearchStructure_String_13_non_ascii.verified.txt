@@ -39,7 +39,7 @@ internal static class BinarySearchStructure_String_13_non_ascii
                 hi = i - 1;
         }
 
-        return ~lo >= 0;
+        return false;
     }
 
     public const uint ItemCount = 13;

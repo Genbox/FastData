@@ -5,14 +5,10 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 <#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateData.RangeTemplateData" name="Data" #>
 
-<#
-    string minLabel = Model.ToValueLabel(Data.Min);
-    string maxLabel = Model.ToValueLabel(Data.Max);
-#>
 <#= Model.MethodAttribute #>
 <#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-    return <#= Common.LookupKeyName #> >= <#= minLabel #> && <#= Common.LookupKeyName #> <= <#= maxLabel #>;
+    return <#= Common.LookupKeyName #> >= <#= Model.ToValueLabel(Data.Min) #> && <#= Common.LookupKeyName #> <= <#= Model.ToValueLabel(Data.Max) #>;
 }

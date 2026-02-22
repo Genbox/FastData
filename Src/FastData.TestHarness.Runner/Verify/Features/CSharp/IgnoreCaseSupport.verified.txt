@@ -38,7 +38,7 @@ internal static class IgnoreCaseSupport
                 hi = i - 1;
         }
 
-        return ~lo >= 0;
+        return false;
     }
 
     public const uint ItemCount = 3;

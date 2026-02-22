@@ -33,21 +33,7 @@
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
 <#
-        if (keys.Length == 0)
-        {
-#>    return false;
-<#
-        }
-        else
-        {
-#>    if (<#= FormatHelper.FormatList(keys, x => Model.GetEqualFunction(Common.LookupKeyName, Model.ToValueLabel(x)), " || ") #>)
-        return true;
-
-<#
-        }
-#>
-
-    return false;
+#>    return <#= FormatHelper.FormatList(keys, x => Model.GetEqualFunction(Common.LookupKeyName, Model.ToValueLabel(x)), " || ") #>;
 }
 <#
         if (Data.ValueCount > 0)
@@ -101,7 +87,6 @@
 <#= Model.MethodAttribute #>
 <#= Model.MethodModifier #>bool TryLookup(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>, out <#= Model.ValueTypeName #>? value)
 {
-    value = default;
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
     switch (<#= Common.LookupKeyName #>)
     {

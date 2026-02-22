@@ -44,7 +44,6 @@ internal static class ConditionalStructure_Int32_3_complex
 
     public static bool TryLookup(int key, out Person? value)
     {
-        value = default;
 
         switch (key)
         {

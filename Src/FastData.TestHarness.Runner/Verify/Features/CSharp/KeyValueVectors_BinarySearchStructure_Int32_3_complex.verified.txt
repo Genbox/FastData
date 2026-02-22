@@ -51,7 +51,7 @@ internal static class BinarySearchStructure_Int32_3_complex
                 hi = i - 1;
         }
 
-        return ~lo >= 0;
+        return false;
     }
 
 

@@ -37,7 +37,7 @@ internal static class StaticData
                 hi = i - 1;
         }
 
-        return ~lo >= 0;
+        return false;
     }
 
     public const uint ItemCount = 3;

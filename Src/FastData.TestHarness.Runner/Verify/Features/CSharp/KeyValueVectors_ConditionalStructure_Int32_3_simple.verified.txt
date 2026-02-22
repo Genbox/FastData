@@ -31,7 +31,6 @@ internal static class ConditionalStructure_Int32_3_simple
 
     public static bool TryLookup(int key, out int? value)
     {
-        value = default;
 
         switch (key)
         {

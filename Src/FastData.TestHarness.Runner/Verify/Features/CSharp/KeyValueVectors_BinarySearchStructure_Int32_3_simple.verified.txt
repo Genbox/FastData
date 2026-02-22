@@ -38,7 +38,7 @@ internal static class BinarySearchStructure_Int32_3_simple
                 hi = i - 1;
         }
 
-        return ~lo >= 0;
+        return false;
     }
 
 

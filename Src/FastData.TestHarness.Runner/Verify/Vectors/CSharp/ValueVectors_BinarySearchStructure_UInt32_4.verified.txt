@@ -34,7 +34,7 @@ internal static class BinarySearchStructure_UInt32_4
                 hi = i - 1;
         }
 
-        return ~lo >= 0;
+        return false;
     }
 
     public const uint ItemCount = 4;

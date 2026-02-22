@@ -43,7 +43,7 @@
             hi = i - 1;
     }
 
-    return ~lo >= 0;
+    return false;
 }
 <#
     if (Data.ValueCount > 0)
