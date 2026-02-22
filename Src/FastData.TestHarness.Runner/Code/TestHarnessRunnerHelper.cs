@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.InternalShared.TestHarness;
@@ -7,6 +9,7 @@ namespace Genbox.FastData.TestHarness.Runner.Code;
 
 internal static class TestHarnessRunnerHelper
 {
+    private const int CompileHashBytes = 8;
     private const int SuccessExitCode = 1;
     private const string FeatureDirectory = "../Verify/Features/";
     private const string VectorDirectory = "../Verify/Vectors/";
@@ -31,15 +34,24 @@ internal static class TestHarnessRunnerHelper
     {
         ITestRenderer renderer = harness.CreateRenderer(spec);
         string program = harness.RenderContainsProgram(spec, renderer, present, notPresent);
-        return harness.Run(fileId, program);
+        string compileId = GetCompileId(harness, fileId, program);
+        return harness.Run(compileId, program);
     }
 
     internal static int RunTryLookupProgram<TKey, TValue>(ITestHarness harness, GeneratorSpec spec, TestVector<TKey, TValue> vector, string fileId) where TValue : notnull
     {
         ITestRenderer renderer = harness.CreateRenderer(spec);
         string program = harness.RenderTryLookupProgram(spec, renderer, vector);
-        return harness.Run(fileId, program);
+        string compileId = GetCompileId(harness, fileId, program);
+        return harness.Run(compileId, program);
     }
 
     internal static void AssertSuccessExitCode(int exitCode) => Assert.Equal(SuccessExitCode, exitCode);
+
+    private static string GetCompileId(ITestHarness harness, string fileId, string source)
+    {
+        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(source));
+        string hashHex = Convert.ToHexString(hash.AsSpan(0, CompileHashBytes));
+        return $"{harness.Name}_{fileId}_{hashHex}";
+    }
 }

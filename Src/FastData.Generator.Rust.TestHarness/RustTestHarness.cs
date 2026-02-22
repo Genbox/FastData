@@ -17,7 +17,7 @@ public sealed class RustTestHarness : TestHarnessBase
 
     public RustTestHarness() : base("Rust")
     {
-        string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "Rust");
+        string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "Rust", Environment.ProcessId.ToString());
         Directory.CreateDirectory(rootDir);
         _compiler = new RustCompiler(false, rootDir);
     }

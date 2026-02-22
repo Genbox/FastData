@@ -17,7 +17,7 @@ public sealed class CPlusPlusTestHarness : TestHarnessBase
 
     public CPlusPlusTestHarness() : base("CPlusPlus")
     {
-        string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "CPlusPlus");
+        string rootDir = Path.Combine(Path.GetTempPath(), "FastData", "CPlusPlus", Environment.ProcessId.ToString());
         Directory.CreateDirectory(rootDir);
         _compiler = new GccCompiler(false, rootDir, false);
     }
