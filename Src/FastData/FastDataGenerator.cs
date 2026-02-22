@@ -282,7 +282,7 @@ public static partial class FastDataGenerator
             case StructureType.Conditional:
                 return GenerateWrapper(tempState, new ConditionalStructure<TKey, TValue>());
             case StructureType.BinarySearch:
-                if (props.IsWellDistributed)
+                if (IsWellDistributed(keySpan, props, keyType, fdCfg.MaxHistogramBuckets))
                     return GenerateWrapper(tempState, new InterpolatedBinarySearchStructure<TKey, TValue>());
 
                 return GenerateWrapper(tempState, new BinarySearchStructure<TKey, TValue>(keyType, fdCfg.IgnoreCase));
@@ -545,6 +545,93 @@ public static partial class FastDataGenerator
         KeyType.UInt32 or
         KeyType.Int64 or
         KeyType.UInt64;
+
+    private static bool IsWellDistributed<TKey>(ReadOnlySpan<TKey> keys, NumericKeyProperties<TKey> props, KeyType keyType, int maxHistogramBuckets)
+    {
+        if (keys.Length < 16)
+            return false;
+
+        int buckets = Math.Min(maxHistogramBuckets, keys.Length);
+        if (buckets <= 1)
+            return false;
+
+        if (props.Range == 0)
+            return false;
+
+        Span<int> hist = stackalloc int[buckets];
+        ulong min = (ulong)props.ValueConverter(props.MinKeyValue);
+
+        if (keyType == KeyType.Single)
+        {
+            for (int i = 0; i < keys.Length; i++)
+            {
+                float key = (float)(object)keys[i]!;
+                if (float.IsNaN(key) || float.IsInfinity(key))
+                    return false;
+
+                ulong value = (ulong)(long)key;
+                ulong diff = value - min;
+                int bucketIndex = (int)((diff * (ulong)buckets) / props.Range);
+
+                if ((uint)bucketIndex >= (uint)buckets)
+                    bucketIndex = buckets - 1;
+
+                hist[bucketIndex]++;
+            }
+        }
+        else if (keyType == KeyType.Double)
+        {
+            for (int i = 0; i < keys.Length; i++)
+            {
+                double key = (double)(object)keys[i]!;
+                if (double.IsNaN(key) || double.IsInfinity(key))
+                    return false;
+
+                ulong value = (ulong)(long)key;
+                ulong diff = value - min;
+                int bucketIndex = (int)((diff * (ulong)buckets) / props.Range);
+
+                if ((uint)bucketIndex >= (uint)buckets)
+                    bucketIndex = buckets - 1;
+
+                hist[bucketIndex]++;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < keys.Length; i++)
+            {
+                ulong value = (ulong)props.ValueConverter(keys[i]);
+                ulong diff = value - min;
+                int bucketIndex = (int)((diff * (ulong)buckets) / props.Range);
+
+                if ((uint)bucketIndex >= (uint)buckets)
+                    bucketIndex = buckets - 1;
+
+                hist[bucketIndex]++;
+            }
+        }
+
+        int minCount = int.MaxValue;
+        int maxCount = 0;
+        int sum = 0;
+
+        for (int i = 0; i < buckets; i++)
+        {
+            int count = hist[i];
+            sum += count;
+            if (count < minCount)
+                minCount = count;
+            if (count > maxCount)
+                maxCount = count;
+        }
+
+        if (minCount == 0)
+            return false;
+
+        int avg = sum / buckets;
+        return maxCount - minCount <= avg;
+    }
 
     private static void Benchmark(byte[] data, int iterations, Candidate candidate)
     {

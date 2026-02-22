@@ -6,6 +6,7 @@ namespace Genbox.FastData;
 [PublicAPI]
 public sealed class FastDataConfig(StructureType structureType = StructureType.Auto)
 {
+    private int _maxHistogramBuckets = 20;
     private int _skipQuantum = 128;
 
     /// <summary>The type of structure to create. Defaults to Auto.</summary>
@@ -61,6 +62,19 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
 
     /// <summary>Maximum item count to use ConditionalStructure in Auto mode.</summary>
     public int ConditionalStructureMaxItemCount { get; set; } = 400;
+
+    /// <summary>Maximum number of histogram buckets used for interpolated binary search selection.</summary>
+    public int MaxHistogramBuckets
+    {
+        get => _maxHistogramBuckets;
+        set
+        {
+            if (value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "MaxHistogramBuckets must be greater than 0.");
+
+            _maxHistogramBuckets = value;
+        }
+    }
 
     /// <summary>Maximum relative slowdown allowed for a perfect hash before preferring a faster non-perfect hash.</summary>
     public double PerfectHashMaxSlowdownFactor { get; set; } = 0.25;
