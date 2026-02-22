@@ -30,15 +30,33 @@
 
     let mut lo: usize = 0;
     let mut hi: usize = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
-    while lo <= hi {
-        let i = lo + ((hi - lo) >> 1);
-        let entry = Self::KEYS[i];
-        let order = <#= Model.GetCompareFunction("entry", Common.LookupKeyName) #>;
+    while lo <= hi && <#= Common.LookupKeyName #> >= Self::KEYS[lo] && <#= Common.LookupKeyName #> <= Self::KEYS[hi] {
+        let lo_key = Self::KEYS[lo];
+        let hi_key = Self::KEYS[hi];
 
-        if order == 0 {
+        if lo_key == hi_key {
+            if lo_key == <#= Common.LookupKeyName #> {
+                return true;
+            }
+
+            break;
+        }
+
+        let range = (hi_key as f64) - (lo_key as f64);
+        let offset = (<#= Common.LookupKeyName #> as f64) - (lo_key as f64);
+        let mut i = lo + ((offset * (hi - lo) as f64) / range) as usize;
+
+        if i < lo {
+            i = lo;
+        } else if i > hi {
+            i = hi;
+        }
+
+        let entry = Self::KEYS[i];
+        if entry == <#= Common.LookupKeyName #> {
             return true;
         }
-        if order < 0 {
+        if entry < <#= Common.LookupKeyName #> {
             lo = i + 1;
         } else {
             hi = i - 1;
@@ -58,15 +76,33 @@
 
     let mut lo: usize = 0;
     let mut hi: usize = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
-    while lo <= hi {
-        let i = lo + ((hi - lo) >> 1);
-        let entry = Self::KEYS[i];
-        let order = <#= Model.GetCompareFunction("entry", Common.LookupKeyName) #>;
+    while lo <= hi && <#= Common.LookupKeyName #> >= Self::KEYS[lo] && <#= Common.LookupKeyName #> <= Self::KEYS[hi] {
+        let lo_key = Self::KEYS[lo];
+        let hi_key = Self::KEYS[hi];
 
-        if order == 0 {
+        if lo_key == hi_key {
+            if lo_key == <#= Common.LookupKeyName #> {
+                return Some(Self::VALUES[lo]);
+            }
+
+            break;
+        }
+
+        let range = (hi_key as f64) - (lo_key as f64);
+        let offset = (<#= Common.LookupKeyName #> as f64) - (lo_key as f64);
+        let mut i = lo + ((offset * (hi - lo) as f64) / range) as usize;
+
+        if i < lo {
+            i = lo;
+        } else if i > hi {
+            i = hi;
+        }
+
+        let entry = Self::KEYS[i];
+        if entry == <#= Common.LookupKeyName #> {
             return Some(Self::VALUES[i]);
         }
-        if order < 0 {
+        if entry < <#= Common.LookupKeyName #> {
             lo = i + 1;
         } else {
             hi = i - 1;

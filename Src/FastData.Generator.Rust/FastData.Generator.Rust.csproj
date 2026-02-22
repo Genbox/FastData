@@ -157,6 +157,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SingleValueCode.t4</DependentUpon>
     </Compile>
+    <Compile Update="Templates\BinarySearchInterpolationCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BinarySearchInterpolationCode.t4</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

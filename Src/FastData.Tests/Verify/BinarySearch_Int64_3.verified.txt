@@ -4,6 +4,5 @@
     0,
     9223372036854775807
   ],
-  "Values": [],
-  "UseInterpolation": false
+  "Values": []
 }

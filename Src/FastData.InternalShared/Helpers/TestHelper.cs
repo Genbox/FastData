@@ -235,7 +235,9 @@ public static class TestHelper
         if (vector.Type == typeof(ConditionalStructure<,>))
             return Generate(state, new ConditionalStructure<TKey, TValue>());
         if (vector.Type == typeof(BinarySearchStructure<,>))
-            return Generate(state, new BinarySearchStructure<TKey, TValue>(keyType, config.IgnoreCase, props as NumericKeyProperties<TKey>));
+            return Generate(state, new BinarySearchStructure<TKey, TValue>(keyType, config.IgnoreCase));
+        if (vector.Type == typeof(InterpolatedBinarySearchStructure<,>))
+            return Generate(state, new InterpolatedBinarySearchStructure<TKey, TValue>());
         if (vector.Type == typeof(HashTableStructure<,>))
             return Generate(state, new HashTableStructure<TKey, TValue>(GetHashData(keySpan, keyType, generator.Encoding), keyType));
         if (vector.Type == typeof(HashTablePerfectStructure<,>))

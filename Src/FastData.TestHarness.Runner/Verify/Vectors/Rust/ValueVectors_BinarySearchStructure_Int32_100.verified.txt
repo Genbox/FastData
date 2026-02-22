@@ -31,33 +31,15 @@ impl BinarySearchStructure_Int32_100 {
 
         let mut lo: usize = 0;
         let mut hi: usize = 99;
-        while lo <= hi && key >= Self::KEYS[lo] && key <= Self::KEYS[hi] {
-            let lo_key = Self::KEYS[lo];
-            let hi_key = Self::KEYS[hi];
-
-            if lo_key == hi_key {
-                if lo_key == key {
-                    return true;
-                }
-
-                break;
-            }
-
-            let range = (hi_key as f64) - (lo_key as f64);
-            let offset = (key as f64) - (lo_key as f64);
-            let mut i = lo + ((offset * (hi - lo) as f64) / range) as usize;
-
-            if i < lo {
-                i = lo;
-            } else if i > hi {
-                i = hi;
-            }
-
+        while lo <= hi {
+            let i = lo + ((hi - lo) >> 1);
             let entry = Self::KEYS[i];
-            if entry == key {
+            let order = if entry < key { -1 } else if entry > key { 1 } else { 0 };
+
+            if order == 0 {
                 return true;
             }
-            if entry < key {
+            if order < 0 {
                 lo = i + 1;
             } else {
                 hi = i - 1;

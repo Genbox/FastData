@@ -92,6 +92,11 @@
     <Compile Include="..\..\Misc\Compat\RequiredMemberAttribute.cs">
       <Link>Internal\Compat\RequiredMemberAttribute.cs</Link>
     </Compile>
+    <Compile Update="Templates\BinarySearchInterpolationCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BinarySearchInterpolationCode.t4</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

@@ -144,6 +144,15 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                         ValueCount = bsCtx.Values.Length
                     };
 
+                case InterpolatedBinarySearchContext<TKey, TValue> ibsCtx:
+                    return new BinarySearchTemplateData
+                    {
+                        Keys = ibsCtx.Keys.ToObjects(),
+                        KeyCount = ibsCtx.Keys.Length,
+                        Values = ibsCtx.Values.ToObjects(),
+                        ValueCount = ibsCtx.Values.Length
+                    };
+
                 case ConditionalContext<TKey, TValue> conCtx:
                     return new ArrayTemplateData
                     {

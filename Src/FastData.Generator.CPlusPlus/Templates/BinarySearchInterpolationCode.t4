@@ -30,14 +30,30 @@ public:
 
     int32_t lo = 0;
     int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
-    while (lo <= hi) {
-        const int32_t mid = lo + ((hi - lo) >> 1);
-        const <#= Model.KeyTypeName #> mid_key = keys[mid];
-        const int32_t order = <#= Model.GetCompareFunction("mid_key", Common.LookupKeyName) #>;
+    while (lo <= hi && <#= Common.LookupKeyName #> >= keys[lo] && <#= Common.LookupKeyName #> <= keys[hi]) {
+        const <#= Model.KeyTypeName #> lo_key = keys[lo];
+        const <#= Model.KeyTypeName #> hi_key = keys[hi];
 
-        if (order == 0)
+        if (lo_key == hi_key) {
+            if (lo_key == <#= Common.LookupKeyName #>)
+                return true;
+
+            break;
+        }
+
+        const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
+        const double offset = static_cast<double>(<#= Common.LookupKeyName #>) - static_cast<double>(lo_key);
+        int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+
+        if (mid < lo)
+            mid = lo;
+        else if (mid > hi)
+            mid = hi;
+
+        const <#= Model.KeyTypeName #> mid_key = keys[mid];
+        if (mid_key == <#= Common.LookupKeyName #>)
             return true;
-        if (order < 0)
+        if (mid_key < <#= Common.LookupKeyName #>)
             lo = mid + 1;
         else
             hi = mid - 1;
@@ -57,18 +73,37 @@ public:
 
     int32_t lo = 0;
     int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
-    while (lo <= hi) {
-        const int32_t mid = lo + ((hi - lo) >> 1);
-        const <#= Model.KeyTypeName #> mid_key = keys[mid];
-        const int32_t order = <#= Model.GetCompareFunction("mid_key", Common.LookupKeyName) #>;
+    while (lo <= hi && <#= Common.LookupKeyName #> >= keys[lo] && <#= Common.LookupKeyName #> <= keys[hi]) {
+        const <#= Model.KeyTypeName #> lo_key = keys[lo];
+        const <#= Model.KeyTypeName #> hi_key = keys[hi];
 
-        if (order == 0)
+        if (lo_key == hi_key) {
+            if (lo_key == <#= Common.LookupKeyName #>)
+            {
+                value = <#= Model.IsPrimitive ? "&" : "" #>values[lo];
+                return true;
+            }
+
+            break;
+        }
+
+        const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
+        const double offset = static_cast<double>(<#= Common.LookupKeyName #>) - static_cast<double>(lo_key);
+        int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+
+        if (mid < lo)
+            mid = lo;
+        else if (mid > hi)
+            mid = hi;
+
+        const <#= Model.KeyTypeName #> mid_key = keys[mid];
+        if (mid_key == <#= Common.LookupKeyName #>)
         {
             value = <#= Model.IsPrimitive ? "&" : "" #>values[mid];
             return true;
         }
 
-        if (order < 0)
+        if (mid_key < <#= Common.LookupKeyName #>)
             lo = mid + 1;
         else
             hi = mid - 1;

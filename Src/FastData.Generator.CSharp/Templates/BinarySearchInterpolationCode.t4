@@ -30,20 +30,38 @@
 
     int lo = 0;
     int hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
-    while (lo <= hi)
+    while (lo <= hi && <#= Common.LookupKeyName #> >= _keys[lo] && <#= Common.LookupKeyName #> <= _keys[hi])
     {
-        int i = lo + ((hi - lo) >> 1);
-        int order = <#= Model.GetCompareFunction("_keys[i]", Common.LookupKeyName) #>;
+        <#= Model.KeyTypeName #> loKey = _keys[lo];
+        <#= Model.KeyTypeName #> hiKey = _keys[hi];
 
-        if (order == 0)
+        if (loKey == hiKey)
+        {
+            if (loKey == <#= Common.LookupKeyName #>)
+                return true;
+
+            break;
+        }
+
+        double range = (double)hiKey - (double)loKey;
+        double offset = (double)<#= Common.LookupKeyName #> - (double)loKey;
+        int i = lo + (int)((offset * (hi - lo)) / range);
+
+        if (i < lo)
+            i = lo;
+        else if (i > hi)
+            i = hi;
+
+        <#= Model.KeyTypeName #> midKey = _keys[i];
+        if (midKey == <#= Common.LookupKeyName #>)
             return true;
-        if (order < 0)
+        if (midKey < <#= Common.LookupKeyName #>)
             lo = i + 1;
         else
             hi = i - 1;
     }
 
-    return ~lo >= 0;
+    return false;
 }
 <#
     if (Data.ValueCount > 0)
@@ -57,17 +75,38 @@
 
     int lo = 0;
     int hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
-    while (lo <= hi)
+    while (lo <= hi && <#= Common.LookupKeyName #> >= _keys[lo] && <#= Common.LookupKeyName #> <= _keys[hi])
     {
-        int i = lo + ((hi - lo) >> 1);
-        int order = <#= Model.GetCompareFunction("_keys[i]", Common.LookupKeyName) #>;
+        <#= Model.KeyTypeName #> loKey = _keys[lo];
+        <#= Model.KeyTypeName #> hiKey = _keys[hi];
 
-        if (order == 0)
+        if (loKey == hiKey)
+        {
+            if (loKey == <#= Common.LookupKeyName #>)
+            {
+                value = _values[lo];
+                return true;
+            }
+
+            break;
+        }
+
+        double range = (double)hiKey - (double)loKey;
+        double offset = (double)<#= Common.LookupKeyName #> - (double)loKey;
+        int i = lo + (int)((offset * (hi - lo)) / range);
+
+        if (i < lo)
+            i = lo;
+        else if (i > hi)
+            i = hi;
+
+        <#= Model.KeyTypeName #> midKey = _keys[i];
+        if (midKey == <#= Common.LookupKeyName #>)
         {
             value = _values[i];
             return true;
         }
-        if (order < 0)
+        if (midKey < <#= Common.LookupKeyName #>)
             lo = i + 1;
         else
             hi = i - 1;

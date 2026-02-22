@@ -297,7 +297,8 @@ internal static class KeyAnalyzer
         }
 
         ulong range = (ulong)(max - min);
-        return new NumericKeyProperties<char>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        bool isWellDistributed = IsWellDistributed(keys, range, min, static v => v);
+        return new NumericKeyProperties<char>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, isWellDistributed, mask, static v => v);
     }
 
     private static NumericKeyProperties<float> GetSingleProperties(ReadOnlySpan<float> keys)
@@ -323,7 +324,8 @@ internal static class KeyAnalyzer
         }
 
         ulong range = ClampRangeToUInt64(max - min);
-        return new NumericKeyProperties<float>(min, max, range, CalculateDensity(keys.Length, range), hasZeroOrNaN, IsFloatConsecutive(keys, min, max, hasNaNOrInfinity), 0, static v => (long)v);
+        bool isWellDistributed = !hasNaNOrInfinity && IsWellDistributed(keys, range, min, static v => (long)v);
+        return new NumericKeyProperties<float>(min, max, range, CalculateDensity(keys.Length, range), hasZeroOrNaN, IsFloatConsecutive(keys, min, max, hasNaNOrInfinity), isWellDistributed, 0, static v => (long)v);
     }
 
     private static NumericKeyProperties<double> GetDoubleProperties(ReadOnlySpan<double> keys)
@@ -349,7 +351,8 @@ internal static class KeyAnalyzer
         }
 
         ulong range = ClampRangeToUInt64(max - min);
-        return new NumericKeyProperties<double>(min, max, range, CalculateDensity(keys.Length, range), hasZeroOrNaN, IsDoubleConsecutive(keys, min, max, hasNaNOrInfinity), 0, static v => (long)v);
+        bool isWellDistributed = !hasNaNOrInfinity && IsWellDistributed(keys, range, min, static v => (long)v);
+        return new NumericKeyProperties<double>(min, max, range, CalculateDensity(keys.Length, range), hasZeroOrNaN, IsDoubleConsecutive(keys, min, max, hasNaNOrInfinity), isWellDistributed, 0, static v => (long)v);
     }
 
     private static NumericKeyProperties<byte> GetByteProperties(ReadOnlySpan<byte> keys)
@@ -366,7 +369,8 @@ internal static class KeyAnalyzer
         }
 
         ulong range = (ulong)(max - min);
-        return new NumericKeyProperties<byte>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        bool isWellDistributed = IsWellDistributed(keys, range, min, static v => v);
+        return new NumericKeyProperties<byte>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, isWellDistributed, mask, static v => v);
     }
 
     private static NumericKeyProperties<sbyte> GetSByteProperties(ReadOnlySpan<sbyte> keys)
@@ -383,7 +387,8 @@ internal static class KeyAnalyzer
         }
 
         ulong range = (ulong)(max - min);
-        return new NumericKeyProperties<sbyte>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        bool isWellDistributed = IsWellDistributed(keys, range, min, static v => v);
+        return new NumericKeyProperties<sbyte>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, isWellDistributed, mask, static v => v);
     }
 
     private static NumericKeyProperties<short> GetInt16Properties(ReadOnlySpan<short> keys)
@@ -400,7 +405,8 @@ internal static class KeyAnalyzer
         }
 
         ulong range = (ulong)(max - min);
-        return new NumericKeyProperties<short>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        bool isWellDistributed = IsWellDistributed(keys, range, min, static v => v);
+        return new NumericKeyProperties<short>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, isWellDistributed, mask, static v => v);
     }
 
     private static NumericKeyProperties<ushort> GetUInt16Properties(ReadOnlySpan<ushort> keys)
@@ -417,7 +423,8 @@ internal static class KeyAnalyzer
         }
 
         ulong range = (ulong)(max - min);
-        return new NumericKeyProperties<ushort>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        bool isWellDistributed = IsWellDistributed(keys, range, min, static v => v);
+        return new NumericKeyProperties<ushort>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, isWellDistributed, mask, static v => v);
     }
 
     private static NumericKeyProperties<int> GetInt32Properties(ReadOnlySpan<int> keys)
@@ -434,7 +441,8 @@ internal static class KeyAnalyzer
         }
 
         ulong range = (ulong)((long)max - min);
-        return new NumericKeyProperties<int>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || (long)max - min == keys.Length - 1, mask, static v => v);
+        bool isWellDistributed = IsWellDistributed(keys, range, min, static v => v);
+        return new NumericKeyProperties<int>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || (long)max - min == keys.Length - 1, isWellDistributed, mask, static v => v);
     }
 
     private static NumericKeyProperties<uint> GetUInt32Properties(ReadOnlySpan<uint> keys)
@@ -451,7 +459,8 @@ internal static class KeyAnalyzer
         }
 
         ulong range = max - min;
-        return new NumericKeyProperties<uint>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1), mask, static v => v);
+        bool isWellDistributed = IsWellDistributed(keys, range, min, static v => v);
+        return new NumericKeyProperties<uint>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1), isWellDistributed, mask, static v => v);
     }
 
     private static NumericKeyProperties<long> GetInt64Properties(ReadOnlySpan<long> keys)
@@ -468,7 +477,8 @@ internal static class KeyAnalyzer
         }
 
         ulong range = unchecked((ulong)max - (ulong)min);
-        return new NumericKeyProperties<long>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || range == (ulong)(keys.Length - 1), mask, static v => v);
+        bool isWellDistributed = IsWellDistributed(keys, range, min, static v => v);
+        return new NumericKeyProperties<long>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || range == (ulong)(keys.Length - 1), isWellDistributed, mask, static v => v);
     }
 
     private static NumericKeyProperties<ulong> GetUInt64Properties(ReadOnlySpan<ulong> keys)
@@ -485,7 +495,8 @@ internal static class KeyAnalyzer
         }
 
         ulong range = max - min;
-        return new NumericKeyProperties<ulong>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1), mask, static v => (long)v);
+        bool isWellDistributed = IsWellDistributed(keys, range, min, static v => (long)v);
+        return new NumericKeyProperties<ulong>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1), isWellDistributed, mask, static v => (long)v);
     }
 
     private static bool IsFloatConsecutive(ReadOnlySpan<float> keys, float min, float max, bool hasNaNOrInfinity)
@@ -551,6 +562,56 @@ internal static class KeyAnalyzer
             return ulong.MaxValue;
 
         return (ulong)range;
+    }
+
+    private static bool IsWellDistributed<T>(ReadOnlySpan<T> keys, ulong range, T minKeyValue, Func<T, long> converter)
+    {
+        const int bucketLimit = 20;
+
+        if (keys.Length < 16)
+            return false;
+
+        int buckets = Math.Min(bucketLimit, keys.Length);
+        if (buckets <= 1)
+            return false;
+
+        if (range == 0)
+            return false;
+
+        Span<int> hist = stackalloc int[buckets];
+        ulong min = (ulong)converter(minKeyValue);
+
+        foreach (T key in keys)
+        {
+            ulong value = (ulong)converter(key);
+            ulong diff = value - min;
+            int i = (int)((diff * (ulong)buckets) / range);
+
+            if ((uint)i >= (uint)buckets)
+                i = buckets - 1;
+
+            hist[i]++;
+        }
+
+        int minCount = int.MaxValue;
+        int maxCount = 0;
+        int sum = 0;
+
+        for (int i = 0; i < buckets; i++)
+        {
+            int count = hist[i];
+            sum += count;
+            if (count < minCount)
+                minCount = count;
+            if (count > maxCount)
+                maxCount = count;
+        }
+
+        if (minCount == 0)
+            return false;
+
+        int avg = sum / buckets;
+        return maxCount - minCount <= avg;
     }
 
     private static double CalculateDensity(int keyCount, ulong range)
