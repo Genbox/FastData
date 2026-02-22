@@ -1,12 +1,215 @@
 <#@ template language="C#" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 
 <#@ parameter type="Genbox.FastData.Generator.Rust.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.EliasFanoContext" name="Context" #>
+
+const LOWER_BIT_COUNT: i32 = <#= Context.LowerBitCount #>;
+<#= Model.FieldModifier #>UPPER_BITS: [u64; <#= Context.UpperBits.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.UpperBits, x => Model.ToValueLabel(x)) #>
+];
+<#
+    if (Context.LowerBitCount != 0)
+    {
+#>
+
+<#= Model.FieldModifier #>LOWER_BITS: [u64; <#= Context.LowerBits.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.LowerBits, x => Model.ToValueLabel(x)) #>
+];
+
+const LOWER_MASK: u64 = <#= Model.ToValueLabel(Context.LowerMask) #>;
+<#
+    }
+#>
+
+const SAMPLE_RATE_SHIFT: i32 = <#= Context.SampleRateShift #>;
+<#= Model.FieldModifier #>SAMPLE_POSITIONS: [i32; <#= Context.SamplePositions.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.SamplePositions, x => Model.ToValueLabel(x)) #>
+];
 
 <#= Model.MethodAttribute #>
 <#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName() #>) -> bool {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
-    let _ = <#= Common.InputKeyName #>;
-    false
+
+    let value = <#= Common.LookupKeyName #> as i64;
+    let high = value >> (Self::LOWER_BIT_COUNT as u32);
+
+    let position = if high == 0 { 0 } else { Self::select_zero(high - 1) + 1 };
+    if position < 0 {
+        return false;
+    }
+
+    let mut rank = position - high;
+    if (rank as u64) >= Self::ITEM_COUNT as u64 {
+        return false;
+    }
+
+    let mut curr_word = (position >> 6) as usize;
+
+    if curr_word >= Self::UPPER_BITS.len() {
+        return false;
+    }
+
+    let mut window = Self::UPPER_BITS[curr_word] & (u64::MAX << ((position & 63) as u32));
+<#
+    if (Context.LowerBitCount != 0)
+    {
+#>    let target_low = (value as u64) & Self::LOWER_MASK;
+    let mut lower_bits_offset = rank * (Self::LOWER_BIT_COUNT as i64);
+
+    loop {
+        while window == 0 {
+            curr_word += 1;
+            if curr_word >= Self::UPPER_BITS.len() {
+                return false;
+            }
+
+            window = Self::UPPER_BITS[curr_word];
+        }
+
+        let trailing = window.trailing_zeros() as i64;
+        let one_position = ((curr_word as i64) << 6) + trailing;
+        let current_high = one_position - rank;
+
+        if current_high >= high {
+            if current_high > high {
+                return false;
+            }
+
+            let word_index = (lower_bits_offset >> 6) as usize;
+            let start_bit = (lower_bits_offset & 63) as u32;
+
+            let current_low = if start_bit + (Self::LOWER_BIT_COUNT as u32) <= 64 {
+                (Self::LOWER_BITS[word_index] >> start_bit) & Self::LOWER_MASK
+            } else {
+                let lower = Self::LOWER_BITS[word_index] >> start_bit;
+                let upper = Self::LOWER_BITS[word_index + 1] << (64 - start_bit);
+                (lower | upper) & Self::LOWER_MASK
+            };
+
+            if current_low == target_low {
+                return true;
+            }
+
+            if current_low > target_low {
+                return false;
+            }
+        }
+
+        window &= window - 1;
+        rank += 1;
+
+        if (rank as u64) >= Self::ITEM_COUNT as u64 {
+            return false;
+        }
+
+        lower_bits_offset += Self::LOWER_BIT_COUNT as i64;
+    }
+<#
+    }
+    else
+    {
+#>    loop {
+        while window == 0 {
+            curr_word += 1;
+            if curr_word >= Self::UPPER_BITS.len() {
+                return false;
+            }
+
+            window = Self::UPPER_BITS[curr_word];
+        }
+
+        let trailing = window.trailing_zeros() as i64;
+        let one_position = ((curr_word as i64) << 6) + trailing;
+        let current_high = one_position - rank;
+
+        if current_high >= high {
+            if current_high > high {
+                return false;
+            }
+
+            return true;
+        }
+
+        window &= window - 1;
+        rank += 1;
+
+        if (rank as u64) >= Self::ITEM_COUNT as u64 {
+            return false;
+        }
+    }
+<#
+    }
+#>}
+
+fn select_zero(rank: i64) -> i64 {
+    if rank < 0 {
+        return -1;
+    }
+
+    let sample_index = (rank >> (Self::SAMPLE_RATE_SHIFT as u32)) as usize;
+    if sample_index >= Self::SAMPLE_POSITIONS.len() {
+        return -1;
+    }
+
+    let mut zero_rank = (sample_index as i64) << (Self::SAMPLE_RATE_SHIFT as u32);
+    let start_position = Self::SAMPLE_POSITIONS[sample_index] as i64;
+    let mut word_index = (start_position >> 6) as usize;
+    let mut start_bit = (start_position & 63) as u32;
+
+    while word_index < Self::UPPER_BITS.len() {
+        let valid_bits = if word_index == Self::UPPER_BITS.len() - 1 { <#= (Context.UpperBitLength & 63) #> } else { 64 };
+        let valid_mask = if valid_bits == 64 { u64::MAX } else { (1u64 << (valid_bits as u32)) - 1 };
+        let mut zeros = !Self::UPPER_BITS[word_index] & valid_mask;
+
+        if start_bit > 0 {
+            zeros &= !((1u64 << start_bit) - 1);
+            start_bit = 0;
+        }
+
+        let zero_count = zeros.count_ones() as i64;
+        if zero_count == 0 {
+            word_index += 1;
+            continue;
+        }
+
+        if zero_rank + zero_count > rank {
+            let rank_in_word = (rank - zero_rank) as i32;
+            let bit_in_word = Self::select_bit_in_word(zeros, rank_in_word);
+            return ((word_index as i64) << 6) + bit_in_word as i64;
+        }
+
+        zero_rank += zero_count;
+        word_index += 1;
+    }
+
+    -1
+}
+
+#[inline(always)]
+fn select_bit_in_word(word: u64, rank: i32) -> i32 {
+    if rank < 0 || rank >= 64 {
+        return -1;
+    }
+
+    let mut remaining = rank;
+    let mut value = word;
+
+    while remaining > 0 {
+        if value == 0 {
+            return -1;
+        }
+
+        value &= value - 1;
+        remaining -= 1;
+    }
+
+    if value == 0 {
+        return -1;
+    }
+
+    value.trailing_zeros() as i32
 }

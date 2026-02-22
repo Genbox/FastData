@@ -9,15 +9,180 @@ use std::ptr;
 pub struct EliasFanoStructure_Int32_1000_natural_sparse;
 
 impl EliasFanoStructure_Int32_1000_natural_sparse {
-#[must_use]
-pub fn contains(key: i32) -> bool {
+    const LOWER_BIT_COUNT: i32 = 5;
+    const UPPER_BITS: [u64; 35] = [
+        u64::MIN, u64::MIN, u64::MIN, u64::MIN, u64::MIN, 8569998247165165568, 13505994968989940663, 13121086807930026043, 7178733607867, 8572282884688183296, 
+        8017373763884250893, 8626345266874530775, 114843099, 8563716590631608320, 8606077467601124215, 4861485018049613239, 6917529027641082743, 7993570332096837495, 16751963369270632827, 265391556270995382, 
+        17252674445944815616, 17730371410552387638, 8570048300139133806, 3151895837623, 17132517322838245376, 7993567941276448494, 1654753857512159095, 31160182, 17248150737747666944, 14082156645215274934, 
+        8565249309840735086, 16717361816799281527, 15590861283333202286, 7916723541758146286, 24545834871
+    ];
+
+    const LOWER_BITS: [u64; 79] = [
+        13381157542753010415, 5259608392997391241, 8278300478900102390, 6430456644257046673, 8661777615979087666, 4741329775448022559, 18429273440410558711, 10970153460314561856, 10903284999962971405, 15223127904740104680, 
+        13148863654793060072, 1151801467238817559, 14395173049126421404, 7054611735073078946, 5740033379695440593, 7832982931856408661, 17894879870264318184, 2754544002549051455, 13625427461182034777, 16489447962146853899, 
+        6125721526290708006, 6740632697962226563, 17933568190195004385, 9070409572135365850, 11184335873243103096, 10366757993120053403, 3325599644650983268, 10653585939564988695, 11767076348912235301, 2074300112330154491, 
+        18167213940925665140, 9501758702200673295, 8431863336021577945, 3836682911469117065, 7467633665883893389, 18428823475821080955, 8961839901508663744, 2193323318911953452, 18053621551963254038, 14647262467445228884, 
+        9616916818585816710, 7179215893365720527, 15092654568107488658, 5576750433282900155, 5777824052103570030, 6681261138144802869, 10235929937476795924, 15999344638198992303, 12928677308572891015, 18294175300244441529, 
+        16289366044209116744, 4436678369653854578, 3805780845500248665, 14742057723572979642, 13974261949167368001, 4454195716505288959, 5782604860378385816, 6046694362377218199, 8801674211884984341, 18160014507494021046, 
+        14262229915956386831, 16646429028881703623, 13345734027394601313, 12995270594609042767, 6296716507696654444, 4186989851602869496, 1674800131495647526, 15442191721967127485, 211464465109362404, 14666457841769087829, 
+        16200926409952297541, 16181841252959705848, 3944653260232554621, 16005643698267790235, 6987125693839533199, 15646621693333018422, 5552261306875323795, 14511994689465383843, 28
+    ];
+
+    const LOWER_MASK: u64 = 31;
+
+    const SAMPLE_RATE_SHIFT: i32 = 7;
+    const SAMPLE_POSITIONS: [i32; 10] = [
+        0, 128, 256, 424, 709, 997, 1276, 1531, 1786, 2041
+    ];
+
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
         if (key as u32 & 4294901760) != 0 {
             return false;
         }
 
-    let _ = key;
-    false
-}
+
+        let value = key as i64;
+        let high = value >> (Self::LOWER_BIT_COUNT as u32);
+
+        let position = if high == 0 { 0 } else { Self::select_zero(high - 1) + 1 };
+        if position < 0 {
+            return false;
+        }
+
+        let mut rank = position - high;
+        if (rank as u64) >= Self::ITEM_COUNT as u64 {
+            return false;
+        }
+
+        let mut curr_word = (position >> 6) as usize;
+
+        if curr_word >= Self::UPPER_BITS.len() {
+            return false;
+        }
+
+        let mut window = Self::UPPER_BITS[curr_word] & (u64::MAX << ((position & 63) as u32));
+        let target_low = (value as u64) & Self::LOWER_MASK;
+        let mut lower_bits_offset = rank * (Self::LOWER_BIT_COUNT as i64);
+
+        loop {
+            while window == 0 {
+                curr_word += 1;
+                if curr_word >= Self::UPPER_BITS.len() {
+                    return false;
+                }
+
+                window = Self::UPPER_BITS[curr_word];
+            }
+
+            let trailing = window.trailing_zeros() as i64;
+            let one_position = ((curr_word as i64) << 6) + trailing;
+            let current_high = one_position - rank;
+
+            if current_high >= high {
+                if current_high > high {
+                    return false;
+                }
+
+                let word_index = (lower_bits_offset >> 6) as usize;
+                let start_bit = (lower_bits_offset & 63) as u32;
+
+                let current_low = if start_bit + (Self::LOWER_BIT_COUNT as u32) <= 64 {
+                    (Self::LOWER_BITS[word_index] >> start_bit) & Self::LOWER_MASK
+                } else {
+                    let lower = Self::LOWER_BITS[word_index] >> start_bit;
+                    let upper = Self::LOWER_BITS[word_index + 1] << (64 - start_bit);
+                    (lower | upper) & Self::LOWER_MASK
+                };
+
+                if current_low == target_low {
+                    return true;
+                }
+
+                if current_low > target_low {
+                    return false;
+                }
+            }
+
+            window &= window - 1;
+            rank += 1;
+
+            if (rank as u64) >= Self::ITEM_COUNT as u64 {
+                return false;
+            }
+
+            lower_bits_offset += Self::LOWER_BIT_COUNT as i64;
+        }
+    }
+
+    fn select_zero(rank: i64) -> i64 {
+        if rank < 0 {
+            return -1;
+        }
+
+        let sample_index = (rank >> (Self::SAMPLE_RATE_SHIFT as u32)) as usize;
+        if sample_index >= Self::SAMPLE_POSITIONS.len() {
+            return -1;
+        }
+
+        let mut zero_rank = (sample_index as i64) << (Self::SAMPLE_RATE_SHIFT as u32);
+        let start_position = Self::SAMPLE_POSITIONS[sample_index] as i64;
+        let mut word_index = (start_position >> 6) as usize;
+        let mut start_bit = (start_position & 63) as u32;
+
+        while word_index < Self::UPPER_BITS.len() {
+            let valid_bits = if word_index == Self::UPPER_BITS.len() - 1 { 35 } else { 64 };
+            let valid_mask = if valid_bits == 64 { u64::MAX } else { (1u64 << (valid_bits as u32)) - 1 };
+            let mut zeros = !Self::UPPER_BITS[word_index] & valid_mask;
+
+            if start_bit > 0 {
+                zeros &= !((1u64 << start_bit) - 1);
+                start_bit = 0;
+            }
+
+            let zero_count = zeros.count_ones() as i64;
+            if zero_count == 0 {
+                word_index += 1;
+                continue;
+            }
+
+            if zero_rank + zero_count > rank {
+                let rank_in_word = (rank - zero_rank) as i32;
+                let bit_in_word = Self::select_bit_in_word(zeros, rank_in_word);
+                return ((word_index as i64) << 6) + bit_in_word as i64;
+            }
+
+            zero_rank += zero_count;
+            word_index += 1;
+        }
+
+        -1
+    }
+
+    #[inline(always)]
+    fn select_bit_in_word(word: u64, rank: i32) -> i32 {
+        if rank < 0 || rank >= 64 {
+            return -1;
+        }
+
+        let mut remaining = rank;
+        let mut value = word;
+
+        while remaining > 0 {
+            if value == 0 {
+                return -1;
+            }
+
+            value &= value - 1;
+            remaining -= 1;
+        }
+
+        if value == 0 {
+            return -1;
+        }
+
+        value.trailing_zeros() as i32
+    }
 
     pub const ITEM_COUNT: usize = 1000;
     pub const MIN_KEY: i32 = 11727;
