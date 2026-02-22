@@ -12,23 +12,19 @@ internal static class HashTableCompactStructure_UInt32_4
     private struct E
     {
         internal uint Key;
-        
-        
         internal E(uint key)
         {
             Key = key;
-            
-            
         }
     };
 
     private static readonly byte[] _bucketStarts = new byte[] {
         0, 1, 2, 3
-     };
+    };
 
     private static readonly byte[] _bucketCounts = new byte[] {
         1, 1, 1, 1
-     };
+    };
 
     private static readonly E[] _entries = {
         new E(uint.MinValue), new E(1u), new E(2u), new E(uint.MaxValue)
@@ -41,7 +37,7 @@ internal static class HashTableCompactStructure_UInt32_4
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(uint key)
     {
         if (key < uint.MinValue || key > uint.MaxValue)

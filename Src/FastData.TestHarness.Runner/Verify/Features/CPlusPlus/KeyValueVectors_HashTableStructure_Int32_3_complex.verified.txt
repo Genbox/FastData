@@ -18,7 +18,6 @@ class HashTableStructure_Int32_3_complex final {
     struct e {
         int32_t key;
         int8_t next;
-        
         const Person* value;
         e(const int32_t key, const int8_t next, const Person* value)
            : key(key), next(next), value(value) {}
@@ -26,7 +25,7 @@ class HashTableStructure_Int32_3_complex final {
 
     static constexpr std::array<int8_t, 3> buckets = {
         3, 1, 2
-     };
+    };
 
     inline static const std::array<e, 3> entries = {
         e(1, -1, new Person(1, u8"Bob", new Person(4, u8"Anna", nullptr))), e(2, -1, new Person(2, u8"Billy", nullptr)), e(3, -1, new Person(3, u8"Bibi", nullptr))
@@ -37,7 +36,7 @@ class HashTableStructure_Int32_3_complex final {
         return static_cast<uint64_t>(value);
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
         if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
@@ -59,13 +58,14 @@ public:
 
         return false;
     }
+
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
         if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
             {
-    value = nullptr;
-    return false;
-}
+        value = nullptr;
+        return false;
+    }
 
 
         const uint64_t hash = get_hash(key);

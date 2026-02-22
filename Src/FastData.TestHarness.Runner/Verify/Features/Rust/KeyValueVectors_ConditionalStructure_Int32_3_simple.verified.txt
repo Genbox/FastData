@@ -9,10 +9,10 @@ use std::ptr;
 pub struct ConditionalStructure_Int32_3_simple;
 
 impl ConditionalStructure_Int32_3_simple {
-
-   const VALUES: [i32; 3] = [
+    const VALUES: [i32; 3] = [
         1, 2, 3
-    ];    #[must_use]
+    ];
+    #[must_use]
     pub fn contains(key: i32) -> bool {
 
 
@@ -22,6 +22,7 @@ impl ConditionalStructure_Int32_3_simple {
 
         false
     }
+
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<i32> {
 
@@ -34,7 +35,6 @@ impl ConditionalStructure_Int32_3_simple {
         if (key == 3) {
             return Some(Self::VALUES[2]);
         }
-
         None
     }
 

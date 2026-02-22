@@ -12,49 +12,49 @@
     if (Data.ValueCount > 0)
     {
 #>
-<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName() #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
-    };
+};
 
 <#
     }
 #>
 <#= Model.GetFieldModifier(true) #>std::array<<#= Model.KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
 <#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, Model.ToValueLabel) #>
-    };
+};
 
 public:
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-        for (<#= Common.ArraySizeType #> i = 0; i < <#= Data.KeyCount.ToStringInvariant() #>; i++)
-        {
-            if (<#= Model.GetEqualFunction("keys[i]", Common.LookupKeyName) #>)
-                return true;
-        }
-        return false;
+    for (<#= Common.ArraySizeType #> i = 0; i < <#= Data.KeyCount.ToStringInvariant() #>; i++)
+    {
+        if (<#= Model.GetEqualFunction("keys[i]", Common.LookupKeyName) #>)
+            return true;
     }
+    return false;
+}
 <#
     if (Data.ValueCount > 0)
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
 
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
-        for (<#= Common.ArraySizeType #> i = 0; i < <#= Data.KeyCount.ToStringInvariant() #>; i++) {
-            if (<#= Model.GetEqualFunction("keys[i]", Common.LookupKeyName) #>) {
-                value = <#= Model.IsPrimitive ? "&" : "" #>values[i];
-                return true;
-            }
+    for (<#= Common.ArraySizeType #> i = 0; i < <#= Data.KeyCount.ToStringInvariant() #>; i++) {
+        if (<#= Model.GetEqualFunction("keys[i]", Common.LookupKeyName) #>) {
+            value = <#= Model.IsPrimitive ? "&" : "" #>values[i];
+            return true;
         }
-
-        value = nullptr;
-        return false;
     }
+
+    value = nullptr;
+    return false;
+}
 <#
     }
 #>

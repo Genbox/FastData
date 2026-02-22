@@ -14,24 +14,22 @@ internal static class HashTableStructure_String_13_non_ascii
         internal string Key;
         internal sbyte Next;
         internal ulong HashCode;
-        
-        internal E(string key, sbyte next, ulong hashCode )
+        internal E(string key, sbyte next, ulong hashCode)
         {
             Key = key;
             Next = next;
             HashCode = hashCode;
-            
         }
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
         6, 13, 10, 0, 11, 2, 12, 3, 7, 0, 
         0, 0, 0
-     };
+    };
 
     private static readonly E[] _entries = {
-        new E("æ", -1, 18225460979434644138), new E("à", -1, 18225460988831147784), new E("ä", -1, 18225460982566812020), new E("ö", -1, 18225461004491987194), new E("ü", 0, 18225461020152826604), new E("ß", 3, 18225461065569260893), new E("é", 4, 18225460999793735371), new E("è", -1, 18225461001359819312), new E("ê", -1, 18225460998227651430), new E("ç", 8, 18225460977868560197), 
-        new E("ñ", -1, 18225461012322406899), new E("ø", -1, 18225461026417162368), new E("å", 7, 18225460981000728079)
+        new E("æ", -1, 18225460979434644138ul), new E("à", -1, 18225460988831147784ul), new E("ä", -1, 18225460982566812020ul), new E("ö", -1, 18225461004491987194ul), new E("ü", 0, 18225461020152826604ul), new E("ß", 3, 18225461065569260893ul), new E("é", 4, 18225460999793735371ul), new E("è", -1, 18225461001359819312ul), new E("ê", -1, 18225460998227651430ul), new E("ç", 8, 18225460977868560197ul), 
+        new E("ñ", -1, 18225461012322406899ul), new E("ø", -1, 18225461026417162368ul), new E("å", 7, 18225460981000728079ul)
     };
 
 
@@ -52,7 +50,7 @@ internal static class HashTableStructure_String_13_non_ascii
         return 352654597 + (hash * 1566083941);
     }
 
-    
+
     public static bool Contains(string key)
     {
         if (key.Length != 1u)

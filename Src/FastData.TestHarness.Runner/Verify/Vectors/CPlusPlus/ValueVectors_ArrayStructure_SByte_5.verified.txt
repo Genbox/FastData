@@ -12,7 +12,7 @@ class ArrayStructure_SByte_5 final {
         std::numeric_limits<int8_t>::lowest(), -1, 0, 1, std::numeric_limits<int8_t>::max()
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int8_t key) noexcept {
         if (key < std::numeric_limits<int8_t>::lowest() || key > std::numeric_limits<int8_t>::max())

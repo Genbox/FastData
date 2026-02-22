@@ -60,5 +60,5 @@ impl HashTableCompactStructure_Double_4 {
 }struct E {
     hash_code: u64,
     key: f64,
-    
 }
+

@@ -48,8 +48,7 @@ impl HashTableStructure_Byte_3 {
     pub const MIN_KEY: u8 = u8::MIN;
     pub const MAX_KEY: u8 = u8::MAX;
 }struct E {
-    
     next: i8,
     key: u8,
-    
 }
+

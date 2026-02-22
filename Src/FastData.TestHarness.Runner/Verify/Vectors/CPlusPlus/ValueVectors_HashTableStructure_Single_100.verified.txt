@@ -12,7 +12,6 @@ class HashTableStructure_Single_100 final {
         float key;
         int8_t next;
         uint64_t hash_code;
-        
         e(const float key, const int8_t next, const uint64_t hash_code)
            : key(key), next(next), hash_code(hash_code) {}
     };
@@ -28,7 +27,7 @@ class HashTableStructure_Single_100 final {
         0, 0, 79, 0, 0, 0, 86, 0, 0, 0, 
         93, 0, 0, 0, 100, 0, 0, 0, 82, 0, 
         0, 0, 89, 0, 0, 0, 96, 0, 0, 0
-     };
+    };
 
     inline static const std::array<e, 100> entries = {
         e(0.0f, -1, 0), e(1.0f, -1, 1065353216), e(2.0f, -1, 1073741824), e(3.0f, -1, 1077936128), e(4.0f, -1, 1082130432), e(5.0f, -1, 1084227584), e(6.0f, -1, 1086324736), e(7.0f, -1, 1088421888), e(8.0f, -1, 1090519040), e(9.0f, 1, 1091567616), 
@@ -52,7 +51,7 @@ class HashTableStructure_Single_100 final {
         return bits;
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
         if (key < 0.0f || key > 99.0f)

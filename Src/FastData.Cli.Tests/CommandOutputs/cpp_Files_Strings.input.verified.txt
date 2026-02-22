@@ -10,7 +10,7 @@
 #include <string_view>
 
 class MyData final {
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 5u)

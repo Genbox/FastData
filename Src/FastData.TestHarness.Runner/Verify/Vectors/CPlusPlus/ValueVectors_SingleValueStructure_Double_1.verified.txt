@@ -8,7 +8,7 @@
 #include <string_view>
 
 class SingleValueStructure_Double_1 final {
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const double key) noexcept {
 

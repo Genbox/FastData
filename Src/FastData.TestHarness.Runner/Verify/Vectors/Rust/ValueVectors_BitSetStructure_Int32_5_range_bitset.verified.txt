@@ -12,6 +12,7 @@ impl BitSetStructure_Int32_5_range_bitset {
     const BITSET: [u64; 1] = [
         31
     ];
+
     #[must_use]
     pub fn contains(key: i32) -> bool {
 

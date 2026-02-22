@@ -9,10 +9,10 @@
 
 class KeyLengthStructure_String_7 final {
     static constexpr std::array<std::string_view, 8> keys = {
-        u8"aaa", u8"", u8"aaaaa", u8"aaaaaa", u8"aaaaaaa", u8"aaaaaaaa", u8"aaaaaaaaa", u8"aaaaaaaaaa"
+        u8"aaa", {}, u8"aaaaa", u8"aaaaaa", u8"aaaaaaa", u8"aaaaaaaa", u8"aaaaaaaaa", u8"aaaaaaaaaa"
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
          const size_t len = key.length();

@@ -11,49 +11,49 @@
 
 <#= Model.GetFieldModifier(true) #>std::array<uint64_t, <#= Context.BitSet.Length.ToStringInvariant() #>> bitset = {
 <#= FormatHelper.FormatColumns(Context.BitSet, x => Model.ToValueLabel(x)) #>
-    };
+};
 
 <#
     if (Data.ValueCount > 0)
     {
 #>
-<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName() #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
-    };
+};
 
 <#
     }
 #>
 public:
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-        const uint64_t offset = static_cast<uint64_t>(<#= Common.LookupKeyName #> - min_key);
-        const size_t word = static_cast<size_t>(offset >> 6);
-        return (bitset[word] & (1ULL << (offset & 63))) != 0;
-    }
+    const uint64_t offset = static_cast<uint64_t>(<#= Common.LookupKeyName #> - min_key);
+    const size_t word = static_cast<size_t>(offset >> 6);
+    return (bitset[word] & (1ULL << (offset & 63))) != 0;
+}
 <#
     if (Data.ValueCount > 0)
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
 
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
-        const uint64_t offset = static_cast<uint64_t>(<#= Common.LookupKeyName #> - min_key);
-        const size_t word = static_cast<size_t>(offset >> 6);
-        if ((bitset[word] & (1ULL << (offset & 63))) == 0)
-        {
-            value = nullptr;
-            return false;
-        }
-
-        value = <#= Model.IsPrimitive ? "&" : "" #>values[static_cast<size_t>(offset)];
-        return true;
+    const uint64_t offset = static_cast<uint64_t>(<#= Common.LookupKeyName #> - min_key);
+    const size_t word = static_cast<size_t>(offset >> 6);
+    if ((bitset[word] & (1ULL << (offset & 63))) == 0)
+    {
+        value = nullptr;
+        return false;
     }
+
+    value = <#= Model.IsPrimitive ? "&" : "" #>values[static_cast<size_t>(offset)];
+    return true;
+}
 <#
     }
 #>

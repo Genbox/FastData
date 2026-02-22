@@ -8,7 +8,7 @@
 #include <string_view>
 
 class ConditionalStructure_String_100 final {
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
          const size_t len = key.length();

@@ -13,20 +13,16 @@ internal static class HashTableStructure_UInt16_4
     {
         internal ushort Key;
         internal sbyte Next;
-        
-        
-        internal E(ushort key, sbyte next )
+        internal E(ushort key, sbyte next)
         {
             Key = key;
             Next = next;
-            
-            
         }
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
         1, 2, 3, 4
-     };
+    };
 
     private static readonly E[] _entries = {
         new E(ushort.MinValue, -1), new E(1, -1), new E(2, -1), new E(ushort.MaxValue, -1)
@@ -39,7 +35,7 @@ internal static class HashTableStructure_UInt16_4
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(ushort key)
     {
         if (key < ushort.MinValue || key > ushort.MaxValue)

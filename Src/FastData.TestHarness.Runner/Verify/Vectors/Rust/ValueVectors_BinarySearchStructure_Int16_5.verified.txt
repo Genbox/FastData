@@ -19,6 +19,7 @@ impl BinarySearchStructure_Int16_5 {
             return false;
         }
 
+
         let mut lo: usize = 0;
         let mut hi: usize = 4;
         while lo <= hi {

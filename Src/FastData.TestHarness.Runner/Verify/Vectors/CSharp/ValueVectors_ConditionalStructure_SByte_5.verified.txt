@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 
 internal static class ConditionalStructure_SByte_5
 {
-    
     public static bool Contains(sbyte key)
     {
         if (key < sbyte.MinValue || key > sbyte.MaxValue)

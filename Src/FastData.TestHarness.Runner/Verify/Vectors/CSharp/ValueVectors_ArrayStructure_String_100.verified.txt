@@ -21,7 +21,7 @@ internal static class ArrayStructure_String_100
         "90", "91", "92", "93", "94", "95", "96", "97", "98", "99"
     };
 
-    
+
     public static bool Contains(string key)
     {
         int len = key.Length;
@@ -35,7 +35,7 @@ internal static class ArrayStructure_String_100
         for (int i = 0; i < 100; i++)
         {
             if (StringComparer.Ordinal.Equals(key, _keys[i]))
-               return true;
+                return true;
         }
         return false;
     }

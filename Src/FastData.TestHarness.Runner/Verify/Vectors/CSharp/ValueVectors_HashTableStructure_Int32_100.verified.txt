@@ -13,14 +13,10 @@ internal static class HashTableStructure_Int32_100
     {
         internal int Key;
         internal sbyte Next;
-        
-        
-        internal E(int key, sbyte next )
+        internal E(int key, sbyte next)
         {
             Key = key;
             Next = next;
-            
-            
         }
     };
 
@@ -35,7 +31,7 @@ internal static class HashTableStructure_Int32_100
         71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 
         81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 
         91, 92, 93, 94, 95, 96, 97, 98, 99, 100
-     };
+    };
 
     private static readonly E[] _entries = {
         new E(0, -1), new E(1, -1), new E(2, -1), new E(3, -1), new E(4, -1), new E(5, -1), new E(6, -1), new E(7, -1), new E(8, -1), new E(9, -1), 
@@ -57,7 +53,7 @@ internal static class HashTableStructure_Int32_100
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(int key)
     {
         if (((uint)key & 4294967168u) != 0)

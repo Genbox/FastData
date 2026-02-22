@@ -12,7 +12,7 @@ class ArrayStructure_String_2_prefix_suffix final {
         u8"suf", u8"pre"
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 6u)

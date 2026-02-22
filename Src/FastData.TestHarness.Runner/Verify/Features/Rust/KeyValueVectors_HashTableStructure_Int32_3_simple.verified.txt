@@ -43,6 +43,7 @@ impl HashTableStructure_Int32_3_simple {
 
         false
     }
+
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<i32> {
         if (key as u32 & 4294967292) != 0 {
@@ -69,8 +70,8 @@ impl HashTableStructure_Int32_3_simple {
     pub const MIN_KEY: i32 = 1;
     pub const MAX_KEY: i32 = 3;
 }struct E {
-    
     next: i8,
     key: i32,
     value: i32,
 }
+

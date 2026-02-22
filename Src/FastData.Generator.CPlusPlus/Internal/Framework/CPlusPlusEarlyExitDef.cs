@@ -18,12 +18,12 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         return bitSet.Length == 1
             ? RenderWord(bitSet[0], methodType)
             : $$"""
-                        switch (key.length() >> 6)
-                        {
+                    switch (key.length() >> 6)
+                    {
                 {{RenderCases()}}
-                            default:
-                                {{RenderExit(methodType)}}
-                        }
+                        default:
+                            {{RenderExit(methodType)}}
+                    }
                 """;
 
         string RenderCases()
@@ -33,9 +33,9 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
             for (int i = 0; i < bitSet.Length; i++)
             {
                 sb.Append($"""
-                                       case {i.ToStringInvariant()}:
-                               {RenderWord(bitSet[i], methodType)}
-                                       break;
+                                   case {i.ToStringInvariant()}:
+                           {RenderWord(bitSet[i], methodType)}
+                                   break;
 
                            """);
             }
@@ -46,8 +46,8 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
 
     protected override string GetValueEarlyExit<T>(MethodType methodType, T min, T max) =>
         $"""
-                 if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
-                     {RenderExit(methodType)}
+             if ({(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")})
+                 {RenderExit(methodType)}
          """;
 
     protected override string GetValueBitMaskEarlyExit<T>(MethodType methodType, ulong mask)
@@ -58,8 +58,8 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         string maskLiteral = map.ToValueLabel(maskValue, unsignedType);
 
         return $"""
-                        if ((static_cast<{unsignedTypeName}>(key) & {maskLiteral}) != 0)
-                            {RenderExit(methodType)}
+                    if ((static_cast<{unsignedTypeName}>(key) & {maskLiteral}) != 0)
+                        {RenderExit(methodType)}
                 """;
     }
 
@@ -74,8 +74,8 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         };
 
         return $"""
-                         if (key.length() != {map.ToValueLabel(lengthValue)})
-                             {RenderExit(methodType)}
+                     if (key.length() != {map.ToValueLabel(lengthValue)})
+                         {RenderExit(methodType)}
                 """;
     }
 
@@ -104,9 +104,9 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         }
 
         return $"""
-                         const size_t len = key.length();
-                         if (len < {map.ToValueLabel(minLen)} || len > {map.ToValueLabel(maxLen)})
-                             {RenderExit(methodType)}
+                     const size_t len = key.length();
+                     if (len < {map.ToValueLabel(minLen)} || len > {map.ToValueLabel(maxLen)})
+                         {RenderExit(methodType)}
                 """;
     }
 
@@ -115,8 +115,8 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         Debug.Assert(byteDivisor > 1);
 
         return $"""
-                        if (key.length() % {map.ToValueLabel(byteDivisor)} != 0)
-                            {RenderExit(methodType)}
+                    if (key.length() % {map.ToValueLabel(byteDivisor)} != 0)
+                        {RenderExit(methodType)}
                 """;
     }
 
@@ -131,69 +131,69 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
         if (!ignoreCase)
         {
             return $"""
-                                    uint64_t first = 0;
-                                    std::memcpy(&first, key.data(), {byteCount});
+                                uint64_t first = 0;
+                                std::memcpy(&first, key.data(), {byteCount});
 
-                                    if ((first & {mask.ToStringInvariant()}ULL) != 0)
-                                        {RenderExit(methodType)}
+                                if ((first & {mask.ToStringInvariant()}ULL) != 0)
+                                    {RenderExit(methodType)}
                     """;
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.Append("                uint64_t first = 0;");
+        sb.Append("            uint64_t first = 0;");
 
         for (int i = 0; i < byteCount; i++)
         {
             sb.Append($"""
-                                       uint32_t c{i} = static_cast<uint32_t>(key[{i}]);
-                                       c{i} = to_lower_ascii(c{i});
-                                       first |= static_cast<uint64_t>(c{i}) << {i * 8};
+                                   uint32_t c{i} = static_cast<uint32_t>(key[{i}]);
+                                   c{i} = to_lower_ascii(c{i});
+                                   first |= static_cast<uint64_t>(c{i}) << {i * 8};
                        """);
         }
 
         sb.Append($"""
 
-                                   if ((first & {mask.ToStringInvariant()}ULL) != 0)
-                                       {RenderExit(methodType)}
+                               if ((first & {mask.ToStringInvariant()}ULL) != 0)
+                                   {RenderExit(methodType)}
                    """);
         return sb.ToString();
     }
 
     protected override string GetCharRangeEarlyExit(MethodType methodType, CharPosition position, char min, char max, bool ignoreCase, GeneratorEncoding encoding) =>
         $"""
-                 uint32_t valueChar = {(position == CharPosition.First ?
-                     ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.front()))" : "static_cast<uint32_t>(key.front())" :
-                     ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.back()))" : "static_cast<uint32_t>(key.back())")};
-                 if (valueChar < {map.ToValueLabel((uint)min)} || valueChar > {map.ToValueLabel((uint)max)})
-                     {RenderExit(methodType)}
+             uint32_t valueChar = {(position == CharPosition.First ?
+                 ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.front()))" : "static_cast<uint32_t>(key.front())" :
+                 ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.back()))" : "static_cast<uint32_t>(key.back())")};
+             if (valueChar < {map.ToValueLabel((uint)min)} || valueChar > {map.ToValueLabel((uint)max)})
+                 {RenderExit(methodType)}
          """;
 
     protected override string GetCharEqualsEarlyExit(MethodType methodType, CharPosition position, char value, bool ignoreCase, GeneratorEncoding encoding) =>
         $"""
-                 uint32_t valueChar = {(position == CharPosition.First ?
-                     ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.front()))" : "static_cast<uint32_t>(key.front())" :
-                     ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.back()))" : "static_cast<uint32_t>(key.back())")};
-                 if (valueChar != {map.ToValueLabel((uint)value)})
-                     {RenderExit(methodType)}
+             uint32_t valueChar = {(position == CharPosition.First ?
+                 ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.front()))" : "static_cast<uint32_t>(key.front())" :
+                 ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.back()))" : "static_cast<uint32_t>(key.back())")};
+             if (valueChar != {map.ToValueLabel((uint)value)})
+                 {RenderExit(methodType)}
          """;
 
     protected override string GetCharBitmapEarlyExit(MethodType methodType, CharPosition position, ulong low, ulong high, bool ignoreCase, GeneratorEncoding encoding) =>
         $$"""
-                  uint32_t valueChar = {{(position == CharPosition.First ?
-                      ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.front()))" : "static_cast<uint32_t>(key.front())" :
-                      ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.back()))" : "static_cast<uint32_t>(key.back())")}};
-                  if (valueChar > 0x7F)
+              uint32_t valueChar = {{(position == CharPosition.First ?
+                  ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.front()))" : "static_cast<uint32_t>(key.front())" :
+                  ignoreCase ? "to_lower_ascii(static_cast<uint32_t>(key.back()))" : "static_cast<uint32_t>(key.back())")}};
+              if (valueChar > 0x7F)
+                  {{RenderExit(methodType)}}
+              if (valueChar < 64)
+              {
+                  if (((1ULL << valueChar) & {{low.ToStringInvariant()}}ULL) == 0)
                       {{RenderExit(methodType)}}
-                  if (valueChar < 64)
-                  {
-                      if (((1ULL << valueChar) & {{low.ToStringInvariant()}}ULL) == 0)
-                          {{RenderExit(methodType)}}
-                  }
-                  else
-                  {
-                      if (((1ULL << (valueChar - 64)) & {{high.ToStringInvariant()}}ULL) == 0)
-                          {{RenderExit(methodType)}}
-                  }
+              }
+              else
+              {
+                  if (((1ULL << (valueChar - 64)) & {{high.ToStringInvariant()}}ULL) == 0)
+                      {{RenderExit(methodType)}}
+              }
           """;
 
     protected override string GetStringPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
@@ -208,15 +208,15 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
             condition = suffix.Length == 0 ? prefixCheck : $"{prefixCheck} && {suffixCheck}";
 
         return $"""
-                        if (!({condition}))
-                            {RenderExit(methodType)}
+                    if (!({condition}))
+                        {RenderExit(methodType)}
                 """;
     }
 
     private static string RenderWord(ulong word, MethodType methodType) =>
         $"""
-                 if (({word.ToStringInvariant()}ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
-                     {RenderExit(methodType)}
+             if (({word.ToStringInvariant()}ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+                 {RenderExit(methodType)}
          """;
 
     private static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup

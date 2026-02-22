@@ -19,7 +19,7 @@
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #><#= Model.FieldModifier #><#= Model.ValueTypeName #>[] _values = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
-    };
+};
 
 <#
     }
@@ -87,8 +87,8 @@
 
     switch (<#= Common.LookupKeyName #>)
     {
-<#= FormatHelper.FormatList(keys, x => $"            case {Model.ToValueLabel(x)}:", "\n") #>
-        return true;
+<#= FormatHelper.FormatList(keys, x => $"        case {Model.ToValueLabel(x)}:", "\n") #>
+            return true;
         default:
             return false;
     }

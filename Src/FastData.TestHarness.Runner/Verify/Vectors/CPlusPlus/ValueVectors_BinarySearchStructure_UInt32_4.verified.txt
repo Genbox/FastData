@@ -12,11 +12,12 @@ class BinarySearchStructure_UInt32_4 final {
         0, 1u, 2u, std::numeric_limits<uint32_t>::max()
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const uint32_t key) noexcept {
         if (key < 0 || key > std::numeric_limits<uint32_t>::max())
             return false;
+
 
         int32_t lo = 0;
         int32_t hi = 3;

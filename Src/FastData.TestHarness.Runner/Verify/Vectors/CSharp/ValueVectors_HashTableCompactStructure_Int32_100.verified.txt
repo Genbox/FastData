@@ -12,13 +12,9 @@ internal static class HashTableCompactStructure_Int32_100
     private struct E
     {
         internal int Key;
-        
-        
         internal E(int key)
         {
             Key = key;
-            
-            
         }
     };
 
@@ -33,7 +29,7 @@ internal static class HashTableCompactStructure_Int32_100
         70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 
         80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 
         90, 91, 92, 93, 94, 95, 96, 97, 98, 99
-     };
+    };
 
     private static readonly byte[] _bucketCounts = new byte[] {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
@@ -46,7 +42,7 @@ internal static class HashTableCompactStructure_Int32_100
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-     };
+    };
 
     private static readonly E[] _entries = {
         new E(0), new E(1), new E(2), new E(3), new E(4), new E(5), new E(6), new E(7), new E(8), new E(9), 
@@ -68,7 +64,7 @@ internal static class HashTableCompactStructure_Int32_100
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(int key)
     {
         if (((uint)key & 4294967168u) != 0)

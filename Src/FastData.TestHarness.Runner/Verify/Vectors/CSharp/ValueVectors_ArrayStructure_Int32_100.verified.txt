@@ -21,7 +21,7 @@ internal static class ArrayStructure_Int32_100
         90, 91, 92, 93, 94, 95, 96, 97, 98, 99
     };
 
-    
+
     public static bool Contains(int key)
     {
         if (((uint)key & 4294967168u) != 0)
@@ -31,7 +31,7 @@ internal static class ArrayStructure_Int32_100
         for (int i = 0; i < 100; i++)
         {
             if (key == _keys[i])
-               return true;
+                return true;
         }
         return false;
     }

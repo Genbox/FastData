@@ -22,11 +22,12 @@ class KeyLengthStructure_String_3_complex final {
     inline static const std::array<Person*, 3> values = {
         new Person(1, u8"Bob", new Person(4, u8"Anna", nullptr)), new Person(2, u8"Billy", nullptr), new Person(3, u8"Bibi", nullptr)
     };
+
     static constexpr std::array<std::string_view, 3> keys = {
         u8"a", u8"aa", u8"aaa"
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
          const size_t len = key.length();
@@ -39,20 +40,21 @@ public:
 
         return key == keys[key.length() - 1];
     }
+
     [[nodiscard]]
     static bool try_lookup(const std::string_view key, const Person*& value) noexcept {
          const size_t len = key.length();
          if (len < 1u || len > 3u)
              {
-    value = nullptr;
-    return false;
-}
+        value = nullptr;
+        return false;
+    }
         uint32_t valueChar = static_cast<uint32_t>(key.front());
         if (valueChar != 97u)
             {
-    value = nullptr;
-    return false;
-}
+        value = nullptr;
+        return false;
+    }
 
 
         size_t idx = key.length() - 1;

@@ -103,7 +103,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                         ValueObjectDeclarations = GetObjectDeclarations<TValue>(),
                         GetMethodModifier = constExpr => constExpr ? "static constexpr " : "static ",
                         GetFieldModifier = constExpr => constExpr ? "static constexpr " : "inline static const ",
-                        GetValueTypeName = customType => customType ? ValueTypeName + "*" : ValueTypeName
+                        GetValueTypeName = () => typeof(TValue).IsPrimitive ? ValueTypeName : ValueTypeName + "*"
                     }
                 },
                 { "Context", context },
@@ -264,7 +264,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
             sb.Append(base.GetMethodHeader(methodType));
 
             if (TotalTrimLength != 0)
-                sb.Append($"        const auto {TrimmedKeyName} = {InputKeyName}.substr({TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.length() - {TotalTrimLength.ToStringInvariant()});");
+                sb.Append($"    const auto {TrimmedKeyName} = {InputKeyName}.substr({TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.length() - {TotalTrimLength.ToStringInvariant()});");
 
             return sb.ToString();
         }

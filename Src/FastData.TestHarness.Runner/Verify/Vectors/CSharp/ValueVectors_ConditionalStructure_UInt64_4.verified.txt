@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 
 internal static class ConditionalStructure_UInt64_4
 {
-    
     public static bool Contains(ulong key)
     {
         if (key < ulong.MinValue || key > ulong.MaxValue)

@@ -12,14 +12,13 @@ class HashTableStructure_Double_5 final {
         double key;
         int8_t next;
         uint64_t hash_code;
-        
         e(const double key, const int8_t next, const uint64_t hash_code)
            : key(key), next(next), hash_code(hash_code) {}
     };
 
     static constexpr std::array<int8_t, 5> buckets = {
         4, 0, 3, 1, 5
-     };
+    };
 
     inline static const std::array<e, 5> entries = {
         e(1.0, -1, 4607182418800017408), e(2.0, -1, 4611686018427387904), e(3.0, -1, 4613937818241073152), e(4.0, -1, 4616189618054758400), e(5.0, 1, 4617315517961601024)
@@ -32,7 +31,7 @@ class HashTableStructure_Double_5 final {
         return bits;
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const double key) noexcept {
         if (key < 1.0 || key > 5.0)

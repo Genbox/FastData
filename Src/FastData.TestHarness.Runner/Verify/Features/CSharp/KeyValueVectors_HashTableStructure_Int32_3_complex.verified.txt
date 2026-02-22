@@ -26,20 +26,18 @@ internal static class HashTableStructure_Int32_3_complex
     {
         internal int Key;
         internal sbyte Next;
-        
         internal Person Value;
-        internal E(int key, sbyte next , Person value)
+        internal E(int key, sbyte next, Person value)
         {
             Key = key;
             Next = next;
-            
             Value = value;
         }
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
         3, 1, 2
-     };
+    };
 
     private static readonly E[] _entries = {
         new E(1, -1, new Person(1, "Bob", new Person(4, "Anna", null))), new E(2, -1, new Person(2, "Billy", null)), new E(3, -1, new Person(3, "Bibi", null))
@@ -52,7 +50,7 @@ internal static class HashTableStructure_Int32_3_complex
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(int key)
     {
         if (((uint)key & 4294967292u) != 0)
@@ -75,7 +73,8 @@ internal static class HashTableStructure_Int32_3_complex
 
         return false;
     }
-    
+
+
     public static bool TryLookup(int key, out Person value)
     {
         if (((uint)key & 4294967292u) != 0)

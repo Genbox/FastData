@@ -1,5 +1,6 @@
 <#@ template language="C#" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System.Linq" #>
@@ -26,7 +27,7 @@ struct e {
 #><#
     if (Data.ValueCount > 0)
     {
-#>    const <#= Model.GetValueTypeName(!Model.IsPrimitive) #> value;
+#>    const <#= Model.GetValueTypeName() #> value;
 <#
     }
 #>    e(const <#= Model.KeyTypeName #> key, const <#= bucketType #> next<#
@@ -37,7 +38,7 @@ struct e {
 #><#
     if (Data.ValueCount > 0)
     {
-#>, const <#= Model.GetValueTypeName(!Model.IsPrimitive) #> value<#
+#>, const <#= Model.GetValueTypeName() #> value<#
     }
 #>)
        : key(key), next(next)<#
@@ -55,7 +56,7 @@ struct e {
 
 <#= Model.GetFieldModifier(true) #>std::array<<#= bucketType #>, <#= Context.Buckets.Length.ToStringInvariant() #>> buckets = {
 <#= FormatHelper.FormatColumns(Context.Buckets, static x => x.ToStringInvariant()) #>
-     };
+};
 
 <#= Model.GetFieldModifier(false) #>std::array<e, <#= Data.Entries.Length.ToStringInvariant() #>> entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
@@ -64,68 +65,68 @@ struct e {
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
         return $"e({Model.ToValueLabel(x.Key)}, {x.Next.ToStringInvariant()}{hashPart}{valuePart})";
     }) #>
-    };
+};
 
 <#= Model.HashSource #>
 
 public:
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-        const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
-        const <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Context.Buckets.Length) #>;
-        <#= bucketType #> i = static_cast<<#= bucketType #>>(buckets[index] - 1);
+    const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
+    const <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Context.Buckets.Length) #>;
+    <#= bucketType #> i = static_cast<<#= bucketType #>>(buckets[index] - 1);
 
-        while (i >= 0) {
-            const auto& entry = entries[i];
+    while (i >= 0) {
+        const auto& entry = entries[i];
 
-            if (<#
+        if (<#
     if (Context.StoreHashCode)
     {
 #><#= Model.GetEqualFunctionByType("entry.hash_code", "hash", KeyType.Int64) #> && <#
     }
 #><#= Model.GetEqualFunction("entry.key", Common.LookupKeyName) #>)
-                return true;
+            return true;
 
-            i = entry.next;
-        }
-
-        return false;
+        i = entry.next;
     }
+
+    return false;
+}
 <#
     if (Data.ValueCount > 0)
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
 
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
-        const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
-        const <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Context.Buckets.Length) #>;
-        <#= bucketType #> i = static_cast<<#= bucketType #>>(buckets[index] - 1);
+    const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
+    const <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Context.Buckets.Length) #>;
+    <#= bucketType #> i = static_cast<<#= bucketType #>>(buckets[index] - 1);
 
-        while (i >= 0) {
-            const auto& entry = entries[i];
+    while (i >= 0) {
+        const auto& entry = entries[i];
 
-            if (<#
+        if (<#
         if (Context.StoreHashCode)
         {
 #><#= Model.GetEqualFunctionByType("entry.hash_code", "hash", KeyType.Int64) #> && <#
         }
 #><#= Model.GetEqualFunction("entry.key", Common.LookupKeyName) #>) {
-                value = <#= Model.IsPrimitive ? "&" : "" #>entry.value;
-                return true;
-            }
-
-            i = entry.next;
+            value = <#= Model.IsPrimitive ? "&" : "" #>entry.value;
+            return true;
         }
 
-        value = nullptr;
-        return false;
+        i = entry.next;
     }
+
+    value = nullptr;
+    return false;
+}
 <#
     }
 #>

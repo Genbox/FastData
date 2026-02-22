@@ -11,18 +11,17 @@ class HashTableCompactStructure_Double_4 final {
     struct e {
         double key;
         uint64_t hash_code;
-        
         e(const double key, const uint64_t hash_code)
            : key(key), hash_code(hash_code) {}
     };
 
     static constexpr std::array<uint8_t, 4> bucket_starts = {
         0, 2, 2, 2
-     };
+    };
 
     static constexpr std::array<uint8_t, 4> bucket_counts = {
         2, 0, 0, 2
-     };
+    };
 
     inline static const std::array<e, 4> entries = {
         e(0.0, 0), e(1.0, 4607182418800017408), e(std::numeric_limits<double>::lowest(), 18442240474082181119), e(std::numeric_limits<double>::max(), 9218868437227405311)
@@ -37,7 +36,7 @@ class HashTableCompactStructure_Double_4 final {
         return bits;
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const double key) noexcept {
         if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())

@@ -13,20 +13,16 @@ internal static class TypeReductionEnabled_False
     {
         internal byte Key;
         internal int Next;
-        
-        
-        internal E(byte key, int next )
+        internal E(byte key, int next)
         {
             Key = key;
             Next = next;
-            
-            
         }
     };
 
     private static readonly int[] _buckets = new int[] {
         3, 2, 0
-     };
+    };
 
     private static readonly E[] _entries = {
         new E(byte.MinValue, -1), new E(1, -1), new E(byte.MaxValue, 0)
@@ -39,7 +35,7 @@ internal static class TypeReductionEnabled_False
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(byte key)
     {
         if (key < byte.MinValue || key > byte.MaxValue)

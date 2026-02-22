@@ -12,7 +12,7 @@ class ArrayStructure_UInt64_4 final {
         0, 1ull, 2ull, std::numeric_limits<uint64_t>::max()
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const uint64_t key) noexcept {
         if (key < 0 || key > std::numeric_limits<uint64_t>::max())

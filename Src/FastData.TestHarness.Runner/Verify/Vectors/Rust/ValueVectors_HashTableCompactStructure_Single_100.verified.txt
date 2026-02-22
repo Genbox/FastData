@@ -87,5 +87,5 @@ impl HashTableCompactStructure_Single_100 {
 }struct E {
     hash_code: u64,
     key: f32,
-    
 }
+

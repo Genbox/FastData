@@ -12,7 +12,7 @@ class ArrayStructure_Char_3 final {
         0, 97, 127
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const char key) noexcept {
         if ((static_cast<uint16_t>(key) & 65408) != 0)

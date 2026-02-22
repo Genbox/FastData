@@ -12,11 +12,11 @@ internal class CSharpHashDef : IHashDef
     public string GetHashSource(KeyType keyType, string typeName, HashInfo info) =>
         $$"""
           {{GetState(info.StringHash?.State)}}
-              [MethodImpl(MethodImplOptions.AggressiveInlining)]
-              private static ulong Hash({{typeName}} value)
-              {
+          [MethodImpl(MethodImplOptions.AggressiveInlining)]
+          private static ulong Hash({{typeName}} value)
+          {
           {{GetHash(keyType, info)}}
-              }
+          }
           """;
 
     private static string GetState(StateInfo[]? info)
@@ -48,59 +48,59 @@ internal class CSharpHashDef : IHashDef
         {
             return info.StringHash != null
                 ? $"""
-                           int length = value.Length;
+                       int length = value.Length;
                    {info.StringHash.HashSource}
-                           return hash;
+                       return hash;
                    {GetFunctions(info.StringHash.ReaderFunctions)}
                    """
                 : """
-                          ulong hash = 352654597;
+                      ulong hash = 352654597;
 
-                          ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
-                          int len = value.Length;
+                      ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
+                      int len = value.Length;
 
-                          while (len-- > 0)
-                          {
-                              hash = (((hash << 5) | (hash >> 27)) + hash) ^ ptr;
-                              ptr = ref Unsafe.Add(ref ptr, 1);
-                          }
+                      while (len-- > 0)
+                      {
+                          hash = (((hash << 5) | (hash >> 27)) + hash) ^ ptr;
+                          ptr = ref Unsafe.Add(ref ptr, 1);
+                      }
 
-                          return 352654597 + (hash * 1566083941);
+                      return 352654597 + (hash * 1566083941);
                   """;
         }
 
         if (keyType.IsIdentityHash())
-            return "        return (ulong)value;";
+            return "    return (ulong)value;";
 
         if (keyType == KeyType.Single)
         {
             return info.HasZeroOrNaN
                 ? """
-                          uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
+                      uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
 
-                          if (((bits - 1) & ~(0x8000_0000)) >= 0x7FF0_0000)
-                              bits &= 0x7FF0_0000;
+                      if (((bits - 1) & ~(0x8000_0000)) >= 0x7FF0_0000)
+                          bits &= 0x7FF0_0000;
 
-                          return (ulong)bits;
+                      return (ulong)bits;
                   """
-                : "        return (ulong)Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));";
+                : "    return (ulong)Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));";
         }
 
         if (keyType == KeyType.Double)
         {
             return info.HasZeroOrNaN
                 ? """
-                          ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
+                      ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
 
-                          if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
-                              bits &= 0x7FF0_0000_0000_0000;
+                      if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
+                          bits &= 0x7FF0_0000_0000_0000;
 
-                          return bits;
+                      return bits;
                   """
-                : "        return Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));";
+                : "    return Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));";
         }
 
-        return "        return (ulong)value.GetHashCode();";
+        return "    return (ulong)value.GetHashCode();";
     }
 
     private static string GetFunctions(ReaderFunctions functions)
@@ -111,13 +111,13 @@ internal class CSharpHashDef : IHashDef
         StringBuilder sb = new StringBuilder();
 
         if (functions.HasFlag(ReaderFunctions.ReadU8))
-            sb.AppendLine("        static byte ReadU8(string ptr, int offset) => (byte)Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset);");
+            sb.AppendLine("    static byte ReadU8(string ptr, int offset) => (byte)Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset);");
         if (functions.HasFlag(ReaderFunctions.ReadU16))
-            sb.AppendLine("        static ushort ReadU16(string ptr, int offset) => Unsafe.ReadUnaligned<ushort>(ref Unsafe.As<char, byte>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset)));");
+            sb.AppendLine("    static ushort ReadU16(string ptr, int offset) => Unsafe.ReadUnaligned<ushort>(ref Unsafe.As<char, byte>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset)));");
         if (functions.HasFlag(ReaderFunctions.ReadU32))
-            sb.AppendLine("        static uint ReadU32(string ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.As<char, byte>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset)));");
+            sb.AppendLine("    static uint ReadU32(string ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.As<char, byte>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset)));");
         if (functions.HasFlag(ReaderFunctions.ReadU64))
-            sb.AppendLine("        static ulong ReadU64(string ptr, int offset) => Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<char, byte>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset)));");
+            sb.AppendLine("    static ulong ReadU64(string ptr, int offset) => Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<char, byte>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset)));");
 
         return sb.ToString();
     }

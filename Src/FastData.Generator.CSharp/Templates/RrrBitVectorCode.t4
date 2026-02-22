@@ -1,5 +1,6 @@
 <#@ template language="C#" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 
 <#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
@@ -27,10 +28,10 @@ private const ulong _rrrMaxValue = <#= Model.ToValueLabel(Context.MaxValue) #>;
 private const int _rrrBlockSize = <#= Context.BlockSize #>;
 <#= Model.FieldModifier #>byte[] _rrrClasses = new byte[] {
 <#= FormatHelper.FormatColumns(Context.Classes, x => Model.ToValueLabel(x)) #>
-    };
+};
 <#= Model.FieldModifier #>uint[] _rrrOffsets = new uint[] {
 <#= FormatHelper.FormatColumns(Context.Offsets, x => Model.ToValueLabel(x)) #>
-    };
+};
 
 <#= Model.MethodAttribute #>
 <#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)

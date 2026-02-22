@@ -23,9 +23,9 @@ class BloomFilterStructure_Single_100 final {
         return bits;
     }
 
-          public:
-              [[nodiscard]]
-              static constexpr bool contains(const float key) noexcept {
+    public:
+    [[nodiscard]]
+    static constexpr bool contains(const float key) noexcept {
         if (key < 0.0f || key > 99.0f)
             return false;
 

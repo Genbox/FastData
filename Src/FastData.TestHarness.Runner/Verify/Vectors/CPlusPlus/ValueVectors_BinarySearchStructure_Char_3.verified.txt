@@ -12,11 +12,12 @@ class BinarySearchStructure_Char_3 final {
         0, 97, 127
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const char key) noexcept {
         if ((static_cast<uint16_t>(key) & 65408) != 0)
             return false;
+
 
         int32_t lo = 0;
         int32_t hi = 2;

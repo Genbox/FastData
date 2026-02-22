@@ -14,44 +14,44 @@
     if (Data.ValueCount > 0)
     {
 #>
-<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName() #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
-    };
+};
 
 <#
     }
 #>
 public:
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
-        if (<#= FormatHelper.FormatList(keys, x => Model.GetEqualFunction(Common.LookupKeyName, Model.ToValueLabel(x)), " || ") #>)
-            return true;
+    if (<#= FormatHelper.FormatList(keys, x => Model.GetEqualFunction(Common.LookupKeyName, Model.ToValueLabel(x)), " || ") #>)
+        return true;
 
-        return false;
-    }
+    return false;
+}
 <#
     if (Data.ValueCount > 0)
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
 
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 <#
-        for (int i = 0; i < keys.Length; i++)
-        {
-#>        if (<#= Model.GetEqualFunction(Common.LookupKeyName, Model.ToValueLabel(keys[i])) #>) {
-            value = <#= Model.IsPrimitive ? "&" : "" #>values[<#= i.ToStringInvariant() #>];
-            return true;
-        }
-<#
-        }
-#>
-        value = nullptr;
-        return false;
+    for (int i = 0; i < keys.Length; i++)
+    {
+#>    if (<#= Model.GetEqualFunction(Common.LookupKeyName, Model.ToValueLabel(keys[i])) #>) {
+        value = <#= Model.IsPrimitive ? "&" : "" #>values[<#= i.ToStringInvariant() #>];
+        return true;
     }
+<#
+    }
+#>
+    value = nullptr;
+    return false;
+}
 <#
     }
 #>

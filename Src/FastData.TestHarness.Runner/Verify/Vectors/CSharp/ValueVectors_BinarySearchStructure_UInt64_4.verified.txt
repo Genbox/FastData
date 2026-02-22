@@ -12,11 +12,12 @@ internal static class BinarySearchStructure_UInt64_4
         ulong.MinValue, 1ul, 2ul, ulong.MaxValue
     };
 
-    
+
     public static bool Contains(ulong key)
     {
         if (key < ulong.MinValue || key > ulong.MaxValue)
             return false;
+
 
         int lo = 0;
         int hi = 3;

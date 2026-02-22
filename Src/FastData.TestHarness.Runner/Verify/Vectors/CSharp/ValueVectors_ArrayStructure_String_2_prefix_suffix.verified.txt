@@ -12,7 +12,7 @@ internal static class ArrayStructure_String_2_prefix_suffix
         "suf", "pre"
     };
 
-    
+
     public static bool Contains(string key)
     {
         if (key.Length != 6u)
@@ -27,7 +27,7 @@ internal static class ArrayStructure_String_2_prefix_suffix
         for (int i = 0; i < 2; i++)
         {
             if (StringComparer.Ordinal.Equals(trimmedKey, _keys[i]))
-               return true;
+                return true;
         }
         return false;
     }

@@ -13,7 +13,7 @@ class BinarySearchStructure_String_13_non_ascii final {
         u8"ö", u8"ø", u8"ü"
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 2u)
@@ -23,6 +23,7 @@ public:
 
                 if ((first & 16444ULL) != 0)
                     return false;
+
 
         int32_t lo = 0;
         int32_t hi = 12;

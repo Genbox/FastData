@@ -14,17 +14,17 @@
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #><#= Model.FieldModifier #>int[] _offsets = {
 <#= FormatHelper.FormatColumns(Context.ValueOffsets, x => Model.ToValueLabel(x)) #>
-    };
+};
 
 <#= Model.FieldModifier #><#= Model.ValueTypeName #>[] _values = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
-    };
+};
 
 <#
     }
 #><#= Model.FieldModifier #><#= Model.KeyTypeName #>[] _keys = {
 <#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, Model.ToValueLabel) #>
-    };
+};
 
 <#= Model.MethodAttribute #>
 <#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)

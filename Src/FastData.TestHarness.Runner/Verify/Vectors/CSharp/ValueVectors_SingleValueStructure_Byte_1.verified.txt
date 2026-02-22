@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 
 internal static class SingleValueStructure_Byte_1
 {
-    
     public static bool Contains(byte key)
     {
 

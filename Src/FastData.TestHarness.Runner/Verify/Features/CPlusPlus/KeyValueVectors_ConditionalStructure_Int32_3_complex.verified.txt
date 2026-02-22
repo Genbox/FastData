@@ -18,7 +18,8 @@ class ConditionalStructure_Int32_3_complex final {
     inline static const std::array<Person*, 3> values = {
         new Person(1, u8"Bob", new Person(4, u8"Anna", nullptr)), new Person(2, u8"Billy", nullptr), new Person(3, u8"Bibi", nullptr)
     };
-public:
+
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 
@@ -27,6 +28,7 @@ public:
 
         return false;
     }
+
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
 
@@ -42,7 +44,6 @@ public:
             value = values[2];
             return true;
         }
-
         value = nullptr;
         return false;
     }

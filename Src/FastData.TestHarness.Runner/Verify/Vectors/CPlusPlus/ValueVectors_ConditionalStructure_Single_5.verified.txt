@@ -8,7 +8,7 @@
 #include <string_view>
 
 class ConditionalStructure_Single_5 final {
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
         if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())

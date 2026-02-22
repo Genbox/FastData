@@ -14,22 +14,20 @@ internal static class HashTableStructure_Double_5
         internal double Key;
         internal sbyte Next;
         internal ulong HashCode;
-        
-        internal E(double key, sbyte next, ulong hashCode )
+        internal E(double key, sbyte next, ulong hashCode)
         {
             Key = key;
             Next = next;
             HashCode = hashCode;
-            
         }
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
         4, 0, 3, 1, 5
-     };
+    };
 
     private static readonly E[] _entries = {
-        new E(1.0, -1, 4607182418800017408), new E(2.0, -1, 4611686018427387904), new E(3.0, -1, 4613937818241073152), new E(4.0, -1, 4616189618054758400), new E(5.0, 1, 4617315517961601024)
+        new E(1.0, -1, 4607182418800017408ul), new E(2.0, -1, 4611686018427387904ul), new E(3.0, -1, 4613937818241073152ul), new E(4.0, -1, 4616189618054758400ul), new E(5.0, 1, 4617315517961601024ul)
     };
 
 
@@ -39,7 +37,7 @@ internal static class HashTableStructure_Double_5
         return Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
     }
 
-    
+
     public static bool Contains(double key)
     {
         if (key < 1.0 || key > 5.0)

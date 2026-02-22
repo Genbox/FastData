@@ -48,8 +48,7 @@ impl HashTableStructure_UInt64_4 {
     pub const MIN_KEY: u64 = u64::MIN;
     pub const MAX_KEY: u64 = u64::MAX;
 }struct E {
-    
     next: i8,
     key: u64,
-    
 }
+

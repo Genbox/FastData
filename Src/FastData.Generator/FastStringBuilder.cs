@@ -4,7 +4,6 @@ namespace Genbox.FastData.Generator;
 
 public sealed class FastStringBuilder
 {
-    private const byte IndentSize = 4;
     private readonly StringBuilder _sb = new StringBuilder();
     private bool _indentPending = true;
 
@@ -90,7 +89,7 @@ public sealed class FastStringBuilder
     private void DoIndent()
     {
         if (_indentPending && Indent > 0)
-            _sb.Append(' ', Indent * IndentSize);
+            _sb.Append(' ', Indent);
 
         _indentPending = false;
     }

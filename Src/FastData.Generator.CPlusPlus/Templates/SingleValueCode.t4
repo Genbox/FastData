@@ -13,34 +13,34 @@
     if (Data.Value != null)
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
-#>      static inline const auto stored_value = <#= Model.ToValueLabel(Data.Value) #>;
+#>static inline const auto stored_value = <#= Model.ToValueLabel(Data.Value) #>;
 <#
     }
 #>
 public:
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-        return <#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>;
-    }
+    return <#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>;
+}
 <#
     if (Data.Value != null)
     {
 #>
 
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
-        if (<#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>) {
-            value = <#= Model.IsPrimitive ? "&" : "" #>stored_value;
-            return true;
-        }
-
-        value = nullptr;
-        return false;
+    if (<#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>) {
+        value = <#= Model.IsPrimitive ? "&" : "" #>stored_value;
+        return true;
     }
+
+    value = nullptr;
+    return false;
+}
 <#
     }
 #>

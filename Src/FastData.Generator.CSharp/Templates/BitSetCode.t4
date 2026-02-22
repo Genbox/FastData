@@ -10,7 +10,7 @@
 
 <#= Model.FieldModifier #>ulong[] _bitset = new ulong[] {
 <#= FormatHelper.FormatColumns(Context.BitSet, x => Model.ToValueLabel(x)) #>
-    };
+};
 
 <#
     if (Data.ValueCount > 0)
@@ -18,7 +18,7 @@
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #><#= Model.FieldModifier #><#= Model.ValueTypeName #>[] _values = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
-    };
+};
 
 <#
     }

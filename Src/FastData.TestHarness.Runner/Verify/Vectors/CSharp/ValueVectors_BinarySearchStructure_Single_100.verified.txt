@@ -21,11 +21,12 @@ internal static class BinarySearchStructure_Single_100
         90f, 91f, 92f, 93f, 94f, 95f, 96f, 97f, 98f, 99f
     };
 
-    
+
     public static bool Contains(float key)
     {
         if (key < 0f || key > 99f)
             return false;
+
 
         int lo = 0;
         int hi = 99;

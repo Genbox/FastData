@@ -12,11 +12,12 @@ internal static class BinarySearchStructure_Single_5
         float.MinValue, -1f, 0f, 1f, float.MaxValue
     };
 
-    
+
     public static bool Contains(float key)
     {
         if (key < float.MinValue || key > float.MaxValue)
             return false;
+
 
         int lo = 0;
         int hi = 4;

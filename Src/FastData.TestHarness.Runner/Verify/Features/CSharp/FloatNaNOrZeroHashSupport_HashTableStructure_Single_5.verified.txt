@@ -14,22 +14,20 @@ internal static class HashTableStructure_Single_5
         internal float Key;
         internal sbyte Next;
         internal ulong HashCode;
-        
-        internal E(float key, sbyte next, ulong hashCode )
+        internal E(float key, sbyte next, ulong hashCode)
         {
             Key = key;
             Next = next;
             HashCode = hashCode;
-            
         }
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
         0, 1, 4, 3, 5
-     };
+    };
 
     private static readonly E[] _entries = {
-        new E(1f, -1, 1065353216), new E(2f, -1, 1073741824), new E(3f, -1, 1077936128), new E(4f, -1, 1082130432), new E(5f, 1, 1084227584)
+        new E(1f, -1, 1065353216ul), new E(2f, -1, 1073741824ul), new E(3f, -1, 1077936128ul), new E(4f, -1, 1082130432ul), new E(5f, 1, 1084227584ul)
     };
 
 
@@ -39,7 +37,7 @@ internal static class HashTableStructure_Single_5
         return (ulong)Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
     }
 
-    
+
     public static bool Contains(float key)
     {
         if (key < 1f || key > 5f)

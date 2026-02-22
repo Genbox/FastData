@@ -3,7 +3,6 @@
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System.Linq" #>
-<#@ import namespace="Genbox.FastData.Generator.CSharp.TemplateData" #>
 
 <#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>
@@ -63,7 +62,7 @@ private struct E
 
 <#= Model.FieldModifier #><#= bucketType #>[] _buckets = new <#= bucketType #>[] {
 <#= FormatHelper.FormatColumns(Context.Buckets, x => Model.ToValueLabel(x)) #>
-     };
+};
 
 <#= Model.FieldModifier #>E[] _entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
@@ -72,7 +71,7 @@ private struct E
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
         return $"new E({Model.ToValueLabel(x.Key)}, {Model.ToValueLabel(x.Next)}{hashPart}{valuePart})";
     }) #>
-    };
+};
 
 <#= Model.HashSource #>
 

@@ -75,5 +75,5 @@ impl HashTableStructure_String_13_non_ascii {
     hash_code: u64,
     next: i8,
     key: &'static str,
-    
 }
+

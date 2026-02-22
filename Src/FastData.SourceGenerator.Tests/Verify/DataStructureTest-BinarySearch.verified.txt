@@ -12,7 +12,7 @@ internal static class StaticData
         "item1", "item2", "item3"
     };
 
-    
+
     public static bool Contains(string key)
     {
         if (key.Length != 5u)
@@ -20,6 +20,7 @@ internal static class StaticData
         char valueChar = key[0];
         if (valueChar != 'i')
             return false;
+
 
         int lo = 0;
         int hi = 2;

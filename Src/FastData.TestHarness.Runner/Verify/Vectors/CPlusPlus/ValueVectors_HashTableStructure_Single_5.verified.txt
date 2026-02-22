@@ -12,14 +12,13 @@ class HashTableStructure_Single_5 final {
         float key;
         int8_t next;
         uint64_t hash_code;
-        
         e(const float key, const int8_t next, const uint64_t hash_code)
            : key(key), next(next), hash_code(hash_code) {}
     };
 
     static constexpr std::array<int8_t, 5> buckets = {
         3, 4, 1, 0, 5
-     };
+    };
 
     inline static const std::array<e, 5> entries = {
         e(std::numeric_limits<float>::lowest(), -1, 4286578687), e(-1.0f, -1, 3212836864), e(0.0f, -1, 0), e(1.0f, -1, 1065353216), e(std::numeric_limits<float>::max(), 1, 2139095039)
@@ -34,7 +33,7 @@ class HashTableStructure_Single_5 final {
         return bits;
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
         if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())

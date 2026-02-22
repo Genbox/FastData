@@ -14,22 +14,20 @@ internal static class HashTableStructure_String_3
         internal string Key;
         internal sbyte Next;
         internal ulong HashCode;
-        
-        internal E(string key, sbyte next, ulong hashCode )
+        internal E(string key, sbyte next, ulong hashCode)
         {
             Key = key;
             Next = next;
             HashCode = hashCode;
-            
         }
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
         3, 2, 0
-     };
+    };
 
     private static readonly E[] _entries = {
-        new E("a", -1, 18225461187723808291), new E("item", 0, 16750939634977259983), new E("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", -1, 9198652691199425319)
+        new E("a", -1, 18225461187723808291ul), new E("item", 0, 16750939634977259983ul), new E("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", -1, 9198652691199425319ul)
     };
 
 
@@ -50,25 +48,25 @@ internal static class HashTableStructure_String_3
         return 352654597 + (hash * 1566083941);
     }
 
-    
+
     public static bool Contains(string key)
     {
         switch (key.Length >> 6)
         {
             case 0:
-                    if ((9UL & (1UL << ((key.Length - 1) & 63))) == 0)
+                if ((9UL & (1UL << ((key.Length - 1) & 63))) == 0)
                     return false;
             break;
             case 1:
-                    if ((0UL & (1UL << ((key.Length - 1) & 63))) == 0)
+                if ((0UL & (1UL << ((key.Length - 1) & 63))) == 0)
                     return false;
             break;
             case 2:
-                    if ((0UL & (1UL << ((key.Length - 1) & 63))) == 0)
+                if ((0UL & (1UL << ((key.Length - 1) & 63))) == 0)
                     return false;
             break;
             case 3:
-                    if ((4611686018427387904UL & (1UL << ((key.Length - 1) & 63))) == 0)
+                if ((4611686018427387904UL & (1UL << ((key.Length - 1) & 63))) == 0)
                     return false;
             break;
 

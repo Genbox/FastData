@@ -9,10 +9,9 @@ use std::ptr;
 pub struct HashTablePerfectStructure_Int32_3;
 
 impl HashTablePerfectStructure_Int32_3 {
-
-const ENTRIES: [i32; 3] = [
-            3, 1, 2
-];
+    const ENTRIES: [i32; 3] = [
+        3, 1, 2
+    ];
 
     #[inline(always)]
     fn get_hash(value: i32) -> u64 {

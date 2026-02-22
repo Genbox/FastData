@@ -56,5 +56,5 @@ impl HashTableStructure_Single_5 {
     hash_code: u64,
     next: i8,
     key: f32,
-    
 }
+

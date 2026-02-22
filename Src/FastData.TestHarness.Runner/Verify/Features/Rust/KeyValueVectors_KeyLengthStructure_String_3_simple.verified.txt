@@ -9,13 +9,14 @@ use std::ptr;
 pub struct KeyLengthStructure_String_3_simple;
 
 impl KeyLengthStructure_String_3_simple {
-   const VALUES: [i32; 3] = [
+    const VALUES: [i32; 3] = [
         1, 2, 3
     ];
 
-   const OFFSETS: [i32; 3] = [
+    const OFFSETS: [i32; 3] = [
         0, 1, 2
     ];
+
     const KEYS: [&'static str; 3] = [
         "a", "aa", "aaa"
     ];
@@ -36,8 +37,9 @@ impl KeyLengthStructure_String_3_simple {
 
         return key == Self::KEYS[key.len() - 1];
     }
-#[must_use]
-pub fn try_lookup(key: &'static str) -> Option<i32> {
+
+    #[must_use]
+    pub fn try_lookup(key: &'static str) -> Option<i32> {
         let len = key.len();
         if len < 1 as usize || len > 3 as usize {
             return None;
@@ -50,12 +52,12 @@ pub fn try_lookup(key: &'static str) -> Option<i32> {
         }
 
 
-    let idx = (key.len() - 1) as usize;
-    if (key == Self::KEYS[idx]) {
-        return Some(Self::VALUES[Self::OFFSETS[idx] as usize]);
+        let idx = (key.len() - 1) as usize;
+        if (key == Self::KEYS[idx]) {
+            return Some(Self::VALUES[Self::OFFSETS[idx] as usize]);
+        }
+        None
     }
-    None
-}
 
     pub const ITEM_COUNT: usize = 3;
     pub const MIN_KEY_LENGTH: usize = 1;

@@ -21,11 +21,12 @@ class BinarySearchStructure_Int32_100 final {
         90, 91, 92, 93, 94, 95, 96, 97, 98, 99
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
         if ((static_cast<uint32_t>(key) & 4294967168u) != 0)
             return false;
+
 
         int32_t lo = 0;
         int32_t hi = 99;

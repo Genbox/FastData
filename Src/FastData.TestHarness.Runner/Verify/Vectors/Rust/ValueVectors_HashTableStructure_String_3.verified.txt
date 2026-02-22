@@ -35,32 +35,32 @@ impl HashTableStructure_String_3 {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-    match key.len() >> 6 {
-        0 => {
-            if 9u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
+        match key.len() >> 6 {
+            0 => {
+                if 9u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
                 return false;
             }
-        },
-        1 => {
-            if 0u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
+            },
+            1 => {
+                if 0u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
                 return false;
             }
-        },
-        2 => {
-            if 0u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
+            },
+            2 => {
+                if 0u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
                 return false;
             }
-        },
-        3 => {
-            if 4611686018427387904u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
+            },
+            3 => {
+                if 4611686018427387904u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
                 return false;
             }
-        },
+            },
 
-        _ => {
-             return false;
+            _ => {
+                 return false;
+            }
         }
-    }
         let bytes = key.as_bytes();
         let len = bytes.len();
         let value_char = bytes[0] as u32;
@@ -105,5 +105,5 @@ impl HashTableStructure_String_3 {
     hash_code: u64,
     next: i8,
     key: &'static str,
-    
 }
+

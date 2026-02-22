@@ -9,7 +9,7 @@
 private const int _lowerBitCount = <#= Context.LowerBitCount #>;
 <#= Model.FieldModifier #>ulong[] _upperBits = new ulong[] {
 <#= FormatHelper.FormatColumns(Context.UpperBits, x => Model.ToValueLabel(x)) #>
-    };
+};
 <#
     if (Context.LowerBitCount != 0)
     {
@@ -17,7 +17,7 @@ private const int _lowerBitCount = <#= Context.LowerBitCount #>;
 
 <#= Model.FieldModifier #>ulong[] _lowerBits = new ulong[] {
 <#= FormatHelper.FormatColumns(Context.LowerBits, x => Model.ToValueLabel(x)) #>
-    };
+};
 
 private const ulong _lowerMask = <#= Model.ToValueLabel(Context.LowerMask) #>;
 <#
@@ -27,7 +27,7 @@ private const ulong _lowerMask = <#= Model.ToValueLabel(Context.LowerMask) #>;
 private const int _sampleRateShift = <#= Context.SampleRateShift #>;
 <#= Model.FieldModifier #>int[] _samplePositions = new int[] {
 <#= FormatHelper.FormatColumns(Context.SamplePositions, x => Model.ToValueLabel(x)) #>
-    };
+};
 
 <#= Model.MethodAttribute #>
 <#= Model.MethodModifier #>bool Contains(<#= Model.KeyTypeName #> <#= Common.InputKeyName #>)

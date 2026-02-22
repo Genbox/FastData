@@ -89,7 +89,7 @@ class PrefixSuffixTrimming_IgnoreCase final {
         u8"Alpha", u8"Bravo", u8"Charlie"
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
          const size_t len = key.length();
@@ -101,6 +101,7 @@ public:
         if (!(case_insensitive_starts_with(key, u8"Pre") && case_insensitive_ends_with(key, u8"Suf")))
             return false;
         const auto trimmedKey = key.substr(3, key.length() - 6);
+
         int32_t lo = 0;
         int32_t hi = 2;
         while (lo <= hi) {

@@ -12,11 +12,12 @@ internal static class BinarySearchStructure_Byte_3
         byte.MinValue, 1, byte.MaxValue
     };
 
-    
+
     public static bool Contains(byte key)
     {
         if (key < byte.MinValue || key > byte.MaxValue)
             return false;
+
 
         int lo = 0;
         int hi = 2;

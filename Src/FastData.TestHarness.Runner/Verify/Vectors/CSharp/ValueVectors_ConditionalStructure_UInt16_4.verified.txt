@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 
 internal static class ConditionalStructure_UInt16_4
 {
-    
     public static bool Contains(ushort key)
     {
         if (key < ushort.MinValue || key > ushort.MaxValue)

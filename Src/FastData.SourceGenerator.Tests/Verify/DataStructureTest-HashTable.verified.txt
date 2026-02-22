@@ -8,22 +8,20 @@ using System.Runtime.InteropServices;
 
 internal static class StaticData
 {
-[StructLayout(LayoutKind.Auto)]
-private struct E
-{
-    internal string Key;
-    internal ulong HashCode;
-    
-
-    internal E(string key, ulong hashCode)
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
     {
-        Key = key;
-        HashCode = hashCode;
-        
+        internal string Key;
+        internal ulong HashCode;
+        internal E(string key, ulong hashCode)
+        {
+            Key = key;
+            HashCode = hashCode;
+        }
     }
-}
+
     private static readonly E[] _entries = {
-        new E("item1", 17825845005562073391), new E("item3", 17825845002429905509), new E("item2", 17825845003995989450)
+        new E("item1", 17825845005562073391ul), new E("item3", 17825845002429905509ul), new E("item2", 17825845003995989450ul)
     };
 
 
@@ -44,7 +42,7 @@ private struct E
         return 352654597 + (hash * 1566083941);
     }
 
-    
+
     public static bool Contains(string key)
     {
         if (key.Length != 5u)

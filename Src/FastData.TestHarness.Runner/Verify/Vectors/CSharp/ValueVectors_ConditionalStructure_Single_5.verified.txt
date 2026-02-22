@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 
 internal static class ConditionalStructure_Single_5
 {
-    
     public static bool Contains(float key)
     {
         if (key < float.MinValue || key > float.MaxValue)

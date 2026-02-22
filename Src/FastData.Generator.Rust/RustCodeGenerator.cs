@@ -87,7 +87,6 @@ public sealed class RustCodeGenerator : CodeGenerator
                         FieldModifier = "const ",
                         KeyTypeName = KeyTypeName,
                         ValueTypeName = ValueTypeName,
-                        IsPrimitive = typeof(TValue).IsPrimitive,
                         GetMethodHeader = GetMethodHeader,
                         GetEqualFunction = (a, b) => GetEqualFunction(a, b),
                         GetEqualFunctionByType = GetEqualFunction,
@@ -97,8 +96,8 @@ public sealed class RustCodeGenerator : CodeGenerator
                         GetSmallestUnsignedType = GetSmallestUnsignedType,
                         ToValueLabel = ToValueLabel,
                         ValueObjectDeclarations = GetObjectDeclarations<TValue>(),
-                        GetKeyTypeName = GetKeyTypeName,
-                        GetValueTypeName = GetValueTypeName
+                        GetKeyTypeName = () => typeof(TKey) == typeof(string) ? $"&'static {KeyTypeName}" : KeyTypeName,
+                        GetValueTypeName = () => typeof(TValue) == typeof(string) || !typeof(TValue).IsPrimitive ? $"&'static {ValueTypeName}" : ValueTypeName
                     }
                 },
                 { "Context", context },
@@ -240,9 +239,6 @@ public sealed class RustCodeGenerator : CodeGenerator
             }
         }
 
-        private string GetKeyTypeName(bool customType) => customType ? $"&'static {KeyTypeName}" : KeyTypeName;
-        private string GetValueTypeName(bool customType) => customType ? $"&'static {ValueTypeName}" : ValueTypeName;
-
         private string GetCompareFunction(string var1, string var2)
         {
             if (KeyType == KeyType.String && IgnoreCase)
@@ -257,7 +253,7 @@ public sealed class RustCodeGenerator : CodeGenerator
             sb.Append(base.GetMethodHeader(methodType));
 
             if (TotalTrimLength != 0)
-                sb.Append($"        let {TrimmedKeyName} = &{InputKeyName}[{TrimPrefix.Length.ToStringInvariant()}..{InputKeyName}.len() - {TrimSuffix.Length.ToStringInvariant()}];");
+                sb.Append($"    let {TrimmedKeyName} = &{InputKeyName}[{TrimPrefix.Length.ToStringInvariant()}..{InputKeyName}.len() - {TrimSuffix.Length.ToStringInvariant()}];");
 
             return sb.ToString();
         }

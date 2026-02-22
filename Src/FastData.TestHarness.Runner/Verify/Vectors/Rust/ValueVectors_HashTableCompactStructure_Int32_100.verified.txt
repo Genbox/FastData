@@ -80,7 +80,6 @@ impl HashTableCompactStructure_Int32_100 {
     pub const MIN_KEY: i32 = 0;
     pub const MAX_KEY: i32 = 99;
 }struct E {
-    
     key: i32,
-    
 }
+

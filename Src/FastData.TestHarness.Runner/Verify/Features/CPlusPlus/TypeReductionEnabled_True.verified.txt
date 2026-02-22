@@ -11,15 +11,13 @@ class TypeReductionEnabled_True final {
     struct e {
         uint8_t key;
         int8_t next;
-        
-        
         e(const uint8_t key, const int8_t next)
            : key(key), next(next) {}
     };
 
     static constexpr std::array<int8_t, 3> buckets = {
         3, 2, 0
-     };
+    };
 
     inline static const std::array<e, 3> entries = {
         e(0, -1), e(1, -1), e(std::numeric_limits<uint8_t>::max(), 0)
@@ -30,7 +28,7 @@ class TypeReductionEnabled_True final {
         return static_cast<uint64_t>(value);
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const uint8_t key) noexcept {
         if (key < 0 || key > std::numeric_limits<uint8_t>::max())

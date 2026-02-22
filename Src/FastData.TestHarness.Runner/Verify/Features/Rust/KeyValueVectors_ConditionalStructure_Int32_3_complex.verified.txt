@@ -19,10 +19,10 @@ impl Person {
 }
 
 impl ConditionalStructure_Int32_3_complex {
-
-   const VALUES: [&'static Person; 3] = [
+    const VALUES: [&'static Person; 3] = [
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
-    ];    #[must_use]
+    ];
+    #[must_use]
     pub fn contains(key: i32) -> bool {
 
 
@@ -32,6 +32,7 @@ impl ConditionalStructure_Int32_3_complex {
 
         false
     }
+
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
 
@@ -44,7 +45,6 @@ impl ConditionalStructure_Int32_3_complex {
         if (key == 3) {
             return Some(Self::VALUES[2]);
         }
-
         None
     }
 

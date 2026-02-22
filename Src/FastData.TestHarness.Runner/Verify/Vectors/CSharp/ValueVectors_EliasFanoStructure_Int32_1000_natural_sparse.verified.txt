@@ -15,9 +15,9 @@ internal static class EliasFanoStructure_Int32_1000_natural_sparse
         17252674445944815616ul, 17730371410552387638ul, 8570048300139133806ul, 3151895837623ul, 17132517322838245376ul, 7993567941276448494ul, 1654753857512159095ul, 31160182ul, 17248150737747666944ul, 14082156645215274934ul, 
         8565249309840735086ul, 16717361816799281527ul, 15590861283333202286ul, 7916723541758146286ul, 24545834871ul
     };
-    
-            private static readonly ulong[] _lowerBits = new ulong[] {
-                13381157542753010415ul, 5259608392997391241ul, 8278300478900102390ul, 6430456644257046673ul, 8661777615979087666ul, 4741329775448022559ul, 18429273440410558711ul, 10970153460314561856ul, 10903284999962971405ul, 15223127904740104680ul, 
+
+    private static readonly ulong[] _lowerBits = new ulong[] {
+        13381157542753010415ul, 5259608392997391241ul, 8278300478900102390ul, 6430456644257046673ul, 8661777615979087666ul, 4741329775448022559ul, 18429273440410558711ul, 10970153460314561856ul, 10903284999962971405ul, 15223127904740104680ul, 
         13148863654793060072ul, 1151801467238817559ul, 14395173049126421404ul, 7054611735073078946ul, 5740033379695440593ul, 7832982931856408661ul, 17894879870264318184ul, 2754544002549051455ul, 13625427461182034777ul, 16489447962146853899ul, 
         6125721526290708006ul, 6740632697962226563ul, 17933568190195004385ul, 9070409572135365850ul, 11184335873243103096ul, 10366757993120053403ul, 3325599644650983268ul, 10653585939564988695ul, 11767076348912235301ul, 2074300112330154491ul, 
         18167213940925665140ul, 9501758702200673295ul, 8431863336021577945ul, 3836682911469117065ul, 7467633665883893389ul, 18428823475821080955ul, 8961839901508663744ul, 2193323318911953452ul, 18053621551963254038ul, 14647262467445228884ul, 
@@ -25,16 +25,16 @@ internal static class EliasFanoStructure_Int32_1000_natural_sparse
         16289366044209116744ul, 4436678369653854578ul, 3805780845500248665ul, 14742057723572979642ul, 13974261949167368001ul, 4454195716505288959ul, 5782604860378385816ul, 6046694362377218199ul, 8801674211884984341ul, 18160014507494021046ul, 
         14262229915956386831ul, 16646429028881703623ul, 13345734027394601313ul, 12995270594609042767ul, 6296716507696654444ul, 4186989851602869496ul, 1674800131495647526ul, 15442191721967127485ul, 211464465109362404ul, 14666457841769087829ul, 
         16200926409952297541ul, 16181841252959705848ul, 3944653260232554621ul, 16005643698267790235ul, 6987125693839533199ul, 15646621693333018422ul, 5552261306875323795ul, 14511994689465383843ul, 28ul
-            };
+    };
 
-            private const ulong _lowerMask = 31ul;
+    private const ulong _lowerMask = 31ul;
 
     private const int _sampleRateShift = 7;
     private static readonly int[] _samplePositions = new int[] {
         0, 128, 256, 424, 709, 997, 1276, 1531, 1786, 2041
     };
 
-    
+
     public static bool Contains(int key)
     {
         if (((uint)key & 4294901760u) != 0)
@@ -58,57 +58,57 @@ internal static class EliasFanoStructure_Int32_1000_natural_sparse
             return false;
 
         ulong window = _upperBits[currWord] & (ulong.MaxValue << (int)(position & 63));
-            ulong targetLow = (ulong)value & _lowerMask;
-            long lowerBitsOffset = rank * _lowerBitCount;
+        ulong targetLow = (ulong)value & _lowerMask;
+        long lowerBitsOffset = rank * _lowerBitCount;
 
-            while (true)
+        while (true)
+        {
+            while (window == 0)
             {
-                while (window == 0)
-                {
-                    currWord++;
-                    if ((uint)currWord >= (uint)_upperBits.Length)
-                        return false;
-
-                    window = _upperBits[currWord];
-                }
-
-                int trailing = System.Numerics.BitOperations.TrailingZeroCount(window);
-                long onePosition = ((long)currWord << 6) + trailing;
-                long currentHigh = onePosition - rank;
-
-                if (currentHigh >= high)
-                {
-                    if (currentHigh > high)
-                        return false;
-
-                    int wordIndex = (int)(lowerBitsOffset >> 6);
-                    int startBit = (int)(lowerBitsOffset & 63);
-
-                    ulong currentLow;
-                    if (startBit + _lowerBitCount <= 64)
-                        currentLow = (_lowerBits[wordIndex] >> startBit) & _lowerMask;
-                    else
-                    {
-                        ulong lower = _lowerBits[wordIndex] >> startBit;
-                        ulong upper = _lowerBits[wordIndex + 1] << (64 - startBit);
-                        currentLow = (lower | upper) & _lowerMask;
-                    }
-
-                    if (currentLow == targetLow)
-                        return true;
-
-                    if (currentLow > targetLow)
-                        return false;
-                }
-
-                window &= window - 1;
-                rank++;
-
-                if ((ulong)rank >= ItemCount)
+                currWord++;
+                if ((uint)currWord >= (uint)_upperBits.Length)
                     return false;
 
-                lowerBitsOffset += _lowerBitCount;
+                window = _upperBits[currWord];
             }
+
+            int trailing = System.Numerics.BitOperations.TrailingZeroCount(window);
+            long onePosition = ((long)currWord << 6) + trailing;
+            long currentHigh = onePosition - rank;
+
+            if (currentHigh >= high)
+            {
+                if (currentHigh > high)
+                    return false;
+
+                int wordIndex = (int)(lowerBitsOffset >> 6);
+                int startBit = (int)(lowerBitsOffset & 63);
+
+                ulong currentLow;
+                if (startBit + _lowerBitCount <= 64)
+                    currentLow = (_lowerBits[wordIndex] >> startBit) & _lowerMask;
+                else
+                {
+                    ulong lower = _lowerBits[wordIndex] >> startBit;
+                    ulong upper = _lowerBits[wordIndex + 1] << (64 - startBit);
+                    currentLow = (lower | upper) & _lowerMask;
+                }
+
+                if (currentLow == targetLow)
+                    return true;
+
+                if (currentLow > targetLow)
+                    return false;
+            }
+
+            window &= window - 1;
+            rank++;
+
+            if ((ulong)rank >= ItemCount)
+                return false;
+
+            lowerBitsOffset += _lowerBitCount;
+        }
     }
 
     private static long SelectZero(long rank)

@@ -22,5 +22,5 @@ public sealed class TemplateModel
     public required string ValueObjectDeclarations { get; init; }
     public required Func<bool, string> GetMethodModifier { get; init; }
     public required Func<bool, string> GetFieldModifier { get; init; }
-    public required Func<bool, string> GetValueTypeName { get; init; }
+    public required Func<string> GetValueTypeName { get; init; }
 }

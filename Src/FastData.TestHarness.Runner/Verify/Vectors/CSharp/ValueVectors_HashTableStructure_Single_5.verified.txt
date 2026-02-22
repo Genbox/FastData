@@ -14,22 +14,20 @@ internal static class HashTableStructure_Single_5
         internal float Key;
         internal sbyte Next;
         internal ulong HashCode;
-        
-        internal E(float key, sbyte next, ulong hashCode )
+        internal E(float key, sbyte next, ulong hashCode)
         {
             Key = key;
             Next = next;
             HashCode = hashCode;
-            
         }
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
         3, 4, 1, 0, 5
-     };
+    };
 
     private static readonly E[] _entries = {
-        new E(float.MinValue, -1, 4286578687), new E(-1f, -1, 3212836864), new E(0f, -1, 0), new E(1f, -1, 1065353216), new E(float.MaxValue, 1, 2139095039)
+        new E(float.MinValue, -1, 4286578687ul), new E(-1f, -1, 3212836864ul), new E(0f, -1, ulong.MinValue), new E(1f, -1, 1065353216ul), new E(float.MaxValue, 1, 2139095039ul)
     };
 
 
@@ -44,7 +42,7 @@ internal static class HashTableStructure_Single_5
         return (ulong)bits;
     }
 
-    
+
     public static bool Contains(float key)
     {
         if (key < float.MinValue || key > float.MaxValue)

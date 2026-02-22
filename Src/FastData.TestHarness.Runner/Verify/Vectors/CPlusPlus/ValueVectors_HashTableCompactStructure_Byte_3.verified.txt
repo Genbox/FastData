@@ -10,19 +10,17 @@
 class HashTableCompactStructure_Byte_3 final {
     struct e {
         uint8_t key;
-        
-        
         e(const uint8_t key)
            : key(key) {}
     };
 
     static constexpr std::array<uint8_t, 3> bucket_starts = {
         0, 2, 3
-     };
+    };
 
     static constexpr std::array<uint8_t, 3> bucket_counts = {
         2, 1, 0
-     };
+    };
 
     inline static const std::array<e, 3> entries = {
         e(0), e(std::numeric_limits<uint8_t>::max()), e(1)
@@ -33,7 +31,7 @@ class HashTableCompactStructure_Byte_3 final {
         return static_cast<uint64_t>(value);
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const uint8_t key) noexcept {
         if (key < 0 || key > std::numeric_limits<uint8_t>::max())

@@ -14,22 +14,20 @@ internal static class HashTableStructure_Double_4
         internal double Key;
         internal sbyte Next;
         internal ulong HashCode;
-        
-        internal E(double key, sbyte next, ulong hashCode )
+        internal E(double key, sbyte next, ulong hashCode)
         {
             Key = key;
             Next = next;
             HashCode = hashCode;
-            
         }
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
         3, 0, 0, 4
-     };
+    };
 
     private static readonly E[] _entries = {
-        new E(double.MinValue, -1, 18442240474082181119), new E(0.0, -1, 0), new E(1.0, 1, 4607182418800017408), new E(double.MaxValue, 0, 9218868437227405311)
+        new E(double.MinValue, -1, 18442240474082181119ul), new E(0.0, -1, ulong.MinValue), new E(1.0, 1, 4607182418800017408ul), new E(double.MaxValue, 0, 9218868437227405311ul)
     };
 
 
@@ -44,7 +42,7 @@ internal static class HashTableStructure_Double_4
         return bits;
     }
 
-    
+
     public static bool Contains(double key)
     {
         if (key < double.MinValue || key > double.MaxValue)

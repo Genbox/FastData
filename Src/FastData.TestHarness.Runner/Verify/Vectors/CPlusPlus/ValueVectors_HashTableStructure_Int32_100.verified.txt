@@ -11,8 +11,6 @@ class HashTableStructure_Int32_100 final {
     struct e {
         int32_t key;
         int8_t next;
-        
-        
         e(const int32_t key, const int8_t next)
            : key(key), next(next) {}
     };
@@ -28,7 +26,7 @@ class HashTableStructure_Int32_100 final {
         71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 
         81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 
         91, 92, 93, 94, 95, 96, 97, 98, 99, 100
-     };
+    };
 
     inline static const std::array<e, 100> entries = {
         e(0, -1), e(1, -1), e(2, -1), e(3, -1), e(4, -1), e(5, -1), e(6, -1), e(7, -1), e(8, -1), e(9, -1), 
@@ -48,7 +46,7 @@ class HashTableStructure_Int32_100 final {
         return static_cast<uint64_t>(value);
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
         if ((static_cast<uint32_t>(key) & 4294967168u) != 0)

@@ -12,7 +12,6 @@ class HashTableStructure_String_13_non_ascii final {
         std::string_view key;
         int8_t next;
         uint64_t hash_code;
-        
         e(const std::string_view key, const int8_t next, const uint64_t hash_code)
            : key(key), next(next), hash_code(hash_code) {}
     };
@@ -20,7 +19,7 @@ class HashTableStructure_String_13_non_ascii final {
     static constexpr std::array<int8_t, 13> buckets = {
         0, 0, 13, 10, 0, 4, 0, 0, 7, 3, 
         12, 2, 11
-     };
+    };
 
     inline static const std::array<e, 13> entries = {
         e(u8"æ", -1, 11144404048339054737), e(u8"à", -1, 11144404045206886855), e(u8"ä", -1, 11144404051471222619), e(u8"ö", -1, 11144404023281711681), e(u8"ü", -1, 11144404013885208035), e(u8"ß", -1, 11144404062433810206), e(u8"é", 4, 11144404034244299268), e(u8"è", -1, 11144404032678215327), e(u8"ê", -1, 11144404029546047445), e(u8"ç", 8, 11144404049905138678), 
@@ -29,15 +28,15 @@ class HashTableStructure_String_13_non_ascii final {
 
     static constexpr uint64_t get_hash(const std::string_view value) noexcept
     {
-    uint64_t hash = 352654597;
+        uint64_t hash = 352654597;
 
-    for (unsigned char ch : value)
-        hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+        for (unsigned char ch : value)
+            hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
 
-    return 352654597 + (hash * 1566083941);
+        return 352654597 + (hash * 1566083941);
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 2u)

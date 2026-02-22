@@ -15,11 +15,12 @@ internal static class KeyLengthStructure_String_3_simple
     private static readonly int[] _values = {
         1, 2, 3
     };
+
     private static readonly string[] _keys = {
         "a", "aa", "aaa"
     };
 
-    
+
     public static bool Contains(string key)
     {
         int len = key.Length;
@@ -31,7 +32,8 @@ internal static class KeyLengthStructure_String_3_simple
 
 
         return StringComparer.Ordinal.Equals(key, _keys[key.Length - 1]);
-    }    
+    }
+
     public static bool TryLookup(string key, out int value)
     {
         int len = key.Length;

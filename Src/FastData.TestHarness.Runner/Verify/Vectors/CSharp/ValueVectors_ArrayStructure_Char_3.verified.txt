@@ -12,7 +12,7 @@ internal static class ArrayStructure_Char_3
         char.MinValue, 'a', ''
     };
 
-    
+
     public static bool Contains(char key)
     {
         if (((ushort)key & 65408) != 0)
@@ -22,7 +22,7 @@ internal static class ArrayStructure_Char_3
         for (int i = 0; i < 3; i++)
         {
             if (key == _keys[i])
-               return true;
+                return true;
         }
         return false;
     }

@@ -8,7 +8,7 @@
 #include <string_view>
 
 class ConditionalStructure_Byte_3 final {
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const uint8_t key) noexcept {
 

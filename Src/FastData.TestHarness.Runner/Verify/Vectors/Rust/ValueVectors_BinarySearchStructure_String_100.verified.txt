@@ -35,6 +35,7 @@ impl BinarySearchStructure_String_100 {
             return false;
         }
 
+
         let mut lo: usize = 0;
         let mut hi: usize = 99;
         while lo <= hi {

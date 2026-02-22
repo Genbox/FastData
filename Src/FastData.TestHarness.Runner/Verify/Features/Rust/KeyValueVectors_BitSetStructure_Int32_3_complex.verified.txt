@@ -22,9 +22,11 @@ impl BitSetStructure_Int32_3_complex {
     const BITSET: [u64; 1] = [
         7
     ];
-   const VALUES: [&'static Person; 3] = [
+
+    const VALUES: [&'static Person; 3] = [
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
     ];
+
     #[must_use]
     pub fn contains(key: i32) -> bool {
 
@@ -34,6 +36,7 @@ impl BitSetStructure_Int32_3_complex {
         let mask = 1u64 << ((offset & 63) as u32);
         (Self::BITSET[word] & mask) != 0
     }
+
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
 

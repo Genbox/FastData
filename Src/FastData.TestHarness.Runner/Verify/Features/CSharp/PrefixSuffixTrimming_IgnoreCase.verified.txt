@@ -12,7 +12,7 @@ internal static class PrefixSuffixTrimming_IgnoreCase
         "Alpha", "Bravo", "Charlie"
     };
 
-    
+
     public static bool Contains(string key)
     {
         int len = key.Length;
@@ -24,6 +24,7 @@ internal static class PrefixSuffixTrimming_IgnoreCase
         if (!(key.StartsWith("Pre", StringComparison.OrdinalIgnoreCase) && key.EndsWith("Suf", StringComparison.OrdinalIgnoreCase)))
             return false;
         string trimmedKey = key.Substring(3, key.Length - 6);
+
         int lo = 0;
         int hi = 2;
         while (lo <= hi)

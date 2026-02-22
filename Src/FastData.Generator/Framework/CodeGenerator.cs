@@ -73,11 +73,81 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         foreach (string code in Shared.GetType(CodePlacement.InClass))
             sb.AppendLine(code);
 
-        sb.AppendLine(writer.Generate());
+        string str = writer.Generate();
+
+        int start = 0;
+        int end = str.Length;
+
+        while (start < end)
+        {
+            char c = str[start];
+            if (c != '\r' && c != '\n')
+                break;
+
+            start++;
+        }
+
+        while (end > start)
+        {
+            char c = str[end - 1];
+            if (c != '\r' && c != '\n')
+                break;
+
+            end--;
+        }
+
+        bool atLineStart = true;
+
+        for (int i = start; i < end; i++)
+        {
+            char c = str[i];
+
+            if (atLineStart)
+            {
+                if (c == '\r' || c == '\n')
+                {
+                    if (c == '\r' && i + 1 < str.Length && str[i + 1] == '\n')
+                    {
+                        sb.Append('\r');
+                        sb.Append('\n');
+                        i++;
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+
+                    continue;
+                }
+
+                sb.Append("    ");
+                atLineStart = false;
+            }
+
+            if (c == '\r' || c == '\n')
+            {
+                if (c == '\r' && i + 1 < str.Length && str[i + 1] == '\n')
+                {
+                    sb.Append('\r');
+                    sb.Append('\n');
+                    i++;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+
+                atLineStart = true;
+                continue;
+            }
+
+            sb.Append(c);
+        }
     }
 
     protected virtual void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)
     {
+        sb.AppendLine();
         sb.AppendLine();
         sb.AppendLine(constDef.ItemCountTemplate(langDef.ArraySizeType, genCfg.Constants.ItemCount.ToStringInvariant()));
 

@@ -10,12 +10,11 @@
 class HashTablePerfectStructure_Int32_3_simple final {
     struct e {
         int32_t key;
-        
         const int32_t value;
-
         constexpr e(const int32_t key, const int32_t value) noexcept
         : key(key), value(value) {}
     };
+
     inline static const std::array<e, 3> entries = {
         e(3, 3), e(1, 1), e(2, 2)
     };
@@ -25,7 +24,7 @@ class HashTablePerfectStructure_Int32_3_simple final {
         return static_cast<uint64_t>(value);
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
         if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
@@ -38,13 +37,14 @@ public:
 
         return key == entry.key;
     }
+
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
         if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
             {
-    value = nullptr;
-    return false;
-}
+        value = nullptr;
+        return false;
+    }
 
 
         const uint64_t hash = get_hash(key);

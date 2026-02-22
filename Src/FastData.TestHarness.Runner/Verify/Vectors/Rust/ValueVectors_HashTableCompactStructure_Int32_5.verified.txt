@@ -53,7 +53,6 @@ impl HashTableCompactStructure_Int32_5 {
     pub const MIN_KEY: i32 = i32::MIN;
     pub const MAX_KEY: i32 = i32::MAX;
 }struct E {
-    
     key: i32,
-    
 }
+

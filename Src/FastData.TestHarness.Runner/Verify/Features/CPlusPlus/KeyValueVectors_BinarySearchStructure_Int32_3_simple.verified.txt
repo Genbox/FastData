@@ -11,15 +11,17 @@ class BinarySearchStructure_Int32_3_simple final {
     inline static const std::array<int32_t, 3> values = {
         1, 2, 3
     };
+
     static constexpr std::array<int32_t, 3> keys = {
         1, 2, 3
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
         if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
             return false;
+
 
         int32_t lo = 0;
         int32_t hi = 2;
@@ -38,13 +40,15 @@ public:
 
         return false;
     }
+
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
         if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
             {
-    value = nullptr;
-    return false;
-}
+        value = nullptr;
+        return false;
+    }
+
 
         int32_t lo = 0;
         int32_t hi = 2;

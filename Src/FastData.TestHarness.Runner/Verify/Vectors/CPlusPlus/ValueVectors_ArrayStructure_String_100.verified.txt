@@ -21,7 +21,7 @@ class ArrayStructure_String_100 final {
         u8"90", u8"91", u8"92", u8"93", u8"94", u8"95", u8"96", u8"97", u8"98", u8"99"
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
          const size_t len = key.length();

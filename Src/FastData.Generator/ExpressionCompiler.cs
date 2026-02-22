@@ -8,7 +8,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 {
     protected readonly FastStringBuilder Output = new FastStringBuilder();
 
-    public string GetCode(Expression expression, int indent = 2)
+    public string GetCode(Expression expression, int indent = 4)
     {
         Output.Clear();
         Output.Indent = indent;

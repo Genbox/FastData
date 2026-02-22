@@ -11,10 +11,10 @@ internal class CPlusPlusHashDef : IHashDef
         bool notConst = keyType is KeyType.Single or KeyType.Double or KeyType.Int64 or KeyType.UInt64;
 
         return $$"""
-                     static{{(notConst ? " " : " constexpr ")}}uint64_t get_hash(const {{typeName}} value) noexcept
-                     {
+                 static{{(notConst ? " " : " constexpr ")}}uint64_t get_hash(const {{typeName}} value) noexcept
+                 {
                  {{GetHash(keyType, info)}}
-                     }
+                 }
                  """;
     }
 
@@ -33,40 +33,39 @@ internal class CPlusPlusHashDef : IHashDef
         }
 
         if (keyType.IsIdentityHash())
-            return "        return static_cast<uint64_t>(value);";
+            return "    return static_cast<uint64_t>(value);";
 
         if (keyType == KeyType.Single)
         {
             return info.HasZeroOrNaN
                 ? """
-                          uint32_t bits;
-                          std::memcpy(&bits, &value, sizeof(bits));
-                          if (((bits - 1) & ~0x80000000u) >= 0x7F800000u)
-                              bits &= 0x7F800000u;
-                          return bits;
+                      uint32_t bits;
+                      std::memcpy(&bits, &value, sizeof(bits));
+                      if (((bits - 1) & ~0x80000000u) >= 0x7F800000u)
+                          bits &= 0x7F800000u;
+                      return bits;
                   """
                 : """
-                          uint32_t bits;
-                          std::memcpy(&bits, &value, sizeof(bits));
-                          return bits;
+                      uint32_t bits;
+                      std::memcpy(&bits, &value, sizeof(bits));
+                      return bits;
                   """;
-
         }
 
         if (keyType == KeyType.Double)
         {
             return info.HasZeroOrNaN
                 ? """
-                          uint64_t bits;
-                          std::memcpy(&bits, &value, sizeof(bits));
-                          if (((bits - 1) & ~0x8000000000000000ull) >= 0x7FF0000000000000ull)
-                              bits &= 0x7FF0000000000000ull;
-                          return bits;
+                      uint64_t bits;
+                      std::memcpy(&bits, &value, sizeof(bits));
+                      if (((bits - 1) & ~0x8000000000000000ull) >= 0x7FF0000000000000ull)
+                          bits &= 0x7FF0000000000000ull;
+                      return bits;
                   """
                 : """
-                          uint64_t bits;
-                          std::memcpy(&bits, &value, sizeof(bits));
-                          return bits;
+                      uint64_t bits;
+                      std::memcpy(&bits, &value, sizeof(bits));
+                      return bits;
                   """;
         }
 

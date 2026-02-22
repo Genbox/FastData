@@ -13,26 +13,25 @@ class MyData final {
     struct e {
         std::string_view key;
         uint64_t hash_code;
-        
-
         constexpr e(const std::string_view key, const uint64_t hash_code) noexcept
         : key(key), hash_code(hash_code) {}
     };
+
     inline static const std::array<e, 2> entries = {
-        e(u8"test2", 0), e(u8"test1", 1)
+        e(u8"test2", 0), e(u8"test1", 1ull)
     };
 
     static constexpr uint64_t get_hash(const std::string_view value) noexcept
     {
-    uint64_t hash = 352654597;
+        uint64_t hash = 352654597;
 
-    for (unsigned char ch : value)
-        hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+        for (unsigned char ch : value)
+            hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
 
-    return 352654597 + (hash * 1566083941);
+        return 352654597 + (hash * 1566083941);
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 5u)

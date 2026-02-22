@@ -12,11 +12,12 @@ internal static class BinarySearchStructure_UInt16_4
         ushort.MinValue, 1, 2, ushort.MaxValue
     };
 
-    
+
     public static bool Contains(ushort key)
     {
         if (key < ushort.MinValue || key > ushort.MaxValue)
             return false;
+
 
         int lo = 0;
         int hi = 3;

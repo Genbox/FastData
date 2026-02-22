@@ -16,44 +16,44 @@
 #>
 <#= Model.GetFieldModifier(true) #>std::array<int32_t, <#= Context.ValueOffsets.Length.ToStringInvariant() #>> offsets = {
 <#= FormatHelper.FormatColumns(Context.ValueOffsets, static x => x.ToStringInvariant()) #>
-    };
+};
 
-<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= Model.GetFieldModifier(false) #>std::array<<#= Model.GetValueTypeName() #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
-    };
+};
 
 <#
     }
 #>
 <#= Model.GetFieldModifier(true) #>std::array<<#= Model.KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
-<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, Model.ToValueLabel) #>
-    };
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, item => item == null ? "{}" : Model.ToValueLabel(item)) #>
+};
 
 public:
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-        return <#= Model.GetEqualFunction(Common.LookupKeyName, $"keys[{Common.LookupKeyName}.length() - {Context.MinLength.ToStringInvariant()}]") #>;
-    }
+    return <#= Model.GetEqualFunction(Common.LookupKeyName, $"keys[{Common.LookupKeyName}.length() - {Context.MinLength.ToStringInvariant()}]") #>;
+}
 <#
     if (Data.ValueCount > 0)
     {
 #>
 
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
-        size_t idx = <#= Common.LookupKeyName #>.length() - <#= Context.MinLength.ToStringInvariant() #>;
-        if (<#= Model.GetEqualFunction(Common.LookupKeyName, "keys[idx]") #>) {
-            value = <#= Model.IsPrimitive ? "&" : "" #>values[offsets[idx]];
-            return true;
-        }
-
-        value = nullptr;
-        return false;
+    size_t idx = <#= Common.LookupKeyName #>.length() - <#= Context.MinLength.ToStringInvariant() #>;
+    if (<#= Model.GetEqualFunction(Common.LookupKeyName, "keys[idx]") #>) {
+        value = <#= Model.IsPrimitive ? "&" : "" #>values[offsets[idx]];
+        return true;
     }
+
+    value = nullptr;
+    return false;
+}
 <#
     }
 #>

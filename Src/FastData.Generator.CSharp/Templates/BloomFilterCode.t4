@@ -8,7 +8,7 @@
 
 <#= Model.FieldModifier #>ulong[] _bloom = new ulong[] {
 <#= FormatHelper.FormatColumns(Context.BitSet, x => Model.ToValueLabel(x)) #>
-    };
+};
 
 <#= Model.HashSource #>
 

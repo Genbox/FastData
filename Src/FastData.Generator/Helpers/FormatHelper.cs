@@ -5,22 +5,22 @@ namespace Genbox.FastData.Generator.Helpers;
 
 public static class FormatHelper
 {
-    public static string FormatColumns<T>(T[] items, Func<T, string> Render, int indent = 8, int columns = 10)
+    public static string FormatColumns<T>(T[] items, Func<T, string> Render, int indent = 4, int columns = 10)
     {
         return FormatColumns(items.AsReadOnlySpan(), (_, y) => Render(y), indent, columns);
     }
 
-    public static string FormatColumns<T>(T[] items, Func<int, T, string> Render, int indent = 8, int columns = 10)
+    public static string FormatColumns<T>(T[] items, Func<int, T, string> Render, int indent = 4, int columns = 10)
     {
         return FormatColumns(items.AsReadOnlySpan(), Render, indent, columns);
     }
 
-    public static string FormatColumns<T>(ReadOnlySpan<T> items, Func<T, string> Render, int indent = 8, int columns = 10)
+    public static string FormatColumns<T>(ReadOnlySpan<T> items, Func<T, string> Render, int indent = 4, int columns = 10)
     {
         return FormatColumns(items, (_, y) => Render(y), indent, columns);
     }
 
-    public static string FormatColumns<T>(ReadOnlySpan<T> items, Func<int, T, string> Render, int indent = 8, int columns = 10)
+    public static string FormatColumns<T>(ReadOnlySpan<T> items, Func<int, T, string> Render, int indent = 4, int columns = 10)
     {
         if (items.Length == 0)
             return string.Empty;
@@ -52,17 +52,12 @@ public static class FormatHelper
         return sb.ToString();
     }
 
-    public static string FormatColumns(IEnumerable<object> items, int itemCount)
-    {
-        return FormatColumns(items, itemCount, (_, item) => item.ToString() ?? "null");
-    }
-
-    public static string FormatColumns(IEnumerable<object> items, int itemCount, Func<object?, string> Render, int indent = 8, int columns = 10)
+    public static string FormatColumns(IEnumerable<object> items, int itemCount, Func<object?, string> Render, int indent = 4, int columns = 10)
     {
         return FormatColumns(items, itemCount, (_, item) => Render(item), indent, columns);
     }
 
-    public static string FormatColumns(IEnumerable<object> items, int itemCount, Func<int, object, string> Render, int indent = 8, int columns = 10)
+    public static string FormatColumns(IEnumerable<object> items, int itemCount, Func<int, object, string> Render, int indent = 4, int columns = 10)
     {
         if (itemCount == 0)
             return string.Empty;

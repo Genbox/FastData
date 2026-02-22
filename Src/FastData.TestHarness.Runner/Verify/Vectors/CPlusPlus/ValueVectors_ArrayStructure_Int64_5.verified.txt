@@ -12,7 +12,7 @@ class ArrayStructure_Int64_5 final {
         std::numeric_limits<int64_t>::lowest(), -1ll, 0ll, 1ll, std::numeric_limits<int64_t>::max()
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int64_t key) noexcept {
         if (key < std::numeric_limits<int64_t>::lowest() || key > std::numeric_limits<int64_t>::max())

@@ -10,19 +10,17 @@
 class HashTableCompactStructure_UInt64_4 final {
     struct e {
         uint64_t key;
-        
-        
         e(const uint64_t key)
            : key(key) {}
     };
 
     static constexpr std::array<uint8_t, 4> bucket_starts = {
         0, 1, 2, 3
-     };
+    };
 
     static constexpr std::array<uint8_t, 4> bucket_counts = {
         1, 1, 1, 1
-     };
+    };
 
     inline static const std::array<e, 4> entries = {
         e(0), e(1ull), e(2ull), e(std::numeric_limits<uint64_t>::max())
@@ -33,7 +31,7 @@ class HashTableCompactStructure_UInt64_4 final {
         return static_cast<uint64_t>(value);
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const uint64_t key) noexcept {
         if (key < 0 || key > std::numeric_limits<uint64_t>::max())

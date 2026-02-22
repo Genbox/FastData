@@ -24,10 +24,12 @@ internal static class BitSetStructure_Int32_3_complex
     private static readonly ulong[] _bitset = new ulong[] {
         7ul
     };
+
     private static readonly Person[] _values = {
         new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
     };
-    
+
+
     public static bool Contains(int key)
     {
 
@@ -36,7 +38,8 @@ internal static class BitSetStructure_Int32_3_complex
         int word = (int)(offset >> 6);
         return (_bitset[word] & (1UL << (int)(offset & 63))) != 0;
     }
-    
+
+
     public static bool TryLookup(int key, out Person value)
     {
 

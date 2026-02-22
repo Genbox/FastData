@@ -12,23 +12,19 @@ internal static class HashTableCompactStructure_Int64_5
     private struct E
     {
         internal long Key;
-        
-        
         internal E(long key)
         {
             Key = key;
-            
-            
         }
     };
 
     private static readonly byte[] _bucketStarts = new byte[] {
         0, 2, 3, 4, 5
-     };
+    };
 
     private static readonly byte[] _bucketCounts = new byte[] {
         2, 1, 1, 1, 0
-     };
+    };
 
     private static readonly E[] _entries = {
         new E(-1l), new E(0l), new E(1l), new E(long.MaxValue), new E(long.MinValue)
@@ -41,7 +37,7 @@ internal static class HashTableCompactStructure_Int64_5
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(long key)
     {
         if (key < long.MinValue || key > long.MaxValue)

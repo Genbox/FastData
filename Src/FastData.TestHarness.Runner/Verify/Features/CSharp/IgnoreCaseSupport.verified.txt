@@ -12,7 +12,7 @@ internal static class IgnoreCaseSupport
         "Alpha", "bravo", "CHARLIE"
     };
 
-    
+
     public static bool Contains(string key)
     {
         int len = key.Length;
@@ -21,6 +21,7 @@ internal static class IgnoreCaseSupport
         char valueChar = (char)(key[0] | 0x20);
         if (valueChar < 'a' || valueChar > 'c')
             return false;
+
 
         int lo = 0;
         int hi = 2;

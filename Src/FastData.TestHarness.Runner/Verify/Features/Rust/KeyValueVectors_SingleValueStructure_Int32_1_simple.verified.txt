@@ -9,12 +9,14 @@ use std::ptr;
 pub struct SingleValueStructure_Int32_1_simple;
 
 impl SingleValueStructure_Int32_1_simple {
-    pub const STORED_VALUE: i32 = 1;    #[must_use]
+    pub const STORED_VALUE: i32 = 1;
+    #[must_use]
     pub fn contains(key: i32) -> bool {
 
 
         key == 1
-    }    #[must_use]
+    }
+    #[must_use]
     pub fn try_lookup(key: i32) -> Option<i32> {
 
 

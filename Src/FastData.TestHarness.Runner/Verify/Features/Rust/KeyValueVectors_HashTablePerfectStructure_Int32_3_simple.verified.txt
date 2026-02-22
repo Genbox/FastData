@@ -9,18 +9,18 @@ use std::ptr;
 pub struct HashTablePerfectStructure_Int32_3_simple;
 pub struct e {
     pub key: i32,
-    
     pub value: i32,
 }
+
 impl e {
     pub const fn new (key: i32, value: i32) -> Self { Self { key, value  } }
 }
 
-impl HashTablePerfectStructure_Int32_3_simple {
 
-const ENTRIES: [e; 3] = [
-            e::new(3, 3), e::new(1, 1), e::new(2, 2)
-];
+impl HashTablePerfectStructure_Int32_3_simple {
+    const ENTRIES: [e; 3] = [
+        e::new(3, 3), e::new(1, 1), e::new(2, 2)
+    ];
 
     #[inline(always)]
     fn get_hash(value: i32) -> u64 {
@@ -39,6 +39,7 @@ const ENTRIES: [e; 3] = [
 
         return key == Self::ENTRIES[index].key;
     }
+
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<i32> {
         if (key as u32 & 4294967292) != 0 {

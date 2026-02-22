@@ -19,9 +19,10 @@ impl Person {
 }
 
 impl ArrayStructure_Int32_3_complex {
-   const VALUES: [&'static Person; 3] = [
+    const VALUES: [&'static Person; 3] = [
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
     ];
+
     const KEYS: [i32; 3] = [
         1, 2, 3
     ];
@@ -40,6 +41,7 @@ impl ArrayStructure_Int32_3_complex {
         }
         false
     }
+
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
         if (key as u32 & 4294967292) != 0 {

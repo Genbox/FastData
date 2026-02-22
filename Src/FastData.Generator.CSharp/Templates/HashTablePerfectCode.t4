@@ -1,5 +1,6 @@
 <#@ template language="C#" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System.Linq" #>
 
@@ -75,7 +76,7 @@ private struct E
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
         return $"new E({Model.ToValueLabel(x.Key)}{hashPart}{valuePart})";
     }) #>
-    };
+};
 
 <#= Model.HashSource #>
 

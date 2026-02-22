@@ -11,7 +11,6 @@ public sealed class TemplateModel
     public required string FieldModifier { get; init; }
     public required string KeyTypeName { get; init; }
     public required string ValueTypeName { get; init; }
-    public required bool IsPrimitive { get; init; }
     public required Func<MethodType, string> GetMethodHeader { get; init; }
     public required Func<string, string, string> GetEqualFunction { get; init; }
     public required Func<string, string, KeyType, string> GetEqualFunctionByType { get; init; }
@@ -21,6 +20,6 @@ public sealed class TemplateModel
     public required Func<long, string> GetSmallestUnsignedType { get; init; }
     public required Func<object?, string> ToValueLabel { get; init; }
     public required string ValueObjectDeclarations { get; init; }
-    public required Func<bool, string> GetKeyTypeName { get; init; }
-    public required Func<bool, string> GetValueTypeName { get; init; }
+    public required Func<string> GetKeyTypeName { get; init; }
+    public required Func<string> GetValueTypeName { get; init; }
 }

@@ -19,12 +19,14 @@ impl Person {
 }
 
 impl SingleValueStructure_Int32_1_complex {
-    pub const STORED_VALUE: &'static Person = &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None)));    #[must_use]
+    pub const STORED_VALUE: &'static Person = &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None)));
+    #[must_use]
     pub fn contains(key: i32) -> bool {
 
 
         key == 1
-    }    #[must_use]
+    }
+    #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
 
 

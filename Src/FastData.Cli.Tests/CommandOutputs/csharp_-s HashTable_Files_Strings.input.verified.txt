@@ -16,22 +16,20 @@ internal static class MyData
         internal string Key;
         internal sbyte Next;
         internal ulong HashCode;
-        
-        internal E(string key, sbyte next, ulong hashCode )
+        internal E(string key, sbyte next, ulong hashCode)
         {
             Key = key;
             Next = next;
             HashCode = hashCode;
-            
         }
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
         2, 0
-     };
+    };
 
     private static readonly E[] _entries = {
-        new E("test1", -1, 114), new E("test2", 0, 114)
+        new E("test1", -1, 114ul), new E("test2", 0, 114ul)
     };
 
 
@@ -55,7 +53,7 @@ internal static class MyData
 
     }
 
-    
+
     public static bool Contains(string key)
     {
         if (key.Length != 5u)

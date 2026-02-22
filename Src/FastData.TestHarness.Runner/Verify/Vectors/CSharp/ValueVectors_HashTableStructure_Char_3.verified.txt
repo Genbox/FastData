@@ -13,20 +13,16 @@ internal static class HashTableStructure_Char_3
     {
         internal char Key;
         internal sbyte Next;
-        
-        
-        internal E(char key, sbyte next )
+        internal E(char key, sbyte next)
         {
             Key = key;
             Next = next;
-            
-            
         }
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
         1, 3, 0
-     };
+    };
 
     private static readonly E[] _entries = {
         new E(char.MinValue, -1), new E('a', -1), new E('', 1)
@@ -39,7 +35,7 @@ internal static class HashTableStructure_Char_3
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(char key)
     {
         if (((ushort)key & 65408) != 0)

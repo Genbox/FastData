@@ -13,7 +13,7 @@ class ArrayStructure_String_13_non_ascii final {
         u8"ñ", u8"ø", u8"å"
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 2u)

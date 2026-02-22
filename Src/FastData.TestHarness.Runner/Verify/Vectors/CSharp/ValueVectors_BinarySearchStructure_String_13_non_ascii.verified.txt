@@ -13,7 +13,7 @@ internal static class BinarySearchStructure_String_13_non_ascii
         "ö", "ø", "ü"
     };
 
-    
+
     public static bool Contains(string key)
     {
         if (key.Length != 1u)
@@ -22,6 +22,7 @@ internal static class BinarySearchStructure_String_13_non_ascii
 
         if ((first & 65280UL) != 0)
             return false;
+
 
         int lo = 0;
         int hi = 12;

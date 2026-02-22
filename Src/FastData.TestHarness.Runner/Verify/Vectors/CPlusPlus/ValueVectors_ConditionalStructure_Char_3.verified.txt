@@ -8,7 +8,7 @@
 #include <string_view>
 
 class ConditionalStructure_Char_3 final {
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const char key) noexcept {
 

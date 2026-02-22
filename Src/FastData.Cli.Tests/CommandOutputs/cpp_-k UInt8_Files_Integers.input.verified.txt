@@ -10,7 +10,7 @@
 #include <string_view>
 
 class MyData final {
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const uint8_t key) noexcept {
         if ((static_cast<uint8_t>(key) & 129) != 0)

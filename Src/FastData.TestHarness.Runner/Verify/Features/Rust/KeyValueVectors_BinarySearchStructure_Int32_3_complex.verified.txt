@@ -19,9 +19,10 @@ impl Person {
 }
 
 impl BinarySearchStructure_Int32_3_complex {
-   const VALUES: [&'static Person; 3] = [
+    const VALUES: [&'static Person; 3] = [
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
     ];
+
     const KEYS: [i32; 3] = [
         1, 2, 3
     ];
@@ -31,6 +32,7 @@ impl BinarySearchStructure_Int32_3_complex {
         if (key as u32 & 4294967292) != 0 {
             return false;
         }
+
 
         let mut lo: usize = 0;
         let mut hi: usize = 2;
@@ -51,11 +53,13 @@ impl BinarySearchStructure_Int32_3_complex {
 
         false
     }
+
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
         if (key as u32 & 4294967292) != 0 {
             return None;
         }
+
 
         let mut lo: usize = 0;
         let mut hi: usize = 2;

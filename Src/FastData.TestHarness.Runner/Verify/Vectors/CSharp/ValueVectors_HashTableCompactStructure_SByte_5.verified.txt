@@ -12,23 +12,19 @@ internal static class HashTableCompactStructure_SByte_5
     private struct E
     {
         internal sbyte Key;
-        
-        
         internal E(sbyte key)
         {
             Key = key;
-            
-            
         }
     };
 
     private static readonly byte[] _bucketStarts = new byte[] {
         0, 2, 3, 4, 5
-     };
+    };
 
     private static readonly byte[] _bucketCounts = new byte[] {
         2, 1, 1, 1, 0
-     };
+    };
 
     private static readonly E[] _entries = {
         new E(-1), new E(0), new E(1), new E(sbyte.MaxValue), new E(sbyte.MinValue)
@@ -41,7 +37,7 @@ internal static class HashTableCompactStructure_SByte_5
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(sbyte key)
     {
         if (key < sbyte.MinValue || key > sbyte.MaxValue)

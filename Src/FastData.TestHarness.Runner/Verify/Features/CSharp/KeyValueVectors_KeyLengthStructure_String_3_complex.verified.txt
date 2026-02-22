@@ -28,11 +28,12 @@ internal static class KeyLengthStructure_String_3_complex
     private static readonly Person[] _values = {
         new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
     };
+
     private static readonly string[] _keys = {
         "a", "aa", "aaa"
     };
 
-    
+
     public static bool Contains(string key)
     {
         int len = key.Length;
@@ -44,7 +45,8 @@ internal static class KeyLengthStructure_String_3_complex
 
 
         return StringComparer.Ordinal.Equals(key, _keys[key.Length - 1]);
-    }    
+    }
+
     public static bool TryLookup(string key, out Person value)
     {
         int len = key.Length;

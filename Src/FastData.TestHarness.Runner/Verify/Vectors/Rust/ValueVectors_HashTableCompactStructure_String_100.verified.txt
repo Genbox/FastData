@@ -105,5 +105,5 @@ impl HashTableCompactStructure_String_100 {
 }struct E {
     hash_code: u64,
     key: &'static str,
-    
 }
+

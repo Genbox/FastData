@@ -21,7 +21,7 @@ internal static class ArrayStructure_Single_100
         90f, 91f, 92f, 93f, 94f, 95f, 96f, 97f, 98f, 99f
     };
 
-    
+
     public static bool Contains(float key)
     {
         if (key < 0f || key > 99f)
@@ -31,7 +31,7 @@ internal static class ArrayStructure_Single_100
         for (int i = 0; i < 100; i++)
         {
             if (key == _keys[i])
-               return true;
+                return true;
         }
         return false;
     }

@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 
 internal static class SingleValueStructure_Single_1
 {
-    
     public static bool Contains(float key)
     {
 

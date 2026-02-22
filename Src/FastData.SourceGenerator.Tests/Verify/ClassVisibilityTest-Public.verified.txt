@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 
 public static class StaticData
 {
-    
     public static bool Contains(string key)
     {
         if (key.Length != 5u)

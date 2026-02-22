@@ -12,11 +12,12 @@ class BinarySearchStructure_Single_5 final {
         std::numeric_limits<float>::lowest(), -1.0f, 0.0f, 1.0f, std::numeric_limits<float>::max()
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
         if (key < std::numeric_limits<float>::lowest() || key > std::numeric_limits<float>::max())
             return false;
+
 
         int32_t lo = 0;
         int32_t hi = 4;

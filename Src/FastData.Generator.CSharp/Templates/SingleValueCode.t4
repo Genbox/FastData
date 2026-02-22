@@ -13,7 +13,7 @@
     if (Data.Value != null)
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
-#>    private static readonly <#= Model.ValueTypeName #> _storedValue = <#= Model.ToValueLabel(Data.Value) #>;
+#>private static readonly <#= Model.ValueTypeName #> _storedValue = <#= Model.ToValueLabel(Data.Value) #>;
 <#
     }
 #>

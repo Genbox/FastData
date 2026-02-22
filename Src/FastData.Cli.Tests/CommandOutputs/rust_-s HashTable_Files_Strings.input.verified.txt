@@ -12,17 +12,17 @@ pub struct MyData;
 pub struct e {
     pub key: &'static str,
     pub hash_code: u64,
-    
 }
+
 impl e {
     pub const fn new (key: str, hash_code: u64) -> Self { Self { key, hash_code  } }
 }
 
-impl MyData {
 
-const ENTRIES: [e; 2] = [
-            e::new("test2", 0), e::new("test1", 1)
-];
+impl MyData {
+    const ENTRIES: [e; 2] = [
+        e::new("test2", 0), e::new("test1", 1)
+    ];
 
     #[inline]
     unsafe fn get_hash(value: &str) -> u64 {

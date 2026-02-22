@@ -13,12 +13,12 @@
     if (Data.Value != null)
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
-#>    pub const STORED_VALUE: <#= Model.GetValueTypeName(!Model.IsPrimitive) #> = <#= Model.ToValueLabel(Data.Value) #>;
+#>pub const STORED_VALUE: <#= Model.GetValueTypeName() #> = <#= Model.ToValueLabel(Data.Value) #>;
 <#
     }
 #>
 <#= Model.MethodAttribute #>
-<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(!Model.IsPrimitive) #>) -> bool {
+<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName() #>) -> bool {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
     <#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>
@@ -28,7 +28,7 @@
     {
 #>
 <#= Model.MethodAttribute #>
-<#= Model.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(!Model.IsPrimitive) #>) -> Option<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>> {
+<#= Model.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName() #>) -> Option<<#= Model.GetValueTypeName() #>> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
     if (<#= Model.GetEqualFunction(Common.LookupKeyName, itemLabel) #>) {

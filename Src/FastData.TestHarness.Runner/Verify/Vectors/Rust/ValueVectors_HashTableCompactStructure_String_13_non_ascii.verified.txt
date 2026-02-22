@@ -80,5 +80,5 @@ impl HashTableCompactStructure_String_13_non_ascii {
 }struct E {
     hash_code: u64,
     key: &'static str,
-    
 }
+

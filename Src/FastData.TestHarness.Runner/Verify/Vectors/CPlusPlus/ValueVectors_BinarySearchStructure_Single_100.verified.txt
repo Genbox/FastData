@@ -21,11 +21,12 @@ class BinarySearchStructure_Single_100 final {
         90.0f, 91.0f, 92.0f, 93.0f, 94.0f, 95.0f, 96.0f, 97.0f, 98.0f, 99.0f
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
         if (key < 0.0f || key > 99.0f)
             return false;
+
 
         int32_t lo = 0;
         int32_t hi = 99;

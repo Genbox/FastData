@@ -1,5 +1,6 @@
 <#@ template language="C#" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System.Linq" #>
@@ -29,7 +30,7 @@
 #><#
         if (Data.ValueCount > 0)
         {
-#>    const <#= Model.GetValueTypeName(!Model.IsPrimitive) #> value;
+#>    const <#= Model.GetValueTypeName() #> value;
 <#
         }
 #>
@@ -41,7 +42,7 @@
 #><#
         if (Data.ValueCount > 0)
         {
-#>, const <#= Model.GetValueTypeName(!Model.IsPrimitive) #> value<#
+#>, const <#= Model.GetValueTypeName() #> value<#
         }
 #>)<#= Model.PostMethodModifier #>
     : key(key)<#
@@ -70,53 +71,53 @@
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
         return $"e({Model.ToValueLabel(x.Key)}{hashPart}{valuePart})";
     }) #>
-    };
+};
 
 <#= Model.HashSource #>
 
 public:
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-        const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
-        const <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Data.Entries.Length) #>;
-        const auto& entry = entries[index];
+    const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
+    const <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Data.Entries.Length) #>;
+    const auto& entry = entries[index];
 
-        return <#
+    return <#
     if (useEntryStruct && Context.StoreHashCode)
     {
 #><#= Model.GetEqualFunctionByType("hash", "entry.hash_code", KeyType.Int64) #> && <#
     }
 #><#= Model.GetEqualFunction(Common.LookupKeyName, useEntryStruct ? "entry.key" : "entry") #>;
-    }
+}
 <#
     if (Data.ValueCount > 0)
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
 
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
-        const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
-        const <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Data.Entries.Length) #>;
-        const auto& entry = entries[index];
+    const <#= Common.HashSizeType #> hash = get_hash(<#= Common.LookupKeyName #>);
+    const <#= Common.ArraySizeType #> index = <#= Model.GetModFunction("hash", (ulong)Data.Entries.Length) #>;
+    const auto& entry = entries[index];
 
-        if (<#
+    if (<#
         if (Context.StoreHashCode)
         {
 #><#= Model.GetEqualFunctionByType("hash", "entry.hash_code", KeyType.Int64) #> && <#
         }
 #><#= Model.GetEqualFunction(Common.LookupKeyName, "entry.key") #>) {
-            value = <#= Model.IsPrimitive ? "&" : "" #>entry.value;
-            return true;
-        }
-
-        value = nullptr;
-        return false;
+        value = <#= Model.IsPrimitive ? "&" : "" #>entry.value;
+        return true;
     }
+
+    value = nullptr;
+    return false;
+}
 <#
     }
 #>

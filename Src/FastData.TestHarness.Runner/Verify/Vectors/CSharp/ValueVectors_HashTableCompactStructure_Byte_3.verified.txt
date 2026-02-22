@@ -12,23 +12,19 @@ internal static class HashTableCompactStructure_Byte_3
     private struct E
     {
         internal byte Key;
-        
-        
         internal E(byte key)
         {
             Key = key;
-            
-            
         }
     };
 
     private static readonly byte[] _bucketStarts = new byte[] {
         0, 2, 3
-     };
+    };
 
     private static readonly byte[] _bucketCounts = new byte[] {
         2, 1, 0
-     };
+    };
 
     private static readonly E[] _entries = {
         new E(byte.MinValue), new E(byte.MaxValue), new E(1)
@@ -41,7 +37,7 @@ internal static class HashTableCompactStructure_Byte_3
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(byte key)
     {
         if (key < byte.MinValue || key > byte.MaxValue)

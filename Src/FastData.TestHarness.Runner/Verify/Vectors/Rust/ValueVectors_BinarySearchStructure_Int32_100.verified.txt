@@ -28,6 +28,7 @@ impl BinarySearchStructure_Int32_100 {
             return false;
         }
 
+
         let mut lo: usize = 0;
         let mut hi: usize = 99;
         while lo <= hi && key >= Self::KEYS[lo] && key <= Self::KEYS[hi] {

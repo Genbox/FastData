@@ -8,7 +8,7 @@
 #include <string_view>
 
 class ConditionalStructure_UInt32_4 final {
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const uint32_t key) noexcept {
         if (key < 0 || key > std::numeric_limits<uint32_t>::max())

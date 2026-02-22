@@ -5,7 +5,7 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
 
 <#= Model.MethodAttribute #>
-<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(!Model.IsPrimitive) #>) -> bool {
+<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName() #>) -> bool {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
     let _ = <#= Common.InputKeyName #>;
     false

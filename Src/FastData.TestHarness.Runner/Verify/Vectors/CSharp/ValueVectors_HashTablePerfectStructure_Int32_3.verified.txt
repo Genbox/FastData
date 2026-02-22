@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 
 internal static class HashTablePerfectStructure_Int32_3
 {
-
     private static readonly int[] _entries = {
         3, 1, 2
     };
@@ -20,7 +19,7 @@ internal static class HashTablePerfectStructure_Int32_3
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(int key)
     {
         if (((uint)key & 4294967292u) != 0)

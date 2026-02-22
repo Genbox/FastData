@@ -1,5 +1,6 @@
 <#@ template language="C#" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System.Linq" #>
@@ -20,11 +21,11 @@
     {
         StringBuilder structBuilder = new StringBuilder();
         structBuilder.AppendLine("pub struct e {");
-        structBuilder.AppendLine($"    pub key: {Model.GetKeyTypeName(!Model.IsPrimitive)},");
+        structBuilder.AppendLine($"    pub key: {Model.GetKeyTypeName()},");
         if (Context.StoreHashCode)
             structBuilder.AppendLine($"    pub hash_code: {Common.HashSizeType},");
         if (Data.ValueCount > 0)
-            structBuilder.AppendLine($"    pub value: {Model.GetValueTypeName(!Model.IsPrimitive)},");
+            structBuilder.AppendLine($"    pub value: {Model.GetValueTypeName()},");
         structBuilder.AppendLine("}");
         Shared.Add(CodePlacement.Before, structBuilder.ToString());
 
@@ -34,8 +35,8 @@
         if (Context.StoreHashCode)
             implBuilder.Append($", hash_code: {Common.HashSizeType}");
         if (Data.ValueCount > 0)
-            implBuilder.Append($", value: {Model.GetValueTypeName(!Model.IsPrimitive)}");
-        implBuilder.AppendLine(") -> Self { Self { key");
+            implBuilder.Append($", value: {Model.GetValueTypeName()}");
+        implBuilder.Append(") -> Self { Self { key");
         if (Context.StoreHashCode)
             implBuilder.Append(", hash_code");
         if (Data.ValueCount > 0)
@@ -47,7 +48,7 @@
 #>
 
 <#= Model.FieldModifier #>ENTRIES: [<#= entryTypeName #>; <#= Data.Entries.Length.ToStringInvariant() #>] = [
-    <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
+<#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
         if (!useEntryStruct)
             return Model.ToValueLabel(x.Key);
@@ -81,7 +82,7 @@
 #>
 
 <#= Model.MethodAttribute #>
-<#= Model.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.KeyTypeName #>) -> Option<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>> {
+<#= Model.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.KeyTypeName #>) -> Option<<#= Model.GetValueTypeName() #>> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
     let hash = unsafe { Self::get_hash(<#= Common.LookupKeyName #>) };

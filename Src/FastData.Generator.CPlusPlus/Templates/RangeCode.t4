@@ -10,9 +10,9 @@
     string maxLabel = Model.ToValueLabel(Data.Max);
 #>
 public:
-    <#= Model.MethodAttribute #>
-    <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
+<#= Model.MethodAttribute #>
+<#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-        return <#= Common.LookupKeyName #> >= <#= minLabel #> && <#= Common.LookupKeyName #> <= <#= maxLabel #>;
-    }
+    return <#= Common.LookupKeyName #> >= <#= minLabel #> && <#= Common.LookupKeyName #> <= <#= maxLabel #>;
+}

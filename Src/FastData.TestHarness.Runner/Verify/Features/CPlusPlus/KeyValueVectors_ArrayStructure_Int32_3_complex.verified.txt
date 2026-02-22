@@ -18,11 +18,12 @@ class ArrayStructure_Int32_3_complex final {
     inline static const std::array<Person*, 3> values = {
         new Person(1, u8"Bob", new Person(4, u8"Anna", nullptr)), new Person(2, u8"Billy", nullptr), new Person(3, u8"Bibi", nullptr)
     };
+
     static constexpr std::array<int32_t, 3> keys = {
         1, 2, 3
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
         if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
@@ -36,13 +37,14 @@ public:
         }
         return false;
     }
+
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
         if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
             {
-    value = nullptr;
-    return false;
-}
+        value = nullptr;
+        return false;
+    }
 
 
         for (size_t i = 0; i < 3; i++) {

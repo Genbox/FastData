@@ -9,12 +9,12 @@
 
 <#= Model.FieldModifier #>BLOOM: [u64; <#= Context.BitSet.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Context.BitSet, x => Model.ToValueLabel(x)) #>
-    ];
+];
 
 <#= Model.HashSource #>
 
 <#= Model.MethodAttribute #>
-<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(!Model.IsPrimitive) #>) -> bool {
+<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName() #>) -> bool {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
     let hash = unsafe { Self::get_hash(<#= Common.LookupKeyName #>) };

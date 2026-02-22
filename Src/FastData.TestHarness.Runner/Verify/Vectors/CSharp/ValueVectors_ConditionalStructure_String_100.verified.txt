@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 
 internal static class ConditionalStructure_String_100
 {
-    
     public static bool Contains(string key)
     {
         int len = key.Length;

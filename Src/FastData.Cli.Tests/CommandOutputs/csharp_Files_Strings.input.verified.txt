@@ -10,7 +10,6 @@ using System.Runtime.InteropServices;
 
 internal static class MyData
 {
-    
     public static bool Contains(string key)
     {
         if (key.Length != 5u)

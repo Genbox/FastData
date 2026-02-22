@@ -12,7 +12,7 @@ class ArrayStructure_Double_4 final {
         std::numeric_limits<double>::lowest(), 0.0, 1.0, std::numeric_limits<double>::max()
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const double key) noexcept {
         if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())

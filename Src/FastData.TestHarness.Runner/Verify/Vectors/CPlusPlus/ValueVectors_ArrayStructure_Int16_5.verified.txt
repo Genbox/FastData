@@ -12,7 +12,7 @@ class ArrayStructure_Int16_5 final {
         std::numeric_limits<int16_t>::lowest(), -1, 0, 1, std::numeric_limits<int16_t>::max()
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int16_t key) noexcept {
         if (key < std::numeric_limits<int16_t>::lowest() || key > std::numeric_limits<int16_t>::max())

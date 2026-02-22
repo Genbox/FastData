@@ -157,7 +157,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                     return new SingleValueTemplateData
                     {
                         Item = singleCtx.Key,
-                        Value = singleCtx.Values
+                        Value = singleCtx.Values.IsEmpty ? null : singleCtx.Values.Span[0]
                     };
 
                 case RangeContext<TKey> rangeCtx:
@@ -289,7 +289,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
             sb.Append(base.GetMethodHeader(methodType));
 
             if (TotalTrimLength != 0)
-                sb.Append($"        string {TrimmedKeyName} = {InputKeyName}.Substring({TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.Length - {TotalTrimLength.ToStringInvariant()});");
+                sb.Append($"    string {TrimmedKeyName} = {InputKeyName}.Substring({TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.Length - {TotalTrimLength.ToStringInvariant()});");
 
             return sb.ToString();
         }

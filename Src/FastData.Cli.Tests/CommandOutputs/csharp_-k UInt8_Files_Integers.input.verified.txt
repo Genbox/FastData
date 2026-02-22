@@ -10,7 +10,6 @@ using System.Runtime.InteropServices;
 
 internal static class MyData
 {
-    
     public static bool Contains(byte key)
     {
         if (((byte)key & 129) != 0)

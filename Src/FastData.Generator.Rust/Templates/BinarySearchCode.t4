@@ -14,19 +14,19 @@
     {
         Shared.Add(CodePlacement.Before, Model.ValueObjectDeclarations);
 #>
-<#= Model.FieldModifier #>VALUES: [<#= Model.GetValueTypeName(!Model.IsPrimitive) #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
+<#= Model.FieldModifier #>VALUES: [<#= Model.GetValueTypeName() #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, Model.ToValueLabel) #>
-    ];
+];
 
 <#
     }
 #>
-<#= Model.FieldModifier #>KEYS: [<#= Model.GetKeyTypeName(Model.IsPrimitive) #>; <#= Data.KeyCount.ToStringInvariant() #>] = [
+<#= Model.FieldModifier #>KEYS: [<#= Model.GetKeyTypeName() #>; <#= Data.KeyCount.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, Model.ToValueLabel) #>
-    ];
+];
 
 <#= Model.MethodAttribute #>
-<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(!Model.IsPrimitive) #>) -> bool {
+<#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName() #>) -> bool {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
 <#
@@ -101,7 +101,7 @@
 #>
 
 <#= Model.MethodAttribute #>
-<#= Model.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName(!Model.IsPrimitive) #>) -> Option<<#= Model.GetValueTypeName(!Model.IsPrimitive) #>> {
+<#= Model.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName() #>) -> Option<<#= Model.GetValueTypeName() #>> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
 <#

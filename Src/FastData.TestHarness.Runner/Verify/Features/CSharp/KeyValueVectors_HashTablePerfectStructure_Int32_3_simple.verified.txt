@@ -8,20 +8,19 @@ using System.Runtime.InteropServices;
 
 internal static class HashTablePerfectStructure_Int32_3_simple
 {
-[StructLayout(LayoutKind.Auto)]
-private struct E
-{
-    internal int Key;
-    
-    internal int Value;
-
-    internal E(int key, int value)
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
     {
-        Key = key;
-        
-        Value = value;
+        internal int Key;
+        internal int Value;
+
+        internal E(int key, int value)
+        {
+            Key = key;
+            Value = value;
+        }
     }
-}
+
     private static readonly E[] _entries = {
         new E(3, 3), new E(1, 1), new E(2, 2)
     };
@@ -33,7 +32,7 @@ private struct E
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(int key)
     {
         if (((uint)key & 4294967292u) != 0)
@@ -46,7 +45,8 @@ private struct E
 
         return key == entry.Key;
     }
-    
+
+
     public static bool TryLookup(int key, out int value)
     {
         if (((uint)key & 4294967292u) != 0)

@@ -15,13 +15,15 @@ struct Person {
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
 class SingleValueStructure_Int32_1_complex final {
-      static inline const auto stored_value = new Person(1, u8"Bob", new Person(4, u8"Anna", nullptr));public:
+    static inline const auto stored_value = new Person(1, u8"Bob", new Person(4, u8"Anna", nullptr));
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 
 
         return key == 1;
     }
+
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
 

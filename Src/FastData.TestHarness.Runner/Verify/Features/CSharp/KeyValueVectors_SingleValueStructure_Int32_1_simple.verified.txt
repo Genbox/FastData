@@ -8,14 +8,16 @@ using System.Runtime.InteropServices;
 
 internal static class SingleValueStructure_Int32_1_simple
 {
-    private static readonly int _storedValue = 1;    
+    private static readonly int _storedValue = 1;
+
     public static bool Contains(int key)
     {
 
 
         return key == 1;
     }
-    
+
+
     public static bool TryLookup(int key, out int value)
     {
 

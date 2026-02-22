@@ -1,5 +1,6 @@
 <#@ template language="C#" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="Genbox.FastData.Generator.CSharp.TemplateData" #>
@@ -60,11 +61,11 @@ private struct E
 
 <#= Model.FieldModifier #><#= indexType #>[] _bucketStarts = new <#= indexType #>[] {
 <#= FormatHelper.FormatColumns(Context.BucketStarts, x => Model.ToValueLabel(x)) #>
-     };
+};
 
 <#= Model.FieldModifier #><#= indexType #>[] _bucketCounts = new <#= indexType #>[] {
 <#= FormatHelper.FormatColumns(Context.BucketCounts, x => Model.ToValueLabel(x)) #>
-     };
+};
 
 <#= Model.FieldModifier #>E[] _entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
@@ -73,7 +74,7 @@ private struct E
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
         return $"new E({Model.ToValueLabel(x.Key)}{hashPart}{valuePart})";
     }) #>
-    };
+};
 
 <#= Model.HashSource #>
 

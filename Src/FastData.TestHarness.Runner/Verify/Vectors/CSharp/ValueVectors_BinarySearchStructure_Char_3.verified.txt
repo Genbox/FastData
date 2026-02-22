@@ -12,11 +12,12 @@ internal static class BinarySearchStructure_Char_3
         char.MinValue, 'a', ''
     };
 
-    
+
     public static bool Contains(char key)
     {
         if (((ushort)key & 65408) != 0)
             return false;
+
 
         int lo = 0;
         int hi = 2;

@@ -53,7 +53,6 @@ impl HashTableCompactStructure_UInt64_4 {
     pub const MIN_KEY: u64 = u64::MIN;
     pub const MAX_KEY: u64 = u64::MAX;
 }struct E {
-    
     key: u64,
-    
 }
+

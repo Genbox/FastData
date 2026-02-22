@@ -13,20 +13,16 @@ internal static class HashTableStructure_UInt64_4
     {
         internal ulong Key;
         internal sbyte Next;
-        
-        
-        internal E(ulong key, sbyte next )
+        internal E(ulong key, sbyte next)
         {
             Key = key;
             Next = next;
-            
-            
         }
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
         1, 2, 3, 4
-     };
+    };
 
     private static readonly E[] _entries = {
         new E(ulong.MinValue, -1), new E(1ul, -1), new E(2ul, -1), new E(ulong.MaxValue, -1)
@@ -39,7 +35,7 @@ internal static class HashTableStructure_UInt64_4
         return (ulong)value;
     }
 
-    
+
     public static bool Contains(ulong key)
     {
         if (key < ulong.MinValue || key > ulong.MaxValue)

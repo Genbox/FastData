@@ -9,9 +9,10 @@ use std::ptr;
 pub struct BinarySearchStructure_Int32_3_simple;
 
 impl BinarySearchStructure_Int32_3_simple {
-   const VALUES: [i32; 3] = [
+    const VALUES: [i32; 3] = [
         1, 2, 3
     ];
+
     const KEYS: [i32; 3] = [
         1, 2, 3
     ];
@@ -21,6 +22,7 @@ impl BinarySearchStructure_Int32_3_simple {
         if (key as u32 & 4294967292) != 0 {
             return false;
         }
+
 
         let mut lo: usize = 0;
         let mut hi: usize = 2;
@@ -41,11 +43,13 @@ impl BinarySearchStructure_Int32_3_simple {
 
         false
     }
+
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<i32> {
         if (key as u32 & 4294967292) != 0 {
             return None;
         }
+
 
         let mut lo: usize = 0;
         let mut hi: usize = 2;

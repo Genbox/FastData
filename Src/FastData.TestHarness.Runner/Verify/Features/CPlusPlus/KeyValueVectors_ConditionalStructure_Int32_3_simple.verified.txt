@@ -11,7 +11,8 @@ class ConditionalStructure_Int32_3_simple final {
     inline static const std::array<int32_t, 3> values = {
         1, 2, 3
     };
-public:
+
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 
@@ -20,6 +21,7 @@ public:
 
         return false;
     }
+
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
 
@@ -35,7 +37,6 @@ public:
             value = &values[2];
             return true;
         }
-
         value = nullptr;
         return false;
     }

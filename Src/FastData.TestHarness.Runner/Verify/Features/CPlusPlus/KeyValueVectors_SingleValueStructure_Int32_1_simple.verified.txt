@@ -8,13 +8,15 @@
 #include <string_view>
 
 class SingleValueStructure_Int32_1_simple final {
-      static inline const auto stored_value = 1;public:
+    static inline const auto stored_value = 1;
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 
 
         return key == 1;
     }
+
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
 

@@ -12,25 +12,25 @@ class BinarySearchStructure_String_3 final {
         u8"a", u8"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", u8"item"
     };
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
         switch (key.length() >> 6)
         {
             case 0:
-            if ((9ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+        if ((9ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
             return false;
             break;
             case 1:
-            if ((0ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+        if ((0ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
             return false;
             break;
             case 2:
-            if ((0ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+        if ((0ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
             return false;
             break;
             case 3:
-            if ((4611686018427387904ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+        if ((4611686018427387904ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
             return false;
             break;
 
@@ -50,6 +50,7 @@ public:
             if (((1ULL << (valueChar - 64)) & 2207613190144ULL) == 0)
                 return false;
         }
+
 
         int32_t lo = 0;
         int32_t hi = 2;

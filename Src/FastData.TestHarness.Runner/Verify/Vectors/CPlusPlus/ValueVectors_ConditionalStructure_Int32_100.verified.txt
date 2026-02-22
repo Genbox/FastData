@@ -8,7 +8,7 @@
 #include <string_view>
 
 class ConditionalStructure_Int32_100 final {
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
         if ((static_cast<uint32_t>(key) & 4294967168u) != 0)

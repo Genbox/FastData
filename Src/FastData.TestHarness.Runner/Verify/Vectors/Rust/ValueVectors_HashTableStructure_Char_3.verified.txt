@@ -48,8 +48,7 @@ impl HashTableStructure_Char_3 {
     pub const MIN_KEY: char = char::MIN;
     pub const MAX_KEY: char = '';
 }struct E {
-    
     next: i8,
     key: char,
-    
 }
+

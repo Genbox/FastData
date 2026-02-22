@@ -12,14 +12,13 @@ class HashTableStructure_String_3 final {
         std::string_view key;
         int8_t next;
         uint64_t hash_code;
-        
         e(const std::string_view key, const int8_t next, const uint64_t hash_code)
            : key(key), next(next), hash_code(hash_code) {}
     };
 
     static constexpr std::array<int8_t, 3> buckets = {
         3, 2, 0
-     };
+    };
 
     inline static const std::array<e, 3> entries = {
         e(u8"a", -1, 18225461187723808291), e(u8"item", 0, 16750939634977259983), e(u8"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", -1, 9198652691199425319)
@@ -27,33 +26,33 @@ class HashTableStructure_String_3 final {
 
     static constexpr uint64_t get_hash(const std::string_view value) noexcept
     {
-    uint64_t hash = 352654597;
+        uint64_t hash = 352654597;
 
-    for (unsigned char ch : value)
-        hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+        for (unsigned char ch : value)
+            hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
 
-    return 352654597 + (hash * 1566083941);
+        return 352654597 + (hash * 1566083941);
     }
 
-public:
+    public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
         switch (key.length() >> 6)
         {
             case 0:
-            if ((9ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+        if ((9ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
             return false;
             break;
             case 1:
-            if ((0ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+        if ((0ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
             return false;
             break;
             case 2:
-            if ((0ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+        if ((0ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
             return false;
             break;
             case 3:
-            if ((4611686018427387904ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
+        if ((4611686018427387904ULL & (1ULL << ((key.length() - 1) & 63))) == 0)
             return false;
             break;
 

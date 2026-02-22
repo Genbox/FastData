@@ -34,7 +34,7 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
             {
                 sb.Append($$"""
                                     {{i.ToStringInvariant()}} => {
-                            {{RenderWord(bitSet[i], methodType)}}
+                                {{RenderWord(bitSet[i], methodType)}}
                                     },
 
                             """);
@@ -46,9 +46,9 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
 
     protected override string GetValueEarlyExit<T>(MethodType methodType, T min, T max) =>
         $$"""
-                  if {{(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")}} {
-                      {{RenderExit(methodType)}}
-                  }
+              if {{(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")}} {
+                  {{RenderExit(methodType)}}
+              }
           """;
 
     protected override string GetValueBitMaskEarlyExit<T>(MethodType methodType, ulong mask)
@@ -59,35 +59,35 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
         string maskLiteral = map.ToValueLabel(maskValue, unsignedType);
 
         return $$"""
-                         if (key as {{unsignedTypeName}} & {{maskLiteral}}) != 0 {
-                             {{RenderExit(methodType)}}
-                         }
+                     if (key as {{unsignedTypeName}} & {{maskLiteral}}) != 0 {
+                         {{RenderExit(methodType)}}
+                     }
                  """;
     }
 
     protected override string GetLengthEqualEarlyExit(MethodType methodType, uint length, uint byteCount, GeneratorEncoding encoding) =>
         $$"""
-                         if key.len() != {{map.ToValueLabel(byteCount)}} as usize {
-                             {{RenderExit(methodType)}}
-                         }
-                 """;
+              if key.len() != {{map.ToValueLabel(byteCount)}} as usize {
+                  {{RenderExit(methodType)}}
+              }
+          """;
 
     protected override string GetLengthRangeEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding) =>
         $$"""
-                         let len = key.len();
-                         if len < {{map.ToValueLabel(minByte)}} as usize || len > {{map.ToValueLabel(maxByte)}} as usize {
-                             {{RenderExit(methodType)}}
-                         }
-                 """;
+              let len = key.len();
+              if len < {{map.ToValueLabel(minByte)}} as usize || len > {{map.ToValueLabel(maxByte)}} as usize {
+                  {{RenderExit(methodType)}}
+              }
+          """;
 
     protected override string GetLengthDivisorEarlyExit(MethodType methodType, uint charDivisor, uint byteDivisor)
     {
         Debug.Assert(byteDivisor > 1);
 
         return $$"""
-                         if key.len() % {{map.ToValueLabel(byteDivisor)}} as usize != 0 {
-                             {{RenderExit(methodType)}}
-                         }
+                     if key.len() % {{map.ToValueLabel(byteDivisor)}} as usize != 0 {
+                         {{RenderExit(methodType)}}
+                     }
                  """;
     }
 
@@ -114,12 +114,12 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
             }
 
             return $$"""
-                             let bytes = key.as_bytes();
-                             let first = {{expr}};
+                         let bytes = key.as_bytes();
+                         let first = {{expr}};
 
-                             if (first & {{mask.ToStringInvariant()}}u64) != 0 {
-                                 {{RenderExit(methodType)}}
-                             }
+                         if (first & {{mask.ToStringInvariant()}}u64) != 0 {
+                             {{RenderExit(methodType)}}
+                         }
                      """;
         }
 
@@ -132,64 +132,64 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
         for (int i = 0; i < byteCount; i++)
         {
             sb.Append($"""
-                                       let mut b{i} = bytes[{i}];
-                                       b{i} = to_lower_ascii(b{i});
-                                       first |= (b{i} as u64) << {i * 8};
+                                   let mut b{i} = bytes[{i}];
+                                   b{i} = to_lower_ascii(b{i});
+                                   first |= (b{i} as u64) << {i * 8};
                        """);
         }
 
         sb.Append($$"""
 
-                                    if (first & {{mask.ToStringInvariant()}}u64) != 0 {
-                                        {{RenderExit(methodType)}}
-                                    }
+                                if (first & {{mask.ToStringInvariant()}}u64) != 0 {
+                                    {{RenderExit(methodType)}}
+                                }
                     """);
         return sb.ToString();
     }
 
     protected override string GetCharRangeEarlyExit(MethodType methodType, CharPosition position, char min, char max, bool ignoreCase, GeneratorEncoding encoding) =>
         $$"""
-                  let bytes = key.as_bytes();
-                  let len = bytes.len();
-                  let value_char = {{(position == CharPosition.First
-                      ? ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]"
-                      : ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}};
-                  if value_char < {{map.ToValueLabel((byte)min)}}u8 || value_char > {{map.ToValueLabel((byte)max)}}u8 {
-                      {{RenderExit(methodType)}}
-                  }
+              let bytes = key.as_bytes();
+              let len = bytes.len();
+              let value_char = {{(position == CharPosition.First
+                  ? ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]"
+                  : ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}};
+              if value_char < {{map.ToValueLabel((byte)min)}}u8 || value_char > {{map.ToValueLabel((byte)max)}}u8 {
+                  {{RenderExit(methodType)}}
+              }
           """;
 
     protected override string GetCharEqualsEarlyExit(MethodType methodType, CharPosition position, char value, bool ignoreCase, GeneratorEncoding encoding) =>
         $$"""
-                  let bytes = key.as_bytes();
-                  let len = bytes.len();
-                  let value_char = {{(position == CharPosition.First
-                      ? ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]"
-                      : ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}};
-                  if value_char != {{map.ToValueLabel((byte)value)}} {
-                      {{RenderExit(methodType)}}
-                  }
+              let bytes = key.as_bytes();
+              let len = bytes.len();
+              let value_char = {{(position == CharPosition.First
+                  ? ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]"
+                  : ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}};
+              if value_char != {{map.ToValueLabel((byte)value)}} {
+                  {{RenderExit(methodType)}}
+              }
           """;
 
     protected override string GetCharBitmapEarlyExit(MethodType methodType, CharPosition position, ulong low, ulong high, bool ignoreCase, GeneratorEncoding encoding) =>
         $$"""
-                  let bytes = key.as_bytes();
-                  let len = bytes.len();
-                  let value_char = {{(position == CharPosition.First ?
-                      ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]" :
-                      ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}} as u32;
-                  if value_char > 0x7F {
+              let bytes = key.as_bytes();
+              let len = bytes.len();
+              let value_char = {{(position == CharPosition.First ?
+                  ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]" :
+                  ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}} as u32;
+              if value_char > 0x7F {
+                  {{RenderExit(methodType)}}
+              }
+              if value_char < 64 {
+                  if (((1u64 << value_char) & {{low.ToStringInvariant()}}u64) == 0) {
                       {{RenderExit(methodType)}}
                   }
-                  if value_char < 64 {
-                      if (((1u64 << value_char) & {{low.ToStringInvariant()}}u64) == 0) {
-                          {{RenderExit(methodType)}}
-                      }
-                  } else {
-                      if (((1u64 << (value_char - 64)) & {{high.ToStringInvariant()}}u64) == 0) {
-                          {{RenderExit(methodType)}}
-                      }
+              } else {
+                  if (((1u64 << (value_char - 64)) & {{high.ToStringInvariant()}}u64) == 0) {
+                      {{RenderExit(methodType)}}
                   }
+              }
           """;
 
     protected override string GetStringPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
@@ -204,17 +204,17 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
             condition = suffix.Length == 0 ? prefixCheck : $"{prefixCheck} && {suffixCheck}";
 
         return $$"""
-                         if !({{condition}}) {
-                             {{RenderExit(methodType)}}
-                         }
+                     if !({{condition}}) {
+                         {{RenderExit(methodType)}}
+                     }
                  """;
     }
 
     private static string RenderWord(ulong word, MethodType methodType) =>
         $$"""
-                      if {{word.ToStringInvariant()}}u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
-                          {{RenderExit(methodType)}}
-                      }
+                  if {{word.ToStringInvariant()}}u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
+                      {{RenderExit(methodType)}}
+                  }
           """;
 
     private static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup ? "return None;" : "return false;";

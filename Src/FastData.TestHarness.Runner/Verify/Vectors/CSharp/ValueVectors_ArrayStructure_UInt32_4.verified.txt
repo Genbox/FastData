@@ -12,7 +12,7 @@ internal static class ArrayStructure_UInt32_4
         uint.MinValue, 1u, 2u, uint.MaxValue
     };
 
-    
+
     public static bool Contains(uint key)
     {
         if (key < uint.MinValue || key > uint.MaxValue)
@@ -22,7 +22,7 @@ internal static class ArrayStructure_UInt32_4
         for (int i = 0; i < 4; i++)
         {
             if (key == _keys[i])
-               return true;
+                return true;
         }
         return false;
     }

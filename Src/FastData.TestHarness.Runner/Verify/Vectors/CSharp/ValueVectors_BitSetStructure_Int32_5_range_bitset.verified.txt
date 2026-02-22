@@ -11,7 +11,8 @@ internal static class BitSetStructure_Int32_5_range_bitset
     private static readonly ulong[] _bitset = new ulong[] {
         31ul
     };
-    
+
+
     public static bool Contains(int key)
     {
 
