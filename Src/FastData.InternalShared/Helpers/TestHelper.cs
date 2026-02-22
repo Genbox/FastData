@@ -224,7 +224,7 @@ public static class TestHelper
             props = strProps;
         }
         else
-            props = KeyAnalyzer.GetNumericProperties(keyMemory);
+            props = KeyAnalyzer.GetNumericProperties(keyMemory, false);
 
         TempState<TKey, TValue> state = new TempState<TKey, TValue>(keyMemory, values, keyType, vector, generator, props, trimPrefix, trimSuffix, config);
 

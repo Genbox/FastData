@@ -3,7 +3,7 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValue, RrrBitVectorContext>
+internal sealed class RrrBitVectorStructure<TKey, TValue>(bool keysAreSorted = false) : IStructure<TKey, TValue, RrrBitVectorContext>
 {
     private const int BlockSize = 15;
 
@@ -15,12 +15,13 @@ internal sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TVa
         for (int i = 0; i < span.Length; i++)
             mapped[i] = MapKeyToSortable(span[i]);
 
-        Array.Sort(mapped);
+        if (!keysAreSorted)
+            Array.Sort(mapped);
 
         ulong minValue = mapped[0];
         ulong maxValue = mapped[mapped.Length - 1];
         ulong universe = maxValue - minValue + 1UL;
-        ulong blockCount64 = (universe + (ulong)BlockSize - 1UL) / (ulong)BlockSize;
+        ulong blockCount64 = (universe + BlockSize - 1UL) / BlockSize;
 
         if (blockCount64 > int.MaxValue)
             throw new InvalidOperationException("RRR bitvector is too large.");
@@ -38,12 +39,12 @@ internal sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TVa
             while (keyIndex < mapped.Length)
             {
                 ulong normalized = mapped[keyIndex] - minValue;
-                ulong currentBlock = normalized / (ulong)BlockSize;
+                ulong currentBlock = normalized / BlockSize;
 
                 if (currentBlock != (ulong)block)
                     break;
 
-                int bit = (int)(normalized % (ulong)BlockSize);
+                int bit = (int)(normalized % BlockSize);
                 mask |= (ushort)(1 << bit);
                 keyIndex++;
             }

@@ -3,11 +3,7 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [MemoryDiagnoser]
 public class DeduplicationBenchmarks
 {
-    private int[] _intKeys = [];
-    private string[] _stringKeys = [];
-
-    [Params(DeduplicationMode.Disabled, DeduplicationMode.HashSet, DeduplicationMode.Sort)]
-    public DeduplicationMode Mode { get; set; }
+    private int[] _intKeys = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -17,27 +13,29 @@ public class DeduplicationBenchmarks
         _intKeys = new int[1000];
         for (int i = 0; i < _intKeys.Length; i++)
             _intKeys[i] = rng.Next(0, 200);
-
-        _stringKeys = new string[1000];
-        for (int i = 0; i < _stringKeys.Length; i++)
-            _stringKeys[i] = "key" + rng.Next(0, 200);
     }
 
     [Benchmark]
-    public void IntKeys()
+    public void HashSetDedup()
     {
-        FastDataConfig cfg = new FastDataConfig();
-        cfg.DeduplicationMode = Mode;
-
-        FastDataGenerator.DeduplicateKeys(cfg, _intKeys, ReadOnlyMemory<int>.Empty, EqualityComparer<int>.Default, Comparer<int>.Default, out _, out _, out int _);
+        int[] keys = new int[_intKeys.Length];
+        Array.Copy(_intKeys, keys, _intKeys.Length);
+        FastDataGenerator.DeduplicateWithHashSet(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, out _);
     }
 
     [Benchmark]
-    public void StringKeys()
+    public void SortDedup()
     {
-        FastDataConfig cfg = new FastDataConfig();
-        cfg.DeduplicationMode = Mode;
+        int[] keys = new int[_intKeys.Length];
+        Array.Copy(_intKeys, keys, _intKeys.Length);
+        FastDataGenerator.DeduplicateWithSort(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, Comparer<int>.Default, out _);
+    }
 
-        FastDataGenerator.DeduplicateKeys(cfg, _stringKeys, ReadOnlyMemory<int>.Empty, StringComparer.Ordinal, StringComparer.Ordinal, out _, out _, out int _);
+    [Benchmark]
+    public void SortPreserveDedup()
+    {
+        int[] keys = new int[_intKeys.Length];
+        Array.Copy(_intKeys, keys, _intKeys.Length);
+        FastDataGenerator.DeduplicateWithSortPreserveInputOrder(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, Comparer<int>.Default, out _);
     }
 }

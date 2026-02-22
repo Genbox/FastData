@@ -3,25 +3,23 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class InterpolatedBinarySearchStructure<TKey, TValue> : IStructure<TKey, TValue, InterpolatedBinarySearchContext<TKey, TValue>>
+internal sealed class InterpolatedBinarySearchStructure<TKey, TValue>(bool keysAreSorted = false) : IStructure<TKey, TValue, InterpolatedBinarySearchContext<TKey, TValue>>
 {
     public InterpolatedBinarySearchContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
+        if (keysAreSorted)
+            return new InterpolatedBinarySearchContext<TKey, TValue>(keys, values);
+
         TKey[] keysCopy = new TKey[keys.Length];
-        keys.Span.CopyTo(keysCopy);
+        keys.CopyTo(keysCopy);
 
-        TValue[] valuesCopy = [];
+        TValue[] valuesCopy = new TValue[values.Length];
+        values.CopyTo(valuesCopy);
 
-        if (!values.IsEmpty)
-        {
-            valuesCopy = new TValue[values.Length];
-            values.Span.CopyTo(valuesCopy);
-        }
-
-        if (!values.IsEmpty)
-            Array.Sort(keysCopy, valuesCopy);
-        else
+        if (values.IsEmpty)
             Array.Sort(keysCopy);
+        else
+            Array.Sort(keysCopy, valuesCopy);
 
         return new InterpolatedBinarySearchContext<TKey, TValue>(keysCopy, valuesCopy);
     }

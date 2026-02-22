@@ -10,12 +10,14 @@ namespace Genbox.FastData.Tests;
 public class FastDataGeneratorTests
 {
     [Theory]
-    [InlineData(DeduplicationMode.HashSetThrowOnDup)]
-    [InlineData(DeduplicationMode.SortThrowOnDup)]
+    [InlineData(DeduplicationMode.HashSetPreserveOrder)]
+    [InlineData(DeduplicationMode.Sort)]
+    [InlineData(DeduplicationMode.SortPreserveOrder)]
     public void Generate_ThrowOnDuplicate(DeduplicationMode mode)
     {
         FastDataConfig config = new FastDataConfig();
         config.DeduplicationMode = mode;
+        config.ThrowOnDuplicates = true;
 
         Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate(["item", "item"], config, new DummyGenerator()));
         Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate([1, 2, 2], config, new DummyGenerator()));
@@ -23,22 +25,17 @@ public class FastDataGeneratorTests
 
     [Theory]
     [InlineData(DeduplicationMode.Disabled)]
-    [InlineData(DeduplicationMode.HashSet)]
+    [InlineData(DeduplicationMode.HashSetPreserveOrder)]
     [InlineData(DeduplicationMode.Sort)]
+    [InlineData(DeduplicationMode.SortPreserveOrder)]
     public void Generate_NoThrowOnDuplicates(DeduplicationMode mode)
     {
         FastDataConfig config = new FastDataConfig();
         config.DeduplicationMode = mode;
+        config.ThrowOnDuplicates = false;
 
         FastDataGenerator.Generate(["item", "item"], config, new DummyGenerator());
         FastDataGenerator.Generate([1, 2, 2], config, new DummyGenerator());
-    }
-
-    [Fact]
-    public void FastDataConfig_SkipQuantum_DefaultValueIs128()
-    {
-        FastDataConfig config = new FastDataConfig();
-        Assert.Equal(128, config.SkipQuantum);
     }
 
     [Fact]
@@ -56,17 +53,10 @@ public class FastDataGeneratorTests
         Assert.Throws<ArgumentException>(() => config.SkipQuantum = 3);
     }
 
-    [Fact]
-    public void FastDataConfig_SkipQuantum_AcceptsPowerOfTwo()
-    {
-        FastDataConfig config = new FastDataConfig();
-        config.SkipQuantum = 64;
-        Assert.Equal(64, config.SkipQuantum);
-    }
-
     [Theory]
-    [InlineData(DeduplicationMode.HashSet)]
+    [InlineData(DeduplicationMode.HashSetPreserveOrder)]
     [InlineData(DeduplicationMode.Sort)]
+    [InlineData(DeduplicationMode.SortPreserveOrder)]
     public void GenerateKeyed_StringDeduplication_RemovesDuplicates(DeduplicationMode mode)
     {
         string[] keys = ["b", "a", "b", "c"];
@@ -74,12 +64,13 @@ public class FastDataGeneratorTests
 
         FastDataConfig config = new FastDataConfig(StructureType.Array);
         config.DeduplicationMode = mode;
+        config.ThrowOnDuplicates = false;
 
         ContextCaptureGenerator generator = new ContextCaptureGenerator();
         FastDataGenerator.GenerateKeyed(keys, values, config, generator);
 
         ArrayContext<string, string> ctx = Assert.IsType<ArrayContext<string, string>>(generator.Context);
-        if (mode == DeduplicationMode.HashSet)
+        if (mode is DeduplicationMode.HashSetPreserveOrder or DeduplicationMode.SortPreserveOrder)
         {
             Assert.True(ctx.Keys.Span.SequenceEqual(["b", "a", "c"]));
             Assert.True(ctx.Values.Span.SequenceEqual(["vb", "va", "vc"]));
@@ -92,20 +83,23 @@ public class FastDataGeneratorTests
     }
 
     [Theory]
-    [InlineData(DeduplicationMode.HashSet)]
+    [InlineData(DeduplicationMode.HashSetPreserveOrder)]
     [InlineData(DeduplicationMode.Sort)]
+    [InlineData(DeduplicationMode.SortPreserveOrder)]
     public void GenerateKeyed_NumericDeduplication_RemovesDuplicates(DeduplicationMode mode)
     {
         int[] keys = [3, 1, 3, 2];
         string[] values = ["v3", "v1", "v3", "v2"];
+
         FastDataConfig config = new FastDataConfig(StructureType.Array);
         config.DeduplicationMode = mode;
-        ContextCaptureGenerator generator = new ContextCaptureGenerator();
+        config.ThrowOnDuplicates = false;
 
+        ContextCaptureGenerator generator = new ContextCaptureGenerator();
         FastDataGenerator.GenerateKeyed(keys, values, config, generator);
 
         ArrayContext<int, string> ctx = Assert.IsType<ArrayContext<int, string>>(generator.Context);
-        if (mode == DeduplicationMode.HashSet)
+        if (mode is DeduplicationMode.HashSetPreserveOrder or DeduplicationMode.SortPreserveOrder)
         {
             Assert.True(ctx.Keys.Span.SequenceEqual([3, 1, 2]));
             Assert.True(ctx.Values.Span.SequenceEqual(["v3", "v1", "v2"]));
@@ -141,11 +135,10 @@ public class FastDataGeneratorTests
     [Fact]
     public void Generate_IgnoreCase_DeduplicatesCaseInsensitive()
     {
-        FastDataConfig config = new FastDataConfig(StructureType.Array)
-        {
-            IgnoreCase = true,
-            DeduplicationMode = DeduplicationMode.SortThrowOnDup
-        };
+        FastDataConfig config = new FastDataConfig(StructureType.Array);
+        config.IgnoreCase = true;
+        config.DeduplicationMode = DeduplicationMode.Sort;
+        config.ThrowOnDuplicates = true;
 
         Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate(["abc", "ABC"], config, new DummyGenerator()));
     }
@@ -345,18 +338,6 @@ public class FastDataGeneratorTests
         Assert.Equal("pre", generator.TrimPrefix);
         Assert.Equal("SUF", generator.TrimSuffix);
     }
-
-    // [Fact]
-    // public async Task Generate_SpanSupport()
-    // {
-    //     ReadOnlySpan<int> span = [1, 2, 3, 4, 5];
-    //     string source = FastDataGenerator.Generate(span, new FastDataConfig(StructureType.Array), new DummyGenerator());
-    //
-    //     await Verify(source)
-    //           .UseFileName("SupportSpan")
-    //           .UseDirectory("Features")
-    //           .DisableDiff();
-    // }
 
     [Theory]
     [MemberData(nameof(GetTestData))]

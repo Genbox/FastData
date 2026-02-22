@@ -12,8 +12,11 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
     /// <summary>The type of structure to create. Defaults to Auto.</summary>
     public StructureType StructureType { get; set; } = structureType;
 
-    /// <summary>When true, duplicates will be eliminated from the input.</summary>
-    public DeduplicationMode DeduplicationMode { get; set; } = DeduplicationMode.HashSet;
+    /// <summary>Set the method to use for deduplication of keys. Defaults to <see cref="DeduplicationMode.HashSetPreserveOrder"/>.</summary>
+    public DeduplicationMode DeduplicationMode { get; set; } = DeduplicationMode.HashSetPreserveOrder;
+
+    /// <summary>When true, throws an exception on duplicate keys</summary>
+    public bool ThrowOnDuplicates { get; set; } = true;
 
     /// <summary>For hash-based structures, you can set this factor higher or lower to control how many slots are used. A factor higher than 1 will use more memory, but can improve performance by reducing collisions. A factor lower than 1 will use less memory, but can increase collisions and thus reduce performance.</summary>
     public int HashCapacityFactor { get; set; } = 1;

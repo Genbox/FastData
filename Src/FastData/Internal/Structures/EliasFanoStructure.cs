@@ -5,17 +5,23 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey> props, FastDataConfig cfg) : IStructure<TKey, TValue, EliasFanoContext<TKey>>
+internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey> props, FastDataConfig cfg, bool keysAreSorted = false) : IStructure<TKey, TValue, EliasFanoContext<TKey>>
 {
     public EliasFanoContext<TKey> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         //We need the data to be sorted
-        TKey[] keysSorted = new TKey[keys.Length];
-        keys.Span.CopyTo(keysSorted);
-        Array.Sort(keysSorted);
+        if (!keysAreSorted)
+        {
+            TKey[] keysCopy = new TKey[keys.Length];
+            keys.CopyTo(keysCopy);
+            Array.Sort(keysCopy);
+            keys = keysCopy.AsMemory();
+        }
 
-        int count = keysSorted.Length;
-        long maxValue = props.ValueConverter(keysSorted[count - 1]);
+        ReadOnlySpan<TKey> keysSpan = keys.Span;
+
+        int count = keysSpan.Length;
+        long maxValue = props.ValueConverter(keysSpan[count - 1]);
 
         long factor = maxValue / count;
         int lowerBitCount = factor <= 0 ? 0 : BitOperations.Log2((ulong)factor);
@@ -27,9 +33,9 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
         //Small optimization: If there are no lower bits, we can simply operate on upper bits.
         if (lowerBitCount == 0)
         {
-            for (int i = 0; i < keysSorted.Length; i++)
+            for (int i = 0; i < keysSpan.Length; i++)
             {
-                long value = props.ValueConverter(keysSorted[i]);
+                long value = props.ValueConverter(keysSpan[i]);
                 int index = (int)(value + i);
                 upperBits[index >> 6] |= 1UL << (index & 63);
             }
@@ -38,9 +44,9 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
         {
             lowerMask = (1UL << lowerBitCount) - 1;
 
-            for (int i = 0; i < keys.Length; i++)
+            for (int i = 0; i < keysSpan.Length; i++)
             {
-                long value = props.ValueConverter(keysSorted[i]);
+                long value = props.ValueConverter(keysSpan[i]);
                 int index = (int)((value >> lowerBitCount) + i);
                 upperBits[index >> 6] |= 1UL << (index & 63);
 
@@ -64,7 +70,7 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
         int sampleRateShift = BitOperations.TrailingZeroCount((uint)skipQuantum);
         int[] samplePositions = BuildSamples(upperBits, upperBitLength, skipQuantum);
 
-        return new EliasFanoContext<TKey>(keysSorted, lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions);
+        return new EliasFanoContext<TKey>(keys, lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions);
     }
 
     private static int[] BuildSamples(ulong[] words, int bitLength, int sampleRate)

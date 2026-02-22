@@ -76,40 +76,36 @@ public static partial class FastDataGenerator
         if (!values.IsEmpty && keys.Length != values.Length)
             throw new InvalidOperationException("The number of values does not match the number of keys.");
 
-        ReadOnlySpan<string> keySpan = keys.Span;
+        factory ??= NullLoggerFactory.Instance;
 
-        for (int i = 0; i < keySpan.Length; i++)
+        ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));
+        LogUserStructureType(logger, fdCfg.StructureType);
+
+        // We validate and copy data at the same time
+        foreach (string? key in keys.Span)
         {
-            string? key = keySpan[i];
-
-            if (key is null)
+            if (key == null)
                 throw new InvalidOperationException("Keys cannot contain null values.");
 
             if (key.Length == 0)
                 throw new InvalidOperationException("Keys cannot contain empty strings.");
         }
 
-        factory ??= NullLoggerFactory.Instance;
-
-        ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));
-        LogUserStructureType(logger, fdCfg.StructureType);
+        StringComparer comparer = fdCfg.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
         int oldCount = keys.Length;
-
-        StringComparer comparer = fdCfg.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-        DeduplicateKeys(fdCfg, keys, values, comparer, comparer, out keys, out values, out int newCount);
+        bool sorted = DeduplicateKeys(fdCfg, ref keys, ref values, comparer, comparer);
+        int newCount = keys.Length;
 
         if (oldCount == newCount)
-            LogNumberOfKeys(logger, newCount);
+            LogNumberOfKeys(logger, oldCount);
         else
             LogNumberOfUniqueKeys(logger, oldCount, newCount);
-
-        keySpan = keys.Span;
 
         const KeyType keyType = KeyType.String;
         LogKeyType(logger, keyType);
 
-        StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(keySpan, fdCfg.EnablePrefixSuffixTrimming, fdCfg.IgnoreCase, generator.Encoding);
+        StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(keys.Span, fdCfg.EnablePrefixSuffixTrimming, fdCfg.IgnoreCase, generator.Encoding);
 
         string trimPrefix = string.Empty;
         string trimSuffix = string.Empty;
@@ -119,8 +115,7 @@ public static partial class FastDataGenerator
         {
             trimPrefix = strProps.DeltaData.Prefix;
             trimSuffix = strProps.DeltaData.Suffix;
-            keys = SubStringKeys(keySpan, strProps);
-            keySpan = keys.Span;
+            keys = SubStringKeys(keys.Span, strProps);
         }
 
         LogMinMaxLength(logger, strProps.LengthData.LengthMap.Min, strProps.LengthData.LengthMap.Max);
@@ -163,22 +158,22 @@ public static partial class FastDataGenerator
             {
                 if (fdCfg.AllowApproximateMatching && values.IsEmpty)
                 {
-                    HashData bloomHashData = GetStringHashData(keySpan);
+                    HashData bloomHashData = GetStringHashData(keys.Span);
                     return GenerateWrapper(tempState, new BloomFilterStructure<string, TValue>(bloomHashData));
                 }
 
-                if (keySpan.Length == 1)
+                if (keys.Length == 1)
                     return GenerateWrapper(tempState, new SingleValueStructure<string, TValue>());
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
-                double density = (double)keySpan.Length / (strProps.LengthData.LengthMap.Max - strProps.LengthData.LengthMap.Min + 1);
+                double density = (double)keys.Length / (strProps.LengthData.LengthMap.Max - strProps.LengthData.LengthMap.Min + 1);
 
                 // Use KeyLengthStructure only when string lengths are unique and density >= threshold
                 if (strProps.LengthData.Unique && density >= fdCfg.KeyLengthStructureMinDensity)
                     return GenerateWrapper(tempState, new KeyLengthStructure<string, TValue>(strProps));
 
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
-                if (keySpan.Length < fdCfg.ConditionalStructureMaxItemCount)
+                if (keys.Length < fdCfg.ConditionalStructureMaxItemCount)
                     return GenerateWrapper(tempState, new ConditionalStructure<string, TValue>());
 
                 goto case StructureType.HashTable;
@@ -188,10 +183,10 @@ public static partial class FastDataGenerator
             case StructureType.Conditional:
                 return GenerateWrapper(tempState, new ConditionalStructure<string, TValue>());
             case StructureType.BinarySearch:
-                return GenerateWrapper(tempState, new BinarySearchStructure<string, TValue>(keyType, fdCfg.IgnoreCase));
+                return GenerateWrapper(tempState, new BinarySearchStructure<string, TValue>(keyType, fdCfg.IgnoreCase, sorted));
             case StructureType.HashTable:
             {
-                HashData hashData = GetStringHashData(keySpan);
+                HashData hashData = GetStringHashData(keys.Span);
 
                 if (hashData.HashCodesPerfect)
                     return GenerateWrapper(tempState, new HashTablePerfectStructure<string, TValue>(hashData, keyType));
@@ -220,21 +215,20 @@ public static partial class FastDataGenerator
         ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));
 
         int oldCount = keys.Length;
-        DeduplicateKeys(fdCfg, keys, values, EqualityComparer<TKey>.Default, Comparer<TKey>.Default, out keys, out values, out int newCount);
+        bool sorted = DeduplicateKeys(fdCfg, ref keys, ref values, EqualityComparer<TKey>.Default, Comparer<TKey>.Default);
+        int newCount = keys.Length;
 
-        if (oldCount == newCount)
-            LogNumberOfKeys(logger, newCount);
-        else
+        if (oldCount == newCount) // No duplicates removed
+            LogNumberOfKeys(logger, oldCount);
+        else // Duplicates removed
             LogNumberOfUniqueKeys(logger, oldCount, newCount);
-
-        ReadOnlySpan<TKey> keySpan = keys.Span;
 
         LogUserStructureType(logger, fdCfg.StructureType);
 
         KeyType keyType = (KeyType)Enum.Parse(typeof(KeyType), type.Name, false);
         LogKeyType(logger, keyType);
 
-        NumericKeyProperties<TKey> props = KeyAnalyzer.GetNumericProperties(keys);
+        NumericKeyProperties<TKey> props = KeyAnalyzer.GetNumericProperties(keys, sorted);
         LogMinMaxValues(logger, props.MinKeyValue, props.MaxKeyValue);
 
         HashDetails hashDetails = new HashDetails();
@@ -246,7 +240,7 @@ public static partial class FastDataGenerator
         {
             case StructureType.Auto:
             {
-                if (keySpan.Length == 1)
+                if (keys.Length == 1)
                     return GenerateWrapper(tempState, new SingleValueStructure<TKey, TValue>());
 
                 // RangeStructure handles consecutive keys, but does not support values
@@ -256,7 +250,7 @@ public static partial class FastDataGenerator
                 if (fdCfg.AllowApproximateMatching)
                 {
                     HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, props.HasZeroOrNaN);
-                    HashData bloomHashData = HashData.Create(keySpan, fdCfg.HashCapacityFactor, hashFunc);
+                    HashData bloomHashData = HashData.Create(keys.Span, fdCfg.HashCapacityFactor, hashFunc);
                     return GenerateWrapper(tempState, new BloomFilterStructure<TKey, TValue>(bloomHashData));
                 }
 
@@ -265,15 +259,15 @@ public static partial class FastDataGenerator
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
-                if (keySpan.Length < fdCfg.ConditionalStructureMaxItemCount)
+                if (keys.Length < fdCfg.ConditionalStructureMaxItemCount)
                     return GenerateWrapper(tempState, new ConditionalStructure<TKey, TValue>());
 
-                if (values.IsEmpty && IsIntegralKeyType(keyType) && !props.IsConsecutive && keySpan.Length >= fdCfg.RrrBitVectorStructureMinItemCount && props.Density <= fdCfg.RrrBitVectorStructureMaxDensity)
-                    return GenerateWrapper(tempState, new RrrBitVectorStructure<TKey, TValue>());
+                if (values.IsEmpty && IsIntegralKeyType(keyType) && !props.IsConsecutive && keys.Length >= fdCfg.RrrBitVectorStructureMinItemCount && props.Density <= fdCfg.RrrBitVectorStructureMaxDensity)
+                    return GenerateWrapper(tempState, new RrrBitVectorStructure<TKey, TValue>(sorted));
 
                 // TODO: Elias-Fano currently does not normalize against MinKeyValue, so negative domains may be handled sub-optimally.
-                if (values.IsEmpty && IsIntegralKeyType(keyType) && !props.IsConsecutive && keySpan.Length >= fdCfg.EliasFanoStructureMinItemCount && props.Density <= fdCfg.EliasFanoStructureMaxDensity)
-                    return GenerateWrapper(tempState, new EliasFanoStructure<TKey, TValue>(props, fdCfg));
+                if (values.IsEmpty && IsIntegralKeyType(keyType) && !props.IsConsecutive && keys.Length >= fdCfg.EliasFanoStructureMinItemCount && props.Density <= fdCfg.EliasFanoStructureMaxDensity)
+                    return GenerateWrapper(tempState, new EliasFanoStructure<TKey, TValue>(props, fdCfg, sorted));
 
                 goto case StructureType.HashTable;
             }
@@ -282,14 +276,14 @@ public static partial class FastDataGenerator
             case StructureType.Conditional:
                 return GenerateWrapper(tempState, new ConditionalStructure<TKey, TValue>());
             case StructureType.BinarySearch:
-                if (IsWellDistributed(keySpan, props, keyType, fdCfg.MaxHistogramBuckets))
-                    return GenerateWrapper(tempState, new InterpolatedBinarySearchStructure<TKey, TValue>());
+                if (IsWellDistributed(keys.Span, props, keyType, fdCfg.MaxHistogramBuckets))
+                    return GenerateWrapper(tempState, new InterpolatedBinarySearchStructure<TKey, TValue>(sorted));
 
-                return GenerateWrapper(tempState, new BinarySearchStructure<TKey, TValue>(keyType, fdCfg.IgnoreCase));
+                return GenerateWrapper(tempState, new BinarySearchStructure<TKey, TValue>(keyType, fdCfg.IgnoreCase, sorted));
             case StructureType.HashTable:
             {
                 HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, props.HasZeroOrNaN);
-                HashData hashData = HashData.Create(keySpan, fdCfg.HashCapacityFactor, hashFunc);
+                HashData hashData = HashData.Create(keys.Span, fdCfg.HashCapacityFactor, hashFunc);
 
                 if (hashData.HashCodesPerfect)
                     return GenerateWrapper(tempState, new HashTablePerfectStructure<TKey, TValue>(hashData, keyType));
@@ -301,111 +295,159 @@ public static partial class FastDataGenerator
         }
     }
 
-    internal static void DeduplicateKeys<TKey, TValue>(FastDataConfig fdCfg, ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, IEqualityComparer<TKey> equalityComparer, IComparer<TKey> sortComparer, out ReadOnlyMemory<TKey> newKeys, out ReadOnlyMemory<TValue> newValues, out int uniqueCount)
+    private static bool DeduplicateKeys<TKey, TValue>(FastDataConfig fdCfg, ref ReadOnlyMemory<TKey> keys, ref ReadOnlyMemory<TValue> values, IEqualityComparer<TKey> equalityComparer, IComparer<TKey> sortComparer)
     {
+        // Apply the configured strategy and return new key/value buffers.
         if (fdCfg.DeduplicationMode == DeduplicationMode.Disabled)
         {
-            TKey[] keyCopy = new TKey[keys.Length];
-            keys.CopyTo(keyCopy);
-            newKeys = keyCopy;
-
-            TValue[] valueCopy = new TValue[values.Length];
-            values.CopyTo(valueCopy);
-            newValues = valueCopy;
-
-            uniqueCount = keyCopy.Length;
-            return;
+            return false;
         }
 
-        ReadOnlySpan<TKey> keySpan = keys.Span;
-        ReadOnlySpan<TValue> valueSpan = values.Span;
-        bool hasValues = !values.IsEmpty;
+        TKey[] copyKeys = new TKey[keys.Length];
+        keys.CopyTo(copyKeys);
 
-        if (fdCfg.DeduplicationMode is DeduplicationMode.HashSet or DeduplicationMode.HashSetThrowOnDup)
+        TValue[] copyValues = new TValue[values.Length];
+        values.CopyTo(copyValues);
+
+        bool isSorted = false;
+        int uniqueCount;
+
+        if (fdCfg.DeduplicationMode == DeduplicationMode.HashSetPreserveOrder)
+            DeduplicateWithHashSet(copyKeys, copyValues, fdCfg.ThrowOnDuplicates, equalityComparer, out uniqueCount);
+        else if (fdCfg.DeduplicationMode == DeduplicationMode.Sort)
         {
-            HashSet<TKey> uniq = new HashSet<TKey>(equalityComparer);
-            TKey[] keyCopy = new TKey[keys.Length];
-            TValue[] valueCopy = hasValues ? new TValue[values.Length] : [];
+            DeduplicateWithSort(copyKeys, copyValues, fdCfg.ThrowOnDuplicates, equalityComparer, sortComparer, out uniqueCount);
+            isSorted = true;
+        }
+        else if (fdCfg.DeduplicationMode == DeduplicationMode.SortPreserveOrder)
+            DeduplicateWithSortPreserveInputOrder(copyKeys, copyValues, fdCfg.ThrowOnDuplicates, equalityComparer, sortComparer, out uniqueCount);
+        else
+            throw new InvalidOperationException("Unsupported deduplication mode: " + fdCfg.DeduplicationMode);
 
-            int offset = 0;
-            for (int i = 0; i < keySpan.Length; i++)
+        keys = copyKeys.AsMemory(0, uniqueCount);
+        values = copyValues.Length > 0 ? copyValues.AsMemory(0, uniqueCount) : copyValues;
+        return isSorted;
+    }
+
+    internal static void DeduplicateWithHashSet<TKey, TValue>(TKey[] keys, TValue[] values, bool throwEnabled, IEqualityComparer<TKey> equalityComparer, out int uniqueCount)
+    {
+        HashSet<TKey> uniq = new HashSet<TKey>(equalityComparer);
+
+        uniqueCount = 0;
+
+        for (int i = 0; i < keys.Length; i++)
+        {
+            TKey key = keys[i];
+
+            if (!uniq.Add(key))
             {
-                TKey key = keySpan[i];
+                if (throwEnabled)
+                    throw new InvalidOperationException($"Duplicate key found: {key}");
 
-                if (!uniq.Add(key))
-                {
-                    if (fdCfg.DeduplicationMode == DeduplicationMode.HashSetThrowOnDup)
-                        throw new InvalidOperationException($"Duplicate key found: {key}");
-
-                    continue;
-                }
-
-                keyCopy[offset] = key;
-
-                if (hasValues)
-                    valueCopy[offset] = valueSpan[i];
-
-                offset++;
+                continue;
             }
 
-            newKeys = keyCopy.AsMemory(0, offset);
-            newValues = hasValues ? valueCopy.AsMemory(0, offset) : ReadOnlyMemory<TValue>.Empty;
-            uniqueCount = offset;
-            return;
+            keys[uniqueCount] = key;
+
+            if (values.Length != 0 && uniqueCount != i) // Check avoids swapping an element with itself
+                values[uniqueCount] = values[i];
+
+            uniqueCount++;
         }
+    }
 
-        if (fdCfg.DeduplicationMode is DeduplicationMode.Sort or DeduplicationMode.SortThrowOnDup)
+    internal static void DeduplicateWithSortPreserveInputOrder<TKey, TValue>(TKey[] keys, TValue[] values, bool throwEnabled, IEqualityComparer<TKey> equalityComparer, IComparer<TKey> sortComparer, out int uniqueCount)
+    {
+        // Create a map to keep track of the original order. We need it to map values back to the original order.
+        // We also need it to map values (if any).
+        int[] map = new int[keys.Length];
+
+        for (int i = 0; i < map.Length; i++)
+            map[i] = i;
+
+        /*
+             = Starting state =
+             keys  values  map
+              6     val6    1
+              9     val9    2
+              3     val3    3
+              1     val1    4
+              3     val3    5
+        */
+
+        Array.Sort(keys, map, sortComparer);
+
+        /*
+             = After sorting =
+             keys  values  map
+              1     val6    4
+              3     val9    3
+              3     val3    5
+              6     val1    1
+              9     val3    2
+        */
+
+        uniqueCount = 0;
+        for (int read = 1; read < keys.Length; read++)
         {
-            int[] map = new int[keys.Length];
+            TKey key = keys[read];
 
-            for (int i = 0; i < keys.Length; i++)
-                map[i] = i;
-
-            TKey[] keyCopy = new TKey[keys.Length];
-            keys.CopyTo(keyCopy);
-            Array.Sort(keyCopy, map, sortComparer);
-
-            TValue[] valueCopy = hasValues ? new TValue[values.Length] : [];
-
-            // Handle the first key/value manually to avoid branching inside the for loop below
-            int firstIndex = map[0];
-            TKey last = keySpan[firstIndex]!;
-
-            keyCopy[0] = last;
-
-            if (hasValues)
-                valueCopy[0] = valueSpan[firstIndex];
-
-            int offset = 1;
-            for (int i = 1; i < keys.Length; i++)
+            if (equalityComparer.Equals(key, keys[uniqueCount]))
             {
-                int sourceIndex = map[i];
-                TKey key = keySpan[sourceIndex]!;
+                if (throwEnabled)
+                    throw new InvalidOperationException($"Duplicate key found: {key}");
 
-                if (equalityComparer.Equals(key, last))
-                {
-                    if (fdCfg.DeduplicationMode == DeduplicationMode.SortThrowOnDup)
-                        throw new InvalidOperationException($"Duplicate key found: {key}");
-
-                    continue;
-                }
-
-                keyCopy[offset] = key;
-
-                if (hasValues)
-                    valueCopy[offset] = valueSpan[sourceIndex];
-
-                last = key;
-                offset++;
+                continue;
             }
 
-            newKeys = keyCopy.AsMemory(0, offset);
-            newValues = hasValues ? valueCopy.AsMemory(0, offset) : ReadOnlyMemory<TValue>.Empty;
-            uniqueCount = offset;
-            return;
+            uniqueCount++;
+            keys[uniqueCount] = key;
+            map[uniqueCount] = map[read];
         }
 
-        throw new InvalidOperationException("Unsupported deduplication mode: " + fdCfg.DeduplicationMode);
+        uniqueCount++; // It is off-by-one now. We correct it
+
+        // Sort keys back to original order
+        Array.Sort(map, keys, 0, uniqueCount);
+
+        // If we have values, make sure they are compacted too
+        if (values.Length != 0)
+        {
+            for (int i = 0; i < uniqueCount; i++)
+                values[i] = values[map[i]];
+        }
+    }
+
+    internal static void DeduplicateWithSort<TKey, TValue>(TKey[] keys, TValue[] values, bool throwEnabled, IEqualityComparer<TKey> equalityComparer, IComparer<TKey> sortComparer, out int uniqueCount)
+    {
+        if (values.Length > 0)
+            Array.Sort(keys, values, sortComparer);
+        else
+            Array.Sort(keys, sortComparer);
+
+        TKey current = keys[0];
+        uniqueCount = 1;
+
+        for (int i = 1; i < keys.Length; i++)
+        {
+            TKey key = keys[i];
+
+            if (equalityComparer.Equals(key, current))
+            {
+                if (throwEnabled)
+                    throw new InvalidOperationException($"Duplicate key found: {key}");
+
+                continue;
+            }
+
+            keys[uniqueCount] = key;
+
+            if (values.Length != 0 && uniqueCount != i) // Check avoids swapping an element with itself
+                values[uniqueCount] = values[i];
+
+            current = key;
+            uniqueCount++;
+        }
     }
 
     internal static string[] SubStringKeys(ReadOnlySpan<string> keys, StringKeyProperties props)
