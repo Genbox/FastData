@@ -1,4 +1,3 @@
-using Genbox.FastData.Generator.CPlusPlus.Internal;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.CPlusPlus.TemplateData;
 using Genbox.FastData.Generator.Enums;

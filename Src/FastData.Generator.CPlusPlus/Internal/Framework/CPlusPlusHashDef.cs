@@ -35,7 +35,7 @@ internal class CPlusPlusHashDef : IHashDef
                    """;
         }
 
-        if (keyType.IsIdentityHash())
+        if (keyType.UsesIdentityHash())
             return "    return static_cast<uint64_t>(value);";
 
         if (typeCode == TypeCode.Single)

@@ -26,7 +26,7 @@ public static class TypeExtensions
     /// <summary>Determines whether the specified <see cref="Type" /> uses identity hashing.</summary>
     /// <param name="type">The data type to check.</param>
     /// <returns><see langword="true" /> if the type uses identity hashing; otherwise, <see langword="false" />.</returns>
-    public static bool IsIdentityHash(this Type type) => GetTypeCode(type) switch
+    public static bool UsesIdentityHash(this Type type) => GetTypeCode(type) switch
     {
         TypeCode.Char or TypeCode.SByte or TypeCode.Byte or TypeCode.Int16 or TypeCode.UInt16 or TypeCode.Int32 or TypeCode.UInt32 or TypeCode.Int64 or TypeCode.UInt64 => true,
         TypeCode.String or TypeCode.Single or TypeCode.Double => false,
@@ -35,9 +35,6 @@ public static class TypeExtensions
 
     private static TypeCode GetTypeCode(Type type)
     {
-        if (type == null)
-            throw new ArgumentNullException(nameof(type));
-
         Type? underlyingType = Nullable.GetUnderlyingType(type);
         return Type.GetTypeCode(underlyingType ?? type);
     }

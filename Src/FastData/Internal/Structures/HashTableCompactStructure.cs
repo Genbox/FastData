@@ -47,6 +47,6 @@ internal sealed class HashTableCompactStructure<TKey, TValue>(HashData hashData)
                 denseValues[index] = valueSpan[i];
         }
 
-        return new HashTableCompactContext<TKey, TValue>(bucketStarts, bucketCounts, entries, !typeof(TKey).IsIdentityHash(), denseValues);
+        return new HashTableCompactContext<TKey, TValue>(bucketStarts, bucketCounts, entries, !typeof(TKey).UsesIdentityHash(), denseValues);
     }
 }

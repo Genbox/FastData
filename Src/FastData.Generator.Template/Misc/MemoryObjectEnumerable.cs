@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Genbox.FastData.Generator.Template;
+namespace Genbox.FastData.Generator.Template.Misc;
 
 public sealed class MemoryObjectEnumerable<T>(ReadOnlyMemory<T> memory) : IEnumerable<object>
 {

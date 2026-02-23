@@ -3,7 +3,6 @@ using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Abstracts;
 using Genbox.FastData.Internal.Analysis.Misc;
-using Genbox.FastData.Internal.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
@@ -65,7 +64,7 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
                 throw new InvalidOperationException("There are no parents selected.");
 
             if (config.ShuffleParents)
-                parents.Shuffle(random);
+                Shuffle(parents, random);
 
             //We then cross parents to combine their properties which becomes children. Children are put into the new population
             crossOver.Process(population, parents, newPopulation);
@@ -89,6 +88,15 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
         } while (!termination.Process(generation++, bestFitness));
 
         return heap.Items.Select(x => x.Item2);
+    }
+
+    private static void Shuffle<T>(IList<T> list, IRandom random)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = random.Next(i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
     }
 
     private static void Repopulate(StaticArray<Entity> population, int minPopulation, IGene[] genes, IRandom random)

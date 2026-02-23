@@ -3,7 +3,6 @@ using System.Text;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.InternalShared.TestHarness;
-using Xunit.Sdk;
 
 namespace Genbox.FastData.TestHarness.Runner.Code;
 

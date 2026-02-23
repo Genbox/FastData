@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Helpers;
 using Microsoft.VisualStudio.TextTemplating;

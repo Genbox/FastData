@@ -1,5 +1,4 @@
-using Genbox.FastData.Enums;
-using Genbox.FastData.Internal.Extensions;
+using Genbox.FastData.Extensions;
 using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;

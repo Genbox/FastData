@@ -1,12 +1,12 @@
 using System.Text;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Extensions;
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework.Interfaces;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Extensions;
-using Genbox.FastData.Internal.Extensions;
 
 namespace Genbox.FastData.Generator.Framework;
 

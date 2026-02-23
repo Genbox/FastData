@@ -28,6 +28,6 @@ internal sealed class HashTableStructure<TKey, TValue>(HashData hashData) : IStr
             bucket = i + 1;
         }
 
-        return new HashTableContext<TKey, TValue>(buckets, entries, !typeof(TKey).IsIdentityHash(), values);
+        return new HashTableContext<TKey, TValue>(buckets, entries, !typeof(TKey).UsesIdentityHash(), values);
     }
 }

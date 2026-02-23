@@ -16,7 +16,7 @@ internal sealed class HashTablePerfectStructure<TKey, TValue>(HashData hashData)
         ReadOnlySpan<TValue> valueSpan = values.Span;
         ulong size = (ulong)(keySpan.Length * hashData.CapacityFactor);
         bool hasEmptySlots = size != (ulong)keySpan.Length;
-        bool storeHashCode = !typeof(TKey).IsIdentityHash() || hasEmptySlots;
+        bool storeHashCode = !typeof(TKey).UsesIdentityHash() || hasEmptySlots;
         ulong[] hashCodes = hashData.HashCodes;
         KeyValuePair<TKey, ulong>[] pairs = new KeyValuePair<TKey, ulong>[size];
         TValue[]? denseValues = values.IsEmpty ? null : new TValue[size];

@@ -1,5 +1,3 @@
-using Genbox.FastData.Enums;
-
 namespace Genbox.FastData.Generator.Framework.Interfaces;
 
 public interface ITypeDef

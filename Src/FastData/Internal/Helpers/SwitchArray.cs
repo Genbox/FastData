@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Genbox.FastData.Internal.Helpers;
 
 internal sealed class SwitchArray(uint capacity)
@@ -10,8 +8,6 @@ internal sealed class SwitchArray(uint capacity)
     public bool this[uint index]
     {
         get => _data[index] == _counter;
-        [SuppressMessage("Blocker Code Smell", "S3237:\"value\" contextual keyword should be used")]
-        [SuppressMessage("ReSharper", "ValueParameterNotUsed")]
         set => _data[index] = _counter;
     }
 

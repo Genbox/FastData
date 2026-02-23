@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.SourceGenerator.Attributes;
 using Microsoft.CodeAnalysis;

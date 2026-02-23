@@ -40,7 +40,7 @@ internal class RustHashDef : IHashDef
                    """;
         }
 
-        if (keyType.IsIdentityHash())
+        if (keyType.UsesIdentityHash())
             return "    value as u64";
 
         if (typeCode == TypeCode.Single)

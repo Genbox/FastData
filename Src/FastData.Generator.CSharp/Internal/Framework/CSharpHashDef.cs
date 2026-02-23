@@ -71,7 +71,7 @@ internal class CSharpHashDef : IHashDef
                   """;
         }
 
-        if (keyType.IsIdentityHash())
+        if (keyType.UsesIdentityHash())
             return "    return (ulong)value;";
 
         if (typeCode == TypeCode.Single)

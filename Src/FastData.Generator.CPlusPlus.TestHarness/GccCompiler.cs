@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO.Compression;
 using Genbox.FastData.InternalShared.Helpers;
 using static Genbox.FastData.InternalShared.Helpers.TestHelper;
