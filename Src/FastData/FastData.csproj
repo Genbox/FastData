@@ -15,4 +15,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\..\Misc\Compat\IsExternalInit.cs">
+      <Link>Internal\Compat\IsExternalInit.cs</Link>
+    </Compile>
+  </ItemGroup>
+
 </Project>
