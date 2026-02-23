@@ -96,7 +96,7 @@ private struct E
         if (<#
     if (Context.StoreHashCode)
     {
-#><#= Model.GetEqualFunctionByType("entry.HashCode", "hash", KeyType.Int64) #> && <#
+#><#= Model.GetEqualFunctionByType("entry.HashCode", "hash", TypeCode.Int64) #> && <#
     }
 #><#= Model.GetEqualFunction("entry.Key", Common.LookupKeyName) #>)
             return true;
@@ -128,7 +128,7 @@ private struct E
         if (<#
         if (Context.StoreHashCode)
         {
-#><#= Model.GetEqualFunctionByType("entry.HashCode", "hash", KeyType.Int64) #> && <#
+#><#= Model.GetEqualFunctionByType("entry.HashCode", "hash", TypeCode.Int64) #> && <#
         }
 #><#= Model.GetEqualFunction("entry.Key", Common.LookupKeyName) #>)
         {

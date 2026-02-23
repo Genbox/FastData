@@ -33,7 +33,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     public override string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
     {
         //C++ generator does not support chars outside ASCII
-        if (genCfg.KeyType == KeyType.Char && (char)(object)genCfg.Constants.MaxValue > 127)
+        if (typeof(TKey) == typeof(char) && (char)(object)genCfg.Constants.MaxValue > 127)
             throw new InvalidOperationException("C++ generator does not support chars outside ASCII. Please use a different data type or reduce the max value to 127 or lower.");
 
         return base.Generate<TKey, TValue>(genCfg, context);
@@ -85,11 +85,11 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                 {
                     "Model", new TemplateModel
                     {
-                        KeyType = KeyType,
                         HashSource = HashSource,
                         MethodAttribute = "[[nodiscard]]",
                         PostMethodModifier = " noexcept",
                         KeyTypeName = KeyTypeName,
+                        KeyTypeCode = Type.GetTypeCode(typeof(TKey)),
                         ValueTypeName = ValueTypeName,
                         IsPrimitive = typeof(TValue).IsPrimitive,
                         GetMethodHeader = GetMethodHeader,
@@ -256,7 +256,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
         private string GetCompareFunction(string var1, string var2)
         {
-            if (KeyType == KeyType.String)
+            if (typeof(TKey) == typeof(string))
             {
                 if (IgnoreCase)
                     return $"case_insensitive_compare({var1}, {var2})";
@@ -278,9 +278,9 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
             return sb.ToString();
         }
 
-        protected override string GetEqualFunctionInternal(string value1, string value2, KeyType keyType)
+        protected override string GetEqualFunctionInternal(string value1, string value2, TypeCode keyType)
         {
-            if (keyType == KeyType.String && IgnoreCase)
+            if (keyType == TypeCode.String && IgnoreCase)
                 return $"case_insensitive_equals({value1}, {value2})";
 
             return $"{value1} == {value2}";
@@ -288,7 +288,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
         protected override void RegisterSharedCode()
         {
-            if (KeyType != KeyType.String || !IgnoreCase)
+            if (typeof(TKey) != typeof(string) || !IgnoreCase)
                 return;
 
             string helpers = Encoding switch

@@ -87,7 +87,7 @@ public:
     return <#
     if (useEntryStruct && Context.StoreHashCode)
     {
-#><#= Model.GetEqualFunctionByType("hash", "entry.hash_code", KeyType.Int64) #> && <#
+#><#= Model.GetEqualFunctionByType("hash", "entry.hash_code", TypeCode.Int64) #> && <#
     }
 #><#= Model.GetEqualFunction(Common.LookupKeyName, useEntryStruct ? "entry.key" : "entry") #>;
 }
@@ -108,7 +108,7 @@ public:
     if (<#
         if (Context.StoreHashCode)
         {
-#><#= Model.GetEqualFunctionByType("hash", "entry.hash_code", KeyType.Int64) #> && <#
+#><#= Model.GetEqualFunctionByType("hash", "entry.hash_code", TypeCode.Int64) #> && <#
         }
 #><#= Model.GetEqualFunction(Common.LookupKeyName, "entry.key") #>) {
         value = <#= Model.IsPrimitive ? "&" : "" #>entry.value;

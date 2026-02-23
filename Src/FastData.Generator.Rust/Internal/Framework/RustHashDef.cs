@@ -6,17 +6,23 @@ namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
 internal class RustHashDef : IHashDef
 {
-    public string GetHashSource(KeyType keyType, string typeName, HashInfo info) =>
-        $$"""
-          {{(keyType == KeyType.String ? "#[inline]" : "#[inline(always)]")}}
-          {{(keyType == KeyType.String ? "unsafe " : "")}}fn get_hash(value: {{(keyType == KeyType.String ? "&" : "")}}{{typeName}}) -> u64 {
+    public string GetHashSource(Type keyType, string typeName, HashInfo info)
+    {
+        bool isString = Type.GetTypeCode(keyType) == TypeCode.String;
+
+        return $$"""
+          {{(isString ? "#[inline]" : "#[inline(always)]")}}
+          {{(isString ? "unsafe " : "")}}fn get_hash(value: {{(isString ? "&" : "")}}{{typeName}}) -> u64 {
           {{GetHash(keyType, info)}}
           }
           """;
+    }
 
-    private static string GetHash(KeyType keyType, HashInfo info)
+    private static string GetHash(Type keyType, HashInfo info)
     {
-        if (keyType == KeyType.String)
+        TypeCode typeCode = Type.GetTypeCode(keyType);
+
+        if (typeCode == TypeCode.String)
         {
             return """
                        let mut hash: u64 = 352654597;
@@ -37,7 +43,7 @@ internal class RustHashDef : IHashDef
         if (keyType.IsIdentityHash())
             return "    value as u64";
 
-        if (keyType == KeyType.Single)
+        if (typeCode == TypeCode.Single)
         {
             return info.HasZeroOrNaN
                 ? """
@@ -51,7 +57,7 @@ internal class RustHashDef : IHashDef
                 : "    value.to_bits() as u64";
         }
 
-        if (keyType == KeyType.Double)
+        if (typeCode == TypeCode.Double)
         {
             return info.HasZeroOrNaN
                 ? """

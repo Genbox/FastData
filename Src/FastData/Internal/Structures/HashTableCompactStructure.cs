@@ -1,4 +1,3 @@
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Contexts.Misc;
 using Genbox.FastData.Generators.Extensions;
@@ -7,7 +6,7 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashTableCompactStructure<TKey, TValue>(HashData hashData, KeyType keyType) : IStructure<TKey, TValue, HashTableCompactContext<TKey, TValue>>
+internal sealed class HashTableCompactStructure<TKey, TValue>(HashData hashData) : IStructure<TKey, TValue, HashTableCompactContext<TKey, TValue>>
 {
     public HashTableCompactContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
@@ -48,6 +47,6 @@ internal sealed class HashTableCompactStructure<TKey, TValue>(HashData hashData,
                 denseValues[index] = valueSpan[i];
         }
 
-        return new HashTableCompactContext<TKey, TValue>(bucketStarts, bucketCounts, entries, !keyType.IsIdentityHash(), denseValues);
+        return new HashTableCompactContext<TKey, TValue>(bucketStarts, bucketCounts, entries, !typeof(TKey).IsIdentityHash(), denseValues);
     }
 }

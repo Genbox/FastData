@@ -5,6 +5,7 @@ using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
@@ -102,8 +103,7 @@ public static partial class FastDataGenerator
         else
             LogNumberOfUniqueKeys(logger, oldCount, newCount);
 
-        const KeyType keyType = KeyType.String;
-        LogKeyType(logger, keyType);
+        LogKeyType(logger, nameof(String));
 
         StringKeyProperties strProps = KeyAnalyzer.GetStringProperties(keys.Span, fdCfg.EnablePrefixSuffixTrimming, fdCfg.IgnoreCase, generator.Encoding);
 
@@ -183,15 +183,15 @@ public static partial class FastDataGenerator
             case StructureType.Conditional:
                 return GenerateWrapper(tempState, new ConditionalStructure<string, TValue>());
             case StructureType.BinarySearch:
-                return GenerateWrapper(tempState, new BinarySearchStructure<string, TValue>(keyType, fdCfg.IgnoreCase, sorted));
+                return GenerateWrapper(tempState, new BinarySearchStructure<string, TValue>(fdCfg.IgnoreCase, sorted));
             case StructureType.HashTable:
             {
                 HashData hashData = GetStringHashData(keys.Span);
 
                 if (hashData.HashCodesPerfect)
-                    return GenerateWrapper(tempState, new HashTablePerfectStructure<string, TValue>(hashData, keyType));
+                    return GenerateWrapper(tempState, new HashTablePerfectStructure<string, TValue>(hashData));
 
-                return GenerateWrapper(tempState, new HashTableStructure<string, TValue>(hashData, keyType));
+                return GenerateWrapper(tempState, new HashTableStructure<string, TValue>(hashData));
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
@@ -225,8 +225,7 @@ public static partial class FastDataGenerator
 
         LogUserStructureType(logger, fdCfg.StructureType);
 
-        KeyType keyType = (KeyType)Enum.Parse(typeof(KeyType), type.Name, false);
-        LogKeyType(logger, keyType);
+        LogKeyType(logger, typeof(TKey).Name);
 
         NumericKeyProperties<TKey> props = KeyAnalyzer.GetNumericProperties(keys, sorted);
         LogMinMaxValues(logger, props.MinKeyValue, props.MaxKeyValue);
@@ -234,7 +233,7 @@ public static partial class FastDataGenerator
         HashDetails hashDetails = new HashDetails();
         hashDetails.HasZeroOrNaN = props.HasZeroOrNaN;
 
-        TempNumericState<TKey, TValue> tempState = new TempNumericState<TKey, TValue>(keys, values, fdCfg, generator, props, hashDetails, keyType);
+        TempNumericState<TKey, TValue> tempState = new TempNumericState<TKey, TValue>(keys, values, fdCfg, generator, props, hashDetails);
 
         switch (fdCfg.StructureType)
         {
@@ -249,24 +248,24 @@ public static partial class FastDataGenerator
 
                 if (fdCfg.AllowApproximateMatching)
                 {
-                    HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, props.HasZeroOrNaN);
+                    HashFunc<TKey> hashFunc = PrimitiveHash.GetHashFunc<TKey>(props.HasZeroOrNaN);
                     HashData bloomHashData = HashData.Create(keys.Span, fdCfg.HashCapacityFactor, hashFunc);
                     return GenerateWrapper(tempState, new BloomFilterStructure<TKey, TValue>(bloomHashData));
                 }
 
-                if (keyType != KeyType.Single && keyType != KeyType.Double && props.Range <= fdCfg.BitSetStructureMaxRange && props.Density >= fdCfg.BitSetStructureMinDensity)
-                    return GenerateWrapper(tempState, new BitSetStructure<TKey, TValue>(props, keyType));
+                if (typeof(TKey) != typeof(float) && typeof(TKey) != typeof(double) && props.Range <= fdCfg.BitSetStructureMaxRange && props.Density >= fdCfg.BitSetStructureMinDensity)
+                    return GenerateWrapper(tempState, new BitSetStructure<TKey, TValue>(props));
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
                 // Note: Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
                 if (keys.Length < fdCfg.ConditionalStructureMaxItemCount)
                     return GenerateWrapper(tempState, new ConditionalStructure<TKey, TValue>());
 
-                if (values.IsEmpty && IsIntegralKeyType(keyType) && !props.IsConsecutive && keys.Length >= fdCfg.RrrBitVectorStructureMinItemCount && props.Density <= fdCfg.RrrBitVectorStructureMaxDensity)
+                if (values.IsEmpty && typeof(TKey).IsIntegral() && !props.IsConsecutive && keys.Length >= fdCfg.RrrBitVectorStructureMinItemCount && props.Density <= fdCfg.RrrBitVectorStructureMaxDensity)
                     return GenerateWrapper(tempState, new RrrBitVectorStructure<TKey, TValue>(sorted));
 
                 // TODO: Elias-Fano currently does not normalize against MinKeyValue, so negative domains may be handled sub-optimally.
-                if (values.IsEmpty && IsIntegralKeyType(keyType) && !props.IsConsecutive && keys.Length >= fdCfg.EliasFanoStructureMinItemCount && props.Density <= fdCfg.EliasFanoStructureMaxDensity)
+                if (values.IsEmpty && typeof(TKey).IsIntegral() && !props.IsConsecutive && keys.Length >= fdCfg.EliasFanoStructureMinItemCount && props.Density <= fdCfg.EliasFanoStructureMaxDensity)
                     return GenerateWrapper(tempState, new EliasFanoStructure<TKey, TValue>(props, fdCfg, sorted));
 
                 goto case StructureType.HashTable;
@@ -276,19 +275,19 @@ public static partial class FastDataGenerator
             case StructureType.Conditional:
                 return GenerateWrapper(tempState, new ConditionalStructure<TKey, TValue>());
             case StructureType.BinarySearch:
-                if (IsWellDistributed(keys.Span, props, keyType, fdCfg.MaxHistogramBuckets))
+                if (IsWellDistributed(keys.Span, props, fdCfg.MaxHistogramBuckets))
                     return GenerateWrapper(tempState, new InterpolatedBinarySearchStructure<TKey, TValue>(sorted));
 
-                return GenerateWrapper(tempState, new BinarySearchStructure<TKey, TValue>(keyType, fdCfg.IgnoreCase, sorted));
+                return GenerateWrapper(tempState, new BinarySearchStructure<TKey, TValue>(fdCfg.IgnoreCase, sorted));
             case StructureType.HashTable:
             {
-                HashFunc<TKey> hashFunc = PrimitiveHash.GetHash<TKey>(keyType, props.HasZeroOrNaN);
+                HashFunc<TKey> hashFunc = PrimitiveHash.GetHashFunc<TKey>(props.HasZeroOrNaN);
                 HashData hashData = HashData.Create(keys.Span, fdCfg.HashCapacityFactor, hashFunc);
 
                 if (hashData.HashCodesPerfect)
-                    return GenerateWrapper(tempState, new HashTablePerfectStructure<TKey, TValue>(hashData, keyType));
+                    return GenerateWrapper(tempState, new HashTablePerfectStructure<TKey, TValue>(hashData));
 
-                return GenerateWrapper(tempState, new HashTableStructure<TKey, TValue>(hashData, keyType));
+                return GenerateWrapper(tempState, new HashTableStructure<TKey, TValue>(hashData));
             }
             default:
                 throw new InvalidOperationException($"Unsupported DataStructure {fdCfg.StructureType}");
@@ -472,14 +471,14 @@ public static partial class FastDataGenerator
     {
         TContext res = structure.Create(state.Keys, state.Values);
         StringKeyProperties strProps = state.StringKeyProperties;
-        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(structure.GetType(), KeyType.String, (uint)state.Keys.Length, strProps, state.HashDetails, state.Generator.Encoding, state.TrimPrefix, state.TrimSuffix, state.Config);
+        GeneratorConfig<string> genCfg = new GeneratorConfig<string>(structure.GetType(), (uint)state.Keys.Length, strProps, state.HashDetails, state.Generator.Encoding, state.TrimPrefix, state.TrimSuffix, state.Config);
         return state.Generator.Generate<string, TValue>(genCfg, res);
     }
 
     private static string GenerateWrapper<TKey, TValue, TContext>(in TempNumericState<TKey, TValue> state, IStructure<TKey, TValue, TContext> structure) where TContext : IContext
     {
         TContext res = structure.Create(state.Keys, state.Values);
-        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(structure.GetType(), state.KeyType, (uint)state.Keys.Length, state.NumericKeyProperties, state.HashDetails, state.Config);
+        GeneratorConfig<TKey> genCfg = new GeneratorConfig<TKey>(structure.GetType(), (uint)state.Keys.Length, state.NumericKeyProperties, state.HashDetails, state.Config);
         return state.Generator.Generate<TKey, TValue>(genCfg, res);
     }
 
@@ -577,18 +576,7 @@ public static partial class FastDataGenerator
         return notPerfect[0];
     }
 
-    private static bool IsIntegralKeyType(KeyType keyType) => keyType is
-        KeyType.Char or
-        KeyType.SByte or
-        KeyType.Byte or
-        KeyType.Int16 or
-        KeyType.UInt16 or
-        KeyType.Int32 or
-        KeyType.UInt32 or
-        KeyType.Int64 or
-        KeyType.UInt64;
-
-    private static bool IsWellDistributed<TKey>(ReadOnlySpan<TKey> keys, NumericKeyProperties<TKey> props, KeyType keyType, int maxHistogramBuckets)
+    private static bool IsWellDistributed<TKey>(ReadOnlySpan<TKey> keys, NumericKeyProperties<TKey> props, int maxHistogramBuckets)
     {
         if (keys.Length < 16)
             return false;
@@ -603,7 +591,7 @@ public static partial class FastDataGenerator
         Span<int> hist = stackalloc int[buckets];
         ulong min = (ulong)props.ValueConverter(props.MinKeyValue);
 
-        if (keyType == KeyType.Single)
+        if (typeof(TKey) == typeof(float))
         {
             for (int i = 0; i < keys.Length; i++)
             {
@@ -621,7 +609,7 @@ public static partial class FastDataGenerator
                 hist[bucketIndex]++;
             }
         }
-        else if (keyType == KeyType.Double)
+        else if (typeof(TKey) == typeof(double))
         {
             for (int i = 0; i < keys.Length; i++)
             {
@@ -698,5 +686,5 @@ public static partial class FastDataGenerator
     }
 
     private readonly record struct TempStringState<TKey, TValue>(ReadOnlyMemory<TKey> Keys, ReadOnlyMemory<TValue> Values, FastDataConfig Config, ICodeGenerator Generator, StringKeyProperties StringKeyProperties, HashDetails HashDetails, string TrimPrefix, string TrimSuffix);
-    private readonly record struct TempNumericState<TKey, TValue>(ReadOnlyMemory<TKey> Keys, ReadOnlyMemory<TValue> Values, FastDataConfig Config, ICodeGenerator Generator, NumericKeyProperties<TKey> NumericKeyProperties, HashDetails HashDetails, KeyType KeyType);
+    private readonly record struct TempNumericState<TKey, TValue>(ReadOnlyMemory<TKey> Keys, ReadOnlyMemory<TValue> Values, FastDataConfig Config, ICodeGenerator Generator, NumericKeyProperties<TKey> NumericKeyProperties, HashDetails HashDetails);
 }

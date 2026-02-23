@@ -4,7 +4,7 @@ namespace Genbox.FastData.Generator.Framework.Interfaces;
 
 public interface ITypeDef
 {
-    KeyType KeyType { get; }
+    TypeCode KeyType { get; }
     string Name { get; }
     Func<TypeMap, object, string> PrintObj { get; }
 }

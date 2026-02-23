@@ -21,7 +21,7 @@ public class StringTypeDef : ITypeDef<string>
         }
     }
 
-    public KeyType KeyType => KeyType.String;
+    public TypeCode KeyType => TypeCode.String;
     public string Name { get; }
     public Func<TypeMap, object, string> PrintObj { get; }
     public Func<TypeMap, string, string> Print { get; }

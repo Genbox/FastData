@@ -11,7 +11,7 @@ public class TestVector<TKey, TValue>(Type type, TKey[] keys, TKey[] notPresent,
 
 public class TestVector<TKey>(Type type, TKey[] keys, TKey[] notPresent, string? postfix = null) : ITestVector
 {
-    private readonly KeyType _keyType = Enum.Parse<KeyType>(typeof(TKey).Name);
+    private readonly TypeCode _keyType = Type.GetTypeCode(typeof(TKey));
 
     public TKey[] Keys { get; } = keys;
     public TKey[] NotPresent { get; } = notPresent;

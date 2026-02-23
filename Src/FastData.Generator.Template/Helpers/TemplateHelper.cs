@@ -14,7 +14,7 @@ public static class TemplateHelper
     {
         TemplateGenerator generator = new TemplateGenerator();
         AddTemplateReference(generator, typeof(CommonDataModel));
-        AddTemplateReference(generator, typeof(KeyType));
+        AddTemplateReference(generator, typeof(TypeCode));
         AddTemplateReference(generator, typeof(FormatHelper));
 
         ITextTemplatingSession session = generator.GetOrCreateSession();

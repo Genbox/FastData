@@ -53,7 +53,7 @@ internal static class GPerfTest
                 byte[] bytes = Encoding.ASCII.GetBytes(x);
                 return func(bytes, bytes.Length);
             });
-            HashTablePerfectStructure<string, byte> structure = new HashTablePerfectStructure<string, byte>(hashData, KeyType.String);
+            HashTablePerfectStructure<string, byte> structure = new HashTablePerfectStructure<string, byte>(hashData);
             structure.Create(data, null);
         }
     }

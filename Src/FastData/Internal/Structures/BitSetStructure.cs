@@ -1,15 +1,14 @@
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class BitSetStructure<TKey, TValue>(NumericKeyProperties<TKey> props, KeyType keyType) : IStructure<TKey, TValue, BitSetContext<TValue>>
+internal sealed class BitSetStructure<TKey, TValue>(NumericKeyProperties<TKey> props) : IStructure<TKey, TValue, BitSetContext<TValue>>
 {
     public BitSetContext<TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
-        if (keyType is KeyType.Single or KeyType.Double)
+        if (typeof(TKey) == typeof(float) || typeof(TKey) == typeof(double))
             throw new InvalidOperationException("Floating point values are not supported for BitSets");
 
         ReadOnlySpan<TKey> keySpan = keys.Span;

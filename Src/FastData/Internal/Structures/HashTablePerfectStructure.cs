@@ -1,4 +1,3 @@
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Abstracts;
@@ -6,7 +5,7 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashTablePerfectStructure<TKey, TValue>(HashData hashData, KeyType keyType) : IStructure<TKey, TValue, HashTablePerfectContext<TKey, TValue>>
+internal sealed class HashTablePerfectStructure<TKey, TValue>(HashData hashData) : IStructure<TKey, TValue, HashTablePerfectContext<TKey, TValue>>
 {
     public HashTablePerfectContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
@@ -17,7 +16,7 @@ internal sealed class HashTablePerfectStructure<TKey, TValue>(HashData hashData,
         ReadOnlySpan<TValue> valueSpan = values.Span;
         ulong size = (ulong)(keySpan.Length * hashData.CapacityFactor);
         bool hasEmptySlots = size != (ulong)keySpan.Length;
-        bool storeHashCode = !keyType.IsIdentityHash() || hasEmptySlots;
+        bool storeHashCode = !typeof(TKey).IsIdentityHash() || hasEmptySlots;
         ulong[] hashCodes = hashData.HashCodes;
         KeyValuePair<TKey, ulong>[] pairs = new KeyValuePair<TKey, ulong>[size];
         TValue[]? denseValues = values.IsEmpty ? null : new TValue[size];

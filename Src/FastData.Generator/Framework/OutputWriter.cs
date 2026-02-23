@@ -17,7 +17,6 @@ public abstract class OutputWriter<TKey> : IOutputWriter
     private TypeMap _typeMap = null!;
 
     protected SharedCode Shared { get; private set; } = null!;
-    protected KeyType KeyType => _generatorConfig.KeyType;
     protected bool IgnoreCase => _generatorConfig.IgnoreCase;
     protected GeneratorEncoding Encoding => _generatorConfig.Encoding;
     protected string KeyTypeName { get; private set; } = null!;
@@ -74,19 +73,19 @@ public abstract class OutputWriter<TKey> : IOutputWriter
         }
 
         HashInfo hashInfo = new HashInfo(_generatorConfig.HashDetails.HasZeroOrNaN, stringHash);
-        HashSource = hashDef.GetHashSource(_generatorConfig.KeyType, KeyTypeName, hashInfo);
+        HashSource = hashDef.GetHashSource(typeof(TKey), KeyTypeName, hashInfo);
         RegisterSharedCode();
     }
 
-    protected string GetEqualFunction(string value1, string value2, KeyType keyTypeOverride = KeyType.Null)
+    protected string GetEqualFunction(string value1, string value2, TypeCode keyTypeOverride = TypeCode.Empty)
     {
-        if (keyTypeOverride == KeyType.Null)
-            keyTypeOverride = _generatorConfig.KeyType;
+        if (keyTypeOverride == TypeCode.Empty)
+            keyTypeOverride = Type.GetTypeCode(typeof(TKey));
 
         return GetEqualFunctionInternal(value1, value2, keyTypeOverride);
     }
 
-    protected virtual string GetEqualFunctionInternal(string value1, string value2, KeyType keyType) => $"{value1} == {value2}";
+    protected virtual string GetEqualFunctionInternal(string value1, string value2, TypeCode keyType) => $"{value1} == {value2}";
 
     protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";
 

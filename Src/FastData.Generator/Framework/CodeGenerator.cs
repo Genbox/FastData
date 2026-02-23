@@ -151,12 +151,14 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         sb.AppendLine();
         sb.AppendLine(constDef.ItemCountTemplate(langDef.ArraySizeType, genCfg.Constants.ItemCount.ToStringInvariant()));
 
-        if (genCfg.KeyType.IsInteger())
+        Type keyType = typeof(T);
+
+        if (keyType.IsNumeric())
         {
             sb.AppendLine(constDef.MinValueTemplate(typeName, map.ToValueLabel(genCfg.Constants.MinValue)));
             sb.AppendLine(constDef.MaxValueTemplate(typeName, map.ToValueLabel(genCfg.Constants.MaxValue)));
         }
-        else if (genCfg.KeyType == KeyType.String)
+        else if (Type.GetTypeCode(keyType) == TypeCode.String)
         {
             sb.AppendLine(constDef.MinLengthTemplate(langDef.ArraySizeType, genCfg.Constants.MinStringLength.ToStringInvariant()));
             sb.AppendLine(constDef.MaxLengthTemplate(langDef.ArraySizeType, genCfg.Constants.MaxStringLength.ToStringInvariant()));

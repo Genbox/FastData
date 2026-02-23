@@ -6,9 +6,10 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 internal class CPlusPlusHashDef : IHashDef
 {
-    public string GetHashSource(KeyType keyType, string typeName, HashInfo info)
+    public string GetHashSource(Type keyType, string typeName, HashInfo info)
     {
-        bool notConst = keyType is KeyType.Single or KeyType.Double or KeyType.Int64 or KeyType.UInt64;
+        TypeCode typeCode = Type.GetTypeCode(keyType);
+        bool notConst = typeCode is TypeCode.Single or TypeCode.Double or TypeCode.Int64 or TypeCode.UInt64;
 
         return $$"""
                  static{{(notConst ? " " : " constexpr ")}}uint64_t get_hash(const {{typeName}} value) noexcept
@@ -18,9 +19,11 @@ internal class CPlusPlusHashDef : IHashDef
                  """;
     }
 
-    private static string GetHash(KeyType keyType, HashInfo info)
+    private static string GetHash(Type keyType, HashInfo info)
     {
-        if (keyType == KeyType.String)
+        TypeCode typeCode = Type.GetTypeCode(keyType);
+
+        if (typeCode == TypeCode.String)
         {
             return """
                        uint64_t hash = 352654597;
@@ -35,7 +38,7 @@ internal class CPlusPlusHashDef : IHashDef
         if (keyType.IsIdentityHash())
             return "    return static_cast<uint64_t>(value);";
 
-        if (keyType == KeyType.Single)
+        if (typeCode == TypeCode.Single)
         {
             return info.HasZeroOrNaN
                 ? """
@@ -52,7 +55,7 @@ internal class CPlusPlusHashDef : IHashDef
                   """;
         }
 
-        if (keyType == KeyType.Double)
+        if (typeCode == TypeCode.Double)
         {
             return info.HasZeroOrNaN
                 ? """

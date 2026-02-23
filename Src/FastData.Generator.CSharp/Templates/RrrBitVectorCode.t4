@@ -8,19 +8,16 @@
 <#@ parameter type="Genbox.FastData.Generators.Contexts.RrrBitVectorContext" name="Context" #>
 
 <#
-    string mapSource = Model.KeyType switch
+    string mapSource = Model.KeyTypeCode switch
     {
-        KeyType.Char => $"(ulong){Common.LookupKeyName}",
-        KeyType.Byte => $"(ulong){Common.LookupKeyName}",
-        KeyType.UInt16 => $"(ulong){Common.LookupKeyName}",
-        KeyType.UInt32 => $"(ulong){Common.LookupKeyName}",
-        KeyType.UInt64 => Common.LookupKeyName,
-        KeyType.SByte => $"(ulong)(byte)({Common.LookupKeyName} ^ sbyte.MinValue)",
-        KeyType.Int16 => $"(ulong)(ushort)({Common.LookupKeyName} ^ short.MinValue)",
-        KeyType.Int32 => $"(ulong)(uint)({Common.LookupKeyName} ^ int.MinValue)",
-        KeyType.Int64 => $"(ulong)({Common.LookupKeyName} ^ long.MinValue)",
+        TypeCode.Char or TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64 => $"(ulong){Common.LookupKeyName}",
+        TypeCode.SByte => $"(ulong)(byte)({Common.LookupKeyName} ^ sbyte.MinValue)",
+        TypeCode.Int16 => $"(ulong)(ushort)({Common.LookupKeyName} ^ short.MinValue)",
+        TypeCode.Int32 => $"(ulong)(uint)({Common.LookupKeyName} ^ int.MinValue)",
+        TypeCode.Int64 => $"(ulong)({Common.LookupKeyName} ^ long.MinValue)",
         _ => throw new InvalidOperationException("RRR bitvector only supports integral key types.")
-        };
+    };
+
     string helperModifier = Model.FieldModifier.Contains(" static ", StringComparison.Ordinal) ? "private static " : "private ";
 #>
 private const ulong _rrrMinValue = <#= Model.ToValueLabel(Context.MinValue) #>;

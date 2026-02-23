@@ -97,12 +97,12 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                 {
                     "Model", new TemplateModel
                     {
-                        KeyType = KeyType,
                         HashSource = HashSource,
                         FieldModifier = cfg.ClassType == ClassType.Static ? "private static readonly " : "private readonly ",
                         MethodModifier = cfg.ClassType == ClassType.Static ? "public static " : "public ",
                         MethodAttribute = GetMethodAttribute(),
                         KeyTypeName = KeyTypeName,
+                        KeyTypeCode = Type.GetTypeCode(typeof(TKey)),
                         ValueTypeName = ValueTypeName,
                         GetMethodHeader = GetMethodHeader,
                         GetEqualFunction = (a, b) => GetEqualFunction(a, b),
@@ -278,15 +278,15 @@ public sealed class CSharpCodeGenerator : CodeGenerator
 
         private string GetCompareFunction(string var1, string var2)
         {
-            if (KeyType == KeyType.String)
+            if (typeof(TKey) == typeof(string))
                 return $"StringComparer.{StringHelper.GetStringComparer(IgnoreCase)}.Compare({var1}, {var2})";
 
             return $"{var1}.CompareTo({var2})";
         }
 
-        protected override string GetEqualFunctionInternal(string var1, string var2, KeyType keyType)
+        protected override string GetEqualFunctionInternal(string var1, string var2, TypeCode keyType)
         {
-            if (keyType == KeyType.String)
+            if (keyType == TypeCode.String)
                 return $"StringComparer.{StringHelper.GetStringComparer(IgnoreCase)}.Equals({var1}, {var2})";
 
             return $"{var1} == {var2}";

@@ -80,12 +80,12 @@ public sealed class RustCodeGenerator : CodeGenerator
                 {
                     "Model", new TemplateModel
                     {
-                        KeyType = KeyType,
                         HashSource = HashSource,
                         MethodAttribute = "#[must_use]",
                         MethodModifier = "pub ",
                         FieldModifier = "const ",
                         KeyTypeName = KeyTypeName,
+                        KeyTypeCode = Type.GetTypeCode(typeof(TKey)),
                         ValueTypeName = ValueTypeName,
                         GetMethodHeader = GetMethodHeader,
                         GetEqualFunction = (a, b) => GetEqualFunction(a, b),
@@ -250,7 +250,7 @@ public sealed class RustCodeGenerator : CodeGenerator
 
         private string GetCompareFunction(string var1, string var2)
         {
-            if (KeyType == KeyType.String && IgnoreCase)
+            if (typeof(TKey) == typeof(string) && IgnoreCase)
                 return $"case_insensitive_compare({var1}, {var2})";
 
             return $"if {var1} < {var2} {{ -1 }} else if {var1} > {var2} {{ 1 }} else {{ 0 }}";
@@ -267,9 +267,9 @@ public sealed class RustCodeGenerator : CodeGenerator
             return sb.ToString();
         }
 
-        protected override string GetEqualFunctionInternal(string value1, string value2, KeyType keyType)
+        protected override string GetEqualFunctionInternal(string value1, string value2, TypeCode keyType)
         {
-            if (keyType == KeyType.String && IgnoreCase)
+            if (keyType == TypeCode.String && IgnoreCase)
                 return $"case_insensitive_equals({value1}, {value2})";
 
             return $"{value1} == {value2}";
@@ -277,7 +277,7 @@ public sealed class RustCodeGenerator : CodeGenerator
 
         protected override void RegisterSharedCode()
         {
-            if (KeyType != KeyType.String || !IgnoreCase)
+            if (typeof(TKey) != typeof(string) || !IgnoreCase)
                 return;
 
             Shared.Add(CodePlacement.Before, """

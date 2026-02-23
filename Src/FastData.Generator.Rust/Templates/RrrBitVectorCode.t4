@@ -10,17 +10,13 @@
 <#@ parameter type="Genbox.FastData.Generators.Contexts.RrrBitVectorContext" name="Context" #>
 
 <#
-    string mapSource = Model.KeyType switch
+    string mapSource = Model.KeyTypeCode switch
     {
-        KeyType.Char => $"{Common.LookupKeyName} as u64",
-        KeyType.Byte => $"{Common.LookupKeyName} as u64",
-        KeyType.UInt16 => $"{Common.LookupKeyName} as u64",
-        KeyType.UInt32 => $"{Common.LookupKeyName} as u64",
-        KeyType.UInt64 => Common.LookupKeyName,
-        KeyType.SByte => $"({Common.LookupKeyName} ^ i8::MIN) as u8 as u64",
-        KeyType.Int16 => $"({Common.LookupKeyName} ^ i16::MIN) as u16 as u64",
-        KeyType.Int32 => $"({Common.LookupKeyName} ^ i32::MIN) as u32 as u64",
-        KeyType.Int64 => $"({Common.LookupKeyName} ^ i64::MIN) as u64",
+        TypeCode.Char or TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64 => $"{Common.LookupKeyName} as u64",
+        TypeCode.SByte => $"({Common.LookupKeyName} ^ i8::MIN) as u8 as u64",
+        TypeCode.Int16 => $"({Common.LookupKeyName} ^ i16::MIN) as u16 as u64",
+        TypeCode.Int32 => $"({Common.LookupKeyName} ^ i32::MIN) as u32 as u64",
+        TypeCode.Int64 => $"({Common.LookupKeyName} ^ i64::MIN) as u64",
         _ => throw new InvalidOperationException("RRR bitvector only supports integral key types.")
         };
 #>

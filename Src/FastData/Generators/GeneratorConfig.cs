@@ -10,16 +10,15 @@ using Genbox.FastData.Internal.Structures;
 namespace Genbox.FastData.Generators;
 
 /// <summary>Provides configuration data for code generators in the FastData library.</summary>
-/// <typeparam name="T">The type of data being generated.</typeparam>
-public sealed class GeneratorConfig<T>
+/// <typeparam name="TKey">The type of data being generated.</typeparam>
+public sealed class GeneratorConfig<TKey>
 {
     private readonly FastDataConfig _cfg;
 
-    private GeneratorConfig(Type structureType, KeyType keyType, HashDetails hashDetails, GeneratorEncoding encoding, FastDataConfig cfg)
+    private GeneratorConfig(Type structureType, HashDetails hashDetails, GeneratorEncoding encoding, FastDataConfig cfg)
     {
         _cfg = cfg;
         StructureType = structureType;
-        KeyType = keyType;
         Metadata = new Metadata(typeof(FastDataGenerator).Assembly.GetName().Version!, DateTimeOffset.UtcNow);
         HashDetails = hashDetails;
         Encoding = encoding;
@@ -28,13 +27,13 @@ public sealed class GeneratorConfig<T>
         TrimSuffix = string.Empty;
     }
 
-    internal GeneratorConfig(Type structureType, KeyType keyType, uint itemCount, NumericKeyProperties<T> props, HashDetails hashDetails, FastDataConfig cfg) : this(structureType, keyType, hashDetails, GeneratorEncoding.Unknown, cfg)
+    internal GeneratorConfig(Type structureType, uint itemCount, NumericKeyProperties<TKey> props, HashDetails hashDetails, FastDataConfig cfg) : this(structureType, hashDetails, GeneratorEncoding.Unknown, cfg)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType).ToArray();
         Constants = CreateConstants(props, itemCount);
     }
 
-    internal GeneratorConfig(Type structureType, KeyType keyType, uint itemCount, StringKeyProperties props, HashDetails hashDetails, GeneratorEncoding encoding, string trimPrefix, string trimSuffix, FastDataConfig cfg) : this(structureType, keyType, hashDetails, encoding, cfg)
+    internal GeneratorConfig(Type structureType, uint itemCount, StringKeyProperties props, HashDetails hashDetails, GeneratorEncoding encoding, string trimPrefix, string trimSuffix, FastDataConfig cfg) : this(structureType, hashDetails, encoding, cfg)
     {
         EarlyExits = GetEarlyExits(props, itemCount, structureType, encoding).ToArray();
         Constants = CreateConstants(props, itemCount);
@@ -48,9 +47,6 @@ public sealed class GeneratorConfig<T>
     /// <summary>Gets the structure type that the generator will create.</summary>
     public Type StructureType { get; }
 
-    /// <summary>Gets the data type being generated.</summary>
-    public KeyType KeyType { get; }
-
     /// <summary>Gets the encoding used for string keys.</summary>
     public GeneratorEncoding Encoding { get; }
 
@@ -61,7 +57,7 @@ public sealed class GeneratorConfig<T>
     public IEarlyExit[] EarlyExits { get; }
 
     /// <summary>Gets the constants used by the generator, such as min/max values or string lengths.</summary>
-    public Constants<T> Constants { get; }
+    public Constants<TKey> Constants { get; }
 
     /// <summary>Gets the metadata about the generator, such as version and creation time.</summary>
     public Metadata Metadata { get; }
@@ -74,17 +70,17 @@ public sealed class GeneratorConfig<T>
 
     public bool TypeReductionEnabled => _cfg.TypeReductionEnabled;
 
-    private static Constants<T> CreateConstants(NumericKeyProperties<T> props, uint itemCount)
+    private static Constants<TKey> CreateConstants(NumericKeyProperties<TKey> props, uint itemCount)
     {
-        Constants<T> constants = new Constants<T>(itemCount);
+        Constants<TKey> constants = new Constants<TKey>(itemCount);
         constants.MinValue = props.MinKeyValue;
         constants.MaxValue = props.MaxKeyValue;
         return constants;
     }
 
-    private static Constants<T> CreateConstants(StringKeyProperties props, uint itemCount)
+    private static Constants<TKey> CreateConstants(StringKeyProperties props, uint itemCount)
     {
-        Constants<T> constants = new Constants<T>(itemCount);
+        Constants<TKey> constants = new Constants<TKey>(itemCount);
         constants.MinStringLength = props.LengthData.LengthMap.Min;
         constants.MaxStringLength = props.LengthData.LengthMap.Max;
         constants.CharacterClasses = props.CharacterData.CharacterClasses;
@@ -141,7 +137,7 @@ public sealed class GeneratorConfig<T>
             yield return new StringPrefixSuffixEarlyExit(props.DeltaData.Prefix, props.DeltaData.Suffix);
     }
 
-    private IEnumerable<IEarlyExit> GetEarlyExits(NumericKeyProperties<T> props, uint itemCount, Type structureType)
+    private IEnumerable<IEarlyExit> GetEarlyExits(NumericKeyProperties<TKey> props, uint itemCount, Type structureType)
     {
         //There is no point to using early exists if there is just one item
         if (itemCount == 1)
@@ -157,11 +153,11 @@ public sealed class GeneratorConfig<T>
 
         //If the min and max keys are equal, the generator can output a single length check conditional, which is better than any other method.
         if (props.MinKeyValue.Equals(props.MaxKeyValue))
-            yield return new ValueRangeEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue); // 1 op: val.Len != len
+            yield return new ValueRangeEarlyExit<TKey>(props.MinKeyValue, props.MaxKeyValue); // 1 op: val.Len != len
         else if (IsBitMaskViable(props, out ulong mask))
             yield return new ValueBitMaskEarlyExit(mask); // 2 ops: val & mask != 0
         else
-            yield return new ValueRangeEarlyExit<T>(props.MinKeyValue, props.MaxKeyValue); // 3 ops: len < min || len > max
+            yield return new ValueRangeEarlyExit<TKey>(props.MinKeyValue, props.MaxKeyValue); // 3 ops: len < min || len > max
     }
 
     private MapStrategy GetLengthMapStrategy(LengthBitArray map)
@@ -174,9 +170,9 @@ public sealed class GeneratorConfig<T>
         return density >= _cfg.LengthMapMinDensity ? MapStrategy.Range : MapStrategy.Bitmap;
     }
 
-    private bool IsBitMaskViable(NumericKeyProperties<T> props, out ulong mask)
+    private bool IsBitMaskViable(NumericKeyProperties<TKey> props, out ulong mask)
     {
-        Type keyType = typeof(T);
+        Type keyType = typeof(TKey);
 
         ulong fullMask = Type.GetTypeCode(keyType) switch
         {

@@ -11,11 +11,11 @@
 <#@ parameter type="Genbox.FastData.Generator.Rust.TemplateData.BitSetTemplateData" name="Data" #>
 
 <#
-    string offsetExpression = Model.KeyType switch
+    string offsetExpression = Model.KeyTypeCode switch
     {
-        KeyType.Char => $"({Common.LookupKeyName} as u32 - Self::MIN_KEY as u32) as usize",
-        KeyType.SByte or KeyType.Int16 or KeyType.Int32 or KeyType.Int64 => $"(({Common.LookupKeyName} as i64) - (Self::MIN_KEY as i64)) as usize",
-        KeyType.Byte or KeyType.UInt16 or KeyType.UInt32 or KeyType.UInt64 => $"(({Common.LookupKeyName} as u64) - (Self::MIN_KEY as u64)) as usize",
+        TypeCode.Char => $"({Common.LookupKeyName} as u32 - Self::MIN_KEY as u32) as usize",
+        TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 => $"(({Common.LookupKeyName} as i64) - (Self::MIN_KEY as i64)) as usize",
+        TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64 => $"(({Common.LookupKeyName} as u64) - (Self::MIN_KEY as u64)) as usize",
         _ => $"({Common.LookupKeyName} - Self::MIN_KEY) as usize"
     };
 #>

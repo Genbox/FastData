@@ -8,7 +8,7 @@ namespace Genbox.FastData.InternalShared.TestClasses;
 
 public class TestData<T>(StructureType structureType, T[] values) : ITestData, IXunitSerializable
 {
-    private readonly KeyType _keyType = Enum.Parse<KeyType>(typeof(T).Name);
+    private readonly TypeCode _keyType = Type.GetTypeCode(typeof(T));
     private readonly Random _rng = new Random(42);
 
     public T[] Values { get; private set; } = values;

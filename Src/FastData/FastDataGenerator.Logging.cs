@@ -12,7 +12,7 @@ public static partial class FastDataGenerator
     internal static partial void LogNumberOfUniqueKeys(ILogger logger, int count, int uniqueCount);
 
     [LoggerMessage(LogLevel.Information, "Data consists of {KeyType}")]
-    internal static partial void LogKeyType(ILogger logger, KeyType keyType);
+    internal static partial void LogKeyType(ILogger logger, string keyType);
 
     [LoggerMessage(LogLevel.Information, "Min value: {MinValue}, Max value: {MaxValue}")]
     internal static partial void LogMinMaxValues(ILogger logger, object minValue, object maxValue);
