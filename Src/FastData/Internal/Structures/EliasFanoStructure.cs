@@ -21,11 +21,15 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
         ReadOnlySpan<TKey> keysSpan = keys.Span;
 
         int count = keysSpan.Length;
-        long maxValue = props.ValueConverter(keysSpan[count - 1]);
+        long minValue = props.ValueConverter(props.MinKeyValue);
+        long maxValue = props.ValueConverter(props.MaxKeyValue);
+        long effectiveMinValue = minValue < 0 ? minValue : 0;
+        long maxValueNormalized = maxValue - effectiveMinValue;
 
-        long factor = maxValue / count;
+        long factor = maxValueNormalized / count;
         int lowerBitCount = factor <= 0 ? 0 : BitOperations.Log2((ulong)factor);
-        int upperBitLength = (int)(count + (maxValue >> lowerBitCount));
+        int upperBitLength = (int)(count + (maxValueNormalized >> lowerBitCount));
+
         ulong[] upperBits = new ulong[(upperBitLength + 63) / 64];
         ulong[] lowerBits = new ulong[((count * lowerBitCount) + 63) / 64];
         ulong lowerMask = 0;
@@ -35,7 +39,7 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
         {
             for (int i = 0; i < keysSpan.Length; i++)
             {
-                long value = props.ValueConverter(keysSpan[i]);
+                long value = props.ValueConverter(keysSpan[i]) - effectiveMinValue;
                 int index = (int)(value + i);
                 upperBits[index >> 6] |= 1UL << (index & 63);
             }
@@ -46,7 +50,7 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
 
             for (int i = 0; i < keysSpan.Length; i++)
             {
-                long value = props.ValueConverter(keysSpan[i]);
+                long value = props.ValueConverter(keysSpan[i]) - effectiveMinValue;
                 int index = (int)((value >> lowerBitCount) + i);
                 upperBits[index >> 6] |= 1UL << (index & 63);
 
@@ -70,7 +74,7 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
         int sampleRateShift = BitOperations.TrailingZeroCount((uint)skipQuantum);
         int[] samplePositions = BuildSamples(upperBits, upperBitLength, skipQuantum);
 
-        return new EliasFanoContext<TKey>(keys, lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions);
+        return new EliasFanoContext<TKey>(keys, lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions, effectiveMinValue, maxValue);
     }
 
     private static int[] BuildSamples(ulong[] words, int bitLength, int sampleRate)

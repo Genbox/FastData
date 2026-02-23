@@ -264,7 +264,6 @@ public static partial class FastDataGenerator
                 if (values.IsEmpty && typeof(TKey).IsIntegral() && !props.IsConsecutive && keys.Length >= fdCfg.RrrBitVectorStructureMinItemCount && props.Density <= fdCfg.RrrBitVectorStructureMaxDensity)
                     return GenerateWrapper(tempState, new RrrBitVectorStructure<TKey, TValue>(sorted));
 
-                // TODO: Elias-Fano currently does not normalize against MinKeyValue, so negative domains may be handled sub-optimally.
                 if (values.IsEmpty && typeof(TKey).IsIntegral() && !props.IsConsecutive && keys.Length >= fdCfg.EliasFanoStructureMinItemCount && props.Density <= fdCfg.EliasFanoStructureMaxDensity)
                     return GenerateWrapper(tempState, new EliasFanoStructure<TKey, TValue>(props, fdCfg, sorted));
 

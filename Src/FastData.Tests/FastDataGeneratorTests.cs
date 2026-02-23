@@ -143,7 +143,7 @@ public class FastDataGeneratorTests
         Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate(["abc", "ABC"], config, new DummyGenerator()));
     }
 
-    [Fact(Skip = "Known issue: all-negative sparse inputs can select Elias-Fano and throw during construction.")]
+    [Fact]
     public void Generate_Auto_AllNegativeSparse_DoesNotThrow()
     {
         int[] keys = Enumerable.Range(1, 1000).Select(static x => -x * 20).ToArray();
@@ -153,7 +153,7 @@ public class FastDataGeneratorTests
         Exception? error = Record.Exception(() => FastDataGenerator.Generate(keys, config, generator));
 
         Assert.Null(error);
-        Assert.False(generator.Context is EliasFanoContext<int>);
+        Assert.IsType<EliasFanoContext<int>>(generator.Context);
     }
 
     [Fact]

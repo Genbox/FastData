@@ -8,6 +8,14 @@
 <#@ parameter type="Genbox.FastData.Generators.Contexts.EliasFanoContext" name="Context" #>
 
 const LOWER_BIT_COUNT: i32 = <#= Context.LowerBitCount #>;
+<#
+    long minValue = Context.MinValue;
+    long maxValue = Context.MaxValue;
+    long maxValueNormalized = Context.MaxValue - Context.MinValue;
+#>
+const MIN_VALUE: i64 = <#= Model.ToValueLabel(minValue) #>;
+const MAX_VALUE: i64 = <#= Model.ToValueLabel(maxValue) #>;
+const MAX_VALUE_NORMALIZED: i64 = <#= Model.ToValueLabel(maxValueNormalized) #>;
 <#= Model.FieldModifier #>UPPER_BITS: [u64; <#= Context.UpperBits.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Context.UpperBits, x => Model.ToValueLabel(x)) #>
 ];
@@ -34,7 +42,24 @@ const SAMPLE_RATE_SHIFT: i32 = <#= Context.SampleRateShift #>;
 <#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName() #>) -> bool {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-    let value = <#= Common.LookupKeyName #> as i64;
+<#
+    if (minValue >= 0)
+    {
+#>    let value = <#= Common.LookupKeyName #> as i64;
+    if (value as u64) > (Self::MAX_VALUE as u64) {
+        return false;
+    }
+<#
+    }
+    else
+    {
+#>    let value = (<#= Common.LookupKeyName #> as i64) - Self::MIN_VALUE;
+    if (value as u64) > (Self::MAX_VALUE_NORMALIZED as u64) {
+        return false;
+    }
+<#
+    }
+#>
     let high = value >> (Self::LOWER_BIT_COUNT as u32);
 
     let position = if high == 0 { 0 } else { Self::select_zero(high - 1) + 1 };

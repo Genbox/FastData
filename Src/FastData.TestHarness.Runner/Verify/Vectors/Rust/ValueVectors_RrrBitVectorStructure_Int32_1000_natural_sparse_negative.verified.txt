@@ -1,0 +1,463 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: RrrBitVector
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+pub struct RrrBitVectorStructure_Int32_1000_natural_sparse_negative;
+
+impl RrrBitVectorStructure_Int32_1000_natural_sparse_negative {
+    const RRR_MIN_VALUE: u64 = 2147285375;
+    const RRR_MAX_VALUE: u64 = 2147312403;
+    const RRR_BLOCK_SIZE: i32 = 15;
+    const RRR_CLASSES: [u8; 1802] = [
+        2, 2, 1, 1, 1, 1, 1, 1, 2, 2, 
+        1, 1, 1, 2, 1, u8::MIN, 1, 2, 2, 1, 
+        2, 1, 1, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, 1, 1, 2, 1, 2, 1, 1, 1, 
+        1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 
+        1, 1, 2, 2, 1, 1, 1, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, 1, 2, 2, 
+        1, 1, 1, 2, 1, u8::MIN, 1, 2, 2, 1, 
+        2, 1, 1, 1, 1, 1, 2, 1, 2, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, 1, 
+        1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 
+        1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 
+        2, 2, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        1, 1, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 
+        1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 
+        1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 
+        1, 2, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        1, 2, 1, 1, 1, 1, 1, 1, 2, 2, 
+        1, 1, 2, 1, 1, 1, u8::MIN, 2, 2, 1, 
+        2, 1, 1, 1, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, 1, 2, 1, 2, 1, 1, 1, 
+        1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 
+        1, 2, 1, 2, 1, 1, 1, 1, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, 2, 2, 
+        1, 1, 2, 1, 1, 1, u8::MIN, 2, 2, 1, 
+        2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, 
+        1, 1, 1, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        2, 1, 1, 2, 1, 1, 1, u8::MIN, 2, 2, 
+        1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, 1, 
+        1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 
+        1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 
+        1, 2, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        1, 1, 1, 2, 1, 1, 1, u8::MIN, 2, 2, 
+        1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 
+        1, 1, 1, 1, 1, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, 2, 2, 1, 1, 1, 1, 
+        1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 
+        1, 2, 2, 1, 1, 2, 1, 1, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, u8::MIN, 2, 2, 
+        1, 2, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 
+        1, 1, 2, 2, 1, 1, 1, 1, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, u8::MIN, 1, 2, 
+        2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 
+        2, 1, 1, 1, 1, 1, 1, 2, 1, 2, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, 
+        1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 
+        1, 1, 2, 2, 1, 1, 1, 2, 1, u8::MIN, 
+        1, 2, 2, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, 1, 2, 1, 1, 1, 1, 1, 2, 1, 
+        2, 1, 1, 1, 1, 1, 1, 2, 1, 2, 
+        1, 1, 1, 1, 1, 1, 1, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 2, 1, 1, 1, 1, 
+        1, 1, 2, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 
+        2, 1, 1, 1, 1, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 2, 2, 1, 1, 1, 
+        1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 
+        1, 1, 2, 2, 1, 1, 2, 1, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, u8::MIN, 2, 
+        2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 
+        2, 1, 1, 1, 1, 1, 1, 2, 2, 1, 
+        1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 
+        1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 
+        1, 1, 2, 2, 1, 1, 2, 1, 1, 1, 
+        u8::MIN, 2, 2, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, 2, 1, 1, 1, 1, 1, 2, 1, 
+        2, 1, 1, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, 1, 1, 2, 2, 1, 1, 2, 1, 1, 
+        1, u8::MIN, 2, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, 1, 1, 2, 1, 1, 1, 1, 1, 2, 
+        1, 2, 1, 1, 1, 1, 1, 1, 2, 2, 
+        1, 1, 1, 1, 1, 1, 1, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, 2, 1, 1, 1, 
+        1, 1, 1, 2, 2, 1, 1, 2, 1, 1, 
+        1, u8::MIN, 2, 2, 1, 2, 1, 1, 1, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, 2, 
+        1, 2, 1, 1, 1, 1, 1, 1, 2, 2, 
+        1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 
+        1, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        1, 1, 1, 2, 2, 1, 1, 2, 1, 1, 
+        1, u8::MIN, 2, 2, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, 2, 1, 1, 1, 1, 1, 1, 2, 2, 
+        1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 
+        1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 
+        1, u8::MIN, 1, 2, 2, 1, 2, 1, 1, 1, 
+        1, 1, 2, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, 2, 1, 1, 1, 1, 1, 1, 2, 
+        1, 2, 1, 1, 1, 1, 1, 1, 2, 2, 
+        1, 1, 1, 1, 1, 1, 2, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 2, 1, 1, 1, 2, 
+        1, u8::MIN, 1, 2, 2, 1, 2, 1, 1, 1, 
+        1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 2, 
+        1, 2, 1, 1, 1, 1, 1, 1, 2, 2, 
+        1, 1, 1, 1, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, 1, u8::MIN, 2, 2, 1, 2, 1, 1, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, 1, 
+        2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 
+        2, 1, 1, 1, 1, 1, 1, 2, 1, 2, 
+        1, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        1, 1, 1, 1, 2, 2, 1, 1, 2, 1, 
+        1, 1, u8::MIN, 2, 2, 1, 2, 1, 1, 1, 
+        1, 1, 2, 1, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, 1, 1, 1, 1, 1, 1, 1, 2, 
+        2, 1, 1, 1, 1, 1, 1, 2, 1, 2, 
+        1, 1, 1, 1, 1, 1, 2, 1, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 1, 1, 1, 2, 1, 
+        1, 1
+    ];
+    const RRR_OFFSETS: [u32; 1802] = [
+        28, 68, 8, 5, 3, 2, 2, 3, 71, 96, 
+        9, 5, 2, 91, 14, u32::MIN, u32::MIN, 38, 57, 6, 
+        93, 12, 11, 11, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, 12, 14, 97, 8, 94, 11, 9, 8, 
+        8, 9, 11, 58, 5, 55, 8, 6, 5, 5, 
+        6, 8, 28, 68, 8, 5, 3, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 2, 2, 3, 71, 96, 
+        9, 5, 2, 91, 14, u32::MIN, u32::MIN, 38, 57, 6, 
+        93, 12, 11, 11, 12, 14, 97, 8, 94, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 11, 9, 8, 
+        8, 9, 11, 58, 5, 55, 8, 6, 5, 5, 
+        6, 8, 28, 68, 8, 5, 3, 2, 2, 3, 
+        71, 96, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        9, 5, 2, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 10, 
+        9, 9, 10, 12, 70, 6, 67, 9, 7, 6, 
+        6, 7, 9, 37, 81, 9, 6, 4, 3, 3, 
+        4, 84, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        6, 45, 6, 3, 1, u32::MIN, u32::MIN, 1, 48, 69, 
+        7, 3, 78, 12, 12, 13, u32::MIN, 21, 36, 4, 
+        66, 10, 9, 9, 10, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, 12, 70, 6, 67, 9, 7, 6, 
+        6, 7, 9, 37, 81, 9, 6, 4, 3, 3, 
+        4, 84, 6, 45, 6, 3, 1, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 1, 48, 69, 
+        7, 3, 78, 12, 12, 13, u32::MIN, 21, 36, 4, 
+        66, 10, 9, 9, 10, 12, 70, 6, 67, 9, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 7, 6, 
+        6, 7, 9, 1, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        82, 8, 4, 92, 13, 13, 14, u32::MIN, 29, 46, 
+        5, 79, 11, 10, 10, 11, 13, 83, 7, 2, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 13, 10, 8, 
+        7, 7, 8, 10, 47, 95, 10, 7, 5, 4, 
+        4, 5, 98, 7, 56, 7, 4, 2, 1, 1, 
+        2, 59, 4, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        13, 8, 4, 92, 13, 13, 14, u32::MIN, 29, 46, 
+        5, 79, 11, 10, 10, 11, 13, 83, 7, 80, 
+        10, 8, 7, 7, 8, 10, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, 47, 95, 10, 7, 5, 4, 
+        4, 5, 98, 7, 56, 7, 4, 2, 1, 1, 
+        2, 59, 82, 8, 4, 92, 13, 13, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 14, u32::MIN, 29, 46, 
+        5, 79, 11, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        5, 5, 6, 8, 28, 68, 8, 5, 3, 2, 
+        2, 3, 71, 96, 9, 5, 2, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 14, 14, u32::MIN, u32::MIN, 38, 
+        57, 6, 93, 12, 11, 11, 12, 14, 97, 8, 
+        94, 11, 9, 8, 8, 9, 11, 58, 5, 55, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 8, 6, 
+        5, 5, 6, 8, 28, 68, 8, 5, 3, 2, 
+        2, 3, 71, 96, 9, 5, 2, 91, 14, u32::MIN, 
+        u32::MIN, 38, 57, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, 6, 93, 12, 11, 11, 12, 14, 97, 8, 
+        94, 11, 9, 8, 8, 9, 11, 58, 5, 55, 
+        8, 6, 5, 5, 6, 8, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, 8, 68, 8, 5, 3, 2, 
+        2, 3, 71, 5, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        9, 4, 66, 10, 9, 9, 10, 12, 70, 6, 
+        67, 9, 7, 6, 6, 7, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, 9, 37, 81, 9, 6, 4, 
+        3, 3, 4, 84, 6, 45, 6, 3, 1, u32::MIN, 
+        u32::MIN, 1, 48, 69, 7, 3, 78, 12, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 12, 13, u32::MIN, 21, 
+        36, 4, 66, 10, 9, 9, 10, 12, 70, 6, 
+        67, 9, 7, 6, 6, 7, 9, 37, 81, 9, 
+        6, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 4, 
+        3, 3, 4, 84, 6, 45, 6, 3, 1, u32::MIN, 
+        u32::MIN, 1, 48, 69, 7, 3, 78, 12, 12, 13, 
+        u32::MIN, 21, 36, 4, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, 66, 10, 9, 9, 10, 12, 70, 6, 
+        67, 9, 7, 6, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, 1, 2, 59, 82, 8, 4, 92, 13, 13, 
+        14, u32::MIN, 29, 1, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, 10, 5, 79, 11, 10, 10, 11, 13, 83, 
+        7, 80, 10, 8, 7, 7, 8, 10, 47, 95, 
+        10, 7, 5, 4, 4, 5, 7, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, 14, 7, 56, 7, 4, 2, 
+        1, 1, 2, 59, 82, 8, 4, 92, 13, 13, 
+        14, u32::MIN, 29, 46, 5, 79, 11, 10, 10, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 11, 13, 83, 
+        7, 80, 10, 8, 7, 7, 8, 10, 47, 95, 
+        10, 7, 5, 4, 4, 5, 98, 7, 56, 7, 
+        4, 2, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        1, 1, 2, 59, 82, 8, 4, 92, 13, 13, 
+        14, u32::MIN, 29, 46, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, 55, 8, 6, 5, 5, 6, 8, 28, 68, 
+        8, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 5, 
+        3, 2, 2, 3, 71, 96, 9, 5, 2, 91, 
+        14, u32::MIN, u32::MIN, 38, 57, 6, 93, 12, 11, 11, 
+        12, 14, 97, 8, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, 94, 11, 9, 8, 8, 9, 11, 58, 
+        5, 55, 8, 6, 5, 5, 6, 8, 28, 68, 
+        8, 5, 3, 2, 2, 3, 71, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 96, 9, 5, 2, 91, 
+        14, u32::MIN, u32::MIN, 38, 57, 6, 93, 12, 11, 11, 
+        12, 14, 97, 8, 94, 11, 9, 8, 8, 9, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 11, 58, 
+        5, 55, 8, 6, 5, 5, 6, 8, 28, 68, 
+        8, 5, 3, 2, 2, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, 13, u32::MIN, 21, 36, 4, 66, 10, 9, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 9, 10, 12, 
+        70, 6, 67, 9, 7, 6, 6, 7, 9, 37, 
+        81, 9, 6, 4, 3, 3, 4, 84, 6, 45, 
+        6, 3, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        1, u32::MIN, u32::MIN, 1, 48, 69, 7, 3, 78, 12, 
+        12, 13, u32::MIN, 21, 36, 4, 66, 10, 9, 9, 
+        10, 12, 70, 6, 1, u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, 12, 9, 7, 6, 6, 7, 9, 37, 
+        81, 9, 6, 4, 3, 3, 4, 84, 6, 45, 
+        6, 3, 1, u32::MIN, u32::MIN, 1, 48, 3, u32::MIN, u32::MIN, 
+        u32::MIN, u32::MIN, u32::MIN, u32::MIN, u32::MIN, 12, 7, 3, 78, 12, 
+        12, 13
+    ];
+
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+        if key < -198273 || key > -171245 {
+            return false;
+        }
+
+
+        let mapped = (key ^ i32::MIN) as u32 as u64;
+
+        if mapped < Self::RRR_MIN_VALUE || mapped > Self::RRR_MAX_VALUE {
+            return false;
+        }
+
+        let normalized = mapped - Self::RRR_MIN_VALUE;
+        let block_index = (normalized / (Self::RRR_BLOCK_SIZE as u64)) as usize;
+        let bit_in_block = (normalized % (Self::RRR_BLOCK_SIZE as u64)) as i32;
+        let class_value = Self::RRR_CLASSES[block_index] as i32;
+
+        if class_value == 0 {
+            return false;
+        }
+
+        let rank = Self::RRR_OFFSETS[block_index];
+        Self::decode_bit(class_value, rank, bit_in_block)
+    }
+
+    fn decode_bit(class_value: i32, mut rank: u32, target_bit: i32) -> bool {
+        let mut remaining = class_value;
+
+        for bit in (0..(Self::RRR_BLOCK_SIZE as usize)).rev() {
+            if remaining == 0 {
+                return false;
+            }
+
+            let bit = bit as i32;
+            let comb = Self::binomial(bit, remaining);
+            let is_set;
+
+            if rank >= comb as u32 {
+                rank -= comb as u32;
+                remaining -= 1;
+                is_set = true;
+            } else {
+                is_set = false;
+            }
+
+            if bit == target_bit {
+                return is_set;
+            }
+        }
+
+        false
+    }
+
+    fn binomial(n: i32, mut k: i32) -> i32 {
+        if k < 0 || k > n {
+            return 0;
+        }
+
+        if k == 0 || k == n {
+            return 1;
+        }
+
+        if k > n - k {
+            k = n - k;
+        }
+
+        let mut result = 1i32;
+        let mut i = 1i32;
+
+        while i <= k {
+            result = result * (n - (k - i)) / i;
+            i += 1;
+        }
+
+        result
+    }
+
+    pub const ITEM_COUNT: usize = 1000;
+    pub const MIN_KEY: i32 = -198273;
+    pub const MAX_KEY: i32 = -171245;
+}

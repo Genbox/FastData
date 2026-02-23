@@ -7,6 +7,14 @@
 <#@ parameter type="Genbox.FastData.Generators.Contexts.EliasFanoContext" name="Context" #>
 
 private const int _lowerBitCount = <#= Context.LowerBitCount #>;
+<#
+    long minValue = Context.MinValue;
+    long maxValue = Context.MaxValue;
+    long maxValueNormalized = Context.MaxValue - Context.MinValue;
+#>
+private const long _minValue = <#= Model.ToValueLabel(minValue) #>;
+private const long _maxValue = <#= Model.ToValueLabel(maxValue) #>;
+private const long _maxValueNormalized = <#= Model.ToValueLabel(maxValueNormalized) #>;
 <#= Model.FieldModifier #>ulong[] _upperBits = new ulong[] {
 <#= FormatHelper.FormatColumns(Context.UpperBits, x => Model.ToValueLabel(x)) #>
 };
@@ -34,7 +42,22 @@ private const int _sampleRateShift = <#= Context.SampleRateShift #>;
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-    long value = (long)<#= Common.LookupKeyName #>;
+<#
+    if (minValue >= 0)
+    {
+#>    long value = (long)<#= Common.LookupKeyName #>;
+    if ((ulong)value > (ulong)_maxValue)
+        return false;
+<#
+    }
+    else
+    {
+#>    long value = (long)<#= Common.LookupKeyName #> - _minValue;
+    if ((ulong)value > (ulong)_maxValueNormalized)
+        return false;
+<#
+    }
+#>
     long high = value >> _lowerBitCount;
 
     long position = high == 0 ? 0 : SelectZero(high - 1) + 1;

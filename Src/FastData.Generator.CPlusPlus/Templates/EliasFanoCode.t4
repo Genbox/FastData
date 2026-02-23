@@ -8,6 +8,14 @@
 <#@ parameter type="Genbox.FastData.Generators.Contexts.EliasFanoContext" name="Context" #>
 
 static constexpr int32_t lower_bit_count = <#= Context.LowerBitCount #>;
+<#
+    long minValue = Context.MinValue;
+    long maxValue = Context.MaxValue;
+    long maxValueNormalized = Context.MaxValue - Context.MinValue;
+#>
+static constexpr int64_t min_value = <#= Model.ToValueLabel(minValue) #>;
+static constexpr int64_t max_value = <#= Model.ToValueLabel(maxValue) #>;
+static constexpr int64_t max_value_normalized = <#= Model.ToValueLabel(maxValueNormalized) #>;
 <#= Model.GetFieldModifier(true) #>std::array<uint64_t, <#= Context.UpperBits.Length.ToStringInvariant() #>> upper_bits = {
 <#= FormatHelper.FormatColumns(Context.UpperBits, x => Model.ToValueLabel(x)) #>
 };
@@ -117,7 +125,22 @@ public:
 <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-    const int64_t value = static_cast<int64_t>(<#= Common.LookupKeyName #>);
+<#
+    if (minValue >= 0)
+    {
+#>    const int64_t value = static_cast<int64_t>(<#= Common.LookupKeyName #>);
+    if (static_cast<uint64_t>(value) > static_cast<uint64_t>(max_value))
+        return false;
+<#
+    }
+    else
+    {
+#>    const int64_t value = static_cast<int64_t>(<#= Common.LookupKeyName #>) - min_value;
+    if (static_cast<uint64_t>(value) > static_cast<uint64_t>(max_value_normalized))
+        return false;
+<#
+    }
+#>
     const int64_t high = value >> lower_bit_count;
 
     int64_t position = high == 0 ? 0 : select_zero(high - 1) + 1;

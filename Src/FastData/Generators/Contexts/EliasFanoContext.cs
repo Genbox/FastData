@@ -2,12 +2,12 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generators.Contexts;
 
-public sealed class EliasFanoContext<TKey>(ReadOnlyMemory<TKey> keys, int lowerBitCount, ulong lowerMask, ulong[] upperBits, ulong[] lowerBits, int upperBitLength, int sampleRateShift, int[] samplePositions) : EliasFanoContext(lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions)
+public sealed class EliasFanoContext<TKey>(ReadOnlyMemory<TKey> keys, int lowerBitCount, ulong lowerMask, ulong[] upperBits, ulong[] lowerBits, int upperBitLength, int sampleRateShift, int[] samplePositions, long minValue, long maxValue) : EliasFanoContext(lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions, minValue, maxValue)
 {
     public ReadOnlyMemory<TKey> Keys { get; } = keys;
 }
 
-public abstract class EliasFanoContext(int lowerBitCount, ulong lowerMask, ulong[] upperBits, ulong[] lowerBits, int upperBitLength, int sampleRateShift, int[] samplePositions) : IContext
+public abstract class EliasFanoContext(int lowerBitCount, ulong lowerMask, ulong[] upperBits, ulong[] lowerBits, int upperBitLength, int sampleRateShift, int[] samplePositions, long minValue, long maxValue) : IContext
 {
     public int LowerBitCount { get; } = lowerBitCount;
     public ulong LowerMask { get; } = lowerMask;
@@ -16,4 +16,6 @@ public abstract class EliasFanoContext(int lowerBitCount, ulong lowerMask, ulong
     public int UpperBitLength { get; } = upperBitLength;
     public int SampleRateShift { get; } = sampleRateShift;
     public int[] SamplePositions { get; } = samplePositions;
+    public long MinValue { get; } = minValue;
+    public long MaxValue { get; } = maxValue;
 }
