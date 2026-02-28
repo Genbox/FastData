@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Genbox.FastData.Generator.CPlusPlus.TestHarness")]
+[assembly: InternalsVisibleTo("FastData.Generator.CPlusPlus.TestHarness")]

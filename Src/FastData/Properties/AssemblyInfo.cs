@@ -1,4 +1,4 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Genbox.FastData.Testbed")]
-[assembly: InternalsVisibleTo("Genbox.FastData.InternalShared")]
+[assembly: InternalsVisibleTo("FastData.Testbed")]
+[assembly: InternalsVisibleTo("FastData.InternalShared")]

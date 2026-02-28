@@ -23,7 +23,7 @@ internal static class Program
                                          WarmupCount = 1,
                                          MinIterationCount = 10,
                                          MaxIterationCount = 30
-                                     }, Job.InProcess))
+                                     }))
                                      .AddAnalyser(EnvironmentAnalyser.Default,
                                          MinIterationTimeAnalyser.Default,
                                          RuntimeErrorAnalyser.Default,

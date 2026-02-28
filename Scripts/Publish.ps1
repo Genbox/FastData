@@ -4,6 +4,11 @@ $PublishDir = "$Root/Publish"
 $ArtifactsDir = "$Root/Publish/Artifacts"
 $Color = "Blue"
 
+$CommonProperties = @("-p:PackAssemblyName=true")
+$LibraryPublishProperties = $CommonProperties + @("-p:GenerateDependencyFile=false")
+$CliPublishProperties = $CommonProperties + @("-p:PublishSingleFile=true", "-p:SelfContained=true", "-p:PublishTrimmed=true", "-p:TargetFrameworks=net9.0", "-p:DebugType=none", "-p:GenerateDocumentationFile=false", "-p:EnableCompressionInSingleFile=true", "-p:InvariantGlobalization=true")
+$PackCommonProperties = $CommonProperties + @("-p:ContinuousIntegrationBuild=true")
+
 # Prerequsites
 Write-Host -ForegroundColor $Color "Installing prerequisites"
 dotnet tool install --global minver-cli
@@ -19,34 +24,34 @@ $env:MinVerVersionOverride = $version
 
 Write-Host -ForegroundColor $Color "Publish the dll files"
 $PwshFramework = "netstandard2.0" # Version needed by PowerShell
-dotnet publish $Root/Src/FastData/FastData.csproj -c $Config -f $PwshFramework -p:GenerateDependencyFile=false -o $ArtifactsDir
-dotnet publish $Root/Src/FastData.Generator/FastData.Generator.csproj -c $Config -f $PwshFramework -p:GenerateDependencyFile=false -o $ArtifactsDir
-dotnet publish $Root/Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj -c $Config -f $PwshFramework -p:GenerateDependencyFile=false -o $ArtifactsDir
-dotnet publish $Root/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj -c $Config -f $PwshFramework -p:GenerateDependencyFile=false -o $ArtifactsDir
-dotnet publish $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config -f $PwshFramework -p:GenerateDependencyFile=false -o $ArtifactsDir
+dotnet publish $Root/Src/FastData/FastData.csproj -c $Config -f $PwshFramework @LibraryPublishProperties -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator/FastData.Generator.csproj -c $Config -f $PwshFramework @LibraryPublishProperties -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj -c $Config -f $PwshFramework @LibraryPublishProperties -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj -c $Config -f $PwshFramework @LibraryPublishProperties -o $ArtifactsDir
+dotnet publish $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config -f $PwshFramework @LibraryPublishProperties -o $ArtifactsDir
 
 Write-Host -ForegroundColor $Color "Pack the CLI tool as executable"
-dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -r win-x64 -p:PublishSingleFile=true -p:SelfContained=true -p:PublishTrimmed=true -p:TargetFrameworks="net9.0" -p:DebugType=none -p:GenerateDocumentationFile=false -p:EnableCompressionInSingleFile=true -p:InvariantGlobalization=true -o $PublishDir
+dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -r win-x64 @CliPublishProperties -o $PublishDir
 Move-Item $PublishDir/Genbox.FastData.Cli.exe $PublishDir/FastData-win.exe -Force
 
-dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -r linux-x64 -p:PublishSingleFile=true -p:SelfContained=true -p:PublishTrimmed=true -p:TargetFrameworks="net9.0" -p:DebugType=none -p:GenerateDocumentationFile=false -p:EnableCompressionInSingleFile=true -p:InvariantGlobalization=true -o $PublishDir
+dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -r linux-x64 @CliPublishProperties -o $PublishDir
 Move-Item $PublishDir/Genbox.FastData.Cli $PublishDir/FastData-lin -Force
 
-dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -r osx-x64 -p:PublishSingleFile=true -p:SelfContained=true -p:PublishTrimmed=true -p:TargetFrameworks="net9.0" -p:DebugType=none -p:GenerateDocumentationFile=false -p:EnableCompressionInSingleFile=true -p:InvariantGlobalization=true -o $PublishDir
+dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -r osx-x64 @CliPublishProperties -o $PublishDir
 Move-Item $PublishDir/Genbox.FastData.Cli $PublishDir/FastData-osx -Force
 
 Write-Host -ForegroundColor $Color "Pack the CLI tool as a dotnet tool (NuGet)"
-dotnet pack $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -p:ContinuousIntegrationBuild=true -p:PackAsTool=true -p:ToolCommandName=fastdata -p:PackageVersion=$semver -o $PublishDir
+dotnet pack $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config @PackCommonProperties -p:PackAsTool=true -p:ToolCommandName=fastdata -p:PackageVersion=$semver -o $PublishDir
 
 Write-Host -ForegroundColor $Color "Pack the source generator"
-dotnet pack $Root/Src/FastData.SourceGenerator/FastData.SourceGenerator.csproj -c $Config -p:ContinuousIntegrationBuild=true -p:PackageVersion=$semver -o $PublishDir
+dotnet pack $Root/Src/FastData.SourceGenerator/FastData.SourceGenerator.csproj -c $Config @PackCommonProperties -p:PackageVersion=$semver -o $PublishDir
 
 Write-Host -ForegroundColor $Color "Pack FastData as a library"
-dotnet pack $Root/Src/FastData/FastData.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
-dotnet pack $Root/Src/FastData.Generator/FastData.Generator.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
-dotnet pack $Root/Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
-dotnet pack $Root/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
-dotnet pack $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config -p:ContinuousIntegrationBuild=true -o $PublishDir
+dotnet pack $Root/Src/FastData/FastData.csproj -c $Config @PackCommonProperties -o $PublishDir
+dotnet pack $Root/Src/FastData.Generator/FastData.Generator.csproj -c $Config @PackCommonProperties -o $PublishDir
+dotnet pack $Root/Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj -c $Config @PackCommonProperties -o $PublishDir
+dotnet pack $Root/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj -c $Config @PackCommonProperties -o $PublishDir
+dotnet pack $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config @PackCommonProperties -o $PublishDir
 
 Write-Host -ForegroundColor $Color "Pack the PowerShell variant"
 New-Item -ItemType Directory -Path $PublishDir/Genbox.FastData | Out-Null

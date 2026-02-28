@@ -3,7 +3,7 @@
   <!--Default project info-->
   <PropertyGroup>
     <Authors>Ian Qvist</Authors>
-    <Copyright>Copyright 2025, by Ian Qvist. All rights reserved.</Copyright>
+    <Copyright>Copyright 2026, by Ian Qvist. All rights reserved.</Copyright>
   </PropertyGroup>
 
   <!--Default project settings-->
@@ -15,7 +15,7 @@
 
     <!--Assembly settings-->
     <RootNamespace>Genbox.$(MSBuildProjectName)</RootNamespace>
-    <AssemblyName>Genbox.$(MSBuildProjectName)</AssemblyName>
+    <AssemblyName Condition="'$(PackAssemblyName)' == 'true'">Genbox.$(MSBuildProjectName)</AssemblyName>
 
     <!--C# settings-->
     <LangVersion>latest</LangVersion>
