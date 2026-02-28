@@ -38,39 +38,39 @@
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0"
         }
       },
-      "Genbox.FastData": {
+      "fastdata": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.1, )"
         }
       },
-      "Genbox.FastData.Generator": {
+      "fastdata.generator": {
         "type": "Project",
         "dependencies": {
-          "Genbox.FastData": "[1.0.0, )"
+          "FastData": "[1.0.0, )"
         }
       },
-      "Genbox.FastData.Generator.Rust": {
+      "fastdata.generator.rust": {
         "type": "Project",
         "dependencies": {
-          "Genbox.FastData.Generator.Template": "[1.0.0, )"
+          "FastData.Generator.Template": "[1.0.0, )"
         }
       },
-      "Genbox.FastData.Generator.Rust.TestHarness": {
+      "fastdata.generator.rust.testharness": {
         "type": "Project",
         "dependencies": {
-          "Genbox.FastData.Generator.Rust": "[1.0.0, )",
-          "Genbox.FastData.InternalShared": "[1.0.0, )"
+          "FastData.Generator.Rust": "[1.0.0, )",
+          "FastData.InternalShared": "[1.0.0, )"
         }
       },
-      "Genbox.FastData.Generator.Template": {
+      "fastdata.generator.template": {
         "type": "Project",
         "dependencies": {
-          "Genbox.FastData.Generator": "[1.0.0, )",
+          "FastData.Generator": "[1.0.0, )",
           "Mono.TextTemplating": "[3.0.0, )"
         }
       },
-      "Genbox.FastData.InternalShared": {
+      "fastdata.internalshared": {
         "type": "Project",
         "dependencies": {
           "Microsoft.CodeAnalysis.CSharp": "[4.10.0, )",
