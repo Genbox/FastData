@@ -13,37 +13,53 @@ public abstract class OutputWriter<TKey> : IOutputWriter
 {
     private IEarlyExitDef _earlyExitDef = null!;
     private ILanguageDef _langDef = null!;
-    private GeneratorConfig<TKey> _generatorConfig = null!;
     private TypeMap _typeMap = null!;
 
     protected SharedCode Shared { get; private set; } = null!;
-    protected bool IgnoreCase => _generatorConfig.IgnoreCase;
-    protected GeneratorEncoding Encoding => _generatorConfig.Encoding;
+    public GeneratorConfigBase GeneratorConfig { get; private set; } = null!;
     protected string KeyTypeName { get; private set; } = null!;
     protected string ValueTypeName { get; private set; } = null!;
     protected string HashSource { get; private set; } = null!;
     public string HashSizeType => _typeMap.GetTypeName(typeof(ulong));
     public string ArraySizeType => _langDef.ArraySizeType;
-    protected string TrimPrefix => _generatorConfig.TrimPrefix;
-    protected string TrimSuffix => _generatorConfig.TrimSuffix;
-    protected int TotalTrimLength => TrimPrefix.Length + TrimSuffix.Length;
     public string InputKeyName => "key";
+
+    public string LookupKeyName
+    {
+        get
+        {
+            if (GeneratorConfig is StringGeneratorConfig stringConfig)
+                if (stringConfig.TrimPrefix.Length + stringConfig.TrimSuffix.Length != 0)
+                    return "trimmedKey";
+
+            return InputKeyName;
+        }
+    }
+
     protected static string TrimmedKeyName => "trimmedKey";
-    public string LookupKeyName => TotalTrimLength == 0 ? InputKeyName : TrimmedKeyName;
 
     public abstract string Generate();
 
     protected virtual string GetMethodHeader(MethodType methodType)
     {
-        return _earlyExitDef.GetEarlyExits<TKey>(_generatorConfig.EarlyExits, methodType, _generatorConfig.IgnoreCase, _generatorConfig.Encoding, Shared);
+        bool ignoreCase = false;
+        GeneratorEncoding encoding = GeneratorEncoding.Unknown;
+
+        if (GeneratorConfig is StringGeneratorConfig stringConfig)
+        {
+            ignoreCase = stringConfig.IgnoreCase;
+            encoding = stringConfig.Encoding;
+        }
+
+        return _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType, ignoreCase, encoding, Shared);
     }
 
-    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, ExpressionCompiler? compiler, SharedCode shared)
+    internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfigBase genCfg, string keyTypeName, string valueTypeName, ExpressionCompiler? compiler, SharedCode shared)
     {
         _langDef = langDef;
         _earlyExitDef = earlyExitDef;
         _typeMap = map;
-        _generatorConfig = genCfg;
+        GeneratorConfig = genCfg;
         Shared = shared;
         KeyTypeName = keyTypeName;
         ValueTypeName = valueTypeName;
@@ -51,11 +67,11 @@ public abstract class OutputWriter<TKey> : IOutputWriter
         //If there is no compiler, or there is no specialized string hash, we give null to the hash definition
         StringHashInfo? stringHash = null;
 
-        if (_generatorConfig.HashDetails.StringHash != null && compiler != null)
+        if (GeneratorConfig.HashDetails.StringHash != null && compiler != null)
         {
             //We convert state from State to StateInfo such that consumers can use it directly
             StateInfo[]? genState = null;
-            State[]? fdState = _generatorConfig.HashDetails.StringHash.State;
+            State[]? fdState = GeneratorConfig.HashDetails.StringHash.State;
 
             if (fdState != null)
             {
@@ -69,10 +85,10 @@ public abstract class OutputWriter<TKey> : IOutputWriter
                 }
             }
 
-            stringHash = new StringHashInfo(compiler.GetCode(_generatorConfig.HashDetails.StringHash.Expression), _generatorConfig.HashDetails.StringHash.Functions, genState);
+            stringHash = new StringHashInfo(compiler.GetCode(GeneratorConfig.HashDetails.StringHash.Expression), GeneratorConfig.HashDetails.StringHash.Functions, genState);
         }
 
-        HashInfo hashInfo = new HashInfo(_generatorConfig.HashDetails.HasZeroOrNaN, stringHash);
+        HashInfo hashInfo = new HashInfo(GeneratorConfig.HashDetails.HasZeroOrNaN, stringHash);
         HashSource = hashDef.GetHashSource(typeof(TKey), KeyTypeName, hashInfo);
         RegisterSharedCode();
     }
@@ -85,14 +101,14 @@ public abstract class OutputWriter<TKey> : IOutputWriter
         return GetEqualFunctionInternal(value1, value2, keyTypeOverride);
     }
 
-    protected virtual string GetEqualFunctionInternal(string value1, string value2, TypeCode keyType) => $"{value1} == {value2}";
+    protected virtual string GetEqualFunctionInternal(string value1, string value2, TypeCode overrideType) => $"{value1} == {value2}";
 
     protected virtual string GetModFunction(string variable, ulong value) => $"{variable} % {value}";
 
     protected string ToValueLabel<T>(T value) => _typeMap.ToValueLabel(value); //Uses its own generics here, not TKey. We need T so we can change the type in generators
     protected string GetObjectDeclarations<TValue>() => typeof(TValue).IsPrimitive ? "" : _typeMap.GetDeclarations<TValue>(); //We don't have declarations for primitives
-    protected string GetSmallestSignedType(long value) => _generatorConfig.TypeReductionEnabled ? _typeMap.GetSmallestIntType(value) : _typeMap.Get<int>().Name;
-    protected string GetSmallestUnsignedType(long value) => _generatorConfig.TypeReductionEnabled ? _typeMap.GetSmallestUIntType((ulong)value) : _typeMap.Get<uint>().Name;
+    protected string GetSmallestSignedType(long value) => GeneratorConfig.TypeReductionEnabled ? _typeMap.GetSmallestIntType(value) : _typeMap.Get<int>().Name;
+    protected string GetSmallestUnsignedType(long value) => GeneratorConfig.TypeReductionEnabled ? _typeMap.GetSmallestUIntType((ulong)value) : _typeMap.Get<uint>().Name;
 
     private static IEnumerable<string> GetValues(Array array, TypeMap map, Type type)
     {

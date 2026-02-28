@@ -29,16 +29,16 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
     public override GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
 
-    public override string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
+    public override string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
     {
         //C++ generator does not support chars outside ASCII
-        if (typeof(TKey) == typeof(char) && (char)(object)genCfg.Constants.MaxValue > 127)
+        if (genCfg is NumericGeneratorConfig<char> cfg && cfg.Constants.MaxValue > 127)
             throw new InvalidOperationException("C++ generator does not support chars outside ASCII. Please use a different data type or reduce the max value to 127 or lower.");
 
         return base.Generate<TKey, TValue>(genCfg, context);
     }
 
-    protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext context)
+    protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfigBase genCfg, IContext context)
     {
         base.AppendHeader<TKey, TValue>(sb, genCfg, context);
 
@@ -53,7 +53,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                       """);
     }
 
-    protected override void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext context)
+    protected override void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfigBase genCfg, string keyTypeName, string valueTypeName, IContext context)
     {
         sb.AppendLine($$"""
                         class {{_cfg.ClassName}} final {
@@ -62,13 +62,13 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         base.AppendBody<TKey, TValue>(sb, genCfg, keyTypeName, valueTypeName, context);
     }
 
-    protected override void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)
+    protected override void AppendFooter<T>(StringBuilder sb, GeneratorConfigBase genCfg, string typeName)
     {
-        base.AppendFooter(sb, genCfg, typeName);
+        base.AppendFooter<T>(sb, genCfg, typeName);
         sb.Append("};");
     }
 
-    protected override OutputWriter<TKey> GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context) => new TemplateBasedOutputWriter<TKey, TValue>(context);
+    protected override OutputWriter<TKey> GetOutputWriter<TKey, TValue>(GeneratorConfigBase genCfg, IContext context) => new TemplateBasedOutputWriter<TKey, TValue>(context);
 
     private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context) : OutputWriter<TKey>
     {
@@ -255,13 +255,8 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
         private string GetCompareFunction(string var1, string var2)
         {
-            if (typeof(TKey) == typeof(string))
-            {
-                if (IgnoreCase)
-                    return $"case_insensitive_compare({var1}, {var2})";
-
-                return $"{var1}.compare({var2})";
-            }
+            if (GeneratorConfig is StringGeneratorConfig strCfg)
+                return strCfg.IgnoreCase ? $"case_insensitive_compare({var1}, {var2})" : $"{var1}.compare({var2})";
 
             return $"{var1} < {var2} ? -1 : ({var1} > {var2} ? 1 : 0)";
         }
@@ -271,15 +266,15 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
             StringBuilder sb = new StringBuilder();
             sb.Append(base.GetMethodHeader(methodType));
 
-            if (TotalTrimLength != 0)
-                sb.Append($"    const auto {TrimmedKeyName} = {InputKeyName}.substr({TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.length() - {TotalTrimLength.ToStringInvariant()});");
+            if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
+                sb.Append($"    const auto {TrimmedKeyName} = {InputKeyName}.substr({strCfg.TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.length() - {strCfg.TotalTrimLength.ToStringInvariant()});");
 
             return sb.ToString();
         }
 
-        protected override string GetEqualFunctionInternal(string value1, string value2, TypeCode keyType)
+        protected override string GetEqualFunctionInternal(string value1, string value2, TypeCode overrideType)
         {
-            if (keyType == TypeCode.String && IgnoreCase)
+            if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.IgnoreCase)
                 return $"case_insensitive_equals({value1}, {value2})";
 
             return $"{value1} == {value2}";
@@ -287,15 +282,15 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
         protected override void RegisterSharedCode()
         {
-            if (typeof(TKey) != typeof(string) || !IgnoreCase)
+            if (GeneratorConfig is not StringGeneratorConfig strCfg || !strCfg.IgnoreCase)
                 return;
 
-            string helpers = Encoding switch
+            string helpers = strCfg.Encoding switch
             {
                 GeneratorEncoding.UTF16 => GetUtf16CaseInsensitiveHelpers(),
                 GeneratorEncoding.UTF32 => GetUtf32CaseInsensitiveHelpers(),
                 GeneratorEncoding.UTF8 or GeneratorEncoding.ASCII => GetAsciiCaseInsensitiveHelpers(),
-                _ => throw new InvalidOperationException($"Unsupported encoding: {Encoding}")
+                _ => throw new InvalidOperationException($"Unsupported encoding: {strCfg.Encoding}")
             };
 
             Shared.Add(CodePlacement.Before, helpers);

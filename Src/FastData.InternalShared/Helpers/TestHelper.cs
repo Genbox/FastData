@@ -274,17 +274,17 @@ public static class TestHelper
     {
         TContext context = structure.Create(state.Keys, state.Values);
 
-        GeneratorConfig<TKey> genCfg;
+        GeneratorConfigBase genCfg;
         HashDetails hashDetails = new HashDetails();
 
         if (state.KeyProperties is StringKeyProperties stringProps)
         {
-            genCfg = new GeneratorConfig<TKey>(state.Vector.Type, (uint)state.Keys.Length, stringProps, hashDetails, state.Generator.Encoding, state.TrimPrefix, state.TrimSuffix, state.Config);
+            genCfg = new StringGeneratorConfig(state.Vector.Type, (uint)state.Keys.Length, stringProps, hashDetails, state.Generator.Encoding, state.TrimPrefix, state.TrimSuffix, state.Config);
         }
         else if (state.KeyProperties is NumericKeyProperties<TKey> valueProps)
         {
             hashDetails.HasZeroOrNaN = valueProps.HasZeroOrNaN;
-            genCfg = new GeneratorConfig<TKey>(state.Vector.Type, (uint)state.Keys.Length, valueProps, hashDetails, state.Config);
+            genCfg = new NumericGeneratorConfig<TKey>(state.Vector.Type, (uint)state.Keys.Length, valueProps, hashDetails, state.Config);
         }
         else
             throw new InvalidOperationException("Bug");

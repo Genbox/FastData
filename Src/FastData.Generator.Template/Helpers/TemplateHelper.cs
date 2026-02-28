@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Helpers;
+using Genbox.FastData.Generators;
 using Microsoft.VisualStudio.TextTemplating;
 using Mono.TextTemplating;
 

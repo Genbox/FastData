@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
+using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
 

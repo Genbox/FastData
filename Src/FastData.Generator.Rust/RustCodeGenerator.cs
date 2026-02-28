@@ -29,7 +29,7 @@ public sealed class RustCodeGenerator : CodeGenerator
 
     public override GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
 
-    protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext context)
+    protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfigBase genCfg, IContext context)
     {
         base.AppendHeader<TKey, TValue>(sb, genCfg, context);
 
@@ -45,7 +45,7 @@ public sealed class RustCodeGenerator : CodeGenerator
                    """);
     }
 
-    protected override void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext context)
+    protected override void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfigBase genCfg, string keyTypeName, string valueTypeName, IContext context)
     {
         sb.Append($$"""
 
@@ -56,14 +56,14 @@ public sealed class RustCodeGenerator : CodeGenerator
         base.AppendBody<TKey, TValue>(sb, genCfg, keyTypeName, valueTypeName, context);
     }
 
-    protected override void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)
+    protected override void AppendFooter<T>(StringBuilder sb, GeneratorConfigBase genCfg, string typeName)
     {
-        base.AppendFooter(sb, genCfg, typeName);
+        base.AppendFooter<T>(sb, genCfg, typeName);
 
         sb.Append('}');
     }
 
-    protected override OutputWriter<TKey> GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context) => new TemplateBasedOutputWriter<TKey, TValue>(context);
+    protected override OutputWriter<TKey> GetOutputWriter<TKey, TValue>(GeneratorConfigBase genCfg, IContext context) => new TemplateBasedOutputWriter<TKey, TValue>(context);
 
     private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context) : OutputWriter<TKey>
     {
@@ -249,7 +249,7 @@ public sealed class RustCodeGenerator : CodeGenerator
 
         private string GetCompareFunction(string var1, string var2)
         {
-            if (typeof(TKey) == typeof(string) && IgnoreCase)
+            if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.IgnoreCase)
                 return $"case_insensitive_compare({var1}, {var2})";
 
             return $"if {var1} < {var2} {{ -1 }} else if {var1} > {var2} {{ 1 }} else {{ 0 }}";
@@ -260,15 +260,15 @@ public sealed class RustCodeGenerator : CodeGenerator
             StringBuilder sb = new StringBuilder();
             sb.Append(base.GetMethodHeader(methodType));
 
-            if (TotalTrimLength != 0)
-                sb.Append($"    let {TrimmedKeyName} = &{InputKeyName}[{TrimPrefix.Length.ToStringInvariant()}..{InputKeyName}.len() - {TrimSuffix.Length.ToStringInvariant()}];");
+            if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
+                sb.Append($"    let {TrimmedKeyName} = &{InputKeyName}[{strCfg.TrimPrefix.Length.ToStringInvariant()}..{InputKeyName}.len() - {strCfg.TrimSuffix.Length.ToStringInvariant()}];");
 
             return sb.ToString();
         }
 
-        protected override string GetEqualFunctionInternal(string value1, string value2, TypeCode keyType)
+        protected override string GetEqualFunctionInternal(string value1, string value2, TypeCode overrideType)
         {
-            if (keyType == TypeCode.String && IgnoreCase)
+            if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.IgnoreCase)
                 return $"case_insensitive_equals({value1}, {value2})";
 
             return $"{value1} == {value2}";
@@ -276,7 +276,7 @@ public sealed class RustCodeGenerator : CodeGenerator
 
         protected override void RegisterSharedCode()
         {
-            if (typeof(TKey) != typeof(string) || !IgnoreCase)
+            if (GeneratorConfig is not StringGeneratorConfig strCfg || !strCfg.IgnoreCase)
                 return;
 
             Shared.Add(CodePlacement.Before, """

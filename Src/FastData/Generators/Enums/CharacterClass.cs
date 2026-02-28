@@ -1,4 +1,4 @@
-namespace Genbox.FastData.Generators;
+namespace Genbox.FastData.Generators.Enums;
 
 [Flags]
 public enum CharacterClass : byte

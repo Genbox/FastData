@@ -16,7 +16,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 
     public abstract GeneratorEncoding Encoding { get; }
 
-    public virtual string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
+    public virtual string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
     {
         Shared.Clear();
 
@@ -32,7 +32,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         AppendBody<TKey, TValue>(body, genCfg, keyTypeName, valueTypeName, context);
 
         StringBuilder footer = new StringBuilder();
-        AppendFooter(footer, genCfg, keyTypeName);
+        AppendFooter<TKey>(footer, genCfg, keyTypeName);
 
         foreach (string code in Shared.GetType(CodePlacement.After))
             footer.AppendLine(code);
@@ -48,9 +48,9 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         return final.ToString();
     }
 
-    protected abstract OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context);
+    protected abstract OutputWriter<TKey>? GetOutputWriter<TKey, TValue>(GeneratorConfigBase genCfg, IContext context);
 
-    protected virtual void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, IContext context)
+    protected virtual void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfigBase genCfg, IContext context)
     {
         sb.Append(constDef.Comment).Append(' ').AppendLine("This file is auto-generated. Do not edit manually.");
         sb.Append(constDef.Comment).Append(' ').AppendLine($"Structure: {genCfg.StructureType.GetCleanName().Replace("Structure", "")}");
@@ -61,7 +61,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 #endif
     }
 
-    protected virtual void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfig<TKey> genCfg, string keyTypeName, string valueTypeName, IContext context)
+    protected virtual void AppendBody<TKey, TValue>(StringBuilder sb, GeneratorConfigBase genCfg, string keyTypeName, string valueTypeName, IContext context)
     {
         OutputWriter<TKey>? writer = GetOutputWriter<TKey, TValue>(genCfg, context);
 
@@ -145,24 +145,22 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
         }
     }
 
-    protected virtual void AppendFooter<T>(StringBuilder sb, GeneratorConfig<T> genCfg, string typeName)
+    protected virtual void AppendFooter<T>(StringBuilder sb, GeneratorConfigBase genCfg, string typeName)
     {
         sb.AppendLine();
         sb.AppendLine();
-        sb.AppendLine(constDef.ItemCountTemplate(langDef.ArraySizeType, genCfg.Constants.ItemCount.ToStringInvariant()));
+        sb.AppendLine(constDef.ItemCountTemplate(langDef.ArraySizeType, genCfg.ItemCount.ToStringInvariant()));
 
-        Type keyType = typeof(T);
-
-        if (keyType.IsNumeric())
+        if (genCfg is NumericGeneratorConfig<T> numericCfg)
         {
-            sb.AppendLine(constDef.MinValueTemplate(typeName, map.ToValueLabel(genCfg.Constants.MinValue)));
-            sb.AppendLine(constDef.MaxValueTemplate(typeName, map.ToValueLabel(genCfg.Constants.MaxValue)));
+            sb.AppendLine(constDef.MinValueTemplate(typeName, map.ToValueLabel(numericCfg.Constants.MinValue)));
+            sb.AppendLine(constDef.MaxValueTemplate(typeName, map.ToValueLabel(numericCfg.Constants.MaxValue)));
         }
-        else if (Type.GetTypeCode(keyType) == TypeCode.String)
+        else if (genCfg is StringGeneratorConfig stringCfg)
         {
-            sb.AppendLine(constDef.MinLengthTemplate(langDef.ArraySizeType, genCfg.Constants.MinStringLength.ToStringInvariant()));
-            sb.AppendLine(constDef.MaxLengthTemplate(langDef.ArraySizeType, genCfg.Constants.MaxStringLength.ToStringInvariant()));
-            sb.AppendLine(constDef.CharacterClassesTemplate(genCfg.Constants.CharacterClasses));
+            sb.AppendLine(constDef.MinLengthTemplate(langDef.ArraySizeType, stringCfg.Constants.MinStringLength.ToStringInvariant()));
+            sb.AppendLine(constDef.MaxLengthTemplate(langDef.ArraySizeType, stringCfg.Constants.MaxStringLength.ToStringInvariant()));
+            sb.AppendLine(constDef.CharacterClassesTemplate(stringCfg.Constants.CharacterClasses));
         }
     }
 }

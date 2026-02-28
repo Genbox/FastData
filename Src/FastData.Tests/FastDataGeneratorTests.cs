@@ -371,7 +371,7 @@ public class FastDataGeneratorTests
 
         public IContext? Context { get; private set; }
 
-        public string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
+        public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
         {
             Context = context;
             return string.Empty;
@@ -385,10 +385,11 @@ public class FastDataGeneratorTests
         public string TrimPrefix { get; private set; } = string.Empty;
         public string TrimSuffix { get; private set; } = string.Empty;
 
-        public string Generate<TKey, TValue>(GeneratorConfig<TKey> genCfg, IContext context)
+        public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
         {
-            TrimPrefix = genCfg.TrimPrefix;
-            TrimSuffix = genCfg.TrimSuffix;
+            StringGeneratorConfig stringCfg = (StringGeneratorConfig)genCfg;
+            TrimPrefix = stringCfg.TrimPrefix;
+            TrimSuffix = stringCfg.TrimSuffix;
             return string.Empty;
         }
     }
