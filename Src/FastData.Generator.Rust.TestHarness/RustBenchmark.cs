@@ -23,7 +23,7 @@ public sealed class RustBenchmark : BenchmarkBase<RustBootstrap>
                       edition = "2024"
 
                       [dev-dependencies]
-                      criterion = "0.8.1"
+                      criterion = "0.8.2"
 
                       """);
 
