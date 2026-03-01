@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="../../Imports/Library.props" />
-  
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
@@ -10,15 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\FastData.Generator.CPlusPlus\FastData.Generator.CPlusPlus.csproj" />
     <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Resources\*" />
-    <EmbeddedResource Include="Resources\*" />
-    <None Include="Resources\benchmark-lin.lib.gz" />
-    <None Include="Resources\benchmark-win.lib.gz" />
-    <None Include="Resources\benchmark.h.gz" />
-    <None Include="Resources\export.h.gz" />
   </ItemGroup>
 
 </Project>

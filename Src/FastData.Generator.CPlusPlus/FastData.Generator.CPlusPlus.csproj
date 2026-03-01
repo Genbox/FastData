@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Templates\**\*.t4">
+    <None Include="Templates\*.t4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>Templates\CPlusPlus\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+      <TargetPath>Templates\CPlusPlus\%(Filename)%(Extension)</TargetPath>
     </None>
   </ItemGroup>
 

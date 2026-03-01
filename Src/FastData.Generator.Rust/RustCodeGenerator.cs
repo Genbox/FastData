@@ -127,7 +127,7 @@ public sealed class RustCodeGenerator : CodeGenerator
                         ValueCount = bsCtx.Values.Length
                     };
 
-                case InterpolatedBinarySearchContext<TKey, TValue> ibsCtx:
+                case BinarySearchInterpolationContext<TKey, TValue> ibsCtx:
                     return new BinarySearchTemplateData
                     {
                         Keys = ibsCtx.Keys.ToObjects(),

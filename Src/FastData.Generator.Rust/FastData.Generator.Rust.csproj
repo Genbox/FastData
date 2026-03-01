@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Templates\**\*.t4">
+    <None Include="Templates\*.t4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>Templates\Rust\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+      <TargetPath>Templates\Rust\%(Filename)%(Extension)</TargetPath>
     </None>
   </ItemGroup>
 

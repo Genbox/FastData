@@ -13,7 +13,7 @@ public sealed class SharedCode
         if (string.IsNullOrWhiteSpace(value)) //Don't add empty strings
             return;
 
-        var key = (type, value);
+        (CodePlacement type, string value) key = (type, value);
 
         if (!_cache.Add(key))
             throw new InvalidOperationException("This code snippet already exists");

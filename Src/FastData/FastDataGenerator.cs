@@ -275,7 +275,7 @@ public static partial class FastDataGenerator
                 return GenerateWrapper(tempState, new ConditionalStructure<TKey, TValue>());
             case StructureType.BinarySearch:
                 if (IsWellDistributed(keys.Span, props, fdCfg.MaxHistogramBuckets))
-                    return GenerateWrapper(tempState, new InterpolatedBinarySearchStructure<TKey, TValue>(sorted));
+                    return GenerateWrapper(tempState, new BinarySearchInterpolationStructure<TKey, TValue>(sorted));
 
                 return GenerateWrapper(tempState, new BinarySearchStructure<TKey, TValue>(fdCfg.IgnoreCase, sorted));
             case StructureType.HashTable:

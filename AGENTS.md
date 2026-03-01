@@ -38,10 +38,11 @@
 - Run a single test class: `dotnet test Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter "FullyQualifiedName~Namespace.ClassName"`.
 - Optional analyzers (lint-like): `dotnet build FastData.slnx -c Debug -p:RunAnalyzersDuringBuild=true`.
 - Run benchmarks: `dotnet run -c Release --project Src/FastData.Benchmarks/FastData.Benchmarks.csproj`.
-- Other benchmark projects:
-  - `dotnet run -c Release --project Src/FastData.Generator.CSharp.Benchmarks/FastData.Generator.CSharp.Benchmarks.csproj`
-  - `dotnet run -c Release --project Src/FastData.Generator.CPlusPlus.Benchmarks/FastData.Generator.CPlusPlus.Benchmarks.csproj`
-  - `dotnet run -c Release --project Src/FastData.Generator.Rust.Benchmarks/FastData.Generator.Rust.Benchmarks.csproj`
+- Generator benchmark harness:
+  - `dotnet run -c Release --project Src/FastData.BenchmarkHarness.Runner/FastData.BenchmarkHarness.Runner.csproj`
+  - `dotnet run -c Release --project Src/FastData.BenchmarkHarness.Runner/FastData.BenchmarkHarness.Runner.csproj CSharp`
+  - `dotnet run -c Release --project Src/FastData.BenchmarkHarness.Runner/FastData.BenchmarkHarness.Runner.csproj CPlusPlus`
+  - `dotnet run -c Release --project Src/FastData.BenchmarkHarness.Runner/FastData.BenchmarkHarness.Runner.csproj Rust`
 - Run a specific benchmark (BenchmarkDotNet): `dotnet run -c Release --project Src/FastData.Benchmarks/FastData.Benchmarks.csproj -- --filter "*Hash*"`.
 
 ## Common Test Examples

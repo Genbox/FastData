@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography;
 using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
@@ -16,26 +13,9 @@ using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.InternalShared.Helpers;
 
-public sealed record ProcessResult(int ExitCode, string StandardOutput, string StandardError);
-
 public static class TestHelper
 {
     private const string _alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private static readonly Encoding _utf8NoBom = new UTF8Encoding(false);
-
-    public static void CreateOrEmptyDirectory(string path)
-    {
-        if (Directory.Exists(path))
-        {
-            foreach (string file in Directory.EnumerateFiles(path))
-                File.Delete(file);
-
-            foreach (string dir in Directory.EnumerateDirectories(path))
-                Directory.Delete(dir, recursive: true);
-        }
-
-        Directory.CreateDirectory(path);
-    }
 
     public static string GenerateRandomString(Random rng, int length)
     {
@@ -47,95 +27,6 @@ public static class TestHelper
         }
 
         return new string(data);
-    }
-
-    public static bool TryRunProcess(string application, string args)
-    {
-        try
-        {
-            return RunProcess(application, args).ExitCode == 0;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    [SuppressMessage("Usage", "MA0040:Forward the CancellationToken parameter to methods that take one")]
-    public static ProcessResult RunProcess(string application, string? args = null, string? workingDir = null, int timeoutMs = 5000)
-    {
-        using Process process = new Process();
-        process.StartInfo = new ProcessStartInfo
-        {
-            FileName = application,
-            Arguments = args,
-            CreateNoWindow = true,
-            UseShellExecute = false,
-            WorkingDirectory = workingDir,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true
-        };
-
-        process.Start();
-
-        Task<string> stdOutTask = process.StandardOutput.ReadToEndAsync();
-        Task<string> stdErrTask = process.StandardError.ReadToEndAsync();
-
-        bool exited = process.WaitForExit(timeoutMs);
-
-        if (!exited)
-        {
-            try
-            {
-                process.Kill(entireProcessTree: true);
-            }
-            catch
-            {
-                // Ignore - best effort.
-            }
-
-            try
-            {
-                process.WaitForExit(1000);
-            }
-            catch
-            {
-                // Ignore - best effort.
-            }
-        }
-
-        string stdOut = "";
-        string stdErr = "";
-
-        try { stdOut = stdOutTask.GetAwaiter().GetResult(); }
-        catch
-        {
-            /* best effort */
-        }
-        try { stdErr = stdErrTask.GetAwaiter().GetResult(); }
-        catch
-        {
-            /* best effort */
-        }
-
-        return new ProcessResult(process.ExitCode, stdOut, stdErr);
-    }
-
-    /// <summary>This function is here to help avoid write-fatigue</summary>
-    /// <returns>True if the file was written, false if it was skipped due to identical content</returns>
-    public static bool TryWriteFile(string path, string content)
-    {
-        if (File.Exists(path))
-        {
-            byte[] oldHash = SHA1.HashData(File.ReadAllBytes(path));
-            byte[] newHash = SHA1.HashData(_utf8NoBom.GetBytes(content));
-
-            if (oldHash.SequenceEqual(newHash))
-                return false;
-        }
-
-        File.WriteAllText(path, content, _utf8NoBom);
-        return true;
     }
 
     public static GeneratorSpec Generate<TKey>(Func<string, ICodeGenerator> func, TestVector<TKey> vector) => GenerateInternal(func, vector, ReadOnlyMemory<byte>.Empty);
@@ -223,8 +114,8 @@ public static class TestHelper
             return Generate(state, new ConditionalStructure<TKey, TValue>());
         if (vector.Type == typeof(BinarySearchStructure<,>))
             return Generate(state, new BinarySearchStructure<TKey, TValue>(config.IgnoreCase));
-        if (vector.Type == typeof(InterpolatedBinarySearchStructure<,>))
-            return Generate(state, new InterpolatedBinarySearchStructure<TKey, TValue>());
+        if (vector.Type == typeof(BinarySearchInterpolationStructure<,>))
+            return Generate(state, new BinarySearchInterpolationStructure<TKey, TValue>());
         if (vector.Type == typeof(HashTableStructure<,>))
             return Generate(state, new HashTableStructure<TKey, TValue>(GetHashData(keySpan, generator.Encoding)));
         if (vector.Type == typeof(HashTablePerfectStructure<,>))

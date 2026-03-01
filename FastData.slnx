@@ -1,97 +1,93 @@
 <Solution>
-  <Configurations>
-    <Platform Name="Any CPU" />
-    <Platform Name="x64" />
-    <Platform Name="x86" />
-  </Configurations>
-  <Folder Name="/Cli/">
-    <Project Path="Src/FastData.Cli.Tests/FastData.Cli.Tests.csproj" />
-    <Project Path="Src/FastData.Cli/FastData.Cli.csproj" />
-  </Folder>
-  <Folder Name="/Cli/PowerShell/">
-    <File Path="Misc/PowerShell/FastData.psd1" />
-    <File Path="Misc/PowerShell/FastData.psm1" />
-  </Folder>
-  <Folder Name="/Generators/">
-    <Project Path="Src/FastData.Generator.CPlusPlus.Benchmarks/FastData.Generator.CPlusPlus.Benchmarks.csproj" />
-    <Project Path="Src/FastData.Generator.CPlusPlus.TestHarness/FastData.Generator.CPlusPlus.TestHarness.csproj" />
-    <Project Path="Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj" />
-    <Project Path="Src/FastData.Generator.CSharp.Benchmarks/FastData.Generator.CSharp.Benchmarks.csproj" />
-    <Project Path="Src/FastData.Generator.CSharp.TestHarness/FastData.Generator.CSharp.TestHarness.csproj" />
-    <Project Path="Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj" />
-    <Project Path="Src/FastData.Generator.Rust.Benchmarks/FastData.Generator.Rust.Benchmarks.csproj" />
-    <Project Path="Src/FastData.Generator.Rust.TestHarness/FastData.Generator.Rust.TestHarness.csproj" />
-    <Project Path="Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj" />
-    <Project Path="Src/FastData.Generator.Template/FastData.Generator.Template.csproj" />
-    <Project Path="Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj" />
-    <Project Path="Src/FastData.Generator/FastData.Generator.csproj" />
-  </Folder>
-  <Folder Name="/SourceGenerator/">
-    <Project Path="Src/FastData.SourceGenerator.Attributes/FastData.SourceGenerator.Attributes.csproj" />
-    <Project Path="Src/FastData.SourceGenerator.Examples/FastData.SourceGenerator.Examples.csproj" />
-    <Project Path="Src/FastData.SourceGenerator.Tests/FastData.SourceGenerator.Tests.csproj" />
-    <Project Path="Src/FastData.SourceGenerator/FastData.SourceGenerator.csproj" />
-  </Folder>
-  <Folder Name="/_Docs/">
-    <File Path="AGENTS.md" />
-    <File Path="Docs/DataStructures.md" />
-    <File Path="Docs/HowWork.md" />
-    <File Path="Docs/Optimizations.md" />
-    <File Path="README.md" />
-  </Folder>
-  <Folder Name="/_Github/">
-    <File Path=".github/FUNDING.yml" />
-  </Folder>
-  <Folder Name="/_Github/IssueTemplates/">
-    <File Path=".github/ISSUE_TEMPLATE/bug_report.md" />
-    <File Path=".github/ISSUE_TEMPLATE/feature_request.md" />
-  </Folder>
-  <Folder Name="/_Github/Workflows/">
-    <File Path=".github/workflows/generic-build.yml" />
-    <File Path=".github/workflows/nuget-release.yml" />
-  </Folder>
-  <Folder Name="/_Imports/" />
-  <Folder Name="/_Imports/Local/">
-    <File Path="Locals/Benchmarks.props" />
-    <File Path="Locals/Directory.Build.props" />
-    <File Path="Locals/Directory.Packages.props" />
-    <File Path="Locals/Library.props" />
-    <File Path="Locals/Tests.props" />
-  </Folder>
-  <Folder Name="/_Imports/Managed/">
-    <File Path="Src/Directory.Build.props" />
-    <File Path="Src/Directory.Build.targets" />
-  </Folder>
-  <Folder Name="/_Imports/Managed/Packages/">
-    <File Path="Src/Directory.Packages.Analyzers.props" />
-    <File Path="Src/Directory.Packages.props" />
-  </Folder>
-  <Folder Name="/_Imports/Managed/Project/">
-    <File Path="Imports/Benchmarks.props" />
-    <File Path="Imports/Console.props" />
-    <File Path="Imports/Examples.props" />
-    <File Path="Imports/Library.props" />
-    <File Path="Imports/Tests.props" />
-  </Folder>
-  <Folder Name="/_Items/">
-    <File Path=".editorconfig" />
-    <File Path=".gitattributes" />
-    <File Path=".gitignore" />
-    <File Path=".globalconfig" />
-    <File Path="LICENSE.txt" />
-  </Folder>
-  <Folder Name="/_Scripts/">
-    <File Path="Scripts/Build.ps1" />
-    <File Path="Scripts/Install-Gcc.ps1" />
-    <File Path="Scripts/Install-Rust.ps1" />
-    <File Path="Scripts/Publish.ps1" />
-  </Folder>
-  <Project Path="Src/FastData.Benchmarks/FastData.Benchmarks.csproj" />
-  <Project Path="Src/FastData.Demo/FastData.Demo.csproj" />
-  <Project Path="Src/FastData.Examples/FastData.Examples.csproj" />
-  <Project Path="Src/FastData.InternalShared/FastData.InternalShared.csproj" />
-  <Project Path="Src/FastData.Testbed/FastData.Testbed.csproj" />
-  <Project Path="Src/FastData.TestHarness.Runner/FastData.TestHarness.Runner.csproj" />
-  <Project Path="Src/FastData.Tests/FastData.Tests.csproj" />
-  <Project Path="Src/FastData/FastData.csproj" />
+    <Configurations>
+        <Platform Name="Any CPU" />
+        <Platform Name="x64" />
+        <Platform Name="x86" />
+    </Configurations>
+    <Folder Name="/Cli/">
+        <Project Path="Src/FastData.Cli.Tests/FastData.Cli.Tests.csproj" />
+        <Project Path="Src/FastData.Cli/FastData.Cli.csproj" />
+    </Folder>
+    <Folder Name="/Cli/PowerShell/">
+        <File Path="Misc/PowerShell/FastData.psd1" />
+        <File Path="Misc/PowerShell/FastData.psm1" />
+    </Folder>
+    <Folder Name="/Generators/">
+        <Project Path="Src/FastData.Generator.CPlusPlus.TestHarness/FastData.Generator.CPlusPlus.TestHarness.csproj" />
+        <Project Path="Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj" />
+        <Project Path="Src/FastData.Generator.CSharp.TestHarness/FastData.Generator.CSharp.TestHarness.csproj" />
+        <Project Path="Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj" />
+        <Project Path="Src/FastData.Generator.Rust.TestHarness/FastData.Generator.Rust.TestHarness.csproj" />
+        <Project Path="Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj" />
+        <Project Path="Src/FastData.Generator.Template/FastData.Generator.Template.csproj" />
+        <Project Path="Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj" />
+        <Project Path="Src/FastData.Generator/FastData.Generator.csproj" />
+    </Folder>
+    <Folder Name="/SourceGenerator/">
+        <Project Path="Src/FastData.SourceGenerator.Attributes/FastData.SourceGenerator.Attributes.csproj" />
+        <Project Path="Src/FastData.SourceGenerator.Examples/FastData.SourceGenerator.Examples.csproj" />
+        <Project Path="Src/FastData.SourceGenerator.Tests/FastData.SourceGenerator.Tests.csproj" />
+        <Project Path="Src/FastData.SourceGenerator/FastData.SourceGenerator.csproj" />
+    </Folder>
+    <Folder Name="/_Docs/">
+        <File Path="AGENTS.md" />
+        <File Path="Docs/DataStructures.md" />
+        <File Path="Docs/HowWork.md" />
+        <File Path="Docs/Optimizations.md" />
+        <File Path="README.md" />
+    </Folder>
+    <Folder Name="/_Github/">
+        <File Path=".github/FUNDING.yml" />
+    </Folder>
+    <Folder Name="/_Github/IssueTemplates/">
+        <File Path=".github/ISSUE_TEMPLATE/bug_report.md" />
+        <File Path=".github/ISSUE_TEMPLATE/feature_request.md" />
+    </Folder>
+    <Folder Name="/_Github/Workflows/">
+        <File Path=".github/workflows/generic-build.yml" />
+        <File Path=".github/workflows/nuget-release.yml" />
+    </Folder>
+    <Folder Name="/_Imports/" />
+    <Folder Name="/_Imports/Local/">
+        <File Path="Locals/Benchmarks.props" />
+        <File Path="Locals/Directory.Build.props" />
+        <File Path="Locals/Directory.Packages.props" />
+        <File Path="Locals/Library.props" />
+        <File Path="Locals/Tests.props" />
+    </Folder>
+    <Folder Name="/_Imports/Managed/">
+        <File Path="Src/Directory.Build.props" />
+        <File Path="Src/Directory.Build.targets" />
+    </Folder>
+    <Folder Name="/_Imports/Managed/Packages/">
+        <File Path="Src/Directory.Packages.Analyzers.props" />
+        <File Path="Src/Directory.Packages.props" />
+    </Folder>
+    <Folder Name="/_Imports/Managed/Project/">
+        <File Path="Imports/Benchmarks.props" />
+        <File Path="Imports/Console.props" />
+        <File Path="Imports/Examples.props" />
+        <File Path="Imports/Library.props" />
+        <File Path="Imports/Tests.props" />
+    </Folder>
+    <Folder Name="/_Items/">
+        <File Path=".editorconfig" />
+        <File Path=".gitattributes" />
+        <File Path=".gitignore" />
+        <File Path=".globalconfig" />
+        <File Path="LICENSE.txt" />
+    </Folder>
+    <Folder Name="/_Scripts/">
+        <File Path="Scripts/Build.ps1" />
+        <File Path="Scripts/Publish.ps1" />
+    </Folder>
+    <Project Path="Src/FastData.Benchmarks/FastData.Benchmarks.csproj" />
+    <Project Path="Src/FastData.BenchmarkHarness.Runner/FastData.BenchmarkHarness.Runner.csproj" />
+    <Project Path="Src/FastData.Demo/FastData.Demo.csproj" />
+    <Project Path="Src/FastData.Examples/FastData.Examples.csproj" />
+    <Project Path="Src/FastData.InternalShared/FastData.InternalShared.csproj" />
+    <Project Path="Src/FastData.Testbed/FastData.Testbed.csproj" />
+    <Project Path="Src/FastData.TestHarness.Runner/FastData.TestHarness.Runner.csproj" />
+    <Project Path="Src/FastData.Tests/FastData.Tests.csproj" />
+    <Project Path="Src/FastData/FastData.csproj" />
 </Solution>

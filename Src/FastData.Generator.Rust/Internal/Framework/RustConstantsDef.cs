@@ -1,5 +1,4 @@
 using Genbox.FastData.Generator.Framework.Interfaces;
-using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Enums;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Framework;

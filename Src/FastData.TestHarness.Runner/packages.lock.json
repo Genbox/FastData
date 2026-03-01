@@ -242,6 +242,8 @@
       "fastdata.generator.cplusplus.testharness": {
         "type": "Project",
         "dependencies": {
+          "FastData": "[1.0.0, )",
+          "FastData.Generator": "[1.0.0, )",
           "FastData.Generator.CPlusPlus": "[1.0.0, )",
           "FastData.InternalShared": "[1.0.0, )"
         }
@@ -255,6 +257,8 @@
       "fastdata.generator.csharp.testharness": {
         "type": "Project",
         "dependencies": {
+          "FastData": "[1.0.0, )",
+          "FastData.Generator": "[1.0.0, )",
           "FastData.Generator.CSharp": "[1.0.0, )",
           "FastData.InternalShared": "[1.0.0, )"
         }
@@ -268,6 +272,8 @@
       "fastdata.generator.rust.testharness": {
         "type": "Project",
         "dependencies": {
+          "FastData": "[1.0.0, )",
+          "FastData.Generator": "[1.0.0, )",
           "FastData.Generator.Rust": "[1.0.0, )",
           "FastData.InternalShared": "[1.0.0, )"
         }

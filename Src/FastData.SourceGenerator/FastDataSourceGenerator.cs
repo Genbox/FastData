@@ -342,7 +342,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
     private static MethodInfo GetGenerateMethod(Type genType, string name, int genericArgCount, int paramCount, int memoryParamCount)
     {
-        var methods = genType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+        MethodInfo[] methods = genType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
         MethodInfo? method = Array.Find(methods, m =>
         {

@@ -6,7 +6,6 @@ using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework.Interfaces;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
-using Genbox.FastData.Generators.Extensions;
 
 namespace Genbox.FastData.Generator.Framework;
 
