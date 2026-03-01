@@ -13,11 +13,11 @@ public sealed class CPlusPlusBootstrap : BootstrapBase
     {
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
         Map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
-        Compiler = new GccCompiler(RootDir);
+        Compiler = new ClangCompiler(RootDir);
     }
 
     internal TypeMap Map { get; }
-    internal GccCompiler Compiler { get; }
+    internal ClangCompiler Compiler { get; }
 
     public override ICodeGenerator GeneratorFactory(string id) => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig(id));
 }

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using Genbox.FastData.Generator.CPlusPlus.TestHarness.Code;
 using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.Helpers;
@@ -52,7 +53,7 @@ public sealed class CPlusPlusBenchmark : BenchmarkBase<CPlusPlusBootstrap>
 
     public override void Run(BenchmarkSuite suite, bool useBencher, bool useShell)
     {
-        ProcessResult configureResult = ProcessHelper.RunProcess("cmake", "-S . -B build", Bootstrap.RootDir, 100_000);
+        ProcessResult configureResult = ProcessHelper.RunProcess("cmake", "-S . -B build -DCMAKE_CXX_COMPILER=\"" + ClangCompiler.CompilerPath + "\"", Bootstrap.RootDir, 100_000);
 
         if (configureResult.ExitCode != 0)
             throw new InvalidOperationException($"Failed to configure CMake. Exit code: {configureResult.ExitCode}\nSTDOUT:\n{configureResult.StandardOutput}\nSTDERR:\n{configureResult.StandardError}");
@@ -81,6 +82,18 @@ public sealed class CPlusPlusBenchmark : BenchmarkBase<CPlusPlusBootstrap>
     private static string BuildCMakeLists(IEnumerable<string> sources) =>
         $$"""
           cmake_minimum_required(VERSION 3.20)
+
+          if(DEFINED ENV{FASTDATA_CLANGXX})
+            set(_clangxx "$ENV{FASTDATA_CLANGXX}")
+            if(IS_DIRECTORY "${_clangxx}")
+              set(_clangxx "${_clangxx}/clang++")
+            endif()
+            if(WIN32 AND NOT EXISTS "${_clangxx}" AND EXISTS "${_clangxx}.exe")
+              set(_clangxx "${_clangxx}.exe")
+            endif()
+            set(CMAKE_CXX_COMPILER "${_clangxx}" CACHE FILEPATH "" FORCE)
+          endif()
+
           project(fast_data_benchmarks LANGUAGES CXX)
           set(CMAKE_CXX_STANDARD 17)
           set(CMAKE_CXX_STANDARD_REQUIRED ON)

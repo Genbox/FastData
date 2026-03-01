@@ -3,15 +3,16 @@ using Genbox.FastData.InternalShared.Misc;
 
 namespace Genbox.FastData.Generator.CPlusPlus.TestHarness.Code;
 
-public sealed class GccCompiler
+public sealed class ClangCompiler
 {
     private readonly string _rootPath;
+    internal const string CompilerPath = @"C:\clang+llvm-22.1.0-x86_64-pc-windows-msvc\bin\clang++.exe";
 
-    public GccCompiler(string rootDir)
+    public ClangCompiler(string rootDir)
     {
         _rootPath = rootDir;
 
-        if (!ProcessHelper.TryRunProcess("g++.exe", "--version"))
+        if (!ProcessHelper.TryRunProcess(CompilerPath, "--version"))
             throw new InvalidOperationException("No compiler found");
     }
 
@@ -24,7 +25,7 @@ public sealed class GccCompiler
         if (!FileHelper.TryWriteFile(srcFile, source) && File.Exists(dstFile))
             return dstFile;
 
-        ProcessResult res = ProcessHelper.RunProcess("g++", $"{srcFile} -std=c++17 -O3 -DNDEBUG -o {dstFile}");
+        ProcessResult res = ProcessHelper.RunProcess(CompilerPath, $"\"{srcFile}\" -std=c++17 -O3 -DNDEBUG -o \"{dstFile}\"");
 
         if (res.ExitCode != 0)
         {
