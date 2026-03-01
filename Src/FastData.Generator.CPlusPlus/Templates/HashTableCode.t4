@@ -61,7 +61,7 @@ struct e {
 <#= Model.GetFieldModifier(false) #>std::array<e, <#= Data.Entries.Length.ToStringInvariant() #>> entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        string hashPart = Context.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : "";
+        string hashPart = Context.StoreHashCode ? $", {Model.ToValueLabel(x.Hash)}" : "";
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
         return $"e({Model.ToValueLabel(x.Key)}, {x.Next.ToStringInvariant()}{hashPart}{valuePart})";
     }) #>

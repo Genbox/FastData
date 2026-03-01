@@ -32,9 +32,9 @@
 <#= Model.FieldModifier #>ENTRIES: [E; <#= Data.Entries.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        string hashPart = Context.StoreHashCode ? $"hash_code: {x.Hash}, " : "";
+        string hashPart = Context.StoreHashCode ? $"hash_code: {Model.ToValueLabel(x.Hash)}, " : "";
         string valuePart = Data.ValueCount > 0 ? $", value: {valueLabels[i]}" : "";
-        return $"E {{ {hashPart}next: {x.Next.ToStringInvariant()}, key: {Model.ToValueLabel(x.Key)}{valuePart} }}";
+        return $"E {{ {hashPart}next: {Model.ToValueLabel(x.Next)}, key: {Model.ToValueLabel(x.Key)}{valuePart} }}";
     }) #>
 ];
 
