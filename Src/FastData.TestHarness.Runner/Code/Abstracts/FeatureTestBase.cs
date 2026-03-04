@@ -1,89 +1,80 @@
-using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
-using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Harness;
-using Genbox.FastData.InternalShared.TestClasses;
-using Genbox.FastData.TestHarness.Runner.Code.Theory;
-using static Genbox.FastData.InternalShared.Helpers.TestHelper;
-using static Genbox.FastData.TestHarness.Runner.Code.TestHarnessHelper;
+using static Genbox.FastData.TestHarness.Runner.Code.VerifyHelper;
 
 namespace Genbox.FastData.TestHarness.Runner.Code.Abstracts;
 
-[SuppressMessage("Usage", "xUnit1039:The type argument to theory data is not compatible with the type of the corresponding test method parameter")]
 public abstract class FeatureTestBase
 {
     protected abstract TestBase Harness { get; }
 
-    [Theory]
-    [ClassData(typeof(FloatNaNZeroTestVectors))]
-    public async Task FloatNaNOrZeroHashSupport<T>(TestVector<T> vector)
-    {
-        GeneratorSpec spec = Generate(Harness.CreateGenerator, vector);
-
-        string snapshotId = $"{nameof(FloatNaNOrZeroHashSupport)}_{spec.Identifier}";
-
-        await VerifyFeatureAsync(Harness, snapshotId, spec.Source);
-
-        AssertSuccessExitCode(RunContains(Harness, spec, vector.Keys, vector.NotPresent, snapshotId));
-    }
-
     [Fact]
-    public async Task IgnoreCaseSupport()
-    {
-        string[] keys = ["Alpha", "bravo", "CHARLIE"];
-
-        FastDataConfig config = new FastDataConfig(StructureType.BinarySearch);
-        config.IgnoreCase = true;
-
-        const string className = nameof(IgnoreCaseSupport);
-        string source = FastDataGenerator.Generate(keys, config, Harness.CreateGenerator(className));
-        GeneratorSpec spec = new GeneratorSpec(className, source);
-
-        await VerifyFeatureAsync(Harness, className, spec.Source);
-
-        string[] lookups = ["alpha", "BRAVO", "charlie"];
-        string[] notPresent = ["delta", "echo"];
-        AssertSuccessExitCode(RunContains(Harness, spec, lookups, notPresent, className));
-    }
-
-    [Theory]
-    [InlineData(true), InlineData(false)]
-    public async Task PrefixSuffixTrimming(bool ignoreCase)
-    {
-        string[] keys = ["PreAlphaSuf", "PreBravoSuf", "PreCharlieSuf"];
-
-        FastDataConfig config = new FastDataConfig(StructureType.BinarySearch);
-        config.EnablePrefixSuffixTrimming = true;
-        config.IgnoreCase = ignoreCase;
-
-        string className = $"{nameof(PrefixSuffixTrimming)}_{(ignoreCase ? "IgnoreCase" : "Ordinal")}";
-        string source = FastDataGenerator.Generate(keys, config, Harness.CreateGenerator(className));
-        GeneratorSpec spec = new GeneratorSpec(className, source);
-
-        await VerifyFeatureAsync(Harness, className, spec.Source);
-
-        string[] lookups = ignoreCase ? ["prealphasuf", "PREBRAVOSUF", "precharliesuf"] : keys;
-        string[] notPresent = ["PreDeltaSuf", "preEchoSuf", "Nope"];
-
-        AssertSuccessExitCode(RunContains(Harness, spec, lookups, notPresent, className));
-    }
-
-    [Theory]
-    [InlineData(true), InlineData(false)]
-    public async Task TypeReductionEnabled(bool typeReductionEnabled)
+    public async Task FloatNaNOrZeroHashSupport()
     {
         FastDataConfig config = new FastDataConfig(StructureType.HashTable);
-        config.TypeReductionEnabled = typeReductionEnabled;
 
-        string className = $"{nameof(TypeReductionEnabled)}_{typeReductionEnabled}";
+        float[] floats = [1f, 2f, 3f, 4f, 5f];
+        string source = FastDataGenerator.Generate(floats, config, Harness.Generator);
+        string id = $"{nameof(FloatNaNOrZeroHashSupport)}_Float";
+        await VerifyFeatureAsync(Harness.Name, id, source);
+        Assert.Equal(1, await Harness.RunContainsAsync(source, id, floats, [], TestContext.Current.CancellationToken));
+
+        float[] doubles = [1.0f, 2.0f, 3.0f, 4.0f, 5.0f];
+        source = FastDataGenerator.Generate(doubles, config, Harness.Generator);
+        id = $"{nameof(FloatNaNOrZeroHashSupport)}_Double";
+        await VerifyFeatureAsync(Harness.Name, id, source);
+        Assert.Equal(1, await Harness.RunContainsAsync(source, id, doubles, [], TestContext.Current.CancellationToken));
+    }
+
+    [Theory]
+    [InlineData(true), InlineData(false)]
+    public async Task IgnoreCaseSupport(bool ignoreCase)
+    {
+        FastDataConfig config = new FastDataConfig(StructureType.BinarySearch);
+        config.IgnoreCase = ignoreCase;
+
+        string[] keys = ["Alpha", "bravo", "CHARLIE"];
+        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
+
+        string id = $"{nameof(IgnoreCaseSupport)}_{(ignoreCase ? "IgnoreCase" : "Ordinal")}";
+        await VerifyFeatureAsync(Harness.Name, id, source);
+
+        string[] lookups = ignoreCase ? ["alpha", "BRAVO", "charlie"] : keys;
+        string[] notPresent = ["delta", "echo"];
+        Assert.Equal(1, await Harness.RunContainsAsync(source, id, lookups, notPresent, TestContext.Current.CancellationToken));
+    }
+
+    [Theory]
+    [InlineData(true), InlineData(false)]
+    public async Task PrefixSuffixTrimmingSupported(bool enabled)
+    {
+        FastDataConfig config = new FastDataConfig(StructureType.BinarySearch);
+        config.EnablePrefixSuffixTrimming = enabled;
+
+        string[] keys = ["PreAlphaSuf", "PreBravoSuf", "PreCharlieSuf"];
+        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
+
+        string id = $"{nameof(PrefixSuffixTrimmingSupported)}_{(enabled ? "TrimEnabled" : "TrimDisabled")}";
+        await VerifyFeatureAsync(Harness.Name, id, source);
+
+        string[] notPresent = ["PreDeltaSuf", "preEchoSuf", "Nope"];
+        Assert.Equal(1, await Harness.RunContainsAsync(source, id, keys, notPresent, TestContext.Current.CancellationToken));
+    }
+
+    [Theory]
+    [InlineData(true), InlineData(false)]
+    public async Task TypeReductionSupported(bool enabled)
+    {
+        FastDataConfig config = new FastDataConfig(StructureType.HashTable);
+        config.TypeReductionEnabled = enabled;
+
         byte[] keys = [byte.MinValue, 1, byte.MaxValue];
+        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
 
-        string source = FastDataGenerator.Generate(keys, config, Harness.CreateGenerator(className));
-        GeneratorSpec spec = new GeneratorSpec(className, source);
-
-        await VerifyFeatureAsync(Harness, className, spec.Source);
+        string id = $"{nameof(TypeReductionSupported)}_{enabled}";
+        await VerifyFeatureAsync(Harness.Name, id, source);
 
         byte[] notPresent = [2, 4];
-        AssertSuccessExitCode(RunContains(Harness, spec, keys, notPresent, className));
+        Assert.Equal(1, await Harness.RunContainsAsync(source, id, keys, notPresent, TestContext.Current.CancellationToken));
     }
 }

@@ -343,11 +343,11 @@ public class FastDataGeneratorTests
     [MemberData(nameof(GetTestData))]
     public async Task Generate_CommonInputs(ITestData testData)
     {
-        testData.Generate(_ => new DummyGenerator(), out GeneratorSpec spec);
-        Assert.NotNull(spec.Source);
+        string source = testData.Generate(new DummyGenerator());
+        Assert.NotNull(source);
 
-        await Verify(spec.Source)
-              .UseFileName(spec.Identifier)
+        await Verify(source)
+              .UseFileName(nameof(Generate_CommonInputs) + '_' + testData.Identifier)
               .UseDirectory("Verify")
               .DisableDiff();
     }

@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class RrrBitVectorStructure_Int32_1000_natural_sparse_negative
+internal static class FastData
 {
     private const ulong _rrrMinValue = 2147285375ul;
     private const ulong _rrrMaxValue = 2147312403ul;

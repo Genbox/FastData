@@ -8,12 +8,6 @@ namespace Genbox.FastData.InternalShared.Helpers;
 
 public static class TestVectorHelper
 {
-    public static IEnumerable<ITestVector> GetFloatNaNZeroTestVectors()
-    {
-        foreach (ITestVector testVector in GenerateTestVectors(GetFloatSpecialCases(), null, typeof(HashTableStructure<,>)))
-            yield return testVector;
-    }
-
     public static IEnumerable<ITestVector> GetKeyValueTestVectors()
     {
         // First we try with a simple value
@@ -226,13 +220,6 @@ public static class TestVectorHelper
         new DataPair([long.MinValue, -1L, 0L, 1L, long.MaxValue], [-2L, 2L]),
         new DataPair([0UL, 1UL, 2UL, ulong.MaxValue], [3UL, 4UL]),
         new DataPair(["a", "item", new string('a', 255)], ["b", "item2"])
-    ];
-
-    private static DataPair[] GetFloatSpecialCases() =>
-    [
-        //If we don't have zero or NaN, we can use a simple hash
-        new DataPair([1f, 2f, 3f, 4f, 5f], []),
-        new DataPair([1.0, 2.0, 3.0, 4.0, 5.0], []),
     ];
 
     private static DataPair[] GetDataOfSize(int size) =>

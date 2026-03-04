@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: Conditional
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class ConditionalStructure_UInt64_4 final {
+class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const uint64_t key) noexcept {

@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: Range
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class RangeStructure_Int32_5_range_bitset final {
+class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {

@@ -19,5 +19,6 @@
     <PackageVersion Include="Genbox.FastData.SourceGenerator" Version="0.2.0" />
     <PackageVersion Include="xunit.v3.extensibility.core" Version="3.2.2" />
     <PackageVersion Include="Mono.TextTemplating" Version="3.0.0" />
+    <PackageVersion Include="Docker.DotNet" Version="3.125.15" />
   </ItemGroup>
 </Project>

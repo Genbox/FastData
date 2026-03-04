@@ -4,7 +4,8 @@ using Genbox.FastData.TestHarness.Runner.Code.Abstracts;
 
 namespace Genbox.FastData.TestHarness.Runner.Tests.CSharp;
 
-public sealed class CSharpVectorTests : VectorTestsBase
+[Collection("Docker-CSharp")]
+public sealed class CSharpVectorTests(DockerCSharpFixture fixture) : VectorTestsBase
 {
-    protected override TestBase Harness => CSharpTest.Instance;
+    protected override TestBase Harness { get; } = new CSharpTest(fixture.DockerManager);
 }

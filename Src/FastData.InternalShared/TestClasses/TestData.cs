@@ -6,34 +6,36 @@ using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public class TestData<T>(StructureType structureType, T[] values) : ITestData, IXunitSerializable
+public class TestData<TKey>(StructureType structureType, TKey[] keys) : ITestData, IXunitSerializable
 {
-    private readonly TypeCode _keyType = Type.GetTypeCode(typeof(T));
+    private readonly TypeCode _keyType = Type.GetTypeCode(typeof(TKey));
     private readonly Random _rng = new Random(42);
 
-    public T[] Values { get; private set; } = values;
+    public TKey[] Keys { get; private set; } = keys;
     public StructureType StructureType { get; private set; } = structureType;
+    public int WarmupIterations { get; } = 1_000_000;
+    public int WorkIterations { get; } = 1_000_000;
+    public int QueryCount { get; } = 25;
 
-    public string Identifier => $"{StructureType}_{_keyType}_{Values.Length}";
+    public string Identifier => $"{StructureType}_{_keyType}_{Keys.Length}";
 
-    public void Generate(Func<string, ICodeGenerator> factory, out GeneratorSpec spec)
+    public string Generate(ICodeGenerator generator)
     {
-        string source = FastDataGenerator.Generate(Values, new FastDataConfig(StructureType) { StringAnalyzerConfig = null }, factory(Identifier));
-        spec = new GeneratorSpec(Identifier, source);
+        return FastDataGenerator.Generate(Keys, new FastDataConfig(StructureType) { StringAnalyzerConfig = null }, generator);
     }
 
-    public string GetValueLabel(TypeMap map) => map.ToValueLabel(Values[_rng.Next(0, Values.Length)]);
+    public string GetRandomKey(TypeMap map) => map.ToValueLabel(Keys[_rng.Next(0, Keys.Length)]);
 
     public void Serialize(IXunitSerializationInfo info)
     {
         info.AddValue(nameof(StructureType), StructureType);
-        info.AddValue(nameof(Values), Values);
+        info.AddValue(nameof(Keys), Keys);
     }
 
     public void Deserialize(IXunitSerializationInfo info)
     {
         StructureType = info.GetValue<StructureType>(nameof(StructureType));
-        Values = info.GetValue<T[]>(nameof(Values));
+        Keys = info.GetValue<TKey[]>(nameof(Keys));
     }
 
     public override string ToString() => Identifier;

@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: RrrBitVector
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class RrrBitVectorStructure_Int32_1000_natural_sparse final {
+class fastdata final {
     static constexpr uint64_t rrr_min_value = 2147495375ull;
     static constexpr uint64_t rrr_max_value = 2147522403ull;
     static constexpr int32_t rrr_block_size = 15;

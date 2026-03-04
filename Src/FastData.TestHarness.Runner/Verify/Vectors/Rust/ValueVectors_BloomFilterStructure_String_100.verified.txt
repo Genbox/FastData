@@ -1,14 +1,16 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: BloomFilter
-#![allow(unused_parens)]
-#![allow(missing_docs)]
-#![allow(unused_imports)]
-#![allow(unused_unsafe)]
-use std::ptr;
+ #![allow(non_camel_case_types)]
+ #![allow(unused_parens)]
+ #![allow(missing_docs)]
+ #![allow(unused_imports)]
+ #![allow(unused_variables)]
+ #![allow(unused_unsafe)]
+ use std::ptr;
 
-pub struct BloomFilterStructure_String_100;
+pub struct fastdata;
 
-impl BloomFilterStructure_String_100 {
+impl fastdata {
     const BLOOM: [u64; 23] = [
         10133101846175744, 2305860740986699928, 576460891889876992, 2328361007652536341, 108386557731308048, 9223376439196254720, 9232382199804727552, 2268415000582, 68720525312, 4614096147992042497, 
         18155413023244292, 2305843009213694080, 14450503128371429376, 2824095783714816, 17314611264, 8882014389064, 2323857547326394377, 288230377361899681, 3026454408845214208, 565157566628112, 

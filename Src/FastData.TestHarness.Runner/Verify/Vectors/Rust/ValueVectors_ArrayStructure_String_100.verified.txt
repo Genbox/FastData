@@ -1,14 +1,16 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: Array
-#![allow(unused_parens)]
-#![allow(missing_docs)]
-#![allow(unused_imports)]
-#![allow(unused_unsafe)]
-use std::ptr;
+ #![allow(non_camel_case_types)]
+ #![allow(unused_parens)]
+ #![allow(missing_docs)]
+ #![allow(unused_imports)]
+ #![allow(unused_variables)]
+ #![allow(unused_unsafe)]
+ use std::ptr;
 
-pub struct ArrayStructure_String_100;
+pub struct fastdata;
 
-impl ArrayStructure_String_100 {
+impl fastdata {
     const KEYS: [&'static str; 100] = [
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
         "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", 

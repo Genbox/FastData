@@ -1,14 +1,16 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: EliasFano
-#![allow(unused_parens)]
-#![allow(missing_docs)]
-#![allow(unused_imports)]
-#![allow(unused_unsafe)]
-use std::ptr;
+ #![allow(non_camel_case_types)]
+ #![allow(unused_parens)]
+ #![allow(missing_docs)]
+ #![allow(unused_imports)]
+ #![allow(unused_variables)]
+ #![allow(unused_unsafe)]
+ use std::ptr;
 
-pub struct EliasFanoStructure_Int32_1000_natural_sparse_negative;
+pub struct fastdata;
 
-impl EliasFanoStructure_Int32_1000_natural_sparse_negative {
+impl fastdata {
     const LOWER_BIT_COUNT: i32 = 4;
     const MIN_VALUE: i64 = -198273;
     const MAX_VALUE: i64 = -171245;

@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: BinarySearch
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class BinarySearchStructure_Byte_3 final {
+class fastdata final {
     static constexpr std::array<uint8_t, 3> keys = {
         0, 1, std::numeric_limits<uint8_t>::max()
     };

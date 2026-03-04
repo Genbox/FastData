@@ -1,14 +1,16 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: HashTableCompact
-#![allow(unused_parens)]
-#![allow(missing_docs)]
-#![allow(unused_imports)]
-#![allow(unused_unsafe)]
-use std::ptr;
+ #![allow(non_camel_case_types)]
+ #![allow(unused_parens)]
+ #![allow(missing_docs)]
+ #![allow(unused_imports)]
+ #![allow(unused_variables)]
+ #![allow(unused_unsafe)]
+ use std::ptr;
 
-pub struct HashTableCompactStructure_Single_100;
+pub struct fastdata;
 
-impl HashTableCompactStructure_Single_100 {
+impl fastdata {
     const BUCKET_STARTS: [u8; 100] = [
         0, 5, 5, 5, 5, 8, 8, 8, 8, 11, 
         11, 11, 11, 15, 15, 15, 15, 20, 20, 20, 

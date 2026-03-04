@@ -1,19 +1,34 @@
-using Genbox.FastData.InternalShared.TestClasses;
+using Genbox.FastData.InternalShared.Helpers;
+using Genbox.FastData.InternalShared.Misc;
 using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.Harness;
 
-public abstract class TestBase<T>(T bootstrap) : TestBase(bootstrap) where T : BootstrapBase
+public abstract class TestBase<T>(T bootstrap, DockerManager manager) : TestBase(bootstrap, manager) where T : BootstrapBase
 {
-    public T Bootstrap { get; } = bootstrap;
+    protected T Bootstrap { get; } = bootstrap;
 }
 
-public abstract class TestBase(BootstrapBase bootstrap) : HarnessBase(bootstrap), IXunitSerializable
+public abstract class TestBase(BootstrapBase bootstrap, DockerManager dockerManager) : HarnessBase(bootstrap, dockerManager), IXunitSerializable
 {
-    public abstract string RenderContains<TKey>(GeneratorSpec spec, TKey[] present, TKey[] notPresent);
-    public abstract string RenderTryLookup<TKey, TValue>(GeneratorSpec spec, TestVector<TKey, TValue> vector) where TValue : notnull;
+    protected abstract string RenderContains<TKey>(string source, TKey[] present, TKey[] notPresent);
+    protected abstract string RenderTryLookup<TKey, TValue>(string source, TKey[] present, TValue[] presentValues, TKey[] notPresent);
 
-    public abstract int Run(string fileId, string source);
+    public async Task<int> RunContainsAsync<TKey>(string source, string id, TKey[] present, TKey[] notPresent, CancellationToken cancellationToken = default)
+    {
+        return await RunLocalAsync(RenderContains(source, present, notPresent), id, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<int> RunTryLookupAsync<TKey, TValue>(string source, string id, TKey[] present, TValue[] presentValues, TKey[] notPresent, CancellationToken cancellationToken = default)
+    {
+        return await RunLocalAsync(RenderTryLookup(source, present, presentValues, notPresent), id, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task<int> RunLocalAsync(string program, string id, CancellationToken cancellationToken)
+    {
+        ProcessResult res = await RunAsync(program, id, cancellationToken).ConfigureAwait(false);
+        return res.ExitCode;
+    }
 
     public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(Name), Name);
     public void Deserialize(IXunitSerializationInfo info) => info.GetValue<string>(nameof(Name));

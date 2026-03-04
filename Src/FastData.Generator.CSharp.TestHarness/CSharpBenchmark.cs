@@ -1,87 +1,72 @@
-using System.Globalization;
-using System.Text;
-using Genbox.FastData.InternalShared;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.Helpers;
 using Genbox.FastData.InternalShared.TestClasses;
+using static System.Linq.Enumerable;
+using static Genbox.FastData.Generator.Helpers.FormatHelper;
 
 namespace Genbox.FastData.Generator.CSharp.TestHarness;
 
-public sealed class CSharpBenchmark : BenchmarkBase<CSharpBootstrap>
+public sealed class CSharpBenchmark(DockerManager dockerManager) : BenchmarkBase<CSharpBootstrap>(new CSharpBootstrap(HarnessType.Benchmark), dockerManager)
 {
-    private CSharpBenchmark() : base(new CSharpBootstrap(HarnessType.Benchmark)) {}
+    protected override string Render(ITestData data) =>
+        $$"""
+          using System.Diagnostics;
+          using System.Globalization;
 
-    public static CSharpBenchmark Instance { get; } = new CSharpBenchmark();
+          {{data.Generate(Bootstrap.Generator)}}
 
-    public override BenchmarkSuite CreateFiles(IEnumerable<ITestData> data)
-    {
-        List<BenchmarkFile> files =
-        [
-            new BenchmarkFile("CSharp.csproj", """
-                                               <Project Sdk="Microsoft.NET.Sdk">
-                                                 <PropertyGroup>
-                                                   <OutputType>Exe</OutputType>
-                                                   <TargetFramework>net10.0</TargetFramework>
-                                                   <Nullable>enable</Nullable>
-                                                 </PropertyGroup>
+          public static class Program
+          {
+              internal static int Main()
+              {
+                  var keys = new[] { {{FormatList(Range(0, data.QueryCount)
+                                                  .Select(_ => data.GetRandomKey(Bootstrap.Map))
+                                                  .ToArray(), s => s, ", ")}} };
+                  int keyIndex = 0;
 
-                                                 <ItemGroup>
-                                                   <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
-                                                 </ItemGroup>
-                                               </Project>
-                                               """)
-        ];
+                  // Warmup
+                  for (int i = 0; i < {{data.WarmupIterations}}; i++)
+                  {
+                      var key = keys[keyIndex];
+                      keyIndex++;
+                      if (keyIndex == keys.Length)
+                          keyIndex = 0;
 
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("""
-                      using System.Diagnostics.CodeAnalysis;
-                      using BenchmarkDotNet.Running;
-                      using BenchmarkDotNet.Attributes;
+                      FastData.Contains(key);
+                  }
 
-                      namespace CSharp;
+                  GC.Collect();
+                  GC.WaitForPendingFinalizers();
+                  GC.Collect();
 
-                      [JsonExporterAttribute.BriefCompressed]
-                      [ShortRunJob]
-                      [SuppressMessage("Performance", "CA1822:Mark members as static")]
-                      public class Program
+                  int foundCount = 0;
+
+                  long startTicks = Stopwatch.GetTimestamp();
+
+                  for (int i = 0; i < {{data.WorkIterations}}; i++)
+                  {
+          {{FormatList(Range(0, data.QueryCount).ToArray(), _ =>
+              """
                       {
-                      """);
+                          var key = keys[keyIndex];
+                          keyIndex++;
+                          if (keyIndex == keys.Length)
+                              keyIndex = 0;
 
-        foreach (ITestData item in data)
-        {
-            item.Generate(Bootstrap.GeneratorFactory, out GeneratorSpec spec);
-            files.Add(new BenchmarkFile(spec.Identifier + ".cs", spec.Source));
-
-            sb.AppendLine(CultureInfo.InvariantCulture, $$"""
-                                                              [Benchmark]
-                                                              public void CSharp_{{spec.Identifier}}()
-                                                              {
-                                                          {{RenderBenchmarkQueries(item, spec.Identifier)}}
-                                                              }
-                                                          """);
-        }
-
-        sb.AppendLine("""
-
-                          internal static void Main() => BenchmarkRunner.Run<Program>();
+                          foundCount += FastData.Contains(key) ? 1 : 0;
                       }
-                      """);
+              """, "\n")}}
+                  }
 
-        return new BenchmarkSuite("Program.cs", sb.ToString(), files);
-    }
+                  long elapsedTicks = Stopwatch.GetTimestamp() - startTicks;
+                  double ticksPerCall = (double)elapsedTicks / {{Bootstrap.Map.ToValueLabel(data.WorkIterations * data.QueryCount)}};
+                  double elapsed = ticksPerCall * 1_000_000_000d / Stopwatch.Frequency;
 
-    public override void Run(BenchmarkSuite suite, bool useBencher, bool useShell)
-    {
-        BenchmarkHelper.RunBenchmark("dotnet", "run -c release", Bootstrap.RootDir, @"--adapter c_sharp_dot_net --file BenchmarkDotNet.Artifacts\results\CSharp.Program-report-brief-compressed.json --testbed CSharp", useBencher, useShell);
-    }
-
-    private string RenderBenchmarkQueries(ITestData data, string identifier)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < 25; i++)
-            sb.AppendLine(CultureInfo.InvariantCulture, $"        {identifier}.Contains({data.GetValueLabel(Bootstrap.Map)});");
-
-        return sb.ToString();
-    }
+                  GC.KeepAlive(foundCount);
+                  Console.WriteLine(elapsed.ToString("R", CultureInfo.InvariantCulture));
+                  return 0;
+              }
+          }
+          """;
 }

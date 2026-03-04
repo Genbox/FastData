@@ -59,8 +59,6 @@
       "fastdata.generator.cplusplus.testharness": {
         "type": "Project",
         "dependencies": {
-          "FastData": "[1.0.0, )",
-          "FastData.Generator": "[1.0.0, )",
           "FastData.Generator.CPlusPlus": "[1.0.0, )",
           "FastData.InternalShared": "[1.0.0, )"
         }
@@ -74,8 +72,6 @@
       "fastdata.generator.csharp.testharness": {
         "type": "Project",
         "dependencies": {
-          "FastData": "[1.0.0, )",
-          "FastData.Generator": "[1.0.0, )",
           "FastData.Generator.CSharp": "[1.0.0, )",
           "FastData.InternalShared": "[1.0.0, )"
         }
@@ -89,8 +85,6 @@
       "fastdata.generator.rust.testharness": {
         "type": "Project",
         "dependencies": {
-          "FastData": "[1.0.0, )",
-          "FastData.Generator": "[1.0.0, )",
           "FastData.Generator.Rust": "[1.0.0, )",
           "FastData.InternalShared": "[1.0.0, )"
         }
@@ -105,9 +99,19 @@
       "fastdata.internalshared": {
         "type": "Project",
         "dependencies": {
+          "Docker.DotNet": "[3.125.15, )",
           "Microsoft.CodeAnalysis.CSharp": "[4.10.0, )",
           "Newtonsoft.Json": "[13.0.4, )",
           "xunit.v3.extensibility.core": "[3.2.2, )"
+        }
+      },
+      "Docker.DotNet": {
+        "type": "CentralTransitive",
+        "requested": "[3.125.15, )",
+        "resolved": "3.125.15",
+        "contentHash": "XN8FKxVv8Mjmwu104/Hl9lM61pLY675s70gzwSj8KR5pwblo8HfWLcCuinh9kYsqujBkMH4HVRCEcRuU6al4BQ==",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1"
         }
       },
       "Microsoft.CodeAnalysis.CSharp": {

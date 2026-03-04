@@ -1,32 +1,26 @@
 using Genbox.FastData.Generator.Extensions;
-using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.Helpers;
-using Genbox.FastData.InternalShared.TestClasses;
 using static Genbox.FastData.Generator.Helpers.FormatHelper;
 
 namespace Genbox.FastData.Generator.Rust.TestHarness;
 
-public sealed class RustTest : TestBase<RustBootstrap>
+public sealed class RustTest(DockerManager manager) : TestBase<RustBootstrap>(new RustBootstrap(HarnessType.Test), manager)
 {
-    private RustTest() : base(new RustBootstrap(HarnessType.Test)) {}
-
-    public static RustTest Instance { get; } = new RustTest();
-
-    public override string RenderContains<T>(GeneratorSpec spec, T[] present, T[] notPresent) =>
+    protected override string RenderContains<TKey>(string source, TKey[] present, TKey[] notPresent) =>
         $$"""
           #![allow(non_camel_case_types)]
-          {{spec.Source}}
+          {{source}}
 
           fn main() {
           {{FormatList(present, x => $$"""
-                                           if !{{spec.Identifier}}::contains({{Bootstrap.Map.ToValueLabel(x)}}) {
+                                           if !fastdata::contains({{Bootstrap.Map.ToValueLabel(x)}}) {
                                                std::process::exit(0);
                                            }
                                        """, "\n")}}
 
           {{FormatList(notPresent, x => $$"""
-                                              if {{spec.Identifier}}::contains({{Bootstrap.Map.ToValueLabel(x)}}) {
+                                              if fastdata::contains({{Bootstrap.Map.ToValueLabel(x)}}) {
                                                   std::process::exit(0);
                                               }
                                           """, "\n")}}
@@ -35,25 +29,25 @@ public sealed class RustTest : TestBase<RustBootstrap>
           }
           """;
 
-    public override string RenderTryLookup<TKey, TValue>(GeneratorSpec spec, TestVector<TKey, TValue> vector) =>
+    protected override string RenderTryLookup<TKey, TValue>(string source, TKey[] present, TValue[] presentValues, TKey[] notPresent) =>
         $$"""
           #![allow(non_camel_case_types)]
-          {{spec.Source}}
+          {{source}}
 
           fn main() {
-          {{FormatList(vector.Keys, x => $$"""
-                                               if {{spec.Identifier}}::try_lookup({{Bootstrap.Map.ToValueLabel(x)}}).is_none() {
-                                                   std::process::exit(0);
-                                               }
-                                           """, "\n")}}
+          {{FormatList(present, x => $$"""
+                                           if fastdata::try_lookup({{Bootstrap.Map.ToValueLabel(x)}}).is_none() {
+                                               std::process::exit(0);
+                                           }
+                                       """, "\n")}}
+
+          {{FormatList(notPresent, x => $$"""
+                                              if fastdata::try_lookup({{Bootstrap.Map.ToValueLabel(x)}}).is_some() {
+                                                  std::process::exit(0);
+                                              }
+                                          """, "\n")}}
 
               std::process::exit(1);
           }
           """;
-
-    public override int Run(string fileId, string source)
-    {
-        string executable = Bootstrap.Compiler.Compile(fileId, source);
-        return ProcessHelper.RunProcess(executable).ExitCode;
-    }
 }

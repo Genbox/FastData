@@ -5,6 +5,10 @@ namespace Genbox.FastData.InternalShared.TestClasses;
 
 public interface ITestData
 {
-    void Generate(Func<string, ICodeGenerator> factory, out GeneratorSpec spec);
-    string GetValueLabel(TypeMap map);
+    string Identifier { get; }
+    int WarmupIterations { get; }
+    int WorkIterations { get; }
+    int QueryCount { get; }
+    string Generate(ICodeGenerator generator);
+    string GetRandomKey(TypeMap map);
 }

@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: BloomFilter
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class BloomFilterStructure_Single_100 final {
+class fastdata final {
     static constexpr std::array<uint64_t, 23> bloom = {
         1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 
         1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 1ull, 

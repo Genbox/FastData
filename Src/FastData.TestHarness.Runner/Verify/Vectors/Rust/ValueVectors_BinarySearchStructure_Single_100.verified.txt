@@ -1,14 +1,16 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: BinarySearch
-#![allow(unused_parens)]
-#![allow(missing_docs)]
-#![allow(unused_imports)]
-#![allow(unused_unsafe)]
-use std::ptr;
+ #![allow(non_camel_case_types)]
+ #![allow(unused_parens)]
+ #![allow(missing_docs)]
+ #![allow(unused_imports)]
+ #![allow(unused_variables)]
+ #![allow(unused_unsafe)]
+ use std::ptr;
 
-pub struct BinarySearchStructure_Single_100;
+pub struct fastdata;
 
-impl BinarySearchStructure_Single_100 {
+impl fastdata {
     const KEYS: [f32; 100] = [
         0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 
         10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 

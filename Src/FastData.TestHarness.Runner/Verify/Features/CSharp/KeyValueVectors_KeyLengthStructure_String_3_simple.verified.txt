@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class KeyLengthStructure_String_3_simple
+internal static class FastData
 {
     private static readonly int[] _offsets = {
         0, 1, 2

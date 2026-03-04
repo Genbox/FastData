@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class ArrayStructure_Single_5
+internal static class FastData
 {
     private static readonly float[] _keys = new float[] {
         float.MinValue, -1f, 0f, 1f, float.MaxValue

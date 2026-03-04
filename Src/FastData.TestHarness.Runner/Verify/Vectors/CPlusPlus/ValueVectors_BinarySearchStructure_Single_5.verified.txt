@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: BinarySearch
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class BinarySearchStructure_Single_5 final {
+class fastdata final {
     static constexpr std::array<float, 5> keys = {
         std::numeric_limits<float>::lowest(), -1.0f, 0.0f, 1.0f, std::numeric_limits<float>::max()
     };

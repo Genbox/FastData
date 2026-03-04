@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: HashTable
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class HashTableStructure_Double_4 final {
+class fastdata final {
     struct e {
         double key;
         int8_t next;
@@ -21,7 +20,7 @@ class HashTableStructure_Double_4 final {
     };
 
     inline static const std::array<e, 4> entries = {
-        e(std::numeric_limits<double>::lowest(), -1, 18442240474082181119), e(0.0, -1, 0), e(1.0, 1, 4607182418800017408), e(std::numeric_limits<double>::max(), 0, 9218868437227405311)
+        e(std::numeric_limits<double>::lowest(), -1, 18442240474082181119ull), e(0.0, -1, 0), e(1.0, 1, 4607182418800017408ull), e(std::numeric_limits<double>::max(), 0, 9218868437227405311ull)
     };
 
     static uint64_t get_hash(const double value) noexcept

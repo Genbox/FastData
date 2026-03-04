@@ -1,6 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: HashTable
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
@@ -14,7 +13,7 @@ struct Person {
 
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
-class HashTableStructure_Int32_3_complex final {
+class fastdata final {
     struct e {
         int32_t key;
         int8_t next;

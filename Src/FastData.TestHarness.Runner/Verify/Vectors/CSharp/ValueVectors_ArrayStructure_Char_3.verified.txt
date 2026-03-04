@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class ArrayStructure_Char_3
+internal static class FastData
 {
     private static readonly char[] _keys = new char[] {
         char.MinValue, 'a', ''

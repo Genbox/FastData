@@ -1,0 +1,59 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: HashTable
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class fastdata final {
+    struct e {
+        float key;
+        int8_t next;
+        uint64_t hash_code;
+        e(const float key, const int8_t next, const uint64_t hash_code)
+           : key(key), next(next), hash_code(hash_code) {}
+    };
+
+    static constexpr std::array<int8_t, 5> buckets = {
+        0, 1, 4, 3, 5
+    };
+
+    inline static const std::array<e, 5> entries = {
+        e(1.0f, -1, 1065353216ull), e(2.0f, -1, 1073741824ull), e(3.0f, -1, 1077936128ull), e(4.0f, -1, 1082130432ull), e(5.0f, 1, 1084227584ull)
+    };
+
+    static uint64_t get_hash(const float value) noexcept
+    {
+        uint32_t bits;
+        std::memcpy(&bits, &value, sizeof(bits));
+        return bits;
+    }
+
+    public:
+    [[nodiscard]]
+    static constexpr bool contains(const float key) noexcept {
+        if (key < 1.0f || key > 5.0f)
+            return false;
+
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 5;
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
+
+        while (i >= 0) {
+            const auto& entry = entries[i];
+
+            if (entry.hash_code == hash && entry.key == key)
+                return true;
+
+            i = entry.next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr float min_key = 1.0f;
+    static constexpr float max_key = 5.0f;
+};

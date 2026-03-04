@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: HashTablePerfect
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class HashTablePerfectStructure_Int32_3_simple final {
+class fastdata final {
     struct e {
         int32_t key;
         const int32_t value;

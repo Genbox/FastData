@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: Conditional
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class ConditionalStructure_Int32_3_simple final {
+class fastdata final {
     inline static const std::array<int32_t, 3> values = {
         1, 2, 3
     };

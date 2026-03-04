@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: BloomFilter
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class BloomFilterStructure_String_13_non_ascii final {
+class fastdata final {
     static constexpr std::array<uint64_t, 10> bloom = {
         70369012875265ull, 288230376151744770ull, 0, 0, 0, 9007783405944960ull, 1082130432ull, 4611967495551713280ull, 594475150812906512ull, 134217856ull
     };

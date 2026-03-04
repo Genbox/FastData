@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class ArrayStructure_SByte_5
+internal static class FastData
 {
     private static readonly sbyte[] _keys = new sbyte[] {
         sbyte.MinValue, -1, 0, 1, sbyte.MaxValue

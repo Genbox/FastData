@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: EliasFano
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class EliasFanoStructure_Int32_1000_natural_sparse_negative final {
+class fastdata final {
     static constexpr int32_t lower_bit_count = 4;
     static constexpr int64_t min_value = -198273ll;
     static constexpr int64_t max_value = -171245ll;

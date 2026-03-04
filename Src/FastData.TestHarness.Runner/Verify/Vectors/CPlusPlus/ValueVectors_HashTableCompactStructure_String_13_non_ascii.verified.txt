@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: HashTableCompact
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class HashTableCompactStructure_String_13_non_ascii final {
+class fastdata final {
     struct e {
         std::string_view key;
         uint64_t hash_code;

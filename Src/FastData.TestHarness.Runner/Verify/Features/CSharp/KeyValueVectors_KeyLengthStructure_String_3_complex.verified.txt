@@ -19,7 +19,7 @@ public class Person
 
 };
 
-internal static class KeyLengthStructure_String_3_complex
+internal static class FastData
 {
     private static readonly int[] _offsets = {
         0, 1, 2

@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class BinarySearchStructure_UInt64_4
+internal static class FastData
 {
     private static readonly ulong[] _keys = new ulong[] {
         ulong.MinValue, 1ul, 2ul, ulong.MaxValue

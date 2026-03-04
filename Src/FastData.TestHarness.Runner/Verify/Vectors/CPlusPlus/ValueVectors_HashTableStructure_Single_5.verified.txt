@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: HashTable
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class HashTableStructure_Single_5 final {
+class fastdata final {
     struct e {
         float key;
         int8_t next;
@@ -21,7 +20,7 @@ class HashTableStructure_Single_5 final {
     };
 
     inline static const std::array<e, 5> entries = {
-        e(std::numeric_limits<float>::lowest(), -1, 4286578687), e(-1.0f, -1, 3212836864), e(0.0f, -1, 0), e(1.0f, -1, 1065353216), e(std::numeric_limits<float>::max(), 1, 2139095039)
+        e(std::numeric_limits<float>::lowest(), -1, 4286578687ull), e(-1.0f, -1, 3212836864ull), e(0.0f, -1, 0), e(1.0f, -1, 1065353216ull), e(std::numeric_limits<float>::max(), 1, 2139095039ull)
     };
 
     static uint64_t get_hash(const float value) noexcept

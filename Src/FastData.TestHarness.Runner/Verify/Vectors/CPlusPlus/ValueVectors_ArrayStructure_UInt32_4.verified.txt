@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: Array
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class ArrayStructure_UInt32_4 final {
+class fastdata final {
     static constexpr std::array<uint32_t, 4> keys = {
         0, 1u, 2u, std::numeric_limits<uint32_t>::max()
     };

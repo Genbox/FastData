@@ -4,7 +4,8 @@ using Genbox.FastData.TestHarness.Runner.Code.Abstracts;
 
 namespace Genbox.FastData.TestHarness.Runner.Tests.CPlusPlus;
 
-public sealed class CPlusPlusVectorTests : VectorTestsBase
+[Collection("Docker-CPlusPlus")]
+public sealed class CPlusPlusVectorTests(DockerCPlusPlusFixture fixture) : VectorTestsBase
 {
-    protected override TestBase Harness => CPlusPlusTest.Instance;
+    protected override TestBase Harness { get; } = new CPlusPlusTest(fixture.DockerManager);
 }

@@ -1,6 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: KeyLength
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
@@ -14,7 +13,7 @@ struct Person {
 
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
-class KeyLengthStructure_String_3_complex final {
+class fastdata final {
     static constexpr std::array<int32_t, 3> offsets = {
         0, 1, 2
     };

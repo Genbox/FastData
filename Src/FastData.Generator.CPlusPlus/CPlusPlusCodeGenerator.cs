@@ -43,7 +43,6 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         base.AppendHeader<TKey, TValue>(sb, genCfg, context);
 
         sb.AppendLine("""
-                      #pragma once
                       #include <array>
                       #include <cstring>
                       #include <cstdint>

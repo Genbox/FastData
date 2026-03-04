@@ -1,10 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
-using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.TestHarness.Runner.Code.Theory;
-using static Genbox.FastData.InternalShared.Helpers.TestHelper;
-using static Genbox.FastData.TestHarness.Runner.Code.TestHarnessHelper;
+using static Genbox.FastData.InternalShared.TestGenerator;
+using static Genbox.FastData.TestHarness.Runner.Code.VerifyHelper;
 
 namespace Genbox.FastData.TestHarness.Runner.Code.Abstracts;
 
@@ -14,28 +13,26 @@ public abstract class VectorTestsBase
     protected abstract TestBase Harness { get; }
 
     [Theory]
-    [ClassData(typeof(KeyValueVectors))]
-    public async Task KeyValueVectors<TKey, TValue>(TestVector<TKey, TValue> vector) where TValue : notnull
+    [ClassData(typeof(ValueVectors))]
+    public async Task ValueVectors<TKey>(TestVector<TKey> vector)
     {
-        GeneratorSpec spec = Generate(Harness.CreateGenerator, vector);
-        Assert.NotEmpty(spec.Source);
+        string source = Generate(Harness.Generator, vector);
+        Assert.NotEmpty(source);
 
-        string snapshotId = $"{nameof(KeyValueVectors)}_{spec.Identifier}";
-
-        await VerifyFeatureAsync(Harness, snapshotId, spec.Source);
-        AssertSuccessExitCode(RunTryLookup(Harness, spec, vector, snapshotId));
+        string id = $"{nameof(ValueVectors)}_{vector.Identifier}";
+        await VerifyVectorAsync(Harness.Name, id, source);
+        Assert.Equal(1, await Harness.RunContainsAsync(source, id, vector.Keys, vector.NotPresent, TestContext.Current.CancellationToken));
     }
 
     [Theory]
-    [ClassData(typeof(ValueVectors))]
-    public async Task ValueVectors<T>(TestVector<T> vector)
+    [ClassData(typeof(KeyValueVectors))]
+    public async Task KeyValueVectors<TKey, TValue>(TestVector<TKey, TValue> vector) where TValue : notnull
     {
-        GeneratorSpec spec = Generate(Harness.CreateGenerator, vector);
-        Assert.NotEmpty(spec.Source);
+        string source = Generate(Harness.Generator, vector);
+        Assert.NotEmpty(source);
 
-        string snapshotId = $"{nameof(ValueVectors)}_{spec.Identifier}";
-
-        await VerifyVectorAsync(Harness, snapshotId, spec.Source);
-        AssertSuccessExitCode(RunContains(Harness, spec, vector.Keys, vector.NotPresent, snapshotId));
+        string id = $"{nameof(KeyValueVectors)}_{vector.Identifier}";
+        await VerifyFeatureAsync(Harness.Name, id, source);
+        Assert.Equal(1, await Harness.RunTryLookupAsync(source, id, vector.Keys, vector.Values, vector.NotPresent, TestContext.Current.CancellationToken));
     }
 }

@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: Array
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class ArrayStructure_Int16_5 final {
+class fastdata final {
     static constexpr std::array<int16_t, 5> keys = {
         std::numeric_limits<int16_t>::lowest(), -1, 0, 1, std::numeric_limits<int16_t>::max()
     };

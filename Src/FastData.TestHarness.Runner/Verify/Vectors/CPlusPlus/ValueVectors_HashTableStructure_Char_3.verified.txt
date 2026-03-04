@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: HashTable
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class HashTableStructure_Char_3 final {
+class fastdata final {
     struct e {
         char key;
         int8_t next;

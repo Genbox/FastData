@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: Conditional
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class ConditionalStructure_Single_5 final {
+class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {

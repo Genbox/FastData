@@ -1,15 +1,14 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: Array
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class ArrayStructure_String_2_prefix_suffix final {
+class fastdata final {
     static constexpr std::array<std::string_view, 2> keys = {
-        u8"suf", u8"pre"
+        u8"suffix", u8"prefix"
     };
 
     public:
@@ -20,13 +19,11 @@ class ArrayStructure_String_2_prefix_suffix final {
         uint32_t valueChar = static_cast<uint32_t>(key.back());
         if (valueChar != 120u)
             return false;
-        if (!(key.compare(key.length() - 3, 3, u8"fix") == 0))
-            return false;
-        const auto trimmedKey = key.substr(0, key.length() - 3);
+
 
         for (size_t i = 0; i < 2; i++)
         {
-            if (keys[i] == trimmedKey)
+            if (keys[i] == key)
                 return true;
         }
         return false;

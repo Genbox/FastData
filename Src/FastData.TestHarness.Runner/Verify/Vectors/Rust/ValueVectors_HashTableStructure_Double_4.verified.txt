@@ -1,20 +1,22 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: HashTable
-#![allow(unused_parens)]
-#![allow(missing_docs)]
-#![allow(unused_imports)]
-#![allow(unused_unsafe)]
-use std::ptr;
+ #![allow(non_camel_case_types)]
+ #![allow(unused_parens)]
+ #![allow(missing_docs)]
+ #![allow(unused_imports)]
+ #![allow(unused_variables)]
+ #![allow(unused_unsafe)]
+ use std::ptr;
 
-pub struct HashTableStructure_Double_4;
+pub struct fastdata;
 
-impl HashTableStructure_Double_4 {
+impl fastdata {
     const BUCKETS: [i8; 4] = [
         3, 0, 0, 4
     ];
 
     const ENTRIES: [E; 4] = [
-        E { hash_code: 18442240474082181119, next: -1, key: f64::MIN }, E { hash_code: 0, next: -1, key: 0.0 }, E { hash_code: 4607182418800017408, next: 1, key: 1.0 }, E { hash_code: 9218868437227405311, next: 0, key: f64::MAX }
+        E { hash_code: 18442240474082181119, next: -1, key: f64::MIN }, E { hash_code: u64::MIN, next: -1, key: 0.0 }, E { hash_code: 4607182418800017408, next: 1, key: 1.0 }, E { hash_code: 9218868437227405311, next: 0, key: f64::MAX }
     ];
 
     #[inline(always)]

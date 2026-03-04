@@ -64,7 +64,7 @@ internal static class Program
         string[] data = Enumerable.Range(0, size).Select(_ => TestHelper.GenerateRandomString(rng, rng.Next(5, 10))).ToArray();
 
         TestVector<string> vector = new TestVector<string>(type, data, []);
-        GeneratorSpec spec = TestHelper.Generate(id => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig(id)), vector);
-        File.WriteAllText("Gen-" + type.GetCleanName() + "-" + size + ".cs", spec.Source);
+        string source = TestGenerator.Generate(CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("fastdata")), vector);
+        File.WriteAllText("Gen-" + type.GetCleanName() + "-" + size + ".cs", source);
     }
 }

@@ -1,51 +1,38 @@
+using System.Globalization;
 using Genbox.FastData.Generator.CPlusPlus.TestHarness;
 using Genbox.FastData.Generator.CSharp.TestHarness;
 using Genbox.FastData.Generator.Rust.TestHarness;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.Helpers;
+using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.BenchmarkHarness.Runner;
 
 internal static class Program
 {
-    private const bool UseBencher = false;
-    private const bool UseShell = true;
-
-    private static readonly BenchmarkBase[] Harnesses =
+    private static readonly Func<DockerManager, BenchmarkBase>[] HarnessFactories =
     [
-        CSharpBenchmark.Instance,
-        CPlusPlusBenchmark.Instance,
-        RustBenchmark.Instance
+        x => new CSharpBenchmark(x),
+        x => new CPlusPlusBenchmark(x),
+        x => new RustBenchmark(x)
     ];
 
-    private static void Main()
+    private static async Task Main()
     {
-        Parallel.ForEach(Harnesses, RunHarness);
+        foreach (Func<DockerManager, BenchmarkBase> factory in HarnessFactories)
+            await RunHarnessAsync(factory, CancellationToken.None);
     }
 
-    private static void RunHarness(BenchmarkBase harness)
+    private static async ValueTask RunHarnessAsync(Func<DockerManager, BenchmarkBase> harnessFactory, CancellationToken cancellationToken)
     {
-        BenchmarkSuite suite = harness.CreateFiles(TestVectorHelper.GetBenchmarkData());
-        WriteSuite(harness.RootDir, suite);
+        await using DockerManager dockerManager = new DockerManager();
+        BenchmarkBase harness = harnessFactory(dockerManager);
 
-        Console.WriteLine($"Executing {harness.Name}");
-        harness.Run(suite, UseBencher, UseShell);
-    }
-
-    private static void WriteSuite(string rootDir, BenchmarkSuite suite)
-    {
-        string entryPath = Path.Combine(rootDir, suite.EntryFilename);
-        FileHelper.TryWriteFile(entryPath, suite.EntrySource);
-
-        foreach (BenchmarkFile file in suite.AdditionalFiles)
+        foreach (ITestData data in TestVectorHelper.GetBenchmarkData())
         {
-            string filePath = Path.Combine(rootDir, file.Filename);
-            string? fileDir = Path.GetDirectoryName(filePath);
-
-            if (fileDir != null && !Directory.Exists(fileDir))
-                Directory.CreateDirectory(fileDir);
-
-            FileHelper.TryWriteFile(filePath, file.Source);
+            double res = await harness.RunAsync(data, cancellationToken);
+            string value = res.ToString("0.#################", CultureInfo.InvariantCulture);
+            Console.WriteLine($"{harness.Name,-10} {data.Identifier,-30} {value}");
         }
     }
 }

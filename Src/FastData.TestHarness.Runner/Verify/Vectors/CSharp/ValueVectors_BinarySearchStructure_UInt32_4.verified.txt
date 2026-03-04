@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class BinarySearchStructure_UInt32_4
+internal static class FastData
 {
     private static readonly uint[] _keys = new uint[] {
         uint.MinValue, 1u, 2u, uint.MaxValue

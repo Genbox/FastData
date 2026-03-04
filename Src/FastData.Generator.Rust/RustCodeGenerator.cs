@@ -34,11 +34,13 @@ public sealed class RustCodeGenerator : CodeGenerator
         base.AppendHeader<TKey, TValue>(sb, genCfg, context);
 
         sb.Append($"""
-                   #![allow(unused_parens)]
-                   #![allow(missing_docs)]
-                   #![allow(unused_imports)]
-                   #![allow(unused_unsafe)]
-                   use std::ptr;
+                    #![allow(non_camel_case_types)]
+                    #![allow(unused_parens)]
+                    #![allow(missing_docs)]
+                    #![allow(unused_imports)]
+                    #![allow(unused_variables)]
+                    #![allow(unused_unsafe)]
+                    use std::ptr;
 
                    pub struct {_cfg.ClassName};
 

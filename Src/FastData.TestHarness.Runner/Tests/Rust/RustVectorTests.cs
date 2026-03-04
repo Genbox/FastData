@@ -4,7 +4,8 @@ using Genbox.FastData.TestHarness.Runner.Code.Abstracts;
 
 namespace Genbox.FastData.TestHarness.Runner.Tests.Rust;
 
-public sealed class RustVectorTests : VectorTestsBase
+[Collection("Docker-Rust")]
+public sealed class RustVectorTests(DockerRustFixture fixture) : VectorTestsBase
 {
-    protected override TestBase Harness => RustTest.Instance;
+    protected override TestBase Harness { get; } = new RustTest(fixture.DockerManager);
 }

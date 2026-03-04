@@ -1,80 +1,49 @@
-using System.Globalization;
-using System.Text;
-using Genbox.FastData.InternalShared;
+using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.Helpers;
 using Genbox.FastData.InternalShared.TestClasses;
+using static System.Linq.Enumerable;
+using static Genbox.FastData.Generator.Helpers.FormatHelper;
 
 namespace Genbox.FastData.Generator.Rust.TestHarness;
 
-public sealed class RustBenchmark : BenchmarkBase<RustBootstrap>
+public sealed class RustBenchmark(DockerManager dockerManager) : BenchmarkBase<RustBootstrap>(new RustBootstrap(HarnessType.Benchmark), dockerManager)
 {
-    private RustBenchmark() : base(new RustBootstrap(HarnessType.Benchmark)) {}
+    protected override string Render(ITestData data) =>
+        $$"""
+          {{data.Generate(Bootstrap.Generator)}}
 
-    public static RustBenchmark Instance { get; } = new RustBenchmark();
+          fn main() {
+              let mut found_count: u64 = 0;
+              let keys = [ {{FormatList(Range(0, data.QueryCount)
+                                        .Select(_ => data.GetRandomKey(Bootstrap.Map))
+                                        .ToArray(), s => s, ", ")}} ];
+              let mut key_index: usize = 0;
 
-    public override BenchmarkSuite CreateFiles(IEnumerable<ITestData> data)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("""
-                      [package]
-                      name = "fast_data_benchmarks"
-                      version = "0.1.0"
-                      edition = "2024"
+              let start = std::time::Instant::now();
 
-                      [dev-dependencies]
-                      criterion = "0.8.2"
+              for _ in 0..{{data.WorkIterations}} {
+          {{FormatList(Range(0, data.QueryCount).ToArray(), _ =>
+              """
+                      {
+                          let key = keys[key_index];
+                          key_index += 1;
+                          if key_index == keys.len() {
+                              key_index = 0;
+                          }
 
-                      """);
+                          let key = std::hint::black_box(key);
+                          found_count += if fastdata::contains(key) { 1 } else { 0 };
+                      }
+              """, "\n")}}
+              }
 
-        List<BenchmarkFile> files = new List<BenchmarkFile>();
+              let elapsed_ns = start.elapsed().as_secs_f64() * 1_000_000_000.0;
+              let elapsed_ns_per_call = elapsed_ns / {{Bootstrap.Map.ToValueLabel(data.WorkIterations * data.QueryCount)}} as f64;
 
-        foreach (ITestData item in data)
-        {
-            item.Generate(Bootstrap.GeneratorFactory, out GeneratorSpec spec);
+              std::hint::black_box(found_count);
 
-            files.Add(new BenchmarkFile(Path.Combine("benches", spec.Identifier + ".rs"),
-                $$"""
-                  #![allow(non_camel_case_types)]
-
-                  {{spec.Source}}
-
-                  use criterion::{criterion_group, criterion_main, Criterion};
-
-                  fn bench_contains(c: &mut Criterion) {
-                      c.bench_function("Rust_{{spec.Identifier}}", |b| {
-                          b.iter(|| {
-                  {{RenderBenchmarkQueries(item, spec.Identifier)}}
-                          });
-                      });
-                  }
-
-                  criterion_group!(benches, bench_contains);
-                  criterion_main!(benches);
-                  """));
-
-            sb.AppendLine(CultureInfo.InvariantCulture, $"""
-                                                         [[bench]]
-                                                         name = "{spec.Identifier}"
-                                                         harness = false
-                                                         """);
-        }
-
-        return new BenchmarkSuite("Cargo.toml", sb.ToString(), files);
-    }
-
-    public override void Run(BenchmarkSuite suite, bool useBencher, bool useShell)
-    {
-        BenchmarkHelper.RunBenchmark("cargo", "bench", Bootstrap.RootDir, "--adapter rust_criterion --testbed Rust", useBencher, useShell);
-    }
-
-    private string RenderBenchmarkQueries(ITestData data, string identifier)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < 25; i++)
-            sb.AppendLine(CultureInfo.InvariantCulture, $"           let _ = {identifier}::contains({data.GetValueLabel(Bootstrap.Map)});");
-
-        return sb.ToString();
-    }
+              println!("{}", elapsed_ns_per_call);
+          }
+          """;
 }

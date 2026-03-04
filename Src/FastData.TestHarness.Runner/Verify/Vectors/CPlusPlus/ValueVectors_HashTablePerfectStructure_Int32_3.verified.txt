@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: HashTablePerfect
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class HashTablePerfectStructure_Int32_3 final {
+class fastdata final {
     inline static const std::array<int32_t, 3> entries = {
         3, 1, 2
     };

@@ -6,18 +6,6 @@ namespace Genbox.FastData.InternalShared.Helpers;
 
 public static class ProcessHelper
 {
-    public static bool TryRunProcess(string application, string args)
-    {
-        try
-        {
-            return RunProcess(application, args).ExitCode == 0;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
     public static int RunShell(string application, string? args = null, string? workingDir = null, int timeoutMs = 60_000, nint affinity = -1)
     {
         using Process process = new Process();
@@ -64,7 +52,7 @@ public static class ProcessHelper
     }
 
     [SuppressMessage("Usage", "MA0040:Forward the CancellationToken parameter to methods that take one")]
-    public static ProcessResult RunProcess(string application, string? args = null, string? workingDir = null, int timeoutMs = 5000, nint affinity = -1)
+    public static ProcessResult RunProcess(string application, string? args = null, string? workingDir = null, int timeoutMs = 60_000, nint affinity = -1)
     {
         using Process process = new Process();
         process.StartInfo = new ProcessStartInfo

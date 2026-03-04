@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class BinarySearchStructure_UInt16_4
+internal static class FastData
 {
     private static readonly ushort[] _keys = new ushort[] {
         ushort.MinValue, 1, 2, ushort.MaxValue

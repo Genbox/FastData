@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: Array
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class ArrayStructure_Char_3 final {
+class fastdata final {
     static constexpr std::array<char, 3> keys = {
         0, 97, 127
     };

@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: HashTableCompact
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class HashTableCompactStructure_UInt64_4 final {
+class fastdata final {
     struct e {
         uint64_t key;
         e(const uint64_t key)

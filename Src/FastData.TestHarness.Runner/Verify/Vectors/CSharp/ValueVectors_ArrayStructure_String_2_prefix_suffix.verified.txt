@@ -6,10 +6,10 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class ArrayStructure_String_2_prefix_suffix
+internal static class FastData
 {
     private static readonly string[] _keys = new string[] {
-        "suf", "pre"
+        "suffix", "prefix"
     };
 
 
@@ -20,13 +20,11 @@ internal static class ArrayStructure_String_2_prefix_suffix
         char valueChar = key[key.Length - 1];
         if (valueChar != 'x')
             return false;
-        if (!(key.EndsWith("fix", StringComparison.Ordinal)))
-            return false;
-        string trimmedKey = key.Substring(0, key.Length - 3);
+
 
         for (int i = 0; i < 2; i++)
         {
-            if (StringComparer.Ordinal.Equals(trimmedKey, _keys[i]))
+            if (StringComparer.Ordinal.Equals(key, _keys[i]))
                 return true;
         }
         return false;

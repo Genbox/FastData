@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: KeyLength
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class KeyLengthStructure_String_3_simple final {
+class fastdata final {
     static constexpr std::array<int32_t, 3> offsets = {
         0, 1, 2
     };

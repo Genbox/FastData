@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: SingleValue
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class SingleValueStructure_Int32_1_simple final {
+class fastdata final {
     static inline const auto stored_value = 1;
     public:
     [[nodiscard]]

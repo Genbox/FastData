@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: BinarySearch
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class BinarySearchStructure_Double_4 final {
+class fastdata final {
     static constexpr std::array<double, 4> keys = {
         std::numeric_limits<double>::lowest(), 0.0, 1.0, std::numeric_limits<double>::max()
     };

@@ -1,13 +1,12 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Structure: BitSet
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
-class BitSetStructure_Int32_5_range_bitset final {
+class fastdata final {
     static constexpr std::array<uint64_t, 1> bitset = {
         31ull
     };

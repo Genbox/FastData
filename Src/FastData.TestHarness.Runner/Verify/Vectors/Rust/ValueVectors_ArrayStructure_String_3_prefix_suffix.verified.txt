@@ -1,16 +1,18 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: Array
-#![allow(unused_parens)]
-#![allow(missing_docs)]
-#![allow(unused_imports)]
-#![allow(unused_unsafe)]
-use std::ptr;
+ #![allow(non_camel_case_types)]
+ #![allow(unused_parens)]
+ #![allow(missing_docs)]
+ #![allow(unused_imports)]
+ #![allow(unused_variables)]
+ #![allow(unused_unsafe)]
+ use std::ptr;
 
-pub struct ArrayStructure_String_3_prefix_suffix;
+pub struct fastdata;
 
-impl ArrayStructure_String_3_prefix_suffix {
+impl fastdata {
     const KEYS: [&'static str; 3] = [
-        "text", "fetch", "fix"
+        "pretext", "prefetch", "prefix"
     ];
 
     #[must_use]
@@ -25,13 +27,10 @@ impl ArrayStructure_String_3_prefix_suffix {
         if value_char != 112 {
             return false;
         }
-        if !(key.starts_with("pre")) {
-            return false;
-        }
-        let trimmedKey = &key[3..key.len() - 0];
+
 
         for entry in Self::KEYS.iter() {
-            if *entry == trimmedKey {
+            if *entry == key {
                 return true;
             }
         }

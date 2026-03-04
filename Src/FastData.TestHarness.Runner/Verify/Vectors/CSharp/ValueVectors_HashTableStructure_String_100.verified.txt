@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class HashTableStructure_String_100
+internal static class FastData
 {
     [StructLayout(LayoutKind.Auto)]
     private struct E

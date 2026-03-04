@@ -1,12 +1,14 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: BitSet
-#![allow(unused_parens)]
-#![allow(missing_docs)]
-#![allow(unused_imports)]
-#![allow(unused_unsafe)]
-use std::ptr;
+ #![allow(non_camel_case_types)]
+ #![allow(unused_parens)]
+ #![allow(missing_docs)]
+ #![allow(unused_imports)]
+ #![allow(unused_variables)]
+ #![allow(unused_unsafe)]
+ use std::ptr;
 
-pub struct BitSetStructure_Int32_3_complex;
+pub struct fastdata;
 pub struct Person {
     pub age: i32,
     pub name: &'static str,
@@ -18,7 +20,7 @@ impl Person {
     pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
 }
 
-impl BitSetStructure_Int32_3_complex {
+impl fastdata {
     const BITSET: [u64; 1] = [
         7
     ];

@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-internal static class SingleValueStructure_Int16_1
+internal static class FastData
 {
     public static bool Contains(short key)
     {
