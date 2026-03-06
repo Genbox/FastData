@@ -69,7 +69,7 @@ public sealed class RustCodeGenerator : CodeGenerator
 
     private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context) : OutputWriter<TKey>
     {
-        private readonly TemplateManager _manager = new TemplateManager("Rust", @"C:\Users\Genbox\AppData\Local\Temp\FastData\", true);
+        private readonly TemplateManager _manager = new TemplateManager("Rust", Path.Combine(Path.GetTempPath(), "FastData"), true);
 
         public override string Generate()
         {

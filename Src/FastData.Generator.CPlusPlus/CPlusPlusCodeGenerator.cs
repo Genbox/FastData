@@ -72,7 +72,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context) : OutputWriter<TKey>
     {
         private readonly IContext _context = context;
-        private readonly TemplateManager _manager = new TemplateManager("CPlusPlus", @"C:\Users\Genbox\AppData\Local\Temp\FastData\", true);
+        private readonly TemplateManager _manager = new TemplateManager("CPlusPlus", Path.Combine(Path.GetTempPath(), "FastData"), true);
 
         public override string Generate()
         {

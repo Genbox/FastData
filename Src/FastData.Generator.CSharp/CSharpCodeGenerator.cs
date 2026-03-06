@@ -85,7 +85,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
     private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context, CSharpCodeGeneratorConfig cfg) : OutputWriter<TKey>
     {
         private readonly IContext _context = context;
-        private readonly TemplateManager _manager = new TemplateManager("CSharp", @"C:\Users\Genbox\AppData\Local\Temp\FastData\", true);
+        private readonly TemplateManager _manager = new TemplateManager("CSharp", Path.Combine(Path.GetTempPath(), "FastData"), true);
 
         public override string Generate()
         {
