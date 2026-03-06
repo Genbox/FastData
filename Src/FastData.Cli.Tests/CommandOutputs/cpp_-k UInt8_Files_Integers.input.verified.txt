@@ -2,7 +2,6 @@
   Item1:
 // This file is auto-generated. Do not edit manually.
 // Structure: Conditional
-#pragma once
 #include <array>
 #include <cstring>
 #include <cstdint>
