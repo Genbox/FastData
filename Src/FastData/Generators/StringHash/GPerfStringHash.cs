@@ -36,7 +36,7 @@ internal sealed record GPerfStringHash : IStringHash
         List<Expression> ex = new List<Expression>
         {
             // hash = 0UL
-            Assign(hash, Constant(0UL)),
+            Assign(hash, Constant(0UL))
         };
 
         int key = Positions[0];

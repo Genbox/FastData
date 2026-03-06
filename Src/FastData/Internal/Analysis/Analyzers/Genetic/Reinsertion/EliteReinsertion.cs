@@ -27,8 +27,6 @@ internal class EliteReinsertion : IReinsertion
         int number = (int)(population.Count * _topPercent);
 
         for (int i = 0; i < number; i++)
-        {
             newPopulation.Add(population[indices[i]]);
-        }
     }
 }

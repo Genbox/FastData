@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Genbox.FastData.InternalShared.Misc;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using Genbox.FastData.InternalShared.Misc;
 
 namespace Genbox.FastData.InternalShared.Helpers;
 
@@ -15,8 +12,8 @@ public sealed class DockerManager : IAsyncDisposable
     private const string WorkDir = "/work";
     private const string DefaultContainerPrefix = "fastdata";
     private readonly DockerClient _client = new DockerClientConfiguration().CreateClient();
-    private readonly ConcurrentDictionary<string, string> _containersByImage = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
     private readonly string _containerPrefix;
+    private readonly ConcurrentDictionary<string, string> _containersByImage = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
 
     public DockerManager(string containerPrefix = DefaultContainerPrefix)
     {
@@ -27,6 +24,13 @@ public sealed class DockerManager : IAsyncDisposable
         RemoveAllManagedContainersAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
 
+    public async ValueTask DisposeAsync()
+    {
+        await RemoveAllManagedContainersAsync(CancellationToken.None).ConfigureAwait(false);
+        _containersByImage.Clear();
+        _client.Dispose();
+    }
+
     public async Task<ProcessResult> RunInContainerAsync(string imageId, string workDir, string command, CancellationToken cancellationToken = default)
     {
         await EnsureImageAsync(imageId, cancellationToken).ConfigureAwait(false);
@@ -35,13 +39,6 @@ public sealed class DockerManager : IAsyncDisposable
         (string standardOutput, string standardError, int exitCode) = await ExecInContainerAsync(containerId, command, cancellationToken).ConfigureAwait(false);
 
         return new ProcessResult(exitCode, standardOutput, standardError);
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await RemoveAllManagedContainersAsync(CancellationToken.None).ConfigureAwait(false);
-        _containersByImage.Clear();
-        _client.Dispose();
     }
 
     private async Task EnsureImageAsync(string imageId, CancellationToken cancellationToken)
@@ -59,7 +56,7 @@ public sealed class DockerManager : IAsyncDisposable
                 Tag = tag
             };
 
-            await _client.Images.CreateImageAsync(parameters, authConfig: null, progress: new Progress<JSONMessage>(), cancellationToken).ConfigureAwait(false);
+            await _client.Images.CreateImageAsync(parameters, null, new Progress<JSONMessage>(), cancellationToken).ConfigureAwait(false);
         }
     }
 

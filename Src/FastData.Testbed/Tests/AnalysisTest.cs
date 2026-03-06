@@ -180,9 +180,7 @@ internal static class AnalysisTest
         string[] res = new string[str.Length];
 
         for (int i = 0; i < str.Length; i++)
-        {
             res[i] = func(str[i], factor);
-        }
 
         return res;
     }

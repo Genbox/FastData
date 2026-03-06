@@ -32,7 +32,7 @@ public sealed class CPlusPlusBenchmark(DockerManager dockerManager) : BenchmarkB
               std::uint64_t found_count = 0;
               auto keys = std::array{ {{FormatList(Range(0, data.QueryCount)
                                                    .Select(_ => data.GetRandomKey(Bootstrap.Map))
-                                                   .ToArray(), s => s, ", ")}} };
+                                                   .ToArray(), s => s)}} };
               std::size_t key_index = 0;
               auto start = std::chrono::steady_clock::now();
 

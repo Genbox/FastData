@@ -53,9 +53,7 @@ internal sealed record GeneticStringHash : IStringHash
     private static Expression CreateMixer(int iterations, Random rng, Expression value)
     {
         for (int i = 0; i < iterations; i++)
-        {
             value = GetMix(rng, value);
-        }
 
         return value;
     }

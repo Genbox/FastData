@@ -212,7 +212,7 @@ public class FastDataGeneratorTests
         AssertKeysOnly(generator, keys);
 
         generator = new ContextCaptureGenerator();
-        FastDataGenerator.Generate<int>((ReadOnlyMemory<int>)keys, config, generator);
+        FastDataGenerator.Generate((ReadOnlyMemory<int>)keys, config, generator);
         AssertKeysOnly(generator, keys);
 
         generator = new ContextCaptureGenerator();
@@ -365,35 +365,6 @@ public class FastDataGeneratorTests
         return data;
     }
 
-    private sealed class ContextCaptureGenerator : ICodeGenerator
-    {
-        public GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
-
-        public IContext? Context { get; private set; }
-
-        public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
-        {
-            Context = context;
-            return string.Empty;
-        }
-    }
-
-    private sealed class TrimCaptureGenerator : ICodeGenerator
-    {
-        public GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
-
-        public string TrimPrefix { get; private set; } = string.Empty;
-        public string TrimSuffix { get; private set; } = string.Empty;
-
-        public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
-        {
-            StringGeneratorConfig stringCfg = (StringGeneratorConfig)genCfg;
-            TrimPrefix = stringCfg.TrimPrefix;
-            TrimSuffix = stringCfg.TrimSuffix;
-            return string.Empty;
-        }
-    }
-
     private static void AssertKeysOnly<TKey>(ContextCaptureGenerator generator, ReadOnlySpan<TKey> keys)
     {
         ArrayContext<TKey, byte> ctx = Assert.IsType<ArrayContext<TKey, byte>>(generator.Context);
@@ -406,5 +377,32 @@ public class FastDataGeneratorTests
         ArrayContext<TKey, TValue> ctx = Assert.IsType<ArrayContext<TKey, TValue>>(generator.Context);
         Assert.True(ctx.Keys.Span.SequenceEqual(keys));
         Assert.True(ctx.Values.Span.SequenceEqual(values));
+    }
+
+    private sealed class ContextCaptureGenerator : ICodeGenerator
+    {
+        public IContext? Context { get; private set; }
+        public GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
+
+        public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
+        {
+            Context = context;
+            return string.Empty;
+        }
+    }
+
+    private sealed class TrimCaptureGenerator : ICodeGenerator
+    {
+        public string TrimPrefix { get; private set; } = string.Empty;
+        public string TrimSuffix { get; private set; } = string.Empty;
+        public GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
+
+        public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
+        {
+            StringGeneratorConfig stringCfg = (StringGeneratorConfig)genCfg;
+            TrimPrefix = stringCfg.TrimPrefix;
+            TrimSuffix = stringCfg.TrimSuffix;
+            return string.Empty;
+        }
     }
 }

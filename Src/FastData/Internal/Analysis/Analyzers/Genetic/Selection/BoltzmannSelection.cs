@@ -4,7 +4,10 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 
-/// <summary>Boltzmann Selection is a method that dynamically adjusts selection pressure using a temperature parameter. Unlike traditional selection methods that fix selection probabilities based on fitness, Boltzmann Selection gradually shifts from exploration (randomness) to exploitation (favoring high-fitness individuals) over time. It is inspired by simulated annealing, where higher temperatures allow more randomness, and lower temperatures favor the best solutions.</summary>
+/// <summary>
+/// Boltzmann Selection is a method that dynamically adjusts selection pressure using a temperature parameter. Unlike traditional selection methods that fix selection probabilities based on fitness, Boltzmann Selection gradually shifts from exploration (randomness) to exploitation (favoring
+/// high-fitness individuals) over time. It is inspired by simulated annealing, where higher temperatures allow more randomness, and lower temperatures favor the best solutions.
+/// </summary>
 internal sealed class BoltzmannSelection(double temperature, IRandom random) : ISelection
 {
     public void Process(StaticArray<Entity> population, List<int> parents, int maxParents)
@@ -19,9 +22,7 @@ internal sealed class BoltzmannSelection(double temperature, IRandom random) : I
 
         // Precompute cumulative probabilities
         for (int i = 1; i < probabilities.Length; i++)
-        {
             cumulative[i] = cumulative[i - 1] + probabilities[i];
-        }
 
         double sum = cumulative[cumulative.Length - 1]; // Total probability sum
 

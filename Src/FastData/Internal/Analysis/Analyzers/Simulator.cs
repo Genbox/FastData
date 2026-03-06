@@ -8,8 +8,8 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 internal sealed class Simulator(int length, GeneratorEncoding encoding, int capacityFactor = 1)
 {
     private readonly int _capacity = length * capacityFactor;
-    private readonly NoEqualityEmulator _set = new NoEqualityEmulator((uint)(length * capacityFactor));
     private readonly Encoding _encoding = encoding == GeneratorEncoding.UTF8 ? Encoding.UTF8 : Encoding.Unicode;
+    private readonly NoEqualityEmulator _set = new NoEqualityEmulator((uint)(length * capacityFactor));
 
     internal Candidate Run(ReadOnlySpan<string> data, IStringHash stringHash, Func<double>? extraFitness = null)
     {

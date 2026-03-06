@@ -52,9 +52,7 @@ internal static class Program
         foreach (Type type in structures)
         {
             foreach (int size in sizes)
-            {
                 DoStructure(type, size);
-            }
         }
     }
 

@@ -6,13 +6,13 @@ using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generator.Template.Abstracts;
+using Genbox.FastData.Generator.Template.Extensions;
+using Genbox.FastData.Generator.Template.Helpers;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Helpers;
-using Genbox.FastData.Generator.Template.Abstracts;
-using Genbox.FastData.Generator.Template.Extensions;
-using Genbox.FastData.Generator.Template.Helpers;
 
 namespace Genbox.FastData.Generator.CSharp;
 
@@ -23,6 +23,8 @@ public sealed class CSharpCodeGenerator : CodeGenerator
     private CSharpCodeGenerator(CSharpCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, TypeMap map, ExpressionCompiler compiler)
         : base(langDef, constDef, earlyExitDef, hashDef, map, compiler) => _cfg = cfg;
 
+    public override GeneratorEncoding Encoding => GeneratorEncoding.UTF16;
+
     public static CSharpCodeGenerator Create(CSharpCodeGeneratorConfig userCfg)
     {
         CSharpLanguageDef langDef = new CSharpLanguageDef();
@@ -30,8 +32,6 @@ public sealed class CSharpCodeGenerator : CodeGenerator
 
         return new CSharpCodeGenerator(userCfg, langDef, new CSharpConstantsDef(), new CSharpEarlyExitDef(map, userCfg.GeneratorOptions), new CSharpHashDef(), map, new CSharpExpressionCompiler(map));
     }
-
-    public override GeneratorEncoding Encoding => GeneratorEncoding.UTF16;
 
     protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfigBase genCfg, IContext context)
     {
@@ -84,8 +84,8 @@ public sealed class CSharpCodeGenerator : CodeGenerator
 
     private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context, CSharpCodeGeneratorConfig cfg) : OutputWriter<TKey>
     {
-        private readonly TemplateManager _manager = new TemplateManager("CSharp", @"C:\Users\Genbox\AppData\Local\Temp\FastData\", true);
         private readonly IContext _context = context;
+        private readonly TemplateManager _manager = new TemplateManager("CSharp", @"C:\Users\Genbox\AppData\Local\Temp\FastData\", true);
 
         public override string Generate()
         {

@@ -135,18 +135,14 @@ internal sealed class DeltaGenerator : ISegmentGenerator
         while (offset < arr.Length)
         {
             while (offset < arr.Length && arr[offset] == 0)
-            {
                 offset++;
-            }
 
             if (offset >= arr.Length)
                 break;
 
             uint start = offset;
             while (offset < arr.Length && arr[offset] != 0)
-            {
                 offset++;
-            }
 
             yield return new ArraySegment(start, (int)(offset - start), Alignment.Unknown);
         }

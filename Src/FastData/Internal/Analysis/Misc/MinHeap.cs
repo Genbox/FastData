@@ -15,9 +15,7 @@ internal sealed class MinHeap<T>(int capacity)
         get
         {
             for (int i = 0; i < _count; i++)
-            {
                 yield return _items[i];
-            }
         }
     }
 

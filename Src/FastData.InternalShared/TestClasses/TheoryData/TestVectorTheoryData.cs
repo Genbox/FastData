@@ -8,8 +8,6 @@ public sealed class TestVectorTheoryData : TheoryData<ITestVector>
     public TestVectorTheoryData()
     {
         foreach (ITestVector data in TestVectorHelper.GetValueTestVectors())
-        {
             Add(data);
-        }
     }
 }

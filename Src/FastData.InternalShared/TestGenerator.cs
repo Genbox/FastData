@@ -104,9 +104,7 @@ public static class TestGenerator
         HashDetails hashDetails = new HashDetails();
 
         if (state.KeyProperties is StringKeyProperties stringProps)
-        {
             genCfg = new StringGeneratorConfig(state.Vector.Type, (uint)state.Keys.Length, stringProps, hashDetails, state.Generator.Encoding, state.TrimPrefix, state.TrimSuffix, state.Config);
-        }
         else if (state.KeyProperties is NumericKeyProperties<TKey> valueProps)
         {
             hashDetails.HasZeroOrNaN = valueProps.HasZeroOrNaN;

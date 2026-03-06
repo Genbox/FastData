@@ -42,9 +42,7 @@ public class StringHashBenchmarks
         ulong value = 0;
 
         foreach (string s in _array)
-        {
             value += XxHash.ComputeHash(s);
-        }
 
         return value;
     }
@@ -69,7 +67,7 @@ public class StringHashBenchmarks
             while (length >= 4)
             {
                 hash1 ^= Round(0, ptr64);
-                hash1 = RotateLeft(hash1, 27) * PRIME64_1 + PRIME64_4;
+                hash1 = (RotateLeft(hash1, 27) * PRIME64_1) + PRIME64_4;
                 ptr64 = ref Unsafe.Add(ref ptr64, 1);
                 length -= 4;
             }

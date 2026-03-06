@@ -67,18 +67,14 @@ internal static class GPerfTest
             string[] elements = new string[i];
 
             for (int k = 0; k < i; k++)
-            {
                 elements[k] = TestHelper.GenerateRandomString(_random, _random.Next(1, 10));
-            }
 
             using FileStream fs = File.OpenWrite(Path.Combine(path, filename));
             using StreamWriter tw = new StreamWriter(fs);
             tw.NewLine = "\n";
 
             foreach (string s in elements)
-            {
                 tw.WriteLine(s);
-            }
         }
     }
 }

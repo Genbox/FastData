@@ -14,7 +14,7 @@ namespace Genbox.FastData.Tests;
 [SuppressMessage("Usage", "xUnit1016:MemberData must reference a public member")]
 public class SegmentGeneratorTests(ITestOutputHelper o)
 {
-    [Theory, MemberData(nameof(GetGenerators))]
+    [Theory][MemberData(nameof(GetGenerators))]
     internal void CoverageTest(ISegmentGenerator generator, int maxLen)
     {
         //Tests if BruteForceGenerator, EdgeGramGenerator and OffsetGenerator covers the entire string for lengths [1..max]
@@ -31,9 +31,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
                 SegmentHelper.ConvertToOffsets(data[0].Length, in segment, out int start, out int end);
 
                 for (int i = start; i < end; i++)
-                {
                     coverage[i]++;
-                }
 
                 o.WriteLine(segment.Alignment.ToString() + '\t' + SegmentHelper.InsertSegmentBounds(data[0], segment));
             }
@@ -114,9 +112,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         ArraySegment[] res = gen.Generate(props).ToArray();
 
         foreach (ArraySegment segment in res)
-        {
             o.WriteLine($"{segment}. res: {string.Join(",", input.Select(x => SegmentHelper.InsertSegmentBounds(x, segment)))}");
-        }
 
         Assert.Equal(expected, res[0]);
     }
@@ -136,9 +132,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         string[] res = new string[count];
 
         for (int i = 0; i < count; i++)
-        {
             res[i] = TestHelper.GenerateRandomString(rng, len);
-        }
 
         return res;
     }

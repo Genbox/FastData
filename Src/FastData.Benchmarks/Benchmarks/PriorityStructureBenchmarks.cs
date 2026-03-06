@@ -23,36 +23,28 @@ public class PriorityStructureBenchmarks
     public void MinHeapTest()
     {
         for (double i = 0; i < 100; i++)
-        {
             _heap.Add(i, true);
-        }
     }
 
     [Benchmark]
     public void RingBufferTest()
     {
         for (double i = 0; i < 100; i++)
-        {
             _buffer.Add(i);
-        }
     }
 
     [Benchmark]
     public void FixedSetTest()
     {
         for (double i = 0; i < 100; i++)
-        {
             _fixedSet.Add(i);
-        }
     }
 
     [Benchmark]
     public void SortedSetTest()
     {
         for (double i = 0; i < 100; i++)
-        {
             _sorted.Add(i);
-        }
     }
 
     private sealed class FixedSet(int capacity)

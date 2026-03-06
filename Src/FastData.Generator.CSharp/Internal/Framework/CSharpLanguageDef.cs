@@ -1,10 +1,10 @@
 using System.Reflection;
-#if NETSTANDARD2_0
-using Genbox.FastData.Generator.Compat;
-#endif
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Framework.Interfaces;
+#if NETSTANDARD2_0
+using Genbox.FastData.Generator.Compat;
+#endif
 
 namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
@@ -29,7 +29,7 @@ internal class CSharpLanguageDef : ILanguageDef
         new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "double.MinValue", "double.MaxValue", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
         new StringTypeDef("string"),
 
-        new ObjectTypeDef(PrintDeclaration, PrintValue),
+        new ObjectTypeDef(PrintDeclaration, PrintValue)
     };
 
     private static string PrintDeclaration(TypeMap map, Type type)

@@ -17,7 +17,7 @@ public sealed class RustBenchmark(DockerManager dockerManager) : BenchmarkBase<R
               let mut found_count: u64 = 0;
               let keys = [ {{FormatList(Range(0, data.QueryCount)
                                         .Select(_ => data.GetRandomKey(Bootstrap.Map))
-                                        .ToArray(), s => s, ", ")}} ];
+                                        .ToArray(), s => s)}} ];
               let mut key_index: usize = 0;
 
               let start = std::time::Instant::now();

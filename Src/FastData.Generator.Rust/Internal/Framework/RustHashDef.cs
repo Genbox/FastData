@@ -11,11 +11,11 @@ internal class RustHashDef : IHashDef
         bool isString = Type.GetTypeCode(keyType) == TypeCode.String;
 
         return $$"""
-          {{(isString ? "#[inline]" : "#[inline(always)]")}}
-          {{(isString ? "unsafe " : "")}}fn get_hash(value: {{(isString ? "&" : "")}}{{typeName}}) -> u64 {
-          {{GetHash(keyType, info)}}
-          }
-          """;
+                 {{(isString ? "#[inline]" : "#[inline(always)]")}}
+                 {{(isString ? "unsafe " : "")}}fn get_hash(value: {{(isString ? "&" : "")}}{{typeName}}) -> u64 {
+                 {{GetHash(keyType, info)}}
+                 }
+                 """;
     }
 
     private static string GetHash(Type keyType, HashInfo info)

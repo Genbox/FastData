@@ -39,10 +39,7 @@ public readonly struct DummyGenerator : ICodeGenerator
             _writer.MakeGenericMethod(elementType).Invoke(null, new[] { writer, value, serializer });
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
-        {
-            throw new NotSupportedException("ReadOnlyMemory deserialization is not supported.");
-        }
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) => throw new NotSupportedException("ReadOnlyMemory deserialization is not supported.");
 
         private static void WriteJsonInternal<T>(JsonWriter writer, ReadOnlyMemory<T> memory, JsonSerializer serializer)
         {

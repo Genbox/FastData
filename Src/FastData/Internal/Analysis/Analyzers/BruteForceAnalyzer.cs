@@ -143,7 +143,7 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
 
     private sealed class AvalancheIdentity : IAvalancheGenerator
     {
-        public void Reset() { }
+        public void Reset() {}
 
         public bool TryGet(out Avalanche op)
         {

@@ -28,6 +28,16 @@ public sealed class TypeMap : ITypeMap
 
     public string GetNull() => _index[0].PrintObj(this, null);
 
+    public string GetTypeName(Type type)
+    {
+        ITypeDef res = Get(type);
+
+        if (res is ObjectTypeDef)
+            return type.Name;
+
+        return res.Name;
+    }
+
     public ITypeDef<T> Get<T>() => (ITypeDef<T>)Get(typeof(T));
 
     public ITypeDef Get(Type type)
@@ -41,15 +51,5 @@ public sealed class TypeMap : ITypeMap
             res = dyn.Get(_encoding).StringTypeDef;
 
         return res;
-    }
-
-    public string GetTypeName(Type type)
-    {
-        ITypeDef res = Get(type);
-
-        if (res is ObjectTypeDef)
-            return type.Name;
-
-        return res.Name;
     }
 }

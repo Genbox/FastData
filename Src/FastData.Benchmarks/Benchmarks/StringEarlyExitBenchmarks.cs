@@ -1,6 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [DisassemblyDiagnoser]
+[SuppressMessage("ReSharper", "ConvertToConstant.Local")]
+[SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
 public class StringEarlyExitBenchmarks
 {
     private string _value = "hello world";

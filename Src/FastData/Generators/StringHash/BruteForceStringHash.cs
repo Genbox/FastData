@@ -10,7 +10,7 @@ namespace Genbox.FastData.Generators.StringHash;
 internal sealed record BruteForceStringHash : IStringHash
 {
     //We need this ctor when resuing the object
-    internal BruteForceStringHash() { }
+    internal BruteForceStringHash() {}
 
     internal BruteForceStringHash(ArraySegment segment, Mixer mixer, Avalanche avalanche)
     {

@@ -19,9 +19,7 @@ internal sealed class RandomSelection(bool avoidDuplicates, IRandom random) : IS
         else
         {
             for (int i = 0; i < maxParents; i++)
-            {
                 parents.Add(random.Next(population.Count));
-            }
         }
     }
 }

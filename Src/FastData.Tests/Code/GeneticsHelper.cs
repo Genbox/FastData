@@ -11,7 +11,7 @@ internal static class GeneticsHelper
         for (int i = 0; i < size; i++)
         {
             Entity entity = new Entity([]);
-            entity.Fitness = Random.Shared.NextDouble() * (maxFitness - minFitness) + minFitness;
+            entity.Fitness = (Random.Shared.NextDouble() * (maxFitness - minFitness)) + minFitness;
             population.Add(ref entity);
         }
 

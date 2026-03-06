@@ -9,6 +9,28 @@ namespace Genbox.FastData.Benchmarks.Docs;
 [Config(typeof(CustomConfig))]
 public class KeyedBenchmark
 {
+    private static readonly (string, byte)[] _array = [("Labrador", 1), ("German Shepherd", 2), ("Golden Retriever", 3)];
+    private static readonly Dictionary<string, byte> _dict = new Dictionary<string, byte>(_array.Select(x => new KeyValuePair<string, byte>(x.Item1, x.Item2)), StringComparer.Ordinal);
+    private static readonly FrozenDictionary<string, byte> _frozen = _dict.ToFrozenDictionary();
+
+    [BenchmarkCategory("InSet")][Benchmark(Baseline = true)]
+    public bool Dictionary() => _dict.TryGetValue("German Shepherd", out _);
+
+    [BenchmarkCategory("InSet")][Benchmark]
+    public bool FrozenDictionary() => _frozen.TryGetValue("German Shepherd", out _);
+
+    [BenchmarkCategory("InSet")][Benchmark]
+    public bool FastData() => Dogs.TryLookup("German Shepherd", out _);
+
+    [BenchmarkCategory("NotInSet")][Benchmark(Baseline = true)]
+    public bool DictionaryNF() => _dict.TryGetValue("Beagle", out _);
+
+    [BenchmarkCategory("NotInSet")][Benchmark]
+    public bool FrozenDictionaryNF() => _frozen.TryGetValue("Beagle", out _);
+
+    [BenchmarkCategory("NotInSet")][Benchmark]
+    public bool FastDataNF() => Dogs.TryLookup("Beagle", out _);
+
     private class CustomConfig : ManualConfig
     {
         public CustomConfig()
@@ -20,28 +42,6 @@ public class KeyedBenchmark
             AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByCategory);
         }
     }
-
-    private static readonly (string, byte)[] _array = [("Labrador", 1), ("German Shepherd", 2), ("Golden Retriever", 3)];
-    private static readonly Dictionary<string, byte> _dict = new Dictionary<string, byte>(_array.Select(x => new KeyValuePair<string, byte>(x.Item1, x.Item2)), StringComparer.Ordinal);
-    private static readonly FrozenDictionary<string, byte> _frozen = _dict.ToFrozenDictionary();
-
-    [BenchmarkCategory("InSet"), Benchmark(Baseline = true)]
-    public bool Dictionary() => _dict.TryGetValue("German Shepherd", out _);
-
-    [BenchmarkCategory("InSet"), Benchmark]
-    public bool FrozenDictionary() => _frozen.TryGetValue("German Shepherd", out _);
-
-    [BenchmarkCategory("InSet"), Benchmark]
-    public bool FastData() => Dogs.TryLookup("German Shepherd", out _);
-
-    [BenchmarkCategory("NotInSet"), Benchmark(Baseline = true)]
-    public bool DictionaryNF() => _dict.TryGetValue("Beagle", out _);
-
-    [BenchmarkCategory("NotInSet"), Benchmark]
-    public bool FrozenDictionaryNF() => _frozen.TryGetValue("Beagle", out _);
-
-    [BenchmarkCategory("NotInSet"), Benchmark]
-    public bool FastDataNF() => Dogs.TryLookup("Beagle", out _);
 
     private static class Dogs
     {

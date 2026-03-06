@@ -18,9 +18,9 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
     private static readonly string FastDataKeyValueAttr = typeof(FastDataKeyValueAttribute<,>).FullName!;
 
     private static readonly SymbolDisplayFormat Format = new SymbolDisplayFormat(
-        globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
-        typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
-        genericsOptions: SymbolDisplayGenericsOptions.None,
+        SymbolDisplayGlobalNamespaceStyle.Omitted,
+        SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+        SymbolDisplayGenericsOptions.None,
         miscellaneousOptions:
         SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
         SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
@@ -159,9 +159,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             //Copy out the values to avoid hanging on to Roslyn references later on
             Array keysArr = Array.CreateInstance(ToRuntimeType(genericArg0), keys.Length);
             for (int i = 0; i < keys.Length; i++)
-            {
                 keysArr.SetValue(keys[i].Value ?? throw new InvalidOperationException("Null key in dataset"), i);
-            }
 
             Array? valueArr = null;
 
@@ -172,9 +170,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                 valueArr = Array.CreateInstance(ToRuntimeType(genericArg1), values.Length);
 
                 for (int i = 0; i < valueArr.Length; i++)
-                {
                     valueArr.SetValue(values[i].Value ?? throw new InvalidOperationException("Null value in dataset"), i);
-                }
             }
 
             FastDataConfig fdCfg = new FastDataConfig();
@@ -234,22 +230,6 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
             yield return new CombinedConfig(keysArr, valueArr, fdCfg, csCfg);
         }
-    }
-
-    private enum SupportedKeyType : byte
-    {
-        Char,
-        SByte,
-        Byte,
-        Int16,
-        UInt16,
-        Int32,
-        UInt32,
-        Int64,
-        UInt64,
-        Single,
-        Double,
-        String,
     }
 
     public static Type? ToRuntimeType(ITypeSymbol symbol)
@@ -373,5 +353,21 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             throw new InvalidOperationException($"Unable to find '{name}' overload that accepts ReadOnlyMemory arguments.");
 
         return method;
+    }
+
+    private enum SupportedKeyType : byte
+    {
+        Char,
+        SByte,
+        Byte,
+        Int16,
+        UInt16,
+        Int32,
+        UInt32,
+        Int64,
+        UInt64,
+        Single,
+        Double,
+        String
     }
 }

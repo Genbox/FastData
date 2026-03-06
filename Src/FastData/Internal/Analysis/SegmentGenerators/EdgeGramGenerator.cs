@@ -23,13 +23,9 @@ internal sealed class EdgeGramGenerator(int maxLength) : ISegmentGenerator
         //[test]
 
         for (len = 1; len <= max; len++)
-        {
             yield return new ArraySegment(0, len, Alignment.Left);
-        }
 
         for (len = 1; len <= max; len++)
-        {
             yield return new ArraySegment(0, len, Alignment.Right);
-        }
     }
 }

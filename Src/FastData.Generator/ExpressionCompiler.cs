@@ -20,9 +20,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
     protected override Expression VisitIndex(IndexExpression node)
     {
         if (node.Object != null)
-        {
             Visit(node.Object);
-        }
         else if (node.Indexer != null)
         {
             Output.Append(map.GetTypeName(node.Indexer.DeclaringType!))

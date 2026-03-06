@@ -75,9 +75,7 @@ public class StringVsBytesBenchmarks
             {
                 int hash = 17;
                 foreach (byte b in obj)
-                {
-                    hash = hash * 31 + b;
-                }
+                    hash = (hash * 31) + b;
                 return hash;
             }
         }

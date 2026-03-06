@@ -290,32 +290,6 @@ internal static class Program
             await File.WriteAllTextAsync(outputFile.FullName, source, token).ConfigureAwait(false);
     }
 
-    private sealed class PooledArray<T>(int initialCapacity = 1024)
-    {
-        private T[] _buffer = ArrayPool<T>.Shared.Rent(initialCapacity);
-        private int _count;
-
-        public void Add(in T item)
-        {
-            if (_count == _buffer.Length)
-            {
-                T[] newBuf = ArrayPool<T>.Shared.Rent(_buffer.Length * 2);
-                Array.Copy(_buffer, newBuf, _buffer.Length);
-                ArrayPool<T>.Shared.Return(_buffer, clearArray: true);
-                _buffer = newBuf;
-            }
-            _buffer[_count++] = item;
-        }
-
-        public T[] ToArray()
-        {
-            T[] result = new T[_count];
-            Array.Copy(_buffer, result, _count);
-            ArrayPool<T>.Shared.Return(_buffer, clearArray: true);
-            return result;
-        }
-    }
-
     private static async Task<T[]> ParseFileAsync<T>(string filePath, Action<PooledArray<T>, ReadOnlySpan<byte>> func, CancellationToken token = default)
     {
         PooledArray<T> pool = new PooledArray<T>();
@@ -358,6 +332,32 @@ internal static class Program
 
         await reader.CompleteAsync().ConfigureAwait(false);
         return pool.ToArray();
+    }
+
+    private sealed class PooledArray<T>(int initialCapacity = 1024)
+    {
+        private T[] _buffer = ArrayPool<T>.Shared.Rent(initialCapacity);
+        private int _count;
+
+        public void Add(in T item)
+        {
+            if (_count == _buffer.Length)
+            {
+                T[] newBuf = ArrayPool<T>.Shared.Rent(_buffer.Length * 2);
+                Array.Copy(_buffer, newBuf, _buffer.Length);
+                ArrayPool<T>.Shared.Return(_buffer, true);
+                _buffer = newBuf;
+            }
+            _buffer[_count++] = item;
+        }
+
+        public T[] ToArray()
+        {
+            T[] result = new T[_count];
+            Array.Copy(_buffer, result, _count);
+            ArrayPool<T>.Shared.Return(_buffer, true);
+            return result;
+        }
     }
 
     private sealed class CustomHelpAction(RootCommand rootCmd) : SynchronousCommandLineAction

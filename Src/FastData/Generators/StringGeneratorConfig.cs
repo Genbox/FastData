@@ -98,7 +98,7 @@ public sealed class StringGeneratorConfig : GeneratorConfigBase
         if (map.BitCount <= 1)
             return MapStrategy.Equals;
 
-        ulong range = (ulong)map.Max - map.Min + 1;
+        ulong range = ((ulong)map.Max - map.Min) + 1;
         double density = map.BitCount / (double)range;
         return density >= cfg.LengthMapMinDensity ? MapStrategy.Range : MapStrategy.Bitmap;
     }

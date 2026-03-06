@@ -22,9 +22,7 @@ internal sealed class BruteForceGenerator(int maxLength) : ISegmentGenerator
         for (uint offset = 0; offset < max; offset++)
         {
             for (int length = 1; length <= max - offset; length++)
-            {
                 yield return new ArraySegment(offset, length, Alignment.Left);
-            }
         }
 
         //Generates:
@@ -35,9 +33,7 @@ internal sealed class BruteForceGenerator(int maxLength) : ISegmentGenerator
         for (uint offset = 0; offset < max; offset++)
         {
             for (int length = 1; length <= max - offset; length++)
-            {
                 yield return new ArraySegment(offset, length, Alignment.Right);
-            }
         }
     }
 }

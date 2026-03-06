@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [DisassemblyDiagnoser]
+[SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
 public class NumericEarlyExitBenchmarks
 {
     private int _min = 3;

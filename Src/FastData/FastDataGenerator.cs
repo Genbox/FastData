@@ -54,20 +54,11 @@ public static partial class FastDataGenerator
         return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, (ReadOnlyMemory<TValue>)values, fdCfg, generator, factory);
     }
 
-    public static string Generate(ReadOnlyMemory<string> keys, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
-    {
-        return GenerateStringInternal(keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
-    }
+    public static string Generate(ReadOnlyMemory<string> keys, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) => GenerateStringInternal(keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
 
-    public static string Generate(string[] keys, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
-    {
-        return GenerateStringInternal(new ReadOnlyMemory<string>(keys), ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
-    }
+    public static string Generate(string[] keys, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) => GenerateStringInternal(new ReadOnlyMemory<string>(keys), ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
 
-    public static string GenerateKeyed<TValue>(ReadOnlyMemory<string> keys, ReadOnlyMemory<TValue> values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
-    {
-        return GenerateStringInternal(keys, values, fdCfg, generator, factory);
-    }
+    public static string GenerateKeyed<TValue>(ReadOnlyMemory<string> keys, ReadOnlyMemory<TValue> values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) => GenerateStringInternal(keys, values, fdCfg, generator, factory);
 
     private static string GenerateStringInternal<TValue>(ReadOnlyMemory<string> keys, ReadOnlyMemory<TValue> values, FastDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
@@ -166,7 +157,7 @@ public static partial class FastDataGenerator
                     return GenerateWrapper(tempState, new SingleValueStructure<string, TValue>());
 
                 // For small amounts of data, logic is the fastest. However, it increases the assembly size, so we want to try some special cases first.
-                double density = (double)keys.Length / (strProps.LengthData.LengthMap.Max - strProps.LengthData.LengthMap.Min + 1);
+                double density = (double)keys.Length / ((strProps.LengthData.LengthMap.Max - strProps.LengthData.LengthMap.Min) + 1);
 
                 // Use KeyLengthStructure only when string lengths are unique and density >= threshold
                 if (strProps.LengthData.Unique && density >= fdCfg.KeyLengthStructureMinDensity)
@@ -297,9 +288,7 @@ public static partial class FastDataGenerator
     {
         // Apply the configured strategy and return new key/value buffers.
         if (fdCfg.DeduplicationMode == DeduplicationMode.Disabled)
-        {
             return false;
-        }
 
         TKey[] copyKeys = new TKey[keys.Length];
         keys.CopyTo(copyKeys);

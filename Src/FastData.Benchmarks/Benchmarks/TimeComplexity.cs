@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
@@ -8,9 +9,9 @@ public class TimeComplexity
     private int[] _data = null!;
     private int[] _eytzinger = null!;
     private HashSet<int> _hashSet = null!;
-    private int[] _k16Keys = null!;
     private int[] _k16Children = null!;
     private byte[] _k16KeyCounts = null!;
+    private int[] _k16Keys = null!;
 
     [Params(1, 50, 100)]
     public int Query { get; set; }
@@ -50,10 +51,10 @@ public class TimeComplexity
         if (node >= eytzinger.Length)
             return;
 
-        BuildEytzinger(sorted, eytzinger, node * 2 + 1, ref index);
+        BuildEytzinger(sorted, eytzinger, (node * 2) + 1, ref index);
         eytzinger[node] = sorted[index];
         index++;
-        BuildEytzinger(sorted, eytzinger, node * 2 + 2, ref index);
+        BuildEytzinger(sorted, eytzinger, (node * 2) + 2, ref index);
     }
 
     private static int EytzingerSearch(int[] eytzinger, int value)
@@ -68,7 +69,7 @@ public class TimeComplexity
             if (value == current)
                 return node;
 
-            node = value < current ? node * 2 + 1 : node * 2 + 2;
+            node = value < current ? (node * 2) + 1 : (node * 2) + 2;
         }
 
         return -1;
@@ -87,7 +88,7 @@ public class TimeComplexity
             if (lowValue == highValue)
                 return value == lowValue ? low : -1;
 
-            int pos = low + (int)((long)(value - lowValue) * (high - low) / (highValue - lowValue));
+            int pos = low + (int)(((long)(value - lowValue) * (high - low)) / (highValue - lowValue));
             int current = sorted[pos];
 
             if (current == value)
@@ -243,41 +244,41 @@ public class TimeComplexity
             int k15 = keys[keyBase + 15];
 
             int eq = (value == k0 ? 1 : 0)
-                | (value == k1 ? 1 : 0)
-                | (value == k2 ? 1 : 0)
-                | (value == k3 ? 1 : 0)
-                | (value == k4 ? 1 : 0)
-                | (value == k5 ? 1 : 0)
-                | (value == k6 ? 1 : 0)
-                | (value == k7 ? 1 : 0)
-                | (value == k8 ? 1 : 0)
-                | (value == k9 ? 1 : 0)
-                | (value == k10 ? 1 : 0)
-                | (value == k11 ? 1 : 0)
-                | (value == k12 ? 1 : 0)
-                | (value == k13 ? 1 : 0)
-                | (value == k14 ? 1 : 0)
-                | (value == k15 ? 1 : 0);
+                     | (value == k1 ? 1 : 0)
+                     | (value == k2 ? 1 : 0)
+                     | (value == k3 ? 1 : 0)
+                     | (value == k4 ? 1 : 0)
+                     | (value == k5 ? 1 : 0)
+                     | (value == k6 ? 1 : 0)
+                     | (value == k7 ? 1 : 0)
+                     | (value == k8 ? 1 : 0)
+                     | (value == k9 ? 1 : 0)
+                     | (value == k10 ? 1 : 0)
+                     | (value == k11 ? 1 : 0)
+                     | (value == k12 ? 1 : 0)
+                     | (value == k13 ? 1 : 0)
+                     | (value == k14 ? 1 : 0)
+                     | (value == k15 ? 1 : 0);
 
             if (eq != 0)
                 return node;
 
             int childSlot = (value > k0 ? 1 : 0)
-                + (value > k1 ? 1 : 0)
-                + (value > k2 ? 1 : 0)
-                + (value > k3 ? 1 : 0)
-                + (value > k4 ? 1 : 0)
-                + (value > k5 ? 1 : 0)
-                + (value > k6 ? 1 : 0)
-                + (value > k7 ? 1 : 0)
-                + (value > k8 ? 1 : 0)
-                + (value > k9 ? 1 : 0)
-                + (value > k10 ? 1 : 0)
-                + (value > k11 ? 1 : 0)
-                + (value > k12 ? 1 : 0)
-                + (value > k13 ? 1 : 0)
-                + (value > k14 ? 1 : 0)
-                + (value > k15 ? 1 : 0);
+                            + (value > k1 ? 1 : 0)
+                            + (value > k2 ? 1 : 0)
+                            + (value > k3 ? 1 : 0)
+                            + (value > k4 ? 1 : 0)
+                            + (value > k5 ? 1 : 0)
+                            + (value > k6 ? 1 : 0)
+                            + (value > k7 ? 1 : 0)
+                            + (value > k8 ? 1 : 0)
+                            + (value > k9 ? 1 : 0)
+                            + (value > k10 ? 1 : 0)
+                            + (value > k11 ? 1 : 0)
+                            + (value > k12 ? 1 : 0)
+                            + (value > k13 ? 1 : 0)
+                            + (value > k14 ? 1 : 0)
+                            + (value > k15 ? 1 : 0);
 
             node = children[childBase + childSlot];
         }
@@ -369,9 +370,9 @@ public class TimeComplexity
             Vector128<int> eq3 = Sse2.CompareEqual(valueVector, v3);
 
             ulong eqMask = (ulong)Sse2.MoveMask(eq0.AsByte())
-                | ((ulong)Sse2.MoveMask(eq1.AsByte()) << 16)
-                | ((ulong)Sse2.MoveMask(eq2.AsByte()) << 32)
-                | ((ulong)Sse2.MoveMask(eq3.AsByte()) << 48);
+                           | ((ulong)Sse2.MoveMask(eq1.AsByte()) << 16)
+                           | ((ulong)Sse2.MoveMask(eq2.AsByte()) << 32)
+                           | ((ulong)Sse2.MoveMask(eq3.AsByte()) << 48);
 
             if (eqMask != 0)
                 return node;
@@ -386,10 +387,10 @@ public class TimeComplexity
             uint mask2 = (uint)Sse2.MoveMask(gt2.AsByte());
             uint mask3 = (uint)Sse2.MoveMask(gt3.AsByte());
 
-            int childSlot = (System.Numerics.BitOperations.PopCount(mask0)
-                + System.Numerics.BitOperations.PopCount(mask1)
-                + System.Numerics.BitOperations.PopCount(mask2)
-                + System.Numerics.BitOperations.PopCount(mask3)) / 4;
+            int childSlot = (BitOperations.PopCount(mask0)
+                             + BitOperations.PopCount(mask1)
+                             + BitOperations.PopCount(mask2)
+                             + BitOperations.PopCount(mask3)) / 4;
 
             node = children[childBase + childSlot];
         }
@@ -416,7 +417,7 @@ public class TimeComplexity
             Vector256<int> eq0 = Avx2.CompareEqual(valueVector, v0);
             Vector256<int> eq1 = Avx2.CompareEqual(valueVector, v1);
             ulong eqMask = (ulong)Avx2.MoveMask(eq0.AsByte())
-                | ((ulong)Avx2.MoveMask(eq1.AsByte()) << 32);
+                           | ((ulong)Avx2.MoveMask(eq1.AsByte()) << 32);
 
             if (eqMask != 0)
                 return node;
@@ -426,8 +427,8 @@ public class TimeComplexity
             uint mask0 = (uint)Avx2.MoveMask(gt0.AsByte());
             uint mask1 = (uint)Avx2.MoveMask(gt1.AsByte());
 
-            int childSlot = (System.Numerics.BitOperations.PopCount(mask0)
-                + System.Numerics.BitOperations.PopCount(mask1)) / 4;
+            int childSlot = (BitOperations.PopCount(mask0)
+                             + BitOperations.PopCount(mask1)) / 4;
 
             node = children[childBase + childSlot];
         }

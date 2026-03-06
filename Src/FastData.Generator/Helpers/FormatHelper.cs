@@ -10,10 +10,7 @@ public static class FormatHelper
         return FormatColumns(items.AsReadOnlySpan(), (_, y) => Render(y), indent, columns);
     }
 
-    public static string FormatColumns<T>(T[] items, Func<int, T, string> Render, int indent = 4, int columns = 10)
-    {
-        return FormatColumns(items.AsReadOnlySpan(), Render, indent, columns);
-    }
+    public static string FormatColumns<T>(T[] items, Func<int, T, string> Render, int indent = 4, int columns = 10) => FormatColumns(items.AsReadOnlySpan(), Render, indent, columns);
 
     public static string FormatColumns<T>(ReadOnlySpan<T> items, Func<T, string> Render, int indent = 4, int columns = 10)
     {
@@ -89,10 +86,7 @@ public static class FormatHelper
         return sb.ToString();
     }
 
-    public static string FormatList<T>(T[] items, Func<T, string> render, string delim = ", ")
-    {
-        return FormatList(items.AsReadOnlySpan(), render, delim);
-    }
+    public static string FormatList<T>(T[] items, Func<T, string> render, string delim = ", ") => FormatList(items.AsReadOnlySpan(), render, delim);
 
     public static string FormatList<T>(ReadOnlySpan<T> items, Func<T, string> render, string delim = ", ")
     {

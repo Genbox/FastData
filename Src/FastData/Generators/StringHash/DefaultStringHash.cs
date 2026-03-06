@@ -12,16 +12,19 @@ internal sealed record DefaultStringHash : IStringHash
 {
     private readonly GeneratorEncoding _encoding;
 
-    private DefaultStringHash(GeneratorEncoding encoding) => _encoding = encoding;
+    private DefaultStringHash(GeneratorEncoding encoding)
+    {
+        _encoding = encoding;
+    }
 
     internal static DefaultStringHash UTF8Instance { get; } = new DefaultStringHash(GeneratorEncoding.UTF8);
     internal static DefaultStringHash UTF16Instance { get; } = new DefaultStringHash(GeneratorEncoding.UTF16);
 
-    internal static DefaultStringHash GetInstance(GeneratorEncoding enc) => enc == GeneratorEncoding.UTF8 ? UTF8Instance : UTF16Instance;
-
     public State[]? State => null;
     public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.BuildFull(Mixer, Avalanche, _encoding);
     public ReaderFunctions Functions => ReaderFunctions.ReadU16;
+
+    internal static DefaultStringHash GetInstance(GeneratorEncoding enc) => enc == GeneratorEncoding.UTF8 ? UTF8Instance : UTF16Instance;
 
     // (((hash << 5) | (hash >> 27)) + hash) ^ Read(data, offset)
     private static Expression Mixer(Expression hash, Expression read) =>

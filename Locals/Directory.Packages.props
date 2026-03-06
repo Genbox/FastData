@@ -1,24 +1,24 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <ItemGroup>
+    <PackageVersion Include="AgileObjects.ReadableExpressions" Version="4.1.3" />
+    <PackageVersion Include="Docker.DotNet" Version="3.125.15" />
+    <PackageVersion Include="Genbox.FastData.SourceGenerator" Version="0.2.0" />
     <PackageVersion Include="Genbox.FastFilter" Version="1.0.0-alpha.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0-2.final" />
-    <PackageVersion Include="System.Memory" Version="4.6.3" />
-    <PackageVersion Include="Spectre.Console" Version="0.54.0" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.3" />
-    <PackageVersion Include="System.Linq.Async" Version="7.0.0" />
-    <PackageVersion Include="Verify.DiffPlex" Version="3.1.2" />
-    <PackageVersion Include="Verify.XunitV3" Version="31.13.2" />
-    <PackageVersion Include="AgileObjects.ReadableExpressions" Version="4.1.3" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.14.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.3" />
+    <PackageVersion Include="Mono.TextTemplating" Version="3.0.0" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="Serilog.Expressions" Version="5.0.0" />
     <PackageVersion Include="Serilog.Extensions.Logging" Version="10.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.14.0" />
-    <PackageVersion Include="Genbox.FastData.SourceGenerator" Version="0.2.0" />
+    <PackageVersion Include="Spectre.Console" Version="0.54.0" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.3" />
+    <PackageVersion Include="System.Linq.Async" Version="7.0.0" />
+    <PackageVersion Include="System.Memory" Version="4.6.3" />
+    <PackageVersion Include="Verify.DiffPlex" Version="3.1.2" />
+    <PackageVersion Include="Verify.XunitV3" Version="31.13.2" />
     <PackageVersion Include="xunit.v3.extensibility.core" Version="3.2.2" />
-    <PackageVersion Include="Mono.TextTemplating" Version="3.0.0" />
-    <PackageVersion Include="Docker.DotNet" Version="3.125.15" />
   </ItemGroup>
 </Project>

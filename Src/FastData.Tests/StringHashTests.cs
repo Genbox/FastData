@@ -19,6 +19,6 @@ public class StringHashTests
     public static TheoryData<StringHashFunc, bool, ulong> GetSpecs() => new TheoryData<StringHashFunc, bool, ulong>
     {
         { DefaultStringHash.UTF16Instance.GetExpression().Compile(), true, 16317555765854685474 },
-        { DefaultStringHash.UTF8Instance.GetExpression().Compile(), false, 16317555765854685474 },
+        { DefaultStringHash.UTF8Instance.GetExpression().Compile(), false, 16317555765854685474 }
     };
 }

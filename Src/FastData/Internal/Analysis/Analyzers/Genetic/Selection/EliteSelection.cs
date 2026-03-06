@@ -28,8 +28,6 @@ internal sealed class EliteSelection : ISelection
         int number = Math.Min((int)(population.Count * _topPercent), maxParents);
 
         for (int i = 0; i < number; i++)
-        {
             parents.Add(indices[i]);
-        }
     }
 }

@@ -23,7 +23,7 @@ internal sealed class LengthBitArray(int length = 64)
             if (BitCount == 0)
                 return false;
 
-            return BitCount == Max - Min + 1;
+            return BitCount == (Max - Min) + 1;
         }
     }
 

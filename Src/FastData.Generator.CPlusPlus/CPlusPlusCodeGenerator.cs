@@ -19,6 +19,8 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, TypeMap helper)
         : base(langDef, constDef, earlyExitDef, hashDef, helper, null) => _cfg = cfg;
 
+    public override GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
+
     public static CPlusPlusCodeGenerator Create(CPlusPlusCodeGeneratorConfig userCfg)
     {
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
@@ -26,8 +28,6 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
         return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(map, userCfg.GeneratorOptions), new CPlusPlusHashDef(), map);
     }
-
-    public override GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
 
     public override string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
     {
@@ -71,8 +71,8 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
     private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context) : OutputWriter<TKey>
     {
-        private readonly TemplateManager _manager = new TemplateManager("CPlusPlus", @"C:\Users\Genbox\AppData\Local\Temp\FastData\", true);
         private readonly IContext _context = context;
+        private readonly TemplateManager _manager = new TemplateManager("CPlusPlus", @"C:\Users\Genbox\AppData\Local\Temp\FastData\", true);
 
         public override string Generate()
         {
@@ -120,36 +120,36 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                 case ArrayContext<TKey, TValue> arrayCtx:
                     return new ArrayTemplateData
                     {
-                        Keys = (arrayCtx.Keys).ToObjects(),
+                        Keys = arrayCtx.Keys.ToObjects(),
                         KeyCount = arrayCtx.Keys.Length,
-                        Values = (arrayCtx.Values).ToObjects(),
+                        Values = arrayCtx.Values.ToObjects(),
                         ValueCount = arrayCtx.Values.Length
                     };
 
                 case BinarySearchContext<TKey, TValue> bsCtx:
                     return new BinarySearchTemplateData
                     {
-                        Keys = (bsCtx.Keys).ToObjects(),
+                        Keys = bsCtx.Keys.ToObjects(),
                         KeyCount = bsCtx.Keys.Length,
-                        Values = (bsCtx.Values).ToObjects(),
+                        Values = bsCtx.Values.ToObjects(),
                         ValueCount = bsCtx.Values.Length
                     };
 
                 case BinarySearchInterpolationContext<TKey, TValue> ibsCtx:
                     return new BinarySearchTemplateData
                     {
-                        Keys = (ibsCtx.Keys).ToObjects(),
+                        Keys = ibsCtx.Keys.ToObjects(),
                         KeyCount = ibsCtx.Keys.Length,
-                        Values = (ibsCtx.Values).ToObjects(),
+                        Values = ibsCtx.Values.ToObjects(),
                         ValueCount = ibsCtx.Values.Length
                     };
 
                 case ConditionalContext<TKey, TValue> conCtx:
                     return new ArrayTemplateData
                     {
-                        Keys = (conCtx.Keys).ToObjects(),
+                        Keys = conCtx.Keys.ToObjects(),
                         KeyCount = conCtx.Keys.Length,
-                        Values = (conCtx.Values).ToObjects(),
+                        Values = conCtx.Values.ToObjects(),
                         ValueCount = conCtx.Values.Length
                     };
 
@@ -172,7 +172,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     {
                         Keys = klCtx.Lengths,
                         KeyCount = klCtx.Lengths.Length,
-                        Values = (klCtx.Values).ToObjects(),
+                        Values = klCtx.Values.ToObjects(),
                         ValueCount = klCtx.Values.Length
                     };
 
@@ -182,7 +182,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                 case BitSetContext<TValue> bsCtx:
                     return new BitSetTemplateData
                     {
-                        Values = (bsCtx.Values).ToObjects(),
+                        Values = bsCtx.Values.ToObjects(),
                         ValueCount = bsCtx.Values.Length
                     };
 
@@ -202,7 +202,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     return new HashTableTemplateData
                     {
                         Entries = hashEntries,
-                        Values = (hashCtx.Values).ToObjects(),
+                        Values = hashCtx.Values.ToObjects(),
                         ValueCount = hashCtx.Values.Length
                     };
 
@@ -221,7 +221,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     return new HashTableCompactTemplateData
                     {
                         Entries = compactEntries,
-                        Values = (compactCtx.Values).ToObjects(),
+                        Values = compactCtx.Values.ToObjects(),
                         ValueCount = compactCtx.Values.Length
                     };
 
@@ -240,7 +240,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     return new HashTablePerfectTemplateData
                     {
                         Entries = perfectEntries,
-                        Values = (perfectCtx.Values).ToObjects(),
+                        Values = perfectCtx.Values.ToObjects(),
                         ValueCount = perfectCtx.Values.Length
                     };
 

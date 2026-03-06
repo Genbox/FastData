@@ -75,9 +75,7 @@ public class KeyAnalyzerTests
         Assert.Equal(data.Distinct().Count(), map.BitCount);
 
         foreach (string str in data)
-        {
             Assert.True(map.Get((uint)str.Length));
-        }
 
         Assert.Equal((uint)data.Min(x => x.Length), res.LengthData.LengthMap.Min);
         Assert.Equal((uint)data.Max(x => x.Length), res.LengthData.LengthMap.Max);

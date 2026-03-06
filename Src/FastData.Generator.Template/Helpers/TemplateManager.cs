@@ -15,9 +15,9 @@ namespace Genbox.FastData.Generator.Template.Helpers;
 
 public class TemplateManager
 {
-    private readonly bool _release;
-    private readonly string _classNamespace;
     private readonly string _cacheDirectory;
+    private readonly string _classNamespace;
+    private readonly bool _release;
 
     public TemplateManager(string language, string workDir, bool release)
     {

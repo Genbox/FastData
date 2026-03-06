@@ -29,8 +29,10 @@ public abstract class OutputWriter<TKey> : IOutputWriter
         get
         {
             if (GeneratorConfig is StringGeneratorConfig stringConfig)
+            {
                 if (stringConfig.TrimPrefix.Length + stringConfig.TrimSuffix.Length != 0)
                     return "trimmedKey";
+            }
 
             return InputKeyName;
         }

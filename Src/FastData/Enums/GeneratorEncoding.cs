@@ -6,5 +6,5 @@ public enum GeneratorEncoding : byte
     ASCII,
     UTF8,
     UTF16,
-    UTF32,
+    UTF32
 }

@@ -125,9 +125,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
             int field_width = keywords.Max(x => x.SelChars.Length);
 
             foreach (Keyword keyword in keywords)
-            {
                 sb.AppendLine($"{keyword.HashValue,11},{keyword.AllChars.Length,11},{"-1",6}, {keyword.SelChars.PadLeft(field_width)}, {keyword.AllChars}");
-            }
 
             sb.AppendLine("End dumping list.\n");
 
@@ -484,16 +482,12 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
         if (alphaInc == null)
         {
             foreach (Keyword keyword in keywords)
-            {
                 keyword.InitSelCharsTuple(positions);
-            }
         }
         else
         {
             foreach (Keyword keyword in keywords)
-            {
                 keyword.InitSelCharsMultiset(positions, alphaInc);
-            }
         }
 
         HashSet<string> set = new HashSet<string>(StringComparer.Ordinal);
@@ -602,9 +596,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
         {
             // Initialize each keyword's SelChars array.
             foreach (Keyword keyword in keywords)
-            {
                 keyword.InitSelCharsMultiset(positions, alphaInc);
-            }
 
             // Compute the maximum SelChars.Length over all keywords.
             int maxSelCharsLength = keywords.Max(x => x.SelChars.Length);
@@ -633,9 +625,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
             foreach (Keyword keyword in keywords)
             {
                 foreach (char c in keyword.SelChars)
-                {
                     Occurrences[c]++;
-                }
             }
 
             Values = new int[alphaSize];
@@ -674,9 +664,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
                 int field_width = keywords.Max(x => x.SelChars.Length);
                 int i = 0;
                 foreach (Keyword keyword in keywords)
-                {
                     sb.AppendLine($"{++i,9}, {keyword.SelChars.PadLeft(field_width)}, {keyword.AllChars}");
-                }
 
                 LogGPerfDebug(logger, sb.ToString());
             }
@@ -695,9 +683,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
 
             bool[] determined = new bool[alphaSize];
             for (uint c = 0; c < alphaSize; c++)
-            {
                 determined[c] = true;
-            }
 
             while (true)
             {
@@ -802,9 +788,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
                     for (EquivalenceClass? cls = step.Partition; cls != null; cls = cls.Next)
                     {
                         foreach (Keyword keyword in cls.Keywords)
-                        {
                             sb.AppendLine("  " + keyword.AllChars);
-                        }
                     }
                     sb.AppendLine();
                 }
@@ -815,9 +799,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
 
             // Initialize _asso_values[]. (The value given here matters only for those c which occur in all keywords with equal multiplicity.)
             for (uint c = 0; c < alphaSize; c++)
-            {
                 Values[c] = 0;
-            }
 
             uint stepNo = 0;
             for (Step? step = steps; step != null; step = step._next)
@@ -836,9 +818,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
                 int[] iter = new int[k];
 
                 for (int i = 0; i < k; i++)
-                {
                     iter[i] = 0;
-                }
 
                 int ii = jump != 0 ? k - 1 : 0;
 
@@ -1036,9 +1016,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
             for (EquivalenceClass? cls = partition; cls != null; cls = cls.Next)
             {
                 for (int i = 0; i <= maxSelCharsLength; i++)
-                {
                     split_cardinalities[i] = 0;
-                }
 
                 foreach (Keyword keyword in cls.Keywords)
                 {
@@ -1054,9 +1032,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
 
                 sum += cls.Cardinality * cls.Cardinality;
                 for (int i = 0; i <= maxSelCharsLength; i++)
-                {
                     sum -= split_cardinalities[i] * split_cardinalities[i];
-                }
             }
             return sum;
         }

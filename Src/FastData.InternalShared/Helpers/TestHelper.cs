@@ -9,9 +9,7 @@ public static class TestHelper
         char[] data = new char[length];
 
         for (int i = 0; i < length; i++)
-        {
             data[i] = _alphabet[rng.Next(0, _alphabet.Length)];
-        }
 
         return new string(data);
     }

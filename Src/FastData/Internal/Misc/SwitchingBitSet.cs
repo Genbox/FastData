@@ -76,9 +76,7 @@ internal sealed class SwitchingBitSet
             mask = 1UL << bitIndex;
         }
         else
-        {
             mask = 1UL << ((int)index & 63);
-        }
     }
 
     private void SwitchToSet()

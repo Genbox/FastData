@@ -19,10 +19,7 @@ public class TestData<TKey>(StructureType structureType, TKey[] keys) : ITestDat
 
     public string Identifier => $"{StructureType}_{_keyType}_{Keys.Length}";
 
-    public string Generate(ICodeGenerator generator)
-    {
-        return FastDataGenerator.Generate(Keys, new FastDataConfig(StructureType) { StringAnalyzerConfig = null }, generator);
-    }
+    public string Generate(ICodeGenerator generator) => FastDataGenerator.Generate(Keys, new FastDataConfig(StructureType) { StringAnalyzerConfig = null }, generator);
 
     public string GetRandomKey(TypeMap map) => map.ToValueLabel(Keys[_rng.Next(0, Keys.Length)]);
 

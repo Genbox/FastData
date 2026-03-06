@@ -1,11 +1,10 @@
-#if NETSTANDARD2_0
-using Genbox.FastData.Generator.Compat;
-#endif
-
 using System.Reflection;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Framework.Interfaces;
+#if NETSTANDARD2_0
+using Genbox.FastData.Generator.Compat;
+#endif
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 

@@ -39,9 +39,7 @@ public static class CompilationHelper
         HashSet<string> locations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (Type type in types)
-        {
             locations.Add(type.Assembly.Location);
-        }
 
         foreach (Assembly assembly in AssemblyLoadContext.Default.Assemblies)
         {

@@ -20,8 +20,8 @@ internal sealed class RrrBitVectorStructure<TKey, TValue>(bool keysAreSorted = f
 
         ulong minValue = mapped[0];
         ulong maxValue = mapped[mapped.Length - 1];
-        ulong universe = maxValue - minValue + 1UL;
-        ulong blockCount64 = (universe + BlockSize - 1UL) / BlockSize;
+        ulong universe = (maxValue - minValue) + 1UL;
+        ulong blockCount64 = ((universe + BlockSize) - 1UL) / BlockSize;
 
         if (blockCount64 > int.MaxValue)
             throw new InvalidOperationException("RRR bitvector is too large.");
@@ -106,7 +106,7 @@ internal sealed class RrrBitVectorStructure<TKey, TValue>(bool keysAreSorted = f
         int result = 1;
 
         for (int i = 1; i <= k; i++)
-            result = checked(result * (n - (k - i)) / i);
+            result = checked((result * (n - (k - i))) / i);
 
         return result;
     }

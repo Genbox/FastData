@@ -55,8 +55,6 @@ public class SourceGeneratorTests
         Assert.False(tryLookup("dontexist", out value) && value == null);
     }
 
-    private delegate bool TryLookupDelegate(string key, out int? value);
-
     [Theory]
     [InlineData(StructureType.Array)]
     [InlineData(StructureType.Conditional)]
@@ -160,4 +158,6 @@ public class SourceGeneratorTests
 
         return output;
     }
+
+    private delegate bool TryLookupDelegate(string key, out int? value);
 }

@@ -1,11 +1,11 @@
-#if NETSTANDARD2_0
-using Genbox.FastData.Generator.Compat;
-#endif
 using System.Collections.ObjectModel;
 using System.Reflection;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Framework.Interfaces;
+#if NETSTANDARD2_0
+using Genbox.FastData.Generator.Compat;
+#endif
 
 namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
@@ -28,7 +28,7 @@ internal class RustLanguageDef : ILanguageDef
         new IntegerTypeDef<float>("f32", float.MinValue, float.MaxValue, "f32::MIN", "f32::MAX", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
         new IntegerTypeDef<double>("f64", double.MinValue, double.MaxValue, "f64::MIN", "f64::MAX", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
         new StringTypeDef("str"),
-        new ObjectTypeDef(PrintDeclaration, PrintValue),
+        new ObjectTypeDef(PrintDeclaration, PrintValue)
     };
 
     private static string PrintDeclaration(TypeMap map, Type type)
@@ -122,9 +122,7 @@ internal class RustLanguageDef : ILanguageDef
     {
         StringBuilder sb = new StringBuilder();
         foreach (PropertyInfo prop in properties)
-        {
             sb.AppendLine($"    pub {prop.Name.ToLowerInvariant()}: {RenderType(map, prop.PropertyType, staticLife, IsPropertyNullable(prop))},");
-        }
         return sb.ToString();
     }
 

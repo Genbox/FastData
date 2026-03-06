@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
@@ -12,6 +13,7 @@ public class VectorBenchmarks
         private const ulong _rrrMinValue = 2147483648ul;
         private const ulong _rrrMaxValue = 2147484647ul;
         private const int _rrrBlockSize = 15;
+
         private static readonly byte[] _rrrClasses = new byte[]
         {
             15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
@@ -22,7 +24,7 @@ public class VectorBenchmarks
             15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
             15, 15, 15, 15, 15, 15, 10
         };
-        private static readonly uint[] _rrrOffsets = new uint[]
+        private static readonly uint[] _rrrOffsets = new[]
         {
             uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue,
             uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue,
@@ -38,14 +40,14 @@ public class VectorBenchmarks
             if (((uint)key & 4294966272u) != 0)
                 return false;
 
-            ulong mapped = (ulong)(uint)(key ^ int.MinValue);
+            ulong mapped = (uint)(key ^ int.MinValue);
 
             if (mapped < _rrrMinValue || mapped > _rrrMaxValue)
                 return false;
 
             ulong normalized = mapped - _rrrMinValue;
-            int blockIndex = (int)(normalized / (ulong)_rrrBlockSize);
-            int bitInBlock = (int)(normalized % (ulong)_rrrBlockSize);
+            int blockIndex = (int)(normalized / _rrrBlockSize);
+            int bitInBlock = (int)(normalized % _rrrBlockSize);
             int classValue = _rrrClasses[blockIndex];
 
             if (classValue == 0)
@@ -97,29 +99,28 @@ public class VectorBenchmarks
             int result = 1;
 
             for (int i = 1; i <= k; i++)
-                result = checked(result * (n - (k - i)) / i);
+                result = checked((result * (n - (k - i))) / i);
 
             return result;
         }
-
-        public const uint ItemCount = 1000;
-        public const int MinKey = 0;
-        public const int MaxKey = 999;
     }
 
     private static class EliasFanoStructure_Int32_1000
     {
         private const int _lowerBitCount = 0;
-        private static readonly ulong[] _upperBits = new ulong[]
+
+        private const int _sampleRateShift = 7;
+
+        public const uint ItemCount = 1000;
+
+        private static readonly ulong[] _upperBits = new[]
         {
             6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul,
             6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul,
             6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul, 6148914691236517205ul,
             6148914691236517205ul, 21845ul
         };
-
-        private const int _sampleRateShift = 7;
-        private static readonly int[] _samplePositions = new int[]
+        private static readonly int[] _samplePositions = new[]
         {
             0, 257, 513, 769, 1025, 1281, 1537, 1793
         };
@@ -129,7 +130,7 @@ public class VectorBenchmarks
             if (((uint)key & 4294966272u) != 0)
                 return false;
 
-            long value = (long)key;
+            long value = key;
             long high = value >> _lowerBitCount;
 
             long position = high == 0 ? 0 : SelectZero(high - 1) + 1;
@@ -157,7 +158,7 @@ public class VectorBenchmarks
                     window = _upperBits[currWord];
                 }
 
-                int trailing = System.Numerics.BitOperations.TrailingZeroCount(window);
+                int trailing = BitOperations.TrailingZeroCount(window);
                 long onePosition = ((long)currWord << 6) + trailing;
                 long currentHigh = onePosition - rank;
 
@@ -203,7 +204,7 @@ public class VectorBenchmarks
                     startBit = 0;
                 }
 
-                int zeroCount = System.Numerics.BitOperations.PopCount(zeros);
+                int zeroCount = BitOperations.PopCount(zeros);
                 if (zeroCount == 0)
                     continue;
 
@@ -241,11 +242,7 @@ public class VectorBenchmarks
             if (value == 0)
                 return -1;
 
-            return System.Numerics.BitOperations.TrailingZeroCount(value);
+            return BitOperations.TrailingZeroCount(value);
         }
-
-        public const uint ItemCount = 1000;
-        public const int MinKey = 0;
-        public const int MaxKey = 999;
     }
 }

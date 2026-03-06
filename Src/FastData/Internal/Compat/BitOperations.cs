@@ -48,7 +48,8 @@ internal static class BitOperations
             value >>= 2;
             result += 2;
         }
-        if (value >= 1UL << 1) { result += 1; }
+        if (value >= 1UL << 1)
+            result += 1;
 
         return result;
     }

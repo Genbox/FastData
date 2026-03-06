@@ -22,7 +22,7 @@ public sealed class CSharpBenchmark(DockerManager dockerManager) : BenchmarkBase
               {
                   var keys = new[] { {{FormatList(Range(0, data.QueryCount)
                                                   .Select(_ => data.GetRandomKey(Bootstrap.Map))
-                                                  .ToArray(), s => s, ", ")}} };
+                                                  .ToArray(), s => s)}} };
                   int keyIndex = 0;
 
                   // Warmup

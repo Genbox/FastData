@@ -34,7 +34,7 @@ public static class TestVectorHelper
         [
             new Person { Age = 1, Name = "Bob", Other = new Person { Name = "Anna", Age = 4 } },
             new Person { Age = 2, Name = "Billy" },
-            new Person { Age = 3, Name = "Bibi" },
+            new Person { Age = 3, Name = "Bibi" }
         ];
 
         foreach (ITestVector testVector in GenerateTestVectors([[1]], [[complexValues[0]]], "complex", typeof(SingleValueStructure<,>)))
@@ -152,15 +152,11 @@ public static class TestVectorHelper
                 //Convert object[] to T[]
                 Array keysArr = Array.CreateInstance(keyType, keys.Length);
                 for (int i = 0; i < keys.Length; i++)
-                {
                     keysArr.SetValue(keys[i], i);
-                }
 
                 Array notInKeysArr = Array.CreateInstance(keyType, notInKeys.Length);
                 for (int i = 0; i < notInKeys.Length; i++)
-                {
                     notInKeysArr.SetValue(notInKeys[i], i);
-                }
 
                 if (values != null)
                 {
@@ -168,9 +164,7 @@ public static class TestVectorHelper
 
                     Array valuesArr = Array.CreateInstance(valueType, values.Length);
                     for (int i = 0; i < values.Length; i++)
-                    {
                         valuesArr.SetValue(values[i], i);
-                    }
 
                     Type vector = typeof(TestVector<,>).MakeGenericType(keyType, valueType);
                     yield return (ITestVector)Activator.CreateInstance(vector, st, keysArr, notInKeysArr, valuesArr, postfix)!;

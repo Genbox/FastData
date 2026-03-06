@@ -1,17 +1,19 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Genbox.FastData.Generators.Helpers;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 /// <summary>Benchmarks the difference between normal modulus and FastMod</summary>
+[SuppressMessage("ReSharper", "ConvertToConstant.Local")]
 public class FastModBenchmarks
 {
-    private readonly uint _value = 3_000_000_000; //Note: Do not make this const!
-    private readonly ushort _mod = 1024; //Note: Do not make this const!
     private const ushort _modConst = 1024;
+    private readonly ushort _mod = 1024; //Note: Do not make this const!
 
     private readonly ulong _mult = MathHelper.GetFastModMultiplier(int.MaxValue);
     private readonly uint _mult2 = GetFastModMultiplierSmall(3000);
+    private readonly uint _value = 3_000_000_000; //Note: Do not make this const!
 
     [Benchmark]
     public uint Const() => _value % 1024;

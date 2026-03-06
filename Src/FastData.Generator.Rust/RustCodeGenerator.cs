@@ -19,6 +19,8 @@ public sealed class RustCodeGenerator : CodeGenerator
     private RustCodeGenerator(RustCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, TypeMap map)
         : base(langDef, constDef, earlyExitDef, hashDef, map, null) => _cfg = cfg;
 
+    public override GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
+
     public static RustCodeGenerator Create(RustCodeGeneratorConfig userCfg)
     {
         RustLanguageDef langDef = new RustLanguageDef();
@@ -26,8 +28,6 @@ public sealed class RustCodeGenerator : CodeGenerator
 
         return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(map, userCfg.GeneratorOptions), new RustHashDef(), map);
     }
-
-    public override GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
 
     protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfigBase genCfg, IContext context)
     {

@@ -112,9 +112,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
                         i++;
                     }
                     else
-                    {
                         sb.Append(c);
-                    }
 
                     continue;
                 }
@@ -132,9 +130,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
                     i++;
                 }
                 else
-                {
                     sb.Append(c);
-                }
 
                 atLineStart = true;
                 continue;
