@@ -69,6 +69,8 @@ public sealed class RustCodeGenerator : CodeGenerator
 
     private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context) : OutputWriter<TKey>
     {
+        private readonly TemplateManager _manager = new TemplateManager("Rust", @"C:\Users\Genbox\AppData\Local\Temp\FastData\", true);
+
         public override string Generate()
         {
             string raw = context.GetType().Name;
@@ -76,7 +78,7 @@ public sealed class RustCodeGenerator : CodeGenerator
             string name = raw.Substring(0, idx) + "Code.t4";
             string source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Templates", "Rust", name));
 
-            return TemplateHelper.Render(this, name, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
+            return _manager.Render(this, name, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
             {
                 {
                     "Model", new TemplateModel

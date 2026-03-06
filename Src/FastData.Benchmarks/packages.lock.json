@@ -53,15 +53,15 @@
       },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "Transitive",
-        "resolved": "3.11.0",
-        "contentHash": "v/EW3UE8/lbEYHoC2Qq7AR/DnmvpgdtAMndfQNmpuIMx/Mto8L5JnuCfdBYtgvalQOtfNCnxFejxuRrryvUTsg=="
+        "resolved": "5.3.0-2.final",
+        "contentHash": "VzdevMuvWpgH5s7bj+Y8CHaAPvJvzdRjBL/f2bzCEugZIOFOCZfblsbHwbCJ3hUFvvrbbcLcTrLt6HIj3bngAw=="
       },
       "Microsoft.CodeAnalysis.Common": {
         "type": "Transitive",
-        "resolved": "4.14.0",
-        "contentHash": "PC3tuwZYnC+idaPuoC/AZpEdwrtX7qFpmnrfQkgobGIWiYmGi5MCRtl5mx6QrfMGQpK78X2lfIEoZDLg/qnuHg==",
+        "resolved": "5.3.0-2.final",
+        "contentHash": "pFJLuTM+S24ezzQEJ3tYTbz9Sey1KOfSNJMQcILMYlpvEhwIq91IGe8qimeD7haYe2LAMAJoQqqIhrVUnlVNGQ==",
         "dependencies": {
-          "Microsoft.CodeAnalysis.Analyzers": "3.11.0"
+          "Microsoft.CodeAnalysis.Analyzers": "5.3.0-2.25625.1"
         }
       },
       "Microsoft.Diagnostics.NETCore.Client": {
@@ -193,6 +193,7 @@
         "type": "Project",
         "dependencies": {
           "FastData.Generator": "[1.0.0, )",
+          "Microsoft.CodeAnalysis.CSharp": "[5.3.0-2.final, )",
           "Mono.TextTemplating": "[3.0.0, )"
         }
       },
@@ -200,7 +201,7 @@
         "type": "Project",
         "dependencies": {
           "Docker.DotNet": "[3.125.15, )",
-          "Microsoft.CodeAnalysis.CSharp": "[4.10.0, )",
+          "Microsoft.CodeAnalysis.CSharp": "[5.3.0-2.final, )",
           "Newtonsoft.Json": "[13.0.4, )",
           "xunit.v3.extensibility.core": "[3.2.2, )"
         }
@@ -216,12 +217,12 @@
       },
       "Microsoft.CodeAnalysis.CSharp": {
         "type": "CentralTransitive",
-        "requested": "[4.10.0, )",
-        "resolved": "4.14.0",
-        "contentHash": "568a6wcTivauIhbeWcCwfWwIn7UV7MeHEBvFB2uzGIpM2OhJ4eM/FZ8KS0yhPoNxnSpjGzz7x7CIjTxhslojQA==",
+        "requested": "[5.3.0-2.final, )",
+        "resolved": "5.3.0-2.final",
+        "contentHash": "8d5I7PAkaH4J6yqGerBiXvxxhwNfrvRaAcCFb8cdiInnLibjry/wKahMJUgcRrv1ejDXAKRZb3ChtztjS5gDlw==",
         "dependencies": {
-          "Microsoft.CodeAnalysis.Analyzers": "3.11.0",
-          "Microsoft.CodeAnalysis.Common": "[4.14.0]"
+          "Microsoft.CodeAnalysis.Analyzers": "5.3.0-2.25625.1",
+          "Microsoft.CodeAnalysis.Common": "[5.3.0-2.final]"
         }
       },
       "Microsoft.Extensions.Logging.Abstractions": {

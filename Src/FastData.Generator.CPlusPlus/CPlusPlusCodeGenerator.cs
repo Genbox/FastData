@@ -71,14 +71,17 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
     private sealed class TemplateBasedOutputWriter<TKey, TValue>(IContext context) : OutputWriter<TKey>
     {
+        private readonly TemplateManager _manager = new TemplateManager("CPlusPlus", @"C:\Users\Genbox\AppData\Local\Temp\FastData\", true);
+        private readonly IContext _context = context;
+
         public override string Generate()
         {
-            string raw = context.GetType().Name;
+            string raw = _context.GetType().Name;
             int idx = raw.IndexOf("Context", StringComparison.Ordinal);
             string name = raw.Substring(0, idx) + "Code.t4";
             string source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Templates", "CPlusPlus", name));
 
-            return TemplateHelper.Render(this, name, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
+            return _manager.Render(this, name, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
             {
                 {
                     "Model", new TemplateModel
@@ -104,7 +107,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                         GetValueTypeName = () => typeof(TValue).IsPrimitive ? ValueTypeName : ValueTypeName + "*"
                     }
                 },
-                { "Context", context },
+                { "Context", _context },
                 { "Shared", Shared },
                 { "Data", CreateContextModel() }
             });
@@ -112,7 +115,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 
         private ITemplateData? CreateContextModel()
         {
-            switch (context)
+            switch (_context)
             {
                 case ArrayContext<TKey, TValue> arrayCtx:
                     return new ArrayTemplateData
@@ -248,7 +251,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                     return null;
 
                 default:
-                    throw new InvalidOperationException("No template mapping found for context type: " + context.GetType().FullName);
+                    throw new InvalidOperationException("No template mapping found for context type: " + _context.GetType().FullName);
             }
         }
 

@@ -2,6 +2,19 @@
   "version": 2,
   "dependencies": {
     "net10.0": {
+      "Microsoft.CodeAnalysis.Analyzers": {
+        "type": "Transitive",
+        "resolved": "5.3.0-2.final",
+        "contentHash": "VzdevMuvWpgH5s7bj+Y8CHaAPvJvzdRjBL/f2bzCEugZIOFOCZfblsbHwbCJ3hUFvvrbbcLcTrLt6HIj3bngAw=="
+      },
+      "Microsoft.CodeAnalysis.Common": {
+        "type": "Transitive",
+        "resolved": "5.3.0-2.final",
+        "contentHash": "pFJLuTM+S24ezzQEJ3tYTbz9Sey1KOfSNJMQcILMYlpvEhwIq91IGe8qimeD7haYe2LAMAJoQqqIhrVUnlVNGQ==",
+        "dependencies": {
+          "Microsoft.CodeAnalysis.Analyzers": "5.3.0-2.25625.1"
+        }
+      },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
         "resolved": "10.0.3",
@@ -34,7 +47,18 @@
         "type": "Project",
         "dependencies": {
           "FastData.Generator": "[1.0.0, )",
+          "Microsoft.CodeAnalysis.CSharp": "[5.3.0-2.final, )",
           "Mono.TextTemplating": "[3.0.0, )"
+        }
+      },
+      "Microsoft.CodeAnalysis.CSharp": {
+        "type": "CentralTransitive",
+        "requested": "[5.3.0-2.final, )",
+        "resolved": "5.3.0-2.final",
+        "contentHash": "8d5I7PAkaH4J6yqGerBiXvxxhwNfrvRaAcCFb8cdiInnLibjry/wKahMJUgcRrv1ejDXAKRZb3ChtztjS5gDlw==",
+        "dependencies": {
+          "Microsoft.CodeAnalysis.Analyzers": "5.3.0-2.25625.1",
+          "Microsoft.CodeAnalysis.Common": "[5.3.0-2.final]"
         }
       },
       "Microsoft.Extensions.Logging.Abstractions": {
