@@ -146,12 +146,26 @@ public class TemplateManager
 
     private static IEnumerable<MetadataReference> GetMetadataReferences(TemplateGenerator generator, TemplateSettings settings, string[] references)
     {
-        HashSet<string> referencePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        AddReferencePaths(referencePaths, references);
-        AddReferencePaths(referencePaths, generator.Refs);
-        AddReferencePaths(referencePaths, settings.Assemblies);
+        HashSet<string> paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        AddReferencePaths(paths, references);
+        AddReferencePaths(paths, generator.Refs);
+        AddReferencePaths(paths, settings.Assemblies);
 
-        return referencePaths.Select(r => MetadataReference.CreateFromFile(r));
+        // Add standard references for .NET
+        string? dotNetDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
+
+        if (dotNetDir == null)
+            throw new InvalidOperationException("Unable to find .NET runtime");
+
+        paths.Add(Path.Combine(dotNetDir, "System.Runtime.dll"));
+        paths.Add(Path.Combine(dotNetDir, "System.Collections.dll"));
+        paths.Add(Path.Combine(dotNetDir, "System.Collections.NonGeneric.dll"));
+        paths.Add(Path.Combine(dotNetDir, "System.Linq.dll"));
+        paths.Add(Path.Combine(dotNetDir, "netstandard.dll"));
+
+        paths.Add(Path.Combine(AppContext.BaseDirectory, "System.CodeDom.dll"));
+
+        return paths.Select(r => MetadataReference.CreateFromFile(r));
     }
 
     private static void AddReferencePaths(HashSet<string> referencePaths, ICollection<string> references)
