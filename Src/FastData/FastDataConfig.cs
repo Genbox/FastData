@@ -9,8 +9,11 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
     /// <summary>The type of structure to create. Defaults to Auto.</summary>
     public StructureType StructureType { get; set; } = structureType;
 
-    /// <summary>Set the method to use for deduplication of keys. Defaults to <see cref="DeduplicationMode.HashSetPreserveOrder" />.</summary>
-    public DeduplicationMode DeduplicationMode { get; set; } = DeduplicationMode.HashSetPreserveOrder;
+    /// <summary>Set the method to use for deduplication of keys. Defaults to <see cref="FastData.DeduplicationMode.HashSet" />.</summary>
+    public DeduplicationMode DeduplicationMode { get; set; } = DeduplicationMode.HashSet;
+
+    /// <summary>When true, FastData will only use data structures and algorithms that preserve the original data order</summary>
+    public bool PreserveOrder { get; set; } = true;
 
     /// <summary>When true, throws an exception on duplicate keys</summary>
     public bool ThrowOnDuplicates { get; set; } = true;

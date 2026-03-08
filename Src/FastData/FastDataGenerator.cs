@@ -299,15 +299,15 @@ public static partial class FastDataGenerator
         bool isSorted = false;
         int uniqueCount;
 
-        if (fdCfg.DeduplicationMode == DeduplicationMode.HashSetPreserveOrder)
+        if (fdCfg.DeduplicationMode == DeduplicationMode.HashSet)
             DeduplicateWithHashSet(copyKeys, copyValues, fdCfg.ThrowOnDuplicates, equalityComparer, out uniqueCount);
+        else if (fdCfg.DeduplicationMode == DeduplicationMode.Sort && fdCfg.PreserveOrder)
+            DeduplicateWithSortPreserveInputOrder(copyKeys, copyValues, fdCfg.ThrowOnDuplicates, equalityComparer, sortComparer, out uniqueCount);
         else if (fdCfg.DeduplicationMode == DeduplicationMode.Sort)
         {
             DeduplicateWithSort(copyKeys, copyValues, fdCfg.ThrowOnDuplicates, equalityComparer, sortComparer, out uniqueCount);
             isSorted = true;
         }
-        else if (fdCfg.DeduplicationMode == DeduplicationMode.SortPreserveOrder)
-            DeduplicateWithSortPreserveInputOrder(copyKeys, copyValues, fdCfg.ThrowOnDuplicates, equalityComparer, sortComparer, out uniqueCount);
         else
             throw new InvalidOperationException("Unsupported deduplication mode: " + fdCfg.DeduplicationMode);
 

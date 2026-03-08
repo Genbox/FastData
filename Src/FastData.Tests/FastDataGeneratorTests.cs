@@ -10,9 +10,8 @@ namespace Genbox.FastData.Tests;
 public class FastDataGeneratorTests
 {
     [Theory]
-    [InlineData(DeduplicationMode.HashSetPreserveOrder)]
+    [InlineData(DeduplicationMode.HashSet)]
     [InlineData(DeduplicationMode.Sort)]
-    [InlineData(DeduplicationMode.SortPreserveOrder)]
     public void Generate_ThrowOnDuplicate(DeduplicationMode mode)
     {
         FastDataConfig config = new FastDataConfig();
@@ -25,9 +24,8 @@ public class FastDataGeneratorTests
 
     [Theory]
     [InlineData(DeduplicationMode.Disabled)]
-    [InlineData(DeduplicationMode.HashSetPreserveOrder)]
+    [InlineData(DeduplicationMode.HashSet)]
     [InlineData(DeduplicationMode.Sort)]
-    [InlineData(DeduplicationMode.SortPreserveOrder)]
     public void Generate_NoThrowOnDuplicates(DeduplicationMode mode)
     {
         FastDataConfig config = new FastDataConfig();
@@ -54,10 +52,11 @@ public class FastDataGeneratorTests
     }
 
     [Theory]
-    [InlineData(DeduplicationMode.HashSetPreserveOrder)]
-    [InlineData(DeduplicationMode.Sort)]
-    [InlineData(DeduplicationMode.SortPreserveOrder)]
-    public void GenerateKeyed_StringDeduplication_RemovesDuplicates(DeduplicationMode mode)
+    [InlineData(DeduplicationMode.HashSet, true)]
+    [InlineData(DeduplicationMode.HashSet, false)]
+    [InlineData(DeduplicationMode.Sort, true)]
+    [InlineData(DeduplicationMode.Sort, false)]
+    public void GenerateKeyed_StringDeduplication_RemovesDuplicates(DeduplicationMode mode, bool preserveOrder)
     {
         string[] keys = ["b", "a", "b", "c"];
         string[] values = ["vb", "va", "vb", "vc"];
@@ -65,28 +64,36 @@ public class FastDataGeneratorTests
         FastDataConfig config = new FastDataConfig(StructureType.Array);
         config.DeduplicationMode = mode;
         config.ThrowOnDuplicates = false;
+        config.PreserveOrder = preserveOrder;
 
         ContextCaptureGenerator generator = new ContextCaptureGenerator();
         FastDataGenerator.GenerateKeyed(keys, values, config, generator);
 
         ArrayContext<string, string> ctx = Assert.IsType<ArrayContext<string, string>>(generator.Context);
-        if (mode is DeduplicationMode.HashSetPreserveOrder or DeduplicationMode.SortPreserveOrder)
+
+        // If user asked for preserved order, we should preserve no matter what method used
+        if (preserveOrder)
         {
-            Assert.True(ctx.Keys.Span.SequenceEqual(["b", "a", "c"]));
-            Assert.True(ctx.Values.Span.SequenceEqual(["vb", "va", "vc"]));
+            Assert.Equal(["b", "a", "c"], ctx.Keys.Span);
+            Assert.Equal(["vb", "va", "vc"], ctx.Values.Span);
         }
         else
         {
-            Assert.True(ctx.Keys.Span.SequenceEqual(["a", "b", "c"]));
-            Assert.True(ctx.Values.Span.SequenceEqual(["va", "vb", "vc"]));
+            // Additionally, if the user asked for sort, but no preservation, data should be sorted
+            if (mode == DeduplicationMode.Sort)
+            {
+                Assert.Equal(["a", "b", "c"], ctx.Keys.Span);
+                Assert.Equal(["va", "vb", "vc"], ctx.Values.Span);
+            }
         }
     }
 
     [Theory]
-    [InlineData(DeduplicationMode.HashSetPreserveOrder)]
-    [InlineData(DeduplicationMode.Sort)]
-    [InlineData(DeduplicationMode.SortPreserveOrder)]
-    public void GenerateKeyed_NumericDeduplication_RemovesDuplicates(DeduplicationMode mode)
+    [InlineData(DeduplicationMode.HashSet, true)]
+    [InlineData(DeduplicationMode.HashSet, false)]
+    [InlineData(DeduplicationMode.Sort, true)]
+    [InlineData(DeduplicationMode.Sort, false)]
+    public void GenerateKeyed_NumericDeduplication_RemovesDuplicates(DeduplicationMode mode, bool preserveOrder)
     {
         int[] keys = [3, 1, 3, 2];
         string[] values = ["v3", "v1", "v3", "v2"];
@@ -94,20 +101,27 @@ public class FastDataGeneratorTests
         FastDataConfig config = new FastDataConfig(StructureType.Array);
         config.DeduplicationMode = mode;
         config.ThrowOnDuplicates = false;
+        config.PreserveOrder = preserveOrder;
 
         ContextCaptureGenerator generator = new ContextCaptureGenerator();
         FastDataGenerator.GenerateKeyed(keys, values, config, generator);
 
         ArrayContext<int, string> ctx = Assert.IsType<ArrayContext<int, string>>(generator.Context);
-        if (mode is DeduplicationMode.HashSetPreserveOrder or DeduplicationMode.SortPreserveOrder)
+
+        // If user asked for preserved order, we should preserve no matter what method used
+        if (preserveOrder)
         {
-            Assert.True(ctx.Keys.Span.SequenceEqual([3, 1, 2]));
-            Assert.True(ctx.Values.Span.SequenceEqual(["v3", "v1", "v2"]));
+            Assert.Equal([3, 1, 2], ctx.Keys.Span);
+            Assert.Equal(["v3", "v1", "v2"], ctx.Values.Span);
         }
         else
         {
-            Assert.True(ctx.Keys.Span.SequenceEqual([1, 2, 3]));
-            Assert.True(ctx.Values.Span.SequenceEqual(["v1", "v2", "v3"]));
+            // Additionally, if the user asked for sort, but no preservation, data should be sorted
+            if (mode == DeduplicationMode.Sort)
+            {
+                Assert.Equal([1, 2, 3], ctx.Keys.Span);
+                Assert.Equal(["v1", "v2", "v3"], ctx.Values.Span);
+            }
         }
     }
 

@@ -10,15 +10,10 @@ public enum DeduplicationMode : byte
     /// <summary>
     /// Uses a hash set to deduplicate data. It is faster than sorting, but uses more memory. It does not change the order of keys.
     /// </summary>
-    HashSetPreserveOrder,
+    HashSet,
 
     /// <summary>
-    /// Uses sorting to deduplicate data. It is not as fast as <seealso cref="HashSetPreserveOrder" />, but it uses about half the memory. As a side effect, it changes the order of keys, which might be a desired side effect under certain circumstances.
+    /// Uses sorting to deduplicate data. It is not as fast as <seealso cref="HashSet" />, but it uses about half the memory. As a side effect, it changes the order of keys, which might be a desired side effect under certain circumstances.
     /// </summary>
     Sort,
-
-    /// <summary>
-    /// Same as <seealso cref="Sort" />, but input order is preserved.
-    /// </summary>
-    SortPreserveOrder
 }
