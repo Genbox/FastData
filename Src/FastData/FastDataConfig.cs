@@ -6,9 +6,6 @@ namespace Genbox.FastData;
 [PublicAPI]
 public sealed class FastDataConfig(StructureType structureType = StructureType.Auto)
 {
-    private int _maxHistogramBuckets = 20;
-    private int _skipQuantum = 128;
-
     /// <summary>The type of structure to create. Defaults to Auto.</summary>
     public StructureType StructureType { get; set; } = structureType;
 
@@ -72,15 +69,15 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
     /// <summary>Maximum number of histogram buckets used for interpolated binary search selection.</summary>
     public int MaxHistogramBuckets
     {
-        get => _maxHistogramBuckets;
+        get;
         set
         {
             if (value <= 0)
                 throw new ArgumentOutOfRangeException(nameof(value), "MaxHistogramBuckets must be greater than 0.");
 
-            _maxHistogramBuckets = value;
+            field = value;
         }
-    }
+    } = 20;
 
     /// <summary>Maximum relative slowdown allowed for a perfect hash before preferring a faster non-perfect hash.</summary>
     public double PerfectHashMaxSlowdownFactor { get; set; } = 0.25;
@@ -88,7 +85,7 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
     /// <summary>Sample rate for Elias-Fano zero-select index. Must be a power of two.</summary>
     public int SkipQuantum
     {
-        get => _skipQuantum;
+        get;
         set
         {
             if (value <= 0)
@@ -97,9 +94,9 @@ public sealed class FastDataConfig(StructureType structureType = StructureType.A
             if ((value & (value - 1)) != 0)
                 throw new ArgumentException("SkipQuantum must be a power of two.", nameof(value));
 
-            _skipQuantum = value;
+            field = value;
         }
-    }
+    } = 128;
 
     /// <summary>When enabled, data structures will be generated with the smallest possible internal data types to lower memory.</summary>
     public bool TypeReductionEnabled { get; set; } = true; //TODO: Evaluate default value
