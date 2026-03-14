@@ -2,5 +2,7 @@ namespace Genbox.FastData.Generator.Framework.Interfaces;
 
 public interface IHashDef
 {
-    string GetHashSource(Type keyType, string typeName, HashInfo info);
+    string GetStringHashSource(string typeName);
+    string GetNumericHashSource(TypeCode keyType, string typeName, bool hasZeroOrNaN);
+    string Wrap(TypeCode typeCode, string typeName, string hash);
 }

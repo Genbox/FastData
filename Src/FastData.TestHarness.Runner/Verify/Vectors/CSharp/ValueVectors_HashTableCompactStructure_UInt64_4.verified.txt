@@ -30,7 +30,6 @@ internal static class FastData
         new E(ulong.MinValue), new E(1ul), new E(2ul), new E(ulong.MaxValue)
     };
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(ulong value)
     {
@@ -40,7 +39,7 @@ internal static class FastData
 
     public static bool Contains(ulong key)
     {
-        if (key < ulong.MinValue || key > ulong.MaxValue)
+        if (((ulong)key & ulong.MinValue) != 0)
             return false;
 
 

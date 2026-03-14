@@ -117,12 +117,6 @@ impl fastdata {
         if len < 5 as usize || len > 7 as usize {
             return false;
         }
-        let bytes = key.as_bytes();
-        let len = bytes.len();
-        let value_char = to_lower_ascii(bytes[0]);
-        if value_char < 97u8 || value_char > 99u8 {
-            return false;
-        }
 
 
         let mut lo: usize = 0;

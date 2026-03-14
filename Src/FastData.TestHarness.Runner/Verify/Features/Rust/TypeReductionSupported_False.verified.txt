@@ -26,9 +26,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: u8) -> bool {
-        if key < u8::MIN || key > u8::MAX {
-            return false;
-        }
 
 
         let hash = unsafe { Self::get_hash(key) };

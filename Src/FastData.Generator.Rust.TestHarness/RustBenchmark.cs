@@ -1,5 +1,6 @@
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.InternalShared.Harness;
+using Genbox.FastData.InternalShared.Harness.Enums;
 using Genbox.FastData.InternalShared.Helpers;
 using Genbox.FastData.InternalShared.TestClasses;
 using static System.Linq.Enumerable;

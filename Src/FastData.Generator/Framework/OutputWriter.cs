@@ -1,4 +1,3 @@
-using System.Collections;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Abstracts;
 using Genbox.FastData.Generator.Enums;
@@ -19,7 +18,6 @@ public abstract class OutputWriter<TKey> : IOutputWriter
     public GeneratorConfigBase GeneratorConfig { get; private set; } = null!;
     protected string KeyTypeName { get; private set; } = null!;
     protected string ValueTypeName { get; private set; } = null!;
-    protected string HashSource { get; private set; } = null!;
     public string HashSizeType => _typeMap.GetTypeName(typeof(ulong));
     public string ArraySizeType => _langDef.ArraySizeType;
     public string InputKeyName => "key";
@@ -39,6 +37,8 @@ public abstract class OutputWriter<TKey> : IOutputWriter
     }
 
     protected static string TrimmedKeyName => "trimmedKey";
+
+    public string? HashSource { get; private set; }
 
     public abstract string Generate();
 
@@ -66,32 +66,29 @@ public abstract class OutputWriter<TKey> : IOutputWriter
         KeyTypeName = keyTypeName;
         ValueTypeName = valueTypeName;
 
-        //If there is no compiler, or there is no specialized string hash, we give null to the hash definition
-        StringHashInfo? stringHash = null;
+        TypeCode typeCode = Type.GetTypeCode(typeof(TKey));
 
-        if (GeneratorConfig.HashDetails.StringHash != null && compiler != null)
+        // If the generator supports expressions, and we have a generated hash
+        if (hashDef is IHashExpressionDef expDef && genCfg is StringGeneratorConfig strCfg && strCfg.HashInfo != null && compiler != null)
         {
-            //We convert state from State to StateInfo such that consumers can use it directly
-            StateInfo[]? genState = null;
-            State[]? fdState = GeneratorConfig.HashDetails.StringHash.State;
+            // Render helper functions and additional data
+            if (strCfg.HashInfo.Functions != ReaderFunctions.None)
+                Shared.Add(CodePlacement.InClass, expDef.RenderFunctions(strCfg.HashInfo.Functions));
 
-            if (fdState != null)
-            {
-                //We convert from State to an easily consumable StateInfo
-                genState = new StateInfo[fdState.Length];
+            if (strCfg.HashInfo.AdditionalData != null)
+                Shared.Add(CodePlacement.InClass, expDef.RenderAdditionalData(strCfg.HashInfo.AdditionalData));
 
-                for (int i = 0; i < fdState.Length; i++)
-                {
-                    State state = fdState[i];
-                    genState[i] = new StateInfo(state.Name, _typeMap.GetTypeName(state.Type), GetValues(state.Values, _typeMap, state.Type).ToArray());
-                }
-            }
+            // Compile the expression to source
+            string exprStr = compiler.GetCode(strCfg.HashInfo.Expression);
 
-            stringHash = new StringHashInfo(compiler.GetCode(GeneratorConfig.HashDetails.StringHash.Expression), GeneratorConfig.HashDetails.StringHash.Functions, genState);
+            //Wrap it in a function
+            HashSource = hashDef.Wrap(typeCode, keyTypeName, exprStr);
+        }
+        else
+        {
+            HashSource = hashDef.Wrap(typeCode, keyTypeName, typeCode == TypeCode.String ? hashDef.GetStringHashSource(keyTypeName) : hashDef.GetNumericHashSource(typeCode, keyTypeName, ((NumericGeneratorConfig<TKey>)GeneratorConfig).HasZeroOrNaN));
         }
 
-        HashInfo hashInfo = new HashInfo(GeneratorConfig.HashDetails.HasZeroOrNaN, stringHash);
-        HashSource = hashDef.GetHashSource(typeof(TKey), KeyTypeName, hashInfo);
         RegisterSharedCode();
     }
 
@@ -111,14 +108,6 @@ public abstract class OutputWriter<TKey> : IOutputWriter
     protected string GetObjectDeclarations<TValue>() => typeof(TValue).IsPrimitive ? "" : _typeMap.GetDeclarations<TValue>(); //We don't have declarations for primitives
     protected string GetSmallestSignedType(long value) => GeneratorConfig.TypeReductionEnabled ? _typeMap.GetSmallestIntType(value) : _typeMap.Get<int>().Name;
     protected string GetSmallestUnsignedType(long value) => GeneratorConfig.TypeReductionEnabled ? _typeMap.GetSmallestUIntType((ulong)value) : _typeMap.Get<uint>().Name;
-
-    private static IEnumerable<string> GetValues(Array array, TypeMap map, Type type)
-    {
-        IEnumerator enumerator = array.GetEnumerator();
-
-        while (enumerator.MoveNext())
-            yield return map.ToValueLabel(enumerator.Current, type);
-    }
 
     protected virtual void RegisterSharedCode() {}
 }

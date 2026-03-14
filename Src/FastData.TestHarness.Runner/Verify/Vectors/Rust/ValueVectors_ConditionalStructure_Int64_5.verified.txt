@@ -13,7 +13,7 @@ pub struct fastdata;
 impl fastdata {
     #[must_use]
     pub fn contains(key: i64) -> bool {
-        if key < i64::MIN || key > i64::MAX {
+        if (key as u64 & u64::MIN) != 0 {
             return false;
         }
 

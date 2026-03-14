@@ -12,7 +12,6 @@ internal static class FastData
         3, 1, 2
     };
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(int value)
     {
@@ -22,8 +21,6 @@ internal static class FastData
 
     public static bool Contains(int key)
     {
-        if (((uint)key & 4294967292u) != 0)
-            return false;
 
 
         ulong hash = Hash(key);

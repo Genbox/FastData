@@ -1,14 +1,22 @@
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class BinarySearchStructure<TKey, TValue>(bool ignoreCase, bool keysAreSorted = false) : IStructure<TKey, TValue, BinarySearchContext<TKey, TValue>>
+public sealed class BinarySearchStructure<TKey, TValue> : IStructure<TKey, TValue, BinarySearchContext<TKey, TValue>>
 {
+    private readonly bool _keysAreSorted;
+    private readonly StringComparer? _comparer;
+
+    internal BinarySearchStructure(bool keysAreSorted, StringComparer? comparer)
+    {
+        _keysAreSorted = keysAreSorted;
+        _comparer = comparer;
+    }
+
     public BinarySearchContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
-        if (keysAreSorted)
+        if (_keysAreSorted)
             return new BinarySearchContext<TKey, TValue>(keys, values);
 
         TKey[] keysCopy = new TKey[keys.Length];
@@ -20,9 +28,9 @@ internal sealed class BinarySearchStructure<TKey, TValue>(bool ignoreCase, bool 
         if (typeof(TKey) == typeof(string))
         {
             if (values.IsEmpty)
-                Array.Sort(keysCopy, StringHelper.GetStringComparer(ignoreCase));
+                Array.Sort(keysCopy, _comparer);
             else
-                Array.Sort(keysCopy, valuesCopy, StringHelper.GetStringComparer(ignoreCase));
+                Array.Sort(keysCopy, valuesCopy, _comparer);
         }
         else
         {

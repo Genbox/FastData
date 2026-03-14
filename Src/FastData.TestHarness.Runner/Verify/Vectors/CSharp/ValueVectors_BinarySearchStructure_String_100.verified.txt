@@ -27,9 +27,6 @@ internal static class FastData
         int len = key.Length;
         if (len < 1u || len > 2u)
             return false;
-        char valueChar = key[0];
-        if (valueChar < '0' || valueChar > '9')
-            return false;
 
 
         int lo = 0;

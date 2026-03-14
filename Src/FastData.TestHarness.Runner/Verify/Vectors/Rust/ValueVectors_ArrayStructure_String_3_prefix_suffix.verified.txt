@@ -21,12 +21,6 @@ impl fastdata {
         if len < 6 as usize || len > 8 as usize {
             return false;
         }
-        let bytes = key.as_bytes();
-        let len = bytes.len();
-        let value_char = bytes[0];
-        if value_char != 112 {
-            return false;
-        }
 
 
         for entry in Self::KEYS.iter() {

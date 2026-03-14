@@ -1,7 +1,7 @@
 using Genbox.FastData.Internal.Abstracts;
 using JetBrains.Annotations;
 
-namespace Genbox.FastData;
+namespace Genbox.FastData.Config.Analysis;
 
 [PublicAPI]
 public sealed class GeneticAnalyzerConfig : IAnalyzerConfig

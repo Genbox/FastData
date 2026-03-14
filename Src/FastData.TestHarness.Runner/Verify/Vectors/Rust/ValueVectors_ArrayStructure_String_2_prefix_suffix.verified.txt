@@ -20,12 +20,6 @@ impl fastdata {
         if key.len() != 6 as usize {
             return false;
         }
-        let bytes = key.as_bytes();
-        let len = bytes.len();
-        let value_char = bytes[len - 1];
-        if value_char != 120 {
-            return false;
-        }
 
 
         for entry in Self::KEYS.iter() {

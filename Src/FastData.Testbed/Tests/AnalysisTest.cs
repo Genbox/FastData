@@ -1,7 +1,10 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Genbox.FastData.Config;
+using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.StringHash;
+using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -46,7 +49,7 @@ internal static class AnalysisTest
         GeneticAnalyzerConfig gcfg = new GeneticAnalyzerConfig();
         cfg.GeneticAnalyzerConfig = gcfg;
 
-        FastDataConfig fdCfg = new FastDataConfig();
+        StringDataConfig fdCfg = new StringDataConfig();
 
         Stopwatch sw = Stopwatch.StartNew();
 
@@ -59,7 +62,7 @@ internal static class AnalysisTest
                 gcfg.PopulationSize = j;
 
                 sw.Restart();
-                Candidate cand = FastDataGenerator.GetBestHash(Data, props, cfg, NullLoggerFactory.Instance, GeneratorEncoding.UTF16, false, fdCfg);
+                Candidate cand = HashBenchmark.GetBestHash(Data, props, cfg, NullLoggerFactory.Instance, GeneratorEncoding.UTF16, false);
 
                 sw.Stop();
                 Console.WriteLine($"{i.ToString(),-10}{j.ToString(),-10}{sw.ElapsedMilliseconds,-10:N0}{cand.Collisions,-10:N0}");

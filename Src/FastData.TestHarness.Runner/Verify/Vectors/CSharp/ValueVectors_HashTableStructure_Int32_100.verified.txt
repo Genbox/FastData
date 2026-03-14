@@ -46,7 +46,6 @@ internal static class FastData
         new E(90, -1), new E(91, -1), new E(92, -1), new E(93, -1), new E(94, -1), new E(95, -1), new E(96, -1), new E(97, -1), new E(98, -1), new E(99, -1)
     };
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(int value)
     {

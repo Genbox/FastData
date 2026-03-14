@@ -31,8 +31,6 @@ class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-        if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
-            return false;
 
 
         const uint64_t hash = get_hash(key);
@@ -53,11 +51,6 @@ class fastdata final {
 
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
-        if ((static_cast<uint32_t>(key) & 4294967292u) != 0)
-            {
-        value = nullptr;
-        return false;
-    }
 
 
         const uint64_t hash = get_hash(key);

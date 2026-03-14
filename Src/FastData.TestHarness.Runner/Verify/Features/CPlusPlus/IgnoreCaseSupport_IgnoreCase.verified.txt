@@ -94,9 +94,6 @@ class fastdata final {
          const size_t len = key.length();
          if (len < 5u || len > 7u)
              return false;
-        uint32_t valueChar = to_lower_ascii(static_cast<uint32_t>(key.front()));
-        if (valueChar < 97u || valueChar > 99u)
-            return false;
 
 
         int32_t lo = 0;

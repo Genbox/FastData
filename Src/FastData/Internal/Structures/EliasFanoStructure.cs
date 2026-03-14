@@ -1,16 +1,30 @@
 using System.Numerics;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey> props, FastDataConfig cfg, bool keysAreSorted = false) : IStructure<TKey, TValue, EliasFanoContext<TKey>>
+public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, EliasFanoContext<TKey>>
 {
+    private readonly TKey _minValue;
+    private readonly TKey _maxValue;
+    private readonly Func<TKey, long> _valueConverter;
+    private readonly bool _keysAreSorted;
+    private readonly int _skipQuantum;
+
+    internal EliasFanoStructure(TKey minValue, TKey maxValue, Func<TKey, long> valueConverter, bool keysAreSorted, int skipQuantum)
+    {
+        _minValue = minValue;
+        _maxValue = maxValue;
+        _valueConverter = valueConverter;
+        _keysAreSorted = keysAreSorted;
+        _skipQuantum = skipQuantum;
+    }
+
     public EliasFanoContext<TKey> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         //We need the data to be sorted
-        if (!keysAreSorted)
+        if (!_keysAreSorted)
         {
             TKey[] keysCopy = new TKey[keys.Length];
             keys.CopyTo(keysCopy);
@@ -21,10 +35,10 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
         ReadOnlySpan<TKey> keysSpan = keys.Span;
 
         int count = keysSpan.Length;
-        long minValue = props.ValueConverter(props.MinKeyValue);
-        long maxValue = props.ValueConverter(props.MaxKeyValue);
-        long effectiveMinValue = minValue < 0 ? minValue : 0;
-        long maxValueNormalized = maxValue - effectiveMinValue;
+        long min = _valueConverter(_minValue);
+        long max = _valueConverter(_maxValue);
+        long effectiveMinValue = min < 0 ? min : 0;
+        long maxValueNormalized = max - effectiveMinValue;
 
         long factor = maxValueNormalized / count;
         int lowerBitCount = factor <= 0 ? 0 : BitOperations.Log2((ulong)factor);
@@ -39,7 +53,7 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
         {
             for (int i = 0; i < keysSpan.Length; i++)
             {
-                long value = props.ValueConverter(keysSpan[i]) - effectiveMinValue;
+                long value = _valueConverter(keysSpan[i]) - effectiveMinValue;
                 int index = (int)(value + i);
                 upperBits[index >> 6] |= 1UL << (index & 63);
             }
@@ -50,7 +64,7 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
 
             for (int i = 0; i < keysSpan.Length; i++)
             {
-                long value = props.ValueConverter(keysSpan[i]) - effectiveMinValue;
+                long value = _valueConverter(keysSpan[i]) - effectiveMinValue;
                 int index = (int)((value >> lowerBitCount) + i);
                 upperBits[index >> 6] |= 1UL << (index & 63);
 
@@ -70,11 +84,10 @@ internal sealed class EliasFanoStructure<TKey, TValue>(NumericKeyProperties<TKey
         }
 
         //To index Elias-Fano, we build a quantum skip list
-        int skipQuantum = cfg.SkipQuantum;
-        int sampleRateShift = BitOperations.TrailingZeroCount((uint)skipQuantum);
-        int[] samplePositions = BuildSamples(upperBits, upperBitLength, skipQuantum);
+        int sampleRateShift = BitOperations.TrailingZeroCount((uint)_skipQuantum);
+        int[] samplePositions = BuildSamples(upperBits, upperBitLength, _skipQuantum);
 
-        return new EliasFanoContext<TKey>(keys, lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions, effectiveMinValue, maxValue);
+        return new EliasFanoContext<TKey>(keys, lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions, effectiveMinValue, max);
     }
 
     private static int[] BuildSamples(ulong[] words, int bitLength, int sampleRate)

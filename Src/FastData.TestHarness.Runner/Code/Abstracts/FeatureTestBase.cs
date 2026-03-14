@@ -1,4 +1,6 @@
+using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Harness;
 using static Genbox.FastData.TestHarness.Runner.Code.VerifyHelper;
 
@@ -11,7 +13,8 @@ public abstract class FeatureTestBase
     [Fact]
     public async Task FloatNaNOrZeroHashSupport()
     {
-        FastDataConfig config = new FastDataConfig(StructureType.HashTable);
+        NumericDataConfig config = new NumericDataConfig();
+        config.StructureTypeOverride = typeof(HashTableStructure<,>);
 
         float[] floats = [1f, 2f, 3f, 4f, 5f];
         string source = FastDataGenerator.Generate(floats, config, Harness.Generator);
@@ -30,7 +33,8 @@ public abstract class FeatureTestBase
     [InlineData(true), InlineData(false)]
     public async Task IgnoreCaseSupport(bool ignoreCase)
     {
-        FastDataConfig config = new FastDataConfig(StructureType.BinarySearch);
+        StringDataConfig config = new StringDataConfig();
+        config.StructureTypeOverride = typeof(BinarySearchStructure<,>);
         config.IgnoreCase = ignoreCase;
 
         string[] keys = ["Alpha", "bravo", "CHARLIE"];
@@ -48,7 +52,8 @@ public abstract class FeatureTestBase
     [InlineData(true), InlineData(false)]
     public async Task PrefixSuffixTrimmingSupported(bool enabled)
     {
-        FastDataConfig config = new FastDataConfig(StructureType.BinarySearch);
+        StringDataConfig config = new StringDataConfig();
+        config.StructureTypeOverride = typeof(BinarySearchStructure<,>);
         config.EnablePrefixSuffixTrimming = enabled;
 
         string[] keys = ["PreAlphaSuf", "PreBravoSuf", "PreCharlieSuf"];
@@ -65,7 +70,8 @@ public abstract class FeatureTestBase
     [InlineData(true), InlineData(false)]
     public async Task TypeReductionSupported(bool enabled)
     {
-        FastDataConfig config = new FastDataConfig(StructureType.HashTable);
+        NumericDataConfig config = new NumericDataConfig();
+        config.StructureTypeOverride = typeof(HashTableStructure<,>);
         config.TypeReductionEnabled = enabled;
 
         byte[] keys = [byte.MinValue, 1, byte.MaxValue];

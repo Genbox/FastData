@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Genbox.FastData.Generator.CPlusPlus.Enums;
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
@@ -107,16 +106,6 @@ internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : Ea
                      const size_t len = key.length();
                      if (len < {map.ToValueLabel(minLen)} || len > {map.ToValueLabel(maxLen)})
                          {RenderExit(methodType)}
-                """;
-    }
-
-    protected override string GetLengthDivisorEarlyExit(MethodType methodType, uint charDivisor, uint byteDivisor)
-    {
-        Debug.Assert(byteDivisor > 1);
-
-        return $"""
-                    if (key.length() % {map.ToValueLabel(byteDivisor)} != 0)
-                        {RenderExit(methodType)}
                 """;
     }
 

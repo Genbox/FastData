@@ -17,9 +17,6 @@ class fastdata final {
          const size_t len = key.length();
          if (len < 3u || len > 10u)
              return false;
-        uint32_t valueChar = static_cast<uint32_t>(key.front());
-        if (valueChar != 97u)
-            return false;
 
 
         return key == keys[key.length() - 3];

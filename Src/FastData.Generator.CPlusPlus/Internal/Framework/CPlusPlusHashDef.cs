@@ -1,4 +1,3 @@
-using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Interfaces;
 using Genbox.FastData.Generators.Extensions;
 
@@ -6,41 +5,24 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 internal class CPlusPlusHashDef : IHashDef
 {
-    public string GetHashSource(Type keyType, string typeName, HashInfo info)
+    public string GetStringHashSource(string typeName) =>
+        """
+        uint64_t hash = 352654597;
+
+           for (unsigned char ch : value)
+               hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+
+           return 352654597 + (hash * 1566083941);
+        """;
+
+    public string GetNumericHashSource(TypeCode keyType, string typeName, bool hasZeroOrNaN)
     {
-        TypeCode typeCode = Type.GetTypeCode(keyType);
-        bool notConst = typeCode is TypeCode.Single or TypeCode.Double or TypeCode.Int64 or TypeCode.UInt64;
-
-        return $$"""
-                 static{{(notConst ? " " : " constexpr ")}}uint64_t get_hash(const {{typeName}} value) noexcept
-                 {
-                 {{GetHash(keyType, info)}}
-                 }
-                 """;
-    }
-
-    private static string GetHash(Type keyType, HashInfo info)
-    {
-        TypeCode typeCode = Type.GetTypeCode(keyType);
-
-        if (typeCode == TypeCode.String)
-        {
-            return """
-                       uint64_t hash = 352654597;
-
-                       for (unsigned char ch : value)
-                           hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
-
-                       return 352654597 + (hash * 1566083941);
-                   """;
-        }
-
         if (keyType.UsesIdentityHash())
             return "    return static_cast<uint64_t>(value);";
 
-        if (typeCode == TypeCode.Single)
+        if (keyType == TypeCode.Single)
         {
-            return info.HasZeroOrNaN
+            return hasZeroOrNaN
                 ? """
                       uint32_t bits;
                       std::memcpy(&bits, &value, sizeof(bits));
@@ -55,9 +37,9 @@ internal class CPlusPlusHashDef : IHashDef
                   """;
         }
 
-        if (typeCode == TypeCode.Double)
+        if (keyType == TypeCode.Double)
         {
-            return info.HasZeroOrNaN
+            return hasZeroOrNaN
                 ? """
                       uint64_t bits;
                       std::memcpy(&bits, &value, sizeof(bits));
@@ -72,6 +54,18 @@ internal class CPlusPlusHashDef : IHashDef
                   """;
         }
 
-        throw new InvalidOperationException("Unsupported data type: " + keyType);
+        throw new InvalidOperationException("Unsupported key type: " + keyType);
+    }
+
+    public string Wrap(TypeCode keyType, string typeName, string hash)
+    {
+        bool notConst = keyType is TypeCode.Single or TypeCode.Double or TypeCode.Int64 or TypeCode.UInt64;
+
+        return $$"""
+                 static{{(notConst ? " " : " constexpr ")}}uint64_t get_hash(const {{typeName}} value) noexcept
+                 {
+                 {{hash}}
+                 }
+                 """;
     }
 }

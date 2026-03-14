@@ -1,3 +1,3 @@
 namespace Genbox.FastData.Generators.StringHash.Framework;
 
-public delegate ulong HashFunc<in T>(T obj);
+public delegate ulong NumericHashFunc<in T>(T obj);

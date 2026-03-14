@@ -1,4 +1,4 @@
-﻿namespace Genbox.FastData.InternalShared.Harness;
+﻿namespace Genbox.FastData.InternalShared.Harness.Enums;
 
 public enum HarnessType
 {

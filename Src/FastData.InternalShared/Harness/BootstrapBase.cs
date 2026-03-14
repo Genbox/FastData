@@ -1,4 +1,5 @@
 using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.InternalShared.Harness.Enums;
 
 namespace Genbox.FastData.InternalShared.Harness;
 

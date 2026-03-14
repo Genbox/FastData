@@ -14,7 +14,6 @@ internal static class FastData
         288254840285429792ul, 361484261993218048ul, 9009398350348352ul
     };
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(string value)
     {
@@ -37,9 +36,6 @@ internal static class FastData
     {
         int len = key.Length;
         if (len < 1u || len > 2u)
-            return false;
-        char valueChar = key[0];
-        if (valueChar < '0' || valueChar > '9')
             return false;
 
 

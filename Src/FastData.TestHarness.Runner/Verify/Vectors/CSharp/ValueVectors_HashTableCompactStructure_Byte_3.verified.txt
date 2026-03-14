@@ -30,7 +30,6 @@ internal static class FastData
         new E(byte.MinValue), new E(byte.MaxValue), new E(1)
     };
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(byte value)
     {
@@ -40,8 +39,6 @@ internal static class FastData
 
     public static bool Contains(byte key)
     {
-        if (key < byte.MinValue || key > byte.MaxValue)
-            return false;
 
 
         ulong hash = Hash(key);

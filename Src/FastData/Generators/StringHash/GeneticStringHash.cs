@@ -35,7 +35,7 @@ internal sealed record GeneticStringHash : IStringHash
     internal int MixerIterations { get; }
     internal int AvalancheSeed { get; }
     internal int AvalancheIterations { get; }
-    public State[]? State => null;
+    public AdditionalData[]? AdditionalData => null;
 
     public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.Build([Segment], GetMixer(), GetAvalanche());
     public ReaderFunctions Functions => ReaderFunctions.All;

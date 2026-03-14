@@ -59,7 +59,6 @@ internal static class FastData
         new E("67", 11144406284706922485ul), new E("10", 11144406353614615889ul), new E("36", 11144406353614615889ul), new E("59", 11144406135928948090ul), new E("62", 11144406292537342190ul), new E("77", 11144406135928948090ul), new E("8", 18225461126646534592ul), new E("43", 11144406300367761895ul), new E("70", 11144406143759367795ul), new E("86", 11144406865724064596ul)
     };
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(string value)
     {
@@ -82,9 +81,6 @@ internal static class FastData
     {
         int len = key.Length;
         if (len < 1u || len > 2u)
-            return false;
-        char valueChar = key[0];
-        if (valueChar < '0' || valueChar > '9')
             return false;
 
 

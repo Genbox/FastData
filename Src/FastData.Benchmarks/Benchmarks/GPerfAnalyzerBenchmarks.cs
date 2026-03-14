@@ -1,3 +1,4 @@
+using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;

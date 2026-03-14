@@ -10,6 +10,9 @@ internal static class FastData
 {
     public static bool Contains(string key)
     {
+        int len = key.Length;
+        if (len < 1u || len > 255u)
+            return false;
 
 
         switch (key)

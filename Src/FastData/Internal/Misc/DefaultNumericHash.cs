@@ -3,9 +3,9 @@ using Genbox.FastData.Generators.StringHash.Framework;
 
 namespace Genbox.FastData.Internal.Misc;
 
-internal static class PrimitiveHash
+internal static class DefaultNumericHash
 {
-    internal static HashFunc<T> GetHashFunc<T>(bool hasZeroOrNaN) => Type.GetTypeCode(typeof(T)) switch
+    internal static NumericHashFunc<T> GetHashFunc<T>(bool hasZeroOrNaN) => Type.GetTypeCode(typeof(T)) switch
     {
         TypeCode.Char => static obj => (char)(object)obj!,
         TypeCode.SByte => static obj => unchecked((ulong)(sbyte)(object)obj!),

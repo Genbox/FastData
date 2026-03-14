@@ -22,7 +22,7 @@ internal sealed record BruteForceStringHash : IStringHash
     internal ArraySegment Segment { get; set; }
     internal Mixer Mixer { get; set; }
     internal Avalanche Avalanche { get; set; }
-    public State[]? State => null;
+    public AdditionalData[]? AdditionalData => null;
 
     public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.Build([Segment], Mixer, Avalanche);
     public ReaderFunctions Functions => ReaderFunctions.All;

@@ -32,7 +32,6 @@ internal static class FastData
         new E(0.0, ulong.MinValue), new E(1.0, 4607182418800017408ul), new E(double.MinValue, 18442240474082181119ul), new E(double.MaxValue, 9218868437227405311ul)
     };
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(double value)
     {

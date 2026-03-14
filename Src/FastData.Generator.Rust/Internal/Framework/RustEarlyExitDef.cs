@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
@@ -79,17 +78,6 @@ internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
                   {{RenderExit(methodType)}}
               }
           """;
-
-    protected override string GetLengthDivisorEarlyExit(MethodType methodType, uint charDivisor, uint byteDivisor)
-    {
-        Debug.Assert(byteDivisor > 1);
-
-        return $$"""
-                     if key.len() % {{map.ToValueLabel(byteDivisor)}} as usize != 0 {
-                         {{RenderExit(methodType)}}
-                     }
-                 """;
-    }
 
     protected override string GetStringBitMaskEarlyExit(MethodType methodType, ulong mask, int byteCount, bool ignoreCase, GeneratorEncoding encoding)
     {

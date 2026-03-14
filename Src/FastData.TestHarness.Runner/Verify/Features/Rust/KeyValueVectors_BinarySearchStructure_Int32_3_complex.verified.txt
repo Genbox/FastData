@@ -31,9 +31,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if (key as u32 & 4294967292) != 0 {
-            return false;
-        }
 
 
         let mut lo: usize = 0;
@@ -58,9 +55,6 @@ impl fastdata {
 
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
-        if (key as u32 & 4294967292) != 0 {
-            return None;
-        }
 
 
         let mut lo: usize = 0;

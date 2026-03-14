@@ -21,12 +21,6 @@ impl fastdata {
         if len < 3 as usize || len > 10 as usize {
             return false;
         }
-        let bytes = key.as_bytes();
-        let len = bytes.len();
-        let value_char = bytes[0];
-        if value_char != 97 {
-            return false;
-        }
 
 
         return key == Self::KEYS[key.len() - 3];

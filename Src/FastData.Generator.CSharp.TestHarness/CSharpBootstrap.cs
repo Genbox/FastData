@@ -3,6 +3,7 @@ using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.InternalShared.Harness;
+using Genbox.FastData.InternalShared.Harness.Enums;
 
 namespace Genbox.FastData.Generator.CSharp.TestHarness;
 

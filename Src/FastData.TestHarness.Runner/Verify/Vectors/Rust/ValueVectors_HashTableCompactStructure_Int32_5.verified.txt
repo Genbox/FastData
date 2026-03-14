@@ -30,7 +30,7 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if key < i32::MIN || key > i32::MAX {
+        if (key as u32 & u32::MIN) != 0 {
             return false;
         }
 

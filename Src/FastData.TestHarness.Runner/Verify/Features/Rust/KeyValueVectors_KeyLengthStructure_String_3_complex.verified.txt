@@ -39,12 +39,6 @@ impl fastdata {
         if len < 1 as usize || len > 3 as usize {
             return false;
         }
-        let bytes = key.as_bytes();
-        let len = bytes.len();
-        let value_char = bytes[0];
-        if value_char != 97 {
-            return false;
-        }
 
 
         return key == Self::KEYS[key.len() - 1];
@@ -54,12 +48,6 @@ impl fastdata {
     pub fn try_lookup(key: &'static str) -> Option<&'static Person> {
         let len = key.len();
         if len < 1 as usize || len > 3 as usize {
-            return None;
-        }
-        let bytes = key.as_bytes();
-        let len = bytes.len();
-        let value_char = bytes[0];
-        if value_char != 97 {
             return None;
         }
 

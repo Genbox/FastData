@@ -26,9 +26,6 @@ internal static class FastData
         int len = key.Length;
         if (len < 1u || len > 3u)
             return false;
-        char valueChar = key[0];
-        if (valueChar != 'a')
-            return false;
 
 
         return StringComparer.Ordinal.Equals(key, _keys[key.Length - 1]);
@@ -38,12 +35,6 @@ internal static class FastData
     {
         int len = key.Length;
         if (len < 1u || len > 3u)
-            {
-            value = default;
-            return false;
-        }
-        char valueChar = key[0];
-        if (valueChar != 'a')
             {
             value = default;
             return false;

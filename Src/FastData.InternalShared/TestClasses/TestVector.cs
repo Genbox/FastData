@@ -1,4 +1,5 @@
-using Genbox.FastData.Extensions;
+using Genbox.FastData.Enums;
+using Genbox.FastData.Internal.Extensions;
 using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
@@ -14,11 +15,11 @@ public class TestVector<TKey>(Type type, TKey[] keys, TKey[] notPresent, string?
 
     public TKey[] Keys { get; } = keys;
     public TKey[] NotPresent { get; } = notPresent;
-    public Type Type { get; } = type;
+    public Type StructureType { get; } = type;
 
     public string Identifier
     {
-        get => field ??= $"{Type.GetCleanName()}_{_keyType}_{Keys.Length}" + (postfix != null ? $"_{postfix}" : "");
+        get => field ??= $"{StructureType.GetFriendlyName()}_{_keyType}_{Keys.Length}" + (postfix != null ? $"_{postfix}" : "");
         set;
     }
 

@@ -17,9 +17,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: u8) -> bool {
-        if key < u8::MIN || key > u8::MAX {
-            return false;
-        }
 
 
         let mut lo: usize = 0;

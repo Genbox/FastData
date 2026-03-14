@@ -1,4 +1,3 @@
-using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Interfaces;
 using Genbox.FastData.Generators.Extensions;
 
@@ -6,46 +5,32 @@ namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
 internal class RustHashDef : IHashDef
 {
-    public string GetHashSource(Type keyType, string typeName, HashInfo info)
+    public string GetStringHashSource(string typeName) =>
+        """
+            let mut hash: u64 = 352654597;
+
+            let mut ptr = value.as_ptr();
+            let mut len = value.len();
+
+             while len > 0 {
+                    hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
+                    ptr = ptr.add(1);
+                    len -= 1;
+             }
+
+            hash.wrapping_mul(1566083941).wrapping_add(352654597)
+        """;
+
+    public string GetNumericHashSource(TypeCode keyType, string typeName, bool hasZeroOrNaN) => GetNumericHash(keyType, hasZeroOrNaN);
+
+    private static string GetNumericHash(TypeCode typeCode, bool hasZeroOrNaN)
     {
-        bool isString = Type.GetTypeCode(keyType) == TypeCode.String;
-
-        return $$"""
-                 {{(isString ? "#[inline]" : "#[inline(always)]")}}
-                 {{(isString ? "unsafe " : "")}}fn get_hash(value: {{(isString ? "&" : "")}}{{typeName}}) -> u64 {
-                 {{GetHash(keyType, info)}}
-                 }
-                 """;
-    }
-
-    private static string GetHash(Type keyType, HashInfo info)
-    {
-        TypeCode typeCode = Type.GetTypeCode(keyType);
-
-        if (typeCode == TypeCode.String)
-        {
-            return """
-                       let mut hash: u64 = 352654597;
-
-                       let mut ptr = value.as_ptr();
-                       let mut len = value.len();
-
-                        while len > 0 {
-                               hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
-                               ptr = ptr.add(1);
-                               len -= 1;
-                        }
-
-                       hash.wrapping_mul(1566083941).wrapping_add(352654597)
-                   """;
-        }
-
-        if (keyType.UsesIdentityHash())
+        if (typeCode.UsesIdentityHash())
             return "    value as u64";
 
         if (typeCode == TypeCode.Single)
         {
-            return info.HasZeroOrNaN
+            return hasZeroOrNaN
                 ? """
                       let mut bits = value.to_bits();
 
@@ -59,7 +44,7 @@ internal class RustHashDef : IHashDef
 
         if (typeCode == TypeCode.Double)
         {
-            return info.HasZeroOrNaN
+            return hasZeroOrNaN
                 ? """
                       let mut bits = value.to_bits();
 
@@ -71,6 +56,18 @@ internal class RustHashDef : IHashDef
                 : "    value.to_bits()";
         }
 
-        throw new InvalidOperationException("Unsupported data type: " + keyType);
+        throw new InvalidOperationException("Unsupported data type: " + typeCode);
+    }
+
+    public string Wrap(TypeCode keyType, string typeName, string hash)
+    {
+        bool isString = keyType == TypeCode.String;
+
+        return $$"""
+                 {{(isString ? "#[inline]" : "#[inline(always)]")}}
+                 {{(isString ? "unsafe " : "")}}fn get_hash(value: {{(isString ? "&" : "")}}{{typeName}}) -> u64 {
+                 {{hash}}
+                 }
+                 """;
     }
 }

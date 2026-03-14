@@ -30,12 +30,6 @@ impl fastdata {
         if len < 1 as usize || len > 2 as usize {
             return false;
         }
-        let bytes = key.as_bytes();
-        let len = bytes.len();
-        let value_char = bytes[0];
-        if value_char < 48u8 || value_char > 57u8 {
-            return false;
-        }
 
 
         let mut lo: usize = 0;

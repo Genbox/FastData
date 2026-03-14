@@ -22,7 +22,7 @@ internal sealed record GPerfStringHash : IStringHash
     internal uint MinLen { get; }
 
     public ReaderFunctions Functions => ReaderFunctions.None;
-    public State[] State => [new State(nameof(AssociationValues), typeof(int), AssociationValues)];
+    public AdditionalData[] AdditionalData => [new AdditionalData(nameof(AssociationValues), typeof(int), AssociationValues)];
 
     public Expression<StringHashFunc> GetExpression()
     {

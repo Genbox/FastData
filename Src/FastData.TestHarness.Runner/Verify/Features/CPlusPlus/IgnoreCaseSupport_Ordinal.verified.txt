@@ -17,19 +17,6 @@ class fastdata final {
          const size_t len = key.length();
          if (len < 5u || len > 7u)
              return false;
-        uint32_t valueChar = static_cast<uint32_t>(key.front());
-        if (valueChar > 0x7F)
-            return false;
-        if (valueChar < 64)
-        {
-            if (((1ULL << valueChar) & 0ULL) == 0)
-                return false;
-        }
-        else
-        {
-            if (((1ULL << (valueChar - 64)) & 17179869194ULL) == 0)
-                return false;
-        }
 
 
         int32_t lo = 0;

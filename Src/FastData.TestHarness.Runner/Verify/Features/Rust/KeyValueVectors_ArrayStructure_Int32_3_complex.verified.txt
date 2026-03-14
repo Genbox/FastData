@@ -31,9 +31,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if (key as u32 & 4294967292) != 0 {
-            return false;
-        }
 
 
         for entry in Self::KEYS.iter() {
@@ -46,9 +43,6 @@ impl fastdata {
 
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
-        if (key as u32 & 4294967292) != 0 {
-            return None;
-        }
 
 
         for entry in Self::KEYS.iter() {

@@ -1,29 +1,35 @@
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashTablePerfectStructure<TKey, TValue>(HashData hashData) : IStructure<TKey, TValue, HashTablePerfectContext<TKey, TValue>>
+public sealed class HashTablePerfectStructure<TKey, TValue> : IStructure<TKey, TValue, HashTablePerfectContext<TKey, TValue>>
 {
+    private readonly HashData _hashData;
+
+    internal HashTablePerfectStructure(HashData hashData)
+    {
+        _hashData = hashData;
+    }
+
     public HashTablePerfectContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
-        if (!hashData.HashCodesPerfect)
+        if (!_hashData.HashCodesPerfect)
             throw new InvalidOperationException("HashSetPerfectStructure can only be created with a perfect hash function.");
 
         ReadOnlySpan<TKey> keySpan = keys.Span;
         ReadOnlySpan<TValue> valueSpan = values.Span;
-        ulong size = (ulong)(keySpan.Length * hashData.CapacityFactor);
+        ulong size = (ulong)(keySpan.Length * _hashData.CapacityFactor);
         bool hasEmptySlots = size != (ulong)keySpan.Length;
-        bool storeHashCode = !typeof(TKey).UsesIdentityHash() || hasEmptySlots;
-        ulong[] hashCodes = hashData.HashCodes;
+        bool storeHashCode = !Type.GetTypeCode(typeof(TKey)).UsesIdentityHash() || hasEmptySlots;
+        ulong[] hashCodes = _hashData.HashCodes;
         KeyValuePair<TKey, ulong>[] pairs = new KeyValuePair<TKey, ulong>[size];
         TValue[]? denseValues = values.IsEmpty ? null : new TValue[size];
 
         if (storeHashCode && hasEmptySlots)
         {
-            ulong sentinel = GetSentinel(hashData, hashCodes, keySpan.Length);
+            ulong sentinel = GetSentinel(_hashData, hashCodes, keySpan.Length);
 
             for (ulong i = 0; i < size; i++)
                 pairs[i] = new KeyValuePair<TKey, ulong>(default!, sentinel);

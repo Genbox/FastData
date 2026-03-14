@@ -304,6 +304,7 @@ internal static class KeyAnalyzer
             }
         }
 
+        mask ^= byte.MaxValue;
         ulong range = (ulong)(max - min);
         return new NumericKeyProperties<byte>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
     }
@@ -329,6 +330,7 @@ internal static class KeyAnalyzer
             }
         }
 
+        mask ^= byte.MaxValue;
         ulong range = (ulong)(max - min);
         return new NumericKeyProperties<sbyte>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
     }
@@ -354,6 +356,7 @@ internal static class KeyAnalyzer
             }
         }
 
+        mask ^= ushort.MaxValue;
         ulong range = (ulong)(max - min);
         return new NumericKeyProperties<short>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
     }
@@ -379,6 +382,7 @@ internal static class KeyAnalyzer
             }
         }
 
+        mask ^= ushort.MaxValue;
         ulong range = (ulong)(max - min);
         return new NumericKeyProperties<ushort>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
     }
@@ -404,6 +408,7 @@ internal static class KeyAnalyzer
             }
         }
 
+        mask ^= uint.MaxValue;
         ulong range = (ulong)((long)max - min);
         return new NumericKeyProperties<int>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || (long)max - min == keys.Length - 1, mask, static v => v);
     }
@@ -429,6 +434,7 @@ internal static class KeyAnalyzer
             }
         }
 
+        mask ^= uint.MaxValue;
         ulong range = max - min;
         return new NumericKeyProperties<uint>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1), mask, static v => v);
     }
@@ -454,6 +460,7 @@ internal static class KeyAnalyzer
             }
         }
 
+        mask ^= ulong.MaxValue;
         ulong range = unchecked((ulong)max - (ulong)min);
         return new NumericKeyProperties<long>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || range == (ulong)(keys.Length - 1), mask, static v => v);
     }
@@ -479,6 +486,7 @@ internal static class KeyAnalyzer
             }
         }
 
+        mask ^= ulong.MaxValue;
         ulong range = max - min;
         return new NumericKeyProperties<ulong>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1), mask, static v => (long)v);
     }
@@ -570,12 +578,12 @@ internal static class KeyAnalyzer
         return (ulong)range;
     }
 
-    private static double CalculateDensity(int keyCount, ulong range)
+    private static float CalculateDensity(int keyCount, ulong range)
     {
         if (keyCount <= 0)
             return 0;
 
-        return keyCount / (range + 1.0d);
+        return keyCount / (range + 1.0f);
     }
 
     private static int CountZero(int[] data)

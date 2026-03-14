@@ -2,23 +2,29 @@ using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Contexts.Misc;
 using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class HashTableCompactStructure<TKey, TValue>(HashData hashData) : IStructure<TKey, TValue, HashTableCompactContext<TKey, TValue>>
+public sealed class HashTableCompactStructure<TKey, TValue> : IStructure<TKey, TValue, HashTableCompactContext<TKey, TValue>>
 {
+    private readonly HashData _hashData;
+
+    internal HashTableCompactStructure(HashData hashData)
+    {
+        _hashData = hashData;
+    }
+
     public HashTableCompactContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         ReadOnlySpan<TKey> keySpan = keys.Span;
         ReadOnlySpan<TValue> valueSpan = values.Span;
-        ulong size = (ulong)(keySpan.Length * hashData.CapacityFactor);
+        ulong size = (ulong)(keySpan.Length * _hashData.CapacityFactor);
 
         int[] bucketCounts = new int[size];
 
         for (int i = 0; i < keySpan.Length; i++)
         {
-            ulong hashCode = hashData.HashCodes[i];
+            ulong hashCode = _hashData.HashCodes[i];
             bucketCounts[hashCode % size]++;
         }
 
@@ -37,7 +43,7 @@ internal sealed class HashTableCompactStructure<TKey, TValue>(HashData hashData)
 
         for (int i = 0; i < keySpan.Length; i++)
         {
-            ulong hashCode = hashData.HashCodes[i];
+            ulong hashCode = _hashData.HashCodes[i];
             ulong bucket = hashCode % size;
             int index = bucketStarts[bucket] + bucketOffsets[bucket]++;
 
@@ -47,6 +53,6 @@ internal sealed class HashTableCompactStructure<TKey, TValue>(HashData hashData)
                 denseValues[index] = valueSpan[i];
         }
 
-        return new HashTableCompactContext<TKey, TValue>(bucketStarts, bucketCounts, entries, !typeof(TKey).UsesIdentityHash(), denseValues);
+        return new HashTableCompactContext<TKey, TValue>(bucketStarts, bucketCounts, entries, !Type.GetTypeCode(typeof(TKey)).UsesIdentityHash(), denseValues);
     }
 }

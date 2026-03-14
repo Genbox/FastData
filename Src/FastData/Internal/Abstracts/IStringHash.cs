@@ -6,6 +6,6 @@ namespace Genbox.FastData.Internal.Abstracts;
 internal interface IStringHash
 {
     ReaderFunctions Functions { get; }
-    State[]? State { get; }
+    AdditionalData[]? AdditionalData { get; }
     Expression<StringHashFunc> GetExpression();
 }

@@ -35,7 +35,6 @@ internal static class FastData
         new E("æ", 18225460979434644138ul), new E("ü", 18225461020152826604ul), new E("é", 18225460999793735371ul)
     };
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(string value)
     {
@@ -57,10 +56,6 @@ internal static class FastData
     public static bool Contains(string key)
     {
         if (key.Length != 1u)
-            return false;
-        ulong first = (ulong)key[0];
-
-        if ((first & 65280UL) != 0)
             return false;
 
 

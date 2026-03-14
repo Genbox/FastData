@@ -15,8 +15,6 @@ internal static class FastData
 
     public static bool Contains(char key)
     {
-        if (((ushort)key & 65408) != 0)
-            return false;
 
 
         int lo = 0;

@@ -1,7 +1,7 @@
 using System.Globalization;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Structures;
-using Genbox.FastData.InternalShared.Code;
+using Genbox.FastData.InternalShared.Misc;
 using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.InternalShared.Helpers;
@@ -119,25 +119,13 @@ public static class TestVectorHelper
     {
         const int benchmarkSize = 1000;
 
-        foreach (StructureType type in Enum.GetValues<StructureType>())
-        {
-            switch (type)
-            {
-                //We skip these
-                case StructureType.Auto:
-                    continue;
+        Type[] types = [typeof(ConditionalStructure<,>), typeof(BinarySearchStructure<,>), typeof(ArrayStructure<,>), typeof(HashTableStructure<,>)];
 
-                case StructureType.Conditional:
-                case StructureType.BinarySearch:
-                case StructureType.Array:
-                case StructureType.HashTable:
-                    yield return new TestData<int>(type, Enumerable.Range(0, benchmarkSize).Select(x => x).ToArray());
-                    yield return new TestData<float>(type, Enumerable.Range(0, benchmarkSize).Select(x => (float)x).ToArray());
-                    yield return new TestData<string>(type, Enumerable.Range(0, benchmarkSize).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).ToArray());
-                    break;
-                default:
-                    throw new NotSupportedException("There are no benchmark vectors for " + type);
-            }
+        foreach (Type type in types)
+        {
+            yield return new TestData<int>(type, Enumerable.Range(0, benchmarkSize).Select(x => x).ToArray());
+            yield return new TestData<float>(type, Enumerable.Range(0, benchmarkSize).Select(x => (float)x).ToArray());
+            yield return new TestData<string>(type, Enumerable.Range(0, benchmarkSize).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).ToArray());
         }
     }
 

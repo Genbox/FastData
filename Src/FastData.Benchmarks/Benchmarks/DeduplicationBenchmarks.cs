@@ -1,3 +1,5 @@
+using Genbox.FastData.Internal;
+
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [MemoryDiagnoser]
@@ -20,7 +22,7 @@ public class DeduplicationBenchmarks
     {
         int[] keys = new int[_intKeys.Length];
         Array.Copy(_intKeys, keys, _intKeys.Length);
-        FastDataGenerator.DeduplicateWithHashSet(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, out _);
+        Deduplication.DeduplicateWithHashSet(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, out _);
     }
 
     [Benchmark]
@@ -28,7 +30,7 @@ public class DeduplicationBenchmarks
     {
         int[] keys = new int[_intKeys.Length];
         Array.Copy(_intKeys, keys, _intKeys.Length);
-        FastDataGenerator.DeduplicateWithSort(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, Comparer<int>.Default, out _);
+        Deduplication.DeduplicateWithSort(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, Comparer<int>.Default, out _);
     }
 
     [Benchmark]
@@ -36,6 +38,6 @@ public class DeduplicationBenchmarks
     {
         int[] keys = new int[_intKeys.Length];
         Array.Copy(_intKeys, keys, _intKeys.Length);
-        FastDataGenerator.DeduplicateWithSortPreserveInputOrder(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, Comparer<int>.Default, out _);
+        Deduplication.DeduplicateWithSortPreserveInputOrder(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, Comparer<int>.Default, out _);
     }
 }

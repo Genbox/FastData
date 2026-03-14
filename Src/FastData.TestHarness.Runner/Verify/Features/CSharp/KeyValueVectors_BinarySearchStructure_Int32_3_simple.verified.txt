@@ -19,8 +19,6 @@ internal static class FastData
 
     public static bool Contains(int key)
     {
-        if (((uint)key & 4294967292u) != 0)
-            return false;
 
 
         int lo = 0;
@@ -44,11 +42,6 @@ internal static class FastData
 
     public static bool TryLookup(int key, out int? value)
     {
-        if (((uint)key & 4294967292u) != 0)
-            {
-            value = default;
-            return false;
-        }
 
 
         int lo = 0;

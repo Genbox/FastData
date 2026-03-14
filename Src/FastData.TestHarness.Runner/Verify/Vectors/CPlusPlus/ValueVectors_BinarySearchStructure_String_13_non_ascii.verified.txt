@@ -17,11 +17,6 @@ class fastdata final {
     static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 2u)
              return false;
-                uint64_t first = 0;
-                std::memcpy(&first, key.data(), 2);
-
-                if ((first & 16444ULL) != 0)
-                    return false;
 
 
         int32_t lo = 0;

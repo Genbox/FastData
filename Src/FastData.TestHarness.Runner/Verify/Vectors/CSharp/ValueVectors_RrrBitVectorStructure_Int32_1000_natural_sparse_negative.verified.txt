@@ -381,7 +381,7 @@ internal static class FastData
 
     public static bool Contains(int key)
     {
-        if (key < -198273 || key > -171245)
+        if (((uint)key & 131072u) != 0)
             return false;
 
 

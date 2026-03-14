@@ -33,7 +33,7 @@ class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const int16_t key) noexcept {
-        if (key < std::numeric_limits<int16_t>::lowest() || key > std::numeric_limits<int16_t>::max())
+        if ((static_cast<uint16_t>(key) & 0) != 0)
             return false;
 
 

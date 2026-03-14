@@ -3,12 +3,11 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using Genbox.FastData.Extensions;
+using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.Internal.Structures;
-using Genbox.FastData.InternalShared;
 using Genbox.FastData.InternalShared.Helpers;
-using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.Benchmarks;
 
@@ -47,7 +46,7 @@ internal static class Program
         // This code is used to generate the files in the Generated folder.
 
         int[] sizes = [1, 5, 10, 50, 100, 500, 1000];
-        Type[] structures = [typeof(ArrayStructure<,>), typeof(ConditionalStructure<,>), typeof(BinarySearchStructure<,>), typeof(BinarySearchStructure<,>), typeof(HashTableStructure<,>)];
+        Type[] structures = [typeof(ArrayStructure<,>), typeof(ConditionalStructure<,>), typeof(BinarySearchStructure<,>), typeof(HashTableStructure<,>)];
 
         foreach (Type type in structures)
         {
@@ -61,8 +60,12 @@ internal static class Program
         Random rng = new Random(42);
         string[] data = Enumerable.Range(0, size).Select(_ => TestHelper.GenerateRandomString(rng, rng.Next(5, 10))).ToArray();
 
-        TestVector<string> vector = new TestVector<string>(type, data, []);
-        string source = TestGenerator.Generate(CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("fastdata")), vector);
-        File.WriteAllText("Gen-" + type.GetCleanName() + "-" + size + ".cs", source);
+        CSharpCodeGenerator generator = CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("fastdata"));
+
+        StringDataConfig config = new StringDataConfig();
+        config.StructureTypeOverride = type;
+
+        string source = FastDataGenerator.Generate(data, config, generator);
+        File.WriteAllText("Gen-" + type + "-" + size + ".cs", source);
     }
 }

@@ -1,11 +1,17 @@
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class BloomFilterStructure<TKey, TValue>(HashData hashData) : IStructure<TKey, TValue, BloomFilterContext>
+public sealed class BloomFilterStructure<TKey, TValue> : IStructure<TKey, TValue, BloomFilterContext>
 {
+    private readonly HashData _hashData;
+
+    internal BloomFilterStructure(HashData hashData)
+    {
+        _hashData = hashData;
+    }
+
     private const int BitsPerKey = 10;
 
     public BloomFilterContext Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
@@ -16,7 +22,7 @@ internal sealed class BloomFilterStructure<TKey, TValue>(HashData hashData) : IS
 
         uint length = (uint)(buckets + sizeof(ulong));
         ulong[] bitset = new ulong[length];
-        ulong[] hashCodes = hashData.HashCodes;
+        ulong[] hashCodes = _hashData.HashCodes;
 
         for (int i = 0; i < capacity; i++)
         {

@@ -1,22 +1,22 @@
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class KeyLengthStructure<TKey, TValue>(StringKeyProperties props) : IStructure<TKey, TValue, KeyLengthContext<TValue>>
+public sealed class KeyLengthStructure<TKey, TValue> : IStructure<TKey, TValue, KeyLengthContext<TValue>>
 {
+    private readonly uint _minLength;
+    private readonly uint _maxLength;
+
+    internal KeyLengthStructure(uint minLength, uint maxLength)
+    {
+        _minLength = minLength;
+        _maxLength = maxLength;
+    }
+
     public KeyLengthContext<TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
-        if (typeof(TKey) != typeof(string))
-            throw new InvalidCastException("This structure only works on strings");
-
-        if (!props.LengthData.Unique)
-            throw new InvalidOperationException("We can only use this structure when all lengths are unique");
-
-        uint minLen = props.LengthData.LengthMap.Min;
-        uint maxLen = props.LengthData.LengthMap.Max;
-        int range = (int)((maxLen - minLen) + 1); //+1 because we need a place for zero
+        int range = (int)((_maxLength - _minLength) + 1); //+1 because we need a place for zero
 
         string?[] lengths = new string?[range];
         int[] offsets = values.IsEmpty ? [] : new int[range];
@@ -25,13 +25,13 @@ internal sealed class KeyLengthStructure<TKey, TValue>(StringKeyProperties props
         for (int i = 0; i < keySpan.Length; i++)
         {
             string str = (string)(object)keySpan[i]!;
-            int idx = str.Length - (int)minLen;
+            int idx = str.Length - (int)_minLength;
             lengths[idx] = str;
 
             if (!values.IsEmpty)
                 offsets[idx] = i;
         }
 
-        return new KeyLengthContext<TValue>(lengths, minLen, values, offsets);
+        return new KeyLengthContext<TValue>(lengths, _minLength, values, offsets);
     }
 }

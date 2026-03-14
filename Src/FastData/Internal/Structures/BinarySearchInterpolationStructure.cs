@@ -3,11 +3,18 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class BinarySearchInterpolationStructure<TKey, TValue>(bool keysAreSorted = false) : IStructure<TKey, TValue, BinarySearchInterpolationContext<TKey, TValue>>
+public sealed class BinarySearchInterpolationStructure<TKey, TValue> : IStructure<TKey, TValue, BinarySearchInterpolationContext<TKey, TValue>>
 {
+    private readonly bool _keysAreSorted;
+
+    internal BinarySearchInterpolationStructure(bool keysAreSorted)
+    {
+        _keysAreSorted = keysAreSorted;
+    }
+
     public BinarySearchInterpolationContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
-        if (keysAreSorted)
+        if (_keysAreSorted)
             return new BinarySearchInterpolationContext<TKey, TValue>(keys, values);
 
         TKey[] keysCopy = new TKey[keys.Length];

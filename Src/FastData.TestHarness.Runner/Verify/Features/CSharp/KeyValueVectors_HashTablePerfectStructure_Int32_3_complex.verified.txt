@@ -38,7 +38,6 @@ internal static class FastData
         new E(3, new Person(3, "Bibi", null)), new E(1, new Person(1, "Bob", new Person(4, "Anna", null))), new E(2, new Person(2, "Billy", null))
     };
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(int value)
     {
@@ -48,8 +47,6 @@ internal static class FastData
 
     public static bool Contains(int key)
     {
-        if (((uint)key & 4294967292u) != 0)
-            return false;
 
 
         ulong hash = Hash(key);
@@ -62,11 +59,6 @@ internal static class FastData
 
     public static bool TryLookup(int key, out Person value)
     {
-        if (((uint)key & 4294967292u) != 0)
-            {
-            value = default;
-            return false;
-        }
 
 
         ulong hash = Hash(key);

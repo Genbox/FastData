@@ -26,9 +26,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: char) -> bool {
-        if (key as u16 & 65408) != 0 {
-            return false;
-        }
 
 
         let hash = unsafe { Self::get_hash(key) };

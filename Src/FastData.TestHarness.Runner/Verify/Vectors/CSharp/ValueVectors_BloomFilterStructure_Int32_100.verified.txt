@@ -14,7 +14,6 @@ internal static class FastData
         8796127625221ul, 17592255250441ul, 35184510500881ul
     };
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(int value)
     {

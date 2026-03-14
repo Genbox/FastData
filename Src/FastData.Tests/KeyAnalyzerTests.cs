@@ -57,9 +57,9 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetProperties_Density_Test()
     {
-        Assert.Equal(1.0d, GetNumericProperties<int>(new[] { 10, 11, 12 }, false).Density);
-        Assert.Equal(2.0d / 101.0d, GetNumericProperties<int>(new[] { 0, 100 }, false).Density, 12);
-        Assert.Equal(1.0d, GetNumericProperties<int>(new[] { 42 }, false).Density);
+        Assert.Equal(1.0f, GetNumericProperties<int>(new[] { 10, 11, 12 }, false).Density);
+        Assert.Equal(2.0f / 101.0f, GetNumericProperties<int>(new[] { 0, 100 }, false).Density, 12);
+        Assert.Equal(1.0f, GetNumericProperties<int>(new[] { 42 }, false).Density);
     }
 
     [Theory]

@@ -1,4 +1,4 @@
-namespace Genbox.FastData.InternalShared.Code;
+namespace Genbox.FastData.InternalShared.Misc;
 
 internal class Person
 {

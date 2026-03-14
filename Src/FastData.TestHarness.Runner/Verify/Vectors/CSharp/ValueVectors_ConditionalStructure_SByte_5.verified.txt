@@ -10,7 +10,7 @@ internal static class FastData
 {
     public static bool Contains(sbyte key)
     {
-        if (key < sbyte.MinValue || key > sbyte.MaxValue)
+        if (((byte)key & byte.MinValue) != 0)
             return false;
 
 

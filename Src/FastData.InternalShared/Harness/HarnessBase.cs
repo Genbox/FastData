@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.InternalShared.Harness.Enums;
 using Genbox.FastData.InternalShared.Helpers;
 using Genbox.FastData.InternalShared.Misc;
 

@@ -20,7 +20,7 @@ internal sealed record DefaultStringHash : IStringHash
     internal static DefaultStringHash UTF8Instance { get; } = new DefaultStringHash(GeneratorEncoding.UTF8);
     internal static DefaultStringHash UTF16Instance { get; } = new DefaultStringHash(GeneratorEncoding.UTF16);
 
-    public State[]? State => null;
+    public AdditionalData[]? AdditionalData => null;
     public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.BuildFull(Mixer, Avalanche, _encoding);
     public ReaderFunctions Functions => ReaderFunctions.ReadU16;
 

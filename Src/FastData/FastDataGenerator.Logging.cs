@@ -1,4 +1,3 @@
-using Genbox.FastData.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData;
@@ -20,8 +19,8 @@ public static partial class FastDataGenerator
     [LoggerMessage(LogLevel.Information, "Min length: {MinLength}, Max length: {MaxLength}")]
     internal static partial void LogMinMaxLength(ILogger logger, uint minLength, uint maxLength);
 
-    [LoggerMessage(LogLevel.Information, "User selected structure type {Type}")]
-    internal static partial void LogUserStructureType(ILogger logger, StructureType type);
+    [LoggerMessage(LogLevel.Information, "Structure type {Type}")]
+    internal static partial void LogStructureType(ILogger logger, string type);
 
     [LoggerMessage(LogLevel.Information, "Generated StringHash with fitness {Fitness}")]
     internal static partial void LogStringHashFitness(ILogger logger, double fitness);

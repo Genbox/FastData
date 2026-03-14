@@ -43,7 +43,7 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if key < -198273 || key > -171245 {
+        if (key as u32 & 131072) != 0 {
             return false;
         }
 

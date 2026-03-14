@@ -30,7 +30,7 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i8) -> bool {
-        if key < i8::MIN || key > i8::MAX {
+        if (key as u8 & u8::MIN) != 0 {
             return false;
         }
 

@@ -12,11 +12,6 @@ class fastdata final {
     static constexpr bool contains(const std::string_view key) noexcept {
          if (key.length() != 2u)
              return false;
-                uint64_t first = 0;
-                std::memcpy(&first, key.data(), 2);
-
-                if ((first & 16444ULL) != 0)
-                    return false;
 
         if (key == u8"æ" || key == u8"à" || key == u8"ä" || key == u8"ö" || key == u8"ü" || key == u8"ß" || key == u8"é" || key == u8"è" || key == u8"ê" || key == u8"ç" || key == u8"ñ" || key == u8"ø" || key == u8"å")
             return true;

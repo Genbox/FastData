@@ -21,21 +21,6 @@ impl fastdata {
         if len < 5 as usize || len > 7 as usize {
             return false;
         }
-        let bytes = key.as_bytes();
-        let len = bytes.len();
-        let value_char = bytes[0] as u32;
-        if value_char > 0x7F {
-            return false;
-        }
-        if value_char < 64 {
-            if (((1u64 << value_char) & 0u64) == 0) {
-                return false;
-            }
-        } else {
-            if (((1u64 << (value_char - 64)) & 17179869194u64) == 0) {
-                return false;
-            }
-        }
 
 
         let mut lo: usize = 0;

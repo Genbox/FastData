@@ -1,3 +1,4 @@
+using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
@@ -6,20 +7,26 @@ using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public class TestData<TKey>(StructureType structureType, TKey[] keys) : ITestData, IXunitSerializable
+public class TestData<TKey>(Type structureType, TKey[] keys) : ITestData, IXunitSerializable
 {
     private readonly TypeCode _keyType = Type.GetTypeCode(typeof(TKey));
     private readonly Random _rng = new Random(42);
 
     public TKey[] Keys { get; private set; } = keys;
-    public StructureType StructureType { get; private set; } = structureType;
+    public Type StructureType { get; private set; } = structureType;
     public int WarmupIterations { get; } = 1_000_000;
     public int WorkIterations { get; } = 1_000_000;
     public int QueryCount { get; } = 25;
 
     public string Identifier => $"{StructureType}_{_keyType}_{Keys.Length}";
 
-    public string Generate(ICodeGenerator generator) => FastDataGenerator.Generate(Keys, new FastDataConfig(StructureType) { StringAnalyzerConfig = null }, generator);
+    public string Generate(ICodeGenerator generator)
+    {
+        if (Keys is string[] strArr)
+            return FastDataGenerator.Generate(strArr, new StringDataConfig { StructureTypeOverride = StructureType }, generator);
+        else
+            return FastDataGenerator.Generate<TKey>(Keys, new NumericDataConfig { StructureTypeOverride = StructureType }, generator);
+    }
 
     public string GetRandomKey(TypeMap map) => map.ToValueLabel(Keys[_rng.Next(0, Keys.Length)]);
 
@@ -31,7 +38,7 @@ public class TestData<TKey>(StructureType structureType, TKey[] keys) : ITestDat
 
     public void Deserialize(IXunitSerializationInfo info)
     {
-        StructureType = info.GetValue<StructureType>(nameof(StructureType));
+        StructureType = info.GetValue<Type>(nameof(StructureType));
         Keys = info.GetValue<TKey[]>(nameof(Keys));
     }
 

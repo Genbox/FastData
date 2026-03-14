@@ -1,0 +1,25 @@
+﻿namespace Genbox.FastData.Config;
+
+public abstract class DataConfig
+{
+    /// <summary>The type of structure to create. Defaults to Auto.</summary>
+    public Type? StructureTypeOverride { get; set; }
+
+    /// <summary>When enabled, data structures will be generated with the smallest possible internal data types to lower memory.</summary>
+    public bool TypeReductionEnabled { get; set; } = true; //TODO: Evaluate default value
+
+    /// <summary>Set the method to use for deduplication of keys. Defaults to <see cref="FastData.DeduplicationMode.HashSet" />.</summary>
+    public DeduplicationMode DeduplicationMode { get; set; } = DeduplicationMode.HashSet;
+
+    /// <summary>When true, FastData will only use data structures and algorithms that preserve the original data order</summary>
+    public bool PreserveOrder { get; set; } = true;
+
+    /// <summary>When true, throws an exception on duplicate keys</summary>
+    public bool ThrowOnDuplicates { get; set; } = true;
+
+    /// <summary>
+    /// For hash-based structures, you can set this factor higher or lower to control how many slots are used. A factor higher than 1 will use more memory, but can improve performance by reducing collisions. A factor lower than 1 will use less memory, but can increase collisions and thus reduce
+    /// performance.
+    /// </summary>
+    public int HashCapacityFactor { get; set; } = 1;
+}

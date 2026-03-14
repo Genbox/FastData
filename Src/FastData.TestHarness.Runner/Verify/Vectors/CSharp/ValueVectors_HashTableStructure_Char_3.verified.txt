@@ -28,7 +28,6 @@ internal static class FastData
         new E(char.MinValue, -1), new E('a', -1), new E('', 1)
     };
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(char value)
     {
@@ -38,8 +37,6 @@ internal static class FastData
 
     public static bool Contains(char key)
     {
-        if (((ushort)key & 65408) != 0)
-            return false;
 
 
         ulong hash = Hash(key);

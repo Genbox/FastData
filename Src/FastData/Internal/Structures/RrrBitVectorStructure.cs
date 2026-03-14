@@ -3,8 +3,15 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-internal sealed class RrrBitVectorStructure<TKey, TValue>(bool keysAreSorted = false) : IStructure<TKey, TValue, RrrBitVectorContext>
+public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValue, RrrBitVectorContext>
 {
+    private readonly bool _keysAreSorted;
+
+    internal RrrBitVectorStructure(bool keysAreSorted)
+    {
+        _keysAreSorted = keysAreSorted;
+    }
+
     private const int BlockSize = 15;
 
     public RrrBitVectorContext Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
@@ -15,7 +22,7 @@ internal sealed class RrrBitVectorStructure<TKey, TValue>(bool keysAreSorted = f
         for (int i = 0; i < span.Length; i++)
             mapped[i] = MapKeyToSortable(span[i]);
 
-        if (!keysAreSorted)
+        if (!_keysAreSorted)
             Array.Sort(mapped);
 
         ulong minValue = mapped[0];

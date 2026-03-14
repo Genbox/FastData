@@ -18,19 +18,6 @@ internal static class FastData
         int len = key.Length;
         if (len < 5u || len > 7u)
             return false;
-        uint valueChar = key[0];
-        if (valueChar > 0x7F)
-            return false;
-        if (valueChar < 64)
-        {
-            if (((1UL << (int)valueChar) & 0UL) == 0)
-                return false;
-        }
-        else
-        {
-            if (((1UL << (int)(valueChar - 64)) & 17179869194UL) == 0)
-                return false;
-        }
 
 
         int lo = 0;
