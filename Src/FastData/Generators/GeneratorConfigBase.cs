@@ -6,7 +6,7 @@ namespace Genbox.FastData.Generators;
 public abstract class GeneratorConfigBase(string structureName, IEarlyExit[] earlyExits, uint itemCount, bool typeReductionEnabled)
 {
     /// <summary>Name of the structure being generated.</summary>
-    public string StructureName { get; } = structureName.Substring(0, structureName.Length - 9);
+    public string StructureName { get; } = structureName;
 
     /// <summary>Gets the set of early exit strategies used by the generator to optimize code generation.</summary>
     public IEarlyExit[] EarlyExits { get; } = earlyExits;

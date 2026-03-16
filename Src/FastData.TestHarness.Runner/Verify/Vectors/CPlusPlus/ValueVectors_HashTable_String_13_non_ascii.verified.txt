@@ -15,12 +15,14 @@ class fastdata final {
            : key(key), next(next), hash_code(hash_code) {}
     };
 
-    static constexpr std::array<int8_t, 3> buckets = {
-        3, 2, 0
+    static constexpr std::array<int8_t, 13> buckets = {
+        0, 0, 13, 10, 0, 4, 0, 0, 7, 3, 
+        12, 2, 11
     };
 
-    inline static const std::array<e, 3> entries = {
-        e(u8"a", -1, 18225461187723808291ull), e(u8"item", 0, 16750939634977259983ull), e(u8"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", -1, 9198652691199425319ull)
+    inline static const std::array<e, 13> entries = {
+        e(u8"æ", -1, 11144404048339054737ull), e(u8"à", -1, 11144404045206886855ull), e(u8"ä", -1, 11144404051471222619ull), e(u8"ö", -1, 11144404023281711681ull), e(u8"ü", -1, 11144404013885208035ull), e(u8"ß", -1, 11144404062433810206ull), e(u8"é", 4, 11144404034244299268ull), e(u8"è", -1, 11144404032678215327ull), e(u8"ê", -1, 11144404029546047445ull), e(u8"ç", 8, 11144404049905138678ull), 
+        e(u8"ñ", 5, 11144404021715627740ull), e(u8"ø", 0, 11144404007620872271ull), e(u8"å", 7, 11144404053037306560ull)
     };
 
     static constexpr uint64_t get_hash(const std::string_view value) noexcept
@@ -36,13 +38,12 @@ class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-         const size_t len = key.length();
-         if (len < 1u || len > 255u)
+         if (key.length() != 2u)
              return false;
 
 
         const uint64_t hash = get_hash(key);
-        const size_t index = hash % 3;
+        const size_t index = hash % 13;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
         while (i >= 0) {
@@ -57,9 +58,9 @@ class fastdata final {
         return false;
     }
 
-    static constexpr size_t item_count = 3;
+    static constexpr size_t item_count = 13;
     static constexpr size_t min_key_length = 1;
-    static constexpr size_t max_key_length = 255;
+    static constexpr size_t max_key_length = 1;
     static constexpr bool has_number = false;
     static constexpr bool has_uppercase = false;
     static constexpr bool has_lowercase = true;

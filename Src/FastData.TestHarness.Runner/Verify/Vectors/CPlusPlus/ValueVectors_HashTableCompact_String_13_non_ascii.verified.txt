@@ -1,5 +1,5 @@
 ﻿// This file is auto-generated. Do not edit manually.
-// Structure: HashTable
+// Structure: HashTableCompact
 #include <array>
 #include <cstring>
 #include <cstdint>
@@ -9,20 +9,24 @@
 class fastdata final {
     struct e {
         std::string_view key;
-        int8_t next;
         uint64_t hash_code;
-        e(const std::string_view key, const int8_t next, const uint64_t hash_code)
-           : key(key), next(next), hash_code(hash_code) {}
+        e(const std::string_view key, const uint64_t hash_code)
+           : key(key), hash_code(hash_code) {}
     };
 
-    static constexpr std::array<int8_t, 13> buckets = {
-        0, 0, 13, 10, 0, 4, 0, 0, 7, 3, 
-        12, 2, 11
+    static constexpr std::array<uint8_t, 13> bucket_starts = {
+        0, 0, 0, 2, 4, 4, 5, 5, 5, 7, 
+        8, 10, 11
+    };
+
+    static constexpr std::array<uint8_t, 13> bucket_counts = {
+        0, 0, 2, 2, 0, 1, 0, 0, 2, 1, 
+        2, 1, 2
     };
 
     inline static const std::array<e, 13> entries = {
-        e(u8"æ", -1, 11144404048339054737ull), e(u8"à", -1, 11144404045206886855ull), e(u8"ä", -1, 11144404051471222619ull), e(u8"ö", -1, 11144404023281711681ull), e(u8"ü", -1, 11144404013885208035ull), e(u8"ß", -1, 11144404062433810206ull), e(u8"é", 4, 11144404034244299268ull), e(u8"è", -1, 11144404032678215327ull), e(u8"ê", -1, 11144404029546047445ull), e(u8"ç", 8, 11144404049905138678ull), 
-        e(u8"ñ", 5, 11144404021715627740ull), e(u8"ø", 0, 11144404007620872271ull), e(u8"å", 7, 11144404053037306560ull)
+        e(u8"è", 11144404032678215327), e(u8"å", 11144404053037306560), e(u8"ê", 11144404029546047445), e(u8"ç", 11144404049905138678), e(u8"ö", 11144404023281711681), e(u8"ü", 11144404013885208035), e(u8"é", 11144404034244299268), e(u8"ä", 11144404051471222619), e(u8"æ", 11144404048339054737), e(u8"ø", 11144404007620872271), 
+        e(u8"à", 11144404045206886855), e(u8"ß", 11144404062433810206), e(u8"ñ", 11144404021715627740)
     };
 
     static constexpr uint64_t get_hash(const std::string_view value) noexcept
@@ -44,15 +48,15 @@ class fastdata final {
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 13;
-        int8_t i = static_cast<int8_t>(buckets[index] - 1);
+        const size_t start = static_cast<size_t>(bucket_starts[index]);
+        const size_t count = static_cast<size_t>(bucket_counts[index]);
+        const size_t end = start + count;
 
-        while (i >= 0) {
+        for (size_t i = start; i < end; i++) {
             const auto& entry = entries[i];
 
             if (entry.hash_code == hash && entry.key == key)
                 return true;
-
-            i = entry.next;
         }
 
         return false;
