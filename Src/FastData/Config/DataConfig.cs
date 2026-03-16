@@ -2,6 +2,15 @@
 
 public abstract class DataConfig
 {
+    /// <summary>Configuration controlling which structures are available and their limits.</summary>
+    public StructureConfig StructureConfig { get; set; } = StructureConfig.Default;
+
+    /// <summary>Configuration controlling early-exit behavior.</summary>
+    public EarlyExitConfig EarlyExitConfig { get; set; } = EarlyExitConfig.Default;
+
+    /// <summary>Enable approximate matching using a Bloom filter.</summary>
+    public bool AllowApproximateMatching { get; set; }
+
     /// <summary>The type of structure to create. Defaults to Auto.</summary>
     public Type? StructureTypeOverride { get; set; }
 

@@ -30,6 +30,7 @@ public class EarlyExitConfig
         }
     }
 
+    public bool Disabled { get; set; }
     public uint MinItemCount { get; set; }
 
     public void DisableEarlyExit(Type earlyExitType) => _disabled.Add(earlyExitType);

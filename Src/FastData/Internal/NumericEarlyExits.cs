@@ -10,6 +10,9 @@ internal static class NumericEarlyExits<TKey>
 {
     internal static IEnumerable<IEarlyExit> GetCandidates(Type structureType, TKey min, TKey max, ulong range, ulong bitMask, uint itemCount, EarlyExitConfig config)
     {
+        if (config.Disabled)
+            yield break;
+
         if (!config.IsEnabledForStructure(structureType))
             yield break;
 

@@ -10,8 +10,11 @@ namespace Genbox.FastData.Internal;
 
 internal static class StringEarlyExits
 {
-    internal static IEnumerable<IEarlyExit> GetCandidates(Type structureType, StringKeyProperties props, StringDataConfig cfg, GeneratorEncoding enc, EarlyExitConfig config)
+    internal static IEnumerable<IEarlyExit> GetCandidates(Type structureType, StringKeyProperties props, bool ignoreCase, GeneratorEncoding enc, EarlyExitConfig config)
     {
+        if (config.Disabled)
+            yield break;
+
         if (!config.IsEnabledForStructure(structureType))
             yield break;
 
@@ -38,7 +41,7 @@ internal static class StringEarlyExits
             yield break;
         }
 
-        if (ShouldApplyCharMap(props.LengthData.LengthMap.Min, props.CharacterData.AllAscii, enc, cfg.IgnoreCase))
+        if (ShouldApplyCharMap(props.LengthData.LengthMap.Min, props.CharacterData.AllAscii, enc, ignoreCase))
         {
             AsciiMap firstMap = props.CharacterData.FirstCharMap;
             if (config.IsEarlyExitEnabled(typeof(CharEqualsEarlyExit)) && firstMap.BitCount == 1)

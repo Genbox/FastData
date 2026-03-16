@@ -111,9 +111,9 @@ public static partial class FastDataGenerator
         if (cfg.StructureTypeOverride != null)
             structureType = cfg.StructureTypeOverride;
         else
-            structureType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthMap.Min, props.LengthData.LengthMap.Max, false, props.LengthData.Unique, StructureConfig.Default, x => EnsureHashData(x.Span));
+            structureType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthMap.Min, props.LengthData.LengthMap.Max, cfg.AllowApproximateMatching, props.LengthData.Unique, cfg.StructureConfig, x => EnsureHashData(x.Span));
 
-        IEarlyExit[] earlyExits = StringEarlyExits.GetCandidates(structureType, props, cfg, generator.Encoding, EarlyExitConfig.Default).ToArray();
+        IEarlyExit[] earlyExits = StringEarlyExits.GetCandidates(structureType, props, cfg.IgnoreCase, generator.Encoding, cfg.EarlyExitConfig).ToArray();
 
         LogStructureType(logger, structureType.Name);
 
@@ -143,6 +143,7 @@ public static partial class FastDataGenerator
 
             (HashData hashData, StringHashInfo _) = GetStringHash(keySpan);
             cacheHashData = hashData;
+
             // cacheHashInfo = ...; //TODO: Disabled temporarily until i can look at the compiler again
             return hashData;
         }
@@ -245,12 +246,12 @@ public static partial class FastDataGenerator
                 cacheHashData = GetNumericHash(keys.Span);
         }
         else
-            structureType = NumericStructures<TKey>.GetBest(keys, !values.IsEmpty, props.Density, props.IsConsecutive, false, StructureConfig.Default, x =>
+            structureType = NumericStructures<TKey>.GetBest(keys, !values.IsEmpty, props.Density, props.IsConsecutive, cfg.AllowApproximateMatching, cfg.StructureConfig, x =>
             {
                 return cacheHashData = GetNumericHash(x.Span);
             });
 
-        IEarlyExit[] earlyExits = NumericEarlyExits<TKey>.GetCandidates(type, props.MinKeyValue, props.MaxKeyValue, props.Range, props.BitMask, (uint)keys.Length, EarlyExitConfig.Default).ToArray();
+        IEarlyExit[] earlyExits = NumericEarlyExits<TKey>.GetCandidates(type, props.MinKeyValue, props.MaxKeyValue, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig).ToArray();
 
         LogStructureType(logger, structureType.Name);
 
