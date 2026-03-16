@@ -1,0 +1,1 @@
+﻿((((key.Length >> 6) >= 2) || (((key.Length >> 6) == 0) && ((10ul & (1ul << ((key.Length - 1) & 63))) == ulong.MinValue))) || (((key.Length >> 6) == 1) && ((5ul & (1ul << ((key.Length - 1) & 63))) == ulong.MinValue)))

@@ -5,6 +5,7 @@ using Genbox.FastData.Generator.Framework.Definitions;
 using Genbox.FastData.Generator.Helpers;
 using Genbox.FastData.Generator.Rust.Enums;
 using Genbox.FastData.Generators.EarlyExits;
+using Genbox.FastData.Generators.Helpers;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 

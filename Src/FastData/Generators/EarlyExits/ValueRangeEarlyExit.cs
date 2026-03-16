@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generators.EarlyExits;
@@ -6,4 +7,20 @@ namespace Genbox.FastData.Generators.EarlyExits;
 /// <typeparam name="T">The type of the value to check.</typeparam>
 /// <param name="MinValue">The minimum valid value.</param>
 /// <param name="MaxValue">The maximum valid value.</param>
-public sealed record ValueRangeEarlyExit<T>(T MinValue, T MaxValue) : IEarlyExit;
+public sealed record ValueRangeEarlyExit<T>(T MinValue, T MaxValue) : IEarlyExit
+{
+    public Expression GetExpression(string keyName)
+    {
+        Type keyType = typeof(T);
+        ParameterExpression key = Expression.Parameter(keyType, keyName);
+        Expression minConst = Expression.Constant(MinValue, keyType);
+        Expression maxConst = Expression.Constant(MaxValue, keyType);
+
+        if (Equals(MinValue, MaxValue))
+            return Expression.NotEqual(key, maxConst);
+
+        Expression minCheck = Expression.LessThan(key, minConst);
+        Expression maxCheck = Expression.GreaterThan(key, maxConst);
+        return Expression.OrElse(minCheck, maxCheck);
+    }
+}

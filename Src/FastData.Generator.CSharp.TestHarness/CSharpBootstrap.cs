@@ -1,4 +1,5 @@
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generator.CSharp.Internal;
 using Genbox.FastData.Generator.CSharp.Internal.Framework;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generators.Abstracts;
@@ -18,6 +19,8 @@ public sealed class CSharpBootstrap : BootstrapBase
     internal TypeMap Map { get; }
 
     public override ICodeGenerator Generator => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("FastData"));
+
+    public ExpressionCompiler CreateExpressionCompiler() => new CSharpExpressionCompiler(Map);
 
     private static string GetCommandTemplate(HarnessType type) =>
         type == HarnessType.Test

@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
@@ -25,9 +25,9 @@ internal static class NumericEarlyExits<TKey>
 
         TypeCode typeCode = Type.GetTypeCode(typeof(TKey));
 
-        if (config.IsEarlyExitEnabled(typeof(ValueBitMaskEarlyExit)) && typeCode.IsIntegral() && config.CheckDensityLimits(typeof(ValueBitMaskEarlyExit), bitDensity))
+        if (config.IsEarlyExitEnabled(typeof(ValueBitMaskEarlyExit<>)) && typeCode.IsIntegral() && config.CheckDensityLimits(typeof(ValueBitMaskEarlyExit<>), bitDensity))
         {
-            yield return new ValueBitMaskEarlyExit(bitMask);
+            yield return new ValueBitMaskEarlyExit<TKey>(bitMask);
             yield break;
         }
 

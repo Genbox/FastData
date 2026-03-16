@@ -1,4 +1,4 @@
-namespace Genbox.FastData.Generator.Helpers;
+namespace Genbox.FastData.Generators.Helpers;
 
 public static class TypeHelper
 {

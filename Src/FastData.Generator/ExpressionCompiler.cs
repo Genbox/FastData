@@ -131,6 +131,12 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 
     protected override Expression VisitConstant(ConstantExpression node)
     {
+        if (node.Value is Enum && node.Type.IsEnum)
+        {
+            Output.Append(node.Type.Name).Append(".").Append(node.Value.ToString());
+            return node;
+        }
+
         string str = node.Value switch
         {
             char x => map.ToValueLabel(x),
@@ -164,6 +170,13 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         if (node.NodeType == ExpressionType.Convert)
         {
             Output.Append("(").Append(map.GetTypeName(node.Type)).Append(")");
+            Visit(node.Operand);
+            return node;
+        }
+
+        if (node.NodeType == ExpressionType.Not)
+        {
+            Output.Append("!");
             Visit(node.Operand);
             return node;
         }
@@ -250,6 +263,14 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         ExpressionType.LeftShift => " << ",
         ExpressionType.RightShift => " >> ",
         ExpressionType.Or => " | ",
+        ExpressionType.And => " & ",
+        ExpressionType.AndAlso => " && ",
+        ExpressionType.OrElse => " || ",
+        ExpressionType.Modulo => " % ",
+        ExpressionType.Equal => " == ",
+        ExpressionType.NotEqual => " != ",
+        ExpressionType.LessThan => " < ",
+        ExpressionType.LessThanOrEqual => " <= ",
         ExpressionType.GreaterThan => " > ",
         ExpressionType.GreaterThanOrEqual => " >= ",
         ExpressionType.AddAssign => " += ",

@@ -38,7 +38,7 @@ public abstract class EarlyExitDef : IEarlyExitDef
                 sb.AppendLine(GetStringPrefixSuffixEarlyExit(methodType, prefix, suffix, ignoreCase));
             else if (spec is ValueRangeEarlyExit<T>(var minValue, var maxValue))
                 sb.AppendLine(GetValueEarlyExit(methodType, minValue, maxValue));
-            else if (spec is ValueBitMaskEarlyExit(var mask))
+            else if (spec is ValueBitMaskEarlyExit<T>(var mask))
                 sb.AppendLine(GetValueBitMaskEarlyExit<T>(methodType, mask));
             else
                 throw new InvalidOperationException("Unknown early exit type: " + spec.GetType().Name);
