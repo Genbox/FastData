@@ -15,8 +15,6 @@ internal static class FastData
 
     public static bool Contains(float key)
     {
-        if (key < float.MinValue || key > float.MaxValue)
-            return false;
 
 
         for (int i = 0; i < 5; i++)

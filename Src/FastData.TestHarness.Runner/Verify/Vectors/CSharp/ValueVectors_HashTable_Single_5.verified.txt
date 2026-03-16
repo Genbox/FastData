@@ -44,8 +44,6 @@ internal static class FastData
 
     public static bool Contains(float key)
     {
-        if (key < float.MinValue || key > float.MaxValue)
-            return false;
 
 
         ulong hash = Hash(key);

@@ -14,8 +14,6 @@ class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const double key) noexcept {
-        if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())
-            return false;
 
 
         int32_t lo = 0;

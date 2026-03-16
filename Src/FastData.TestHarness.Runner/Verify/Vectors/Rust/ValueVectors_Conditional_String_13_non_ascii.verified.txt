@@ -13,9 +13,6 @@ pub struct fastdata;
 impl fastdata {
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        if key.len() != 2 as usize {
-            return false;
-        }
 
 
         if key == "æ" || key == "à" || key == "ä" || key == "ö" || key == "ü" || key == "ß" || key == "é" || key == "è" || key == "ê" || key == "ç" || key == "ñ" || key == "ø" || key == "å" {

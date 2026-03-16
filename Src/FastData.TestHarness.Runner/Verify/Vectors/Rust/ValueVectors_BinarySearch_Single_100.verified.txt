@@ -26,9 +26,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: f32) -> bool {
-        if key < 0.0 || key > 99.0 {
-            return false;
-        }
 
 
         let mut lo: usize = 0;

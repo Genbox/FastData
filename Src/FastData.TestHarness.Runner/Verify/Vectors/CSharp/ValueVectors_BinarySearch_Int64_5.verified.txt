@@ -15,8 +15,6 @@ internal static class FastData
 
     public static bool Contains(long key)
     {
-        if (((ulong)key & ulong.MinValue) != 0)
-            return false;
 
 
         int lo = 0;

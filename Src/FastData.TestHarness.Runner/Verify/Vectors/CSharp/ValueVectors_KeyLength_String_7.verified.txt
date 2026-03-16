@@ -15,9 +15,6 @@ internal static class FastData
 
     public static bool Contains(string key)
     {
-        int len = key.Length;
-        if (len < 3u || len > 10u)
-            return false;
 
 
         return StringComparer.Ordinal.Equals(key, _keys[key.Length - 3]);

@@ -383,9 +383,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if (key as u32 & 4294901760) != 0 {
-            return false;
-        }
 
 
         let mapped = (key ^ i32::MIN) as u32 as u64;

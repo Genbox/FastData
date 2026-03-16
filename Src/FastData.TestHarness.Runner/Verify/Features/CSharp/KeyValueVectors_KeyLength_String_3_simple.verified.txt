@@ -23,9 +23,6 @@ internal static class FastData
 
     public static bool Contains(string key)
     {
-        int len = key.Length;
-        if (len < 1u || len > 3u)
-            return false;
 
 
         return StringComparer.Ordinal.Equals(key, _keys[key.Length - 1]);
@@ -33,12 +30,6 @@ internal static class FastData
 
     public static bool TryLookup(string key, out int value)
     {
-        int len = key.Length;
-        if (len < 1u || len > 3u)
-            {
-            value = default;
-            return false;
-        }
 
 
         int idx = key.Length - 1;

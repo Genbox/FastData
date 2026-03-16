@@ -17,9 +17,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i8) -> bool {
-        if (key as u8 & u8::MIN) != 0 {
-            return false;
-        }
 
 
         let mut lo: usize = 0;

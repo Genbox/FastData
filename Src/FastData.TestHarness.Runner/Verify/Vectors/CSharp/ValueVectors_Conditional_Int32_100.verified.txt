@@ -10,8 +10,6 @@ internal static class FastData
 {
     public static bool Contains(int key)
     {
-        if (((uint)key & 4294967168u) != 0)
-            return false;
 
 
         switch (key)

@@ -17,9 +17,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: f32) -> bool {
-        if key < f32::MIN || key > f32::MAX {
-            return false;
-        }
 
 
         for entry in Self::KEYS.iter() {

@@ -35,8 +35,6 @@ class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const double key) noexcept {
-        if (key < std::numeric_limits<double>::lowest() || key > std::numeric_limits<double>::max())
-            return false;
 
 
         const uint64_t hash = get_hash(key);

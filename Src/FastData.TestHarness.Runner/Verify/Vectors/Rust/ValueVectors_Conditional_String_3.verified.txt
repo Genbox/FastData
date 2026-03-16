@@ -13,10 +13,6 @@ pub struct fastdata;
 impl fastdata {
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        let len = key.len();
-        if len < 1 as usize || len > 255 as usize {
-            return false;
-        }
 
 
         if key == "a" || key == "item" || key == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" {

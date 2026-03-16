@@ -121,8 +121,6 @@ class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-        if ((static_cast<uint32_t>(key) & 4294901760u) != 0)
-            return false;
 
 
         const int64_t value = static_cast<int64_t>(key);

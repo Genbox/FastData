@@ -13,9 +13,6 @@ pub struct fastdata;
 impl fastdata {
     #[must_use]
     pub fn contains(key: u16) -> bool {
-        if (key as u16 & u16::MIN) != 0 {
-            return false;
-        }
 
 
         if key == u16::MIN || key == 1 || key == 2 || key == u16::MAX {

@@ -30,8 +30,6 @@ class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const uint16_t key) noexcept {
-        if ((static_cast<uint16_t>(key) & 0) != 0)
-            return false;
 
 
         const uint64_t hash = get_hash(key);

@@ -29,9 +29,6 @@ class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-         const size_t len = key.length();
-         if (len < 1u || len > 3u)
-             return false;
 
 
         return key == keys[key.length() - 1];
@@ -39,12 +36,6 @@ class fastdata final {
 
     [[nodiscard]]
     static bool try_lookup(const std::string_view key, const Person*& value) noexcept {
-         const size_t len = key.length();
-         if (len < 1u || len > 3u)
-             {
-        value = nullptr;
-        return false;
-    }
 
 
         size_t idx = key.length() - 1;

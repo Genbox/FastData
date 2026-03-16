@@ -381,8 +381,6 @@ internal static class FastData
 
     public static bool Contains(int key)
     {
-        if (((uint)key & 131072u) != 0)
-            return false;
 
 
         ulong mapped = (ulong)(uint)(key ^ int.MinValue);

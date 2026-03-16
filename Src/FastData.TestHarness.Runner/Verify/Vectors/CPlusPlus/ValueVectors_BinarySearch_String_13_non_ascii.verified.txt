@@ -15,8 +15,6 @@ class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-         if (key.length() != 2u)
-             return false;
 
 
         int32_t lo = 0;

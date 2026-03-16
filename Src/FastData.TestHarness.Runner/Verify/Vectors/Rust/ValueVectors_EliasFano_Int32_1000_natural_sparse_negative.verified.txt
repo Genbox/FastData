@@ -43,9 +43,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if (key as u32 & 131072) != 0 {
-            return false;
-        }
 
 
         let value = (key as i64) - Self::MIN_VALUE;

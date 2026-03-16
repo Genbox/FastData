@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Config;
+using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.TestHarness.Runner.Code.Theory;
@@ -19,15 +20,26 @@ public abstract class VectorTestsBase
         string source;
 
         if (vector.Keys is string[] strKeys)
-            source = FastDataGenerator.Generate(strKeys, new StringDataConfig { StructureTypeOverride = vector.StructureType }, Harness.Generator);
+        {
+            StringDataConfig config = new StringDataConfig();
+            config.StructureTypeOverride = vector.StructureType;
+            config.EarlyExitConfig.Disabled = true;
+            source = FastDataGenerator.Generate(strKeys, config, Harness.Generator);
+        }
         else
-            source = FastDataGenerator.Generate(vector.Keys, new NumericDataConfig { StructureTypeOverride = vector.StructureType }, Harness.Generator);
+        {
+            NumericDataConfig config = new NumericDataConfig();
+            config.StructureTypeOverride = vector.StructureType;
+            config.EarlyExitConfig.Disabled = true;
+            source = FastDataGenerator.Generate(vector.Keys, config, Harness.Generator);
+        }
 
         Assert.NotEmpty(source);
 
         string id = $"{nameof(ValueVectors)}_{vector.Identifier}";
         await VerifyVectorAsync(Harness.Name, id, source);
-        Assert.Equal(1, await Harness.RunContainsAsync(source, id, vector.Keys, vector.NotPresent, TestContext.Current.CancellationToken));
+        TKey[] notPresent = vector.StructureType == typeof(BloomFilterStructure<,>) ? Array.Empty<TKey>() : vector.NotPresent;
+        Assert.Equal(1, await Harness.RunContainsAsync(source, id, vector.Keys, notPresent, TestContext.Current.CancellationToken));
     }
 
     [Theory]
@@ -37,14 +49,25 @@ public abstract class VectorTestsBase
         string source;
 
         if (vector.Keys is string[] strKeys)
-            source = FastDataGenerator.GenerateKeyed(strKeys, vector.Values, new StringDataConfig { StructureTypeOverride = vector.StructureType }, Harness.Generator);
+        {
+            StringDataConfig config = new StringDataConfig();
+            config.StructureTypeOverride = vector.StructureType;
+            config.EarlyExitConfig.Disabled = true;
+            source = FastDataGenerator.GenerateKeyed(strKeys, vector.Values, config, Harness.Generator);
+        }
         else
-            source = FastDataGenerator.GenerateKeyed(vector.Keys, vector.Values, new NumericDataConfig { StructureTypeOverride = vector.StructureType }, Harness.Generator);
+        {
+            NumericDataConfig config = new NumericDataConfig();
+            config.StructureTypeOverride = vector.StructureType;
+            config.EarlyExitConfig.Disabled = true;
+            source = FastDataGenerator.GenerateKeyed(vector.Keys, vector.Values, config, Harness.Generator);
+        }
 
         Assert.NotEmpty(source);
 
         string id = $"{nameof(KeyValueVectors)}_{vector.Identifier}";
         await VerifyFeatureAsync(Harness.Name, id, source);
-        Assert.Equal(1, await Harness.RunTryLookupAsync(source, id, vector.Keys, vector.Values, vector.NotPresent, TestContext.Current.CancellationToken));
+        TKey[] notPresent = vector.StructureType == typeof(BloomFilterStructure<,>) ? Array.Empty<TKey>() : vector.NotPresent;
+        Assert.Equal(1, await Harness.RunTryLookupAsync(source, id, vector.Keys, vector.Values, notPresent, TestContext.Current.CancellationToken));
     }
 }

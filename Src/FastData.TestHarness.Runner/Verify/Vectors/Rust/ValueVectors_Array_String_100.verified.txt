@@ -26,10 +26,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        let len = key.len();
-        if len < 1 as usize || len > 2 as usize {
-            return false;
-        }
 
 
         for entry in Self::KEYS.iter() {

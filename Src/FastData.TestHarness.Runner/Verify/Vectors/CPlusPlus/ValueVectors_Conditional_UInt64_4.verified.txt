@@ -10,8 +10,6 @@ class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const uint64_t key) noexcept {
-        if ((static_cast<uint64_t>(key) & 0) != 0)
-            return false;
 
         if (key == 0 || key == 1ull || key == 2ull || key == std::numeric_limits<uint64_t>::max())
             return true;

@@ -35,10 +35,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        let len = key.len();
-        if len < 1 as usize || len > 3 as usize {
-            return false;
-        }
 
 
         return key == Self::KEYS[key.len() - 1];
@@ -46,10 +42,6 @@ impl fastdata {
 
     #[must_use]
     pub fn try_lookup(key: &'static str) -> Option<&'static Person> {
-        let len = key.len();
-        if len < 1 as usize || len > 3 as usize {
-            return None;
-        }
 
 
         let idx = (key.len() - 1) as usize;
