@@ -15,6 +15,7 @@ public abstract class FeatureTestBase
     {
         NumericDataConfig config = new NumericDataConfig();
         config.StructureTypeOverride = typeof(HashTableStructure<,>);
+        config.EarlyExitConfig.Disabled = true;
 
         float[] floats = [1f, 2f, 3f, 4f, 5f];
         string source = FastDataGenerator.Generate(floats, config, Harness.Generator);
@@ -35,6 +36,7 @@ public abstract class FeatureTestBase
     {
         StringDataConfig config = new StringDataConfig();
         config.StructureTypeOverride = typeof(BinarySearchStructure<,>);
+        config.EarlyExitConfig.Disabled = true;
         config.IgnoreCase = ignoreCase;
 
         string[] keys = ["Alpha", "bravo", "CHARLIE"];
@@ -54,6 +56,7 @@ public abstract class FeatureTestBase
     {
         StringDataConfig config = new StringDataConfig();
         config.StructureTypeOverride = typeof(BinarySearchStructure<,>);
+        config.EarlyExitConfig.Disabled = true;
         config.EnablePrefixSuffixTrimming = enabled;
 
         string[] keys = ["PreAlphaSuf", "PreBravoSuf", "PreCharlieSuf"];
@@ -72,6 +75,7 @@ public abstract class FeatureTestBase
     {
         NumericDataConfig config = new NumericDataConfig();
         config.StructureTypeOverride = typeof(HashTableStructure<,>);
+        config.EarlyExitConfig.Disabled = true;
         config.TypeReductionEnabled = enabled;
 
         byte[] keys = [byte.MinValue, 1, byte.MaxValue];
