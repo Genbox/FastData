@@ -20,11 +20,11 @@ impl fastdata {
     pub fn contains(key: &'static str) -> bool {
 
 
-        let mut lo: usize = 0;
-        let mut hi: usize = 12;
+        let mut lo: i32 = 0;
+        let mut hi: i32 = 12;
         while lo <= hi {
             let i = lo + ((hi - lo) >> 1);
-            let entry = Self::KEYS[i];
+            let entry = Self::KEYS[i as usize];
             let order = if entry < key { -1 } else if entry > key { 1 } else { 0 };
 
             if order == 0 {

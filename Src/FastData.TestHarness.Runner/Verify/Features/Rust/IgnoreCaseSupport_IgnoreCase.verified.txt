@@ -115,11 +115,11 @@ impl fastdata {
     pub fn contains(key: &'static str) -> bool {
 
 
-        let mut lo: usize = 0;
-        let mut hi: usize = 2;
+        let mut lo: i32 = 0;
+        let mut hi: i32 = 2;
         while lo <= hi {
             let i = lo + ((hi - lo) >> 1);
-            let entry = Self::KEYS[i];
+            let entry = Self::KEYS[i as usize];
             let order = case_insensitive_compare(entry, key);
 
             if order == 0 {
