@@ -19,7 +19,15 @@ impl fastdata {
     pub fn contains(key: &'static str) -> bool {
 
 
-        return key == Self::KEYS[key.len() - 3];
+        let Some(idx) = key.len().checked_sub(3) else {
+            return false;
+        };
+
+        if idx >= Self::KEYS.len() {
+            return false;
+        }
+
+        return key == Self::KEYS[idx];
     }
 
     pub const ITEM_COUNT: usize = 7;

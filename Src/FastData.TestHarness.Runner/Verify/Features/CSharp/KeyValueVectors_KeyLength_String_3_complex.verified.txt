@@ -38,7 +38,11 @@ internal static class FastData
     {
 
 
-        return StringComparer.Ordinal.Equals(key, _keys[key.Length - 1]);
+        int idx = key.Length - 1;
+        if ((uint)idx >= (uint)_keys.Length)
+            return false;
+
+        return StringComparer.Ordinal.Equals(key, _keys[idx]);
     }
 
     public static bool TryLookup(string key, out Person value)
@@ -46,6 +50,12 @@ internal static class FastData
 
 
         int idx = key.Length - 1;
+        if ((uint)idx >= (uint)_keys.Length)
+        {
+            value = default;
+            return false;
+        }
+
         if (StringComparer.Ordinal.Equals(key, _keys[idx]))
         {
             value = _values[_offsets[idx]];

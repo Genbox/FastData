@@ -31,14 +31,31 @@ class fastdata final {
     static constexpr bool contains(const std::string_view key) noexcept {
 
 
-        return key == keys[key.length() - 1];
+        if (key.length() < 1)
+            return false;
+
+        size_t idx = key.length() - 1;
+        if (idx >= keys.size())
+            return false;
+
+        return key == keys[idx];
     }
 
     [[nodiscard]]
     static bool try_lookup(const std::string_view key, const Person*& value) noexcept {
 
 
+        if (key.length() < 1) {
+            value = nullptr;
+            return false;
+        }
+
         size_t idx = key.length() - 1;
+        if (idx >= keys.size()) {
+            value = nullptr;
+            return false;
+        }
+
         if (key == keys[idx]) {
             value = values[offsets[idx]];
             return true;

@@ -16,7 +16,14 @@ class fastdata final {
     static constexpr bool contains(const std::string_view key) noexcept {
 
 
-        return key == keys[key.length() - 3];
+        if (key.length() < 3)
+            return false;
+
+        size_t idx = key.length() - 3;
+        if (idx >= keys.size())
+            return false;
+
+        return key == keys[idx];
     }
 
     static constexpr size_t item_count = 7;

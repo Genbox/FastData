@@ -17,10 +17,10 @@ class fastdata final {
     static constexpr bool contains(const std::string_view key) noexcept {
 
 
-        int32_t lo = 0;
-        int32_t hi = 12;
-        while (lo <= hi) {
-            const int32_t mid = lo + ((hi - lo) >> 1);
+        size_t lo = 0;
+        size_t hi = 13;
+        while (lo < hi) {
+            const size_t mid = lo + ((hi - lo) >> 1);
             const std::string_view mid_key = keys[mid];
             const int32_t order = mid_key.compare(key);
 
@@ -29,7 +29,7 @@ class fastdata final {
             if (order < 0)
                 lo = mid + 1;
             else
-                hi = mid - 1;
+                hi = mid;
         }
 
         return false;

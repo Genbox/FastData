@@ -25,10 +25,10 @@ class fastdata final {
     static constexpr bool contains(const int32_t key) noexcept {
 
 
-        int32_t lo = 0;
-        int32_t hi = 99;
-        while (lo <= hi) {
-            const int32_t mid = lo + ((hi - lo) >> 1);
+        size_t lo = 0;
+        size_t hi = 100;
+        while (lo < hi) {
+            const size_t mid = lo + ((hi - lo) >> 1);
             const int32_t mid_key = keys[mid];
             const int32_t order = mid_key < key ? -1 : (mid_key > key ? 1 : 0);
 
@@ -37,7 +37,7 @@ class fastdata final {
             if (order < 0)
                 lo = mid + 1;
             else
-                hi = mid - 1;
+                hi = mid;
         }
 
         return false;

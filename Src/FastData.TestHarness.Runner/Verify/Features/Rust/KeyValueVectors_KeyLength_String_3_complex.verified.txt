@@ -37,14 +37,29 @@ impl fastdata {
     pub fn contains(key: &'static str) -> bool {
 
 
-        return key == Self::KEYS[key.len() - 1];
+        let Some(idx) = key.len().checked_sub(1) else {
+            return false;
+        };
+
+        if idx >= Self::KEYS.len() {
+            return false;
+        }
+
+        return key == Self::KEYS[idx];
     }
 
     #[must_use]
     pub fn try_lookup(key: &'static str) -> Option<&'static Person> {
 
 
-        let idx = (key.len() - 1) as usize;
+        let Some(idx) = key.len().checked_sub(1) else {
+            return None;
+        };
+
+        if idx >= Self::KEYS.len() {
+            return None;
+        }
+
         if (key == Self::KEYS[idx]) {
             return Some(Self::VALUES[Self::OFFSETS[idx] as usize]);
         }

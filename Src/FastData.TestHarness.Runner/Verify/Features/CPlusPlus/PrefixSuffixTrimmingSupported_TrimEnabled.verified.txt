@@ -19,10 +19,10 @@ class fastdata final {
         const auto trimmedKey = key.substr(3, key.length() - 6);
 
 
-        int32_t lo = 0;
-        int32_t hi = 2;
-        while (lo <= hi) {
-            const int32_t mid = lo + ((hi - lo) >> 1);
+        size_t lo = 0;
+        size_t hi = 3;
+        while (lo < hi) {
+            const size_t mid = lo + ((hi - lo) >> 1);
             const std::string_view mid_key = keys[mid];
             const int32_t order = mid_key.compare(trimmedKey);
 
@@ -31,7 +31,7 @@ class fastdata final {
             if (order < 0)
                 lo = mid + 1;
             else
-                hi = mid - 1;
+                hi = mid;
         }
 
         return false;
