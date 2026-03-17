@@ -31,7 +31,11 @@
 {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-    return <#= Model.GetEqualFunction(Common.LookupKeyName, $"_keys[{Common.LookupKeyName}.Length - {Context.MinLength}]") #>;
+    int idx = <#= Common.LookupKeyName #>.Length - <#= Context.MinLength #>;
+    if ((uint)idx >= (uint)_keys.Length)
+        return false;
+
+    return <#= Model.GetEqualFunction(Common.LookupKeyName, "_keys[idx]") #>;
 }
 <#
     if (Data.ValueCount > 0)
@@ -43,6 +47,12 @@
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
     int idx = <#= Common.LookupKeyName #>.Length - <#= Context.MinLength #>;
+    if ((uint)idx >= (uint)_keys.Length)
+    {
+        value = default;
+        return false;
+    }
+
     if (<#= Model.GetEqualFunction(Common.LookupKeyName, "_keys[idx]") #>)
     {
         value = _values[_offsets[idx]];
