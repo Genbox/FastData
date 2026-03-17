@@ -26,8 +26,9 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
     {
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
         TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
+        CPlusPlusExpressionCompiler compiler = new CPlusPlusExpressionCompiler(map);
 
-        return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(map), new CPlusPlusHashDef(map), map, new CPlusPlusExpressionCompiler(map));
+        return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(compiler), new CPlusPlusHashDef(map), map, compiler);
     }
 
     public override string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)

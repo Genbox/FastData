@@ -18,9 +18,8 @@ public sealed class BloomFilterStructure<TKey, TValue> : IStructure<TKey, TValue
     {
         int capacity = keys.Length;
         int bits = checked(capacity * BitsPerKey);
-        int buckets = bits / 64;
 
-        uint length = (uint)(buckets + sizeof(ulong));
+        uint length = (uint)((bits + 63) / 64);
         ulong[] bitset = new ulong[length];
         ulong[] hashCodes = _hashData.HashCodes;
 

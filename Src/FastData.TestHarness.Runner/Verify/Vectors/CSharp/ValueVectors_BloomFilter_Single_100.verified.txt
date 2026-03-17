@@ -9,9 +9,8 @@ using System.Runtime.InteropServices;
 internal static class FastData
 {
     private static readonly ulong[] _bloom = new ulong[] {
-        1ul, 1ul, 1ul, 1ul, 1ul, 1ul, 1ul, 1ul, 1ul, 1ul, 
-        1ul, 1ul, 1ul, 1ul, 1ul, 1ul, 1ul, 1ul, 1ul, 1ul, 
-        1ul, 1ul, 1ul
+        1ul, ulong.MinValue, ulong.MinValue, ulong.MinValue, ulong.MinValue, ulong.MinValue, ulong.MinValue, ulong.MinValue, ulong.MinValue, ulong.MinValue, 
+        ulong.MinValue, ulong.MinValue, ulong.MinValue, ulong.MinValue, ulong.MinValue, ulong.MinValue
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -31,7 +30,7 @@ internal static class FastData
 
 
         ulong hash = Hash(key);
-        uint index = (uint)(hash % 23);
+        uint index = (uint)(hash & 15);
         uint shift1 = (uint)hash & 63u;
         uint shift2 = (uint)(hash >> 8) & 63u;
         ulong mask = (1UL << (int)shift1) | (1UL << (int)shift2);

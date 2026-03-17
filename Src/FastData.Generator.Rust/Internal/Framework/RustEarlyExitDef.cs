@@ -1,207 +1,24 @@
+using Genbox.FastData.Generator.Compat;
 using Genbox.FastData.Generator.Enums;
-using Genbox.FastData.Generator.Extensions;
-using Genbox.FastData.Generator.Framework;
-using Genbox.FastData.Generator.Framework.Definitions;
-using Genbox.FastData.Generator.Rust.Enums;
-using Genbox.FastData.Generators.EarlyExits;
-using Genbox.FastData.Generators.Helpers;
+using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
-internal class RustEarlyExitDef(TypeMap map) : EarlyExitDef
+internal sealed class RustEarlyExitDef(ExpressionCompiler compiler) : IEarlyExitDef
 {
-    protected override string GetLengthBitmapEarlyExit(MethodType methodType, ulong[] bitSet)
+    public string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, bool ignoreCase, GeneratorEncoding encoding, string keyName)
     {
-        return bitSet.Length == 1
-            ? RenderWord(bitSet[0], methodType)
-            : $$"""
-                    match key.len() >> 6 {
-                {{RenderCases()}}
-                        _ => {
-                             {{RenderExit(methodType)}}
-                        }
-                    }
-                """;
-
-        string RenderCases()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            for (int i = 0; i < bitSet.Length; i++)
-            {
-                sb.Append($$"""
-                                    {{i.ToStringInvariant()}} => {
-                                {{RenderWord(bitSet[i], methodType)}}
-                                    },
-
-                            """);
-            }
-
-            return sb.ToString();
-        }
-    }
-
-    protected override string GetValueEarlyExit<T>(MethodType methodType, T min, T max) =>
-        $$"""
-              if {{(min.Equals(max) ? $"key != {map.ToValueLabel(max)}" : $"key < {map.ToValueLabel(min)} || key > {map.ToValueLabel(max)}")}} {
-                  {{RenderExit(methodType)}}
-              }
-          """;
-
-    protected override string GetValueBitMaskEarlyExit<T>(MethodType methodType, ulong mask)
-    {
-        Type unsignedType = TypeHelper.GetUnsignedType(typeof(T));
-        string unsignedTypeName = map.GetTypeName(unsignedType);
-        object maskValue = TypeHelper.ConvertValueToType(mask, unsignedType);
-        string maskLiteral = map.ToValueLabel(maskValue, unsignedType);
-
-        return $$"""
-                     if (key as {{unsignedTypeName}} & {{maskLiteral}}) != 0 {
-                         {{RenderExit(methodType)}}
-                     }
-                 """;
-    }
-
-    protected override string GetLengthEqualEarlyExit(MethodType methodType, uint length, uint byteCount, GeneratorEncoding encoding) =>
-        $$"""
-              if key.len() != {{map.ToValueLabel(byteCount)}} as usize {
-                  {{RenderExit(methodType)}}
-              }
-          """;
-
-    protected override string GetLengthRangeEarlyExit(MethodType methodType, uint min, uint max, uint minByte, uint maxByte, GeneratorEncoding encoding) =>
-        $$"""
-              let len = key.len();
-              if len < {{map.ToValueLabel(minByte)}} as usize || len > {{map.ToValueLabel(maxByte)}} as usize {
-                  {{RenderExit(methodType)}}
-              }
-          """;
-
-    protected override string GetStringBitMaskEarlyExit(MethodType methodType, ulong mask, int byteCount, bool ignoreCase, GeneratorEncoding encoding)
-    {
-        if (mask == 0 || byteCount <= 0)
-            return string.Empty;
-
-        if (encoding != GeneratorEncoding.UTF8 && encoding != GeneratorEncoding.ASCII)
-            return string.Empty;
-
-        if (!ignoreCase)
-        {
-            StringBuilder expr = new StringBuilder();
-
-            for (int i = 0; i < byteCount; i++)
-            {
-                if (i > 0)
-                    expr.Append(" | ");
-
-                expr.Append($"(bytes[{i}] as u64)");
-                if (i > 0)
-                    expr.Append($" << {i * 8}");
-            }
-
-            return $$"""
-                         let bytes = key.as_bytes();
-                         let first = {{expr}};
-
-                         if (first & {{mask.ToStringInvariant()}}u64) != 0 {
-                             {{RenderExit(methodType)}}
-                         }
-                     """;
-        }
-
         StringBuilder sb = new StringBuilder();
-        sb.Append("""
-                        let mut first: u64 = 0;
-                        let bytes = key.as_bytes();
-                  """);
 
-        for (int i = 0; i < byteCount; i++)
-        {
-            sb.Append($"""
-                                   let mut b{i} = bytes[{i}];
-                                   b{i} = to_lower_ascii(b{i});
-                                   first |= (b{i} as u64) << {i * 8};
-                       """);
-        }
+        foreach (IEarlyExit earlyExit in earlyExits)
+            sb.AppendJoin(" && ", compiler.GetCode(earlyExit.GetExpression(keyName), 0));
 
-        sb.Append($$"""
-
-                                if (first & {{mask.ToStringInvariant()}}u64) != 0 {
-                                    {{RenderExit(methodType)}}
-                                }
-                    """);
-        return sb.ToString();
+        string eeStr = sb.ToString();
+        return eeStr.Length == 0 ? string.Empty : RenderExit(methodType, sb.ToString());
     }
 
-    protected override string GetCharRangeEarlyExit(MethodType methodType, CharPosition position, char min, char max, bool ignoreCase, GeneratorEncoding encoding) =>
-        $$"""
-              let bytes = key.as_bytes();
-              let len = bytes.len();
-              let value_char = {{(position == CharPosition.First
-                  ? ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]"
-                  : ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}};
-              if value_char < {{map.ToValueLabel((byte)min)}}u8 || value_char > {{map.ToValueLabel((byte)max)}}u8 {
-                  {{RenderExit(methodType)}}
-              }
-          """;
-
-    protected override string GetCharEqualsEarlyExit(MethodType methodType, CharPosition position, char value, bool ignoreCase, GeneratorEncoding encoding) =>
-        $$"""
-              let bytes = key.as_bytes();
-              let len = bytes.len();
-              let value_char = {{(position == CharPosition.First
-                  ? ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]"
-                  : ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}};
-              if value_char != {{map.ToValueLabel((byte)value)}} {
-                  {{RenderExit(methodType)}}
-              }
-          """;
-
-    protected override string GetCharBitmapEarlyExit(MethodType methodType, CharPosition position, ulong low, ulong high, bool ignoreCase, GeneratorEncoding encoding) =>
-        $$"""
-              let bytes = key.as_bytes();
-              let len = bytes.len();
-              let value_char = {{(position == CharPosition.First ?
-                  ignoreCase ? "to_lower_ascii(bytes[0])" : "bytes[0]" :
-                  ignoreCase ? "to_lower_ascii(bytes[len - 1])" : "bytes[len - 1]")}} as u32;
-              if value_char > 0x7F {
-                  {{RenderExit(methodType)}}
-              }
-              if value_char < 64 {
-                  if (((1u64 << value_char) & {{low.ToStringInvariant()}}u64) == 0) {
-                      {{RenderExit(methodType)}}
-                  }
-              } else {
-                  if (((1u64 << (value_char - 64)) & {{high.ToStringInvariant()}}u64) == 0) {
-                      {{RenderExit(methodType)}}
-                  }
-              }
-          """;
-
-    protected override string GetStringPrefixSuffixEarlyExit(MethodType methodType, string prefix, string suffix, bool ignoreCase)
-    {
-        string prefixCheck = ignoreCase ? $"case_insensitive_starts_with(key, {map.ToValueLabel(prefix)})" : $"key.starts_with({map.ToValueLabel(prefix)})";
-        string suffixCheck = ignoreCase ? $"case_insensitive_ends_with(key, {map.ToValueLabel(suffix)})" : $"key.ends_with({map.ToValueLabel(suffix)})";
-
-        string condition;
-        if (prefix.Length == 0)
-            condition = suffixCheck;
-        else
-            condition = suffix.Length == 0 ? prefixCheck : $"{prefixCheck} && {suffixCheck}";
-
-        return $$"""
-                     if !({{condition}}) {
-                         {{RenderExit(methodType)}}
-                     }
-                 """;
-    }
-
-    private static string RenderWord(ulong word, MethodType methodType) =>
-        $$"""
-                  if {{word.ToStringInvariant()}}u64 & (1u64 << ((key.len().wrapping_sub(1)) & 63)) == 0 {
-                      {{RenderExit(methodType)}}
-                  }
-          """;
-
-    private static string RenderExit(MethodType methodType) => methodType == MethodType.TryLookup ? "return None;" : "return false;";
+    private static string RenderExit(MethodType methodType, string condition) => methodType == MethodType.TryLookup
+        ? $"if {condition} {{ return None; }}"
+        : $"if {condition} {{ return false; }}";
 }

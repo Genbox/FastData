@@ -13,12 +13,12 @@ internal sealed class SwitchArray(uint capacity)
 
     public void Clear()
     {
-        _counter++;
-
         if (_counter == uint.MaxValue)
         {
             Array.Clear(_data, 0, _data.Length);
             _counter = 0;
         }
+
+        _counter++;
     }
 }

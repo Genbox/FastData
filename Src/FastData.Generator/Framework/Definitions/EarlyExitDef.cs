@@ -9,7 +9,7 @@ namespace Genbox.FastData.Generator.Framework.Definitions;
 
 public abstract class EarlyExitDef : IEarlyExitDef
 {
-    public string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, bool ignoreCase, GeneratorEncoding encoding, SharedCode shared)
+    public string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, bool ignoreCase, GeneratorEncoding encoding, string keyName)
     {
         StringBuilder sb = new StringBuilder();
 

@@ -7,8 +7,8 @@
 #include <string_view>
 
 class fastdata final {
-    static constexpr std::array<uint64_t, 10> bloom = {
-        70369012875265ull, 288230376151744770ull, 0, 0, 0, 9007783405944960ull, 1082130432ull, 4611967495551713280ull, 594475150812906512ull, 134217856ull
+    static constexpr std::array<uint64_t, 3> bloom = {
+        282025817146385ull, 594545519859106176ull, 4908923630475280514ull
     };
 
     static constexpr uint64_t get_hash(const std::string_view value) noexcept
@@ -27,7 +27,7 @@ class fastdata final {
 
 
         const uint64_t hash = get_hash(key);
-        const size_t index = hash % 10;
+        const size_t index = hash % 3;
         const uint32_t shift1 = static_cast<uint32_t>(hash) & 63u;
         const uint32_t shift2 = static_cast<uint32_t>(hash >> 8) & 63u;
         const uint64_t mask = (1ULL << shift1) | (1ULL << shift2);

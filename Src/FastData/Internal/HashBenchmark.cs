@@ -18,7 +18,7 @@ internal static class HashBenchmark
         Simulator sim = new Simulator(data.Length, encoding);
 
         //Run each of the analyzers
-        List<Candidate> candidates = new List<Candidate>();
+        List<Candidate> candidates = new List<Candidate>(16);
 
         //We always add the default hash as a candidate
         if (includeDefault)
@@ -46,8 +46,8 @@ internal static class HashBenchmark
         }
 
         //Split candidates into perfect and not perfect
-        List<Candidate> perfect = new List<Candidate>();
-        List<Candidate> notPerfect = new List<Candidate>();
+        List<Candidate> perfect = new List<Candidate>(candidates.Count);
+        List<Candidate> notPerfect = new List<Candidate>(candidates.Count);
 
         foreach (Candidate candidate in candidates)
         {

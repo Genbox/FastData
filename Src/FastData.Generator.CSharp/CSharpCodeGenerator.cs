@@ -29,8 +29,9 @@ public sealed class CSharpCodeGenerator : CodeGenerator
     {
         CSharpLanguageDef langDef = new CSharpLanguageDef();
         TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF16);
+        CSharpExpressionCompiler compiler = new CSharpExpressionCompiler(map);
 
-        return new CSharpCodeGenerator(userCfg, langDef, new CSharpConstantsDef(), new CSharpEarlyExitDef(map, userCfg.GeneratorOptions), new CSharpHashDef(), map, new CSharpExpressionCompiler(map));
+        return new CSharpCodeGenerator(userCfg, langDef, new CSharpConstantsDef(), new CSharpEarlyExitDef(compiler), new CSharpHashDef(), map, compiler);
     }
 
     protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfigBase genCfg, IContext context)

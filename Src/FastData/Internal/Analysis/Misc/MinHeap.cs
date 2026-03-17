@@ -92,5 +92,6 @@ internal sealed class MinHeap<T>(int capacity)
     public void Clear()
     {
         _count = 0;
+        _best = double.MinValue;
     }
 }

@@ -26,8 +26,9 @@ public sealed class RustCodeGenerator : CodeGenerator
     {
         RustLanguageDef langDef = new RustLanguageDef();
         TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
+        RustExpressionCompiler compiler = new RustExpressionCompiler(map);
 
-        return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(map), new RustHashDef(map), map, new RustExpressionCompiler(map));
+        return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(compiler), new RustHashDef(map), map, compiler);
     }
 
     protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfigBase genCfg, IContext context)

@@ -11,8 +11,8 @@
 pub struct fastdata;
 
 impl fastdata {
-    const BLOOM: [u64; 10] = [
-        70369012875265, 288230376151744770, u64::MIN, u64::MIN, u64::MIN, 9007783405944960, 1082130432, 4611967495551713280, 594475150812906512, 134217856
+    const BLOOM: [u64; 3] = [
+        282025817146385, 594545519859106176, 4908923630475280514
     ];
 
     #[inline]
@@ -36,7 +36,7 @@ impl fastdata {
 
 
         let hash = unsafe { Self::get_hash(key) };
-        let index = hash % 10;
+        let index = hash % 3;
         let shift1 = (hash as u32) & 63;
         let shift2 = ((hash >> 8) as u32) & 63;
         let mask = (1u64 << shift1) | (1u64 << shift2);

@@ -53,7 +53,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
             encoding = stringConfig.Encoding;
         }
 
-        return _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType, ignoreCase, encoding, Shared);
+        return _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType, ignoreCase, encoding, InputKeyName);
     }
 
     internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfigBase genCfg, string keyTypeName, string valueTypeName, ExpressionCompiler? compiler, SharedCode shared)
