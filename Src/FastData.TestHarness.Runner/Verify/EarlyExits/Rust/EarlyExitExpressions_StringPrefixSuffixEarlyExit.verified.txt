@@ -1,0 +1,1 @@
+﻿!(key.starts_with("pre") && key.ends_with("suf"))

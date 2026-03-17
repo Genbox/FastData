@@ -1,0 +1,1 @@
+﻿((((key.len() as i32) as u32) < 2) || (((key.len() as i32) as u32) > 5))

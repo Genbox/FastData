@@ -11,8 +11,6 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
 internal class CSharpEarlyExitDef(TypeMap map, CSharpOptions options) : EarlyExitDef
 {
-    protected override bool IsEnabled => !options.HasFlag(CSharpOptions.DisableEarlyExits);
-
     protected override string GetLengthBitmapEarlyExit(MethodType methodType, ulong[] bitSet)
     {
         return bitSet.Length == 1

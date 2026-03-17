@@ -9,13 +9,8 @@ namespace Genbox.FastData.Generator.Framework.Definitions;
 
 public abstract class EarlyExitDef : IEarlyExitDef
 {
-    protected abstract bool IsEnabled { get; }
-
     public string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, bool ignoreCase, GeneratorEncoding encoding, SharedCode shared)
     {
-        if (!IsEnabled)
-            return string.Empty;
-
         StringBuilder sb = new StringBuilder();
 
         foreach (IEarlyExit spec in earlyExits)

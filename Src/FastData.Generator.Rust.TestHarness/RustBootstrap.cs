@@ -1,5 +1,6 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generator.Rust.Internal;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.InternalShared.Harness;
@@ -18,6 +19,8 @@ public sealed class RustBootstrap : BootstrapBase
     internal TypeMap Map { get; }
 
     public override ICodeGenerator Generator => RustCodeGenerator.Create(new RustCodeGeneratorConfig("fastdata"));
+
+    public ExpressionCompiler CreateExpressionCompiler() => new RustExpressionCompiler(Map);
 
     private static string GetCommandTemplate(HarnessType type) => type == HarnessType.Test
         ? "/bin/sh -c \"rustc -C debuginfo=0 -o {1} {0} && ./{1}\""

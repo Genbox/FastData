@@ -8,10 +8,8 @@ using Genbox.FastData.Generators.Helpers;
 
 namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
-internal class RustEarlyExitDef(TypeMap map, RustOptions options) : EarlyExitDef
+internal class RustEarlyExitDef(TypeMap map) : EarlyExitDef
 {
-    protected override bool IsEnabled => !options.HasFlag(RustOptions.DisableEarlyExits);
-
     protected override string GetLengthBitmapEarlyExit(MethodType methodType, ulong[] bitSet)
     {
         return bitSet.Length == 1

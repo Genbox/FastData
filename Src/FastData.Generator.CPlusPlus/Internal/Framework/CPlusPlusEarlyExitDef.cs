@@ -8,10 +8,8 @@ using static Genbox.FastData.Generators.Helpers.TypeHelper;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
-internal class CPlusPlusEarlyExitDef(TypeMap map, CPlusPlusOptions options) : EarlyExitDef
+internal class CPlusPlusEarlyExitDef(TypeMap map) : EarlyExitDef
 {
-    protected override bool IsEnabled => !options.HasFlag(CPlusPlusOptions.DisableEarlyExits);
-
     protected override string GetLengthBitmapEarlyExit(MethodType methodType, ulong[] bitSet)
     {
         return bitSet.Length == 1

@@ -1,0 +1,1 @@
+﻿(key.as_bytes()[(((key.len() as i32) - 1) as usize)] != 120u8)

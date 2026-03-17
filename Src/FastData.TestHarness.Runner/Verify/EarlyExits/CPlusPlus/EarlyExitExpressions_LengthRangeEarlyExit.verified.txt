@@ -1,0 +1,1 @@
+﻿((static_cast<uint32_t>(key.length()) < 2u) || (static_cast<uint32_t>(key.length()) > 5u))

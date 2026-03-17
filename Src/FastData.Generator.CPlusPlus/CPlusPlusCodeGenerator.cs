@@ -1,3 +1,4 @@
+using Genbox.FastData.Generator.CPlusPlus.Internal;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generator.CPlusPlus.TemplateData;
 using Genbox.FastData.Generator.Enums;
@@ -16,8 +17,8 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
 {
     private readonly CPlusPlusCodeGeneratorConfig _cfg;
 
-    private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, TypeMap helper)
-        : base(langDef, constDef, earlyExitDef, hashDef, helper, null) => _cfg = cfg;
+    private CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, TypeMap helper, ExpressionCompiler compiler)
+        : base(langDef, constDef, earlyExitDef, hashDef, helper, compiler) => _cfg = cfg;
 
     public override GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
 
@@ -26,7 +27,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
         TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
 
-        return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(map, userCfg.GeneratorOptions), new CPlusPlusHashDef(), map);
+        return new CPlusPlusCodeGenerator(userCfg, langDef, new CPlusPlusConstantsDef(), new CPlusPlusEarlyExitDef(map), new CPlusPlusHashDef(map), map, new CPlusPlusExpressionCompiler(map));
     }
 
     public override string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)

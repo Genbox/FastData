@@ -2,6 +2,7 @@ using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generator.Rust.Internal;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.Generator.Rust.TemplateData;
 using Genbox.FastData.Generator.Template.Extensions;
@@ -16,8 +17,8 @@ public sealed class RustCodeGenerator : CodeGenerator
 {
     private readonly RustCodeGeneratorConfig _cfg;
 
-    private RustCodeGenerator(RustCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, TypeMap map)
-        : base(langDef, constDef, earlyExitDef, hashDef, map, null) => _cfg = cfg;
+    private RustCodeGenerator(RustCodeGeneratorConfig cfg, ILanguageDef langDef, IConstantsDef constDef, IEarlyExitDef earlyExitDef, IHashDef hashDef, TypeMap map, ExpressionCompiler compiler)
+        : base(langDef, constDef, earlyExitDef, hashDef, map, compiler) => _cfg = cfg;
 
     public override GeneratorEncoding Encoding => GeneratorEncoding.UTF8;
 
@@ -26,7 +27,7 @@ public sealed class RustCodeGenerator : CodeGenerator
         RustLanguageDef langDef = new RustLanguageDef();
         TypeMap map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
 
-        return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(map, userCfg.GeneratorOptions), new RustHashDef(), map);
+        return new RustCodeGenerator(userCfg, langDef, new RustConstantsDef(), new RustEarlyExitDef(map), new RustHashDef(map), map, new RustExpressionCompiler(map));
     }
 
     protected override void AppendHeader<TKey, TValue>(StringBuilder sb, GeneratorConfigBase genCfg, IContext context)
