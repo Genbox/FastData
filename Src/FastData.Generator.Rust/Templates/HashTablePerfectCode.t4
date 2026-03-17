@@ -71,7 +71,7 @@
     return <#
     if (Context.StoreHashCode)
     {
-#><#= Model.GetEqualFunctionByType("hash", "&Self::ENTRIES[index].hash_code", TypeCode.Int64) #> && <#
+#><#= Model.GetEqualFunctionByType("hash", "Self::ENTRIES[index].hash_code", TypeCode.Int64) #> && <#
     }
 #><#= Model.GetEqualFunction(Common.LookupKeyName, useEntryStruct ? "Self::ENTRIES[index].key" : "Self::ENTRIES[index]") #>;
 }
