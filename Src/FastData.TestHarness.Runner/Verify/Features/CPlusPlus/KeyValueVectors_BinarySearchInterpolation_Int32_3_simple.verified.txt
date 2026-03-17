@@ -1,0 +1,106 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearchInterpolation
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class fastdata final {
+    inline static const std::array<int32_t, 3> values = {
+        1, 2, 3
+    };
+
+    static constexpr std::array<int32_t, 3> keys = {
+        1, 2, 3
+    };
+
+    public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+
+
+        int32_t lo = 0;
+        int32_t hi = 2;
+        while (lo <= hi && key >= keys[lo] && key <= keys[hi]) {
+            const int32_t lo_key = keys[lo];
+            const int32_t hi_key = keys[hi];
+
+            if (lo_key == hi_key) {
+                if (lo_key == key)
+                    return true;
+
+                break;
+            }
+
+            const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
+            const double offset = static_cast<double>(key) - static_cast<double>(lo_key);
+            int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+
+            if (mid < lo)
+                mid = lo;
+            else if (mid > hi)
+                mid = hi;
+
+            const int32_t mid_key = keys[mid];
+            if (mid_key == key)
+                return true;
+            if (mid_key < key)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+
+    [[nodiscard]]
+    static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
+
+
+        int32_t lo = 0;
+        int32_t hi = 2;
+        while (lo <= hi && key >= keys[lo] && key <= keys[hi]) {
+            const int32_t lo_key = keys[lo];
+            const int32_t hi_key = keys[hi];
+
+            if (lo_key == hi_key) {
+                if (lo_key == key)
+                {
+                    value = &values[lo];
+                    return true;
+                }
+
+                break;
+            }
+
+            const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
+            const double offset = static_cast<double>(key) - static_cast<double>(lo_key);
+            int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+
+            if (mid < lo)
+                mid = lo;
+            else if (mid > hi)
+                mid = hi;
+
+            const int32_t mid_key = keys[mid];
+            if (mid_key == key)
+            {
+                value = &values[mid];
+                return true;
+            }
+
+            if (mid_key < key)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        value = nullptr;
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 3;
+};

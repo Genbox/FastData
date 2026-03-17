@@ -1,0 +1,56 @@
+﻿// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearchInterpolation
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+class fastdata final {
+    static constexpr std::array<float, 5> keys = {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f
+    };
+
+    public:
+    [[nodiscard]]
+    static constexpr bool contains(const float key) noexcept {
+
+
+        int32_t lo = 0;
+        int32_t hi = 4;
+        while (lo <= hi && key >= keys[lo] && key <= keys[hi]) {
+            const float lo_key = keys[lo];
+            const float hi_key = keys[hi];
+
+            if (lo_key == hi_key) {
+                if (lo_key == key)
+                    return true;
+
+                break;
+            }
+
+            const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
+            const double offset = static_cast<double>(key) - static_cast<double>(lo_key);
+            int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+
+            if (mid < lo)
+                mid = lo;
+            else if (mid > hi)
+                mid = hi;
+
+            const float mid_key = keys[mid];
+            if (mid_key == key)
+                return true;
+            if (mid_key < key)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr float min_key = 1.0f;
+    static constexpr float max_key = 5.0f;
+};
