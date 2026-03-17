@@ -1,5 +1,4 @@
 using Genbox.FastData.Config;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Harness;
 using static Genbox.FastData.TestHarness.Runner.Code.VerifyHelper;

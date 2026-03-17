@@ -15,7 +15,6 @@ using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using StructureConfig = Genbox.FastData.Config.StructureConfig;
 
 namespace Genbox.FastData;
 

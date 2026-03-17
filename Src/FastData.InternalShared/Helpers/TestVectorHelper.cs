@@ -1,5 +1,4 @@
 using System.Globalization;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Misc;
 using Genbox.FastData.InternalShared.TestClasses;

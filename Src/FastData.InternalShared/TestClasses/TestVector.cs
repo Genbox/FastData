@@ -1,4 +1,3 @@
-using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Extensions;
 using Xunit.Sdk;
 

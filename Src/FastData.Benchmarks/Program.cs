@@ -4,7 +4,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using Genbox.FastData.Config;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Helpers;
