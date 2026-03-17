@@ -78,7 +78,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
         {
             string raw = _context.GetType().Name;
             int idx = raw.IndexOf("Context", StringComparison.Ordinal);
-            string name = raw.Substring(0, idx) + "Code.t4";
+            string name = raw.Substring(0, idx) + ".t4";
             string source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Templates", "CPlusPlus", name));
 
             return _manager.Render(this, name, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
