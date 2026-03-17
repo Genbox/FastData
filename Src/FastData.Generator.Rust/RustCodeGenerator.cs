@@ -265,7 +265,16 @@ public sealed class RustCodeGenerator : CodeGenerator
             sb.Append(base.GetMethodHeader(methodType));
 
             if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
-                sb.Append($"    let {TrimmedKeyName} = &{InputKeyName}[{strCfg.TrimPrefix.Length.ToStringInvariant()}..{InputKeyName}.len() - {strCfg.TrimSuffix.Length.ToStringInvariant()}];");
+            {
+                string totalTrimLength = strCfg.TotalTrimLength.ToStringInvariant();
+
+                if (methodType == MethodType.TryLookup)
+                    sb.AppendLine($"    if {InputKeyName}.len() < {totalTrimLength} {{ return None; }}");
+                else
+                    sb.AppendLine($"    if {InputKeyName}.len() < {totalTrimLength} {{ return false; }}");
+
+                sb.AppendLine($"    let {TrimmedKeyName} = &{InputKeyName}[{strCfg.TrimPrefix.Length.ToStringInvariant()}..{InputKeyName}.len() - {strCfg.TrimSuffix.Length.ToStringInvariant()}];");
+            }
 
             return sb.ToString();
         }

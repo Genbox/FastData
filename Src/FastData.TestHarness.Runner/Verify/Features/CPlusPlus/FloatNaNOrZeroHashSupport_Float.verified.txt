@@ -33,8 +33,6 @@ class fastdata final {
     public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
-        if (key < 1.0f || key > 5.0f)
-            return false;
 
 
         const uint64_t hash = get_hash(key);

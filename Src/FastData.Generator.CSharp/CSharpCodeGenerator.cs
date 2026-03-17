@@ -300,7 +300,29 @@ public sealed class CSharpCodeGenerator : CodeGenerator
             sb.Append(base.GetMethodHeader(methodType));
 
             if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
-                sb.Append($"    string {TrimmedKeyName} = {InputKeyName}.Substring({strCfg.TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.Length - {strCfg.TotalTrimLength.ToStringInvariant()});");
+            {
+                string totalTrimLength = strCfg.TotalTrimLength.ToStringInvariant();
+
+                if (methodType == MethodType.TryLookup)
+                {
+                    sb.AppendLine($$"""
+                                        if ({{InputKeyName}}.Length < {{totalTrimLength}})
+                                        {
+                                            value = default;
+                                            return false;
+                                        }
+                                    """);
+                }
+                else
+                {
+                    sb.AppendLine($"""
+                                       if ({InputKeyName}.Length < {totalTrimLength})
+                                           return false;
+                                   """);
+                }
+
+                sb.AppendLine($"    string {TrimmedKeyName} = {InputKeyName}.Substring({strCfg.TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.Length - {totalTrimLength});");
+            }
 
             return sb.ToString();
         }

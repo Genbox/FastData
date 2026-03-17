@@ -17,10 +17,6 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &'static str) -> bool {
-        let len = key.len();
-        if len < 5 as usize || len > 7 as usize {
-            return false;
-        }
 
 
         let mut lo: usize = 0;

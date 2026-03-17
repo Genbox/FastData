@@ -269,7 +269,29 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
             sb.Append(base.GetMethodHeader(methodType));
 
             if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
-                sb.Append($"    const auto {TrimmedKeyName} = {InputKeyName}.substr({strCfg.TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.length() - {strCfg.TotalTrimLength.ToStringInvariant()});");
+            {
+                string totalTrimLength = strCfg.TotalTrimLength.ToStringInvariant();
+
+                if (methodType == MethodType.TryLookup)
+                {
+                    sb.AppendLine($$"""
+                                        if ({{InputKeyName}}.length() < {{totalTrimLength}})
+                                        {
+                                            value = nullptr;
+                                            return false;
+                                        }
+                                    """);
+                }
+                else
+                {
+                    sb.AppendLine($"""
+                                       if ({InputKeyName}.length() < {totalTrimLength})
+                                           return false;
+                                   """);
+                }
+
+                sb.AppendLine($"    const auto {TrimmedKeyName} = {InputKeyName}.substr({strCfg.TrimPrefix.Length.ToStringInvariant()}, {InputKeyName}.length() - {totalTrimLength});");
+            }
 
             return sb.ToString();
         }

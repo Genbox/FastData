@@ -15,10 +15,10 @@ internal static class FastData
 
     public static bool Contains(string key)
     {
-        int len = key.Length;
-        if (len < 11u || len > 13u)
+        if (key.Length < 6)
             return false;
         string trimmedKey = key.Substring(3, key.Length - 6);
+
 
         int lo = 0;
         int hi = 2;
