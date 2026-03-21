@@ -102,6 +102,9 @@ public static partial class FastDataGenerator
 
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys.Span, cfg.EnablePrefixSuffixTrimming, cfg.IgnoreCase, generator.Encoding);
 
+        if (!props.CharacterData.AllAscii && generator.Encoding == GeneratorEncoding.ASCII)
+            throw new InvalidOperationException("Your data has non-ASCII in it, and the generator is set to produce an ASCII API. That's not supported.");
+
         StringHashInfo? cacheHashInfo = null;
         HashData? cacheHashData = null;
 
@@ -112,7 +115,7 @@ public static partial class FastDataGenerator
         else
             structureType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthMap.Min, props.LengthData.LengthMap.Max, cfg.AllowApproximateMatching, props.LengthData.UniqueLengths, cfg.StructureConfig, x => EnsureHashData(x.Span));
 
-        IEarlyExit[] earlyExits = StringEarlyExits.GetCandidates(structureType, props, cfg.IgnoreCase, generator.Encoding, cfg.EarlyExitConfig).ToArray();
+        IEarlyExit[] earlyExits = StringEarlyExits.GetCandidates(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase).ToArray();
 
         LogStructureType(logger, structureType.Name);
 

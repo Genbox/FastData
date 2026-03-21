@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
-using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.Generators.StringHash;
 

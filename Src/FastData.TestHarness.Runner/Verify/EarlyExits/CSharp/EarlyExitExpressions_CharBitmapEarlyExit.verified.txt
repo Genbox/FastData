@@ -1,1 +1,0 @@
-﻿(((uint)key[0] > 127u) || ((((uint)key[0] < 64u) && ((1ul & (1ul << (int)(uint)key[0])) == ulong.MinValue)) || (((uint)key[0] >= 64u) && ((2ul & (1ul << (int)((uint)key[0] - 64u))) == ulong.MinValue))))

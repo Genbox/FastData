@@ -1,1 +1,0 @@
-﻿((key & 65280ul) != ulong.MinValue)

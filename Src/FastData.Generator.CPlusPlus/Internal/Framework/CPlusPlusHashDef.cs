@@ -102,24 +102,16 @@ internal class CPlusPlusHashDef(TypeMap map) : IHashDef, IHashExpressionDef
         StringBuilder sb = new StringBuilder();
 
         if (functions.HasFlag(ReaderFunctions.ReadU8))
-        {
             sb.AppendLine("    static uint8_t ReadU8(const std::string_view value, const size_t offset) noexcept { return static_cast<uint8_t>(value[offset]); }");
-        }
 
         if (functions.HasFlag(ReaderFunctions.ReadU16))
-        {
             sb.AppendLine("    static uint16_t ReadU16(const std::string_view value, const size_t offset) noexcept { uint16_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }");
-        }
 
         if (functions.HasFlag(ReaderFunctions.ReadU32))
-        {
             sb.AppendLine("    static uint32_t ReadU32(const std::string_view value, const size_t offset) noexcept { uint32_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }");
-        }
 
         if (functions.HasFlag(ReaderFunctions.ReadU64))
-        {
             sb.AppendLine("    static uint64_t ReadU64(const std::string_view value, const size_t offset) noexcept { uint64_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }");
-        }
 
         return sb.ToString();
     }

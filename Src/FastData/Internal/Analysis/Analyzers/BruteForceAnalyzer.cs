@@ -6,7 +6,6 @@ using Genbox.FastData.Internal.Analysis.SegmentGenerators;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
 using Microsoft.Extensions.Logging;
-using static System.Linq.Expressions.Expression;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 

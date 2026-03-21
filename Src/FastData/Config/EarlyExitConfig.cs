@@ -21,10 +21,10 @@ public class EarlyExitConfig
             cfg.DisableForStructure(typeof(RangeStructure<,>));
             cfg.DisableForStructure(typeof(SingleValueStructure<,>));
 
+            cfg.AppendLimit(typeof(ValueBitMaskEarlyExit), new ValueDensityMinMaxLimit(0, 0.25f));
             cfg.AppendLimit(typeof(LengthBitmapEarlyExit), new ValueDensityMinMaxLimit(0, 0.45f));
-            cfg.AppendLimit(typeof(ValueBitMaskEarlyExit<>), new ValueDensityMinMaxLimit(0, 0.25f));
-            cfg.AppendLimit(typeof(StringBitMaskEarlyExit), new ValueDensityMinMaxLimit(0, 0.25f));
-            cfg.AppendLimit(typeof(CharBitmapEarlyExit), new ValueDensityMinMaxLimit(0, 0.45f));
+            cfg.AppendLimit(typeof(CharFirstBitmapEarlyExit), new ValueDensityMinMaxLimit(0, 0.45f));
+            cfg.AppendLimit(typeof(CharLastBitmapEarlyExit), new ValueDensityMinMaxLimit(0, 0.45f));
 
             return cfg;
         }

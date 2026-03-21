@@ -1,1 +1,0 @@
-﻿!(key.compare(0, 3, u8"pre") == 0 && key.compare(key.length() - 3, 3, u8"suf") == 0)

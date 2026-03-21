@@ -16,14 +16,25 @@ public sealed class CSharpBootstrap : BootstrapBase
         Map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF16);
     }
 
-    internal TypeMap Map { get; }
+    public TypeMap Map { get; }
 
     public override ICodeGenerator Generator => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("FastData"));
+
+    public override string Wrap(string code) =>
+        $$"""
+          public static class Program
+          {
+              public static int Main()
+              {
+          {{code}}
+              }
+          }
+          """;
 
     public ExpressionCompiler CreateExpressionCompiler() => new CSharpExpressionCompiler(Map);
 
     private static string GetCommandTemplate(HarnessType type) =>
         type == HarnessType.Test
-            ? "dotnet run -c Debug -p:DebugType=None -p:DebugSymbols=false {0}"
-            : "dotnet run -c Release {0}";
+            ? "dotnet run -c Debug --property PublishAot=false -p:DebugType=None -p:DebugSymbols=false {0}"
+            : "dotnet run -c Release --property PublishAot=false {0}";
 }

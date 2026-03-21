@@ -1,0 +1,1 @@
+﻿((36 & (1 << ((((GetLength(inputKey).wrapping_sub(1)) & 63) as i32) as u32))) == u64::MIN)

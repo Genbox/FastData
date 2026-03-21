@@ -1,0 +1,1 @@
+﻿!EndsWithIgnoreCase(u8"suf", inputKey)

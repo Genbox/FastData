@@ -44,16 +44,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
 
     protected virtual string GetMethodHeader(MethodType methodType)
     {
-        bool ignoreCase = false;
-        GeneratorEncoding encoding = GeneratorEncoding.Unknown;
-
-        if (GeneratorConfig is StringGeneratorConfig stringConfig)
-        {
-            ignoreCase = stringConfig.IgnoreCase;
-            encoding = stringConfig.Encoding;
-        }
-
-        return _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType, ignoreCase, encoding, InputKeyName);
+        return _earlyExitDef.GetEarlyExits<TKey>(GeneratorConfig.EarlyExits, methodType, InputKeyName);
     }
 
     internal void Initialize(ILanguageDef langDef, IEarlyExitDef earlyExitDef, TypeMap map, IHashDef hashDef, GeneratorConfigBase genCfg, string keyTypeName, string valueTypeName, ExpressionCompiler? compiler, SharedCode shared)
@@ -79,7 +70,7 @@ public abstract class OutputWriter<TKey> : IOutputWriter
                 Shared.Add(CodePlacement.InClass, expDef.RenderAdditionalData(strCfg.HashInfo.AdditionalData));
 
             // Compile the expression to source
-            string exprStr = compiler.GetCode(strCfg.HashInfo.Expression);
+            string exprStr = compiler.GetCode(strCfg.HashInfo.Expression, 4);
 
             //Wrap it in a function
             HashSource = hashDef.Wrap(typeCode, keyTypeName, exprStr);

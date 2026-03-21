@@ -8,7 +8,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 {
     protected readonly FastStringBuilder Output = new FastStringBuilder();
 
-    public string GetCode(Expression expression, int indent = 4)
+    public string GetCode(Expression expression, int indent = 0)
     {
         Output.Clear();
         Output.Indent = indent;
@@ -176,7 +176,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 
         if (node.NodeType == ExpressionType.Not)
         {
-            Output.Append("!");
+            Output.Append(node.Type == typeof(bool) ? "!" : "~");
             Visit(node.Operand);
             return node;
         }

@@ -1,0 +1,1 @@
+﻿((36ul & (1ul << (int)((GetLength(inputKey) - 1u) & 63u))) == ulong.MinValue)

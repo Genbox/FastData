@@ -1,0 +1,1 @@
+﻿((36ull & (1ull << static_cast<int32_t>(((GetLength(inputKey) - 1u) & 63u)))) == 0)

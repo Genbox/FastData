@@ -1,0 +1,1 @@
+﻿(GetFirstCharLower(inputKey) != 120u8)

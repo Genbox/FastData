@@ -7,12 +7,12 @@ namespace Genbox.FastData.Generator.CSharp.Internal.Framework;
 
 internal sealed class CSharpEarlyExitDef(ExpressionCompiler compiler) : IEarlyExitDef
 {
-    public string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, bool ignoreCase, GeneratorEncoding encoding, string keyName)
+    public string GetEarlyExits<T>(IEnumerable<IEarlyExit> earlyExits, MethodType methodType, string keyName)
     {
         StringBuilder sb = new StringBuilder();
 
-        foreach (IEarlyExit earlyExit in earlyExits)
-            sb.AppendJoin(" && ", compiler.GetCode(earlyExit.GetExpression(keyName), 0));
+        // foreach (IEarlyExit earlyExit in earlyExits)
+            // sb.AppendJoin(" && ", compiler.GetCode(earlyExit.GetExpression(keyName), 0));
 
         string eeStr = sb.ToString();
         return eeStr.Length == 0 ? string.Empty : RenderExit(methodType, sb.ToString());

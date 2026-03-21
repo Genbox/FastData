@@ -41,4 +41,36 @@ public static class TypeCodeExtensions
         TypeCode.String or TypeCode.Single or TypeCode.Double => false,
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
+
+    public static TKey GetMinValue<TKey>(this TypeCode typeCode) => typeCode switch
+    {
+        TypeCode.Char => (TKey)(object)char.MinValue,
+        TypeCode.SByte => (TKey)(object)sbyte.MinValue,
+        TypeCode.Byte => (TKey)(object)byte.MinValue,
+        TypeCode.Int16 => (TKey)(object)short.MinValue,
+        TypeCode.UInt16 => (TKey)(object)ushort.MinValue,
+        TypeCode.Int32 => (TKey)(object)int.MinValue,
+        TypeCode.UInt32 => (TKey)(object)uint.MinValue,
+        TypeCode.Int64 => (TKey)(object)long.MinValue,
+        TypeCode.UInt64 => (TKey)(object)ulong.MinValue,
+        TypeCode.Single => (TKey)(object)float.MinValue,
+        TypeCode.Double => (TKey)(object)double.MinValue,
+        _ => throw new InvalidOperationException($"Unsupported numeric type: {typeof(TKey)}")
+    };
+
+    public static TKey GetMaxValue<TKey>(this TypeCode typeCode) => typeCode switch
+    {
+        TypeCode.Char => (TKey)(object)char.MaxValue,
+        TypeCode.SByte => (TKey)(object)sbyte.MaxValue,
+        TypeCode.Byte => (TKey)(object)byte.MaxValue,
+        TypeCode.Int16 => (TKey)(object)short.MaxValue,
+        TypeCode.UInt16 => (TKey)(object)ushort.MaxValue,
+        TypeCode.Int32 => (TKey)(object)int.MaxValue,
+        TypeCode.UInt32 => (TKey)(object)uint.MaxValue,
+        TypeCode.Int64 => (TKey)(object)long.MaxValue,
+        TypeCode.UInt64 => (TKey)(object)ulong.MaxValue,
+        TypeCode.Single => (TKey)(object)float.MaxValue,
+        TypeCode.Double => (TKey)(object)double.MaxValue,
+        _ => throw new InvalidOperationException($"Unsupported numeric type: {typeof(TKey)}")
+    };
 }

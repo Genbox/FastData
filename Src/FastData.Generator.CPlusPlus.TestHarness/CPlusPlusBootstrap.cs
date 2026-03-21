@@ -16,9 +16,17 @@ public sealed class CPlusPlusBootstrap : BootstrapBase
         Map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
     }
 
-    internal TypeMap Map { get; }
+    public TypeMap Map { get; }
 
     public override ICodeGenerator Generator => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig("fastdata"));
+
+    public override string Wrap(string code) =>
+        $$"""
+          int main()
+          {
+          {{code}}
+          }
+          """;
 
     public ExpressionCompiler CreateExpressionCompiler() => new CPlusPlusExpressionCompiler(Map);
 

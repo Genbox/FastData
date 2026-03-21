@@ -9,46 +9,48 @@ namespace Genbox.FastData.Generator.Rust.TestHarness;
 public sealed class RustTest(DockerManager manager) : TestBase<RustBootstrap>(new RustBootstrap(HarnessType.Test), manager)
 {
     protected override string RenderContains<TKey>(string source, TKey[] present, TKey[] notPresent) =>
-        $$"""
-          #![allow(non_camel_case_types)]
-          {{source}}
+        $"""
+         #![allow(non_camel_case_types)]
 
-          fn main() {
-          {{FormatList(present, x => $$"""
-                                           if !fastdata::contains({{Bootstrap.Map.ToValueLabel(x)}}) {
-                                               std::process::exit(0);
-                                           }
-                                       """, "\n")}}
+         {source}
 
-          {{FormatList(notPresent, x => $$"""
-                                              if fastdata::contains({{Bootstrap.Map.ToValueLabel(x)}}) {
-                                                  std::process::exit(0);
-                                              }
-                                          """, "\n")}}
+         {Bootstrap.Wrap($"""
+                                  {FormatList(present, x => $$"""
+                                                                  if !fastdata::contains({{Bootstrap.Map.ToValueLabel(x)}}) {
+                                                                      std::process::exit(0);
+                                                                  }
+                                                              """, "\n")}
 
-              std::process::exit(1);
-          }
-          """;
+                                  {FormatList(notPresent, x => $$"""
+                                                                     if fastdata::contains({{Bootstrap.Map.ToValueLabel(x)}}) {
+                                                                         std::process::exit(0);
+                                                                     }
+                                                                 """, "\n")}
+
+                                  std::process::exit(1);
+                          """)}
+         """;
 
     protected override string RenderTryLookup<TKey, TValue>(string source, TKey[] present, TValue[] presentValues, TKey[] notPresent) =>
-        $$"""
-          #![allow(non_camel_case_types)]
-          {{source}}
+        $"""
+         #![allow(non_camel_case_types)]
 
-          fn main() {
-          {{FormatList(present, x => $$"""
-                                           if fastdata::try_lookup({{Bootstrap.Map.ToValueLabel(x)}}).is_none() {
-                                               std::process::exit(0);
-                                           }
-                                       """, "\n")}}
+         {source}
 
-          {{FormatList(notPresent, x => $$"""
-                                              if fastdata::try_lookup({{Bootstrap.Map.ToValueLabel(x)}}).is_some() {
-                                                  std::process::exit(0);
-                                              }
-                                          """, "\n")}}
+         {Bootstrap.Wrap($"""
+                                  {FormatList(present, x => $$"""
+                                                                  if fastdata::try_lookup({{Bootstrap.Map.ToValueLabel(x)}}).is_none() {
+                                                                      std::process::exit(0);
+                                                                  }
+                                                              """, "\n")}
 
-              std::process::exit(1);
-          }
-          """;
+                                  {FormatList(notPresent, x => $$"""
+                                                                     if fastdata::try_lookup({{Bootstrap.Map.ToValueLabel(x)}}).is_some() {
+                                                                         std::process::exit(0);
+                                                                     }
+                                                                 """, "\n")}
+
+                                  std::process::exit(1);
+                          """)}
+         """;
 }

@@ -4,29 +4,18 @@ using static Genbox.FastData.Generators.Helpers.TypeHelper;
 
 namespace Genbox.FastData.Generators.EarlyExits;
 
-/// <summary>Represents an early exit strategy that checks for bits that can never be set.</summary>
-public sealed record ValueBitMaskEarlyExit<TKey> : IEarlyExit
+// (inputKey & Mask) != 0;
+public sealed class ValueBitMaskEarlyExit(ulong Mask) : IEarlyExit
 {
-    private readonly ulong _mask;
-
-    public ValueBitMaskEarlyExit(ulong mask)
+    public Expression GetExpression(ParameterExpression key)
     {
-        _mask = mask;
-    }
-
-    public Expression GetExpression(string keyName)
-    {
-        Type KeyType = typeof(TKey);
-
-        Type unsignedType = GetUnsignedType(KeyType);
-        ParameterExpression key = Expression.Parameter(KeyType, keyName);
-        Expression keyValue = KeyType == unsignedType ? key : Expression.Convert(key, unsignedType);
-        object maskValue = ConvertValueToType(_mask, unsignedType);
-        Expression masked = Expression.And(keyValue, Expression.Constant(maskValue, unsignedType));
+        Type keyType = key.Type;
+        Type unsignedType = GetUnsignedType(keyType);
+        Expression keyValue = keyType == unsignedType ? key : Convert(key, unsignedType);
+        object maskValue = ConvertValueToType(Mask, unsignedType);
+        Expression masked = And(keyValue, Constant(maskValue, unsignedType));
         object zeroValue = ConvertValueToType(0, unsignedType);
 
-        return Expression.NotEqual(masked, Expression.Constant(zeroValue, unsignedType));
+        return NotEqual(masked, Constant(zeroValue, unsignedType));
     }
-
-    public void Deconstruct(out ulong mask) => mask = _mask;
 }

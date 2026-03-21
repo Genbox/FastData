@@ -1,1 +1,0 @@
-﻿(((static_cast<uint64_t>(key[0]) | (static_cast<uint64_t>(key[1]) << 16)) & 65535ull) != 0)

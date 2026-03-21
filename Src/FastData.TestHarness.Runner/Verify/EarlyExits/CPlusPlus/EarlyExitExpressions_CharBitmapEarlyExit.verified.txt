@@ -1,1 +1,0 @@
-﻿((static_cast<uint32_t>(key[0]) > 127u) || (((static_cast<uint32_t>(key[0]) < 64u) && ((1ull & (1ull << static_cast<int32_t>(static_cast<uint32_t>(key[0])))) == 0)) || ((static_cast<uint32_t>(key[0]) >= 64u) && ((2ull & (1ull << static_cast<int32_t>((static_cast<uint32_t>(key[0]) - 64u)))) == 0))))

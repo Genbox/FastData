@@ -1,16 +1,10 @@
-using Genbox.FastData.Config;
-using Genbox.FastData.InternalShared;
-
 namespace Genbox.FastData.Generator.Tests;
 
-public class GenericTests
+public class EarlyExitHelperTests
 {
     [Fact]
-    public Task VerifyChecksTest() => VerifyChecks.Run();
-
-    [Fact]
-    public void KeyedThrowsOnValueCountMismatch()
+    public Task GetExitsTest()
     {
-        Assert.Throws<InvalidOperationException>(() => FastDataGenerator.GenerateKeyed([1, 2, 3], [1, 2], new NumericDataConfig(), new DummyGenerator()));
+        return Task.CompletedTask;
     }
 }

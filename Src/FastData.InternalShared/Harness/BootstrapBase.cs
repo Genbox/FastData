@@ -25,5 +25,8 @@ public abstract class BootstrapBase
     public string CommandTemplate { get; }
     public string RootDir { get; }
     public abstract ICodeGenerator Generator { get; }
+
+    public abstract string Wrap(string code);
+
     public override string ToString() => Name;
 }

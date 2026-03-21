@@ -40,20 +40,20 @@ internal static class KeyAnalyzer
 
     internal static StringKeyProperties GetStringProperties(ReadOnlySpan<string> keys, bool enableTrimming, bool ignoreCase, GeneratorEncoding encoding)
     {
-        //Contains a map of unique lengths
-        LengthBitArray charLenMap = new LengthBitArray();
+        //Contains a map of unique lengths & tracks min/max values in byte counts
         LengthBitArray byteLenMap = new LengthBitArray();
+        LengthBitArray charLenMap = new LengthBitArray();
 
         //We need to know the longest string for optimal mixing. Probably not 100% necessary.
         string maxStr = keys[0];
-        bool charLenUniq = true;
         bool byteLenUniq = true;
+        bool charLenUniq = true;
         bool allAscii = true;
         CharacterClass charClass = CharacterClass.Unknown;
         AsciiMap firstCharMap = new AsciiMap();
         AsciiMap lastCharMap = new AsciiMap();
 
-        //We wire up the delegate here to avoid branching in the foreach below
+        //We wire up the delegates here to avoid branching in the foreach below
         Func<string, int> getByteCount = encoding switch
         {
             GeneratorEncoding.ASCII => static str => Encoding.ASCII.GetByteCount(str),
@@ -63,32 +63,25 @@ internal static class KeyAnalyzer
             _ => throw new InvalidOperationException($"Unsupported encoding: {encoding}")
         };
 
+        Func<char, char> getChar = ignoreCase ? char.ToLowerInvariant : static c => c;
+
         foreach (string str in keys)
         {
             if (str.Length > maxStr.Length)
                 maxStr = str;
 
             int byteLen = getByteCount(str);
-            int charLen = str.Length;
-            charLenUniq &= !charLenMap.SetTrue((uint)charLen);
             byteLenUniq &= !byteLenMap.SetTrue((uint)byteLen);
 
-            // Code under here is for first/last char analysis
-            char firstChar = str[0];
-            char lastChar = str[str.Length - 1];
+            int charLen = str.Length;
+            charLenUniq &= !charLenMap.SetTrue((uint)charLen);
 
-            if (ignoreCase)
-            {
-                firstChar = char.ToLowerInvariant(firstChar);
-                lastChar = char.ToLowerInvariant(lastChar);
-            }
-
-            firstCharMap.Add(firstChar);
-            lastCharMap.Add(lastChar);
+            firstCharMap.Add(getChar(str[0]));
+            lastCharMap.Add(getChar(str[str.Length - 1]));
 
             foreach (char c in str)
             {
-                if ((uint)c > '\x007f')
+                if (allAscii && (uint)c > '\x007f')
                     allAscii = false;
 
                 if (char.IsLower(c))
@@ -104,9 +97,6 @@ internal static class KeyAnalyzer
             }
         }
 
-        byte stringBitMaskLen = (byte)Math.Min(byteLenMap.Min, 8); // Make up to 8 bytes mask, but no longer than the smallest string for perf.
-        ulong stringBitMask = GetStringBitMask(keys, encoding, ignoreCase, stringBitMaskLen);
-
         // The code beneath there calculate entropy maps that cna be used to derive the longest common substrings or longest prefix/suffix strings.
         // It works by adding characters to an accumulator, and then potentially removing the value from it again if the characters are the same.
         // If the accumulator for an offset contains 0 after all strings have been accumulated, it is highly likely that all the characters were the same.
@@ -116,8 +106,10 @@ internal static class KeyAnalyzer
         int[]? left = null;
         int[]? right = null;
 
-        // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough, but not too long!
-        if (enableTrimming && keys.Length > 1 && charLenMap.Min > 1 && maxStr.Length <= ushort.MaxValue)
+        //TODO: The if() below seems wrong
+
+        // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough
+        if (enableTrimming && keys.Length > 1 && charLenMap.Min > 1)
         {
             //Build a forward and reverse map of merged entropy
             //We can derive common prefix/suffix from it that can be used later for high-entropy hash/equality functions
@@ -128,11 +120,8 @@ internal static class KeyAnalyzer
             {
                 for (int i = 0; i < str.Length; i++)
                 {
-                    char lc = str[i];
-                    char rc = str[str.Length - 1 - i];
-
-                    left[i] ^= lc;
-                    right[i] ^= rc;
+                    left[i] ^= getChar(str[i]);
+                    right[i] ^= getChar(str[str.Length - 1 - i]);
                 }
             }
 
@@ -142,11 +131,9 @@ internal static class KeyAnalyzer
                 for (int i = 0; i < maxStr.Length; i++)
                 {
                     //For best mixing, we take the longest string
-                    char lc = maxStr[i];
-                    char rc = maxStr[maxStr.Length - 1 - i];
 
-                    left[i] ^= lc;
-                    right[i] ^= rc;
+                    left[i] ^= getChar(maxStr[i]);
+                    right[i] ^= getChar(maxStr[maxStr.Length - 1 - i]);
 
                     //We do not add to characterMap here since it does not need the duplicate
                 }
@@ -168,7 +155,7 @@ internal static class KeyAnalyzer
             }
         }
 
-        return new StringKeyProperties(new LengthData(charLenUniq, charLenMap, byteLenUniq, byteLenMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskLen, firstCharMap, lastCharMap));
+        return new StringKeyProperties(new LengthData(charLenUniq, charLenMap, byteLenUniq, byteLenMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, firstCharMap, lastCharMap));
     }
 
     private static NumericKeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys, bool keysAreSorted)
@@ -584,82 +571,5 @@ internal static class KeyAnalyzer
                 break;
         }
         return count;
-    }
-
-    private static ulong GetStringBitMask(ReadOnlySpan<string> keys, GeneratorEncoding encoding, bool ignoreCase, int byteCount)
-    {
-        ulong union = 0;
-
-        if (encoding == GeneratorEncoding.ASCII)
-        {
-            foreach (string key in keys)
-                union |= GetFirst64BitsAscii(key, ignoreCase, byteCount);
-        }
-        else if (encoding == GeneratorEncoding.UTF8)
-        {
-            foreach (string key in keys)
-                union |= GetFirst64BitsUtf8(key, ignoreCase, byteCount);
-        }
-        else if (encoding == GeneratorEncoding.UTF16)
-        {
-            int charCount = byteCount / 2;
-            foreach (string key in keys)
-                union |= GetFirst64BitsUtf16(key, ignoreCase, charCount);
-        }
-        else
-            return 0;
-
-        ulong mask = ~union;
-        ulong fullMask = byteCount == 8 ? ulong.MaxValue : (1UL << (byteCount * 8)) - 1;
-        return mask & fullMask;
-    }
-
-    private static ulong GetFirst64BitsAscii(string value, bool ignoreCase, int byteCount)
-    {
-        ulong result = 0;
-
-        for (int i = 0; i < byteCount; i++)
-        {
-            uint b = value[i];
-            if (ignoreCase && b - 'A' <= 'Z' - 'A')
-                b |= 0x20u;
-
-            result |= (ulong)b << (i * 8);
-        }
-
-        return result;
-    }
-
-    private static ulong GetFirst64BitsUtf8(string value, bool ignoreCase, int byteCount)
-    {
-        byte[] bytes = Encoding.UTF8.GetBytes(value);
-        ulong result = 0;
-
-        for (int i = 0; i < byteCount; i++)
-        {
-            uint b = bytes[i];
-            if (ignoreCase && b - 'A' <= 'Z' - 'A')
-                b |= 0x20u;
-
-            result |= (ulong)b << (i * 8);
-        }
-
-        return result;
-    }
-
-    private static ulong GetFirst64BitsUtf16(string value, bool ignoreCase, int charCount)
-    {
-        ulong result = 0;
-
-        for (int i = 0; i < charCount; i++)
-        {
-            uint c = value[i];
-            if (ignoreCase && c - 'A' <= 'Z' - 'A')
-                c |= 0x20u;
-
-            result |= (ulong)c << (i * 16);
-        }
-
-        return result;
     }
 }

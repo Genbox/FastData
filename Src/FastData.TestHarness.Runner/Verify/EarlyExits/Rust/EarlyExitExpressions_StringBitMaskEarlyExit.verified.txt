@@ -1,1 +1,0 @@
-﻿((((key.as_bytes()[(0 as usize)] as u64) | ((key.as_bytes()[(1 as usize)] as u64) << (16 as u32))) & 65535) != u64::MIN)

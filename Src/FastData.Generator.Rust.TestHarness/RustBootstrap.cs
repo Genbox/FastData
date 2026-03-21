@@ -16,9 +16,16 @@ public sealed class RustBootstrap : BootstrapBase
         Map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
     }
 
-    internal TypeMap Map { get; }
+    public TypeMap Map { get; }
 
     public override ICodeGenerator Generator => RustCodeGenerator.Create(new RustCodeGeneratorConfig("fastdata"));
+
+    public override string Wrap(string code) =>
+        $$"""
+          fn main() {
+          {{code}}
+          }
+          """;
 
     public ExpressionCompiler CreateExpressionCompiler() => new RustExpressionCompiler(Map);
 

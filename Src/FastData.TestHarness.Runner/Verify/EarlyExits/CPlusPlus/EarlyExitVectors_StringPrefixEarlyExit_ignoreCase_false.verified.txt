@@ -1,0 +1,1 @@
+﻿!StartsWith(u8"pre", inputKey)

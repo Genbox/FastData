@@ -17,7 +17,7 @@ public abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager docke
     public async Task<double> RunAsync(ITestData data, CancellationToken cancellationToken = default)
     {
         string source = Render(data);
-        ProcessResult res = await base.RunAsync(source, data.Identifier, cancellationToken).ConfigureAwait(false);
+        ProcessResult res = await base.RunAsync(source, data.Identifier, false, cancellationToken: cancellationToken).ConfigureAwait(false);
         string output = res.StandardOutput.Trim();
 
         if (output.Length == 0)

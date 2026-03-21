@@ -61,6 +61,13 @@ internal sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(m
 
     protected override Expression VisitUnary(UnaryExpression node)
     {
+        if (node.NodeType == ExpressionType.Not)
+        {
+            Output.Append("!");
+            Visit(node.Operand);
+            return node;
+        }
+
         if (node.NodeType == ExpressionType.Convert)
         {
             Output.Append("(");
@@ -99,8 +106,23 @@ internal sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(m
             return node;
         }
 
+        if (node.NodeType == ExpressionType.Subtract && IsUnsigned(node.Type))
+        {
+            Output.Append('(');
+            Visit(node.Left);
+            Output.Append(".wrapping_sub(");
+            Visit(node.Right);
+            Output.Append("))");
+            return node;
+        }
+
         return base.VisitBinary(node);
     }
+
+    private static bool IsUnsigned(Type type) => type == typeof(byte)
+        || type == typeof(ushort)
+        || type == typeof(uint)
+        || type == typeof(ulong);
 
     private Expression RenderStringCall(MethodCallExpression node, string methodName)
     {

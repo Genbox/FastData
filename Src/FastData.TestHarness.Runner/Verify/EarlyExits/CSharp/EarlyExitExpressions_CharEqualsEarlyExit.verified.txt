@@ -1,1 +1,0 @@
-﻿(key[(key.Length - 1)] != 'x')

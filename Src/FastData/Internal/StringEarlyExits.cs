@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-using Genbox.FastData.Config;
-using Genbox.FastData.Enums;
+﻿using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
 using Genbox.FastData.Internal.Analysis.Data;
@@ -10,7 +8,7 @@ namespace Genbox.FastData.Internal;
 
 internal static class StringEarlyExits
 {
-    internal static IEnumerable<IEarlyExit> GetCandidates(Type structureType, StringKeyProperties props, bool ignoreCase, GeneratorEncoding enc, EarlyExitConfig config)
+    internal static IEnumerable<IEarlyExit> GetCandidates(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase)
     {
         if (config.Disabled)
             yield break;
@@ -18,81 +16,68 @@ internal static class StringEarlyExits
         if (!config.IsEnabledForStructure(structureType))
             yield break;
 
-        (_, LengthBitArray charMap, _, LengthBitArray byteMap) = props.LengthData;
-
-        if (config.IsEarlyExitEnabled(typeof(LengthEqualEarlyExit)) && charMap.BitCount == 1)
+        /*
+           Length early exits are great for languages that provide constant time access to the length of a string (C#, Java, Python, Go, Rust)
+           For languages that has to iterate the string (C, Swift, Haskell), it is slower than comparing the first char.
+        */
         {
-            // If lengths are all the same, we only use that.
-            yield return new LengthEqualEarlyExit(charMap.Max, byteMap.Min);
-            yield break;
+            //The length map is in bytes, in the encoding the generator has
+            (_, _, _, LengthBitArray map) = props.LengthData;
+
+            if (config.IsEarlyExitEnabled(typeof(LengthNotEqualEarlyExit)) && map.BitCount == 1) //1 bit means all lengths are the same
+                yield return new LengthNotEqualEarlyExit(map.Min); //We can use min or max. They are the same.
+
+            if (config.IsEarlyExitEnabled(typeof(LengthLessThanEarlyExit)) && map.Min > 0)
+                yield return new LengthLessThanEarlyExit(map.Min);
+
+            if (config.IsEarlyExitEnabled(typeof(LengthGreaterThanEarlyExit)) && map.Max < uint.MaxValue)
+                yield return new LengthGreaterThanEarlyExit(map.Max);
+
+            float density = (float)map.BitCount / ((map.Max - map.Min) + 1);
+            if (config.IsEarlyExitEnabled(typeof(LengthBitmapEarlyExit)) && config.CheckDensityLimits(typeof(LengthBitmapEarlyExit), density))
+                yield return new LengthBitmapEarlyExit(map.Values[0]);
         }
 
-        float lengthDensity = (float)charMap.BitCount / ((charMap.Max - charMap.Min) + 1);
-
-        if (config.IsEarlyExitEnabled(typeof(LengthRangeEarlyExit)) && config.CheckDensityLimits(typeof(LengthRangeEarlyExit), lengthDensity))
-        {
-            yield return new LengthRangeEarlyExit(charMap.Min, charMap.Max, byteMap.Min, byteMap.Max);
-            yield break;
-        }
-
-        if (config.IsEarlyExitEnabled(typeof(LengthBitmapEarlyExit)) && config.CheckDensityLimits(typeof(LengthBitmapEarlyExit), lengthDensity))
-        {
-            yield return new LengthBitmapEarlyExit(charMap.Values); //TODO: Create byte variant
-            yield break;
-        }
-
-        if (ShouldApplyCharMap(props.LengthData.LengthMap.Min, props.CharacterData.AllAscii, enc, ignoreCase))
+        /*
+           Accessing the first char/byte in a string is always constant time.
+         */
         {
             AsciiMap firstMap = props.CharacterData.FirstCharMap;
-            if (config.IsEarlyExitEnabled(typeof(CharEqualsEarlyExit)) && firstMap.BitCount == 1)
-            {
-                yield return new CharEqualsEarlyExit(CharPosition.First, firstMap.Min);
-            }
-            else
-            {
-                if (config.IsEarlyExitEnabled(typeof(CharBitmapEarlyExit)) && config.CheckDensityLimits(typeof(CharRangeEarlyExit), firstMap.Density))
-                    yield return new CharBitmapEarlyExit(CharPosition.First, firstMap.Low, firstMap.High);
-                else if (config.IsEarlyExitEnabled(typeof(CharRangeEarlyExit)))
-                    yield return new CharRangeEarlyExit(CharPosition.First, firstMap.Min, firstMap.Max);
-            }
+            if (config.IsEarlyExitEnabled(typeof(CharFirstNotEqualEarlyExit)) && firstMap.BitCount == 1) //1 bit means all first characters are the same
+                yield return new CharFirstNotEqualEarlyExit(firstMap.Min, ignoreCase); //We can use min or max. They are the same.
+
+            if (config.IsEarlyExitEnabled(typeof(CharFirstLessThanEarlyExit)) && firstMap.Min > 0)
+                yield return new CharFirstLessThanEarlyExit(firstMap.Min);
+
+            if (config.IsEarlyExitEnabled(typeof(CharFirstGreaterThanEarlyExit)) && firstMap.Max < char.MaxValue)
+                yield return new CharFirstGreaterThanEarlyExit(firstMap.Max);
+
+            if (config.IsEarlyExitEnabled(typeof(CharFirstBitmapEarlyExit)) && config.CheckDensityLimits(typeof(CharFirstBitmapEarlyExit), firstMap.Density))
+                yield return new CharFirstBitmapEarlyExit(firstMap.Low, firstMap.High, ignoreCase);
 
             AsciiMap lastMap = props.CharacterData.LastCharMap;
-            if (config.IsEarlyExitEnabled(typeof(CharEqualsEarlyExit)) && lastMap.BitCount == 1)
-            {
-                yield return new CharEqualsEarlyExit(CharPosition.Last, lastMap.Min);
-            }
-            else
-            {
-                if (config.IsEarlyExitEnabled(typeof(CharBitmapEarlyExit)) && config.CheckDensityLimits(typeof(CharRangeEarlyExit), lastMap.Density))
-                    yield return new CharBitmapEarlyExit(CharPosition.Last, lastMap.Low, lastMap.High);
-                else if (config.IsEarlyExitEnabled(typeof(CharRangeEarlyExit)))
-                    yield return new CharRangeEarlyExit(CharPosition.Last, lastMap.Min, lastMap.Max);
-            }
+            if (config.IsEarlyExitEnabled(typeof(CharLastNotEqualEarlyExit)) && lastMap.BitCount == 1) //1 bit means all last characters are the same
+                yield return new CharLastNotEqualEarlyExit(lastMap.Min, ignoreCase); //We can use min or max. They are the same.
+
+            if (config.IsEarlyExitEnabled(typeof(CharLastLessThanEarlyExit)) && lastMap.Min > 0)
+                yield return new CharLastLessThanEarlyExit(lastMap.Min);
+
+            if (config.IsEarlyExitEnabled(typeof(CharLastGreaterThanEarlyExit)) && lastMap.Max < char.MaxValue)
+                yield return new CharLastGreaterThanEarlyExit(lastMap.Max);
+
+            if (config.IsEarlyExitEnabled(typeof(CharLastBitmapEarlyExit)) && config.CheckDensityLimits(typeof(CharLastBitmapEarlyExit), lastMap.Density))
+                yield return new CharLastBitmapEarlyExit(lastMap.Low, lastMap.High, ignoreCase);
         }
 
-        float bitMaskDensity = BitOperations.PopCount(props.CharacterData.StringBitMask) / (float)(props.CharacterData.StringBitMaskBytes * 8);
+        /*
+           If prefix/suffix trimming is disabled, we can use them as early exits instead.
+         */
+        {
+            if (config.IsEarlyExitEnabled(typeof(StringPrefixEarlyExit)) && props.DeltaData.Prefix.Length != 0)
+                yield return new StringPrefixEarlyExit(props.DeltaData.Prefix, ignoreCase);
 
-        if (config.IsEarlyExitEnabled(typeof(StringBitMaskEarlyExit)) && config.CheckDensityLimits(typeof(StringBitMaskEarlyExit), bitMaskDensity))
-            yield return new StringBitMaskEarlyExit(props.CharacterData.StringBitMask, props.CharacterData.StringBitMaskBytes);
-
-        if (config.IsEarlyExitEnabled(typeof(StringPrefixSuffixEarlyExit)) && (props.DeltaData.Prefix.Length != 0 || props.DeltaData.Suffix.Length != 0))
-            yield return new StringPrefixSuffixEarlyExit(props.DeltaData.Prefix, props.DeltaData.Suffix);
-    }
-
-    private static bool ShouldApplyCharMap(uint minLength, bool allAscii, GeneratorEncoding encoding, bool ignoreCase)
-    {
-        if (minLength == 0)
-            return false;
-
-        if (!allAscii)
-            return false;
-
-        if (ignoreCase && !allAscii)
-            return false;
-
-        if (encoding is GeneratorEncoding.ASCII or GeneratorEncoding.UTF8)
-            return allAscii;
-
-        return true;
+            if (config.IsEarlyExitEnabled(typeof(StringSuffixEarlyExit)) && props.DeltaData.Suffix.Length != 0)
+                yield return new StringSuffixEarlyExit(props.DeltaData.Suffix, ignoreCase);
+        }
     }
 }

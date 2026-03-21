@@ -1,4 +1,3 @@
-using System.Numerics;
 using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
@@ -21,22 +20,23 @@ internal static class NumericEarlyExits<TKey>
         if (itemCount <= config.MinItemCount)
             yield break;
 
-        float bitDensity = (float)BitOperations.PopCount(bitMask) / Type.GetTypeCode(typeof(TKey)).GetBitWidth();
-
         TypeCode typeCode = Type.GetTypeCode(typeof(TKey));
 
-        if (config.IsEarlyExitEnabled(typeof(ValueBitMaskEarlyExit<>)) && typeCode.IsIntegral() && config.CheckDensityLimits(typeof(ValueBitMaskEarlyExit<>), bitDensity))
+        if (config.IsEarlyExitEnabled(typeof(ValueBitMaskEarlyExit)) && typeCode.IsIntegral())
         {
-            yield return new ValueBitMaskEarlyExit<TKey>(bitMask);
-            yield break;
+            float density = (float)range / itemCount;
+
+            if (config.CheckDensityLimits(typeof(ValueBitMaskEarlyExit), density))
+                yield return new ValueBitMaskEarlyExit(bitMask);
         }
 
-        float valueDensity = (float)range / itemCount;
+        if (config.IsEarlyExitEnabled(typeof(ValueNotEqualEarlyExit<>)) && EqualityComparer<TKey>.Default.Equals(min, max))
+            yield return new ValueNotEqualEarlyExit<TKey>(min);
 
-        if (config.IsEarlyExitEnabled(typeof(ValueRangeEarlyExit<>)) && config.CheckDensityLimits(typeof(ValueRangeEarlyExit<>), valueDensity))
-        {
-            yield return new ValueRangeEarlyExit<TKey>(min, max);
-            yield break;
-        }
+        if (config.IsEarlyExitEnabled(typeof(ValueLessThanEarlyExit<>)) && Comparer<TKey>.Default.Compare(min, typeCode.GetMinValue<TKey>()) > 0)
+            yield return new ValueLessThanEarlyExit<TKey>(min);
+
+        if (config.IsEarlyExitEnabled(typeof(ValueGreaterThanEarlyExit<>)) && Comparer<TKey>.Default.Compare(max, typeCode.GetMaxValue<TKey>()) < 0)
+            yield return new ValueGreaterThanEarlyExit<TKey>(max);
     }
 }

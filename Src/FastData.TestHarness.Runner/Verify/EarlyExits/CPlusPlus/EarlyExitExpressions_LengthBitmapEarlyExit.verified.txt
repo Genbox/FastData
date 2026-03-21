@@ -1,1 +1,0 @@
-﻿((((key.length() >> 6) >= 2) || (((key.length() >> 6) == 0) && ((10ull & (1ull << ((key.length() - 1) & 63))) == 0))) || (((key.length() >> 6) == 1) && ((5ull & (1ull << ((key.length() - 1) & 63))) == 0)))
