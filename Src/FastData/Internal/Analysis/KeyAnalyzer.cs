@@ -41,42 +41,37 @@ internal static class KeyAnalyzer
     internal static StringKeyProperties GetStringProperties(ReadOnlySpan<string> keys, bool enableTrimming, bool ignoreCase, GeneratorEncoding encoding)
     {
         //Contains a map of unique lengths
-        LengthBitArray lengthMap = new LengthBitArray();
+        LengthBitArray charLenMap = new LengthBitArray();
+        LengthBitArray byteLenMap = new LengthBitArray();
 
         //We need to know the longest string for optimal mixing. Probably not 100% necessary.
         string maxStr = keys[0];
-        int minByteCount = int.MaxValue;
-        int maxByteCount = int.MinValue;
-        bool uniqLen = true;
+        bool charLenUniq = true;
+        bool byteLenUniq = true;
         bool allAscii = true;
         CharacterClass charClass = CharacterClass.Unknown;
         AsciiMap firstCharMap = new AsciiMap();
         AsciiMap lastCharMap = new AsciiMap();
-        uint lengthGcd = 0;
-        uint byteGcd = 0;
+
+        //We wire up the delegate here to avoid branching in the foreach below
+        Func<string, int> getByteCount = encoding switch
+        {
+            GeneratorEncoding.ASCII => static str => Encoding.ASCII.GetByteCount(str),
+            GeneratorEncoding.UTF8 => static str => Encoding.UTF8.GetByteCount(str),
+            GeneratorEncoding.UTF16 => static str => Encoding.Unicode.GetByteCount(str),
+            GeneratorEncoding.UTF32 => static str => Encoding.UTF32.GetByteCount(str),
+            _ => throw new InvalidOperationException($"Unsupported encoding: {encoding}")
+        };
 
         foreach (string str in keys)
         {
             if (str.Length > maxStr.Length)
                 maxStr = str;
 
-            //TODO: Remove branch by rewriting delegate
-            int byteCount = encoding switch
-            {
-                GeneratorEncoding.ASCII => Encoding.ASCII.GetByteCount(str),
-                GeneratorEncoding.UTF8 => Encoding.UTF8.GetByteCount(str),
-                GeneratorEncoding.UTF16 => Encoding.Unicode.GetByteCount(str),
-                GeneratorEncoding.UTF32 => Encoding.UTF32.GetByteCount(str),
-                _ => throw new InvalidOperationException($"Unsupported encoding: {encoding}")
-            };
-
-            minByteCount = Math.Min(byteCount, minByteCount);
-            maxByteCount = Math.Max(byteCount, maxByteCount);
-
-            int length = str.Length;
-            uniqLen &= !lengthMap.SetTrue((uint)length);
-            lengthGcd = UpdateGcd(lengthGcd, (uint)length);
-            byteGcd = UpdateGcd(byteGcd, (uint)byteCount);
+            int byteLen = getByteCount(str);
+            int charLen = str.Length;
+            charLenUniq &= !charLenMap.SetTrue((uint)charLen);
+            byteLenUniq &= !byteLenMap.SetTrue((uint)byteLen);
 
             // Code under here is for first/last char analysis
             char firstChar = str[0];
@@ -109,7 +104,7 @@ internal static class KeyAnalyzer
             }
         }
 
-        byte stringBitMaskLen = (byte)Math.Min(minByteCount, 8); // Make up to 8 bytes mask, but no longer than the smallest string for perf.
+        byte stringBitMaskLen = (byte)Math.Min(byteLenMap.Min, 8); // Make up to 8 bytes mask, but no longer than the smallest string for perf.
         ulong stringBitMask = GetStringBitMask(keys, encoding, ignoreCase, stringBitMaskLen);
 
         // The code beneath there calculate entropy maps that cna be used to derive the longest common substrings or longest prefix/suffix strings.
@@ -122,7 +117,7 @@ internal static class KeyAnalyzer
         int[]? right = null;
 
         // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough, but not too long!
-        if (enableTrimming && keys.Length > 1 && lengthMap.Min > 1 && maxStr.Length <= ushort.MaxValue)
+        if (enableTrimming && keys.Length > 1 && charLenMap.Min > 1 && maxStr.Length <= ushort.MaxValue)
         {
             //Build a forward and reverse map of merged entropy
             //We can derive common prefix/suffix from it that can be used later for high-entropy hash/equality functions
@@ -161,7 +156,7 @@ internal static class KeyAnalyzer
             int rightCount = CountZero(right);
 
             // Make sure that we handle the case where all characters in the inputs are the same
-            if (leftCount == lengthMap.Min || rightCount == lengthMap.Min)
+            if (leftCount == charLenMap.Min || rightCount == charLenMap.Min)
             {
                 prefix = string.Empty;
                 suffix = string.Empty;
@@ -173,13 +168,7 @@ internal static class KeyAnalyzer
             }
         }
 
-        uint charDivisor = lengthGcd <= 1 ? 0u : lengthGcd;
-        uint byteDivisor = byteGcd <= 1 ? 0u : byteGcd;
-
-        if (charDivisor == 0)
-            byteDivisor = 0;
-
-        return new StringKeyProperties(new LengthData((uint)minByteCount, (uint)maxByteCount, uniqLen, lengthMap, charDivisor, byteDivisor), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskLen, firstCharMap, lastCharMap));
+        return new StringKeyProperties(new LengthData(charLenUniq, charLenMap, byteLenUniq, byteLenMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, stringBitMask, stringBitMaskLen, firstCharMap, lastCharMap));
     }
 
     private static NumericKeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys, bool keysAreSorted)
@@ -595,21 +584,6 @@ internal static class KeyAnalyzer
                 break;
         }
         return count;
-    }
-
-    private static uint UpdateGcd(uint current, uint value)
-    {
-        if (current == 0)
-            return value;
-
-        while (value != 0)
-        {
-            uint remainder = current % value;
-            current = value;
-            value = remainder;
-        }
-
-        return current;
     }
 
     private static ulong GetStringBitMask(ReadOnlySpan<string> keys, GeneratorEncoding encoding, bool ignoreCase, int byteCount)

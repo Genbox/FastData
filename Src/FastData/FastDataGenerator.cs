@@ -110,7 +110,7 @@ public static partial class FastDataGenerator
         if (cfg.StructureTypeOverride != null)
             structureType = cfg.StructureTypeOverride;
         else
-            structureType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthMap.Min, props.LengthData.LengthMap.Max, cfg.AllowApproximateMatching, props.LengthData.Unique, cfg.StructureConfig, x => EnsureHashData(x.Span));
+            structureType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthMap.Min, props.LengthData.LengthMap.Max, cfg.AllowApproximateMatching, props.LengthData.UniqueLengths, cfg.StructureConfig, x => EnsureHashData(x.Span));
 
         IEarlyExit[] earlyExits = StringEarlyExits.GetCandidates(structureType, props, cfg.IgnoreCase, generator.Encoding, cfg.EarlyExitConfig).ToArray();
 

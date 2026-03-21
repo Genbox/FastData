@@ -18,26 +18,26 @@ internal static class StringEarlyExits
         if (!config.IsEnabledForStructure(structureType))
             yield break;
 
-        (uint minByteCount, uint maxByteCount, _, LengthBitArray map, _, _) = props.LengthData;
+        (_, LengthBitArray charMap, _, LengthBitArray byteMap) = props.LengthData;
 
-        if (config.IsEarlyExitEnabled(typeof(LengthEqualEarlyExit)) && map.BitCount == 1)
+        if (config.IsEarlyExitEnabled(typeof(LengthEqualEarlyExit)) && charMap.BitCount == 1)
         {
-            // Does not matter which length we use, as the yare all the same
-            yield return new LengthEqualEarlyExit(map.Max, minByteCount);
+            // If lengths are all the same, we only use that.
+            yield return new LengthEqualEarlyExit(charMap.Max, byteMap.Min);
             yield break;
         }
 
-        float lengthDensity = (float)map.BitCount / ((map.Max - map.Min) + 1);
+        float lengthDensity = (float)charMap.BitCount / ((charMap.Max - charMap.Min) + 1);
 
         if (config.IsEarlyExitEnabled(typeof(LengthRangeEarlyExit)) && config.CheckDensityLimits(typeof(LengthRangeEarlyExit), lengthDensity))
         {
-            yield return new LengthRangeEarlyExit(map.Min, map.Max, minByteCount, maxByteCount); //TODO: Move byte variants into map?
+            yield return new LengthRangeEarlyExit(charMap.Min, charMap.Max, byteMap.Min, byteMap.Max);
             yield break;
         }
 
         if (config.IsEarlyExitEnabled(typeof(LengthBitmapEarlyExit)) && config.CheckDensityLimits(typeof(LengthBitmapEarlyExit), lengthDensity))
         {
-            yield return new LengthBitmapEarlyExit(map.Values); //TODO: Create byte variant
+            yield return new LengthBitmapEarlyExit(charMap.Values); //TODO: Create byte variant
             yield break;
         }
 
