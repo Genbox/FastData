@@ -1,0 +1,1 @@
+﻿new BoolHolder() {Value = p}
