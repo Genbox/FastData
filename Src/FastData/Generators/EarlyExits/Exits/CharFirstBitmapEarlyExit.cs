@@ -1,6 +1,6 @@
 using Genbox.FastData.Generators.EarlyExits.Abstracts;
 
-namespace Genbox.FastData.Generators.EarlyExits;
+namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // inputKey => ((uint)GetFirstChar(inputKey) < 64u)
 //     ? ((Low & (1UL << (int)(uint)GetFirstChar(inputKey))) == 0UL)

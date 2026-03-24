@@ -1,16 +1,18 @@
 using System.Numerics;
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
+using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
 public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, EliasFanoContext<TKey>>
 {
-    private readonly TKey _minValue;
-    private readonly TKey _maxValue;
-    private readonly Func<TKey, long> _valueConverter;
     private readonly bool _keysAreSorted;
+    private readonly TKey _maxValue;
+    private readonly TKey _minValue;
     private readonly int _skipQuantum;
+    private readonly Func<TKey, long> _valueConverter;
 
     internal EliasFanoStructure(TKey minValue, TKey maxValue, Func<TKey, long> valueConverter, bool keysAreSorted, int skipQuantum)
     {
@@ -88,6 +90,12 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         int[] samplePositions = BuildSamples(upperBits, upperBitLength, _skipQuantum);
 
         return new EliasFanoContext<TKey>(keys, lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions, effectiveMinValue, max);
+    }
+
+    public IEnumerable<IEarlyExit> GetMandatoryExits()
+    {
+        yield return new ValueLessThanEarlyExit<TKey>(_minValue);
+        yield return new ValueGreaterThanEarlyExit<TKey>(_maxValue);
     }
 
     private static int[] BuildSamples(ulong[] words, int bitLength, int sampleRate)

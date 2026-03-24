@@ -1,3 +1,4 @@
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Contexts.Misc;
 using Genbox.FastData.Generators.Extensions;
@@ -55,4 +56,6 @@ public sealed class HashTableCompactStructure<TKey, TValue> : IStructure<TKey, T
 
         return new HashTableCompactContext<TKey, TValue>(bucketStarts, bucketCounts, entries, !Type.GetTypeCode(typeof(TKey)).UsesIdentityHash(), denseValues);
     }
+
+    public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 }

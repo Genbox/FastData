@@ -5,6 +5,7 @@ using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.EarlyExits;
 using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal;
@@ -296,7 +297,7 @@ public static partial class FastDataGenerator
         if (type == typeof(RangeStructure<,>))
             return new RangeStructure<TKey, TValue>(props.MinKeyValue, props.MaxKeyValue);
         if (type == typeof(RrrBitVectorStructure<,>))
-            return new RrrBitVectorStructure<TKey, TValue>(sorted);
+            return new RrrBitVectorStructure<TKey, TValue>(props.MinKeyValue, props.MaxKeyValue, sorted);
         if (type == typeof(SingleValueStructure<,>))
             return new SingleValueStructure<TKey, TValue>();
 

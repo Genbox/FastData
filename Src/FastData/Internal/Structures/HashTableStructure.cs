@@ -1,3 +1,4 @@
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Contexts.Misc;
 using Genbox.FastData.Generators.Extensions;
@@ -36,4 +37,6 @@ public sealed class HashTableStructure<TKey, TValue> : IStructure<TKey, TValue, 
 
         return new HashTableContext<TKey, TValue>(buckets, entries, !Type.GetTypeCode(typeof(TKey)).UsesIdentityHash(), values);
     }
+
+    public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 }

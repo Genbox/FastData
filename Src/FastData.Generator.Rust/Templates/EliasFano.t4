@@ -46,17 +46,11 @@ const SAMPLE_RATE_SHIFT: i32 = <#= Context.SampleRateShift #>;
     if (minValue >= 0)
     {
 #>    let value = <#= Common.LookupKeyName #> as i64;
-    if (value as u64) > (Self::MAX_VALUE as u64) {
-        return false;
-    }
 <#
     }
     else
     {
 #>    let value = (<#= Common.LookupKeyName #> as i64) - Self::MIN_VALUE;
-    if (value as u64) > (Self::MAX_VALUE_NORMALIZED as u64) {
-        return false;
-    }
 <#
     }
 #>

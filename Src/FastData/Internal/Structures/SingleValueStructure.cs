@@ -1,3 +1,4 @@
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
 
@@ -12,4 +13,6 @@ public sealed class SingleValueStructure<TKey, TValue> : IStructure<TKey, TValue
 
         return new SingleValueContext<TKey, TValue>(keys.Span[0], values);
     }
+
+    public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 }

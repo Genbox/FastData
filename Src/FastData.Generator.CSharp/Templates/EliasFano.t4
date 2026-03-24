@@ -46,15 +46,11 @@ private const int _sampleRateShift = <#= Context.SampleRateShift #>;
     if (minValue >= 0)
     {
 #>    long value = (long)<#= Common.LookupKeyName #>;
-    if ((ulong)value > (ulong)_maxValue)
-        return false;
 <#
     }
     else
     {
 #>    long value = (long)<#= Common.LookupKeyName #> - _minValue;
-    if ((ulong)value > (ulong)_maxValueNormalized)
-        return false;
 <#
     }
 #>

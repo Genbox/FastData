@@ -1,10 +1,10 @@
-﻿using Genbox.FastData.Config;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
-using Genbox.FastData.Generators.EarlyExits;
+using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
 
-namespace Genbox.FastData.Internal;
+namespace Genbox.FastData.Generators.EarlyExits;
 
 internal static class StringEarlyExits
 {

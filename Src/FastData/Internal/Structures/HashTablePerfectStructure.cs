@@ -1,3 +1,4 @@
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Abstracts;
@@ -47,6 +48,8 @@ public sealed class HashTablePerfectStructure<TKey, TValue> : IStructure<TKey, T
 
         return new HashTablePerfectContext<TKey, TValue>(pairs, storeHashCode, denseValues);
     }
+
+    public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 
     private static ulong GetSentinel(HashData hashData, ulong[] hashCodes, int count)
     {

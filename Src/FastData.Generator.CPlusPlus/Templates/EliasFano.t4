@@ -129,15 +129,11 @@ public:
     if (minValue >= 0)
     {
 #>    const int64_t value = static_cast<int64_t>(<#= Common.LookupKeyName #>);
-    if (static_cast<uint64_t>(value) > static_cast<uint64_t>(max_value))
-        return false;
 <#
     }
     else
     {
 #>    const int64_t value = static_cast<int64_t>(<#= Common.LookupKeyName #>) - min_value;
-    if (static_cast<uint64_t>(value) > static_cast<uint64_t>(max_value_normalized))
-        return false;
 <#
     }
 #>

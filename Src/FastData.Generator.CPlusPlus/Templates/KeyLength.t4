@@ -34,13 +34,7 @@ public:
 <#= Model.GetMethodModifier(true) #>bool contains(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-    if (<#= Common.LookupKeyName #>.length() < <#= Context.MinLength.ToStringInvariant() #>)
-        return false;
-
     size_t idx = <#= Common.LookupKeyName #>.length() - <#= Context.MinLength.ToStringInvariant() #>;
-    if (idx >= keys.size())
-        return false;
-
     return <#= Model.GetEqualFunction(Common.LookupKeyName, "keys[idx]") #>;
 }
 <#
@@ -52,17 +46,7 @@ public:
 <#= Model.GetMethodModifier(false) #>bool try_lookup(const <#= Model.KeyTypeName #> <#= Common.InputKeyName #>, const <#= Model.ValueTypeName #>*& value)<#= Model.PostMethodModifier #> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
-    if (<#= Common.LookupKeyName #>.length() < <#= Context.MinLength.ToStringInvariant() #>) {
-        value = nullptr;
-        return false;
-    }
-
     size_t idx = <#= Common.LookupKeyName #>.length() - <#= Context.MinLength.ToStringInvariant() #>;
-    if (idx >= keys.size()) {
-        value = nullptr;
-        return false;
-    }
-
     if (<#= Model.GetEqualFunction(Common.LookupKeyName, "keys[idx]") #>) {
         value = <#= Model.IsPrimitive ? "&" : "" #>values[offsets[idx]];
         return true;

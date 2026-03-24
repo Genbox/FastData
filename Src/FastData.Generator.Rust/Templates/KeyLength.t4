@@ -33,14 +33,7 @@
 <#= Model.MethodModifier #>fn contains(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName() #>) -> bool {
 <#= Model.GetMethodHeader(MethodType.Contains) #>
 
-    let Some(idx) = <#= Common.LookupKeyName #>.len().checked_sub(<#= Context.MinLength.ToStringInvariant() #>) else {
-        return false;
-    };
-
-    if idx >= Self::KEYS.len() {
-        return false;
-    }
-
+    let idx = <#= Common.LookupKeyName #>.len() - <#= Context.MinLength.ToStringInvariant() #>;
     return <#= Model.GetEqualFunction(Common.LookupKeyName, "Self::KEYS[idx]") #>;
 }
 <#
@@ -52,14 +45,7 @@
 <#= Model.MethodModifier #>fn try_lookup(<#= Common.InputKeyName #>: <#= Model.GetKeyTypeName() #>) -> Option<<#= Model.GetValueTypeName() #>> {
 <#= Model.GetMethodHeader(MethodType.TryLookup) #>
 
-    let Some(idx) = <#= Common.LookupKeyName #>.len().checked_sub(<#= Context.MinLength.ToStringInvariant() #>) else {
-        return None;
-    };
-
-    if idx >= Self::KEYS.len() {
-        return None;
-    }
-
+    let idx = <#= Common.LookupKeyName #>.len() - <#= Context.MinLength.ToStringInvariant() #>;
     if (<#= Model.GetEqualFunction(Common.LookupKeyName, "Self::KEYS[idx]") #>) {
         return Some(Self::VALUES[Self::OFFSETS[idx] as usize]);
     }

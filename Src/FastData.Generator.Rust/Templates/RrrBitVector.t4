@@ -36,10 +36,6 @@ const RRR_BLOCK_SIZE: i32 = <#= Context.BlockSize #>;
 
     let mapped = <#= mapSource #>;
 
-    if mapped < Self::RRR_MIN_VALUE || mapped > Self::RRR_MAX_VALUE {
-        return false;
-    }
-
     let normalized = mapped - Self::RRR_MIN_VALUE;
     let block_index = (normalized / (Self::RRR_BLOCK_SIZE as u64)) as usize;
     let bit_in_block = (normalized % (Self::RRR_BLOCK_SIZE as u64)) as i32;

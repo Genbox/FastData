@@ -1,3 +1,4 @@
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
 
@@ -5,14 +6,13 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class BloomFilterStructure<TKey, TValue> : IStructure<TKey, TValue, BloomFilterContext>
 {
+    private const int BitsPerKey = 10;
     private readonly HashData _hashData;
 
     internal BloomFilterStructure(HashData hashData)
     {
         _hashData = hashData;
     }
-
-    private const int BitsPerKey = 10;
 
     public BloomFilterContext Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
@@ -35,4 +35,6 @@ public sealed class BloomFilterStructure<TKey, TValue> : IStructure<TKey, TValue
 
         return new BloomFilterContext(bitset);
     }
+
+    public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 }

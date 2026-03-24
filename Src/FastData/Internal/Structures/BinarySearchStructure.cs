@@ -1,3 +1,4 @@
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
 
@@ -5,8 +6,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class BinarySearchStructure<TKey, TValue> : IStructure<TKey, TValue, BinarySearchContext<TKey, TValue>>
 {
-    private readonly bool _keysAreSorted;
     private readonly StringComparer? _comparer;
+    private readonly bool _keysAreSorted;
 
     internal BinarySearchStructure(bool keysAreSorted, StringComparer? comparer)
     {
@@ -42,4 +43,6 @@ public sealed class BinarySearchStructure<TKey, TValue> : IStructure<TKey, TValu
 
         return new BinarySearchContext<TKey, TValue>(keysCopy, valuesCopy);
     }
+
+    public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 }

@@ -37,9 +37,6 @@ private const int _rrrBlockSize = <#= Context.BlockSize #>;
 
     ulong mapped = <#= mapSource #>;
 
-    if (mapped < _rrrMinValue || mapped > _rrrMaxValue)
-        return false;
-
     ulong normalized = mapped - _rrrMinValue;
     int blockIndex = (int)(normalized / (ulong)_rrrBlockSize);
     int bitInBlock = (int)(normalized % (ulong)_rrrBlockSize);

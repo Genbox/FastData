@@ -1,4 +1,5 @@
 using Genbox.FastData.Generators.EarlyExits;
+using Genbox.FastData.Generators.EarlyExits.Exits;
 
 namespace Genbox.FastData.TestHarness.Runner.Code.Theory;
 

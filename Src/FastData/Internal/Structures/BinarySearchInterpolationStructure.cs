@@ -1,3 +1,4 @@
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
 
@@ -30,4 +31,6 @@ public sealed class BinarySearchInterpolationStructure<TKey, TValue> : IStructur
 
         return new BinarySearchInterpolationContext<TKey, TValue>(keysCopy, valuesCopy);
     }
+
+    public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 }

@@ -80,9 +80,6 @@ public:
 
         const uint64_t mapped = <#= mapSource #>;
 
-        if (mapped < rrr_min_value || mapped > rrr_max_value)
-            return false;
-
         const uint64_t normalized = mapped - rrr_min_value;
         const int32_t block_index = static_cast<int32_t>(normalized / static_cast<uint64_t>(rrr_block_size));
         const int32_t bit_in_block = static_cast<int32_t>(normalized % static_cast<uint64_t>(rrr_block_size));

@@ -1,12 +1,14 @@
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
+using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
 public sealed class KeyLengthStructure<TKey, TValue> : IStructure<TKey, TValue, KeyLengthContext<TValue>>
 {
-    private readonly uint _minLength;
     private readonly uint _maxLength;
+    private readonly uint _minLength;
 
     internal KeyLengthStructure(uint minLength, uint maxLength)
     {
@@ -33,5 +35,14 @@ public sealed class KeyLengthStructure<TKey, TValue> : IStructure<TKey, TValue, 
         }
 
         return new KeyLengthContext<TValue>(lengths, _minLength, values, offsets);
+    }
+
+    public IEnumerable<IEarlyExit> GetMandatoryExits()
+    {
+        if (_minLength > 0)
+            yield return new LengthLessThanEarlyExit(_minLength);
+
+        if (_maxLength < uint.MaxValue)
+            yield return new LengthGreaterThanEarlyExit(_maxLength);
     }
 }

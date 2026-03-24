@@ -1,9 +1,9 @@
 using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
-using Genbox.FastData.Generators.EarlyExits;
+using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Generators.Extensions;
 
-namespace Genbox.FastData.Internal;
+namespace Genbox.FastData.Generators.EarlyExits;
 
 internal static class NumericEarlyExits<TKey>
 {

@@ -1,18 +1,23 @@
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
+using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
 public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValue, RrrBitVectorContext>
 {
+    private const int BlockSize = 15;
     private readonly bool _keysAreSorted;
+    private readonly TKey _maxValue;
+    private readonly TKey _minValue;
 
-    internal RrrBitVectorStructure(bool keysAreSorted)
+    internal RrrBitVectorStructure(TKey minValue, TKey maxValue, bool keysAreSorted)
     {
+        _minValue = minValue;
+        _maxValue = maxValue;
         _keysAreSorted = keysAreSorted;
     }
-
-    private const int BlockSize = 15;
 
     public RrrBitVectorContext Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
@@ -64,6 +69,12 @@ public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValu
         }
 
         return new RrrBitVectorContext(minValue, maxValue, BlockSize, classes, offsets);
+    }
+
+    public IEnumerable<IEarlyExit> GetMandatoryExits()
+    {
+        yield return new ValueLessThanEarlyExit<TKey>(_minValue);
+        yield return new ValueGreaterThanEarlyExit<TKey>(_maxValue);
     }
 
     private static uint RankMask(ushort mask, int classValue)
