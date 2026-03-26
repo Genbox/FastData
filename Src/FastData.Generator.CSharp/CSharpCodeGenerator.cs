@@ -90,12 +90,13 @@ public sealed class CSharpCodeGenerator : CodeGenerator
 
         public override string Generate()
         {
-            string raw = _context.GetType().Name;
-            int idx = raw.IndexOf("Context", StringComparison.Ordinal);
-            string name = raw.Substring(0, idx) + ".t4";
-            string source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Templates", "CSharp", name));
+            string typeName = _context.GetType().Name;
+            int idx = typeName.IndexOf("Context", StringComparison.Ordinal);
+            string name = typeName.Substring(0, idx) + ".t4";
+            string templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "CSharp", name);
+            string source = File.ReadAllText(templatePath);
 
-            return _manager.Render(this, name, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
+            return _manager.Render(this, templatePath, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
             {
                 {
                     "Model", new TemplateModel
@@ -106,6 +107,7 @@ public sealed class CSharpCodeGenerator : CodeGenerator
                         MethodAttribute = GetMethodAttribute(),
                         KeyTypeName = KeyTypeName,
                         KeyTypeCode = Type.GetTypeCode(typeof(TKey)),
+                        HasEarlyExits = GeneratorConfig.EarlyExits.Length != 0,
                         ValueTypeName = ValueTypeName,
                         GetMethodHeader = GetMethodHeader,
                         GetEqualFunction = (a, b) => GetEqualFunction(a, b),

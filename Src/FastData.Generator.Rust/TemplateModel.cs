@@ -10,6 +10,7 @@ public sealed class TemplateModel
     public required string FieldModifier { get; init; }
     public required string KeyTypeName { get; init; }
     public required TypeCode KeyTypeCode { get; init; }
+    public required bool HasEarlyExits { get; init; }
     public required string ValueTypeName { get; init; }
     public required Func<MethodType, string> GetMethodHeader { get; init; }
     public required Func<string, string, string> GetEqualFunction { get; init; }

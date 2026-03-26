@@ -5,7 +5,7 @@ using Genbox.FastData.Generators.Abstracts;
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // (BitSet & (1UL << (int)((GetLength(inputKey) - 1) & 63))) == 0UL;
-public sealed class LengthBitmapEarlyExit(ulong BitSet) : IEarlyExit
+public sealed record LengthBitmapEarlyExit(ulong BitSet) : IEarlyExit
 {
     public Expression GetExpression(ParameterExpression key)
     {

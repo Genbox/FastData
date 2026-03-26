@@ -5,7 +5,7 @@ using static Genbox.FastData.Generators.Helpers.TypeHelper;
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // (inputKey & Mask) != 0;
-public sealed class ValueBitMaskEarlyExit(ulong Mask) : IEarlyExit
+public sealed record ValueBitMaskEarlyExit(ulong Mask) : IEarlyExit
 {
     public Expression GetExpression(ParameterExpression key)
     {

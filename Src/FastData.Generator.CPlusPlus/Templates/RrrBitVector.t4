@@ -4,6 +4,7 @@
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ include file="_StringHelpers.tt" #>
 
 <#@ parameter type="Genbox.FastData.Generator.CPlusPlus.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>
@@ -18,7 +19,7 @@
         TypeCode.Int32 => $"static_cast<uint64_t>(static_cast<uint32_t>({Common.LookupKeyName} ^ std::numeric_limits<int32_t>::lowest()))",
         TypeCode.Int64 => $"static_cast<uint64_t>({Common.LookupKeyName} ^ std::numeric_limits<int64_t>::lowest())",
         _ => throw new InvalidOperationException("RRR bitvector only supports integral key types.")
-    };
+        };
 #>
 static constexpr uint64_t rrr_min_value = <#= Model.ToValueLabel(Context.MinValue) #>;
 static constexpr uint64_t rrr_max_value = <#= Model.ToValueLabel(Context.MaxValue) #>;

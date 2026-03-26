@@ -62,9 +62,9 @@ public class TemplateManager
         return generator;
     }
 
-    private void CompileTemplateAssembly(TemplateGenerator generator, string name, string source, string className, string assemblyPath)
+    private void CompileTemplateAssembly(TemplateGenerator generator, string filePath, string source, string className, string assemblyPath)
     {
-        ParsedTemplate parsed = generator.ParseTemplate(name, source);
+        ParsedTemplate parsed = generator.ParseTemplate(filePath, source);
 
         TemplateSettings settings = TemplatingEngine.GetSettings(generator, parsed);
         settings.Culture = CultureInfo.InvariantCulture;
@@ -73,10 +73,10 @@ public class TemplateManager
         settings.Name = className;
         settings.Namespace = _classNamespace;
 
-        string preprocessed = generator.PreprocessTemplate(parsed, name, source, settings, out string[] references);
+        string preprocessed = generator.PreprocessTemplate(parsed, filePath, source, settings, out string[] references);
 
         if (generator.Errors.HasErrors)
-            throw new InvalidOperationException($"Failed to preprocess template '{name}':\n{FormatErrors(generator.Errors)}");
+            throw new InvalidOperationException($"Failed to preprocess template '{filePath}':\n{FormatErrors(generator.Errors)}");
 
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(preprocessed, new CSharpParseOptions(LanguageVersion.Latest));
 
@@ -90,7 +90,7 @@ public class TemplateManager
         EmitResult emitResult = compilation.Emit(assemblyPath, pdbPath);
 
         if (!emitResult.Success)
-            throw new InvalidOperationException($"Failed to compile template '{name}':\n{FormatDiagnostics(emitResult.Diagnostics)}");
+            throw new InvalidOperationException($"Failed to compile template '{filePath}':\n{FormatDiagnostics(emitResult.Diagnostics)}");
     }
 
     private string ExecuteCompiledTemplate<TKey>(OutputWriter<TKey> writer, string className, string assemblyPath, Dictionary<string, object?> variables)

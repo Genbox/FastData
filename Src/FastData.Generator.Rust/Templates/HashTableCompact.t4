@@ -5,6 +5,7 @@
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
+<#@ include file="_StringHelpers.tt" #>
 
 <#@ parameter type="Genbox.FastData.Generator.Rust.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>

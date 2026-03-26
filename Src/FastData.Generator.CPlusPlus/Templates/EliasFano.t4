@@ -2,6 +2,7 @@
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ include file="_StringHelpers.tt" #>
 
 <#@ parameter type="Genbox.FastData.Generator.CPlusPlus.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>

@@ -3,6 +3,7 @@
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="System.Linq" #>
+<#@ include file="_StringHelpers.tt" #>
 
 <#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.SharedCode" name="Shared" #>

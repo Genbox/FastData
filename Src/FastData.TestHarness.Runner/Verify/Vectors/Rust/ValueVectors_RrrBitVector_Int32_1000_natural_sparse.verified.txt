@@ -383,13 +383,19 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
+        if ((key < 11727))
+        {
+         return false;
+        }
+
+        if ((key > 38755))
+        {
+         return false;
+        }
+
 
 
         let mapped = (key ^ i32::MIN) as u32 as u64;
-
-        if mapped < Self::RRR_MIN_VALUE || mapped > Self::RRR_MAX_VALUE {
-            return false;
-        }
 
         let normalized = mapped - Self::RRR_MIN_VALUE;
         let block_index = (normalized / (Self::RRR_BLOCK_SIZE as u64)) as usize;

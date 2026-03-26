@@ -81,9 +81,10 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
             string raw = _context.GetType().Name;
             int idx = raw.IndexOf("Context", StringComparison.Ordinal);
             string name = raw.Substring(0, idx) + ".t4";
-            string source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Templates", "CPlusPlus", name));
+            string templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "CPlusPlus", name);
+            string source = File.ReadAllText(templatePath);
 
-            return _manager.Render(this, name, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
+            return _manager.Render(this, templatePath, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
             {
                 {
                     "Model", new TemplateModel
@@ -93,6 +94,7 @@ public sealed class CPlusPlusCodeGenerator : CodeGenerator
                         PostMethodModifier = " noexcept",
                         KeyTypeName = KeyTypeName,
                         KeyTypeCode = Type.GetTypeCode(typeof(TKey)),
+                        HasEarlyExits = GeneratorConfig.EarlyExits.Length != 0,
                         ValueTypeName = ValueTypeName,
                         IsPrimitive = typeof(TValue).IsPrimitive,
                         GetMethodHeader = GetMethodHeader,

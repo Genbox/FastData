@@ -1,6 +1,7 @@
 <#@ template language="C#" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+<#@ include file="_StringHelpers.tt" #>
 
 <#@ parameter type="Genbox.FastData.Generator.CSharp.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.Template.CommonDataModel" name="Common" #>

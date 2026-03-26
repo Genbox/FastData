@@ -95,7 +95,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         foreach (Expression expr in node.Expressions)
         {
             Visit(expr);
-            if (expr is LoopExpression)
+            if (expr is LoopExpression or ConditionalExpression)
                 Output.AppendLine();
             else
                 Output.AppendLine(";");
@@ -203,7 +203,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         Output.DecrementIndent();
         Output.AppendLine("}");
 
-        if (node.IfFalse != Expression.Empty())
+        if (node.IfFalse is not DefaultExpression || node.IfFalse.Type != typeof(void))
         {
             Output.AppendLine("else");
             Output.AppendLine("{");

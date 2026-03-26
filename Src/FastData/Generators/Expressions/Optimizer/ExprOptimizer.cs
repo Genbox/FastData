@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 
 namespace Genbox.FastData.Generators.Expressions.Optimizer;
 
-internal static class ExpressionOptimizer
+internal static class ExprOptimizer
 {
     private static readonly Func<Expression, Expression>[] ConstantReductions =
     [

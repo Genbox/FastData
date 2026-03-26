@@ -116,8 +116,6 @@ public static partial class FastDataGenerator
         else
             structureType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthMap.Min, props.LengthData.LengthMap.Max, cfg.AllowApproximateMatching, props.LengthData.UniqueLengths, cfg.StructureConfig, x => EnsureHashData(x.Span));
 
-        IEarlyExit[] earlyExits = StringEarlyExits.GetCandidates(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase).ToArray();
-
         LogStructureType(logger, structureType.Name);
 
         string trimPrefix = string.Empty;
@@ -134,6 +132,8 @@ public static partial class FastDataGenerator
         LogMinMaxLength(logger, props.LengthData.LengthMap.Min, props.LengthData.LengthMap.Max);
 
         IStructure<string, TValue, IContext> structure = StringStructureFactory<TValue>(structureType, props, () => EnsureHashData(keys.Span), comparer, sorted);
+
+        IEarlyExit[] earlyExits = CombineEarlyExits(structure.GetMandatoryExits(), StringEarlyExits.GetCandidates(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase));
 
         IContext res = structure.Create(keys, values);
         StringGeneratorConfig genCfg = new StringGeneratorConfig(structureType, (uint)keys.Length, props.LengthData.LengthMap.Min, props.LengthData.LengthMap.Max, cfg.IgnoreCase, props.CharacterData.CharacterClasses, generator.Encoding, earlyExits, trimPrefix, trimSuffix, cfg.TypeReductionEnabled, cacheHashInfo);
@@ -180,6 +180,19 @@ public static partial class FastDataGenerator
             });
 
             return (hashData, info);
+        }
+
+        static IEarlyExit[] CombineEarlyExits(IEnumerable<IEarlyExit> mandatoryExits, IEnumerable<IEarlyExit> candidateExits)
+        {
+            HashSet<IEarlyExit> combined = new HashSet<IEarlyExit>();
+
+            foreach (IEarlyExit exit in mandatoryExits)
+                combined.Add(exit);
+
+            foreach (IEarlyExit exit in candidateExits)
+                combined.Add(exit);
+
+            return combined.ToArray();
         }
     }
 
@@ -254,11 +267,11 @@ public static partial class FastDataGenerator
                 return cacheHashData = GetNumericHash(x.Span);
             });
 
-        IEarlyExit[] earlyExits = NumericEarlyExits<TKey>.GetCandidates(type, props.MinKeyValue, props.MaxKeyValue, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig).ToArray();
-
         LogStructureType(logger, structureType.Name);
 
         IStructure<TKey, TValue, IContext> structure = NumericStructureFactory<TKey, TValue>(structureType, props, cacheHashData!, sorted);
+
+        IEarlyExit[] earlyExits = CombineEarlyExits(structure.GetMandatoryExits(), NumericEarlyExits<TKey>.GetCandidates(type, props.MinKeyValue, props.MaxKeyValue, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig));
 
         IContext res = structure.Create(keys, values);
         NumericGeneratorConfig<TKey> genCfg = new NumericGeneratorConfig<TKey>(structureType, (uint)keys.Length, props.MinKeyValue, props.MaxKeyValue, earlyExits, cfg.TypeReductionEnabled, props.HasZeroOrNaN);
@@ -269,6 +282,19 @@ public static partial class FastDataGenerator
             NumericHashFunc<TKey> hashFunc = DefaultNumericHash.GetHashFunc<TKey>(props.HasZeroOrNaN);
             HashData hashData = HashData.Create(keySpan, cfg.HashCapacityFactor, x => hashFunc(x));
             return hashData;
+        }
+
+        static IEarlyExit[] CombineEarlyExits(IEnumerable<IEarlyExit> mandatoryExits, IEnumerable<IEarlyExit> candidateExits)
+        {
+            HashSet<IEarlyExit> combined = new HashSet<IEarlyExit>();
+
+            foreach (IEarlyExit exit in mandatoryExits)
+                combined.Add(exit);
+
+            foreach (IEarlyExit exit in candidateExits)
+                combined.Add(exit);
+
+            return combined.ToArray();
         }
     }
 

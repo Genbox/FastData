@@ -41,11 +41,19 @@ internal static class FastData
 
     public static bool Contains(int key)
     {
+        if ((key < -198273))
+        {
+         return false;
+        }
+
+        if ((key > -171245))
+        {
+         return false;
+        }
+
 
 
         long value = (long)key - _minValue;
-        if ((ulong)value > (ulong)_maxValueNormalized)
-            return false;
         long high = value >> _lowerBitCount;
 
         long position = high == 0 ? 0 : SelectZero(high - 1) + 1;

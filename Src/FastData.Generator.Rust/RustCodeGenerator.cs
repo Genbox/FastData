@@ -78,9 +78,10 @@ public sealed class RustCodeGenerator : CodeGenerator
             string raw = context.GetType().Name;
             int idx = raw.IndexOf("Context", StringComparison.Ordinal);
             string name = raw.Substring(0, idx) + ".t4";
-            string source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Templates", "Rust", name));
+            string templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "Rust", name);
+            string source = File.ReadAllText(templatePath);
 
-            return _manager.Render(this, name, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
+            return _manager.Render(this, templatePath, source, new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
             {
                 {
                     "Model", new TemplateModel
@@ -91,6 +92,7 @@ public sealed class RustCodeGenerator : CodeGenerator
                         FieldModifier = "const ",
                         KeyTypeName = KeyTypeName,
                         KeyTypeCode = Type.GetTypeCode(typeof(TKey)),
+                        HasEarlyExits = GeneratorConfig.EarlyExits.Length != 0,
                         ValueTypeName = ValueTypeName,
                         GetMethodHeader = GetMethodHeader,
                         GetEqualFunction = (a, b) => GetEqualFunction(a, b),

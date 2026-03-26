@@ -381,12 +381,19 @@ internal static class FastData
 
     public static bool Contains(int key)
     {
+        if ((key < 11727))
+        {
+         return false;
+        }
+
+        if ((key > 38755))
+        {
+         return false;
+        }
+
 
 
         ulong mapped = (ulong)(uint)(key ^ int.MinValue);
-
-        if (mapped < _rrrMinValue || mapped > _rrrMaxValue)
-            return false;
 
         ulong normalized = mapped - _rrrMinValue;
         int blockIndex = (int)(normalized / (ulong)_rrrBlockSize);

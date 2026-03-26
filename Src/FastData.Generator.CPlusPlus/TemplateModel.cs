@@ -9,6 +9,7 @@ public sealed class TemplateModel
     public required string PostMethodModifier { get; init; }
     public required string KeyTypeName { get; init; }
     public required TypeCode KeyTypeCode { get; init; }
+    public required bool HasEarlyExits { get; init; }
     public required string ValueTypeName { get; init; }
     public required bool IsPrimitive { get; init; }
     public required Func<MethodType, string> GetMethodHeader { get; init; }

@@ -6,6 +6,30 @@ namespace Genbox.FastData.Generator.Rust.Internal;
 
 internal sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
 {
+    protected override Expression VisitBlock(BlockExpression node)
+    {
+        foreach (ParameterExpression v in node.Variables)
+        {
+            Type t = v.Type;
+
+            if (v.Type.IsArray)
+                t = v.Type.GetElementType()!;
+
+            Output.AppendLine($"let mut {v.Name}: {map.GetTypeName(t)}{(v.Type.IsArray ? "[]" : string.Empty)};");
+        }
+
+        foreach (Expression expr in node.Expressions)
+        {
+            Visit(expr);
+            if (expr is LoopExpression or ConditionalExpression)
+                Output.AppendLine();
+            else
+                Output.AppendLine(";");
+        }
+
+        return node;
+    }
+
     protected override Expression VisitMember(MemberExpression node)
     {
         if (node.Expression is ConstantExpression)

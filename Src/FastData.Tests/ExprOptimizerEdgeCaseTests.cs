@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 using static System.Linq.Expressions.Expression;
-using static Genbox.FastData.Generators.Expressions.Optimizer.ExpressionOptimizer;
+using static Genbox.FastData.Generators.Expressions.Optimizer.ExprOptimizer;
 
 namespace Genbox.FastData.Tests;
 
-public sealed class ExpressionOptimizerEdgeCaseTests
+public sealed class ExprOptimizerEdgeCaseTests
 {
     [Fact]
     public void AddCheckedOverflowDoesNotFold()

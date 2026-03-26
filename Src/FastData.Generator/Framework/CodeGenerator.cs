@@ -68,10 +68,10 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 
         writer.Initialize(langDef, earlyExitDef, map, hashDef, genCfg, keyTypeName, valueTypeName, compiler, Shared);
 
+        string str = writer.Generate();
+
         foreach (string code in Shared.GetType(CodePlacement.InClass))
             sb.AppendLine(code);
-
-        string str = writer.Generate();
 
         int start = 0;
         int end = str.Length;
@@ -102,7 +102,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
 
             if (atLineStart)
             {
-                if (c == '\r' || c == '\n')
+                if (c is '\r' or '\n')
                 {
                     if (c == '\r' && i + 1 < str.Length && str[i + 1] == '\n')
                     {
@@ -120,7 +120,7 @@ public abstract class CodeGenerator(ILanguageDef langDef, IConstantsDef constDef
                 atLineStart = false;
             }
 
-            if (c == '\r' || c == '\n')
+            if (c is '\r' or '\n')
             {
                 if (c == '\r' && i + 1 < str.Length && str[i + 1] == '\n')
                 {

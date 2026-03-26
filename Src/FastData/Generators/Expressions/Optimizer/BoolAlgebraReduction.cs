@@ -104,8 +104,7 @@ internal static class BoolAlgebraReduction
         if (expr is not BinaryExpression be)
             return expr;
 
-        if (expr.NodeType != ExpressionType.Equal
-            && expr.NodeType != ExpressionType.NotEqual
+        if ((expr.NodeType != ExpressionType.Equal && expr.NodeType != ExpressionType.NotEqual)
             || be.Left.Type != typeof(bool)
             || be.Right.Type != typeof(bool)
             || be.Type != typeof(bool))

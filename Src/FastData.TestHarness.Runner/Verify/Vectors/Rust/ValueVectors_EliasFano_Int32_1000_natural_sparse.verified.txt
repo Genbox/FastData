@@ -42,12 +42,19 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
+        if ((key < 11727))
+        {
+         return false;
+        }
+
+        if ((key > 38755))
+        {
+         return false;
+        }
+
 
 
         let value = key as i64;
-        if (value as u64) > (Self::MAX_VALUE as u64) {
-            return false;
-        }
         let high = value >> (Self::LOWER_BIT_COUNT as u32);
 
         let position = if high == 0 { 0 } else { Self::select_zero(high - 1) + 1 };

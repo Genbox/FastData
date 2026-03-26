@@ -3,9 +3,9 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generators.EarlyExits.Abstracts;
 
-public abstract class ValueComparisonEarlyExitBase<T>(T value) : IEarlyExit
+public abstract record ValueComparisonEarlyExitBase<T>(T Value) : IEarlyExit
 {
-    public Expression GetExpression(ParameterExpression key) => Compare(key, Constant(value, key.Type));
+    public Expression GetExpression(ParameterExpression key) => Compare(key, Constant(Value, key.Type));
 
     protected abstract BinaryExpression Compare(Expression left, Expression right);
 }
