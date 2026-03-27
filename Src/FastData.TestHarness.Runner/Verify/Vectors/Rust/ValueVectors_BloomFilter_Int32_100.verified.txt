@@ -1,16 +1,17 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: BloomFilter
- #![allow(non_camel_case_types)]
- #![allow(unused_parens)]
- #![allow(missing_docs)]
- #![allow(unused_imports)]
- #![allow(unused_variables)]
- #![allow(unused_unsafe)]
- use std::ptr;
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
 
 pub struct fastdata;
-
 impl fastdata {
+
     const BLOOM: [u64; 16] = [
         281479271743489, 562958543486979, 1125917086973957, 2251834173947913, 4503668347895825, 9007336695791649, 18014673391583297, 36029346783166593, 72058693566333185, 144117387132666369, 
         288234774265332737, 576469548530665473, 1152939097061330945, 2305878194122661889, 4611756388245323777, 9223512776490647553
@@ -24,13 +25,12 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: i32) -> bool {
 
-
         let hash = unsafe { Self::get_hash(key) };
-        let index = hash % 16;
+        let index = (hash % 16u64) as usize;
         let shift1 = (hash as u32) & 63;
         let shift2 = ((hash >> 8) as u32) & 63;
         let mask = (1u64 << shift1) | (1u64 << shift2);
-        (Self::BLOOM[index as usize] & mask) == mask
+        (Self::BLOOM[index] & mask) == mask
     }
 
     pub const ITEM_COUNT: usize = 100;

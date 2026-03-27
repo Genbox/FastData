@@ -1,7 +1,6 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus.Internal;
 using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
-using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.Harness.Enums;
@@ -18,7 +17,7 @@ public sealed class CPlusPlusBootstrap : BootstrapBase
 
     public TypeMap Map { get; }
 
-    public override ICodeGenerator Generator => CPlusPlusCodeGenerator.Create(new CPlusPlusCodeGeneratorConfig("fastdata"));
+    public override ICodeGenerator Generator => new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig("fastdata"));
 
     public override string Wrap(string code) =>
         $$"""

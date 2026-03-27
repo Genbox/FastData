@@ -8,7 +8,7 @@ public abstract record StringAffixEarlyExitBase(string Affix, string Method) : I
 {
     public Expression GetExpression(ParameterExpression key)
     {
-        MethodInfo methodInfo = typeof(EarlyExitFunctions).GetMethod(Method, [typeof(string), typeof(string)])!;
+        MethodInfo methodInfo = typeof(StringFunctions).GetMethod(Method, [typeof(string), typeof(string)])!;
         return Not(Call(methodInfo, Constant(Affix), key));
     }
 }

@@ -1,0 +1,49 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.ConditionalTemplateData" name="Data" #>
+
+<#
+    object[] keys = Data.Keys.ToArray();
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    };
+<#
+    }
+#>
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+        if (<#= FormatHelper.FormatList(keys, x => GetEqual(LookupKeyName, TypeMap.ToValueLabel(x)), " || ") #>)
+            return true;
+
+        return false;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+<#
+    for (int i = 0; i < keys.Length; i++)
+    {
+#>        if (<#= GetEqual(LookupKeyName, TypeMap.ToValueLabel(keys[i])) #>) {
+            value = &values[<#= i.ToStringInvariant() #>];
+            return true;
+        }
+<#
+    }
+#>
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

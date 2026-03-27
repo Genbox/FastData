@@ -1,0 +1,114 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.BinarySearchTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier #><#= ValueTypeName #>[] _values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    };
+
+<#
+    }
+#>
+    <#= FieldModifier #><#= KeyTypeName #>[] _keys = new <#= KeyTypeName #>[] {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+    };
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
+    {
+<#= GetMethodHeader(MethodType.Contains) #>
+
+        int lo = 0;
+        int hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+        while (lo <= hi && <#= LookupKeyName #> >= _keys[lo] && <#= LookupKeyName #> <= _keys[hi])
+        {
+            <#= KeyTypeName #> loKey = _keys[lo];
+            <#= KeyTypeName #> hiKey = _keys[hi];
+
+            if (loKey == hiKey)
+            {
+                if (loKey == <#= LookupKeyName #>)
+                    return true;
+
+                break;
+            }
+
+            double range = (double)hiKey - (double)loKey;
+            double offset = (double)<#= LookupKeyName #> - (double)loKey;
+            int i = lo + (int)((offset * (hi - lo)) / range);
+
+            if (i < lo)
+                i = lo;
+            else if (i > hi)
+                i = hi;
+
+            <#= KeyTypeName #> midKey = _keys[i];
+            if (midKey == <#= LookupKeyName #>)
+                return true;
+            if (midKey < <#= LookupKeyName #>)
+                lo = i + 1;
+            else
+                hi = i - 1;
+        }
+
+        return false;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool TryLookup(<#= KeyTypeName #> key, out <#= ValueTypeName #>? value)
+    {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+
+        int lo = 0;
+        int hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+        while (lo <= hi && <#= LookupKeyName #> >= _keys[lo] && <#= LookupKeyName #> <= _keys[hi])
+        {
+            <#= KeyTypeName #> loKey = _keys[lo];
+            <#= KeyTypeName #> hiKey = _keys[hi];
+
+            if (loKey == hiKey)
+            {
+                if (loKey == <#= LookupKeyName #>)
+                {
+                    value = _values[lo];
+                    return true;
+                }
+
+                break;
+            }
+
+            double range = (double)hiKey - (double)loKey;
+            double offset = (double)<#= LookupKeyName #> - (double)loKey;
+            int i = lo + (int)((offset * (hi - lo)) / range);
+
+            if (i < lo)
+                i = lo;
+            else if (i > hi)
+                i = hi;
+
+            <#= KeyTypeName #> midKey = _keys[i];
+            if (midKey == <#= LookupKeyName #>)
+            {
+                value = _values[i];
+                return true;
+            }
+            if (midKey < <#= LookupKeyName #>)
+                lo = i + 1;
+            else
+                hi = i - 1;
+        }
+
+        value = default;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

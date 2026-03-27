@@ -8,7 +8,7 @@ internal static class Program
     private static void Main()
     {
         StringDataConfig config = new StringDataConfig();
-        CSharpCodeGenerator generator = CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("Dogs"));
+        CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpCodeGeneratorConfig("Dogs"));
 
         string source = FastDataGenerator.Generate(["Labrador", "German Shepherd", "Golden Retriever"], config, generator);
         Console.WriteLine(source);

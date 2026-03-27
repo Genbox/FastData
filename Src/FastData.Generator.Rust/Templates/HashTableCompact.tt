@@ -1,0 +1,99 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.HashTableCompactContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HashTableCompactTemplateData" name="Data" #>
+
+<#
+    string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
+    string indexType = TypeMap.GetSmallestUIntType((ulong)Data.Entries.Length);
+#>
+struct E {
+    key: <#= StoredKeyTypeName #>,
+<#
+    if (Context.StoreHashCode)
+    {
+#>    hash_code: u64,
+<#
+    }
+    if (Data.ValueCount > 0)
+    {
+#>    value: <#= StoredValueTypeName #>,
+<#
+    }
+#>}
+
+<#@ include file="Includes\ImplHeader.ttinclude" #>
+    <#= FieldModifier #>BUCKET_STARTS: [<#= indexType #>; <#= Context.BucketStarts.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.BucketStarts, (_, x) => x.ToStringInvariant(), 8) #>
+    ];
+
+    <#= FieldModifier #>BUCKET_COUNTS: [<#= indexType #>; <#= Context.BucketCounts.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.BucketCounts, (_, x) => x.ToStringInvariant(), 8) #>
+    ];
+
+    <#= FieldModifier #>ENTRIES: [E; <#= Data.Entries.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
+    {
+        string hashPart = Context.StoreHashCode ? $"hash_code: {x.Hash.ToStringInvariant()}, " : string.Empty;
+        string valuePart = Data.ValueCount > 0 ? $", value: {valueLabels[i]}" : string.Empty;
+        return $"E {{ {hashPart}key: {TypeMap.ToValueLabel(x.Key)}{valuePart} }}";
+    }, 8) #>
+    ];
+
+<#= HashSource #>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
+<#= GetMethodHeader(MethodType.Contains) #>
+        let hash = unsafe { Self::get_hash(<#= LookupKeyName #>) };
+        let index = (<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>) as usize;
+        let start = Self::BUCKET_STARTS[index] as usize;
+        let count = Self::BUCKET_COUNTS[index] as usize;
+        let end = start + count;
+
+        for i in start..end {
+            let entry = &Self::ENTRIES[i];
+            if <#
+    if (Context.StoreHashCode)
+    {
+#>entry.hash_code == hash && <#
+    }
+#><#= GetEqual("entry.key", LookupKeyName) #> {
+                return true;
+            }
+        }
+
+        false
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        let hash = unsafe { Self::get_hash(<#= LookupKeyName #>) };
+        let index = (<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>) as usize;
+        let start = Self::BUCKET_STARTS[index] as usize;
+        let count = Self::BUCKET_COUNTS[index] as usize;
+        let end = start + count;
+
+        for i in start..end {
+            let entry = &Self::ENTRIES[i];
+            if <#
+        if (Context.StoreHashCode)
+        {
+#>entry.hash_code == hash && <#
+        }
+#><#= GetEqual("entry.key", LookupKeyName) #> {
+                return Some(entry.value);
+            }
+        }
+
+        None
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

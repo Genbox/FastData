@@ -1,0 +1,136 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.HashTableCompactContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HashTableCompactTemplateData" name="Data" #>
+
+<#
+    string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
+    string indexType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUIntType((ulong)Data.Entries.Length) : TypeMap.GetTypeName(typeof(uint));
+#>
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
+    {
+        internal <#= KeyTypeName #> Key;
+<#
+    if (Context.StoreHashCode)
+    {
+#>        internal ulong HashCode;
+<#
+    }
+#><#
+    if (Data.ValueCount > 0)
+    {
+#>        internal <#= ValueTypeName #> Value;
+<#
+    }
+#>        internal E(<#= KeyTypeName #> key<#
+    if (Context.StoreHashCode)
+    {
+#>, ulong hashCode<#
+    }
+#><#
+    if (Data.ValueCount > 0)
+    {
+#>, <#= ValueTypeName #> value<#
+    }
+#>)
+        {
+            Key = key;
+<#
+    if (Context.StoreHashCode)
+    {
+#>        HashCode = hashCode;
+<#
+    }
+#><#
+    if (Data.ValueCount > 0)
+    {
+#>        Value = value;
+<#
+    }
+#>    }
+    };
+
+    <#= FieldModifier #><#= indexType #>[] _bucketStarts = new <#= indexType #>[] {
+<#= FormatHelper.FormatColumns(Context.BucketStarts, TypeMap.ToValueLabel, 8) #>
+    };
+
+    <#= FieldModifier #><#= indexType #>[] _bucketCounts = new <#= indexType #>[] {
+<#= FormatHelper.FormatColumns(Context.BucketCounts, TypeMap.ToValueLabel, 8) #>
+    };
+
+    <#= FieldModifier #>E[] _entries = {
+<#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
+    {
+        string hashPart = Context.StoreHashCode ? $", {TypeMap.ToValueLabel(x.Hash)}" : "";
+        string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
+        return $"new E({TypeMap.ToValueLabel(x.Key)}{hashPart}{valuePart})";
+    }, 8) #>
+    };
+
+<#= HashSource #>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
+    {
+<#= GetMethodHeader(MethodType.Contains) #>
+
+        ulong hash = Hash(<#= LookupKeyName #>);
+        int index = (int)(<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>);
+        int start = (int)_bucketStarts[index];
+        int count = (int)_bucketCounts[index];
+        int end = start + count;
+
+        for (int i = start; i < end; i++)
+        {
+            ref E entry = ref _entries[i];
+
+            if (<#
+    if (Context.StoreHashCode)
+    {
+#>entry.HashCode == hash && <#
+    }
+#><#= GetEqual("entry.Key", LookupKeyName) #>)
+                return true;
+        }
+
+        return false;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool TryLookup(<#= KeyTypeName #> key, out <#= ValueTypeName #> value)
+    {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+
+        ulong hash = Hash(<#= LookupKeyName #>);
+        int index = (int)(<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>);
+        int start = (int)_bucketStarts[index];
+        int count = (int)_bucketCounts[index];
+        int end = start + count;
+
+        for (int i = start; i < end; i++)
+        {
+            ref E entry = ref _entries[i];
+
+            if (<#
+        if (Context.StoreHashCode)
+        {
+#> entry.HashCode == hash && <#
+        }
+#><#= GetEqual("entry.Key", LookupKeyName) #>)
+            {
+                value = entry.Value;
+                return true;
+            }
+        }
+
+        value = default;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

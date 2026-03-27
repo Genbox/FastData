@@ -1,0 +1,26 @@
+﻿<#@ import namespace="Genbox.FastData.Generators" #>
+<#@ import namespace="Genbox.FastData.Generators.Enums" #>
+
+    public const int ItemCount = <#= GeneratorConfig.ItemCount #>;
+<#
+    if (GeneratorConfig is StringGeneratorConfig strCfg)
+    {
+#>
+    public const int MinKeyLength = <#= strCfg.Constants.MinStringLength #>;
+    public const int MaxKeyLength = <#= strCfg.Constants.MaxStringLength #>;
+    public const bool HasNumber = <#= strCfg.Constants.CharacterClasses.HasFlag(CharacterClass.Number) ? "true" : "false" #>;
+    public const bool HasUppercase = <#= strCfg.Constants.CharacterClasses.HasFlag(CharacterClass.Uppercase) ? "true" : "false" #>;
+    public const bool HasLowercase = <#= strCfg.Constants.CharacterClasses.HasFlag(CharacterClass.Lowercase) ? "true" : "false" #>;
+    public const bool HasSymbol = <#= strCfg.Constants.CharacterClasses.HasFlag(CharacterClass.Symbol) ? "true" : "false" #>;
+    public const bool HasWhitespace = <#= strCfg.Constants.CharacterClasses.HasFlag(CharacterClass.Whitespace) ? "true" : "false" #>;
+<#
+    }
+    if (GeneratorConfig is NumericGeneratorConfig numCfg)
+    {
+#>
+    public const <#= TypeMap.GetTypeName(numCfg.Constants.MinValue.GetType()) #> MinKey = <#= TypeMap.ToValueLabel(numCfg.Constants.MinValue) #>;
+    public const <#= TypeMap.GetTypeName(numCfg.Constants.MaxValue.GetType()) #> MaxKey = <#= TypeMap.ToValueLabel(numCfg.Constants.MaxValue) #>;
+<#
+    }
+#>
+}

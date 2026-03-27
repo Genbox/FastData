@@ -59,7 +59,7 @@ internal static class Program
         Random rng = new Random(42);
         string[] data = Enumerable.Range(0, size).Select(_ => TestHelper.GenerateRandomString(rng, rng.Next(5, 10))).ToArray();
 
-        CSharpCodeGenerator generator = CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("fastdata"));
+        CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpCodeGeneratorConfig("fastdata"));
 
         StringDataConfig config = new StringDataConfig();
         config.StructureTypeOverride = type;

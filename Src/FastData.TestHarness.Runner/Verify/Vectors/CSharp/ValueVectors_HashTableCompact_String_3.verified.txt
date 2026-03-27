@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
     [StructLayout(LayoutKind.Auto)]
     private struct E
     {
@@ -16,8 +18,8 @@ internal static class FastData
         internal E(string key, ulong hashCode)
         {
             Key = key;
-            HashCode = hashCode;
-        }
+        HashCode = hashCode;
+    }
     };
 
     private static readonly byte[] _bucketStarts = new byte[] {
@@ -49,13 +51,13 @@ internal static class FastData
         return 352654597 + (hash * 1566083941);
     }
 
-
+    
     public static bool Contains(string key)
     {
 
 
         ulong hash = Hash(key);
-        uint index = (uint)(hash % 3);
+        int index = (int)(hash % 3);
         int start = (int)_bucketStarts[index];
         int count = (int)_bucketCounts[index];
         int end = start + count;
@@ -71,9 +73,9 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 3;
-    public const uint MinKeyLength = 1;
-    public const uint MaxKeyLength = 255;
+    public const int ItemCount = 3;
+    public const int MinKeyLength = 1;
+    public const int MaxKeyLength = 255;
     public const bool HasNumber = false;
     public const bool HasUppercase = false;
     public const bool HasLowercase = true;

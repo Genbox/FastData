@@ -1,22 +1,22 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: Conditional
- #![allow(non_camel_case_types)]
- #![allow(unused_parens)]
- #![allow(missing_docs)]
- #![allow(unused_imports)]
- #![allow(unused_variables)]
- #![allow(unused_unsafe)]
- use std::ptr;
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
 
 pub struct fastdata;
-
 impl fastdata {
+
     const VALUES: [i32; 3] = [
         1, 2, 3
     ];
     #[must_use]
     pub fn contains(key: i32) -> bool {
-
 
         if key == 1 || key == 2 || key == 3 {
             return true;
@@ -28,13 +28,13 @@ impl fastdata {
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<i32> {
 
-        if (key == 1) {
+        if key == 1 {
             return Some(Self::VALUES[0]);
         }
-        if (key == 2) {
+        if key == 2 {
             return Some(Self::VALUES[1]);
         }
-        if (key == 3) {
+        if key == 3 {
             return Some(Self::VALUES[2]);
         }
         None

@@ -1,8 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Reflection;
-using Genbox.FastData.Generator.Framework;
-using Genbox.FastData.Generator.Framework.Definitions;
-using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generator.Abstracts;
+using Genbox.FastData.Generator.Definitions;
 #if NETSTANDARD2_0
 using Genbox.FastData.Generator.Compat;
 #endif
@@ -11,8 +10,6 @@ namespace Genbox.FastData.Generator.Rust.Internal.Framework;
 
 internal class RustLanguageDef : ILanguageDef
 {
-    public string ArraySizeType => "usize";
-
     public IList<ITypeDef> TypeDefinitions => new List<ITypeDef>
     {
         new NullTypeDef("None"),
@@ -27,7 +24,7 @@ internal class RustLanguageDef : ILanguageDef
         new IntegerTypeDef<ulong>("u64", ulong.MinValue, ulong.MaxValue, "u64::MIN", "u64::MAX"),
         new IntegerTypeDef<float>("f32", float.MinValue, float.MaxValue, "f32::MIN", "f32::MAX", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
         new IntegerTypeDef<double>("f64", double.MinValue, double.MaxValue, "f64::MIN", "f64::MAX", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
-        new StringTypeDef("str"),
+        new StringTypeDef("&str"),
         new ObjectTypeDef(PrintDeclaration, PrintValue)
     };
 
@@ -93,7 +90,7 @@ internal class RustLanguageDef : ILanguageDef
         }
 
         if (typeCode is TypeCode.String)
-            return "&" + staticStr + map.GetTypeName(type);
+            return staticLife ? "&'static str" : "&str";
 
         return map.GetTypeName(type);
     }

@@ -4,7 +4,7 @@ using Genbox.FastData.Generators.EarlyExits.Abstracts;
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // GetLastChar(inputKey) > Value;
-public sealed record CharLastGreaterThanEarlyExit(char Value) : MethodComparisonEarlyExitBase<char>(Value, nameof(EarlyExitFunctions.GetLastChar))
+public sealed record CharLastGreaterThanEarlyExit(char Value) : MethodComparisonEarlyExitBase<char>(Value, nameof(StringFunctions.GetLastChar))
 {
     protected override BinaryExpression Compare(Expression left, Expression right) => GreaterThan(left, right);
 }

@@ -1,7 +1,5 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp.Internal;
-using Genbox.FastData.Generator.CSharp.Internal.Framework;
-using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.Harness.Enums;
@@ -18,7 +16,7 @@ public sealed class CSharpBootstrap : BootstrapBase
 
     public TypeMap Map { get; }
 
-    public override ICodeGenerator Generator => CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("FastData"));
+    public override ICodeGenerator Generator => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig("FastData"));
 
     public override string Wrap(string code) =>
         $$"""

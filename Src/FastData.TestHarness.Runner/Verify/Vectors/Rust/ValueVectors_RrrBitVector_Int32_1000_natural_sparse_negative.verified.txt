@@ -1,16 +1,17 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: RrrBitVector
- #![allow(non_camel_case_types)]
- #![allow(unused_parens)]
- #![allow(missing_docs)]
- #![allow(unused_imports)]
- #![allow(unused_variables)]
- #![allow(unused_unsafe)]
- use std::ptr;
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
 
 pub struct fastdata;
-
 impl fastdata {
+
     const RRR_MIN_VALUE: u64 = 2147285375;
     const RRR_MAX_VALUE: u64 = 2147312403;
     const RRR_BLOCK_SIZE: i32 = 15;
@@ -394,51 +395,51 @@ impl fastdata {
         }
 
 
-
-        let mapped = (key ^ i32::MIN) as u32 as u64;
+        let mapped: u64 = ((key ^ i32::MIN) as u32) as u64;
 
         let normalized = mapped - Self::RRR_MIN_VALUE;
-        let block_index = (normalized / (Self::RRR_BLOCK_SIZE as u64)) as usize;
+        let block_index = (normalized / (Self::RRR_BLOCK_SIZE as u64)) as i32;
         let bit_in_block = (normalized % (Self::RRR_BLOCK_SIZE as u64)) as i32;
-        let class_value = Self::RRR_CLASSES[block_index] as i32;
+        let class_value = Self::RRR_CLASSES[block_index as usize] as i32;
 
         if class_value == 0 {
             return false;
         }
 
-        let rank = Self::RRR_OFFSETS[block_index];
+        let rank = Self::RRR_OFFSETS[block_index as usize];
         Self::decode_bit(class_value, rank, bit_in_block)
     }
 
-    fn decode_bit(class_value: i32, mut rank: u32, target_bit: i32) -> bool {
+    fn decode_bit(class_value: i32, rank: u32, target_bit: i32) -> bool {
         let mut remaining = class_value;
+        let mut rank = rank;
 
-        for bit in (0..(Self::RRR_BLOCK_SIZE as usize)).rev() {
+        let mut bit = Self::RRR_BLOCK_SIZE - 1;
+        while bit >= 0 {
             if remaining == 0 {
                 return false;
             }
 
-            let bit = bit as i32;
             let comb = Self::binomial(bit, remaining);
-            let is_set;
+            let mut is_set = false;
 
             if rank >= comb as u32 {
                 rank -= comb as u32;
                 remaining -= 1;
                 is_set = true;
-            } else {
-                is_set = false;
             }
 
             if bit == target_bit {
                 return is_set;
             }
+
+            bit -= 1;
         }
 
         false
     }
 
-    fn binomial(n: i32, mut k: i32) -> i32 {
+    fn binomial(n: i32, k: i32) -> i32 {
         if k < 0 || k > n {
             return 0;
         }
@@ -447,13 +448,14 @@ impl fastdata {
             return 1;
         }
 
+        let mut k = k;
         if k > n - k {
             k = n - k;
         }
 
-        let mut result = 1i32;
-        let mut i = 1i32;
+        let mut result = 1;
 
+        let mut i = 1;
         while i <= k {
             result = result * (n - (k - i)) / i;
             i += 1;

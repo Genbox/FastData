@@ -1,19 +1,19 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: Conditional
- #![allow(non_camel_case_types)]
- #![allow(unused_parens)]
- #![allow(missing_docs)]
- #![allow(unused_imports)]
- #![allow(unused_variables)]
- #![allow(unused_unsafe)]
- use std::ptr;
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
 
 pub struct fastdata;
-
 impl fastdata {
+
     #[must_use]
     pub fn contains(key: u64) -> bool {
-
 
         if key == u64::MIN || key == 1 || key == 2 || key == u64::MAX {
             return true;

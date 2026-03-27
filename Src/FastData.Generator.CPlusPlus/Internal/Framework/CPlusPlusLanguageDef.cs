@@ -1,7 +1,6 @@
 using System.Reflection;
-using Genbox.FastData.Generator.Framework;
-using Genbox.FastData.Generator.Framework.Definitions;
-using Genbox.FastData.Generator.Framework.Interfaces;
+using Genbox.FastData.Generator.Abstracts;
+using Genbox.FastData.Generator.Definitions;
 #if NETSTANDARD2_0
 using Genbox.FastData.Generator.Compat;
 #endif
@@ -10,8 +9,6 @@ namespace Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 
 internal class CPlusPlusLanguageDef : ILanguageDef
 {
-    public string ArraySizeType => "size_t";
-
     public IList<ITypeDef> TypeDefinitions => new List<ITypeDef>
     {
         new NullTypeDef("nullptr"),
@@ -51,7 +48,9 @@ internal class CPlusPlusLanguageDef : ILanguageDef
                  """;
     }
 
-    private static string PrintValue(TypeMap map, object? value)
+    private static string PrintValue(TypeMap map, object? value) => PrintValue(map, value, true);
+
+    private static string PrintValue(TypeMap map, object? value, bool objectAsValue)
     {
         if (value == null)
             return map.GetNull();
@@ -62,10 +61,15 @@ internal class CPlusPlusLanguageDef : ILanguageDef
             return map.Get(type).PrintObj(map, value);
 
         if (type.IsArray)
-            return $"{{ {string.Join(", ", ((Array)value).Cast<object>().Select(x => PrintValue(map, x)))} }}";
+        {
+            Array array = (Array)value;
+            return $"{{ {string.Join(", ", array.Cast<object>().Select(x => PrintValue(map, x, false)))} }}";
+        }
 
         PropertyInfo[] props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        return $"new {type.Name}({string.Join(", ", props.Select(p => $"{PrintValue(map, p.GetValue(value))}"))})";
+        string args = string.Join(", ", props.Select(p => PrintValue(map, p.GetValue(value), false)));
+        string ctor = $"{type.Name}({args})";
+        return objectAsValue ? ctor : $"new {ctor}";
     }
 
     private static string RenderType(TypeMap map, Type type)

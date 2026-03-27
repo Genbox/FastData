@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: HashTableCompact
 #include <array>
 #include <cstring>
@@ -6,7 +7,10 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     struct e {
         uint16_t key;
         e(const uint16_t key)
@@ -25,15 +29,13 @@ class fastdata final {
         e(0), e(1), e(2), e(std::numeric_limits<uint16_t>::max())
     };
 
-    static constexpr uint64_t get_hash(const uint16_t value) noexcept
-    {
+    static constexpr uint64_t get_hash(const uint16_t value) noexcept {
         return static_cast<uint64_t>(value);
     }
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const uint16_t key) noexcept {
-
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 4;

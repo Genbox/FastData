@@ -8,11 +8,14 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
+
     private static readonly byte[] _keys = new byte[] {
         byte.MinValue, 1, byte.MaxValue
     };
 
-
+    
     public static bool Contains(byte key)
     {
 
@@ -25,7 +28,7 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 3;
+    public const int ItemCount = 3;
     public const byte MinKey = byte.MinValue;
     public const byte MaxKey = byte.MaxValue;
 }

@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: HashTableCompact
 #include <array>
 #include <cstring>
@@ -6,7 +7,10 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     struct e {
         std::string_view key;
         uint64_t hash_code;
@@ -26,20 +30,18 @@ class fastdata final {
         e(u8"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 9198652691199425319), e(u8"a", 18225461187723808291), e(u8"item", 16750939634977259983)
     };
 
-    static constexpr uint64_t get_hash(const std::string_view value) noexcept
-    {
-    uint64_t hash = 352654597;
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept {
+        uint64_t hash = 352654597;
 
-       for (unsigned char ch : value)
-           hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+        for (unsigned char ch : value)
+            hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
 
-       return 352654597 + (hash * 1566083941);
+        return 352654597 + (hash * 1566083941);
     }
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;

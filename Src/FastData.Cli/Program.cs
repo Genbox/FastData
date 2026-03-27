@@ -139,7 +139,7 @@ internal static class Program
             genCfg.ClassVisibility = cv;
             genCfg.ClassType = ct;
 
-            CSharpCodeGenerator generator = CSharpCodeGenerator.Create(genCfg);
+            CSharpCodeGenerator generator = new CSharpCodeGenerator(genCfg);
 
             await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile, token).ConfigureAwait(false);
         });
@@ -154,7 +154,7 @@ internal static class Program
             string? cn = pr.GetValue(classNameOpt);
 
             CPlusPlusCodeGeneratorConfig genCfg = new CPlusPlusCodeGeneratorConfig(cn);
-            CPlusPlusCodeGenerator generator = CPlusPlusCodeGenerator.Create(genCfg);
+            CPlusPlusCodeGenerator generator = new CPlusPlusCodeGenerator(genCfg);
 
             await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile, token).ConfigureAwait(false);
         });
@@ -169,7 +169,7 @@ internal static class Program
             string? cn = pr.GetValue(classNameOpt);
 
             RustCodeGeneratorConfig genCfg = new RustCodeGeneratorConfig(cn);
-            RustCodeGenerator generator = RustCodeGenerator.Create(genCfg);
+            RustCodeGenerator generator = new RustCodeGenerator(genCfg);
 
             await GenerateAsync(inputFile, keyType, structureType, ignoreCase, generator, outputFile, token).ConfigureAwait(false);
         });

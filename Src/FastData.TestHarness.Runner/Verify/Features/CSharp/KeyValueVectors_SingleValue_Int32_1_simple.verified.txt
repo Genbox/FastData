@@ -8,16 +8,17 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
-    private static readonly int _storedValue = 1;
 
+
+    private static readonly int _storedValue = 1;
+    
     public static bool Contains(int key)
     {
-
 
         return key == 1;
     }
 
-
+    
     public static bool TryLookup(int key, out int value)
     {
 
@@ -32,7 +33,7 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 1;
+    public const int ItemCount = 1;
     public const int MinKey = 1;
     public const int MaxKey = 1;
 }

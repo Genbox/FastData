@@ -8,11 +8,13 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
     private static readonly sbyte[] _keys = new sbyte[] {
         sbyte.MinValue, -1, 0, 1, sbyte.MaxValue
     };
 
-
+    
     public static bool Contains(sbyte key)
     {
 
@@ -35,7 +37,7 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 5;
+    public const int ItemCount = 5;
     public const sbyte MinKey = sbyte.MinValue;
     public const sbyte MaxKey = sbyte.MaxValue;
 }

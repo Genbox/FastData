@@ -1,0 +1,22 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.BloomFilterContext" name="Context" #>
+
+    <#= FieldModifier #>ulong[] _bloom = new ulong[] {
+<#= FormatHelper.FormatColumns(Context.BitSet, TypeMap.ToValueLabel, 8) #>
+    };
+
+<#= HashSource #>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
+    {
+<#= GetMethodHeader(MethodType.Contains) #>
+
+        ulong hash = Hash(<#= LookupKeyName #>);
+        int index = (int)(<#= GetMod("hash", (ulong)Context.BitSet.Length) #>);
+        uint shift1 = (uint)hash & 63u;
+        uint shift2 = (uint)(hash >> 8) & 63u;
+        ulong mask = (1UL << (int)shift1) | (1UL << (int)shift2);
+        return (_bloom[index] & mask) == mask;
+    }
+<#@ include file="Includes\Footer.ttinclude" #>

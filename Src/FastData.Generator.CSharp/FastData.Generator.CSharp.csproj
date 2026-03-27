@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Templates\*.t4">
+    <None Include="Templates\**\*.tt*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>Templates\CSharp\%(Filename)%(Extension)</TargetPath>
+      <TargetPath>Templates\CSharp\%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
     </None>
   </ItemGroup>
 

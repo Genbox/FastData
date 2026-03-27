@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: HashTableCompact
 #include <array>
 #include <cstring>
@@ -6,7 +7,10 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     struct e {
         float key;
         uint64_t hash_code;
@@ -26,8 +30,7 @@ class fastdata final {
         e(0.0f, 0), e(1.0f, 1065353216), e(std::numeric_limits<float>::lowest(), 4286578687), e(-1.0f, 3212836864), e(std::numeric_limits<float>::max(), 2139095039)
     };
 
-    static uint64_t get_hash(const float value) noexcept
-    {
+    static uint64_t get_hash(const float value) noexcept {
         uint32_t bits;
         std::memcpy(&bits, &value, sizeof(bits));
         if (((bits - 1) & ~0x80000000u) >= 0x7F800000u)
@@ -35,10 +38,9 @@ class fastdata final {
         return bits;
     }
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
-
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 5;

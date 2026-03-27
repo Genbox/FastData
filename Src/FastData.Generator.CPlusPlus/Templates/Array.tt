@@ -1,0 +1,50 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.ArrayTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    };
+<#
+    }
+#>
+
+    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+    };
+
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+        for (size_t i = 0; i < <#= Data.KeyCount.ToStringInvariant() #>; i++) {
+            if (<#= GetEqual("keys[i]", LookupKeyName) #>)
+                return true;
+        }
+        return false;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        for (size_t i = 0; i < <#= Data.KeyCount.ToStringInvariant() #>; i++) {
+            if (<#= GetEqual("keys[i]", LookupKeyName) #>) {
+                value = &values[i];
+                return true;
+            }
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #><#@ import namespace="Genbox.FastData.Generators.Abstracts" #>

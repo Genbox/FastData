@@ -8,11 +8,13 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
     private static readonly short[] _keys = new short[] {
         short.MinValue, -1, 0, 1, short.MaxValue
     };
 
-
+    
     public static bool Contains(short key)
     {
 
@@ -35,7 +37,7 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 5;
+    public const int ItemCount = 5;
     public const short MinKey = short.MinValue;
     public const short MaxKey = short.MaxValue;
 }

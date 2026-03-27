@@ -1,0 +1,105 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.BinarySearchTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    };
+<#
+    }
+#>
+    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+    };
+
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+        int32_t lo = 0;
+        int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+        while (lo <= hi && <#= LookupKeyName #> >= keys[lo] && <#= LookupKeyName #> <= keys[hi]) {
+            const <#= KeyTypeName #> lo_key = keys[lo];
+            const <#= KeyTypeName #> hi_key = keys[hi];
+
+            if (lo_key == hi_key) {
+                if (lo_key == <#= LookupKeyName #>)
+                    return true;
+
+                break;
+            }
+
+            const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
+            const double offset = static_cast<double>(<#= LookupKeyName #>) - static_cast<double>(lo_key);
+            int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+
+            if (mid < lo)
+                mid = lo;
+            else if (mid > hi)
+                mid = hi;
+
+            const <#= KeyTypeName #> mid_key = keys[mid];
+            if (mid_key == <#= LookupKeyName #>)
+                return true;
+            if (mid_key < <#= LookupKeyName #>)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        int32_t lo = 0;
+        int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+        while (lo <= hi && <#= LookupKeyName #> >= keys[lo] && <#= LookupKeyName #> <= keys[hi]) {
+            const <#= KeyTypeName #> lo_key = keys[lo];
+            const <#= KeyTypeName #> hi_key = keys[hi];
+
+            if (lo_key == hi_key) {
+                if (lo_key == <#= LookupKeyName #>) {
+                    value = &values[lo];
+                    return true;
+                }
+
+                break;
+            }
+
+            const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
+            const double offset = static_cast<double>(<#= LookupKeyName #>) - static_cast<double>(lo_key);
+            int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+
+            if (mid < lo)
+                mid = lo;
+            else if (mid > hi)
+                mid = hi;
+
+            const <#= KeyTypeName #> mid_key = keys[mid];
+            if (mid_key == <#= LookupKeyName #>) {
+                value = &values[mid];
+                return true;
+            }
+
+            if (mid_key < <#= LookupKeyName #>)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

@@ -8,7 +8,7 @@ public abstract record CharBitmapEarlyExitBase(ulong Low, ulong High, string Met
 {
     public Expression GetExpression(ParameterExpression key)
     {
-        MethodInfo methodInfo = typeof(EarlyExitFunctions).GetMethod(Method, [typeof(string)])!;
+        MethodInfo methodInfo = typeof(StringFunctions).GetMethod(Method, [typeof(string)])!;
 
         Expression valueExpr = Convert(Call(methodInfo, key), typeof(uint));
         Expression bitIndex = And(valueExpr, Constant(63u));

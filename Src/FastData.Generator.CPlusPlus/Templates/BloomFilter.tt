@@ -1,0 +1,21 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.BloomFilterContext" name="Context" #>
+
+    <#= FieldModifier(true) #>std::array<uint64_t, <#= Context.BitSet.Length.ToStringInvariant() #>> bloom = {
+<#= FormatHelper.FormatColumns(Context.BitSet, TypeMap.ToValueLabel, 8) #>
+    };
+
+<#= HashSource #>
+
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+        const uint64_t hash = get_hash(<#= LookupKeyName #>);
+        const size_t index = <#= GetMod("hash", (ulong)Context.BitSet.Length) #>;
+        const uint32_t shift1 = static_cast<uint32_t>(hash) & 63u;
+        const uint32_t shift2 = static_cast<uint32_t>(hash >> 8) & 63u;
+        const uint64_t mask = (1ULL << shift1) | (1ULL << shift2);
+        return (bloom[index] & mask) == mask;
+    }
+<#@ include file="Includes\Footer.ttinclude" #>

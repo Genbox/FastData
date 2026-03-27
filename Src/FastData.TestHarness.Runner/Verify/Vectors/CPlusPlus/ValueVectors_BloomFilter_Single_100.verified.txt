@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: BloomFilter
 #include <array>
 #include <cstring>
@@ -6,14 +7,16 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     static constexpr std::array<uint64_t, 16> bloom = {
         1ull, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
         0, 0, 0, 0, 0, 0
     };
 
-    static uint64_t get_hash(const float value) noexcept
-    {
+    static uint64_t get_hash(const float value) noexcept {
         uint32_t bits;
         std::memcpy(&bits, &value, sizeof(bits));
         if (((bits - 1) & ~0x80000000u) >= 0x7F800000u)
@@ -21,10 +24,9 @@ class fastdata final {
         return bits;
     }
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
-
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 16;

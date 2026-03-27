@@ -1,10 +1,9 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Generator.Extensions;
-using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.Generator.CPlusPlus.Internal;
 
-internal sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
+public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
 {
     protected override Expression VisitMember(MemberExpression node)
     {

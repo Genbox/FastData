@@ -1,0 +1,53 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.KeyLengthContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.KeyLengthTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>    <#= FieldModifier #>int[] _offsets = {
+<#= FormatHelper.FormatColumns(Context.ValueOffsets, TypeMap.ToValueLabel, 8) #>
+    };
+
+    <#= FieldModifier #><#= ValueTypeName #>[] _values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    };
+
+<#
+    }
+#>
+    <#= FieldModifier #><#= KeyTypeName #>[] _keys = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+    };
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
+    {
+<#= GetMethodHeader(MethodType.Contains) #>
+
+        int idx = <#= LookupKeyName #>.Length - <#= Context.MinLength #>;
+        return <#= GetEqual(LookupKeyName, "_keys[idx]") #>;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool TryLookup(<#= KeyTypeName #> key, out <#= ValueTypeName #> value)
+    {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+
+        int idx = <#= LookupKeyName #>.Length - <#= Context.MinLength #>;
+        if (<#= GetEqual(LookupKeyName, "_keys[idx]") #>)
+        {
+            value = _values[_offsets[idx]];
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

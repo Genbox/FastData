@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
     private static readonly ulong[] _bloom = new ulong[] {
         4540325822465ul, 586033177844384006ul, 296386822148ul, 4613946788280795160ul, 2310346695009911320ul, 9520610033304338464ul, 27162610135744577ul, 581161688498304ul, 90363363145581312ul, 144153121328743168ul, 
         289378541236128800ul, 576460754618814528ul, 2342032334930317312ul, 2305843009886888064ul, 4686065921751531520ul, 11566510482634408456ul
@@ -30,22 +32,22 @@ internal static class FastData
         return 352654597 + (hash * 1566083941);
     }
 
-
+    
     public static bool Contains(string key)
     {
 
 
         ulong hash = Hash(key);
-        uint index = (uint)(hash & 15);
+        int index = (int)(hash % 16);
         uint shift1 = (uint)hash & 63u;
         uint shift2 = (uint)(hash >> 8) & 63u;
         ulong mask = (1UL << (int)shift1) | (1UL << (int)shift2);
         return (_bloom[index] & mask) == mask;
     }
 
-    public const uint ItemCount = 100;
-    public const uint MinKeyLength = 1;
-    public const uint MaxKeyLength = 2;
+    public const int ItemCount = 100;
+    public const int MinKeyLength = 1;
+    public const int MaxKeyLength = 2;
     public const bool HasNumber = true;
     public const bool HasUppercase = false;
     public const bool HasLowercase = false;

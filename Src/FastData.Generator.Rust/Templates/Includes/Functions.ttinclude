@@ -1,0 +1,218 @@
+<#@ template language="C#" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq.Expressions" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generator.Rust.Internal" #>
+<#@ import namespace="Genbox.FastData.Generators" #>
+<#@ import namespace="Genbox.FastData.Generators.EarlyExits" #>
+<#@ import namespace="Genbox.FastData.Generators.Expressions" #>
+<#@ import namespace="Genbox.FastData.Generators.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generators.Enums" #>
+<#+
+    private string _keyTypeName => TypeMap.GetTypeName(Model.KeyType);
+    private string _valueTypeName => TypeMap.GetTypeName(Model.ValueType);
+
+    public string MethodAttribute => "#[must_use]";
+    public string MethodModifier => "pub ";
+    public string FieldModifier => "const ";
+    public string LookupKeyName { get; private set; } = "key";
+
+    public string InputKeyTypeName
+    {
+        get
+        {
+            TypeCode keyType = Type.GetTypeCode(Model.KeyType);
+
+            if (keyType == TypeCode.String)
+                return "&str";
+
+            if (keyType == TypeCode.Object)
+                return $"&{Model.KeyType.Name}";
+
+            return _keyTypeName;
+        }
+    }
+
+    public string StoredKeyTypeName
+    {
+        get
+        {
+            TypeCode keyType = Type.GetTypeCode(Model.KeyType);
+
+            if (keyType == TypeCode.String)
+                return "&'static str";
+
+            if (keyType == TypeCode.Object)
+                return $"&'static {Model.KeyType.Name}";
+
+            return _keyTypeName;
+        }
+    }
+
+    public string StoredValueTypeName
+    {
+        get
+        {
+            TypeCode valueType = Type.GetTypeCode(Model.ValueType);
+
+            if (valueType == TypeCode.String)
+                return "&'static str";
+
+            if (valueType == TypeCode.Object)
+                return $"&'static {Model.ValueType.Name}";
+
+            return _valueTypeName;
+        }
+    }
+
+    public string HashSource
+    {
+        get
+        {
+            bool isString = Type.GetTypeCode(Model.KeyType) == TypeCode.String;
+            string inlineAttr = isString ? "#[inline]" : "#[inline(always)]";
+            string unsafePrefix = isString ? "unsafe " : string.Empty;
+
+            return $$"""
+                        {{inlineAttr}}
+                        {{unsafePrefix}}fn get_hash(value: {{InputKeyTypeName}}) -> u64 {
+                    {{GetHash()}}
+                        }
+                    """;
+        }
+    }
+
+    public string GetEqual(string var1, string var2)
+    {
+        if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.IgnoreCase)
+            return $"case_insensitive_equals({var1}, {var2})";
+
+        return $"{var1} == {var2}";
+    }
+
+    public string GetCompare(string var1, string var2)
+    {
+        if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.IgnoreCase)
+            return $"case_insensitive_compare({var1}, {var2})";
+
+        return $"if {var1} < {var2} {{ -1 }} else if {var1} > {var2} {{ 1 }} else {{ 0 }}";
+    }
+
+    public string GetMod(string var1, ulong var2) => $"{var1} % {var2.ToStringInvariant()}u64";
+
+    public string GetMethodHeader(MethodType methodType)
+    {
+        StringBuilder sb = new StringBuilder();
+        LookupKeyName = "key";
+        sb.Append(GetEarlyExits(methodType));
+
+        if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
+        {
+            string totalTrimLength = strCfg.TotalTrimLength.ToStringInvariant();
+
+            if (methodType == MethodType.TryLookup)
+                sb.AppendLine($"        if key.len() < {totalTrimLength} {{ return None; }}");
+            else
+                sb.AppendLine($"        if key.len() < {totalTrimLength} {{ return false; }}");
+
+            sb.AppendLine($"        let trimmedKey = &key[{strCfg.TrimPrefix.Length.ToStringInvariant()}..key.len() - {strCfg.TrimSuffix.Length.ToStringInvariant()}];");
+            LookupKeyName = "trimmedKey";
+        }
+
+        return sb.ToString();
+    }
+
+    private string GetHash()
+    {
+        TypeCode keyType = Type.GetTypeCode(Model.KeyType);
+
+        if (keyType.UsesIdentityHash())
+            return "        value as u64";
+
+        if (keyType == TypeCode.String)
+        {
+            return """
+                            let mut hash: u64 = 352654597;
+
+                            let mut ptr = value.as_ptr();
+                            let mut len = value.len();
+
+                            while len > 0 {
+                                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
+                                ptr = ptr.add(1);
+                                len -= 1;
+                            }
+
+                            hash.wrapping_mul(1566083941).wrapping_add(352654597)
+                    """;
+        }
+
+        if (GeneratorConfig is NumericGeneratorConfig numCfg)
+        {
+            if (keyType == TypeCode.Single)
+            {
+                return numCfg.HasZeroOrNaN
+                    ? """
+                                let mut bits = value.to_bits();
+
+                                if ((bits.wrapping_sub(1)) & !0x8000_0000) >= 0x7F80_0000 {
+                                    bits &= 0x7F80_0000;
+                                }
+                                bits as u64
+                        """
+                    : "        value.to_bits() as u64";
+            }
+
+            if (keyType == TypeCode.Double)
+            {
+                return numCfg.HasZeroOrNaN
+                    ? """
+                                let mut bits = value.to_bits();
+
+                                if ((bits.wrapping_sub(1)) & !0x8000_0000_0000_0000) >= 0x7FF0_0000_0000_0000 {
+                                    bits &= 0x7FF0_0000_0000_0000;
+                                }
+                                bits
+                        """
+                    : "        value.to_bits()";
+            }
+        }
+
+        throw new InvalidOperationException("Unsupported key type: " + keyType);
+    }
+
+    private string GetEarlyExits(MethodType methodType)
+    {
+        IEnumerable<AnnotatedExpr> transformed = ExpressionHelper.Transform(GeneratorConfig.EarlyExits, [new EarlyExitConditionTransform(GetBody(methodType))]);
+
+        List<ParameterExpression> variables = new List<ParameterExpression>();
+        List<Expression> statements = new List<Expression>();
+
+        foreach (AnnotatedExpr expr in transformed)
+        {
+            if (expr.Kind == ExprKind.Assignment && expr.Expression is BinaryExpression { NodeType: ExpressionType.Assign, Left: ParameterExpression left })
+                variables.Add(left);
+
+            statements.Add(expr.Expression);
+        }
+
+        RustExpressionCompiler compiler = new RustExpressionCompiler(TypeMap);
+        BlockExpression block = Expression.Block(variables, statements);
+        return block.Expressions.Count == 0 ? string.Empty : compiler.GetCode(block, 8);
+    }
+
+    private static ICollection<Expression> GetBody(MethodType methodType) => methodType == MethodType.TryLookup
+        ? [ReturnSymbol("None")]
+        : [ReturnSymbol("false")];
+
+    private static ParameterExpression Symbol(string name) => Expression.Parameter(typeof(object), name);
+
+    private static GotoExpression ReturnSymbol(string symbol)
+    {
+        ParameterExpression value = Symbol(symbol);
+        LabelTarget target = Expression.Label(value.Type);
+        return Expression.MakeGoto(GotoExpressionKind.Break, target, value, value.Type);
+    }
+#>

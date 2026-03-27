@@ -1,0 +1,37 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ include file="Includes\ImplHeader.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.SingleValueTemplateData" name="Data" #>
+
+<#
+    string itemLabel = TypeMap.ToValueLabel(Data.Item);
+#>
+<#
+    if (Data.Value != null)
+    {
+#>    const STORED_VALUE: <#= StoredValueTypeName #> = <#= TypeMap.ToValueLabel(Data.Value) #>;
+<#
+    }
+#>
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
+<#= GetMethodHeader(MethodType.Contains) #>
+        <#= GetEqual(LookupKeyName, itemLabel) #>
+    }
+<#
+    if (Data.Value != null)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        if <#= GetEqual(LookupKeyName, itemLabel) #> {
+            return Some(Self::STORED_VALUE);
+        }
+
+        None
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

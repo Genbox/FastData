@@ -8,16 +8,18 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
     private static readonly string[] _keys = new string[] {
         "Alpha", "Bravo", "Charlie"
     };
 
-
+    
     public static bool Contains(string key)
     {
         if (key.Length < 6)
             return false;
-        string trimmedKey = key.Substring(3, key.Length - 6);
+        string trimmed = key.Substring(3, key.Length - 6);
 
 
         int lo = 0;
@@ -25,7 +27,7 @@ internal static class FastData
         while (lo <= hi)
         {
             int i = lo + ((hi - lo) >> 1);
-            int order = StringComparer.Ordinal.Compare(_keys[i], trimmedKey);
+            int order = StringComparer.Ordinal.Compare(_keys[i], trimmed);
 
             if (order == 0)
                 return true;
@@ -38,9 +40,9 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 3;
-    public const uint MinKeyLength = 11;
-    public const uint MaxKeyLength = 13;
+    public const int ItemCount = 3;
+    public const int MinKeyLength = 11;
+    public const int MaxKeyLength = 13;
     public const bool HasNumber = false;
     public const bool HasUppercase = true;
     public const bool HasLowercase = true;

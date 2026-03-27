@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: BinarySearch
 #include <array>
 #include <cstring>
@@ -6,7 +7,10 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     static constexpr std::array<int32_t, 100> keys = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
@@ -20,10 +24,9 @@ class fastdata final {
         90, 91, 92, 93, 94, 95, 96, 97, 98, 99
     };
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-
 
         size_t lo = 0;
         size_t hi = 100;

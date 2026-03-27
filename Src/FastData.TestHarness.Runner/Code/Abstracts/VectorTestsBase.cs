@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Config;
+using Genbox.FastData.Generators;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.TestClasses;

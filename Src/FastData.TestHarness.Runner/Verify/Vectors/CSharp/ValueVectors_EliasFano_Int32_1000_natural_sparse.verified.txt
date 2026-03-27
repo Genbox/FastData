@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
     private const int _lowerBitCount = 5;
     private const long _minValue = 0l;
     private const long _maxValue = 38755l;
@@ -37,7 +39,7 @@ internal static class FastData
         0, 128, 256, 424, 709, 997, 1276, 1531, 1786, 2041
     };
 
-
+    
     public static bool Contains(int key)
     {
         if ((key < 11727))
@@ -189,7 +191,7 @@ internal static class FastData
         return System.Numerics.BitOperations.TrailingZeroCount(value);
     }
 
-    public const uint ItemCount = 1000;
+    public const int ItemCount = 1000;
     public const int MinKey = 11727;
     public const int MaxKey = 38755;
 }

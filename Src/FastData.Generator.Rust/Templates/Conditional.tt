@@ -1,0 +1,48 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ import namespace="System.Linq" #>
+<#@ include file="Includes\ImplHeader.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.ConditionalTemplateData" name="Data" #>
+
+<#
+    object[] keys = Data.Keys.ToArray();
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier #>VALUES: [<#= StoredValueTypeName #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    ];
+<#
+    }
+#>
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
+<#= GetMethodHeader(MethodType.Contains) #>
+        if <#= FormatHelper.FormatList(keys, x => GetEqual(LookupKeyName, TypeMap.ToValueLabel(x)), " || ") #> {
+            return true;
+        }
+
+        false
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+<#
+    for (int i = 0; i < keys.Length; i++)
+    {
+#>        if <#= GetEqual(LookupKeyName, TypeMap.ToValueLabel(keys[i])) #> {
+            return Some(Self::VALUES[<#= i.ToStringInvariant() #>]);
+        }
+<#
+    }
+#>
+        None
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

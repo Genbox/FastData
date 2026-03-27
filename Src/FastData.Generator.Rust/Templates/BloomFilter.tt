@@ -1,0 +1,21 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ include file="Includes\ImplHeader.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.BloomFilterContext" name="Context" #>
+
+    <#= FieldModifier #>BLOOM: [u64; <#= Context.BitSet.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.BitSet, TypeMap.ToValueLabel, 8) #>
+    ];
+
+<#= HashSource #>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
+<#= GetMethodHeader(MethodType.Contains) #>
+        let hash = unsafe { Self::get_hash(<#= LookupKeyName #>) };
+        let index = (<#= GetMod("hash", (ulong)Context.BitSet.Length) #>) as usize;
+        let shift1 = (hash as u32) & 63;
+        let shift2 = ((hash >> 8) as u32) & 63;
+        let mask = (1u64 << shift1) | (1u64 << shift2);
+        (Self::BLOOM[index] & mask) == mask
+    }
+<#@ include file="Includes\Footer.ttinclude" #>

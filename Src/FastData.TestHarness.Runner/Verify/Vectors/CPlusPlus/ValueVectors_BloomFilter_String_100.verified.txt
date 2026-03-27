@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: BloomFilter
 #include <array>
 #include <cstring>
@@ -6,26 +7,27 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     static constexpr std::array<uint64_t, 16> bloom = {
         4540325822465ull, 586033177844384006ull, 296386822148ull, 4613946788280795160ull, 2310346695009911320ull, 9520610033304338464ull, 27162610135744577ull, 581161688498304ull, 90363363145581312ull, 144153121328743168ull, 
         289378541236128800ull, 576460754618814528ull, 2342032334930317312ull, 2305843009886888064ull, 4686065921751531520ull, 11566510482634408456ull
     };
 
-    static constexpr uint64_t get_hash(const std::string_view value) noexcept
-    {
-    uint64_t hash = 352654597;
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept {
+        uint64_t hash = 352654597;
 
-       for (unsigned char ch : value)
-           hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+        for (unsigned char ch : value)
+            hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
 
-       return 352654597 + (hash * 1566083941);
+        return 352654597 + (hash * 1566083941);
     }
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 16;

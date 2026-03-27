@@ -1,0 +1,108 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ include file="Includes\ImplHeader.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.BinarySearchTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier #>VALUES: [<#= StoredValueTypeName #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    ];
+<#
+    }
+#>
+    <#= FieldModifier #>KEYS: [<#= StoredKeyTypeName #>; <#= Data.KeyCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+    ];
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
+<#= GetMethodHeader(MethodType.Contains) #>
+        let mut lo: i32 = 0;
+        let mut hi: i32 = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+        while lo <= hi && <#= LookupKeyName #> >= Self::KEYS[lo as usize] && <#= LookupKeyName #> <= Self::KEYS[hi as usize] {
+            let lo_key: <#= InputKeyTypeName #> = Self::KEYS[lo as usize];
+            let hi_key: <#= InputKeyTypeName #> = Self::KEYS[hi as usize];
+
+            if lo_key == hi_key {
+                if lo_key == <#= LookupKeyName #> {
+                    return true;
+                }
+
+                break;
+            }
+
+            let range = (hi_key as f64) - (lo_key as f64);
+            let offset = (<#= LookupKeyName #> as f64) - (lo_key as f64);
+            let mut mid: i32 = lo + ((offset * ((hi - lo) as f64)) / range) as i32;
+
+            if mid < lo {
+                mid = lo;
+            } else if mid > hi {
+                mid = hi;
+            }
+
+            let mid_key: <#= InputKeyTypeName #> = Self::KEYS[mid as usize];
+            if mid_key == <#= LookupKeyName #> {
+                return true;
+            }
+            if mid_key < <#= LookupKeyName #> {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+
+        false
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        let mut lo: i32 = 0;
+        let mut hi: i32 = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+        while lo <= hi && <#= LookupKeyName #> >= Self::KEYS[lo as usize] && <#= LookupKeyName #> <= Self::KEYS[hi as usize] {
+            let lo_key: <#= InputKeyTypeName #> = Self::KEYS[lo as usize];
+            let hi_key: <#= InputKeyTypeName #> = Self::KEYS[hi as usize];
+
+            if lo_key == hi_key {
+                if lo_key == <#= LookupKeyName #> {
+                    return Some(Self::VALUES[lo as usize]);
+                }
+
+                break;
+            }
+
+            let range = (hi_key as f64) - (lo_key as f64);
+            let offset = (<#= LookupKeyName #> as f64) - (lo_key as f64);
+            let mut mid: i32 = lo + ((offset * ((hi - lo) as f64)) / range) as i32;
+
+            if mid < lo {
+                mid = lo;
+            } else if mid > hi {
+                mid = hi;
+            }
+
+            let mid_key: <#= InputKeyTypeName #> = Self::KEYS[mid as usize];
+            if mid_key == <#= LookupKeyName #> {
+                return Some(Self::VALUES[mid as usize]);
+            }
+
+            if mid_key < <#= LookupKeyName #> {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+
+        None
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

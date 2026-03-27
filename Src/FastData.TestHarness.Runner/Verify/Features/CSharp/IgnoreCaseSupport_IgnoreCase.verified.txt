@@ -8,11 +8,13 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
     private static readonly string[] _keys = new string[] {
         "Alpha", "bravo", "CHARLIE"
     };
 
-
+    
     public static bool Contains(string key)
     {
 
@@ -35,9 +37,9 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 3;
-    public const uint MinKeyLength = 5;
-    public const uint MaxKeyLength = 7;
+    public const int ItemCount = 3;
+    public const int MinKeyLength = 5;
+    public const int MaxKeyLength = 7;
     public const bool HasNumber = false;
     public const bool HasUppercase = true;
     public const bool HasLowercase = true;

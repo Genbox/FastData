@@ -5,6 +5,9 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
+internal static class FastData
+{
 public class Person
 {
     public Person(int age, string name, Person other)
@@ -19,16 +22,15 @@ public class Person
 
 };
 
-internal static class FastData
-{
     private static readonly Person[] _values = {
         new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
     };
+
     private static readonly int[] _keys = new int[] {
         1, 2, 3
     };
 
-
+    
     public static bool Contains(int key)
     {
 
@@ -41,14 +43,14 @@ internal static class FastData
         return false;
     }
 
-
+    
     public static bool TryLookup(int key, out Person? value)
     {
 
 
-        for (uint i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
-            if (_keys[i] == key)
+            if (key == _keys[i])
             {
                 value = _values[i];
                 return true;
@@ -59,7 +61,7 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 3;
+    public const int ItemCount = 3;
     public const int MinKey = 1;
     public const int MaxKey = 3;
 }

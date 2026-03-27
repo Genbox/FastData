@@ -1,0 +1,123 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.HashTablePerfectContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HashTablePerfectTemplateData" name="Data" #>
+
+<#
+    string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
+    bool useEntryStruct = Context.StoreHashCode || Data.ValueCount > 0;
+    string entryTypeName = useEntryStruct ? "E" : KeyTypeName;
+#>
+<#
+    if (useEntryStruct)
+    {
+#>
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
+    {
+        internal <#= KeyTypeName #> Key;
+<#
+        if (Context.StoreHashCode)
+        {
+#>            internal ulong HashCode;
+<#
+        }
+#><#
+        if (Data.ValueCount > 0)
+        {
+#>        internal <#= ValueTypeName #> Value;
+
+<#
+        }
+#>        internal E(<#= KeyTypeName #> key<#
+        if (Context.StoreHashCode)
+        {
+#>, ulong hashCode<#
+        }
+#><#
+        if (Data.ValueCount > 0)
+        {
+#>, <#= ValueTypeName #> value<#
+        }
+#>)
+        {
+            Key = key;
+<#
+        if (Context.StoreHashCode)
+        {
+#>            HashCode = hashCode;
+<#
+        }
+#><#
+        if (Data.ValueCount > 0)
+        {
+#>            Value = value;
+<#
+        }
+#>        }
+    }
+<#
+    }
+#>
+
+    <#= FieldModifier #><#= entryTypeName #>[] _entries = {
+<#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
+    {
+        if (!useEntryStruct)
+            return TypeMap.ToValueLabel(x.Key);
+
+        string hashPart = Context.StoreHashCode ? $", {TypeMap.ToValueLabel(x.Hash)}" : "";
+        string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
+        return $"new E({TypeMap.ToValueLabel(x.Key)}{hashPart}{valuePart})";
+    }, 8) #>
+    };
+
+<#= HashSource #>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
+    {
+<#= GetMethodHeader(MethodType.Contains) #>
+
+        ulong hash = Hash(<#= LookupKeyName #>);
+        int index = (int)(<#= GetMod("hash", (ulong)Data.Entries.Length) #>);
+        ref var entry = ref _entries[index];
+
+        return <#
+    if (useEntryStruct && Context.StoreHashCode)
+    {
+#>     hash == entry.HashCode && <#
+    }
+#><#= GetEqual(LookupKeyName, useEntryStruct ? "entry.Key" : "entry") #>;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool TryLookup(<#= KeyTypeName #> key, out <#= ValueTypeName #> value)
+    {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+
+        ulong hash = Hash(<#= LookupKeyName #>);
+        int index = (int)(<#= GetMod("hash", (ulong)Data.Entries.Length) #>);
+        ref E entry = ref _entries[index];
+
+        if (<#
+        if (Context.StoreHashCode)
+        {
+#>     hash == entry.HashCode && <#
+        }
+#><#= GetEqual(LookupKeyName, "entry.Key") #>)
+        {
+            value = entry.Value;
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

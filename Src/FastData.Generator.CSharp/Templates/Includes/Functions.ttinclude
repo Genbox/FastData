@@ -1,0 +1,191 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generators" #>
+<#@ import namespace="Genbox.FastData.Generator.CSharp.Enums" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq.Expressions" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="Genbox.FastData.Generator.CSharp.Internal" #>
+<#@ import namespace="Genbox.FastData.Generators.Abstracts" #>
+<#@ import namespace="Genbox.FastData.Generators.EarlyExits" #>
+<#@ import namespace="Genbox.FastData.Generators.Expressions" #>
+<#@ import namespace="Genbox.FastData.Generators.Extensions" #>
+<#+
+    public string KeyTypeName => TypeMap.GetTypeName(Model.KeyType);
+    public string ValueTypeName => TypeMap.GetTypeName(Model.ValueType);
+
+    public string FieldModifier => CSharpConfig.ClassType == ClassType.Static ? "private static readonly " : "private readonly ";
+    public string MethodModifier => CSharpConfig.ClassType == ClassType.Static ? "public static " : "public ";
+    public string MethodAttribute => "";
+    public string LookupKeyName { get; private set; } = "key";
+
+    public string HashSource => $$"""
+                                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                                    private static ulong Hash({{KeyTypeName}} value)
+                                    {
+                                {{GetHash()}}
+                                    }
+                                """;
+
+    public string GetEqual(string var1, string var2)
+    {
+        if (GeneratorConfig is StringGeneratorConfig strCfg)
+            return $"StringComparer.{GetStringComparer(strCfg.IgnoreCase)}.Equals({var1}, {var2})";
+
+        return $"{var1} == {var2}";
+    }
+
+    public string GetCompare(string var1, string var2)
+    {
+        if (GeneratorConfig is StringGeneratorConfig strCfg)
+            return $"StringComparer.{GetStringComparer(strCfg.IgnoreCase)}.Compare({var1}, {var2})";
+
+        return $"{var1}.CompareTo({var2})";
+    }
+
+    public string GetMod(string var1, ulong var2) => $"{var1} % {var2.ToStringInvariant()}";
+
+    public string GetMethodHeader(MethodType type)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        LookupKeyName = "key";
+
+        sb.Append(GetEarlyExits(type));
+
+        if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
+        {
+            string totalTrimLength = strCfg.TotalTrimLength.ToStringInvariant();
+
+            if (type == MethodType.TryLookup)
+            {
+                sb.AppendLine($$"""
+                                        if (key.Length < {{totalTrimLength}})
+                                        {
+                                            value = default;
+                                            return false;
+                                        }
+                                """);
+            }
+            else
+            {
+                sb.AppendLine($"""
+                                       if (key.Length < {totalTrimLength})
+                                           return false;
+                               """);
+            }
+
+            sb.AppendLine($"        string trimmed = key.Substring({strCfg.TrimPrefix.Length.ToStringInvariant()}, key.Length - {totalTrimLength});");
+
+            LookupKeyName = "trimmed";
+        }
+
+        return sb.ToString();
+    }
+
+    private string GetEarlyExits(MethodType methodType)
+    {
+        IExprTransform[] transforms = [new EarlyExitConditionTransform(GetBody(methodType))];
+
+        IEnumerable<AnnotatedExpr> transformed = ExpressionHelper.Transform(GeneratorConfig.EarlyExits, transforms);
+
+        List<ParameterExpression> variables = new List<ParameterExpression>();
+        List<Expression> statements = new List<Expression>();
+
+        foreach (AnnotatedExpr expr in transformed)
+        {
+            if (expr.Kind == ExprKind.Assignment && expr.Expression is BinaryExpression { NodeType: ExpressionType.Assign, Left: ParameterExpression left })
+                variables.Add(left);
+
+            statements.Add(expr.Expression);
+        }
+
+        CSharpExpressionCompiler compiler = new CSharpExpressionCompiler(TypeMap);
+        BlockExpression block = Expression.Block(variables, statements);
+        return block.Expressions.Count == 0 ? string.Empty : compiler.GetCode(block, 8);
+    }
+
+    private string GetHash()
+    {
+        TypeCode keyType = Type.GetTypeCode(Model.KeyType);
+
+        if (keyType.UsesIdentityHash())
+            return "        return (ulong)value;";
+
+        if (keyType == TypeCode.String)
+        {
+            return """
+                           ulong hash = 352654597;
+
+                           ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
+                           int len = value.Length;
+
+                           while (len-- > 0)
+                           {
+                               hash = (((hash << 5) | (hash >> 27)) + hash) ^ ptr;
+                               ptr = ref Unsafe.Add(ref ptr, 1);
+                           }
+
+                           return 352654597 + (hash * 1566083941);
+                   """;
+        }
+
+        if (GeneratorConfig is NumericGeneratorConfig numCfg)
+        {
+
+            if (keyType == TypeCode.Single)
+            {
+                return numCfg.HasZeroOrNaN
+                    ? """
+                              uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
+
+                              if (((bits - 1) & ~(0x8000_0000)) >= 0x7FF0_0000)
+                                  bits &= 0x7FF0_0000;
+
+                              return (ulong)bits;
+                      """
+                    : "        return (ulong)Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));";
+            }
+
+            if (keyType == TypeCode.Double)
+            {
+                return numCfg.HasZeroOrNaN
+                    ? """
+                              ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
+
+                              if (((bits - 1) & ~(0x8000_0000_0000_0000)) >= 0x7FF0_0000_0000_0000)
+                                  bits &= 0x7FF0_0000_0000_0000;
+
+                              return bits;
+                      """
+                    : "        return Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));";
+            }
+        }
+
+        return "        return (ulong)value.GetHashCode();";
+    }
+
+    private static ICollection<Expression> GetBody(MethodType methodType) => methodType == MethodType.TryLookup
+        ? [
+            Expression.Assign(Symbol("value"), Symbol("default")),
+            ReturnSymbol("false")
+            ]
+        : [ReturnSymbol("false")];
+
+    private static ParameterExpression Symbol(string name) => Expression.Parameter(typeof(object), name);
+
+    private static GotoExpression ReturnSymbol(string symbol)
+    {
+        ParameterExpression value = Symbol(symbol);
+        LabelTarget target = Expression.Label(value.Type);
+        return Expression.MakeGoto(GotoExpressionKind.Break, target, value, value.Type);
+    }
+
+    private static string GetStringComparer(bool ignoreCase) => ignoreCase switch
+    {
+        true => nameof(StringComparer.OrdinalIgnoreCase),
+        false => nameof(StringComparer.Ordinal)
+        };
+#>

@@ -1,11 +1,11 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: HashTablePerfect
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
-
 struct Person {
     int32_t age;
     std::string_view name;
@@ -13,27 +13,28 @@ struct Person {
 
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
+
 class fastdata final {
+
+
     struct e {
         int32_t key;
-        const Person* value;
-        constexpr e(const int32_t key, const Person* value) noexcept
-        : key(key), value(value) {}
+        const Person value;
+        constexpr e(const int32_t key, const Person value) noexcept
+           : key(key), value(value) {}
     };
 
     inline static const std::array<e, 3> entries = {
-        e(3, new Person(3, u8"Bibi", nullptr)), e(1, new Person(1, u8"Bob", new Person(4, u8"Anna", nullptr))), e(2, new Person(2, u8"Billy", nullptr))
+        e(3, Person(3, u8"Bibi", nullptr)), e(1, Person(1, u8"Bob", new Person(4, u8"Anna", nullptr))), e(2, Person(2, u8"Billy", nullptr))
     };
 
-    static constexpr uint64_t get_hash(const int32_t value) noexcept
-    {
+    static constexpr uint64_t get_hash(const int32_t value) noexcept {
         return static_cast<uint64_t>(value);
     }
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;
@@ -45,13 +46,12 @@ class fastdata final {
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
 
-
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;
         const auto& entry = entries[index];
 
         if (key == entry.key) {
-            value = entry.value;
+            value = &entry.value;
             return true;
         }
 

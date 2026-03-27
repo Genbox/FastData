@@ -1,0 +1,167 @@
+<#@ template language="C#" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+<#@ import namespace="Genbox.FastData.Generators" #>
+<#@ import namespace="Genbox.FastData.Generators.Enums" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.TypeMap" name="TypeMap" #>
+<#@ parameter type="Genbox.FastData.Generator.Rust.RustCodeGeneratorConfig" name="RustConfig" #>
+<#@ parameter type="Genbox.FastData.Generators.GeneratorConfigBase" name="GeneratorConfig" #>
+<#@ include file="Functions.ttinclude" #>
+//! This file is auto-generated. Do not edit manually.
+//! Structure: <#= GeneratorConfig.StructureName #>
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+<#
+    string objectDecl = Model.ValueType.IsPrimitive ? string.Empty : TypeMap.GetObjectDeclaration(Model.ValueType).Trim();
+#>
+<#= objectDecl #>
+<#
+    if (GeneratorConfig is StringGeneratorConfig strCfg2)
+    {
+        if (strCfg2.IgnoreCase || (strCfg2.StringFunctions & (StringFunction.GetFirstCharLower | StringFunction.GetLastCharLower | StringFunction.StartsWithLower | StringFunction.EndsWithLower)) != 0)
+        {
+#>
+fn ToLowerAscii(value: u8) -> u8 {
+    if value >= b'A' && value <= b'Z' {
+        value + 32
+    } else {
+        value
+    }
+}
+
+<#
+        }
+
+        if (strCfg2.IgnoreCase)
+        {
+#>
+fn case_insensitive_equals(left: &str, right: &str) -> bool {
+    let left_bytes = left.as_bytes();
+    let right_bytes = right.as_bytes();
+
+    if left_bytes.len() != right_bytes.len() {
+        return false;
+    }
+
+    for i in 0..left_bytes.len() {
+        if ToLowerAscii(left_bytes[i]) != ToLowerAscii(right_bytes[i]) {
+            return false;
+        }
+    }
+
+    true
+}
+
+fn case_insensitive_compare(left: &str, right: &str) -> i32 {
+    let left_bytes = left.as_bytes();
+    let right_bytes = right.as_bytes();
+    let min_len = if left_bytes.len() < right_bytes.len() { left_bytes.len() } else { right_bytes.len() };
+
+    for i in 0..min_len {
+        let left_ch = ToLowerAscii(left_bytes[i]);
+        let right_ch = ToLowerAscii(right_bytes[i]);
+
+        if left_ch < right_ch {
+            return -1;
+        }
+
+        if left_ch > right_ch {
+            return 1;
+        }
+    }
+
+    if left_bytes.len() < right_bytes.len() {
+        return -1;
+    }
+
+    if left_bytes.len() > right_bytes.len() {
+        return 1;
+    }
+
+    0
+}
+
+<#
+        }
+
+        Dictionary<StringFunction, string> map = new()
+        {
+            { StringFunction.ReadU8, "fn ReadU8(value: &[u8], offset: usize) -> u8 { unsafe { *value.get_unchecked(offset) } }" },
+            { StringFunction.ReadU16, "fn ReadU16(value: &[u8], offset: usize) -> u16 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u16) } }" },
+            { StringFunction.ReadU32, "fn ReadU32(value: &[u8], offset: usize) -> u32 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u32) } }" },
+            { StringFunction.ReadU64, "fn ReadU64(value: &[u8], offset: usize) -> u64 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u64) } }" },
+
+            { StringFunction.GetFirstChar, "fn GetFirstChar(value: &str) -> u8 { value.as_bytes()[0] }" },
+            { StringFunction.GetFirstCharLower, "fn GetFirstCharLower(value: &str) -> u8 { ToLowerAscii(GetFirstChar(value)) }" },
+            { StringFunction.GetLastChar, """
+fn GetLastChar(value: &str) -> u8 {
+    let bytes = value.as_bytes();
+    bytes[bytes.len() - 1]
+}
+""" },
+            { StringFunction.GetLastCharLower, "fn GetLastCharLower(value: &str) -> u8 { ToLowerAscii(GetLastChar(value)) }" },
+
+            { StringFunction.GetLength, "fn GetLength(value: &str) -> u32 { value.len() as u32 }" },
+
+            { StringFunction.StartsWith, "fn StartsWith(prefix: &str, value: &str) -> bool { value.starts_with(prefix) }" },
+            { StringFunction.StartsWithLower, """
+fn StartsWithIgnoreCase(prefix: &str, value: &str) -> bool {
+    let prefix_bytes = prefix.as_bytes();
+    let value_bytes = value.as_bytes();
+
+    if value_bytes.len() < prefix_bytes.len() {
+        return false;
+    }
+
+    for i in 0..prefix_bytes.len() {
+        if ToLowerAscii(value_bytes[i]) != ToLowerAscii(prefix_bytes[i]) {
+            return false;
+        }
+    }
+
+    true
+}
+""" },
+
+            { StringFunction.EndsWith, "fn EndsWith(suffix: &str, value: &str) -> bool { value.ends_with(suffix) }" },
+            { StringFunction.EndsWithLower, """
+fn EndsWithIgnoreCase(suffix: &str, value: &str) -> bool {
+    let suffix_bytes = suffix.as_bytes();
+    let value_bytes = value.as_bytes();
+
+    if value_bytes.len() < suffix_bytes.len() {
+        return false;
+    }
+
+    let start = value_bytes.len() - suffix_bytes.len();
+    for i in 0..suffix_bytes.len() {
+        if ToLowerAscii(value_bytes[start + i]) != ToLowerAscii(suffix_bytes[i]) {
+            return false;
+        }
+    }
+
+    true
+}
+""" }
+        };
+
+        foreach (KeyValuePair<StringFunction, string> kv in map)
+        {
+            if ((strCfg2.StringFunctions & kv.Key) == 0)
+                continue;
+#>
+<#= kv.Value #>
+
+<#
+        }
+    }
+#>
+
+pub struct <#= RustConfig.ClassName #>;

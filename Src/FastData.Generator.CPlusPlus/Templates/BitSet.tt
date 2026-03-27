@@ -1,0 +1,48 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.BitSetContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.BitSetTemplateData" name="Data" #>
+
+    <#= FieldModifier(true) #>std::array<uint64_t, <#= Context.BitSet.Length.ToStringInvariant() #>> bitset = {
+<#= FormatHelper.FormatColumns(Context.BitSet, TypeMap.ToValueLabel, 8) #>
+    };
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    };
+<#
+    }
+#>
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+        const uint64_t offset = static_cast<uint64_t>(<#= LookupKeyName #> - min_key);
+        const size_t word = static_cast<size_t>(offset >> 6);
+        return (bitset[word] & (1ULL << (offset & 63))) != 0;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        const uint64_t offset = static_cast<uint64_t>(<#= LookupKeyName #> - min_key);
+        const size_t word = static_cast<size_t>(offset >> 6);
+        if ((bitset[word] & (1ULL << (offset & 63))) == 0) {
+            value = nullptr;
+            return false;
+        }
+
+        value = &values[static_cast<size_t>(offset)];
+        return true;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

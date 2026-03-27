@@ -1,0 +1,48 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ include file="Includes\ImplHeader.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.KeyLengthContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.KeyLengthTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier #>OFFSETS: [i32; <#= Context.ValueOffsets.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.ValueOffsets, (_, x) => x.ToStringInvariant(), 8) #>
+    ];
+
+    <#= FieldModifier #>VALUES: [<#= StoredValueTypeName #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    ];
+<#
+    }
+#>
+    <#= FieldModifier #>KEYS: [<#= StoredKeyTypeName #>; <#= Data.KeyCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, item => item == null ? "\"\"" : TypeMap.ToValueLabel(item), 8) #>
+    ];
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
+<#= GetMethodHeader(MethodType.Contains) #>
+        let idx = <#= LookupKeyName #>.len() - <#= Context.MinLength.ToStringInvariant() #>;
+        <#= GetEqual(LookupKeyName, "Self::KEYS[idx]") #>
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        let idx = <#= LookupKeyName #>.len() - <#= Context.MinLength.ToStringInvariant() #>;
+        if <#= GetEqual(LookupKeyName, "Self::KEYS[idx]") #> {
+            return Some(Self::VALUES[Self::OFFSETS[idx] as usize]);
+        }
+
+        None
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

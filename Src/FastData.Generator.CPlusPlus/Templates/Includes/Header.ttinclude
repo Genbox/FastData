@@ -1,0 +1,161 @@
+<#@ template language="C#" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+<#@ import namespace="Genbox.FastData.Generators" #>
+<#@ import namespace="Genbox.FastData.Generators.Enums" #>
+<#@ import namespace="Genbox.FastData.Generators.Abstracts" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateModel" name="Model" #>
+<#@ parameter type="Genbox.FastData.Generator.TypeMap" name="TypeMap" #>
+<#@ parameter type="Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig" name="CPlusPlusConfig" #>
+<#@ parameter type="Genbox.FastData.Generators.GeneratorConfigBase" name="GeneratorConfig" #>
+<#@ include file="Functions.ttinclude" #>
+/// @generated
+// This file is auto-generated. Do not edit manually.
+// Structure: <#= GeneratorConfig.StructureName #>
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+<#
+    string objectDecl = Model.ValueType.IsPrimitive ? string.Empty : TypeMap.GetObjectDeclaration(Model.ValueType).Trim();
+#>
+<#= objectDecl #>
+
+class <#= CPlusPlusConfig.ClassName #> final {
+
+<#
+    if (GeneratorConfig is StringGeneratorConfig strCfg2)
+    {
+        if (strCfg2.IgnoreCase || (strCfg2.StringFunctions & (StringFunction.GetFirstCharLower | StringFunction.GetLastCharLower | StringFunction.StartsWithLower | StringFunction.EndsWithLower)) != 0)
+        {
+#>
+    static constexpr char ToLowerAscii(char value) {
+        if (value >= 'A' && value <= 'Z')
+            return static_cast<char>(value + 32);
+        return value;
+    }
+<#
+        }
+
+        if (strCfg2.IgnoreCase)
+        {
+#>
+    static constexpr bool case_insensitive_equals(std::string_view left, std::string_view right) {
+        if (left.length() != right.length())
+            return false;
+
+        for (size_t i = 0; i < left.length(); ++i) {
+            if (ToLowerAscii(left[i]) != ToLowerAscii(right[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    static constexpr int32_t case_insensitive_compare(std::string_view left, std::string_view right) {
+        const size_t left_len = left.length();
+        const size_t right_len = right.length();
+        const size_t min_len = left_len < right_len ? left_len : right_len;
+
+        for (size_t i = 0; i < min_len; ++i) {
+            const char left_ch = ToLowerAscii(left[i]);
+            const char right_ch = ToLowerAscii(right[i]);
+
+            if (left_ch < right_ch)
+                return -1;
+            if (left_ch > right_ch)
+                return 1;
+        }
+
+        if (left_len < right_len)
+            return -1;
+        if (left_len > right_len)
+            return 1;
+        return 0;
+    }
+<#
+        }
+
+        Dictionary<StringFunction, string> map = new()
+        {
+            { StringFunction.ReadU8, "uint8_t ReadU8(const std::string_view value, const size_t offset) noexcept { return static_cast<uint8_t>(value[offset]); }" },
+            { StringFunction.ReadU16, "uint16_t ReadU16(const std::string_view value, const size_t offset) noexcept { uint16_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }" },
+            { StringFunction.ReadU32, "uint32_t ReadU32(const std::string_view value, const size_t offset) noexcept { uint32_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }" },
+            { StringFunction.ReadU64, "uint64_t ReadU64(const std::string_view value, const size_t offset) noexcept { uint64_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }" },
+
+            { StringFunction.GetFirstChar, "constexpr char GetFirstChar(std::string_view str) { return str[0]; }" },
+            { StringFunction.GetFirstCharLower, "constexpr char GetFirstCharLower(std::string_view str) { return ToLowerAscii(GetFirstChar(str)); }" },
+            { StringFunction.GetLastChar, "constexpr char GetLastChar(std::string_view str) { return str[str.length() - 1]; }" },
+            { StringFunction.GetLastCharLower, "constexpr char GetLastCharLower(std::string_view str) { return ToLowerAscii(GetLastChar(str)); }" },
+
+            { StringFunction.GetLength, "constexpr uint32_t GetLength(std::string_view str) { return static_cast<uint32_t>(str.length()); }" },
+
+            { StringFunction.StartsWith, """
+    constexpr bool StartsWith(std::string_view prefix, std::string_view str) {
+        if (str.length() < prefix.length())
+            return false;
+
+        for (size_t i = 0; i < prefix.length(); ++i) {
+            if (str[i] != prefix[i])
+                return false;
+        }
+
+        return true;
+    }
+""" },
+            { StringFunction.StartsWithLower, """
+    constexpr bool StartsWithIgnoreCase(std::string_view prefix, std::string_view str) {
+        if (str.length() < prefix.length())
+            return false;
+
+        for (size_t i = 0; i < prefix.length(); ++i) {
+            if (ToLowerAscii(str[i]) != ToLowerAscii(prefix[i]))
+                return false;
+        }
+
+        return true;
+    }
+""" },
+
+            { StringFunction.EndsWith, """
+    constexpr bool EndsWith(std::string_view suffix, std::string_view str) {
+        if (str.length() < suffix.length())
+            return false;
+
+        size_t offset = str.length() - suffix.length();
+        for (size_t i = 0; i < suffix.length(); ++i) {
+            if (str[offset + i] != suffix[i])
+                return false;
+        }
+
+        return true;
+    }
+""" },
+            { StringFunction.EndsWithLower, """
+    constexpr bool EndsWithIgnoreCase(std::string_view suffix, std::string_view str) {
+        if (str.length() < suffix.length())
+            return false;
+
+        size_t offset = str.length() - suffix.length();
+        for (size_t i = 0; i < suffix.length(); ++i) {
+            if (ToLowerAscii(str[offset + i]) != ToLowerAscii(suffix[i]))
+                return false;
+        }
+
+        return true;
+    }
+""" }
+        };
+
+        foreach (KeyValuePair<StringFunction, string> kv in map)
+        {
+            if ((strCfg2.StringFunctions & kv.Key) == 0)
+                continue;
+#>
+    static <#= kv.Value #>
+<#
+        }
+    }
+#>

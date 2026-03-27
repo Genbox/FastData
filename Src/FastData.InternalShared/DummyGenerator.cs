@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
@@ -6,6 +7,7 @@ using Newtonsoft.Json;
 
 namespace Genbox.FastData.InternalShared;
 
+[SuppressMessage("Major Code Smell", "S2326:Unused type parameters should be removed")]
 public readonly struct DummyGenerator : ICodeGenerator
 {
     public GeneratorEncoding Encoding => GeneratorEncoding.UTF16;

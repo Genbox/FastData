@@ -1,8 +1,10 @@
 using System.Linq.Expressions;
+using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.Expressions;
 
 namespace Genbox.FastData.Generators.EarlyExits;
 
-public sealed class EarlyExitConditionTransform(IReadOnlyList<Expression> body) : IExprTransform
+public sealed class EarlyExitConditionTransform(ICollection<Expression> body) : IExprTransform
 {
     public object CreateState() => new object();
 

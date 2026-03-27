@@ -1,14 +1,19 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: HashTableCompact
- #![allow(non_camel_case_types)]
- #![allow(unused_parens)]
- #![allow(missing_docs)]
- #![allow(unused_imports)]
- #![allow(unused_variables)]
- #![allow(unused_unsafe)]
- use std::ptr;
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
 
 pub struct fastdata;
+
+struct E {
+    key: i64,
+}
 
 impl fastdata {
     const BUCKET_STARTS: [u8; 5] = [
@@ -31,11 +36,10 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: i64) -> bool {
 
-
         let hash = unsafe { Self::get_hash(key) };
-        let index = hash % 5;
-        let start = Self::BUCKET_STARTS[index as usize] as usize;
-        let count = Self::BUCKET_COUNTS[index as usize] as usize;
+        let index = (hash % 5u64) as usize;
+        let start = Self::BUCKET_STARTS[index] as usize;
+        let count = Self::BUCKET_COUNTS[index] as usize;
         let end = start + count;
 
         for i in start..end {
@@ -51,7 +55,4 @@ impl fastdata {
     pub const ITEM_COUNT: usize = 5;
     pub const MIN_KEY: i64 = i64::MIN;
     pub const MAX_KEY: i64 = i64::MAX;
-}struct E {
-    key: i64,
 }
-

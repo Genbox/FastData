@@ -8,21 +8,14 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
-    private static char GetFirstChar(string str) => str[0];
-    private static char GetFirstCharLower(string str) => char.ToLowerInvariant(str[0]);
-    private static char GetLastChar(string str) => str[str.Length - 1];
-    private static char GetLastCharLower(string str) => char.ToLowerInvariant(str[str.Length - 1]);
+
     private static uint GetLength(string str) => (uint)str.Length;
-    private static bool StartsWith(string prefix, string str) => str.StartsWith(prefix, StringComparison.Ordinal);
-    private static bool StartsWithIgnoreCase(string prefix, string str) => str.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
-    private static bool EndsWith(string suffix, string str) => str.EndsWith(suffix, StringComparison.Ordinal);
-    private static bool EndsWithIgnoreCase(string suffix, string str) => str.EndsWith(suffix, StringComparison.OrdinalIgnoreCase);
 
     private static readonly string[] _keys = {
         "aaa", null, "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"
     };
 
-
+    
     public static bool Contains(string key)
     {
         uint getLength;
@@ -43,9 +36,9 @@ internal static class FastData
         return StringComparer.Ordinal.Equals(key, _keys[idx]);
     }
 
-    public const uint ItemCount = 7;
-    public const uint MinKeyLength = 3;
-    public const uint MaxKeyLength = 10;
+    public const int ItemCount = 7;
+    public const int MinKeyLength = 3;
+    public const int MaxKeyLength = 10;
     public const bool HasNumber = false;
     public const bool HasUppercase = false;
     public const bool HasLowercase = true;

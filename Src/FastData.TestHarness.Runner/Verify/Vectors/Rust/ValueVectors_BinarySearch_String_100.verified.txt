@@ -1,16 +1,17 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: BinarySearch
- #![allow(non_camel_case_types)]
- #![allow(unused_parens)]
- #![allow(missing_docs)]
- #![allow(unused_imports)]
- #![allow(unused_variables)]
- #![allow(unused_unsafe)]
- use std::ptr;
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
 
 pub struct fastdata;
-
 impl fastdata {
+
     const KEYS: [&'static str; 100] = [
         "0", "1", "10", "11", "12", "13", "14", "15", "16", "17", 
         "18", "19", "2", "20", "21", "22", "23", "24", "25", "26", 
@@ -25,23 +26,22 @@ impl fastdata {
     ];
 
     #[must_use]
-    pub fn contains(key: &'static str) -> bool {
-
+    pub fn contains(key: &str) -> bool {
 
         let mut lo: usize = 0;
         let mut hi: usize = 100;
         while lo < hi {
-            let i = lo + ((hi - lo) >> 1);
-            let entry = Self::KEYS[i];
-            let order = if entry < key { -1 } else if entry > key { 1 } else { 0 };
+            let mid: usize = lo + ((hi - lo) >> 1);
+            let mid_key: &str = Self::KEYS[mid];
+            let order: i32 = if mid_key < key { -1 } else if mid_key > key { 1 } else { 0 };
 
             if order == 0 {
                 return true;
             }
             if order < 0 {
-                lo = i + 1;
+                lo = mid + 1;
             } else {
-                hi = i;
+                hi = mid;
             }
         }
 

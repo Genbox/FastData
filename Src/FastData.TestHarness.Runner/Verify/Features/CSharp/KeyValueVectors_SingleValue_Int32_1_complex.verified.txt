@@ -5,6 +5,9 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
+internal static class FastData
+{
 public class Person
 {
     public Person(int age, string name, Person other)
@@ -19,18 +22,15 @@ public class Person
 
 };
 
-internal static class FastData
-{
     private static readonly Person _storedValue = new Person(1, "Bob", new Person(4, "Anna", null));
-
+    
     public static bool Contains(int key)
     {
-
 
         return key == 1;
     }
 
-
+    
     public static bool TryLookup(int key, out Person value)
     {
 
@@ -45,7 +45,7 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 1;
+    public const int ItemCount = 1;
     public const int MinKey = 1;
     public const int MaxKey = 1;
 }

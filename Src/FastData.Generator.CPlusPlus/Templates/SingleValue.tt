@@ -1,0 +1,39 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.SingleValueTemplateData" name="Data" #>
+
+<#
+    string itemLabel = TypeMap.ToValueLabel(Data.Item);
+#>
+<#
+    if (Data.Value != null)
+    {
+#>    static inline const auto stored_value = <#= TypeMap.ToValueLabel(Data.Value) #>;
+<#
+    }
+#>
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+        return <#= GetEqual(LookupKeyName, itemLabel) #>;
+    }
+<#
+    if (Data.Value != null)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        if (<#= GetEqual(LookupKeyName, itemLabel) #>) {
+            value = &stored_value;
+            return true;
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

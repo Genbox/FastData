@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Misc;
 using JetBrains.Annotations;
@@ -146,30 +147,21 @@ internal static class ExpressionHashBuilder
 
     private static UnaryExpression GetReadFunc(Expression data, Expression idx, int length)
     {
-        ReaderFunctions func = length switch
+        StringFunction func = length switch
         {
-            1 => ReaderFunctions.ReadU8,
-            2 => ReaderFunctions.ReadU16,
-            4 => ReaderFunctions.ReadU32,
-            8 => ReaderFunctions.ReadU64,
+            1 => StringFunction.ReadU8,
+            2 => StringFunction.ReadU16,
+            4 => StringFunction.ReadU32,
+            8 => StringFunction.ReadU64,
             _ => throw new InvalidOperationException($"Invalid length: {length.ToString(NumberFormatInfo.InvariantInfo)}")
         };
 
-        MethodInfo? readFunc = typeof(ReaderHelpers).GetMethod(func.ToString(), BindingFlags.Static | BindingFlags.Public);
+        MethodInfo? readFunc = typeof(StringFunctions).GetMethod(func.ToString(), BindingFlags.Static | BindingFlags.Public);
 
         if (readFunc == null)
             throw new InvalidOperationException("Could not find method");
 
         // Read(data, idx)
         return Convert(Call(readFunc, data, idx), typeof(ulong));
-    }
-
-    [UsedImplicitly(ImplicitUseTargetFlags.Members)]
-    private static class ReaderHelpers
-    {
-        public static byte ReadU8(byte[] ptr, int offset) => Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset);
-        public static ushort ReadU16(byte[] ptr, int offset) => Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));
-        public static uint ReadU32(byte[] ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));
-        public static ulong ReadU64(byte[] ptr, int offset) => Unsafe.ReadUnaligned<ulong>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));
     }
 }

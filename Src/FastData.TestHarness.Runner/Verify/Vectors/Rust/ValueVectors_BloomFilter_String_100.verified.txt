@@ -1,16 +1,17 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: BloomFilter
- #![allow(non_camel_case_types)]
- #![allow(unused_parens)]
- #![allow(missing_docs)]
- #![allow(unused_imports)]
- #![allow(unused_variables)]
- #![allow(unused_unsafe)]
- use std::ptr;
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
 
 pub struct fastdata;
-
 impl fastdata {
+
     const BLOOM: [u64; 16] = [
         4540325822465, 586033177844384006, 296386822148, 4613946788280795160, 2310346695009911320, 9520610033304338464, 27162610135744577, 581161688498304, 90363363145581312, 144153121328743168, 
         289378541236128800, 576460754618814528, 2342032334930317312, 2305843009886888064, 4686065921751531520, 11566510482634408456
@@ -23,25 +24,24 @@ impl fastdata {
         let mut ptr = value.as_ptr();
         let mut len = value.len();
 
-         while len > 0 {
-                hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
-                ptr = ptr.add(1);
-                len -= 1;
-         }
+        while len > 0 {
+            hash = (((hash << 5) | (hash >> 27)).wrapping_add(hash)) ^ (ptr.read() as u64);
+            ptr = ptr.add(1);
+            len -= 1;
+        }
 
         hash.wrapping_mul(1566083941).wrapping_add(352654597)
     }
 
     #[must_use]
-    pub fn contains(key: &'static str) -> bool {
-
+    pub fn contains(key: &str) -> bool {
 
         let hash = unsafe { Self::get_hash(key) };
-        let index = hash % 16;
+        let index = (hash % 16u64) as usize;
         let shift1 = (hash as u32) & 63;
         let shift2 = ((hash >> 8) as u32) & 63;
         let mask = (1u64 << shift1) | (1u64 << shift2);
-        (Self::BLOOM[index as usize] & mask) == mask
+        (Self::BLOOM[index] & mask) == mask
     }
 
     pub const ITEM_COUNT: usize = 100;

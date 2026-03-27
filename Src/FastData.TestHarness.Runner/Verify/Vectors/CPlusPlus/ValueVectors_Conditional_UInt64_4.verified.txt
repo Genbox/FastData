@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: Conditional
 #include <array>
 #include <cstring>
@@ -6,8 +7,11 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
-    public:
+
+
+public:
     [[nodiscard]]
     static constexpr bool contains(const uint64_t key) noexcept {
 

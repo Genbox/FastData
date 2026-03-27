@@ -9,7 +9,7 @@ public sealed record LengthBitmapEarlyExit(ulong BitSet) : IEarlyExit
 {
     public Expression GetExpression(ParameterExpression key)
     {
-        MethodInfo methodInfo = typeof(EarlyExitFunctions).GetMethod(nameof(EarlyExitFunctions.GetLength), [typeof(string)])!;
+        MethodInfo methodInfo = typeof(StringFunctions).GetMethod(nameof(StringFunctions.GetLength), [typeof(string)])!;
 
         Expression shift = And(Subtract(Call(methodInfo, key), Constant(1u)), Constant(63u));
         Expression shiftedBit = LeftShift(Constant(1UL), Convert(shift, typeof(int)));

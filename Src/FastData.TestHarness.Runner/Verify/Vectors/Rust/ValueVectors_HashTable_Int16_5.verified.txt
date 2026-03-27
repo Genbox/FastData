@@ -1,14 +1,20 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: HashTable
- #![allow(non_camel_case_types)]
- #![allow(unused_parens)]
- #![allow(missing_docs)]
- #![allow(unused_imports)]
- #![allow(unused_variables)]
- #![allow(unused_unsafe)]
- use std::ptr;
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
 
 pub struct fastdata;
+
+struct E {
+    key: i16,
+    next: i8,
+}
 
 impl fastdata {
     const BUCKETS: [i8; 5] = [
@@ -27,9 +33,8 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: i16) -> bool {
 
-
         let hash = unsafe { Self::get_hash(key) };
-        let index = hash % 5;
+        let index = hash % 5u64;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 
         while i >= 0 {
@@ -46,8 +51,4 @@ impl fastdata {
     pub const ITEM_COUNT: usize = 5;
     pub const MIN_KEY: i16 = i16::MIN;
     pub const MAX_KEY: i16 = i16::MAX;
-}struct E {
-    next: i8,
-    key: i16,
 }
-

@@ -60,7 +60,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                         Array keys = combinedCfg.Keys;
                         Array? values = combinedCfg.Values;
                         FastDataConfig fdCfg = combinedCfg.FDConfig;
-                        CSharpCodeGenerator generator = CSharpCodeGenerator.Create(combinedCfg.CSConfig);
+                        CSharpCodeGenerator generator = new CSharpCodeGenerator(combinedCfg.CSConfig);
 
                         Type genType = typeof(FastDataGenerator);
 

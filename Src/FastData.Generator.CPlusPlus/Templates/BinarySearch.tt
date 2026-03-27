@@ -1,0 +1,71 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.BinarySearchTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    };
+<#
+    }
+#>
+    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+    };
+
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+        size_t lo = 0;
+        size_t hi = <#= Data.KeyCount.ToStringInvariant() #>;
+        while (lo < hi) {
+            const size_t mid = lo + ((hi - lo) >> 1);
+            const <#= KeyTypeName #> mid_key = keys[mid];
+            const int32_t order = <#= GetCompare("mid_key", LookupKeyName) #>;
+
+            if (order == 0)
+                return true;
+            if (order < 0)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+
+        return false;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        size_t lo = 0;
+        size_t hi = <#= Data.KeyCount.ToStringInvariant() #>;
+        while (lo < hi) {
+            const size_t mid = lo + ((hi - lo) >> 1);
+            const <#= KeyTypeName #> mid_key = keys[mid];
+            const int32_t order = <#= GetCompare("mid_key", LookupKeyName) #>;
+
+            if (order == 0) {
+                value = &values[mid];
+                return true;
+            }
+
+            if (order < 0)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

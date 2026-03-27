@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: HashTable
 #include <array>
 #include <cstring>
@@ -6,7 +7,10 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     struct e {
         std::string_view key;
         int8_t next;
@@ -41,20 +45,18 @@ class fastdata final {
         e(u8"90", -1, 11144406716946090201ull), e(u8"91", -1, 11144406718512174142ull), e(u8"92", -1, 11144406720078258083ull), e(u8"93", -1, 11144406721644342024ull), e(u8"94", 81, 11144406710681754437ull), e(u8"95", 80, 11144406712247838378ull), e(u8"96", 83, 11144406713813922319ull), e(u8"97", 82, 11144406715380006260ull), e(u8"98", -1, 11144406729474761729ull), e(u8"99", -1, 11144406731040845670ull)
     };
 
-    static constexpr uint64_t get_hash(const std::string_view value) noexcept
-    {
-    uint64_t hash = 352654597;
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept {
+        uint64_t hash = 352654597;
 
-       for (unsigned char ch : value)
-           hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+        for (unsigned char ch : value)
+            hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
 
-       return 352654597 + (hash * 1566083941);
+        return 352654597 + (hash * 1566083941);
     }
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 100;

@@ -1,6 +1,7 @@
 using Genbox.FastData.Config;
+using Genbox.FastData.Generator;
 using Genbox.FastData.Generator.Extensions;
-using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Xunit.Sdk;
 
@@ -23,8 +24,8 @@ public class TestData<TKey>(Type structureType, TKey[] keys) : ITestData, IXunit
     {
         if (Keys is string[] strArr)
             return FastDataGenerator.Generate(strArr, new StringDataConfig { StructureTypeOverride = StructureType }, generator);
-        else
-            return FastDataGenerator.Generate<TKey>(Keys, new NumericDataConfig { StructureTypeOverride = StructureType }, generator);
+
+        return FastDataGenerator.Generate(Keys, new NumericDataConfig { StructureTypeOverride = StructureType }, generator);
     }
 
     public string GetRandomKey(TypeMap map) => map.ToValueLabel(Keys[_rng.Next(0, Keys.Length)]);

@@ -1,27 +1,24 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: HashTablePerfect
- #![allow(non_camel_case_types)]
- #![allow(unused_parens)]
- #![allow(missing_docs)]
- #![allow(unused_imports)]
- #![allow(unused_variables)]
- #![allow(unused_unsafe)]
- use std::ptr;
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
 
 pub struct fastdata;
-pub struct e {
-    pub key: i32,
-    pub value: i32,
-}
 
-impl e {
-    pub const fn new (key: i32, value: i32) -> Self { Self { key, value  } }
+struct E {
+    key: i32,
+    value: i32,
 }
-
 
 impl fastdata {
-    const ENTRIES: [e; 3] = [
-        e::new(3, 3), e::new(1, 1), e::new(2, 2)
+    const ENTRIES: [E; 3] = [
+        E { key: 3, value: 3 }, E { key: 1, value: 1 }, E { key: 2, value: 2 }
     ];
 
     #[inline(always)]
@@ -32,22 +29,21 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: i32) -> bool {
 
-
         let hash = unsafe { Self::get_hash(key) };
-        let index = (hash % 3) as usize;
+        let index = (hash % 3u64) as usize;
+        let entry = &Self::ENTRIES[index];
 
-        return key == Self::ENTRIES[index].key;
+        key == entry.key
     }
 
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<i32> {
 
-
         let hash = unsafe { Self::get_hash(key) };
-        let index = (hash % 3) as usize;
+        let index = (hash % 3u64) as usize;
         let entry = &Self::ENTRIES[index];
 
-        if (key == entry.key) {
+        if key == entry.key {
             return Some(entry.value);
         }
 

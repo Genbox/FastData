@@ -8,6 +8,9 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
+    
     public static bool Contains(ulong key)
     {
 
@@ -23,8 +26,8 @@ internal static class FastData
                 return false;
         }
     }
-
-    public const uint ItemCount = 4;
+    
+    public const int ItemCount = 4;
     public const ulong MinKey = ulong.MinValue;
     public const ulong MaxKey = ulong.MaxValue;
 }

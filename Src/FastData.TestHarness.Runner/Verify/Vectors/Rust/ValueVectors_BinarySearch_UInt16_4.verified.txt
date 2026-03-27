@@ -1,16 +1,17 @@
 ﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: BinarySearch
- #![allow(non_camel_case_types)]
- #![allow(unused_parens)]
- #![allow(missing_docs)]
- #![allow(unused_imports)]
- #![allow(unused_variables)]
- #![allow(unused_unsafe)]
- use std::ptr;
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
 
 pub struct fastdata;
-
 impl fastdata {
+
     const KEYS: [u16; 4] = [
         u16::MIN, 1, 2, u16::MAX
     ];
@@ -18,21 +19,20 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: u16) -> bool {
 
-
         let mut lo: usize = 0;
         let mut hi: usize = 4;
         while lo < hi {
-            let i = lo + ((hi - lo) >> 1);
-            let entry = Self::KEYS[i];
-            let order = if entry < key { -1 } else if entry > key { 1 } else { 0 };
+            let mid: usize = lo + ((hi - lo) >> 1);
+            let mid_key: u16 = Self::KEYS[mid];
+            let order: i32 = if mid_key < key { -1 } else if mid_key > key { 1 } else { 0 };
 
             if order == 0 {
                 return true;
             }
             if order < 0 {
-                lo = i + 1;
+                lo = mid + 1;
             } else {
-                hi = i;
+                hi = mid;
             }
         }
 

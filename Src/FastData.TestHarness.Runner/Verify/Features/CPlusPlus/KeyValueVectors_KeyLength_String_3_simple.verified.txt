@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: KeyLength
 #include <array>
 #include <cstring>
@@ -6,77 +7,10 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
-    static constexpr char ToLowerAscii(char value)
-    {
-        if (value >= 'A' && value <= 'Z')
-            return static_cast<char>(value + 32);
-        return value;
-    }
 
-    static constexpr char GetFirstChar(std::string_view str) { return str[0]; }
-    static constexpr char GetFirstCharLower(std::string_view str) { return ToLowerAscii(GetFirstChar(str)); }
-    static constexpr char GetLastChar(std::string_view str) { return str[str.length() - 1]; }
-    static constexpr char GetLastCharLower(std::string_view str) { return ToLowerAscii(GetLastChar(str)); }
     static constexpr uint32_t GetLength(std::string_view str) { return static_cast<uint32_t>(str.length()); }
-
-    static constexpr bool StartsWith(std::string_view prefix, std::string_view str)
-    {
-        if (str.length() < prefix.length())
-            return false;
-
-        for (size_t i = 0; i < prefix.length(); ++i)
-        {
-            if (str[i] != prefix[i])
-                return false;
-        }
-
-        return true;
-    }
-
-    static constexpr bool StartsWithIgnoreCase(std::string_view prefix, std::string_view str)
-    {
-        if (str.length() < prefix.length())
-            return false;
-
-        for (size_t i = 0; i < prefix.length(); ++i)
-        {
-            if (ToLowerAscii(str[i]) != ToLowerAscii(prefix[i]))
-                return false;
-        }
-
-        return true;
-    }
-
-    static constexpr bool EndsWith(std::string_view suffix, std::string_view str)
-    {
-        if (str.length() < suffix.length())
-            return false;
-
-        size_t offset = str.length() - suffix.length();
-        for (size_t i = 0; i < suffix.length(); ++i)
-        {
-            if (str[offset + i] != suffix[i])
-                return false;
-        }
-
-        return true;
-    }
-
-    static constexpr bool EndsWithIgnoreCase(std::string_view suffix, std::string_view str)
-    {
-        if (str.length() < suffix.length())
-            return false;
-
-        size_t offset = str.length() - suffix.length();
-        for (size_t i = 0; i < suffix.length(); ++i)
-        {
-            if (ToLowerAscii(str[offset + i]) != ToLowerAscii(suffix[i]))
-                return false;
-        }
-
-        return true;
-    }
 
     static constexpr std::array<int32_t, 3> offsets = {
         0, 1, 2
@@ -85,12 +19,11 @@ class fastdata final {
     inline static const std::array<int32_t, 3> values = {
         1, 2, 3
     };
-
     static constexpr std::array<std::string_view, 3> keys = {
         u8"a", u8"aa", u8"aaa"
     };
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
         uint32_t getLength;
@@ -104,7 +37,6 @@ class fastdata final {
         {
          return false;
         }
-
 
 
         size_t idx = key.length() - 1;
@@ -126,7 +58,6 @@ class fastdata final {
          value = nullptr;
          return false;
         }
-
 
 
         size_t idx = key.length() - 1;

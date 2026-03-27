@@ -8,14 +8,17 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
     private static readonly int[] _values = {
         1, 2, 3
     };
+
     private static readonly int[] _keys = new int[] {
         1, 2, 3
     };
 
-
+    
     public static bool Contains(int key)
     {
 
@@ -28,14 +31,14 @@ internal static class FastData
         return false;
     }
 
-
+    
     public static bool TryLookup(int key, out int? value)
     {
 
 
-        for (uint i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
-            if (_keys[i] == key)
+            if (key == _keys[i])
             {
                 value = _values[i];
                 return true;
@@ -46,7 +49,7 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 3;
+    public const int ItemCount = 3;
     public const int MinKey = 1;
     public const int MaxKey = 3;
 }

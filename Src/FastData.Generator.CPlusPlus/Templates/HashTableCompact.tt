@@ -1,0 +1,122 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.HashTableCompactContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HashTableCompactTemplateData" name="Data" #>
+
+<#
+    string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
+    string indexType = TypeMap.GetSmallestUIntType((ulong)Data.Entries.Length);
+#>
+    struct e {
+        <#= KeyTypeName #> key;
+<#
+    if (Context.StoreHashCode)
+    {
+#>        uint64_t hash_code;
+<#
+    }
+    if (Data.ValueCount > 0)
+    {
+#>        const <#= ValueTypeName #> value;
+<#
+    }
+#>        e(const <#= KeyTypeName #> key<#
+    if (Context.StoreHashCode)
+    {
+#>, const uint64_t hash_code<#
+    }
+    if (Data.ValueCount > 0)
+    {
+#>, const <#= ValueTypeName #> value<#
+    }
+#>)
+           : key(key)<#
+    if (Context.StoreHashCode)
+    {
+#>, hash_code(hash_code)<#
+    }
+    if (Data.ValueCount > 0)
+    {
+#>, value(value)<#
+    }
+#> {}
+    };
+
+    <#= FieldModifier(true) #>std::array<<#= indexType #>, <#= Context.BucketStarts.Length.ToStringInvariant() #>> bucket_starts = {
+<#= FormatHelper.FormatColumns(Context.BucketStarts, static x => x.ToStringInvariant(), 8) #>
+    };
+
+    <#= FieldModifier(true) #>std::array<<#= indexType #>, <#= Context.BucketCounts.Length.ToStringInvariant() #>> bucket_counts = {
+<#= FormatHelper.FormatColumns(Context.BucketCounts, static x => x.ToStringInvariant(), 8) #>
+    };
+
+    <#= FieldModifier(false) #>std::array<e, <#= Data.Entries.Length.ToStringInvariant() #>> entries = {
+<#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
+    {
+        string hashPart = Context.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : string.Empty;
+        string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : string.Empty;
+        return $"e({TypeMap.ToValueLabel(x.Key)}{hashPart}{valuePart})";
+    }, 8) #>
+    };
+
+<#= HashSource #>
+
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+        const uint64_t hash = get_hash(<#= LookupKeyName #>);
+        const size_t index = <#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>;
+        const size_t start = static_cast<size_t>(bucket_starts[index]);
+        const size_t count = static_cast<size_t>(bucket_counts[index]);
+        const size_t end = start + count;
+
+        for (size_t i = start; i < end; i++) {
+            const auto& entry = entries[i];
+
+            if (<#
+    if (Context.StoreHashCode)
+    {
+#>entry.hash_code == hash && <#
+    }
+#><#= GetEqual("entry.key", LookupKeyName) #>)
+                return true;
+        }
+
+        return false;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        const uint64_t hash = get_hash(<#= LookupKeyName #>);
+        const size_t index = <#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>;
+        const size_t start = static_cast<size_t>(bucket_starts[index]);
+        const size_t count = static_cast<size_t>(bucket_counts[index]);
+        const size_t end = start + count;
+
+        for (size_t i = start; i < end; i++) {
+            const auto& entry = entries[i];
+
+            if (<#
+        if (Context.StoreHashCode)
+        {
+#>entry.hash_code == hash && <#
+        }
+#><#= GetEqual("entry.key", LookupKeyName) #>) {
+                value = &entry.value;
+                return true;
+            }
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

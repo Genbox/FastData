@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: BloomFilter
 #include <array>
 #include <cstring>
@@ -6,21 +7,22 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     static constexpr std::array<uint64_t, 16> bloom = {
         281479271743489ull, 562958543486979ull, 1125917086973957ull, 2251834173947913ull, 4503668347895825ull, 9007336695791649ull, 18014673391583297ull, 36029346783166593ull, 72058693566333185ull, 144117387132666369ull, 
         288234774265332737ull, 576469548530665473ull, 1152939097061330945ull, 2305878194122661889ull, 4611756388245323777ull, 9223512776490647553ull
     };
 
-    static constexpr uint64_t get_hash(const int32_t value) noexcept
-    {
+    static constexpr uint64_t get_hash(const int32_t value) noexcept {
         return static_cast<uint64_t>(value);
     }
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 16;

@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
     private static readonly float[] _keys = new float[] {
         0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 
         10f, 11f, 12f, 13f, 14f, 15f, 16f, 17f, 18f, 19f, 
@@ -21,7 +23,7 @@ internal static class FastData
         90f, 91f, 92f, 93f, 94f, 95f, 96f, 97f, 98f, 99f
     };
 
-
+    
     public static bool Contains(float key)
     {
 
@@ -44,7 +46,7 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 100;
+    public const int ItemCount = 100;
     public const float MinKey = 0f;
     public const float MaxKey = 99f;
 }

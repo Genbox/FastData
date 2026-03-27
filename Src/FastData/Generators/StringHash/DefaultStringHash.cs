@@ -21,7 +21,6 @@ internal sealed record DefaultStringHash : IStringHash
 
     public AdditionalData[]? AdditionalData => null;
     public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.BuildFull(Mixer, Avalanche, _encoding);
-    public ReaderFunctions Functions => ReaderFunctions.ReadU16;
 
     internal static DefaultStringHash GetInstance(GeneratorEncoding enc) => enc == GeneratorEncoding.UTF8 ? UTF8Instance : UTF16Instance;
 

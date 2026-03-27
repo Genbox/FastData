@@ -1,10 +1,9 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Generator.Extensions;
-using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.Generator.Rust.Internal;
 
-internal sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
+public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
 {
     protected override Expression VisitBlock(BlockExpression node)
     {
@@ -144,9 +143,9 @@ internal sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(m
     }
 
     private static bool IsUnsigned(Type type) => type == typeof(byte)
-        || type == typeof(ushort)
-        || type == typeof(uint)
-        || type == typeof(ulong);
+                                                 || type == typeof(ushort)
+                                                 || type == typeof(uint)
+                                                 || type == typeof(ulong);
 
     private Expression RenderStringCall(MethodCallExpression node, string methodName)
     {

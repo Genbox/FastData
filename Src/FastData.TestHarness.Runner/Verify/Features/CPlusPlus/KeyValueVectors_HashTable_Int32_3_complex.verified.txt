@@ -1,11 +1,11 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: HashTable
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
-
 struct Person {
     int32_t age;
     std::string_view name;
@@ -13,12 +13,15 @@ struct Person {
 
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
+
 class fastdata final {
+
+
     struct e {
         int32_t key;
         int8_t next;
-        const Person* value;
-        e(const int32_t key, const int8_t next, const Person* value)
+        const Person value;
+        e(const int32_t key, const int8_t next, const Person value)
            : key(key), next(next), value(value) {}
     };
 
@@ -27,18 +30,16 @@ class fastdata final {
     };
 
     inline static const std::array<e, 3> entries = {
-        e(1, -1, new Person(1, u8"Bob", new Person(4, u8"Anna", nullptr))), e(2, -1, new Person(2, u8"Billy", nullptr)), e(3, -1, new Person(3, u8"Bibi", nullptr))
+        e(1, -1, Person(1, u8"Bob", new Person(4, u8"Anna", nullptr))), e(2, -1, Person(2, u8"Billy", nullptr)), e(3, -1, Person(3, u8"Bibi", nullptr))
     };
 
-    static constexpr uint64_t get_hash(const int32_t value) noexcept
-    {
+    static constexpr uint64_t get_hash(const int32_t value) noexcept {
         return static_cast<uint64_t>(value);
     }
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;
@@ -59,7 +60,6 @@ class fastdata final {
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
 
-
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 3;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);
@@ -68,7 +68,7 @@ class fastdata final {
             const auto& entry = entries[i];
 
             if (entry.key == key) {
-                value = entry.value;
+                value = &entry.value;
                 return true;
             }
 

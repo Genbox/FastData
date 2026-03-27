@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: EliasFano
 #include <array>
 #include <cstring>
@@ -6,7 +7,10 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     static constexpr int32_t lower_bit_count = 5;
     static constexpr int64_t min_value = 0ll;
     static constexpr int64_t max_value = 38755ll;
@@ -46,9 +50,8 @@ class fastdata final {
     }
 
     static constexpr int trailing_zero_count(uint64_t value) noexcept {
-        if (value == 0) {
+        if (value == 0)
             return 64;
-        }
 
         int count = 0;
         while ((value & 1ULL) == 0) {
@@ -118,7 +121,7 @@ class fastdata final {
         return -1;
     }
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
         if ((key < 11727))
@@ -130,7 +133,6 @@ class fastdata final {
         {
          return false;
         }
-
 
 
         const int64_t value = static_cast<int64_t>(key);

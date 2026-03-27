@@ -1,0 +1,50 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.KeyLengthContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.KeyLengthTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier(true) #>std::array<int32_t, <#= Context.ValueOffsets.Length.ToStringInvariant() #>> offsets = {
+<#= FormatHelper.FormatColumns(Context.ValueOffsets, static x => x.ToStringInvariant(), 8) #>
+    };
+
+    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    };
+<#
+    }
+#>
+    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, item => item == null ? "{}" : TypeMap.ToValueLabel(item), 8) #>
+    };
+
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+        size_t idx = <#= LookupKeyName #>.length() - <#= Context.MinLength.ToStringInvariant() #>;
+        return <#= GetEqual(LookupKeyName, "keys[idx]") #>;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        size_t idx = <#= LookupKeyName #>.length() - <#= Context.MinLength.ToStringInvariant() #>;
+        if (<#= GetEqual(LookupKeyName, "keys[idx]") #>) {
+            value = &values[offsets[idx]];
+            return true;
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

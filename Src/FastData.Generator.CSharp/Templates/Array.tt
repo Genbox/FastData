@@ -1,0 +1,56 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.ArrayTemplateData" name="Data" #>
+
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier #><#= ValueTypeName #>[] _values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    };
+<#
+    }
+#>
+
+    <#= FieldModifier #><#= KeyTypeName #>[] _keys = new <#= KeyTypeName #>[] {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+    };
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
+    {
+<#= GetMethodHeader(MethodType.Contains) #>
+
+        for (int i = 0; i < <#= Data.KeyCount.ToStringInvariant() #>; i++)
+        {
+            if (<#= GetEqual(LookupKeyName, "_keys[i]") #>)
+                return true;
+        }
+        return false;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool TryLookup(<#= KeyTypeName #> key, out <#= ValueTypeName #>? value)
+    {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+
+        for (int i = 0; i < <#= Data.KeyCount.ToStringInvariant() #>; i++)
+        {
+            if (<#= GetEqual(LookupKeyName, "_keys[i]") #>)
+            {
+                value = _values[i];
+                return true;
+            }
+        }
+
+        value = default;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

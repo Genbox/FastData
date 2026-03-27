@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
     private const ulong _rrrMinValue = 2147495375ul;
     private const ulong _rrrMaxValue = 2147522403ul;
     private const int _rrrBlockSize = 15;
@@ -378,7 +380,7 @@ internal static class FastData
         12u, 13u
     };
 
-
+    
     public static bool Contains(int key)
     {
         if ((key < 11727))
@@ -454,7 +456,7 @@ internal static class FastData
         return result;
     }
 
-    public const uint ItemCount = 1000;
+    public const int ItemCount = 1000;
     public const int MinKey = 11727;
     public const int MaxKey = 38755;
 }

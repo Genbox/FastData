@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: BinarySearch
 #include <array>
 #include <cstring>
@@ -6,19 +7,20 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     inline static const std::array<int32_t, 3> values = {
         1, 2, 3
     };
-
     static constexpr std::array<int32_t, 3> keys = {
         1, 2, 3
     };
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-
 
         size_t lo = 0;
         size_t hi = 3;
@@ -41,7 +43,6 @@ class fastdata final {
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
 
-
         size_t lo = 0;
         size_t hi = 3;
         while (lo < hi) {
@@ -49,8 +50,7 @@ class fastdata final {
             const int32_t mid_key = keys[mid];
             const int32_t order = mid_key < key ? -1 : (mid_key > key ? 1 : 0);
 
-            if (order == 0)
-            {
+            if (order == 0) {
                 value = &values[mid];
                 return true;
             }

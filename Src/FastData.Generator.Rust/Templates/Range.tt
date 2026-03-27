@@ -1,0 +1,14 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ include file="Includes\ImplHeader.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.RangeTemplateData" name="Data" #>
+
+<#
+    string minLabel = TypeMap.ToValueLabel(Data.Min);
+    string maxLabel = TypeMap.ToValueLabel(Data.Max);
+#>
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
+<#= GetMethodHeader(MethodType.Contains) #>
+        <#= LookupKeyName #> >= <#= minLabel #> && <#= LookupKeyName #> <= <#= maxLabel #>
+    }
+<#@ include file="Includes\Footer.ttinclude" #>

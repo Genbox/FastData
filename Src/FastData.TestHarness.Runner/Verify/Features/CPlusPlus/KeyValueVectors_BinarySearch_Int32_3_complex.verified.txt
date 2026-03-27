@@ -1,11 +1,11 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: BinarySearch
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
-
 struct Person {
     int32_t age;
     std::string_view name;
@@ -13,19 +13,20 @@ struct Person {
 
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
-class fastdata final {
-    inline static const std::array<Person*, 3> values = {
-        new Person(1, u8"Bob", new Person(4, u8"Anna", nullptr)), new Person(2, u8"Billy", nullptr), new Person(3, u8"Bibi", nullptr)
-    };
 
+class fastdata final {
+
+
+    inline static const std::array<Person, 3> values = {
+        Person(1, u8"Bob", new Person(4, u8"Anna", nullptr)), Person(2, u8"Billy", nullptr), Person(3, u8"Bibi", nullptr)
+    };
     static constexpr std::array<int32_t, 3> keys = {
         1, 2, 3
     };
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-
 
         size_t lo = 0;
         size_t hi = 3;
@@ -48,7 +49,6 @@ class fastdata final {
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
 
-
         size_t lo = 0;
         size_t hi = 3;
         while (lo < hi) {
@@ -56,9 +56,8 @@ class fastdata final {
             const int32_t mid_key = keys[mid];
             const int32_t order = mid_key < key ? -1 : (mid_key > key ? 1 : 0);
 
-            if (order == 0)
-            {
-                value = values[mid];
+            if (order == 0) {
+                value = &values[mid];
                 return true;
             }
 

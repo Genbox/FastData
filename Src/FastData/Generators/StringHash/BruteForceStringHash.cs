@@ -25,7 +25,6 @@ internal sealed record BruteForceStringHash : IStringHash
     public AdditionalData[]? AdditionalData => null;
 
     public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.Build([Segment], Mixer, Avalanche);
-    public ReaderFunctions Functions => ReaderFunctions.All;
 
     public override string ToString() =>
         $"""

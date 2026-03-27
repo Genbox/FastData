@@ -1,5 +1,4 @@
 using Genbox.FastData.Enums;
-using Genbox.FastData.Generator.Framework;
 using Genbox.FastData.Generator.Rust.Internal;
 using Genbox.FastData.Generator.Rust.Internal.Framework;
 using Genbox.FastData.Generators.Abstracts;
@@ -18,7 +17,7 @@ public sealed class RustBootstrap : BootstrapBase
 
     public TypeMap Map { get; }
 
-    public override ICodeGenerator Generator => RustCodeGenerator.Create(new RustCodeGeneratorConfig("fastdata"));
+    public override ICodeGenerator Generator => new RustCodeGenerator(new RustCodeGeneratorConfig("fastdata"));
 
     public override string Wrap(string code) =>
         $$"""

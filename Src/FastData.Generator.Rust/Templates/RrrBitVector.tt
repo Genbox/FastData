@@ -1,0 +1,99 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ import namespace="System" #>
+<#@ include file="Includes\ImplHeader.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.RrrBitVectorContext" name="Context" #>
+
+<#
+    TypeCode keyType = Type.GetTypeCode(Model.KeyType);
+    string mapSource = keyType switch
+    {
+        TypeCode.Char or TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64 => $"{LookupKeyName} as u64",
+        TypeCode.SByte => $"(({LookupKeyName} ^ i8::MIN) as u8) as u64",
+        TypeCode.Int16 => $"(({LookupKeyName} ^ i16::MIN) as u16) as u64",
+        TypeCode.Int32 => $"(({LookupKeyName} ^ i32::MIN) as u32) as u64",
+        TypeCode.Int64 => $"({LookupKeyName} ^ i64::MIN) as u64",
+        _ => throw new InvalidOperationException("RRR bitvector only supports integral key types.")
+    };
+#>
+    const RRR_MIN_VALUE: u64 = <#= TypeMap.ToValueLabel(Context.MinValue) #>;
+    const RRR_MAX_VALUE: u64 = <#= TypeMap.ToValueLabel(Context.MaxValue) #>;
+    const RRR_BLOCK_SIZE: i32 = <#= Context.BlockSize #>;
+    <#= FieldModifier #>RRR_CLASSES: [u8; <#= Context.Classes.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.Classes, TypeMap.ToValueLabel, 8) #>
+    ];
+    <#= FieldModifier #>RRR_OFFSETS: [u32; <#= Context.Offsets.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.Offsets, TypeMap.ToValueLabel, 8) #>
+    ];
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
+<#= GetMethodHeader(MethodType.Contains) #>
+        let mapped: u64 = <#= mapSource #>;
+
+        let normalized = mapped - Self::RRR_MIN_VALUE;
+        let block_index = (normalized / (Self::RRR_BLOCK_SIZE as u64)) as i32;
+        let bit_in_block = (normalized % (Self::RRR_BLOCK_SIZE as u64)) as i32;
+        let class_value = Self::RRR_CLASSES[block_index as usize] as i32;
+
+        if class_value == 0 {
+            return false;
+        }
+
+        let rank = Self::RRR_OFFSETS[block_index as usize];
+        Self::decode_bit(class_value, rank, bit_in_block)
+    }
+
+    fn decode_bit(class_value: i32, rank: u32, target_bit: i32) -> bool {
+        let mut remaining = class_value;
+        let mut rank = rank;
+
+        let mut bit = Self::RRR_BLOCK_SIZE - 1;
+        while bit >= 0 {
+            if remaining == 0 {
+                return false;
+            }
+
+            let comb = Self::binomial(bit, remaining);
+            let mut is_set = false;
+
+            if rank >= comb as u32 {
+                rank -= comb as u32;
+                remaining -= 1;
+                is_set = true;
+            }
+
+            if bit == target_bit {
+                return is_set;
+            }
+
+            bit -= 1;
+        }
+
+        false
+    }
+
+    fn binomial(n: i32, k: i32) -> i32 {
+        if k < 0 || k > n {
+            return 0;
+        }
+
+        if k == 0 || k == n {
+            return 1;
+        }
+
+        let mut k = k;
+        if k > n - k {
+            k = n - k;
+        }
+
+        let mut result = 1;
+
+        let mut i = 1;
+        while i <= k {
+            result = result * (n - (k - i)) / i;
+            i += 1;
+        }
+
+        result
+    }
+<#@ include file="Includes\Footer.ttinclude" #>

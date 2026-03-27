@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: BinarySearch
 #include <array>
 #include <cstring>
@@ -6,16 +7,18 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     static constexpr std::array<std::string_view, 13> keys = {
         u8"ß", u8"à", u8"ä", u8"å", u8"æ", u8"ç", u8"è", u8"é", u8"ê", u8"ñ", 
         u8"ö", u8"ø", u8"ü"
     };
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-
 
         size_t lo = 0;
         size_t hi = 13;

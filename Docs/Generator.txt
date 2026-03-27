@@ -1,0 +1,12 @@
+Generator rules:
+- Generators should be able to run multiple times, but only output new structures. That is, any shared helpers, object declarations, etc. should be output only once.
+- Generator's output should be configurable by users. The FastData.Generator.Template package helps developing templatable generators using the T4 template engine.
+- Generators should provide placeholders that configures the output across all templates. For example, in C#, the user might want to generate a static class instead of an instance class. Instead of having them go through all templates and update them to accomodate the need, they simply set ClassType = Static.
+- Generators must be named <Lang>CodeGenerator as the naming scheme is assumed elsewhere.
+
+## Supporting core features
+The FastData engine supports several core features that a generator developer can use. However, to support them, you must do the following:
+
+- Trimming: You must use the InputKeyName/LookupKeyName abstraction, as the engine will switch the name if trimming is enabled
+- Early exits: You must render the early exit expression at the top of public API methods. TODO: Which expressions to support in compiler?
+- Case sensitivity support: You must provide an indirection for string comparison and switch between case-sensitive and case-insensitive matching depending on the value of Config.IgnoreCase.

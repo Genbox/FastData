@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: SingleValue
 #include <array>
 #include <cstring>
@@ -6,19 +7,20 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     static inline const auto stored_value = 1;
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-
 
         return key == 1;
     }
 
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
-
 
         if (key == 1) {
             value = &stored_value;

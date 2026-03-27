@@ -1,4 +1,4 @@
-using Genbox.FastData.Generator.Framework;
+using Genbox.FastData.Generator;
 using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.InternalShared.TestClasses;

@@ -1,4 +1,5 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: RrrBitVector
 #include <array>
 #include <cstring>
@@ -6,7 +7,10 @@
 #include <limits>
 #include <string_view>
 
+
 class fastdata final {
+
+
     static constexpr uint64_t rrr_min_value = 2147285375ull;
     static constexpr uint64_t rrr_max_value = 2147312403ull;
     static constexpr int32_t rrr_block_size = 15;
@@ -420,9 +424,9 @@ class fastdata final {
         return false;
     }
 
-    public:
-        [[nodiscard]]
-        static constexpr bool contains(const int32_t key) noexcept {
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
         if ((key < -198273))
         {
          return false;
@@ -434,20 +438,19 @@ class fastdata final {
         }
 
 
+        const uint64_t mapped = static_cast<uint64_t>(static_cast<uint32_t>(key ^ std::numeric_limits<int32_t>::lowest()));
 
-            const uint64_t mapped = static_cast<uint64_t>(static_cast<uint32_t>(key ^ std::numeric_limits<int32_t>::lowest()));
+        const uint64_t normalized = mapped - rrr_min_value;
+        const int32_t block_index = static_cast<int32_t>(normalized / static_cast<uint64_t>(rrr_block_size));
+        const int32_t bit_in_block = static_cast<int32_t>(normalized % static_cast<uint64_t>(rrr_block_size));
+        const int32_t class_value = rrr_classes[static_cast<size_t>(block_index)];
 
-            const uint64_t normalized = mapped - rrr_min_value;
-            const int32_t block_index = static_cast<int32_t>(normalized / static_cast<uint64_t>(rrr_block_size));
-            const int32_t bit_in_block = static_cast<int32_t>(normalized % static_cast<uint64_t>(rrr_block_size));
-            const int32_t class_value = rrr_classes[static_cast<size_t>(block_index)];
+        if (class_value == 0)
+            return false;
 
-            if (class_value == 0)
-                return false;
-
-            const uint32_t rank = rrr_offsets[static_cast<size_t>(block_index)];
-            return decode_bit(class_value, rank, bit_in_block);
-        }
+        const uint32_t rank = rrr_offsets[static_cast<size_t>(block_index)];
+        return decode_bit(class_value, rank, bit_in_block);
+    }
 
     static constexpr size_t item_count = 1000;
     static constexpr int32_t min_key = -198273;

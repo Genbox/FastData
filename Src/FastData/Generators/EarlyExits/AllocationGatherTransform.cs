@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
+using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.Expressions;
 
 namespace Genbox.FastData.Generators.EarlyExits;
 
@@ -29,7 +31,7 @@ public class AllocationGatherTransform : IExprTransform
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.DeclaringType == typeof(EarlyExitFunctions))
+            if (node.Method.DeclaringType == typeof(StringFunctions))
             {
                 Expression? instance = node.Object == null ? null : Visit(node.Object);
                 List<Expression> arguments = new List<Expression>(node.Arguments.Count);

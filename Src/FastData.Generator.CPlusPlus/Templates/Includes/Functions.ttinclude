@@ -1,0 +1,183 @@
+<#@ template language="C#" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Linq.Expressions" #>
+<#@ import namespace="Genbox.FastData.Enums" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="Genbox.FastData.Generator.CPlusPlus.Internal" #>
+<#@ import namespace="Genbox.FastData.Generator.Enums" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generators" #>
+<#@ import namespace="Genbox.FastData.Generators.EarlyExits" #>
+<#@ import namespace="Genbox.FastData.Generators.Expressions" #>
+<#@ import namespace="Genbox.FastData.Generators.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generators.Enums" #>
+<#@ import namespace="Genbox.FastData.Generators.Abstracts" #>
+
+<#+
+    public string KeyTypeName => TypeMap.GetTypeName(Model.KeyType);
+    public string ValueTypeName => TypeMap.GetTypeName(Model.ValueType);
+
+    public string FieldModifier(bool constExpr) => constExpr ? "static constexpr " : "inline static const ";
+    public string MethodModifier(bool constExpr) => constExpr ? "static constexpr " : "static ";
+    public string MethodAttribute => "[[nodiscard]]";
+    public string PostMethodModifier => " noexcept";
+    public string LookupKeyName { get; private set; } = "key";
+
+    public string HashSource => $$"""
+                                    {{GetHashModifier()}}uint64_t get_hash(const {{KeyTypeName}} value) noexcept {
+                                {{GetHash()}}
+                                    }
+                                """;
+
+    public string GetEqual(string var1, string var2)
+    {
+        if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.IgnoreCase)
+            return $"case_insensitive_equals({var1}, {var2})";
+
+        return $"{var1} == {var2}";
+    }
+
+    public string GetCompare(string var1, string var2)
+    {
+        if (GeneratorConfig is StringGeneratorConfig strCfg)
+            return strCfg.IgnoreCase ? $"case_insensitive_compare({var1}, {var2})" : $"{var1}.compare({var2})";
+
+        return $"{var1} < {var2} ? -1 : ({var1} > {var2} ? 1 : 0)";
+    }
+
+    public string GetMod(string var1, ulong var2) => $"{var1} % {var2.ToStringInvariant()}";
+
+    public string GetMethodHeader(MethodType methodType)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append(GetEarlyExits(methodType));
+
+        if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
+        {
+            string totalTrimLength = strCfg.TotalTrimLength.ToStringInvariant();
+
+            if (methodType == MethodType.TryLookup)
+            {
+                sb.AppendLine($$"""
+                                        if (key.length() < {{totalTrimLength}})
+                                        {
+                                            value = nullptr;
+                                            return false;
+                                        }
+                                """);
+            }
+            else
+            {
+                sb.AppendLine($"""
+                                        if (key.length() < {totalTrimLength})
+                                            return false;
+                                """);
+            }
+
+            sb.AppendLine($"        const auto trimmedKey = key.substr({strCfg.TrimPrefix.Length.ToStringInvariant()}, key.length() - {totalTrimLength});");
+            LookupKeyName = "trimmedKey";
+        }
+
+        return sb.ToString();
+    }
+
+    private string GetHashModifier()
+    {
+        TypeCode keyType = Type.GetTypeCode(Model.KeyType);
+        return keyType is TypeCode.Single or TypeCode.Double or TypeCode.Int64 or TypeCode.UInt64 ? "static " : "static constexpr ";
+    }
+
+    private string GetEarlyExits(MethodType methodType)
+    {
+        IEnumerable<AnnotatedExpr> transformed = ExpressionHelper.Transform(GeneratorConfig.EarlyExits, [new EarlyExitConditionTransform(GetBody(methodType))]);
+
+        List<ParameterExpression> variables = new List<ParameterExpression>();
+        List<Expression> statements = new List<Expression>();
+
+        foreach (AnnotatedExpr expr in transformed)
+        {
+            if (expr.Kind == ExprKind.Assignment && expr.Expression is BinaryExpression { NodeType: ExpressionType.Assign, Left: ParameterExpression left })
+                variables.Add(left);
+
+            statements.Add(expr.Expression);
+        }
+
+        CPlusPlusExpressionCompiler compiler = new CPlusPlusExpressionCompiler(TypeMap);
+        BlockExpression block = Expression.Block(variables, statements);
+        return block.Expressions.Count == 0 ? string.Empty : compiler.GetCode(block, 8);
+    }
+
+    private string GetHash()
+    {
+        TypeCode keyType = Type.GetTypeCode(Model.KeyType);
+
+        if (keyType.UsesIdentityHash())
+            return "        return static_cast<uint64_t>(value);";
+
+        if (keyType == TypeCode.String)
+        {
+            return """
+                            uint64_t hash = 352654597;
+
+                            for (unsigned char ch : value)
+                                hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+
+                            return 352654597 + (hash * 1566083941);
+                    """;
+        }
+
+        if (GeneratorConfig is NumericGeneratorConfig numCfg)
+        {
+            if (keyType == TypeCode.Single)
+            {
+                return numCfg.HasZeroOrNaN
+                    ? """
+                                uint32_t bits;
+                                std::memcpy(&bits, &value, sizeof(bits));
+                                if (((bits - 1) & ~0x80000000u) >= 0x7F800000u)
+                                    bits &= 0x7F800000u;
+                                return bits;
+                        """
+                    : """
+                                uint32_t bits;
+                                std::memcpy(&bits, &value, sizeof(bits));
+                                return bits;
+                        """;
+            }
+
+            if (keyType == TypeCode.Double)
+            {
+                return numCfg.HasZeroOrNaN
+                    ? """
+                                uint64_t bits;
+                                std::memcpy(&bits, &value, sizeof(bits));
+                                if (((bits - 1) & ~0x8000000000000000ull) >= 0x7FF0000000000000ull)
+                                    bits &= 0x7FF0000000000000ull;
+                                return bits;
+                        """
+                    : """
+                                uint64_t bits;
+                                std::memcpy(&bits, &value, sizeof(bits));
+                                return bits;
+                        """;
+            }
+        }
+
+        throw new InvalidOperationException("Unsupported key type: " + keyType);
+    }
+
+    private static ICollection<Expression> GetBody(MethodType methodType) => methodType == MethodType.TryLookup
+        ? [Expression.Assign(Symbol("value"), Symbol("nullptr")),ReturnSymbol("false")]
+        : [ReturnSymbol("false")];
+
+    private static ParameterExpression Symbol(string name) => Expression.Parameter(typeof(object), name);
+
+    private static GotoExpression ReturnSymbol(string symbol)
+    {
+        ParameterExpression value = Symbol(symbol);
+        LabelTarget target = Expression.Label(value.Type);
+        return Expression.MakeGoto(GotoExpressionKind.Break, target, value, value.Type);
+    }
+#>

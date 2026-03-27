@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 
 internal static class FastData
 {
+
+
     [StructLayout(LayoutKind.Auto)]
     private struct E
     {
@@ -59,13 +61,13 @@ internal static class FastData
         return (ulong)bits;
     }
 
-
+    
     public static bool Contains(float key)
     {
 
 
         ulong hash = Hash(key);
-        uint index = (uint)(hash % 100);
+        int index = (int)(hash % 100);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
         while (i >= 0)
@@ -81,7 +83,7 @@ internal static class FastData
         return false;
     }
 
-    public const uint ItemCount = 100;
+    public const int ItemCount = 100;
     public const float MinKey = 0f;
     public const float MaxKey = 99f;
 }

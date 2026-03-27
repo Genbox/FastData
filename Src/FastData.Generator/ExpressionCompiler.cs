@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Generator.Extensions;
-using Genbox.FastData.Generator.Framework;
 
 namespace Genbox.FastData.Generator;
 

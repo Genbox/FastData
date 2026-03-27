@@ -1,11 +1,11 @@
-﻿// This file is auto-generated. Do not edit manually.
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
 // Structure: BinarySearchInterpolation
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
-
 struct Person {
     int32_t age;
     std::string_view name;
@@ -13,19 +13,20 @@ struct Person {
 
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
-class fastdata final {
-    inline static const std::array<Person*, 3> values = {
-        new Person(1, u8"Bob", new Person(4, u8"Anna", nullptr)), new Person(2, u8"Billy", nullptr), new Person(3, u8"Bibi", nullptr)
-    };
 
+class fastdata final {
+
+
+    inline static const std::array<Person, 3> values = {
+        Person(1, u8"Bob", new Person(4, u8"Anna", nullptr)), Person(2, u8"Billy", nullptr), Person(3, u8"Bibi", nullptr)
+    };
     static constexpr std::array<int32_t, 3> keys = {
         1, 2, 3
     };
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
-
 
         int32_t lo = 0;
         int32_t hi = 2;
@@ -64,7 +65,6 @@ class fastdata final {
     [[nodiscard]]
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
 
-
         int32_t lo = 0;
         int32_t hi = 2;
         while (lo <= hi && key >= keys[lo] && key <= keys[hi]) {
@@ -72,9 +72,8 @@ class fastdata final {
             const int32_t hi_key = keys[hi];
 
             if (lo_key == hi_key) {
-                if (lo_key == key)
-                {
-                    value = values[lo];
+                if (lo_key == key) {
+                    value = &values[lo];
                     return true;
                 }
 
@@ -91,9 +90,8 @@ class fastdata final {
                 mid = hi;
 
             const int32_t mid_key = keys[mid];
-            if (mid_key == key)
-            {
-                value = values[mid];
+            if (mid_key == key) {
+                value = &values[mid];
                 return true;
             }
 
