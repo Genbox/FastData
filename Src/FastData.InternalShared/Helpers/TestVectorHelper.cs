@@ -25,9 +25,7 @@ public static class TestVectorHelper
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableStructure<,>),
                      typeof(HashTablePerfectStructure<,>)))
-        {
             yield return testVector;
-        }
 
         // Then we try with complex values
         Person[] complexValues =
@@ -51,9 +49,7 @@ public static class TestVectorHelper
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableStructure<,>),
                      typeof(HashTablePerfectStructure<,>)))
-        {
             yield return testVector;
-        }
     }
 
     public static IEnumerable<ITestVector> GetValueTestVectors()
@@ -67,9 +63,7 @@ public static class TestVectorHelper
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableStructure<,>),
                      typeof(HashTableCompactStructure<,>)))
-        {
             yield return testVector;
-        }
 
         foreach (ITestVector testVector in GenerateTestVectors(GetDataOfSize(100), null,
                      typeof(ArrayStructure<,>),
@@ -78,9 +72,7 @@ public static class TestVectorHelper
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableStructure<,>),
                      typeof(HashTableCompactStructure<,>)))
-        {
             yield return testVector;
-        }
 
         foreach (ITestVector testVector in GenerateTestVectors(GetNaturallySparseIntData(1000), "natural_sparse", typeof(EliasFanoStructure<,>), typeof(RrrBitVectorStructure<,>)))
             yield return testVector;
@@ -103,9 +95,7 @@ public static class TestVectorHelper
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableCompactStructure<,>),
                      typeof(HashTableStructure<,>)))
-        {
             yield return testVector;
-        }
 
         foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "interpolation", typeof(BinarySearchInterpolationStructure<,>)))
             yield return testVector;

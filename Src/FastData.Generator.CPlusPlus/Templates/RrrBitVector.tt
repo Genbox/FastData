@@ -1,5 +1,4 @@
 <#@ include file="Includes\Header.ttinclude" #>
-<#@ import namespace="System" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.RrrBitVectorContext" name="Context" #>
 
 <#

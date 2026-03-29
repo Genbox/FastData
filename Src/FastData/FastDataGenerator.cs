@@ -208,21 +208,6 @@ public static partial class FastDataGenerator
         }
     }
 
-    private sealed class UsedFunctionVisitor : ExpressionVisitor
-    {
-        internal StringFunction Functions { get; private set; }
-
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-            if (!Enum.TryParse(node.Method.Name, false, out StringFunction value))
-                throw new InvalidOperationException($"The method '{node.Method.Name}' is unknown.");
-
-            Functions |= value;
-
-            return base.VisitMethodCall(node);
-        }
-    }
-
     private static IStructure<string, TValue, IContext> StringStructureFactory<TValue>(Type type, StringKeyProperties props, Func<HashData> getHashData, StringComparer comparer, bool sorted)
     {
         if (type == typeof(ArrayStructure<,>))
@@ -289,10 +274,12 @@ public static partial class FastDataGenerator
                 cacheHashData = GetNumericHash(keys.Span);
         }
         else
+        {
             structureType = NumericStructures<TKey>.GetBest(keys, !values.IsEmpty, props.Density, props.IsConsecutive, cfg.AllowApproximateMatching, cfg.StructureConfig, x =>
             {
                 return cacheHashData = GetNumericHash(x.Span);
             });
+        }
 
         LogStructureType(logger, structureType.Name);
 
@@ -364,5 +351,20 @@ public static partial class FastDataGenerator
             return new SingleValueStructure<TKey, TValue>();
 
         throw new InvalidOperationException($"Unsupported DataStructure {type}");
+    }
+
+    private sealed class UsedFunctionVisitor : ExpressionVisitor
+    {
+        internal StringFunction Functions { get; private set; }
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            if (!Enum.TryParse(node.Method.Name, false, out StringFunction value))
+                throw new InvalidOperationException($"The method '{node.Method.Name}' is unknown.");
+
+            Functions |= value;
+
+            return base.VisitMethodCall(node);
+        }
     }
 }

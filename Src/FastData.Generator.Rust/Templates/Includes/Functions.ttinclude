@@ -1,15 +1,3 @@
-<#@ template language="C#" #>
-<#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="System.Linq.Expressions" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="Genbox.FastData.Generator.Enums" #>
-<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
-<#@ import namespace="Genbox.FastData.Generator.Rust.Internal" #>
-<#@ import namespace="Genbox.FastData.Generators" #>
-<#@ import namespace="Genbox.FastData.Generators.EarlyExits" #>
-<#@ import namespace="Genbox.FastData.Generators.Expressions" #>
-<#@ import namespace="Genbox.FastData.Generators.Extensions" #>
-<#@ import namespace="Genbox.FastData.Generators.Enums" #>
 <#+
     private string _keyTypeName => TypeMap.GetTypeName(Model.KeyType);
     private string _valueTypeName => TypeMap.GetTypeName(Model.ValueType);

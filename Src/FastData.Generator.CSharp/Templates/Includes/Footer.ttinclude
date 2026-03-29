@@ -1,6 +1,4 @@
-﻿<#@ import namespace="Genbox.FastData.Generators" #>
-<#@ import namespace="Genbox.FastData.Generators.Enums" #>
-
+﻿
     public const int ItemCount = <#= GeneratorConfig.ItemCount #>;
 <#
     if (GeneratorConfig is StringGeneratorConfig strCfg)

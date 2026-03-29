@@ -53,10 +53,7 @@ internal static class ExprOptimizer
         ..BooleanAlgebraReductions
     ];
 
-    public static Expression Visit(Expression exp)
-    {
-        return DoReduction(VisitChildren(exp));
-    }
+    public static Expression Visit(Expression exp) => DoReduction(VisitChildren(exp));
 
     private static Expression DoReduction(Expression exp)
     {

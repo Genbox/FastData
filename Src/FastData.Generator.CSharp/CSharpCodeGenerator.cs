@@ -1,5 +1,4 @@
 using Genbox.FastData.Generator.CSharp.Internal;
-using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Template;
 using Genbox.FastData.Generator.Template.Helpers;
 using Genbox.FastData.Generators;

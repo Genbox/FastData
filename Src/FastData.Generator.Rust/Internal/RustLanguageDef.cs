@@ -1,12 +1,10 @@
 using System.Collections.ObjectModel;
 using System.Reflection;
 using Genbox.FastData.Generator.Abstracts;
-using Genbox.FastData.Generator.Definitions;
-#if NETSTANDARD2_0
 using Genbox.FastData.Generator.Compat;
-#endif
+using Genbox.FastData.Generator.Definitions;
 
-namespace Genbox.FastData.Generator.Rust.Internal.Framework;
+namespace Genbox.FastData.Generator.Rust.Internal;
 
 internal class RustLanguageDef : ILanguageDef
 {

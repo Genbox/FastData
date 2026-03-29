@@ -326,8 +326,6 @@ internal static class ComparisonReduction
         return expression;
     }
 
-    private delegate bool TryGetBinary(Expression expression, [NotNullWhen(true)]out Expression? left, [NotNullWhen(true)]out Expression? right);
-
     private static bool TryCompareConstants(Expression left, Expression right, out int comparison)
     {
         comparison = 0;
@@ -440,4 +438,6 @@ internal static class ComparisonReduction
 
         return false;
     }
+
+    private delegate bool TryGetBinary(Expression expression, [NotNullWhen(true)]out Expression? left, [NotNullWhen(true)]out Expression? right);
 }

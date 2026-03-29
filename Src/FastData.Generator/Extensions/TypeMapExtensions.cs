@@ -17,7 +17,7 @@ public static class TypeMapExtensions
         return s.Print(map, value);
     }
 
-    public static string GetObjectDeclaration<TValue>(this TypeMap map) => GetObjectDeclaration(map, typeof(TValue));
+    public static string GetObjectDeclaration<TValue>(this TypeMap map) => map.GetObjectDeclaration(typeof(TValue));
 
     public static string GetObjectDeclaration(this TypeMap map, Type valueType)
     {

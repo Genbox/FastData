@@ -3,7 +3,7 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal;
 
-internal  static class StringTransform
+internal static class StringTransform
 {
     internal static string[] SubStringKeys(ReadOnlySpan<string> keys, StringKeyProperties props)
     {

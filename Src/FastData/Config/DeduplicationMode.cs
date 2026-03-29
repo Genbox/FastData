@@ -1,4 +1,4 @@
-namespace Genbox.FastData;
+namespace Genbox.FastData.Config;
 
 public enum DeduplicationMode : byte
 {
@@ -15,5 +15,5 @@ public enum DeduplicationMode : byte
     /// <summary>
     /// Uses sorting to deduplicate data. It is not as fast as <seealso cref="HashSet" />, but it uses about half the memory. As a side effect, it changes the order of keys, which might be a desired side effect under certain circumstances.
     /// </summary>
-    Sort,
+    Sort
 }

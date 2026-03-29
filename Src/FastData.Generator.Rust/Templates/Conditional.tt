@@ -1,5 +1,4 @@
 <#@ include file="Includes\Header.ttinclude" #>
-<#@ import namespace="System.Linq" #>
 <#@ include file="Includes\ImplHeader.ttinclude" #>
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.ConditionalTemplateData" name="Data" #>
 

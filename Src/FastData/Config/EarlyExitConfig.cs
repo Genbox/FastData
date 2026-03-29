@@ -6,9 +6,9 @@ namespace Genbox.FastData.Config;
 
 public class EarlyExitConfig
 {
-    private readonly Dictionary<Type, List<ILimit>> _limits = new Dictionary<Type, List<ILimit>>();
     private readonly HashSet<Type> _disabled = new HashSet<Type>();
     private readonly HashSet<Type> _disabledForStructure = new HashSet<Type>();
+    private readonly Dictionary<Type, List<ILimit>> _limits = new Dictionary<Type, List<ILimit>>();
 
     public static EarlyExitConfig Default
     {
@@ -47,8 +47,10 @@ public class EarlyExitConfig
     internal bool CheckDensityLimits(Type earlyExitType, float density)
     {
         foreach (ValueDensityMinMaxLimit limit in GetLimitsOfType<ValueDensityMinMaxLimit>(earlyExitType))
+        {
             if (!limit.IsWithinLimit(density))
                 return false;
+        }
 
         return true;
     }

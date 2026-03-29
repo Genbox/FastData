@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Generator.Extensions;
 
-namespace Genbox.FastData.Generator.CPlusPlus.Internal;
+namespace Genbox.FastData.Generator.CPlusPlus;
 
 public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
 {

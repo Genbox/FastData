@@ -13,7 +13,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, exactMatch: false);
+        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, false);
         Assert.Equal(ExpressionType.AddChecked, result.NodeType);
         ConstantExpression left = Assert.IsType<ConstantExpression>(result.Left);
         ConstantExpression right = Assert.IsType<ConstantExpression>(result.Right);
@@ -28,7 +28,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, exactMatch: false);
+        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, false);
         Assert.Equal(ExpressionType.Divide, result.NodeType);
         ConstantExpression right = Assert.IsType<ConstantExpression>(result.Right);
         Assert.Equal(0, (int)right.Value!);
@@ -41,7 +41,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, exactMatch: false);
+        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, false);
         Assert.Equal(ExpressionType.Modulo, result.NodeType);
         ConstantExpression right = Assert.IsType<ConstantExpression>(result.Right);
         Assert.Equal(0, (int)right.Value!);
@@ -54,7 +54,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        ConstantExpression result = Assert.IsType<ConstantExpression>(optimized, exactMatch: false);
+        ConstantExpression result = Assert.IsType<ConstantExpression>(optimized, false);
         Assert.Equal(typeof(bool), result.Type);
         Assert.False((bool)result.Value!);
     }
@@ -67,7 +67,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, exactMatch: false);
+        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, false);
         Assert.Equal(ExpressionType.Subtract, result.NodeType);
         Assert.Equal(expression.ToString(), result.ToString());
     }
@@ -80,7 +80,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, exactMatch: false);
+        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, false);
         Assert.Equal(ExpressionType.Multiply, result.NodeType);
         ConstantExpression right = Assert.IsType<ConstantExpression>(result.Right);
         Assert.Equal(0f, (float)right.Value!);
@@ -94,7 +94,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, exactMatch: false);
+        BinaryExpression result = Assert.IsType<BinaryExpression>(optimized, false);
         Assert.Equal(ExpressionType.Equal, result.NodeType);
         Assert.Equal(expression.ToString(), result.ToString());
     }
@@ -223,7 +223,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        ParameterExpression result = Assert.IsType<ParameterExpression>(optimized, exactMatch: false);
+        ParameterExpression result = Assert.IsType<ParameterExpression>(optimized, false);
         Assert.Same(parameter, result);
     }
 
@@ -235,7 +235,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        ParameterExpression result = Assert.IsType<ParameterExpression>(optimized, exactMatch: false);
+        ParameterExpression result = Assert.IsType<ParameterExpression>(optimized, false);
         Assert.Same(parameter, result);
     }
 
@@ -246,7 +246,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        ConstantExpression result = Assert.IsType<ConstantExpression>(optimized, exactMatch: false);
+        ConstantExpression result = Assert.IsType<ConstantExpression>(optimized, false);
         Assert.True((bool)result.Value!);
     }
 
@@ -257,7 +257,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        ConstantExpression result = Assert.IsType<ConstantExpression>(optimized, exactMatch: false);
+        ConstantExpression result = Assert.IsType<ConstantExpression>(optimized, false);
         Assert.False((bool)result.Value!);
     }
 
@@ -269,7 +269,7 @@ public sealed class ExprOptimizerEdgeCaseTests
 
         Expression optimized = Visit(expression);
 
-        ConstantExpression result = Assert.IsType<ConstantExpression>(optimized, exactMatch: false);
+        ConstantExpression result = Assert.IsType<ConstantExpression>(optimized, false);
         Assert.Equal(13, (int)result.Value!);
     }
 

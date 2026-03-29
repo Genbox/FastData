@@ -111,12 +111,16 @@ internal static class BoolAlgebraReduction
             return expr;
 
         if (TryGetValueBool(be.Left, out bool leftValue))
+        {
             return expr.NodeType == ExpressionType.Equal ? leftValue ? be.Right : Not(be.Right) :
                 leftValue ? Not(be.Right) : be.Right;
+        }
 
         if (TryGetValueBool(be.Right, out bool rightValue))
+        {
             return expr.NodeType == ExpressionType.Equal ? rightValue ? be.Left : Not(be.Left) :
                 rightValue ? Not(be.Left) : be.Left;
+        }
 
         return expr;
     }
@@ -963,8 +967,10 @@ internal static class BoolAlgebraReduction
             && TryGetOr(or5, out Expression? e, out Expression? or6)
             && TryGetOr(or6, out Expression? f, out Expression? or7)
             && TryGetOr(or7, out Expression? g, out Expression? h))
+        {
             return OrElse(OrElse(OrElse(a, b), OrElse(c, d)),
                 OrElse(OrElse(e, f), OrElse(g, h)));
+        }
 
         {
             if (TryGetOr(expression, out Expression? left1, out Expression? right1)
@@ -974,8 +980,10 @@ internal static class BoolAlgebraReduction
                 && TryGetOr(left4, out Expression? left5, out Expression? right5)
                 && TryGetOr(left5, out Expression? left6, out Expression? right6)
                 && TryGetOr(left6, out Expression? leftInnerLeft, out Expression? leftInnerRight))
+            {
                 return OrElse(OrElse(OrElse(leftInnerLeft, leftInnerRight), OrElse(right6, right5)),
                     OrElse(OrElse(right4, right3), OrElse(right2, right1)));
+            }
         }
 
         if (TryGetAnd(expression, out Expression? a1, out Expression? and2)
@@ -985,8 +993,10 @@ internal static class BoolAlgebraReduction
             && TryGetAnd(and5, out Expression? a5, out Expression? and6)
             && TryGetAnd(and6, out Expression? a6, out Expression? and7)
             && TryGetAnd(and7, out Expression? a7, out Expression? a8))
+        {
             return AndAlso(AndAlso(AndAlso(a1, a2), AndAlso(a3, a4)),
                 AndAlso(AndAlso(a5, a6), AndAlso(a7, a8)));
+        }
 
         {
             if (TryGetAnd(expression, out Expression? leftA1, out Expression? rightA1)
@@ -996,8 +1006,10 @@ internal static class BoolAlgebraReduction
                 && TryGetAnd(leftA4, out Expression? leftA5, out Expression? rightA5)
                 && TryGetAnd(leftA5, out Expression? leftA6, out Expression? rightA6)
                 && TryGetAnd(leftA6, out Expression? leftInnerLeft, out Expression? leftInnerRight))
+            {
                 return AndAlso(AndAlso(AndAlso(leftInnerLeft, leftInnerRight), AndAlso(rightA6, rightA5)),
                     AndAlso(AndAlso(rightA4, rightA3), AndAlso(rightA2, rightA1)));
+            }
         }
 
         return expression;

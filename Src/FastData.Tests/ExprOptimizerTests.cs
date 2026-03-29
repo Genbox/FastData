@@ -1266,13 +1266,10 @@ public sealed class ExprOptimizerTests
         await VerifyOptimized(optimized, testName);
     }
 
-    private static Task VerifyOptimized(Expression optimized, string testName)
-    {
-        return Verify(optimized.ToString())
-               .UseDirectory("Verify/ExpressionOptimizer")
-               .UseFileName(testName)
-               .DisableDiff();
-    }
+    private static Task VerifyOptimized(Expression optimized, string testName) => Verify(optimized.ToString())
+                                                                                  .UseDirectory("Verify/ExpressionOptimizer")
+                                                                                  .UseFileName(testName)
+                                                                                  .DisableDiff();
 
     private sealed class BoolHolder
     {

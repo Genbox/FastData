@@ -1,7 +1,6 @@
 using Genbox.FastData.Config;
 using Genbox.FastData.Generator;
 using Genbox.FastData.Generator.Extensions;
-using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Xunit.Sdk;
 

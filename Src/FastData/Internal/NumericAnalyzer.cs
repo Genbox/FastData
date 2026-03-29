@@ -2,7 +2,7 @@
 
 namespace Genbox.FastData.Internal;
 
-internal  static class NumericAnalyzer
+internal static class NumericAnalyzer
 {
     internal static bool IsWellDistributed<TKey>(ReadOnlySpan<TKey> keys, NumericKeyProperties<TKey> props, int maxHistogramBuckets)
     {

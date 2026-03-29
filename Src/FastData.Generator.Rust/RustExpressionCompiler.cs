@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Generator.Extensions;
 
-namespace Genbox.FastData.Generator.Rust.Internal;
+namespace Genbox.FastData.Generator.Rust;
 
 public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
 {

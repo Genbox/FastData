@@ -5,8 +5,8 @@ namespace Genbox.FastData.Config;
 
 public class StructureConfig
 {
-    private readonly Dictionary<Type, List<ILimit>> _limits = new Dictionary<Type, List<ILimit>>();
     private readonly HashSet<Type> _disabled = new HashSet<Type>();
+    private readonly Dictionary<Type, List<ILimit>> _limits = new Dictionary<Type, List<ILimit>>();
 
     public static StructureConfig Default
     {
@@ -40,8 +40,10 @@ public class StructureConfig
     public bool CheckDensityLimits(Type type, float density)
     {
         foreach (ValueDensityMinMaxLimit limit in GetLimitsOfType<ValueDensityMinMaxLimit>(type))
+        {
             if (!limit.IsWithinLimit(density))
                 return false;
+        }
 
         return true;
     }
@@ -49,8 +51,10 @@ public class StructureConfig
     public bool CheckItemCountLimits(Type type, uint itemCount)
     {
         foreach (ItemCountMinMaxLimit limit in GetLimitsOfType<ItemCountMinMaxLimit>(type))
+        {
             if (!limit.IsWithinLimit(itemCount))
                 return false;
+        }
 
         return true;
     }

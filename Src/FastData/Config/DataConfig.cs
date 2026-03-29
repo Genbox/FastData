@@ -1,4 +1,4 @@
-﻿namespace Genbox.FastData.Config;
+namespace Genbox.FastData.Config;
 
 public abstract class DataConfig
 {
@@ -11,13 +11,13 @@ public abstract class DataConfig
     /// <summary>Enable approximate matching using a Bloom filter.</summary>
     public bool AllowApproximateMatching { get; set; }
 
-    /// <summary>The type of structure to create. Defaults to Auto.</summary>
+    /// <summary>Override the type of structure to create. Mostly used for internal testing.</summary>
     public Type? StructureTypeOverride { get; set; }
 
     /// <summary>When enabled, data structures will be generated with the smallest possible internal data types to lower memory.</summary>
-    public bool TypeReductionEnabled { get; set; } = true; //TODO: Evaluate default value
+    public bool TypeReductionEnabled { get; set; } = true;
 
-    /// <summary>Set the method to use for deduplication of keys. Defaults to <see cref="FastData.DeduplicationMode.HashSet" />.</summary>
+    /// <summary>Set the method to use for deduplication of keys. Defaults to <see cref="Config.DeduplicationMode.HashSet" />.</summary>
     public DeduplicationMode DeduplicationMode { get; set; } = DeduplicationMode.HashSet;
 
     /// <summary>When true, FastData will only use data structures and algorithms that preserve the original data order</summary>

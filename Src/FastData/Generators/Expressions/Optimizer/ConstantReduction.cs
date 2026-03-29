@@ -62,13 +62,13 @@ internal static class ConstantReduction
 
         ExpressionType nodeType = expr.NodeType;
         if ((nodeType != ExpressionType.Add
-            && nodeType != ExpressionType.AddChecked
-            && nodeType != ExpressionType.Subtract
-            && nodeType != ExpressionType.SubtractChecked
-            && nodeType != ExpressionType.Multiply
-            && nodeType != ExpressionType.MultiplyChecked
-            && nodeType != ExpressionType.Divide
-            && nodeType != ExpressionType.Modulo)
+             && nodeType != ExpressionType.AddChecked
+             && nodeType != ExpressionType.Subtract
+             && nodeType != ExpressionType.SubtractChecked
+             && nodeType != ExpressionType.Multiply
+             && nodeType != ExpressionType.MultiplyChecked
+             && nodeType != ExpressionType.Divide
+             && nodeType != ExpressionType.Modulo)
             || be.Left.Type != be.Right.Type)
             return expr;
 
@@ -529,10 +529,6 @@ internal static class ConstantReduction
         return null;
     }
 
-    private static Expression? RemoveDivisionIdentity(Expression expr, ConstantExpression constant)
-    {
-        // x / 1 -> x
-
-        return IsOne(constant) ? expr : null;
-    }
+    // x / 1 -> x
+    private static Expression? RemoveDivisionIdentity(Expression expr, ConstantExpression constant) => IsOne(constant) ? expr : null;
 }

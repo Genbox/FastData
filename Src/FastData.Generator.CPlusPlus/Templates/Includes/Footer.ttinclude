@@ -1,5 +1,3 @@
-<#@ import namespace="Genbox.FastData.Generators" #>
-<#@ import namespace="Genbox.FastData.Generators.Enums" #>
 
     static constexpr size_t item_count = <#= GeneratorConfig.ItemCount #>;
 <#

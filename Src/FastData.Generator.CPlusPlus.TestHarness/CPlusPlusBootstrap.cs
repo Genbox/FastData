@@ -1,6 +1,5 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus.Internal;
-using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.Harness.Enums;

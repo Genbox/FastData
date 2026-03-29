@@ -1,4 +1,4 @@
-using Genbox.FastData.Generator.CPlusPlus.Internal.Framework;
+using Genbox.FastData.Generator.CPlusPlus.Internal;
 using Genbox.FastData.Generator.Template;
 using Genbox.FastData.Generator.Template.Helpers;
 using Genbox.FastData.Generators;

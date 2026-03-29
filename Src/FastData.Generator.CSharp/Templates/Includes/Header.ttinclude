@@ -1,15 +1,21 @@
 ﻿<#@ template language="C#" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Linq.Expressions" #>
+<#@ import namespace="System.Text" #>
+
+<#@ import namespace="Genbox.FastData.Generator.CSharp" #>
+<#@ import namespace="Genbox.FastData.Generator.CSharp.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
-<#@ import namespace="Genbox.FastData.Generators" #>
-<#@ import namespace="Genbox.FastData.Generator.CSharp.Enums" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generators" #>
-<#@ import namespace="Genbox.FastData.Generator.CSharp.Enums" #>
-<#@ import namespace="Genbox.FastData.Generators.Enums" #>
 <#@ import namespace="Genbox.FastData.Generators.Abstracts" #>
+<#@ import namespace="Genbox.FastData.Generators.EarlyExits" #>
+<#@ import namespace="Genbox.FastData.Generators.Enums" #>
+<#@ import namespace="Genbox.FastData.Generators.Expressions" #>
+<#@ import namespace="Genbox.FastData.Generators.Extensions" #>
+
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.TypeMap" name="TypeMap" #>
 <#@ parameter type="Genbox.FastData.Generator.CSharp.CSharpCodeGeneratorConfig" name="CSharpConfig" #>

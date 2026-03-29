@@ -12,9 +12,9 @@ namespace Genbox.FastData.Generator.Template;
 
 public abstract class TemplatedCodeGenerator : ICodeGenerator
 {
+    private readonly string _languageName;
     private readonly TemplateManager _manager;
     private readonly TypeMap _map;
-    private readonly string _languageName;
 
     protected TemplatedCodeGenerator(ILanguageDef languageDef, GeneratorEncoding encoding)
     {
@@ -34,9 +34,9 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
         _manager = new TemplateManager(_languageName, Path.Combine(Path.GetTempPath(), "FastData"), release);
     }
 
-    public GeneratorEncoding Encoding { get; }
-
     protected string TemplateDir => Path.Combine(AppContext.BaseDirectory, "Templates", _languageName);
+
+    public GeneratorEncoding Encoding { get; }
 
     public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
     {
