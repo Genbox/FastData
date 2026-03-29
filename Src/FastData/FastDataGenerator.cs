@@ -283,7 +283,7 @@ public static partial class FastDataGenerator
 
         LogStructureType(logger, structureType.Name);
 
-        IStructure<TKey, TValue, IContext> structure = NumericStructureFactory<TKey, TValue>(structureType, props, cacheHashData!, sorted);
+        IStructure<TKey, TValue, IContext> structure = NumericStructureFactory<TKey, TValue>(cfg, structureType, props, cacheHashData!, sorted);
 
         IEarlyExit[] earlyExits = CombineEarlyExits(structure.GetMandatoryExits(), NumericEarlyExits<TKey>.GetCandidates(type, props.MinKeyValue, props.MaxKeyValue, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig));
 
@@ -321,7 +321,7 @@ public static partial class FastDataGenerator
         return combined.ToArray();
     }
 
-    private static IStructure<TKey, TValue, IContext> NumericStructureFactory<TKey, TValue>(Type type, NumericKeyProperties<TKey> props, HashData hashData, bool sorted)
+    private static IStructure<TKey, TValue, IContext> NumericStructureFactory<TKey, TValue>(DataConfig cfg, Type type, NumericKeyProperties<TKey> props, HashData hashData, bool sorted)
     {
         if (type == typeof(ArrayStructure<,>))
             return new ArrayStructure<TKey, TValue>();
@@ -336,7 +336,7 @@ public static partial class FastDataGenerator
         if (type == typeof(ConditionalStructure<,>))
             return new ConditionalStructure<TKey, TValue>();
         if (type == typeof(EliasFanoStructure<,>))
-            return new EliasFanoStructure<TKey, TValue>(props.MinKeyValue, props.MaxKeyValue, props.ValueConverter, sorted, 128); // TODO: Make skip a config
+            return new EliasFanoStructure<TKey, TValue>(props.MinKeyValue, props.MaxKeyValue, props.ValueConverter, sorted, GetSetting(cfg, "SkipQuantum", 128));
         if (type == typeof(HashTableStructure<,>))
             return new HashTableStructure<TKey, TValue>(hashData);
         if (type == typeof(HashTableCompactStructure<,>))
@@ -351,6 +351,14 @@ public static partial class FastDataGenerator
             return new SingleValueStructure<TKey, TValue>();
 
         throw new InvalidOperationException($"Unsupported DataStructure {type}");
+    }
+
+    private static T GetSetting<T>(DataConfig cfg, string key, T defaultValue)
+    {
+        if (!cfg.StructureSettings.TryGetValue(key, out object? value))
+            return defaultValue;
+
+        return (T)value;
     }
 
     private sealed class UsedFunctionVisitor : ExpressionVisitor

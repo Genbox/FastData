@@ -1,4 +1,4 @@
-namespace Genbox.FastData.Config;
+﻿namespace Genbox.FastData.Config;
 
 public abstract class DataConfig
 {
@@ -31,4 +31,7 @@ public abstract class DataConfig
     /// performance.
     /// </summary>
     public int HashCapacityFactor { get; set; } = 1;
+
+    /// <summary>Can be used to give advanced fine-tuning parameters to individual data structures</summary>
+    public Dictionary<string, object> StructureSettings { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 }
