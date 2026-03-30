@@ -18,4 +18,6 @@ public sealed record ValueBitMaskEarlyExit(ulong Mask) : IEarlyExit
 
         return NotEqual(masked, Constant(zeroValue, unsignedType));
     }
+
+    public bool IsWorseThan(IEarlyExit other) => false;
 }

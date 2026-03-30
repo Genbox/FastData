@@ -11,4 +11,6 @@ public abstract record StringAffixEarlyExitBase(string Affix, string Method) : I
         MethodInfo methodInfo = typeof(StringFunctions).GetMethod(Method, [typeof(string), typeof(string)])!;
         return Not(Call(methodInfo, Constant(Affix), key));
     }
+
+    public bool IsWorseThan(IEarlyExit other) => false;
 }

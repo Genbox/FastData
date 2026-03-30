@@ -24,4 +24,6 @@ public abstract record CharBitmapEarlyExitBase(ulong Low, ulong High, string Met
         Expression selected = Or(And(lowMasked, lowMask), And(highMasked, highMask));
         return Equal(selected, Constant(0UL));
     }
+
+    public bool IsWorseThan(IEarlyExit other) => false;
 }

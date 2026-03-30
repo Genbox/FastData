@@ -16,4 +16,6 @@ public sealed record LengthBitmapEarlyExit(ulong BitSet) : IEarlyExit
         Expression masked = And(Constant(BitSet), shiftedBit);
         return Equal(masked, Constant(0UL));
     }
+
+    public bool IsWorseThan(IEarlyExit other) => false;
 }

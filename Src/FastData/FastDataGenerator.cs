@@ -310,6 +310,7 @@ public static partial class FastDataGenerator
 
     private static IEarlyExit[] CombineEarlyExits(IEnumerable<IEarlyExit> mandatoryExits, IEnumerable<IEarlyExit> candidateExits)
     {
+        // Use hash set to deduplicate early exits on their direct values
         HashSet<IEarlyExit> combined = new HashSet<IEarlyExit>();
 
         foreach (IEarlyExit exit in mandatoryExits)
@@ -317,6 +318,30 @@ public static partial class FastDataGenerator
 
         foreach (IEarlyExit exit in candidateExits)
             combined.Add(exit);
+
+        // Some early exits are reducible. For example, a LengthLessThan with a value of 3 is worse than one with 4.
+        // So if there are competing exits, we take the one with the best bounds.
+        if (combined.Count > 1)
+        {
+            IEarlyExit[] exits = combined.ToArray();
+
+            for (int i = 0; i < exits.Length; i++)
+            {
+                IEarlyExit exit = exits[i];
+
+                for (int j = 0; j < exits.Length; j++)
+                {
+                    if (i == j)
+                        continue;
+
+                    if (exit.IsWorseThan(exits[j]))
+                    {
+                        combined.Remove(exit);
+                        break;
+                    }
+                }
+            }
+        }
 
         return combined.ToArray();
     }
