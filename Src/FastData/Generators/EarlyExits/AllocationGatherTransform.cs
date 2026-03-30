@@ -7,6 +7,58 @@ namespace Genbox.FastData.Generators.EarlyExits;
 
 public class AllocationGatherTransform : IExprTransform
 {
+    /*
+        If we just print out each expression, we will get something like this:
+
+        public bool Contains(string key)
+        {
+            if (GetLength(key) < 3 || GetLength(key) > 6)
+                return false;
+
+            if (GetFirstChar(key) != 'Æ')
+                return false;
+
+            if (GetFirstChar(key) < 'A')
+                return false;
+        }
+
+        That's suboptimal for performance due to repeated calls. However, if we just detect the calls and print them out in the beginning, it is
+        still not good, as the allocations will happen before they are needed.
+
+        public bool Contains(string key)
+        {
+            uint len = GetLength(key);
+            char firstChar = GetFirstChar(key);
+
+            if (len < 3 || len > 6)
+                return false;
+
+            if (firstChar != 'Æ')
+                return false;
+
+            if (firstChar < 'A')
+                return false;
+        }
+
+        However, by adding the gatherer transform, it will register the allocation the first time they are needed, and it now looks like this:
+
+        public bool Contains(string key)
+        {
+            uint len = GetLength(key);
+
+            if (len < 3 || len > 6)
+                return false;
+
+            char firstChar = GetFirstChar(key);
+
+            if (firstChar != 'Æ')
+                return false;
+
+            if (firstChar < 'A')
+                return false;
+        }
+    */
+
     public object CreateState() => new AllocationGatherState();
 
     public IEnumerable<AnnotatedExpr> Transform(AnnotatedExpr expr, object state)
