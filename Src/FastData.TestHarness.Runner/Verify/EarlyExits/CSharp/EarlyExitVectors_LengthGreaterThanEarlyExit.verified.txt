@@ -1,1 +1,1 @@
-﻿(GetLength(inputKey) > 5u)
+﻿(GetLength(inputKey) > 5)

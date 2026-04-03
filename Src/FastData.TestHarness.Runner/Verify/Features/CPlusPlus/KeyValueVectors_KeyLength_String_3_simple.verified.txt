@@ -10,7 +10,7 @@
 
 class fastdata final {
 
-    static constexpr uint32_t GetLength(std::string_view str) { return static_cast<uint32_t>(str.length()); }
+    static constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }
 
     static constexpr std::array<int32_t, 3> offsets = {
         0, 1, 2
@@ -26,14 +26,14 @@ class fastdata final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        uint32_t getLength;
+        int32_t getLength;
         getLength = GetLength(key);
-        if ((getLength < 1u))
+        if ((getLength < 1))
         {
          return false;
         }
 
-        if ((getLength > 3u))
+        if ((getLength > 3))
         {
          return false;
         }
@@ -45,15 +45,15 @@ public:
 
     [[nodiscard]]
     static bool try_lookup(const std::string_view key, const int32_t*& value) noexcept {
-        uint32_t getLength;
+        int32_t getLength;
         getLength = GetLength(key);
-        if ((getLength < 1u))
+        if ((getLength < 1))
         {
          value = nullptr;
          return false;
         }
 
-        if ((getLength > 3u))
+        if ((getLength > 3))
         {
          value = nullptr;
          return false;
@@ -71,8 +71,8 @@ public:
     }
 
     static constexpr size_t item_count = 3;
-    static constexpr size_t min_key_length = 1;
-    static constexpr size_t max_key_length = 3;
+    static constexpr int32_t min_key_length = 1;
+    static constexpr int32_t max_key_length = 3;
     static constexpr bool has_number = false;
     static constexpr bool has_uppercase = false;
     static constexpr bool has_lowercase = true;

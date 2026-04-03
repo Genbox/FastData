@@ -19,8 +19,8 @@ public class GPerfAnalyzerBenchmarks
         Random rng = new Random(42);
         _data = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(rng, 50)).ToArray();
 
-        StringKeyProperties props = KeyAnalyzer.GetStringProperties(_data, false, false, GeneratorEncoding.ASCII);
-        _analyzer = new GPerfAnalyzer(_data.Length, props, new GPerfAnalyzerConfig(), new Simulator(_data.Length, GeneratorEncoding.UTF16), NullLogger<GPerfAnalyzer>.Instance);
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(_data, false, false, GeneratorEncoding.Utf16CodeUnits);
+        _analyzer = new GPerfAnalyzer(_data.Length, props, new GPerfAnalyzerConfig(), new Simulator(_data.Length, GeneratorEncoding.Utf16CodeUnits), NullLogger<GPerfAnalyzer>.Instance);
     }
 
     [Benchmark]

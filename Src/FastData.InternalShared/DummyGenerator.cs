@@ -10,7 +10,7 @@ namespace Genbox.FastData.InternalShared;
 [SuppressMessage("Major Code Smell", "S2326:Unused type parameters should be removed")]
 public readonly struct DummyGenerator : ICodeGenerator
 {
-    public GeneratorEncoding Encoding => GeneratorEncoding.UTF16;
+    public GeneratorEncoding Encoding => GeneratorEncoding.Utf16CodeUnits;
 
     public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
     {

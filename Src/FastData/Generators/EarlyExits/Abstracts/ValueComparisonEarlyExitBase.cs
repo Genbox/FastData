@@ -10,4 +10,5 @@ public abstract record ValueComparisonEarlyExitBase<T>(T Value) : IEarlyExit
     protected abstract BinaryExpression Compare(Expression left, Expression right);
 
     public abstract bool IsWorseThan(IEarlyExit other);
+    public abstract ulong KeyspaceSize { get; }
 }

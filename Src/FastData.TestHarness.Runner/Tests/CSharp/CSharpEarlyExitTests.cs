@@ -20,7 +20,7 @@ public sealed class CSharpEarlyExitTests(DockerCSharpFixture fixture) : EarlyExi
               private static char GetFirstCharLower(string str) => char.ToLowerInvariant(str[0]);
               private static char GetLastChar(string str) => str[str.Length - 1];
               private static char GetLastCharLower(string str) => char.ToLowerInvariant(str[str.Length - 1]);
-              private static uint GetLength(string str) => (uint)str.Length;
+              private static int GetLength(string str) => str.Length;
               private static bool StartsWith(string prefix, string str) => str.StartsWith(prefix, StringComparison.Ordinal);
               private static bool StartsWithIgnoreCase(string prefix, string str) => str.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
               private static bool EndsWith(string prefix, string str) => str.EndsWith(prefix, StringComparison.Ordinal);

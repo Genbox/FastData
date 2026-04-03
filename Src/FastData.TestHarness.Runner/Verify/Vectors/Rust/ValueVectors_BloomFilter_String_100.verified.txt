@@ -45,8 +45,8 @@ impl fastdata {
     }
 
     pub const ITEM_COUNT: usize = 100;
-    pub const MIN_KEY_LENGTH: usize = 1;
-    pub const MAX_KEY_LENGTH: usize = 2;
+    pub const MIN_KEY_LENGTH: i32 = 1;
+    pub const MAX_KEY_LENGTH: i32 = 2;
     pub const HAS_NUMBER: bool = true;
     pub const HAS_UPPERCASE: bool = false;
     pub const HAS_LOWERCASE: bool = false;

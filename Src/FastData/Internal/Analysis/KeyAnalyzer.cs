@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis;
 
@@ -12,69 +12,70 @@ internal static class KeyAnalyzer
 {
     internal static NumericKeyProperties<T> GetNumericProperties<T>(ReadOnlyMemory<T> keys, bool keysAreSorted)
     {
+        if (!keysAreSorted)
+        {
+            T[] sorted = new T[keys.Length];
+            keys.Span.CopyTo(sorted);
+            Array.Sort(sorted, Comparer<T>.Default);
+            keys = sorted;
+        }
+
         if (typeof(T) == typeof(char))
-            return (NumericKeyProperties<T>)(object)GetCharProperties(((ReadOnlyMemory<char>)(object)keys).Span, keysAreSorted);
+            return (NumericKeyProperties<T>)(object)GetCharProperties(((ReadOnlyMemory<char>)(object)keys).Span);
         if (typeof(T) == typeof(sbyte))
-            return (NumericKeyProperties<T>)(object)GetSByteProperties(((ReadOnlyMemory<sbyte>)(object)keys).Span, keysAreSorted);
+            return (NumericKeyProperties<T>)(object)GetSByteProperties(((ReadOnlyMemory<sbyte>)(object)keys).Span);
         if (typeof(T) == typeof(byte))
-            return (NumericKeyProperties<T>)(object)GetByteProperties(((ReadOnlyMemory<byte>)(object)keys).Span, keysAreSorted);
+            return (NumericKeyProperties<T>)(object)GetByteProperties(((ReadOnlyMemory<byte>)(object)keys).Span);
         if (typeof(T) == typeof(short))
-            return (NumericKeyProperties<T>)(object)GetInt16Properties(((ReadOnlyMemory<short>)(object)keys).Span, keysAreSorted);
+            return (NumericKeyProperties<T>)(object)GetInt16Properties(((ReadOnlyMemory<short>)(object)keys).Span);
         if (typeof(T) == typeof(ushort))
-            return (NumericKeyProperties<T>)(object)GetUInt16Properties(((ReadOnlyMemory<ushort>)(object)keys).Span, keysAreSorted);
+            return (NumericKeyProperties<T>)(object)GetUInt16Properties(((ReadOnlyMemory<ushort>)(object)keys).Span);
         if (typeof(T) == typeof(int))
-            return (NumericKeyProperties<T>)(object)GetInt32Properties(((ReadOnlyMemory<int>)(object)keys).Span, keysAreSorted);
+            return (NumericKeyProperties<T>)(object)GetInt32Properties(((ReadOnlyMemory<int>)(object)keys).Span);
         if (typeof(T) == typeof(uint))
-            return (NumericKeyProperties<T>)(object)GetUInt32Properties(((ReadOnlyMemory<uint>)(object)keys).Span, keysAreSorted);
+            return (NumericKeyProperties<T>)(object)GetUInt32Properties(((ReadOnlyMemory<uint>)(object)keys).Span);
         if (typeof(T) == typeof(long))
-            return (NumericKeyProperties<T>)(object)GetInt64Properties(((ReadOnlyMemory<long>)(object)keys).Span, keysAreSorted);
+            return (NumericKeyProperties<T>)(object)GetInt64Properties(((ReadOnlyMemory<long>)(object)keys).Span);
         if (typeof(T) == typeof(ulong))
-            return (NumericKeyProperties<T>)(object)GetUInt64Properties(((ReadOnlyMemory<ulong>)(object)keys).Span, keysAreSorted);
+            return (NumericKeyProperties<T>)(object)GetUInt64Properties(((ReadOnlyMemory<ulong>)(object)keys).Span);
         if (typeof(T) == typeof(float))
-            return (NumericKeyProperties<T>)(object)GetSingleProperties(((ReadOnlyMemory<float>)(object)keys).Span, keysAreSorted);
+            return (NumericKeyProperties<T>)(object)GetSingleProperties(((ReadOnlyMemory<float>)(object)keys).Span);
         if (typeof(T) == typeof(double))
-            return (NumericKeyProperties<T>)(object)GetDoubleProperties(((ReadOnlyMemory<double>)(object)keys).Span, keysAreSorted);
+            return (NumericKeyProperties<T>)(object)GetDoubleProperties(((ReadOnlyMemory<double>)(object)keys).Span);
 
         throw new InvalidOperationException($"Unsupported data type: {typeof(T).Name}");
     }
 
     internal static StringKeyProperties GetStringProperties(ReadOnlySpan<string> keys, bool enableTrimming, bool ignoreCase, GeneratorEncoding encoding)
     {
-        //Contains a map of unique lengths & tracks min/max values in byte counts
-        LengthBitArray byteLenMap = new LengthBitArray();
-        LengthBitArray charLenMap = new LengthBitArray();
+        // We need to create a length map for generators
+        HashSet<int> uniqLengths = new HashSet<int>();
 
-        //We need to know the longest string for optimal mixing. Probably not 100% necessary.
+        // We need to know the longest string for optimal mixing. Probably not 100% necessary.
         string maxStr = keys[0];
-        bool byteLenUniq = true;
-        bool charLenUniq = true;
+
+        // We separately need to keep track of the smallest string, but only the length of it.
+        int minLength = int.MaxValue;
+
         bool allAscii = true;
         CharacterClass charClass = CharacterClass.Unknown;
         AsciiMap firstCharMap = new AsciiMap();
         AsciiMap lastCharMap = new AsciiMap();
 
-        //We wire up the delegates here to avoid branching in the foreach below
-        Func<string, int> getByteCount = encoding switch
-        {
-            GeneratorEncoding.ASCII => static str => Encoding.ASCII.GetByteCount(str),
-            GeneratorEncoding.UTF8 => static str => Encoding.UTF8.GetByteCount(str),
-            GeneratorEncoding.UTF16 => static str => Encoding.Unicode.GetByteCount(str),
-            GeneratorEncoding.UTF32 => static str => Encoding.UTF32.GetByteCount(str),
-            _ => throw new InvalidOperationException($"Unsupported encoding: {encoding}")
-        };
+        // We wire up the delegates here to avoid branching in the foreach below
 
+        // Get the generator-specific string length.
+        Func<string, int> getLength = StringHelper.GetLengthFunc(encoding);
         Func<char, char> getChar = ignoreCase ? char.ToLowerInvariant : static c => c;
 
-        foreach (string str in keys)
+        for (int i = 0; i < keys.Length; i++)
         {
+            string str = keys[i];
             if (str.Length > maxStr.Length)
                 maxStr = str;
 
-            int byteLen = getByteCount(str);
-            byteLenUniq &= !byteLenMap.SetTrue((uint)byteLen);
-
-            int charLen = str.Length;
-            charLenUniq &= !charLenMap.SetTrue((uint)charLen);
+            minLength = Math.Min(minLength, str.Length);
+            uniqLengths.Add(getLength(str));
 
             firstCharMap.Add(getChar(str[0]));
             lastCharMap.Add(getChar(str[str.Length - 1]));
@@ -106,10 +107,31 @@ internal static class KeyAnalyzer
         int[]? left = null;
         int[]? right = null;
 
-        //TODO: The if() below seems wrong
+        // Convert lengths to an array and sort it so we can make it into ranges.
+        int[] lengthArr = uniqLengths.ToArray();
+        Array.Sort(lengthArr);
+
+        DataRanges<int> ranges = new DataRanges<int>(lengthArr.Length);
+        int rangeStart = lengthArr[0];
+        int previous = lengthArr[0];
+
+        for (int i = 1; i < lengthArr.Length; i++)
+        {
+            int current = lengthArr[i];
+
+            if (current - previous > 1)
+            {
+                ranges.Add(rangeStart, previous);
+                rangeStart = current;
+            }
+
+            previous = current;
+        }
+
+        ranges.Add(rangeStart, previous);
 
         // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough
-        if (enableTrimming && keys.Length > 1 && charLenMap.Min > 1)
+        if (enableTrimming && keys.Length > 1 && minLength > 1)
         {
             //Build a forward and reverse map of merged entropy
             //We can derive common prefix/suffix from it that can be used later for high-entropy hash/equality functions
@@ -143,7 +165,7 @@ internal static class KeyAnalyzer
             int rightCount = CountZero(right);
 
             // Make sure that we handle the case where all characters in the inputs are the same
-            if (leftCount == charLenMap.Min || rightCount == charLenMap.Min)
+            if (leftCount == minLength || rightCount == minLength)
             {
                 prefix = string.Empty;
                 suffix = string.Empty;
@@ -155,412 +177,333 @@ internal static class KeyAnalyzer
             }
         }
 
-        return new StringKeyProperties(new LengthData(charLenUniq, charLenMap, byteLenUniq, byteLenMap), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, firstCharMap, lastCharMap));
+        return new StringKeyProperties(new LengthData(keys.Length == uniqLengths.Count, ranges, minLength, maxStr.Length), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, firstCharMap, lastCharMap));
     }
 
-    private static NumericKeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys, bool keysAreSorted)
+    private static NumericKeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys)
     {
-        char min = keysAreSorted ? keys[0] : char.MaxValue;
-        char max = keysAreSorted ? keys[keys.Length - 1] : char.MinValue;
         ushort mask = 0;
+        DataRanges<char> ranges = new DataRanges<char>(keys.Length);
+        char rangeStart = keys[0];
+        char previous = keys[0];
+        mask |= previous;
 
-        if (keysAreSorted)
+        for (int i = 1; i < keys.Length; i++)
         {
-            foreach (char c in keys)
-                mask |= c;
-        }
-        else
-        {
-            foreach (char c in keys)
+            char val = keys[i];
+            mask |= val;
+
+            if (val - previous > 1)
             {
-                min = c < min ? c : min;
-                max = c > max ? c : max;
-                mask |= c;
+                ranges.Add(rangeStart, previous);
+                rangeStart = val;
             }
+
+            previous = val;
         }
 
-        ulong range = (ulong)(max - min);
-        return new NumericKeyProperties<char>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        ranges.Add(rangeStart, previous);
+
+        mask ^= char.MaxValue;
+        ulong range = (ulong)(ranges.Max - ranges.Min);
+        bool isConsecutive = range == (ulong)(keys.Length - 1);
+        return new NumericKeyProperties<char>(ranges, range, CalculateDensity(keys.Length, range), false, isConsecutive, mask);
     }
 
-    private static NumericKeyProperties<float> GetSingleProperties(ReadOnlySpan<float> keys, bool keysAreSorted)
+    private static NumericKeyProperties<byte> GetByteProperties(ReadOnlySpan<byte> keys)
     {
-        float min = keysAreSorted ? keys[0] : float.MaxValue;
-        float max = keysAreSorted ? keys[keys.Length - 1] : float.MinValue;
-
-        bool hasZeroOrNaN = false;
-        bool hasNaNOrInfinity = false;
-
-        if (keysAreSorted)
-        {
-            foreach (float c in keys)
-            {
-                if (!hasZeroOrNaN && (float.IsNaN(c) || c == 0.0f))
-                    hasZeroOrNaN = true;
-
-                if (!hasNaNOrInfinity && (float.IsNaN(c) || float.IsInfinity(c)))
-                    hasNaNOrInfinity = true;
-            }
-        }
-        else
-        {
-            foreach (float c in keys)
-            {
-                if (!hasZeroOrNaN && (float.IsNaN(c) || c == 0.0f))
-                    hasZeroOrNaN = true;
-
-                if (!hasNaNOrInfinity && (float.IsNaN(c) || float.IsInfinity(c)))
-                    hasNaNOrInfinity = true;
-
-                min = c < min ? c : min;
-                max = c > max ? c : max;
-            }
-        }
-
-        ulong range = ClampRangeToUInt64(max - min);
-        return new NumericKeyProperties<float>(min, max, range, CalculateDensity(keys.Length, range), hasZeroOrNaN, IsFloatConsecutive(keys, min, max, hasNaNOrInfinity, keysAreSorted), 0, static v => (long)v);
-    }
-
-    private static NumericKeyProperties<double> GetDoubleProperties(ReadOnlySpan<double> keys, bool keysAreSorted)
-    {
-        double min = keysAreSorted ? keys[0] : double.MaxValue;
-        double max = keysAreSorted ? keys[keys.Length - 1] : double.MinValue;
-
-        bool hasZeroOrNaN = false;
-        bool hasNaNOrInfinity = false;
-
-        if (keysAreSorted)
-        {
-            foreach (double c in keys)
-            {
-                if (!hasZeroOrNaN && (double.IsNaN(c) || c == 0.0d))
-                    hasZeroOrNaN = true;
-
-                if (!hasNaNOrInfinity && (double.IsNaN(c) || double.IsInfinity(c)))
-                    hasNaNOrInfinity = true;
-            }
-        }
-        else
-        {
-            foreach (double c in keys)
-            {
-                if (!hasZeroOrNaN && (double.IsNaN(c) || c == 0.0d))
-                    hasZeroOrNaN = true;
-
-                if (!hasNaNOrInfinity && (double.IsNaN(c) || double.IsInfinity(c)))
-                    hasNaNOrInfinity = true;
-
-                min = c < min ? c : min;
-                max = c > max ? c : max;
-            }
-        }
-
-        ulong range = ClampRangeToUInt64(max - min);
-        return new NumericKeyProperties<double>(min, max, range, CalculateDensity(keys.Length, range), hasZeroOrNaN, IsDoubleConsecutive(keys, min, max, hasNaNOrInfinity, keysAreSorted), 0, static v => (long)v);
-    }
-
-    private static NumericKeyProperties<byte> GetByteProperties(ReadOnlySpan<byte> keys, bool keysAreSorted)
-    {
-        byte min = keysAreSorted ? keys[0] : byte.MaxValue;
-        byte max = keysAreSorted ? keys[keys.Length - 1] : byte.MinValue;
         byte mask = 0;
+        DataRanges<byte> ranges = new DataRanges<byte>(keys.Length);
+        byte rangeStart = keys[0];
+        byte previous = keys[0];
+        mask |= previous;
 
-        if (keysAreSorted)
+        for (int i = 1; i < keys.Length; i++)
         {
-            foreach (byte val in keys)
-                mask |= val;
-        }
-        else
-        {
-            foreach (byte val in keys)
+            byte val = keys[i];
+            mask |= val;
+
+            if (val - previous > 1)
             {
-                min = Math.Min(min, val);
-                max = Math.Max(max, val);
-                mask |= val;
+                ranges.Add(rangeStart, previous);
+                rangeStart = val;
             }
+
+            previous = val;
         }
+
+        ranges.Add(rangeStart, previous);
 
         mask ^= byte.MaxValue;
-        ulong range = (ulong)(max - min);
-        return new NumericKeyProperties<byte>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        ulong range = (ulong)(ranges.Max - ranges.Min);
+        bool isConsecutive = range == (ulong)(keys.Length - 1);
+        return new NumericKeyProperties<byte>(ranges, range, CalculateDensity(keys.Length, range), false, isConsecutive, mask);
     }
 
-    private static NumericKeyProperties<sbyte> GetSByteProperties(ReadOnlySpan<sbyte> keys, bool keysAreSorted)
+    private static NumericKeyProperties<sbyte> GetSByteProperties(ReadOnlySpan<sbyte> keys)
     {
-        sbyte min = keysAreSorted ? keys[0] : sbyte.MaxValue;
-        sbyte max = keysAreSorted ? keys[keys.Length - 1] : sbyte.MinValue;
         byte mask = 0;
+        DataRanges<sbyte> ranges = new DataRanges<sbyte>(keys.Length);
+        sbyte rangeStart = keys[0];
+        sbyte previous = keys[0];
+        mask |= unchecked((byte)previous);
 
-        if (keysAreSorted)
+        for (int i = 1; i < keys.Length; i++)
         {
-            foreach (sbyte val in keys)
-                mask |= unchecked((byte)val);
-        }
-        else
-        {
-            foreach (sbyte val in keys)
+            sbyte val = keys[i];
+            mask |= unchecked((byte)val);
+
+            if (val - previous > 1)
             {
-                min = Math.Min(min, val);
-                max = Math.Max(max, val);
-                mask |= unchecked((byte)val);
+                ranges.Add(rangeStart, previous);
+                rangeStart = val;
             }
+
+            previous = val;
         }
+
+        ranges.Add(rangeStart, previous);
 
         mask ^= byte.MaxValue;
-        ulong range = (ulong)(max - min);
-        return new NumericKeyProperties<sbyte>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        ulong range = (ulong)(ranges.Max - ranges.Min);
+        bool isConsecutive = range == (ulong)(keys.Length - 1);
+        return new NumericKeyProperties<sbyte>(ranges, range, CalculateDensity(keys.Length, range), false, isConsecutive, mask);
     }
 
-    private static NumericKeyProperties<short> GetInt16Properties(ReadOnlySpan<short> keys, bool keysAreSorted)
+    private static NumericKeyProperties<short> GetInt16Properties(ReadOnlySpan<short> keys)
     {
-        short min = keysAreSorted ? keys[0] : short.MaxValue;
-        short max = keysAreSorted ? keys[keys.Length - 1] : short.MinValue;
         ushort mask = 0;
+        DataRanges<short> ranges = new DataRanges<short>(keys.Length);
+        short rangeStart = keys[0];
+        short previous = keys[0];
+        mask |= unchecked((ushort)previous);
 
-        if (keysAreSorted)
+        for (int i = 1; i < keys.Length; i++)
         {
-            foreach (short val in keys)
-                mask |= unchecked((ushort)val);
-        }
-        else
-        {
-            foreach (short val in keys)
+            short val = keys[i];
+            mask |= unchecked((ushort)val);
+
+            if (val - previous > 1)
             {
-                min = Math.Min(min, val);
-                max = Math.Max(max, val);
-                mask |= unchecked((ushort)val);
+                ranges.Add(rangeStart, previous);
+                rangeStart = val;
             }
+
+            previous = val;
         }
+
+        ranges.Add(rangeStart, previous);
 
         mask ^= ushort.MaxValue;
-        ulong range = (ulong)(max - min);
-        return new NumericKeyProperties<short>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        ulong range = (ulong)(ranges.Max - ranges.Min);
+        bool isConsecutive = range == (ulong)(keys.Length - 1);
+        return new NumericKeyProperties<short>(ranges, range, CalculateDensity(keys.Length, range), false, isConsecutive, mask);
     }
 
-    private static NumericKeyProperties<ushort> GetUInt16Properties(ReadOnlySpan<ushort> keys, bool keysAreSorted)
+    private static NumericKeyProperties<ushort> GetUInt16Properties(ReadOnlySpan<ushort> keys)
     {
-        ushort min = keysAreSorted ? keys[0] : ushort.MaxValue;
-        ushort max = keysAreSorted ? keys[keys.Length - 1] : ushort.MinValue;
         ushort mask = 0;
+        DataRanges<ushort> ranges = new DataRanges<ushort>(keys.Length);
+        ushort rangeStart = keys[0];
+        ushort previous = keys[0];
+        mask |= previous;
 
-        if (keysAreSorted)
+        for (int i = 1; i < keys.Length; i++)
         {
-            foreach (ushort val in keys)
-                mask |= val;
-        }
-        else
-        {
-            foreach (ushort val in keys)
+            ushort val = keys[i];
+            mask |= val;
+
+            if (val - previous > 1)
             {
-                min = Math.Min(min, val);
-                max = Math.Max(max, val);
-                mask |= val;
+                ranges.Add(rangeStart, previous);
+                rangeStart = val;
             }
+
+            previous = val;
         }
+
+        ranges.Add(rangeStart, previous);
 
         mask ^= ushort.MaxValue;
-        ulong range = (ulong)(max - min);
-        return new NumericKeyProperties<ushort>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == keys.Length - 1, mask, static v => v);
+        ulong range = (ulong)(ranges.Max - ranges.Min);
+        bool isConsecutive = range == (ulong)(keys.Length - 1);
+        return new NumericKeyProperties<ushort>(ranges, range, CalculateDensity(keys.Length, range), false, isConsecutive, mask);
     }
 
-    private static NumericKeyProperties<int> GetInt32Properties(ReadOnlySpan<int> keys, bool keysAreSorted)
+    private static NumericKeyProperties<int> GetInt32Properties(ReadOnlySpan<int> keys)
     {
-        int min = keysAreSorted ? keys[0] : int.MaxValue;
-        int max = keysAreSorted ? keys[keys.Length - 1] : int.MinValue;
         uint mask = 0;
+        DataRanges<int> ranges = new DataRanges<int>(keys.Length);
+        int rangeStart = keys[0];
+        int previous = keys[0];
+        mask |= unchecked((uint)previous);
 
-        if (keysAreSorted)
+        for (int i = 1; i < keys.Length; i++)
         {
-            foreach (int val in keys)
-                mask |= unchecked((uint)val);
-        }
-        else
-        {
-            foreach (int val in keys)
+            int val = keys[i];
+            mask |= unchecked((uint)val);
+
+            if ((long)val - previous > 1)
             {
-                min = Math.Min(min, val);
-                max = Math.Max(max, val);
-                mask |= unchecked((uint)val);
+                ranges.Add(rangeStart, previous);
+                rangeStart = val;
             }
+
+            previous = val;
         }
+
+        ranges.Add(rangeStart, previous);
 
         mask ^= uint.MaxValue;
-        ulong range = (ulong)((long)max - min);
-        return new NumericKeyProperties<int>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || (long)max - min == keys.Length - 1, mask, static v => v);
+        ulong range = (ulong)((long)ranges.Max - ranges.Min);
+        bool isConsecutive = range == (ulong)(keys.Length - 1);
+        return new NumericKeyProperties<int>(ranges, range, CalculateDensity(keys.Length, range), false, isConsecutive, mask);
     }
 
-    private static NumericKeyProperties<uint> GetUInt32Properties(ReadOnlySpan<uint> keys, bool keysAreSorted)
+    private static NumericKeyProperties<uint> GetUInt32Properties(ReadOnlySpan<uint> keys)
     {
-        uint min = keysAreSorted ? keys[0] : uint.MaxValue;
-        uint max = keysAreSorted ? keys[keys.Length - 1] : uint.MinValue;
         uint mask = 0;
+        DataRanges<uint> ranges = new DataRanges<uint>(keys.Length);
+        uint rangeStart = keys[0];
+        uint previous = keys[0];
+        mask |= previous;
 
-        if (keysAreSorted)
+        for (int i = 1; i < keys.Length; i++)
         {
-            foreach (uint val in keys)
-                mask |= val;
-        }
-        else
-        {
-            foreach (uint val in keys)
+            uint val = keys[i];
+            mask |= val;
+
+            if (val - previous > 1)
             {
-                min = Math.Min(min, val);
-                max = Math.Max(max, val);
-                mask |= val;
+                ranges.Add(rangeStart, previous);
+                rangeStart = val;
             }
+
+            previous = val;
         }
+
+        ranges.Add(rangeStart, previous);
 
         mask ^= uint.MaxValue;
-        ulong range = max - min;
-        return new NumericKeyProperties<uint>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || (ulong)max - min == (ulong)(keys.Length - 1), mask, static v => v);
+        ulong range = ranges.Max - ranges.Min;
+        bool isConsecutive = range == (ulong)(keys.Length - 1);
+        return new NumericKeyProperties<uint>(ranges, range, CalculateDensity(keys.Length, range), false, isConsecutive, mask);
     }
 
-    private static NumericKeyProperties<long> GetInt64Properties(ReadOnlySpan<long> keys, bool keysAreSorted)
+    private static NumericKeyProperties<long> GetInt64Properties(ReadOnlySpan<long> keys)
     {
-        long min = keysAreSorted ? keys[0] : long.MaxValue;
-        long max = keysAreSorted ? keys[keys.Length - 1] : long.MinValue;
         ulong mask = 0;
+        DataRanges<long> ranges = new DataRanges<long>(keys.Length);
+        long rangeStart = keys[0];
+        long previous = keys[0];
+        mask |= unchecked((ulong)previous);
 
-        if (keysAreSorted)
+        for (int i = 1; i < keys.Length; i++)
         {
-            foreach (long val in keys)
-                mask |= unchecked((ulong)val);
-        }
-        else
-        {
-            foreach (long val in keys)
+            long val = keys[i];
+            mask |= unchecked((ulong)val);
+
+            if (previous < long.MaxValue && val > previous + 1)
             {
-                min = Math.Min(min, val);
-                max = Math.Max(max, val);
-                mask |= unchecked((ulong)val);
+                ranges.Add(rangeStart, previous);
+                rangeStart = val;
             }
+
+            previous = val;
         }
+
+        ranges.Add(rangeStart, previous);
 
         mask ^= ulong.MaxValue;
-        ulong range = unchecked((ulong)max - (ulong)min);
-        return new NumericKeyProperties<long>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || range == (ulong)(keys.Length - 1), mask, static v => v);
+        ulong range = unchecked((ulong)ranges.Max - (ulong)ranges.Min);
+        bool isConsecutive = range == (ulong)(keys.Length - 1);
+        return new NumericKeyProperties<long>(ranges, range, CalculateDensity(keys.Length, range), false, isConsecutive, mask);
     }
 
-    private static NumericKeyProperties<ulong> GetUInt64Properties(ReadOnlySpan<ulong> keys, bool keysAreSorted)
+    private static NumericKeyProperties<ulong> GetUInt64Properties(ReadOnlySpan<ulong> keys)
     {
-        ulong min = keysAreSorted ? keys[0] : ulong.MaxValue;
-        ulong max = keysAreSorted ? keys[keys.Length - 1] : ulong.MinValue;
         ulong mask = 0;
+        DataRanges<ulong> ranges = new DataRanges<ulong>(keys.Length);
+        ulong rangeStart = keys[0];
+        ulong previous = keys[0];
+        mask |= previous;
 
-        if (keysAreSorted)
+        for (int i = 1; i < keys.Length; i++)
         {
-            foreach (ulong val in keys)
-                mask |= val;
-        }
-        else
-        {
-            foreach (ulong val in keys)
+            ulong val = keys[i];
+            mask |= val;
+
+            if (val - previous > 1)
             {
-                min = Math.Min(min, val);
-                max = Math.Max(max, val);
-                mask |= val;
+                ranges.Add(rangeStart, previous);
+                rangeStart = val;
             }
+
+            previous = val;
         }
+
+        ranges.Add(rangeStart, previous);
 
         mask ^= ulong.MaxValue;
-        ulong range = max - min;
-        return new NumericKeyProperties<ulong>(min, max, range, CalculateDensity(keys.Length, range), false, keys.Length <= 1 || max - min == (ulong)(keys.Length - 1), mask, static v => (long)v);
+        ulong range = ranges.Max - ranges.Min;
+        bool isConsecutive = range == (ulong)(keys.Length - 1);
+        return new NumericKeyProperties<ulong>(ranges, range, CalculateDensity(keys.Length, range), false, isConsecutive, mask);
     }
 
-    private static bool IsFloatConsecutive(ReadOnlySpan<float> keys, float min, float max, bool hasNaNOrInfinity, bool keysAreSorted)
+    private static NumericKeyProperties<float> GetSingleProperties(ReadOnlySpan<float> keys)
     {
-        if (hasNaNOrInfinity)
-            return false;
+        bool hasZero = false;
 
-        if (keys.Length <= 1)
-            return true;
-
-        float expectedRange = keys.Length - 1;
-        float range = max - min;
-
-        if (Math.Abs(range - expectedRange) > float.Epsilon)
-            return false;
-
-        if (keysAreSorted)
+        for (int i = 0; i < keys.Length; i++)
         {
-            for (int i = 1; i < keys.Length; i++)
+            if (keys[i] == 0.0f) // Covers -0 and +0
             {
-                if (Math.Abs(keys[i] - (keys[i - 1] + 1.0f)) > float.Epsilon)
-                    return false;
-            }
-        }
-        else
-        {
-            float[] sorted = new float[keys.Length];
-            keys.CopyTo(sorted);
-            Array.Sort(sorted);
-
-            for (int i = 1; i < sorted.Length; i++)
-            {
-                if (Math.Abs(sorted[i] - (sorted[i - 1] + 1.0f)) > float.Epsilon)
-                    return false;
+                hasZero = true;
+                break;
             }
         }
 
-        return true;
+        float min = keys[0];
+        float max = keys[keys.Length - 1];
+
+        DataRanges<float> ranges = new DataRanges<float>(min, max);
+        float actualRange = max - min;
+        ulong range = ClampRangeToUInt64(actualRange);
+
+        return new NumericKeyProperties<float>(ranges, range, CalculateDensity(keys.Length, range), hasZero, false, 0);
     }
 
-    private static bool IsDoubleConsecutive(ReadOnlySpan<double> keys, double min, double max, bool hasNaNOrInfinity, bool keysAreSorted)
+    private static NumericKeyProperties<double> GetDoubleProperties(ReadOnlySpan<double> keys)
     {
-        if (hasNaNOrInfinity)
-            return false;
+        bool hasZero = false;
 
-        if (keys.Length <= 1)
-            return true;
-
-        double expectedRange = keys.Length - 1;
-        double range = max - min;
-
-        if (Math.Abs(range - expectedRange) > double.Epsilon)
-            return false;
-
-        if (keysAreSorted)
+        for (int i = 0; i < keys.Length; i++)
         {
-            for (int i = 1; i < keys.Length; i++)
+            if (keys[i] == 0.0d) // Covers -0 and +0
             {
-                if (Math.Abs(keys[i] - (keys[i - 1] + 1.0d)) > double.Epsilon)
-                    return false;
-            }
-        }
-        else
-        {
-            double[] sorted = new double[keys.Length];
-            keys.CopyTo(sorted);
-            Array.Sort(sorted);
-
-            for (int i = 1; i < sorted.Length; i++)
-            {
-                if (Math.Abs(sorted[i] - (sorted[i - 1] + 1.0d)) > double.Epsilon)
-                    return false;
+                hasZero = true;
+                break;
             }
         }
 
-        return true;
+        double min = keys[0];
+        double max = keys[keys.Length - 1];
+
+        DataRanges<double> ranges = new DataRanges<double>(min, max);
+        double actualRange = max - min;
+        ulong range = ClampRangeToUInt64(actualRange);
+
+        return new NumericKeyProperties<double>(ranges, range, CalculateDensity(keys.Length, range), hasZero, false, 0);
     }
 
-    private static ulong ClampRangeToUInt64(double range)
+    private static ulong ClampRangeToUInt64(double range) => range switch
     {
-        if (double.IsNaN(range) || range <= 0.0d)
-            return 0;
+        <= 0.0d => 0,
+        >= ulong.MaxValue => ulong.MaxValue,
+        _ => (ulong)range
+    };
 
-        if (range >= ulong.MaxValue)
-            return ulong.MaxValue;
-
-        return (ulong)range;
-    }
-
-    private static float CalculateDensity(int keyCount, ulong range)
-    {
-        if (keyCount <= 0)
-            return 0;
-
-        return keyCount / (range + 1.0f);
-    }
+    private static float CalculateDensity(int keyCount, ulong range) => keyCount / (range + 1.0f);
 
     private static int CountZero(int[] data)
     {

@@ -3,7 +3,7 @@ using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Expressions;
 using Genbox.FastData.Internal.Misc;
-using static Genbox.FastData.Internal.Helpers.ExpressionHelper;
+using static Genbox.FastData.Generators.Helpers.ExpressionHelper;
 
 namespace Genbox.FastData.Generators.StringHash;
 

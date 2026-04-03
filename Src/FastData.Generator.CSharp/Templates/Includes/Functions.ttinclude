@@ -123,7 +123,7 @@
 
             if (keyType == TypeCode.Single)
             {
-                return numCfg.HasZeroOrNaN
+                return numCfg.HasZero
                     ? """
                               uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
 
@@ -137,7 +137,7 @@
 
             if (keyType == TypeCode.Double)
             {
-                return numCfg.HasZeroOrNaN
+                return numCfg.HasZero
                     ? """
                               ulong bits = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
 
@@ -173,5 +173,5 @@
     {
         true => nameof(StringComparer.OrdinalIgnoreCase),
         false => nameof(StringComparer.Ordinal)
-        };
+    };
 #>

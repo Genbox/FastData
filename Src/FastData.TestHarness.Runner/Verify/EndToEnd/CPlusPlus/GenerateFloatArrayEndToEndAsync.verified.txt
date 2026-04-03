@@ -1,0 +1,43 @@
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+
+class fastdata final {
+
+
+
+    static constexpr std::array<float, 4> keys = {
+        1.3f, 3.5f, 6.8f, 9.0f
+    };
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const float key) noexcept {
+        if ((key < 1.3f))
+        {
+         return false;
+        }
+
+        if ((key > 9.0f))
+        {
+         return false;
+        }
+
+
+        for (size_t i = 0; i < 4; i++) {
+            if (keys[i] == key)
+                return true;
+        }
+        return false;
+    }
+
+    static constexpr size_t item_count = 4;
+    static constexpr float min_key = 1.3f;
+    static constexpr float max_key = 9.0f;
+};

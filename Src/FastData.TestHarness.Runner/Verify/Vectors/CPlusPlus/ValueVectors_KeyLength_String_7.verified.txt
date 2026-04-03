@@ -10,7 +10,7 @@
 
 class fastdata final {
 
-    static constexpr uint32_t GetLength(std::string_view str) { return static_cast<uint32_t>(str.length()); }
+    static constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }
 
     static constexpr std::array<std::string_view, 8> keys = {
         u8"aaa", {}, u8"aaaaa", u8"aaaaaa", u8"aaaaaaa", u8"aaaaaaaa", u8"aaaaaaaaa", u8"aaaaaaaaaa"
@@ -19,14 +19,14 @@ class fastdata final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        uint32_t getLength;
+        int32_t getLength;
         getLength = GetLength(key);
-        if ((getLength < 3u))
+        if ((getLength < 3))
         {
          return false;
         }
 
-        if ((getLength > 10u))
+        if ((getLength > 10))
         {
          return false;
         }
@@ -37,8 +37,8 @@ public:
     }
 
     static constexpr size_t item_count = 7;
-    static constexpr size_t min_key_length = 3;
-    static constexpr size_t max_key_length = 10;
+    static constexpr int32_t min_key_length = 3;
+    static constexpr int32_t max_key_length = 10;
     static constexpr bool has_number = false;
     static constexpr bool has_uppercase = false;
     static constexpr bool has_lowercase = true;

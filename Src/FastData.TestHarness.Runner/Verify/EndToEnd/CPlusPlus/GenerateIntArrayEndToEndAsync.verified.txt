@@ -1,0 +1,53 @@
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
+// Structure: Array
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+
+class fastdata final {
+
+
+
+    static constexpr std::array<int32_t, 5> keys = {
+        1, 4, 7, 10, 12
+    };
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+        if ((key < 1))
+        {
+         return false;
+        }
+
+        if ((key > 12))
+        {
+         return false;
+        }
+
+        if (((key > 1) && (key < 4)))
+        {
+         return false;
+        }
+
+        if (((key > 4) && (key < 7)))
+        {
+         return false;
+        }
+
+
+        for (size_t i = 0; i < 5; i++) {
+            if (keys[i] == key)
+                return true;
+        }
+        return false;
+    }
+
+    static constexpr size_t item_count = 5;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 12;
+};

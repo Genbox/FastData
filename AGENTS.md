@@ -27,6 +27,7 @@
 - Scripted build: `pwsh Scripts/Build.ps1`.
 - Test full solution: `dotnet test FastData.slnx -c Debug`.
 - Test a single project: `dotnet test Src/FastData.Tests/FastData.Tests.csproj -c Debug`.
+- Test harness runner (uses real generators): `dotnet test --project Src/FastData.TestHarness.Runner/FastData.TestHarness.Runner.csproj -c Debug`.
 - Test project list:
   - `Src/FastData.Tests/FastData.Tests.csproj`
   - `Src/FastData.Cli.Tests/FastData.Cli.Tests.csproj`

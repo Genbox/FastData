@@ -4,11 +4,12 @@
 <#@ import namespace="System.Linq.Expressions" #>
 <#@ import namespace="System.Text" #>
 
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
-<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generator.Rust" #>
 <#@ import namespace="Genbox.FastData.Generators" #>
+<#@ import namespace="Genbox.FastData.Generators.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generators.Abstracts" #>
 <#@ import namespace="Genbox.FastData.Generators.EarlyExits" #>
 <#@ import namespace="Genbox.FastData.Generators.Enums" #>
@@ -109,17 +110,17 @@ fn case_insensitive_compare(left: &str, right: &str) -> i32 {
             { StringFunction.ReadU32, "fn ReadU32(value: &[u8], offset: usize) -> u32 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u32) } }" },
             { StringFunction.ReadU64, "fn ReadU64(value: &[u8], offset: usize) -> u64 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u64) } }" },
 
-            { StringFunction.GetFirstChar, "fn GetFirstChar(value: &str) -> u8 { value.as_bytes()[0] }" },
-            { StringFunction.GetFirstCharLower, "fn GetFirstCharLower(value: &str) -> u8 { ToLowerAscii(GetFirstChar(value)) }" },
+            { StringFunction.GetFirstChar, "fn GetFirstChar(value: &str) -> char { value.as_bytes()[0] as char }" },
+            { StringFunction.GetFirstCharLower, "fn GetFirstCharLower(value: &str) -> char { ToLowerAscii(GetFirstChar(value) as u8) as char }" },
             { StringFunction.GetLastChar, """
-fn GetLastChar(value: &str) -> u8 {
+fn GetLastChar(value: &str) -> char {
     let bytes = value.as_bytes();
-    bytes[bytes.len() - 1]
+    bytes[bytes.len() - 1] as char
 }
 """ },
-            { StringFunction.GetLastCharLower, "fn GetLastCharLower(value: &str) -> u8 { ToLowerAscii(GetLastChar(value)) }" },
+            { StringFunction.GetLastCharLower, "fn GetLastCharLower(value: &str) -> char { ToLowerAscii(GetLastChar(value) as u8) as char }" },
 
-            { StringFunction.GetLength, "fn GetLength(value: &str) -> u32 { value.len() as u32 }" },
+            { StringFunction.GetLength, "fn GetLength(value: &str) -> i32 { value.len() as i32 }" },
 
             { StringFunction.StartsWith, "fn StartsWith(prefix: &str, value: &str) -> bool { value.starts_with(prefix) }" },
             { StringFunction.StartsWithLower, """

@@ -16,13 +16,20 @@ internal sealed record DefaultStringHash : IStringHash
         _encoding = encoding;
     }
 
-    internal static DefaultStringHash UTF8Instance { get; } = new DefaultStringHash(GeneratorEncoding.UTF8);
-    internal static DefaultStringHash UTF16Instance { get; } = new DefaultStringHash(GeneratorEncoding.UTF16);
+    internal static DefaultStringHash ASCIIInstance { get; } = new DefaultStringHash(GeneratorEncoding.AsciiBytes);
+    internal static DefaultStringHash UTF8Instance { get; } = new DefaultStringHash(GeneratorEncoding.Utf8Bytes);
+    internal static DefaultStringHash UTF16Instance { get; } = new DefaultStringHash(GeneratorEncoding.Utf16CodeUnits);
 
     public AdditionalData[]? AdditionalData => null;
     public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.BuildFull(Mixer, Avalanche, _encoding);
 
-    internal static DefaultStringHash GetInstance(GeneratorEncoding enc) => enc == GeneratorEncoding.UTF8 ? UTF8Instance : UTF16Instance;
+    internal static DefaultStringHash GetInstance(GeneratorEncoding enc) => enc switch
+    {
+        GeneratorEncoding.AsciiBytes => ASCIIInstance,
+        GeneratorEncoding.Utf8Bytes => UTF8Instance,
+        GeneratorEncoding.Utf16CodeUnits => UTF16Instance,
+        _ => throw new InvalidOperationException($"Unsupported length semantics: {enc}")
+    };
 
     // (((hash << 5) | (hash >> 27)) + hash) ^ Read(data, offset)
     private static Expression Mixer(Expression hash, Expression read) =>

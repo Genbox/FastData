@@ -7,7 +7,7 @@ namespace Genbox.FastData.Generators.StringHash;
 
 internal sealed record GPerfStringHash : IStringHash
 {
-    internal GPerfStringHash(int[] associationValues, int[] alphaIncrements, int[] positions, uint minLen)
+    internal GPerfStringHash(int[] associationValues, int[] alphaIncrements, int[] positions, int minLen)
     {
         AssociationValues = associationValues;
         AlphaIncrements = alphaIncrements;
@@ -18,7 +18,7 @@ internal sealed record GPerfStringHash : IStringHash
     internal int[] AssociationValues { get; }
     internal int[] AlphaIncrements { get; }
     internal int[] Positions { get; }
-    internal uint MinLen { get; }
+    internal int MinLen { get; }
 
     public AdditionalData[] AdditionalData => [new AdditionalData(nameof(AssociationValues), typeof(int), AssociationValues)];
 

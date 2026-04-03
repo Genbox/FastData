@@ -4,8 +4,8 @@
     if (GeneratorConfig is StringGeneratorConfig strCfg)
     {
 #>
-    pub const MIN_KEY_LENGTH: usize = <#= strCfg.Constants.MinStringLength #>;
-    pub const MAX_KEY_LENGTH: usize = <#= strCfg.Constants.MaxStringLength #>;
+    pub const MIN_KEY_LENGTH: i32 = <#= strCfg.Constants.MinStringLength #>;
+    pub const MAX_KEY_LENGTH: i32 = <#= strCfg.Constants.MaxStringLength #>;
     pub const HAS_NUMBER: bool = <#= strCfg.Constants.CharacterClasses.HasFlag(CharacterClass.Number) ? "true" : "false" #>;
     pub const HAS_UPPERCASE: bool = <#= strCfg.Constants.CharacterClasses.HasFlag(CharacterClass.Uppercase) ? "true" : "false" #>;
     pub const HAS_LOWERCASE: bool = <#= strCfg.Constants.CharacterClasses.HasFlag(CharacterClass.Lowercase) ? "true" : "false" #>;

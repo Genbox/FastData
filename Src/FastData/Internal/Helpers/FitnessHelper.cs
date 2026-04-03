@@ -10,7 +10,7 @@ internal static class FitnessHelper
     internal static double CalculateFitness(StringKeyProperties props, ArraySegment segment, Expression expression)
     {
         //The length of segment is a factor
-        int minLen = (int)props.LengthData.LengthMap.Min;
+        int minLen = props.LengthData.MinCharLength;
         int segLen = segment.Length;
         double segFit;
 
@@ -27,9 +27,8 @@ internal static class FitnessHelper
             segFit = segLen == 1 ? 1.0 : 0.0;
 
         //The number of operations is a factor
-        ExpressionCounter counter = new ExpressionCounter();
-        counter.Visit(expression);
-        double countFit = 1.0 / counter.Count;
+        int count = ExpressionCounter.CountNodes(expression);
+        double countFit = 1.0 / count;
 
         return (segFit + countFit) / 2.0;
     }

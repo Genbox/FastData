@@ -1,1 +1,1 @@
-﻿(GetFirstChar(inputKey) > 109u8)
+﻿(GetFirstChar(inputKey) > 'm')

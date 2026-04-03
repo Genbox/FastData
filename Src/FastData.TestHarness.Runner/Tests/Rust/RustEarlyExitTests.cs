@@ -22,14 +22,14 @@ public sealed class RustEarlyExitTests(DockerRustFixture fixture) : EarlyExitTes
               }
           }
 
-          fn GetFirstChar(value: &str) -> u8 { value.as_bytes()[0] }
-          fn GetFirstCharLower(value: &str) -> u8 { ToLowerAscii(GetFirstChar(value)) }
-          fn GetLastChar(value: &str) -> u8 {
+          fn GetFirstChar(value: &str) -> char { value.as_bytes()[0] as char }
+          fn GetFirstCharLower(value: &str) -> char { ToLowerAscii(GetFirstChar(value) as u8) as char }
+          fn GetLastChar(value: &str) -> char {
               let bytes = value.as_bytes();
-              bytes[bytes.len() - 1]
+              bytes[bytes.len() - 1] as char
           }
-          fn GetLastCharLower(value: &str) -> u8 { ToLowerAscii(GetLastChar(value)) }
-          fn GetLength(value: &str) -> u32 { value.len() as u32 }
+          fn GetLastCharLower(value: &str) -> char { ToLowerAscii(GetLastChar(value) as u8) as char }
+          fn GetLength(value: &str) -> i32 { value.len() as i32 }
 
           fn StartsWith(prefix: &str, value: &str) -> bool { value.starts_with(prefix) }
           fn StartsWithIgnoreCase(prefix: &str, value: &str) -> bool {

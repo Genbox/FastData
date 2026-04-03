@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Numerics;
 using Genbox.FastData.Generators.Abstracts;
 using static Genbox.FastData.Generators.Helpers.TypeHelper;
 
@@ -20,4 +21,6 @@ public sealed record ValueBitMaskEarlyExit(ulong Mask) : IEarlyExit
     }
 
     public bool IsWorseThan(IEarlyExit other) => false;
+
+    public ulong KeyspaceSize => (ulong)BitOperations.PopCount(Mask);
 }

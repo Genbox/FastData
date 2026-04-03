@@ -26,7 +26,7 @@ public sealed class CPlusPlusEarlyExitTests(DockerCPlusPlusFixture fixture) : Ea
           static char GetFirstCharLower(std::string_view str) { return ToLowerAscii(GetFirstChar(str)); }
           static char GetLastChar(std::string_view str) { return str[str.length() - 1]; }
           static char GetLastCharLower(std::string_view str) { return ToLowerAscii(GetLastChar(str)); }
-          static uint32_t GetLength(std::string_view str) { return static_cast<uint32_t>(str.length()); }
+          static int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }
 
           static bool StartsWith(std::string_view prefix, std::string_view str)
           {

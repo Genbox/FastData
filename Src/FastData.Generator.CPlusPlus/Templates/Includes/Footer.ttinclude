@@ -4,8 +4,8 @@
     if (GeneratorConfig is StringGeneratorConfig strCfg)
     {
 #>
-    static constexpr size_t min_key_length = <#= strCfg.Constants.MinStringLength #>;
-    static constexpr size_t max_key_length = <#= strCfg.Constants.MaxStringLength #>;
+    static constexpr int32_t min_key_length = <#= strCfg.Constants.MinStringLength #>;
+    static constexpr int32_t max_key_length = <#= strCfg.Constants.MaxStringLength #>;
     static constexpr bool has_number = <#= strCfg.Constants.CharacterClasses.HasFlag(CharacterClass.Number) ? "true" : "false" #>;
     static constexpr bool has_uppercase = <#= strCfg.Constants.CharacterClasses.HasFlag(CharacterClass.Uppercase) ? "true" : "false" #>;
     static constexpr bool has_lowercase = <#= strCfg.Constants.CharacterClasses.HasFlag(CharacterClass.Lowercase) ? "true" : "false" #>;

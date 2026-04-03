@@ -10,4 +10,6 @@ public sealed record CharFirstLessThanEarlyExit(char Value) : MethodComparisonEa
     protected override BinaryExpression Compare(Expression left, Expression right) => LessThan(left, right);
 
     public override bool IsWorseThan(IEarlyExit other) => other is CharFirstLessThanEarlyExit otherExit && Value < otherExit.Value;
+
+    public override ulong KeyspaceSize => Value;
 }

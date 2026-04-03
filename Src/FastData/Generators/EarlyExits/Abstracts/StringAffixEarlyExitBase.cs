@@ -13,4 +13,6 @@ public abstract record StringAffixEarlyExitBase(string Affix, string Method) : I
     }
 
     public bool IsWorseThan(IEarlyExit other) => false;
+
+    public ulong KeyspaceSize => (ulong)Affix.Length;
 }

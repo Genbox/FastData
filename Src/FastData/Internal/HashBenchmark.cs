@@ -7,6 +7,7 @@ using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Helpers;
 using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal;
@@ -61,8 +62,9 @@ internal static class HashBenchmark
         perfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
         notPerfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
 
-        string test = new string('a', (int)props.LengthData.LengthMap.Max);
-        byte[] testBytes = encoding == GeneratorEncoding.UTF8 ? Encoding.UTF8.GetBytes(test) : Encoding.Unicode.GetBytes(test);
+        string test = new string('a', props.LengthData.MaxCharLength);
+        Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(encoding);
+        byte[] testBytes = getBytes(test);
 
         //We start with the perfect results (if any)
         if (perfect.Count > 0)

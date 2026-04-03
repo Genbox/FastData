@@ -141,7 +141,7 @@
         {
             if (keyType == TypeCode.Single)
             {
-                return numCfg.HasZeroOrNaN
+                return numCfg.HasZero
                     ? """
                                 let mut bits = value.to_bits();
 
@@ -155,7 +155,7 @@
 
             if (keyType == TypeCode.Double)
             {
-                return numCfg.HasZeroOrNaN
+                return numCfg.HasZero
                     ? """
                                 let mut bits = value.to_bits();
 

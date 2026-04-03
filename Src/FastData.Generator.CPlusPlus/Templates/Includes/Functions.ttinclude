@@ -116,7 +116,7 @@
         {
             if (keyType == TypeCode.Single)
             {
-                return numCfg.HasZeroOrNaN
+                return numCfg.HasZero
                     ? """
                                 uint32_t bits;
                                 std::memcpy(&bits, &value, sizeof(bits));
@@ -133,7 +133,7 @@
 
             if (keyType == TypeCode.Double)
             {
-                return numCfg.HasZeroOrNaN
+                return numCfg.HasZero
                     ? """
                                 uint64_t bits;
                                 std::memcpy(&bits, &value, sizeof(bits));

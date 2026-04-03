@@ -2,13 +2,14 @@ using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
 internal sealed class Simulator(int length, GeneratorEncoding encoding, int capacityFactor = 1)
 {
     private readonly int _capacity = length * capacityFactor;
-    private readonly Encoding _encoding = encoding == GeneratorEncoding.UTF8 ? Encoding.UTF8 : Encoding.Unicode;
+    private readonly Func<string, byte[]> _getBytes = StringHelper.GetBytesFunc(encoding);
     private readonly NoEqualityEmulator _set = new NoEqualityEmulator((uint)(length * capacityFactor));
 
     internal Candidate Run(ReadOnlySpan<string> data, IStringHash stringHash, Func<double>? extraFitness = null)
@@ -18,7 +19,7 @@ internal sealed class Simulator(int length, GeneratorEncoding encoding, int capa
         int collisions = 0;
         foreach (string str in data)
         {
-            byte[] bytes = _encoding.GetBytes(str);
+            byte[] bytes = _getBytes(str);
 
             if (!_set.Add(bytes))
                 collisions++;

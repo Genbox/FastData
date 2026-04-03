@@ -7,4 +7,5 @@ public interface IEarlyExit
 {
     Expression GetExpression(ParameterExpression key);
     bool IsWorseThan(IEarlyExit other);
+    ulong KeyspaceSize { get; }
 }

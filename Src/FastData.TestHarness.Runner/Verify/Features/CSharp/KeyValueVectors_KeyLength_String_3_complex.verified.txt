@@ -21,7 +21,7 @@ public class Person
     Person Other { get; set; }
 
 };
-    private static uint GetLength(string str) => (uint)str.Length;
+    private static int GetLength(string str) => str.Length;
 
     private static readonly int[] _offsets = {
         0, 1, 2
@@ -38,14 +38,14 @@ public class Person
     
     public static bool Contains(string key)
     {
-        uint getLength;
+        int getLength;
         getLength = GetLength(key);
-        if ((getLength < 1u))
+        if ((getLength < 1))
         {
          return false;
         }
 
-        if ((getLength > 3u))
+        if ((getLength > 3))
         {
          return false;
         }
@@ -58,15 +58,15 @@ public class Person
     
     public static bool TryLookup(string key, out Person value)
     {
-        uint getLength;
+        int getLength;
         getLength = GetLength(key);
-        if ((getLength < 1u))
+        if ((getLength < 1))
         {
          value = default;
          return false;
         }
 
-        if ((getLength > 3u))
+        if ((getLength > 3))
         {
          value = default;
          return false;

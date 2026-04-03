@@ -1,0 +1,73 @@
+//! This file is auto-generated. Do not edit manually.
+//! Structure: Array
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+fn GetFirstChar(value: &str) -> char { value.as_bytes()[0] as char }
+
+fn GetLastChar(value: &str) -> char {
+    let bytes = value.as_bytes();
+    bytes[bytes.len() - 1] as char
+}
+
+fn GetLength(value: &str) -> i32 { value.len() as i32 }
+
+
+pub struct fastdata;
+impl fastdata {
+
+    const KEYS: [&'static str; 4] = [
+        "alpha", "bravo", "charlie", "delta"
+    ];
+
+    #[must_use]
+    pub fn contains(key: &str) -> bool {
+        let mut getLength: i32;
+        let mut getFirstChar: char;
+        let mut getLastChar: char;
+        getLength = GetLength(key);
+        if ((getLength > 7))
+        {
+         return false;
+        }
+
+        getFirstChar = GetFirstChar(key);
+        if ((getFirstChar > 'd'))
+        {
+         return false;
+        }
+
+        getLastChar = GetLastChar(key);
+        if ((getLastChar > 'o'))
+        {
+         return false;
+        }
+
+        if (((((u64::MIN & (1 << ((((getLastChar as u32) & 63) as i32) as u32))) & !(u64::MIN.wrapping_sub((((getLastChar as u32) >> (6 as u32)) as u64)))) | ((140883517243392 & (1 << ((((getLastChar as u32) & 63) as i32) as u32))) & (u64::MIN.wrapping_sub((((getLastChar as u32) >> (6 as u32)) as u64))))) == u64::MIN))
+        {
+         return false;
+        }
+
+
+        for entry in Self::KEYS.iter() {
+            if *entry == key {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 4;
+    pub const MIN_KEY_LENGTH: i32 = 5;
+    pub const MAX_KEY_LENGTH: i32 = 7;
+    pub const HAS_NUMBER: bool = false;
+    pub const HAS_UPPERCASE: bool = false;
+    pub const HAS_LOWERCASE: bool = true;
+    pub const HAS_SYMBOL: bool = false;
+    pub const HAS_WHITESPACE: bool = false;
+}

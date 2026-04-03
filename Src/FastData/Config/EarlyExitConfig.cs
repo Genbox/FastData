@@ -1,4 +1,4 @@
-﻿using Genbox.FastData.Config.Limits;
+using Genbox.FastData.Config.Limits;
 using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Internal.Structures;
 
@@ -16,6 +16,8 @@ public class EarlyExitConfig
         {
             EarlyExitConfig cfg = new EarlyExitConfig();
             cfg.MinItemCount = 3;
+            cfg.MaxCandidates = 4;
+            cfg.ReductionEnabled = true;
 
             // These don't support early exits
             cfg.DisableForStructure(typeof(RangeStructure<,>));
@@ -32,6 +34,8 @@ public class EarlyExitConfig
 
     public bool Disabled { get; set; }
     public uint MinItemCount { get; set; }
+    public int MaxCandidates { get; set; }
+    public bool ReductionEnabled { get; set; }
 
     public void DisableEarlyExit(Type earlyExitType) => _disabled.Add(earlyExitType);
     public void DisableForStructure(Type structureType) => _disabledForStructure.Add(structureType);

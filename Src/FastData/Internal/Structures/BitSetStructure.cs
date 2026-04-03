@@ -1,5 +1,6 @@
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
+using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 
@@ -26,11 +27,12 @@ public sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, Bit
         ulong[] bitset = new ulong[(range + 63) / 64];
         TValue[]? denseValues = values.IsEmpty ? null : new TValue[range];
 
-        long minKey = _props.ValueConverter(_props.MinKeyValue);
+        Func<TKey, long> conv = Type.GetTypeCode(typeof(TKey)).GetSignedValueConverter<TKey>();
+        long minKey = conv(_props.DataRanges.Min);
 
         for (int i = 0; i < keySpan.Length; i++)
         {
-            ulong offset = (ulong)(_props.ValueConverter(keySpan[i]) - minKey);
+            ulong offset = (ulong)(conv(keySpan[i]) - minKey);
             int word = (int)(offset >> 6);
             bitset[word] |= 1UL << (int)(offset & 63);
 

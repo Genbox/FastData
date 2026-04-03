@@ -2,6 +2,7 @@ using System.Numerics;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
+using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
@@ -12,13 +13,11 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
     private readonly TKey _maxValue;
     private readonly TKey _minValue;
     private readonly int _skipQuantum;
-    private readonly Func<TKey, long> _valueConverter;
 
-    internal EliasFanoStructure(TKey minValue, TKey maxValue, Func<TKey, long> valueConverter, bool keysAreSorted, int skipQuantum)
+    internal EliasFanoStructure(TKey minValue, TKey maxValue, bool keysAreSorted, int skipQuantum)
     {
         _minValue = minValue;
         _maxValue = maxValue;
-        _valueConverter = valueConverter;
         _keysAreSorted = keysAreSorted;
         _skipQuantum = skipQuantum;
     }
@@ -36,9 +35,11 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
 
         ReadOnlySpan<TKey> keysSpan = keys.Span;
 
+        Func<TKey, long> conv = Type.GetTypeCode(typeof(TKey)).GetSignedValueConverter<TKey>();
+
         int count = keysSpan.Length;
-        long min = _valueConverter(_minValue);
-        long max = _valueConverter(_maxValue);
+        long min = conv(_minValue);
+        long max = conv(_maxValue);
         long effectiveMinValue = min < 0 ? min : 0;
         long maxValueNormalized = max - effectiveMinValue;
 
@@ -55,7 +56,7 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         {
             for (int i = 0; i < keysSpan.Length; i++)
             {
-                long value = _valueConverter(keysSpan[i]) - effectiveMinValue;
+                long value = conv(keysSpan[i]) - effectiveMinValue;
                 int index = (int)(value + i);
                 upperBits[index >> 6] |= 1UL << (index & 63);
             }
@@ -66,7 +67,7 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
 
             for (int i = 0; i < keysSpan.Length; i++)
             {
-                long value = _valueConverter(keysSpan[i]) - effectiveMinValue;
+                long value = conv(keysSpan[i]) - effectiveMinValue;
                 int index = (int)((value >> lowerBitCount) + i);
                 upperBits[index >> 6] |= 1UL << (index & 63);
 

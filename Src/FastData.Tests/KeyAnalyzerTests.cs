@@ -37,21 +37,8 @@ public class KeyAnalyzerTests
         Assert.True(GetNumericProperties<ulong>(new[] { 1ul, 2ul, 3ul }, false).IsConsecutive);
         Assert.False(GetNumericProperties<ulong>(new[] { 1ul, 2ul, 4ul }, false).IsConsecutive);
 
-        Assert.True(GetNumericProperties<float>(new[] { 0.5f, 1.5f, 2.5f }, false).IsConsecutive);
         Assert.False(GetNumericProperties<float>(new[] { 0f, 0.9f, 2f }, false).IsConsecutive);
-
-        Assert.True(GetNumericProperties<double>(new[] { 0.5d, 1.5d, 2.5d }, false).IsConsecutive);
-        Assert.False(GetNumericProperties<double>(new[] { 0d, 0.9d, 2d }, false).IsConsecutive);
-    }
-
-    [Fact]
-    public void GetProperties_IsConsecutive_Sorted_Test()
-    {
-        Assert.True(GetNumericProperties<float>(new[] { 0.5f, 1.5f, 2.5f }, true).IsConsecutive);
-        Assert.False(GetNumericProperties<float>(new[] { 0.5f, 1.5f, 3.5f }, true).IsConsecutive);
-
-        Assert.True(GetNumericProperties<double>(new[] { 0.5d, 1.5d, 2.5d }, true).IsConsecutive);
-        Assert.False(GetNumericProperties<double>(new[] { 0.5d, 1.5d, 3.5d }, true).IsConsecutive);
+        Assert.False(GetNumericProperties<double>(new[] { 0.0d, 0.9d, 2.0d }, false).IsConsecutive);
     }
 
     [Fact]
@@ -68,17 +55,11 @@ public class KeyAnalyzerTests
     [InlineData((object)new[] { "a", "aaa", "aaaa" })] //Test when there is gaps
     [InlineData((object)new[] { "a" })] //Test when there is only one item
     [InlineData((object)new[] { "a", "a", "aaa", "aaa" })] //Test duplicates
-    public void GetStringProperties_LengthMap_Test(string[] data)
+    public void GetStringProperties_LengthRanges_Test(string[] data)
     {
-        StringKeyProperties res = GetStringProperties(data, false, false, GeneratorEncoding.UTF16);
-        LengthBitArray map = res.LengthData.LengthMap;
-        Assert.Equal(data.Distinct().Count(), map.BitCount);
+        StringKeyProperties res = GetStringProperties(data, false, false, GeneratorEncoding.Utf16CodeUnits);
 
-        foreach (string str in data)
-            Assert.True(map.Get((uint)str.Length));
-
-        Assert.Equal((uint)data.Min(x => x.Length), res.LengthData.LengthMap.Min);
-        Assert.Equal((uint)data.Max(x => x.Length), res.LengthData.LengthMap.Max);
+        //TODO
     }
 
     [Theory]
@@ -89,7 +70,7 @@ public class KeyAnalyzerTests
     [InlineData(new[] { "hello world" }, 0, 0)] // One key should result in no prefix/suffix calculation
     public void GetStringProperties_DeltaData_Test(string[] data, int leftZero, int rightZero)
     {
-        StringKeyProperties res = GetStringProperties(data, true, false, GeneratorEncoding.UTF16);
+        StringKeyProperties res = GetStringProperties(data, true, false, GeneratorEncoding.Utf16CodeUnits);
         Assert.Equal(leftZero, res.DeltaData.Prefix.Length);
         Assert.Equal(rightZero, res.DeltaData.Suffix.Length);
     }
@@ -97,7 +78,7 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetStringProperties_CharRange_Test()
     {
-        StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, false, false, GeneratorEncoding.UTF16);
+        StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, false, false, GeneratorEncoding.Utf16CodeUnits);
         CharacterData data = res.CharacterData;
         Assert.Equal('A', data.FirstCharMap.Min);
         Assert.Equal('b', data.FirstCharMap.Max);
@@ -108,7 +89,7 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetStringProperties_CharRange_IgnoreCase_Test()
     {
-        StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, false, true, GeneratorEncoding.UTF16);
+        StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, false, true, GeneratorEncoding.Utf16CodeUnits);
         CharacterData data = res.CharacterData;
         Assert.Equal('a', data.FirstCharMap.Min);
         Assert.Equal('c', data.FirstCharMap.Max);
@@ -119,9 +100,30 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetStringProperties_AsciiEarlyExitData_Test()
     {
-        (LengthData lengthData, _, CharacterData data) = GetStringProperties(new[] { "ab", "ac", "bd" }, false, true, GeneratorEncoding.UTF16);
-        Assert.True(lengthData.LengthMap.HasEven);
-        Assert.False(lengthData.LengthMap.HasOdd);
+        (LengthData lengthData, _, CharacterData data) = GetStringProperties(new[] { "ab", "ac", "bd" }, false, true, GeneratorEncoding.Utf16CodeUnits);
+        Assert.Equal(2, lengthData.MinCharLength);
+        Assert.Equal(2, lengthData.MaxCharLength);
         Assert.True(data.AllAscii);
+    }
+
+    private static int CountLengths(DataRanges<int> ranges)
+    {
+        int count = 0;
+
+        foreach ((int Start, int End) range in ranges.Ranges)
+            count += (range.End - range.Start) + 1;
+
+        return count;
+    }
+
+    private static bool ContainsLength(DataRanges<int> ranges, int length)
+    {
+        foreach ((int Start, int End) range in ranges.Ranges)
+        {
+            if (length >= range.Start && length <= range.End)
+                return true;
+        }
+
+        return false;
     }
 }

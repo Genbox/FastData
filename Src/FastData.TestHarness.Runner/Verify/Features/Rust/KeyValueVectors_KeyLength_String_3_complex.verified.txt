@@ -17,7 +17,7 @@ pub struct Person {
 impl Person {
     pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
 }
-fn GetLength(value: &str) -> u32 { value.len() as u32 }
+fn GetLength(value: &str) -> i32 { value.len() as i32 }
 
 
 pub struct fastdata;
@@ -36,7 +36,7 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
-        let mut getLength: u32;
+        let mut getLength: i32;
         getLength = GetLength(key);
         if ((getLength < 1))
         {
@@ -55,7 +55,7 @@ impl fastdata {
 
     #[must_use]
     pub fn try_lookup(key: &str) -> Option<&'static Person> {
-        let mut getLength: u32;
+        let mut getLength: i32;
         getLength = GetLength(key);
         if ((getLength < 1))
         {
@@ -77,8 +77,8 @@ impl fastdata {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_KEY_LENGTH: usize = 1;
-    pub const MAX_KEY_LENGTH: usize = 3;
+    pub const MIN_KEY_LENGTH: i32 = 1;
+    pub const MAX_KEY_LENGTH: i32 = 3;
     pub const HAS_NUMBER: bool = false;
     pub const HAS_UPPERCASE: bool = false;
     pub const HAS_LOWERCASE: bool = true;

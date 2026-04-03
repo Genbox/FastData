@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Numerics;
 using System.Reflection;
 using Genbox.FastData.Generators.Abstracts;
 
@@ -26,4 +27,14 @@ public abstract record CharBitmapEarlyExitBase(ulong Low, ulong High, string Met
     }
 
     public bool IsWorseThan(IEarlyExit other) => false;
+
+    public ulong KeyspaceSize
+    {
+        get
+        {
+            // Bitmap represents observed ASCII chars; rejected count is missing values in the 0..127 domain.
+            int observed = BitOperations.PopCount(Low) + BitOperations.PopCount(High);
+            return 128UL - (ulong)observed;
+        }
+    }
 }

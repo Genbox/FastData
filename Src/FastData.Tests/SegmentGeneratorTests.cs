@@ -23,7 +23,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         for (int len = 1; len < maxLen; len++)
         {
             string[] data = GenerateStrings(rng, len, 1);
-            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, false, GeneratorEncoding.UTF16);
+            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, false, GeneratorEncoding.Utf16CodeUnits);
             int[] coverage = new int[len]; // Track how many times each index is covered
 
             foreach (ArraySegment segment in generator.Generate(props))
@@ -53,7 +53,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         {
             string[] data = GenerateStrings(rng, i, 1);
 
-            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, false, GeneratorEncoding.UTF16);
+            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, false, GeneratorEncoding.Utf16CodeUnits);
             Assert.True(gen.IsAppropriate(props));
             Assert.Equal(counts[i - 1], gen.Generate(props).Count());
         }
@@ -70,7 +70,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         {
             string[] data = GenerateStrings(rng, i, 1);
 
-            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, false, GeneratorEncoding.UTF16);
+            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, false, GeneratorEncoding.Utf16CodeUnits);
             Assert.True(gen.IsAppropriate(props));
 
             int max = Math.Min(i * 2, 16);
@@ -89,7 +89,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         {
             string[] data = GenerateStrings(rng, i, 2);
 
-            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, true, false, GeneratorEncoding.UTF16);
+            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, true, false, GeneratorEncoding.Utf16CodeUnits);
             Assert.True(gen.IsAppropriate(props));
             Assert.NotEmpty(gen.Generate(props));
         }
@@ -103,7 +103,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     [InlineData(new[] { "aaxbb", "aanbb" }, 2, 1)] //Test single char difference
     public void DeltaGeneratorPatternTest(string[] input, uint offset, int length)
     {
-        StringKeyProperties props = KeyAnalyzer.GetStringProperties(input, true, false, GeneratorEncoding.UTF16);
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(input, true, false, GeneratorEncoding.Utf16CodeUnits);
 
         DeltaGenerator gen = new DeltaGenerator();
         Assert.True(gen.IsAppropriate(props)); //We allow delta always
@@ -121,7 +121,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     [InlineData((object)new[] { "aa", "aaaaaaaaaaaaaa" })] //We don't support inputs where characters don't differ
     public void DeltaGeneratorFailureTest(string[] input)
     {
-        StringKeyProperties props = KeyAnalyzer.GetStringProperties(input, false, false, GeneratorEncoding.UTF16);
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(input, false, false, GeneratorEncoding.Utf16CodeUnits);
 
         DeltaGenerator gen = new DeltaGenerator();
         Assert.Empty(gen.Generate(props));

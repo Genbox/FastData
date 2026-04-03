@@ -37,7 +37,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
     public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<string> data)
     {
         // We cannot work on empty strings
-        if (props.LengthData.LengthMap.Min == 0)
+        if (props.LengthData.MinCharLength == 0)
             return [];
 
         // Step1: Find positions
@@ -48,7 +48,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
         if (positions.Length == 0)
             return [];
 
-        int maxLen = (int)props.LengthData.LengthMap.Max;
+        int maxLen = props.LengthData.MaxCharLength;
 
         // TODO: For now, we keep regenerating state within Keyword. In the future, I hope to do this more efficiently
         List<Keyword> keywords = new List<Keyword>(data.Length);
@@ -135,7 +135,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
 #endif
 
         // We convert keywords to KeyValuePair to keep Keyword internal
-        GPerfStringHash stringHash = new GPerfStringHash(table.Values, alphaInc, positions.OrderByDescending(x => x).ToArray(), props.LengthData.LengthMap.Min);
+        GPerfStringHash stringHash = new GPerfStringHash(table.Values, alphaInc, positions.OrderByDescending(x => x).ToArray(), props.LengthData.MinCharLength);
 
         Candidate candidate = sim.Run(data, stringHash);
         LogCandidate(logger, candidate.Fitness, candidate.Collisions);
@@ -179,7 +179,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
             - Case-sensitivity (alpha_unify)
         */
 
-        int max = (int)Math.Min(props.LengthData.LengthMap.Max - 1, config.MaxPositions - 1);
+        int max = (int)Math.Min(props.LengthData.MaxCharLength - 1, config.MaxPositions - 1);
 
         // Stage 1: Find all positions that are mandatory. If two items are the same length, but differ only on one character, then we must include that character.
         DirectMap mandatory = new DirectMap(max + 1);

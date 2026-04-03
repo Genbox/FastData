@@ -60,8 +60,8 @@ public:
     }
 
     static constexpr size_t item_count = 3;
-    static constexpr size_t min_key_length = 1;
-    static constexpr size_t max_key_length = 255;
+    static constexpr int32_t min_key_length = 1;
+    static constexpr int32_t max_key_length = 255;
     static constexpr bool has_number = false;
     static constexpr bool has_uppercase = false;
     static constexpr bool has_lowercase = true;

@@ -1,4 +1,4 @@
-﻿<#@ template language="C#" #>
+<#@ template language="C#" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Linq.Expressions" #>
@@ -7,8 +7,9 @@
 <#@ import namespace="Genbox.FastData.Generator.CSharp" #>
 <#@ import namespace="Genbox.FastData.Generator.CSharp.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
-<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+<#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generators.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generators" #>
 <#@ import namespace="Genbox.FastData.Generators.Abstracts" #>
 <#@ import namespace="Genbox.FastData.Generators.EarlyExits" #>
@@ -65,7 +66,7 @@ using System.Runtime.InteropServices;
             { StringFunction.GetLastChar, "char GetLastChar(string str) => str[str.Length - 1];" },
             { StringFunction.GetLastCharLower, "char GetLastCharLower(string str) => char.ToLowerInvariant(str[str.Length - 1]);" },
 
-            { StringFunction.GetLength, "uint GetLength(string str) => (uint)str.Length;" },
+            { StringFunction.GetLength, "int GetLength(string str) => str.Length;" },
 
             { StringFunction.StartsWith, "bool StartsWith(string prefix, string str) => str.StartsWith(prefix, StringComparison.Ordinal);" },
             { StringFunction.StartsWithLower, "bool StartsWithIgnoreCase(string prefix, string str) => str.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);" },

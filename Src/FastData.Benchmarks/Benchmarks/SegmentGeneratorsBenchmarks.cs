@@ -15,7 +15,7 @@ public class SegmentGeneratorsBenchmarks
     private readonly OffsetGenerator _ofGen = new OffsetGenerator();
 
     //We start at 8 and go up to 100 to cover as many cases as possible
-    private readonly StringKeyProperties _props = KeyAnalyzer.GetStringProperties(Enumerable.Range(8, 100).Select(x => TestHelper.GenerateRandomString(Random.Shared, x)).ToArray(), false, false, GeneratorEncoding.UTF16);
+    private readonly StringKeyProperties _props = KeyAnalyzer.GetStringProperties(Enumerable.Range(8, 100).Select(x => TestHelper.GenerateRandomString(Random.Shared, x)).ToArray(), false, false, GeneratorEncoding.Utf16CodeUnits);
 
     [Benchmark]
     public object BruteForceGenerator() => _bfGen.Generate(_props).ToArray();

@@ -4,6 +4,7 @@ using System.Reflection;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.StringHash.Framework;
+using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.Expressions;
@@ -24,7 +25,7 @@ internal static class ExpressionHashBuilder
         // int hash = 352654597U
         ex.Add(Assign(hash, Constant(352654597UL)));
 
-        int size = encoding == GeneratorEncoding.UTF8 ? 1 : 2;
+        int size = StringHelper.GetSize(encoding);
 
         // while (length > 0)
         LabelTarget breakLabel = Label();

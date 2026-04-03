@@ -1,4 +1,5 @@
-﻿using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Generators.Extensions;
+using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal;
 
@@ -17,7 +18,8 @@ internal static class NumericAnalyzer
             return false;
 
         Span<int> hist = stackalloc int[buckets];
-        ulong min = (ulong)props.ValueConverter(props.MinKeyValue);
+        Func<TKey, long> conv = Type.GetTypeCode(typeof(TKey)).GetSignedValueConverter<TKey>();
+        ulong min = (ulong)conv(props.DataRanges.Min);
 
         if (typeof(TKey) == typeof(float))
         {
@@ -59,7 +61,7 @@ internal static class NumericAnalyzer
         {
             for (int i = 0; i < keys.Length; i++)
             {
-                ulong value = (ulong)props.ValueConverter(keys[i]);
+                ulong value = (ulong)conv(keys[i]);
                 ulong diff = value - min;
                 int bucketIndex = (int)((diff * (ulong)buckets) / props.Range);
 

@@ -62,7 +62,7 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
                 if (i < node.Arguments.Count - 1)
                     Output.Append(", ");
             }
-            Output.Append("]");
+            Output.Append("] as char");
             return node;
         }
 
@@ -106,11 +106,8 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
     {
         if (node.Value is char ch)
         {
-            if (ch <= byte.MaxValue)
-            {
-                Output.Append(((byte)ch).ToString(CultureInfo.InvariantCulture)).Append("u8");
-                return node;
-            }
+            Output.Append(map.ToValueLabel(ch));
+            return node;
         }
 
         return base.VisitConstant(node);

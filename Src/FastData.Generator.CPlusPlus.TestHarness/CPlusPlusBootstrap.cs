@@ -11,7 +11,7 @@ public sealed class CPlusPlusBootstrap : BootstrapBase
     public CPlusPlusBootstrap(HarnessType type) : base("CPlusPlus", ".cpp", type, "silkeh/clang", GetCommandTemplate(type))
     {
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
-        Map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
+        Map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.Utf8Bytes);
     }
 
     public TypeMap Map { get; }

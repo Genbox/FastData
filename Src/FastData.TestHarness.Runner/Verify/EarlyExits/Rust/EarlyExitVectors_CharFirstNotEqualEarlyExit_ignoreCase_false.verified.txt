@@ -1,1 +1,1 @@
-﻿(GetFirstChar(inputKey) != 120u8)
+﻿(GetFirstChar(inputKey) != 'x')

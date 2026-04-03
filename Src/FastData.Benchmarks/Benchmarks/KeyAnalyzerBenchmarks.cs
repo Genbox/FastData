@@ -16,5 +16,5 @@ public class KeyAnalyzerBenchmarks
     }
 
     [Benchmark]
-    public object GetStringProperties() => KeyAnalyzer.GetStringProperties(_data, true, false, GeneratorEncoding.UTF16);
+    public object GetStringProperties() => KeyAnalyzer.GetStringProperties(_data, true, false, GeneratorEncoding.Utf16CodeUnits);
 }

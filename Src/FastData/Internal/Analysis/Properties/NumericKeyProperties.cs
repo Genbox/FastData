@@ -1,3 +1,5 @@
+using Genbox.FastData.Internal.Analysis.Data;
+
 namespace Genbox.FastData.Internal.Analysis.Properties;
 
-internal sealed record NumericKeyProperties<T>(T MinKeyValue, T MaxKeyValue, ulong Range, float Density, bool HasZeroOrNaN, bool IsConsecutive, ulong BitMask, Func<T, long> ValueConverter) : IProperties;
+internal sealed record NumericKeyProperties<T>(DataRanges<T> DataRanges, ulong Range, float Density, bool HasZero, bool IsConsecutive, ulong BitMask) : IProperties;

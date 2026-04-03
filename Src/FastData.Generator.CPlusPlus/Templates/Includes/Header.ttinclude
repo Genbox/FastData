@@ -9,6 +9,7 @@
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generators" #>
+<#@ import namespace="Genbox.FastData.Generators.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generators.Abstracts" #>
 <#@ import namespace="Genbox.FastData.Generators.EarlyExits" #>
 <#@ import namespace="Genbox.FastData.Generators.Enums" #>
@@ -100,7 +101,7 @@ class <#= CPlusPlusConfig.ClassName #> final {
             { StringFunction.GetLastChar, "constexpr char GetLastChar(std::string_view str) { return str[str.length() - 1]; }" },
             { StringFunction.GetLastCharLower, "constexpr char GetLastCharLower(std::string_view str) { return ToLowerAscii(GetLastChar(str)); }" },
 
-            { StringFunction.GetLength, "constexpr uint32_t GetLength(std::string_view str) { return static_cast<uint32_t>(str.length()); }" },
+            { StringFunction.GetLength, "constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }" },
 
             { StringFunction.StartsWith, """
     constexpr bool StartsWith(std::string_view prefix, std::string_view str) {

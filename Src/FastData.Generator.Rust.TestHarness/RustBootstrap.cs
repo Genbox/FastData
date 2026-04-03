@@ -11,7 +11,7 @@ public sealed class RustBootstrap : BootstrapBase
     public RustBootstrap(HarnessType type) : base("Rust", ".rs", type, "rust:slim-trixie", GetCommandTemplate(type))
     {
         RustLanguageDef langDef = new RustLanguageDef();
-        Map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.UTF8);
+        Map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.Utf8Bytes);
     }
 
     public TypeMap Map { get; }

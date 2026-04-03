@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 internal static class FastData
 {
 
-    private static uint GetLength(string str) => (uint)str.Length;
+    private static int GetLength(string str) => str.Length;
 
     private static readonly string[] _keys = {
         "aaa", null, "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"
@@ -18,14 +18,14 @@ internal static class FastData
     
     public static bool Contains(string key)
     {
-        uint getLength;
+        int getLength;
         getLength = GetLength(key);
-        if ((getLength < 3u))
+        if ((getLength < 3))
         {
          return false;
         }
 
-        if ((getLength > 10u))
+        if ((getLength > 10))
         {
          return false;
         }

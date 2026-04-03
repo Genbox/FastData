@@ -19,4 +19,10 @@ internal static class VerifyHelper
               .UseFileName(snapshotId)
               .UseDirectory("../Verify/EarlyExits/" + harnessName)
               .DisableDiff();
+
+    internal static async Task VerifyEndToEndAsync(string harnessName, string snapshotId, string source) =>
+        await Verify(source)
+              .UseFileName(snapshotId)
+              .UseDirectory("../Verify/EndToEnd/" + harnessName)
+              .DisableDiff();
 }

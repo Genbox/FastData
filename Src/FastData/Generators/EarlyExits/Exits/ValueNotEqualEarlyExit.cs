@@ -10,4 +10,6 @@ public sealed record ValueNotEqualEarlyExit<T>(T Value) : ValueComparisonEarlyEx
     protected override BinaryExpression Compare(Expression left, Expression right) => NotEqual(left, right);
 
     public override bool IsWorseThan(IEarlyExit other) => false;
+
+    public override ulong KeyspaceSize => 1;
 }

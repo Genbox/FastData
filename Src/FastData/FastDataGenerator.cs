@@ -1,18 +1,19 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using System.Text;
 using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
 using Genbox.FastData.Generators.Expressions;
+using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
 using Genbox.FastData.Internal.Structures;
 using Microsoft.Extensions.Logging;
@@ -104,7 +105,7 @@ public static partial class FastDataGenerator
 
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys.Span, cfg.EnablePrefixSuffixTrimming, cfg.IgnoreCase, generator.Encoding);
 
-        if (!props.CharacterData.AllAscii && generator.Encoding == GeneratorEncoding.ASCII)
+        if (!props.CharacterData.AllAscii && generator.Encoding == GeneratorEncoding.AsciiBytes)
             throw new InvalidOperationException("Your data has non-ASCII in it, and the generator is set to produce an ASCII API. That's not supported.");
 
         StringHashInfo? cacheHashInfo = null;
@@ -115,7 +116,7 @@ public static partial class FastDataGenerator
         if (cfg.StructureTypeOverride != null)
             structureType = cfg.StructureTypeOverride;
         else
-            structureType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthMap.Min, props.LengthData.LengthMap.Max, cfg.AllowApproximateMatching, props.LengthData.UniqueLengths, cfg.StructureConfig, x => EnsureHashData(x.Span));
+            structureType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.AllowApproximateMatching, props.LengthData.UniqueLengths, cfg.StructureConfig, x => EnsureHashData(x.Span));
 
         LogStructureType(logger, structureType.Name);
 
@@ -130,25 +131,20 @@ public static partial class FastDataGenerator
             keys = StringTransform.SubStringKeys(keys.Span, props);
         }
 
-        LogMinMaxLength(logger, props.LengthData.LengthMap.Min, props.LengthData.LengthMap.Max);
+        LogMinMaxLength(logger, props.LengthData.MinCharLength, props.LengthData.MaxCharLength);
 
-        IStructure<string, TValue, IContext> structure = StringStructureFactory<TValue>(structureType, props, () => EnsureHashData(keys.Span), comparer, sorted);
+        IStructure<string, TValue, IContext> structure = StringStructureFactory<TValue>(structureType, props, () => EnsureHashData(keys.Span), comparer, sorted, generator.Encoding);
 
         // Combine mandatory early exits from structures with generated early exits from analysis
-        IEarlyExit[] earlyExits = CombineEarlyExits(structure.GetMandatoryExits(), StringEarlyExits.GetCandidates(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase));
+        List<IEarlyExit> earlyExits = CombineExits(structure.GetMandatoryExits(), StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase));
+        if (cfg.EarlyExitConfig.ReductionEnabled)
+            ReduceExits(earlyExits);
 
         UsedFunctionVisitor usedVisitor = new UsedFunctionVisitor();
-        AnnotatedExpr[] exprs = new AnnotatedExpr[earlyExits.Length];
 
         // Convert the early exits into a set of annotated expressions. We assume the input is called "key".
         ParameterExpression inputKey = Parameter(typeof(string), "key");
-
-        for (int i = 0; i < earlyExits.Length; i++)
-        {
-            Expression expression = earlyExits[i].GetExpression(inputKey);
-            usedVisitor.Visit(expression); // Update string functions with functions used in early exits
-            exprs[i] = new AnnotatedExpr(expression, ExprKind.EarlyExit);
-        }
+        AnnotatedExpr[] exprs = AnnotateExits(earlyExits, inputKey, usedVisitor);
 
         // Now we transform the expressions into more efficient representations
         AnnotatedExpr[] transformed = ExpressionHelper.Transform(exprs, [new AllocationGatherTransform()]).ToArray();
@@ -158,8 +154,8 @@ public static partial class FastDataGenerator
             usedVisitor.Visit(cacheHashInfo.Expression);
 
         IContext res = structure.Create(keys, values);
-        StringGeneratorConfig genCfg = new StringGeneratorConfig(structureType, (uint)keys.Length, props.LengthData.LengthMap.Min,
-            props.LengthData.LengthMap.Max, cfg.IgnoreCase, props.CharacterData.CharacterClasses,
+        StringGeneratorConfig genCfg = new StringGeneratorConfig(structureType, (uint)keys.Length, props.LengthData.LengthRanges.Min,
+            props.LengthData.LengthRanges.Max, cfg.IgnoreCase, props.CharacterData.CharacterClasses,
             generator.Encoding, transformed, trimPrefix, trimSuffix, cfg.TypeReductionEnabled, cacheHashInfo, usedVisitor.Functions);
 
         return generator.Generate<string, TValue>(genCfg, res);
@@ -197,10 +193,12 @@ public static partial class FastDataGenerator
                 hashFunc = expression.Compile();
             }
 
+            Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(generator.Encoding);
+
             HashData hashData = HashData.Create(keySpan, cfg.HashCapacityFactor, x =>
             {
                 //TODO: Optimize this. Maybe reuse the same buffer. Benchmark it
-                byte[] bytes = generator.Encoding == GeneratorEncoding.UTF8 ? Encoding.UTF8.GetBytes(x) : Encoding.Unicode.GetBytes(x);
+                byte[] bytes = getBytes(x);
                 return hashFunc(bytes, bytes.Length);
             });
 
@@ -208,7 +206,7 @@ public static partial class FastDataGenerator
         }
     }
 
-    private static IStructure<string, TValue, IContext> StringStructureFactory<TValue>(Type type, StringKeyProperties props, Func<HashData> getHashData, StringComparer comparer, bool sorted)
+    private static IStructure<string, TValue, IContext> StringStructureFactory<TValue>(Type type, StringKeyProperties props, Func<HashData> getHashData, StringComparer comparer, bool sorted, GeneratorEncoding encoding)
     {
         if (type == typeof(ArrayStructure<,>))
             return new ArrayStructure<string, TValue>();
@@ -225,7 +223,7 @@ public static partial class FastDataGenerator
         if (type == typeof(HashTablePerfectStructure<,>))
             return new HashTablePerfectStructure<string, TValue>(getHashData());
         if (type == typeof(KeyLengthStructure<,>))
-            return new KeyLengthStructure<string, TValue>(props.LengthData.LengthMap.Min, props.LengthData.LengthMap.Max);
+            return new KeyLengthStructure<string, TValue>(props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, encoding);
         if (type == typeof(SingleValueStructure<,>))
             return new SingleValueStructure<string, TValue>();
 
@@ -245,6 +243,23 @@ public static partial class FastDataGenerator
         if (type != typeof(char) && type != typeof(sbyte) && type != typeof(byte) && type != typeof(short) && type != typeof(ushort) && type != typeof(int) && type != typeof(uint) && type != typeof(long) && type != typeof(ulong) && type != typeof(float) && type != typeof(double))
             throw new InvalidOperationException($"Unsupported data type: {type.Name}");
 
+        if (keys is ReadOnlyMemory<float> floats)
+        {
+            foreach (float key in floats.Span)
+            {
+                if (float.IsNaN(key) || float.IsInfinity(key))
+                    throw new InvalidOperationException("Keys cannot contain NaN or Infinity values.");
+            }
+        }
+        else if (keys is ReadOnlyMemory<double> doubles)
+        {
+            foreach (double key in doubles.Span)
+            {
+                if (double.IsNaN(key) || double.IsInfinity(key))
+                    throw new InvalidOperationException("Keys cannot contain NaN or Infinity values.");
+            }
+        }
+
         factory ??= NullLoggerFactory.Instance;
         ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));
         LogKeyType(logger, type.Name);
@@ -260,7 +275,7 @@ public static partial class FastDataGenerator
 
         //TODO: Only produce hash data when structure is indexed
         NumericKeyProperties<TKey> props = KeyAnalyzer.GetNumericProperties(keys, sorted);
-        LogMinMaxValues(logger, props.MinKeyValue, props.MaxKeyValue);
+        LogMinMaxValues(logger, props.DataRanges.Min, props.DataRanges.Max);
 
         HashData? cacheHashData = null;
 
@@ -285,65 +300,86 @@ public static partial class FastDataGenerator
 
         IStructure<TKey, TValue, IContext> structure = NumericStructureFactory<TKey, TValue>(cfg, structureType, props, cacheHashData!, sorted);
 
-        IEarlyExit[] earlyExits = CombineEarlyExits(structure.GetMandatoryExits(), NumericEarlyExits<TKey>.GetCandidates(type, props.MinKeyValue, props.MaxKeyValue, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig));
-
-        AnnotatedExpr[] exprs = new AnnotatedExpr[earlyExits.Length];
+        IEarlyExit[] exitsAnalyzed = NumericEarlyExits<TKey>.GetExits(type, props.DataRanges, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig);
+        List<IEarlyExit> exits = CombineExits(structure.GetMandatoryExits(), exitsAnalyzed);
+        if (cfg.EarlyExitConfig.ReductionEnabled)
+            ReduceExits(exits);
 
         // Convert the early exits into a set of annotated expressions. We assume the input is called "key".
         ParameterExpression inputKey = Parameter(typeof(TKey), "key");
-
-        for (int i = 0; i < earlyExits.Length; i++)
-            exprs[i] = new AnnotatedExpr(earlyExits[i].GetExpression(inputKey), ExprKind.EarlyExit);
+        AnnotatedExpr[] exprs = AnnotateExits(exits, inputKey, null);
 
         IContext res = structure.Create(keys, values);
-        NumericGeneratorConfig genCfg = new NumericGeneratorConfig(structureType, (uint)keys.Length, props.MinKeyValue, props.MaxKeyValue, exprs, cfg.TypeReductionEnabled, props.HasZeroOrNaN);
+        NumericGeneratorConfig genCfg = new NumericGeneratorConfig(structureType, (uint)keys.Length, props.DataRanges.Min, props.DataRanges.Max, exprs, cfg.TypeReductionEnabled, props.HasZero);
 
         return generator.Generate<TKey, TValue>(genCfg, res);
 
         HashData GetNumericHash(ReadOnlySpan<TKey> keySpan)
         {
-            NumericHashFunc<TKey> hashFunc = DefaultNumericHash.GetHashFunc<TKey>(props.HasZeroOrNaN);
-            HashData hashData = HashData.Create(keySpan, cfg.HashCapacityFactor, x => hashFunc(x));
+            NumericHashFunc<TKey> hashFunc = DefaultNumericHash.GetHashFunc<TKey>(props.HasZero);
+            HashData hashData = HashData.Create(keySpan, cfg.HashCapacityFactor, hashFunc);
             return hashData;
         }
     }
 
-    private static IEarlyExit[] CombineEarlyExits(IEnumerable<IEarlyExit> mandatoryExits, IEnumerable<IEarlyExit> candidateExits)
+    private static List<IEarlyExit> CombineExits(IEnumerable<IEarlyExit> mandatory, IEnumerable<IEarlyExit> candidates)
     {
-        // Use hash set to deduplicate early exits on their direct values
-        HashSet<IEarlyExit> combined = new HashSet<IEarlyExit>();
+        List<IEarlyExit> exits = new List<IEarlyExit>(8);
 
-        foreach (IEarlyExit exit in mandatoryExits)
-            combined.Add(exit);
+        foreach (IEarlyExit exit in mandatory)
+            AddExit(exit);
 
-        foreach (IEarlyExit exit in candidateExits)
-            combined.Add(exit);
+        foreach (IEarlyExit exit in candidates)
+            AddExit(exit);
 
+        return exits;
+
+        void AddExit(IEarlyExit exit)
+        {
+            for (int i = 0; i < exits.Count; i++)
+            {
+                if (EqualityComparer<IEarlyExit>.Default.Equals(exit, exits[i]))
+                    return;
+            }
+
+            exits.Add(exit);
+        }
+    }
+
+    private static void ReduceExits(List<IEarlyExit> exits)
+    {
         // Some early exits are reducible. For example, a LengthLessThan with a value of 3 is worse than one with 4.
         // So if there are competing exits, we take the one with the best bounds.
-        if (combined.Count > 1)
+        for (int i = exits.Count - 1; i >= 0; i--)
         {
-            IEarlyExit[] exits = combined.ToArray();
+            IEarlyExit current = exits[i];
 
-            for (int i = 0; i < exits.Length; i++)
+            for (int j = exits.Count - 1; j >= 0; j--)
             {
-                IEarlyExit exit = exits[i];
+                if (i == j)
+                    continue;
 
-                for (int j = 0; j < exits.Length; j++)
+                if (current.IsWorseThan(exits[j]))
                 {
-                    if (i == j)
-                        continue;
-
-                    if (exit.IsWorseThan(exits[j]))
-                    {
-                        combined.Remove(exit);
-                        break;
-                    }
+                    exits.RemoveAt(i);
+                    break;
                 }
             }
         }
+    }
 
-        return combined.ToArray();
+    private static AnnotatedExpr[] AnnotateExits(List<IEarlyExit> exits, ParameterExpression inputKey, UsedFunctionVisitor? usedVisitor)
+    {
+        AnnotatedExpr[] exprs = new AnnotatedExpr[exits.Count];
+
+        for (int i = 0; i < exits.Count; i++)
+        {
+            Expression expression = exits[i].GetExpression(inputKey);
+            usedVisitor?.Visit(expression);
+            exprs[i] = new AnnotatedExpr(expression, ExprKind.EarlyExit);
+        }
+
+        return exprs;
     }
 
     private static IStructure<TKey, TValue, IContext> NumericStructureFactory<TKey, TValue>(DataConfig cfg, Type type, NumericKeyProperties<TKey> props, HashData hashData, bool sorted)
@@ -361,7 +397,7 @@ public static partial class FastDataGenerator
         if (type == typeof(ConditionalStructure<,>))
             return new ConditionalStructure<TKey, TValue>();
         if (type == typeof(EliasFanoStructure<,>))
-            return new EliasFanoStructure<TKey, TValue>(props.MinKeyValue, props.MaxKeyValue, props.ValueConverter, sorted, GetSetting(cfg, "SkipQuantum", 128));
+            return new EliasFanoStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, sorted, GetSetting(cfg, "SkipQuantum", 128));
         if (type == typeof(HashTableStructure<,>))
             return new HashTableStructure<TKey, TValue>(hashData);
         if (type == typeof(HashTableCompactStructure<,>))
@@ -369,9 +405,9 @@ public static partial class FastDataGenerator
         if (type == typeof(HashTablePerfectStructure<,>))
             return new HashTablePerfectStructure<TKey, TValue>(hashData);
         if (type == typeof(RangeStructure<,>))
-            return new RangeStructure<TKey, TValue>(props.MinKeyValue, props.MaxKeyValue);
+            return new RangeStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max);
         if (type == typeof(RrrBitVectorStructure<,>))
-            return new RrrBitVectorStructure<TKey, TValue>(props.MinKeyValue, props.MaxKeyValue, sorted);
+            return new RrrBitVectorStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, sorted);
         if (type == typeof(SingleValueStructure<,>))
             return new SingleValueStructure<TKey, TValue>();
 

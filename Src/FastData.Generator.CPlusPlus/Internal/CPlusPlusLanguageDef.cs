@@ -25,12 +25,10 @@ internal class CPlusPlusLanguageDef : ILanguageDef
 
         new ObjectTypeDef(PrintDeclaration, PrintValue),
 
-        //Support reduction from UTF16 to ASCII
         new DynamicStringTypeDef(
-            new StringType(GeneratorEncoding.UTF32, "std::u32string_view", static x => $"U\"{x}\""),
-            new StringType(GeneratorEncoding.UTF16, "std::u16string_view", static x => $"u\"{x}\""),
-            new StringType(GeneratorEncoding.UTF8, "std::string_view", static x => $"u8\"{x}\""),
-            new StringType(GeneratorEncoding.ASCII, "std::string_view", static x => $"\"{x}\""))
+            new StringType(GeneratorEncoding.Utf16CodeUnits, "std::u16string_view", static x => $"u\"{x}\""),
+            new StringType(GeneratorEncoding.Utf8Bytes, "std::string_view", static x => $"u8\"{x}\""),
+            new StringType(GeneratorEncoding.AsciiBytes, "std::string_view", static x => $"\"{x}\""))
     };
 
     private static string PrintDeclaration(TypeMap map, Type type)

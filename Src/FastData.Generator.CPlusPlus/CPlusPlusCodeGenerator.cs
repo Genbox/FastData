@@ -5,7 +5,7 @@ using Genbox.FastData.Generators;
 
 namespace Genbox.FastData.Generator.CPlusPlus;
 
-public sealed class CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cppCfg) : TemplatedCodeGenerator(new CPlusPlusLanguageDef(), GeneratorEncoding.UTF8)
+public sealed class CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cppCfg) : TemplatedCodeGenerator(new CPlusPlusLanguageDef(), GeneratorEncoding.Utf8Bytes)
 {
     protected override string GenerateTemplated<TKey, TValue>(GeneratorConfigBase genCfg, TemplateManager manager, Dictionary<string, object?> variables)
     {

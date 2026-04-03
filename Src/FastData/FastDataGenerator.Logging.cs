@@ -17,7 +17,7 @@ public static partial class FastDataGenerator
     internal static partial void LogMinMaxValues(ILogger logger, object minValue, object maxValue);
 
     [LoggerMessage(LogLevel.Information, "Min length: {MinLength}, Max length: {MaxLength}")]
-    internal static partial void LogMinMaxLength(ILogger logger, uint minLength, uint maxLength);
+    internal static partial void LogMinMaxLength(ILogger logger, int minLength, int maxLength);
 
     [LoggerMessage(LogLevel.Information, "Structure type {Type}")]
     internal static partial void LogStructureType(ILogger logger, string type);

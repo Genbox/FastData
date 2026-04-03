@@ -5,14 +5,7 @@ namespace Genbox.FastData.Internal;
 
 internal static class StringStructures
 {
-    internal static Type GetBest(ReadOnlyMemory<string> keys,
-                                 bool hasValues,
-                                 uint minLength,
-                                 uint maxLength,
-                                 bool allowApproximate,
-                                 bool lengthsUnique,
-                                 StructureConfig config,
-                                 Func<ReadOnlyMemory<string>, HashData> getHashData)
+    internal static Type GetBest(ReadOnlyMemory<string> keys, bool hasValues, int minLength, int maxLength, bool allowApproximate, bool lengthsUnique, StructureConfig config, Func<ReadOnlyMemory<string>, HashData> getHashData)
     {
         uint keyCount = (uint)keys.Length;
 
