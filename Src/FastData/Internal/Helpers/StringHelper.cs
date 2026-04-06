@@ -30,10 +30,4 @@ internal static class StringHelper
         GeneratorEncoding.Utf16Bytes or GeneratorEncoding.Utf16CodeUnits => 2,
         _ => throw new InvalidOperationException($"Unsupported encoding: {encoding}")
     };
-
-    internal static StringComparer GetStringComparer(bool ignoreCase) => ignoreCase switch
-    {
-        true => StringComparer.OrdinalIgnoreCase,
-        false => StringComparer.Ordinal
-    };
 }

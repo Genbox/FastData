@@ -42,13 +42,6 @@ public class StringHelperTests
     }
 
     [Fact]
-    public void GetStringComparer_ReturnsOrdinalVariants()
-    {
-        Assert.True(StringHelper.GetStringComparer(true).Equals("alpha", "ALPHA"));
-        Assert.False(StringHelper.GetStringComparer(false).Equals("alpha", "ALPHA"));
-    }
-
-    [Fact]
     public void UnsupportedEncoding_Throws()
     {
         Assert.Throws<InvalidOperationException>(() => StringHelper.GetLengthFunc(GeneratorEncoding.Unknown));
