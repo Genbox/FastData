@@ -38,7 +38,7 @@ public abstract class VectorTestsBase
 
         string id = $"{nameof(ValueVectors)}_{vector.Identifier}";
         await VerifyVectorAsync(Harness.Name, id, source);
-        TKey[] notPresent = vector.StructureType == typeof(BloomFilterStructure<,>) ? Array.Empty<TKey>() : vector.NotPresent;
+        TKey[] notPresent = vector.StructureType == typeof(BloomFilterStructure<,>) ? [] : vector.NotPresent;
         Assert.Equal(1, await Harness.RunContainsAsync(source, id, vector.Keys, notPresent, TestContext.Current.CancellationToken));
     }
 
@@ -67,7 +67,7 @@ public abstract class VectorTestsBase
 
         string id = $"{nameof(KeyValueVectors)}_{vector.Identifier}";
         await VerifyFeatureAsync(Harness.Name, id, source);
-        TKey[] notPresent = vector.StructureType == typeof(BloomFilterStructure<,>) ? Array.Empty<TKey>() : vector.NotPresent;
+        TKey[] notPresent = vector.StructureType == typeof(BloomFilterStructure<,>) ? [] : vector.NotPresent;
         Assert.Equal(1, await Harness.RunTryLookupAsync(source, id, vector.Keys, vector.Values, notPresent, TestContext.Current.CancellationToken));
     }
 }

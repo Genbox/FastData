@@ -985,7 +985,7 @@ internal sealed partial class GPerfAnalyzer(int dataLength, StringKeyProperties 
 
                 // Add the keyword to the equivalence class.
                 if (equClass.Keywords == null)
-                    equClass.Keywords = new List<Keyword> { keyword };
+                    equClass.Keywords = [keyword];
                 else
                     equClass.Keywords.Add(keyword);
 

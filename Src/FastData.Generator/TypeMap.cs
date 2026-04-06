@@ -5,6 +5,7 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generator;
 
+/// <summary>Takes in type definitions and can then be used as a lookup table afterward.</summary>
 public sealed class TypeMap : ITypeMap
 {
     private readonly GeneratorEncoding _encoding;

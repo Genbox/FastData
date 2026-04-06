@@ -307,7 +307,7 @@ public sealed class ExprOptimizerTests
         // Before: new List<bool> { (p || false) }
         // After: new List<bool> { p }
         ParameterExpression param = Parameter(typeof(bool), "p");
-        MethodInfo addMethod = typeof(List<bool>).GetMethod("Add", new[] { typeof(bool) })!;
+        MethodInfo addMethod = typeof(List<bool>).GetMethod("Add", [typeof(bool)])!;
         ElementInit initializer = ElementInit(addMethod, OrElse(param, Constant(false)));
         ListInitExpression init = ListInit(New(typeof(List<bool>)), initializer);
 

@@ -10,6 +10,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.Template;
 
+/// <summary>Base class for T4 template based generators</summary>
 public abstract class TemplatedCodeGenerator : ICodeGenerator
 {
     private readonly string _languageName;
@@ -60,7 +61,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
 
     protected abstract string GenerateTemplated<TKey, TValue>(GeneratorConfigBase genCfg, TemplateManager manager, Dictionary<string, object?> variables);
 
-    protected static ITemplateData? CreateContextModel<TKey, TValue>(IContext context)
+    private static ITemplateData? CreateContextModel<TKey, TValue>(IContext context)
     {
         switch (context)
         {
@@ -195,7 +196,6 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
                 return null;
 
             case EliasFanoContext<TKey>:
-                //TODO
                 return null;
 
             default:

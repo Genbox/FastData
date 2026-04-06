@@ -1,8 +1,10 @@
 using Genbox.FastData.Generator.Abstracts;
 using Genbox.FastData.Generator.Definitions;
+using JetBrains.Annotations;
 
 namespace Genbox.FastData.Generator.Extensions;
 
+[PublicAPI]
 public static class TypeMapExtensions
 {
     public static string ToValueLabel(this TypeMap map, object value, Type type)

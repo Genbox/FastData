@@ -14,6 +14,7 @@ using Mono.TextTemplating;
 
 namespace Genbox.FastData.Generator.Template.Helpers;
 
+/// <summary>Used for handling and rendering templates</summary>
 public class TemplateManager
 {
     private readonly string _cacheDirectory;

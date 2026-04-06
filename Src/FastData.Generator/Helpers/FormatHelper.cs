@@ -1,8 +1,10 @@
 using System.Text;
 using Genbox.FastData.Generator.Extensions;
+using JetBrains.Annotations;
 
 namespace Genbox.FastData.Generator.Helpers;
 
+[PublicAPI]
 public static class FormatHelper
 {
     public static string FormatColumns<T>(T[] items, Func<T, string> Render, int indent = 4, int columns = 10)

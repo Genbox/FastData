@@ -5,7 +5,7 @@ namespace Genbox.FastData.Generator;
 
 public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 {
-    protected readonly FastStringBuilder Output = new FastStringBuilder();
+    protected readonly IndentedStringBuilder Output = new IndentedStringBuilder();
 
     public string GetCode(Expression expression, int indent = 0)
     {

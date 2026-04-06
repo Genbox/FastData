@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Genbox.FastData.Generator.Extensions;
 
+[PublicAPI]
 public static class SpanExtensions
 {
     public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[] arr) => new ReadOnlySpan<T>(arr);

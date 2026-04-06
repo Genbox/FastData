@@ -1,7 +1,9 @@
 using System.Globalization;
+using JetBrains.Annotations;
 
 namespace Genbox.FastData.Generator.Extensions;
 
+[PublicAPI]
 public static class IntegerExtensions
 {
     public static string ToStringInvariant(this int value) => value.ToString(NumberFormatInfo.InvariantInfo);

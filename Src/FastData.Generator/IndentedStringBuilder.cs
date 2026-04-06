@@ -2,48 +2,49 @@ using System.Text;
 
 namespace Genbox.FastData.Generator;
 
-public sealed class FastStringBuilder
+/// <summary>A StringBuilder that supports indentation for easy code printing</summary>
+public sealed class IndentedStringBuilder
 {
     private readonly StringBuilder _sb = new StringBuilder();
     private bool _indentPending = true;
 
     public int Indent { get; set; }
 
-    public FastStringBuilder Append(object value)
+    public IndentedStringBuilder Append(object value)
     {
         DoIndent();
         _sb.Append(value);
         return this;
     }
 
-    public FastStringBuilder Append(string value)
+    public IndentedStringBuilder Append(string value)
     {
         DoIndent();
         _sb.Append(value);
         return this;
     }
 
-    public FastStringBuilder Append(FormattableString value)
+    public IndentedStringBuilder Append(FormattableString value)
     {
         DoIndent();
         _sb.Append(value);
         return this;
     }
 
-    public FastStringBuilder Append(char value)
+    public IndentedStringBuilder Append(char value)
     {
         DoIndent();
         _sb.Append(value);
         return this;
     }
 
-    public FastStringBuilder AppendLine()
+    public IndentedStringBuilder AppendLine()
     {
         AppendLine(string.Empty);
         return this;
     }
 
-    public FastStringBuilder AppendLine(string value)
+    public IndentedStringBuilder AppendLine(string value)
     {
         if (value.Length != 0)
             DoIndent();
@@ -54,7 +55,7 @@ public sealed class FastStringBuilder
         return this;
     }
 
-    public FastStringBuilder AppendLine(FormattableString value)
+    public IndentedStringBuilder AppendLine(FormattableString value)
     {
         DoIndent();
         _sb.Append(value);
@@ -62,7 +63,7 @@ public sealed class FastStringBuilder
         return this;
     }
 
-    public FastStringBuilder Clear()
+    public IndentedStringBuilder Clear()
     {
         _sb.Clear();
         Indent = 0;
@@ -70,13 +71,13 @@ public sealed class FastStringBuilder
         return this;
     }
 
-    public FastStringBuilder IncrementIndent()
+    public IndentedStringBuilder IncrementIndent()
     {
         Indent++;
         return this;
     }
 
-    public FastStringBuilder DecrementIndent()
+    public IndentedStringBuilder DecrementIndent()
     {
         if (Indent > 0)
             Indent--;

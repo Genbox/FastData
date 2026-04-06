@@ -12,6 +12,7 @@
 - Shared test utilities: `Src/FastData.InternalShared`.
 - Test harnesses: `Src/*TestHarness*` and `Src/FastData.TestHarness.Runner`.
 - Console/demo apps live under `Src/*Console` and `Src/*Demo`.
+- Testbed app: `Src/FastData.Testbed`.
 - Docs live under `Docs/`.
 - Build/publish scripts live under `Scripts/`.
 - Local machine overrides live under `Locals/` (do not commit secrets).
@@ -25,8 +26,8 @@
 - Build full solution: `dotnet build FastData.slnx -c Debug`.
 - Build Release: `dotnet build FastData.slnx -c Release`.
 - Scripted build: `pwsh Scripts/Build.ps1`.
-- Test full solution: `dotnet test FastData.slnx -c Debug`.
-- Test a single project: `dotnet test Src/FastData.Tests/FastData.Tests.csproj -c Debug`.
+- Test full solution: `dotnet test --solution FastData.slnx -c Debug`.
+- Test a single project: `dotnet test --project Src/FastData.Tests/FastData.Tests.csproj -c Debug`.
 - Test harness runner (uses real generators): `dotnet test --project Src/FastData.TestHarness.Runner/FastData.TestHarness.Runner.csproj -c Debug`.
 - Test project list:
   - `Src/FastData.Tests/FastData.Tests.csproj`
@@ -34,9 +35,9 @@
   - `Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj`
   - `Src/FastData.SourceGenerator.Tests/FastData.SourceGenerator.Tests.csproj`
 - Run a single test by name:
-  - `dotnet test Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter "FullyQualifiedName~Namespace.ClassName.TestName"`
-  - `dotnet test Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter "DisplayName~some substring"`
-- Run a single test class: `dotnet test Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter "FullyQualifiedName~Namespace.ClassName"`.
+  - `dotnet test --project Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter "FullyQualifiedName~Namespace.ClassName.TestName"`
+  - `dotnet test --project Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter "DisplayName~some substring"`
+- Run a single test class: `dotnet test --project Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter "FullyQualifiedName~Namespace.ClassName"`.
 - Optional analyzers (lint-like): `dotnet build FastData.slnx -c Debug -p:RunAnalyzersDuringBuild=true`.
 - Run benchmarks: `dotnet run -c Release --project Src/FastData.Benchmarks/FastData.Benchmarks.csproj`.
 - Generator benchmark harness:
@@ -47,11 +48,11 @@
 - Run a specific benchmark (BenchmarkDotNet): `dotnet run -c Release --project Src/FastData.Benchmarks/FastData.Benchmarks.csproj -- --filter "*Hash*"`.
 
 ## Common Test Examples
-- CLI tests: `dotnet test Src/FastData.Cli.Tests/FastData.Cli.Tests.csproj -c Debug`.
-- Generator tests: `dotnet test Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj -c Debug`.
-- Source generator tests: `dotnet test Src/FastData.SourceGenerator.Tests/FastData.SourceGenerator.Tests.csproj -c Debug`.
-- Single test in CLI tests: `dotnet test Src/FastData.Cli.Tests/FastData.Cli.Tests.csproj -c Debug --filter "FullyQualifiedName~Namespace.ClassName.TestName"`.
-- Single test in generator tests: `dotnet test Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj -c Debug --filter "DisplayName~some substring"`.
+- CLI tests: `dotnet test --project Src/FastData.Cli.Tests/FastData.Cli.Tests.csproj -c Debug`.
+- Generator tests: `dotnet test --project Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj -c Debug`.
+- Source generator tests: `dotnet test --project Src/FastData.SourceGenerator.Tests/FastData.SourceGenerator.Tests.csproj -c Debug`.
+- Single test in CLI tests: `dotnet test --project Src/FastData.Cli.Tests/FastData.Cli.Tests.csproj -c Debug --filter "FullyQualifiedName~Namespace.ClassName.TestName"`.
+- Single test in generator tests: `dotnet test --project Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj -c Debug --filter "DisplayName~some substring"`.
 
 ## Language & Project Settings
 - C# `LangVersion` is `latest` with `Features` set to `strict`.
