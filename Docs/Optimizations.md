@@ -35,34 +35,72 @@ Range reduction only works if the numbers are consecutive (until I add support f
 An early exit is a lightweight check we can perform before the actual lookup to speed up the process. They have to be **really** fast, otherwise they will add unwanted overhead to each call.
 Only generalized data structures perform early exits, as reductions already have early exits built into them.
 
-### Value range early exit
-Let's say we have a hash table data structure. Each lookup needs to hash the input data, lookup the bucket and do an equality check. With just one additional check, we can say that an element won't be in dataset at all.
-Input: `4 9 42 99 123`
+Early exit candidates are filtered by a rejection ratio threshold. The default is `EarlyExitConfig.MinRejectionRatio = 0.05`, meaning a candidate must reject at least 5% of the observed range to be kept.
 
-If we track the minimum and maximum values, instead of doing a lookup, we can just check if the range matches: `if (value < 4 || value > 123) return false;`
+### Numeric early exits
+#### Value less than early exit
+Rejects keys that are smaller than the minimum observed value. Input: `4 9 42 99 123` yields `if (value < 4) return false;`.
 
-### Length range early exit
-This one works much like the other early exit above, but checks the length of the value, rather than the value itself. Therefore it only works on arrays (strings are interpreted as an array in that context).
-Input: `horse pig cow sheep`
+#### Value greater than early exit
+Rejects keys that are larger than the maximum observed value. Input: `4 9 42 99 123` yields `if (value > 123) return false;`.
 
-We track the minimum and maximum lengths, and can do a check like this: `if (value.Length < 3 || value.Length > 5) return false;`
+#### Value not equal early exit
+Used when all values are identical. It emits `if (value != 42) return false;` for input `42 42 42`.
 
-There is also another variant that checks if all lengths are the same. In that case, we can save an if-statement.
-Input `cow pig cat`
+#### Value in range early exit
+Rejects gaps between observed ranges by checking if the input is strictly inside a missing interval. Input: `10 12 20` yields `if (value > 12 && value < 20) return false;`.
 
-It will produce: `if (value.Length != 3) return false;`
+#### Value bitmask early exit
+Builds a bitmask of bits never seen in the dataset and rejects any key that sets one of them. Input: `2 4 6 8` yields `if ((key & 1) != 0) return false;`.
 
-### Length bitmap early exit
-FastData can also sometimes produce a bitmap of value lengths. It basically map lengths into a 64bit integer and check if the corresponding bit is set. For larger ranges, it can emit a multi-word bitset.
-Input: `stable softice sophisticated santa`
+#### Value bitset early exit
+Builds a bitmap of missing values inside a compact range and rejects any key that lands on a missing value. Input: `10 12 13` yields a range check plus a missing bitset check.
 
-It generates this early exit: `if ((4208UL & (1UL << (value.Length - 1))) == 0) return false;`
+### String early exits
+#### Length less than early exit
+Rejects strings shorter than the minimum observed length. Input: `horse pig cow sheep` yields `if (value.Length < 3) return false;`.
 
-### Value bitmask early exit
-For integer keys, FastData can build a bitmask of all bits that appear in the dataset. If an input has any bit set that never appears in any key, it cannot be in the dataset.
-Input: `2 4 6 8`
+#### Length greater than early exit
+Rejects strings longer than the maximum observed length. Input: `horse pig cow sheep` yields `if (value.Length > 5) return false;`.
 
-It generates this early exit: `if ((key & 1) != 0) return false;`
+#### Length not equal early exit
+Used when all lengths are identical. Input: `cow pig cat` yields `if (value.Length != 3) return false;`.
+
+#### String length range early exit
+Rejects gaps between observed length ranges by checking for missing length intervals. Input lengths `3 4 7` yield `if (value.Length > 4 && value.Length < 7) return false;`.
+
+#### Length bitmap early exit
+Builds a 64 bit bitmap of observed lengths and rejects missing lengths in the 1 to 64 range. Input: `stable softice sophisticated santa` yields `if ((4208UL & (1UL << (value.Length - 1))) == 0) return false;`.
+
+#### Char first less than early exit
+Rejects strings whose first ASCII character is below the minimum observed first character. Input: `cat dog emu` yields `if (first < 'c') return false;`.
+
+#### Char first greater than early exit
+Rejects strings whose first ASCII character is above the maximum observed first character. Input: `cat dog emu` yields `if (first > 'e') return false;`.
+
+#### Char first not equal early exit
+Used when all strings share the same first character. Input: `apple axe ant` yields `if (first != 'a') return false;`.
+
+#### Char first bitmap early exit
+Builds a bitmap of observed first ASCII characters and rejects missing characters. Input: `alpha zulu` yields a bitmap test for the first character.
+
+#### Char last less than early exit
+Rejects strings whose last ASCII character is below the minimum observed last character. Input: `alpha bravo charlie` yields `if (last < 'a') return false;`.
+
+#### Char last greater than early exit
+Rejects strings whose last ASCII character is above the maximum observed last character. Input: `alpha bravo charlie` yields `if (last > 'e') return false;`.
+
+#### Char last not equal early exit
+Used when all strings share the same last character. Input: `tuba panda villa` yields `if (last != 'a') return false;`.
+
+#### Char last bitmap early exit
+Builds a bitmap of observed last ASCII characters and rejects missing characters. Input: `alpha zulu` yields a bitmap test for the last character.
+
+#### String prefix early exit
+Rejects strings that do not start with an observed prefix when trimming is disabled. Input: `preOne preTwo preSix` yields `if (!StartsWith("pre")) return false;`.
+
+#### String suffix early exit
+Rejects strings that do not end with an observed suffix when trimming is disabled. Input: `OneSuf TwoSuf SixSuf` yields `if (!EndsWith("Suf")) return false;`.
 
 ## Structure specializations
 
