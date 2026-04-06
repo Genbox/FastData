@@ -34,10 +34,12 @@
   - `Src/FastData.Cli.Tests/FastData.Cli.Tests.csproj`
   - `Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj`
   - `Src/FastData.SourceGenerator.Tests/FastData.SourceGenerator.Tests.csproj`
-- Run a single test by name:
-  - `dotnet test --project Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter "FullyQualifiedName~Namespace.ClassName.TestName"`
-  - `dotnet test --project Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter "DisplayName~some substring"`
-- Run a single test class: `dotnet test --project Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter "FullyQualifiedName~Namespace.ClassName"`.
+- Run a single test class:
+  - `dotnet test --project Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter-class "Namespace.ClassName"`
+- Run a single test method:
+  - `dotnet test --project Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter-method "Namespace.ClassName.TestName"`
+- Run tests by query:
+  - `dotnet test --project Src/FastData.Tests/FastData.Tests.csproj -c Debug --filter-query "/assemblyName/namespace/type/method[trait=value]"`
 - Optional analyzers (lint-like): `dotnet build FastData.slnx -c Debug -p:RunAnalyzersDuringBuild=true`.
 - Run benchmarks: `dotnet run -c Release --project Src/FastData.Benchmarks/FastData.Benchmarks.csproj`.
 - Generator benchmark harness:
@@ -51,8 +53,8 @@
 - CLI tests: `dotnet test --project Src/FastData.Cli.Tests/FastData.Cli.Tests.csproj -c Debug`.
 - Generator tests: `dotnet test --project Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj -c Debug`.
 - Source generator tests: `dotnet test --project Src/FastData.SourceGenerator.Tests/FastData.SourceGenerator.Tests.csproj -c Debug`.
-- Single test in CLI tests: `dotnet test --project Src/FastData.Cli.Tests/FastData.Cli.Tests.csproj -c Debug --filter "FullyQualifiedName~Namespace.ClassName.TestName"`.
-- Single test in generator tests: `dotnet test --project Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj -c Debug --filter "DisplayName~some substring"`.
+- Single test in CLI tests: `dotnet test --project Src/FastData.Cli.Tests/FastData.Cli.Tests.csproj -c Debug --filter-method "Namespace.ClassName.TestName"`.
+- Single test in generator tests: `dotnet test --project Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj -c Debug --filter-method "Namespace.ClassName.TestName"`.
 
 ## Language & Project Settings
 - C# `LangVersion` is `latest` with `Features` set to `strict`.
