@@ -9,8 +9,8 @@ internal static class NumericStructures<TKey>
     internal static Type GetBest(ReadOnlyMemory<TKey> keys,
                                  bool hasValues,
                                  float density,
-                                 bool isConsecutive,
                                  bool allowApproximate,
+                                 int rangeCount,
                                  StructureConfig config,
                                  Func<ReadOnlyMemory<TKey>, HashData> getHashData)
     {
@@ -19,8 +19,8 @@ internal static class NumericStructures<TKey>
         if (config.IsEnabled(typeof(SingleValueStructure<,>)) && keyCount == 1)
             return typeof(SingleValueStructure<,>);
 
-        // RangeStructure handles consecutive keys, but does not support values
-        if (config.IsEnabled(typeof(RangeStructure<,>)) && isConsecutive && !hasValues)
+        // RangeStructure handles range-based keys, but does not support values
+        if (config.IsEnabled(typeof(RangeStructure<,>)) && !hasValues && config.CheckItemCountLimits(typeof(RangeStructure<,>), (uint)rangeCount))
             return typeof(RangeStructure<,>);
 
         if (config.IsEnabled(typeof(BloomFilterStructure<,>)) && allowApproximate)

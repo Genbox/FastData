@@ -1,21 +1,20 @@
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis.Data;
 
 namespace Genbox.FastData.Internal.Structures;
 
 public sealed class RangeStructure<TKey, TValue> : IStructure<TKey, TValue, RangeContext<TKey>>
 {
-    private readonly TKey _maxValue;
-    private readonly TKey _minValue;
+    private readonly (TKey Start, TKey End)[] _ranges;
 
-    internal RangeStructure(TKey minValue, TKey maxValue)
+    internal RangeStructure(DataRanges<TKey> ranges)
     {
-        _minValue = minValue;
-        _maxValue = maxValue;
+        _ranges = ranges.Ranges.ToArray();
     }
 
-    public RangeContext<TKey> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values) => new RangeContext<TKey>(_minValue, _maxValue);
+    public RangeContext<TKey> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values) => new RangeContext<TKey>(_ranges);
 
     public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 }

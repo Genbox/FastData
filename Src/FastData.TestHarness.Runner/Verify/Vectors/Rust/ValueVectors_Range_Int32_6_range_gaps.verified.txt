@@ -1,0 +1,37 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Range
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+
+pub struct fastdata;
+impl fastdata {
+
+    const RANGE_STARTS: [i32; 4] = [
+        1, 4, 7, 10
+    ];
+
+    const RANGE_ENDS: [i32; 4] = [
+        2, 4, 8, 10
+    ];
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+
+        for i in 0..4 {
+            if key >= Self::RANGE_STARTS[i] && key <= Self::RANGE_ENDS[i] {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 6;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 10;
+}

@@ -103,8 +103,12 @@ public static class TestVectorHelper
         foreach (ITestVector testVector in GenerateTestVectors([[1f, 2f, 3f, 4f, 5f]], "interpolation", typeof(BinarySearchInterpolationStructure<,>)))
             yield return testVector;
 
-        // Test range/bitset support. Keys have to be without gaps for range to kick in.
+        // Test range/bitset support. RangeStructure is selected when range count is low.
         foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "range_bitset", typeof(RangeStructure<,>), typeof(BitSetStructure<,>)))
+            yield return testVector;
+
+        // Test range support for non-consecutive data.
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 4, 7, 8, 10]], "range_gaps", typeof(RangeStructure<,>)))
             yield return testVector;
 
         // Test prefix/suffix support

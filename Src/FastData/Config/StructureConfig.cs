@@ -22,6 +22,7 @@ public class StructureConfig
             cfg.AppendLimit(typeof(RrrBitVectorStructure<,>), new ValueDensityMinMaxLimit(0, 0.015625f)); // 1 / 64
             cfg.AppendLimit(typeof(EliasFanoStructure<,>), new ItemCountMinMaxLimit(256, uint.MaxValue));
             cfg.AppendLimit(typeof(EliasFanoStructure<,>), new ValueDensityMinMaxLimit(0, 0.083333f)); // 1 / 12
+            cfg.AppendLimit(typeof(RangeStructure<,>), new ItemCountMinMaxLimit(1, 100));
 
             return cfg;
         }

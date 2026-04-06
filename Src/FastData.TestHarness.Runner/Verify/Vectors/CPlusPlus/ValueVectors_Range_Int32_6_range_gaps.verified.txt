@@ -1,0 +1,36 @@
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
+// Structure: Range
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+
+class fastdata final {
+
+
+    static constexpr std::array<int32_t, 4> range_starts = {
+        1, 4, 7, 10
+    };
+
+    static constexpr std::array<int32_t, 4> range_ends = {
+        2, 4, 8, 10
+    };
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+
+        for (size_t i = 0; i < 4; ++i) {
+            if (key >= range_starts[i] && key <= range_ends[i])
+                return true;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 6;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 10;
+};

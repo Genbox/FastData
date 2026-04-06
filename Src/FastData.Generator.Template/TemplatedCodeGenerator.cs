@@ -1,4 +1,4 @@
-﻿using Genbox.FastData.Enums;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Abstracts;
 using Genbox.FastData.Generator.Template.Abstracts;
 using Genbox.FastData.Generator.Template.Extensions;
@@ -109,10 +109,22 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
                 };
 
             case RangeContext<TKey> rangeCtx:
+                ReadOnlySpan<(TKey Start, TKey End)> ranges = rangeCtx.Ranges.Span;
+                RangeEntryTemplateData[] rangeEntries = new RangeEntryTemplateData[ranges.Length];
+
+                for (int i = 0; i < ranges.Length; i++)
+                {
+                    rangeEntries[i] = new RangeEntryTemplateData
+                    {
+                        Start = ranges[i].Start!,
+                        End = ranges[i].End!
+                    };
+                }
+
                 return new RangeTemplateData
                 {
-                    Min = rangeCtx.Min,
-                    Max = rangeCtx.Max
+                    Ranges = rangeEntries,
+                    RangeCount = rangeEntries.Length
                 };
 
             case KeyLengthContext<TValue> klCtx:

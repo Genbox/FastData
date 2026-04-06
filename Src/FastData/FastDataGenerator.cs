@@ -290,7 +290,7 @@ public static partial class FastDataGenerator
         }
         else
         {
-            structureType = NumericStructures<TKey>.GetBest(keys, !values.IsEmpty, props.Density, props.IsConsecutive, cfg.AllowApproximateMatching, cfg.StructureConfig, x =>
+            structureType = NumericStructures<TKey>.GetBest(keys, !values.IsEmpty, props.Density, cfg.AllowApproximateMatching, props.DataRanges.Ranges.Count, cfg.StructureConfig, x =>
             {
                 return cacheHashData = GetNumericHash(x.Span);
             });
@@ -405,7 +405,7 @@ public static partial class FastDataGenerator
         if (type == typeof(HashTablePerfectStructure<,>))
             return new HashTablePerfectStructure<TKey, TValue>(hashData);
         if (type == typeof(RangeStructure<,>))
-            return new RangeStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max);
+            return new RangeStructure<TKey, TValue>(props.DataRanges);
         if (type == typeof(RrrBitVectorStructure<,>))
             return new RrrBitVectorStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, sorted);
         if (type == typeof(SingleValueStructure<,>))

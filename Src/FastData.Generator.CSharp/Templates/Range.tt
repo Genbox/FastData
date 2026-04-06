@@ -1,11 +1,44 @@
 <#@ include file="Includes\Header.ttinclude" #>
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.RangeTemplateData" name="Data" #>
 
+<#
+    if (Data.RangeCount > 1)
+    {
+#>
+    <#= FieldModifier #><#= KeyTypeName #>[] _rangeStarts = new <#= KeyTypeName #>[] {
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.Start), 8) #>
+    };
+
+    <#= FieldModifier #><#= KeyTypeName #>[] _rangeEnds = new <#= KeyTypeName #>[] {
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.End), 8) #>
+    };
+<#
+    }
+#>
     <#= MethodAttribute #>
     <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
     {
 <#= GetMethodHeader(MethodType.Contains) #>
 
-        return <#= LookupKeyName #> >= <#= TypeMap.ToValueLabel(Data.Min) #> && <#= LookupKeyName #> <= <#= TypeMap.ToValueLabel(Data.Max) #>;
+<#
+    if (Data.RangeCount == 1)
+    {
+#>
+        return <#= LookupKeyName #> >= <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #> && <#= LookupKeyName #> <= <#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>;
+<#
+    }
+    else
+    {
+#>
+        for (int i = 0; i < <#= Data.RangeCount.ToStringInvariant() #>; i++)
+        {
+            if (<#= LookupKeyName #> >= _rangeStarts[i] && <#= LookupKeyName #> <= _rangeEnds[i])
+                return true;
+        }
+
+        return false;
+<#
+    }
+#>
     }
 <#@ include file="Includes\Footer.ttinclude" #>

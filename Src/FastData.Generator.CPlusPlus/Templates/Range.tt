@@ -2,13 +2,41 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.RangeTemplateData" name="Data" #>
 
 <#
-    string minLabel = TypeMap.ToValueLabel(Data.Min);
-    string maxLabel = TypeMap.ToValueLabel(Data.Max);
+    if (Data.RangeCount > 1)
+    {
+#>
+    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.RangeCount.ToStringInvariant() #>> range_starts = {
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.Start), 8) #>
+    };
+
+    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.RangeCount.ToStringInvariant() #>> range_ends = {
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.End), 8) #>
+    };
+<#
+    }
 #>
 public:
     <#= MethodAttribute #>
     <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.Contains) #>
-        return <#= LookupKeyName #> >= <#= minLabel #> && <#= LookupKeyName #> <= <#= maxLabel #>;
+<#
+    if (Data.RangeCount == 1)
+    {
+#>
+        return <#= LookupKeyName #> >= <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #> && <#= LookupKeyName #> <= <#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>;
+<#
+    }
+    else
+    {
+#>
+        for (size_t i = 0; i < <#= Data.RangeCount.ToStringInvariant() #>; ++i) {
+            if (<#= LookupKeyName #> >= range_starts[i] && <#= LookupKeyName #> <= range_ends[i])
+                return true;
+        }
+
+        return false;
+<#
+    }
+#>
     }
 <#@ include file="Includes\Footer.ttinclude" #>

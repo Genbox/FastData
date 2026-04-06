@@ -3,12 +3,41 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.RangeTemplateData" name="Data" #>
 
 <#
-    string minLabel = TypeMap.ToValueLabel(Data.Min);
-    string maxLabel = TypeMap.ToValueLabel(Data.Max);
+    if (Data.RangeCount > 1)
+    {
+#>
+    <#= FieldModifier #>RANGE_STARTS: [<#= StoredKeyTypeName #>; <#= Data.RangeCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.Start), 8) #>
+    ];
+
+    <#= FieldModifier #>RANGE_ENDS: [<#= StoredKeyTypeName #>; <#= Data.RangeCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.End), 8) #>
+    ];
+<#
+    }
 #>
     <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
-        <#= LookupKeyName #> >= <#= minLabel #> && <#= LookupKeyName #> <= <#= maxLabel #>
+<#
+    if (Data.RangeCount == 1)
+    {
+#>
+        <#= LookupKeyName #> >= <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #> && <#= LookupKeyName #> <= <#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>
+<#
+    }
+    else
+    {
+#>
+        for i in 0..<#= Data.RangeCount.ToStringInvariant() #> {
+            if <#= LookupKeyName #> >= Self::RANGE_STARTS[i] && <#= LookupKeyName #> <= Self::RANGE_ENDS[i] {
+                return true;
+            }
+        }
+
+        false
+<#
+    }
+#>
     }
 <#@ include file="Includes\Footer.ttinclude" #>
