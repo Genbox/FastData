@@ -24,7 +24,7 @@ public sealed record StringLengthRangeEarlyExit(int Min, int Max) : IEarlyExit
         if (Min == otherExit.Min && Max == otherExit.Max)
             return false;
 
-        return Min <= otherExit.Min && Max >= otherExit.Max;
+        return Min >= otherExit.Min && Max <= otherExit.Max;
     }
 
     public ulong KeyspaceSize

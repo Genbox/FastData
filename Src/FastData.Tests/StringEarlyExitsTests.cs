@@ -1,0 +1,111 @@
+using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
+using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.EarlyExits;
+using Genbox.FastData.Generators.EarlyExits.Exits;
+using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Structures;
+
+namespace Genbox.FastData.Tests;
+
+public class StringEarlyExitsTests
+{
+    [Fact]
+    public void GetExits_DisabledConfig_ReturnsEmpty()
+    {
+        string[] keys = ["alpha", "bravo", "charlie"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.Disabled = true;
+
+        IEarlyExit[] exits = GetExits(keys, false, false, cfg);
+
+        Assert.Empty(exits);
+    }
+
+    [Fact]
+    public void GetExits_DisabledForStructure_ReturnsEmpty()
+    {
+        string[] keys = ["alpha", "bravo", "charlie"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.DisableForStructure(typeof(ArrayStructure<,>));
+
+        IEarlyExit[] exits = GetExits(keys, false, false, cfg);
+
+        Assert.Empty(exits);
+    }
+
+    [Fact]
+    public void GetExits_LengthBitmapAndRangeProduced()
+    {
+        string[] keys = ["a", "abcdefghij"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+
+        IEarlyExit[] exits = GetExits(keys, false, false, cfg);
+
+        Assert.Contains(exits, static x => x is LengthLessThanEarlyExit { Value: 1 });
+        Assert.Contains(exits, static x => x is LengthGreaterThanEarlyExit { Value: 10 });
+        Assert.Contains(exits, static x => x is StringLengthRangeEarlyExit { Min: 1, Max: 10 });
+
+        LengthBitmapEarlyExit bitmap = exits.OfType<LengthBitmapEarlyExit>().First();
+        Assert.Equal(513UL, bitmap.BitSet);
+    }
+
+    [Fact]
+    public void GetExits_LengthBitmapNotProducedWhenDensityHigh()
+    {
+        string[] keys = ["a", "bb", "ccc", "dddd"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+
+        IEarlyExit[] exits = GetExits(keys, false, false, cfg);
+
+        Assert.DoesNotContain(exits, static x => x is LengthBitmapEarlyExit);
+    }
+
+    [Fact]
+    public void GetExits_CharFirstBitmapRespectsDensityLimits()
+    {
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+
+        IEarlyExit[] sparse = GetExits(["alpha", "zulu"], false, false, cfg);
+        Assert.Contains(sparse, static x => x is CharFirstBitmapEarlyExit);
+
+        IEarlyExit[] dense = GetExits(["apple", "banana"], false, false, cfg);
+        Assert.DoesNotContain(dense, static x => x is CharFirstBitmapEarlyExit);
+    }
+
+    [Fact]
+    public void GetExits_PrefixSuffixProducedWhenTrimmingEnabled()
+    {
+        string[] keys = ["preOneSuf", "preTwoSuf", "preSixSuf"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+
+        IEarlyExit[] exits = GetExits(keys, true, false, cfg);
+
+        Assert.Contains(exits, static x => x is StringPrefixEarlyExit { Prefix: "pre" });
+        Assert.Contains(exits, static x => x is StringSuffixEarlyExit { Suffix: "Suf" });
+    }
+
+    [Fact]
+    public void GetExits_PrefixSuffixNotProducedWhenTrimmingDisabled()
+    {
+        string[] keys = ["preOneSuf", "preTwoSuf", "preSixSuf"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+
+        IEarlyExit[] exits = GetExits(keys, false, false, cfg);
+
+        Assert.DoesNotContain(exits, static x => x is StringPrefixEarlyExit);
+        Assert.DoesNotContain(exits, static x => x is StringSuffixEarlyExit);
+    }
+
+    private static IEarlyExit[] GetExits(string[] keys, bool enableTrimming, bool ignoreCase, EarlyExitConfig config)
+    {
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, enableTrimming, ignoreCase, GeneratorEncoding.Utf16CodeUnits);
+        return StringEarlyExits.GetExits(typeof(ArrayStructure<,>), props, config, ignoreCase);
+    }
+}

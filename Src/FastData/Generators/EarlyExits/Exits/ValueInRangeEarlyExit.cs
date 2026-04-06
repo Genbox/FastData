@@ -28,7 +28,7 @@ public sealed record ValueInRangeEarlyExit<T>(T Min, T Max) : IEarlyExit
         if (minCompare == 0 && maxCompare == 0)
             return false;
 
-        return minCompare <= 0 && maxCompare >= 0;
+        return minCompare >= 0 && maxCompare <= 0;
     }
 
     public ulong KeyspaceSize

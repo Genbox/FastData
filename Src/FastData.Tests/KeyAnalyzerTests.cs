@@ -1,4 +1,5 @@
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
 using static Genbox.FastData.Internal.Analysis.KeyAnalyzer;
@@ -49,6 +50,41 @@ public class KeyAnalyzerTests
         Assert.Equal(1.0f, GetNumericProperties<int>(new[] { 42 }, false).Density);
     }
 
+    [Fact]
+    public void GetNumericProperties_Ranges_SortsInput_Test()
+    {
+        int[] data = [5, 1, 2, 4, 8];
+
+        NumericKeyProperties<int> props = GetNumericProperties<int>(data, false);
+
+        Assert.Equal(1, props.DataRanges.Min);
+        Assert.Equal(8, props.DataRanges.Max);
+        Assert.Equal(3, props.DataRanges.Ranges.Count);
+        Assert.Equal((1, 2), props.DataRanges.Ranges[0]);
+        Assert.Equal((4, 5), props.DataRanges.Ranges[1]);
+        Assert.Equal((8, 8), props.DataRanges.Ranges[2]);
+        Assert.False(props.IsConsecutive);
+    }
+
+    [Fact]
+    public void GetNumericProperties_FloatHasZero_Test()
+    {
+        NumericKeyProperties<float> withZero = GetNumericProperties<float>(new[] { -0.0f, 1.25f }, false);
+        NumericKeyProperties<float> withoutZero = GetNumericProperties<float>(new[] { 1.25f, 2.5f }, false);
+
+        Assert.True(withZero.HasZero);
+        Assert.False(withoutZero.HasZero);
+    }
+
+    [Fact]
+    public void GetNumericProperties_DoubleClampsRange_Test()
+    {
+        NumericKeyProperties<double> props = GetNumericProperties<double>(new[] { 0.0d, double.MaxValue }, true);
+
+        Assert.True(props.HasZero);
+        Assert.Equal(ulong.MaxValue, props.Range);
+    }
+
     [Theory]
     [InlineData((object)new[] { "a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa" })]
     [InlineData((object)new[] { "aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa" })] //Test inputs that don't start with 1
@@ -58,8 +94,27 @@ public class KeyAnalyzerTests
     public void GetStringProperties_LengthRanges_Test(string[] data)
     {
         StringKeyProperties res = GetStringProperties(data, false, false, GeneratorEncoding.Utf16CodeUnits);
+        LengthData lengthData = res.LengthData;
 
-        //TODO
+        HashSet<int> expectedLengths = [];
+        int minLength = int.MaxValue;
+        int maxLength = 0;
+
+        foreach (string value in data)
+        {
+            int length = value.Length;
+            expectedLengths.Add(length);
+            minLength = Math.Min(minLength, length);
+            maxLength = Math.Max(maxLength, length);
+        }
+
+        Assert.Equal(expectedLengths.Count == data.Length, lengthData.UniqueLengths);
+        Assert.Equal(minLength, lengthData.MinCharLength);
+        Assert.Equal(maxLength, lengthData.MaxCharLength);
+        Assert.Equal(expectedLengths.Count, CountLengths(lengthData.LengthRanges));
+
+        foreach (int length in expectedLengths)
+            Assert.True(ContainsLength(lengthData.LengthRanges, length));
     }
 
     [Theory]
@@ -73,6 +128,18 @@ public class KeyAnalyzerTests
         StringKeyProperties res = GetStringProperties(data, true, false, GeneratorEncoding.Utf16CodeUnits);
         Assert.Equal(leftZero, res.DeltaData.Prefix.Length);
         Assert.Equal(rightZero, res.DeltaData.Suffix.Length);
+    }
+
+    [Fact]
+    public void GetStringProperties_DeltaData_IgnoreCase_Test()
+    {
+        string[] data = ["Abc1", "Abc2", "Abc3", "abc4"];
+
+        StringKeyProperties ignoreCase = GetStringProperties(data, true, true, GeneratorEncoding.Utf16CodeUnits);
+        StringKeyProperties caseSensitive = GetStringProperties(data, true, false, GeneratorEncoding.Utf16CodeUnits);
+
+        Assert.Equal("Abc", ignoreCase.DeltaData.Prefix);
+        Assert.Equal(string.Empty, caseSensitive.DeltaData.Prefix);
     }
 
     [Fact]
@@ -104,6 +171,23 @@ public class KeyAnalyzerTests
         Assert.Equal(2, lengthData.MinCharLength);
         Assert.Equal(2, lengthData.MaxCharLength);
         Assert.True(data.AllAscii);
+    }
+
+    [Fact]
+    public void GetStringProperties_CharacterClasses_Test()
+    {
+        StringKeyProperties res = GetStringProperties(new[] { "A b1$", "c" }, false, false, GeneratorEncoding.Utf16CodeUnits);
+        CharacterClass expected = CharacterClass.Uppercase | CharacterClass.Lowercase | CharacterClass.Number | CharacterClass.Symbol | CharacterClass.Whitespace;
+
+        Assert.Equal(expected, res.CharacterData.CharacterClasses);
+    }
+
+    [Fact]
+    public void GetStringProperties_AllAscii_False_Test()
+    {
+        StringKeyProperties res = GetStringProperties(new[] { "abc", "\u0101bc" }, false, false, GeneratorEncoding.Utf16CodeUnits);
+
+        Assert.False(res.CharacterData.AllAscii);
     }
 
     private static int CountLengths(DataRanges<int> ranges)

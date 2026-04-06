@@ -33,14 +33,11 @@ internal static class SegmentHelper
             throw new InvalidOperationException("Invalid alignment");
     }
 
-    internal static ReadOnlySpan<char> GetSpan(in ArraySegment segment, string input)
+    internal static ReadOnlySpan<char> GetSpan(string input, in ArraySegment segment)
     {
         ConvertToOffsets(input.Length, segment, out int start, out int end);
         return input.AsSpan(start, end - start);
     }
 
-    internal static string Print(ArraySegment[] segments)
-    {
-        return string.Join(", ", segments.Select(x => x.ToString()));
-    }
+    internal static string Print(ArraySegment[] segments) => string.Join(", ", segments.Select(x => x.ToString()));
 }

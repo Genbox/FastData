@@ -3,7 +3,7 @@ namespace Genbox.FastData.Internal.Helpers;
 internal sealed class SwitchArray(uint capacity)
 {
     private readonly uint[] _data = new uint[capacity];
-    private uint _counter;
+    private uint _counter = 1;
 
     public bool this[uint index]
     {
@@ -13,12 +13,12 @@ internal sealed class SwitchArray(uint capacity)
 
     public void Clear()
     {
+        _counter++;
+
         if (_counter == uint.MaxValue)
         {
             Array.Clear(_data, 0, _data.Length);
-            _counter = 0;
+            _counter = 1;
         }
-
-        _counter++;
     }
 }
