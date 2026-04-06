@@ -53,6 +53,7 @@ public class NumericEarlyExitsTests
     {
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.DisableEarlyExit(typeof(ValueBitMaskEarlyExit));
+        cfg.MinRejectionRatio = 0f;
 
         IEarlyExit[] exits = GetExits([(10, 10), (20, 30)], 20, 0, 10, cfg);
 
@@ -67,6 +68,7 @@ public class NumericEarlyExitsTests
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.DisableEarlyExit(typeof(ValueLessThanEarlyExit<>));
         cfg.DisableEarlyExit(typeof(ValueGreaterThanEarlyExit<>));
+        cfg.MinRejectionRatio = 0f;
 
         IEarlyExit[] valid = GetExits([(10, 10)], 20, 10, 100, cfg);
         Assert.Contains(valid, static x => x is ValueBitMaskEarlyExit { Mask: 10 });
@@ -89,6 +91,7 @@ public class NumericEarlyExitsTests
         cfg.DisableEarlyExit(typeof(ValueLessThanEarlyExit<>));
         cfg.DisableEarlyExit(typeof(ValueGreaterThanEarlyExit<>));
         cfg.MaxCandidates = 3;
+        cfg.MinRejectionRatio = 0f;
 
         IEarlyExit[] exits = GetExits([(1, 1), (3, 3), (8, 8), (20, 20), (40, 40)], 39, 0, 20, cfg);
 
@@ -101,6 +104,35 @@ public class NumericEarlyExitsTests
 
         Assert.True(firstSize >= secondSize);
         Assert.True(secondSize >= thirdSize);
+    }
+
+    [Fact]
+    public void GetExits_RejectionBelowThreshold_DiscardsRangeExit()
+    {
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.DisableEarlyExit(typeof(ValueBitMaskEarlyExit));
+        cfg.DisableEarlyExit(typeof(ValueLessThanEarlyExit<>));
+        cfg.DisableEarlyExit(typeof(ValueGreaterThanEarlyExit<>));
+        cfg.MinRejectionRatio = 0.5f;
+
+        IEarlyExit[] exits = GetExits([(10, 10), (12, 12)], 2, 0, 10, cfg);
+
+        Assert.Empty(exits);
+    }
+
+    [Fact]
+    public void GetExits_ObservedRangeBaseline_KeepsLessThanExit()
+    {
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.DisableEarlyExit(typeof(ValueGreaterThanEarlyExit<>));
+
+        // Observed range is tiny (1000..1003), so the less-than exit covers a large share of the observed span.
+        IEarlyExit[] exits = GetExits([(1000u, 1003u)], 3, 0, 4, cfg);
+        Assert.Contains(exits, static x => x is ValueLessThanEarlyExit<uint> { Value: 1000u });
+
+        // Observed-range ratio is used to keep the exit.
+        ValueLessThanEarlyExit<uint> exit = new ValueLessThanEarlyExit<uint>(1000u);
+        Assert.True(exit.KeyspaceSize / ((1003u - 1000u) + 1d) >= 0.5d);
     }
 
     private static IEarlyExit[] GetExits<T>(List<(T Start, T End)> ranges, ulong range, ulong bitMask, uint itemCount, EarlyExitConfig cfg)

@@ -17,6 +17,13 @@ internal static class NumericEarlyExits<TKey>
         if (candidates.Length == 0)
             return [];
 
+        float threshold = config.MinRejectionRatio;
+        if (threshold > 0f)
+            candidates = FilterByRejection(candidates, range, threshold).ToArray();
+
+        if (candidates.Length == 0)
+            return [];
+
         // There can be quite a few candidates, and too many will slow down queries, so we need to find the best ones.
         return GetTopExits(candidates, config.MaxCandidates).ToArray();
     }
@@ -76,5 +83,22 @@ internal static class NumericEarlyExits<TKey>
             return [];
 
         return candidates.OrderByDescending(x => x.KeyspaceSize).Take(maxCandidates);
+    }
+
+    private static IEnumerable<IEarlyExit> FilterByRejection(IEarlyExit[] candidates, ulong range, float threshold)
+    {
+        double domainSize = range + 1d;
+
+        foreach (IEarlyExit exit in candidates)
+        {
+            double ratio = domainSize <= 0d ? 0d : exit.KeyspaceSize / domainSize;
+            if (double.IsNaN(ratio) || double.IsInfinity(ratio) || ratio > 1d)
+                ratio = 1d;
+            else if (ratio < 0d)
+                ratio = 0d;
+
+            if (ratio >= threshold)
+                yield return exit;
+        }
     }
 }

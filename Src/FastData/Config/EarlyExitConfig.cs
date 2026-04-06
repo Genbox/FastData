@@ -18,6 +18,7 @@ public class EarlyExitConfig
             cfg.MinItemCount = 3;
             cfg.MaxCandidates = 4;
             cfg.ReductionEnabled = true;
+            cfg.MinRejectionRatio = 0.05f;
 
             // These don't support early exits
             cfg.DisableForStructure(typeof(RangeStructure<,>));
@@ -36,6 +37,7 @@ public class EarlyExitConfig
     public uint MinItemCount { get; set; }
     public int MaxCandidates { get; set; }
     public bool ReductionEnabled { get; set; }
+    public float MinRejectionRatio { get; set; }
 
     public void DisableEarlyExit(Type earlyExitType) => _disabled.Add(earlyExitType);
     public void DisableForStructure(Type structureType) => _disabledForStructure.Add(structureType);

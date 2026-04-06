@@ -41,6 +41,7 @@ public class StringEarlyExitsTests
         string[] keys = ["a", "abcdefghij"];
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0f;
 
         IEarlyExit[] exits = GetExits(keys, false, false, cfg);
 
@@ -58,6 +59,7 @@ public class StringEarlyExitsTests
         string[] keys = ["a", "bb", "ccc", "dddd"];
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0f;
 
         IEarlyExit[] exits = GetExits(keys, false, false, cfg);
 
@@ -69,6 +71,7 @@ public class StringEarlyExitsTests
     {
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0f;
 
         IEarlyExit[] sparse = GetExits(["alpha", "zulu"], false, false, cfg);
         Assert.Contains(sparse, static x => x is CharFirstBitmapEarlyExit);
@@ -83,6 +86,7 @@ public class StringEarlyExitsTests
         string[] keys = ["preOneSuf", "preTwoSuf", "preSixSuf"];
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0f;
 
         IEarlyExit[] exits = GetExits(keys, true, false, cfg);
 
@@ -96,11 +100,46 @@ public class StringEarlyExitsTests
         string[] keys = ["preOneSuf", "preTwoSuf", "preSixSuf"];
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0f;
 
         IEarlyExit[] exits = GetExits(keys, false, false, cfg);
 
         Assert.DoesNotContain(exits, static x => x is StringPrefixEarlyExit);
         Assert.DoesNotContain(exits, static x => x is StringSuffixEarlyExit);
+    }
+
+    [Fact]
+    public void GetExits_RejectionBelowThreshold_DiscardsShortAffix()
+    {
+        string[] keys = ["abshort", "abmediumlen", "abveryverylong"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0.5f;
+
+        IEarlyExit[] exits = GetExits(keys, true, false, cfg);
+
+        Assert.DoesNotContain(exits, static x => x is StringPrefixEarlyExit { Prefix: "ab" });
+    }
+
+    [Fact]
+    public void GetExits_ObservedRangeBaseline_KeepsShortAffix()
+    {
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+
+        // Prefix is large relative to the observed length span, so the observed ratio keeps it.
+        string[] keys = ["abaaaaaa", "abbbbbbb", "abccccccc"];
+        IEarlyExit[] exits = GetExits(keys, true, false, cfg);
+
+        Assert.Contains(exits, static x => x is StringPrefixEarlyExit { Prefix: "ab" });
+
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, true, false, GeneratorEncoding.Utf16CodeUnits);
+        int minLength = props.LengthData.LengthRanges.Min;
+        int maxLength = props.LengthData.LengthRanges.Max;
+        double lengthSpan = (maxLength - minLength) + 1d;
+
+        // Observed-length ratio keeps this prefix.
+        Assert.True("ab".Length / lengthSpan >= 0.5d);
     }
 
     private static IEarlyExit[] GetExits(string[] keys, bool enableTrimming, bool ignoreCase, EarlyExitConfig config)

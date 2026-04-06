@@ -15,6 +15,14 @@ internal static class StringEarlyExits
         if (candidates.Length == 0)
             return [];
 
+        float threshold = config.MinRejectionRatio;
+
+        if (threshold > 0f)
+            candidates = FilterByRejection(candidates, props, threshold).ToArray();
+
+        if (candidates.Length == 0)
+            return [];
+
         return GetTopExits(candidates, config.MaxCandidates).ToArray();
     }
 
@@ -105,6 +113,47 @@ internal static class StringEarlyExits
             return [];
 
         return candidates.OrderByDescending(x => x.KeyspaceSize).Take(maxCandidates);
+    }
+
+    private static IEnumerable<IEarlyExit> FilterByRejection(IEarlyExit[] candidates, StringKeyProperties props, float threshold)
+    {
+        int minLength = props.LengthData.LengthRanges.Min;
+        int maxLength = props.LengthData.LengthRanges.Max;
+        double lengthSpan = maxLength >= minLength ? maxLength - minLength + 1d : 0d;
+        double firstSpan = GetAsciiSpan(props.CharacterData.FirstCharMap);
+        double lastSpan = GetAsciiSpan(props.CharacterData.LastCharMap);
+
+        foreach (IEarlyExit exit in candidates)
+        {
+            double span = GetObservedSpan(exit, lengthSpan, firstSpan, lastSpan);
+            double ratio = span <= 0d ? 0d : exit.KeyspaceSize / span;
+            if (double.IsNaN(ratio) || double.IsInfinity(ratio) || ratio > 1d)
+                ratio = 1d;
+            else if (ratio < 0d)
+                ratio = 0d;
+
+            if (ratio >= threshold)
+                yield return exit;
+        }
+    }
+
+    private static double GetObservedSpan(IEarlyExit exit, double lengthSpan, double firstSpan, double lastSpan)
+    {
+        if (exit is CharFirstLessThanEarlyExit or CharFirstGreaterThanEarlyExit or CharFirstNotEqualEarlyExit or CharFirstBitmapEarlyExit)
+            return firstSpan;
+
+        if (exit is CharLastLessThanEarlyExit or CharLastGreaterThanEarlyExit or CharLastNotEqualEarlyExit or CharLastBitmapEarlyExit)
+            return lastSpan;
+
+        return lengthSpan;
+    }
+
+    private static double GetAsciiSpan(AsciiMap map)
+    {
+        if (map.BitCount == 0 || map.Max < map.Min)
+            return 0d;
+
+        return map.Max - map.Min + 1d;
     }
 
     private static int GetRangeCount(DataRanges<int> ranges)
