@@ -30,8 +30,10 @@ public sealed class StringGeneratorConfig : GeneratorConfigBase
         StringFunctions = stringFunctions;
     }
 
+    /// <summary>Gets the selected string hash expression and additional data, when string hash analysis is active.</summary>
     public StringHashInfo? HashInfo { get; }
 
+    /// <summary>Gets string metadata constants emitted with the generated structure.</summary>
     public StringConstants Constants { get; }
 
     /// <summary>A set of functions used in hashing/comparing string in generated expressions</summary>
@@ -43,8 +45,12 @@ public sealed class StringGeneratorConfig : GeneratorConfigBase
     /// <summary>Gets a value indicating whether string keys should be treated as case-insensitive.</summary>
     public bool IgnoreCase { get; }
 
+    /// <summary>Gets the common prefix removed from keys before structure data is built.</summary>
     public string TrimPrefix { get; }
+
+    /// <summary>Gets the common suffix removed from keys before structure data is built.</summary>
     public string TrimSuffix { get; }
 
+    /// <summary>Gets the total number of characters trimmed from each key.</summary>
     public int TotalTrimLength => TrimPrefix.Length + TrimSuffix.Length;
 }

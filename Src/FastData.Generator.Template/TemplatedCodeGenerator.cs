@@ -10,7 +10,7 @@ using Genbox.FastData.Generators.Contexts;
 
 namespace Genbox.FastData.Generator.Template;
 
-/// <summary>Base class for T4 template based generators</summary>
+/// <summary>Base class for T4 template-based language generators.</summary>
 public abstract class TemplatedCodeGenerator : ICodeGenerator
 {
     private readonly string _languageName;
@@ -35,10 +35,13 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
         _manager = new TemplateManager(_languageName, Path.Combine(Path.GetTempPath(), "FastData"), release);
     }
 
+    /// <summary>Gets the directory containing the templates for the current target language.</summary>
     protected string TemplateDir => Path.Combine(AppContext.BaseDirectory, "Templates", _languageName);
 
+    /// <inheritdoc />
     public GeneratorEncoding Encoding { get; }
 
+    /// <inheritdoc />
     public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
     {
         Dictionary<string, object?> variables = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
@@ -59,10 +62,18 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
         return GenerateTemplated<TKey, TValue>(genCfg, _manager, variables);
     }
 
+    /// <summary>Renders the target-language template for a selected structure.</summary>
+    /// <typeparam name="TKey">The lookup key type.</typeparam>
+    /// <typeparam name="TValue">The associated value type.</typeparam>
+    /// <param name="genCfg">The generator configuration.</param>
+    /// <param name="manager">The template manager used to render and cache templates.</param>
+    /// <param name="variables">The variables exposed to the template.</param>
+    /// <returns>The generated source code.</returns>
     protected abstract string GenerateTemplated<TKey, TValue>(GeneratorConfigBase genCfg, TemplateManager manager, Dictionary<string, object?> variables);
 
     private static ITemplateData? CreateContextModel<TKey, TValue>(IContext context)
     {
+        // Templates consume simple DTOs instead of the raw contexts when the raw shape contains spans or generic fields.
         switch (context)
         {
             case ArrayContext<TKey, TValue> arrayCtx:

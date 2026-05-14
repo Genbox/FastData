@@ -13,9 +13,11 @@ public sealed class HashTableCompactContext<TKey, TValue>(int[] bucketStarts, in
     /// <summary>Gets the array of hash table entries.</summary>
     public HashTableCompactEntry<TKey>[] Entries { get; } = entries;
 
+    /// <summary>Gets the values emitted into the generated structure.</summary>
     public ReadOnlyMemory<TValue> Values { get; } = values;
 }
 
+/// <summary>Provides compact bucket data shared by compact hash-table generated structures.</summary>
 public abstract class HashTableCompactContext(int[] bucketStarts, int[] bucketCounts, bool storeHashCode) : IContext
 {
     /// <summary>Gets the array of bucket start indices.</summary>

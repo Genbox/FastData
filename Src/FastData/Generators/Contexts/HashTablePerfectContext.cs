@@ -10,9 +10,11 @@ public sealed class HashTablePerfectContext<TKey, TValue>(KeyValuePair<TKey, ulo
     /// <summary>Gets the array of items and their hash codes.</summary>
     public KeyValuePair<TKey, ulong>[] Data { get; } = data;
 
+    /// <summary>Gets the values emitted into the generated structure.</summary>
     public ReadOnlyMemory<TValue> Values { get; } = values;
 }
 
+/// <summary>Provides metadata shared by perfect-hash generated structures.</summary>
 public abstract class HashTablePerfectContext(bool storeHashCode) : IContext
 {
     /// <summary>Indicates whether the hash set should store the hash code or only the value.</summary>

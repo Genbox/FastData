@@ -12,9 +12,11 @@ public sealed class HashTableContext<TKey, TValue>(int[] buckets, HashTableEntry
     /// <summary>Gets the array of hash set entries.</summary>
     public HashTableEntry<TKey>[] Entries { get; } = entries;
 
+    /// <summary>Gets the values emitted into the generated structure.</summary>
     public ReadOnlyMemory<TValue> Values { get; } = values;
 }
 
+/// <summary>Provides bucket data shared by hash-table generated structures.</summary>
 public abstract class HashTableContext(int[] buckets, bool storeHashCode) : IContext
 {
     /// <summary>Gets the array of bucket indices.</summary>

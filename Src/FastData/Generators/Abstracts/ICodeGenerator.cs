@@ -2,15 +2,17 @@ using Genbox.FastData.Enums;
 
 namespace Genbox.FastData.Generators.Abstracts;
 
-/// <summary>Defines the interface for code generators</summary>
+/// <summary>Defines the contract implemented by target-language code generators.</summary>
 public interface ICodeGenerator
 {
-    /// <summary>Gets a value indicating whether the generator uses UTF-16 encoding for string inputs (used in hashing).</summary>
+    /// <summary>Gets the string encoding model expected by the generated code.</summary>
     GeneratorEncoding Encoding { get; }
 
-    /// <summary>Attempts to generate source code using the specified generator configuration and context.</summary>
+    /// <summary>Generates source code using the specified generator configuration and structure context.</summary>
+    /// <typeparam name="TKey">The lookup key type.</typeparam>
+    /// <typeparam name="TValue">The associated value type, or <see cref="byte" /> for membership-only data.</typeparam>
     /// <param name="genCfg">The generator configuration.</param>
     /// <param name="context">The context for code generation.</param>
-    /// <returns>True if code generation succeeded; otherwise, false.</returns>
+    /// <returns>The generated source code.</returns>
     string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context);
 }

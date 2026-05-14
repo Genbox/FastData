@@ -7,9 +7,11 @@ namespace Genbox.FastData.Generators.Contexts;
 /// <param name="minLength">The minimum string length.</param>
 public sealed class KeyLengthContext<TValue>(string?[] lengths, int minLength, ReadOnlyMemory<TValue> values, int[] valueOffsets) : KeyLengthContext(lengths, minLength, valueOffsets)
 {
+    /// <summary>Gets the values emitted into the generated structure.</summary>
     public ReadOnlyMemory<TValue> Values { get; } = values;
 }
 
+/// <summary>Provides length-indexed key data for key-length generated structures.</summary>
 public abstract class KeyLengthContext(string?[] lengths, int minLength, int[] valueOffsets) : IContext
 {
     /// <summary>Gets the array of lists containing string lengths.</summary>
@@ -18,5 +20,6 @@ public abstract class KeyLengthContext(string?[] lengths, int minLength, int[] v
     /// <summary>Gets the minimum string length.</summary>
     public int MinLength { get; } = minLength;
 
+    /// <summary>Gets offsets that map length entries to values.</summary>
     public int[] ValueOffsets { get; } = valueOffsets;
 }

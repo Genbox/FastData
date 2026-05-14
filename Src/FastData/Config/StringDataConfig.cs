@@ -2,6 +2,7 @@
 
 namespace Genbox.FastData.Config;
 
+/// <summary>Configuration for generating string-key lookup structures.</summary>
 public sealed class StringDataConfig : DataConfig
 {
     /// <summary>Enable case-insensitive lookups for string keys.</summary>

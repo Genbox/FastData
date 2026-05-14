@@ -12,7 +12,9 @@ public sealed class NumericGeneratorConfig : GeneratorConfigBase
         HasZero = hasZero;
     }
 
+    /// <summary>Gets numeric metadata constants emitted with the generated structure.</summary>
     public NumericConstants Constants { get; }
 
+    /// <summary>Gets a value indicating whether the input data contains zero.</summary>
     public bool HasZero { get; }
 }

@@ -21,48 +21,113 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Genbox.FastData;
 
+/// <summary>Generates source code for static lookup data structures.</summary>
 [SuppressMessage("ApiDesign", "RS0026:Do not add multiple public overloads with optional parameters")]
 public static partial class FastDataGenerator
 {
+    /// <summary>Generates source code for an exact membership lookup over numeric keys.</summary>
+    /// <typeparam name="TKey">The numeric key type.</typeparam>
+    /// <param name="keys">The keys to include in the generated lookup.</param>
+    /// <param name="fdCfg">The numeric data configuration.</param>
+    /// <param name="generator">The target-language code generator.</param>
+    /// <param name="factory">Optional logger factory used to report generation decisions.</param>
+    /// <returns>The generated source code.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains unsupported values, or uses an unsupported key type.</exception>
     public static string Generate<TKey>(ReadOnlyMemory<TKey> keys, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         return GenerateNumericInternal(keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
     }
 
-    // We need this overload as otherwise array expressions don't work for the user
+    /// <summary>Generates source code for an exact membership lookup over numeric keys.</summary>
+    /// <typeparam name="TKey">The numeric key type.</typeparam>
+    /// <param name="keys">The keys to include in the generated lookup.</param>
+    /// <param name="fdCfg">The numeric data configuration.</param>
+    /// <param name="generator">The target-language code generator.</param>
+    /// <param name="factory">Optional logger factory used to report generation decisions.</param>
+    /// <returns>The generated source code.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains unsupported values, or uses an unsupported key type.</exception>
     public static string Generate<TKey>(TKey[] keys, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
     }
 
+    /// <summary>Generates source code for an exact key/value lookup over numeric keys.</summary>
+    /// <typeparam name="TKey">The numeric key type.</typeparam>
+    /// <typeparam name="TValue">The value type returned for matching keys.</typeparam>
+    /// <param name="keys">The keys to include in the generated lookup.</param>
+    /// <param name="values">The values associated with <paramref name="keys" />.</param>
+    /// <param name="fdCfg">The numeric data configuration.</param>
+    /// <param name="generator">The target-language code generator.</param>
+    /// <param name="factory">Optional logger factory used to report generation decisions.</param>
+    /// <returns>The generated source code.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains unsupported values, or uses an unsupported key type.</exception>
     public static string GenerateKeyed<TKey, TValue>(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) where TKey : struct
     {
         return GenerateNumericInternal(keys, values, fdCfg, generator, factory);
     }
 
-    // We need this overload as otherwise array expressions don't work for the user
+    /// <summary>Generates source code for an exact key/value lookup over numeric keys.</summary>
+    /// <typeparam name="TKey">The numeric key type.</typeparam>
+    /// <typeparam name="TValue">The value type returned for matching keys.</typeparam>
+    /// <param name="keys">The keys to include in the generated lookup.</param>
+    /// <param name="values">The values associated with <paramref name="keys" />.</param>
+    /// <param name="fdCfg">The numeric data configuration.</param>
+    /// <param name="generator">The target-language code generator.</param>
+    /// <param name="factory">Optional logger factory used to report generation decisions.</param>
+    /// <returns>The generated source code.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains unsupported values, or uses an unsupported key type.</exception>
     public static string GenerateKeyed<TKey, TValue>(TKey[] keys, TValue[] values, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, (ReadOnlyMemory<TValue>)values, fdCfg, generator, factory);
     }
 
+    /// <summary>Generates source code for an exact membership lookup over string keys.</summary>
+    /// <param name="keys">The string keys to include in the generated lookup.</param>
+    /// <param name="fdCfg">The string data configuration.</param>
+    /// <param name="generator">The target-language code generator.</param>
+    /// <param name="factory">Optional logger factory used to report generation decisions.</param>
+    /// <returns>The generated source code.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static string Generate(ReadOnlyMemory<string> keys, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         return GenerateStringInternal(keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
     }
 
-    // We need this overload as otherwise array expressions don't work for the user
+    /// <summary>Generates source code for an exact membership lookup over string keys.</summary>
+    /// <param name="keys">The string keys to include in the generated lookup.</param>
+    /// <param name="fdCfg">The string data configuration.</param>
+    /// <param name="generator">The target-language code generator.</param>
+    /// <param name="factory">Optional logger factory used to report generation decisions.</param>
+    /// <returns>The generated source code.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static string Generate(string[] keys, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         return GenerateStringInternal(new ReadOnlyMemory<string>(keys), ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
     }
 
+    /// <summary>Generates source code for an exact key/value lookup over string keys.</summary>
+    /// <typeparam name="TValue">The value type returned for matching keys.</typeparam>
+    /// <param name="keys">The string keys to include in the generated lookup.</param>
+    /// <param name="values">The values associated with <paramref name="keys" />.</param>
+    /// <param name="fdCfg">The string data configuration.</param>
+    /// <param name="generator">The target-language code generator.</param>
+    /// <param name="factory">Optional logger factory used to report generation decisions.</param>
+    /// <returns>The generated source code.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static string GenerateKeyed<TValue>(ReadOnlyMemory<string> keys, ReadOnlyMemory<TValue> values, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         return GenerateStringInternal(keys, values, fdCfg, generator, factory);
     }
 
-    // We need this overload as otherwise array expressions don't work for the user
+    /// <summary>Generates source code for an exact key/value lookup over string keys.</summary>
+    /// <typeparam name="TValue">The value type returned for matching keys.</typeparam>
+    /// <param name="keys">The string keys to include in the generated lookup.</param>
+    /// <param name="values">The values associated with <paramref name="keys" />.</param>
+    /// <param name="fdCfg">The string data configuration.</param>
+    /// <param name="generator">The target-language code generator.</param>
+    /// <param name="factory">Optional logger factory used to report generation decisions.</param>
+    /// <returns>The generated source code.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static string GenerateKeyed<TValue>(string[] keys, TValue[] values, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         return GenerateStringInternal(new ReadOnlyMemory<string>(keys), (ReadOnlyMemory<TValue>)values, fdCfg, generator, factory);
@@ -137,7 +202,7 @@ public static partial class FastDataGenerator
 
         // Combine mandatory early exits from structures with generated early exits from analysis
         List<IEarlyExit> earlyExits = CombineExits(structure.GetMandatoryExits(), StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase));
-        if (cfg.EarlyExitConfig.ReductionEnabled)
+        if (cfg.EarlyExitConfig.OptimizeExpression)
             ReduceExits(earlyExits);
 
         UsedFunctionVisitor usedVisitor = new UsedFunctionVisitor();
@@ -165,6 +230,7 @@ public static partial class FastDataGenerator
             if (cacheHashData != null)
                 return cacheHashData;
 
+            // Hash analysis can be expensive, so structure selection and structure creation share the same result.
             (HashData hashData, StringHashInfo _) = GetStringHash(keySpan);
             cacheHashData = hashData;
 
@@ -300,9 +366,10 @@ public static partial class FastDataGenerator
 
         IStructure<TKey, TValue, IContext> structure = NumericStructureFactory<TKey, TValue>(cfg, structureType, props, cacheHashData!, sorted);
 
+        // Early exits are generated from numeric properties and then merged with checks required by the structure itself.
         IEarlyExit[] exitsAnalyzed = NumericEarlyExits<TKey>.GetExits(type, props.DataRanges, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig);
         List<IEarlyExit> exits = CombineExits(structure.GetMandatoryExits(), exitsAnalyzed);
-        if (cfg.EarlyExitConfig.ReductionEnabled)
+        if (cfg.EarlyExitConfig.OptimizeExpression)
             ReduceExits(exits);
 
         // Convert the early exits into a set of annotated expressions. We assume the input is called "key".

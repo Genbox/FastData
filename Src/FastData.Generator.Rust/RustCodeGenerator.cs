@@ -5,6 +5,7 @@ using Genbox.FastData.Generators;
 
 namespace Genbox.FastData.Generator.Rust;
 
+/// <summary>Generates Rust source code from FastData structure contexts.</summary>
 public sealed class RustCodeGenerator(RustCodeGeneratorConfig rustCfg) : TemplatedCodeGenerator(new RustLanguageDef(), GeneratorEncoding.Utf8Bytes)
 {
     protected override string GenerateTemplated<TKey, TValue>(GeneratorConfigBase genCfg, TemplateManager manager, Dictionary<string, object?> variables)

@@ -3,10 +3,15 @@ using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator;
 
+/// <summary>Converts expression trees used by FastData into target-language source fragments.</summary>
 public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 {
     protected readonly IndentedStringBuilder Output = new IndentedStringBuilder();
 
+    /// <summary>Renders an expression tree to source code.</summary>
+    /// <param name="expression">The expression tree to render.</param>
+    /// <param name="indent">The starting indentation level.</param>
+    /// <returns>The rendered source fragment.</returns>
     public string GetCode(Expression expression, int indent = 0)
     {
         Output.Clear();

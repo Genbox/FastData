@@ -11,6 +11,9 @@ public sealed class TypeMap : ITypeMap
     private readonly GeneratorEncoding _encoding;
     private readonly ITypeDef?[] _index = new ITypeDef?[19];
 
+    /// <summary>Initializes a new instance of the <see cref="TypeMap" /> class.</summary>
+    /// <param name="typeSpecs">The type definitions supported by a target language.</param>
+    /// <param name="encoding">The string encoding model used by the generator.</param>
     public TypeMap(IList<ITypeDef> typeSpecs, GeneratorEncoding encoding)
     {
         _encoding = encoding;
@@ -19,7 +22,7 @@ public sealed class TypeMap : ITypeMap
             ITypeDef spec = typeSpecs[i];
             byte idx = (byte)spec.KeyType;
 
-            //Quick check to see if a language has a duplicate definition for a DataType
+            // Fail early if a language registers two definitions for the same CLR type code.
             if (_index[idx] != null)
                 throw new InvalidOperationException($"Duplicate type spec found for '{spec.KeyType}'");
 
@@ -27,8 +30,13 @@ public sealed class TypeMap : ITypeMap
         }
     }
 
+    /// <summary>Gets the target-language literal for a null value.</summary>
+    /// <returns>The target-language null literal.</returns>
     public string GetNull() => _index[0].PrintObj(this, null);
 
+    /// <summary>Gets the target-language type name for a CLR type.</summary>
+    /// <param name="type">The CLR type.</param>
+    /// <returns>The target-language type name.</returns>
     public string GetTypeName(Type type)
     {
         ITypeDef res = Get(type);
@@ -39,8 +47,14 @@ public sealed class TypeMap : ITypeMap
         return res.Name;
     }
 
+    /// <summary>Gets the type definition for a CLR type.</summary>
+    /// <typeparam name="T">The CLR type.</typeparam>
+    /// <returns>The type definition for <typeparamref name="T" />.</returns>
     public ITypeDef<T> Get<T>() => (ITypeDef<T>)Get(typeof(T));
 
+    /// <summary>Gets the type definition for a CLR type.</summary>
+    /// <param name="type">The CLR type.</param>
+    /// <returns>The type definition for <paramref name="type" />.</returns>
     public ITypeDef Get(Type type)
     {
         ITypeDef? res = _index[(int)Type.GetTypeCode(type)];
