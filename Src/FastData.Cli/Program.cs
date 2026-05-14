@@ -33,7 +33,7 @@ internal static class Program
         {
             Description = "The type of data in the input file.",
             DefaultValueFactory = _ => KeyType.String,
-            HelpName = "bool|char|double|int16|int32|int64|int8|single|string|uint16|uint32|uint64|uint8",
+            HelpName = "char|double|int16|int32|int64|int8|single|string|uint16|uint32|uint64|uint8",
             Recursive = true
         };
 
