@@ -142,8 +142,12 @@ Each output language has different settings. Run `FastData <lang> --help` to see
 Common CLI options include:
 
 * `--key-type`, `-k`: input key type. Defaults to `string`.
+* `--values-file`, `-v`: input values file for key/value lookup generation.
+* `--value-type`: input value type. Defaults to `string`.
 * `--structure-type`, `-s`: force a structure instead of automatic selection.
 * `--ignore-case`, `-ic`: enable ordinal-ignore-case lookups for string keys.
+* `--analysis-level`: string-hash analysis level. Use `disabled`, `fast`, `balanced`, or `aggressive`.
+* `--allow-approximate`: allow approximate membership lookups such as Bloom filters.
 * `--class-name`, `-cn`: generated class or struct name.
 * `--output-file`, `-o`: write generated source to a file instead of standard output.
 
