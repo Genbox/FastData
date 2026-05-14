@@ -31,6 +31,7 @@
     </Folder>
     <Folder Name="/_Docs/">
         <File Path="AGENTS.md" />
+        <File Path="Docs/Architecture.md" />
         <File Path="Docs/DataStructures.md" />
         <File Path="Docs/HowWork.md" />
         <File Path="Docs/Optimizations.md" />

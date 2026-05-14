@@ -41,7 +41,7 @@ It supports many output languages (C#, C++, Rust, etc.), ready for inclusion in 
 2. Add `FastDataAttribute` as an assembly level attribute.
 
 ```csharp
-using Genbox.FastData.SourceGenerator;
+using Genbox.FastData.SourceGenerator.Attributes;
 
 [assembly: FastData<string>("Dogs", ["Labrador", "German Shepherd", "Golden Retriever"])]
 
@@ -63,8 +63,8 @@ internal static class Program
 {
     private static void Main()
     {
-        FastDataConfig config = new FastDataConfig();
-        CSharpCodeGenerator generator = CSharpCodeGenerator.Create(new CSharpCodeGeneratorConfig("Dogs"));
+        StringDataConfig config = new StringDataConfig();
+        CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpCodeGeneratorConfig("Dogs"));
 
         string source = FastDataGenerator.Generate(["Labrador", "German Shepherd", "Golden Retriever"], config, generator);
         Console.WriteLine(source);
@@ -126,7 +126,7 @@ As a bonus, we also get some metadata about the dataset as constants, which, whe
 - **Fast hashing:** Strings are analyzed and the hash function is specially tailored to the data.
 - **Zero dependencies:** The generated code has no dependencies, making it easy to integrate into your project.
 - **Minimal memory usage:** The generated data structures are memory-efficient, using only the necessary amount of memory for the dataset.
-- **High-perfromance:** The generated data structures are generated without unnecessary branching or virtualization making the compiler produce optimal code.
+- **High-performance:** The generated data structures are generated without unnecessary branching or virtualization making the compiler produce optimal code.
 - **Key/Value support:** FastData can produce key/value lookup data structures
 
 For more details about the data structures, see [data structures](Docs/DataStructures.md).
@@ -138,6 +138,24 @@ FastData supports several output programming languages.
 * Rust: `FastData rust <input-file>`
 
 Each output language has different settings. Run `FastData <lang> --help` to see the options.
+
+Common CLI options include:
+
+* `--key-type`, `-k`: input key type. Defaults to `string`.
+* `--structure-type`, `-s`: force a structure instead of automatic selection.
+* `--ignore-case`, `-ic`: enable ordinal-ignore-case lookups for string keys.
+* `--class-name`, `-cn`: generated class or struct name.
+* `--output-file`, `-o`: write generated source to a file instead of standard output.
+
+C# output also supports `--namespace`, `--class-visibility`, and `--class-type`.
+
+## How FastData chooses a structure
+
+FastData analyzes the input before emitting code. Numeric keys are analyzed for ranges, density, missing bits, and hash behavior. String keys are analyzed for length distribution, ASCII compatibility, common prefix/suffix data, and optional string hash candidates.
+
+The selected structure depends on that analysis and on the configured limits. Small sets often become direct conditionals or single-value checks, dense integer ranges can become range or bitset lookups, sparse integer sets can use succinct bit vectors, and larger or irregular sets fall back to hash-table variants.
+
+For a deeper explanation, see [how it works](Docs/HowWork.md), [data structures](Docs/DataStructures.md), and [optimizations](Docs/Optimizations.md).
 
 ## Benchmarks
 
@@ -176,7 +194,7 @@ Yes and no. For some data structures like Array, it uses the same amount of memo
 Yes, you can specify key/value arrays as input data and FastData will generate a efficient key lookup function that returns a value.
 
 #### Does it support case-insensitive lookups?
-Yes. Set `FastDataConfig.IgnoreCase = true` (or `IgnoreCase = true` on the source generator attribute, or `--ignore-case` in the CLI) to use OrdinalIgnoreCase on ASCII string keys.
+Yes. Set `StringDataConfig.IgnoreCase = true` (or `IgnoreCase = true` on the source generator attribute, or `--ignore-case` in the CLI) to use OrdinalIgnoreCase on ASCII string keys.
 
 #### Does it support custom equality comparers?
 No, not yet.

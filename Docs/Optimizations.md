@@ -29,7 +29,7 @@ If the programming language cache the string length, we can get constant lookup 
 
 ### Reduction to bitmap lookup
 If a sequence of numbers is a short range, but cannot get optimized via the range reduction above, then it might be a good fit for a bitmap instead. Let's say you have the numbers in range 10-100 and 300-900.
-Range reduction only works if the numbers are consecutive (until I add support for multi-ranges), and there are too many numbers to use conditionals efficiently, so instead we use a bitmap.
+Range reduction works when the numbers can be represented as a compact set of ranges, and there are too many numbers to use conditionals efficiently, so instead we use a bitmap when the range is dense enough.
 
 ## Early exits
 An early exit is a lightweight check we can perform before the actual lookup to speed up the process. They have to be **really** fast, otherwise they will add unwanted overhead to each call.
@@ -104,6 +104,26 @@ Rejects strings that do not end with an observed suffix when trimming is disable
 
 ## Structure specializations
 
+### Single value
+
+When the dataset has exactly one unique key, FastData emits a direct equality check and optional value return. This removes all indexing, hashing, and table metadata.
+
+### Range
+
+For numeric membership datasets with compact consecutive ranges, FastData stores start/end pairs instead of every key. This is especially effective for dense clusters separated by gaps.
+
+### BitSet
+
+Dense integral datasets can be represented by one bit per possible value in the observed range. Lookup becomes a range check plus a bit test.
+
+### Bloom filter
+
+When approximate matching is enabled, FastData can use a Bloom filter for membership checks. This trades exactness for compact memory and constant-time rejection.
+
+### RRR bit vector and Elias-Fano
+
+Very sparse integral membership datasets can use succinct encodings. `RrrBitVectorStructure` compresses bit-vector blocks into classes and offsets. `EliasFanoStructure` splits sorted values into upper and lower bit streams with samples for faster navigation.
+
 ### Hash table
 
 #### Small hash table type optimization
@@ -123,6 +143,9 @@ Because of that, we don't need to store both the key and the hash of the key. It
 #### No collision on keys
 If the keys have no collisions among them, a special data structure called PerfectHashTable is produced.
 It is like a normal HashTable, but without any logic for collision resolution, thereby making it faster and saving up to 4 bytes pr. key.
+
+#### Compact hash table layout
+When the generated table does not need all metadata used by the general hash table, FastData can use a compact hash table layout. This reduces per-entry storage while keeping constant-time lookup behavior.
 
 ## Hash function optimizations
 - For integer hashes, FastData uses identity hashes. That means the value itself is used as a hash.
