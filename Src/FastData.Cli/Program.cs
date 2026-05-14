@@ -6,12 +6,14 @@ using System.CommandLine.Invocation;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus;
 using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.Rust;
 using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Internal.Structures;
 using Spectre.Console;
 
 namespace Genbox.FastData.Cli;
@@ -194,93 +196,101 @@ internal static class Program
     private static async Task GenerateAsync(FileInfo inputFile, KeyType keyType, StructureType structureType, bool ignoreCase, ICodeGenerator generator, FileInfo? outputFile, CancellationToken token)
     {
         string fi = inputFile.FullName;
-        FastDataConfig config = new FastDataConfig(structureType)
+        Type? structureTypeOverride = MapStructureType(structureType);
+        StringDataConfig stringConfig = new StringDataConfig
         {
             IgnoreCase = ignoreCase
         };
+        NumericDataConfig numericConfig = new NumericDataConfig();
+
+        if (structureTypeOverride != null)
+        {
+            stringConfig.StructureTypeOverride = structureTypeOverride;
+            numericConfig.StructureTypeOverride = structureTypeOverride;
+        }
 
         if (ignoreCase && keyType != KeyType.String)
             throw new InvalidOperationException("IgnoreCase is only supported for string keys.");
 
         string source = keyType switch
         {
-            KeyType.String => FastDataGenerator.Generate(await ParseFileAsync<string>(fi, static (x, y) => x.Add(Encoding.UTF8.GetString(y)), token).ConfigureAwait(false), config, generator),
+            KeyType.String => FastDataGenerator.Generate(await ParseFileAsync<string>(fi, static (x, y) => x.Add(Encoding.UTF8.GetString(y)), token).ConfigureAwait(false), stringConfig, generator),
             KeyType.Int8 => FastDataGenerator.Generate(await ParseFileAsync<sbyte>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out sbyte value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, token).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), numericConfig, generator),
             KeyType.UInt8 => FastDataGenerator.Generate(await ParseFileAsync<byte>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out byte value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, token).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), numericConfig, generator),
             KeyType.Int16 => FastDataGenerator.Generate(await ParseFileAsync<short>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out short value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, token).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), numericConfig, generator),
             KeyType.UInt16 => FastDataGenerator.Generate(await ParseFileAsync<ushort>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out ushort value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, token).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), numericConfig, generator),
             KeyType.Int32 => FastDataGenerator.Generate(await ParseFileAsync<int>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out int value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, token).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), numericConfig, generator),
             KeyType.UInt32 => FastDataGenerator.Generate(await ParseFileAsync<uint>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out uint value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, token).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), numericConfig, generator),
             KeyType.Int64 => FastDataGenerator.Generate(await ParseFileAsync<long>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out long value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, token).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), numericConfig, generator),
             KeyType.UInt64 => FastDataGenerator.Generate(await ParseFileAsync<ulong>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out ulong value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, token).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), numericConfig, generator),
             KeyType.Single => FastDataGenerator.Generate(await ParseFileAsync<float>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out float value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, token).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), numericConfig, generator),
             KeyType.Double => FastDataGenerator.Generate(await ParseFileAsync<double>(fi, static (x, y) =>
             {
                 if (Utf8Parser.TryParse(y, out double value, out _))
                     x.Add(value);
                 else
                     throw new InvalidOperationException("Invalid value");
-            }, token).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), numericConfig, generator),
             KeyType.Char => FastDataGenerator.Generate(await ParseFileAsync<char>(fi, static (x, y) =>
             {
                 Span<char> chars = stackalloc char[1];
                 Encoding.UTF8.GetChars(y, chars);
                 x.Add(chars[0]);
-            }, token).ConfigureAwait(false), config, generator),
+            }, token).ConfigureAwait(false), numericConfig, generator),
             _ => throw new ArgumentOutOfRangeException(nameof(keyType), keyType, null)
         };
 
@@ -289,6 +299,26 @@ internal static class Program
         else
             await File.WriteAllTextAsync(outputFile.FullName, source, token).ConfigureAwait(false);
     }
+
+    private static Type? MapStructureType(StructureType structureType) => structureType switch
+    {
+        StructureType.Auto => null,
+        StructureType.Array => typeof(ArrayStructure<,>),
+        StructureType.BinarySearch => typeof(BinarySearchStructure<,>),
+        StructureType.BinarySearchInterpolation => typeof(BinarySearchInterpolationStructure<,>),
+        StructureType.BitSet => typeof(BitSetStructure<,>),
+        StructureType.BloomFilter => typeof(BloomFilterStructure<,>),
+        StructureType.Conditional => typeof(ConditionalStructure<,>),
+        StructureType.EliasFano => typeof(EliasFanoStructure<,>),
+        StructureType.HashTableCompact => typeof(HashTableCompactStructure<,>),
+        StructureType.HashTablePerfect => typeof(HashTablePerfectStructure<,>),
+        StructureType.HashTable => typeof(HashTableStructure<,>),
+        StructureType.KeyLength => typeof(KeyLengthStructure<,>),
+        StructureType.Range => typeof(RangeStructure<,>),
+        StructureType.RrrBitVector => typeof(RrrBitVectorStructure<,>),
+        StructureType.SingleValue => typeof(SingleValueStructure<,>),
+        _ => throw new ArgumentOutOfRangeException(nameof(structureType), structureType, "Unsupported structure type.")
+    };
 
     private static async Task<T[]> ParseFileAsync<T>(string filePath, Action<PooledArray<T>, ReadOnlySpan<byte>> func, CancellationToken token = default)
     {

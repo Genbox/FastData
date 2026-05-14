@@ -3,10 +3,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using Genbox.FastData.Config;
+using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Generator.CSharp;
+using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.SourceGenerator.Attributes;
+using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using AttributeClassType = Genbox.FastData.SourceGenerator.Attributes.ClassType;
+using AttributeClassVisibility = Genbox.FastData.SourceGenerator.Attributes.ClassVisibility;
+using CSharpClassType = Genbox.FastData.Generator.CSharp.Enums.ClassType;
+using CSharpClassVisibility = Genbox.FastData.Generator.CSharp.Enums.ClassVisibility;
 
 namespace Genbox.FastData.SourceGenerator;
 
@@ -20,12 +28,11 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
     private static readonly SymbolDisplayFormat Format = new SymbolDisplayFormat(
         SymbolDisplayGlobalNamespaceStyle.Omitted,
         SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
-        SymbolDisplayGenericsOptions.None,
         miscellaneousOptions:
         SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
         SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
 
-    private readonly DiagnosticDescriptor _generationError = new DiagnosticDescriptor("FD001", "Exception while generating code", "{0}", "TODO", DiagnosticSeverity.Error, true);
+    private readonly DiagnosticDescriptor _generationError = new DiagnosticDescriptor("FD001", "Exception while generating code", "{0}", "FastData", DiagnosticSeverity.Error, true);
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -59,7 +66,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                     {
                         Array keys = combinedCfg.Keys;
                         Array? values = combinedCfg.Values;
-                        FastDataConfig fdCfg = combinedCfg.FDConfig;
+                        DataConfig fdCfg = combinedCfg.FDConfig;
                         CSharpCodeGenerator generator = new CSharpCodeGenerator(combinedCfg.CSConfig);
 
                         Type genType = typeof(FastDataGenerator);
@@ -67,18 +74,41 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                         string source;
                         if (values == null)
                         {
-                            object keyMemory = CreateReadOnlyMemory(keys);
-                            MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.Generate), 1, 4, 1)
-                                .MakeGenericMethod(keys.GetValue(0).GetType());
-                            source = (string)mi.Invoke(null, [keyMemory, fdCfg, generator, null])!;
+                            Type keyType = keys.GetValue(0).GetType();
+                            if (keyType == typeof(string))
+                            {
+                                source = FastDataGenerator.Generate((string[])keys, (StringDataConfig)fdCfg, generator);
+                            }
+                            else
+                            {
+                                object keyMemory = CreateReadOnlyMemory(keys);
+
+                                // The attribute key type is only known through Roslyn metadata, so invocation uses the runtime array element type.
+                                MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.Generate), 1, 4, 1)
+                                    .MakeGenericMethod(keyType);
+                                source = (string)mi.Invoke(null, [keyMemory, fdCfg, generator, null])!;
+                            }
                         }
                         else
                         {
-                            object keyMemory = CreateReadOnlyMemory(keys);
-                            object valueMemory = CreateReadOnlyMemory(values);
-                            MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.GenerateKeyed), 2, 5, 2)
-                                .MakeGenericMethod(keys.GetValue(0).GetType(), values.GetValue(0).GetType());
-                            source = (string)mi.Invoke(null, [keyMemory, valueMemory, fdCfg, generator, null])!;
+                            Type keyType = keys.GetValue(0).GetType();
+                            Type valueType = values.GetValue(0).GetType();
+                            if (keyType == typeof(string))
+                            {
+                                MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.GenerateKeyed), 1, 5, 0)
+                                    .MakeGenericMethod(valueType);
+                                source = (string)mi.Invoke(null, [keys, values, fdCfg, generator, null])!;
+                            }
+                            else
+                            {
+                                object keyMemory = CreateReadOnlyMemory(keys);
+                                object valueMemory = CreateReadOnlyMemory(values);
+
+                                // Key/value generation is invoked the same way to keep the incremental pipeline type-agnostic.
+                                MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.GenerateKeyed), 2, 5, 2)
+                                    .MakeGenericMethod(keyType, valueType);
+                                source = (string)mi.Invoke(null, [keyMemory, valueMemory, fdCfg, generator, null])!;
+                            }
                         }
 
                         spc.AddSource(combinedCfg.CSConfig.ClassName + ".g.cs", SourceText.From(source, Encoding.UTF8));
@@ -173,14 +203,32 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                     valueArr.SetValue(values[i].Value ?? throw new InvalidOperationException("Null value in dataset"), i);
             }
 
-            FastDataConfig fdCfg = new FastDataConfig();
-            BindValue(() => fdCfg.StructureType, ad.NamedArguments);
-            BindValue(() => fdCfg.IgnoreCase, ad.NamedArguments);
+            Type runtimeKeyType = ToRuntimeType(genericArg0) ?? throw new InvalidOperationException($"Unable to map '{genericArg0.Name}' to a runtime type.");
+            DataConfig fdCfg = runtimeKeyType == typeof(string) ? new StringDataConfig() : new NumericDataConfig();
+
+            object? structureArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.StructureType)).Value.Value;
+            if (structureArg != null)
+                fdCfg.StructureTypeOverride = MapStructureType((StructureType)structureArg);
+
+            object? ignoreCaseArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.IgnoreCase)).Value.Value;
+            if (ignoreCaseArg is true)
+            {
+                if (fdCfg is not StringDataConfig stringCfg)
+                    throw new InvalidOperationException("IgnoreCase is only supported for string keys.");
+
+                stringCfg.IgnoreCase = true;
+            }
 
             CSharpCodeGeneratorConfig csCfg = new CSharpCodeGeneratorConfig(name);
             BindValue(() => csCfg.Namespace, ad.NamedArguments);
-            BindValue(() => csCfg.ClassVisibility, ad.NamedArguments);
-            BindValue(() => csCfg.ClassType, ad.NamedArguments);
+
+            object? classVisibilityArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.ClassVisibility)).Value.Value;
+            if (classVisibilityArg != null)
+                csCfg.ClassVisibility = MapClassVisibility((AttributeClassVisibility)classVisibilityArg);
+
+            object? classTypeArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.ClassType)).Value.Value;
+            if (classTypeArg != null)
+                csCfg.ClassType = MapClassType((AttributeClassType)classTypeArg);
 
             //We need logic for analysis level
             object? alArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.AnalysisLevel)).Value.Value;
@@ -188,7 +236,10 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             {
                 AnalysisLevel al = (AnalysisLevel)alArg;
 
-                fdCfg.StringAnalyzerConfig = al switch
+                if (fdCfg is not StringDataConfig stringCfg)
+                    throw new InvalidOperationException("AnalysisLevel is only supported for string keys.");
+
+                stringCfg.StringAnalyzerConfig = al switch
                 {
                     AnalysisLevel.Disabled => null,
                     AnalysisLevel.Fast => new StringAnalyzerConfig
@@ -267,6 +318,33 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                         .Select(a => a.GetType(metadataName, false))
                         .FirstOrDefault(t => t != null);
     }
+
+    private static Type? MapStructureType(StructureType structureType) => structureType switch
+    {
+        StructureType.Auto => null,
+        StructureType.Array => typeof(ArrayStructure<,>),
+        StructureType.Conditional => typeof(ConditionalStructure<,>),
+        StructureType.BinarySearch => typeof(BinarySearchStructure<,>),
+        StructureType.HashTable => typeof(HashTableStructure<,>),
+        _ => throw new ArgumentOutOfRangeException(nameof(structureType), structureType, "Unsupported structure type.")
+    };
+
+    private static CSharpClassVisibility MapClassVisibility(AttributeClassVisibility classVisibility) => classVisibility switch
+    {
+        AttributeClassVisibility.Unknown => CSharpClassVisibility.Unknown,
+        AttributeClassVisibility.Internal => CSharpClassVisibility.Internal,
+        AttributeClassVisibility.Public => CSharpClassVisibility.Public,
+        _ => throw new ArgumentOutOfRangeException(nameof(classVisibility), classVisibility, "Unsupported class visibility.")
+    };
+
+    private static CSharpClassType MapClassType(AttributeClassType classType) => classType switch
+    {
+        AttributeClassType.Unknown => CSharpClassType.Unknown,
+        AttributeClassType.Static => CSharpClassType.Static,
+        AttributeClassType.Instance => CSharpClassType.Instance,
+        AttributeClassType.Struct => CSharpClassType.Struct,
+        _ => throw new ArgumentOutOfRangeException(nameof(classType), classType, "Unsupported class type.")
+    };
 
     private static void BindValue<T>(Expression<Func<T?>> property, ImmutableArray<KeyValuePair<string, TypedConstant>> namedArgs)
     {
@@ -355,6 +433,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
         return method;
     }
 
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private enum SupportedKeyType : byte
     {
         Char,

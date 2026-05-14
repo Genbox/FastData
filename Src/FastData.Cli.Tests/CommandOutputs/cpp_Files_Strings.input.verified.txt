@@ -1,5 +1,6 @@
 ﻿{
   Item1:
+/// @generated
 // This file is auto-generated. Do not edit manually.
 // Structure: Conditional
 #include <array>
@@ -8,15 +9,42 @@
 #include <limits>
 #include <string_view>
 
+
 class MyData final {
-    public:
+
+    static constexpr char GetFirstChar(std::string_view str) { return str[0]; }
+    static constexpr char GetLastChar(std::string_view str) { return str[str.length() - 1]; }
+    static constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }
+
+public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-         if (key.length() != 5u)
-             return false;
-        uint32_t valueChar = static_cast<uint32_t>(key.front());
-        if (valueChar != 116u)
-            return false;
+        int32_t getLength;
+        char getLastChar;
+        char getFirstChar;
+        getLength = GetLength(key);
+        if ((getLength > 5))
+        {
+         return false;
+        }
+
+        getLastChar = GetLastChar(key);
+        if ((getLastChar > 50))
+        {
+         return false;
+        }
+
+        getFirstChar = GetFirstChar(key);
+        if ((getFirstChar > 116))
+        {
+         return false;
+        }
+
+        if ((getFirstChar < 116))
+        {
+         return false;
+        }
+
 
         if (key == u8"test1" || key == u8"test2")
             return true;
@@ -25,8 +53,8 @@ class MyData final {
     }
 
     static constexpr size_t item_count = 2;
-    static constexpr size_t min_key_length = 5;
-    static constexpr size_t max_key_length = 5;
+    static constexpr int32_t min_key_length = 5;
+    static constexpr int32_t max_key_length = 5;
     static constexpr bool has_number = true;
     static constexpr bool has_uppercase = false;
     static constexpr bool has_lowercase = true;

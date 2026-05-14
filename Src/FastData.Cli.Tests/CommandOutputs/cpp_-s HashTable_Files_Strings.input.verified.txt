@@ -1,27 +1,38 @@
 ﻿{
   Item1:
+/// @generated
 // This file is auto-generated. Do not edit manually.
-// Structure: HashTablePerfect
+// Structure: HashTable
 #include <array>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
+
 class MyData final {
+
+    static constexpr char GetFirstChar(std::string_view str) { return str[0]; }
+    static constexpr char GetLastChar(std::string_view str) { return str[str.length() - 1]; }
+    static constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }
+
     struct e {
         std::string_view key;
+        int8_t next;
         uint64_t hash_code;
-        constexpr e(const std::string_view key, const uint64_t hash_code) noexcept
-        : key(key), hash_code(hash_code) {}
+        e(const std::string_view key, const int8_t next, const uint64_t hash_code)
+           : key(key), next(next), hash_code(hash_code) {}
+    };
+
+    static constexpr std::array<int8_t, 2> buckets = {
+        1, 2
     };
 
     inline static const std::array<e, 2> entries = {
-        e(u8"test2", 0), e(u8"test1", 1ull)
+        e(u8"test1", -1, 17837601492779536344ull), e(u8"test2", -1, 17837601488081284521ull)
     };
 
-    static constexpr uint64_t get_hash(const std::string_view value) noexcept
-    {
+    static constexpr uint64_t get_hash(const std::string_view value) noexcept {
         uint64_t hash = 352654597;
 
         for (unsigned char ch : value)
@@ -30,26 +41,55 @@ class MyData final {
         return 352654597 + (hash * 1566083941);
     }
 
-    public:
+public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-         if (key.length() != 5u)
-             return false;
-        uint32_t valueChar = static_cast<uint32_t>(key.front());
-        if (valueChar != 116u)
-            return false;
+        int32_t getLength;
+        char getLastChar;
+        char getFirstChar;
+        getLength = GetLength(key);
+        if ((getLength > 5))
+        {
+         return false;
+        }
+
+        getLastChar = GetLastChar(key);
+        if ((getLastChar > 50))
+        {
+         return false;
+        }
+
+        getFirstChar = GetFirstChar(key);
+        if ((getFirstChar > 116))
+        {
+         return false;
+        }
+
+        if ((getFirstChar < 116))
+        {
+         return false;
+        }
 
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 2;
-        const auto& entry = entries[index];
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
-        return hash == entry.hash_code && key == entry.key;
+        while (i >= 0) {
+            const auto& entry = entries[i];
+
+            if (entry.hash_code == hash && entry.key == key)
+                return true;
+
+            i = entry.next;
+        }
+
+        return false;
     }
 
     static constexpr size_t item_count = 2;
-    static constexpr size_t min_key_length = 5;
-    static constexpr size_t max_key_length = 5;
+    static constexpr int32_t min_key_length = 5;
+    static constexpr int32_t max_key_length = 5;
     static constexpr bool has_number = true;
     static constexpr bool has_uppercase = false;
     static constexpr bool has_lowercase = true;

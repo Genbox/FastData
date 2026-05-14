@@ -8,13 +8,40 @@ using System.Runtime.InteropServices;
 
 internal static class StaticData
 {
+
+    private static char GetFirstChar(string str) => str[0];
+    private static char GetLastChar(string str) => str[str.Length - 1];
+    private static int GetLength(string str) => str.Length;
+
+    
     public static bool Contains(string key)
     {
-        if (key.Length != 5u)
-            return false;
-        char valueChar = key[0];
-        if (valueChar != 'i')
-            return false;
+        int getLength;
+        char getLastChar;
+        char getFirstChar;
+        getLength = GetLength(key);
+        if ((getLength > 5))
+        {
+         return false;
+        }
+
+        getLastChar = GetLastChar(key);
+        if ((getLastChar > '3'))
+        {
+         return false;
+        }
+
+        getFirstChar = GetFirstChar(key);
+        if ((getFirstChar > 'i'))
+        {
+         return false;
+        }
+
+        if ((getFirstChar < 'i'))
+        {
+         return false;
+        }
+
 
 
         switch (key)
@@ -27,10 +54,10 @@ internal static class StaticData
                 return false;
         }
     }
-
-    public const uint ItemCount = 3;
-    public const uint MinKeyLength = 5;
-    public const uint MaxKeyLength = 5;
+    
+    public const int ItemCount = 3;
+    public const int MinKeyLength = 5;
+    public const int MaxKeyLength = 5;
     public const bool HasNumber = true;
     public const bool HasUppercase = false;
     public const bool HasLowercase = true;

@@ -1,27 +1,53 @@
 ﻿{
   Item1:
 //! This file is auto-generated. Do not edit manually.
-//! Structure: Conditional
- #![allow(non_camel_case_types)]
- #![allow(unused_parens)]
- #![allow(missing_docs)]
- #![allow(unused_imports)]
- #![allow(unused_variables)]
- #![allow(unused_unsafe)]
- use std::ptr;
+//! Structure: Range
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
 
 pub struct MyData;
-
 impl MyData {
+
+    const RANGE_STARTS: [u8; 4] = [
+        42, 62, 80, 100
+    ];
+
+    const RANGE_ENDS: [u8; 4] = [
+        42, 62, 80, 100
+    ];
     #[must_use]
     pub fn contains(key: u8) -> bool {
-        if (key as u8 & 129) != 0 {
-            return false;
+        if ((key > 100))
+        {
+         return false;
+        }
+
+        if ((key < 42))
+        {
+         return false;
+        }
+
+        if (((key > 42) && (key < 62)))
+        {
+         return false;
+        }
+
+        if (((key > 80) && (key < 100)))
+        {
+         return false;
         }
 
 
-        if key == 42 || key == 62 || key == 80 || key == 100 {
-            return true;
+        for i in 0..4 {
+            if key >= Self::RANGE_STARTS[i] && key <= Self::RANGE_ENDS[i] {
+                return true;
+            }
         }
 
         false
