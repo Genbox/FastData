@@ -77,6 +77,20 @@ public class StructureConfig
 
     internal bool IsEnabled(Type structureType) => !_disabled.Contains(structureType);
 
+    /// <summary>Needed to avoid mutating user's reference of the config. Internally FastData uses it to temporarily disable a structure or make other changes.</summary>
+    internal StructureConfig Clone()
+    {
+        StructureConfig cfg = new StructureConfig();
+
+        foreach (Type type in _disabled)
+            cfg._disabled.Add(type);
+
+        foreach (KeyValuePair<Type, List<ILimit>> pair in _limits)
+            cfg._limits[pair.Key] = new List<ILimit>(pair.Value);
+
+        return cfg;
+    }
+
     private IEnumerable<T> GetLimitsOfType<T>(Type type)
     {
         if (_limits.TryGetValue(type, out List<ILimit>? limits))

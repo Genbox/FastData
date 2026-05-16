@@ -31,7 +31,7 @@ public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hybl
         _hashData = hashData;
     }
 
-    public HybleContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
+    public HybleContext<TKey, TValue>? Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         Debug.Assert(!keys.IsEmpty, "HybleStructure requires at least one key.");
         Debug.Assert(values.IsEmpty || values.Length == keys.Length, "HybleStructure requires value count to match key count when values are present.");
@@ -57,7 +57,7 @@ public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hybl
             unchecked { seed *= SeedMult; }
         }
 
-        throw new InvalidOperationException($"Hyble: failed to construct a displacement table after {MaxSeedAttempts} attempts.");
+        return null;
     }
 
     public IEnumerable<IEarlyExit> GetMandatoryExits() => [];

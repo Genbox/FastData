@@ -9,28 +9,31 @@ internal static class StringStructures
     {
         uint keyCount = (uint)keys.Length;
 
-        if (keyCount == 1)
+        if (config.IsEnabled(typeof(SingleValueStructure<,>)) && keyCount == 1)
             return typeof(SingleValueStructure<,>);
 
-        if (allowApproximate && !hasValues)
+        if (config.IsEnabled(typeof(BloomFilterStructure<,>)) && allowApproximate && !hasValues)
             return typeof(BloomFilterStructure<,>);
 
         float density = (float)keyCount / ((maxLength - minLength) + 1);
 
-        if (lengthsUnique && config.CheckDensityLimits(typeof(KeyLengthStructure<,>), density))
+        if (config.IsEnabled(typeof(KeyLengthStructure<,>)) && lengthsUnique && config.CheckDensityLimits(typeof(KeyLengthStructure<,>), density))
             return typeof(KeyLengthStructure<,>);
 
-        if (config.CheckItemCountLimits(typeof(ConditionalStructure<,>), keyCount))
+        if (config.IsEnabled(typeof(ConditionalStructure<,>)) && config.CheckItemCountLimits(typeof(ConditionalStructure<,>), keyCount))
             return typeof(ConditionalStructure<,>);
 
         HashData hashData = getHashData(keys);
 
-        if (hashData.HashCodesPerfect)
+        if (config.IsEnabled(typeof(HashTablePerfectStructure<,>)) && hashData.HashCodesPerfect)
             return typeof(HashTablePerfectStructure<,>);
 
         if (config.IsEnabled(typeof(HybleStructure<,>)))
             return typeof(HybleStructure<,>);
 
-        return typeof(HashTableStructure<,>);
+        if (config.IsEnabled(typeof(HashTableStructure<,>)))
+            return typeof(HashTableStructure<,>);
+
+        throw new InvalidOperationException("No enabled string structure matched the requested configuration.");
     }
 }

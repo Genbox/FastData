@@ -6,13 +6,7 @@ namespace Genbox.FastData.Internal;
 
 internal static class NumericStructures<TKey>
 {
-    internal static Type GetBest(ReadOnlyMemory<TKey> keys,
-                                 bool hasValues,
-                                 float density,
-                                 bool allowApproximate,
-                                 int rangeCount,
-                                 StructureConfig config,
-                                 Func<ReadOnlyMemory<TKey>, HashData> getHashData)
+    internal static Type GetBest(ReadOnlyMemory<TKey> keys, bool hasValues, float density, bool allowApproximate, int rangeCount, StructureConfig config, Func<ReadOnlyMemory<TKey>, HashData> getHashData)
     {
         uint keyCount = (uint)keys.Length;
 
