@@ -1,3 +1,4 @@
+using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Pgm;
 using Genbox.FastData.Internal.Structures;
 
@@ -14,7 +15,7 @@ public class PgmTests
     }
 
     [Fact]
-    public void PgmBuilder_FindsDuplicateInt32Keys()
+    public void PgmStructure_FindsDuplicateInt32Keys()
     {
         int[] keys = [1, 1, 2, 4, 4, 10, 100];
 
@@ -25,7 +26,7 @@ public class PgmTests
     }
 
     [Fact]
-    public void PgmBuilder_FindsUnsignedLargeGapKeys()
+    public void PgmStructure_FindsUnsignedLargeGapKeys()
     {
         ulong[] keys = [0ul, 1ul, 4_294_967_296ul, 9_223_372_036_854_775_808ul, ulong.MaxValue - 1];
 
@@ -36,7 +37,7 @@ public class PgmTests
     }
 
     [Fact]
-    public void PgmBuilder_FindsInt64LargeGapKeys()
+    public void PgmStructure_FindsInt64LargeGapKeys()
     {
         long[] keys = [long.MinValue, -10_000_000_000L, -1L, 0L, 10_000_000_000L, long.MaxValue - 1];
 
@@ -47,7 +48,7 @@ public class PgmTests
     }
 
     [Fact]
-    public void PgmBuilder_FindsFloatingPointKeys()
+    public void PgmStructure_FindsFloatingPointKeys()
     {
         float[] keys = [-10.5f, -1.25f, 0f, 0.5f, 100.25f];
 
@@ -59,7 +60,9 @@ public class PgmTests
 
     private static bool Contains<T>(T[] keys, int epsilon, T key) where T : notnull
     {
-        PgmSegment<T>[] segments = PgmBuilder<T>.Build(keys, epsilon);
+        PgmStructure<T, byte> structure = new PgmStructure<T, byte>(true, epsilon);
+        PgmContext<T, byte> ctx = structure.Create(keys, Array.Empty<byte>());
+        PgmSegment<T>[] segments = ctx.Segments;
 
         int seg = 0;
         int segHi = segments.Length - 1;

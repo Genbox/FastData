@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
@@ -16,6 +17,9 @@ public sealed class BloomFilterStructure<TKey, TValue> : IStructure<TKey, TValue
 
     public BloomFilterContext Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
+        Debug.Assert(!keys.IsEmpty, "BloomFilterStructure requires at least one key.");
+        Debug.Assert(_hashData.HashCodes.Length == keys.Length, "BloomFilterStructure requires one hash code per key.");
+
         int capacity = keys.Length;
         int bits = checked(capacity * BitsPerKey);
 

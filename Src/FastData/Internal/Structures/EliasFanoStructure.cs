@@ -1,9 +1,11 @@
+using System.Diagnostics;
 using System.Numerics;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Extensions;
 
 namespace Genbox.FastData.Internal.Structures;
 
@@ -24,7 +26,12 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
 
     public EliasFanoContext<TKey> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
-        //We need the data to be sorted
+        Debug.Assert(!keys.IsEmpty, "EliasFanoStructure requires at least one key.");
+        Debug.Assert(values.IsEmpty || values.Length == keys.Length, "EliasFanoStructure requires value count to match key count when values are present.");
+        Debug.Assert(_skipQuantum > 0, "EliasFanoStructure requires a positive skip quantum.");
+        Debug.Assert((_skipQuantum & (_skipQuantum - 1)) == 0, "EliasFanoStructure requires skip quantum to be a power of two.");
+        Debug.Assert(!_keysAreSorted || keys.IsSorted(), "EliasFanoStructure requires sorted input when keysAreSorted is true.");
+
         if (!_keysAreSorted)
         {
             TKey[] keysCopy = new TKey[keys.Length];
@@ -40,6 +47,9 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         int count = keysSpan.Length;
         long min = conv(_minValue);
         long max = conv(_maxValue);
+        Debug.Assert(min <= max, "EliasFanoStructure requires minValue to be less than or equal to maxValue.");
+        Debug.Assert(AllKeysInRange(keysSpan, conv, min, max), "EliasFanoStructure requires every key to be within the provided min/max range.");
+
         long effectiveMinValue = min < 0 ? min : 0;
         long maxValueNormalized = max - effectiveMinValue;
 
@@ -101,6 +111,9 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
 
     private static int[] BuildSamples(ulong[] words, int bitLength, int sampleRate)
     {
+        Debug.Assert(sampleRate > 0, "EliasFano samples require a positive sample rate.");
+        Debug.Assert(bitLength >= 0, "EliasFano samples require a non-negative bit length.");
+
         if (bitLength <= 0)
             return [];
 
@@ -145,6 +158,8 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
 
     private static long CountZeros(ulong[] words, int bitLength)
     {
+        Debug.Assert(bitLength >= 0, "EliasFano zero counting requires a non-negative bit length.");
+
         long zeros = 0;
 
         for (int i = 0; i < words.Length; i++)
@@ -163,10 +178,26 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
 
     private static int GetValidBits(int wordIndex, int wordCount, int bitLength)
     {
+        Debug.Assert(wordIndex >= 0, "EliasFano valid-bit calculation requires a non-negative word index.");
+        Debug.Assert(wordCount >= 0, "EliasFano valid-bit calculation requires a non-negative word count.");
+        Debug.Assert(bitLength >= 0, "EliasFano valid-bit calculation requires a non-negative bit length.");
+
         if (wordIndex != wordCount - 1)
             return 64;
 
         int remainder = bitLength & 63;
         return remainder == 0 ? 64 : remainder;
+    }
+
+    private static bool AllKeysInRange(ReadOnlySpan<TKey> keys, Func<TKey, long> conv, long min, long max)
+    {
+        for (int i = 0; i < keys.Length; i++)
+        {
+            long key = conv(keys[i]);
+            if (key < min || key > max)
+                return false;
+        }
+
+        return true;
     }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Extensions;
@@ -17,6 +18,10 @@ public sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, Bit
 
     public BitSetContext<TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
+        Debug.Assert(!keys.IsEmpty, "BitSetStructure requires at least one key.");
+        Debug.Assert(values.IsEmpty || values.Length == keys.Length, "BitSetStructure requires value count to match key count when values are present.");
+        Debug.Assert(_props.Range < int.MaxValue, "BitSetStructure requires a range that fits in an int-backed dense table.");
+
         if (typeof(TKey) == typeof(float) || typeof(TKey) == typeof(double))
             throw new InvalidOperationException("Floating point values are not supported for BitSets");
 
@@ -33,6 +38,7 @@ public sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, Bit
         for (int i = 0; i < keySpan.Length; i++)
         {
             ulong offset = (ulong)(conv(keySpan[i]) - minKey);
+            Debug.Assert(offset <= _props.Range, "BitSetStructure requires every key to be within the analyzed numeric range.");
             int word = (int)(offset >> 6);
             bitset[word] |= 1UL << (int)(offset & 63);
 

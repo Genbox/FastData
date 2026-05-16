@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Extensions;
@@ -16,6 +17,13 @@ public sealed class HashTablePerfectStructure<TKey, TValue> : IStructure<TKey, T
 
     public HashTablePerfectContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
+        Debug.Assert(!keys.IsEmpty, "HashTablePerfectStructure requires at least one key.");
+        Debug.Assert(values.IsEmpty || values.Length == keys.Length, "HashTablePerfectStructure requires value count to match key count when values are present.");
+        Debug.Assert(_hashData.CapacityFactor > 0, "HashTablePerfectStructure requires a positive capacity factor.");
+        Debug.Assert(_hashData.HashCodes.Length >= keys.Length, "HashTablePerfectStructure requires one hash code per key.");
+        Debug.Assert(_hashData.HashCodesPerfect, "HashTablePerfectStructure requires a perfect hash function.");
+        Debug.Assert((ulong)keys.Length * (ulong)_hashData.CapacityFactor <= int.MaxValue, "HashTablePerfectStructure requires the table to fit in an int-backed array.");
+
         if (!_hashData.HashCodesPerfect)
             throw new InvalidOperationException("HashSetPerfectStructure can only be created with a perfect hash function.");
 
@@ -53,6 +61,9 @@ public sealed class HashTablePerfectStructure<TKey, TValue> : IStructure<TKey, T
 
     private static ulong GetSentinel(HashData hashData, ulong[] hashCodes, int count)
     {
+        Debug.Assert(count > 0, "Sentinel selection requires at least one hash code.");
+        Debug.Assert(hashCodes.Length >= count, "Sentinel selection requires hashCodes to contain count entries.");
+
         if (hashData.MaxHashCode != ulong.MaxValue)
             return hashData.MaxHashCode + 1;
 

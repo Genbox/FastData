@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Contexts.Misc;
@@ -17,6 +18,12 @@ public sealed class HashTableCompactStructure<TKey, TValue> : IStructure<TKey, T
 
     public HashTableCompactContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
+        Debug.Assert(!keys.IsEmpty, "HashTableCompactStructure requires at least one key.");
+        Debug.Assert(values.IsEmpty || values.Length == keys.Length, "HashTableCompactStructure requires value count to match key count when values are present.");
+        Debug.Assert(_hashData.CapacityFactor > 0, "HashTableCompactStructure requires a positive capacity factor.");
+        Debug.Assert(_hashData.HashCodes.Length >= keys.Length, "HashTableCompactStructure requires one hash code per key.");
+        Debug.Assert((ulong)keys.Length * (ulong)_hashData.CapacityFactor <= int.MaxValue, "HashTableCompactStructure requires the bucket table to fit in an int-backed array.");
+
         ReadOnlySpan<TKey> keySpan = keys.Span;
         ReadOnlySpan<TValue> valueSpan = values.Span;
         ulong size = (ulong)(keySpan.Length * _hashData.CapacityFactor);

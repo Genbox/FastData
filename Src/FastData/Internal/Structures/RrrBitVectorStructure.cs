@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Extensions;
 
 namespace Genbox.FastData.Internal.Structures;
 
@@ -21,6 +23,10 @@ public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValu
 
     public RrrBitVectorContext Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
+        Debug.Assert(!keys.IsEmpty, "RrrBitVectorStructure requires at least one key.");
+        Debug.Assert(typeof(TKey) == typeof(char) || typeof(TKey) == typeof(byte) || typeof(TKey) == typeof(ushort) || typeof(TKey) == typeof(uint) || typeof(TKey) == typeof(ulong) || typeof(TKey) == typeof(sbyte) || typeof(TKey) == typeof(short) || typeof(TKey) == typeof(int) || typeof(TKey) == typeof(long), "RrrBitVectorStructure only supports integral key types.");
+        Debug.Assert(!_keysAreSorted || keys.IsSorted(), "RrrBitVectorStructure requires sorted input when keysAreSorted is true.");
+
         ReadOnlySpan<TKey> span = keys.Span;
         ulong[] mapped = new ulong[span.Length];
 
@@ -34,6 +40,7 @@ public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValu
         ulong maxValue = mapped[mapped.Length - 1];
         ulong universe = (maxValue - minValue) + 1UL;
         ulong blockCount64 = ((universe + BlockSize) - 1UL) / BlockSize;
+        Debug.Assert(blockCount64 <= int.MaxValue, "RrrBitVectorStructure requires a block count that fits in an int-backed table.");
 
         if (blockCount64 > int.MaxValue)
             throw new InvalidOperationException("RRR bitvector is too large.");
@@ -132,32 +139,34 @@ public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValu
     private static ulong MapKeyToSortable(TKey key)
     {
         if (typeof(TKey) == typeof(char))
-            return (char)(object)key;
+            return Cast<char>(key);
 
         if (typeof(TKey) == typeof(byte))
-            return (byte)(object)key;
+            return Cast<byte>(key);
 
         if (typeof(TKey) == typeof(ushort))
-            return (ushort)(object)key;
+            return Cast<ushort>(key);
 
         if (typeof(TKey) == typeof(uint))
-            return (uint)(object)key;
+            return Cast<uint>(key);
 
         if (typeof(TKey) == typeof(ulong))
-            return (ulong)(object)key;
+            return Cast<ulong>(key);
 
         if (typeof(TKey) == typeof(sbyte))
-            return unchecked((byte)((sbyte)(object)key ^ sbyte.MinValue));
+            return unchecked((byte)(Cast<sbyte>(key) ^ sbyte.MinValue));
 
         if (typeof(TKey) == typeof(short))
-            return unchecked((ushort)((short)(object)key ^ short.MinValue));
+            return unchecked((ushort)(Cast<short>(key) ^ short.MinValue));
 
         if (typeof(TKey) == typeof(int))
-            return unchecked((uint)((int)(object)key ^ int.MinValue));
+            return unchecked((uint)(Cast<int>(key) ^ int.MinValue));
 
         if (typeof(TKey) == typeof(long))
-            return unchecked((ulong)((long)(object)key ^ long.MinValue));
+            return unchecked((ulong)(Cast<long>(key) ^ long.MinValue));
 
         throw new InvalidOperationException("RRR bitvector only supports integral key types.");
     }
+
+    private static T Cast<T>(TKey key) => (T)(object)key!;
 }
