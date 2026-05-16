@@ -7,8 +7,8 @@ public abstract record ValueComparisonEarlyExitBase<T>(T Value) : IEarlyExit
 {
     public Expression GetExpression(ParameterExpression key) => Compare(key, Constant(Value, key.Type));
 
-    protected abstract BinaryExpression Compare(Expression left, Expression right);
-
     public abstract bool IsWorseThan(IEarlyExit other);
     public abstract ulong KeyspaceSize { get; }
+
+    protected abstract BinaryExpression Compare(Expression left, Expression right);
 }

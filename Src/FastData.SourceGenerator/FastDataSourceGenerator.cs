@@ -76,9 +76,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                         {
                             Type keyType = keys.GetValue(0).GetType();
                             if (keyType == typeof(string))
-                            {
                                 source = FastDataGenerator.Generate((string[])keys, (StringDataConfig)fdCfg, generator);
-                            }
                             else
                             {
                                 object keyMemory = CreateReadOnlyMemory(keys);

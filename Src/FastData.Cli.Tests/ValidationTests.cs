@@ -1,9 +1,13 @@
+using System.Text;
+
 namespace Genbox.FastData.Cli.Tests;
 
 [Collection("CliTests")]
 public sealed class ValidationTests : IDisposable
 {
     private readonly List<string> _tempFiles = new List<string>();
+
+    public void Dispose() => CleanupTempFiles(_tempFiles);
 
     [Fact]
     public async Task RejectsPartialIntegerInput()
@@ -214,14 +218,12 @@ public sealed class ValidationTests : IDisposable
         Assert.DoesNotContain("bool|", output, StringComparison.OrdinalIgnoreCase);
     }
 
-    public void Dispose() => CleanupTempFiles(_tempFiles);
-
     private Task<string> WriteTempAsync(string content) => WriteTempFileAsync(_tempFiles, content);
 
     private async Task<string> WriteTempLinesAsync(params string[] lines)
     {
         string path = GetTempFilePath(_tempFiles, ".input");
-        await File.WriteAllLinesAsync(path, lines, new System.Text.UTF8Encoding(false));
+        await File.WriteAllLinesAsync(path, lines, new UTF8Encoding(false));
         return path;
     }
 }

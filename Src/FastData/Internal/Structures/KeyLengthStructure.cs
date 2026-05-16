@@ -9,9 +9,9 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class KeyLengthStructure<TKey, TValue> : IStructure<TKey, TValue, KeyLengthContext<TValue>>
 {
+    private readonly GeneratorEncoding _encoding;
     private readonly int _maxLength;
     private readonly int _minLength;
-    private readonly GeneratorEncoding _encoding;
 
     internal KeyLengthStructure(int minLength, int maxLength, GeneratorEncoding encoding)
     {

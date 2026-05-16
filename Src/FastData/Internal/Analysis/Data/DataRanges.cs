@@ -12,12 +12,12 @@ internal sealed class DataRanges<T>
         Ranges = new List<(T Start, T End)>(numKeys / 4);
     }
 
+    internal List<(T Start, T End)> Ranges { get; }
+    internal T Min => Ranges[0].Start;
+    internal T Max => Ranges[Ranges.Count - 1].End;
+
     public void Add(T start, T end)
     {
         Ranges.Add((start, end));
     }
-
-    internal List<(T Start, T End)> Ranges { get; }
-    internal T Min => Ranges[0].Start;
-    internal T Max => Ranges[Ranges.Count - 1].End;
 }

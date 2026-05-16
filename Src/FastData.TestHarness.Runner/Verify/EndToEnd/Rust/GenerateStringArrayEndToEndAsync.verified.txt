@@ -1,4 +1,4 @@
-//! This file is auto-generated. Do not edit manually.
+﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: Array
 #![allow(non_camel_case_types)]
 #![allow(unused_parens)]

@@ -10,5 +10,5 @@ public enum GeneratorEncoding : byte
     Utf16Bytes,
 
     // Number of code units in a specific encoding / runtime model
-    Utf16CodeUnits,
+    Utf16CodeUnits
 }

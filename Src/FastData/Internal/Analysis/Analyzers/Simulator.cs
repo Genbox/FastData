@@ -1,4 +1,3 @@
-using System.Text;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;

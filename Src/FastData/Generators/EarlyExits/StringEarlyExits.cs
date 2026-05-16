@@ -119,7 +119,7 @@ internal static class StringEarlyExits
     {
         int minLength = props.LengthData.LengthRanges.Min;
         int maxLength = props.LengthData.LengthRanges.Max;
-        double lengthSpan = maxLength >= minLength ? maxLength - minLength + 1d : 0d;
+        double lengthSpan = maxLength >= minLength ? (maxLength - minLength) + 1d : 0d;
         double firstSpan = GetAsciiSpan(props.CharacterData.FirstCharMap);
         double lastSpan = GetAsciiSpan(props.CharacterData.LastCharMap);
 
@@ -153,7 +153,7 @@ internal static class StringEarlyExits
         if (map.BitCount == 0 || map.Max < map.Min)
             return 0d;
 
-        return map.Max - map.Min + 1d;
+        return (map.Max - map.Min) + 1d;
     }
 
     private static int GetRangeCount(DataRanges<int> ranges)
@@ -161,9 +161,7 @@ internal static class StringEarlyExits
         int count = 0;
 
         foreach ((int Start, int End) range in ranges.Ranges)
-        {
             count += (range.End - range.Start) + 1;
-        }
 
         return count;
     }

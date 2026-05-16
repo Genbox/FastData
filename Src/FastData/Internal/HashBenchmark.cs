@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text;
 using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.StringHash;

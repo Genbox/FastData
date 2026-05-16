@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Genbox.FastData.Config;
 using Genbox.FastData.Config.Analysis;
-using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus;
 using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.Generator.CSharp.Enums;
@@ -106,17 +105,6 @@ internal static class Program
             return -1;
         }
     }
-
-    private readonly record struct CommonOptions(
-        FileInfo InputFile,
-        FileInfo? OutputFile,
-        FileInfo? ValuesFile,
-        KeyType KeyType,
-        KeyType ValueType,
-        StructureType StructureType,
-        bool IgnoreCase,
-        bool AllowApproximate,
-        AnalysisLevel AnalysisLevel);
 
     private static async Task RunAsync(CommonOptions opts, ICodeGenerator generator, CancellationToken token)
     {
@@ -305,8 +293,6 @@ internal static class Program
         _ => throw new ArgumentOutOfRangeException(nameof(keyType), keyType, null)
     };
 
-    private delegate bool Utf8NumberParser<T>(ReadOnlySpan<byte> source, out T value, out int bytesConsumed);
-
     private static void AddParsedNumber<T>(PooledArray<T> values, ReadOnlySpan<byte> source, Utf8NumberParser<T> parser)
     {
         if (parser(source, out T value, out int bytesConsumed) && bytesConsumed == source.Length)
@@ -374,6 +360,19 @@ internal static class Program
         await reader.CompleteAsync().ConfigureAwait(false);
         return pool.ToArray();
     }
+
+    private readonly record struct CommonOptions(
+        FileInfo InputFile,
+        FileInfo? OutputFile,
+        FileInfo? ValuesFile,
+        KeyType KeyType,
+        KeyType ValueType,
+        StructureType StructureType,
+        bool IgnoreCase,
+        bool AllowApproximate,
+        AnalysisLevel AnalysisLevel);
+
+    private delegate bool Utf8NumberParser<T>(ReadOnlySpan<byte> source, out T value, out int bytesConsumed);
 
     private sealed class PooledArray<T>(int initialCapacity = 1024)
     {

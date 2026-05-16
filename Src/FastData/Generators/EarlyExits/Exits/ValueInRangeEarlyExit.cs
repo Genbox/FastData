@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Extensions;
+using Convert = System.Convert;
 
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
@@ -47,8 +48,8 @@ public sealed record ValueInRangeEarlyExit<T>(T Min, T Max) : IEarlyExit
             }
 
             // Floating point is a heuristic based on numeric difference.
-            double floatMin = System.Convert.ToDouble(Min, CultureInfo.InvariantCulture);
-            double floatMax = System.Convert.ToDouble(Max, CultureInfo.InvariantCulture);
+            double floatMin = Convert.ToDouble(Min, CultureInfo.InvariantCulture);
+            double floatMax = Convert.ToDouble(Max, CultureInfo.InvariantCulture);
             double diff = floatMax - floatMin;
 
             if (diff >= ulong.MaxValue)

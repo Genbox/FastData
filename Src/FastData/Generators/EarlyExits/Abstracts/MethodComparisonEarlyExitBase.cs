@@ -12,9 +12,9 @@ public abstract record MethodComparisonEarlyExitBase<T>(T Value, string Method) 
         return Compare(Call(methodInfo, key), Constant(Value, typeof(T)));
     }
 
-    protected abstract BinaryExpression Compare(Expression left, Expression right);
-
     public abstract bool IsWorseThan(IEarlyExit other);
 
     public abstract ulong KeyspaceSize { get; }
+
+    protected abstract BinaryExpression Compare(Expression left, Expression right);
 }

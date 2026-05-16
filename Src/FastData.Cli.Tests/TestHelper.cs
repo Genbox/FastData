@@ -61,8 +61,8 @@ internal static class TestHelper
                 if (File.Exists(path))
                     File.Delete(path);
             }
-            catch (IOException) { }
-            catch (UnauthorizedAccessException) { }
+            catch (IOException) {}
+            catch (UnauthorizedAccessException) {}
         }
     }
 }

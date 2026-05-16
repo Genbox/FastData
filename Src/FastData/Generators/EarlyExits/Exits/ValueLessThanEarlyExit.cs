@@ -3,16 +3,13 @@ using System.Linq.Expressions;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits.Abstracts;
 using Genbox.FastData.Generators.Extensions;
+using Convert = System.Convert;
 
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // inputKey < Value;
 public sealed record ValueLessThanEarlyExit<T>(T Value) : ValueComparisonEarlyExitBase<T>(Value)
 {
-    protected override BinaryExpression Compare(Expression left, Expression right) => LessThan(left, right);
-
-    public override bool IsWorseThan(IEarlyExit other) => other is ValueLessThanEarlyExit<T> otherExit && Comparer<T>.Default.Compare(Value, otherExit.Value) < 0;
-
     public override ulong KeyspaceSize
     {
         get
@@ -29,12 +26,16 @@ public sealed record ValueLessThanEarlyExit<T>(T Value) : ValueComparisonEarlyEx
             }
 
             // Floating point is a heuristic based on numeric difference.
-            double floatValue = System.Convert.ToDouble(Value, CultureInfo.InvariantCulture);
-            double floatMin = System.Convert.ToDouble(code.GetMinValue<T>(), CultureInfo.InvariantCulture);
+            double floatValue = Convert.ToDouble(Value, CultureInfo.InvariantCulture);
+            double floatMin = Convert.ToDouble(code.GetMinValue<T>(), CultureInfo.InvariantCulture);
             double diff = floatValue - floatMin;
             return ClampToUInt64(diff);
         }
     }
+
+    protected override BinaryExpression Compare(Expression left, Expression right) => LessThan(left, right);
+
+    public override bool IsWorseThan(IEarlyExit other) => other is ValueLessThanEarlyExit<T> otherExit && Comparer<T>.Default.Compare(Value, otherExit.Value) < 0;
 
     private static ulong ClampToUInt64(double value)
     {

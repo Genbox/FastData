@@ -7,9 +7,8 @@ namespace Genbox.FastData.Generators.EarlyExits.Exits;
 // GetFirstChar(inputKey) > Value;
 public sealed record CharFirstGreaterThanEarlyExit(char Value) : MethodComparisonEarlyExitBase<char>(Value, nameof(StringFunctions.GetFirstChar))
 {
+    public override ulong KeyspaceSize => (ulong)(char.MaxValue - Value);
     protected override BinaryExpression Compare(Expression left, Expression right) => GreaterThan(left, right);
 
     public override bool IsWorseThan(IEarlyExit other) => other is CharFirstGreaterThanEarlyExit otherExit && Value > otherExit.Value;
-
-    public override ulong KeyspaceSize => (ulong)(char.MaxValue - Value);
 }

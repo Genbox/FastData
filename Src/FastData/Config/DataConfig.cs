@@ -27,7 +27,10 @@ public abstract class DataConfig
     /// <summary>When true, throws an exception on duplicate keys</summary>
     public bool ThrowOnDuplicates { get; set; } = true;
 
-    /// <summary>For hash-based structures, you can set this factor higher or lower to control how many slots are used. A factor higher than 1 will use more memory, but can improve performance by reducing collisions. A factor lower than 1 will use less memory, but can increase collisions and thus reduce performance.</summary>
+    /// <summary>
+    /// For hash-based structures, you can set this factor higher or lower to control how many slots are used. A factor higher than 1 will use more memory, but can improve performance by reducing collisions. A factor lower than 1 will use less memory, but can increase collisions and thus reduce
+    /// performance.
+    /// </summary>
     public int HashCapacityFactor { get; set; } = 1;
 
     /// <summary>Can be used to give advanced fine-tuning parameters to individual data structures</summary>
