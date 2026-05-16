@@ -9,8 +9,7 @@ using System.Runtime.InteropServices;
 internal static class FastData
 {
 
-    private static char GetCharAt(string str, int index) => str[index];
-    private static char GetCharFromEnd(string str, int fromEnd) => str[str.Length - 1 - fromEnd];
+    private static char GetCharAt(string str, int offset) => offset >= 0 ? str[offset] : str[str.Length + offset];
     private static int GetLength(string str) => str.Length;
 
 
@@ -22,27 +21,27 @@ internal static class FastData
     public static bool Contains(string key)
     {
         int getLength;
-        char getCharAt;
-        char getCharFromEnd;
+        char getCharAt0;
+        char getCharAtNeg1;
         getLength = GetLength(key);
         if ((getLength > 7))
         {
          return false;
         }
 
-        getCharAt = GetCharAt(key, 0);
-        if ((getCharAt > 'd'))
+        getCharAt0 = GetCharAt(key, 0);
+        if ((getCharAt0 > 'd'))
         {
          return false;
         }
 
-        getCharFromEnd = GetCharFromEnd(key, 0);
-        if ((getCharFromEnd > 'o'))
+        getCharAtNeg1 = GetCharAt(key, -1);
+        if ((getCharAtNeg1 > 'o'))
         {
          return false;
         }
 
-        if (((((ulong.MinValue & (1ul << (int)((uint)getCharFromEnd & 63u))) & ~(ulong.MinValue - (ulong)((uint)getCharFromEnd >> 6))) | ((140883517243392ul & (1ul << (int)((uint)getCharFromEnd & 63u))) & (ulong.MinValue - (ulong)((uint)getCharFromEnd >> 6)))) == ulong.MinValue))
+        if (((((ulong.MinValue & (1ul << (int)((uint)getCharAtNeg1 & 63u))) & ~(ulong.MinValue - (ulong)((uint)getCharAtNeg1 >> 6))) | ((140883517243392ul & (1ul << (int)((uint)getCharAtNeg1 & 63u))) & (ulong.MinValue - (ulong)((uint)getCharAtNeg1 >> 6)))) == ulong.MinValue))
         {
          return false;
         }

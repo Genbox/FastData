@@ -12,11 +12,11 @@
     Kind: EarlyExit
   },
   {
-    Expression: (getCharAt = GetCharAt(inputKey, 0)),
+    Expression: (getCharAt0 = GetCharAt(inputKey, 0)),
     Kind: Assignment
   },
   {
-    Expression: (getCharAt < a),
+    Expression: (getCharAt0 < a),
     Kind: EarlyExit
   }
 ]

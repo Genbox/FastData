@@ -9,8 +9,7 @@ using System.Runtime.InteropServices;
 internal static class StaticData
 {
 
-    private static char GetCharAt(string str, int index) => str[index];
-    private static char GetCharFromEnd(string str, int fromEnd) => str[str.Length - 1 - fromEnd];
+    private static char GetCharAt(string str, int offset) => offset >= 0 ? str[offset] : str[str.Length + offset];
     private static int GetLength(string str) => str.Length;
 
     private static readonly string[] _keys = new string[] {
@@ -21,27 +20,27 @@ internal static class StaticData
     public static bool Contains(string key)
     {
         int getLength;
-        char getCharFromEnd;
-        char getCharAt;
+        char getCharAtNeg1;
+        char getCharAt0;
         getLength = GetLength(key);
         if ((getLength > 5))
         {
          return false;
         }
 
-        getCharFromEnd = GetCharFromEnd(key, 0);
-        if ((getCharFromEnd > '3'))
+        getCharAtNeg1 = GetCharAt(key, -1);
+        if ((getCharAtNeg1 > '3'))
         {
          return false;
         }
 
-        getCharAt = GetCharAt(key, 0);
-        if ((getCharAt > 'i'))
+        getCharAt0 = GetCharAt(key, 0);
+        if ((getCharAt0 > 'i'))
         {
          return false;
         }
 
-        if ((getCharAt < 'i'))
+        if ((getCharAt0 < 'i'))
         {
          return false;
         }

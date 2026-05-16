@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using System.Reflection;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Expressions;
@@ -95,7 +96,7 @@ public class AllocationGatherTransform : IExprTransform
 
                 if (!state.Variables.TryGetValue(signature, out ParameterExpression? variable))
                 {
-                    string name = ToCamelCase(updatedCall.Method.Name);
+                    string name = BuildVariableName(updatedCall);
                     variable = Variable(updatedCall.Type, name);
                     state.Variables.Add(signature, variable);
                     Assignments.Add(Assign(variable, updatedCall));
@@ -107,7 +108,23 @@ public class AllocationGatherTransform : IExprTransform
             return base.VisitMethodCall(node);
         }
 
-        private static string ToCamelCase(string name) => char.ToLowerInvariant(name[0]) + name.Substring(1);
+        [SuppressMessage("Minor Code Smell", "S1643:Strings should not be concatenated using \'+\' in a loop")]
+        private static string BuildVariableName(MethodCallExpression call)
+        {
+            string baseName = char.ToLowerInvariant(call.Method.Name[0]) + call.Method.Name.Substring(1);
+
+            // Append constant argument values to disambiguate calls to the same method with different constant arguments
+            foreach (Expression arg in call.Arguments)
+            {
+                if (arg is ConstantExpression constant && constant.Value != null)
+                {
+                    string value = constant.Value.ToString()!;
+                    baseName += value.StartsWith("-", StringComparison.Ordinal) ? "Neg" + value.Substring(1) : value;
+                }
+            }
+
+            return baseName;
+        }
     }
 
     private readonly struct CallSignature(MethodInfo method, ArgumentSignature[] arguments)

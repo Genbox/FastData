@@ -67,17 +67,17 @@ public class StringEarlyExitsTests
     }
 
     [Fact]
-    public void GetExits_CharFirstBitmapRespectsDensityLimits()
+    public void GetExits_CharOffsetBitmapRespectsDensityLimits()
     {
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.MaxCandidates = 50;
         cfg.MinRejectionRatio = 0f;
 
         IEarlyExit[] sparse = GetExits(["alpha", "zulu"], false, cfg);
-        Assert.Contains(sparse, static x => x is CharFirstBitmapEarlyExit);
+        Assert.Contains(sparse, static x => x is CharOffsetBitmapEarlyExit { Offset: >= 0 });
 
         IEarlyExit[] dense = GetExits(["apple", "banana"], false, cfg);
-        Assert.DoesNotContain(dense, static x => x is CharFirstBitmapEarlyExit);
+        Assert.DoesNotContain(dense, static x => x is CharOffsetBitmapEarlyExit { Offset: >= 0 });
     }
 
     [Fact]
@@ -90,8 +90,8 @@ public class StringEarlyExitsTests
 
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
-        Assert.Contains(exits, static x => x is StringPrefixEarlyExit { Prefix: "pre" });
-        Assert.Contains(exits, static x => x is StringSuffixEarlyExit { Suffix: "Suf" });
+        Assert.Contains(exits, static x => x is StringAffixEarlyExit { Affix: "pre" });
+        Assert.Contains(exits, static x => x is StringAffixEarlyExit { Affix: "Suf" });
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class StringEarlyExitsTests
 
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
-        Assert.DoesNotContain(exits, static x => x is StringPrefixEarlyExit { Prefix: "ab" });
+        Assert.DoesNotContain(exits, static x => x is StringAffixEarlyExit { Affix: "ab" });
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class StringEarlyExitsTests
         string[] keys = ["abaaaaaa", "abbbbbbb", "abccccccc"];
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
-        Assert.Contains(exits, static x => x is StringPrefixEarlyExit { Prefix: "ab" });
+        Assert.Contains(exits, static x => x is StringAffixEarlyExit { Affix: "ab" });
 
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, false, GeneratorEncoding.Utf16CodeUnits);
         int minLength = props.LengthData.LengthRanges.Min;

@@ -10,8 +10,7 @@
 
 class fastdata final {
 
-    static constexpr char GetCharAt(std::string_view str, int32_t index) { return str[index]; }
-    static constexpr char GetCharFromEnd(std::string_view str, int32_t fromEnd) { return str[str.length() - 1 - fromEnd]; }
+    static constexpr char GetCharAt(std::string_view str, int32_t offset) { return offset >= 0 ? str[offset] : str[str.length() + offset]; }
     static constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }
 
 
@@ -23,27 +22,27 @@ public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
         int32_t getLength;
-        char getCharAt;
-        char getCharFromEnd;
+        char getCharAt0;
+        char getCharAtNeg1;
         getLength = GetLength(key);
         if ((getLength > 7))
         {
          return false;
         }
 
-        getCharAt = GetCharAt(key, 0);
-        if ((getCharAt > 100))
+        getCharAt0 = GetCharAt(key, 0);
+        if ((getCharAt0 > 100))
         {
          return false;
         }
 
-        getCharFromEnd = GetCharFromEnd(key, 0);
-        if ((getCharFromEnd > 111))
+        getCharAtNeg1 = GetCharAt(key, -1);
+        if ((getCharAtNeg1 > 111))
         {
          return false;
         }
 
-        if (((((0 & (1ull << static_cast<int32_t>((static_cast<uint32_t>(getCharFromEnd) & 63u)))) & ~(0 - static_cast<uint64_t>((static_cast<uint32_t>(getCharFromEnd) >> 6)))) | ((140883517243392ull & (1ull << static_cast<int32_t>((static_cast<uint32_t>(getCharFromEnd) & 63u)))) & (0 - static_cast<uint64_t>((static_cast<uint32_t>(getCharFromEnd) >> 6))))) == 0))
+        if (((((0 & (1ull << static_cast<int32_t>((static_cast<uint32_t>(getCharAtNeg1) & 63u)))) & ~(0 - static_cast<uint64_t>((static_cast<uint32_t>(getCharAtNeg1) >> 6)))) | ((140883517243392ull & (1ull << static_cast<int32_t>((static_cast<uint32_t>(getCharAtNeg1) & 63u)))) & (0 - static_cast<uint64_t>((static_cast<uint32_t>(getCharAtNeg1) >> 6))))) == 0))
         {
          return false;
         }

@@ -22,15 +22,14 @@ public sealed class RustEarlyExitTests(DockerRustFixture fixture) : EarlyExitTes
               }
           }
 
-          fn GetCharAt(value: &str, index: usize) -> char { value.as_bytes()[index] as char }
-          fn GetCharAtLower(value: &str, index: usize) -> char { ToLowerAscii(value.as_bytes()[index]) as char }
-          fn GetCharFromEnd(value: &str, from_end: usize) -> char {
+          fn GetCharAt(value: &str, offset: i32) -> char {
               let bytes = value.as_bytes();
-              bytes[bytes.len() - 1 - from_end] as char
+              if offset >= 0 { bytes[offset as usize] as char } else { bytes[bytes.len().wrapping_add(offset as usize)] as char }
           }
-          fn GetCharFromEndLower(value: &str, from_end: usize) -> char {
+          fn GetCharAtLower(value: &str, offset: i32) -> char {
               let bytes = value.as_bytes();
-              ToLowerAscii(bytes[bytes.len() - 1 - from_end]) as char
+              let ch = if offset >= 0 { bytes[offset as usize] } else { bytes[bytes.len().wrapping_add(offset as usize)] };
+              ToLowerAscii(ch) as char
           }
           fn GetLength(value: &str) -> i32 { value.len() as i32 }
 

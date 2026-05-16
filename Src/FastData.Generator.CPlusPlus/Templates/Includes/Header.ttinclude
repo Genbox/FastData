@@ -39,7 +39,7 @@ class <#= CPlusPlusConfig.ClassName #> final {
 <#
     if (GeneratorConfig is StringGeneratorConfig strCfg2)
     {
-        if (strCfg2.IgnoreCase || (strCfg2.StringFunctions & (StringFunction.GetCharAtLower | StringFunction.GetCharFromEndLower | StringFunction.StartsWithLower | StringFunction.EndsWithLower)) != 0)
+        if (strCfg2.IgnoreCase || (strCfg2.StringFunctions & (StringFunction.GetCharAtLower | StringFunction.StartsWithLower | StringFunction.EndsWithLower)) != 0)
         {
 #>
     static constexpr char ToLowerAscii(char value) {
@@ -96,10 +96,8 @@ class <#= CPlusPlusConfig.ClassName #> final {
             { StringFunction.ReadU32, "uint32_t ReadU32(const std::string_view value, const size_t offset) noexcept { uint32_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }" },
             { StringFunction.ReadU64, "uint64_t ReadU64(const std::string_view value, const size_t offset) noexcept { uint64_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }" },
 
-            { StringFunction.GetCharAt, "constexpr char GetCharAt(std::string_view str, int32_t index) { return str[index]; }" },
-            { StringFunction.GetCharAtLower, "constexpr char GetCharAtLower(std::string_view str, int32_t index) { return ToLowerAscii(str[index]); }" },
-            { StringFunction.GetCharFromEnd, "constexpr char GetCharFromEnd(std::string_view str, int32_t fromEnd) { return str[str.length() - 1 - fromEnd]; }" },
-            { StringFunction.GetCharFromEndLower, "constexpr char GetCharFromEndLower(std::string_view str, int32_t fromEnd) { return ToLowerAscii(str[str.length() - 1 - fromEnd]); }" },
+            { StringFunction.GetCharAt, "constexpr char GetCharAt(std::string_view str, int32_t offset) { return offset >= 0 ? str[offset] : str[str.length() + offset]; }" },
+            { StringFunction.GetCharAtLower, "constexpr char GetCharAtLower(std::string_view str, int32_t offset) { return ToLowerAscii(offset >= 0 ? str[offset] : str[str.length() + offset]); }" },
 
             { StringFunction.GetLength, "constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }" },
 

@@ -6,7 +6,7 @@ using Genbox.FastData.Generators.EarlyExits.Abstracts;
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // GetCharAt(inputKey, Offset) > Value;
-public sealed record CharFirstGreaterThanEarlyExit(char Value, int Offset = 0) : MethodComparisonEarlyExitBase<char>(Value, nameof(StringFunctions.GetCharAt))
+public sealed record CharOffsetGreaterThanEarlyExit(char Value, int Offset = 0) : MethodComparisonEarlyExitBase<char>(Value, nameof(StringFunctions.GetCharAt))
 {
     public override ulong KeyspaceSize => (ulong)(char.MaxValue - Value);
     protected override BinaryExpression Compare(Expression left, Expression right) => GreaterThan(left, right);
@@ -17,5 +17,5 @@ public sealed record CharFirstGreaterThanEarlyExit(char Value, int Offset = 0) :
         return Compare(Call(methodInfo, key, Constant(Offset)), Constant(Value, typeof(char)));
     }
 
-    public override bool IsWorseThan(IEarlyExit other) => other is CharFirstGreaterThanEarlyExit otherExit && Value > otherExit.Value;
+    public override bool IsWorseThan(IEarlyExit other) => other is CharOffsetGreaterThanEarlyExit otherExit && Offset == otherExit.Offset && Value > otherExit.Value;
 }

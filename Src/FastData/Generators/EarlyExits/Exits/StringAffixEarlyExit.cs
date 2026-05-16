@@ -2,9 +2,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Genbox.FastData.Generators.Abstracts;
 
-namespace Genbox.FastData.Generators.EarlyExits.Abstracts;
+namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
-public abstract record StringAffixEarlyExitBase(string Affix, string Method) : IEarlyExit
+// !StartsWith/EndsWith(affix, inputKey);
+public sealed record StringAffixEarlyExit(string Affix, string Method) : IEarlyExit
 {
     public Expression GetExpression(ParameterExpression key)
     {

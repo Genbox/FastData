@@ -1,0 +1,3 @@
+﻿var bla = 42
+if ((KeyFirstChar < 'a'))
+if ((KeyFirstChar > 'f'))

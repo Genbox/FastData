@@ -12,8 +12,7 @@
 
 class MyData final {
 
-    static constexpr char GetCharAt(std::string_view str, int32_t index) { return str[index]; }
-    static constexpr char GetCharFromEnd(std::string_view str, int32_t fromEnd) { return str[str.length() - 1 - fromEnd]; }
+    static constexpr char GetCharAt(std::string_view str, int32_t offset) { return offset >= 0 ? str[offset] : str[str.length() + offset]; }
     static constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }
 
     struct e {
@@ -45,27 +44,27 @@ public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
         int32_t getLength;
-        char getCharFromEnd;
-        char getCharAt;
+        char getCharAtNeg1;
+        char getCharAt0;
         getLength = GetLength(key);
         if ((getLength > 5))
         {
          return false;
         }
 
-        getCharFromEnd = GetCharFromEnd(key, 0);
-        if ((getCharFromEnd > 50))
+        getCharAtNeg1 = GetCharAt(key, -1);
+        if ((getCharAtNeg1 > 50))
         {
          return false;
         }
 
-        getCharAt = GetCharAt(key, 0);
-        if ((getCharAt > 116))
+        getCharAt0 = GetCharAt(key, 0);
+        if ((getCharAt0 > 116))
         {
          return false;
         }
 
-        if ((getCharAt < 116))
+        if ((getCharAt0 < 116))
         {
          return false;
         }

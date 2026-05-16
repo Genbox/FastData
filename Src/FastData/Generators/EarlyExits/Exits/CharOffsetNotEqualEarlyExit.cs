@@ -6,7 +6,7 @@ using Genbox.FastData.Generators.EarlyExits.Abstracts;
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // GetCharAt(inputKey, Offset) != Value;
-public sealed record CharFirstNotEqualEarlyExit(char Value, bool IgnoreCase, int Offset = 0) : MethodComparisonEarlyExitBase<char>(Value, IgnoreCase ? nameof(StringFunctions.GetCharAtLower) : nameof(StringFunctions.GetCharAt))
+public sealed record CharOffsetNotEqualEarlyExit(char Value, bool IgnoreCase, int Offset = 0) : MethodComparisonEarlyExitBase<char>(Value, IgnoreCase ? nameof(StringFunctions.GetCharAtLower) : nameof(StringFunctions.GetCharAt))
 {
     public override ulong KeyspaceSize => 1;
     protected override BinaryExpression Compare(Expression left, Expression right) => NotEqual(left, right);

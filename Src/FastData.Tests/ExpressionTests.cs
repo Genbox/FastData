@@ -15,7 +15,7 @@ public class ExpressionTests
     [
         new AnnotatedExpr(new LengthLessThanEarlyExit(4).GetExpression(parameter), ExprKind.EarlyExit),
         new AnnotatedExpr(new LengthGreaterThanEarlyExit(9).GetExpression(parameter), ExprKind.EarlyExit),
-        new AnnotatedExpr(new CharFirstLessThanEarlyExit('a').GetExpression(parameter), ExprKind.EarlyExit)
+        new AnnotatedExpr(new CharOffsetLessThanEarlyExit('a').GetExpression(parameter), ExprKind.EarlyExit)
     ];
 
     [Fact]

@@ -1,1 +1,0 @@
-﻿(GetCharFromEnd(inputKey, 0) > 'm')

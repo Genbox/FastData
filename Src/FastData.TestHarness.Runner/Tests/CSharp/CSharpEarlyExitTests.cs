@@ -16,10 +16,8 @@ public sealed class CSharpEarlyExitTests(DockerCSharpFixture fixture) : EarlyExi
 
           public static class Program
           {
-              private static char GetCharAt(string str, int index) => str[index];
-              private static char GetCharAtLower(string str, int index) => char.ToLowerInvariant(str[index]);
-              private static char GetCharFromEnd(string str, int fromEnd) => str[str.Length - 1 - fromEnd];
-              private static char GetCharFromEndLower(string str, int fromEnd) => char.ToLowerInvariant(str[str.Length - 1 - fromEnd]);
+              private static char GetCharAt(string str, int offset) => offset >= 0 ? str[offset] : str[str.Length + offset];
+              private static char GetCharAtLower(string str, int offset) => char.ToLowerInvariant(offset >= 0 ? str[offset] : str[str.Length + offset]);
               private static int GetLength(string str) => str.Length;
               private static bool StartsWith(string prefix, string str) => str.StartsWith(prefix, StringComparison.Ordinal);
               private static bool StartsWithIgnoreCase(string prefix, string str) => str.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);

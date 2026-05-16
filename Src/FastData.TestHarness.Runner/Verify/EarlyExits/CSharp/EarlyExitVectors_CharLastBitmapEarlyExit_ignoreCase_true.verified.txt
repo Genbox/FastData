@@ -1,1 +1,0 @@
-﻿((((ulong.MinValue & (1ul << (int)((uint)GetCharFromEndLower(inputKey, 0) & 63u))) & ~(ulong.MinValue - (ulong)((uint)GetCharFromEndLower(inputKey, 0) >> 6))) | ((216172782113783808ul & (1ul << (int)((uint)GetCharFromEndLower(inputKey, 0) & 63u))) & (ulong.MinValue - (ulong)((uint)GetCharFromEndLower(inputKey, 0) >> 6)))) == ulong.MinValue)

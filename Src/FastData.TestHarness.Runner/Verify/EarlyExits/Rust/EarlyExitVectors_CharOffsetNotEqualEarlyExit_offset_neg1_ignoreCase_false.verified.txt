@@ -1,0 +1,1 @@
+﻿(GetCharAt(inputKey, -1) != 'x')

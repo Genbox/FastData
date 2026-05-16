@@ -10,8 +10,6 @@ public enum StringFunction
     ReadU64 = 1 << 4,
     GetCharAt = 1 << 5,
     GetCharAtLower = 1 << 6,
-    GetCharFromEnd = 1 << 7,
-    GetCharFromEndLower = 1 << 8,
     GetLength = 1 << 9,
     StartsWith = 1 << 10,
     StartsWithLower = 1 << 11,

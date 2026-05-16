@@ -8,11 +8,9 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-fn GetCharAt(value: &str, index: usize) -> char { value.as_bytes()[index] as char }
-
-fn GetCharFromEnd(value: &str, from_end: usize) -> char {
+fn GetCharAt(value: &str, offset: i32) -> char {
     let bytes = value.as_bytes();
-    bytes[bytes.len() - 1 - from_end] as char
+    if offset >= 0 { bytes[offset as usize] as char } else { bytes[bytes.len().wrapping_add(offset as usize)] as char }
 }
 
 fn GetLength(value: &str) -> i32 { value.len() as i32 }
@@ -28,27 +26,27 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: &str) -> bool {
         let mut getLength: i32;
-        let mut getCharAt: char;
-        let mut getCharFromEnd: char;
+        let mut getCharAt0: char;
+        let mut getCharAtNeg1: char;
         getLength = GetLength(key);
         if ((getLength > 7))
         {
          return false;
         }
 
-        getCharAt = GetCharAt(key, 0);
-        if ((getCharAt > 'd'))
+        getCharAt0 = GetCharAt(key, 0);
+        if ((getCharAt0 > 'd'))
         {
          return false;
         }
 
-        getCharFromEnd = GetCharFromEnd(key, 0);
-        if ((getCharFromEnd > 'o'))
+        getCharAtNeg1 = GetCharAt(key, -1);
+        if ((getCharAtNeg1 > 'o'))
         {
          return false;
         }
 
-        if (((((u64::MIN & (1 << ((((getCharFromEnd as u32) & 63) as i32) as u32))) & !(u64::MIN.wrapping_sub((((getCharFromEnd as u32) >> (6 as u32)) as u64)))) | ((140883517243392 & (1 << ((((getCharFromEnd as u32) & 63) as i32) as u32))) & (u64::MIN.wrapping_sub((((getCharFromEnd as u32) >> (6 as u32)) as u64))))) == u64::MIN))
+        if (((((u64::MIN & (1 << ((((getCharAtNeg1 as u32) & 63) as i32) as u32))) & !(u64::MIN.wrapping_sub((((getCharAtNeg1 as u32) >> (6 as u32)) as u64)))) | ((140883517243392 & (1 << ((((getCharAtNeg1 as u32) & 63) as i32) as u32))) & (u64::MIN.wrapping_sub((((getCharAtNeg1 as u32) >> (6 as u32)) as u64))))) == u64::MIN))
         {
          return false;
         }
