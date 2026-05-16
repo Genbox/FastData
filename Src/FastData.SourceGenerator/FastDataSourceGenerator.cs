@@ -321,9 +321,21 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
     {
         StructureType.Auto => null,
         StructureType.Array => typeof(ArrayStructure<,>),
-        StructureType.Conditional => typeof(ConditionalStructure<,>),
         StructureType.BinarySearch => typeof(BinarySearchStructure<,>),
+        StructureType.BinarySearchInterpolation => typeof(BinarySearchInterpolationStructure<,>),
+        StructureType.BitSet => typeof(BitSetStructure<,>),
+        StructureType.BloomFilter => typeof(BloomFilterStructure<,>),
+        StructureType.Conditional => typeof(ConditionalStructure<,>),
+        StructureType.EliasFano => typeof(EliasFanoStructure<,>),
+        StructureType.HashTableCompact => typeof(HashTableCompactStructure<,>),
+        StructureType.HashTablePerfect => typeof(HashTablePerfectStructure<,>),
         StructureType.HashTable => typeof(HashTableStructure<,>),
+        StructureType.Hyble => typeof(HybleStructure<,>),
+        StructureType.KeyLength => typeof(KeyLengthStructure<,>),
+        StructureType.Pgm => typeof(PgmStructure<,>),
+        StructureType.Range => typeof(RangeStructure<,>),
+        StructureType.RrrBitVector => typeof(RrrBitVectorStructure<,>),
+        StructureType.SingleValue => typeof(SingleValueStructure<,>),
         _ => throw new ArgumentOutOfRangeException(nameof(structureType), structureType, "Unsupported structure type.")
     };
 

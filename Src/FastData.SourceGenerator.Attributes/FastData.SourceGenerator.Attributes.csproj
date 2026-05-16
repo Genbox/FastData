@@ -5,6 +5,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>false</IsPackable>
+    <DefineConstants>$(DefineConstants);SourceGen</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\FastData.Cli\StructureType.cs">
+      <Link>StructureType.cs</Link>
+    </Compile>
+  </ItemGroup>
 
 </Project>
