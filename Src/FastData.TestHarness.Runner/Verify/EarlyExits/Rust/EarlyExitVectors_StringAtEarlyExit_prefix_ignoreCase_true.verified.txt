@@ -1,0 +1,1 @@
+﻿!StringAtIgnoreCase("pre", 0, inputKey)

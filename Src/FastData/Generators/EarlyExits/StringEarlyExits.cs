@@ -103,11 +103,11 @@ internal static class StringEarlyExits
 
         // If prefix/suffix trimming is disabled, we can use them as early exits instead.
         {
-            if (config.IsEarlyExitEnabled(typeof(StringAffixEarlyExit)) && props.DeltaData.Prefix.Length != 0)
-                yield return new StringAffixEarlyExit(props.DeltaData.Prefix, ignoreCase ? nameof(StringFunctions.StartsWithIgnoreCase) : nameof(StringFunctions.StartsWith));
+            if (config.IsEarlyExitEnabled(typeof(StringAtEarlyExit)) && props.DeltaData.Prefix.Length != 0)
+                yield return new StringAtEarlyExit(props.DeltaData.Prefix, 0, ignoreCase);
 
-            if (config.IsEarlyExitEnabled(typeof(StringAffixEarlyExit)) && props.DeltaData.Suffix.Length != 0)
-                yield return new StringAffixEarlyExit(props.DeltaData.Suffix, ignoreCase ? nameof(StringFunctions.EndsWithIgnoreCase) : nameof(StringFunctions.EndsWith));
+            if (config.IsEarlyExitEnabled(typeof(StringAtEarlyExit)) && props.DeltaData.Suffix.Length != 0)
+                yield return new StringAtEarlyExit(props.DeltaData.Suffix, -props.DeltaData.Suffix.Length, ignoreCase);
         }
     }
 

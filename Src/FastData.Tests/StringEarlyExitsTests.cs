@@ -90,8 +90,8 @@ public class StringEarlyExitsTests
 
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
-        Assert.Contains(exits, static x => x is StringAffixEarlyExit { Affix: "pre" });
-        Assert.Contains(exits, static x => x is StringAffixEarlyExit { Affix: "Suf" });
+        Assert.Contains(exits, static x => x is StringAtEarlyExit { Fragment: "pre", Offset: 0 });
+        Assert.Contains(exits, static x => x is StringAtEarlyExit { Fragment: "Suf", Offset: < 0 });
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class StringEarlyExitsTests
 
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
-        Assert.DoesNotContain(exits, static x => x is StringAffixEarlyExit { Affix: "ab" });
+        Assert.DoesNotContain(exits, static x => x is StringAtEarlyExit { Fragment: "ab" });
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class StringEarlyExitsTests
         string[] keys = ["abaaaaaa", "abbbbbbb", "abccccccc"];
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
-        Assert.Contains(exits, static x => x is StringAffixEarlyExit { Affix: "ab" });
+        Assert.Contains(exits, static x => x is StringAtEarlyExit { Fragment: "ab" });
 
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, false, GeneratorEncoding.Utf16CodeUnits);
         int minLength = props.LengthData.LengthRanges.Min;

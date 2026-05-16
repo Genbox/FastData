@@ -1,0 +1,1 @@
+﻿!StringAtIgnoreCase("suf", -3, inputKey)

@@ -216,9 +216,9 @@ public static partial class FastDataGenerator
 
         // When trimming is active, add prefix/suffix checks as early exits
         if (trimPrefix.Length > 0)
-            earlyExits.Add(new StringAffixEarlyExit(trimPrefix, cfg.IgnoreCase ? nameof(StringFunctions.StartsWithIgnoreCase) : nameof(StringFunctions.StartsWith)));
+            earlyExits.Add(new StringAtEarlyExit(trimPrefix, 0, cfg.IgnoreCase));
         if (trimSuffix.Length > 0)
-            earlyExits.Add(new StringAffixEarlyExit(trimSuffix, cfg.IgnoreCase ? nameof(StringFunctions.EndsWithIgnoreCase) : nameof(StringFunctions.EndsWith)));
+            earlyExits.Add(new StringAtEarlyExit(trimSuffix, -trimSuffix.Length, cfg.IgnoreCase));
 
         if (cfg.EarlyExitConfig.OptimizeExpression)
             ReduceExits(earlyExits);

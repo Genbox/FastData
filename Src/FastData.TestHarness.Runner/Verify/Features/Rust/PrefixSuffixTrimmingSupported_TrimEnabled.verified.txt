@@ -8,9 +8,10 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-fn StartsWith(prefix: &str, value: &str) -> bool { value.starts_with(prefix) }
-
-fn EndsWith(suffix: &str, value: &str) -> bool { value.ends_with(suffix) }
+fn StringAt(fragment: &str, offset: i32, value: &str) -> bool {
+    let start = if offset >= 0 { offset as usize } else { value.len().wrapping_add(offset as usize) };
+    &value[start..start + fragment.len()] == fragment
+}
 
 
 pub struct fastdata;
@@ -22,12 +23,12 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
-        if (!StartsWith("Pre", key))
+        if (!StringAt("Pre", 0, key))
         {
          return false;
         }
 
-        if (!EndsWith("Suf", key))
+        if (!StringAt("Suf", -3, key))
         {
          return false;
         }

@@ -19,10 +19,8 @@ public sealed class CSharpEarlyExitTests(DockerCSharpFixture fixture) : EarlyExi
               private static char GetCharAt(string str, int offset) => offset >= 0 ? str[offset] : str[str.Length + offset];
               private static char GetCharAtLower(string str, int offset) => char.ToLowerInvariant(offset >= 0 ? str[offset] : str[str.Length + offset]);
               private static int GetLength(string str) => str.Length;
-              private static bool StartsWith(string prefix, string str) => str.StartsWith(prefix, StringComparison.Ordinal);
-              private static bool StartsWithIgnoreCase(string prefix, string str) => str.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
-              private static bool EndsWith(string prefix, string str) => str.EndsWith(prefix, StringComparison.Ordinal);
-              private static bool EndsWithIgnoreCase(string prefix, string str) => str.EndsWith(prefix, StringComparison.OrdinalIgnoreCase);
+              private static bool StringAt(string fragment, int offset, string str) { int start = offset >= 0 ? offset : str.Length + offset; return string.Compare(str, start, fragment, 0, fragment.Length, StringComparison.Ordinal) == 0; }
+              private static bool StringAtIgnoreCase(string fragment, int offset, string str) { int start = offset >= 0 ? offset : str.Length + offset; return string.Compare(str, start, fragment, 0, fragment.Length, StringComparison.OrdinalIgnoreCase) == 0; }
 
               public static int Main()
               {

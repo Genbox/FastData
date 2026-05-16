@@ -12,8 +12,6 @@ public static class StringFunctions
     public static char GetCharAt(string str, int offset) => offset >= 0 ? str[offset] : str[str.Length + offset];
     public static char GetCharAtLower(string str, int offset) => char.ToLowerInvariant(offset >= 0 ? str[offset] : str[str.Length + offset]);
     public static int GetLength(string str) => str.Length;
-    public static bool StartsWith(string prefix, string str) => str.StartsWith(prefix, StringComparison.Ordinal);
-    public static bool StartsWithIgnoreCase(string prefix, string str) => str.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
-    public static bool EndsWith(string prefix, string str) => str.EndsWith(prefix, StringComparison.Ordinal);
-    public static bool EndsWithIgnoreCase(string prefix, string str) => str.EndsWith(prefix, StringComparison.OrdinalIgnoreCase);
+    public static bool StringAt(string fragment, int offset, string str) { int start = offset >= 0 ? offset : str.Length + offset; return string.Compare(str, start, fragment, 0, fragment.Length, StringComparison.Ordinal) == 0; }
+    public static bool StringAtIgnoreCase(string fragment, int offset, string str) { int start = offset >= 0 ? offset : str.Length + offset; return string.Compare(str, start, fragment, 0, fragment.Length, StringComparison.OrdinalIgnoreCase) == 0; }
 }

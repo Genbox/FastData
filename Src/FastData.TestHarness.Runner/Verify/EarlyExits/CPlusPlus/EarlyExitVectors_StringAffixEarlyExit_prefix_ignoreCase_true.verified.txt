@@ -1,1 +1,0 @@
-﻿!StartsWithIgnoreCase(u8"pre", inputKey)

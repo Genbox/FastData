@@ -33,40 +33,19 @@ public sealed class RustEarlyExitTests(DockerRustFixture fixture) : EarlyExitTes
           }
           fn GetLength(value: &str) -> i32 { value.len() as i32 }
 
-          fn StartsWith(prefix: &str, value: &str) -> bool { value.starts_with(prefix) }
-          fn StartsWithIgnoreCase(prefix: &str, value: &str) -> bool {
-              let prefix_bytes = prefix.as_bytes();
-              let value_bytes = value.as_bytes();
-
-              if value_bytes.len() < prefix_bytes.len() {
-                  return false;
-              }
-
-              for i in 0..prefix_bytes.len() {
-                  if ToLowerAscii(value_bytes[i]) != ToLowerAscii(prefix_bytes[i]) {
-                      return false;
-                  }
-              }
-
-              true
+          fn StringAt(fragment: &str, offset: i32, value: &str) -> bool {
+              let start = if offset >= 0 { offset as usize } else { value.len().wrapping_add(offset as usize) };
+              &value[start..start + fragment.len()] == fragment
           }
-
-          fn EndsWith(suffix: &str, value: &str) -> bool { value.ends_with(suffix) }
-          fn EndsWithIgnoreCase(suffix: &str, value: &str) -> bool {
-              let suffix_bytes = suffix.as_bytes();
+          fn StringAtIgnoreCase(fragment: &str, offset: i32, value: &str) -> bool {
+              let frag_bytes = fragment.as_bytes();
               let value_bytes = value.as_bytes();
-
-              if value_bytes.len() < suffix_bytes.len() {
-                  return false;
-              }
-
-              let start = value_bytes.len() - suffix_bytes.len();
-              for i in 0..suffix_bytes.len() {
-                  if ToLowerAscii(value_bytes[start + i]) != ToLowerAscii(suffix_bytes[i]) {
+              let start = if offset >= 0 { offset as usize } else { value_bytes.len().wrapping_add(offset as usize) };
+              for i in 0..frag_bytes.len() {
+                  if ToLowerAscii(value_bytes[start + i]) != ToLowerAscii(frag_bytes[i]) {
                       return false;
                   }
               }
-
               true
           }
 

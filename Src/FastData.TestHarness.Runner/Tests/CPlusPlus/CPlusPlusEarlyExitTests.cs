@@ -26,46 +26,20 @@ public sealed class CPlusPlusEarlyExitTests(DockerCPlusPlusFixture fixture) : Ea
           static char GetCharAtLower(std::string_view str, int32_t offset) { return ToLowerAscii(offset >= 0 ? str[offset] : str[str.length() + offset]); }
           static int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }
 
-          static bool StartsWith(std::string_view prefix, std::string_view str)
+          static bool StringAt(std::string_view fragment, int32_t offset, std::string_view str)
           {
-              if (str.length() < prefix.length())
-                  return false;
-              return str.compare(0, prefix.length(), prefix) == 0;
+              size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset;
+              return str.compare(start, fragment.length(), fragment) == 0;
           }
 
-          static bool StartsWithIgnoreCase(std::string_view prefix, std::string_view str)
+          static bool StringAtIgnoreCase(std::string_view fragment, int32_t offset, std::string_view str)
           {
-              if (str.length() < prefix.length())
-                  return false;
-
-              for (std::size_t i = 0; i < prefix.length(); ++i)
+              size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset;
+              for (size_t i = 0; i < fragment.length(); ++i)
               {
-                  if (ToLowerAscii(str[i]) != ToLowerAscii(prefix[i]))
+                  if (ToLowerAscii(str[start + i]) != ToLowerAscii(fragment[i]))
                       return false;
               }
-
-              return true;
-          }
-
-          static bool EndsWith(std::string_view suffix, std::string_view str)
-          {
-              if (str.length() < suffix.length())
-                  return false;
-              return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
-          }
-
-          static bool EndsWithIgnoreCase(std::string_view suffix, std::string_view str)
-          {
-              if (str.length() < suffix.length())
-                  return false;
-
-              std::size_t offset = str.length() - suffix.length();
-              for (std::size_t i = 0; i < suffix.length(); ++i)
-              {
-                  if (ToLowerAscii(str[offset + i]) != ToLowerAscii(suffix[i]))
-                      return false;
-              }
-
               return true;
           }
 

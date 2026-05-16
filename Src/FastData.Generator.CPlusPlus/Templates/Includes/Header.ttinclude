@@ -39,7 +39,7 @@ class <#= CPlusPlusConfig.ClassName #> final {
 <#
     if (GeneratorConfig is StringGeneratorConfig strCfg2)
     {
-        if (strCfg2.IgnoreCase || (strCfg2.StringFunctions & (StringFunction.GetCharAtLower | StringFunction.StartsWithLower | StringFunction.EndsWithLower)) != 0)
+        if (strCfg2.IgnoreCase || (strCfg2.StringFunctions & (StringFunction.GetCharAtLower | StringFunction.StringAtLower)) != 0)
         {
 #>
     static constexpr char ToLowerAscii(char value) {
@@ -101,55 +101,20 @@ class <#= CPlusPlusConfig.ClassName #> final {
 
             { StringFunction.GetLength, "constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }" },
 
-            { StringFunction.StartsWith, """
-    constexpr bool StartsWith(std::string_view prefix, std::string_view str) {
-        if (str.length() < prefix.length())
-            return false;
-
-        for (size_t i = 0; i < prefix.length(); ++i) {
-            if (str[i] != prefix[i])
-                return false;
-        }
-
-        return true;
+            { StringFunction.StringAt, """
+    constexpr bool StringAt(std::string_view fragment, int32_t offset, std::string_view str) {
+        size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset;
+        return str.compare(start, fragment.length(), fragment) == 0;
     }
 """ },
-            { StringFunction.StartsWithLower, """
-    constexpr bool StartsWithIgnoreCase(std::string_view prefix, std::string_view str) {
-        if (str.length() < prefix.length())
+            { StringFunction.StringAtLower, """
+    constexpr bool StringAtIgnoreCase(std::string_view fragment, int32_t offset, std::string_view str) {
+        size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset;
+        if (start + fragment.length() > str.length())
             return false;
 
-        for (size_t i = 0; i < prefix.length(); ++i) {
-            if (ToLowerAscii(str[i]) != ToLowerAscii(prefix[i]))
-                return false;
-        }
-
-        return true;
-    }
-""" },
-
-            { StringFunction.EndsWith, """
-    constexpr bool EndsWith(std::string_view suffix, std::string_view str) {
-        if (str.length() < suffix.length())
-            return false;
-
-        size_t offset = str.length() - suffix.length();
-        for (size_t i = 0; i < suffix.length(); ++i) {
-            if (str[offset + i] != suffix[i])
-                return false;
-        }
-
-        return true;
-    }
-""" },
-            { StringFunction.EndsWithLower, """
-    constexpr bool EndsWithIgnoreCase(std::string_view suffix, std::string_view str) {
-        if (str.length() < suffix.length())
-            return false;
-
-        size_t offset = str.length() - suffix.length();
-        for (size_t i = 0; i < suffix.length(); ++i) {
-            if (ToLowerAscii(str[offset + i]) != ToLowerAscii(suffix[i]))
+        for (size_t i = 0; i < fragment.length(); ++i) {
+            if (ToLowerAscii(str[start + i]) != ToLowerAscii(fragment[i]))
                 return false;
         }
 

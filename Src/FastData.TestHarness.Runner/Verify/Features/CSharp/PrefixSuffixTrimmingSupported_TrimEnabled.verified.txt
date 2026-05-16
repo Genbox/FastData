@@ -9,8 +9,7 @@ using System.Runtime.InteropServices;
 internal static class FastData
 {
 
-    private static bool StartsWith(string prefix, string str) => str.StartsWith(prefix, StringComparison.Ordinal);
-    private static bool EndsWith(string prefix, string str) => str.EndsWith(prefix, StringComparison.Ordinal);
+    private static bool StringAt(string fragment, int offset, string str) { int start = offset >= 0 ? offset : str.Length + offset; return string.Compare(str, start, fragment, 0, fragment.Length, StringComparison.Ordinal) == 0; }
 
     private static readonly string[] _keys = new string[] {
         "Alpha", "Bravo", "Charlie"
@@ -19,12 +18,12 @@ internal static class FastData
     
     public static bool Contains(string key)
     {
-        if (!StartsWith("Pre", key))
+        if (!StringAt("Pre", 0, key))
         {
          return false;
         }
 
-        if (!EndsWith("Suf", key))
+        if (!StringAt("Suf", -3, key))
         {
          return false;
         }

@@ -11,8 +11,6 @@ public enum StringFunction
     GetCharAt = 1 << 5,
     GetCharAtLower = 1 << 6,
     GetLength = 1 << 9,
-    StartsWith = 1 << 10,
-    StartsWithLower = 1 << 11,
-    EndsWith = 1 << 12,
-    EndsWithLower = 1 << 13
+    StringAt = 1 << 10,
+    StringAtLower = 1 << 11
 }
