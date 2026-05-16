@@ -1,0 +1,102 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.HybleContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HybleTemplateData" name="Data" #>
+
+<#
+    string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
+    bool useEntryStruct = Data.ValueCount > 0;
+    string entryTypeName = useEntryStruct ? "E" : KeyTypeName;
+#>
+<#
+    if (useEntryStruct)
+    {
+#>
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
+    {
+        internal <#= KeyTypeName #> Key;
+        internal <#= ValueTypeName #> Value;
+
+        internal E(<#= KeyTypeName #> key, <#= ValueTypeName #> value)
+        {
+            Key = key;
+            Value = value;
+        }
+    }
+<#
+    }
+#>
+
+    <#= FieldModifier #><#= entryTypeName #>[] _entries = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, (i, x) =>
+    {
+        if (!useEntryStruct)
+            return TypeMap.ToValueLabel(x);
+
+        return $"new E({TypeMap.ToValueLabel(x)}, {valueLabels[i]})";
+    }, 8) #>
+    };
+
+    <#= FieldModifier #>ushort[] _displacements = {
+<#= FormatHelper.FormatColumns(Data.Displacements, (_, x) => x.ToStringInvariant(), 8) #>
+    };
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static uint Reduce64(ulong hash, uint range)
+    {
+#if NET5_0_OR_GREATER
+        return (uint)Math.BigMul(hash, range, out _);
+#else
+        ulong lo = (uint)hash;
+        ulong hi = hash >> 32;
+        ulong loProduct = lo * range;
+        ulong hiProduct = hi * range;
+        ulong carry = (loProduct >> 32) + (uint)hiProduct;
+        return (uint)((carry >> 32) + (hiProduct >> 32));
+#endif
+    }
+
+<#= HashSource #>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
+    {
+<#= GetMethodHeader(MethodType.Contains) #>
+
+        ulong hash = unchecked(Hash(<#= LookupKeyName #>) * <#= Data.Seed.ToStringInvariant() #>UL);
+        uint approx = Reduce64(hash, <#= Data.ApproxRange.ToStringInvariant() #>U);
+        int bucket = (int)(hash & <#= Data.BucketMask.ToStringInvariant() #>UL);
+        int index = (int)(approx + _displacements[bucket]);
+        ref var entry = ref _entries[index];
+
+        return <#= GetEqual(LookupKeyName, useEntryStruct ? "entry.Key" : "entry") #>;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool TryLookup(<#= KeyTypeName #> key, out <#= ValueTypeName #> value)
+    {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+
+        ulong hash = unchecked(Hash(<#= LookupKeyName #>) * <#= Data.Seed.ToStringInvariant() #>UL);
+        uint approx = Reduce64(hash, <#= Data.ApproxRange.ToStringInvariant() #>U);
+        int bucket = (int)(hash & <#= Data.BucketMask.ToStringInvariant() #>UL);
+        int index = (int)(approx + _displacements[bucket]);
+        ref E entry = ref _entries[index];
+
+        if (<#= GetEqual(LookupKeyName, "entry.Key") #>)
+        {
+            value = entry.Value;
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

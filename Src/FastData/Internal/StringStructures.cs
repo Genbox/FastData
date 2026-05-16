@@ -28,6 +28,9 @@ internal static class StringStructures
         if (hashData.HashCodesPerfect)
             return typeof(HashTablePerfectStructure<,>);
 
+        if (config.IsEnabled(typeof(HybleStructure<,>)))
+            return typeof(HybleStructure<,>);
+
         return typeof(HashTableStructure<,>);
     }
 }

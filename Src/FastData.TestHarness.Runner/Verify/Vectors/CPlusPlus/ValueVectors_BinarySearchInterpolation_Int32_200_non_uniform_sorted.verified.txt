@@ -1,0 +1,78 @@
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
+// Structure: BinarySearchInterpolation
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+
+class fastdata final {
+
+
+    static constexpr std::array<int32_t, 200> keys = {
+        153, 157, 162, 168, 175, 183, 192, 195, 199, 204, 
+        210, 217, 225, 234, 237, 241, 246, 252, 259, 267, 
+        276, 279, 283, 338, 344, 351, 359, 368, 371, 375, 
+        380, 386, 393, 401, 410, 413, 417, 422, 428, 435, 
+        443, 452, 455, 459, 464, 470, 527, 535, 544, 547, 
+        551, 556, 562, 569, 577, 586, 589, 593, 598, 604, 
+        611, 619, 628, 631, 635, 640, 646, 653, 661, 720, 
+        723, 727, 732, 738, 745, 753, 762, 765, 769, 774, 
+        780, 787, 795, 804, 807, 811, 816, 822, 829, 837, 
+        846, 849, 903, 908, 914, 921, 929, 938, 941, 945, 
+        950, 956, 963, 971, 980, 983, 987, 992, 998, 1005, 
+        1013, 1022, 1025, 1029, 1034, 1090, 1097, 1105, 1114, 1117, 
+        1121, 1126, 1132, 1139, 1147, 1156, 1159, 1163, 1168, 1174, 
+        1181, 1189, 1198, 1201, 1205, 1210, 1216, 1223, 1281, 1290, 
+        1293, 1297, 1302, 1308, 1315, 1323, 1332, 1335, 1339, 1344, 
+        1350, 1357, 1365, 1374, 1377, 1381, 1386, 1392, 1399, 1407, 
+        1416, 1469, 1473, 1478, 1484, 1491, 1499, 1508, 1511, 1515, 
+        1520, 1526, 1533, 1541, 1550, 1553, 1557, 1562, 1568, 1575, 
+        1583, 1592, 1595, 1599, 1654, 1660, 1667, 1675, 1684, 1687, 
+        1691, 1696, 1702, 1709, 1717, 1726, 1729, 1733, 1738, 1744
+    };
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+
+        int32_t lo = 0;
+        int32_t hi = 199;
+        while (lo <= hi && key >= keys[lo] && key <= keys[hi]) {
+            const int32_t lo_key = keys[lo];
+            const int32_t hi_key = keys[hi];
+
+            if (lo_key == hi_key) {
+                if (lo_key == key)
+                    return true;
+
+                break;
+            }
+
+            const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
+            const double offset = static_cast<double>(key) - static_cast<double>(lo_key);
+            int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+
+            if (mid < lo)
+                mid = lo;
+            else if (mid > hi)
+                mid = hi;
+
+            const int32_t mid_key = keys[mid];
+            if (mid_key == key)
+                return true;
+            if (mid_key < key)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 200;
+    static constexpr int32_t min_key = 153;
+    static constexpr int32_t max_key = 1744;
+};

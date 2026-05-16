@@ -215,11 +215,50 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
                     ValueCount = perfectCtx.Values.Length
                 };
 
+            case HybleContext<TKey, TValue> hybleCtx:
+                return new HybleTemplateData
+                {
+                    Keys = hybleCtx.Data.Select(x => x.Key).Cast<object>(),
+                    KeyCount = hybleCtx.Data.Length,
+                    Displacements = hybleCtx.Displacements,
+                    ApproxRange = hybleCtx.ApproxRange,
+                    BucketMask = hybleCtx.BucketMask,
+                    Values = hybleCtx.Values.ToObjects(),
+                    ValueCount = hybleCtx.Values.Length,
+                    Seed = hybleCtx.Seed
+                };
+
             case RrrBitVectorContext:
                 return null;
 
             case EliasFanoContext<TKey>:
                 return null;
+
+            case PgmContext<TKey, TValue> pgmCtx when typeof(TKey).IsValueType:
+                PgmSegmentTemplateData[] pgmSegments = new PgmSegmentTemplateData[pgmCtx.Segments.Length];
+
+                for (int i = 0; i < pgmCtx.Segments.Length; i++)
+                {
+                    pgmSegments[i] = new PgmSegmentTemplateData
+                    {
+                        Key = pgmCtx.Segments[i].Key!,
+                        Slope = pgmCtx.Segments[i].Slope,
+                        Intercept = pgmCtx.Segments[i].Intercept
+                    };
+                }
+
+                return new PgmTemplateData
+                {
+                    Keys = pgmCtx.Keys.ToObjects(),
+                    KeyCount = pgmCtx.Keys.Length,
+                    Values = pgmCtx.Values.ToObjects(),
+                    ValueCount = pgmCtx.Values.Length,
+                    Segments = pgmSegments,
+                    LevelsOffsets = pgmCtx.LevelsOffsets,
+                    SegmentCount = pgmCtx.SegmentCount,
+                    Epsilon = pgmCtx.Epsilon,
+                    EpsilonRecursive = pgmCtx.EpsilonRecursive
+                };
 
             default:
                 throw new InvalidOperationException("No template mapping found for context type: " + context.GetType().FullName);

@@ -1,0 +1,80 @@
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
+// Structure: Pgm
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+
+class fastdata final {
+
+
+    inline static const std::array<int32_t, 3> values = {
+        1, 2, 3
+    };
+    static constexpr std::array<int32_t, 3> keys = {
+        1, 2, 3
+    };
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+
+        const double product = static_cast<double>(22.333334f) * static_cast<double>(static_cast<uint32_t>(key) - static_cast<uint32_t>(1));
+        int32_t pos = product <= 0.0 ? 0 : (product >= static_cast<double>(3) ? 3 : static_cast<int32_t>(product));
+        if (pos > 3) pos = 3;
+
+        size_t lo = pos >= 64 ? static_cast<size_t>(pos - 64) : 0;
+        size_t hi = static_cast<size_t>(pos) + 66;
+        if (hi > 3) hi = 3;
+
+        while (lo < hi) {
+            const size_t mid = lo + ((hi - lo) >> 1);
+            const int32_t mid_key = keys[mid];
+            if (mid_key == key)
+                return true;
+            if (mid_key < key)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+
+        return false;
+    }
+
+    [[nodiscard]]
+    static bool try_lookup(const int32_t key, const int32_t*& value) noexcept {
+
+        const double product = static_cast<double>(22.333334f) * static_cast<double>(static_cast<uint32_t>(key) - static_cast<uint32_t>(1));
+        int32_t pos = product <= 0.0 ? 0 : (product >= static_cast<double>(3) ? 3 : static_cast<int32_t>(product));
+        if (pos > 3) pos = 3;
+
+        size_t lo = pos >= 64 ? static_cast<size_t>(pos - 64) : 0;
+        size_t hi = static_cast<size_t>(pos) + 66;
+        if (hi > 3) hi = 3;
+
+        while (lo < hi) {
+            const size_t mid = lo + ((hi - lo) >> 1);
+            const int32_t mid_key = keys[mid];
+
+            if (mid_key == key) {
+                value = &values[mid];
+                return true;
+            }
+
+            if (mid_key < key)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+
+        value = nullptr;
+        return false;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 3;
+};

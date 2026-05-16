@@ -1,0 +1,83 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Pgm
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+
+pub struct fastdata;
+impl fastdata {
+
+    const KEYS: [i32; 5] = [
+        1, 2, 3, 4, 5
+    ];
+
+    const SEG_KEYS: [i32; 3] = [
+        1, 6, i32::MAX
+    ];
+
+    const SEG_SLOPES: [f32; 3] = [
+        13.8_f32, 0.0_f32, 0.0_f32
+    ];
+
+    const SEG_INTERCEPTS: [i32; 3] = [
+        0_i32, 5_i32, 5_i32
+    ];
+
+    fn evaluate_segment(seg: usize, key: i32) -> i32 {
+        let pos: i32 = ((Self::SEG_SLOPES[seg] as f64) * ((key as u32).wrapping_sub(Self::SEG_KEYS[seg] as u32)) as f64) as i32;
+        if pos < 0 { 0 } else { pos + Self::SEG_INTERCEPTS[seg] }
+    }
+
+    fn get_segment_pos(key: i32) -> i32 {
+        let mut seg: usize = 0;
+        let mut seg_hi: usize = 1;
+        while seg < seg_hi {
+            let mid: usize = seg + ((seg_hi - seg) >> 1);
+            if Self::SEG_KEYS[mid + 1] <= key {
+                seg = mid + 1;
+            } else {
+                seg_hi = mid;
+            }
+        }
+
+        let mut pos: i32 = Self::evaluate_segment(seg, key);
+        let next_intercept: i32 = Self::SEG_INTERCEPTS[seg + 1];
+        if pos > next_intercept { pos = next_intercept; }
+        pos
+    }
+
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+
+        let pos: i32 = Self::get_segment_pos(key);
+
+        let lo_raw: i32 = pos - 64;
+        let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
+        let mut hi: usize = (pos as usize) + 66;
+        if hi > 5 { hi = 5; }
+
+        while lo < hi {
+            let mid: usize = lo + ((hi - lo) >> 1);
+            let mid_key: i32 = Self::KEYS[mid];
+            if mid_key == key {
+                return true;
+            }
+            if mid_key < key {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 5;
+}

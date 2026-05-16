@@ -1,0 +1,315 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.PgmTemplateData" name="Data" #>
+
+<#
+    // Unsigned wrapping subtraction for signed integer types (pgm_index.hpp:256-259)
+    string cppDiffExpr;
+    if (Model.KeyType == typeof(int))
+        cppDiffExpr = "static_cast<double>(static_cast<uint32_t>(key) - static_cast<uint32_t>({0}))";
+    else if (Model.KeyType == typeof(long))
+        cppDiffExpr = "static_cast<double>(static_cast<uint64_t>(key) - static_cast<uint64_t>({0}))";
+    else
+        cppDiffExpr = "static_cast<double>(key - {0})";
+
+    bool singleSegment = Data.SegmentCount == 1;
+    bool hasRecursiveLevels = Data.EpsilonRecursive > 0 && Data.LevelsOffsets.Length > 2;
+    int linearSearchThreshold = 64;
+
+    string segKeyConst = singleSegment ? TypeMap.ToValueLabel(Data.Segments[0].Key) : "";
+    float seg0Slope = singleSegment ? Data.Segments[0].Slope : 0;
+    int seg0Intercept = singleSegment ? Data.Segments[0].Intercept : 0;
+    int seg0MaxProduct = singleSegment ? Math.Max(0, Data.KeyCount - seg0Intercept) : 0;
+
+    Func<float, string> formatSlope = slope => {
+        string s = slope.ToString("R", System.Globalization.CultureInfo.InvariantCulture);
+        return s.Contains('.') || s.Contains('E') || s.Contains('e') ? s + "f" : s + ".0f";
+    };
+
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    };
+<#
+    }
+#>
+    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+    };
+<#
+    if (!singleSegment)
+    {
+#>
+
+    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.Segments.Length.ToStringInvariant() #>> seg_keys = {
+<#= FormatHelper.FormatColumns(Data.Segments.Select(s => s.Key), Data.Segments.Length, TypeMap.ToValueLabel, 8) #>
+    };
+
+    <#= FieldModifier(true) #>std::array<float, <#= Data.Segments.Length.ToStringInvariant() #>> seg_slopes = {
+<#= FormatHelper.FormatColumns(Data.Segments.Select(s => (object)s.Slope), Data.Segments.Length, o => formatSlope((float)o), 8) #>
+    };
+
+    <#= FieldModifier(true) #>std::array<int32_t, <#= Data.Segments.Length.ToStringInvariant() #>> seg_intercepts = {
+<#= FormatHelper.FormatColumns(Data.Segments.Select(s => (object)s.Intercept), Data.Segments.Length, o => ((int)o).ToStringInvariant(), 8) #>
+    };
+
+    static constexpr int32_t evaluate_segment(const size_t seg, const <#= KeyTypeName #> key) noexcept {
+        const double product = static_cast<double>(seg_slopes[seg]) * <#= string.Format(cppDiffExpr, "seg_keys[seg]") #>;
+        if (product <= 0.0)
+            return 0;
+
+        // Clamp before narrowing; out-of-range floating-to-integer casts are undefined in C++.
+        const int32_t max_pos = std::numeric_limits<int32_t>::max() - seg_intercepts[seg];
+        if (product >= static_cast<double>(max_pos))
+            return std::numeric_limits<int32_t>::max();
+        return static_cast<int32_t>(product) + seg_intercepts[seg];
+    }
+
+    static constexpr int32_t get_segment_pos(const <#= KeyTypeName #> key) noexcept {
+<#
+        if (!hasRecursiveLevels)
+        {
+#>
+        size_t seg = 0;
+        size_t seg_hi = <#= (Data.SegmentCount - 1).ToStringInvariant() #>;
+        while (seg < seg_hi) {
+            const size_t mid = seg + ((seg_hi - seg) >> 1);
+            if (seg_keys[mid + 1] <= key)
+                seg = mid + 1;
+            else
+                seg_hi = mid;
+        }
+
+        int32_t pos = evaluate_segment(seg, key);
+        const int32_t next_intercept = seg_intercepts[seg + 1];
+        if (pos > next_intercept) pos = next_intercept;
+        return pos;
+<#
+        }
+        else
+        {
+            int rootSegOffset = Data.LevelsOffsets[Data.LevelsOffsets.Length - 2];
+#>
+        size_t seg = <#= rootSegOffset.ToStringInvariant() #>;
+<#
+            for (int level = Data.LevelsOffsets.Length - 3; level >= 0; level--)
+            {
+                int levelBegin = Data.LevelsOffsets[level];
+                int levelEnd = Data.LevelsOffsets[level + 1];
+                int levelSize = levelEnd - levelBegin - 1;
+                int sentinel = levelEnd - 1;
+                int epsRec = Data.EpsilonRecursive;
+                bool useBinarySearch = epsRec > linearSearchThreshold;
+#>
+
+        {
+            int32_t pos = evaluate_segment(seg, key);
+            const int32_t next_intercept = seg_intercepts[seg + 1];
+            if (pos > next_intercept) pos = next_intercept;
+
+            const size_t lo = pos > <#= (epsRec + 1).ToStringInvariant() #> ? static_cast<size_t>(pos - <#= (epsRec + 1).ToStringInvariant() #>) : 0;
+<#
+                if (useBinarySearch)
+                {
+#>
+
+            size_t hi = static_cast<size_t>(pos) + <#= (epsRec + 2).ToStringInvariant() #>;
+            if (hi > <#= levelSize.ToStringInvariant() #>) hi = <#= levelSize.ToStringInvariant() #>;
+
+            seg = <#= levelBegin.ToStringInvariant() #> + lo;
+            size_t seg_hi = <#= levelBegin.ToStringInvariant() #> + hi;
+            while (seg < seg_hi) {
+                const size_t mid = seg + ((seg_hi - seg) >> 1);
+                if (seg_keys[mid + 1] <= key)
+                    seg = mid + 1;
+                else
+                    seg_hi = mid;
+            }
+<#
+                }
+                else
+                {
+#>
+
+            seg = <#= levelBegin.ToStringInvariant() #> + lo;
+            while (seg + 1 < <#= sentinel.ToStringInvariant() #> && seg_keys[seg + 1] <= key)
+                ++seg;
+<#
+                }
+#>
+        }
+<#
+            }
+#>
+
+        {
+            int32_t pos = evaluate_segment(seg, key);
+            const int32_t next_intercept = seg_intercepts[seg + 1];
+            if (pos > next_intercept) pos = next_intercept;
+            return pos;
+        }
+<#
+        }
+#>
+    }
+<#
+    }
+#>
+
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+<#
+    if (singleSegment)
+    {
+        if (seg0Slope == 0)
+        {
+#>
+        int32_t pos = <#= seg0Intercept.ToStringInvariant() #>;
+<#
+        }
+        else
+        {
+#>
+        const double product = static_cast<double>(<#= formatSlope(seg0Slope) #>) * <#= string.Format(cppDiffExpr, segKeyConst) #>;
+        int32_t pos = product <= 0.0 ? 0 : (product >= static_cast<double>(<#= seg0MaxProduct.ToStringInvariant() #>) ? <#= seg0MaxProduct.ToStringInvariant() #> : static_cast<int32_t>(product));
+<#          if (seg0Intercept != 0) { #>
+        pos += <#= seg0Intercept.ToStringInvariant() #>;
+<#          } #>
+        if (pos > <#= Data.KeyCount.ToStringInvariant() #>) pos = <#= Data.KeyCount.ToStringInvariant() #>;
+<#
+        }
+#>
+
+        size_t lo = pos >= <#= Data.Epsilon.ToStringInvariant() #> ? static_cast<size_t>(pos - <#= Data.Epsilon.ToStringInvariant() #>) : 0;
+        size_t hi = static_cast<size_t>(pos) + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+        if (hi > <#= Data.KeyCount.ToStringInvariant() #>) hi = <#= Data.KeyCount.ToStringInvariant() #>;
+
+        while (lo < hi) {
+            const size_t mid = lo + ((hi - lo) >> 1);
+            const <#= KeyTypeName #> mid_key = keys[mid];
+            if (mid_key == <#= LookupKeyName #>)
+                return true;
+            if (mid_key < <#= LookupKeyName #>)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+
+        return false;
+<#
+    }
+    else
+    {
+#>
+        const int32_t pos = get_segment_pos(<#= LookupKeyName #>);
+
+        size_t lo = pos >= <#= Data.Epsilon.ToStringInvariant() #> ? static_cast<size_t>(pos - <#= Data.Epsilon.ToStringInvariant() #>) : 0;
+        size_t hi = static_cast<size_t>(pos) + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+        if (hi > <#= Data.KeyCount.ToStringInvariant() #>) hi = <#= Data.KeyCount.ToStringInvariant() #>;
+
+        while (lo < hi) {
+            const size_t mid = lo + ((hi - lo) >> 1);
+            const <#= KeyTypeName #> mid_key = keys[mid];
+            if (mid_key == <#= LookupKeyName #>)
+                return true;
+            if (mid_key < <#= LookupKeyName #>)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+
+        return false;
+<#
+    }
+#>
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+<#
+        if (singleSegment)
+        {
+            if (seg0Slope == 0)
+            {
+#>
+        int32_t pos = <#= seg0Intercept.ToStringInvariant() #>;
+<#
+            }
+            else
+            {
+#>
+        const double product = static_cast<double>(<#= formatSlope(seg0Slope) #>) * <#= string.Format(cppDiffExpr, segKeyConst) #>;
+        int32_t pos = product <= 0.0 ? 0 : (product >= static_cast<double>(<#= seg0MaxProduct.ToStringInvariant() #>) ? <#= seg0MaxProduct.ToStringInvariant() #> : static_cast<int32_t>(product));
+<#              if (seg0Intercept != 0) { #>
+        pos += <#= seg0Intercept.ToStringInvariant() #>;
+<#              } #>
+        if (pos > <#= Data.KeyCount.ToStringInvariant() #>) pos = <#= Data.KeyCount.ToStringInvariant() #>;
+<#
+            }
+#>
+
+        size_t lo = pos >= <#= Data.Epsilon.ToStringInvariant() #> ? static_cast<size_t>(pos - <#= Data.Epsilon.ToStringInvariant() #>) : 0;
+        size_t hi = static_cast<size_t>(pos) + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+        if (hi > <#= Data.KeyCount.ToStringInvariant() #>) hi = <#= Data.KeyCount.ToStringInvariant() #>;
+
+        while (lo < hi) {
+            const size_t mid = lo + ((hi - lo) >> 1);
+            const <#= KeyTypeName #> mid_key = keys[mid];
+
+            if (mid_key == <#= LookupKeyName #>) {
+                value = &values[mid];
+                return true;
+            }
+
+            if (mid_key < <#= LookupKeyName #>)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+
+        value = nullptr;
+        return false;
+<#
+        }
+        else
+        {
+#>
+        const int32_t pos = get_segment_pos(<#= LookupKeyName #>);
+
+        size_t lo = pos >= <#= Data.Epsilon.ToStringInvariant() #> ? static_cast<size_t>(pos - <#= Data.Epsilon.ToStringInvariant() #>) : 0;
+        size_t hi = static_cast<size_t>(pos) + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+        if (hi > <#= Data.KeyCount.ToStringInvariant() #>) hi = <#= Data.KeyCount.ToStringInvariant() #>;
+
+        while (lo < hi) {
+            const size_t mid = lo + ((hi - lo) >> 1);
+            const <#= KeyTypeName #> mid_key = keys[mid];
+
+            if (mid_key == <#= LookupKeyName #>) {
+                value = &values[mid];
+                return true;
+            }
+
+            if (mid_key < <#= LookupKeyName #>)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+
+        value = nullptr;
+        return false;
+<#
+        }
+#>
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

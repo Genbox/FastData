@@ -1,0 +1,51 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Pgm
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+
+pub struct fastdata;
+impl fastdata {
+
+    const KEYS: [f32; 5] = [
+        1.0, 2.0, 3.0, 4.0, 5.0
+    ];
+
+    #[must_use]
+    pub fn contains(key: f32) -> bool {
+
+        let mut pos: i32 = ((0.50000095_f32 as f64) * ((key as f64) - (1.0 as f64))) as i32;
+        if pos < 0 { pos = 0; }
+        pos += 31;
+        if pos > 5 { pos = 5; }
+
+        let lo_raw: i32 = pos - 64;
+        let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
+        let mut hi: usize = (pos as usize) + 66;
+        if hi > 5 { hi = 5; }
+
+        while lo < hi {
+            let mid: usize = lo + ((hi - lo) >> 1);
+            let mid_key: f32 = Self::KEYS[mid];
+            if mid_key == key {
+                return true;
+            }
+            if mid_key < key {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_KEY: f32 = 1.0;
+    pub const MAX_KEY: f32 = 5.0;
+}

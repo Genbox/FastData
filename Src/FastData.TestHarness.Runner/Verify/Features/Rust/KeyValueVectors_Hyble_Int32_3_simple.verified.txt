@@ -1,0 +1,64 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Hyble
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+
+pub struct fastdata;
+
+struct E {
+    key: i32,
+    value: i32,
+}
+
+impl fastdata {
+    const ENTRIES: [E; 4] = [
+        E { key: 1, value: 1 }, E { key: 1, value: 1 }, E { key: 2, value: 2 }, E { key: 3, value: 3 }
+    ];
+
+    const DISPLACEMENTS: [u16; 1] = [
+        0
+    ];
+
+    #[inline(always)]
+    fn get_hash(value: i32) -> u64 {
+        value as u64
+    }
+
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+
+        let hash = unsafe { Self::get_hash(key) }.wrapping_mul(5871781006564002453u64);
+        let approx = ((hash as u128 * 4u128) >> 64) as u32;
+        let bucket = (hash & 0u64) as usize;
+        let index = (approx + Self::DISPLACEMENTS[bucket] as u32) as usize;
+        let entry = &Self::ENTRIES[index];
+
+        key == entry.key
+    }
+
+    #[must_use]
+    pub fn try_lookup(key: i32) -> Option<i32> {
+
+        let hash = unsafe { Self::get_hash(key) }.wrapping_mul(5871781006564002453u64);
+        let approx = ((hash as u128 * 4u128) >> 64) as u32;
+        let bucket = (hash & 0u64) as usize;
+        let index = (approx + Self::DISPLACEMENTS[bucket] as u32) as usize;
+        let entry = &Self::ENTRIES[index];
+
+        if key == entry.key {
+            return Some(entry.value);
+        }
+
+        None
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 3;
+}

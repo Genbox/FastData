@@ -45,6 +45,9 @@ internal static class NumericStructures<TKey>
         if (config.IsEnabled(typeof(HashTablePerfectStructure<,>)) && hashData.HashCodesPerfect)
             return typeof(HashTablePerfectStructure<,>);
 
+        if (config.IsEnabled(typeof(HybleStructure<,>)))
+            return typeof(HybleStructure<,>);
+
         if (config.IsEnabled(typeof(HashTableStructure<,>)))
             return typeof(HashTableStructure<,>);
 

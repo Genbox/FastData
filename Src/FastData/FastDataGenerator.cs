@@ -288,6 +288,8 @@ public static partial class FastDataGenerator
             return new HashTableCompactStructure<string, TValue>(getHashData());
         if (type == typeof(HashTablePerfectStructure<,>))
             return new HashTablePerfectStructure<string, TValue>(getHashData());
+        if (type == typeof(HybleStructure<,>))
+            return new HybleStructure<string, TValue>(getHashData());
         if (type == typeof(KeyLengthStructure<,>))
             return new KeyLengthStructure<string, TValue>(props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, encoding);
         if (type == typeof(SingleValueStructure<,>))
@@ -351,7 +353,7 @@ public static partial class FastDataGenerator
         {
             structureType = cfg.StructureTypeOverride;
 
-            if (structureType == typeof(HashTableStructure<,>) || structureType == typeof(HashTableCompactStructure<,>) || structureType == typeof(HashTablePerfectStructure<,>) || structureType == typeof(BloomFilterStructure<,>))
+            if (structureType == typeof(HashTableStructure<,>) || structureType == typeof(HashTableCompactStructure<,>) || structureType == typeof(HashTablePerfectStructure<,>) || structureType == typeof(HybleStructure<,>) || structureType == typeof(BloomFilterStructure<,>))
                 cacheHashData = GetNumericHash(keys.Span);
         }
         else
@@ -471,12 +473,16 @@ public static partial class FastDataGenerator
             return new HashTableCompactStructure<TKey, TValue>(hashData);
         if (type == typeof(HashTablePerfectStructure<,>))
             return new HashTablePerfectStructure<TKey, TValue>(hashData);
+        if (type == typeof(HybleStructure<,>))
+            return new HybleStructure<TKey, TValue>(hashData);
         if (type == typeof(RangeStructure<,>))
             return new RangeStructure<TKey, TValue>(props.DataRanges);
         if (type == typeof(RrrBitVectorStructure<,>))
             return new RrrBitVectorStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, sorted);
         if (type == typeof(SingleValueStructure<,>))
             return new SingleValueStructure<TKey, TValue>();
+        if (type == typeof(PgmStructure<,>))
+            return new PgmStructure<TKey, TValue>(sorted, GetSetting(cfg, "Epsilon", 64), GetSetting(cfg, "EpsilonRecursive", 4));
 
         throw new InvalidOperationException($"Unsupported DataStructure {type}");
     }

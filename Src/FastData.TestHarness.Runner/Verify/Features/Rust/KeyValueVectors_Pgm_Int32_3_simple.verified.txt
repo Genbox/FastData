@@ -1,0 +1,82 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Pgm
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+
+pub struct fastdata;
+impl fastdata {
+
+    const VALUES: [i32; 3] = [
+        1, 2, 3
+    ];
+    const KEYS: [i32; 3] = [
+        1, 2, 3
+    ];
+
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+
+        let mut pos: i32 = ((22.333334_f32 as f64) * ((key as u32).wrapping_sub(1 as u32)) as f64) as i32;
+        if pos < 0 { pos = 0; }
+        if pos > 3 { pos = 3; }
+
+        let lo_raw: i32 = pos - 64;
+        let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
+        let mut hi: usize = (pos as usize) + 66;
+        if hi > 3 { hi = 3; }
+
+        while lo < hi {
+            let mid: usize = lo + ((hi - lo) >> 1);
+            let mid_key: i32 = Self::KEYS[mid];
+            if mid_key == key {
+                return true;
+            }
+            if mid_key < key {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+
+        false
+    }
+
+    #[must_use]
+    pub fn try_lookup(key: i32) -> Option<i32> {
+
+        let mut pos: i32 = ((22.333334_f32 as f64) * ((key as u32).wrapping_sub(1 as u32)) as f64) as i32;
+        if pos < 0 { pos = 0; }
+        if pos > 3 { pos = 3; }
+
+        let lo_raw: i32 = pos - 64;
+        let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
+        let mut hi: usize = (pos as usize) + 66;
+        if hi > 3 { hi = 3; }
+
+        while lo < hi {
+            let mid: usize = lo + ((hi - lo) >> 1);
+            let mid_key: i32 = Self::KEYS[mid];
+            if mid_key == key {
+                return Some(Self::VALUES[mid]);
+            }
+
+            if mid_key < key {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+
+        None
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 3;
+}

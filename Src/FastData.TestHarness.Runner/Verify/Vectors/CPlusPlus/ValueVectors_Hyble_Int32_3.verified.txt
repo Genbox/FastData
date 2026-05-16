@@ -1,0 +1,43 @@
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
+// Structure: Hyble
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+
+class fastdata final {
+
+
+
+    inline static const std::array<int32_t, 4> entries = {
+        1, 1, 2, 3
+    };
+
+    inline static const std::array<uint16_t, 1> displacements = {
+        0
+    };
+
+    static constexpr uint64_t get_hash(const int32_t value) noexcept {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+
+        const uint64_t hash = get_hash(key) * 5871781006564002453ULL;
+        const uint32_t approx = static_cast<uint32_t>(static_cast<__uint128_t>(hash) * 4ULL >> 64);
+        const size_t bucket = hash & 0ULL;
+        const size_t index = approx + displacements[bucket];
+        const auto& entry = entries[index];
+
+        return key == entry;
+    }
+
+    static constexpr size_t item_count = 3;
+    static constexpr int32_t min_key = 1;
+    static constexpr int32_t max_key = 3;
+};

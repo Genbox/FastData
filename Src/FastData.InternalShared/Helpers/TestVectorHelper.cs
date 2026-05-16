@@ -24,7 +24,9 @@ public static class TestVectorHelper
                      typeof(BinarySearchInterpolationStructure<,>),
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableStructure<,>),
-                     typeof(HashTablePerfectStructure<,>)))
+                     typeof(HashTablePerfectStructure<,>),
+                     typeof(HybleStructure<,>),
+                     typeof(PgmStructure<,>)))
             yield return testVector;
 
         // Then we try with complex values
@@ -48,7 +50,9 @@ public static class TestVectorHelper
                      typeof(BitSetStructure<,>),
                      typeof(ConditionalStructure<,>),
                      typeof(HashTableStructure<,>),
-                     typeof(HashTablePerfectStructure<,>)))
+                     typeof(HashTablePerfectStructure<,>),
+                     typeof(HybleStructure<,>),
+                     typeof(PgmStructure<,>)))
             yield return testVector;
     }
 
@@ -84,7 +88,7 @@ public static class TestVectorHelper
         foreach (ITestVector testVector in GenerateTestVectors([["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]], null, typeof(KeyLengthStructure<,>)))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], null, typeof(HashTablePerfectStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], null, typeof(HashTablePerfectStructure<,>), typeof(HybleStructure<,>)))
             yield return testVector;
 
         // Strings with characters that are not in the ASCII range
@@ -97,10 +101,14 @@ public static class TestVectorHelper
                      typeof(HashTableStructure<,>)))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "interpolation", typeof(BinarySearchInterpolationStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "sorted_numeric", typeof(BinarySearchInterpolationStructure<,>), typeof(PgmStructure<,>)))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1f, 2f, 3f, 4f, 5f]], "interpolation", typeof(BinarySearchInterpolationStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1f, 2f, 3f, 4f, 5f]], "sorted_numeric", typeof(BinarySearchInterpolationStructure<,>), typeof(PgmStructure<,>)))
+            yield return testVector;
+
+        // Larger sorted, non-uniform numeric dataset for structures that depend on value distribution.
+        foreach (ITestVector testVector in GenerateTestVectors(GetNonUniformSortedIntData(200), "non_uniform_sorted", typeof(BinarySearchInterpolationStructure<,>), typeof(PgmStructure<,>)))
             yield return testVector;
 
         // Test range/bitset support. RangeStructure is selected when range count is low.
@@ -258,6 +266,30 @@ public static class TestVectorHelper
         }
 
         int notPresentCount = Math.Min(256, size);
+        int[] notPresent = new int[notPresentCount];
+
+        for (int i = 0; i < notPresentCount; i++)
+            notPresent[i] = keys[i] - 1;
+
+        return [new DataPair(keys.Cast<object>().ToArray(), notPresent.Cast<object>().ToArray())];
+    }
+
+    private static DataPair[] GetNonUniformSortedIntData(int size)
+    {
+        int[] keys = new int[size];
+        int value = 100;
+
+        for (int i = 0; i < size; i++)
+        {
+            value += 3 + (i % 7);
+
+            if (i % 23 == 0)
+                value += 50;
+
+            keys[i] = value;
+        }
+
+        int notPresentCount = Math.Min(128, size);
         int[] notPresent = new int[notPresentCount];
 
         for (int i = 0; i < notPresentCount; i++)

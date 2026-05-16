@@ -170,8 +170,8 @@ internal static class Program
     private static bool IsStringStructureSupported(StructureType structureType) => structureType is
         StructureType.Auto or StructureType.Array or StructureType.BinarySearch or
         StructureType.BloomFilter or StructureType.Conditional or StructureType.HashTableCompact or
-        StructureType.HashTablePerfect or StructureType.HashTable or StructureType.KeyLength or
-        StructureType.SingleValue;
+        StructureType.HashTablePerfect or StructureType.HashTable or StructureType.Hyble or
+        StructureType.KeyLength or StructureType.SingleValue;
 
     private static bool IsNumericStructureSupported(StructureType structureType) => structureType is not StructureType.KeyLength;
 
@@ -179,7 +179,7 @@ internal static class Program
         StructureType.Auto or StructureType.Array or StructureType.BinarySearch or
         StructureType.BinarySearchInterpolation or StructureType.BitSet or StructureType.Conditional or
         StructureType.HashTableCompact or StructureType.HashTablePerfect or StructureType.HashTable or
-        StructureType.KeyLength or StructureType.SingleValue;
+        StructureType.Hyble or StructureType.KeyLength or StructureType.SingleValue;
 
     private static Type? MapStructureType(StructureType structureType) => structureType switch
     {
@@ -194,7 +194,9 @@ internal static class Program
         StructureType.HashTableCompact => typeof(HashTableCompactStructure<,>),
         StructureType.HashTablePerfect => typeof(HashTablePerfectStructure<,>),
         StructureType.HashTable => typeof(HashTableStructure<,>),
+        StructureType.Hyble => typeof(HybleStructure<,>),
         StructureType.KeyLength => typeof(KeyLengthStructure<,>),
+        StructureType.Pgm => typeof(PgmStructure<,>),
         StructureType.Range => typeof(RangeStructure<,>),
         StructureType.RrrBitVector => typeof(RrrBitVectorStructure<,>),
         StructureType.SingleValue => typeof(SingleValueStructure<,>),

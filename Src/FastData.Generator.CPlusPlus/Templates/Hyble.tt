@@ -1,0 +1,77 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.HybleContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HybleTemplateData" name="Data" #>
+
+<#
+    string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
+    bool useEntryStruct = Data.ValueCount > 0;
+    string entryTypeName = useEntryStruct ? "e" : KeyTypeName;
+#>
+<#
+    if (useEntryStruct)
+    {
+#>    struct e {
+        <#= KeyTypeName #> key;
+        const <#= ValueTypeName #> value;
+
+        constexpr e(const <#= KeyTypeName #> key, const <#= ValueTypeName #> value)<#= PostMethodModifier #>
+           : key(key), value(value) {}
+    };
+<#
+    }
+#>
+
+    <#= FieldModifier(false) #>std::array<<#= entryTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> entries = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, (i, x) =>
+    {
+        if (!useEntryStruct)
+            return TypeMap.ToValueLabel(x);
+
+        return $"e({TypeMap.ToValueLabel(x)}, {valueLabels[i]})";
+    }, 8) #>
+    };
+
+    <#= FieldModifier(false) #>std::array<uint16_t, <#= Data.Displacements.Length.ToStringInvariant() #>> displacements = {
+<#= FormatHelper.FormatColumns(Data.Displacements, (_, x) => x.ToStringInvariant(), 8) #>
+    };
+
+<#= HashSource #>
+
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+        const uint64_t hash = get_hash(<#= LookupKeyName #>) * <#= Data.Seed.ToStringInvariant() #>ULL;
+        const uint32_t approx = static_cast<uint32_t>(static_cast<__uint128_t>(hash) * <#= Data.ApproxRange.ToStringInvariant() #>ULL >> 64);
+        const size_t bucket = hash & <#= Data.BucketMask.ToStringInvariant() #>ULL;
+        const size_t index = approx + displacements[bucket];
+        const auto& entry = entries[index];
+
+        return <#= GetEqual(LookupKeyName, useEntryStruct ? "entry.key" : "entry") #>;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        const uint64_t hash = get_hash(<#= LookupKeyName #>) * <#= Data.Seed.ToStringInvariant() #>ULL;
+        const uint32_t approx = static_cast<uint32_t>(static_cast<__uint128_t>(hash) * <#= Data.ApproxRange.ToStringInvariant() #>ULL >> 64);
+        const size_t bucket = hash & <#= Data.BucketMask.ToStringInvariant() #>ULL;
+        const size_t index = approx + displacements[bucket];
+        const auto& entry = entries[index];
+
+        if (<#= GetEqual(LookupKeyName, "entry.key") #>) {
+            value = &entry.value;
+            return true;
+        }
+
+        value = nullptr;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

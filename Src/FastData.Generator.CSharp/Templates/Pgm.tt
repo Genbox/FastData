@@ -1,0 +1,364 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.PgmTemplateData" name="Data" #>
+
+<#
+    // Unsigned wrapping subtraction for signed integer types (pgm_index.hpp:256-259)
+    string csharpDiffExpr;
+    if (Model.KeyType == typeof(int) || Model.KeyType == typeof(uint))
+        csharpDiffExpr = "(uint)key - (uint){0}";
+    else if (Model.KeyType == typeof(long) || Model.KeyType == typeof(ulong))
+        csharpDiffExpr = "(ulong)key - (ulong){0}";
+    else
+        csharpDiffExpr = "key - {0}";
+
+    bool needsUnchecked = Model.KeyType == typeof(int) || Model.KeyType == typeof(uint) || Model.KeyType == typeof(long) || Model.KeyType == typeof(ulong);
+    bool singleSegment = Data.SegmentCount == 1;
+    bool hasRecursiveLevels = Data.EpsilonRecursive > 0 && Data.LevelsOffsets.Length > 2;
+    int linearSearchThreshold = 64;
+
+    // Single-segment constants
+    string segKeyConst = singleSegment ? TypeMap.ToValueLabel(Data.Segments[0].Key) : "";
+    float seg0Slope = singleSegment ? Data.Segments[0].Slope : 0;
+    int seg0Intercept = singleSegment ? Data.Segments[0].Intercept : 0;
+
+    // Slope formatting helper
+    Func<float, string> formatSlope = slope => {
+        string s = slope.ToString("R", System.Globalization.CultureInfo.InvariantCulture);
+        return s.Contains('.') || s.Contains('E') || s.Contains('e') ? s + "f" : s + ".0f";
+    };
+
+    string staticMod = CSharpConfig.ClassType == ClassType.Static ? "static " : "";
+
+    if (Data.ValueCount > 0)
+    {
+#>
+    <#= FieldModifier #><#= ValueTypeName #>[] _values = {
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+    };
+
+<#
+    }
+#>
+    <#= FieldModifier #><#= KeyTypeName #>[] _keys = new <#= KeyTypeName #>[] {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+    };
+<#
+    // Only emit segment arrays when there are multiple segments
+    if (!singleSegment)
+    {
+#>
+
+    <#= FieldModifier #><#= KeyTypeName #>[] _segKeys = new <#= KeyTypeName #>[] {
+<#= FormatHelper.FormatColumns(Data.Segments.Select(s => s.Key), Data.Segments.Length, TypeMap.ToValueLabel, 8) #>
+    };
+
+    <#= FieldModifier #>float[] _segSlopes = new float[] {
+<#= FormatHelper.FormatColumns(Data.Segments.Select(s => (object)s.Slope), Data.Segments.Length, o => formatSlope((float)o), 8) #>
+    };
+
+    <#= FieldModifier #>int[] _segIntercepts = new int[] {
+<#= FormatHelper.FormatColumns(Data.Segments.Select(s => (object)s.Intercept), Data.Segments.Length, o => ((int)o).ToStringInvariant(), 8) #>
+    };
+<#
+    }
+
+    // Only emit helpers when there are multiple segments
+    if (!singleSegment)
+    {
+#>
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private <#= staticMod #>int EvaluateSegment(int seg, <#= KeyTypeName #> key)
+    {
+<#      if (needsUnchecked) { #>
+        unchecked
+        {
+            double diff = <#= string.Format(csharpDiffExpr, "_segKeys[seg]") #>;
+            int pos = (int)(long)(_segSlopes[seg] * diff);
+            return pos < 0 ? 0 : pos + _segIntercepts[seg];
+        }
+<#      } else { #>
+        double diff = <#= string.Format(csharpDiffExpr, "_segKeys[seg]") #>;
+        int pos = (int)(long)(_segSlopes[seg] * diff);
+        return pos < 0 ? 0 : pos + _segIntercepts[seg];
+<#      } #>
+    }
+
+    private <#= staticMod #>int GetSegmentPos(<#= KeyTypeName #> key)
+    {
+<#
+        if (!hasRecursiveLevels)
+        {
+#>
+        int seg = 0;
+        int segHi = <#= (Data.SegmentCount - 1).ToStringInvariant() #>;
+        while (seg < segHi)
+        {
+            int mid = seg + ((segHi - seg) >> 1);
+            if (_segKeys[mid + 1] <= key)
+                seg = mid + 1;
+            else
+                segHi = mid;
+        }
+
+        int pos = EvaluateSegment(seg, key);
+        int nextIntercept = _segIntercepts[seg + 1];
+        if (pos > nextIntercept) pos = nextIntercept;
+        return pos;
+<#
+        }
+        else
+        {
+            int rootSegOffset = Data.LevelsOffsets[Data.LevelsOffsets.Length - 2];
+#>
+        int seg = <#= rootSegOffset.ToStringInvariant() #>;
+<#
+            for (int level = Data.LevelsOffsets.Length - 3; level >= 0; level--)
+            {
+                int levelBegin = Data.LevelsOffsets[level];
+                int levelEnd = Data.LevelsOffsets[level + 1];
+                int levelSize = levelEnd - levelBegin - 1;
+                int sentinel = levelEnd - 1;
+                int epsRec = Data.EpsilonRecursive;
+                bool useBinarySearch = epsRec > linearSearchThreshold;
+#>
+
+        {
+            int pos = EvaluateSegment(seg, key);
+            int nextIntercept = _segIntercepts[seg + 1];
+            if (pos > nextIntercept) pos = nextIntercept;
+
+            int lo = pos - <#= (epsRec + 1).ToStringInvariant() #>;
+            if (lo < 0) lo = 0;
+<#
+                if (useBinarySearch)
+                {
+#>
+
+            int hi = pos + <#= (epsRec + 2).ToStringInvariant() #>;
+            if (hi > <#= levelSize.ToStringInvariant() #>) hi = <#= levelSize.ToStringInvariant() #>;
+
+            seg = <#= levelBegin.ToStringInvariant() #> + lo;
+            int segHi = <#= levelBegin.ToStringInvariant() #> + hi;
+            while (seg < segHi)
+            {
+                int mid = seg + ((segHi - seg) >> 1);
+                if (_segKeys[mid + 1] <= key)
+                    seg = mid + 1;
+                else
+                    segHi = mid;
+            }
+<#
+                }
+                else
+                {
+#>
+
+            seg = <#= levelBegin.ToStringInvariant() #> + lo;
+            while (seg + 1 < <#= sentinel.ToStringInvariant() #> && _segKeys[seg + 1] <= key)
+                seg++;
+<#
+                }
+#>
+        }
+<#
+            }
+#>
+
+        {
+            int pos = EvaluateSegment(seg, key);
+            int nextIntercept = _segIntercepts[seg + 1];
+            if (pos > nextIntercept) pos = nextIntercept;
+            return pos;
+        }
+<#
+        }
+#>
+    }
+<#
+    }
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
+    {
+<#= GetMethodHeader(MethodType.Contains) #>
+
+<#
+    if (singleSegment)
+    {
+#>
+<#      if (needsUnchecked) { #>
+        unchecked
+        {
+<#      } #>
+<#
+        if (seg0Slope == 0)
+        {
+            // Slope is zero: position is just the intercept, clamped to [0, n]
+#>
+<#= needsUnchecked ? "    " : "" #>        int pos = <#= seg0Intercept.ToStringInvariant() #>;
+<#
+        }
+        else
+        {
+#>
+<#= needsUnchecked ? "    " : "" #>        double diff = <#= string.Format(csharpDiffExpr, segKeyConst) #>;
+<#= needsUnchecked ? "    " : "" #>        int pos = (int)(long)(<#= formatSlope(seg0Slope) #> * diff);
+<#= needsUnchecked ? "    " : "" #>        if (pos < 0) pos = 0;
+<#          if (seg0Intercept != 0) { #>
+<#= needsUnchecked ? "    " : "" #>        pos += <#= seg0Intercept.ToStringInvariant() #>;
+<#          } #>
+<#= needsUnchecked ? "    " : "" #>        if (pos > <#= Data.KeyCount.ToStringInvariant() #>) pos = <#= Data.KeyCount.ToStringInvariant() #>;
+<#
+        }
+#>
+
+<#= needsUnchecked ? "    " : "" #>        int lo = pos - <#= Data.Epsilon.ToStringInvariant() #>;
+<#= needsUnchecked ? "    " : "" #>        if (lo < 0) lo = 0;
+<#= needsUnchecked ? "    " : "" #>        int hi = pos + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+<#= needsUnchecked ? "    " : "" #>        if (hi > <#= Data.KeyCount.ToStringInvariant() #>) hi = <#= Data.KeyCount.ToStringInvariant() #>;
+
+<#= needsUnchecked ? "    " : "" #>        while (lo < hi)
+<#= needsUnchecked ? "    " : "" #>        {
+<#= needsUnchecked ? "    " : "" #>            int i = lo + ((hi - lo) >> 1);
+<#= needsUnchecked ? "    " : "" #>            if (_keys[i] == <#= LookupKeyName #>)
+<#= needsUnchecked ? "    " : "" #>                return true;
+<#= needsUnchecked ? "    " : "" #>            if (_keys[i] < <#= LookupKeyName #>)
+<#= needsUnchecked ? "    " : "" #>                lo = i + 1;
+<#= needsUnchecked ? "    " : "" #>            else
+<#= needsUnchecked ? "    " : "" #>                hi = i;
+<#= needsUnchecked ? "    " : "" #>        }
+
+<#= needsUnchecked ? "    " : "" #>        return false;
+<#      if (needsUnchecked) { #>
+        }
+<#      } #>
+<#
+    }
+    else
+    {
+        // Multi-segment path
+#>
+        int pos = GetSegmentPos(<#= LookupKeyName #>);
+
+        int lo = pos - <#= Data.Epsilon.ToStringInvariant() #>;
+        if (lo < 0) lo = 0;
+        int hi = pos + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+        if (hi > <#= Data.KeyCount.ToStringInvariant() #>) hi = <#= Data.KeyCount.ToStringInvariant() #>;
+
+        while (lo < hi)
+        {
+            int i = lo + ((hi - lo) >> 1);
+            if (_keys[i] == <#= LookupKeyName #>)
+                return true;
+            if (_keys[i] < <#= LookupKeyName #>)
+                lo = i + 1;
+            else
+                hi = i;
+        }
+
+        return false;
+<#
+    }
+#>
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool TryLookup(<#= KeyTypeName #> key, out <#= ValueTypeName #>? value)
+    {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+
+<#
+        if (singleSegment)
+        {
+#>
+<#          if (needsUnchecked) { #>
+        unchecked
+        {
+<#          } #>
+<#
+            if (seg0Slope == 0)
+            {
+#>
+<#= needsUnchecked ? "    " : "" #>        int pos = <#= seg0Intercept.ToStringInvariant() #>;
+<#
+            }
+            else
+            {
+#>
+<#= needsUnchecked ? "    " : "" #>        double diff = <#= string.Format(csharpDiffExpr, segKeyConst) #>;
+<#= needsUnchecked ? "    " : "" #>        int pos = (int)(long)(<#= formatSlope(seg0Slope) #> * diff);
+<#= needsUnchecked ? "    " : "" #>        if (pos < 0) pos = 0;
+<#              if (seg0Intercept != 0) { #>
+<#= needsUnchecked ? "    " : "" #>        pos += <#= seg0Intercept.ToStringInvariant() #>;
+<#              } #>
+<#= needsUnchecked ? "    " : "" #>        if (pos > <#= Data.KeyCount.ToStringInvariant() #>) pos = <#= Data.KeyCount.ToStringInvariant() #>;
+<#
+            }
+#>
+
+<#= needsUnchecked ? "    " : "" #>        int lo = pos - <#= Data.Epsilon.ToStringInvariant() #>;
+<#= needsUnchecked ? "    " : "" #>        if (lo < 0) lo = 0;
+<#= needsUnchecked ? "    " : "" #>        int hi = pos + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+<#= needsUnchecked ? "    " : "" #>        if (hi > <#= Data.KeyCount.ToStringInvariant() #>) hi = <#= Data.KeyCount.ToStringInvariant() #>;
+
+<#= needsUnchecked ? "    " : "" #>        while (lo < hi)
+<#= needsUnchecked ? "    " : "" #>        {
+<#= needsUnchecked ? "    " : "" #>            int i = lo + ((hi - lo) >> 1);
+<#= needsUnchecked ? "    " : "" #>            if (_keys[i] == <#= LookupKeyName #>)
+<#= needsUnchecked ? "    " : "" #>            {
+<#= needsUnchecked ? "    " : "" #>                value = _values[i];
+<#= needsUnchecked ? "    " : "" #>                return true;
+<#= needsUnchecked ? "    " : "" #>            }
+<#= needsUnchecked ? "    " : "" #>            if (_keys[i] < <#= LookupKeyName #>)
+<#= needsUnchecked ? "    " : "" #>                lo = i + 1;
+<#= needsUnchecked ? "    " : "" #>            else
+<#= needsUnchecked ? "    " : "" #>                hi = i;
+<#= needsUnchecked ? "    " : "" #>        }
+
+<#= needsUnchecked ? "    " : "" #>        value = default;
+<#= needsUnchecked ? "    " : "" #>        return false;
+<#          if (needsUnchecked) { #>
+        }
+<#          } #>
+<#
+        }
+        else
+        {
+#>
+        int pos = GetSegmentPos(<#= LookupKeyName #>);
+
+        int lo = pos - <#= Data.Epsilon.ToStringInvariant() #>;
+        if (lo < 0) lo = 0;
+        int hi = pos + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+        if (hi > <#= Data.KeyCount.ToStringInvariant() #>) hi = <#= Data.KeyCount.ToStringInvariant() #>;
+
+        while (lo < hi)
+        {
+            int i = lo + ((hi - lo) >> 1);
+            if (_keys[i] == <#= LookupKeyName #>)
+            {
+                value = _values[i];
+                return true;
+            }
+            if (_keys[i] < <#= LookupKeyName #>)
+                lo = i + 1;
+            else
+                hi = i;
+        }
+
+        value = default;
+        return false;
+<#
+        }
+#>
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>
