@@ -61,10 +61,10 @@ using System.Runtime.InteropServices;
             { StringFunction.ReadU32, "uint ReadU32(byte[] ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));" },
             { StringFunction.ReadU64, "ulong ReadU64(byte[] ptr, int offset) => Unsafe.ReadUnaligned<ulong>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));" },
 
-            { StringFunction.GetFirstChar, "char GetFirstChar(string str) => str[0];" },
-            { StringFunction.GetFirstCharLower, "char GetFirstCharLower(string str) => char.ToLowerInvariant(str[0]);" },
-            { StringFunction.GetLastChar, "char GetLastChar(string str) => str[str.Length - 1];" },
-            { StringFunction.GetLastCharLower, "char GetLastCharLower(string str) => char.ToLowerInvariant(str[str.Length - 1]);" },
+            { StringFunction.GetCharAt, "char GetCharAt(string str, int index) => str[index];" },
+            { StringFunction.GetCharAtLower, "char GetCharAtLower(string str, int index) => char.ToLowerInvariant(str[index]);" },
+            { StringFunction.GetCharFromEnd, "char GetCharFromEnd(string str, int fromEnd) => str[str.Length - 1 - fromEnd];" },
+            { StringFunction.GetCharFromEndLower, "char GetCharFromEndLower(string str, int fromEnd) => char.ToLowerInvariant(str[str.Length - 1 - fromEnd]);" },
 
             { StringFunction.GetLength, "int GetLength(string str) => str.Length;" },
 

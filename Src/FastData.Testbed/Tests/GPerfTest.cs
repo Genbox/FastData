@@ -43,7 +43,7 @@ internal static class GPerfTest
             using SerilogLoggerFactory factory = new SerilogLoggerFactory(serilog);
 
             string[] data = File.ReadAllLines(file);
-            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, false, GeneratorEncoding.Utf16CodeUnits);
+            StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
 
             GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.Utf16CodeUnits), factory.CreateLogger<GPerfAnalyzer>());
             Candidate cand = analyzer.GetCandidates(data).First();

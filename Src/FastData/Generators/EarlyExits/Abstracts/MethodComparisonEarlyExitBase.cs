@@ -6,7 +6,7 @@ namespace Genbox.FastData.Generators.EarlyExits.Abstracts;
 
 public abstract record MethodComparisonEarlyExitBase<T>(T Value, string Method) : IEarlyExit
 {
-    public Expression GetExpression(ParameterExpression key)
+    public virtual Expression GetExpression(ParameterExpression key)
     {
         MethodInfo methodInfo = typeof(StringFunctions).GetMethod(Method, [typeof(string)])!;
         return Compare(Call(methodInfo, key), Constant(Value, typeof(T)));

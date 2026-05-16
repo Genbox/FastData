@@ -1,1 +1,1 @@
-﻿(GetLastChar(inputKey) < 'm')
+﻿(GetCharFromEnd(inputKey, 0) < 'm')

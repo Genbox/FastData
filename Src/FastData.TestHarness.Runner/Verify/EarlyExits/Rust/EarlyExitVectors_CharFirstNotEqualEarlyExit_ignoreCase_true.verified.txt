@@ -1,1 +1,1 @@
-﻿(GetFirstCharLower(inputKey) != 'x')
+﻿(GetCharAtLower(inputKey, 0) != 'x')

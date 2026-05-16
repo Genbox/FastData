@@ -46,7 +46,7 @@ internal static class KeyAnalyzer
         throw new InvalidOperationException($"Unsupported data type: {typeof(T).Name}");
     }
 
-    internal static StringKeyProperties GetStringProperties(ReadOnlySpan<string> keys, bool enableTrimming, bool ignoreCase, GeneratorEncoding encoding)
+    internal static StringKeyProperties GetStringProperties(ReadOnlySpan<string> keys, bool ignoreCase, GeneratorEncoding encoding)
     {
         // We need to create a length map for generators
         HashSet<int> uniqLengths = new HashSet<int>();
@@ -131,7 +131,7 @@ internal static class KeyAnalyzer
         ranges.Add(rangeStart, previous);
 
         // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough
-        if (enableTrimming && keys.Length > 1 && minLength > 1)
+        if (keys.Length > 1 && minLength > 1)
         {
             //Build a forward and reverse map of merged entropy
             //We can derive common prefix/suffix from it that can be used later for high-entropy hash/equality functions

@@ -93,7 +93,7 @@ public class KeyAnalyzerTests
     [InlineData((object)new[] { "a", "a", "aaa", "aaa" })] //Test duplicates
     public void GetStringProperties_LengthRanges_Test(string[] data)
     {
-        StringKeyProperties res = GetStringProperties(data, false, false, GeneratorEncoding.Utf16CodeUnits);
+        StringKeyProperties res = GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
         LengthData lengthData = res.LengthData;
 
         HashSet<int> expectedLengths = [];
@@ -125,7 +125,7 @@ public class KeyAnalyzerTests
     [InlineData(new[] { "hello world" }, 0, 0)] // One key should result in no prefix/suffix calculation
     public void GetStringProperties_DeltaData_Test(string[] data, int leftZero, int rightZero)
     {
-        StringKeyProperties res = GetStringProperties(data, true, false, GeneratorEncoding.Utf16CodeUnits);
+        StringKeyProperties res = GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
         Assert.Equal(leftZero, res.DeltaData.Prefix.Length);
         Assert.Equal(rightZero, res.DeltaData.Suffix.Length);
     }
@@ -135,8 +135,8 @@ public class KeyAnalyzerTests
     {
         string[] data = ["Abc1", "Abc2", "Abc3", "abc4"];
 
-        StringKeyProperties ignoreCase = GetStringProperties(data, true, true, GeneratorEncoding.Utf16CodeUnits);
-        StringKeyProperties caseSensitive = GetStringProperties(data, true, false, GeneratorEncoding.Utf16CodeUnits);
+        StringKeyProperties ignoreCase = GetStringProperties(data, true, GeneratorEncoding.Utf16CodeUnits);
+        StringKeyProperties caseSensitive = GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
 
         Assert.Equal("Abc", ignoreCase.DeltaData.Prefix);
         Assert.Equal(string.Empty, caseSensitive.DeltaData.Prefix);
@@ -145,7 +145,7 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetStringProperties_CharRange_Test()
     {
-        StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, false, false, GeneratorEncoding.Utf16CodeUnits);
+        StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, false, GeneratorEncoding.Utf16CodeUnits);
         CharacterData data = res.CharacterData;
         Assert.Equal('A', data.FirstCharMap.Min);
         Assert.Equal('b', data.FirstCharMap.Max);
@@ -156,7 +156,7 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetStringProperties_CharRange_IgnoreCase_Test()
     {
-        StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, false, true, GeneratorEncoding.Utf16CodeUnits);
+        StringKeyProperties res = GetStringProperties(new[] { "Apple", "banana", "Cherry" }, true, GeneratorEncoding.Utf16CodeUnits);
         CharacterData data = res.CharacterData;
         Assert.Equal('a', data.FirstCharMap.Min);
         Assert.Equal('c', data.FirstCharMap.Max);
@@ -167,7 +167,7 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetStringProperties_AsciiEarlyExitData_Test()
     {
-        (LengthData lengthData, _, CharacterData data) = GetStringProperties(new[] { "ab", "ac", "bd" }, false, true, GeneratorEncoding.Utf16CodeUnits);
+        (LengthData lengthData, _, CharacterData data) = GetStringProperties(new[] { "ab", "ac", "bd" }, true, GeneratorEncoding.Utf16CodeUnits);
         Assert.Equal(2, lengthData.MinCharLength);
         Assert.Equal(2, lengthData.MaxCharLength);
         Assert.True(data.AllAscii);
@@ -176,7 +176,7 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetStringProperties_CharacterClasses_Test()
     {
-        StringKeyProperties res = GetStringProperties(new[] { "A b1$", "c" }, false, false, GeneratorEncoding.Utf16CodeUnits);
+        StringKeyProperties res = GetStringProperties(new[] { "A b1$", "c" }, false, GeneratorEncoding.Utf16CodeUnits);
         CharacterClass expected = CharacterClass.Uppercase | CharacterClass.Lowercase | CharacterClass.Number | CharacterClass.Symbol | CharacterClass.Whitespace;
 
         Assert.Equal(expected, res.CharacterData.CharacterClasses);
@@ -185,7 +185,7 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetStringProperties_AllAscii_False_Test()
     {
-        StringKeyProperties res = GetStringProperties(new[] { "abc", "\u0101bc" }, false, false, GeneratorEncoding.Utf16CodeUnits);
+        StringKeyProperties res = GetStringProperties(new[] { "abc", "\u0101bc" }, false, GeneratorEncoding.Utf16CodeUnits);
 
         Assert.False(res.CharacterData.AllAscii);
     }

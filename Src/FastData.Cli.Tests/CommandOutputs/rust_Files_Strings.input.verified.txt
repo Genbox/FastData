@@ -10,11 +10,11 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-fn GetFirstChar(value: &str) -> char { value.as_bytes()[0] as char }
+fn GetCharAt(value: &str, index: usize) -> char { value.as_bytes()[index] as char }
 
-fn GetLastChar(value: &str) -> char {
+fn GetCharFromEnd(value: &str, from_end: usize) -> char {
     let bytes = value.as_bytes();
-    bytes[bytes.len() - 1] as char
+    bytes[bytes.len() - 1 - from_end] as char
 }
 
 fn GetLength(value: &str) -> i32 { value.len() as i32 }
@@ -26,27 +26,27 @@ impl MyData {
     #[must_use]
     pub fn contains(key: &str) -> bool {
         let mut getLength: i32;
-        let mut getLastChar: char;
-        let mut getFirstChar: char;
+        let mut getCharFromEnd: char;
+        let mut getCharAt: char;
         getLength = GetLength(key);
         if ((getLength > 5))
         {
          return false;
         }
 
-        getLastChar = GetLastChar(key);
-        if ((getLastChar > '2'))
+        getCharFromEnd = GetCharFromEnd(key, 0);
+        if ((getCharFromEnd > '2'))
         {
          return false;
         }
 
-        getFirstChar = GetFirstChar(key);
-        if ((getFirstChar > 't'))
+        getCharAt = GetCharAt(key, 0);
+        if ((getCharAt > 't'))
         {
          return false;
         }
 
-        if ((getFirstChar < 't'))
+        if ((getCharAt < 't'))
         {
          return false;
         }

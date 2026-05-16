@@ -9,35 +9,35 @@ using System.Runtime.InteropServices;
 public static class StaticData
 {
 
-    private static char GetFirstChar(string str) => str[0];
-    private static char GetLastChar(string str) => str[str.Length - 1];
+    private static char GetCharAt(string str, int index) => str[index];
+    private static char GetCharFromEnd(string str, int fromEnd) => str[str.Length - 1 - fromEnd];
     private static int GetLength(string str) => str.Length;
 
     
     public static bool Contains(string key)
     {
         int getLength;
-        char getLastChar;
-        char getFirstChar;
+        char getCharFromEnd;
+        char getCharAt;
         getLength = GetLength(key);
         if ((getLength > 5))
         {
          return false;
         }
 
-        getLastChar = GetLastChar(key);
-        if ((getLastChar > '3'))
+        getCharFromEnd = GetCharFromEnd(key, 0);
+        if ((getCharFromEnd > '3'))
         {
          return false;
         }
 
-        getFirstChar = GetFirstChar(key);
-        if ((getFirstChar > 'i'))
+        getCharAt = GetCharAt(key, 0);
+        if ((getCharAt > 'i'))
         {
          return false;
         }
 
-        if ((getFirstChar < 'i'))
+        if ((getCharAt < 'i'))
         {
          return false;
         }

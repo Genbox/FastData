@@ -68,6 +68,22 @@ public abstract class FeatureTestBase
         Assert.Equal(1, await Harness.RunContainsAsync(source, id, keys, notPresent, TestContext.Current.CancellationToken));
     }
 
+    [Fact]
+    public async Task PrefixSuffixTrimmingWithKeyLengthStructure()
+    {
+        StringDataConfig config = new StringDataConfig();
+        config.StructureTypeOverride = typeof(KeyLengthStructure<,>);
+        config.EarlyExitConfig.Disabled = true;
+        config.EnablePrefixSuffixTrimming = true;
+
+        string[] keys = ["PreASuf", "PreBBSuf", "PreCCCSuf"];
+        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
+
+        string[] notPresent = ["A", "PreASu", "PrASuf", "PreDDSuf"];
+        string id = nameof(PrefixSuffixTrimmingWithKeyLengthStructure);
+        Assert.Equal(1, await Harness.RunContainsAsync(source, id, keys, notPresent, TestContext.Current.CancellationToken));
+    }
+
     [Theory]
     [InlineData(true), InlineData(false)]
     public async Task TypeReductionSupported(bool enabled)

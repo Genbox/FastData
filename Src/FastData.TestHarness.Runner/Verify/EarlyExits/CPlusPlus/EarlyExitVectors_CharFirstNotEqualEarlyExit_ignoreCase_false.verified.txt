@@ -1,1 +1,1 @@
-﻿(GetFirstChar(inputKey) != 120)
+﻿(GetCharAt(inputKey, 0) != 120)

@@ -18,7 +18,7 @@ public class StringEarlyExitsTests
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.Disabled = true;
 
-        IEarlyExit[] exits = GetExits(keys, false, false, cfg);
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
 
         Assert.Empty(exits);
     }
@@ -30,7 +30,7 @@ public class StringEarlyExitsTests
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.DisableForStructure(typeof(ArrayStructure<,>));
 
-        IEarlyExit[] exits = GetExits(keys, false, false, cfg);
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
 
         Assert.Empty(exits);
     }
@@ -43,7 +43,7 @@ public class StringEarlyExitsTests
         cfg.MaxCandidates = 50;
         cfg.MinRejectionRatio = 0f;
 
-        IEarlyExit[] exits = GetExits(keys, false, false, cfg);
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
 
         Assert.Contains(exits, static x => x is LengthLessThanEarlyExit { Value: 1 });
         Assert.Contains(exits, static x => x is LengthGreaterThanEarlyExit { Value: 10 });
@@ -61,7 +61,7 @@ public class StringEarlyExitsTests
         cfg.MaxCandidates = 50;
         cfg.MinRejectionRatio = 0f;
 
-        IEarlyExit[] exits = GetExits(keys, false, false, cfg);
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
 
         Assert.DoesNotContain(exits, static x => x is LengthBitmapEarlyExit);
     }
@@ -73,10 +73,10 @@ public class StringEarlyExitsTests
         cfg.MaxCandidates = 50;
         cfg.MinRejectionRatio = 0f;
 
-        IEarlyExit[] sparse = GetExits(["alpha", "zulu"], false, false, cfg);
+        IEarlyExit[] sparse = GetExits(["alpha", "zulu"], false, cfg);
         Assert.Contains(sparse, static x => x is CharFirstBitmapEarlyExit);
 
-        IEarlyExit[] dense = GetExits(["apple", "banana"], false, false, cfg);
+        IEarlyExit[] dense = GetExits(["apple", "banana"], false, cfg);
         Assert.DoesNotContain(dense, static x => x is CharFirstBitmapEarlyExit);
     }
 
@@ -88,24 +88,10 @@ public class StringEarlyExitsTests
         cfg.MaxCandidates = 50;
         cfg.MinRejectionRatio = 0f;
 
-        IEarlyExit[] exits = GetExits(keys, true, false, cfg);
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
 
         Assert.Contains(exits, static x => x is StringPrefixEarlyExit { Prefix: "pre" });
         Assert.Contains(exits, static x => x is StringSuffixEarlyExit { Suffix: "Suf" });
-    }
-
-    [Fact]
-    public void GetExits_PrefixSuffixNotProducedWhenTrimmingDisabled()
-    {
-        string[] keys = ["preOneSuf", "preTwoSuf", "preSixSuf"];
-        EarlyExitConfig cfg = EarlyExitConfig.Default;
-        cfg.MaxCandidates = 50;
-        cfg.MinRejectionRatio = 0f;
-
-        IEarlyExit[] exits = GetExits(keys, false, false, cfg);
-
-        Assert.DoesNotContain(exits, static x => x is StringPrefixEarlyExit);
-        Assert.DoesNotContain(exits, static x => x is StringSuffixEarlyExit);
     }
 
     [Fact]
@@ -116,7 +102,7 @@ public class StringEarlyExitsTests
         cfg.MaxCandidates = 50;
         cfg.MinRejectionRatio = 0.5f;
 
-        IEarlyExit[] exits = GetExits(keys, true, false, cfg);
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
 
         Assert.DoesNotContain(exits, static x => x is StringPrefixEarlyExit { Prefix: "ab" });
     }
@@ -129,11 +115,11 @@ public class StringEarlyExitsTests
 
         // Prefix is large relative to the observed length span, so the observed ratio keeps it.
         string[] keys = ["abaaaaaa", "abbbbbbb", "abccccccc"];
-        IEarlyExit[] exits = GetExits(keys, true, false, cfg);
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
 
         Assert.Contains(exits, static x => x is StringPrefixEarlyExit { Prefix: "ab" });
 
-        StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, true, false, GeneratorEncoding.Utf16CodeUnits);
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, false, GeneratorEncoding.Utf16CodeUnits);
         int minLength = props.LengthData.LengthRanges.Min;
         int maxLength = props.LengthData.LengthRanges.Max;
         double lengthSpan = (maxLength - minLength) + 1d;
@@ -142,9 +128,9 @@ public class StringEarlyExitsTests
         Assert.True("ab".Length / lengthSpan >= 0.5d);
     }
 
-    private static IEarlyExit[] GetExits(string[] keys, bool enableTrimming, bool ignoreCase, EarlyExitConfig config)
+    private static IEarlyExit[] GetExits(string[] keys, bool ignoreCase, EarlyExitConfig config)
     {
-        StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, enableTrimming, ignoreCase, GeneratorEncoding.Utf16CodeUnits);
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, ignoreCase, GeneratorEncoding.Utf16CodeUnits);
         return StringEarlyExits.GetExits(typeof(ArrayStructure<,>), props, config, ignoreCase);
     }
 }

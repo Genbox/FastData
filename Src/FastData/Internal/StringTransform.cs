@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal;

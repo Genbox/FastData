@@ -10,6 +10,29 @@
 
 class fastdata final {
 
+    static     constexpr bool StartsWith(std::string_view prefix, std::string_view str) {
+        if (str.length() < prefix.length())
+            return false;
+
+        for (size_t i = 0; i < prefix.length(); ++i) {
+            if (str[i] != prefix[i])
+                return false;
+        }
+
+        return true;
+    }
+    static     constexpr bool EndsWith(std::string_view suffix, std::string_view str) {
+        if (str.length() < suffix.length())
+            return false;
+
+        size_t offset = str.length() - suffix.length();
+        for (size_t i = 0; i < suffix.length(); ++i) {
+            if (str[offset + i] != suffix[i])
+                return false;
+        }
+
+        return true;
+    }
 
     static constexpr std::array<std::string_view, 3> keys = {
         u8"Alpha", u8"Bravo", u8"Charlie"
@@ -18,16 +41,24 @@ class fastdata final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        if (key.length() < 6)
-            return false;
-        const auto trimmedKey = key.substr(3, key.length() - 6);
+        if (!StartsWith(u8"Pre", key))
+        {
+         return false;
+        }
+
+        if (!EndsWith(u8"Suf", key))
+        {
+         return false;
+        }
+
+        const auto lookupKey = key.substr(3, key.length() - 6);
 
         size_t lo = 0;
         size_t hi = 3;
         while (lo < hi) {
             const size_t mid = lo + ((hi - lo) >> 1);
             const std::string_view mid_key = keys[mid];
-            const int32_t order = mid_key.compare(trimmedKey);
+            const int32_t order = mid_key.compare(lookupKey);
 
             if (order == 0)
                 return true;

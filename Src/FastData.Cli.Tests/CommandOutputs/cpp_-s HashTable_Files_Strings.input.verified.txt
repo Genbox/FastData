@@ -12,8 +12,8 @@
 
 class MyData final {
 
-    static constexpr char GetFirstChar(std::string_view str) { return str[0]; }
-    static constexpr char GetLastChar(std::string_view str) { return str[str.length() - 1]; }
+    static constexpr char GetCharAt(std::string_view str, int32_t index) { return str[index]; }
+    static constexpr char GetCharFromEnd(std::string_view str, int32_t fromEnd) { return str[str.length() - 1 - fromEnd]; }
     static constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }
 
     struct e {
@@ -45,27 +45,27 @@ public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
         int32_t getLength;
-        char getLastChar;
-        char getFirstChar;
+        char getCharFromEnd;
+        char getCharAt;
         getLength = GetLength(key);
         if ((getLength > 5))
         {
          return false;
         }
 
-        getLastChar = GetLastChar(key);
-        if ((getLastChar > 50))
+        getCharFromEnd = GetCharFromEnd(key, 0);
+        if ((getCharFromEnd > 50))
         {
          return false;
         }
 
-        getFirstChar = GetFirstChar(key);
-        if ((getFirstChar > 116))
+        getCharAt = GetCharAt(key, 0);
+        if ((getCharAt > 116))
         {
          return false;
         }
 
-        if ((getFirstChar < 116))
+        if ((getCharAt < 116))
         {
          return false;
         }

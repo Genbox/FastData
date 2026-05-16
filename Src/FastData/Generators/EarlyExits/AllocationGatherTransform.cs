@@ -15,10 +15,10 @@ public class AllocationGatherTransform : IExprTransform
             if (GetLength(key) < 3 || GetLength(key) > 6)
                 return false;
 
-            if (GetFirstChar(key) != 'Æ')
+            if (GetCharAt(key, 0) != 'Æ')
                 return false;
 
-            if (GetFirstChar(key) < 'A')
+            if (GetCharAt(key, 0) < 'A')
                 return false;
         }
 
@@ -28,15 +28,15 @@ public class AllocationGatherTransform : IExprTransform
         public bool Contains(string key)
         {
             uint len = GetLength(key);
-            char firstChar = GetFirstChar(key);
+            char charAt = GetCharAt(key, 0);
 
             if (len < 3 || len > 6)
                 return false;
 
-            if (firstChar != 'Æ')
+            if (charAt != 'Æ')
                 return false;
 
-            if (firstChar < 'A')
+            if (charAt < 'A')
                 return false;
         }
 
@@ -49,12 +49,12 @@ public class AllocationGatherTransform : IExprTransform
             if (len < 3 || len > 6)
                 return false;
 
-            char firstChar = GetFirstChar(key);
+            char charAt = GetCharAt(key, 0);
 
-            if (firstChar != 'Æ')
+            if (charAt != 'Æ')
                 return false;
 
-            if (firstChar < 'A')
+            if (charAt < 'A')
                 return false;
         }
     */
@@ -83,7 +83,7 @@ public class AllocationGatherTransform : IExprTransform
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.DeclaringType == typeof(StringFunctions))
+            if (node.Method.DeclaringType == typeof(StringFunctions) && node.Type != typeof(bool))
             {
                 Expression? instance = node.Object == null ? null : Visit(node.Object);
                 List<Expression> arguments = new List<Expression>(node.Arguments.Count);

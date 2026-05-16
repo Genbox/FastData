@@ -5,6 +5,8 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
+using Genbox.FastData.Generators.EarlyExits.Exits;
+using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Generators.Expressions;
 using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Generators.StringHash;
@@ -12,6 +14,7 @@ using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
+using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
@@ -168,38 +171,61 @@ public static partial class FastDataGenerator
 
         LogKeyType(logger, nameof(String));
 
-        StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys.Span, cfg.EnablePrefixSuffixTrimming, cfg.IgnoreCase, generator.Encoding);
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys.Span, cfg.IgnoreCase, generator.Encoding);
 
         if (!props.CharacterData.AllAscii && generator.Encoding == GeneratorEncoding.AsciiBytes)
             throw new InvalidOperationException("Your data has non-ASCII in it, and the generator is set to produce an ASCII API. That's not supported.");
+
+        LogMinMaxLength(logger, props.LengthData.MinCharLength, props.LengthData.MaxCharLength);
 
         StringHashInfo? cacheHashInfo = null;
         HashData? cacheHashData = null;
 
         string trimPrefix = string.Empty;
         string trimSuffix = string.Empty;
+        int totalTrimLength = 0;
+
+        // Save original properties for user-facing constants (MinKeyLength, MaxKeyLength, character classes)
+        int originalMinLength = props.LengthData.LengthRanges.Min;
+        int originalMaxLength = props.LengthData.LengthRanges.Max;
+        CharacterClass originalCharClasses = props.CharacterData.CharacterClasses;
 
         // If we can remove prefix/suffix from the keys, we do so.
-        if (props.DeltaData.Prefix.Length > 0 || props.DeltaData.Suffix.Length > 0)
+        if (cfg.EnablePrefixSuffixTrimming)
         {
-            trimPrefix = props.DeltaData.Prefix;
-            trimSuffix = props.DeltaData.Suffix;
-            keys = StringTransform.SubStringKeys(keys.Span, props);
-        }
+            if (props.DeltaData.Prefix.Length > 0 || props.DeltaData.Suffix.Length > 0)
+            {
+                trimPrefix = props.DeltaData.Prefix;
+                trimSuffix = props.DeltaData.Suffix;
+                totalTrimLength = trimPrefix.Length + trimSuffix.Length;
+                keys = StringTransform.SubStringKeys(keys.Span, props);
 
-        LogMinMaxLength(logger, props.LengthData.MinCharLength, props.LengthData.MaxCharLength);
+                // Recompute properties from trimmed keys so that structure selection, early exits, and hash analysis are correct
+                props = KeyAnalyzer.GetStringProperties(keys.Span, cfg.IgnoreCase, generator.Encoding);
+            }
+        }
 
         (Type structureType, IStructure<string, TValue, IContext> structure, IContext res) = cfg.StructureTypeOverride != null ? CreateSelectedStringStructure(cfg.StructureTypeOverride) : CreateBestStringStructure();
         LogStructureType(logger, structureType.Name);
 
-        // Combine mandatory early exits from structures with generated early exits from analysis
-        List<IEarlyExit> earlyExits = CombineExits(structure.GetMandatoryExits(), StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase));
+        // Combine all early exits into a single collection. When trimming is active, length exits are offset
+        // by totalTrimLength and char exits use indexed access so all exits operate on the original key.
+        IEnumerable<IEarlyExit> structureExits = totalTrimLength > 0 ? AdjustLengthExits(structure.GetMandatoryExits(), totalTrimLength) : structure.GetMandatoryExits();
+        IEarlyExit[] analysisExits = StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase, totalTrimLength, trimPrefix.Length, trimSuffix.Length);
+        List<IEarlyExit> earlyExits = CombineExits(structureExits, analysisExits);
+
+        // When trimming is active, add prefix/suffix checks as early exits
+        if (trimPrefix.Length > 0)
+            earlyExits.Add(new StringPrefixEarlyExit(trimPrefix, cfg.IgnoreCase));
+        if (trimSuffix.Length > 0)
+            earlyExits.Add(new StringSuffixEarlyExit(trimSuffix, cfg.IgnoreCase));
+
         if (cfg.EarlyExitConfig.OptimizeExpression)
             ReduceExits(earlyExits);
 
         UsedFunctionVisitor usedVisitor = new UsedFunctionVisitor();
 
-        // Convert the early exits into a set of annotated expressions. We assume the input is called "key".
+        // All exits use "key" - length and char exits are adjusted to work on the original key
         ParameterExpression inputKey = Parameter(typeof(string), "key");
         AnnotatedExpr[] exprs = AnnotateExits(earlyExits, inputKey, usedVisitor);
 
@@ -210,9 +236,7 @@ public static partial class FastDataGenerator
         if (cacheHashInfo != null)
             usedVisitor.Visit(cacheHashInfo.Expression);
 
-        StringGeneratorConfig genCfg = new StringGeneratorConfig(structureType, (uint)keys.Length, props.LengthData.LengthRanges.Min,
-            props.LengthData.LengthRanges.Max, cfg.IgnoreCase, props.CharacterData.CharacterClasses,
-            generator.Encoding, transformed, trimPrefix, trimSuffix, cfg.TypeReductionEnabled, cacheHashInfo, usedVisitor.Functions);
+        StringGeneratorConfig genCfg = new StringGeneratorConfig(structureType, (uint)keys.Length, originalMinLength, originalMaxLength, cfg.IgnoreCase, originalCharClasses, generator.Encoding, transformed, trimPrefix, trimSuffix, cfg.TypeReductionEnabled, cacheHashInfo, usedVisitor.Functions);
 
         return generator.Generate<string, TValue>(genCfg, res);
 
@@ -451,6 +475,19 @@ public static partial class FastDataGenerator
             }
 
             exits.Add(exit);
+        }
+    }
+
+    private static IEnumerable<IEarlyExit> AdjustLengthExits(IEnumerable<IEarlyExit> exits, int offset)
+    {
+        foreach (IEarlyExit exit in exits)
+        {
+            yield return exit switch
+            {
+                LengthLessThanEarlyExit e => new LengthLessThanEarlyExit(e.Value + offset),
+                LengthGreaterThanEarlyExit e => new LengthGreaterThanEarlyExit(e.Value + offset),
+                _ => exit
+            };
         }
     }
 

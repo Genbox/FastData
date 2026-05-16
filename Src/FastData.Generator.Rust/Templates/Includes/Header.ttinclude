@@ -37,7 +37,7 @@ use std::ptr;
 <#
     if (GeneratorConfig is StringGeneratorConfig strCfg2)
     {
-        if (strCfg2.IgnoreCase || (strCfg2.StringFunctions & (StringFunction.GetFirstCharLower | StringFunction.GetLastCharLower | StringFunction.StartsWithLower | StringFunction.EndsWithLower)) != 0)
+        if (strCfg2.IgnoreCase || (strCfg2.StringFunctions & (StringFunction.GetCharAtLower | StringFunction.GetCharFromEndLower | StringFunction.StartsWithLower | StringFunction.EndsWithLower)) != 0)
         {
 #>
 fn ToLowerAscii(value: u8) -> u8 {
@@ -110,15 +110,20 @@ fn case_insensitive_compare(left: &str, right: &str) -> i32 {
             { StringFunction.ReadU32, "fn ReadU32(value: &[u8], offset: usize) -> u32 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u32) } }" },
             { StringFunction.ReadU64, "fn ReadU64(value: &[u8], offset: usize) -> u64 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u64) } }" },
 
-            { StringFunction.GetFirstChar, "fn GetFirstChar(value: &str) -> char { value.as_bytes()[0] as char }" },
-            { StringFunction.GetFirstCharLower, "fn GetFirstCharLower(value: &str) -> char { ToLowerAscii(GetFirstChar(value) as u8) as char }" },
-            { StringFunction.GetLastChar, """
-fn GetLastChar(value: &str) -> char {
+            { StringFunction.GetCharAt, "fn GetCharAt(value: &str, index: usize) -> char { value.as_bytes()[index] as char }" },
+            { StringFunction.GetCharAtLower, "fn GetCharAtLower(value: &str, index: usize) -> char { ToLowerAscii(value.as_bytes()[index]) as char }" },
+            { StringFunction.GetCharFromEnd, """
+fn GetCharFromEnd(value: &str, from_end: usize) -> char {
     let bytes = value.as_bytes();
-    bytes[bytes.len() - 1] as char
+    bytes[bytes.len() - 1 - from_end] as char
 }
 """ },
-            { StringFunction.GetLastCharLower, "fn GetLastCharLower(value: &str) -> char { ToLowerAscii(GetLastChar(value) as u8) as char }" },
+            { StringFunction.GetCharFromEndLower, """
+fn GetCharFromEndLower(value: &str, from_end: usize) -> char {
+    let bytes = value.as_bytes();
+    ToLowerAscii(bytes[bytes.len() - 1 - from_end]) as char
+}
+""" },
 
             { StringFunction.GetLength, "fn GetLength(value: &str) -> i32 { value.len() as i32 }" },
 

@@ -37,45 +37,23 @@
     {
         StringBuilder sb = new StringBuilder();
 
-        LookupKeyName = "key";
-
-        sb.Append(GetEarlyExits(type));
+        sb.Append(GetEarlyExits(type, GeneratorConfig.EarlyExits));
 
         if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
         {
             string totalTrimLength = strCfg.TotalTrimLength.ToStringInvariant();
-
-            if (type == MethodType.TryLookup)
-            {
-                sb.AppendLine($$"""
-                                        if (key.Length < {{totalTrimLength}})
-                                        {
-                                            value = default;
-                                            return false;
-                                        }
-                                """);
-            }
-            else
-            {
-                sb.AppendLine($"""
-                                       if (key.Length < {totalTrimLength})
-                                           return false;
-                               """);
-            }
-
-            sb.AppendLine($"        string trimmed = key.Substring({strCfg.TrimPrefix.Length.ToStringInvariant()}, key.Length - {totalTrimLength});");
-
-            LookupKeyName = "trimmed";
+            sb.AppendLine($"        string lookupKey = key.Substring({strCfg.TrimPrefix.Length.ToStringInvariant()}, key.Length - {totalTrimLength});");
+            LookupKeyName = "lookupKey";
         }
 
         return sb.ToString();
     }
 
-    private string GetEarlyExits(MethodType methodType)
+    private string GetEarlyExits(MethodType methodType, AnnotatedExpr[] earlyExits)
     {
         IExprTransform[] transforms = [new EarlyExitConditionTransform(GetBody(methodType))];
 
-        IEnumerable<AnnotatedExpr> transformed = ExpressionHelper.Transform(GeneratorConfig.EarlyExits, transforms);
+        IEnumerable<AnnotatedExpr> transformed = ExpressionHelper.Transform(earlyExits, transforms);
 
         List<ParameterExpression> variables = new List<ParameterExpression>();
         List<Expression> statements = new List<Expression>();

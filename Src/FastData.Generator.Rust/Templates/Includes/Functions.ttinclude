@@ -93,20 +93,13 @@
     public string GetMethodHeader(MethodType methodType)
     {
         StringBuilder sb = new StringBuilder();
-        LookupKeyName = "key";
-        sb.Append(GetEarlyExits(methodType));
+
+        sb.Append(GetEarlyExits(methodType, GeneratorConfig.EarlyExits));
 
         if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
         {
-            string totalTrimLength = strCfg.TotalTrimLength.ToStringInvariant();
-
-            if (methodType == MethodType.TryLookup)
-                sb.AppendLine($"        if key.len() < {totalTrimLength} {{ return None; }}");
-            else
-                sb.AppendLine($"        if key.len() < {totalTrimLength} {{ return false; }}");
-
-            sb.AppendLine($"        let trimmedKey = &key[{strCfg.TrimPrefix.Length.ToStringInvariant()}..key.len() - {strCfg.TrimSuffix.Length.ToStringInvariant()}];");
-            LookupKeyName = "trimmedKey";
+            sb.AppendLine($"        let lookupKey = &key[{strCfg.TrimPrefix.Length.ToStringInvariant()}..key.len() - {strCfg.TrimSuffix.Length.ToStringInvariant()}];");
+            LookupKeyName = "lookupKey";
         }
 
         return sb.ToString();
@@ -171,9 +164,9 @@
         throw new InvalidOperationException("Unsupported key type: " + keyType);
     }
 
-    private string GetEarlyExits(MethodType methodType)
+    private string GetEarlyExits(MethodType methodType, AnnotatedExpr[] earlyExits)
     {
-        IEnumerable<AnnotatedExpr> transformed = ExpressionHelper.Transform(GeneratorConfig.EarlyExits, [new EarlyExitConditionTransform(GetBody(methodType))]);
+        IEnumerable<AnnotatedExpr> transformed = ExpressionHelper.Transform(earlyExits, [new EarlyExitConditionTransform(GetBody(methodType))]);
 
         List<ParameterExpression> variables = new List<ParameterExpression>();
         List<Expression> statements = new List<Expression>();

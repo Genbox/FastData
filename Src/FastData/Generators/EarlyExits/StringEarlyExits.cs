@@ -8,9 +8,9 @@ namespace Genbox.FastData.Generators.EarlyExits;
 
 internal static class StringEarlyExits
 {
-    internal static IEarlyExit[] GetExits(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase)
+    internal static IEarlyExit[] GetExits(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase, int lengthOffset = 0, int firstCharOffset = 0, int lastCharOffset = 0)
     {
-        IEarlyExit[] candidates = ProduceCandidates(structureType, props, config, ignoreCase).ToArray();
+        IEarlyExit[] candidates = ProduceCandidates(structureType, props, config, ignoreCase, lengthOffset, firstCharOffset, lastCharOffset).ToArray();
 
         if (candidates.Length == 0)
             return [];
@@ -18,7 +18,7 @@ internal static class StringEarlyExits
         float threshold = config.MinRejectionRatio;
 
         if (threshold > 0f)
-            candidates = FilterByRejection(candidates, props, threshold).ToArray();
+            candidates = FilterByRejection(candidates, props, threshold, lengthOffset).ToArray();
 
         if (candidates.Length == 0)
             return [];
@@ -26,7 +26,7 @@ internal static class StringEarlyExits
         return GetTopExits(candidates, config.MaxCandidates).ToArray();
     }
 
-    private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase)
+    private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase, int lengthOffset, int firstCharOffset, int lastCharOffset)
     {
         if (config.Disabled)
             yield break;
@@ -38,8 +38,8 @@ internal static class StringEarlyExits
         // For languages that has to iterate the string (C, Swift, Haskell), it is slower than comparing the first char.
         {
             DataRanges<int> ranges = props.LengthData.LengthRanges;
-            int min = ranges.Min;
-            int max = ranges.Max;
+            int min = ranges.Min + lengthOffset;
+            int max = ranges.Max + lengthOffset;
 
             if (config.IsEarlyExitEnabled(typeof(LengthNotEqualEarlyExit)) && min == max)
                 yield return new LengthNotEqualEarlyExit(min);
@@ -54,47 +54,47 @@ internal static class StringEarlyExits
             {
                 (int Start, int End) current = ranges.Ranges[i];
                 (int Start, int End) next = ranges.Ranges[i + 1];
-                yield return new StringLengthRangeEarlyExit(current.End, next.Start);
+                yield return new StringLengthRangeEarlyExit(current.End + lengthOffset, next.Start + lengthOffset);
             }
 
             int bitCount = GetRangeCount(ranges);
             float density = (float)bitCount / ((max - min) + 1);
             if (config.IsEarlyExitEnabled(typeof(LengthBitmapEarlyExit)) && config.CheckDensityLimits(typeof(LengthBitmapEarlyExit), density))
             {
-                ulong bitSet = BuildLengthBitmap(ranges);
+                ulong bitSet = BuildLengthBitmap(ranges, lengthOffset);
                 if (bitSet != 0)
                     yield return new LengthBitmapEarlyExit(bitSet);
             }
         }
 
         {
-            // Accessing the first char/byte in a string is always constant time.
+            // Accessing a char by index in a string is always constant time.
             AsciiMap firstMap = props.CharacterData.FirstCharMap;
             if (config.IsEarlyExitEnabled(typeof(CharFirstNotEqualEarlyExit)) && firstMap.BitCount == 1) //1 bit means all first characters are the same
-                yield return new CharFirstNotEqualEarlyExit(firstMap.Min, ignoreCase); //We can use min or max. They are the same.
+                yield return new CharFirstNotEqualEarlyExit(firstMap.Min, ignoreCase, firstCharOffset); //We can use min or max. They are the same.
 
             if (config.IsEarlyExitEnabled(typeof(CharFirstLessThanEarlyExit)) && firstMap.Min > 0)
-                yield return new CharFirstLessThanEarlyExit(firstMap.Min);
+                yield return new CharFirstLessThanEarlyExit(firstMap.Min, firstCharOffset);
 
             if (config.IsEarlyExitEnabled(typeof(CharFirstGreaterThanEarlyExit)) && firstMap.Max < char.MaxValue)
-                yield return new CharFirstGreaterThanEarlyExit(firstMap.Max);
+                yield return new CharFirstGreaterThanEarlyExit(firstMap.Max, firstCharOffset);
 
             if (config.IsEarlyExitEnabled(typeof(CharFirstBitmapEarlyExit)) && config.CheckDensityLimits(typeof(CharFirstBitmapEarlyExit), firstMap.Density))
-                yield return new CharFirstBitmapEarlyExit(firstMap.Low, firstMap.High, ignoreCase);
+                yield return new CharFirstBitmapEarlyExit(firstMap.Low, firstMap.High, ignoreCase, firstCharOffset);
 
             // Accessing the last char/byte is slow in languages that don't cache string length
             AsciiMap lastMap = props.CharacterData.LastCharMap;
             if (config.IsEarlyExitEnabled(typeof(CharLastNotEqualEarlyExit)) && lastMap.BitCount == 1) //1 bit means all last characters are the same
-                yield return new CharLastNotEqualEarlyExit(lastMap.Min, ignoreCase); //We can use min or max. They are the same.
+                yield return new CharLastNotEqualEarlyExit(lastMap.Min, ignoreCase, lastCharOffset); //We can use min or max. They are the same.
 
             if (config.IsEarlyExitEnabled(typeof(CharLastLessThanEarlyExit)) && lastMap.Min > 0)
-                yield return new CharLastLessThanEarlyExit(lastMap.Min);
+                yield return new CharLastLessThanEarlyExit(lastMap.Min, lastCharOffset);
 
             if (config.IsEarlyExitEnabled(typeof(CharLastGreaterThanEarlyExit)) && lastMap.Max < char.MaxValue)
-                yield return new CharLastGreaterThanEarlyExit(lastMap.Max);
+                yield return new CharLastGreaterThanEarlyExit(lastMap.Max, lastCharOffset);
 
             if (config.IsEarlyExitEnabled(typeof(CharLastBitmapEarlyExit)) && config.CheckDensityLimits(typeof(CharLastBitmapEarlyExit), lastMap.Density))
-                yield return new CharLastBitmapEarlyExit(lastMap.Low, lastMap.High, ignoreCase);
+                yield return new CharLastBitmapEarlyExit(lastMap.Low, lastMap.High, ignoreCase, lastCharOffset);
         }
 
         // If prefix/suffix trimming is disabled, we can use them as early exits instead.
@@ -115,10 +115,10 @@ internal static class StringEarlyExits
         return candidates.OrderByDescending(x => x.KeyspaceSize).Take(maxCandidates);
     }
 
-    private static IEnumerable<IEarlyExit> FilterByRejection(IEarlyExit[] candidates, StringKeyProperties props, float threshold)
+    private static IEnumerable<IEarlyExit> FilterByRejection(IEarlyExit[] candidates, StringKeyProperties props, float threshold, int lengthOffset)
     {
-        int minLength = props.LengthData.LengthRanges.Min;
-        int maxLength = props.LengthData.LengthRanges.Max;
+        int minLength = props.LengthData.LengthRanges.Min + lengthOffset;
+        int maxLength = props.LengthData.LengthRanges.Max + lengthOffset;
         double lengthSpan = maxLength >= minLength ? (maxLength - minLength) + 1d : 0d;
         double firstSpan = GetAsciiSpan(props.CharacterData.FirstCharMap);
         double lastSpan = GetAsciiSpan(props.CharacterData.LastCharMap);
@@ -166,19 +166,22 @@ internal static class StringEarlyExits
         return count;
     }
 
-    private static ulong BuildLengthBitmap(DataRanges<int> ranges)
+    private static ulong BuildLengthBitmap(DataRanges<int> ranges, int offset)
     {
         const int maxIndex = 63;
         ulong bitSet = 0;
 
         foreach ((int Start, int End) range in ranges.Ranges)
         {
-            if (range.Start > maxIndex)
+            int start = range.Start + offset;
+            int end = range.End + offset;
+
+            if (start > maxIndex)
                 continue;
 
-            int end = Math.Min(range.End, maxIndex);
+            end = Math.Min(end, maxIndex);
 
-            for (int value = range.Start; value <= end; value++)
+            for (int value = start; value <= end; value++)
             {
                 int bitIndex = (value - 1) & 63;
                 bitSet |= 1UL << bitIndex;

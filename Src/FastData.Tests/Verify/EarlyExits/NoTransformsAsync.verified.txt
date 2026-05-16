@@ -8,7 +8,7 @@
     Kind: EarlyExit
   },
   {
-    Expression: (GetFirstChar(inputKey) < a),
+    Expression: (GetCharAt(inputKey, 0) < a),
     Kind: EarlyExit
   }
 ]

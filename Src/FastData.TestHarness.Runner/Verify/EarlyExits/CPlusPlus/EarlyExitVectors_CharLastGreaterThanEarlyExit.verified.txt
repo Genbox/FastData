@@ -1,1 +1,1 @@
-﻿(GetLastChar(inputKey) > 109)
+﻿(GetCharFromEnd(inputKey, 0) > 109)

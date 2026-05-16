@@ -11,8 +11,8 @@ using System.Runtime.InteropServices;
 internal static class MyData
 {
 
-    private static char GetFirstChar(string str) => str[0];
-    private static char GetLastChar(string str) => str[str.Length - 1];
+    private static char GetCharAt(string str, int index) => str[index];
+    private static char GetCharFromEnd(string str, int fromEnd) => str[str.Length - 1 - fromEnd];
     private static int GetLength(string str) => str.Length;
 
     [StructLayout(LayoutKind.Auto)]
@@ -58,27 +58,27 @@ internal static class MyData
     public static bool Contains(string key)
     {
         int getLength;
-        char getLastChar;
-        char getFirstChar;
+        char getCharFromEnd;
+        char getCharAt;
         getLength = GetLength(key);
         if ((getLength > 5))
         {
          return false;
         }
 
-        getLastChar = GetLastChar(key);
-        if ((getLastChar > '2'))
+        getCharFromEnd = GetCharFromEnd(key, 0);
+        if ((getCharFromEnd > '2'))
         {
          return false;
         }
 
-        getFirstChar = GetFirstChar(key);
-        if ((getFirstChar > 't'))
+        getCharAt = GetCharAt(key, 0);
+        if ((getCharAt > 't'))
         {
          return false;
         }
 
-        if ((getFirstChar < 't'))
+        if ((getCharAt < 't'))
         {
          return false;
         }

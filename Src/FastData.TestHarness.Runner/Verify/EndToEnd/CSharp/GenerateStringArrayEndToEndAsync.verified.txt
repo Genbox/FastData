@@ -9,8 +9,8 @@ using System.Runtime.InteropServices;
 internal static class FastData
 {
 
-    private static char GetFirstChar(string str) => str[0];
-    private static char GetLastChar(string str) => str[str.Length - 1];
+    private static char GetCharAt(string str, int index) => str[index];
+    private static char GetCharFromEnd(string str, int fromEnd) => str[str.Length - 1 - fromEnd];
     private static int GetLength(string str) => str.Length;
 
 
@@ -22,27 +22,27 @@ internal static class FastData
     public static bool Contains(string key)
     {
         int getLength;
-        char getFirstChar;
-        char getLastChar;
+        char getCharAt;
+        char getCharFromEnd;
         getLength = GetLength(key);
         if ((getLength > 7))
         {
          return false;
         }
 
-        getFirstChar = GetFirstChar(key);
-        if ((getFirstChar > 'd'))
+        getCharAt = GetCharAt(key, 0);
+        if ((getCharAt > 'd'))
         {
          return false;
         }
 
-        getLastChar = GetLastChar(key);
-        if ((getLastChar > 'o'))
+        getCharFromEnd = GetCharFromEnd(key, 0);
+        if ((getCharFromEnd > 'o'))
         {
          return false;
         }
 
-        if (((((ulong.MinValue & (1ul << (int)((uint)getLastChar & 63u))) & ~(ulong.MinValue - (ulong)((uint)getLastChar >> 6))) | ((140883517243392ul & (1ul << (int)((uint)getLastChar & 63u))) & (ulong.MinValue - (ulong)((uint)getLastChar >> 6)))) == ulong.MinValue))
+        if (((((ulong.MinValue & (1ul << (int)((uint)getCharFromEnd & 63u))) & ~(ulong.MinValue - (ulong)((uint)getCharFromEnd >> 6))) | ((140883517243392ul & (1ul << (int)((uint)getCharFromEnd & 63u))) & (ulong.MinValue - (ulong)((uint)getCharFromEnd >> 6)))) == ulong.MinValue))
         {
          return false;
         }

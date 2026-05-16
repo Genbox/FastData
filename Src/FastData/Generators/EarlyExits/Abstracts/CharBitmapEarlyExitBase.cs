@@ -1,17 +1,16 @@
 using System.Linq.Expressions;
 using System.Numerics;
-using System.Reflection;
 using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generators.EarlyExits.Abstracts;
 
 public abstract record CharBitmapEarlyExitBase(ulong Low, ulong High, string Method) : IEarlyExit
 {
-    public Expression GetExpression(ParameterExpression key)
-    {
-        MethodInfo methodInfo = typeof(StringFunctions).GetMethod(Method, [typeof(string)])!;
+    public abstract Expression GetExpression(ParameterExpression key);
 
-        Expression valueExpr = Convert(Call(methodInfo, key), typeof(uint));
+    protected Expression BuildBitmapExpression(Expression charCall)
+    {
+        Expression valueExpr = Convert(charCall, typeof(uint));
         Expression bitIndex = And(valueExpr, Constant(63u));
         Expression bitShift = LeftShift(Constant(1UL), Convert(bitIndex, typeof(int)));
 
