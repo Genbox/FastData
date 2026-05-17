@@ -5,12 +5,12 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
-// (BitSet & (1UL << (int)((GetLength(inputKey) - 1) & 63))) == 0UL;
+// (BitSet & (1UL << (int)((Length(inputKey) - 1) & 63))) == 0UL;
 public sealed record LengthBitmapEarlyExit(ulong BitSet) : IEarlyExit
 {
     public Expression GetExpression(ParameterExpression key)
     {
-        MethodInfo methodInfo = typeof(StringFunctions).GetMethod(nameof(StringFunctions.GetLength), [typeof(string)])!;
+        MethodInfo methodInfo = typeof(GeneratorFunctions).GetMethod(nameof(GeneratorFunctions.Length), [typeof(string)])!;
 
         Expression shift = And(Subtract(Call(methodInfo, key), Constant(1)), Constant(63));
         Expression shiftedBit = LeftShift(Constant(1UL), Convert(shift, typeof(int)));

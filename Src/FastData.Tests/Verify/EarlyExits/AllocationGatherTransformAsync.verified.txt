@@ -1,22 +1,22 @@
 ﻿[
   {
-    Expression: (getLength = GetLength(inputKey)),
+    Expression: (length = Length(inputKey)),
     Kind: Assignment
   },
   {
-    Expression: (getLength < 4),
+    Expression: (length < 4),
     Kind: EarlyExit
   },
   {
-    Expression: (getLength > 9),
+    Expression: (length > 9),
     Kind: EarlyExit
   },
   {
-    Expression: (getCharAt0 = GetCharAt(inputKey, 0)),
+    Expression: (unitAt0 = UnitAt(inputKey, 0)),
     Kind: Assignment
   },
   {
-    Expression: (getCharAt0 < a),
+    Expression: (unitAt0 < 97),
     Kind: EarlyExit
   }
 ]

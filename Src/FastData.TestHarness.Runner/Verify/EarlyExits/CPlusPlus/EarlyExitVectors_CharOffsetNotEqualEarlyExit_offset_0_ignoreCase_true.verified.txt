@@ -1,1 +1,0 @@
-﻿(GetCharAtLower(inputKey, 0) != 120)

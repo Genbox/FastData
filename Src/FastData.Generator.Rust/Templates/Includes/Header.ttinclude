@@ -37,12 +37,13 @@ use std::ptr;
 <#
     if (GeneratorConfig is StringGeneratorConfig strCfg2)
     {
-        if (strCfg2.IgnoreCase || (strCfg2.StringFunctions & (StringFunction.GetCharAtLower | StringFunction.StringAtLower)) != 0)
+        if (strCfg2.IgnoreCase || (strCfg2.GeneratorFunctions & (GeneratorFunction.UnitAtAsciiLower | GeneratorFunction.EqualsAtAsciiLower)) != 0)
         {
 #>
-fn ToLowerAscii(value: u8) -> u8 {
-    if value >= b'A' && value <= b'Z' {
-        value + 32
+fn ToAsciiLower(value: u32) -> u32 {
+    let candidate = value | 0x20;
+    if candidate.wrapping_sub(b'a' as u32) <= (b'z' - b'a') as u32 {
+        candidate
     } else {
         value
     }
@@ -63,7 +64,7 @@ fn case_insensitive_equals(left: &str, right: &str) -> bool {
     }
 
     for i in 0..left_bytes.len() {
-        if ToLowerAscii(left_bytes[i]) != ToLowerAscii(right_bytes[i]) {
+        if ToAsciiLower(left_bytes[i] as u32) != ToAsciiLower(right_bytes[i] as u32) {
             return false;
         }
     }
@@ -77,8 +78,8 @@ fn case_insensitive_compare(left: &str, right: &str) -> i32 {
     let min_len = if left_bytes.len() < right_bytes.len() { left_bytes.len() } else { right_bytes.len() };
 
     for i in 0..min_len {
-        let left_ch = ToLowerAscii(left_bytes[i]);
-        let right_ch = ToLowerAscii(right_bytes[i]);
+        let left_ch = ToAsciiLower(left_bytes[i] as u32);
+        let right_ch = ToAsciiLower(right_bytes[i] as u32);
 
         if left_ch < right_ch {
             return -1;
@@ -103,55 +104,47 @@ fn case_insensitive_compare(left: &str, right: &str) -> i32 {
 <#
         }
 
-        Dictionary<StringFunction, string> map = new()
+        Dictionary<GeneratorFunction, string> map = new()
         {
-            { StringFunction.ReadU8, "fn ReadU8(value: &[u8], offset: usize) -> u8 { unsafe { *value.get_unchecked(offset) } }" },
-            { StringFunction.ReadU16, "fn ReadU16(value: &[u8], offset: usize) -> u16 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u16) } }" },
-            { StringFunction.ReadU32, "fn ReadU32(value: &[u8], offset: usize) -> u32 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u32) } }" },
-            { StringFunction.ReadU64, "fn ReadU64(value: &[u8], offset: usize) -> u64 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u64) } }" },
-
-            { StringFunction.GetCharAt, """
-fn GetCharAt(value: &str, offset: i32) -> char {
+            { GeneratorFunction.UnitAt, """
+fn UnitAt(value: &str, offset: i32) -> u32 {
     let bytes = value.as_bytes();
-    if offset >= 0 { bytes[offset as usize] as char } else { bytes[bytes.len().wrapping_add(offset as usize)] as char }
+    let index = if offset >= 0 { offset as usize } else { bytes.len().wrapping_add(offset as usize) };
+    bytes[index] as u32
 }
 """ },
-            { StringFunction.GetCharAtLower, """
-fn GetCharAtLower(value: &str, offset: i32) -> char {
-    let bytes = value.as_bytes();
-    let ch = if offset >= 0 { bytes[offset as usize] } else { bytes[bytes.len().wrapping_add(offset as usize)] };
-    ToLowerAscii(ch) as char
-}
-""" },
-
-            { StringFunction.GetLength, "fn GetLength(value: &str) -> i32 { value.len() as i32 }" },
-
-            { StringFunction.StringAt, """
-fn StringAt(fragment: &str, offset: i32, value: &str) -> bool {
+            { GeneratorFunction.UnitAtAsciiLower, "fn UnitAtAsciiLower(value: &str, offset: i32) -> u32 { ToAsciiLower(UnitAt(value, offset)) }" },
+            { GeneratorFunction.Length, "fn Length(value: &str) -> i32 { value.len() as i32 }" },
+            { GeneratorFunction.EqualsAt, """
+fn EqualsAt(value: &str, offset: i32, fragment: &str) -> bool {
     let start = if offset >= 0 { offset as usize } else { value.len().wrapping_add(offset as usize) };
     &value[start..start + fragment.len()] == fragment
 }
 """ },
-            { StringFunction.StringAtLower, """
-fn StringAtIgnoreCase(fragment: &str, offset: i32, value: &str) -> bool {
+            { GeneratorFunction.EqualsAtAsciiLower, """
+fn EqualsAtAsciiLower(value: &str, offset: i32, fragment: &str) -> bool {
     let frag_bytes = fragment.as_bytes();
     let value_bytes = value.as_bytes();
     let start = if offset >= 0 { offset as usize } else { value_bytes.len().wrapping_add(offset as usize) };
 
     for i in 0..frag_bytes.len() {
-        if ToLowerAscii(value_bytes[start + i]) != ToLowerAscii(frag_bytes[i]) {
+        if ToAsciiLower(value_bytes[start + i] as u32) != ToAsciiLower(frag_bytes[i] as u32) {
             return false;
         }
     }
 
     true
 }
-""" }
+""" },
+            { GeneratorFunction.ReadU8, "fn ReadU8(value: &[u8], offset: usize) -> u32 { unsafe { *value.get_unchecked(offset) as u32 } }" },
+            { GeneratorFunction.ReadU16, "fn ReadU16(value: &[u8], offset: usize) -> u32 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u16) as u32 } }" },
+            { GeneratorFunction.ReadU32, "fn ReadU32(value: &[u8], offset: usize) -> u32 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u32) } }" },
+            { GeneratorFunction.ReadU64, "fn ReadU64(value: &[u8], offset: usize) -> u64 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u64) } }" }
         };
 
-        foreach (KeyValuePair<StringFunction, string> kv in map)
+        foreach (KeyValuePair<GeneratorFunction, string> kv in map)
         {
-            if ((strCfg2.StringFunctions & kv.Key) == 0)
+            if ((strCfg2.GeneratorFunctions & kv.Key) == 0)
                 continue;
 #>
 <#= kv.Value #>

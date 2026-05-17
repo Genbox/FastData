@@ -28,7 +28,7 @@ public class EarlyExitConfig
 
             cfg.AppendLimit(typeof(ValueBitMaskEarlyExit), new ValueDensityMinMaxLimit(0, 0.25f));
             cfg.AppendLimit(typeof(LengthBitmapEarlyExit), new ValueDensityMinMaxLimit(0, 0.45f));
-            cfg.AppendLimit(typeof(CharOffsetBitmapEarlyExit), new ValueDensityMinMaxLimit(0, 0.45f));
+            cfg.AppendLimit(typeof(UnitAtBitmapEarlyExit), new ValueDensityMinMaxLimit(0, 0.45f));
 
             return cfg;
         }

@@ -8,12 +8,13 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-fn GetCharAt(value: &str, offset: i32) -> char {
+fn UnitAt(value: &str, offset: i32) -> u32 {
     let bytes = value.as_bytes();
-    if offset >= 0 { bytes[offset as usize] as char } else { bytes[bytes.len().wrapping_add(offset as usize)] as char }
+    let index = if offset >= 0 { offset as usize } else { bytes.len().wrapping_add(offset as usize) };
+    bytes[index] as u32
 }
 
-fn GetLength(value: &str) -> i32 { value.len() as i32 }
+fn Length(value: &str) -> i32 { value.len() as i32 }
 
 
 pub struct fastdata;
@@ -25,28 +26,28 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
-        let mut getLength: i32;
-        let mut getCharAt0: char;
-        let mut getCharAtNeg1: char;
-        getLength = GetLength(key);
-        if ((getLength > 7))
+        let mut length: i32;
+        let mut unitAt0: u32;
+        let mut unitAtNeg1: u32;
+        length = Length(key);
+        if ((length > 7))
         {
          return false;
         }
 
-        getCharAt0 = GetCharAt(key, 0);
-        if ((getCharAt0 > 'd'))
+        unitAt0 = UnitAt(key, 0);
+        if ((unitAt0 > 100))
         {
          return false;
         }
 
-        getCharAtNeg1 = GetCharAt(key, -1);
-        if ((getCharAtNeg1 > 'o'))
+        unitAtNeg1 = UnitAt(key, -1);
+        if ((unitAtNeg1 > 111))
         {
          return false;
         }
 
-        if (((((u64::MIN & (1 << ((((getCharAtNeg1 as u32) & 63) as i32) as u32))) & !(u64::MIN.wrapping_sub((((getCharAtNeg1 as u32) >> (6 as u32)) as u64)))) | ((140883517243392 & (1 << ((((getCharAtNeg1 as u32) & 63) as i32) as u32))) & (u64::MIN.wrapping_sub((((getCharAtNeg1 as u32) >> (6 as u32)) as u64))))) == u64::MIN))
+        if (((((u64::MIN & (1 << ((((unitAtNeg1 as u32) & 63) as i32) as u32))) & !(u64::MIN.wrapping_sub((((unitAtNeg1 as u32) >> (6 as u32)) as u64)))) | ((140883517243392 & (1 << ((((unitAtNeg1 as u32) & 63) as i32) as u32))) & (u64::MIN.wrapping_sub((((unitAtNeg1 as u32) >> (6 as u32)) as u64))))) == u64::MIN))
         {
          return false;
         }

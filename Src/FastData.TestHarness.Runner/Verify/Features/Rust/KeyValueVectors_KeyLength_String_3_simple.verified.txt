@@ -8,7 +8,7 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-fn GetLength(value: &str) -> i32 { value.len() as i32 }
+fn Length(value: &str) -> i32 { value.len() as i32 }
 
 
 pub struct fastdata;
@@ -27,14 +27,14 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
-        let mut getLength: i32;
-        getLength = GetLength(key);
-        if ((getLength < 1))
+        let mut length: i32;
+        length = Length(key);
+        if ((length < 1))
         {
          return false;
         }
 
-        if ((getLength > 3))
+        if ((length > 3))
         {
          return false;
         }
@@ -46,14 +46,14 @@ impl fastdata {
 
     #[must_use]
     pub fn try_lookup(key: &str) -> Option<i32> {
-        let mut getLength: i32;
-        getLength = GetLength(key);
-        if ((getLength < 1))
+        let mut length: i32;
+        length = Length(key);
+        if ((length < 1))
         {
          return None;
         }
 
-        if ((getLength > 3))
+        if ((length > 3))
         {
          return None;
         }

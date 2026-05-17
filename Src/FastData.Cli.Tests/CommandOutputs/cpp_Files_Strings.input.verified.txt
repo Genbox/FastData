@@ -12,34 +12,34 @@
 
 class MyData final {
 
-    static constexpr char GetCharAt(std::string_view str, int32_t offset) { return offset >= 0 ? str[offset] : str[str.length() + offset]; }
-    static constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }
+    static constexpr uint32_t UnitAt(std::string_view str, int32_t offset) noexcept { const size_t index = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset; return static_cast<unsigned char>(str[index]); }
+    static constexpr int32_t Length(std::string_view str) noexcept { return static_cast<int32_t>(str.length()); }
 
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        int32_t getLength;
-        char getCharAtNeg1;
-        char getCharAt0;
-        getLength = GetLength(key);
-        if ((getLength > 5))
+        int32_t length;
+        uint32_t unitAtNeg1;
+        uint32_t unitAt0;
+        length = Length(key);
+        if ((length > 5))
         {
          return false;
         }
 
-        getCharAtNeg1 = GetCharAt(key, -1);
-        if ((getCharAtNeg1 > 50))
+        unitAtNeg1 = UnitAt(key, -1);
+        if ((unitAtNeg1 > 50u))
         {
          return false;
         }
 
-        getCharAt0 = GetCharAt(key, 0);
-        if ((getCharAt0 > 116))
+        unitAt0 = UnitAt(key, 0);
+        if ((unitAt0 > 116u))
         {
          return false;
         }
 
-        if ((getCharAt0 < 116))
+        if ((unitAt0 < 116u))
         {
          return false;
         }

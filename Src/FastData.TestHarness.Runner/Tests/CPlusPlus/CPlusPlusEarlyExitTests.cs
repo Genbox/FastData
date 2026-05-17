@@ -15,29 +15,28 @@ public sealed class CPlusPlusEarlyExitTests(DockerCPlusPlusFixture fixture) : Ea
           #include <cstdint>
           #include <string_view>
 
-          static char ToLowerAscii(char value)
+          static uint32_t ToAsciiLower(uint32_t value)
           {
-              if (value >= 'A' && value <= 'Z')
-                  return static_cast<char>(value + 32);
-              return value;
+              const uint32_t candidate = value | 0x20u;
+              return candidate - 'a' <= 'z' - 'a' ? candidate : value;
           }
 
-          static char GetCharAt(std::string_view str, int32_t offset) { return offset >= 0 ? str[offset] : str[str.length() + offset]; }
-          static char GetCharAtLower(std::string_view str, int32_t offset) { return ToLowerAscii(offset >= 0 ? str[offset] : str[str.length() + offset]); }
-          static int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }
+          static uint32_t UnitAt(std::string_view str, int32_t offset) { const size_t index = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset; return static_cast<unsigned char>(str[index]); }
+          static uint32_t UnitAtAsciiLower(std::string_view str, int32_t offset) { return ToAsciiLower(UnitAt(str, offset)); }
+          static int32_t Length(std::string_view str) { return static_cast<int32_t>(str.length()); }
 
-          static bool StringAt(std::string_view fragment, int32_t offset, std::string_view str)
+          static bool EqualsAt(std::string_view str, int32_t offset, std::string_view fragment)
           {
               size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset;
               return str.compare(start, fragment.length(), fragment) == 0;
           }
 
-          static bool StringAtIgnoreCase(std::string_view fragment, int32_t offset, std::string_view str)
+          static bool EqualsAtAsciiLower(std::string_view str, int32_t offset, std::string_view fragment)
           {
               size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset;
               for (size_t i = 0; i < fragment.length(); ++i)
               {
-                  if (ToLowerAscii(str[start + i]) != ToLowerAscii(fragment[i]))
+                  if (ToAsciiLower(static_cast<unsigned char>(str[start + i])) != ToAsciiLower(static_cast<unsigned char>(fragment[i])))
                       return false;
               }
               return true;

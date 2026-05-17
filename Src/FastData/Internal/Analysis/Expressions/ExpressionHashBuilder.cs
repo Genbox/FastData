@@ -145,16 +145,16 @@ internal static class ExpressionHashBuilder
 
     private static UnaryExpression GetReadFunc(Expression data, Expression idx, int length)
     {
-        StringFunction func = length switch
+        GeneratorFunction func = length switch
         {
-            1 => StringFunction.ReadU8,
-            2 => StringFunction.ReadU16,
-            4 => StringFunction.ReadU32,
-            8 => StringFunction.ReadU64,
+            1 => GeneratorFunction.ReadU8,
+            2 => GeneratorFunction.ReadU16,
+            4 => GeneratorFunction.ReadU32,
+            8 => GeneratorFunction.ReadU64,
             _ => throw new InvalidOperationException($"Invalid length: {length.ToString(NumberFormatInfo.InvariantInfo)}")
         };
 
-        MethodInfo? readFunc = typeof(StringFunctions).GetMethod(func.ToString(), BindingFlags.Static | BindingFlags.Public);
+        MethodInfo? readFunc = typeof(GeneratorFunctions).GetMethod(func.ToString(), BindingFlags.Static | BindingFlags.Public);
 
         if (readFunc == null)
             throw new InvalidOperationException("Could not find method");

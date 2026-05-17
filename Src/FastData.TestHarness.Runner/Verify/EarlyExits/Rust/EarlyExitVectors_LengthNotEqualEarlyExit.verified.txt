@@ -1,1 +1,1 @@
-﻿(GetLength(inputKey) != 4)
+﻿(Length(inputKey) != 4)

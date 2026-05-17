@@ -10,7 +10,7 @@
 
 class fastdata final {
 
-    static     constexpr bool StringAt(std::string_view fragment, int32_t offset, std::string_view str) {
+    static     constexpr bool EqualsAt(std::string_view str, int32_t offset, std::string_view fragment) noexcept {
         size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset;
         return str.compare(start, fragment.length(), fragment) == 0;
     }
@@ -22,12 +22,12 @@ class fastdata final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        if (!StringAt(u8"Pre", 0, key))
+        if (!EqualsAt(key, 0, u8"Pre"))
         {
          return false;
         }
 
-        if (!StringAt(u8"Suf", -3, key))
+        if (!EqualsAt(key, -3, u8"Suf"))
         {
          return false;
         }

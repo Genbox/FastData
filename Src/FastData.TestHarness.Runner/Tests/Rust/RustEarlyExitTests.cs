@@ -14,35 +14,35 @@ public sealed class RustEarlyExitTests(DockerRustFixture fixture) : EarlyExitTes
         $$"""
           #![allow(non_snake_case)]
 
-          fn ToLowerAscii(value: u8) -> u8 {
-              if value >= b'A' && value <= b'Z' {
-                  value + 32
+          fn ToAsciiLower(value: u32) -> u32 {
+              let candidate = value | 0x20;
+              if candidate.wrapping_sub(b'a' as u32) <= (b'z' - b'a') as u32 {
+                  candidate
               } else {
                   value
               }
           }
 
-          fn GetCharAt(value: &str, offset: i32) -> char {
+          fn UnitAt(value: &str, offset: i32) -> u32 {
               let bytes = value.as_bytes();
-              if offset >= 0 { bytes[offset as usize] as char } else { bytes[bytes.len().wrapping_add(offset as usize)] as char }
+              let index = if offset >= 0 { offset as usize } else { bytes.len().wrapping_add(offset as usize) };
+              bytes[index] as u32
           }
-          fn GetCharAtLower(value: &str, offset: i32) -> char {
-              let bytes = value.as_bytes();
-              let ch = if offset >= 0 { bytes[offset as usize] } else { bytes[bytes.len().wrapping_add(offset as usize)] };
-              ToLowerAscii(ch) as char
+          fn UnitAtAsciiLower(value: &str, offset: i32) -> u32 {
+              ToAsciiLower(UnitAt(value, offset))
           }
-          fn GetLength(value: &str) -> i32 { value.len() as i32 }
+          fn Length(value: &str) -> i32 { value.len() as i32 }
 
-          fn StringAt(fragment: &str, offset: i32, value: &str) -> bool {
+          fn EqualsAt(value: &str, offset: i32, fragment: &str) -> bool {
               let start = if offset >= 0 { offset as usize } else { value.len().wrapping_add(offset as usize) };
               &value[start..start + fragment.len()] == fragment
           }
-          fn StringAtIgnoreCase(fragment: &str, offset: i32, value: &str) -> bool {
+          fn EqualsAtAsciiLower(value: &str, offset: i32, fragment: &str) -> bool {
               let frag_bytes = fragment.as_bytes();
               let value_bytes = value.as_bytes();
               let start = if offset >= 0 { offset as usize } else { value_bytes.len().wrapping_add(offset as usize) };
               for i in 0..frag_bytes.len() {
-                  if ToLowerAscii(value_bytes[start + i]) != ToLowerAscii(frag_bytes[i]) {
+                  if ToAsciiLower(value_bytes[start + i] as u32) != ToAsciiLower(frag_bytes[i] as u32) {
                       return false;
                   }
               }

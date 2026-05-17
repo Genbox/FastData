@@ -13,13 +13,13 @@ public class AllocationGatherTransform : IExprTransform
 
         public bool Contains(string key)
         {
-            if (GetLength(key) < 3 || GetLength(key) > 6)
+            if (Length(key) < 3 || Length(key) > 6)
                 return false;
 
-            if (GetCharAt(key, 0) != 'Æ')
+            if (UnitAt(key, 0) != 'Æ')
                 return false;
 
-            if (GetCharAt(key, 0) < 'A')
+            if (UnitAt(key, 0) < 'A')
                 return false;
         }
 
@@ -28,16 +28,16 @@ public class AllocationGatherTransform : IExprTransform
 
         public bool Contains(string key)
         {
-            uint len = GetLength(key);
-            char charAt = GetCharAt(key, 0);
+            uint len = Length(key);
+            uint unitAt = UnitAt(key, 0);
 
             if (len < 3 || len > 6)
                 return false;
 
-            if (charAt != 'Æ')
+            if (unitAt != 'Æ')
                 return false;
 
-            if (charAt < 'A')
+            if (unitAt < 'A')
                 return false;
         }
 
@@ -45,17 +45,17 @@ public class AllocationGatherTransform : IExprTransform
 
         public bool Contains(string key)
         {
-            uint len = GetLength(key);
+            uint len = Length(key);
 
             if (len < 3 || len > 6)
                 return false;
 
-            char charAt = GetCharAt(key, 0);
+            uint unitAt = UnitAt(key, 0);
 
-            if (charAt != 'Æ')
+            if (unitAt != 'Æ')
                 return false;
 
-            if (charAt < 'A')
+            if (unitAt < 'A')
                 return false;
         }
     */
@@ -84,7 +84,7 @@ public class AllocationGatherTransform : IExprTransform
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.DeclaringType == typeof(StringFunctions) && node.Type != typeof(bool))
+            if (node.Method.DeclaringType == typeof(GeneratorFunctions) && node.Type != typeof(bool))
             {
                 Expression? instance = node.Object == null ? null : Visit(node.Object);
                 List<Expression> arguments = new List<Expression>(node.Arguments.Count);

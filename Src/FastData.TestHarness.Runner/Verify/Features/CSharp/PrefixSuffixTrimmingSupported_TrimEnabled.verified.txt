@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 internal static class FastData
 {
 
-    private static bool StringAt(string fragment, int offset, string str) { int start = offset >= 0 ? offset : str.Length + offset; return string.Compare(str, start, fragment, 0, fragment.Length, StringComparison.Ordinal) == 0; }
+    private static bool EqualsAt(string str, int offset, string fragment) { int start = offset >= 0 ? offset : str.Length + offset; return string.CompareOrdinal(str, start, fragment, 0, fragment.Length) == 0; }
 
     private static readonly string[] _keys = new string[] {
         "Alpha", "Bravo", "Charlie"
@@ -18,12 +18,12 @@ internal static class FastData
     
     public static bool Contains(string key)
     {
-        if (!StringAt("Pre", 0, key))
+        if (!EqualsAt(key, 0, "Pre"))
         {
          return false;
         }
 
-        if (!StringAt("Suf", -3, key))
+        if (!EqualsAt(key, -3, "Suf"))
         {
          return false;
         }

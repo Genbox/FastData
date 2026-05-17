@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
 using Genbox.FastData.Generators.EarlyExits.Exits;
@@ -15,7 +15,7 @@ public class ExpressionTests
     [
         new AnnotatedExpr(new LengthLessThanEarlyExit(4).GetExpression(parameter), ExprKind.EarlyExit),
         new AnnotatedExpr(new LengthGreaterThanEarlyExit(9).GetExpression(parameter), ExprKind.EarlyExit),
-        new AnnotatedExpr(new CharOffsetLessThanEarlyExit('a').GetExpression(parameter), ExprKind.EarlyExit)
+        new AnnotatedExpr(new UnitAtLessThanEarlyExit('a').GetExpression(parameter), ExprKind.EarlyExit)
     ];
 
     [Fact]

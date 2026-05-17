@@ -1,1 +1,0 @@
-﻿!StringAt("suf", -3, inputKey)

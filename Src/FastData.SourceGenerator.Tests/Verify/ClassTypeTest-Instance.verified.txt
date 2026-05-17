@@ -9,34 +9,34 @@ using System.Runtime.InteropServices;
 internal partial class StaticData
 {
 
-    private static char GetCharAt(string str, int offset) => offset >= 0 ? str[offset] : str[str.Length + offset];
-    private static int GetLength(string str) => str.Length;
+    private static uint UnitAt(string str, int offset) => offset >= 0 ? str[offset] : str[str.Length + offset];
+    private static int Length(string str) => str.Length;
 
     
     public bool Contains(string key)
     {
-        int getLength;
-        char getCharAtNeg1;
-        char getCharAt0;
-        getLength = GetLength(key);
-        if ((getLength > 5))
+        int length;
+        uint unitAtNeg1;
+        uint unitAt0;
+        length = Length(key);
+        if ((length > 5))
         {
          return false;
         }
 
-        getCharAtNeg1 = GetCharAt(key, -1);
-        if ((getCharAtNeg1 > '3'))
+        unitAtNeg1 = UnitAt(key, -1);
+        if ((unitAtNeg1 > 51u))
         {
          return false;
         }
 
-        getCharAt0 = GetCharAt(key, 0);
-        if ((getCharAt0 > 'i'))
+        unitAt0 = UnitAt(key, 0);
+        if ((unitAt0 > 105u))
         {
          return false;
         }
 
-        if ((getCharAt0 < 'i'))
+        if ((unitAt0 < 105u))
         {
          return false;
         }

@@ -8,9 +8,9 @@ namespace Genbox.FastData.Generators.EarlyExits;
 
 internal static class StringEarlyExits
 {
-    internal static IEarlyExit[] GetExits(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase, int lengthOffset = 0, int firstCharOffset = 0, int lastCharOffset = 0)
+    internal static IEarlyExit[] GetExits(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase, int lengthOffset = 0, int firstUnitAtOffset = 0, int lastUnitAtOffset = 0)
     {
-        IEarlyExit[] candidates = ProduceCandidates(structureType, props, config, ignoreCase, lengthOffset, firstCharOffset, lastCharOffset).ToArray();
+        IEarlyExit[] candidates = ProduceCandidates(structureType, props, config, ignoreCase, lengthOffset, firstUnitAtOffset, lastUnitAtOffset).ToArray();
 
         if (candidates.Length == 0)
             return [];
@@ -26,7 +26,7 @@ internal static class StringEarlyExits
         return GetTopExits(candidates, config.MaxCandidates).ToArray();
     }
 
-    private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase, int lengthOffset, int firstCharOffset, int lastCharOffset)
+    private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase, int lengthOffset, int firstUnitAtOffset, int lastUnitAtOffset)
     {
         if (config.Disabled)
             yield break;
@@ -67,47 +67,52 @@ internal static class StringEarlyExits
             }
         }
 
+        if (props.CharacterData.AllAscii)
         {
-            // Char offset convention: positive = from start, negative = from end
-            // First char: offset 0 (default) or prefixLength when trimming
-            // Last char: offset -1 (default) or -(1 + suffixLength) when trimming
-            int resolvedLastCharOffset = -(1 + lastCharOffset);
+            bool asciiIgnoreCase = ignoreCase;
+
+            // Unit offset convention: positive = from start, negative = from end
+            // First unit: offset 0 (default) or prefixLength when trimming
+            // Last unit: offset -1 (default) or -(1 + suffixLength) when trimming
+            int resolvedLastUnitAtOffset = -(1 + lastUnitAtOffset);
 
             AsciiMap firstMap = props.CharacterData.FirstCharMap;
-            if (config.IsEarlyExitEnabled(typeof(CharOffsetNotEqualEarlyExit)) && firstMap.BitCount == 1) //1 bit means all first characters are the same
-                yield return new CharOffsetNotEqualEarlyExit(firstMap.Min, ignoreCase, firstCharOffset); //We can use min or max. They are the same.
+            if (config.IsEarlyExitEnabled(typeof(UnitAtNotEqualEarlyExit)) && firstMap.BitCount == 1) //1 bit means all first units are the same
+                yield return new UnitAtNotEqualEarlyExit(firstMap.Min, asciiIgnoreCase, firstUnitAtOffset); //We can use min or max. They are the same.
 
-            if (config.IsEarlyExitEnabled(typeof(CharOffsetLessThanEarlyExit)) && firstMap.Min > 0)
-                yield return new CharOffsetLessThanEarlyExit(firstMap.Min, firstCharOffset);
+            if (config.IsEarlyExitEnabled(typeof(UnitAtLessThanEarlyExit)) && firstMap.Min > 0)
+                yield return new UnitAtLessThanEarlyExit(firstMap.Min, firstUnitAtOffset);
 
-            if (config.IsEarlyExitEnabled(typeof(CharOffsetGreaterThanEarlyExit)) && firstMap.Max < char.MaxValue)
-                yield return new CharOffsetGreaterThanEarlyExit(firstMap.Max, firstCharOffset);
+            if (config.IsEarlyExitEnabled(typeof(UnitAtGreaterThanEarlyExit)) && firstMap.Max < char.MaxValue)
+                yield return new UnitAtGreaterThanEarlyExit(firstMap.Max, firstUnitAtOffset);
 
-            if (config.IsEarlyExitEnabled(typeof(CharOffsetBitmapEarlyExit)) && config.CheckDensityLimits(typeof(CharOffsetBitmapEarlyExit), firstMap.Density))
-                yield return new CharOffsetBitmapEarlyExit(firstMap.Low, firstMap.High, ignoreCase, firstCharOffset);
+            if (config.IsEarlyExitEnabled(typeof(UnitAtBitmapEarlyExit)) && config.CheckDensityLimits(typeof(UnitAtBitmapEarlyExit), firstMap.Density))
+                yield return new UnitAtBitmapEarlyExit(firstMap.Low, firstMap.High, asciiIgnoreCase, firstUnitAtOffset);
 
             // Accessing the last char/byte is slow in languages that don't cache string length
             AsciiMap lastMap = props.CharacterData.LastCharMap;
-            if (config.IsEarlyExitEnabled(typeof(CharOffsetNotEqualEarlyExit)) && lastMap.BitCount == 1) //1 bit means all last characters are the same
-                yield return new CharOffsetNotEqualEarlyExit(lastMap.Min, ignoreCase, resolvedLastCharOffset); //We can use min or max. They are the same.
+            if (config.IsEarlyExitEnabled(typeof(UnitAtNotEqualEarlyExit)) && lastMap.BitCount == 1) //1 bit means all last units are the same
+                yield return new UnitAtNotEqualEarlyExit(lastMap.Min, asciiIgnoreCase, resolvedLastUnitAtOffset); //We can use min or max. They are the same.
 
-            if (config.IsEarlyExitEnabled(typeof(CharOffsetLessThanEarlyExit)) && lastMap.Min > 0)
-                yield return new CharOffsetLessThanEarlyExit(lastMap.Min, resolvedLastCharOffset);
+            if (config.IsEarlyExitEnabled(typeof(UnitAtLessThanEarlyExit)) && lastMap.Min > 0)
+                yield return new UnitAtLessThanEarlyExit(lastMap.Min, resolvedLastUnitAtOffset);
 
-            if (config.IsEarlyExitEnabled(typeof(CharOffsetGreaterThanEarlyExit)) && lastMap.Max < char.MaxValue)
-                yield return new CharOffsetGreaterThanEarlyExit(lastMap.Max, resolvedLastCharOffset);
+            if (config.IsEarlyExitEnabled(typeof(UnitAtGreaterThanEarlyExit)) && lastMap.Max < char.MaxValue)
+                yield return new UnitAtGreaterThanEarlyExit(lastMap.Max, resolvedLastUnitAtOffset);
 
-            if (config.IsEarlyExitEnabled(typeof(CharOffsetBitmapEarlyExit)) && config.CheckDensityLimits(typeof(CharOffsetBitmapEarlyExit), lastMap.Density))
-                yield return new CharOffsetBitmapEarlyExit(lastMap.Low, lastMap.High, ignoreCase, resolvedLastCharOffset);
+            if (config.IsEarlyExitEnabled(typeof(UnitAtBitmapEarlyExit)) && config.CheckDensityLimits(typeof(UnitAtBitmapEarlyExit), lastMap.Density))
+                yield return new UnitAtBitmapEarlyExit(lastMap.Low, lastMap.High, asciiIgnoreCase, resolvedLastUnitAtOffset);
         }
 
         // If prefix/suffix trimming is disabled, we can use them as early exits instead.
+        // ASCII ignore-case exits are only valid when all analyzed units are ASCII.
+        if (!ignoreCase || props.CharacterData.AllAscii)
         {
-            if (config.IsEarlyExitEnabled(typeof(StringAtEarlyExit)) && props.DeltaData.Prefix.Length != 0)
-                yield return new StringAtEarlyExit(props.DeltaData.Prefix, 0, ignoreCase);
+            if (config.IsEarlyExitEnabled(typeof(EqualsAtEarlyExit)) && props.DeltaData.Prefix.Length != 0)
+                yield return new EqualsAtEarlyExit(props.DeltaData.Prefix, 0, ignoreCase);
 
-            if (config.IsEarlyExitEnabled(typeof(StringAtEarlyExit)) && props.DeltaData.Suffix.Length != 0)
-                yield return new StringAtEarlyExit(props.DeltaData.Suffix, -props.DeltaData.Suffix.Length, ignoreCase);
+            if (config.IsEarlyExitEnabled(typeof(EqualsAtEarlyExit)) && props.DeltaData.Suffix.Length != 0)
+                yield return new EqualsAtEarlyExit(props.DeltaData.Suffix, -props.DeltaData.Suffix.Length, ignoreCase);
         }
     }
 
@@ -143,16 +148,16 @@ internal static class StringEarlyExits
 
     private static double GetObservedSpan(IEarlyExit exit, double lengthSpan, double firstSpan, double lastSpan)
     {
-        if (exit is CharOffsetLessThanEarlyExit e1)
+        if (exit is UnitAtLessThanEarlyExit e1)
             return e1.Offset >= 0 ? firstSpan : lastSpan;
 
-        if (exit is CharOffsetGreaterThanEarlyExit e2)
+        if (exit is UnitAtGreaterThanEarlyExit e2)
             return e2.Offset >= 0 ? firstSpan : lastSpan;
 
-        if (exit is CharOffsetNotEqualEarlyExit e3)
+        if (exit is UnitAtNotEqualEarlyExit e3)
             return e3.Offset >= 0 ? firstSpan : lastSpan;
 
-        if (exit is CharOffsetBitmapEarlyExit e4)
+        if (exit is UnitAtBitmapEarlyExit e4)
             return e4.Offset >= 0 ? firstSpan : lastSpan;
 
         return lengthSpan;

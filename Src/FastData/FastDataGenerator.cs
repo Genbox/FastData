@@ -14,7 +14,6 @@ using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
-using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
@@ -191,7 +190,9 @@ public static partial class FastDataGenerator
         CharacterClass originalCharClasses = props.CharacterData.CharacterClasses;
 
         // If we can remove prefix/suffix from the keys, we do so.
-        if (cfg.EnablePrefixSuffixTrimming)
+        bool allowPrefixSuffixTrimming = cfg.EnablePrefixSuffixTrimming && (!cfg.IgnoreCase || props.CharacterData.AllAscii);
+
+        if (allowPrefixSuffixTrimming)
         {
             if (props.DeltaData.Prefix.Length > 0 || props.DeltaData.Suffix.Length > 0)
             {
@@ -216,9 +217,9 @@ public static partial class FastDataGenerator
 
         // When trimming is active, add prefix/suffix checks as early exits
         if (trimPrefix.Length > 0)
-            earlyExits.Add(new StringAtEarlyExit(trimPrefix, 0, cfg.IgnoreCase));
+            earlyExits.Add(new EqualsAtEarlyExit(trimPrefix, 0, cfg.IgnoreCase));
         if (trimSuffix.Length > 0)
-            earlyExits.Add(new StringAtEarlyExit(trimSuffix, -trimSuffix.Length, cfg.IgnoreCase));
+            earlyExits.Add(new EqualsAtEarlyExit(trimSuffix, -trimSuffix.Length, cfg.IgnoreCase));
 
         if (cfg.EarlyExitConfig.OptimizeExpression)
             ReduceExits(earlyExits);
@@ -573,11 +574,11 @@ public static partial class FastDataGenerator
 
     private sealed class UsedFunctionVisitor : ExpressionVisitor
     {
-        internal StringFunction Functions { get; private set; }
+        internal GeneratorFunction Functions { get; private set; }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (!Enum.TryParse(node.Method.Name, false, out StringFunction value))
+            if (!Enum.TryParse(node.Method.Name, false, out GeneratorFunction value))
                 throw new InvalidOperationException($"The method '{node.Method.Name}' is unknown.");
 
             Functions |= value;

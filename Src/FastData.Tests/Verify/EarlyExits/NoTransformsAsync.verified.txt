@@ -1,14 +1,14 @@
 ﻿[
   {
-    Expression: (GetLength(inputKey) < 4),
+    Expression: (Length(inputKey) < 4),
     Kind: EarlyExit
   },
   {
-    Expression: (GetLength(inputKey) > 9),
+    Expression: (Length(inputKey) > 9),
     Kind: EarlyExit
   },
   {
-    Expression: (GetCharAt(inputKey, 0) < a),
+    Expression: (UnitAt(inputKey, 0) < 97),
     Kind: EarlyExit
   }
 ]

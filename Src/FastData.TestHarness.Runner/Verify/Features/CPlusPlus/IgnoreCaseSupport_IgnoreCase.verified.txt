@@ -10,17 +10,16 @@
 
 class fastdata final {
 
-    static constexpr char ToLowerAscii(char value) {
-        if (value >= 'A' && value <= 'Z')
-            return static_cast<char>(value + 32);
-        return value;
+    static constexpr uint32_t ToAsciiLower(uint32_t value) {
+        const uint32_t candidate = value | 0x20u;
+        return candidate - 'a' <= 'z' - 'a' ? candidate : value;
     }
     static constexpr bool case_insensitive_equals(std::string_view left, std::string_view right) {
         if (left.length() != right.length())
             return false;
 
         for (size_t i = 0; i < left.length(); ++i) {
-            if (ToLowerAscii(left[i]) != ToLowerAscii(right[i]))
+            if (ToAsciiLower(static_cast<unsigned char>(left[i])) != ToAsciiLower(static_cast<unsigned char>(right[i])))
                 return false;
         }
 
@@ -33,8 +32,8 @@ class fastdata final {
         const size_t min_len = left_len < right_len ? left_len : right_len;
 
         for (size_t i = 0; i < min_len; ++i) {
-            const char left_ch = ToLowerAscii(left[i]);
-            const char right_ch = ToLowerAscii(right[i]);
+            const uint32_t left_ch = ToAsciiLower(static_cast<unsigned char>(left[i]));
+            const uint32_t right_ch = ToAsciiLower(static_cast<unsigned char>(right[i]));
 
             if (left_ch < right_ch)
                 return -1;

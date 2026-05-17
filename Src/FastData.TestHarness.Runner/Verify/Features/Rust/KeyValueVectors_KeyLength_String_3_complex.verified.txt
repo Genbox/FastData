@@ -17,7 +17,7 @@ pub struct Person {
 impl Person {
     pub const fn new(age: i32, name: &'static str, other: Option<&'static Person>) -> Self { Self { age, name, other } }
 }
-fn GetLength(value: &str) -> i32 { value.len() as i32 }
+fn Length(value: &str) -> i32 { value.len() as i32 }
 
 
 pub struct fastdata;
@@ -36,14 +36,14 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
-        let mut getLength: i32;
-        getLength = GetLength(key);
-        if ((getLength < 1))
+        let mut length: i32;
+        length = Length(key);
+        if ((length < 1))
         {
          return false;
         }
 
-        if ((getLength > 3))
+        if ((length > 3))
         {
          return false;
         }
@@ -55,14 +55,14 @@ impl fastdata {
 
     #[must_use]
     pub fn try_lookup(key: &str) -> Option<&'static Person> {
-        let mut getLength: i32;
-        getLength = GetLength(key);
-        if ((getLength < 1))
+        let mut length: i32;
+        length = Length(key);
+        if ((length < 1))
         {
          return None;
         }
 
-        if ((getLength > 3))
+        if ((length > 3))
         {
          return None;
         }

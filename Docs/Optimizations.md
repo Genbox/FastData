@@ -2,40 +2,35 @@
 FastData contains a lot of optimizations that are not that obvious from the get-go. I'll try and document them here.
 
 ## Reductions
-A reduction is the process of going from a generalized data structure, to a specialized data structure that is much faster and efficient.
+A reduction is the process of going from a generalized data structure, to a specialized data structure that is much faster and more efficient.
 
 ### Reduction to single element lookup
 If you create a hash table with a single element in any programming language, the hash table still have to hash inputs, match it to a bucket and do equality.
 But since there is just one element, we don't have to do all that. FastData will return a specialized data structure that just check against the single element.
 
 ### Reduction to range lookup
-This trick pertains to all types of lookup structures, but I'll use binary search as the example.
-
-Binary search works by segmenting an array in half on each iteration of a lookup. It works on any input data, as long as we can establish a concept of `greater than`, `equal` and `less than` between elements.
-However, if we can determine the input set is consecutive, then we don't need to do the binary search at all.
-
-Let's say the input is 42, 43, 44, 45.
-- A check if 100 is in the list, is just `is 100 >= 45?`
-- A check if 43 is in the list, is just `is 43 >= 42 and <= 45?`
-
-We reduce the complexity of binary search from logarithmic to constant lookups.
+If the input is numeric and dense, we can represent it as a simple range check, rather than a more complex data structure.
 
 ### Reduction to length lookup
 When indexing strings, you have to work with a hash function to make the string into an integer. That can be a pretty heavy operation that will dominate the time it takes to lookup an element.
-Can we do better? Let's say you have an input like this: `house car fish`
+Can we do better? Let's say you have an input like this: `house`, `car` and `fish`.
 
 In this case, each of the input strings have a unique length. So why not use their length as their hash? That's exactly what `KeyLengthStructure` does.
-If the programming language cache the string length, we can get constant lookup time.
+If the programming language cache the string length, we can get O(1) lookups.
 
 ### Reduction to bitmap lookup
-If a sequence of numbers is a short range, but cannot get optimized via the range reduction above, then it might be a good fit for a bitmap instead. Let's say you have the numbers in range 10-100 and 300-900.
-Range reduction works when the numbers can be represented as a compact set of ranges, and there are too many numbers to use conditionals efficiently, so instead we use a bitmap when the range is dense enough.
+If a sequence of numbers is a short range, but cannot get optimized via the range reduction above, then it might be a good fit for a bitmap instead.
+Range reduction works when the numbers can be represented as a dense set of ranges, and there are too many numbers to use conditionals efficiently, so instead we use a bitmap.
 
 ## Early exits
 An early exit is a lightweight check we can perform before the actual lookup to speed up the process. They have to be **really** fast, otherwise they will add unwanted overhead to each call.
-Only generalized data structures perform early exits, as reductions already have early exits built into them.
+Early exits come from two places: analysis-generated candidates and structure-mandated checks. The default configuration disables analysis-generated early exits for `RangeStructure` and `SingleValueStructure` because their lookup logic already includes the needed bounds/equality checks. Some other structures can still add mandatory exits; for example `KeyLengthStructure` adds length bounds, and `RrrBitVectorStructure`/`EliasFanoStructure` add numeric min/max bounds.
 
-Early exit candidates are filtered by a rejection ratio threshold. The default is `EarlyExitConfig.MinRejectionRatio = 0.05`, meaning a candidate must reject at least 5% of the observed range to be kept.
+Analysis-generated early exit candidates are filtered by a rejection ratio threshold. The default is `EarlyExitConfig.MinRejectionRatio = 0.05`, meaning a candidate must reject at least 5% of the measured keyspace to be kept. Numeric candidates are measured against the analyzed numeric range. String candidates are measured against the observed length span, first-unit span, or last-unit span, depending on the exit.
+
+Only the best candidates are kept. The default is `EarlyExitConfig.MaxCandidates = 4`, sorted by rejected keyspace size. Candidates can also be disabled globally, per structure, per early-exit type, or by type-specific density limits. The defaults only allow value bitmasks with density up to `0.25`, and length/character bitmaps with density up to `0.45`. Numeric analysis is also skipped when the item count is less than or equal to `EarlyExitConfig.MinItemCount`; string analysis does not use that item-count gate.
+
+After mandatory and analysis-generated exits are combined, FastData removes duplicate exits and, when expression optimization is enabled, removes weaker overlapping bounds. For example, `Length(input) < 3` is removed if `Length(input) < 5` is also present.
 
 ### Numeric early exits
 #### Value less than early exit
@@ -44,19 +39,34 @@ Rejects keys that are smaller than the minimum observed value. Input: `4 9 42 99
 #### Value greater than early exit
 Rejects keys that are larger than the maximum observed value. Input: `4 9 42 99 123` yields `if (value > 123) return false;`.
 
-#### Value not equal early exit
-Used when all values are identical. It emits `if (value != 42) return false;` for input `42 42 42`.
-
 #### Value in range early exit
 Rejects gaps between observed ranges by checking if the input is strictly inside a missing interval. Input: `10 12 20` yields `if (value > 12 && value < 20) return false;`.
 
 #### Value bitmask early exit
-Builds a bitmask of bits never seen in the dataset and rejects any key that sets one of them. Input: `2 4 6 8` yields `if ((key & 1) != 0) return false;`.
+For integral keys, builds a mask from bits that are never set by any observed key and rejects any key that sets one of them. This is only emitted when the mask is useful and passes the density limit. Input: `2 4 6 8` yields `if ((value & 1) != 0) return false;`.
 
-#### Value bitset early exit
-Builds a bitmap of missing values inside a compact range and rejects any key that lands on a missing value. Input: `10 12 13` yields a range check plus a missing bitset check.
+`ValueNotEqualEarlyExit` and `ValueBitSetEarlyExit` are implemented expression types, but they are not currently produced by the numeric early-exit analyzer.
 
 ### String early exits
+#### Generator function contract
+Generated string early exits are expressed through a small cross-language helper API:
+
+- `UnitAt(value, offset)`
+- `UnitAtAsciiLower(value, offset)`
+- `Length(value)`
+- `EqualsAt(value, offset, fragment)`
+- `EqualsAtAsciiLower(value, offset, fragment)`
+
+`Unit` means the selected addressable string unit for the generated target. For byte-oriented targets it is a byte. For UTF-16 code-unit targets it is a UTF-16 code unit.
+
+Offsets are compile-time constants in generated code. `offset >= 0` indexes from the start, and `offset < 0` indexes from the end, with `-1` meaning the last unit. Helper implementations may keep this as a branch in source code because optimized builds should inline the helper and remove the branch for constant offsets.
+
+`AsciiLower` means ASCII-only normalization of `A-Z` to `a-z`. It is not Unicode case folding and it is not culture-sensitive. Implementations should use branch-light ASCII lowering, such as `candidate = unit | 0x20` followed by an unsigned ASCII range check.
+
+Because `AsciiLower` is intentionally ASCII-only, FastData does not emit unit or fixed-position string early exits for case-insensitive non-ASCII string datasets. Those lookups still use length exits and the final ordinal-ignore-case equality logic.
+
+`EqualsAt` and `EqualsAtAsciiLower` are fixed-position region comparisons used for prefix, suffix, or fragment checks.
+
 #### Length less than early exit
 Rejects strings shorter than the minimum observed length. Input: `horse pig cow sheep` yields `if (value.Length < 3) return false;`.
 
@@ -70,37 +80,24 @@ Used when all lengths are identical. Input: `cow pig cat` yields `if (value.Leng
 Rejects gaps between observed length ranges by checking for missing length intervals. Input lengths `3 4 7` yield `if (value.Length > 4 && value.Length < 7) return false;`.
 
 #### Length bitmap early exit
-Builds a 64 bit bitmap of observed lengths and rejects missing lengths in the 1 to 64 range. Input: `stable softice sophisticated santa` yields `if ((4208UL & (1UL << (value.Length - 1))) == 0) return false;`.
+Builds a 64 bit bitmap of observed lengths and rejects missing lengths in the 1 to 64 range. This is only emitted when the observed length density passes the density limit. Input: `stable softice sophisticated santa` yields `if ((4208UL & (1UL << ((value.Length - 1) & 63))) == 0) return false;`.
 
-#### Char first less than early exit
-Rejects strings whose first ASCII character is below the minimum observed first character. Input: `cat dog emu` yields `if (first < 'c') return false;`.
+#### Unit at offset less than early exit
+Rejects strings whose selected unit is below the minimum observed unit at that offset. Offset `0` is the first unit. Offset `-1` is the last unit. When prefix/suffix trimming is active, offsets are adjusted so the check still applies to the original input key. Input: `cat dog emu` yields `if (UnitAt(value, 0) < 'c') return false;`.
 
-#### Char first greater than early exit
-Rejects strings whose first ASCII character is above the maximum observed first character. Input: `cat dog emu` yields `if (first > 'e') return false;`.
+#### Unit at offset greater than early exit
+Rejects strings whose selected unit is above the maximum observed unit at that offset. Input: `cat dog emu` yields `if (UnitAt(value, 0) > 'e') return false;`.
 
-#### Char first not equal early exit
-Used when all strings share the same first character. Input: `apple axe ant` yields `if (first != 'a') return false;`.
+#### Unit at offset not equal early exit
+Used when all strings share the same selected unit. Input: `apple axe ant` yields `if (UnitAt(value, 0) != 'a') return false;`. When ignore-case is enabled this uses `UnitAtAsciiLower`.
 
-#### Char first bitmap early exit
-Builds a bitmap of observed first ASCII characters and rejects missing characters. Input: `alpha zulu` yields a bitmap test for the first character.
+#### Unit at offset bitmap early exit
+Builds a bitmap of observed selected units and rejects missing ASCII units. This is only emitted when the observed unit density passes the density limit. Input: `alpha zulu` yields a bitmap test for `UnitAt(value, 0)`. When ignore-case is enabled this uses `UnitAtAsciiLower`.
 
-#### Char last less than early exit
-Rejects strings whose last ASCII character is below the minimum observed last character. Input: `alpha bravo charlie` yields `if (last < 'a') return false;`.
+#### Equals at offset early exit
+Rejects strings that do not contain an observed fragment at a fixed offset. Offset `0` acts as a prefix check, and a negative offset acts as a suffix check. Input: `preOne preTwo preSix` yields `if (!EqualsAt(value, 0, "pre")) return false;`. Input: `OneSuf TwoSuf SixSuf` yields `if (!EqualsAt(value, -3, "Suf")) return false;`. When ignore-case is enabled this uses `EqualsAtAsciiLower`.
 
-#### Char last greater than early exit
-Rejects strings whose last ASCII character is above the maximum observed last character. Input: `alpha bravo charlie` yields `if (last > 'e') return false;`.
-
-#### Char last not equal early exit
-Used when all strings share the same last character. Input: `tuba panda villa` yields `if (last != 'a') return false;`.
-
-#### Char last bitmap early exit
-Builds a bitmap of observed last ASCII characters and rejects missing characters. Input: `alpha zulu` yields a bitmap test for the last character.
-
-#### String prefix early exit
-Rejects strings that do not start with an observed prefix when trimming is disabled. Input: `preOne preTwo preSix` yields `if (!StartsWith("pre")) return false;`.
-
-#### String suffix early exit
-Rejects strings that do not end with an observed suffix when trimming is disabled. Input: `OneSuf TwoSuf SixSuf` yields `if (!EndsWith("Suf")) return false;`.
+When prefix/suffix trimming is active, FastData removes the common affix from the keys used for structure selection and hashing, then adds the removed prefix/suffix back as mandatory `EqualsAtEarlyExit` checks against the original input key. Length and unit exits are offset at the same time so all generated checks still validate the original input key.
 
 ## Structure specializations
 

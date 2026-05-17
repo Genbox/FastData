@@ -305,6 +305,7 @@ public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hybl
 #if NET5_0_OR_GREATER
         return (uint)Math.BigMul(hash, range, out _);
 #else
+
         // Manual 128-bit multiply: split hash into two 32-bit halves, compute high word of product.
         ulong lo = (uint)hash;
         ulong hi = hash >> 32;

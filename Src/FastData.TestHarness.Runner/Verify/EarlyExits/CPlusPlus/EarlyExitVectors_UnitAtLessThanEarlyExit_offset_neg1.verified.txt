@@ -1,0 +1,1 @@
+﻿(UnitAt(inputKey, -1) < 109u)

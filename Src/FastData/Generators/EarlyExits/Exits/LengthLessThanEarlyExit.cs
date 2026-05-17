@@ -4,8 +4,8 @@ using Genbox.FastData.Generators.EarlyExits.Abstracts;
 
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
-// GetLength(inputKey) < Value;
-public sealed record LengthLessThanEarlyExit(int Value) : MethodComparisonEarlyExitBase<int>(Value, nameof(StringFunctions.GetLength))
+// Length(inputKey) < Value;
+public sealed record LengthLessThanEarlyExit(int Value) : MethodComparisonEarlyExitBase<int>(Value, nameof(GeneratorFunctions.Length))
 {
     public override ulong KeyspaceSize => (ulong)Value;
     protected override BinaryExpression Compare(Expression left, Expression right) => LessThan(left, right);

@@ -39,13 +39,12 @@ class <#= CPlusPlusConfig.ClassName #> final {
 <#
     if (GeneratorConfig is StringGeneratorConfig strCfg2)
     {
-        if (strCfg2.IgnoreCase || (strCfg2.StringFunctions & (StringFunction.GetCharAtLower | StringFunction.StringAtLower)) != 0)
+        if (strCfg2.IgnoreCase || (strCfg2.GeneratorFunctions & (GeneratorFunction.UnitAtAsciiLower | GeneratorFunction.EqualsAtAsciiLower)) != 0)
         {
 #>
-    static constexpr char ToLowerAscii(char value) {
-        if (value >= 'A' && value <= 'Z')
-            return static_cast<char>(value + 32);
-        return value;
+    static constexpr uint32_t ToAsciiLower(uint32_t value) {
+        const uint32_t candidate = value | 0x20u;
+        return candidate - 'a' <= 'z' - 'a' ? candidate : value;
     }
 <#
         }
@@ -58,7 +57,7 @@ class <#= CPlusPlusConfig.ClassName #> final {
             return false;
 
         for (size_t i = 0; i < left.length(); ++i) {
-            if (ToLowerAscii(left[i]) != ToLowerAscii(right[i]))
+            if (ToAsciiLower(static_cast<unsigned char>(left[i])) != ToAsciiLower(static_cast<unsigned char>(right[i])))
                 return false;
         }
 
@@ -71,8 +70,8 @@ class <#= CPlusPlusConfig.ClassName #> final {
         const size_t min_len = left_len < right_len ? left_len : right_len;
 
         for (size_t i = 0; i < min_len; ++i) {
-            const char left_ch = ToLowerAscii(left[i]);
-            const char right_ch = ToLowerAscii(right[i]);
+            const uint32_t left_ch = ToAsciiLower(static_cast<unsigned char>(left[i]));
+            const uint32_t right_ch = ToAsciiLower(static_cast<unsigned char>(right[i]));
 
             if (left_ch < right_ch)
                 return -1;
@@ -89,43 +88,38 @@ class <#= CPlusPlusConfig.ClassName #> final {
 <#
         }
 
-        Dictionary<StringFunction, string> map = new()
+        Dictionary<GeneratorFunction, string> map = new Dictionary<GeneratorFunction, string>
         {
-            { StringFunction.ReadU8, "uint8_t ReadU8(const std::string_view value, const size_t offset) noexcept { return static_cast<uint8_t>(value[offset]); }" },
-            { StringFunction.ReadU16, "uint16_t ReadU16(const std::string_view value, const size_t offset) noexcept { uint16_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }" },
-            { StringFunction.ReadU32, "uint32_t ReadU32(const std::string_view value, const size_t offset) noexcept { uint32_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }" },
-            { StringFunction.ReadU64, "uint64_t ReadU64(const std::string_view value, const size_t offset) noexcept { uint64_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }" },
-
-            { StringFunction.GetCharAt, "constexpr char GetCharAt(std::string_view str, int32_t offset) { return offset >= 0 ? str[offset] : str[str.length() + offset]; }" },
-            { StringFunction.GetCharAtLower, "constexpr char GetCharAtLower(std::string_view str, int32_t offset) { return ToLowerAscii(offset >= 0 ? str[offset] : str[str.length() + offset]); }" },
-
-            { StringFunction.GetLength, "constexpr int32_t GetLength(std::string_view str) { return static_cast<int32_t>(str.length()); }" },
-
-            { StringFunction.StringAt, """
-    constexpr bool StringAt(std::string_view fragment, int32_t offset, std::string_view str) {
+            { GeneratorFunction.UnitAt, "constexpr uint32_t UnitAt(std::string_view str, int32_t offset) noexcept { const size_t index = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset; return static_cast<unsigned char>(str[index]); }" },
+            { GeneratorFunction.UnitAtAsciiLower, "constexpr uint32_t UnitAtAsciiLower(std::string_view str, int32_t offset) noexcept { return ToAsciiLower(UnitAt(str, offset)); }" },
+            { GeneratorFunction.Length, "constexpr int32_t Length(std::string_view str) noexcept { return static_cast<int32_t>(str.length()); }" },
+            { GeneratorFunction.EqualsAt, """
+    constexpr bool EqualsAt(std::string_view str, int32_t offset, std::string_view fragment) noexcept {
         size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset;
         return str.compare(start, fragment.length(), fragment) == 0;
     }
 """ },
-            { StringFunction.StringAtLower, """
-    constexpr bool StringAtIgnoreCase(std::string_view fragment, int32_t offset, std::string_view str) {
+            { GeneratorFunction.EqualsAtAsciiLower, """
+    constexpr bool EqualsAtAsciiLower(std::string_view str, int32_t offset, std::string_view fragment) noexcept {
         size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset;
-        if (start + fragment.length() > str.length())
-            return false;
 
         for (size_t i = 0; i < fragment.length(); ++i) {
-            if (ToLowerAscii(str[start + i]) != ToLowerAscii(fragment[i]))
+            if (ToAsciiLower(static_cast<unsigned char>(str[start + i])) != ToAsciiLower(static_cast<unsigned char>(fragment[i])))
                 return false;
         }
 
         return true;
     }
-""" }
+""" },
+            { GeneratorFunction.ReadU8, "uint32_t ReadU8(const std::string_view value, const size_t offset) noexcept { return static_cast<unsigned char>(value[offset]); }" },
+            { GeneratorFunction.ReadU16, "uint32_t ReadU16(const std::string_view value, const size_t offset) noexcept { uint16_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }" },
+            { GeneratorFunction.ReadU32, "uint32_t ReadU32(const std::string_view value, const size_t offset) noexcept { uint32_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }" },
+            { GeneratorFunction.ReadU64, "uint64_t ReadU64(const std::string_view value, const size_t offset) noexcept { uint64_t result; std::memcpy(&result, value.data() + offset, sizeof(result)); return result; }" }
         };
 
-        foreach (KeyValuePair<StringFunction, string> kv in map)
+        foreach (KeyValuePair<GeneratorFunction, string> kv in map)
         {
-            if ((strCfg2.StringFunctions & kv.Key) == 0)
+            if ((strCfg2.GeneratorFunctions & kv.Key) == 0)
                 continue;
 #>
     static <#= kv.Value #>

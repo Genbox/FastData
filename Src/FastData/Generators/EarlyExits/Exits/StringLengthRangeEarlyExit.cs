@@ -4,12 +4,12 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
-// GetLength(inputKey) > Min && GetLength(inputKey) < Max;
+// Length(inputKey) > Min && Length(inputKey) < Max;
 public sealed record StringLengthRangeEarlyExit(int Min, int Max) : IEarlyExit
 {
     public Expression GetExpression(ParameterExpression key)
     {
-        MethodInfo methodInfo = typeof(StringFunctions).GetMethod(nameof(StringFunctions.GetLength), [typeof(string)])!;
+        MethodInfo methodInfo = typeof(GeneratorFunctions).GetMethod(nameof(GeneratorFunctions.Length), [typeof(string)])!;
         Expression length = Call(methodInfo, key);
         Expression lower = GreaterThan(length, Constant(Min));
         Expression upper = LessThan(length, Constant(Max));

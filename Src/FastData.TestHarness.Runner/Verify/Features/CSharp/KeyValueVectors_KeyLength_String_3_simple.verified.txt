@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 internal static class FastData
 {
 
-    private static int GetLength(string str) => str.Length;
+    private static int Length(string str) => str.Length;
 
     private static readonly int[] _offsets = {
         0, 1, 2
@@ -26,14 +26,14 @@ internal static class FastData
     
     public static bool Contains(string key)
     {
-        int getLength;
-        getLength = GetLength(key);
-        if ((getLength < 1))
+        int length;
+        length = Length(key);
+        if ((length < 1))
         {
          return false;
         }
 
-        if ((getLength > 3))
+        if ((length > 3))
         {
          return false;
         }
@@ -46,15 +46,15 @@ internal static class FastData
     
     public static bool TryLookup(string key, out int value)
     {
-        int getLength;
-        getLength = GetLength(key);
-        if ((getLength < 1))
+        int length;
+        length = Length(key);
+        if ((length < 1))
         {
          value = default;
          return false;
         }
 
-        if ((getLength > 3))
+        if ((length > 3))
         {
          value = default;
          return false;

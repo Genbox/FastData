@@ -10,12 +10,13 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-fn GetCharAt(value: &str, offset: i32) -> char {
+fn UnitAt(value: &str, offset: i32) -> u32 {
     let bytes = value.as_bytes();
-    if offset >= 0 { bytes[offset as usize] as char } else { bytes[bytes.len().wrapping_add(offset as usize)] as char }
+    let index = if offset >= 0 { offset as usize } else { bytes.len().wrapping_add(offset as usize) };
+    bytes[index] as u32
 }
 
-fn GetLength(value: &str) -> i32 { value.len() as i32 }
+fn Length(value: &str) -> i32 { value.len() as i32 }
 
 
 pub struct MyData;
@@ -23,28 +24,28 @@ impl MyData {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
-        let mut getLength: i32;
-        let mut getCharAtNeg1: char;
-        let mut getCharAt0: char;
-        getLength = GetLength(key);
-        if ((getLength > 5))
+        let mut length: i32;
+        let mut unitAtNeg1: u32;
+        let mut unitAt0: u32;
+        length = Length(key);
+        if ((length > 5))
         {
          return false;
         }
 
-        getCharAtNeg1 = GetCharAt(key, -1);
-        if ((getCharAtNeg1 > '2'))
+        unitAtNeg1 = UnitAt(key, -1);
+        if ((unitAtNeg1 > 50))
         {
          return false;
         }
 
-        getCharAt0 = GetCharAt(key, 0);
-        if ((getCharAt0 > 't'))
+        unitAt0 = UnitAt(key, 0);
+        if ((unitAt0 > 116))
         {
          return false;
         }
 
-        if ((getCharAt0 < 't'))
+        if ((unitAt0 < 116))
         {
          return false;
         }

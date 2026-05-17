@@ -8,7 +8,7 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-fn StringAt(fragment: &str, offset: i32, value: &str) -> bool {
+fn EqualsAt(value: &str, offset: i32, fragment: &str) -> bool {
     let start = if offset >= 0 { offset as usize } else { value.len().wrapping_add(offset as usize) };
     &value[start..start + fragment.len()] == fragment
 }
@@ -23,12 +23,12 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
-        if (!StringAt("Pre", 0, key))
+        if (!EqualsAt(key, 0, "Pre"))
         {
          return false;
         }
 
-        if (!StringAt("Suf", -3, key))
+        if (!EqualsAt(key, -3, "Suf"))
         {
          return false;
         }

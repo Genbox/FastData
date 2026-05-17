@@ -8,7 +8,7 @@ public abstract record MethodComparisonEarlyExitBase<T>(T Value, string Method) 
 {
     public virtual Expression GetExpression(ParameterExpression key)
     {
-        MethodInfo methodInfo = typeof(StringFunctions).GetMethod(Method, [typeof(string)])!;
+        MethodInfo methodInfo = typeof(GeneratorFunctions).GetMethod(Method, [typeof(string)])!;
         return Compare(Call(methodInfo, key), Constant(Value, typeof(T)));
     }
 

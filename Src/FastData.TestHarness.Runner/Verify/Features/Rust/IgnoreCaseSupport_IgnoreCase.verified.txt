@@ -8,9 +8,10 @@
 #![allow(unused_unsafe)]
 use std::ptr;
 
-fn ToLowerAscii(value: u8) -> u8 {
-    if value >= b'A' && value <= b'Z' {
-        value + 32
+fn ToAsciiLower(value: u32) -> u32 {
+    let candidate = value | 0x20;
+    if candidate.wrapping_sub(b'a' as u32) <= (b'z' - b'a') as u32 {
+        candidate
     } else {
         value
     }
@@ -25,7 +26,7 @@ fn case_insensitive_equals(left: &str, right: &str) -> bool {
     }
 
     for i in 0..left_bytes.len() {
-        if ToLowerAscii(left_bytes[i]) != ToLowerAscii(right_bytes[i]) {
+        if ToAsciiLower(left_bytes[i] as u32) != ToAsciiLower(right_bytes[i] as u32) {
             return false;
         }
     }
@@ -39,8 +40,8 @@ fn case_insensitive_compare(left: &str, right: &str) -> i32 {
     let min_len = if left_bytes.len() < right_bytes.len() { left_bytes.len() } else { right_bytes.len() };
 
     for i in 0..min_len {
-        let left_ch = ToLowerAscii(left_bytes[i]);
-        let right_ch = ToLowerAscii(right_bytes[i]);
+        let left_ch = ToAsciiLower(left_bytes[i] as u32);
+        let right_ch = ToAsciiLower(right_bytes[i] as u32);
 
         if left_ch < right_ch {
             return -1;

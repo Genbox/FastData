@@ -9,8 +9,8 @@ using System.Runtime.InteropServices;
 internal static class FastData
 {
 
-    private static char GetCharAt(string str, int offset) => offset >= 0 ? str[offset] : str[str.Length + offset];
-    private static int GetLength(string str) => str.Length;
+    private static uint UnitAt(string str, int offset) => offset >= 0 ? str[offset] : str[str.Length + offset];
+    private static int Length(string str) => str.Length;
 
 
     private static readonly string[] _keys = new string[] {
@@ -20,28 +20,28 @@ internal static class FastData
     
     public static bool Contains(string key)
     {
-        int getLength;
-        char getCharAt0;
-        char getCharAtNeg1;
-        getLength = GetLength(key);
-        if ((getLength > 7))
+        int length;
+        uint unitAt0;
+        uint unitAtNeg1;
+        length = Length(key);
+        if ((length > 7))
         {
          return false;
         }
 
-        getCharAt0 = GetCharAt(key, 0);
-        if ((getCharAt0 > 'd'))
+        unitAt0 = UnitAt(key, 0);
+        if ((unitAt0 > 100u))
         {
          return false;
         }
 
-        getCharAtNeg1 = GetCharAt(key, -1);
-        if ((getCharAtNeg1 > 'o'))
+        unitAtNeg1 = UnitAt(key, -1);
+        if ((unitAtNeg1 > 111u))
         {
          return false;
         }
 
-        if (((((ulong.MinValue & (1ul << (int)((uint)getCharAtNeg1 & 63u))) & ~(ulong.MinValue - (ulong)((uint)getCharAtNeg1 >> 6))) | ((140883517243392ul & (1ul << (int)((uint)getCharAtNeg1 & 63u))) & (ulong.MinValue - (ulong)((uint)getCharAtNeg1 >> 6)))) == ulong.MinValue))
+        if (((((ulong.MinValue & (1ul << (int)((uint)unitAtNeg1 & 63u))) & ~(ulong.MinValue - (ulong)((uint)unitAtNeg1 >> 6))) | ((140883517243392ul & (1ul << (int)((uint)unitAtNeg1 & 63u))) & (ulong.MinValue - (ulong)((uint)unitAtNeg1 >> 6)))) == ulong.MinValue))
         {
          return false;
         }

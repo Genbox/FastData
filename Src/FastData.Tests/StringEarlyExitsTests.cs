@@ -67,17 +67,17 @@ public class StringEarlyExitsTests
     }
 
     [Fact]
-    public void GetExits_CharOffsetBitmapRespectsDensityLimits()
+    public void GetExits_UnitAtBitmapRespectsDensityLimits()
     {
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.MaxCandidates = 50;
         cfg.MinRejectionRatio = 0f;
 
         IEarlyExit[] sparse = GetExits(["alpha", "zulu"], false, cfg);
-        Assert.Contains(sparse, static x => x is CharOffsetBitmapEarlyExit { Offset: >= 0 });
+        Assert.Contains(sparse, static x => x is UnitAtBitmapEarlyExit { Offset: >= 0 });
 
         IEarlyExit[] dense = GetExits(["apple", "banana"], false, cfg);
-        Assert.DoesNotContain(dense, static x => x is CharOffsetBitmapEarlyExit { Offset: >= 0 });
+        Assert.DoesNotContain(dense, static x => x is UnitAtBitmapEarlyExit { Offset: >= 0 });
     }
 
     [Fact]
@@ -90,8 +90,23 @@ public class StringEarlyExitsTests
 
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
-        Assert.Contains(exits, static x => x is StringAtEarlyExit { Fragment: "pre", Offset: 0 });
-        Assert.Contains(exits, static x => x is StringAtEarlyExit { Fragment: "Suf", Offset: < 0 });
+        Assert.Contains(exits, static x => x is EqualsAtEarlyExit { Fragment: "pre", Offset: 0 });
+        Assert.Contains(exits, static x => x is EqualsAtEarlyExit { Fragment: "Suf", Offset: < 0 });
+    }
+
+    [Fact]
+    public void GetExits_IgnoreCaseNonAscii_SkipsUnitAndStringAtExits()
+    {
+        string[] keys = ["ÆpreOne", "ÆpreTwo", "ÆpreSix"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0f;
+
+        IEarlyExit[] exits = GetExits(keys, true, cfg);
+
+        Assert.Contains(exits, static x => x is LengthGreaterThanEarlyExit);
+        Assert.DoesNotContain(exits, static x => x is UnitAtNotEqualEarlyExit or UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit or UnitAtBitmapEarlyExit);
+        Assert.DoesNotContain(exits, static x => x is EqualsAtEarlyExit);
     }
 
     [Fact]
@@ -104,7 +119,7 @@ public class StringEarlyExitsTests
 
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
-        Assert.DoesNotContain(exits, static x => x is StringAtEarlyExit { Fragment: "ab" });
+        Assert.DoesNotContain(exits, static x => x is EqualsAtEarlyExit { Fragment: "ab" });
     }
 
     [Fact]
@@ -117,7 +132,7 @@ public class StringEarlyExitsTests
         string[] keys = ["abaaaaaa", "abbbbbbb", "abccccccc"];
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
-        Assert.Contains(exits, static x => x is StringAtEarlyExit { Fragment: "ab" });
+        Assert.Contains(exits, static x => x is EqualsAtEarlyExit { Fragment: "ab" });
 
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, false, GeneratorEncoding.Utf16CodeUnits);
         int minLength = props.LengthData.LengthRanges.Min;
