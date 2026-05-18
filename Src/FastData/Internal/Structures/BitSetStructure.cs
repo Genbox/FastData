@@ -32,21 +32,36 @@ public sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, Bit
         ulong[] bitset = new ulong[(range + 63) / 64];
         TValue[]? denseValues = values.IsEmpty ? null : new TValue[range];
 
-        Func<TKey, long> conv = Type.GetTypeCode(typeof(TKey)).GetSignedValueConverter<TKey>();
-        long minKey = conv(_props.DataRanges.Min);
+        TypeCode typeCode = Type.GetTypeCode(typeof(TKey));
 
-        for (int i = 0; i < keySpan.Length; i++)
+        if (typeCode.IsUnsigned())
         {
-            ulong offset = (ulong)(conv(keySpan[i]) - minKey);
+            Func<TKey, ulong> conv = typeCode.GetUnsignedValueConverter<TKey>();
+            ulong minKey = conv(_props.DataRanges.Min);
+
+            for (int i = 0; i < keySpan.Length; i++)
+                SetEntry(conv(keySpan[i]) - minKey, denseValues == null ? default! : valueSpan[i]);
+        }
+        else
+        {
+            Func<TKey, long> conv = typeCode.GetSignedValueConverter<TKey>();
+            long minKey = conv(_props.DataRanges.Min);
+
+            for (int i = 0; i < keySpan.Length; i++)
+                SetEntry((ulong)(conv(keySpan[i]) - minKey), denseValues == null ? default! : valueSpan[i]);
+        }
+
+        return new BitSetContext<TValue>(bitset, denseValues);
+
+        void SetEntry(ulong offset, TValue value)
+        {
             Debug.Assert(offset <= _props.Range, "BitSetStructure requires every key to be within the analyzed numeric range.");
             int word = (int)(offset >> 6);
             bitset[word] |= 1UL << (int)(offset & 63);
 
             if (denseValues != null)
-                denseValues[(int)offset] = valueSpan[i];
+                denseValues[(int)offset] = value;
         }
-
-        return new BitSetContext<TValue>(bitset, denseValues);
     }
 
     public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
