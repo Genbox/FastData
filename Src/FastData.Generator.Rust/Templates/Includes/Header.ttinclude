@@ -30,10 +30,7 @@
 #![allow(unused_variables)]
 #![allow(unused_unsafe)]
 use std::ptr;
-<#
-    string objectDecl = Model.ValueType.IsPrimitive ? string.Empty : TypeMap.GetObjectDeclaration(Model.ValueType).Trim();
-#>
-<#= objectDecl #>
+<#= Type.GetTypeCode(Model.ValueType) == TypeCode.Object ? TypeMap.GetObjectDeclaration(Model.ValueType).Trim() : string.Empty #>
 <#
     if (GeneratorConfig is StringGeneratorConfig strCfg2)
     {

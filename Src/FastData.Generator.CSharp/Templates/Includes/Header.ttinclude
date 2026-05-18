@@ -48,8 +48,7 @@ using System.Runtime.InteropServices;
 
 <#= ns #><#= attr #><#= visibility #><#= partial #><#= type #> <#= cn #>
 {
-<# string classDef = Model.ValueType.IsPrimitive ? "" : TypeMap.GetObjectDeclaration(Model.ValueType).Trim(); #>
-<#= classDef #>
+<#= Type.GetTypeCode(Model.ValueType) == TypeCode.Object ? TypeMap.GetObjectDeclaration(Model.ValueType).Trim() : string.Empty #>
 <#
     // Output helper functions
     if (GeneratorConfig is StringGeneratorConfig strCfg2)

@@ -29,10 +29,7 @@
 #include <cstdint>
 #include <limits>
 #include <string_view>
-<#
-    string objectDecl = Model.ValueType.IsPrimitive ? string.Empty : TypeMap.GetObjectDeclaration(Model.ValueType).Trim();
-#>
-<#= objectDecl #>
+<#= Type.GetTypeCode(Model.ValueType) == TypeCode.Object ? TypeMap.GetObjectDeclaration(Model.ValueType).Trim() : string.Empty #>
 
 class <#= CPlusPlusConfig.ClassName #> final {
 
