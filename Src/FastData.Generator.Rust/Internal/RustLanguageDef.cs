@@ -11,7 +11,7 @@ internal class RustLanguageDef : ILanguageDef
     public IList<ITypeDef> TypeDefinitions => new List<ITypeDef>
     {
         new NullTypeDef("None"),
-        new IntegerTypeDef<char>("char", char.MinValue, char.MaxValue, "char::MIN", "char::MAX", QuoteChar),
+        new IntegerTypeDef<char>("char", char.MinValue, char.MaxValue, "char::MIN", "char::MAX", static value => "'" + EscapeChar(value) + "'"),
         new IntegerTypeDef<sbyte>("i8", sbyte.MinValue, sbyte.MaxValue, "i8::MIN", "i8::MAX"),
         new IntegerTypeDef<byte>("u8", byte.MinValue, byte.MaxValue, "u8::MIN", "u8::MAX"),
         new IntegerTypeDef<short>("i16", short.MinValue, short.MaxValue, "i16::MIN", "i16::MAX"),
@@ -20,14 +20,11 @@ internal class RustLanguageDef : ILanguageDef
         new IntegerTypeDef<uint>("u32", uint.MinValue, uint.MaxValue, "u32::MIN", "u32::MAX"),
         new IntegerTypeDef<long>("i64", long.MinValue, long.MaxValue, "i64::MIN", "i64::MAX"),
         new IntegerTypeDef<ulong>("u64", ulong.MinValue, ulong.MaxValue, "u64::MIN", "u64::MAX"),
-        new IntegerTypeDef<float>("f32", float.MinValue, float.MaxValue, "f32::MIN", "f32::MAX", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
-        new IntegerTypeDef<double>("f64", double.MinValue, double.MaxValue, "f64::MIN", "f64::MAX", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
-        new StringTypeDef("&str", QuoteString),
+        new IntegerTypeDef<float>("f32", float.MinValue, float.MaxValue, "f32::MIN", "f32::MAX", static x => x.ToString("R", NumberFormatInfo.InvariantInfo) + "f32"),
+        new IntegerTypeDef<double>("f64", double.MinValue, double.MaxValue, "f64::MIN", "f64::MAX", static x => x.ToString("R", NumberFormatInfo.InvariantInfo) + "f64"),
+        new StringTypeDef("&str", static value => "\"" + EscapeString(value) + "\""),
         new ObjectTypeDef(PrintDeclaration, PrintValue)
     };
-
-    private static string QuoteString(string value) => "\"" + EscapeString(value) + "\"";
-    private static string QuoteChar(char value) => "'" + EscapeChar(value) + "'";
 
     private static string EscapeString(string value)
     {

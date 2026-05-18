@@ -11,7 +11,7 @@ internal class CPlusPlusLanguageDef : ILanguageDef
     {
         new NullTypeDef("nullptr"),
 
-        new IntegerTypeDef<char>("char", char.MinValue, (char)127, "0", "127", x => ((byte)x).ToString(NumberFormatInfo.InvariantInfo)),
+        new IntegerTypeDef<char>("char", char.MinValue, (char)127, "0", "127", static x => ((byte)x).ToString(NumberFormatInfo.InvariantInfo)),
         new IntegerTypeDef<sbyte>("int8_t", sbyte.MinValue, sbyte.MaxValue, "std::numeric_limits<int8_t>::lowest()", "std::numeric_limits<int8_t>::max()"),
         new IntegerTypeDef<byte>("uint8_t", byte.MinValue, byte.MaxValue, "0", "std::numeric_limits<uint8_t>::max()"),
         new IntegerTypeDef<short>("int16_t", short.MinValue, short.MaxValue, "std::numeric_limits<int16_t>::lowest()", "std::numeric_limits<int16_t>::max()"),
@@ -20,8 +20,8 @@ internal class CPlusPlusLanguageDef : ILanguageDef
         new IntegerTypeDef<uint>("uint32_t", uint.MinValue, uint.MaxValue, "0", "std::numeric_limits<uint32_t>::max()", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "u"),
         new IntegerTypeDef<long>("int64_t", long.MinValue, long.MaxValue, "std::numeric_limits<int64_t>::lowest()", "std::numeric_limits<int64_t>::max()", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "ll"),
         new IntegerTypeDef<ulong>("uint64_t", ulong.MinValue, ulong.MaxValue, "0", "std::numeric_limits<uint64_t>::max()", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "ull"),
-        new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "std::numeric_limits<float>::lowest()", "std::numeric_limits<float>::max()", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo) + "f"),
-        new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "std::numeric_limits<double>::lowest()", "std::numeric_limits<double>::max()", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
+        new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "std::numeric_limits<float>::lowest()", "std::numeric_limits<float>::max()", FormatFloat),
+        new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "std::numeric_limits<double>::lowest()", "std::numeric_limits<double>::max()", static x => x.ToString("R", NumberFormatInfo.InvariantInfo)),
 
         new ObjectTypeDef(PrintDeclaration, PrintValue),
 
@@ -37,6 +37,16 @@ internal class CPlusPlusLanguageDef : ILanguageDef
             throw new InvalidOperationException("C++ generator does not support string literals that contain NUL bytes.");
 
         return $"{prefix}\"{EscapeString(value)}\"";
+    }
+
+    private static string FormatFloat(float value)
+    {
+        string label = value.ToString("R", NumberFormatInfo.InvariantInfo);
+
+        if (!label.Contains('.') && !label.Contains('E') && !label.Contains('e'))
+            label += ".0";
+
+        return label + "f";
     }
 
     private static string EscapeString(string value)

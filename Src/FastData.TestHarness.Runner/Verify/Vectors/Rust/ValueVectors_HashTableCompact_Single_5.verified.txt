@@ -26,7 +26,7 @@ impl fastdata {
     ];
 
     const ENTRIES: [E; 5] = [
-        E { hash_code: 0, key: 0.0 }, E { hash_code: 1065353216, key: 1.0 }, E { hash_code: 4286578687, key: f32::MIN }, E { hash_code: 3212836864, key: -1.0 }, E { hash_code: 2139095039, key: f32::MAX }
+        E { hash_code: 0, key: 0f32 }, E { hash_code: 1065353216, key: 1f32 }, E { hash_code: 4286578687, key: f32::MIN }, E { hash_code: 3212836864, key: -1f32 }, E { hash_code: 2139095039, key: f32::MAX }
     ];
 
     #[inline(always)]

@@ -12,7 +12,7 @@ internal static class FastData
 
 
     private static readonly double[] _keys = new double[] {
-        double.MinValue, 0.0, 1.0, double.MaxValue
+        double.MinValue, 0, 1, double.MaxValue
     };
 
     

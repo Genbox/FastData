@@ -11,7 +11,7 @@ internal class CSharpLanguageDef : ILanguageDef
     {
         new NullTypeDef("null"),
 
-        new IntegerTypeDef<char>("char", char.MinValue, char.MaxValue, "char.MinValue", "char.MaxValue", QuoteChar),
+        new IntegerTypeDef<char>("char", char.MinValue, char.MaxValue, "char.MinValue", "char.MaxValue", static value => "'" + EscapeChar(value) + "'"),
         new IntegerTypeDef<sbyte>("sbyte", sbyte.MinValue, sbyte.MaxValue, "sbyte.MinValue", "sbyte.MaxValue"),
         new IntegerTypeDef<byte>("byte", byte.MinValue, byte.MaxValue, "byte.MinValue", "byte.MaxValue"),
         new IntegerTypeDef<short>("short", short.MinValue, short.MaxValue, "short.MinValue", "short.MaxValue"),
@@ -20,15 +20,12 @@ internal class CSharpLanguageDef : ILanguageDef
         new IntegerTypeDef<uint>("uint", uint.MinValue, uint.MaxValue, "uint.MinValue", "uint.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "u"),
         new IntegerTypeDef<long>("long", long.MinValue, long.MaxValue, "long.MinValue", "long.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "l"),
         new IntegerTypeDef<ulong>("ulong", ulong.MinValue, ulong.MaxValue, "ulong.MinValue", "ulong.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "ul"),
-        new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "float.MinValue", "float.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "f"),
-        new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "double.MinValue", "double.MaxValue", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
-        new StringTypeDef("string", QuoteString),
+        new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "float.MinValue", "float.MaxValue", static x => x.ToString("R", NumberFormatInfo.InvariantInfo) + "f"),
+        new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "double.MinValue", "double.MaxValue", static x => x.ToString("R", NumberFormatInfo.InvariantInfo)),
+        new StringTypeDef("string", static value => "\"" + EscapeString(value) + "\""),
 
         new ObjectTypeDef(PrintDeclaration, PrintValue)
     };
-
-    private static string QuoteString(string value) => "\"" + EscapeString(value) + "\"";
-    private static string QuoteChar(char value) => "'" + EscapeChar(value) + "'";
 
     private static string EscapeString(string value)
     {

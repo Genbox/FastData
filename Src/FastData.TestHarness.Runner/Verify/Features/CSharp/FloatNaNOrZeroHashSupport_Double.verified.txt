@@ -29,7 +29,7 @@ internal static class FastData
     };
 
     private static readonly E[] _entries = {
-        new E(1.0, -1, 4607182418800017408ul), new E(2.0, -1, 4611686018427387904ul), new E(3.0, -1, 4613937818241073152ul), new E(4.0, -1, 4616189618054758400ul), new E(5.0, 1, 4617315517961601024ul)
+        new E(1, -1, 4607182418800017408ul), new E(2, -1, 4611686018427387904ul), new E(3, -1, 4613937818241073152ul), new E(4, -1, 4616189618054758400ul), new E(5, 1, 4617315517961601024ul)
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -61,6 +61,6 @@ internal static class FastData
     }
 
     public const int ItemCount = 5;
-    public const double MinKey = 1.0;
-    public const double MaxKey = 5.0;
+    public const double MinKey = 1;
+    public const double MaxKey = 5;
 }

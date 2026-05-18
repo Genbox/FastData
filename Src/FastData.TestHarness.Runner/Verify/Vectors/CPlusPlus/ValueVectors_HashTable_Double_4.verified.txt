@@ -24,7 +24,7 @@ class fastdata final {
     };
 
     inline static const std::array<e, 4> entries = {
-        e(std::numeric_limits<double>::lowest(), -1, 18442240474082181119ull), e(0.0, -1, 0), e(1.0, 1, 4607182418800017408ull), e(std::numeric_limits<double>::max(), 0, 9218868437227405311ull)
+        e(std::numeric_limits<double>::lowest(), -1, 18442240474082181119ull), e(0, -1, 0), e(1, 1, 4607182418800017408ull), e(std::numeric_limits<double>::max(), 0, 9218868437227405311ull)
     };
 
     static uint64_t get_hash(const double value) noexcept {

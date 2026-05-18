@@ -13,13 +13,13 @@ class fastdata final {
 
 
     static constexpr std::array<float, 4> keys = {
-        1.3f, 3.5f, 6.8f, 9.0f
+        1.25f, 3.5f, 6.75f, 9.0f
     };
 
 public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
-        if ((key < 1.3f))
+        if ((key < 1.25f))
         {
          return false;
         }
@@ -38,6 +38,6 @@ public:
     }
 
     static constexpr size_t item_count = 4;
-    static constexpr float min_key = 1.3f;
+    static constexpr float min_key = 1.25f;
     static constexpr float max_key = 9.0f;
 };

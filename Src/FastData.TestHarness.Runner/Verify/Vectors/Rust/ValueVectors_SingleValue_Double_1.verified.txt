@@ -15,10 +15,10 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: f64) -> bool {
 
-        key == 1.0
+        key == 1f64
     }
 
     pub const ITEM_COUNT: usize = 1;
-    pub const MIN_KEY: f64 = 1.0;
-    pub const MAX_KEY: f64 = 1.0;
+    pub const MIN_KEY: f64 = 1f64;
+    pub const MAX_KEY: f64 = 1f64;
 }

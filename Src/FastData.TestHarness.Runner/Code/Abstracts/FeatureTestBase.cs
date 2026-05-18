@@ -30,6 +30,22 @@ public abstract class FeatureTestBase
         Assert.Equal(1, await Harness.RunContainsAsync(source, id, doubles, [], TestContext.Current.CancellationToken));
     }
 
+    [Fact]
+    public async Task FractionalFloatingPointLiteralsMatch()
+    {
+        NumericDataConfig config = new NumericDataConfig();
+        config.StructureTypeOverride = typeof(ArrayStructure<,>);
+        config.EarlyExitConfig.Disabled = true;
+
+        float[] floats = [1.25f, 2.5f, 3.75f];
+        string source = FastDataGenerator.Generate(floats, config, Harness.Generator);
+        Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(FractionalFloatingPointLiteralsMatch) + "_Float", floats, [1.2f, 2.4f], TestContext.Current.CancellationToken));
+
+        double[] doubles = [1.23, 2.5, 3.75];
+        source = FastDataGenerator.Generate(doubles, config, Harness.Generator);
+        Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(FractionalFloatingPointLiteralsMatch) + "_Double", doubles, [1.2, 2.4], TestContext.Current.CancellationToken));
+    }
+
     [Theory]
     [InlineData(true), InlineData(false)]
     public async Task IgnoreCaseSupport(bool ignoreCase)

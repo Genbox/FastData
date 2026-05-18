@@ -18,8 +18,8 @@ internal static class FastData
         switch (key)
         {
             case double.MinValue:
-            case 0.0:
-            case 1.0:
+            case 0:
+            case 1:
             case double.MaxValue:
                 return true;
             default:

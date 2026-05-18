@@ -24,7 +24,7 @@ class fastdata final {
     };
 
     inline static const std::array<e, 5> entries = {
-        e(1.0, -1, 4607182418800017408ull), e(2.0, -1, 4611686018427387904ull), e(3.0, -1, 4613937818241073152ull), e(4.0, -1, 4616189618054758400ull), e(5.0, 1, 4617315517961601024ull)
+        e(1, -1, 4607182418800017408ull), e(2, -1, 4611686018427387904ull), e(3, -1, 4613937818241073152ull), e(4, -1, 4616189618054758400ull), e(5, 1, 4617315517961601024ull)
     };
 
     static uint64_t get_hash(const double value) noexcept {
@@ -54,6 +54,6 @@ public:
     }
 
     static constexpr size_t item_count = 5;
-    static constexpr double min_key = 1.0;
-    static constexpr double max_key = 5.0;
+    static constexpr double min_key = 1;
+    static constexpr double max_key = 5;
 };

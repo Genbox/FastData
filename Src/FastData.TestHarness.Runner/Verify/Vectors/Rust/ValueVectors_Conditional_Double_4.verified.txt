@@ -15,7 +15,7 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: f64) -> bool {
 
-        if key == f64::MIN || key == 0.0 || key == 1.0 || key == f64::MAX {
+        if key == f64::MIN || key == 0f64 || key == 1f64 || key == f64::MAX {
             return true;
         }
 

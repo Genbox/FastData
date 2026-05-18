@@ -13,7 +13,7 @@ pub struct fastdata;
 impl fastdata {
 
     const KEYS: [f64; 4] = [
-        f64::MIN, 0.0, 1.0, f64::MAX
+        f64::MIN, 0f64, 1f64, f64::MAX
     ];
 
     #[must_use]

@@ -23,7 +23,7 @@ impl fastdata {
     ];
 
     const ENTRIES: [E; 5] = [
-        E { hash_code: 4607182418800017408, next: -1, key: 1.0 }, E { hash_code: 4611686018427387904, next: -1, key: 2.0 }, E { hash_code: 4613937818241073152, next: -1, key: 3.0 }, E { hash_code: 4616189618054758400, next: -1, key: 4.0 }, E { hash_code: 4617315517961601024, next: 1, key: 5.0 }
+        E { hash_code: 4607182418800017408, next: -1, key: 1f64 }, E { hash_code: 4611686018427387904, next: -1, key: 2f64 }, E { hash_code: 4613937818241073152, next: -1, key: 3f64 }, E { hash_code: 4616189618054758400, next: -1, key: 4f64 }, E { hash_code: 4617315517961601024, next: 1, key: 5f64 }
     ];
 
     #[inline(always)]
@@ -50,6 +50,6 @@ impl fastdata {
     }
 
     pub const ITEM_COUNT: usize = 5;
-    pub const MIN_KEY: f64 = 1.0;
-    pub const MAX_KEY: f64 = 5.0;
+    pub const MIN_KEY: f64 = 1f64;
+    pub const MAX_KEY: f64 = 5f64;
 }
