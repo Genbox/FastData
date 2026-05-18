@@ -37,32 +37,22 @@ internal sealed record GPerfStringHash : IStringHash
             Assign(hash, Constant(0UL))
         };
 
-        int key = Positions[0];
-
-        //Keys are sorted, so we can do some deductions:
-        //- If the key is -1, it means the hash is simply just the last character. In that case, we can render a simple expression
-        //- If the key is less than the minimum strength length, we can render a simple expression.
-
-        if (key == -1 || key < MinLen)
+        // Positions are selected by the analyzer and sorted in gperf order. A selected position contributes only when it exists
+        // for the current logical length; positions outside the logical length are skipped.
+        foreach (int pos in Positions)
         {
-            foreach (int pos in Positions)
-                ex.Add(Assign(hash, Add(hash, GetPosition(asso, value, length, pos))));
-        }
-        else
-        {
-            // Conditional branches down from key to MinLen
-            key++;
-            do
-            {
-                ex.Add(IfThen(
-                    GreaterThanOrEqual(Property(value, "Length"), Constant(key)),
-                    Assign(hash, Add(hash, Convert(GetPosition(asso, value, length, key - 1), typeof(ulong)))
-                    )));
-            } while (key-- > MinLen);
+            Expression add = Assign(hash, Add(hash, GetPosition(asso, value, length, pos)));
 
-            if (key == -1)
-                ex.Add(Assign(hash, Add(hash, Convert(GetPosition(asso, value, length, key), typeof(ulong)))));
+            // Mirror gperf's fast path: the caller only hashes strings with length >= MinLen, so the last character and any
+            // fixed position below MinLen are always valid and do not need a branch.
+            if (pos == -1 || pos < MinLen)
+                ex.Add(add);
+            else
+                ex.Add(IfThen(GreaterThanOrEqual(length, Constant(pos + 1)), add));
         }
+
+        // Keep the block's result type as ulong even when the last emitted statement is a guarded IfThen.
+        ex.Add(hash);
 
         BlockExpression body = Block([hash], ex);
         return Lambda<StringHashFunc>(body, value, length);
