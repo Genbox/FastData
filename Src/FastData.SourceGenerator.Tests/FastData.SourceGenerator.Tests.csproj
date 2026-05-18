@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
     <ProjectReference Include="..\FastData.SourceGenerator.Attributes\FastData.SourceGenerator.Attributes.csproj" />
   </ItemGroup>

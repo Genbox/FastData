@@ -103,11 +103,6 @@
         "resolved": "0.6.0",
         "contentHash": "7GBA+jSpam3NV9IFqTg/ZzUMHytjEnZ0DqGpzHvKWZHV7hGNer71KuDd8rC/+6HwZHswVUzZ14JPt4gi3WhIbw=="
       },
-      "Microsoft.Bcl.AsyncInterfaces": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "UcSjPsst+DfAdJGVDsu346FX0ci0ah+lw3WRtn18NUwEqRt70HaOQ7lI72vy3+1LxtqI3T5GWwV39rQSrCzAeg=="
-      },
       "Microsoft.Build.Tasks.Git": {
         "type": "Transitive",
         "resolved": "10.0.300",
@@ -200,6 +195,12 @@
         "dependencies": {
           "Newtonsoft.Json": "13.0.1"
         }
+      },
+      "Microsoft.Bcl.AsyncInterfaces": {
+        "type": "CentralTransitive",
+        "requested": "[10.0.8, )",
+        "resolved": "6.0.0",
+        "contentHash": "UcSjPsst+DfAdJGVDsu346FX0ci0ah+lw3WRtn18NUwEqRt70HaOQ7lI72vy3+1LxtqI3T5GWwV39rQSrCzAeg=="
       },
       "Microsoft.CodeAnalysis.CSharp": {
         "type": "CentralTransitive",
