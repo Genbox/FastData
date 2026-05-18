@@ -88,7 +88,7 @@
         int start_bit = static_cast<int>(start_position & 63);
 
         for (; word_index < upper_bits.size(); word_index++) {
-            const int valid_bits = word_index == upper_bits.size() - 1 ? <#= (Context.UpperBitLength & 63) #> : 64;
+            const int valid_bits = word_index == upper_bits.size() - 1 ? <#= ((Context.UpperBitLength & 63) == 0 ? 64 : (Context.UpperBitLength & 63)) #> : 64;
             const uint64_t valid_mask = valid_bits == 64 ? std::numeric_limits<uint64_t>::max() : ((1ULL << valid_bits) - 1);
             uint64_t zeros = ~upper_bits[word_index] & valid_mask;
 

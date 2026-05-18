@@ -172,7 +172,7 @@
 
         for (; wordIndex < _upperBits.Length; wordIndex++)
         {
-            int validBits = wordIndex == _upperBits.Length - 1 ? <#= (Context.UpperBitLength & 63) #> : 64;
+            int validBits = wordIndex == _upperBits.Length - 1 ? <#= ((Context.UpperBitLength & 63) == 0 ? 64 : (Context.UpperBitLength & 63)) #> : 64;
             ulong validMask = validBits == 64 ? ulong.MaxValue : (1UL << validBits) - 1;
             ulong zeros = ~_upperBits[wordIndex] & validMask;
 

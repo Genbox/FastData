@@ -174,7 +174,7 @@
         let mut start_bit = (start_position & 63) as u32;
 
         while word_index < Self::UPPER_BITS.len() {
-            let valid_bits = if word_index == Self::UPPER_BITS.len() - 1 { <#= (Context.UpperBitLength & 63) #> } else { 64 };
+            let valid_bits = if word_index == Self::UPPER_BITS.len() - 1 { <#= ((Context.UpperBitLength & 63) == 0 ? 64 : (Context.UpperBitLength & 63)) #> } else { 64 };
             let valid_mask = if valid_bits == 64 { u64::MAX } else { (1u64 << (valid_bits as u32)) - 1 };
             let mut zeros = !Self::UPPER_BITS[word_index] & valid_mask;
 
