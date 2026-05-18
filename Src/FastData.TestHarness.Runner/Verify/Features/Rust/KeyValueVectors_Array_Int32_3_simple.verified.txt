@@ -33,9 +33,9 @@ impl fastdata {
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<i32> {
 
-        for entry in Self::KEYS.iter() {
-            if *entry == key {
-                return Some(Self::VALUES[(key - 1) as usize])
+        for i in 0..3 {
+            if Self::KEYS[i] == key {
+                return Some(Self::VALUES[i])
             }
         }
         None
