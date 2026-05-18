@@ -11,7 +11,7 @@ internal class CSharpLanguageDef : ILanguageDef
     {
         new NullTypeDef("null"),
 
-        new IntegerTypeDef<char>("char", char.MinValue, char.MaxValue, "char.MinValue", "char.MaxValue", x => $"'{x.ToString(NumberFormatInfo.InvariantInfo)}'"),
+        new IntegerTypeDef<char>("char", char.MinValue, char.MaxValue, "char.MinValue", "char.MaxValue", QuoteChar),
         new IntegerTypeDef<sbyte>("sbyte", sbyte.MinValue, sbyte.MaxValue, "sbyte.MinValue", "sbyte.MaxValue"),
         new IntegerTypeDef<byte>("byte", byte.MinValue, byte.MaxValue, "byte.MinValue", "byte.MaxValue"),
         new IntegerTypeDef<short>("short", short.MinValue, short.MaxValue, "short.MinValue", "short.MaxValue"),
@@ -22,9 +22,39 @@ internal class CSharpLanguageDef : ILanguageDef
         new IntegerTypeDef<ulong>("ulong", ulong.MinValue, ulong.MaxValue, "ulong.MinValue", "ulong.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "ul"),
         new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "float.MinValue", "float.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "f"),
         new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "double.MinValue", "double.MaxValue", static x => x.ToString("0.0", NumberFormatInfo.InvariantInfo)),
-        new StringTypeDef("string"),
+        new StringTypeDef("string", QuoteString),
 
         new ObjectTypeDef(PrintDeclaration, PrintValue)
+    };
+
+    private static string QuoteString(string value) => "\"" + EscapeString(value) + "\"";
+    private static string QuoteChar(char value) => "'" + EscapeChar(value) + "'";
+
+    private static string EscapeString(string value)
+    {
+        StringBuilder sb = new StringBuilder(value.Length + 2);
+
+        foreach (char ch in value)
+            sb.Append(EscapeChar(ch));
+
+        return sb.ToString();
+    }
+
+    private static string EscapeChar(char ch) => ch switch
+    {
+        '\0' => "\\0",
+        '\a' => "\\a",
+        '\b' => "\\b",
+        '\f' => "\\f",
+        '\n' => "\\n",
+        '\r' => "\\r",
+        '\t' => "\\t",
+        '\v' => "\\v",
+        '\\' => "\\\\",
+        '\"' => "\\\"",
+        '\'' => "\\'",
+        < ' ' => "\\u" + ((int)ch).ToString("X4", NumberFormatInfo.InvariantInfo),
+        _ => ch.ToString()
     };
 
     private static string PrintDeclaration(TypeMap map, Type type)

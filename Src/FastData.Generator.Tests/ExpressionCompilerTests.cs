@@ -52,13 +52,15 @@ public class ExpressionCompilerTests
         ITypeDef[] defs =
         [
             new NullTypeDef("null"),
-            new StringTypeDef("string"),
+            new StringTypeDef("string", QuoteString),
             new IntegerTypeDef<int>("int", int.MinValue, int.MaxValue, "int.MinValue", "int.MaxValue"),
             new ObjectTypeDef((_, type) => type.Name, (_, value) => value.ToString() ?? string.Empty)
         ];
 
         return new TypeMap(defs, GeneratorEncoding.Utf8Bytes);
     }
+
+    private static string QuoteString(string value) => "\"" + value + "\"";
 
     private sealed class TestCompiler(TypeMap map) : ExpressionCompiler(map);
 }

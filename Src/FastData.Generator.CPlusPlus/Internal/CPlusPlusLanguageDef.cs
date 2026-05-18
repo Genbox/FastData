@@ -26,9 +26,42 @@ internal class CPlusPlusLanguageDef : ILanguageDef
         new ObjectTypeDef(PrintDeclaration, PrintValue),
 
         new DynamicStringTypeDef(
-            new StringType(GeneratorEncoding.Utf16CodeUnits, "std::u16string_view", static x => $"u\"{x}\""),
-            new StringType(GeneratorEncoding.Utf8Bytes, "std::string_view", static x => $"u8\"{x}\""),
-            new StringType(GeneratorEncoding.AsciiBytes, "std::string_view", static x => $"\"{x}\""))
+            new StringType(GeneratorEncoding.Utf16CodeUnits, "std::u16string_view", static x => QuoteStringView(x, "u", "std::u16string_view")),
+            new StringType(GeneratorEncoding.Utf8Bytes, "std::string_view", static x => QuoteStringView(x, "u8", "std::string_view")),
+            new StringType(GeneratorEncoding.AsciiBytes, "std::string_view", static x => QuoteStringView(x, string.Empty, "std::string_view")))
+    };
+
+    private static string QuoteStringView(string value, string prefix, string typeName)
+    {
+        int length = prefix == "u8" ? Encoding.UTF8.GetByteCount(value) : value.Length;
+        return $"{typeName}({prefix}\"{EscapeString(value)}\", {length.ToString(NumberFormatInfo.InvariantInfo)})";
+    }
+
+    private static string EscapeString(string value)
+    {
+        StringBuilder sb = new StringBuilder(value.Length + 2);
+
+        foreach (char ch in value)
+            sb.Append(EscapeChar(ch));
+
+        return sb.ToString();
+    }
+
+    private static string EscapeChar(char ch) => ch switch
+    {
+        '\0' => "\\0",
+        '\a' => "\\a",
+        '\b' => "\\b",
+        '\f' => "\\f",
+        '\n' => "\\n",
+        '\r' => "\\r",
+        '\t' => "\\t",
+        '\v' => "\\v",
+        '\\' => "\\\\",
+        '\"' => "\\\"",
+        '\'' => "\\'",
+        < ' ' => "\\u" + ((int)ch).ToString("X4", NumberFormatInfo.InvariantInfo),
+        _ => ch.ToString()
     };
 
     private static string PrintDeclaration(TypeMap map, Type type)

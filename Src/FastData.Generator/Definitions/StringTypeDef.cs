@@ -4,20 +4,12 @@ namespace Genbox.FastData.Generator.Definitions;
 
 public class StringTypeDef : ITypeDef<string>
 {
-    public StringTypeDef(string name, Func<string, string>? print = null)
+    public StringTypeDef(string name, Func<string, string> print)
     {
         Name = name;
 
-        if (print != null)
-        {
-            Print = (_, x) => print(x);
-            PrintObj = (_, x) => print(x.ToString());
-        }
-        else
-        {
-            Print = static (_, x) => $"\"{x}\"";
-            PrintObj = static (_, x) => $"\"{x}\"";
-        }
+        Print = (_, x) => print(x);
+        PrintObj = (_, x) => print(x.ToString() ?? string.Empty);
     }
 
     public TypeCode KeyType => TypeCode.String;

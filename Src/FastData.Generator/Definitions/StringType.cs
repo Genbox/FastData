@@ -4,7 +4,7 @@ namespace Genbox.FastData.Generator.Definitions;
 
 public readonly record struct StringType
 {
-    public StringType(GeneratorEncoding encoding, string typeName, Func<string, string>? print = null)
+    public StringType(GeneratorEncoding encoding, string typeName, Func<string, string> print)
     {
         Encoding = encoding;
         StringTypeDef = new StringTypeDef(typeName, print);

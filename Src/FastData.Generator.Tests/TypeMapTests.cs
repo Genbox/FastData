@@ -11,8 +11,8 @@ public class TypeMapTests
     {
         List<ITypeDef> defs =
         [
-            new StringTypeDef("string"),
-            new StringTypeDef("other")
+            new StringTypeDef("string", Identity),
+            new StringTypeDef("other", Identity)
         ];
 
         Assert.Throws<InvalidOperationException>(() => new TypeMap(defs, GeneratorEncoding.Utf8Bytes));
@@ -24,7 +24,7 @@ public class TypeMapTests
         ITypeDef[] defs =
         [
             new NullTypeDef("null"),
-            new StringTypeDef("string")
+            new StringTypeDef("string", Identity)
         ];
 
         TypeMap map = new TypeMap(defs, GeneratorEncoding.Utf8Bytes);
@@ -36,8 +36,8 @@ public class TypeMapTests
     public void DynamicStringTypeDefResolvesByEncoding()
     {
         DynamicStringTypeDef dynamic = new DynamicStringTypeDef(
-            new StringType(GeneratorEncoding.AsciiBytes, "ascii"),
-            new StringType(GeneratorEncoding.Utf8Bytes, "utf8"));
+            new StringType(GeneratorEncoding.AsciiBytes, "ascii", Identity),
+            new StringType(GeneratorEncoding.Utf8Bytes, "utf8", Identity));
 
         ITypeDef[] defs = [dynamic];
         TypeMap map = new TypeMap(defs, GeneratorEncoding.Utf8Bytes);
@@ -58,11 +58,13 @@ public class TypeMapTests
     [Fact]
     public void GetThrowsWhenTypeIsMissing()
     {
-        ITypeDef[] defs = [new StringTypeDef("string")];
+        ITypeDef[] defs = [new StringTypeDef("string", Identity)];
         TypeMap map = new TypeMap(defs, GeneratorEncoding.Utf8Bytes);
 
         Assert.Throws<InvalidOperationException>(map.Get<int>);
     }
+
+    private static string Identity(string value) => value;
 
     private sealed class CustomObject;
 }
