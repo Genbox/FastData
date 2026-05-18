@@ -23,7 +23,7 @@ public abstract class FeatureTestBase
         await VerifyFeatureAsync(Harness.Name, id, source);
         Assert.Equal(1, await Harness.RunContainsAsync(source, id, floats, [], TestContext.Current.CancellationToken));
 
-        float[] doubles = [1.0f, 2.0f, 3.0f, 4.0f, 5.0f];
+        double[] doubles = [1.0, 2.0, 3.0, 4.0, 5.0];
         source = FastDataGenerator.Generate(doubles, config, Harness.Generator);
         id = $"{nameof(FloatNaNOrZeroHashSupport)}_Double";
         await VerifyFeatureAsync(Harness.Name, id, source);

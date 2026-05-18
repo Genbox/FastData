@@ -12,30 +12,30 @@ class fastdata final {
 
 
     struct e {
-        float key;
+        double key;
         int8_t next;
         uint64_t hash_code;
-        e(const float key, const int8_t next, const uint64_t hash_code)
+        e(const double key, const int8_t next, const uint64_t hash_code)
            : key(key), next(next), hash_code(hash_code) {}
     };
 
     static constexpr std::array<int8_t, 5> buckets = {
-        0, 1, 4, 3, 5
+        4, 0, 3, 1, 5
     };
 
     inline static const std::array<e, 5> entries = {
-        e(1.0f, -1, 1065353216ull), e(2.0f, -1, 1073741824ull), e(3.0f, -1, 1077936128ull), e(4.0f, -1, 1082130432ull), e(5.0f, 1, 1084227584ull)
+        e(1.0, -1, 4607182418800017408ull), e(2.0, -1, 4611686018427387904ull), e(3.0, -1, 4613937818241073152ull), e(4.0, -1, 4616189618054758400ull), e(5.0, 1, 4617315517961601024ull)
     };
 
-    static uint64_t get_hash(const float value) noexcept {
-        uint32_t bits;
+    static uint64_t get_hash(const double value) noexcept {
+        uint64_t bits;
         std::memcpy(&bits, &value, sizeof(bits));
         return bits;
     }
 
 public:
     [[nodiscard]]
-    static constexpr bool contains(const float key) noexcept {
+    static constexpr bool contains(const double key) noexcept {
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 5;
@@ -54,6 +54,6 @@ public:
     }
 
     static constexpr size_t item_count = 5;
-    static constexpr float min_key = 1.0f;
-    static constexpr float max_key = 5.0f;
+    static constexpr double min_key = 1.0;
+    static constexpr double max_key = 5.0;
 };

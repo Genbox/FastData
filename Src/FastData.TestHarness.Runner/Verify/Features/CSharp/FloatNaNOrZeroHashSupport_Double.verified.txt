@@ -13,10 +13,10 @@ internal static class FastData
     [StructLayout(LayoutKind.Auto)]
     private struct E
     {
-        internal float Key;
+        internal double Key;
         internal sbyte Next;
         internal ulong HashCode;
-        internal E(float key, sbyte next, ulong hashCode)
+        internal E(double key, sbyte next, ulong hashCode)
         {
             Key = key;
             Next = next;
@@ -25,21 +25,21 @@ internal static class FastData
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
-        0, 1, 4, 3, 5
+        4, 0, 3, 1, 5
     };
 
     private static readonly E[] _entries = {
-        new E(1f, -1, 1065353216ul), new E(2f, -1, 1073741824ul), new E(3f, -1, 1077936128ul), new E(4f, -1, 1082130432ul), new E(5f, 1, 1084227584ul)
+        new E(1.0, -1, 4607182418800017408ul), new E(2.0, -1, 4611686018427387904ul), new E(3.0, -1, 4613937818241073152ul), new E(4.0, -1, 4616189618054758400ul), new E(5.0, 1, 4617315517961601024ul)
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong Hash(float value)
+    private static ulong Hash(double value)
     {
-        return (ulong)Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
+        return Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
     }
 
     
-    public static bool Contains(float key)
+    public static bool Contains(double key)
     {
 
 
@@ -61,6 +61,6 @@ internal static class FastData
     }
 
     public const int ItemCount = 5;
-    public const float MinKey = 1f;
-    public const float MaxKey = 5f;
+    public const double MinKey = 1.0;
+    public const double MaxKey = 5.0;
 }
