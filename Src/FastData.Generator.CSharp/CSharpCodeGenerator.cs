@@ -1,4 +1,5 @@
 using Genbox.FastData.Generator.CSharp.Internal;
+using Genbox.FastData.Generator.Enums;
 using Genbox.FastData.Generator.Template;
 using Genbox.FastData.Generator.Template.Helpers;
 using Genbox.FastData.Generators;
@@ -10,6 +11,9 @@ public sealed class CSharpCodeGenerator(CSharpCodeGeneratorConfig csCfg) : Templ
 {
     protected override string GenerateTemplated<TKey, TValue>(GeneratorConfigBase genCfg, TemplateManager manager, Dictionary<string, object?> variables)
     {
+        if (genCfg is StringGeneratorConfig { IgnoreCase: true } && csCfg.ConditionalBranchType == BranchType.Switch)
+            throw new InvalidOperationException("C# switch generation does not support IgnoreCase. Use BranchType.If when IgnoreCase is enabled.");
+
         string templatePath = Path.Combine(TemplateDir, genCfg.StructureName + ".tt");
         string templateSource = File.ReadAllText(templatePath);
 
