@@ -21,7 +21,7 @@ public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValu
         _keysAreSorted = keysAreSorted;
     }
 
-    public RrrBitVectorContext Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
+    public RrrBitVectorContext? Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         Debug.Assert(!keys.IsEmpty, "RrrBitVectorStructure requires at least one key.");
         Debug.Assert(typeof(TKey) == typeof(char) || typeof(TKey) == typeof(byte) || typeof(TKey) == typeof(ushort) || typeof(TKey) == typeof(uint) || typeof(TKey) == typeof(ulong) || typeof(TKey) == typeof(sbyte) || typeof(TKey) == typeof(short) || typeof(TKey) == typeof(int) || typeof(TKey) == typeof(long), "RrrBitVectorStructure only supports integral key types.");
@@ -38,12 +38,13 @@ public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValu
 
         ulong minValue = mapped[0];
         ulong maxValue = mapped[mapped.Length - 1];
-        ulong universe = (maxValue - minValue) + 1UL;
-        ulong blockCount64 = ((universe + BlockSize) - 1UL) / BlockSize;
-        Debug.Assert(blockCount64 <= int.MaxValue, "RrrBitVectorStructure requires a block count that fits in an int-backed table.");
 
-        if (blockCount64 > int.MaxValue)
-            throw new InvalidOperationException("RRR bitvector is too large.");
+        if (maxValue - minValue == ulong.MaxValue)
+            return null; // We cannot produce the data structure. Try next.
+
+        ulong universe = (maxValue - minValue) + 1UL;
+        ulong blockCount64 = (universe + BlockSize - 1UL) / BlockSize;
+        Debug.Assert(blockCount64 <= int.MaxValue, "RrrBitVectorStructure requires a block count that fits in an int-backed table.");
 
         int blockCount = (int)blockCount64;
         byte[] classes = new byte[blockCount];

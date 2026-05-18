@@ -24,7 +24,7 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         _skipQuantum = skipQuantum;
     }
 
-    public EliasFanoContext<TKey> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
+    public EliasFanoContext<TKey>? Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         Debug.Assert(!keys.IsEmpty, "EliasFanoStructure requires at least one key.");
         Debug.Assert(values.IsEmpty || values.Length == keys.Length, "EliasFanoStructure requires value count to match key count when values are present.");
@@ -42,11 +42,16 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
 
         ReadOnlySpan<TKey> keysSpan = keys.Span;
 
-        Func<TKey, long> conv = Type.GetTypeCode(typeof(TKey)).GetSignedValueConverter<TKey>();
+        TypeCode typeCode = Type.GetTypeCode(typeof(TKey));
+        Func<TKey, long> conv = typeCode.GetSignedValueConverter<TKey>();
 
         int count = keysSpan.Length;
         long min = conv(_minValue);
         long max = conv(_maxValue);
+
+        if ((typeCode == TypeCode.UInt64 && min < 0) || max < min)
+            return null; // Elias-Fano does not support UInt64 ranges above Int64.MaxValue.
+
         Debug.Assert(min <= max, "EliasFanoStructure requires minValue to be less than or equal to maxValue.");
         Debug.Assert(AllKeysInRange(keysSpan, conv, min, max), "EliasFanoStructure requires every key to be within the provided min/max range.");
 
