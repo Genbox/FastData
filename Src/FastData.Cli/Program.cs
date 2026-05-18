@@ -325,6 +325,7 @@ internal static class Program
         FileStream stream = File.OpenRead(filePath);
         await using ConfiguredAsyncDisposable stream1 = stream.ConfigureAwait(false);
         PipeReader reader = PipeReader.Create(stream);
+        bool firstRecord = true;
 
         while (true)
         {
@@ -339,6 +340,12 @@ internal static class Program
                 if (span.Length > 0 && span[^1] == '\r')
                     span = span[..^1];
 
+                if (firstRecord)
+                {
+                    span = StripUtf8Bom(span);
+                    firstRecord = false;
+                }
+
                 func(pool, span);
             }
 
@@ -351,6 +358,12 @@ internal static class Program
                 if (span.Length > 0 && span[^1] == '\r')
                     span = span[..^1];
 
+                if (firstRecord)
+                {
+                    span = StripUtf8Bom(span);
+                    firstRecord = false;
+                }
+
                 func(pool, span);
             }
 
@@ -361,6 +374,12 @@ internal static class Program
 
         await reader.CompleteAsync().ConfigureAwait(false);
         return pool.ToArray();
+    }
+
+    private static ReadOnlySpan<byte> StripUtf8Bom(ReadOnlySpan<byte> span)
+    {
+        ReadOnlySpan<byte> bom = [0xEF, 0xBB, 0xBF];
+        return span.StartsWith(bom) ? span[bom.Length..] : span;
     }
 
     private readonly record struct CommonOptions(

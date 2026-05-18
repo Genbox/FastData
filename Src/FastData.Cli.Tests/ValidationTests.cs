@@ -21,12 +21,37 @@ public sealed class ValidationTests : IDisposable
         Assert.Contains("Invalid Int32 value: '123abc'.", error, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task AcceptsUtf8BomForNumericInput()
+    {
+        string inputFile = await WriteTempAsync("1\n2", Encoding.UTF8);
+
+        (int exitCode, string output, string error) = await RunWithExitCodeAsync("csharp", "--key-type", "Int32", inputFile);
+
+        Assert.Equal(0, exitCode);
+        Assert.Empty(error);
+        Assert.NotEmpty(output);
+    }
+
+    [Fact]
+    public async Task StripsUtf8BomFromFirstStringInput()
+    {
+        string inputFile = await WriteTempAsync("one\ntwo", Encoding.UTF8);
+
+        (int exitCode, string output, string error) = await RunWithExitCodeAsync("csharp", inputFile);
+
+        Assert.Equal(0, exitCode);
+        Assert.Empty(error);
+        Assert.DoesNotContain("\ufeff", output, StringComparison.Ordinal);
+        Assert.Contains("\"one\"", output, StringComparison.Ordinal);
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("ab")]
     public async Task RejectsInvalidCharInput(string value)
     {
-        string inputFile = await WriteTempLinesAsync(value);
+        string inputFile = await WriteTempAsync(value);
 
         (int exitCode, string output, string error) = await RunWithExitCodeAsync("csharp", "--key-type", "Char", inputFile);
 
@@ -220,10 +245,12 @@ public sealed class ValidationTests : IDisposable
 
     private Task<string> WriteTempAsync(string content) => WriteTempFileAsync(_tempFiles, content);
 
-    private async Task<string> WriteTempLinesAsync(params string[] lines)
+    private async Task<string> WriteTempAsync(string content, Encoding? encoding)
     {
+        encoding ??= new UTF8Encoding(false);
+
         string path = GetTempFilePath(_tempFiles, ".input");
-        await File.WriteAllLinesAsync(path, lines, new UTF8Encoding(false));
+        await File.WriteAllTextAsync(path, content + "\n", encoding);
         return path;
     }
 }
