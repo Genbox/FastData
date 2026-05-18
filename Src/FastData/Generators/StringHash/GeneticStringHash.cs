@@ -69,7 +69,7 @@ internal sealed record GeneticStringHash : IStringHash
         };
 
     private static BinaryExpression GetOp(Random rng, Expression hash, Expression read) =>
-        rng.Next(1, 4) switch
+        rng.Next(1, 5) switch
         {
             1 => OpAdd(hash, read),
             2 => OpSubtract(hash, read),
