@@ -42,7 +42,7 @@ internal static class FastData
     }
 
     
-    public static bool TryLookup(int key, out int? value)
+    public static bool TryLookup(int key, out int value)
     {
 
 

@@ -269,7 +269,7 @@
 #>
 
     <#= MethodAttribute #>
-    <#= MethodModifier #>bool TryLookup(<#= KeyTypeName #> key, out <#= ValueTypeName #>? value)
+    <#= MethodModifier #>bool TryLookup(<#= KeyTypeName #> key, out <#= ValueTypeName #> value)
     {
 <#= GetMethodHeader(MethodType.TryLookup) #>
 
