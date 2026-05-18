@@ -4,6 +4,7 @@ using System.Reflection;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.StringHash.Framework;
+using Genbox.FastData.Internal.Enums;
 using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
 
@@ -66,8 +67,8 @@ internal static class ExpressionHashBuilder
         {
             foreach (ArraySegment seg in segments)
             {
-                // int offset = <offset>
-                ex.Add(Assign(offset, Constant((int)seg.Offset)));
+                Expression offsetExpr = seg.Alignment == Alignment.Right ? Subtract(Subtract(length, Constant((int)seg.Offset)), Constant(seg.Length)) : Constant((int)seg.Offset);
+                ex.Add(Assign(offset, offsetExpr));
 
                 int rem = seg.Length;
                 while (rem > 0)
