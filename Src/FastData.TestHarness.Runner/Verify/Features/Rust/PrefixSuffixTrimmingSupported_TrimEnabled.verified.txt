@@ -33,7 +33,7 @@ impl fastdata {
          return false;
         }
 
-        let lookupKey = &key[3..key.len() - 3];
+        let lookupKey = &key[3..key.len() - 6 + 3];
 
         let mut lo: usize = 0;
         let mut hi: usize = 3;

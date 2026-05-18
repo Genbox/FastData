@@ -60,6 +60,10 @@ public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompile
             }
             else
             {
+                Output.Append(".length() >= ")
+                      .Append(length)
+                      .Append(" && ");
+                Visit(node.Object);
                 Output.Append(".compare(");
                 Visit(node.Object);
                 Output.Append(".length() - ")
