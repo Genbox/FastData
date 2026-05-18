@@ -80,8 +80,20 @@ public abstract class FeatureTestBase
         string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
 
         string[] notPresent = ["A", "PreASu", "PrASuf", "PreDDSuf"];
-        string id = nameof(PrefixSuffixTrimmingWithKeyLengthStructure);
-        Assert.Equal(1, await Harness.RunContainsAsync(source, id, keys, notPresent, TestContext.Current.CancellationToken));
+        Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(PrefixSuffixTrimmingWithKeyLengthStructure), keys, notPresent, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task SpecialCharacterStringLiteralsCompileAndMatch()
+    {
+        StringDataConfig config = new StringDataConfig();
+        config.StructureTypeOverride = typeof(ArrayStructure<,>);
+        config.EarlyExitConfig.Disabled = true;
+
+        string[] keys = ["quote\"key", "slash\\key", "line\nkey", "tab\tkey", "nul\0key"];
+        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
+
+        Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(SpecialCharacterStringLiteralsCompileAndMatch), keys, ["missing"], TestContext.Current.CancellationToken));
     }
 
     [Theory]
