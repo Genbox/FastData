@@ -198,7 +198,8 @@ public static partial class FastDataGenerator
             {
                 trimPrefix = props.DeltaData.Prefix;
                 trimSuffix = props.DeltaData.Suffix;
-                totalTrimLength = trimPrefix.Length + trimSuffix.Length;
+                Func<string, int> getLength = StringHelper.GetLengthFunc(generator.Encoding);
+                totalTrimLength = getLength(trimPrefix) + getLength(trimSuffix);
                 keys = StringTransform.SubStringKeys(keys.Span, props);
 
                 // Recompute properties from trimmed keys so that structure selection, early exits, and hash analysis are correct
@@ -219,7 +220,7 @@ public static partial class FastDataGenerator
         if (trimPrefix.Length > 0)
             earlyExits.Add(new EqualsAtEarlyExit(trimPrefix, 0, cfg.IgnoreCase));
         if (trimSuffix.Length > 0)
-            earlyExits.Add(new EqualsAtEarlyExit(trimSuffix, -trimSuffix.Length, cfg.IgnoreCase));
+            earlyExits.Add(new EqualsAtEarlyExit(trimSuffix, -StringHelper.GetLengthFunc(generator.Encoding)(trimSuffix), cfg.IgnoreCase));
 
         if (cfg.EarlyExitConfig.OptimizeExpression)
             ReduceExits(earlyExits);
