@@ -26,16 +26,12 @@ internal class CPlusPlusLanguageDef : ILanguageDef
         new ObjectTypeDef(PrintDeclaration, PrintValue),
 
         new DynamicStringTypeDef(
-            new StringType(GeneratorEncoding.Utf16CodeUnits, "std::u16string_view", static x => QuoteStringView(x, "u", "std::u16string_view")),
-            new StringType(GeneratorEncoding.Utf8Bytes, "std::string_view", static x => QuoteStringView(x, "u8", "std::string_view")),
-            new StringType(GeneratorEncoding.AsciiBytes, "std::string_view", static x => QuoteStringView(x, string.Empty, "std::string_view")))
+            new StringType(GeneratorEncoding.Utf16CodeUnits, "std::u16string_view", static x => QuoteString(x, "u")),
+            new StringType(GeneratorEncoding.Utf8Bytes, "std::string_view", static x => QuoteString(x, "u8")),
+            new StringType(GeneratorEncoding.AsciiBytes, "std::string_view", static x => QuoteString(x, string.Empty)))
     };
 
-    private static string QuoteStringView(string value, string prefix, string typeName)
-    {
-        int length = prefix == "u8" ? Encoding.UTF8.GetByteCount(value) : value.Length;
-        return $"{typeName}({prefix}\"{EscapeString(value)}\", {length.ToString(NumberFormatInfo.InvariantInfo)})";
-    }
+    private static string QuoteString(string value, string prefix) => $"{prefix}\"{EscapeString(value)}\"";
 
     private static string EscapeString(string value)
     {
