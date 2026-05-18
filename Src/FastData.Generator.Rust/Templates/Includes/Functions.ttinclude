@@ -98,7 +98,7 @@
 
         if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
         {
-            sb.AppendLine($"        let lookupKey = &key[{strCfg.TrimPrefix.Length.ToStringInvariant()}..key.len() - {strCfg.TrimSuffix.Length.ToStringInvariant()}];");
+            sb.AppendLine($"        let lookupKey = &key[{strCfg.TrimPrefixLength.ToStringInvariant()}..key.len() - {strCfg.TotalTrimLength.ToStringInvariant()} + {strCfg.TrimPrefixLength.ToStringInvariant()}];");
             LookupKeyName = "lookupKey";
         }
 

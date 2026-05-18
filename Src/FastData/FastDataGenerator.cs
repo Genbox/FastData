@@ -182,6 +182,8 @@ public static partial class FastDataGenerator
 
         string trimPrefix = string.Empty;
         string trimSuffix = string.Empty;
+        int trimPrefixLength = 0;
+        int trimSuffixLength = 0;
         int totalTrimLength = 0;
 
         // Save original properties for user-facing constants (MinKeyLength, MaxKeyLength, character classes)
@@ -199,7 +201,9 @@ public static partial class FastDataGenerator
                 trimPrefix = props.DeltaData.Prefix;
                 trimSuffix = props.DeltaData.Suffix;
                 Func<string, int> getLength = StringHelper.GetLengthFunc(generator.Encoding);
-                totalTrimLength = getLength(trimPrefix) + getLength(trimSuffix);
+                trimPrefixLength = getLength(trimPrefix);
+                trimSuffixLength = getLength(trimSuffix);
+                totalTrimLength = trimPrefixLength + trimSuffixLength;
                 keys = StringTransform.SubStringKeys(keys.Span, props);
 
                 // Recompute properties from trimmed keys so that structure selection, early exits, and hash analysis are correct
@@ -213,7 +217,7 @@ public static partial class FastDataGenerator
         // Combine all early exits into a single collection. When trimming is active, length exits are offset
         // by totalTrimLength and char exits use indexed access so all exits operate on the original key.
         IEnumerable<IEarlyExit> structureExits = totalTrimLength > 0 ? AdjustLengthExits(structure.GetMandatoryExits(), totalTrimLength) : structure.GetMandatoryExits();
-        IEarlyExit[] analysisExits = StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase, totalTrimLength, trimPrefix.Length, trimSuffix.Length);
+        IEarlyExit[] analysisExits = StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase, totalTrimLength, trimPrefixLength, trimSuffixLength);
         List<IEarlyExit> earlyExits = CombineExits(structureExits, analysisExits);
 
         // When trimming is active, add prefix/suffix checks as early exits
@@ -238,7 +242,7 @@ public static partial class FastDataGenerator
         if (cacheHashInfo != null)
             usedVisitor.Visit(cacheHashInfo.Expression);
 
-        StringGeneratorConfig genCfg = new StringGeneratorConfig(structureType, (uint)keys.Length, originalMinLength, originalMaxLength, cfg.IgnoreCase, originalCharClasses, generator.Encoding, transformed, trimPrefix, trimSuffix, cfg.TypeReductionEnabled, cacheHashInfo, usedVisitor.Functions);
+        StringGeneratorConfig genCfg = new StringGeneratorConfig(structureType, (uint)keys.Length, originalMinLength, originalMaxLength, cfg.IgnoreCase, originalCharClasses, generator.Encoding, transformed, trimPrefix, trimPrefixLength, trimSuffix, trimSuffixLength, cfg.TypeReductionEnabled, cacheHashInfo, usedVisitor.Functions);
 
         return generator.Generate<string, TValue>(genCfg, res);
 

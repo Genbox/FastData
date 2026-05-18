@@ -9,7 +9,7 @@ namespace Genbox.FastData.Generators;
 /// <summary>Provides configuration data for string code generators in the FastData library.</summary>
 public sealed class StringGeneratorConfig : GeneratorConfigBase
 {
-    internal StringGeneratorConfig(Type structureType, uint itemCount, int minLen, int maxLen, bool ignoreCase, CharacterClass classes, GeneratorEncoding encoding, AnnotatedExpr[] earlyExits, string trimPrefix, string trimSuffix, bool typeReductionEnabled, StringHashInfo? hashInfo, GeneratorFunction generatorFunctions) : base(structureType.GetFriendlyName(), earlyExits, itemCount, typeReductionEnabled)
+    internal StringGeneratorConfig(Type structureType, uint itemCount, int minLen, int maxLen, bool ignoreCase, CharacterClass classes, GeneratorEncoding encoding, AnnotatedExpr[] earlyExits, string trimPrefix, int trimPrefixLength, string trimSuffix, int trimSuffixLength, bool typeReductionEnabled, StringHashInfo? hashInfo, GeneratorFunction generatorFunctions) : base(structureType.GetFriendlyName(), earlyExits, itemCount, typeReductionEnabled)
     {
         // We reduce the dependencies in generators by only providing a subset of StringKeyProperties
         Constants = new StringConstants
@@ -24,7 +24,9 @@ public sealed class StringGeneratorConfig : GeneratorConfigBase
 
         // We use an empty string instead of null to simplify calculations later in the pipeline
         TrimPrefix = trimPrefix;
+        TrimPrefixLength = trimPrefixLength;
         TrimSuffix = trimSuffix;
+        TrimSuffixLength = trimSuffixLength;
 
         HashInfo = hashInfo;
         GeneratorFunctions = generatorFunctions;
@@ -48,9 +50,15 @@ public sealed class StringGeneratorConfig : GeneratorConfigBase
     /// <summary>Gets the common prefix removed from keys before structure data is built.</summary>
     public string TrimPrefix { get; }
 
+    /// <summary>Gets the length of <see cref="TrimPrefix" /> in the generator's string encoding.</summary>
+    public int TrimPrefixLength { get; }
+
     /// <summary>Gets the common suffix removed from keys before structure data is built.</summary>
     public string TrimSuffix { get; }
 
-    /// <summary>Gets the total number of characters trimmed from each key.</summary>
-    public int TotalTrimLength => TrimPrefix.Length + TrimSuffix.Length;
+    /// <summary>Gets the length of <see cref="TrimSuffix" /> in the generator's string encoding.</summary>
+    public int TrimSuffixLength { get; }
+
+    /// <summary>Gets the total number of encoded units trimmed from each key.</summary>
+    public int TotalTrimLength => TrimPrefixLength + TrimSuffixLength;
 }

@@ -40,8 +40,7 @@
 
         if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
         {
-            string totalTrimLength = strCfg.TotalTrimLength.ToStringInvariant();
-            sb.AppendLine($"        const auto lookupKey = key.substr({strCfg.TrimPrefix.Length.ToStringInvariant()}, key.length() - {totalTrimLength});");
+            sb.AppendLine($"        const auto lookupKey = key.substr({strCfg.TrimPrefixLength.ToStringInvariant()}, key.length() - {strCfg.TotalTrimLength.ToStringInvariant()});");
             LookupKeyName = "lookupKey";
         }
 
