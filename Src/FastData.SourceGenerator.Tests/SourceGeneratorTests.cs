@@ -49,10 +49,11 @@ public class SourceGeneratorTests
         Assert.False(contains("dontexist"));
 
         TryLookupDelegate tryLookup = CompilationHelper.GetDelegate<TryLookupDelegate>(output, t => t[0], m => m.Single(x => x.Name == "TryLookup"), false);
-        Assert.True(tryLookup("item1", out int? value) && value == 1);
+        Assert.True(tryLookup("item1", out int value) && value == 1);
         Assert.True(tryLookup("item2", out value) && value == 2);
         Assert.True(tryLookup("item3", out value) && value == 3);
-        Assert.False(tryLookup("dontexist", out value) && value == null);
+        Assert.False(tryLookup("dontexist", out value));
+        Assert.Equal(0, value);
     }
 
     [Theory]
@@ -159,5 +160,5 @@ public class SourceGeneratorTests
         return output;
     }
 
-    private delegate bool TryLookupDelegate(string key, out int? value);
+    private delegate bool TryLookupDelegate(string key, out int value);
 }

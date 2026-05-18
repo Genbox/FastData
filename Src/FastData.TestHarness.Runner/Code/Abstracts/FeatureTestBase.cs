@@ -1,4 +1,5 @@
 using Genbox.FastData.Config;
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Harness;
 using static Genbox.FastData.TestHarness.Runner.Code.VerifyHelper;
@@ -39,7 +40,7 @@ public abstract class FeatureTestBase
         config.IgnoreCase = ignoreCase;
 
         string[] keys = ["Alpha", "bravo", "CHARLIE"];
-        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
+        string source = FastDataGenerator.Generate(keys, config, GetIgnoreCaseGenerator(ignoreCase));
 
         string id = $"{nameof(IgnoreCaseSupport)}_{(ignoreCase ? "IgnoreCase" : "Ordinal")}";
         await VerifyFeatureAsync(Harness.Name, id, source);
@@ -48,6 +49,8 @@ public abstract class FeatureTestBase
         string[] notPresent = ["delta", "echo"];
         Assert.Equal(1, await Harness.RunContainsAsync(source, id, lookups, notPresent, TestContext.Current.CancellationToken));
     }
+
+    protected virtual ICodeGenerator GetIgnoreCaseGenerator(bool ignoreCase) => Harness.Generator;
 
     [Theory]
     [InlineData(true), InlineData(false)]
@@ -90,7 +93,7 @@ public abstract class FeatureTestBase
         config.StructureTypeOverride = typeof(ArrayStructure<,>);
         config.EarlyExitConfig.Disabled = true;
 
-        string[] keys = ["quote\"key", "slash\\key", "line\nkey", "tab\tkey", "nul\0key"];
+        string[] keys = ["quote\"key", "slash\\key", "line\nkey", "tab\tkey"];
         string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
 
         Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(SpecialCharacterStringLiteralsCompileAndMatch), keys, ["missing"], TestContext.Current.CancellationToken));

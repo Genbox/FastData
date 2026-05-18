@@ -31,7 +31,13 @@ internal class CPlusPlusLanguageDef : ILanguageDef
             new StringType(GeneratorEncoding.AsciiBytes, "std::string_view", static x => QuoteString(x, string.Empty)))
     };
 
-    private static string QuoteString(string value, string prefix) => $"{prefix}\"{EscapeString(value)}\"";
+    private static string QuoteString(string value, string prefix)
+    {
+        if (value.Contains('\0'))
+            throw new InvalidOperationException("C++ generator does not support string literals that contain NUL bytes.");
+
+        return $"{prefix}\"{EscapeString(value)}\"";
+    }
 
     private static string EscapeString(string value)
     {
