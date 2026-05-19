@@ -359,7 +359,7 @@ public static partial class FastDataGenerator
         LogStructureType(logger, structureType.Name);
 
         // Early exits are generated from numeric properties and then merged with checks required by the structure itself.
-        IEarlyExit[] exitsAnalyzed = NumericEarlyExits<TKey>.GetExits(type, props.DataRanges, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig);
+        IEarlyExit[] exitsAnalyzed = NumericEarlyExits<TKey>.GetExits(structureType, props.DataRanges, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig);
         List<IEarlyExit> exits = CombineExits(structure.GetMandatoryExits(), exitsAnalyzed);
         if (cfg.EarlyExitConfig.OptimizeExpression)
             ReduceExits(exits);
