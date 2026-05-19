@@ -10,8 +10,6 @@ public class StringEarlyExitBenchmarks
     private string _value = "hello world";
     private int _min = 3;
     private int _max = 42;
-    private string _prefix = "he";
-    private string _suffix = "ld";
     private ulong[] _bitset = [2828, 4848];
     private ulong _firstLow = 60;
     private ulong _lastLow = 60;
@@ -141,35 +139,5 @@ public class StringEarlyExitBenchmarks
 
         ulong packed = value[0] | ((ulong)value[1] << 16) | ((ulong)value[2] << 32) | ((ulong)value[3] << 48);
         return (packed & _stringMask) != 0;
-    }
-
-    [Benchmark]public bool PrefixSuffix() => _value.StartsWith(_prefix, StringComparison.Ordinal) && _value.EndsWith(_suffix, StringComparison.Ordinal);
-
-    [Benchmark]public bool PrefixSuffixOpti()
-    {
-        string value = _value;
-        string prefix = _prefix;
-        string suffix = _suffix;
-        int length = value.Length;
-        int prefixLength = prefix.Length;
-        int suffixLength = suffix.Length;
-
-        if (length < prefixLength || length < suffixLength)
-            return false;
-
-        for (int i = 0; i < prefixLength; i++)
-        {
-            if (value[i] != prefix[i])
-                return false;
-        }
-
-        int suffixStart = length - suffixLength;
-        for (int i = 0; i < suffixLength; i++)
-        {
-            if (value[suffixStart + i] != suffix[i])
-                return false;
-        }
-
-        return true;
     }
 }

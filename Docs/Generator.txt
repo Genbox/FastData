@@ -7,6 +7,5 @@ Generator rules:
 ## Supporting core features
 The FastData engine supports several core features that a generator developer can use. However, to support them, you must do the following:
 
-- Trimming: You must use the InputKeyName/LookupKeyName abstraction, as the engine will switch the name if trimming is enabled
 - Early exits: You must render the early exit expression at the top of public API methods. TODO: Which expressions to support in compiler?
 - Case sensitivity support: You must provide an indirection for string comparison and switch between case-sensitive and case-insensitive matching depending on the value of Config.IgnoreCase.

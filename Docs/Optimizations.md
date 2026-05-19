@@ -83,7 +83,7 @@ Rejects gaps between observed length ranges by checking for missing length inter
 Builds a 64 bit bitmap of observed lengths and rejects missing lengths in the 1 to 64 range. This is only emitted when the observed length density passes the density limit. Input: `stable softice sophisticated santa` yields `if ((4208UL & (1UL << ((value.Length - 1) & 63))) == 0) return false;`.
 
 #### Unit at offset less than early exit
-Rejects strings whose selected unit is below the minimum observed unit at that offset. Offset `0` is the first unit. Offset `-1` is the last unit. When prefix/suffix trimming is active, offsets are adjusted so the check still applies to the original input key. Input: `cat dog emu` yields `if (UnitAt(value, 0) < 'c') return false;`.
+Rejects strings whose selected unit is below the minimum observed unit at that offset. Offset `0` is the first unit. Offset `-1` is the last unit. Input: `cat dog emu` yields `if (UnitAt(value, 0) < 'c') return false;`.
 
 #### Unit at offset greater than early exit
 Rejects strings whose selected unit is above the maximum observed unit at that offset. Input: `cat dog emu` yields `if (UnitAt(value, 0) > 'e') return false;`.
@@ -96,8 +96,6 @@ Builds a bitmap of observed selected units and rejects missing ASCII units. This
 
 #### Equals at offset early exit
 Rejects strings that do not contain an observed fragment at a fixed offset. Offset `0` acts as a prefix check, and a negative offset acts as a suffix check. Input: `preOne preTwo preSix` yields `if (!EqualsAt(value, 0, "pre")) return false;`. Input: `OneSuf TwoSuf SixSuf` yields `if (!EqualsAt(value, -3, "Suf")) return false;`. When ignore-case is enabled this uses `EqualsAtAsciiLower`.
-
-When prefix/suffix trimming is active, FastData removes the common affix from the keys used for structure selection and hashing, then adds the removed prefix/suffix back as mandatory `EqualsAtEarlyExit` checks against the original input key. Length and unit exits are offset at the same time so all generated checks still validate the original input key.
 
 ## Structure specializations
 

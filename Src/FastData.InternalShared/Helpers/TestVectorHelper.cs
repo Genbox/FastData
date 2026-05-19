@@ -119,9 +119,6 @@ public static class TestVectorHelper
         foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 4, 7, 8, 10]], "range_gaps", typeof(RangeStructure<,>)))
             yield return testVector;
 
-        // Test prefix/suffix support
-        foreach (ITestVector testVector in GenerateTestVectors([["pretext", "prefetch", "prefix"], ["suffix", "prefix"]], "prefix_suffix", typeof(ArrayStructure<,>)))
-            yield return testVector;
     }
 
     public static IEnumerable<ITestData> GetBenchmarkData()

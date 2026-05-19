@@ -282,9 +282,6 @@
         <mxCell id="hUysQQ9KYVmHQjwfBoQ5-421" parent="ulFWQ8rmnYkCg9cpMkj--80" style="rounded=1;whiteSpace=wrap;html=1;" value="HashCapacityFactor" vertex="1">
           <mxGeometry height="40" width="135.06493506493504" x="11.428571428571427" y="82.25" as="geometry" />
         </mxCell>
-        <mxCell id="hUysQQ9KYVmHQjwfBoQ5-422" parent="ulFWQ8rmnYkCg9cpMkj--80" style="rounded=1;whiteSpace=wrap;html=1;" value="EnableTrimming" vertex="1">
-          <mxGeometry height="40" width="135.06493506493504" x="11.428571428571427" y="133.76" as="geometry" />
-        </mxCell>
         <mxCell id="ulFWQ8rmnYkCg9cpMkj--85" edge="1" parent="1" source="ulFWQ8rmnYkCg9cpMkj--81" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ulFWQ8rmnYkCg9cpMkj--82" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>

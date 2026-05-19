@@ -68,40 +68,6 @@ public abstract class FeatureTestBase
 
     protected virtual ICodeGenerator GetIgnoreCaseGenerator(bool ignoreCase) => Harness.Generator;
 
-    [Theory]
-    [InlineData(true), InlineData(false)]
-    public async Task PrefixSuffixTrimmingSupported(bool enabled)
-    {
-        StringDataConfig config = new StringDataConfig();
-        config.StructureTypeOverride = typeof(BinarySearchStructure<,>);
-        config.EarlyExitConfig.Disabled = true;
-        config.EnablePrefixSuffixTrimming = enabled;
-
-        string[] keys = ["PreAlphaSuf", "PreBravoSuf", "PreCharlieSuf"];
-        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
-
-        string id = $"{nameof(PrefixSuffixTrimmingSupported)}_{(enabled ? "TrimEnabled" : "TrimDisabled")}";
-        await VerifyFeatureAsync(Harness.Name, id, source);
-
-        string[] notPresent = ["PreDeltaSuf", "preEchoSuf", "Nope"];
-        Assert.Equal(1, await Harness.RunContainsAsync(source, id, keys, notPresent, TestContext.Current.CancellationToken));
-    }
-
-    [Fact]
-    public async Task PrefixSuffixTrimmingWithKeyLengthStructure()
-    {
-        StringDataConfig config = new StringDataConfig();
-        config.StructureTypeOverride = typeof(KeyLengthStructure<,>);
-        config.EarlyExitConfig.Disabled = true;
-        config.EnablePrefixSuffixTrimming = true;
-
-        string[] keys = ["PreASuf", "PreBBSuf", "PreCCCSuf"];
-        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
-
-        string[] notPresent = ["A", "PreASu", "PrASuf", "PreDDSuf"];
-        Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(PrefixSuffixTrimmingWithKeyLengthStructure), keys, notPresent, TestContext.Current.CancellationToken));
-    }
-
     [Fact]
     public async Task SpecialCharacterStringLiteralsCompileAndMatch()
     {

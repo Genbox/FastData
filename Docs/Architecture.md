@@ -35,14 +35,13 @@ String flow:
 
 1. Reject null and empty string keys.
 2. Deduplicate with ordinal or ordinal-ignore-case comparison.
-3. Compute `StringKeyProperties` with length data, character data, and optional prefix/suffix data.
+3. Compute `StringKeyProperties` with length data, character data, and optional edge entropy maps.
 4. Reject non-ASCII data for generators that expose ASCII-byte APIs.
 5. Select a structure through `StringStructures` unless a structure override is supplied.
 6. Optionally benchmark string hash candidates for hash-based structures.
-7. Trim common prefix/suffix data when enabled.
-8. Build string early exits and transform expressions.
-9. Create a string generator config and structure context.
-10. Render source through the selected language generator.
+7. Build string early exits and transform expressions.
+8. Create a string generator config and structure context.
+9. Render source through the selected language generator.
 
 ## Template Generation
 

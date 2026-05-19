@@ -44,7 +44,6 @@ String analysis derives:
 * Length ranges and whether lengths are unique.
 * Character classes and ASCII compatibility.
 * First-character and last-character distributions.
-* Common prefix and suffix data when trimming is enabled.
 
 When string hash analysis is enabled, FastData benchmarks candidate hash expressions against the actual key set. It can use brute force, GPerf-style position selection, and genetic search to find a good hash for the dataset.
 

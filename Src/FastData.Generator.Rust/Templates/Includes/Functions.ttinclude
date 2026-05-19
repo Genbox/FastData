@@ -5,7 +5,7 @@
     public string MethodAttribute => "#[must_use]";
     public string MethodModifier => "pub ";
     public string FieldModifier => "const ";
-    public string LookupKeyName { get; private set; } = "key";
+    public string LookupKeyName => "key";
 
     public string InputKeyTypeName
     {
@@ -95,12 +95,6 @@
         StringBuilder sb = new StringBuilder();
 
         sb.Append(GetEarlyExits(methodType, GeneratorConfig.EarlyExits));
-
-        if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
-        {
-            sb.AppendLine($"        let lookupKey = &key[{strCfg.TrimPrefixLength.ToStringInvariant()}..key.len() - {strCfg.TotalTrimLength.ToStringInvariant()} + {strCfg.TrimPrefixLength.ToStringInvariant()}];");
-            LookupKeyName = "lookupKey";
-        }
 
         return sb.ToString();
     }

@@ -5,7 +5,7 @@
     public string FieldModifier => CSharpConfig.ClassType == ClassType.Static ? "private static readonly " : "private readonly ";
     public string MethodModifier => CSharpConfig.ClassType == ClassType.Static ? "public static " : "public ";
     public string MethodAttribute => "";
-    public string LookupKeyName { get; private set; } = "key";
+    public string LookupKeyName => "key";
 
     public string HashSource => $$"""
                                     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -38,12 +38,6 @@
         StringBuilder sb = new StringBuilder();
 
         sb.Append(GetEarlyExits(type, GeneratorConfig.EarlyExits));
-
-        if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
-        {
-            sb.AppendLine($"        string lookupKey = key.Substring({strCfg.TrimPrefixLength.ToStringInvariant()}, key.Length - {strCfg.TotalTrimLength.ToStringInvariant()});");
-            LookupKeyName = "lookupKey";
-        }
 
         return sb.ToString();
     }

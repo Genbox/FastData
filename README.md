@@ -155,7 +155,7 @@ C# output also supports `--namespace`, `--class-visibility`, and `--class-type`.
 
 ## How FastData chooses a structure
 
-FastData analyzes the input before emitting code. Numeric keys are analyzed for ranges, density, missing bits, and hash behavior. String keys are analyzed for length distribution, ASCII compatibility, common prefix/suffix data, and optional string hash candidates.
+FastData analyzes the input before emitting code. Numeric keys are analyzed for ranges, density, missing bits, and hash behavior. String keys are analyzed for length distribution, ASCII compatibility, edge-unit distributions, and optional string hash candidates.
 
 The selected structure depends on that analysis and on the configured limits. Small sets often become direct conditionals or single-value checks, dense integer ranges can become range or bitset lookups, sparse integer sets can use succinct bit vectors, and larger or irregular sets fall back to hash-table variants.
 

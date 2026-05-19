@@ -6,7 +6,7 @@
     public string MethodModifier(bool constExpr) => constExpr ? "static constexpr " : "static ";
     public string MethodAttribute => "[[nodiscard]]";
     public string PostMethodModifier => " noexcept";
-    public string LookupKeyName { get; private set; } = "key";
+    public string LookupKeyName => "key";
 
     public string HashSource => $$"""
                                     {{GetHashModifier()}}uint64_t get_hash(const {{KeyTypeName}} value) noexcept {
@@ -37,12 +37,6 @@
         StringBuilder sb = new StringBuilder();
 
         sb.Append(GetEarlyExits(methodType, GeneratorConfig.EarlyExits));
-
-        if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.TotalTrimLength != 0)
-        {
-            sb.AppendLine($"        const auto lookupKey = key.substr({strCfg.TrimPrefixLength.ToStringInvariant()}, key.length() - {strCfg.TotalTrimLength.ToStringInvariant()});");
-            LookupKeyName = "lookupKey";
-        }
 
         return sb.ToString();
     }

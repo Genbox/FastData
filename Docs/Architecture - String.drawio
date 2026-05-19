@@ -184,9 +184,6 @@
         <mxCell id="hUysQQ9KYVmHQjwfBoQ5-535" value="HashCapacityFactor" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-1090" y="-196.3800000000001" width="130" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="hUysQQ9KYVmHQjwfBoQ5-536" value="EnableTrimming" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="-1090" y="-141.3800000000001" width="130" height="40" as="geometry" />
-        </mxCell>
         <mxCell id="hUysQQ9KYVmHQjwfBoQ5-537" value="String data" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#6a00ff;fontColor=#ffffff;strokeColor=#3700CC;" parent="1" vertex="1">
           <mxGeometry x="-1114" y="-337.25" width="184" height="60" as="geometry" />
         </mxCell>
@@ -204,9 +201,6 @@
         </mxCell>
         <mxCell id="hUysQQ9KYVmHQjwfBoQ5-421" value="HashCapacityFactor" style="rounded=1;whiteSpace=wrap;html=1;" parent="hUysQQ9KYVmHQjwfBoQ5-544" vertex="1">
           <mxGeometry x="27" y="143.25" width="130" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="hUysQQ9KYVmHQjwfBoQ5-422" value="EnableTrimming" style="rounded=1;whiteSpace=wrap;html=1;" parent="hUysQQ9KYVmHQjwfBoQ5-544" vertex="1">
-          <mxGeometry x="27" y="194.76" width="130" height="40" as="geometry" />
         </mxCell>
         <mxCell id="hUysQQ9KYVmHQjwfBoQ5-532" value="&lt;span&gt;&lt;font style=&quot;color: rgb(241, 241, 241);&quot;&gt;Numeric data&lt;/font&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d80073;fontColor=#ffffff;strokeColor=#A50040;" parent="hUysQQ9KYVmHQjwfBoQ5-544" vertex="1">
           <mxGeometry width="184" height="60" as="geometry" />

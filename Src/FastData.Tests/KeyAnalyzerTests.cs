@@ -117,31 +117,6 @@ public class KeyAnalyzerTests
             Assert.True(ContainsLength(lengthData.LengthRanges, length));
     }
 
-    [Theory]
-    [InlineData(new[] { "item1", "item2", "item3", "item4" }, 4, 0)]
-    [InlineData(new[] { "1item", "2item", "3item", "4item" }, 0, 4)]
-    [InlineData(new[] { "a", "ab", "abc" }, 0, 0)] // The shortest string would become empty, so we don't support it
-    [InlineData(new[] { "aa", "aaa", "aaaaa" }, 0, 0)] // If all strings consist of the same character, they will be reduced to nothing, so we don't support it
-    [InlineData(new[] { "hello world" }, 0, 0)] // One key should result in no prefix/suffix calculation
-    public void GetStringProperties_DeltaData_Test(string[] data, int leftZero, int rightZero)
-    {
-        StringKeyProperties res = GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
-        Assert.Equal(leftZero, res.DeltaData.Prefix.Length);
-        Assert.Equal(rightZero, res.DeltaData.Suffix.Length);
-    }
-
-    [Fact]
-    public void GetStringProperties_DeltaData_IgnoreCase_Test()
-    {
-        string[] data = ["Abc1", "Abc2", "Abc3", "abc4"];
-
-        StringKeyProperties ignoreCase = GetStringProperties(data, true, GeneratorEncoding.Utf16CodeUnits);
-        StringKeyProperties caseSensitive = GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
-
-        Assert.Equal("Abc", ignoreCase.DeltaData.Prefix);
-        Assert.Equal(string.Empty, caseSensitive.DeltaData.Prefix);
-    }
-
     [Fact]
     public void GetStringProperties_CharRange_Test()
     {

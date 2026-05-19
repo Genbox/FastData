@@ -98,12 +98,10 @@ internal static class KeyAnalyzer
             }
         }
 
-        // The code beneath there calculate entropy maps that cna be used to derive the longest common substrings or longest prefix/suffix strings.
+        // The code beneath calculates entropy maps that can be used to derive high-entropy edge segments.
         // It works by adding characters to an accumulator, and then potentially removing the value from it again if the characters are the same.
         // If the accumulator for an offset contains 0 after all strings have been accumulated, it is highly likely that all the characters were the same.
         // However, there is a risk that an accumulator is 0, even if the characters are not the same. So we do a sanity check at the end to ensure we did it right.
-        string prefix = string.Empty;
-        string suffix = string.Empty;
         int[]? left = null;
         int[]? right = null;
 
@@ -130,11 +128,11 @@ internal static class KeyAnalyzer
 
         ranges.Add(rangeStart, previous);
 
-        // Prefix/suffix tracking only makes sense when there are multiple keys, and they are long enough
+        // Edge entropy tracking only makes sense when there are multiple keys, and they are long enough.
         if (keys.Length > 1 && minLength > 1)
         {
             //Build a forward and reverse map of merged entropy
-            //We can derive common prefix/suffix from it that can be used later for high-entropy hash/equality functions
+            // We can derive edge positions from it that can be used later for high-entropy hash functions.
             left = new int[maxStr.Length];
             right = new int[maxStr.Length];
 
@@ -160,24 +158,9 @@ internal static class KeyAnalyzer
                     //We do not add to characterMap here since it does not need the duplicate
                 }
             }
-
-            int leftCount = CountZero(left);
-            int rightCount = CountZero(right);
-
-            // Make sure that we handle the case where all characters in the inputs are the same
-            if (leftCount == minLength || rightCount == minLength)
-            {
-                prefix = string.Empty;
-                suffix = string.Empty;
-            }
-            else
-            {
-                prefix = keys[0].Substring(0, leftCount);
-                suffix = keys[0].Substring(keys[0].Length - rightCount, rightCount);
-            }
         }
 
-        return new StringKeyProperties(new LengthData(keys.Length == uniqLengths.Count, ranges, minLength, maxStr.Length), new DeltaData(prefix, left, suffix, right), new CharacterData(allAscii, charClass, firstCharMap, lastCharMap));
+        return new StringKeyProperties(new LengthData(keys.Length == uniqLengths.Count, ranges, minLength, maxStr.Length), new DeltaData(left, right), new CharacterData(allAscii, charClass, firstCharMap, lastCharMap));
     }
 
     private static NumericKeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys)
@@ -504,15 +487,4 @@ internal static class KeyAnalyzer
     };
 
     private static float CalculateDensity(int keyCount, ulong range) => keyCount / (range + 1.0f);
-
-    private static int CountZero(int[] data)
-    {
-        int count;
-        for (count = 0; count < data.Length; count++)
-        {
-            if (data[count] != 0)
-                break;
-        }
-        return count;
-    }
 }
