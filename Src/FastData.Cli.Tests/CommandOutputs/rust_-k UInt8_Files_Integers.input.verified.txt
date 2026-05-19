@@ -23,26 +23,6 @@ impl MyData {
     ];
     #[must_use]
     pub fn contains(key: u8) -> bool {
-        if ((key > 100))
-        {
-         return false;
-        }
-
-        if ((key < 42))
-        {
-         return false;
-        }
-
-        if (((key > 42) && (key < 62)))
-        {
-         return false;
-        }
-
-        if (((key > 80) && (key < 100)))
-        {
-         return false;
-        }
-
 
         for i in 0..4 {
             if key >= Self::RANGE_STARTS[i] && key <= Self::RANGE_ENDS[i] {

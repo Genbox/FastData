@@ -8,8 +8,17 @@ namespace Genbox.FastData.Generators.EarlyExits;
 
 internal static class StringEarlyExits
 {
-    internal static IEarlyExit[] GetExits(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase)
+    internal static IEarlyExit[] GetExits(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase, uint itemCount)
     {
+        if (config.Disabled)
+            return [];
+
+        if (!config.IsEnabledForStructure(structureType))
+            return [];
+
+        if (itemCount <= config.MinItemCount)
+            return [];
+
         IEarlyExit[] candidates = ProduceCandidates(structureType, props, config, ignoreCase).ToArray();
 
         if (candidates.Length == 0)

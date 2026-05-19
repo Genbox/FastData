@@ -22,26 +22,6 @@ internal static class MyData
     
     public static bool Contains(byte key)
     {
-        if ((key > 100))
-        {
-         return false;
-        }
-
-        if ((key < 42))
-        {
-         return false;
-        }
-
-        if (((key > 42) && (key < 62)))
-        {
-         return false;
-        }
-
-        if (((key > 80) && (key < 100)))
-        {
-         return false;
-        }
-
 
 
         for (int i = 0; i < 4; i++)

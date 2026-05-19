@@ -182,7 +182,7 @@ public static partial class FastDataGenerator
         (Type structureType, IStructure<string, TValue, IContext> structure, IContext res) = cfg.StructureTypeOverride != null ? CreateSelectedStringStructure(cfg.StructureTypeOverride) : CreateBestStringStructure();
         LogStructureType(logger, structureType.Name);
 
-        IEarlyExit[] analysisExits = StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase);
+        IEarlyExit[] analysisExits = StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase, (uint)keys.Length);
         List<IEarlyExit> earlyExits = CombineExits(structure.GetMandatoryExits(), analysisExits);
 
         if (cfg.EarlyExitConfig.OptimizeExpression)

@@ -11,38 +11,10 @@ namespace MyNamespace;
 internal static class StaticData
 {
 
-    private static uint UnitAt(string str, int offset) => offset >= 0 ? str[offset] : str[str.Length + offset];
-    private static int Length(string str) => str.Length;
 
     
     public static bool Contains(string key)
     {
-        int length;
-        uint unitAtNeg1;
-        uint unitAt0;
-        length = Length(key);
-        if ((length > 5))
-        {
-         return false;
-        }
-
-        unitAtNeg1 = UnitAt(key, -1);
-        if ((unitAtNeg1 > 51u))
-        {
-         return false;
-        }
-
-        unitAt0 = UnitAt(key, 0);
-        if ((unitAt0 > 105u))
-        {
-         return false;
-        }
-
-        if ((unitAt0 < 105u))
-        {
-         return false;
-        }
-
 
 
         switch (key)

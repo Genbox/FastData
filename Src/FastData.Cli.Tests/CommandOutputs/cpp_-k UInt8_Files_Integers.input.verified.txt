@@ -23,26 +23,6 @@ class MyData final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const uint8_t key) noexcept {
-        if ((key > 100))
-        {
-         return false;
-        }
-
-        if ((key < 42))
-        {
-         return false;
-        }
-
-        if (((key > 42) && (key < 62)))
-        {
-         return false;
-        }
-
-        if (((key > 80) && (key < 100)))
-        {
-         return false;
-        }
-
 
         for (size_t i = 0; i < 4; ++i) {
             if (key >= range_starts[i] && key <= range_ends[i])

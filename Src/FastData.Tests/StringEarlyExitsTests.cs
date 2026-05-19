@@ -42,6 +42,7 @@ public class StringEarlyExitsTests
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.MaxCandidates = 50;
         cfg.MinRejectionRatio = 0f;
+        cfg.MinItemCount = 0;
 
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
@@ -72,6 +73,7 @@ public class StringEarlyExitsTests
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.MaxCandidates = 50;
         cfg.MinRejectionRatio = 0f;
+        cfg.MinItemCount = 0;
 
         IEarlyExit[] sparse = GetExits(["alpha", "zulu"], false, cfg);
         Assert.Contains(sparse, static x => x is UnitAtBitmapEarlyExit { Offset: >= 0 });
@@ -87,6 +89,7 @@ public class StringEarlyExitsTests
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.MaxCandidates = 50;
         cfg.MinRejectionRatio = 0f;
+        cfg.MinItemCount = 0;
 
         IEarlyExit[] exits = GetExits(keys, true, cfg);
 
@@ -97,6 +100,6 @@ public class StringEarlyExitsTests
     private static IEarlyExit[] GetExits(string[] keys, bool ignoreCase, EarlyExitConfig config)
     {
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, ignoreCase, GeneratorEncoding.Utf16CodeUnits);
-        return StringEarlyExits.GetExits(typeof(ArrayStructure<,>), props, config, ignoreCase);
+        return StringEarlyExits.GetExits(typeof(ArrayStructure<,>), props, config, ignoreCase, (uint)keys.Length);
     }
 }

@@ -12,38 +12,10 @@
 
 class MyData final {
 
-    static constexpr uint32_t UnitAt(std::string_view str, int32_t offset) noexcept { const size_t index = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset; return static_cast<unsigned char>(str[index]); }
-    static constexpr int32_t Length(std::string_view str) noexcept { return static_cast<int32_t>(str.length()); }
 
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        int32_t length;
-        uint32_t unitAtNeg1;
-        uint32_t unitAt0;
-        length = Length(key);
-        if ((length > 5))
-        {
-         return false;
-        }
-
-        unitAtNeg1 = UnitAt(key, -1);
-        if ((unitAtNeg1 > 50u))
-        {
-         return false;
-        }
-
-        unitAt0 = UnitAt(key, 0);
-        if ((unitAt0 > 116u))
-        {
-         return false;
-        }
-
-        if ((unitAt0 < 116u))
-        {
-         return false;
-        }
-
 
         if (key == u8"test1" || key == u8"test2")
             return true;
