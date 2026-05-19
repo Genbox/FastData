@@ -61,6 +61,7 @@ public class StringEarlyExitsTests
         EarlyExitConfig cfg = EarlyExitConfig.Default;
         cfg.MaxCandidates = 50;
         cfg.MinRejectionRatio = 0f;
+        cfg.MinItemCount = 0;
 
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
@@ -95,6 +96,35 @@ public class StringEarlyExitsTests
 
         Assert.Contains(exits, static x => x is LengthGreaterThanEarlyExit);
         Assert.DoesNotContain(exits, static x => x is UnitAtNotEqualEarlyExit or UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit or UnitAtBitmapEarlyExit);
+    }
+
+    [Fact]
+    public void GetExits_LengthBitmapMapsLength64ToBit63()
+    {
+        string[] keys = ["a", new string('b', 64)];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0f;
+        cfg.MinItemCount = 0;
+
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
+
+        LengthBitmapEarlyExit bitmap = exits.OfType<LengthBitmapEarlyExit>().Single();
+        Assert.Equal((1UL << 0) | (1UL << 63), bitmap.BitSet);
+    }
+
+    [Fact]
+    public void GetExits_LengthBitmapNotProducedWhenLengthExceeds64()
+    {
+        string[] keys = ["a", new string('b', 65)];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0f;
+        cfg.MinItemCount = 0;
+
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
+
+        Assert.DoesNotContain(exits, static x => x is LengthBitmapEarlyExit);
     }
 
     private static IEarlyExit[] GetExits(string[] keys, bool ignoreCase, EarlyExitConfig config)

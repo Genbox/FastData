@@ -68,7 +68,7 @@ internal static class StringEarlyExits
 
             int bitCount = GetRangeCount(ranges);
             float density = (float)bitCount / ((max - min) + 1);
-            if (config.IsEarlyExitEnabled(typeof(LengthBitmapEarlyExit)) && config.CheckDensityLimits(typeof(LengthBitmapEarlyExit), density))
+            if (config.IsEarlyExitEnabled(typeof(LengthBitmapEarlyExit)) && min >= 1 && max <= 64 && config.CheckDensityLimits(typeof(LengthBitmapEarlyExit), density))
             {
                 ulong bitSet = BuildLengthBitmap(ranges);
                 if (bitSet != 0)
@@ -176,7 +176,7 @@ internal static class StringEarlyExits
 
     private static ulong BuildLengthBitmap(DataRanges<int> ranges)
     {
-        const int maxIndex = 63;
+        const int maxIndex = 64;
         ulong bitSet = 0;
 
         foreach ((int Start, int End) range in ranges.Ranges)
