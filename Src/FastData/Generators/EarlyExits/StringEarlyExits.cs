@@ -85,19 +85,19 @@ internal static class StringEarlyExits
         {
             AsciiMap firstMap = props.CharacterData.FirstCharMap;
             if (config.IsEarlyExitEnabled(typeof(UnitAtNotEqualEarlyExit)) && firstMap.BitCount == 1) //1 bit means all first units are the same
-                yield return new UnitAtNotEqualEarlyExit(firstMap.Min, ignoreCase, 0); //We can use min or max. They are the same.
+                yield return new UnitAtNotEqualEarlyExit(firstMap.Min, ignoreCase); //We can use min or max. They are the same.
 
             if (!ignoreCase)
             {
                 if (config.IsEarlyExitEnabled(typeof(UnitAtLessThanEarlyExit)) && firstMap.Min > 0)
-                    yield return new UnitAtLessThanEarlyExit(firstMap.Min, 0);
+                    yield return new UnitAtLessThanEarlyExit(firstMap.Min);
 
                 if (config.IsEarlyExitEnabled(typeof(UnitAtGreaterThanEarlyExit)) && firstMap.Max < char.MaxValue)
-                    yield return new UnitAtGreaterThanEarlyExit(firstMap.Max, 0);
+                    yield return new UnitAtGreaterThanEarlyExit(firstMap.Max);
             }
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtBitmapEarlyExit)) && config.CheckDensityLimits(typeof(UnitAtBitmapEarlyExit), firstMap.Density))
-                yield return new UnitAtBitmapEarlyExit(firstMap.Low, firstMap.High, ignoreCase, 0);
+                yield return new UnitAtBitmapEarlyExit(firstMap.Low, firstMap.High, ignoreCase);
 
             // Accessing the last char/byte is slow in languages that don't cache string length
             AsciiMap lastMap = props.CharacterData.LastCharMap;

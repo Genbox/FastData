@@ -52,6 +52,30 @@ public static class GeneratorFunctions
         return true;
     }
 
+    public static bool IsAsciiOnly(string value)
+    {
+        int offset = 0;
+
+        while (value.Length - offset >= 4)
+        {
+            uint left = value[offset] | ((uint)value[offset + 1] << 16);
+            uint right = value[offset + 2] | ((uint)value[offset + 3] << 16);
+
+            if (((left | right) & ~0x007F_007Fu) != 0)
+                return false;
+
+            offset += 4;
+        }
+
+        while (offset < value.Length)
+        {
+            if (value[offset++] >= 0x80)
+                return false;
+        }
+
+        return true;
+    }
+
     public static uint ReadU8(byte[] ptr, int offset) => Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset);
     public static uint ReadU16(byte[] ptr, int offset) => Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));
     public static uint ReadU32(byte[] ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));

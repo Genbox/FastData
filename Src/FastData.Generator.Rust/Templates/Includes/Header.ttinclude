@@ -112,6 +112,32 @@ fn UnitAt(value: &str, offset: i32) -> u32 {
 """ },
             { GeneratorFunction.UnitAtAsciiLower, "fn UnitAtAsciiLower(value: &str, offset: i32) -> u32 { ToAsciiLower(UnitAt(value, offset)) }" },
             { GeneratorFunction.Length, "fn Length(value: &str) -> i32 { value.len() as i32 }" },
+            { GeneratorFunction.IsAsciiOnly, """
+fn IsAsciiOnly(value: &str) -> bool {
+    let bytes = value.as_bytes();
+    let mut offset = 0usize;
+
+    while bytes.len() - offset >= 4 {
+        let left = (bytes[offset] as u32) | ((bytes[offset + 1] as u32) << 16);
+        let right = (bytes[offset + 2] as u32) | ((bytes[offset + 3] as u32) << 16);
+
+        if ((left | right) & !0x007F_007Fu32) != 0 {
+            return false;
+        }
+
+        offset += 4;
+    }
+
+    while offset < bytes.len() {
+        if bytes[offset] >= 0x80 {
+            return false;
+        }
+        offset += 1;
+    }
+
+    true
+}
+""" },
             { GeneratorFunction.EqualsAt, """
 fn EqualsAt(value: &str, offset: i32, fragment: &str) -> bool {
     let start = if offset >= 0 { offset as usize } else { value.len().wrapping_add(offset as usize) };

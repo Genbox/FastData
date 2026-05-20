@@ -24,4 +24,10 @@ internal partial class GPerfAnalyzer
 
     [LoggerMessage(LogLevel.Debug, "A new best: {Collisions} / {Fitness:0.00000}")]
     internal static partial void LogCandidate(ILogger logger, double fitness, int collisions);
+
+    [LoggerMessage(LogLevel.Warning, "Size multiple {SizeMultiple} is excessive; this can create very large GPerf association tables.")]
+    internal static partial void LogSizeMultipleExcessive(ILogger logger, double sizeMultiple);
+
+    [LoggerMessage(LogLevel.Warning, "Size multiple {SizeMultiple} is extremely small; GPerf may need to expand the association table during search.")]
+    internal static partial void LogSizeMultipleSmall(ILogger logger, double sizeMultiple);
 }

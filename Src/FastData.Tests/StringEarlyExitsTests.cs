@@ -167,6 +167,19 @@ public class StringEarlyExitsTests
         Assert.True(guardIndex < unitIndex);
     }
 
+    [Fact]
+    public void IsAsciiOnlyEarlyExit_RejectsOnlyNonAsciiInput()
+    {
+        ParameterExpression parameter = Expression.Parameter(typeof(string), "key");
+        IsAsciiOnlyEarlyExit exit = new IsAsciiOnlyEarlyExit();
+        Func<string, bool> func = Expression.Lambda<Func<string, bool>>(exit.GetExpression(parameter), parameter).Compile();
+
+        Assert.False(func("abc"));
+        Assert.False(func("abc\u007f"));
+        Assert.True(func("abc\u0080"));
+        Assert.True(func("\u00e9"));
+    }
+
     private static IEarlyExit[] GetExits(string[] keys, bool ignoreCase, EarlyExitConfig config)
     {
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, ignoreCase, GeneratorEncoding.Utf16CodeUnits);

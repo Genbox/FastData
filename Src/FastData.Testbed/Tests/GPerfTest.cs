@@ -45,7 +45,7 @@ internal static class GPerfTest
             string[] data = File.ReadAllLines(file);
             StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
 
-            GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.Utf16CodeUnits), factory.CreateLogger<GPerfAnalyzer>());
+            GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.Utf16CodeUnits), factory.CreateLogger<GPerfAnalyzer>(), GeneratorEncoding.Utf16CodeUnits, false);
             Candidate cand = analyzer.GetCandidates(data).First();
             StringHashFunc func = cand.StringHash.GetExpression().Compile();
 

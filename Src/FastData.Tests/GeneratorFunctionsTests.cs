@@ -27,4 +27,18 @@ public class GeneratorFunctionsTests
     {
         Assert.True(GeneratorFunctions.EqualsAtAsciiLower(value, offset, fragment));
     }
+
+    [Theory]
+    [InlineData("", true)]
+    [InlineData("abc", true)]
+    [InlineData("abcd", true)]
+    [InlineData("abcdefg", true)]
+    [InlineData("abc\u007f", true)]
+    [InlineData("abc\u0080", false)]
+    [InlineData("\u00e9", false)]
+    [InlineData("abc\u00e9", false)]
+    public void IsAsciiOnly_ReturnsExpectedResult(string value, bool expected)
+    {
+        Assert.Equal(expected, GeneratorFunctions.IsAsciiOnly(value));
+    }
 }

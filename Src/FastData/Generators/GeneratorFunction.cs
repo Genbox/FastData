@@ -12,5 +12,6 @@ public enum GeneratorFunction
     ReadU8 = 1 << 6,
     ReadU16 = 1 << 7,
     ReadU32 = 1 << 8,
-    ReadU64 = 1 << 9
+    ReadU64 = 1 << 9,
+    IsAsciiOnly = 1 << 10
 }

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.StringHash;
@@ -13,7 +13,7 @@ namespace Genbox.FastData.Internal;
 
 internal static class HashBenchmark
 {
-    internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringKeyProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, GeneratorEncoding encoding, bool includeDefault)
+    internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringKeyProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, GeneratorEncoding encoding, bool includeDefault, bool ignoreCase = false)
     {
         Simulator sim = new Simulator(data.Length, encoding);
 
@@ -40,7 +40,7 @@ internal static class HashBenchmark
 
         if (cfg.GPerfAnalyzerConfig != null)
         {
-            GPerfAnalyzer ha = new GPerfAnalyzer(data.Length, props, cfg.GPerfAnalyzerConfig, sim, factory.CreateLogger<GPerfAnalyzer>());
+            GPerfAnalyzer ha = new GPerfAnalyzer(data.Length, props, cfg.GPerfAnalyzerConfig, sim, factory.CreateLogger<GPerfAnalyzer>(), encoding, ignoreCase);
             if (ha.IsAppropriate())
                 candidates.AddRange(ha.GetCandidates(data));
         }

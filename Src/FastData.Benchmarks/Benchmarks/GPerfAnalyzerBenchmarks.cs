@@ -9,20 +9,30 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [MemoryDiagnoser]
+[InProcess]
 public class GPerfAnalyzerBenchmarks
 {
-    private readonly GPerfAnalyzer _analyzer;
     private readonly string[] _data;
+    private readonly StringKeyProperties _props;
+    private readonly Simulator _simulator;
 
     public GPerfAnalyzerBenchmarks()
     {
         Random rng = new Random(42);
         _data = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(rng, 50)).ToArray();
 
-        StringKeyProperties props = KeyAnalyzer.GetStringProperties(_data, false, GeneratorEncoding.Utf16CodeUnits);
-        _analyzer = new GPerfAnalyzer(_data.Length, props, new GPerfAnalyzerConfig(), new Simulator(_data.Length, GeneratorEncoding.Utf16CodeUnits), NullLogger<GPerfAnalyzer>.Instance);
+        _props = KeyAnalyzer.GetStringProperties(_data, false, GeneratorEncoding.AsciiBytes);
+        _simulator = new Simulator(_data.Length, GeneratorEncoding.AsciiBytes);
     }
 
     [Benchmark]
-    public IEnumerable<object> GPerfAnalyzer() => _analyzer.GetCandidates(_data);
+    public object ConstructHash()
+    {
+        GPerfAnalyzer analyzer = new GPerfAnalyzer(_data.Length, _props, new GPerfAnalyzerConfig(), _simulator, NullLogger<GPerfAnalyzer>.Instance, GeneratorEncoding.AsciiBytes, false);
+
+        foreach (Candidate candidate in analyzer.GetCandidates(_data))
+            return candidate;
+
+        throw new InvalidOperationException("GPerfAnalyzer did not produce a candidate.");
+    }
 }

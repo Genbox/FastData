@@ -5,7 +5,6 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
-using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Generators.Expressions;
 using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Generators.StringHash;
@@ -178,12 +177,19 @@ public static partial class FastDataGenerator
 
         StringHashInfo? cacheHashInfo = null;
         HashData? cacheHashData = null;
+        IEnumerable<IEarlyExit> hashMandatoryExits = [];
 
         (Type structureType, IStructure<string, TValue, IContext> structure, IContext res) = cfg.StructureTypeOverride != null ? CreateSelectedStringStructure(cfg.StructureTypeOverride) : CreateBestStringStructure();
         LogStructureType(logger, structureType.Name);
 
         IEarlyExit[] analysisExits = StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase, (uint)keys.Length);
-        List<IEarlyExit> earlyExits = CombineExits(structure.GetMandatoryExits(), analysisExits);
+        List<IEarlyExit> mandatoryExits = new List<IEarlyExit>();
+
+        // Ensure the structure's mandatory exits are added
+        mandatoryExits.AddRange(hashMandatoryExits);
+        mandatoryExits.AddRange(structure.GetMandatoryExits());
+
+        List<IEarlyExit> earlyExits = CombineExits(mandatoryExits, analysisExits);
 
         if (cfg.EarlyExitConfig.OptimizeExpression)
             ReduceExits(earlyExits);
@@ -253,18 +259,21 @@ public static partial class FastDataGenerator
 
             if (cfg.StringAnalyzerConfig != null)
             {
-                Candidate candidate = HashBenchmark.GetBestHash(keySpan, props, cfg.StringAnalyzerConfig, factory, generator.Encoding, true);
+                Candidate candidate = HashBenchmark.GetBestHash(keySpan, props, cfg.StringAnalyzerConfig, factory, generator.Encoding, true, cfg.IgnoreCase);
                 LogStringHashFitness(logger, candidate.Fitness);
 
                 Expression<StringHashFunc> expression = candidate.StringHash.GetExpression();
                 info = new StringHashInfo(expression, candidate.StringHash.AdditionalData);
                 hashFunc = expression.Compile();
+                hashMandatoryExits = candidate.StringHash.GetMandatoryExits();
             }
             else
             {
-                Expression<StringHashFunc> expression = DefaultStringHash.GetInstance(generator.Encoding).GetExpression();
+                DefaultStringHash stringHash = DefaultStringHash.GetInstance(generator.Encoding);
+                Expression<StringHashFunc> expression = stringHash.GetExpression();
                 info = new StringHashInfo(expression, null);
                 hashFunc = expression.Compile();
+                hashMandatoryExits = stringHash.GetMandatoryExits();
             }
 
             Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(generator.Encoding);

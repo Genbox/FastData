@@ -154,7 +154,7 @@ When it comes to hashing, we need a function that mixes thoroughly, but it also 
 The challenge becomes finding a hash function that mixes the dataset really well, but with as few instructions as possible. FastData uses 3 different methods:
 
 - **Brute force**: Only very simple constructs are made, but sometimes a naive search will yield a high performance hash function with excellent mixing qualities.
-- **GPerf**: GPerf is a clever way of finding unique positions in strings that gives the best mixing, and then uses an fast advanced algorithm for finding good hash functions.
+- **GPerf**: GPerf is a clever way of finding unique positions in strings that gives the best mixing, and then uses a fast advanced algorithm for finding good hash functions. FastData follows the upstream byte-oriented algorithm options for key positions, 7-bit validation, length contribution, association-value sizing, jumps, randomness, and multiple iterations. Duplicate keyword signatures remain unsupported.
 - **Genetics**: It has a fitness function that is measured in time and mixing quality. FastData starts with a set of random hash functions, then measure them, and then let them compete in a tournament style competition. Once a good candidate is found, it is further mutated, refined and put into a new tournament. This yields functions that are tailored to the dataset with hopefully good qualities.
 
 These three methods each yield hash function candidates, which are tested on the actual dataset, and the best function wins.

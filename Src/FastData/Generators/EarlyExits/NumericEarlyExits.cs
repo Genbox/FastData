@@ -1,3 +1,4 @@
+using System.Numerics;
 using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
@@ -106,7 +107,8 @@ internal static class NumericEarlyExits<TKey>
 
     private static double GetRejectionRatio(IEarlyExit exit, double domainSize)
     {
-        double ratio = exit is ValueBitMaskEarlyExit bitMask ? 1d - GetBitMaskAcceptedDensity(bitMask.Mask) : domainSize <= 0d ? 0d : exit.KeyspaceSize / domainSize;
+        double ratio = exit is ValueBitMaskEarlyExit bitMask ? 1d - GetBitMaskAcceptedDensity(bitMask.Mask) :
+            domainSize <= 0d ? 0d : exit.KeyspaceSize / domainSize;
         return ClampRatio(ratio);
     }
 
@@ -119,7 +121,7 @@ internal static class NumericEarlyExits<TKey>
 
     private static float GetBitMaskAcceptedDensity(ulong bitMask)
     {
-        int missingBitCount = System.Numerics.BitOperations.PopCount(bitMask);
+        int missingBitCount = BitOperations.PopCount(bitMask);
         if (missingBitCount >= 64)
             return 0f;
 

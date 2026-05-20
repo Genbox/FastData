@@ -217,7 +217,7 @@ internal static class Program
         {
             BruteForceAnalyzerConfig = new BruteForceAnalyzerConfig { MaxAttempts = 157_464 },
             GeneticAnalyzerConfig = new GeneticAnalyzerConfig { PopulationSize = 64, MaxGenerations = 100 },
-            GPerfAnalyzerConfig = new GPerfAnalyzerConfig { MaxPositions = 1024 }
+            GPerfAnalyzerConfig = new GPerfAnalyzerConfig { MaxPositions = 255 }
         },
         _ => throw new ArgumentOutOfRangeException(nameof(analysisLevel), analysisLevel, "Unsupported analysis level.")
     };

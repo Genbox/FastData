@@ -1,5 +1,8 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using Genbox.FastData.Enums;
+using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 
@@ -7,20 +10,39 @@ namespace Genbox.FastData.Generators.StringHash;
 
 internal sealed record GPerfStringHash : IStringHash
 {
-    internal GPerfStringHash(int[] associationValues, int[] alphaIncrements, int[] positions, int minLen)
+    private readonly IEarlyExit[] _mandatoryExits;
+
+    internal GPerfStringHash(int[] associationValues, int[] alphaIncrements, int[] positions, int minLen, bool hashIncludesLength, GeneratorEncoding encoding = GeneratorEncoding.Utf8Bytes, bool sevenBit = false, int mandatoryMinLength = -1)
     {
         AssociationValues = associationValues;
         AlphaIncrements = alphaIncrements;
         Positions = positions;
         MinLen = minLen;
+        HashIncludesLength = hashIncludesLength;
+        _mandatoryExits = CreateMandatoryExits(encoding, sevenBit, mandatoryMinLength >= 0 ? mandatoryMinLength : minLen);
     }
 
     internal int[] AssociationValues { get; }
     internal int[] AlphaIncrements { get; }
     internal int[] Positions { get; }
     internal int MinLen { get; }
+    internal bool HashIncludesLength { get; }
 
     public AdditionalData[] AdditionalData => [new AdditionalData(nameof(AssociationValues), typeof(int), AssociationValues)];
+    public IEnumerable<IEarlyExit> GetMandatoryExits() => _mandatoryExits;
+
+    private static IEarlyExit[] CreateMandatoryExits(GeneratorEncoding encoding, bool sevenBit, int mandatoryMinLength)
+    {
+        List<IEarlyExit> exits = new List<IEarlyExit>(2);
+
+        if (mandatoryMinLength > 0)
+            exits.Add(new LengthLessThanEarlyExit(mandatoryMinLength));
+
+        if (encoding == GeneratorEncoding.AsciiBytes || sevenBit)
+            exits.Add(new IsAsciiOnlyEarlyExit());
+
+        return exits.ToArray();
+    }
 
     public Expression<StringHashFunc> GetExpression()
     {
@@ -33,12 +55,12 @@ internal sealed record GPerfStringHash : IStringHash
 
         List<Expression> ex = new List<Expression>
         {
-            // hash = 0UL
-            Assign(hash, Constant(0UL))
+            // hash = length or 0UL, matching gperf's optional length contribution.
+            Assign(hash, HashIncludesLength ? Convert(length, typeof(ulong)) : Constant(0UL))
         };
 
         // Positions are selected by the analyzer and sorted in gperf order. A selected position contributes only when it exists
-        // for the current logical length; positions outside the logical length are skipped.
+        // for the current logical length.
         foreach (int pos in Positions)
         {
             Expression add = Assign(hash, Add(hash, GetPosition(asso, value, length, pos)));
@@ -63,7 +85,7 @@ internal sealed record GPerfStringHash : IStringHash
         Expression idx;
 
         if (pos == -1)
-            idx = Subtract(length, Constant(1));
+            idx = ArrayIndex(value, Subtract(length, Constant(1)));
         else
         {
             // Fixed position and optional increment
@@ -84,5 +106,6 @@ internal sealed record GPerfStringHash : IStringHash
          Alpha = {string.Join(", ", AlphaIncrements)}
          {nameof(Positions)} = {string.Join(", ", Positions)}
          {nameof(MinLen)} = {MinLen}
+         {nameof(HashIncludesLength)} = {HashIncludesLength}
          """;
 }

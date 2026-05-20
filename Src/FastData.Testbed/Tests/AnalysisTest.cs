@@ -132,7 +132,7 @@ internal static class AnalysisTest
 
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.Utf16CodeUnits), loggerFactory.CreateLogger<GPerfAnalyzer>());
+        GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.Utf16CodeUnits), loggerFactory.CreateLogger<GPerfAnalyzer>(), GeneratorEncoding.Utf16CodeUnits, false);
         PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());
     }
 

@@ -270,7 +270,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                         },
                         GPerfAnalyzerConfig = new GPerfAnalyzerConfig
                         {
-                            MaxPositions = 1024
+                            MaxPositions = 255
                         }
                     },
                     _ => throw new ArgumentOutOfRangeException("Unsupported AnalysisLevel: " + al)

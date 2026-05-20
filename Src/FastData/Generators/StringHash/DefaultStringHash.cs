@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Expressions;
@@ -21,6 +22,7 @@ internal sealed record DefaultStringHash : IStringHash
     internal static DefaultStringHash UTF16Instance { get; } = new DefaultStringHash(GeneratorEncoding.Utf16CodeUnits);
 
     public AdditionalData[]? AdditionalData => null;
+    public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
     public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.BuildFull(Mixer, Avalanche, _encoding);
 
     internal static DefaultStringHash GetInstance(GeneratorEncoding enc) => enc switch
