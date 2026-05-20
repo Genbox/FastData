@@ -158,17 +158,16 @@ public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hybl
             MarkBucketAsUsed(bucket, bucketStarts, bucketCounts, bucketKeyIndices, approxs, displacement, freeBitmap);
         }
 
-        // Step 6: Compute total table size (max index + 1)
-        uint maxIndex = 0;
-        for (int i = 0; i < keyCount; i++)
+        // Step 6: Compute total table capacity. This must cover every possible lookup key, not
+        // just the occupied indexes, because absent keys can produce any approx in [0, approxRange).
+        ushort maxDisplacement = 0;
+        for (int i = 0; i < displacements.Length; i++)
         {
-            int bucket = bucketsByKey[i];
-            uint index = approxs[i] + displacements[bucket];
-            if (index > maxIndex)
-                maxIndex = index;
+            if (displacements[i] > maxDisplacement)
+                maxDisplacement = displacements[i];
         }
 
-        uint tableSize = maxIndex + 1;
+        uint tableSize = approxRange + maxDisplacement;
 
         // Step 7: Scatter keys into the output array
         KeyValuePair<TKey, ulong>[] pairs = new KeyValuePair<TKey, ulong>[tableSize];
