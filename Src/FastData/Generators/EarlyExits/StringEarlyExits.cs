@@ -86,11 +86,14 @@ internal static class StringEarlyExits
             if (config.IsEarlyExitEnabled(typeof(UnitAtNotEqualEarlyExit)) && firstMap.BitCount == 1) //1 bit means all first units are the same
                 yield return new UnitAtNotEqualEarlyExit(firstMap.Min, ignoreCase, 0); //We can use min or max. They are the same.
 
+            if (!ignoreCase)
+            {
             if (config.IsEarlyExitEnabled(typeof(UnitAtLessThanEarlyExit)) && firstMap.Min > 0)
                 yield return new UnitAtLessThanEarlyExit(firstMap.Min, 0);
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtGreaterThanEarlyExit)) && firstMap.Max < char.MaxValue)
                 yield return new UnitAtGreaterThanEarlyExit(firstMap.Max, 0);
+            }
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtBitmapEarlyExit)) && config.CheckDensityLimits(typeof(UnitAtBitmapEarlyExit), firstMap.Density))
                 yield return new UnitAtBitmapEarlyExit(firstMap.Low, firstMap.High, ignoreCase, 0);
@@ -100,11 +103,14 @@ internal static class StringEarlyExits
             if (config.IsEarlyExitEnabled(typeof(UnitAtNotEqualEarlyExit)) && lastMap.BitCount == 1) //1 bit means all last units are the same
                 yield return new UnitAtNotEqualEarlyExit(lastMap.Min, ignoreCase, -1); //We can use min or max. They are the same.
 
+            if (!ignoreCase)
+            {
             if (config.IsEarlyExitEnabled(typeof(UnitAtLessThanEarlyExit)) && lastMap.Min > 0)
                 yield return new UnitAtLessThanEarlyExit(lastMap.Min, -1);
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtGreaterThanEarlyExit)) && lastMap.Max < char.MaxValue)
                 yield return new UnitAtGreaterThanEarlyExit(lastMap.Max, -1);
+            }
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtBitmapEarlyExit)) && config.CheckDensityLimits(typeof(UnitAtBitmapEarlyExit), lastMap.Density))
                 yield return new UnitAtBitmapEarlyExit(lastMap.Low, lastMap.High, ignoreCase, -1);

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
@@ -96,6 +97,29 @@ public class StringEarlyExitsTests
 
         Assert.Contains(exits, static x => x is LengthGreaterThanEarlyExit);
         Assert.DoesNotContain(exits, static x => x is UnitAtNotEqualEarlyExit or UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit or UnitAtBitmapEarlyExit);
+    }
+
+    [Fact]
+    public void GetExits_IgnoreCaseAscii_DoesNotRejectCaseVariants()
+    {
+        string[] keys = ["Alpha", "bravo", "CHARLIE"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0f;
+        cfg.MinItemCount = 0;
+
+        IEarlyExit[] exits = GetExits(keys, true, cfg);
+
+        Assert.DoesNotContain(exits, static x => x is UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit);
+
+        ParameterExpression parameter = Expression.Parameter(typeof(string), "key");
+        foreach (IEarlyExit exit in exits)
+        {
+            Func<string, bool> func = Expression.Lambda<Func<string, bool>>(exit.GetExpression(parameter), parameter).Compile();
+            Assert.False(func("Alpha"));
+            Assert.False(func("BRAVO"));
+            Assert.False(func("charlie"));
+        }
     }
 
     [Fact]
