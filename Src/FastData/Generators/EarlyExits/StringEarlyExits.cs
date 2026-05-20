@@ -60,11 +60,14 @@ internal static class StringEarlyExits
             if (config.IsEarlyExitEnabled(typeof(LengthGreaterThanEarlyExit)) && max < int.MaxValue)
                 yield return new LengthGreaterThanEarlyExit(max);
 
-            for (int i = 0; i < ranges.Ranges.Count - 1; i++)
+            if (config.IsEarlyExitEnabled(typeof(StringLengthRangeEarlyExit)))
+            {
+                for (int i = 0; i < ranges.Ranges.Count - 1; i++)
             {
                 (int Start, int End) current = ranges.Ranges[i];
                 (int Start, int End) next = ranges.Ranges[i + 1];
                 yield return new StringLengthRangeEarlyExit(current.End, next.Start);
+                }
             }
 
             int bitCount = GetRangeCount(ranges);
