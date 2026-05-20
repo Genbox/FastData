@@ -29,10 +29,11 @@ public readonly struct PgmSegment<T> where T : notnull
         Key = cs.GetFirstKey();
         (double slope, double intercept) = cs.GetFloatingPointSegment(Key);
 
-        // The reference throws if intercept < 0. We clamp to 0 since this can happen due to
-        // floating-point precision loss when using float slopes.
         if (intercept < 0)
-            intercept = 0;
+            throw new OverflowException("Unexpected PGM segment intercept < 0.");
+
+        if (intercept > int.MaxValue)
+            throw new OverflowException("Unexpected PGM segment intercept > int.MaxValue.");
 
         Slope = (float)slope;
         Intercept = (int)intercept;
