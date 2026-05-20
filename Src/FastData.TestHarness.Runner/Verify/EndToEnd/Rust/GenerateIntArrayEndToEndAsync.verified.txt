@@ -28,12 +28,12 @@ impl fastdata {
          return false;
         }
 
-        if (((key > 1) && (key < 4)))
+        if ((((key as u32) & 4294967280) != u32::MIN))
         {
          return false;
         }
 
-        if (((key > 4) && (key < 7)))
+        if (((key > 1) && (key < 4)))
         {
          return false;
         }

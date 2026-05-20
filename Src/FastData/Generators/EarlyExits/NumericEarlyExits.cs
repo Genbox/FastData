@@ -25,7 +25,7 @@ internal static class NumericEarlyExits<TKey>
             return [];
 
         // There can be quite a few candidates, and too many will slow down queries, so we need to find the best ones.
-        return GetTopExits(candidates, config.MaxCandidates).ToArray();
+        return GetTopExits(candidates, range, config.MaxCandidates).ToArray();
     }
 
     private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, DataRanges<TKey> dataRanges, ulong range, ulong bitMask, uint itemCount, EarlyExitConfig config)
@@ -47,7 +47,7 @@ internal static class NumericEarlyExits<TKey>
         // When there are too many values, the bitset quickly becomes all ones and the check becomes useless.
         if (config.IsEarlyExitEnabled(typeof(ValueBitMaskEarlyExit)) && typeCode.IsIntegral() && bitMask != 0 && bitMask != ulong.MaxValue)
         {
-            float density = (float)range / itemCount;
+            float density = GetBitMaskAcceptedDensity(bitMask);
 
             if (config.CheckDensityLimits(typeof(ValueBitMaskEarlyExit), density))
                 yield return new ValueBitMaskEarlyExit(bitMask);
@@ -77,12 +77,12 @@ internal static class NumericEarlyExits<TKey>
         }
     }
 
-    private static IEnumerable<IEarlyExit> GetTopExits(IEarlyExit[] candidates, int maxCandidates)
+    private static IEnumerable<IEarlyExit> GetTopExits(IEarlyExit[] candidates, ulong range, int maxCandidates)
     {
         if (maxCandidates <= 0 || candidates.Length == 0)
             return [];
 
-        return candidates.OrderByDescending(x => x.KeyspaceSize).Take(maxCandidates);
+        return candidates.OrderByDescending(x => GetScore(x, range)).Take(maxCandidates);
     }
 
     private static IEnumerable<IEarlyExit> FilterByRejection(IEarlyExit[] candidates, ulong range, float threshold)
@@ -91,14 +91,49 @@ internal static class NumericEarlyExits<TKey>
 
         foreach (IEarlyExit exit in candidates)
         {
-            double ratio = domainSize <= 0d ? 0d : exit.KeyspaceSize / domainSize;
-            if (double.IsNaN(ratio) || double.IsInfinity(ratio) || ratio > 1d)
-                ratio = 1d;
-            else if (ratio < 0d)
-                ratio = 0d;
+            double ratio = GetRejectionRatio(exit, domainSize);
 
             if (ratio >= threshold)
                 yield return exit;
         }
+    }
+
+    private static double GetScore(IEarlyExit exit, ulong range)
+    {
+        double domainSize = range + 1d;
+        return GetRejectionRatio(exit, domainSize) / GetEstimatedCost(exit);
+    }
+
+    private static double GetRejectionRatio(IEarlyExit exit, double domainSize)
+    {
+        double ratio = exit is ValueBitMaskEarlyExit bitMask ? 1d - GetBitMaskAcceptedDensity(bitMask.Mask) : domainSize <= 0d ? 0d : exit.KeyspaceSize / domainSize;
+        return ClampRatio(ratio);
+    }
+
+    private static double GetEstimatedCost(IEarlyExit exit) => exit switch
+    {
+        ValueInRangeEarlyExit<TKey> => 2d,
+        ValueBitMaskEarlyExit => 1.25d,
+        _ => 1d
+    };
+
+    private static float GetBitMaskAcceptedDensity(ulong bitMask)
+    {
+        int missingBitCount = System.Numerics.BitOperations.PopCount(bitMask);
+        if (missingBitCount >= 64)
+            return 0f;
+
+        return 1f / (1UL << missingBitCount);
+    }
+
+    private static double ClampRatio(double ratio)
+    {
+        if (double.IsNaN(ratio) || double.IsInfinity(ratio) || ratio > 1d)
+            return 1d;
+
+        if (ratio < 0d)
+            return 0d;
+
+        return ratio;
     }
 }

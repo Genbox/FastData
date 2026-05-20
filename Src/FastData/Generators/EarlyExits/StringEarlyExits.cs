@@ -1,3 +1,4 @@
+using System.Numerics;
 using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
@@ -32,7 +33,7 @@ internal static class StringEarlyExits
         if (candidates.Length == 0)
             return [];
 
-        return GetTopExits(candidates, config.MaxCandidates).ToArray();
+        return GetTopExits(candidates, props, config.MaxCandidates);
     }
 
     private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase)
@@ -78,11 +79,9 @@ internal static class StringEarlyExits
 
         if (props.CharacterData.AllAscii)
         {
-            bool asciiIgnoreCase = ignoreCase;
-
             AsciiMap firstMap = props.CharacterData.FirstCharMap;
             if (config.IsEarlyExitEnabled(typeof(UnitAtNotEqualEarlyExit)) && firstMap.BitCount == 1) //1 bit means all first units are the same
-                yield return new UnitAtNotEqualEarlyExit(firstMap.Min, asciiIgnoreCase, 0); //We can use min or max. They are the same.
+                yield return new UnitAtNotEqualEarlyExit(firstMap.Min, ignoreCase, 0); //We can use min or max. They are the same.
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtLessThanEarlyExit)) && firstMap.Min > 0)
                 yield return new UnitAtLessThanEarlyExit(firstMap.Min, 0);
@@ -91,12 +90,12 @@ internal static class StringEarlyExits
                 yield return new UnitAtGreaterThanEarlyExit(firstMap.Max, 0);
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtBitmapEarlyExit)) && config.CheckDensityLimits(typeof(UnitAtBitmapEarlyExit), firstMap.Density))
-                yield return new UnitAtBitmapEarlyExit(firstMap.Low, firstMap.High, asciiIgnoreCase, 0);
+                yield return new UnitAtBitmapEarlyExit(firstMap.Low, firstMap.High, ignoreCase, 0);
 
             // Accessing the last char/byte is slow in languages that don't cache string length
             AsciiMap lastMap = props.CharacterData.LastCharMap;
             if (config.IsEarlyExitEnabled(typeof(UnitAtNotEqualEarlyExit)) && lastMap.BitCount == 1) //1 bit means all last units are the same
-                yield return new UnitAtNotEqualEarlyExit(lastMap.Min, asciiIgnoreCase, -1); //We can use min or max. They are the same.
+                yield return new UnitAtNotEqualEarlyExit(lastMap.Min, ignoreCase, -1); //We can use min or max. They are the same.
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtLessThanEarlyExit)) && lastMap.Min > 0)
                 yield return new UnitAtLessThanEarlyExit(lastMap.Min, -1);
@@ -105,16 +104,16 @@ internal static class StringEarlyExits
                 yield return new UnitAtGreaterThanEarlyExit(lastMap.Max, -1);
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtBitmapEarlyExit)) && config.CheckDensityLimits(typeof(UnitAtBitmapEarlyExit), lastMap.Density))
-                yield return new UnitAtBitmapEarlyExit(lastMap.Low, lastMap.High, asciiIgnoreCase, -1);
+                yield return new UnitAtBitmapEarlyExit(lastMap.Low, lastMap.High, ignoreCase, -1);
         }
     }
 
-    private static IEnumerable<IEarlyExit> GetTopExits(IEarlyExit[] candidates, int maxCandidates)
+    private static IEarlyExit[] GetTopExits(IEarlyExit[] candidates, StringKeyProperties props, int maxCandidates)
     {
         if (maxCandidates <= 0 || candidates.Length == 0)
             return [];
 
-        return candidates.OrderByDescending(x => x.KeyspaceSize).Take(maxCandidates);
+        return candidates.OrderByDescending(x => GetScore(x, props)).Take(maxCandidates).ToArray();
     }
 
     private static IEnumerable<IEarlyExit> FilterByRejection(IEarlyExit[] candidates, StringKeyProperties props, float threshold)
@@ -127,17 +126,49 @@ internal static class StringEarlyExits
 
         foreach (IEarlyExit exit in candidates)
         {
-            double span = GetObservedSpan(exit, lengthSpan, firstSpan, lastSpan);
-            double ratio = span <= 0d ? 0d : exit.KeyspaceSize / span;
-            if (double.IsNaN(ratio) || double.IsInfinity(ratio) || ratio > 1d)
-                ratio = 1d;
-            else if (ratio < 0d)
-                ratio = 0d;
+            double ratio = GetRejectionRatio(exit, lengthSpan, firstSpan, lastSpan);
 
             if (ratio >= threshold)
                 yield return exit;
         }
     }
+
+    private static double GetScore(IEarlyExit exit, StringKeyProperties props)
+    {
+        int minLength = props.LengthData.LengthRanges.Min;
+        int maxLength = props.LengthData.LengthRanges.Max;
+        double lengthSpan = maxLength >= minLength ? (maxLength - minLength) + 1d : 0d;
+        double firstSpan = GetAsciiSpan(props.CharacterData.FirstCharMap);
+        double lastSpan = GetAsciiSpan(props.CharacterData.LastCharMap);
+
+        return GetRejectionRatio(exit, lengthSpan, firstSpan, lastSpan) / GetEstimatedCost(exit);
+    }
+
+    private static double GetRejectionRatio(IEarlyExit exit, double lengthSpan, double firstSpan, double lastSpan)
+    {
+        double span = GetObservedSpan(exit, lengthSpan, firstSpan, lastSpan);
+        double ratio;
+
+        if (exit is LengthBitmapEarlyExit lengthBitmap)
+            ratio = span <= 0d ? 0d : (span - BitOperations.PopCount(lengthBitmap.BitSet)) / span;
+        else if (exit is UnitAtBitmapEarlyExit unitBitmap)
+            ratio = span <= 0d ? 0d : (span - BitOperations.PopCount(unitBitmap.Low) - BitOperations.PopCount(unitBitmap.High)) / span;
+        else
+            ratio = span <= 0d ? 0d : exit.KeyspaceSize / span;
+
+        return ClampRatio(ratio);
+    }
+
+    private static double GetEstimatedCost(IEarlyExit exit) => exit switch
+    {
+        LengthLessThanEarlyExit or LengthGreaterThanEarlyExit or LengthNotEqualEarlyExit => 1d,
+        StringLengthRangeEarlyExit => 2d,
+        LengthBitmapEarlyExit => 2d,
+        UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit or UnitAtNotEqualEarlyExit => 2d,
+        UnitAtBitmapEarlyExit => 4d,
+        EqualsAtEarlyExit equalsAt => Math.Max(2d, equalsAt.Fragment.Length),
+        _ => 1d
+    };
 
     private static double GetObservedSpan(IEarlyExit exit, double lengthSpan, double firstSpan, double lastSpan)
     {
@@ -197,5 +228,16 @@ internal static class StringEarlyExits
         }
 
         return bitSet;
+    }
+
+    private static double ClampRatio(double ratio)
+    {
+        if (double.IsNaN(ratio) || double.IsInfinity(ratio) || ratio > 1d)
+            return 1d;
+
+        if (ratio < 0d)
+            return 0d;
+
+        return ratio;
     }
 }

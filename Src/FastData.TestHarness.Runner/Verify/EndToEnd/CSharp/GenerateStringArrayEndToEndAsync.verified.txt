@@ -22,26 +22,24 @@ internal static class FastData
     {
         int length;
         uint unitAt0;
-        uint unitAtNeg1;
         length = Length(key);
+        if ((length < 5))
+        {
+         return false;
+        }
+
         if ((length > 7))
         {
          return false;
         }
 
         unitAt0 = UnitAt(key, 0);
+        if ((unitAt0 < 97u))
+        {
+         return false;
+        }
+
         if ((unitAt0 > 100u))
-        {
-         return false;
-        }
-
-        unitAtNeg1 = UnitAt(key, -1);
-        if ((unitAtNeg1 > 111u))
-        {
-         return false;
-        }
-
-        if (((((ulong.MinValue & (1ul << (int)((uint)unitAtNeg1 & 63u))) & ~(ulong.MinValue - (ulong)((uint)unitAtNeg1 >> 6))) | ((140883517243392ul & (1ul << (int)((uint)unitAtNeg1 & 63u))) & (ulong.MinValue - (ulong)((uint)unitAtNeg1 >> 6)))) == ulong.MinValue))
         {
          return false;
         }

@@ -79,7 +79,7 @@ public class NumericEarlyExitsTests
         IEarlyExit[] allOnesMask = GetExits([(10, 10)], 20, ulong.MaxValue, 100, cfg);
         Assert.DoesNotContain(allOnesMask, static x => x is ValueBitMaskEarlyExit);
 
-        IEarlyExit[] invalidDensity = GetExits([(10, 10)], 50, 10, 100, cfg);
+        IEarlyExit[] invalidDensity = GetExits([(10, 10)], 50, 1, 100, cfg);
         Assert.DoesNotContain(invalidDensity, static x => x is ValueBitMaskEarlyExit);
     }
 

@@ -29,12 +29,12 @@ public:
          return false;
         }
 
-        if (((key > 1) && (key < 4)))
+        if (((static_cast<uint32_t>(key) & 4294967280u) != 0))
         {
          return false;
         }
 
-        if (((key > 4) && (key < 7)))
+        if (((key > 1) && (key < 4)))
         {
          return false;
         }

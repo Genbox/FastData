@@ -28,12 +28,12 @@ internal static class FastData
          return false;
         }
 
-        if (((key > 1) && (key < 4)))
+        if ((((uint)key & 4294967280u) != uint.MinValue))
         {
          return false;
         }
 
-        if (((key > 4) && (key < 7)))
+        if (((key > 1) && (key < 4)))
         {
          return false;
         }
