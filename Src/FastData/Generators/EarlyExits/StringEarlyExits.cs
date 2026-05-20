@@ -33,7 +33,8 @@ internal static class StringEarlyExits
         if (candidates.Length == 0)
             return [];
 
-        return GetTopExits(candidates, props, config.MaxCandidates);
+        IEarlyExit[] exits = GetTopExits(candidates, props, config.MaxCandidates);
+        return EnsureUnitAtLengthGuard(exits, props, config);
     }
 
     private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase)
@@ -63,10 +64,10 @@ internal static class StringEarlyExits
             if (config.IsEarlyExitEnabled(typeof(StringLengthRangeEarlyExit)))
             {
                 for (int i = 0; i < ranges.Ranges.Count - 1; i++)
-            {
-                (int Start, int End) current = ranges.Ranges[i];
-                (int Start, int End) next = ranges.Ranges[i + 1];
-                yield return new StringLengthRangeEarlyExit(current.End, next.Start);
+                {
+                    (int Start, int End) current = ranges.Ranges[i];
+                    (int Start, int End) next = ranges.Ranges[i + 1];
+                    yield return new StringLengthRangeEarlyExit(current.End, next.Start);
                 }
             }
 
@@ -88,11 +89,11 @@ internal static class StringEarlyExits
 
             if (!ignoreCase)
             {
-            if (config.IsEarlyExitEnabled(typeof(UnitAtLessThanEarlyExit)) && firstMap.Min > 0)
-                yield return new UnitAtLessThanEarlyExit(firstMap.Min, 0);
+                if (config.IsEarlyExitEnabled(typeof(UnitAtLessThanEarlyExit)) && firstMap.Min > 0)
+                    yield return new UnitAtLessThanEarlyExit(firstMap.Min, 0);
 
-            if (config.IsEarlyExitEnabled(typeof(UnitAtGreaterThanEarlyExit)) && firstMap.Max < char.MaxValue)
-                yield return new UnitAtGreaterThanEarlyExit(firstMap.Max, 0);
+                if (config.IsEarlyExitEnabled(typeof(UnitAtGreaterThanEarlyExit)) && firstMap.Max < char.MaxValue)
+                    yield return new UnitAtGreaterThanEarlyExit(firstMap.Max, 0);
             }
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtBitmapEarlyExit)) && config.CheckDensityLimits(typeof(UnitAtBitmapEarlyExit), firstMap.Density))
@@ -105,11 +106,11 @@ internal static class StringEarlyExits
 
             if (!ignoreCase)
             {
-            if (config.IsEarlyExitEnabled(typeof(UnitAtLessThanEarlyExit)) && lastMap.Min > 0)
-                yield return new UnitAtLessThanEarlyExit(lastMap.Min, -1);
+                if (config.IsEarlyExitEnabled(typeof(UnitAtLessThanEarlyExit)) && lastMap.Min > 0)
+                    yield return new UnitAtLessThanEarlyExit(lastMap.Min, -1);
 
-            if (config.IsEarlyExitEnabled(typeof(UnitAtGreaterThanEarlyExit)) && lastMap.Max < char.MaxValue)
-                yield return new UnitAtGreaterThanEarlyExit(lastMap.Max, -1);
+                if (config.IsEarlyExitEnabled(typeof(UnitAtGreaterThanEarlyExit)) && lastMap.Max < char.MaxValue)
+                    yield return new UnitAtGreaterThanEarlyExit(lastMap.Max, -1);
             }
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtBitmapEarlyExit)) && config.CheckDensityLimits(typeof(UnitAtBitmapEarlyExit), lastMap.Density))
@@ -124,6 +125,36 @@ internal static class StringEarlyExits
 
         return candidates.OrderByDescending(x => GetScore(x, props)).Take(maxCandidates).ToArray();
     }
+
+    private static IEarlyExit[] EnsureUnitAtLengthGuard(IEarlyExit[] exits, StringKeyProperties props, EarlyExitConfig config)
+    {
+        // This function ensures we have a length check BEFORE all others when UnitAt is being used.
+
+        if (!Array.Exists(exits, RequiresNonEmptyString))
+            return exits;
+
+        IEarlyExit? guard = Array.Find(exits, RejectsEmptyString);
+
+        if (guard == null)
+        {
+            int minLength = props.LengthData.LengthRanges.Min;
+            if (minLength <= 0 || !config.IsEarlyExitEnabled(typeof(LengthLessThanEarlyExit)))
+                return exits.Where(static x => !RequiresNonEmptyString(x)).ToArray();
+
+            guard = new LengthLessThanEarlyExit(minLength);
+        }
+
+        return exits.Prepend(guard).Distinct().ToArray();
+    }
+
+    private static bool RequiresNonEmptyString(IEarlyExit exit) => exit is UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit or UnitAtNotEqualEarlyExit or UnitAtBitmapEarlyExit;
+
+    private static bool RejectsEmptyString(IEarlyExit exit) => exit switch
+    {
+        LengthLessThanEarlyExit lessThan => lessThan.Value > 0,
+        LengthNotEqualEarlyExit notEqual => notEqual.Value != 0,
+        _ => false
+    };
 
     private static IEnumerable<IEarlyExit> FilterByRejection(IEarlyExit[] candidates, StringKeyProperties props, float threshold)
     {

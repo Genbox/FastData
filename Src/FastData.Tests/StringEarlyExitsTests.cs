@@ -151,6 +151,22 @@ public class StringEarlyExitsTests
         Assert.DoesNotContain(exits, static x => x is LengthBitmapEarlyExit);
     }
 
+    [Fact]
+    public void GetExits_UnitAtExitsKeepMinimumLengthGuardWhenBelowThreshold()
+    {
+        string[] keys = ["a", new string('x', 98), new string('y', 99), new string('z', 100)];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 3;
+
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
+
+        int guardIndex = Array.FindIndex(exits, static x => x is LengthLessThanEarlyExit { Value: 1 });
+        int unitIndex = Array.FindIndex(exits, static x => x is UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit or UnitAtNotEqualEarlyExit or UnitAtBitmapEarlyExit);
+        Assert.True(unitIndex >= 0);
+        Assert.True(guardIndex >= 0);
+        Assert.True(guardIndex < unitIndex);
+    }
+
     private static IEarlyExit[] GetExits(string[] keys, bool ignoreCase, EarlyExitConfig config)
     {
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, ignoreCase, GeneratorEncoding.Utf16CodeUnits);
