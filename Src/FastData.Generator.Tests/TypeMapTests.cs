@@ -1,6 +1,7 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Abstracts;
 using Genbox.FastData.Generator.Definitions;
+using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.Tests;
 
@@ -64,7 +65,37 @@ public class TypeMapTests
         Assert.Throws<InvalidOperationException>(map.Get<int>);
     }
 
+    [Theory]
+    [InlineData(sbyte.MinValue - 1L, "short")]
+    [InlineData(sbyte.MinValue, "sbyte")]
+    [InlineData(sbyte.MaxValue, "sbyte")]
+    [InlineData(short.MinValue - 1L, "int")]
+    [InlineData(short.MinValue, "short")]
+    [InlineData(short.MaxValue, "short")]
+    [InlineData(int.MinValue - 1L, "long")]
+    [InlineData(int.MinValue, "int")]
+    [InlineData(int.MaxValue, "int")]
+    public void GetSmallestIntTypeRespectsSignedLowerBounds(long value, string expected)
+    {
+        TypeMap map = CreateIntegerTypeMap();
+
+        Assert.Equal(expected, map.GetSmallestIntType(value));
+    }
+
     private static string Identity(string value) => value;
+
+    private static TypeMap CreateIntegerTypeMap()
+    {
+        ITypeDef[] defs =
+        [
+            new IntegerTypeDef<sbyte>("sbyte", sbyte.MinValue, sbyte.MaxValue, "sbyte.MinValue", "sbyte.MaxValue"),
+            new IntegerTypeDef<short>("short", short.MinValue, short.MaxValue, "short.MinValue", "short.MaxValue"),
+            new IntegerTypeDef<int>("int", int.MinValue, int.MaxValue, "int.MinValue", "int.MaxValue"),
+            new IntegerTypeDef<long>("long", long.MinValue, long.MaxValue, "long.MinValue", "long.MaxValue")
+        ];
+
+        return new TypeMap(defs, GeneratorEncoding.Utf8Bytes);
+    }
 
     private sealed class CustomObject;
 }

@@ -38,9 +38,9 @@ public static class TypeMapExtensions
 
     public static string GetSmallestIntType(this TypeMap map, long value) => value switch
     {
-        <= sbyte.MaxValue => map.Get<sbyte>().Name,
-        <= short.MaxValue => map.Get<short>().Name,
-        <= int.MaxValue => map.Get<int>().Name,
+        >= sbyte.MinValue and <= sbyte.MaxValue => map.Get<sbyte>().Name,
+        >= short.MinValue and <= short.MaxValue => map.Get<short>().Name,
+        >= int.MinValue and <= int.MaxValue => map.Get<int>().Name,
         _ => map.Get<long>().Name
     };
 }
