@@ -57,6 +57,25 @@ public class DeduplicationTests
     }
 
     [Fact]
+    public void DeduplicateKeys_SortPreserveOrder_KeepsFirstDuplicateValue()
+    {
+        ReadOnlyMemory<DedupKey> keys = (DedupKey[])[new DedupKey(1, 2), new DedupKey(1, 1), new DedupKey(2, 0)];
+        ReadOnlyMemory<int> values = (int[])[20, 21, 30];
+        NumericDataConfig cfg = new NumericDataConfig
+        {
+            DeduplicationMode = DeduplicationMode.Sort,
+            PreserveOrder = true,
+            ThrowOnDuplicates = false
+        };
+
+        bool isSorted = Deduplication.DeduplicateKeys(cfg, ref keys, ref values, DedupKeyEqualityComparer.Instance, DedupKeySortComparer.Instance);
+
+        Assert.False(isSorted);
+        Assert.Equal(new[] { new DedupKey(1, 2), new DedupKey(2, 0) }, keys);
+        Assert.Equal(new[] { 20, 30 }, values);
+    }
+
+    [Fact]
     public void DeduplicateKeys_SortWithoutPreserveOrder_ReturnsSorted()
     {
         ReadOnlyMemory<int> keys = (int[])[3, 1, 3, 2];
@@ -90,5 +109,27 @@ public class DeduplicationTests
         Assert.False(isSorted);
         Assert.Equal(new[] { 2, 2, 1 }, keys);
         Assert.Equal(new[] { 20, 21, 10 }, values);
+    }
+
+    private readonly record struct DedupKey(int Group, int TieBreaker);
+
+    private sealed class DedupKeyEqualityComparer : IEqualityComparer<DedupKey>
+    {
+        public static readonly DedupKeyEqualityComparer Instance = new DedupKeyEqualityComparer();
+
+        public bool Equals(DedupKey x, DedupKey y) => x.Group == y.Group;
+
+        public int GetHashCode(DedupKey obj) => obj.Group;
+    }
+
+    private sealed class DedupKeySortComparer : IComparer<DedupKey>
+    {
+        public static readonly DedupKeySortComparer Instance = new DedupKeySortComparer();
+
+        public int Compare(DedupKey x, DedupKey y)
+        {
+            int groupCompare = x.Group.CompareTo(y.Group);
+            return groupCompare != 0 ? groupCompare : x.TieBreaker.CompareTo(y.TieBreaker);
+        }
     }
 }

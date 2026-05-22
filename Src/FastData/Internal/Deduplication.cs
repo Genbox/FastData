@@ -1,4 +1,4 @@
-﻿using Genbox.FastData.Config;
+using Genbox.FastData.Config;
 
 namespace Genbox.FastData.Internal;
 
@@ -103,6 +103,12 @@ internal static class Deduplication
             {
                 if (throwEnabled)
                     throw new InvalidOperationException($"Duplicate key found: {key}");
+
+                if (map[read] < map[uniqueCount])
+                {
+                    keys[uniqueCount] = key;
+                    map[uniqueCount] = map[read];
+                }
 
                 continue;
             }
