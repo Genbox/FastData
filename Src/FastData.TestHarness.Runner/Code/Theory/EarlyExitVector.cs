@@ -1,4 +1,4 @@
-﻿using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.TestHarness.Runner.Code.Theory;
 

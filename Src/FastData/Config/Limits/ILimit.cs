@@ -1,4 +1,4 @@
-﻿namespace Genbox.FastData.Config.Limits;
+namespace Genbox.FastData.Config.Limits;
 
 public interface ILimit;
 

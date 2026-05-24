@@ -1,4 +1,4 @@
-﻿namespace Genbox.FastData.TestHarness.Runner.Code;
+namespace Genbox.FastData.TestHarness.Runner.Code;
 
 internal static class VerifyHelper
 {

@@ -1,4 +1,4 @@
-﻿namespace Genbox.FastData.Config;
+namespace Genbox.FastData.Config;
 
 /// <summary>Base configuration shared by numeric and string data generation.</summary>
 public abstract class DataConfig

@@ -1,4 +1,4 @@
-﻿using Genbox.FastData.Internal.Structures;
+using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Tests;
 

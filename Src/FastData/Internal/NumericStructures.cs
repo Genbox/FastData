@@ -1,4 +1,4 @@
-﻿using Genbox.FastData.Config;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Structures;
 

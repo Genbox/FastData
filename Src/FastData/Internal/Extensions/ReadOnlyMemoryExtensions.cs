@@ -1,4 +1,4 @@
-﻿namespace Genbox.FastData.Internal.Extensions;
+namespace Genbox.FastData.Internal.Extensions;
 
 internal static class ReadOnlyMemoryExtensions
 {

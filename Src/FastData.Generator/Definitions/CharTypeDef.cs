@@ -1,4 +1,4 @@
-﻿using Genbox.FastData.Generator.Abstracts;
+using Genbox.FastData.Generator.Abstracts;
 
 namespace Genbox.FastData.Generator.Definitions;
 

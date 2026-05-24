@@ -1,4 +1,4 @@
-﻿using Genbox.FastData.Config.Analysis;
+using Genbox.FastData.Config.Analysis;
 
 namespace Genbox.FastData.Config;
 

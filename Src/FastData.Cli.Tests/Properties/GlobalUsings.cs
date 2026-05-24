@@ -1,1 +1,1 @@
-﻿global using static Genbox.FastData.Cli.Tests.TestHelper;
+global using static Genbox.FastData.Cli.Tests.TestHelper;

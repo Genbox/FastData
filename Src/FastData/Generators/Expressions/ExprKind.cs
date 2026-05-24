@@ -1,4 +1,4 @@
-﻿namespace Genbox.FastData.Generators.Expressions;
+namespace Genbox.FastData.Generators.Expressions;
 
 public enum ExprKind : byte
 {

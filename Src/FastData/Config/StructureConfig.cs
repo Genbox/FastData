@@ -1,4 +1,4 @@
-﻿using Genbox.FastData.Config.Limits;
+using Genbox.FastData.Config.Limits;
 using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Config;

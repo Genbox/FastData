@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 namespace Genbox.FastData.Generators.StringHash.Framework;
 
