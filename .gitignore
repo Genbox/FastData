@@ -29,4 +29,3 @@
 # Verify
 *.received.*
 *.received/
-**/Templates/**.cs
