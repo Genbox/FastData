@@ -13,6 +13,9 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
     /// <exception cref="InvalidOperationException"></exception>
     internal IEnumerable<Entity> Evolve<T>(ReadOnlySpan<T> data, Simulation<T> simulation, ISelection selection, ICrossOver crossOver, IMutation mutation, IReinsertion reinsertion, ITermination termination, IRandom random)
     {
+        if (config.PopulationSize < 2)
+            throw new InvalidOperationException("Population size must be at least 2.");
+
         //Create the initial population
         StaticArray<Entity> population = new StaticArray<Entity>(config.PopulationSize * 2);
 

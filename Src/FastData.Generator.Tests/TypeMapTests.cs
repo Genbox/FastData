@@ -66,7 +66,7 @@ public class TypeMapTests
     }
 
     [Theory]
-    [InlineData(sbyte.MinValue - 1L, "short")]
+    [InlineData(-129L, "short")]
     [InlineData(sbyte.MinValue, "sbyte")]
     [InlineData(sbyte.MaxValue, "sbyte")]
     [InlineData(short.MinValue - 1L, "int")]
