@@ -50,6 +50,13 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
                 bestFitness = popBest.Fitness;
             }
 
+            generation++;
+
+            //Termination of the simulation is given the generation and top fitness.
+            //Makes it able to either terminate after a set generation, or when a certain fitness is reached
+            if (termination.Process(generation, bestFitness))
+                break;
+
             //Note: The algorithm here is derived from my understanding of genetics in biology.
             //      It might be different from established terminology in the comp.sci field
 
@@ -85,10 +92,7 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
             population.Clear();
             parents.Clear();
             (population, newPopulation) = (newPopulation, population);
-
-            //Termination of the simulation is given the generation and top fitness.
-            //Makes it able to either terminate after a set generation, or when a certain fitness is reached
-        } while (!termination.Process(generation++, bestFitness));
+        } while (true);
 
         return heap.Items.Select(x => x.Item2);
     }
