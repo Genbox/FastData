@@ -158,7 +158,7 @@ public static partial class FastDataGenerator
         StringComparer comparer = cfg.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
         int oldCount = keys.Length;
-        bool sorted = Deduplication.DeduplicateKeys(cfg, ref keys, ref values, comparer, comparer);
+        Deduplication.DeduplicateKeys(cfg, ref keys, ref values, comparer, comparer);
         int newCount = keys.Length;
 
         if (oldCount == newCount)
@@ -213,7 +213,7 @@ public static partial class FastDataGenerator
 
         (Type StructureType, IStructure<string, TValue, IContext> Structure, IContext Context) CreateSelectedStringStructure(Type selectedType)
         {
-            IStructure<string, TValue, IContext> selectedStructure = StringStructureFactory<TValue>(selectedType, props, () => EnsureHashData(keys.Span), comparer, sorted, generator.Encoding);
+            IStructure<string, TValue, IContext> selectedStructure = StringStructureFactory<TValue>(selectedType, props, () => EnsureHashData(keys.Span), generator.Encoding);
             IContext? selectedContext = selectedStructure.Create(keys, values);
 
             if (selectedContext == null)
@@ -229,7 +229,7 @@ public static partial class FastDataGenerator
             while (true)
             {
                 Type selectedType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.AllowApproximateMatching, props.LengthData.UniqueLengths, structureConfig, x => EnsureHashData(x.Span));
-                IStructure<string, TValue, IContext> selectedStructure = StringStructureFactory<TValue>(selectedType, props, () => EnsureHashData(keys.Span), comparer, sorted, generator.Encoding);
+                IStructure<string, TValue, IContext> selectedStructure = StringStructureFactory<TValue>(selectedType, props, () => EnsureHashData(keys.Span), generator.Encoding);
                 IContext? selectedContext = selectedStructure.Create(keys, values);
 
                 if (selectedContext != null)
@@ -289,12 +289,12 @@ public static partial class FastDataGenerator
         }
     }
 
-    private static IStructure<string, TValue, IContext> StringStructureFactory<TValue>(Type type, StringKeyProperties props, Func<HashData> getHashData, StringComparer comparer, bool sorted, GeneratorEncoding encoding)
+    private static IStructure<string, TValue, IContext> StringStructureFactory<TValue>(Type type, StringKeyProperties props, Func<HashData> getHashData, GeneratorEncoding encoding)
     {
         if (type == typeof(ArrayStructure<,>))
             return new ArrayStructure<string, TValue>();
         if (type == typeof(BinarySearchStructure<,>))
-            return new BinarySearchStructure<string, TValue>(sorted, comparer);
+            return new BinarySearchStructure<string, TValue>();
         if (type == typeof(BloomFilterStructure<,>))
             return new BloomFilterStructure<string, TValue>(getHashData());
         if (type == typeof(ConditionalStructure<,>))
@@ -350,7 +350,7 @@ public static partial class FastDataGenerator
         LogKeyType(logger, type.Name);
 
         int oldCount = keys.Length;
-        bool sorted = Deduplication.DeduplicateKeys(cfg, ref keys, ref values, EqualityComparer<TKey>.Default, Comparer<TKey>.Default);
+        Deduplication.DeduplicateKeys(cfg, ref keys, ref values, EqualityComparer<TKey>.Default, Comparer<TKey>.Default);
         int newCount = keys.Length;
 
         if (oldCount == newCount) // No duplicates removed
@@ -359,7 +359,7 @@ public static partial class FastDataGenerator
             LogNumberOfUniqueKeys(logger, oldCount, newCount);
 
         //TODO: Only produce hash data when structure is indexed
-        NumericKeyProperties<TKey> props = KeyAnalyzer.GetNumericProperties(keys, sorted);
+        NumericKeyProperties<TKey> props = KeyAnalyzer.GetNumericProperties(keys);
         LogMinMaxValues(logger, props.DataRanges.Min, props.DataRanges.Max);
 
         HashData? cacheHashData = null;
@@ -383,7 +383,7 @@ public static partial class FastDataGenerator
 
         (Type StructureType, IStructure<TKey, TValue, IContext> Structure, IContext Context) CreateSelectedNumericStructure(Type selectedType)
         {
-            IStructure<TKey, TValue, IContext> selectedStructure = NumericStructureFactory<TKey, TValue>(cfg, selectedType, props, () => EnsureNumericHash(keys.Span), sorted);
+            IStructure<TKey, TValue, IContext> selectedStructure = NumericStructureFactory<TKey, TValue>(cfg, selectedType, props, () => EnsureNumericHash(keys.Span));
             IContext? selectedContext = selectedStructure.Create(keys, values);
 
             if (selectedContext == null)
@@ -402,7 +402,7 @@ public static partial class FastDataGenerator
                 {
                     return EnsureNumericHash(x.Span);
                 });
-                IStructure<TKey, TValue, IContext> selectedStructure = NumericStructureFactory<TKey, TValue>(cfg, selectedType, props, () => EnsureNumericHash(keys.Span), sorted);
+                IStructure<TKey, TValue, IContext> selectedStructure = NumericStructureFactory<TKey, TValue>(cfg, selectedType, props, () => EnsureNumericHash(keys.Span));
                 IContext? selectedContext = selectedStructure.Create(keys, values);
 
                 if (selectedContext != null)
@@ -488,14 +488,14 @@ public static partial class FastDataGenerator
         return exprs;
     }
 
-    private static IStructure<TKey, TValue, IContext> NumericStructureFactory<TKey, TValue>(DataConfig cfg, Type type, NumericKeyProperties<TKey> props, Func<HashData> getHashData, bool sorted)
+    private static IStructure<TKey, TValue, IContext> NumericStructureFactory<TKey, TValue>(DataConfig cfg, Type type, NumericKeyProperties<TKey> props, Func<HashData> getHashData)
     {
         if (type == typeof(ArrayStructure<,>))
             return new ArrayStructure<TKey, TValue>();
         if (type == typeof(BinarySearchStructure<,>))
-            return new BinarySearchStructure<TKey, TValue>(sorted, null);
+            return new BinarySearchStructure<TKey, TValue>();
         if (type == typeof(BinarySearchInterpolationStructure<,>))
-            return new BinarySearchInterpolationStructure<TKey, TValue>(sorted);
+            return new BinarySearchInterpolationStructure<TKey, TValue>();
         if (type == typeof(BitSetStructure<,>))
             return new BitSetStructure<TKey, TValue>(props);
         if (type == typeof(BloomFilterStructure<,>))
@@ -503,7 +503,7 @@ public static partial class FastDataGenerator
         if (type == typeof(ConditionalStructure<,>))
             return new ConditionalStructure<TKey, TValue>();
         if (type == typeof(EliasFanoStructure<,>))
-            return new EliasFanoStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, sorted, GetSetting(cfg, "SkipQuantum", 128));
+            return new EliasFanoStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, GetSetting(cfg, "SkipQuantum", 128));
         if (type == typeof(HashTableStructure<,>))
             return new HashTableStructure<TKey, TValue>(getHashData());
         if (type == typeof(HashTableCompactStructure<,>))
@@ -515,11 +515,11 @@ public static partial class FastDataGenerator
         if (type == typeof(RangeStructure<,>))
             return new RangeStructure<TKey, TValue>(props.DataRanges);
         if (type == typeof(RrrBitVectorStructure<,>))
-            return new RrrBitVectorStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, sorted);
+            return new RrrBitVectorStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max);
         if (type == typeof(SingleValueStructure<,>))
             return new SingleValueStructure<TKey, TValue>();
         if (type == typeof(PgmStructure<,>))
-            return new PgmStructure<TKey, TValue>(sorted, GetSetting(cfg, "Epsilon", 64), GetSetting(cfg, "EpsilonRecursive", 4));
+            return new PgmStructure<TKey, TValue>(GetSetting(cfg, "Epsilon", 64), GetSetting(cfg, "EpsilonRecursive", 4));
 
         throw new InvalidOperationException($"Unsupported DataStructure {type}");
     }

@@ -19,11 +19,11 @@ struct E {
 
 impl fastdata {
     const BUCKETS: [i8; 3] = [
-        3, 2, 0
+        2, 3, 0
     ];
 
     const ENTRIES: [E; 3] = [
-        E { hash_code: 18225461187723808291, next: -1, key: "a" }, E { hash_code: 16750939634977259983, next: 0, key: "item" }, E { hash_code: 9198652691199425319, next: -1, key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+        E { hash_code: 18225461187723808291, next: -1, key: "a" }, E { hash_code: 9198652691199425319, next: -1, key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }, E { hash_code: 16750939634977259983, next: 0, key: "item" }
     ];
 
     #[inline]

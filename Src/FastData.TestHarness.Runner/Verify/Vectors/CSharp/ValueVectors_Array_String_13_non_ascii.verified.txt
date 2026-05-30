@@ -12,8 +12,8 @@ internal static class FastData
 
 
     private static readonly string[] _keys = new string[] {
-        "æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", 
-        "ñ", "ø", "å"
+        "ß", "à", "ä", "å", "æ", "ç", "è", "é", "ê", "ñ", 
+        "ö", "ø", "ü"
     };
 
     

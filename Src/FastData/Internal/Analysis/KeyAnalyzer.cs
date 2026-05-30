@@ -10,16 +10,8 @@ namespace Genbox.FastData.Internal.Analysis;
 [SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality")]
 internal static class KeyAnalyzer
 {
-    internal static NumericKeyProperties<T> GetNumericProperties<T>(ReadOnlyMemory<T> keys, bool keysAreSorted)
+    internal static NumericKeyProperties<T> GetNumericProperties<T>(ReadOnlyMemory<T> keys)
     {
-        if (!keysAreSorted)
-        {
-            T[] sorted = new T[keys.Length];
-            keys.Span.CopyTo(sorted);
-            Array.Sort(sorted, Comparer<T>.Default);
-            keys = sorted;
-        }
-
         if (typeof(T) == typeof(char))
             return (NumericKeyProperties<T>)(object)GetCharProperties(((ReadOnlyMemory<char>)(object)keys).Span);
         if (typeof(T) == typeof(sbyte))

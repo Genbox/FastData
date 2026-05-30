@@ -13,15 +13,13 @@ public sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmCon
 
     private readonly int _epsilon;
     private readonly int _epsilonRecursive;
-    private readonly bool _keysAreSorted;
 
-    internal PgmStructure(bool keysAreSorted, int epsilon = 64, int epsilonRecursive = 4)
+    internal PgmStructure(int epsilon = 64, int epsilonRecursive = 4)
     {
         Debug.Assert(epsilon > 0, "PgmStructure requires a positive epsilon.");
         Debug.Assert(epsilonRecursive >= 0, "PgmStructure requires a non-negative recursive epsilon.");
         Debug.Assert(typeof(TKey) == typeof(int) || typeof(TKey) == typeof(uint) || typeof(TKey) == typeof(long) || typeof(TKey) == typeof(ulong) || typeof(TKey) == typeof(short) || typeof(TKey) == typeof(ushort) || typeof(TKey) == typeof(byte) || typeof(TKey) == typeof(sbyte) || typeof(TKey) == typeof(char) || typeof(TKey) == typeof(float) || typeof(TKey) == typeof(double), "Unsupported key type");
 
-        _keysAreSorted = keysAreSorted;
         _epsilon = epsilon;
         _epsilonRecursive = epsilonRecursive;
     }
@@ -30,24 +28,6 @@ public sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmCon
     {
         Debug.Assert(!keys.IsEmpty, "PgmStructure requires at least one key.");
         Debug.Assert(values.IsEmpty || values.Length == keys.Length, "PgmStructure requires value count to match key count when values are present.");
-        Debug.Assert(!_keysAreSorted || keys.IsSorted(), "PgmStructure requires sorted input when keysAreSorted is true.");
-
-        if (!_keysAreSorted)
-        {
-            TKey[] keysCopy = new TKey[keys.Length];
-            keys.CopyTo(keysCopy);
-
-            TValue[] valuesCopy = new TValue[values.Length];
-            values.CopyTo(valuesCopy);
-
-            if (values.IsEmpty)
-                Array.Sort(keysCopy);
-            else
-                Array.Sort(keysCopy, valuesCopy);
-
-            keys = keysCopy;
-            values = valuesCopy;
-        }
 
         if (Comparer<TKey>.Default.Compare(keys.Span[keys.Length - 1], PgmTypeTraits<TKey>.MaxValue) == 0)
             throw new ArgumentException($"The value {_sentinel} is reserved as a sentinel.", nameof(keys));

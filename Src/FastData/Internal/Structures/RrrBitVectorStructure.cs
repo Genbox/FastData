@@ -10,31 +10,25 @@ namespace Genbox.FastData.Internal.Structures;
 public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValue, RrrBitVectorContext>
 {
     private const int BlockSize = 15;
-    private readonly bool _keysAreSorted;
     private readonly TKey _maxValue;
     private readonly TKey _minValue;
 
-    internal RrrBitVectorStructure(TKey minValue, TKey maxValue, bool keysAreSorted)
+    internal RrrBitVectorStructure(TKey minValue, TKey maxValue)
     {
         _minValue = minValue;
         _maxValue = maxValue;
-        _keysAreSorted = keysAreSorted;
     }
 
     public RrrBitVectorContext? Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         Debug.Assert(!keys.IsEmpty, "RrrBitVectorStructure requires at least one key.");
         Debug.Assert(typeof(TKey) == typeof(char) || typeof(TKey) == typeof(byte) || typeof(TKey) == typeof(ushort) || typeof(TKey) == typeof(uint) || typeof(TKey) == typeof(ulong) || typeof(TKey) == typeof(sbyte) || typeof(TKey) == typeof(short) || typeof(TKey) == typeof(int) || typeof(TKey) == typeof(long), "RrrBitVectorStructure only supports integral key types.");
-        Debug.Assert(!_keysAreSorted || keys.IsSorted(), "RrrBitVectorStructure requires sorted input when keysAreSorted is true.");
 
         ReadOnlySpan<TKey> span = keys.Span;
         ulong[] mapped = new ulong[span.Length];
 
         for (int i = 0; i < span.Length; i++)
             mapped[i] = MapKeyToSortable(span[i]);
-
-        if (!_keysAreSorted)
-            Array.Sort(mapped);
 
         ulong minValue = mapped[0];
         ulong maxValue = mapped[mapped.Length - 1];

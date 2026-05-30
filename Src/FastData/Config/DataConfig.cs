@@ -18,12 +18,6 @@ public abstract class DataConfig
     /// <summary>When enabled, data structures will be generated with the smallest possible internal data types to lower memory.</summary>
     public bool TypeReductionEnabled { get; set; } = true;
 
-    /// <summary>Set the method to use for deduplication of keys. Defaults to <see cref="Config.DeduplicationMode.HashSet" />.</summary>
-    public DeduplicationMode DeduplicationMode { get; set; } = DeduplicationMode.HashSet;
-
-    /// <summary>When true, FastData will only use data structures and algorithms that preserve the original data order</summary>
-    public bool PreserveOrder { get; set; } = true;
-
     /// <summary>When true, throws an exception on duplicate keys</summary>
     public bool ThrowOnDuplicates { get; set; } = true;
 

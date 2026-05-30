@@ -7,11 +7,11 @@ namespace Genbox.FastData.Tests;
 public class PgmTests
 {
     [Fact]
-    public void PgmStructure_RejectsSentinelKeyAfterSorting()
+    public void PgmStructure_RejectsSentinelKey()
     {
-        PgmStructure<int, byte> structure = new PgmStructure<int, byte>(false);
+        PgmStructure<int, byte> structure = new PgmStructure<int, byte>();
 
-        Assert.Throws<ArgumentException>(() => structure.Create(new[] { 3, int.MaxValue, 1 }, ReadOnlyMemory<byte>.Empty));
+        Assert.Throws<ArgumentException>(() => structure.Create(new[] { 1, 3, int.MaxValue }, ReadOnlyMemory<byte>.Empty));
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class PgmTests
 
     private static bool Contains<T>(T[] keys, int epsilon, T key) where T : notnull
     {
-        PgmStructure<T, byte> structure = new PgmStructure<T, byte>(true, epsilon);
+        PgmStructure<T, byte> structure = new PgmStructure<T, byte>(epsilon);
         PgmContext<T, byte> ctx = structure.Create(keys, Array.Empty<byte>());
         PgmSegment<T>[] segments = ctx.Segments;
 

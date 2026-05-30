@@ -11,66 +11,50 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetProperties_IsConsecutive_Test()
     {
-        Assert.True(GetNumericProperties<char>(new[] { 'a', 'b', 'c' }, false).IsConsecutive);
-        Assert.False(GetNumericProperties<char>(new[] { 'a', 'c' }, false).IsConsecutive);
+        Assert.True(GetNumericProperties<char>(new[] { 'a', 'b', 'c' }).IsConsecutive);
+        Assert.False(GetNumericProperties<char>(new[] { 'a', 'c' }).IsConsecutive);
 
-        Assert.True(GetNumericProperties<sbyte>(new sbyte[] { -1, 0, 1 }, false).IsConsecutive);
-        Assert.False(GetNumericProperties<sbyte>(new sbyte[] { -1, 1, 2 }, false).IsConsecutive);
+        Assert.True(GetNumericProperties<sbyte>(new sbyte[] { -1, 0, 1 }).IsConsecutive);
+        Assert.False(GetNumericProperties<sbyte>(new sbyte[] { -1, 1, 2 }).IsConsecutive);
 
-        Assert.True(GetNumericProperties<byte>(new byte[] { 1, 2, 3 }, false).IsConsecutive);
-        Assert.False(GetNumericProperties<byte>(new byte[] { 1, 3, 4 }, false).IsConsecutive);
+        Assert.True(GetNumericProperties<byte>(new byte[] { 1, 2, 3 }).IsConsecutive);
+        Assert.False(GetNumericProperties<byte>(new byte[] { 1, 3, 4 }).IsConsecutive);
 
-        Assert.True(GetNumericProperties<short>(new short[] { 10, 11, 12 }, false).IsConsecutive);
-        Assert.False(GetNumericProperties<short>(new short[] { 10, 11, 13 }, false).IsConsecutive);
+        Assert.True(GetNumericProperties<short>(new short[] { 10, 11, 12 }).IsConsecutive);
+        Assert.False(GetNumericProperties<short>(new short[] { 10, 11, 13 }).IsConsecutive);
 
-        Assert.True(GetNumericProperties<ushort>(new ushort[] { 10, 11, 12 }, false).IsConsecutive);
-        Assert.False(GetNumericProperties<ushort>(new ushort[] { 10, 11, 13 }, false).IsConsecutive);
+        Assert.True(GetNumericProperties<ushort>(new ushort[] { 10, 11, 12 }).IsConsecutive);
+        Assert.False(GetNumericProperties<ushort>(new ushort[] { 10, 11, 13 }).IsConsecutive);
 
-        Assert.True(GetNumericProperties<int>(new[] { 100, 101 }, false).IsConsecutive);
-        Assert.False(GetNumericProperties<int>(new[] { 100, 102 }, false).IsConsecutive);
+        Assert.True(GetNumericProperties<int>(new[] { 100, 101 }).IsConsecutive);
+        Assert.False(GetNumericProperties<int>(new[] { 100, 102 }).IsConsecutive);
 
-        Assert.True(GetNumericProperties<uint>(new[] { 100u, 101u }, false).IsConsecutive);
-        Assert.False(GetNumericProperties<uint>(new[] { 100u, 102u }, false).IsConsecutive);
+        Assert.True(GetNumericProperties<uint>(new[] { 100u, 101u }).IsConsecutive);
+        Assert.False(GetNumericProperties<uint>(new[] { 100u, 102u }).IsConsecutive);
 
-        Assert.True(GetNumericProperties<long>(new[] { long.MaxValue - 2, long.MaxValue - 1, long.MaxValue }, false).IsConsecutive);
-        Assert.False(GetNumericProperties<long>(new[] { 1L, 3L, 4L }, false).IsConsecutive);
+        Assert.True(GetNumericProperties<long>(new[] { long.MaxValue - 2, long.MaxValue - 1, long.MaxValue }).IsConsecutive);
+        Assert.False(GetNumericProperties<long>(new[] { 1L, 3L, 4L }).IsConsecutive);
 
-        Assert.True(GetNumericProperties<ulong>(new[] { 1ul, 2ul, 3ul }, false).IsConsecutive);
-        Assert.False(GetNumericProperties<ulong>(new[] { 1ul, 2ul, 4ul }, false).IsConsecutive);
+        Assert.True(GetNumericProperties<ulong>(new[] { 1ul, 2ul, 3ul }).IsConsecutive);
+        Assert.False(GetNumericProperties<ulong>(new[] { 1ul, 2ul, 4ul }).IsConsecutive);
 
-        Assert.False(GetNumericProperties<float>(new[] { 0f, 0.9f, 2f }, false).IsConsecutive);
-        Assert.False(GetNumericProperties<double>(new[] { 0.0d, 0.9d, 2.0d }, false).IsConsecutive);
+        Assert.False(GetNumericProperties<float>(new[] { 0f, 0.9f, 2f }).IsConsecutive);
+        Assert.False(GetNumericProperties<double>(new[] { 0.0d, 0.9d, 2.0d }).IsConsecutive);
     }
 
     [Fact]
     public void GetProperties_Density_Test()
     {
-        Assert.Equal(1.0f, GetNumericProperties<int>(new[] { 10, 11, 12 }, false).Density);
-        Assert.Equal(2.0f / 101.0f, GetNumericProperties<int>(new[] { 0, 100 }, false).Density, 12);
-        Assert.Equal(1.0f, GetNumericProperties<int>(new[] { 42 }, false).Density);
-    }
-
-    [Fact]
-    public void GetNumericProperties_Ranges_SortsInput_Test()
-    {
-        int[] data = [5, 1, 2, 4, 8];
-
-        NumericKeyProperties<int> props = GetNumericProperties<int>(data, false);
-
-        Assert.Equal(1, props.DataRanges.Min);
-        Assert.Equal(8, props.DataRanges.Max);
-        Assert.Equal(3, props.DataRanges.Ranges.Count);
-        Assert.Equal((1, 2), props.DataRanges.Ranges[0]);
-        Assert.Equal((4, 5), props.DataRanges.Ranges[1]);
-        Assert.Equal((8, 8), props.DataRanges.Ranges[2]);
-        Assert.False(props.IsConsecutive);
+        Assert.Equal(1.0f, GetNumericProperties<int>(new[] { 10, 11, 12 }).Density);
+        Assert.Equal(2.0f / 101.0f, GetNumericProperties<int>(new[] { 0, 100 }).Density, 12);
+        Assert.Equal(1.0f, GetNumericProperties<int>(new[] { 42 }).Density);
     }
 
     [Fact]
     public void GetNumericProperties_FloatHasZero_Test()
     {
-        NumericKeyProperties<float> withZero = GetNumericProperties<float>(new[] { -0.0f, 1.25f }, false);
-        NumericKeyProperties<float> withoutZero = GetNumericProperties<float>(new[] { 1.25f, 2.5f }, false);
+        NumericKeyProperties<float> withZero = GetNumericProperties<float>(new[] { -0.0f, 1.25f });
+        NumericKeyProperties<float> withoutZero = GetNumericProperties<float>(new[] { 1.25f, 2.5f });
 
         Assert.True(withZero.HasZero);
         Assert.False(withoutZero.HasZero);
@@ -79,7 +63,7 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetNumericProperties_DoubleClampsRange_Test()
     {
-        NumericKeyProperties<double> props = GetNumericProperties<double>(new[] { 0.0d, double.MaxValue }, true);
+        NumericKeyProperties<double> props = GetNumericProperties<double>(new[] { 0.0d, double.MaxValue });
 
         Assert.True(props.HasZero);
         Assert.Equal(ulong.MaxValue, props.Range);

@@ -15,7 +15,7 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: &str) -> bool {
 
-        if key == "æ" || key == "à" || key == "ä" || key == "ö" || key == "ü" || key == "ß" || key == "é" || key == "è" || key == "ê" || key == "ç" || key == "ñ" || key == "ø" || key == "å" {
+        if key == "ß" || key == "à" || key == "ä" || key == "å" || key == "æ" || key == "ç" || key == "è" || key == "é" || key == "ê" || key == "ñ" || key == "ö" || key == "ø" || key == "ü" {
             return true;
         }
 

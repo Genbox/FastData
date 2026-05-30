@@ -12,7 +12,7 @@ public class BitSetStructureTests
         ReadOnlyMemory<ulong> keys = (ulong[])[9_223_372_036_854_775_804UL, 9_223_372_036_854_775_812UL];
         ReadOnlyMemory<int> values = (int[])[10, 20];
 
-        BitSetStructure<ulong, int> structure = new BitSetStructure<ulong, int>(KeyAnalyzer.GetNumericProperties(keys, false));
+        BitSetStructure<ulong, int> structure = new BitSetStructure<ulong, int>(KeyAnalyzer.GetNumericProperties(keys));
         BitSetContext<int> context = structure.Create(keys, values);
 
         Assert.Equal(0b1_0000_0001UL, context.BitSet[0]);

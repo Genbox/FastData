@@ -15,7 +15,7 @@ public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
 
-        if (key == u8"æ" || key == u8"à" || key == u8"ä" || key == u8"ö" || key == u8"ü" || key == u8"ß" || key == u8"é" || key == u8"è" || key == u8"ê" || key == u8"ç" || key == u8"ñ" || key == u8"ø" || key == u8"å")
+        if (key == u8"ß" || key == u8"à" || key == u8"ä" || key == u8"å" || key == u8"æ" || key == u8"ç" || key == u8"è" || key == u8"é" || key == u8"ê" || key == u8"ñ" || key == u8"ö" || key == u8"ø" || key == u8"ü")
             return true;
 
         return false;

@@ -19,13 +19,13 @@ struct E {
 
 impl fastdata {
     const BUCKETS: [i8; 13] = [
-        0, 0, 13, 10, 0, 4, 0, 0, 7, 3, 
-        12, 2, 11
+        0, 0, 7, 9, 0, 11, 0, 0, 13, 3, 
+        12, 2, 10
     ];
 
     const ENTRIES: [E; 13] = [
-        E { hash_code: 11144404048339054737, next: -1, key: "æ" }, E { hash_code: 11144404045206886855, next: -1, key: "à" }, E { hash_code: 11144404051471222619, next: -1, key: "ä" }, E { hash_code: 11144404023281711681, next: -1, key: "ö" }, E { hash_code: 11144404013885208035, next: -1, key: "ü" }, E { hash_code: 11144404062433810206, next: -1, key: "ß" }, E { hash_code: 11144404034244299268, next: 4, key: "é" }, E { hash_code: 11144404032678215327, next: -1, key: "è" }, E { hash_code: 11144404029546047445, next: -1, key: "ê" }, E { hash_code: 11144404049905138678, next: 8, key: "ç" }, 
-        E { hash_code: 11144404021715627740, next: 5, key: "ñ" }, E { hash_code: 11144404007620872271, next: 0, key: "ø" }, E { hash_code: 11144404053037306560, next: 7, key: "å" }
+        E { hash_code: 11144404062433810206, next: -1, key: "ß" }, E { hash_code: 11144404045206886855, next: -1, key: "à" }, E { hash_code: 11144404051471222619, next: -1, key: "ä" }, E { hash_code: 11144404053037306560, next: -1, key: "å" }, E { hash_code: 11144404048339054737, next: -1, key: "æ" }, E { hash_code: 11144404049905138678, next: -1, key: "ç" }, E { hash_code: 11144404032678215327, next: 3, key: "è" }, E { hash_code: 11144404034244299268, next: -1, key: "é" }, E { hash_code: 11144404029546047445, next: 5, key: "ê" }, E { hash_code: 11144404021715627740, next: 0, key: "ñ" }, 
+        E { hash_code: 11144404023281711681, next: -1, key: "ö" }, E { hash_code: 11144404007620872271, next: 4, key: "ø" }, E { hash_code: 11144404013885208035, next: 7, key: "ü" }
     ];
 
     #[inline]

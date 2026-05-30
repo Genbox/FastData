@@ -18,26 +18,10 @@ public class DeduplicationBenchmarks
     }
 
     [Benchmark]
-    public void HashSetDedup()
-    {
-        int[] keys = new int[_intKeys.Length];
-        Array.Copy(_intKeys, keys, _intKeys.Length);
-        Deduplication.DeduplicateWithHashSet(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, out _);
-    }
-
-    [Benchmark]
     public void SortDedup()
     {
         int[] keys = new int[_intKeys.Length];
         Array.Copy(_intKeys, keys, _intKeys.Length);
         Deduplication.DeduplicateWithSort(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, Comparer<int>.Default, out _);
-    }
-
-    [Benchmark]
-    public void SortPreserveDedup()
-    {
-        int[] keys = new int[_intKeys.Length];
-        Array.Copy(_intKeys, keys, _intKeys.Length);
-        Deduplication.DeduplicateWithSortPreserveInputOrder(keys, Array.Empty<int>(), false, EqualityComparer<int>.Default, Comparer<int>.Default, out _);
     }
 }

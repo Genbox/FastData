@@ -11,16 +11,14 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, EliasFanoContext<TKey>>
 {
-    private readonly bool _keysAreSorted;
     private readonly TKey _maxValue;
     private readonly TKey _minValue;
     private readonly int _skipQuantum;
 
-    internal EliasFanoStructure(TKey minValue, TKey maxValue, bool keysAreSorted, int skipQuantum)
+    internal EliasFanoStructure(TKey minValue, TKey maxValue, int skipQuantum)
     {
         _minValue = minValue;
         _maxValue = maxValue;
-        _keysAreSorted = keysAreSorted;
         _skipQuantum = skipQuantum;
     }
 
@@ -30,15 +28,6 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         Debug.Assert(values.IsEmpty || values.Length == keys.Length, "EliasFanoStructure requires value count to match key count when values are present.");
         Debug.Assert(_skipQuantum > 0, "EliasFanoStructure requires a positive skip quantum.");
         Debug.Assert((_skipQuantum & (_skipQuantum - 1)) == 0, "EliasFanoStructure requires skip quantum to be a power of two.");
-        Debug.Assert(!_keysAreSorted || keys.IsSorted(), "EliasFanoStructure requires sorted input when keysAreSorted is true.");
-
-        if (!_keysAreSorted)
-        {
-            TKey[] keysCopy = new TKey[keys.Length];
-            keys.CopyTo(keysCopy);
-            Array.Sort(keysCopy);
-            keys = keysCopy.AsMemory();
-        }
 
         ReadOnlySpan<TKey> keysSpan = keys.Span;
 

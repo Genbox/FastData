@@ -17,19 +17,19 @@ internal static class FastData
 
         switch (key)
         {
-            case "æ":
+            case "ß":
             case "à":
             case "ä":
-            case "ö":
-            case "ü":
-            case "ß":
-            case "é":
-            case "è":
-            case "ê":
-            case "ç":
-            case "ñ":
-            case "ø":
             case "å":
+            case "æ":
+            case "ç":
+            case "è":
+            case "é":
+            case "ê":
+            case "ñ":
+            case "ö":
+            case "ø":
+            case "ü":
                 return true;
             default:
                 return false;

@@ -20,11 +20,11 @@ class fastdata final {
     };
 
     static constexpr std::array<int8_t, 3> buckets = {
-        3, 2, 0
+        2, 3, 0
     };
 
     inline static const std::array<e, 3> entries = {
-        e(u8"a", -1, 18225461187723808291ull), e(u8"item", 0, 16750939634977259983ull), e(u8"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", -1, 9198652691199425319ull)
+        e(u8"a", -1, 18225461187723808291ull), e(u8"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", -1, 9198652691199425319ull), e(u8"item", 0, 16750939634977259983ull)
     };
 
     static constexpr uint64_t get_hash(const std::string_view value) noexcept {
