@@ -141,13 +141,16 @@ public class SourceGeneratorTests
         string source = $"""
                          using Genbox.FastData.SourceGenerator.Attributes;
 
-                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], StructureType = StructureType.HashTable, AnalysisLevel = AnalysisLevel.{al})]
+                         [assembly: FastData<string>("StaticData", ["item1", "item2", "item3"], AnalysisLevel = AnalysisLevel.{al})]
                          """;
 
         string output = RunGenerator(source);
 
-        //We can't verify the outputs as they depend on the computer configuration and will be different across executions. Instead, we just assert it is not empty.
-        Assert.NotEmpty(output);
+        Func<string, bool> contains = CompilationHelper.GetDelegate<Func<string, bool>>(output, false);
+        Assert.True(contains("item1"));
+        Assert.True(contains("item2"));
+        Assert.True(contains("item3"));
+        Assert.False(contains("dontexist"));
     }
 
     private static string RunGenerator(string source)
