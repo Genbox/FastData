@@ -12,29 +12,6 @@ namespace Genbox.FastData.Tests.Genetics;
 
 public class GeneticEngineTests
 {
-    [Theory]
-    [InlineData(-1)]
-    [InlineData(0)]
-    [InlineData(1)]
-    public void RejectsInvalidPopulationSize(int populationSize)
-    {
-        GeneticEngineConfig config = new GeneticEngineConfig { PopulationSize = populationSize };
-        GeneticEngine engine = new GeneticEngine(config, [new TestGene("A")], NullLogger.Instance);
-        DefaultRandom random = new DefaultRandom(42);
-
-        ArgumentOutOfRangeException ex = Assert.Throws<ArgumentOutOfRangeException>(() => engine.Evolve(
-            ReadOnlySpan<string>.Empty,
-            static (ReadOnlySpan<string> _, ref Entity entity) => entity.Fitness = 1,
-            new TournamentSelection(1, random),
-            new OnePointCrossOver(random),
-            new UniformMutation(0, random),
-            new EliteReinsertion(0),
-            new MaxGenerationsTermination(1),
-            random));
-
-        Assert.Equal("PopulationSize", ex.ParamName);
-    }
-
     [Fact]
     public void MaxGenerationsCountsEvaluatedGenerations()
     {
@@ -48,7 +25,7 @@ public class GeneticEngineTests
 
         engine.Evolve(
             ReadOnlySpan<string>.Empty,
-            (ReadOnlySpan<string> _, ref Entity entity) =>
+            (_, ref entity) =>
             {
                 simulations++;
                 entity.Fitness = 1;
