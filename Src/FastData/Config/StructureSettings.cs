@@ -1,4 +1,4 @@
-﻿namespace Genbox.FastData.Config;
+namespace Genbox.FastData.Config;
 
 public class StructureSettings
 {

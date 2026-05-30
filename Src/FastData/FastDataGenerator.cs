@@ -245,17 +245,17 @@ public static partial class FastDataGenerator
                 return cacheHashData;
 
             // Hash analysis can be expensive, so structure selection and structure creation share the same result.
-            (HashData hashData, StringHashInfo _) = GetStringHash(keySpan);
+            (HashData hashData, StringHashInfo? hashInfo) = GetStringHash(keySpan);
             cacheHashData = hashData;
 
             // cacheHashInfo = ...; //TODO: Disabled temporarily until i can look at the compiler again
             return hashData;
         }
 
-        (HashData, StringHashInfo) GetStringHash(ReadOnlySpan<string> keySpan)
+        (HashData, StringHashInfo?) GetStringHash(ReadOnlySpan<string> keySpan)
         {
             StringHashFunc hashFunc;
-            StringHashInfo info;
+            StringHashInfo? info;
 
             if (cfg.StringAnalyzerConfig != null)
             {

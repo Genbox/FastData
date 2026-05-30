@@ -1,4 +1,4 @@
-﻿
+
     public const int ItemCount = <#= GeneratorConfig.ItemCount #>;
 <#
     if (GeneratorConfig is StringGeneratorConfig strCfg)

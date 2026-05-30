@@ -12,10 +12,7 @@ internal sealed record DefaultStringHash : IStringHash
 {
     private readonly GeneratorEncoding _encoding;
 
-    private DefaultStringHash(GeneratorEncoding encoding)
-    {
-        _encoding = encoding;
-    }
+    private DefaultStringHash(GeneratorEncoding encoding) => _encoding = encoding;
 
     internal static DefaultStringHash ASCIIInstance { get; } = new DefaultStringHash(GeneratorEncoding.AsciiBytes);
     internal static DefaultStringHash UTF8Instance { get; } = new DefaultStringHash(GeneratorEncoding.Utf8Bytes);
