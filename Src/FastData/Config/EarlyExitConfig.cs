@@ -62,7 +62,7 @@ public class EarlyExitConfig
     /// <param name="limit">The limit to apply when the early exit is considered.</param>
     public void AppendLimit(Type type, ILimit limit)
     {
-        if (!_limits.TryGetValue(type, out List<ILimit> list))
+        if (!_limits.TryGetValue(type, out List<ILimit>? list))
             _limits[type] = list = new List<ILimit>();
 
         list.Add(limit);
