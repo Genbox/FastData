@@ -109,19 +109,19 @@ internal static class Program
     private static async Task RunAsync(CommonOptions opts, ICodeGenerator generator, CancellationToken token)
     {
         bool hasValues = opts.ValuesFile != null;
-        ValidateOptions(opts.KeyType, hasValues, opts.StructureType, opts.IgnoreCase, opts.AnalysisLevel, opts.AllowApproximate);
+        ValidateOptions(opts.KeyType, hasValues, opts.StructureType, opts.IgnoreCase, opts.AnalysisLevel, opts.AllowApproximation);
 
         Type? structureTypeOverride = MapStructureType(opts.StructureType);
 
         StringDataConfig stringConfig = new StringDataConfig
         {
             IgnoreCase = opts.IgnoreCase,
-            AllowApproximateMatching = opts.AllowApproximate,
+            AllowApproximation = opts.AllowApproximation,
             StringAnalyzerConfig = CreateStringAnalyzerConfig(opts.AnalysisLevel)
         };
         NumericDataConfig numericConfig = new NumericDataConfig
         {
-            AllowApproximateMatching = opts.AllowApproximate
+            AllowApproximation = opts.AllowApproximation
         };
 
         if (structureTypeOverride != null)
@@ -390,7 +390,7 @@ internal static class Program
         KeyType ValueType,
         StructureType StructureType,
         bool IgnoreCase,
-        bool AllowApproximate,
+        bool AllowApproximation,
         AnalysisLevel AnalysisLevel);
 
     private delegate bool Utf8NumberParser<T>(ReadOnlySpan<byte> source, out T value, out int bytesConsumed);

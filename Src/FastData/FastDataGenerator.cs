@@ -228,7 +228,7 @@ public static partial class FastDataGenerator
 
             while (true)
             {
-                Type selectedType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.AllowApproximateMatching, props.LengthData.UniqueLengths, structureConfig, x => EnsureHashData(x.Span));
+                Type selectedType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.AllowApproximation, props.LengthData.UniqueLengths, structureConfig, x => EnsureHashData(x.Span));
                 IStructure<string, TValue, IContext> selectedStructure = StringStructureFactory<TValue>(selectedType, props, () => EnsureHashData(keys.Span), generator.Encoding);
                 IContext? selectedContext = selectedStructure.Create(keys, values);
 
@@ -278,7 +278,7 @@ public static partial class FastDataGenerator
 
             Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(generator.Encoding);
 
-            HashData hashData = HashData.Create(keySpan, cfg.HashCapacityFactor, x =>
+            HashData hashData = HashData.Create(keySpan, cfg.StructureSettings.GetSetting<float>(KnownSettings.HashTableCapacityFactor), x =>
             {
                 //TODO: Optimize this. Maybe reuse the same buffer. Benchmark it
                 byte[] bytes = getBytes(x);
@@ -358,13 +358,12 @@ public static partial class FastDataGenerator
         else // Duplicates removed
             LogNumberOfUniqueKeys(logger, oldCount, newCount);
 
-        //TODO: Only produce hash data when structure is indexed
         NumericKeyProperties<TKey> props = KeyAnalyzer.GetNumericProperties(keys);
         LogMinMaxValues(logger, props.DataRanges.Min, props.DataRanges.Max);
 
         HashData? cacheHashData = null;
 
-        (Type structureType, IStructure<TKey, TValue, IContext> structure, IContext res) = cfg.StructureTypeOverride != null ? CreateSelectedNumericStructure(cfg.StructureTypeOverride) : CreateBestNumericStructure();
+        (Type structureType, IStructure<TKey, TValue, IContext> structure, IContext ctx) = cfg.StructureTypeOverride != null ? CreateSelectedNumericStructure(cfg.StructureTypeOverride) : CreateBestNumericStructure();
         LogStructureType(logger, structureType.Name);
 
         // Early exits are generated from numeric properties and then merged with checks required by the structure itself.
@@ -379,17 +378,14 @@ public static partial class FastDataGenerator
 
         NumericGeneratorConfig genCfg = new NumericGeneratorConfig(structureType, (uint)keys.Length, props.DataRanges.Min, props.DataRanges.Max, exprs, cfg.TypeReductionEnabled, props.HasZero);
 
-        return generator.Generate<TKey, TValue>(genCfg, res);
+        return generator.Generate<TKey, TValue>(genCfg, ctx);
 
-        (Type StructureType, IStructure<TKey, TValue, IContext> Structure, IContext Context) CreateSelectedNumericStructure(Type selectedType)
+        (Type StructureType, IStructure<TKey, TValue, IContext> Structure, IContext Context) CreateSelectedNumericStructure(Type selType)
         {
-            IStructure<TKey, TValue, IContext> selectedStructure = NumericStructureFactory<TKey, TValue>(cfg, selectedType, props, () => EnsureNumericHash(keys.Span));
-            IContext? selectedContext = selectedStructure.Create(keys, values);
+            IStructure<TKey, TValue, IContext> selStruct = NumericStructureFactory<TKey, TValue>(cfg, selType, props, () => EnsureNumericHash(keys.Span));
+            IContext? selCtx = selStruct.Create(keys, values);
 
-            if (selectedContext == null)
-                throw new InvalidOperationException($"The selected structure {selectedType.Name} failed to create.");
-
-            return (selectedType, selectedStructure, selectedContext);
+            return selCtx == null ? throw new InvalidOperationException($"The selected structure {selType.Name} failed to create.") : (selType, selStruct, selCtx);
         }
 
         (Type StructureType, IStructure<TKey, TValue, IContext> Structure, IContext Context) CreateBestNumericStructure()
@@ -398,33 +394,23 @@ public static partial class FastDataGenerator
 
             while (true)
             {
-                Type selectedType = NumericStructures<TKey>.GetBest(keys, !values.IsEmpty, props.Density, cfg.AllowApproximateMatching, props.DataRanges.Ranges.Count, structureConfig, x =>
-                {
-                    return EnsureNumericHash(x.Span);
-                });
-                IStructure<TKey, TValue, IContext> selectedStructure = NumericStructureFactory<TKey, TValue>(cfg, selectedType, props, () => EnsureNumericHash(keys.Span));
-                IContext? selectedContext = selectedStructure.Create(keys, values);
+                Type selType = NumericStructures<TKey>.GetBest(keys, !values.IsEmpty, props.Density, cfg.AllowApproximation, props.DataRanges.Ranges.Count, structureConfig, x => EnsureNumericHash(x.Span));
+                IStructure<TKey, TValue, IContext> selStruct = NumericStructureFactory<TKey, TValue>(cfg, selType, props, () => EnsureNumericHash(keys.Span));
+                IContext? selCtx = selStruct.Create(keys, values);
 
-                if (selectedContext != null)
-                    return (selectedType, selectedStructure, selectedContext);
+                if (selCtx != null)
+                    return (selType, selStruct, selCtx);
 
-                structureConfig.Disable(selectedType);
+                structureConfig.Disable(selType);
             }
         }
 
-        HashData EnsureNumericHash(ReadOnlySpan<TKey> keySpan)
-        {
-            if (cacheHashData != null)
-                return cacheHashData;
-
-            return cacheHashData = GetNumericHash(keySpan);
-        }
+        HashData EnsureNumericHash(ReadOnlySpan<TKey> keySpan) => cacheHashData ??= GetNumericHash(keySpan);
 
         HashData GetNumericHash(ReadOnlySpan<TKey> keySpan)
         {
             NumericHashFunc<TKey> hashFunc = DefaultNumericHash.GetHashFunc<TKey>(props.HasZero);
-            HashData hashData = HashData.Create(keySpan, cfg.HashCapacityFactor, hashFunc);
-            return hashData;
+            return HashData.Create(keySpan, cfg.StructureSettings.GetSetting<float>(KnownSettings.HashTableCapacityFactor), hashFunc);
         }
     }
 
@@ -503,7 +489,7 @@ public static partial class FastDataGenerator
         if (type == typeof(ConditionalStructure<,>))
             return new ConditionalStructure<TKey, TValue>();
         if (type == typeof(EliasFanoStructure<,>))
-            return new EliasFanoStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, GetSetting(cfg, "SkipQuantum", 128));
+            return new EliasFanoStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, cfg.StructureSettings.GetSetting<int>(KnownSettings.EliasFanoSkipQuantum));
         if (type == typeof(HashTableStructure<,>))
             return new HashTableStructure<TKey, TValue>(getHashData());
         if (type == typeof(HashTableCompactStructure<,>))
@@ -519,17 +505,9 @@ public static partial class FastDataGenerator
         if (type == typeof(SingleValueStructure<,>))
             return new SingleValueStructure<TKey, TValue>();
         if (type == typeof(PgmStructure<,>))
-            return new PgmStructure<TKey, TValue>(GetSetting(cfg, "Epsilon", 64), GetSetting(cfg, "EpsilonRecursive", 4));
+            return new PgmStructure<TKey, TValue>(cfg.StructureSettings.GetSetting<int>(KnownSettings.PgmEpsilon), cfg.StructureSettings.GetSetting<int>(KnownSettings.PgmEpsilonRecursive));
 
         throw new InvalidOperationException($"Unsupported DataStructure {type}");
-    }
-
-    private static T GetSetting<T>(DataConfig cfg, string key, T defaultValue)
-    {
-        if (!cfg.StructureSettings.TryGetValue(key, out object? value))
-            return defaultValue;
-
-        return (T)value;
     }
 
     private sealed class UsedFunctionVisitor : ExpressionVisitor

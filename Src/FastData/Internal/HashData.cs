@@ -4,20 +4,17 @@ using Genbox.FastData.Internal.Misc;
 namespace Genbox.FastData.Internal;
 
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
-internal record HashData(ulong[] HashCodes, int CapacityFactor, bool HashCodesUnique, bool HashCodesPerfect, ulong MinHashCode, ulong MaxHashCode)
+internal record HashData(ulong[] HashCodes, float CapacityFactor, bool HashCodesUnique, bool HashCodesPerfect, ulong MinHashCode, ulong MaxHashCode)
 {
-    internal static HashData Create<T>(ReadOnlySpan<T> data, int capacityFactor, NumericHashFunc<T> func)
+    internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, NumericHashFunc<T> func)
     {
         if (capacityFactor <= 0)
             throw new InvalidOperationException("HashCapacityFactor must be greater than 0.");
 
-        ulong size = checked((ulong)data.Length * (ulong)capacityFactor);
+        uint size = (uint)(data.Length * capacityFactor);
 
         if (size == 0)
             throw new InvalidOperationException("HashCapacityFactor results in zero-sized hash table.");
-
-        if (size > int.MaxValue)
-            throw new InvalidOperationException("HashCapacityFactor results in a hash table that is too large.");
 
         ulong[] hashCodes = new ulong[size];
         HashSet<ulong> uniqSet = new HashSet<ulong>();
