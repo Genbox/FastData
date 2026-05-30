@@ -10,7 +10,12 @@ internal sealed class StaticArray<T>(int capacity) : IEnumerable<T> where T : st
 
     internal ref T this[int index] => ref _array[index];
 
-    public IEnumerator<T> GetEnumerator() => _array.AsEnumerable().GetEnumerator();
+    public IEnumerator<T> GetEnumerator()
+    {
+        for (int i = 0; i < Count; i++)
+            yield return _array[i];
+    }
+
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     internal void Add(T item) => _array[Count++] = item;
