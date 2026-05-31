@@ -1,10 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using System.Reflection;
+using System.Text;
 using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
+using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Generators.Expressions;
 using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Generators.StringHash;
@@ -173,7 +176,7 @@ public static partial class FastDataGenerator
         if (!props.CharacterData.AllAscii && generator.Encoding == GeneratorEncoding.AsciiBytes)
             throw new InvalidOperationException("Your data has non-ASCII in it, and the generator is set to produce an ASCII API. That's not supported.");
 
-        LogMinMaxLength(logger, props.LengthData.MinCharLength, props.LengthData.MaxCharLength);
+        LogMinMaxLength(logger, props.LengthData.MinByteLength, props.LengthData.MaxByteLength);
 
         StringHashInfo? cacheHashInfo = null;
         HashData? cacheHashData = null;
@@ -185,9 +188,8 @@ public static partial class FastDataGenerator
         IEarlyExit[] analysisExits = StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase, (uint)keys.Length);
         List<IEarlyExit> mandatoryExits = new List<IEarlyExit>();
 
-        // Ensure the structure's mandatory exits are added
-        mandatoryExits.AddRange(hashMandatoryExits);
-        mandatoryExits.AddRange(structure.GetMandatoryExits());
+        mandatoryExits.AddRange(hashMandatoryExits); // From hash functions
+        mandatoryExits.AddRange(structure.GetMandatoryExits()); // From the structure
 
         List<IEarlyExit> earlyExits = CombineExits(mandatoryExits, analysisExits);
 
@@ -196,20 +198,45 @@ public static partial class FastDataGenerator
 
         UsedFunctionVisitor usedVisitor = new UsedFunctionVisitor();
 
-        // All exits use "key" - length and char exits are adjusted to work on the original key
         ParameterExpression inputKey = Parameter(typeof(string), "key");
+
+        // All exits use "key" - length and char exits are adjusted to work on the original key
         AnnotatedExpr[] exprs = AnnotateExits(earlyExits, inputKey, usedVisitor);
 
-        // Now we transform the expressions into more efficient representations
-        AnnotatedExpr[] transformed = ExpressionHelper.Transform(exprs, [new AllocationGatherTransform()]).ToArray();
+        // Only emit the length allocation when it is actually referenced: either by an early exit that uses Length(), or by a hash function that takes length as a parameter.
+        // We don't have any system-wide mandatory early exits, and only some structures are hash based. It makes this the path of least resistance.
+        bool needsLength = usedVisitor.Functions.HasFlag(GeneratorFunction.Length) || cacheHashInfo != null;
+        AnnotatedExpr[] mandatoryExprs = needsLength ? GetMandatoryExpressions(inputKey).ToArray() : [];
 
-        // Walk the hash expression (if any) and update used functions
+        // Now we transform the expressions into more efficient representations
+        AnnotatedExpr[] combinedExprs = mandatoryExprs.Concat(exprs).ToArray();
+        AnnotatedExpr[] transformed = ExpressionHelper.Transform(combinedExprs,
+        [
+            new AllocationGatherTransform(),
+            new DeduplicateAllocationTransform()
+        ]).ToArray();
+
+        foreach (AnnotatedExpr expr in transformed)
+            usedVisitor.Visit(expr.Expression);
+
+        // Visit the hash expression so that ReadU8/U16/U32/U64 helpers used by the hash are included in the generated source
         if (cacheHashInfo != null)
             usedVisitor.Visit(cacheHashInfo.Expression);
 
         StringGeneratorConfig genCfg = new StringGeneratorConfig(structureType, (uint)keys.Length, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.IgnoreCase, props.CharacterData.CharacterClasses, generator.Encoding, transformed, cfg.TypeReductionEnabled, cacheHashInfo, usedVisitor.Functions);
 
         return generator.Generate<string, TValue>(genCfg, res);
+
+        IEnumerable<AnnotatedExpr> GetMandatoryExpressions(ParameterExpression key)
+        {
+            // This produces an allocation for length: int length = key.Length;
+            // It is needed for length-based early exits and for hash functions, where length is passed as a parameter.
+            // The caller guards this so it is only invoked when length is actually referenced.
+
+            MethodInfo methodInfo = typeof(GeneratorFunctions).GetMethod(nameof(GeneratorFunctions.Length), [typeof(string)])!;
+            ParameterExpression length = Variable(typeof(int), "length");
+            return [AnnotatedExpr.Allocation(Assign(length, Call(methodInfo, key)))];
+        }
 
         (Type StructureType, IStructure<string, TValue, IContext> Structure, IContext Context) CreateSelectedStringStructure(Type selectedType)
         {
@@ -245,47 +272,43 @@ public static partial class FastDataGenerator
                 return cacheHashData;
 
             // Hash analysis can be expensive, so structure selection and structure creation share the same result.
-            (HashData hashData, StringHashInfo? hashInfo) = GetStringHash(keySpan);
+            (HashData hashData, StringHashInfo hashInfo) = GetStringHash(keySpan);
             cacheHashData = hashData;
-
-            // cacheHashInfo = ...; //TODO: Disabled temporarily until i can look at the compiler again
+            cacheHashInfo = hashInfo;
             return hashData;
         }
 
-        (HashData, StringHashInfo?) GetStringHash(ReadOnlySpan<string> keySpan)
+        (HashData, StringHashInfo) GetStringHash(ReadOnlySpan<string> keySpan)
         {
-            StringHashFunc hashFunc;
-            StringHashInfo? info;
+            IStringHash stringHash;
 
             if (cfg.StringAnalyzerConfig != null)
             {
                 Candidate candidate = HashBenchmark.GetBestHash(keySpan, props, cfg.StringAnalyzerConfig, factory, generator.Encoding, true, cfg.IgnoreCase);
                 LogStringHashFitness(logger, candidate.Fitness);
-
-                Expression<StringHashFunc> expression = candidate.StringHash.GetExpression();
-                info = new StringHashInfo(expression, candidate.StringHash.AdditionalData);
-                hashFunc = expression.Compile();
-                hashMandatoryExits = candidate.StringHash.GetMandatoryExits();
+                stringHash = candidate.StringHash;
             }
             else
             {
-                DefaultStringHash stringHash = DefaultStringHash.GetInstance(generator.Encoding);
-                Expression<StringHashFunc> expression = stringHash.GetExpression();
-                info = new StringHashInfo(expression, null);
-                hashFunc = expression.Compile();
-                hashMandatoryExits = stringHash.GetMandatoryExits();
+                // When string analysis is disabled, we still produce an expression that needs compilation. This is because the hashes are produced in FastData's core
+                // and the generated code's hash function must match, otherwise the generated hashes will be different from the runtime's hashes.
+                stringHash = DefaultStringHash.GetInstance(generator.Encoding, cfg.IgnoreCase);
             }
 
-            Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(generator.Encoding);
+            Expression<StringHashFunc> expression = stringHash.GetExpression();
+            StringHashFunc hashFunc = expression.Compile();
+            hashMandatoryExits = stringHash.GetMandatoryExits();
+
+            Encoding encoding = StringHelper.GetEncoding(generator.Encoding);
+            byte[] buffer = new byte[props.LengthData.MaxByteLength];
 
             HashData hashData = HashData.Create(keySpan, cfg.StructureSettings.GetSetting<float>(KnownSettings.HashTableCapacityFactor), x =>
             {
-                //TODO: Optimize this. Maybe reuse the same buffer. Benchmark it
-                byte[] bytes = getBytes(x);
-                return hashFunc(bytes, bytes.Length);
+                int byteCount = encoding.GetBytes(x, 0, x.Length, buffer, 0);
+                return hashFunc(buffer, byteCount);
             });
 
-            return (hashData, info);
+            return (hashData, new StringHashInfo(expression, stringHash.AdditionalData));
         }
     }
 

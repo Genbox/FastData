@@ -10,8 +10,12 @@ internal static class FitnessHelper
     internal static double CalculateFitness(StringKeyProperties props, ArraySegment segment, Expression expression)
     {
         //The length of segment is a factor
-        int minLen = props.LengthData.MinCharLength;
-        int segLen = segment.Length;
+        int minLen = props.LengthData.MinByteLength;
+
+        // Length == -1 means unconstrained (full-tail): the hash reads all bytes from
+        // the segment offset to the end of the string. Treat it as minLen for fitness
+        // scoring so that full-string hashing gets the lowest segment fitness.
+        int segLen = segment.Length == -1 ? minLen : segment.Length;
         double segFit;
 
         if (minLen > 1)

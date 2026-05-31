@@ -7,12 +7,21 @@
     public string MethodAttribute => "[[nodiscard]]";
     public string PostMethodModifier => " noexcept";
     public string LookupKeyName => "key";
+    public string HashCall => Type.GetTypeCode(Model.KeyType) == TypeCode.String ? $"get_hash({LookupKeyName}, length)" : $"get_hash({LookupKeyName})";
 
-    public string HashSource => $$"""
-                                    {{GetHashModifier()}}uint64_t get_hash(const {{KeyTypeName}} value) noexcept {
-                                {{GetHash()}}
-                                    }
-                                """;
+    public string HashSource
+    {
+        get
+        {
+            string parameters = Type.GetTypeCode(Model.KeyType) == TypeCode.String ? $"const {KeyTypeName} value, int32_t length" : $"const {KeyTypeName} value";
+
+            return $$"""
+                                        {{GetHashModifier()}}uint64_t get_hash({{parameters}}) noexcept {
+                                    {{GetHash()}}
+                                        }
+                                    """;
+        }
+    }
 
     public string GetEqual(string var1, string var2)
     {
@@ -74,16 +83,14 @@
         if (keyType.UsesIdentityHash())
             return "        return static_cast<uint64_t>(value);";
 
-        if (keyType == TypeCode.String)
+        if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.HashInfo != null)
         {
-            return """
-                            uint64_t hash = 352654597;
-
-                            for (unsigned char ch : value)
-                                hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
-
-                            return 352654597 + (hash * 1566083941);
-                    """;
+            CPlusPlusExpressionCompiler compiler = new CPlusPlusExpressionCompiler(TypeMap);
+            return $"""
+                           const auto data = value;
+                   {compiler.GetCode(strCfg.HashInfo.Expression, 8)}
+                           return hash;
+                   """;
         }
 
         if (GeneratorConfig is NumericGeneratorConfig numCfg)

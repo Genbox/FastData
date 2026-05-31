@@ -10,6 +10,8 @@
 
 class fastdata final {
 
+    static constexpr int32_t Length(std::string_view str) noexcept { return static_cast<int32_t>(str.length()); }
+    static uint32_t ReadU8(const std::string_view value, const size_t offset) noexcept { return static_cast<unsigned char>(value[offset]); }
 
     struct e {
         std::string_view key;
@@ -57,20 +59,28 @@ class fastdata final {
         e(u8"67", 11144406284706922485), e(u8"10", 11144406353614615889), e(u8"36", 11144406353614615889), e(u8"59", 11144406135928948090), e(u8"62", 11144406292537342190), e(u8"77", 11144406135928948090), e(u8"8", 18225461126646534592), e(u8"43", 11144406300367761895), e(u8"70", 11144406143759367795), e(u8"86", 11144406865724064596)
     };
 
-    static constexpr uint64_t get_hash(const std::string_view value) noexcept {
-        uint64_t hash = 352654597;
+    static constexpr uint64_t get_hash(const std::string_view value, int32_t length) noexcept {
+        const auto data = value;
+        int32_t offset = 0;
+        uint64_t hash = 352654597ull;
+        while ((length > 0))
+        {
+         hash = ((((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint64_t>(ReadU8(data, offset)));
+         offset += 1;
+         length -= 1;
+        }
 
-        for (unsigned char ch : value)
-            hash = (((hash << 5) | (hash >> 27)) + hash) ^ static_cast<uint32_t>(ch);
+        hash = (352654597ull + (hash * 1566083941ull));
 
-        return 352654597 + (hash * 1566083941);
+        return hash;
     }
 
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
+        int32_t length = Length(key);
 
-        const uint64_t hash = get_hash(key);
+        const uint64_t hash = get_hash(key, length);
         const size_t index = hash % 100;
         const size_t start = static_cast<size_t>(bucket_starts[index]);
         const size_t count = static_cast<size_t>(bucket_counts[index]);

@@ -30,7 +30,7 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: f32) -> bool {
 
-        let hash = unsafe { Self::get_hash(key) };
+        let hash = Self::get_hash(key);
         let index = (hash % 16u64) as usize;
         let shift1 = (hash as u32) & 63;
         let shift2 = ((hash >> 8) as u32) & 63;

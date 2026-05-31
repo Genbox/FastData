@@ -20,7 +20,7 @@ internal static class StringEarlyExits
         if (itemCount <= config.MinItemCount)
             return [];
 
-        IEarlyExit[] candidates = ProduceCandidates(structureType, props, config, ignoreCase).ToArray();
+        IEarlyExit[] candidates = ProduceCandidates(props, config, ignoreCase).ToArray();
 
         if (candidates.Length == 0)
             return [];
@@ -37,14 +37,8 @@ internal static class StringEarlyExits
         return EnsureUnitAtLengthGuard(exits, props, config);
     }
 
-    private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase)
+    private static IEnumerable<IEarlyExit> ProduceCandidates(StringKeyProperties props, EarlyExitConfig config, bool ignoreCase)
     {
-        if (config.Disabled)
-            yield break;
-
-        if (!config.IsEnabledForStructure(structureType))
-            yield break;
-
         // Length early exits are great for languages that provide constant time access to the length of a string (C#, Java, Python, Go, Rust)
         // For languages that has to iterate the string (C, Swift, Haskell), it is slower than comparing the first char.
         {

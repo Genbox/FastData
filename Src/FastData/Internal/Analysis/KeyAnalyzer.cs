@@ -43,11 +43,10 @@ internal static class KeyAnalyzer
         // We need to create a length map for generators
         HashSet<int> uniqLengths = new HashSet<int>();
 
-        // We need to know the longest string for optimal mixing. Probably not 100% necessary.
-        string maxStr = keys[0];
-
-        // We separately need to keep track of the smallest string, but only the length of it.
-        int minLength = int.MaxValue;
+        // Track encoded byte lengths. All length-dependent logic (segments, delta maps,
+        // hash expressions) operates on encoded bytes.
+        int minByteLength = int.MaxValue;
+        int maxByteLength = 0;
 
         bool allAscii = true;
         CharacterClass charClass = CharacterClass.Unknown;
@@ -56,17 +55,22 @@ internal static class KeyAnalyzer
 
         // We wire up the delegates here to avoid branching in the foreach below
 
-        // Get the generator-specific string length.
+        // Get the generator-specific string length and byte conversion.
         Func<string, int> getLength = StringHelper.GetLengthFunc(encoding);
+        Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(encoding);
         Func<char, char> getChar = ignoreCase ? char.ToLowerInvariant : static c => c;
+
+        // Pre-encode all keys so we can build byte-level delta maps and track encoded lengths.
+        byte[][] encodedKeys = new byte[keys.Length][];
 
         for (int i = 0; i < keys.Length; i++)
         {
             string str = keys[i];
-            if (str.Length > maxStr.Length)
-                maxStr = str;
+            byte[] bytes = getBytes(str);
+            encodedKeys[i] = bytes;
 
-            minLength = Math.Min(minLength, str.Length);
+            minByteLength = Math.Min(minByteLength, bytes.Length);
+            maxByteLength = Math.Max(maxByteLength, bytes.Length);
             uniqLengths.Add(getLength(str));
 
             firstCharMap.Add(getChar(str[0]));
@@ -91,9 +95,9 @@ internal static class KeyAnalyzer
         }
 
         // The code beneath calculates entropy maps that can be used to derive high-entropy edge segments.
-        // It works by adding characters to an accumulator, and then potentially removing the value from it again if the characters are the same.
-        // If the accumulator for an offset contains 0 after all strings have been accumulated, it is highly likely that all the characters were the same.
-        // However, there is a risk that an accumulator is 0, even if the characters are not the same. So we do a sanity check at the end to ensure we did it right.
+        // It works by XOR-ing byte values at each encoded byte position across all keys. Positions where
+        // all keys have the same byte will cancel out to zero, indicating low entropy at that offset.
+        // Maps are built over encoded bytes so that segment generators produce byte-accurate offsets.
         int[]? left = null;
         int[]? right = null;
 
@@ -121,39 +125,49 @@ internal static class KeyAnalyzer
         ranges.Add(rangeStart, previous);
 
         // Edge entropy tracking only makes sense when there are multiple keys, and they are long enough.
-        if (keys.Length > 1 && minLength > 1)
+        if (keys.Length > 1 && minByteLength > 1)
         {
-            //Build a forward and reverse map of merged entropy
+            //Build a forward and reverse map of merged entropy over encoded bytes.
             // We can derive edge positions from it that can be used later for high-entropy hash functions.
-            left = new int[maxStr.Length];
-            right = new int[maxStr.Length];
+            left = new int[maxByteLength];
+            right = new int[maxByteLength];
 
-            foreach (string str in keys)
+            foreach (byte[] bytes in encodedKeys)
             {
-                for (int i = 0; i < str.Length; i++)
+                for (int i = 0; i < bytes.Length; i++)
                 {
-                    left[i] ^= getChar(str[i]);
-                    right[i] ^= getChar(str[str.Length - 1 - i]);
+                    byte b = ignoreCase ? ToLowerAsciiByte(bytes[i]) : bytes[i];
+                    left[i] ^= b;
+                    right[i] ^= ignoreCase ? ToLowerAsciiByte(bytes[bytes.Length - 1 - i]) : bytes[bytes.Length - 1 - i];
                 }
             }
 
             //Odd number of items. We need it to be even
             if (keys.Length % 2 != 0)
             {
-                for (int i = 0; i < maxStr.Length; i++)
+                byte[] maxBytes = encodedKeys[0];
+                for (int i = 1; i < encodedKeys.Length; i++)
+                {
+                    if (encodedKeys[i].Length > maxBytes.Length)
+                        maxBytes = encodedKeys[i];
+                }
+
+                for (int i = 0; i < maxBytes.Length; i++)
                 {
                     //For best mixing, we take the longest string
-
-                    left[i] ^= getChar(maxStr[i]);
-                    right[i] ^= getChar(maxStr[maxStr.Length - 1 - i]);
+                    byte b = ignoreCase ? ToLowerAsciiByte(maxBytes[i]) : maxBytes[i];
+                    left[i] ^= b;
+                    right[i] ^= ignoreCase ? ToLowerAsciiByte(maxBytes[maxBytes.Length - 1 - i]) : maxBytes[maxBytes.Length - 1 - i];
 
                     //We do not add to characterMap here since it does not need the duplicate
                 }
             }
         }
 
-        return new StringKeyProperties(new LengthData(keys.Length == uniqLengths.Count, ranges, minLength, maxStr.Length), new DeltaData(left, right), new CharacterData(allAscii, charClass, firstCharMap, lastCharMap));
+        return new StringKeyProperties(new LengthData(keys.Length == uniqLengths.Count, ranges, minByteLength, maxByteLength), new DeltaData(left, right), new CharacterData(allAscii, charClass, firstCharMap, lastCharMap));
     }
+
+    private static byte ToLowerAsciiByte(byte b) => b >= (byte)'A' && b <= (byte)'Z' ? (byte)(b + ('a' - 'A')) : b;
 
     private static NumericKeyProperties<char> GetCharProperties(ReadOnlySpan<char> keys)
     {

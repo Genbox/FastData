@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Generators.StringHash.Framework;
@@ -46,24 +47,24 @@ internal sealed record GPerfStringHash : IStringHash
 
     public Expression<StringHashFunc> GetExpression()
     {
-        ParameterExpression value = Parameter(typeof(byte[]), "value");
+        ParameterExpression value = Parameter(typeof(byte[]), "data");
         ParameterExpression length = Parameter(typeof(int), "length");
         ParameterExpression hash = Variable(typeof(ulong), "hash");
 
         PropertyInfo assoProp = typeof(GPerfStringHash).GetProperty(nameof(AssociationValues), BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)!;
         Expression asso = Property(Constant(this, typeof(GPerfStringHash)), assoProp);
 
-        List<Expression> ex = new List<Expression>
-        {
+        List<Expression> ex =
+        [
             // hash = length or 0UL, matching gperf's optional length contribution.
             Assign(hash, HashIncludesLength ? Convert(length, typeof(ulong)) : Constant(0UL))
-        };
+        ];
 
         // Positions are selected by the analyzer and sorted in gperf order. A selected position contributes only when it exists
         // for the current logical length.
         foreach (int pos in Positions)
         {
-            Expression add = Assign(hash, Add(hash, GetPosition(asso, value, length, pos)));
+            Expression add = AddAssign(hash, GetPosition(asso, value, length, pos));
 
             // Mirror gperf's fast path: the caller only hashes strings with length >= MinLen, so the last character and any
             // fixed position below MinLen are always valid and do not need a branch.

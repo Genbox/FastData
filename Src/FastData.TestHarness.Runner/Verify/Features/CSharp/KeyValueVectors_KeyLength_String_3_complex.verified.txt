@@ -38,8 +38,7 @@ public class Person
     
     public static bool Contains(string key)
     {
-        int length;
-        length = Length(key);
+        int length = Length(key);
         if ((length < 1))
         {
          return false;
@@ -58,8 +57,7 @@ public class Person
     
     public static bool TryLookup(string key, out Person value)
     {
-        int length;
-        length = Length(key);
+        int length = Length(key);
         if ((length < 1))
         {
          value = default;

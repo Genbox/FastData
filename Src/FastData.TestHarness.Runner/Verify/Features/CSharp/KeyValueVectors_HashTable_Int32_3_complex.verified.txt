@@ -47,7 +47,10 @@ public class Person
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(int value)
     {
+        unchecked
+        {
         return (ulong)value;
+        }
     }
 
     

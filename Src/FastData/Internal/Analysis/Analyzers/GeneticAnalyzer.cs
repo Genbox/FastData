@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed partial class GeneticAnalyzer(StringKeyProperties props, GeneticAnalyzerConfig config, Simulator sim, ILogger<GeneticAnalyzer> logger) : IStringHashAnalyzer
+internal sealed partial class GeneticAnalyzer(StringKeyProperties props, GeneticAnalyzerConfig config, Simulator sim, ILogger<GeneticAnalyzer> logger, bool ignoreCase = false) : IStringHashAnalyzer
 {
     /*
      This is a genetic algorithm that determines the best configuration from a random population, that via evolution is biased
@@ -141,11 +141,12 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
         entity.Tag = candidate.Collisions; //We cache collisions here and pull it out later
     }
 
-    private static GeneticStringHash CopyGenes(ref Entity entity) => new GeneticStringHash(
+    private GeneticStringHash CopyGenes(ref Entity entity) => new GeneticStringHash(
         ((ArraySegmentGene)entity.Genes[0]).Value,
         ((IntGene)entity.Genes[1]).Value,
         ((IntGene)entity.Genes[2]).Value,
         ((IntGene)entity.Genes[3]).Value,
-        ((IntGene)entity.Genes[4]).Value
+        ((IntGene)entity.Genes[4]).Value,
+        ignoreCase
     );
 }

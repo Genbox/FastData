@@ -1,0 +1,103 @@
+﻿/// @generated
+// This file is auto-generated. Do not edit manually.
+// Structure: HashTable
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+
+class fastdata final {
+
+    static constexpr int32_t Length(std::string_view str) noexcept { return static_cast<int32_t>(str.length()); }
+    inline static const int32_t AssociationValues[] = {
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 
+        0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2
+    };
+
+
+    struct e {
+        std::string_view key;
+        int8_t next;
+        uint64_t hash_code;
+        e(const std::string_view key, const int8_t next, const uint64_t hash_code)
+           : key(key), next(next), hash_code(hash_code) {}
+    };
+
+    static constexpr std::array<int8_t, 2> buckets = {
+        2, 1
+    };
+
+    inline static const std::array<e, 2> entries = {
+        e(u8"test1", -1, 1ull), e(u8"test2", -1, 0)
+    };
+
+    static constexpr uint64_t get_hash(const std::string_view value, int32_t length) noexcept {
+        const auto data = value;
+        uint64_t hash = 0;
+        hash += static_cast<uint64_t>(AssociationValues[static_cast<int32_t>(data[4])]);
+        hash;
+
+        return hash;
+    }
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const std::string_view key) noexcept {
+        int32_t length = Length(key);
+        if ((length < 5))
+        {
+         return false;
+        }
+
+
+        const uint64_t hash = get_hash(key, length);
+        const size_t index = hash % 2;
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
+
+        while (i >= 0) {
+            const auto& entry = entries[i];
+
+            if (entry.hash_code == hash && entry.key == key)
+                return true;
+
+            i = entry.next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 2;
+    static constexpr int32_t min_key_length = 5;
+    static constexpr int32_t max_key_length = 5;
+    static constexpr bool has_number = true;
+    static constexpr bool has_uppercase = false;
+    static constexpr bool has_lowercase = true;
+    static constexpr bool has_symbol = false;
+    static constexpr bool has_whitespace = false;
+};

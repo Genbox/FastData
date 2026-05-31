@@ -14,7 +14,7 @@ internal static class StringHash
     internal static StringHashFunc GetHashFunc(ReadOnlySpan<string> keys, StringKeyProperties props, GeneratorEncoding encoding, ILoggerFactory factory, StringAnalyzerConfig? config, bool ignoreCase = false)
     {
         if (config == null)
-            return DefaultStringHash.GetInstance(encoding).GetExpression().Compile();
+            return DefaultStringHash.GetInstance(encoding, ignoreCase).GetExpression().Compile();
 
         Candidate candidate = HashBenchmark.GetBestHash(keys, props, config, factory, encoding, true, ignoreCase);
         Expression<StringHashFunc> expression = candidate.StringHash.GetExpression();

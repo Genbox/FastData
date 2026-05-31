@@ -64,7 +64,7 @@ public:
     <#= MethodAttribute #>
     <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.Contains) #>
-        const uint64_t hash = get_hash(<#= LookupKeyName #>);
+        const uint64_t hash = <#= HashCall #>;
         const size_t index = <#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>;
         const size_t start = static_cast<size_t>(bucket_starts[index]);
         const size_t count = static_cast<size_t>(bucket_counts[index]);
@@ -92,7 +92,7 @@ public:
     <#= MethodAttribute #>
     <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.TryLookup) #>
-        const uint64_t hash = get_hash(<#= LookupKeyName #>);
+        const uint64_t hash = <#= HashCall #>;
         const size_t index = <#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>;
         const size_t start = static_cast<size_t>(bucket_starts[index]);
         const size_t count = static_cast<size_t>(bucket_counts[index]);

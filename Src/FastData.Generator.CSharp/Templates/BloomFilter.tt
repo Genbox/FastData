@@ -12,7 +12,7 @@
     {
 <#= GetMethodHeader(MethodType.Contains) #>
 
-        ulong hash = Hash(<#= LookupKeyName #>);
+        ulong hash = <#= HashCall #>;
         int index = (int)(<#= GetMod("hash", (ulong)Context.BitSet.Length) #>);
         uint shift1 = (uint)hash & 63u;
         uint shift2 = (uint)(hash >> 8) & 63u;

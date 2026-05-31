@@ -25,4 +25,10 @@ internal static class VerifyHelper
               .UseFileName(snapshotId)
               .UseDirectory("../Verify/EndToEnd/" + harnessName)
               .DisableDiff();
+
+    internal static async Task VerifyStringHashAsync(string harnessName, string snapshotId, string source) =>
+        await Verify(source)
+              .UseFileName(snapshotId)
+              .UseDirectory("../Verify/StringHash/" + harnessName)
+              .DisableDiff();
 }

@@ -69,7 +69,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
     public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<string> data)
     {
         // We cannot work on empty strings
-        if (_props.LengthData.MinCharLength == 0)
+        if (_props.LengthData.MinByteLength == 0)
             return [];
 
         Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(_encoding);

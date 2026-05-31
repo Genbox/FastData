@@ -33,7 +33,7 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: i8) -> bool {
 
-        let hash = unsafe { Self::get_hash(key) };
+        let hash = Self::get_hash(key);
         let index = hash % 5u64;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 

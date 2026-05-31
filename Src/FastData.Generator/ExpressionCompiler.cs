@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator;
 
 /// <summary>Converts expression trees used by FastData into target-language source fragments.</summary>
+[SuppressMessage("Correctness", "SS004:Implement Equals() and GetHashcode() methods for a type used in a collection.")]
 public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 {
     protected readonly IndentedStringBuilder Output = new IndentedStringBuilder();
@@ -86,6 +88,23 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 
     protected override Expression VisitBlock(BlockExpression node)
     {
+        // Build a map from variable to its initializer expression, so we can emit
+        // combined declaration-with-initializer statements (e.g. "int length = Length(key);")
+        // instead of separate declaration and assignment lines.
+        Dictionary<ParameterExpression, Expression> initializers = new Dictionary<ParameterExpression, Expression>();
+        HashSet<Expression> inlinedExprs = new HashSet<Expression>();
+
+        foreach (Expression expr in node.Expressions)
+        {
+            if (expr is BinaryExpression { NodeType: ExpressionType.Assign, Left: ParameterExpression left } assign
+                && node.Variables.Contains(left)
+                && !initializers.ContainsKey(left))
+            {
+                initializers[left] = assign.Right;
+                inlinedExprs.Add(expr);
+            }
+        }
+
         foreach (ParameterExpression v in node.Variables)
         {
             Type t = v.Type;
@@ -93,11 +112,25 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
             if (v.Type.IsArray)
                 t = v.Type.GetElementType()!;
 
-            Output.AppendLine($"{map.GetTypeName(t)}{(v.Type.IsArray ? "[]" : "")} {v.Name};");
+            string typeName = $"{map.GetTypeName(t)}{(v.Type.IsArray ? "[]" : "")}";
+
+            if (initializers.TryGetValue(v, out Expression? init))
+            {
+                Output.Append($"{typeName} {v.Name} = ");
+                Visit(init);
+                Output.AppendLine(";");
+            }
+            else
+            {
+                Output.AppendLine($"{typeName} {v.Name};");
+            }
         }
 
         foreach (Expression expr in node.Expressions)
         {
+            if (inlinedExprs.Contains(expr))
+                continue;
+
             Visit(expr);
             if (expr is LoopExpression or ConditionalExpression)
                 Output.AppendLine();
@@ -118,7 +151,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
             return node;
         }
 
-        bool isAssign = node.NodeType is ExpressionType.Assign or ExpressionType.AddAssign or ExpressionType.SubtractAssign;
+        bool isAssign = node.NodeType is ExpressionType.Assign or ExpressionType.AddAssign or ExpressionType.SubtractAssign or ExpressionType.ExclusiveOrAssign;
 
         if (!isAssign)
             Output.Append('(');
@@ -279,6 +312,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         ExpressionType.GreaterThanOrEqual => " >= ",
         ExpressionType.AddAssign => " += ",
         ExpressionType.SubtractAssign => " -= ",
+        ExpressionType.ExclusiveOrAssign => " ^= ",
         ExpressionType.Assign => " = ",
         _ => throw new NotSupportedException($"Operator {type} is not supported.")
     };

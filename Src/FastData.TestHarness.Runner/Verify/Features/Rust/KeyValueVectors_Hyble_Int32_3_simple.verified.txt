@@ -33,7 +33,7 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: i32) -> bool {
 
-        let hash = unsafe { Self::get_hash(key) }.wrapping_mul(5871781006564002453u64);
+        let hash = Self::get_hash(key).wrapping_mul(5871781006564002453u64);
         let approx = ((hash as u128 * 4u128) >> 64) as u32;
         let bucket = (hash & 0u64) as usize;
         let index = (approx + Self::DISPLACEMENTS[bucket] as u32) as usize;
@@ -45,7 +45,7 @@ impl fastdata {
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<i32> {
 
-        let hash = unsafe { Self::get_hash(key) }.wrapping_mul(5871781006564002453u64);
+        let hash = Self::get_hash(key).wrapping_mul(5871781006564002453u64);
         let approx = ((hash as u128 * 4u128) >> 64) as u32;
         let bucket = (hash & 0u64) as usize;
         let index = (approx + Self::DISPLACEMENTS[bucket] as u32) as usize;

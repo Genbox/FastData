@@ -26,8 +26,7 @@ class fastdata final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        int32_t length;
-        length = Length(key);
+        int32_t length = Length(key);
         if ((length < 1))
         {
          return false;
@@ -45,8 +44,7 @@ public:
 
     [[nodiscard]]
     static bool try_lookup(const std::string_view key, const int32_t*& value) noexcept {
-        int32_t length;
-        length = Length(key);
+        int32_t length = Length(key);
         if ((length < 1))
         {
          value = nullptr;

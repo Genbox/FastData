@@ -74,7 +74,7 @@
     {
 <#= GetMethodHeader(MethodType.Contains) #>
 
-        ulong hash = Hash(<#= LookupKeyName #>);
+        ulong hash = <#= HashCall #>;
         int index = (int)(<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>);
         int start = (int)_bucketStarts[index];
         int count = (int)_bucketCounts[index];
@@ -105,7 +105,7 @@
     {
 <#= GetMethodHeader(MethodType.TryLookup) #>
 
-        ulong hash = Hash(<#= LookupKeyName #>);
+        ulong hash = <#= HashCall #>;
         int index = (int)(<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>);
         int start = (int)_bucketStarts[index];
         int count = (int)_bucketCounts[index];

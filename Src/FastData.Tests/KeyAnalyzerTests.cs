@@ -93,8 +93,8 @@ public class KeyAnalyzerTests
         }
 
         Assert.Equal(expectedLengths.Count == data.Length, lengthData.UniqueLengths);
-        Assert.Equal(minLength, lengthData.MinCharLength);
-        Assert.Equal(maxLength, lengthData.MaxCharLength);
+        Assert.Equal(minLength * 2, lengthData.MinByteLength); // Utf16CodeUnits: 2 bytes per char
+        Assert.Equal(maxLength * 2, lengthData.MaxByteLength);
         Assert.Equal(expectedLengths.Count, CountLengths(lengthData.LengthRanges));
 
         foreach (int length in expectedLengths)
@@ -127,8 +127,8 @@ public class KeyAnalyzerTests
     public void GetStringProperties_AsciiEarlyExitData_Test()
     {
         (LengthData lengthData, _, CharacterData data) = GetStringProperties(new[] { "ab", "ac", "bd" }, true, GeneratorEncoding.Utf16CodeUnits);
-        Assert.Equal(2, lengthData.MinCharLength);
-        Assert.Equal(2, lengthData.MaxCharLength);
+        Assert.Equal(4, lengthData.MinByteLength); // Utf16CodeUnits: 2 bytes per char, "ab" = 4 bytes
+        Assert.Equal(4, lengthData.MaxByteLength);
         Assert.True(data.AllAscii);
     }
 

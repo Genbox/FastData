@@ -11,7 +11,7 @@ public:
     <#= MethodAttribute #>
     <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.Contains) #>
-        const uint64_t hash = get_hash(<#= LookupKeyName #>);
+        const uint64_t hash = <#= HashCall #>;
         const size_t index = <#= GetMod("hash", (ulong)Context.BitSet.Length) #>;
         const uint32_t shift1 = static_cast<uint32_t>(hash) & 63u;
         const uint32_t shift2 = static_cast<uint32_t>(hash >> 8) & 63u;

@@ -15,6 +15,7 @@
 <#@ import namespace="Genbox.FastData.Generators.Enums" #>
 <#@ import namespace="Genbox.FastData.Generators.Expressions" #>
 <#@ import namespace="Genbox.FastData.Generators.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generators.StringHash.Framework" #>
 
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.TypeMap" name="TypeMap" #>
@@ -143,6 +144,19 @@ constexpr bool IsAsciiOnly(std::string_view value) noexcept {
 #>
     static <#= kv.Value #>
 <#
+        }
+        AdditionalData[]? addData = strCfg2.HashInfo?.AdditionalData;
+        if (addData != null)
+        {
+            foreach (AdditionalData data in addData)
+            {
+#>
+    inline static const <#= TypeMap.GetTypeName(data.Type) #> <#= data.Name #>[] = {
+<#= FormatHelper.FormatColumns(data.Values.Cast<object>(), data.Values.Length, x => TypeMap.ToValueLabel(x), 8) #>
+    };
+
+<#
+            }
         }
     }
 #>

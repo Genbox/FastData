@@ -25,7 +25,7 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: i32) -> bool {
 
-        let hash = unsafe { Self::get_hash(key) };
+        let hash = Self::get_hash(key);
         let index = (hash % 3u64) as usize;
         let entry = &Self::ENTRIES[index];
 

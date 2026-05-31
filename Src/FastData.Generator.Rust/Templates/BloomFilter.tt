@@ -11,7 +11,7 @@
     <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
-        let hash = unsafe { Self::get_hash(<#= LookupKeyName #>) };
+        let hash = <#= HashCall #>;
         let index = (<#= GetMod("hash", (ulong)Context.BitSet.Length) #>) as usize;
         let shift1 = (hash as u32) & 63;
         let shift2 = ((hash >> 8) as u32) & 63;

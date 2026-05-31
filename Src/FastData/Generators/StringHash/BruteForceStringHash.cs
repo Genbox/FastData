@@ -23,10 +23,11 @@ internal sealed record BruteForceStringHash : IStringHash
     internal ArraySegment Segment { get; set; }
     internal Mixer Mixer { get; set; }
     internal Avalanche Avalanche { get; set; }
+    internal bool IgnoreCase { get; set; }
     public AdditionalData[]? AdditionalData => null;
     public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 
-    public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.Build([Segment], Mixer, Avalanche);
+    public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.Build([Segment], Mixer, Avalanche, IgnoreCase);
 
     public override string ToString() =>
         $"""

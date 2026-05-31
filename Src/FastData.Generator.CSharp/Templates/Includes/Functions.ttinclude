@@ -1,4 +1,4 @@
-﻿<#+
+<#+
     public string KeyTypeName => TypeMap.GetTypeName(Model.KeyType);
     public string ValueTypeName => TypeMap.GetTypeName(Model.ValueType);
 
@@ -6,14 +6,26 @@
     public string MethodModifier => CSharpConfig.ClassType == ClassType.Static ? "public static " : "public ";
     public string MethodAttribute => "";
     public string LookupKeyName => "key";
+    public string HashCall => Type.GetTypeCode(Model.KeyType) == TypeCode.String ? $"Hash({LookupKeyName}, length * 2)" : $"Hash({LookupKeyName})";
 
-    public string HashSource => $$"""
-                                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                                    private static ulong Hash({{KeyTypeName}} value)
-                                    {
-                                {{GetHash()}}
-                                    }
-                                """;
+    public string HashSource
+    {
+        get
+        {
+            string parameters = Type.GetTypeCode(Model.KeyType) == TypeCode.String ? $"{KeyTypeName} value, int length" : $"{KeyTypeName} value";
+
+            return $$"""
+                                        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                                        private static ulong Hash({{parameters}})
+                                        {
+                                            unchecked
+                                            {
+                                    {{GetHash()}}
+                                            }
+                                        }
+                                    """;
+        }
+    }
 
     public string GetEqual(string var1, string var2)
     {
@@ -71,27 +83,18 @@
         if (keyType.UsesIdentityHash())
             return "        return (ulong)value;";
 
-        if (keyType == TypeCode.String)
+        if (GeneratorConfig is StringGeneratorConfig strCfg && strCfg.HashInfo != null)
         {
-            return """
-                           ulong hash = 352654597;
-
-                           ref char ptr = ref MemoryMarshal.GetReference(value.AsSpan());
-                           int len = value.Length;
-
-                           while (len-- > 0)
-                           {
-                               hash = (((hash << 5) | (hash >> 27)) + hash) ^ ptr;
-                               ptr = ref Unsafe.Add(ref ptr, 1);
-                           }
-
-                           return 352654597 + (hash * 1566083941);
-                   """;
+            CSharpExpressionCompiler compiler = new CSharpExpressionCompiler(TypeMap);
+            return $"""
+                            ReadOnlySpan<byte> data = MemoryMarshal.AsBytes(value.AsSpan());
+                    {compiler.GetCode(strCfg.HashInfo.Expression, 8)}
+                            return hash;
+                    """;
         }
 
         if (GeneratorConfig is NumericGeneratorConfig numCfg)
         {
-
             if (keyType == TypeCode.Single)
             {
                 return numCfg.HasZero

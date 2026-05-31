@@ -14,7 +14,7 @@ internal sealed class EdgeGramGenerator(int maxLength) : ISegmentGenerator
     {
         int len;
 
-        int max = Math.Min(props.LengthData.MinCharLength, maxLength); //We cannot segment above the shortest string.
+        int max = Math.Min(props.LengthData.MinByteLength, maxLength); //We cannot segment above the shortest encoded byte string.
 
         //Generates:
         //[t]est

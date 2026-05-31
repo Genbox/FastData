@@ -16,6 +16,7 @@
 <#@ import namespace="Genbox.FastData.Generators.Enums" #>
 <#@ import namespace="Genbox.FastData.Generators.Expressions" #>
 <#@ import namespace="Genbox.FastData.Generators.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generators.StringHash.Framework" #>
 
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.TypeMap" name="TypeMap" #>
@@ -33,7 +34,7 @@
         ClassType.Instance => " class",
         ClassType.Struct => " struct",
         _ => throw new InvalidOperationException("Invalid ClassType: " + CSharpConfig.ClassType)
-    };
+        };
 
     string attr = CSharpConfig.ClassType == ClassType.Struct ? "[StructLayout(LayoutKind.Auto)]\n" : "";
     string partial = CSharpConfig.ClassType != ClassType.Static ? " partial" : "";
@@ -85,10 +86,10 @@ bool IsAsciiOnly(string value)
 """ },
             { GeneratorFunction.EqualsAt, "bool EqualsAt(string str, int offset, string fragment) { int start = offset >= 0 ? offset : str.Length + offset; return string.CompareOrdinal(str, start, fragment, 0, fragment.Length) == 0; }" },
             { GeneratorFunction.EqualsAtAsciiLower, "bool EqualsAtAsciiLower(string str, int offset, string fragment) { int start = offset >= 0 ? offset : str.Length + offset; for (int i = 0; i < fragment.Length; i++) { uint left = str[start + i]; uint right = fragment[i]; uint leftCandidate = left | 0x20u; uint rightCandidate = right | 0x20u; left = leftCandidate - 'a' <= 'z' - 'a' ? leftCandidate : left; right = rightCandidate - 'a' <= 'z' - 'a' ? rightCandidate : right; if (left != right) return false; } return true; }" },
-            { GeneratorFunction.ReadU8, "uint ReadU8(byte[] ptr, int offset) => Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset);" },
-            { GeneratorFunction.ReadU16, "uint ReadU16(byte[] ptr, int offset) => Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));" },
-            { GeneratorFunction.ReadU32, "uint ReadU32(byte[] ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));" },
-            { GeneratorFunction.ReadU64, "ulong ReadU64(byte[] ptr, int offset) => Unsafe.ReadUnaligned<ulong>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));" }
+            { GeneratorFunction.ReadU8, "uint ReadU8(ReadOnlySpan<byte> ptr, int offset) => Unsafe.Add(ref MemoryMarshal.GetReference(ptr), offset);" },
+            { GeneratorFunction.ReadU16, "uint ReadU16(ReadOnlySpan<byte> ptr, int offset) => Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr), offset));" },
+            { GeneratorFunction.ReadU32, "uint ReadU32(ReadOnlySpan<byte> ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr), offset));" },
+            { GeneratorFunction.ReadU64, "ulong ReadU64(ReadOnlySpan<byte> ptr, int offset) => Unsafe.ReadUnaligned<ulong>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr), offset));" }
         };
 
         foreach (KeyValuePair<GeneratorFunction, string> kv in map)
@@ -98,6 +99,20 @@ bool IsAsciiOnly(string value)
 #>
     private static <#= kv.Value #>
 <#
+        }
+
+        AdditionalData[]? addData = strCfg2.HashInfo?.AdditionalData;
+        if (addData != null)
+        {
+            foreach (AdditionalData data in addData)
+            {
+#>
+    private static readonly <#= TypeMap.GetTypeName(data.Type) #>[] <#= data.Name #> = new <#= TypeMap.GetTypeName(data.Type) #>[] {
+<#= FormatHelper.FormatColumns(data.Values.Cast<object>(), data.Values.Length, x => TypeMap.ToValueLabel(x), 8) #>
+    };
+
+<#
+            }
         }
     }
 #>

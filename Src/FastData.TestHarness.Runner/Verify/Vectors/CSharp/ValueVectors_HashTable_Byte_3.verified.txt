@@ -33,7 +33,10 @@ internal static class FastData
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(byte value)
     {
+        unchecked
+        {
         return (ulong)value;
+        }
     }
 
     

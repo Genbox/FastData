@@ -20,9 +20,8 @@ internal static class FastData
     
     public static bool Contains(string key)
     {
-        int length;
-        uint unitAt0;
-        length = Length(key);
+        int length = Length(key);
+        uint unitAt0 = UnitAt(key, 0);
         if ((length < 5))
         {
          return false;
@@ -33,7 +32,6 @@ internal static class FastData
          return false;
         }
 
-        unitAt0 = UnitAt(key, 0);
         if ((unitAt0 < 97u))
         {
          return false;

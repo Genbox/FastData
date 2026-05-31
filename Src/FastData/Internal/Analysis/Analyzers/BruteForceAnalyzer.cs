@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, BruteForceAnalyzerConfig config, Simulator sim, ILogger<BruteForceAnalyzer> logger) : IStringHashAnalyzer
+internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, BruteForceAnalyzerConfig config, Simulator sim, ILogger<BruteForceAnalyzer> logger, bool ignoreCase = false) : IStringHashAnalyzer
 {
     private static readonly ulong[] Seeds =
     [
@@ -47,7 +47,7 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
     public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<string> data)
     {
         MinHeap<Candidate> heap = new MinHeap<Candidate>(config.MaxReturned);
-        BruteForceStringHash spec = new BruteForceStringHash();
+        BruteForceStringHash spec = new BruteForceStringHash { IgnoreCase = ignoreCase };
         BruteForceGenerator segGen = new BruteForceGenerator(8);
         ArraySegment[] segments = segGen.Generate(props).ToArray();
 
@@ -144,12 +144,20 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
 
     private sealed class AvalancheIdentity : IAvalancheGenerator
     {
-        public void Reset() {}
+        private bool _used;
+        public void Reset() => _used = false;
 
         public bool TryGet(out Avalanche op)
         {
-            op = h => h;
-            return false;
+            if (_used)
+            {
+                op = null!;
+                return false;
+            }
+
+            _used = true;
+            op = static h => h;
+            return true;
         }
     }
 

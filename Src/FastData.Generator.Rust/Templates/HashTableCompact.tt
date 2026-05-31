@@ -44,7 +44,7 @@ struct E {
     <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
-        let hash = unsafe { Self::get_hash(<#= LookupKeyName #>) };
+        let hash = <#= HashCall #>;
         let index = (<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>) as usize;
         let start = Self::BUCKET_STARTS[index] as usize;
         let count = Self::BUCKET_COUNTS[index] as usize;
@@ -72,7 +72,7 @@ struct E {
     <#= MethodAttribute #>
     <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
 <#= GetMethodHeader(MethodType.TryLookup) #>
-        let hash = unsafe { Self::get_hash(<#= LookupKeyName #>) };
+        let hash = <#= HashCall #>;
         let index = (<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>) as usize;
         let start = Self::BUCKET_STARTS[index] as usize;
         let count = Self::BUCKET_COUNTS[index] as usize;

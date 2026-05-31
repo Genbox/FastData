@@ -36,7 +36,7 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: u32) -> bool {
 
-        let hash = unsafe { Self::get_hash(key) };
+        let hash = Self::get_hash(key);
         let index = (hash % 4u64) as usize;
         let start = Self::BUCKET_STARTS[index] as usize;
         let count = Self::BUCKET_COUNTS[index] as usize;

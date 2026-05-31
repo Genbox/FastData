@@ -37,12 +37,15 @@ internal static class FastData
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong Hash(float value)
     {
+        unchecked
+        {
         uint bits = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<float, byte>(ref value));
 
         if (((bits - 1) & ~(0x8000_0000)) >= 0x7F80_0000)
             bits &= 0x7F80_0000;
 
         return (ulong)bits;
+        }
     }
 
     

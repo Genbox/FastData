@@ -21,13 +21,14 @@ internal sealed record GeneticStringHash : IStringHash
         0xFF51AFD7ED558CCD, 0xC4CEB9FE1A85EC53 //Murmur
     ];
 
-    internal GeneticStringHash(ArraySegment segment, int mixerSeed, int mixerIterations, int avalancheSeed, int avalancheIterations)
+    internal GeneticStringHash(ArraySegment segment, int mixerSeed, int mixerIterations, int avalancheSeed, int avalancheIterations, bool ignoreCase = false)
     {
         Segment = segment;
         MixerSeed = mixerSeed;
         MixerIterations = mixerIterations;
         AvalancheSeed = avalancheSeed;
         AvalancheIterations = avalancheIterations;
+        IgnoreCase = ignoreCase;
     }
 
     internal ArraySegment Segment { get; }
@@ -35,10 +36,11 @@ internal sealed record GeneticStringHash : IStringHash
     internal int MixerIterations { get; }
     internal int AvalancheSeed { get; }
     internal int AvalancheIterations { get; }
+    internal bool IgnoreCase { get; }
     public AdditionalData[]? AdditionalData => null;
     public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 
-    public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.Build([Segment], GetMixer(), GetAvalanche());
+    public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.Build([Segment], GetMixer(), GetAvalanche(), IgnoreCase);
 
     private Mixer GetMixer() => (hash, read) =>
     {

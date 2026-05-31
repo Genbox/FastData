@@ -1,0 +1,102 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: HashTable
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+fn Length(value: &str) -> i32 { value.len() as i32 }
+
+const AssociationValues: [i32; 256] = [
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 
+        0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        2, 2, 2, 2, 2, 2
+];
+
+
+pub struct fastdata;
+
+struct E {
+    key: &'static str,
+    hash_code: u64,
+    next: i8,
+}
+
+impl fastdata {
+    const BUCKETS: [i8; 2] = [
+        2, 1
+    ];
+
+    const ENTRIES: [E; 2] = [
+        E { hash_code: 1, next: -1, key: "test1" }, E { hash_code: u64::MIN, next: -1, key: "test2" }
+    ];
+
+    #[inline]
+    unsafe fn get_hash(value: &str, mut length: i32) -> u64 {
+        let data = value.as_bytes();
+        let mut hash: u64 = u64::MIN;
+        hash = hash.wrapping_add((AssociationValues[((data[(4) as usize] as i32)) as usize] as u64));
+        hash;
+
+        return hash;
+    }
+
+    #[must_use]
+    pub fn contains(key: &str) -> bool {
+        let mut length: i32 = Length(key);
+        if ((length < 5))
+        {
+         return false;
+        }
+
+
+        let hash = unsafe { Self::get_hash(key, length) };
+        let index = hash % 2u64;
+        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+
+        while i >= 0 {
+            let entry = &Self::ENTRIES[i as usize];
+            if entry.hash_code == hash && entry.key == key {
+                return true;
+            }
+            i = entry.next;
+        }
+
+        false
+    }
+
+    pub const ITEM_COUNT: usize = 2;
+    pub const MIN_KEY_LENGTH: i32 = 5;
+    pub const MAX_KEY_LENGTH: i32 = 5;
+    pub const HAS_NUMBER: bool = true;
+    pub const HAS_UPPERCASE: bool = false;
+    pub const HAS_LOWERCASE: bool = true;
+    pub const HAS_SYMBOL: bool = false;
+    pub const HAS_WHITESPACE: bool = false;
+}

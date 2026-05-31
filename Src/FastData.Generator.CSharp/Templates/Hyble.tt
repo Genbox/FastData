@@ -63,7 +63,7 @@
     {
 <#= GetMethodHeader(MethodType.Contains) #>
 
-        ulong hash = unchecked(Hash(<#= LookupKeyName #>) * <#= Data.Seed.ToStringInvariant() #>UL);
+        ulong hash = unchecked(<#= HashCall #> * <#= Data.Seed.ToStringInvariant() #>UL);
         uint approx = Reduce64(hash, <#= Data.ApproxRange.ToStringInvariant() #>U);
         int bucket = (int)(hash & <#= Data.BucketMask.ToStringInvariant() #>UL);
         int index = (int)(approx + _displacements[bucket]);
@@ -81,7 +81,7 @@
     {
 <#= GetMethodHeader(MethodType.TryLookup) #>
 
-        ulong hash = unchecked(Hash(<#= LookupKeyName #>) * <#= Data.Seed.ToStringInvariant() #>UL);
+        ulong hash = unchecked(<#= HashCall #> * <#= Data.Seed.ToStringInvariant() #>UL);
         uint approx = Reduce64(hash, <#= Data.ApproxRange.ToStringInvariant() #>U);
         int bucket = (int)(hash & <#= Data.BucketMask.ToStringInvariant() #>UL);
         int index = (int)(approx + _displacements[bucket]);

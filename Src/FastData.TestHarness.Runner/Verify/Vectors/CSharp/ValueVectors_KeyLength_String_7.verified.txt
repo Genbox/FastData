@@ -18,8 +18,7 @@ internal static class FastData
     
     public static bool Contains(string key)
     {
-        int length;
-        length = Length(key);
+        int length = Length(key);
         if ((length < 3))
         {
          return false;

@@ -22,18 +22,18 @@ internal static class HashBenchmark
 
         //We always add the default hash as a candidate
         if (includeDefault)
-            candidates.Add(sim.Run(data, DefaultStringHash.GetInstance(encoding)));
+            candidates.Add(sim.Run(data, DefaultStringHash.GetInstance(encoding, ignoreCase)));
 
         if (cfg.BruteForceAnalyzerConfig != null)
         {
-            BruteForceAnalyzer bf = new BruteForceAnalyzer(props, cfg.BruteForceAnalyzerConfig, sim, factory.CreateLogger<BruteForceAnalyzer>());
+            BruteForceAnalyzer bf = new BruteForceAnalyzer(props, cfg.BruteForceAnalyzerConfig, sim, factory.CreateLogger<BruteForceAnalyzer>(), ignoreCase);
             if (bf.IsAppropriate())
                 candidates.AddRange(bf.GetCandidates(data));
         }
 
         if (cfg.GeneticAnalyzerConfig != null)
         {
-            GeneticAnalyzer ga = new GeneticAnalyzer(props, cfg.GeneticAnalyzerConfig, sim, factory.CreateLogger<GeneticAnalyzer>());
+            GeneticAnalyzer ga = new GeneticAnalyzer(props, cfg.GeneticAnalyzerConfig, sim, factory.CreateLogger<GeneticAnalyzer>(), ignoreCase);
             if (ga.IsAppropriate())
                 candidates.AddRange(ga.GetCandidates(data));
         }
@@ -61,9 +61,7 @@ internal static class HashBenchmark
         perfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
         notPerfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
 
-        string test = new string('a', props.LengthData.MaxCharLength);
-        Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(encoding);
-        byte[] testBytes = getBytes(test);
+        byte[] testBytes = new byte[props.LengthData.MaxByteLength];
 
         //We start with the perfect results (if any)
         if (perfect.Count > 0)
@@ -112,6 +110,9 @@ internal static class HashBenchmark
     {
         //The candidate has already been benchmarked. Do nothing.
         if (candidate.Time >= double.Epsilon)
+            return;
+
+        if (iterations == 0)
             return;
 
         StringHashFunc func = candidate.StringHash.GetExpression().Compile();

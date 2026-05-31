@@ -46,7 +46,7 @@
     <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
-        let hash = unsafe { Self::get_hash(<#= LookupKeyName #>) };
+        let hash = <#= HashCall #>;
         let index = (<#= GetMod("hash", (ulong)Data.Entries.Length) #>) as usize;
         let entry = &Self::ENTRIES[index];
 
@@ -65,7 +65,7 @@
     <#= MethodAttribute #>
     <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
 <#= GetMethodHeader(MethodType.TryLookup) #>
-        let hash = unsafe { Self::get_hash(<#= LookupKeyName #>) };
+        let hash = <#= HashCall #>;
         let index = (<#= GetMod("hash", (ulong)Data.Entries.Length) #>) as usize;
         let entry = &Self::ENTRIES[index];
 

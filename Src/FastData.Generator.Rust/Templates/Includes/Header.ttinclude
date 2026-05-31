@@ -15,6 +15,7 @@
 <#@ import namespace="Genbox.FastData.Generators.Enums" #>
 <#@ import namespace="Genbox.FastData.Generators.Expressions" #>
 <#@ import namespace="Genbox.FastData.Generators.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generators.StringHash.Framework" #>
 
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateModel" name="Model" #>
 <#@ parameter type="Genbox.FastData.Generator.TypeMap" name="TypeMap" #>
@@ -173,6 +174,20 @@ fn EqualsAtAsciiLower(value: &str, offset: i32, fragment: &str) -> bool {
 <#= kv.Value #>
 
 <#
+        }
+
+        AdditionalData[]? addData = strCfg2.HashInfo?.AdditionalData;
+        if (addData != null)
+        {
+            foreach (AdditionalData data in addData)
+            {
+#>
+const <#= data.Name #>: [<#= TypeMap.GetTypeName(data.Type) #>; <#= data.Values.Length #>] = [
+<#= FormatHelper.FormatColumns(data.Values.Cast<object>(), data.Values.Length, x => TypeMap.ToValueLabel(x), 8) #>
+];
+
+<#
+            }
         }
     }
 #>

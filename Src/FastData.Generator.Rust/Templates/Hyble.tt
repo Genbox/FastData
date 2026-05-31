@@ -38,7 +38,7 @@
     <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
-        let hash = unsafe { Self::get_hash(<#= LookupKeyName #>) }.wrapping_mul(<#= Data.Seed.ToStringInvariant() #>u64);
+        let hash = <#= HashCall #>.wrapping_mul(<#= Data.Seed.ToStringInvariant() #>u64);
         let approx = ((hash as u128 * <#= Data.ApproxRange.ToStringInvariant() #>u128) >> 64) as u32;
         let bucket = (hash & <#= Data.BucketMask.ToStringInvariant() #>u64) as usize;
         let index = (approx + Self::DISPLACEMENTS[bucket] as u32) as usize;
@@ -54,7 +54,7 @@
     <#= MethodAttribute #>
     <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
 <#= GetMethodHeader(MethodType.TryLookup) #>
-        let hash = unsafe { Self::get_hash(<#= LookupKeyName #>) }.wrapping_mul(<#= Data.Seed.ToStringInvariant() #>u64);
+        let hash = <#= HashCall #>.wrapping_mul(<#= Data.Seed.ToStringInvariant() #>u64);
         let approx = ((hash as u128 * <#= Data.ApproxRange.ToStringInvariant() #>u128) >> 64) as u32;
         let bucket = (hash & <#= Data.BucketMask.ToStringInvariant() #>u64) as usize;
         let index = (approx + Self::DISPLACEMENTS[bucket] as u32) as usize;

@@ -78,7 +78,7 @@
     {
 <#= GetMethodHeader(MethodType.Contains) #>
 
-        ulong hash = Hash(<#= LookupKeyName #>);
+        ulong hash = <#= HashCall #>;
         int index = (int)(<#= GetMod("hash", (ulong)Data.Entries.Length) #>);
         ref var entry = ref _entries[index];
 
@@ -99,7 +99,7 @@
     {
 <#= GetMethodHeader(MethodType.TryLookup) #>
 
-        ulong hash = Hash(<#= LookupKeyName #>);
+        ulong hash = <#= HashCall #>;
         int index = (int)(<#= GetMod("hash", (ulong)Data.Entries.Length) #>);
         ref E entry = ref _entries[index];
 

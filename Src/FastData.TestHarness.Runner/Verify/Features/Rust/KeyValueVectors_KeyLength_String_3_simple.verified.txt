@@ -27,8 +27,7 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
-        let mut length: i32;
-        length = Length(key);
+        let mut length: i32 = Length(key);
         if ((length < 1))
         {
          return false;
@@ -46,8 +45,7 @@ impl fastdata {
 
     #[must_use]
     pub fn try_lookup(key: &str) -> Option<i32> {
-        let mut length: i32;
-        length = Length(key);
+        let mut length: i32 = Length(key);
         if ((length < 1))
         {
          return None;
