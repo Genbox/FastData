@@ -378,8 +378,11 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private static bool AreEqualSymbols(ISymbol a, ISymbol b)
+    private static bool AreEqualSymbols(ISymbol a, ISymbol? b)
     {
+        if (b == null)
+            return false;
+
         ImmutableArray<SymbolDisplayPart> aParts = a.ToDisplayParts(Format);
         ImmutableArray<SymbolDisplayPart> bParts = b.ToDisplayParts(Format);
 

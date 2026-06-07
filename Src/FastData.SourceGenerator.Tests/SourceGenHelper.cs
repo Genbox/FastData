@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Genbox.FastData.SourceGenerator.Tests;
 
-public static class SourceGenHelper
+internal static class SourceGenHelper
 {
     public static string RunSourceGenerator<T>(string source, bool release, out Diagnostic[] compilerDiagnostics, out Diagnostic[] codeGenDiagnostics) where T : IIncrementalGenerator, new()
     {
