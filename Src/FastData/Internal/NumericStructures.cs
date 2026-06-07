@@ -10,17 +10,18 @@ internal static class NumericStructures<TKey>
     {
         uint keyCount = (uint)keys.Length;
 
+        TypeCode typeCode = Type.GetTypeCode(typeof(TKey));
+
         if (config.IsEnabled(typeof(SingleValueStructure<,>)) && keyCount == 1)
             return typeof(SingleValueStructure<,>);
 
-        // RangeStructure handles range-based keys, but does not support values
-        if (config.IsEnabled(typeof(RangeStructure<,>)) && !hasValues && config.CheckItemCountLimits(typeof(RangeStructure<,>), (uint)rangeCount))
+        // Floating-point min/max ranges are not exact for sparse keys: [1.0, 3.0] would also accept 2.0.
+        // Keep RangeStructure to integral keys where ranges represent discrete consecutive values.
+        if (config.IsEnabled(typeof(RangeStructure<,>)) && typeCode.IsIntegral() && !hasValues && config.CheckItemCountLimits(typeof(RangeStructure<,>), (uint)rangeCount))
             return typeof(RangeStructure<,>);
 
         if (config.IsEnabled(typeof(BloomFilterStructure<,>)) && allowApproximate)
             return typeof(BloomFilterStructure<,>);
-
-        TypeCode typeCode = Type.GetTypeCode(typeof(TKey));
 
         if (config.IsEnabled(typeof(BitSetStructure<,>)) && typeCode.IsIntegral() && config.CheckDensityLimits(typeof(BitSetStructure<,>), density))
             return typeof(BitSetStructure<,>);
