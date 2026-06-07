@@ -3,7 +3,7 @@ function Invoke-FastData
     param (
         [Parameter(Mandatory = $true)][ValidateSet("csharp", "cpp", "rust")] [string]$Command,
         [string]$OutputFile,
-        [ValidateSet("char", "double", "int8", "int16", "int32", "int64", "int8", "single", "string", "uint8", "uint16", "uint32", "uint64" )]
+        [ValidateSet("char", "double", "int8", "int16", "int32", "int64", "single", "string", "uint8", "uint16", "uint32", "uint64" )]
         [string]$DataType = "string",
         [ValidateSet("Auto", "Array", "BinarySearch", "Conditional", "HashTable")]
         [string]$StructureType = "Auto",
@@ -12,65 +12,112 @@ function Invoke-FastData
         [string]$ClassName = "MyData"
     )
 
-    Add-Type -Path "$PSScriptRoot\lib\Genbox.FastData.dll" -ErrorAction Stop
-    Add-Type -Path "$PSScriptRoot\lib\Genbox.FastData.Generator.dll" -ErrorAction Stop
-    Add-Type -Path "$PSScriptRoot\lib\Genbox.FastData.Generator.CSharp.dll" -ErrorAction Stop
-    Add-Type -Path "$PSScriptRoot\lib\Genbox.FastData.Generator.CPlusPlus.dll" -ErrorAction Stop
-    Add-Type -Path "$PSScriptRoot\lib\Genbox.FastData.Generator.Rust.dll" -ErrorAction Stop
+    $libDir = Join-Path $PSScriptRoot "lib"
+    Get-ChildItem -Path $libDir -Filter "*.dll" | ForEach-Object {
+        [System.Reflection.Assembly]::LoadFrom($_.FullName) | Out-Null
+    }
 
-    function Get-TypeFunc
+    function Get-DataTypeInfo
     {
-        param ($DataType)
-        switch ($DataType)
+        param ([string]$Name)
+
+        switch ($Name)
         {
-            "string" { return { [string]$_ } }
-            "char" { return { [char]$_ } }
-            "int8" { return { [sbyte]::Parse($_) } }
-            "uint8" { return { [byte]::Parse($_) } }
-            "int16" { return { [short]::Parse($_) } }
-            "uint16" { return { [ushort]::Parse($_) } }
-            "int32" { return { [int]::Parse($_) } }
-            "uint32" { return { [uint]::Parse($_) } }
-            "int64" { return { [long]::Parse($_) } }
-            "uint64" { return { [ulong]::Parse($_) } }
-            "single" { return { [float]::Parse($_) } }
-            "double" { return { [double]::Parse($_) } }
-            default { throw "Unsupported data type: $DataType" }
+            "string" { return [string], { param ($value) [string]$value } }
+            "char" { return [char], { param ($value) if ($value.Length -ne 1) { throw "Invalid char value: '$value'" } [char]$value[0] } }
+            "int8" { return [sbyte], { param ($value) [sbyte]::Parse($value, [Globalization.CultureInfo]::InvariantCulture) } }
+            "uint8" { return [byte], { param ($value) [byte]::Parse($value, [Globalization.CultureInfo]::InvariantCulture) } }
+            "int16" { return [short], { param ($value) [short]::Parse($value, [Globalization.CultureInfo]::InvariantCulture) } }
+            "uint16" { return [ushort], { param ($value) [ushort]::Parse($value, [Globalization.CultureInfo]::InvariantCulture) } }
+            "int32" { return [int], { param ($value) [int]::Parse($value, [Globalization.CultureInfo]::InvariantCulture) } }
+            "uint32" { return [uint], { param ($value) [uint]::Parse($value, [Globalization.CultureInfo]::InvariantCulture) } }
+            "int64" { return [long], { param ($value) [long]::Parse($value, [Globalization.CultureInfo]::InvariantCulture) } }
+            "uint64" { return [ulong], { param ($value) [ulong]::Parse($value, [Globalization.CultureInfo]::InvariantCulture) } }
+            "single" { return [float], { param ($value) [float]::Parse($value, [Globalization.CultureInfo]::InvariantCulture) } }
+            "double" { return [double], { param ($value) [double]::Parse($value, [Globalization.CultureInfo]::InvariantCulture) } }
+            default { throw "Unsupported data type: $Name" }
         }
     }
 
-    $typeFunc = Get-TypeFunc $DataType
-    $data = Get-Content -Path $InputFile | ForEach-Object { & $typeFunc $_ }
-    $config = New-Object Genbox.FastData.Configs.FastDataConfig([Genbox.FastData.Enums.StructureType]::$StructureType)
+    function Get-StructureTypeOverride
+    {
+        param ([string]$Name)
+
+        switch ($Name)
+        {
+            "Auto" { return $null }
+            "Array" { return [Type]::GetType("Genbox.FastData.Internal.Structures.ArrayStructure``2, Genbox.FastData", $true) }
+            "BinarySearch" { return [Type]::GetType("Genbox.FastData.Internal.Structures.BinarySearchStructure``2, Genbox.FastData", $true) }
+            "Conditional" { return [Type]::GetType("Genbox.FastData.Internal.Structures.ConditionalStructure``2, Genbox.FastData", $true) }
+            "HashTable" { return [Type]::GetType("Genbox.FastData.Internal.Structures.HashTableStructure``2, Genbox.FastData", $true) }
+            default { throw "Unsupported structure type: $Name" }
+        }
+    }
+
+    $typeInfo = Get-DataTypeInfo $DataType
+    $keyType = $typeInfo[0]
+    $converter = $typeInfo[1]
+    $lines = @(Get-Content -Path $InputFile)
+    $data = [Array]::CreateInstance($keyType, $lines.Count)
+
+    for ($i = 0; $i -lt $lines.Count; $i++)
+    {
+        $data.SetValue((& $converter $lines[$i]), $i)
+    }
+
+    if ($keyType -eq [string])
+    {
+        $config = [Genbox.FastData.Config.StringDataConfig]::new()
+    }
+    else
+    {
+        $config = [Genbox.FastData.Config.NumericDataConfig]::new()
+    }
+
+    $structureOverride = Get-StructureTypeOverride $StructureType
+    if ($structureOverride -ne $null)
+    {
+        $config.StructureTypeOverride = $structureOverride
+    }
 
     if ($Command -eq "csharp")
     {
-        $cfg = New-Object Genbox.FastData.Generator.CSharp.CSharpCodeGeneratorConfig($ClassName)
+        $cfg = [Genbox.FastData.Generator.CSharp.CSharpCodeGeneratorConfig]::new($ClassName)
         $cfg.Namespace = $Namespace
-        $generator = [Genbox.FastData.Generator.CSharp.CSharpCodeGenerator]::Create($cfg)
+        $generator = [Genbox.FastData.Generator.CSharp.CSharpCodeGenerator]::new($cfg)
     }
     elseif ($Command -eq "cpp")
     {
-        $cfg = New-Object Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig($ClassName)
-        $generator = [Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator]::Create($cfg)
-
+        $cfg = [Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGeneratorConfig]::new($ClassName)
+        $generator = [Genbox.FastData.Generator.CPlusPlus.CPlusPlusCodeGenerator]::new($cfg)
     }
     elseif ($Command -eq "rust")
     {
-        $cfg = New-Object Genbox.FastData.Generator.Rust.RustCodeGeneratorConfig($ClassName)
-        $generator = [Genbox.FastData.Generator.Rust.RustCodeGenerator]::Create($cfg)
+        $cfg = [Genbox.FastData.Generator.Rust.RustCodeGeneratorConfig]::new($ClassName)
+        $generator = [Genbox.FastData.Generator.Rust.RustCodeGenerator]::new($cfg)
     }
 
-    $source = [Genbox.FastData.FastDataGenerator]::Generate($data, $config, $generator)
-
-    if (-not $ok)
+    if ($keyType -eq [string])
     {
-        throw "Unable to generate code"
+        $source = [Genbox.FastData.FastDataGenerator]::Generate([string[]]$data, $config, $generator)
+    }
+    else
+    {
+        $method = [Genbox.FastData.FastDataGenerator].GetMethods([System.Reflection.BindingFlags]::Public -bor [System.Reflection.BindingFlags]::Static) |
+            Where-Object { $_.Name -eq "Generate" -and $_.IsGenericMethodDefinition -and $_.GetGenericArguments().Length -eq 1 -and $_.GetParameters().Length -eq 4 -and $_.GetParameters()[0].ParameterType.IsArray } |
+            Select-Object -First 1
+
+        if ($method -eq $null)
+        {
+            throw "Unable to find FastDataGenerator.Generate overload"
+        }
+
+        $source = $method.MakeGenericMethod($keyType).Invoke($null, @($data, $config, $generator, $null))
     }
 
     if ($OutputFile)
     {
-        $source.Value | Out-File -Encoding UTF8 -FilePath $OutputFile
+        $source | Out-File -Encoding UTF8 -FilePath $OutputFile
     }
     else
     {

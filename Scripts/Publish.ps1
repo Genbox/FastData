@@ -58,16 +58,23 @@ dotnet pack $Root/Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.
 dotnet pack $Root/Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj -c $Config @PackCommonProperties -o $PublishDir
 
 Write-Host -ForegroundColor $Color "Pack the PowerShell variant"
-New-Item -ItemType Directory -Path $PublishDir/Genbox.FastData | Out-Null
-New-Item -ItemType Directory -Path $PublishDir/Genbox.FastData/lib | Out-Null
-
-Write-Host -ForegroundColor $Color "Copy over the psd1 file, and update the version number in the process"
-(Get-Content $Root/Misc/PowerShell/FastData.psd1) -replace "TODO-VERSION", "$version" | Set-Content $PublishDir/Genbox.FastData/Genbox.FastData.psd1
+$ModuleDir = "$PublishDir/Genbox.FastData"
+New-Item -ItemType Directory -Path $ModuleDir | Out-Null
+New-Item -ItemType Directory -Path $ModuleDir/lib | Out-Null
 
 Write-Host -ForegroundColor $Color "Copy over the other PowerShell files"
-Copy-Item $Root/Misc/PowerShell/FastData.psm1 $PublishDir/Genbox.FastData/Genbox.FastData.psm1
-Copy-Item $ArtifactsDir/*.dll $PublishDir/Genbox.FastData/lib/
-Copy-Item $ArtifactsDir/Templates $PublishDir/Genbox.FastData/lib/Templates -Recurse -Force
+Copy-Item $Root/Misc/PowerShell/FastData.psm1 $ModuleDir/Genbox.FastData.psm1
+Copy-Item $ArtifactsDir/*.dll $ModuleDir/lib/
+Copy-Item $ArtifactsDir/Templates $ModuleDir/lib/Templates -Recurse -Force
+
+Write-Host -ForegroundColor $Color "Copy over the psd1 file, update the version number, and generate the file list"
+$ManifestPath = "$ModuleDir/Genbox.FastData.psd1"
+$FileList = @("Genbox.FastData.psd1") + @(Get-ChildItem -Path $ModuleDir -Recurse -File |
+    ForEach-Object { [System.IO.Path]::GetRelativePath($ModuleDir, $_.FullName).Replace('/', '\') } |
+    Where-Object { $_ -ne "Genbox.FastData.psd1" } |
+    Sort-Object)
+$FileListText = ($FileList | ForEach-Object { "                          '$($_.Replace("'", "''"))'" }) -join ",`n"
+(Get-Content $Root/Misc/PowerShell/FastData.psd1 -Raw).Replace("TODO-VERSION", $version).Replace("                          'TODO-FILELIST'", $FileListText) | Set-Content $ManifestPath
 
 # We don't want to publish versions with tags like "alpha", "beta", etc.
 if ($version -notlike "*-*") {

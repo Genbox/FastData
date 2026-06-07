@@ -5,12 +5,9 @@
     Author            = 'Ian Qvist'
     Description       = 'Data structure generator for high-performance lookups of static data'
     PowerShellVersion = '5.1'
-    FileList          = @('Genbox.FastData.psm1',
-                          'Genbox.FastData.psd1',
-                          'lib\Genbox.FastData.dll',
-                          'lib\Genbox.FastData.Generator.CPlusPlus.dll',
-                          'lib\Genbox.FastData.Generator.CSharp.dll',
-                          'lib\Genbox.FastData.Generator.dll')
+    FileList          = @(
+                          'TODO-FILELIST'
+                      )
     FunctionsToExport = @('Invoke-FastData')
     PrivateData = @{
         PSData = @{
