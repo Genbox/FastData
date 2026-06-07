@@ -20,8 +20,8 @@ internal class CSharpLanguageDef : ILanguageDef
         new IntegerTypeDef<uint>("uint", uint.MinValue, uint.MaxValue, "uint.MinValue", "uint.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "u"),
         new IntegerTypeDef<long>("long", long.MinValue, long.MaxValue, "long.MinValue", "long.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "l"),
         new IntegerTypeDef<ulong>("ulong", ulong.MinValue, ulong.MaxValue, "ulong.MinValue", "ulong.MaxValue", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "ul"),
-        new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "float.MinValue", "float.MaxValue", static x => x.ToString("R", NumberFormatInfo.InvariantInfo) + "f"),
-        new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "double.MinValue", "double.MaxValue", static x => x.ToString("R", NumberFormatInfo.InvariantInfo)),
+        new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "float.MinValue", "float.MaxValue", FormatSingle),
+        new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "double.MinValue", "double.MaxValue", FormatDouble),
         new StringTypeDef("string", static value => "\"" + EscapeString(value) + "\""),
 
         new ObjectTypeDef(PrintDeclaration, PrintValue)
@@ -35,6 +35,30 @@ internal class CSharpLanguageDef : ILanguageDef
             sb.Append(EscapeChar(ch));
 
         return sb.ToString();
+    }
+
+    private static string FormatSingle(float value)
+    {
+        if (float.IsNaN(value))
+            return "float.NaN";
+        if (float.IsPositiveInfinity(value))
+            return "float.PositiveInfinity";
+        if (float.IsNegativeInfinity(value))
+            return "float.NegativeInfinity";
+
+        return value.ToString("R", NumberFormatInfo.InvariantInfo) + "f";
+    }
+
+    private static string FormatDouble(double value)
+    {
+        if (double.IsNaN(value))
+            return "double.NaN";
+        if (double.IsPositiveInfinity(value))
+            return "double.PositiveInfinity";
+        if (double.IsNegativeInfinity(value))
+            return "double.NegativeInfinity";
+
+        return value.ToString("R", NumberFormatInfo.InvariantInfo);
     }
 
     private static string EscapeChar(char ch) => ch switch

@@ -20,8 +20,8 @@ internal class RustLanguageDef : ILanguageDef
         new IntegerTypeDef<uint>("u32", uint.MinValue, uint.MaxValue, "u32::MIN", "u32::MAX"),
         new IntegerTypeDef<long>("i64", long.MinValue, long.MaxValue, "i64::MIN", "i64::MAX"),
         new IntegerTypeDef<ulong>("u64", ulong.MinValue, ulong.MaxValue, "u64::MIN", "u64::MAX"),
-        new IntegerTypeDef<float>("f32", float.MinValue, float.MaxValue, "f32::MIN", "f32::MAX", static x => x.ToString("R", NumberFormatInfo.InvariantInfo) + "f32"),
-        new IntegerTypeDef<double>("f64", double.MinValue, double.MaxValue, "f64::MIN", "f64::MAX", static x => x.ToString("R", NumberFormatInfo.InvariantInfo) + "f64"),
+        new IntegerTypeDef<float>("f32", float.MinValue, float.MaxValue, "f32::MIN", "f32::MAX", FormatSingle),
+        new IntegerTypeDef<double>("f64", double.MinValue, double.MaxValue, "f64::MIN", "f64::MAX", FormatDouble),
         new StringTypeDef("&str", static value => "\"" + EscapeString(value) + "\""),
         new ObjectTypeDef(PrintDeclaration, PrintValue)
     };
@@ -34,6 +34,30 @@ internal class RustLanguageDef : ILanguageDef
             sb.Append(EscapeChar(ch));
 
         return sb.ToString();
+    }
+
+    private static string FormatSingle(float value)
+    {
+        if (float.IsNaN(value))
+            return "f32::NAN";
+        if (float.IsPositiveInfinity(value))
+            return "f32::INFINITY";
+        if (float.IsNegativeInfinity(value))
+            return "f32::NEG_INFINITY";
+
+        return value.ToString("R", NumberFormatInfo.InvariantInfo) + "f32";
+    }
+
+    private static string FormatDouble(double value)
+    {
+        if (double.IsNaN(value))
+            return "f64::NAN";
+        if (double.IsPositiveInfinity(value))
+            return "f64::INFINITY";
+        if (double.IsNegativeInfinity(value))
+            return "f64::NEG_INFINITY";
+
+        return value.ToString("R", NumberFormatInfo.InvariantInfo) + "f64";
     }
 
     private static string EscapeChar(char ch) => ch switch

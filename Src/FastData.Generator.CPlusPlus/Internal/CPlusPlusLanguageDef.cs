@@ -11,7 +11,7 @@ internal class CPlusPlusLanguageDef : ILanguageDef
     {
         new NullTypeDef("nullptr"),
 
-        new IntegerTypeDef<char>("char", char.MinValue, (char)127, "0", "127", static x => ((byte)x).ToString(NumberFormatInfo.InvariantInfo)),
+        new IntegerTypeDef<char>("char", char.MinValue, (char)127, "0", "127", FormatChar),
         new IntegerTypeDef<sbyte>("int8_t", sbyte.MinValue, sbyte.MaxValue, "std::numeric_limits<int8_t>::lowest()", "std::numeric_limits<int8_t>::max()"),
         new IntegerTypeDef<byte>("uint8_t", byte.MinValue, byte.MaxValue, "0", "std::numeric_limits<uint8_t>::max()"),
         new IntegerTypeDef<short>("int16_t", short.MinValue, short.MaxValue, "std::numeric_limits<int16_t>::lowest()", "std::numeric_limits<int16_t>::max()"),
@@ -21,7 +21,7 @@ internal class CPlusPlusLanguageDef : ILanguageDef
         new IntegerTypeDef<long>("int64_t", long.MinValue, long.MaxValue, "std::numeric_limits<int64_t>::lowest()", "std::numeric_limits<int64_t>::max()", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "ll"),
         new IntegerTypeDef<ulong>("uint64_t", ulong.MinValue, ulong.MaxValue, "0", "std::numeric_limits<uint64_t>::max()", static x => x.ToString(NumberFormatInfo.InvariantInfo) + "ull"),
         new IntegerTypeDef<float>("float", float.MinValue, float.MaxValue, "std::numeric_limits<float>::lowest()", "std::numeric_limits<float>::max()", FormatFloat),
-        new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "std::numeric_limits<double>::lowest()", "std::numeric_limits<double>::max()", static x => x.ToString("R", NumberFormatInfo.InvariantInfo)),
+        new IntegerTypeDef<double>("double", double.MinValue, double.MaxValue, "std::numeric_limits<double>::lowest()", "std::numeric_limits<double>::max()", FormatDouble),
 
         new ObjectTypeDef(PrintDeclaration, PrintValue),
 
@@ -39,14 +39,41 @@ internal class CPlusPlusLanguageDef : ILanguageDef
         return $"{prefix}\"{EscapeString(value)}\"";
     }
 
+    private static string FormatChar(char value)
+    {
+        if (value > 127)
+            throw new InvalidOperationException("C++ generator does not support char values outside ASCII. Please use a different value type or reduce char values to 127 or lower.");
+
+        return ((byte)value).ToString(NumberFormatInfo.InvariantInfo);
+    }
+
     private static string FormatFloat(float value)
     {
+        if (float.IsNaN(value))
+            return "std::numeric_limits<float>::quiet_NaN()";
+        if (float.IsPositiveInfinity(value))
+            return "std::numeric_limits<float>::infinity()";
+        if (float.IsNegativeInfinity(value))
+            return "-std::numeric_limits<float>::infinity()";
+
         string label = value.ToString("R", NumberFormatInfo.InvariantInfo);
 
         if (!label.Contains('.') && !label.Contains('E') && !label.Contains('e'))
             label += ".0";
 
         return label + "f";
+    }
+
+    private static string FormatDouble(double value)
+    {
+        if (double.IsNaN(value))
+            return "std::numeric_limits<double>::quiet_NaN()";
+        if (double.IsPositiveInfinity(value))
+            return "std::numeric_limits<double>::infinity()";
+        if (double.IsNegativeInfinity(value))
+            return "-std::numeric_limits<double>::infinity()";
+
+        return value.ToString("R", NumberFormatInfo.InvariantInfo);
     }
 
     private static string EscapeString(string value)
