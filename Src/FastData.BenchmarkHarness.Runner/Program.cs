@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 using Genbox.FastData.Generator.CPlusPlus.TestHarness;
 using Genbox.FastData.Generator.CSharp.TestHarness;
 using Genbox.FastData.Generator.Rust.TestHarness;
@@ -10,15 +11,24 @@ namespace Genbox.FastData.BenchmarkHarness.Runner;
 
 internal static class Program
 {
-    private static readonly Func<DockerManager, BenchmarkBase>[] HarnessFactories =
+    private static readonly (string Name, Func<DockerManager, BenchmarkBase> Factory)[] HarnessFactories =
     [
-        x => new CSharpBenchmark(x),
-        x => new CPlusPlusBenchmark(x),
-        x => new RustBenchmark(x)
+        ("CSharp", x => new CSharpBenchmark(x)),
+        ("CPlusPlus", x => new CPlusPlusBenchmark(x)),
+        ("Rust", x => new RustBenchmark(x))
     ];
 
-    private static async Task Main()
+    private static async Task<int> Main(string[] args)
     {
+        if (!TryParseArgs(args, out string[] filters, out bool showHelp))
+            return 1;
+
+        if (showHelp)
+        {
+            PrintUsage();
+            return 0;
+        }
+
         CpuSelection? cpuSelection = CpuSelector.TryGetSelection();
 
         if (cpuSelection is null)
@@ -27,17 +37,35 @@ internal static class Program
             Console.WriteLine($"Benchmark CPU selection: {cpuSelection.CpuSet} (core {cpuSelection.PhysicalCoreIndex}, siblings {cpuSelection.Siblings}, logical {cpuSelection.LogicalProcessorCount}, cores {cpuSelection.PhysicalCoreCount}).");
 
         string cpuSet = cpuSelection?.CpuSet ?? "0";
+        ITestData[] benchmarkData = TestVectorHelper.GetBenchmarkData().ToArray();
+        bool ranAny = false;
 
-        foreach (Func<DockerManager, BenchmarkBase> factory in HarnessFactories)
-            await RunHarnessAsync(factory, cpuSet, CancellationToken.None);
+        foreach ((string name, Func<DockerManager, BenchmarkBase> factory) in HarnessFactories)
+        {
+            ITestData[] selectedData = benchmarkData.Where(x => MatchesAny(GetBenchmarkName(name, x), filters)).ToArray();
+
+            if (selectedData.Length == 0)
+                continue;
+
+            ranAny = true;
+            await RunHarnessAsync(factory, selectedData, cpuSet, CancellationToken.None);
+        }
+
+        if (!ranAny)
+        {
+            await Console.Error.WriteLineAsync($"No benchmarks matched filter(s): {string.Join(", ", filters)}").ConfigureAwait(false);
+            return 1;
+        }
+
+        return 0;
     }
 
-    private static async ValueTask RunHarnessAsync(Func<DockerManager, BenchmarkBase> harnessFactory, string cpuSet, CancellationToken cancellationToken)
+    private static async ValueTask RunHarnessAsync(Func<DockerManager, BenchmarkBase> harnessFactory, IEnumerable<ITestData> benchmarkData, string cpuSet, CancellationToken cancellationToken)
     {
         await using DockerManager dockerManager = new DockerManager(cpuSet: cpuSet);
         BenchmarkBase harness = harnessFactory(dockerManager);
 
-        foreach (ITestData data in TestVectorHelper.GetBenchmarkData())
+        foreach (ITestData data in benchmarkData)
         {
             BenchmarkResult result = await harness.RunAsync(data, cancellationToken);
             string min = FormatResult(result.Min);
@@ -45,6 +73,80 @@ internal static class Program
             string max = FormatResult(result.Max);
             Console.WriteLine($"{harness.Name,-10} {data.Identifier,-30} min={min,-18} median={median,-18} max={max}");
         }
+    }
+
+    private static bool TryParseArgs(string[] args, out string[] filters, out bool showHelp)
+    {
+        showHelp = false;
+        List<string> parsedFilters = [];
+
+        for (int i = 0; i < args.Length; i++)
+        {
+            string arg = args[i];
+
+            if (string.Equals(arg, "--help", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "-h", StringComparison.OrdinalIgnoreCase))
+            {
+                showHelp = true;
+                filters = [];
+                return true;
+            }
+
+            if (string.Equals(arg, "--filter", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "-f", StringComparison.OrdinalIgnoreCase))
+            {
+                if (i + 1 == args.Length)
+                {
+                    Console.Error.WriteLine($"Missing value for '{arg}'.");
+                    filters = [];
+                    return false;
+                }
+
+                parsedFilters.Add(args[++i]);
+                continue;
+            }
+
+            const string filterPrefix = "--filter=";
+            if (arg.StartsWith(filterPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                parsedFilters.Add(arg[filterPrefix.Length..]);
+                continue;
+            }
+
+            if (arg.Length > 0 && arg[0] == '-')
+            {
+                Console.Error.WriteLine($"Unknown argument '{arg}'.");
+                filters = [];
+                return false;
+            }
+
+            parsedFilters.Add(IsHarnessName(arg) ? arg + ".*" : arg);
+        }
+
+        filters = parsedFilters.Count == 0 ? ["*"] : parsedFilters.ToArray();
+        return true;
+    }
+
+    private static bool MatchesAny(string benchmarkName, string[] filters) => filters.Any(x => Matches(benchmarkName, x));
+
+    private static bool Matches(string benchmarkName, string filter)
+    {
+        string pattern = "^" + Regex.Escape(filter).Replace("\\*", ".*", StringComparison.Ordinal).Replace("\\?", ".", StringComparison.Ordinal) + "$";
+        return Regex.IsMatch(benchmarkName, pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+    }
+
+    private static bool IsHarnessName(string value) => HarnessFactories.Any(x => string.Equals(x.Name, value, StringComparison.OrdinalIgnoreCase));
+
+    private static string GetBenchmarkName(string harnessName, ITestData data) => harnessName + "." + data.Identifier;
+
+    private static void PrintUsage()
+    {
+        Console.WriteLine("Usage:");
+        Console.WriteLine("  FastData.BenchmarkHarness.Runner [language]");
+        Console.WriteLine("  FastData.BenchmarkHarness.Runner --filter <pattern>");
+        Console.WriteLine();
+        Console.WriteLine("Filters use BenchmarkDotNet-style wildcards and match Language.Identifier names, for example:");
+        Console.WriteLine("  --filter \"*HashTable*\"");
+        Console.WriteLine("  --filter \"CSharp.*Int32*\"");
+        Console.WriteLine("  CSharp");
     }
 
     private static string FormatResult(double value) => value.ToString("0.#################", CultureInfo.InvariantCulture);
