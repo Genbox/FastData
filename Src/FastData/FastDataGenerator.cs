@@ -38,7 +38,7 @@ public static partial class FastDataGenerator
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains unsupported values, or uses an unsupported key type.</exception>
     public static string Generate<TKey>(ReadOnlyMemory<TKey> keys, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        return GenerateNumericInternal(keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
+        return GenerateNumericInternal(keys, ReadOnlyMemory<byte>.Empty, false, fdCfg, generator, factory);
     }
 
     /// <summary>Generates source code for an exact membership lookup over numeric keys.</summary>
@@ -51,7 +51,7 @@ public static partial class FastDataGenerator
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains unsupported values, or uses an unsupported key type.</exception>
     public static string Generate<TKey>(TKey[] keys, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
+        return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, ReadOnlyMemory<byte>.Empty, false, fdCfg, generator, factory);
     }
 
     /// <summary>Generates source code for an exact key/value lookup over numeric keys.</summary>
@@ -66,7 +66,7 @@ public static partial class FastDataGenerator
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains unsupported values, or uses an unsupported key type.</exception>
     public static string GenerateKeyed<TKey, TValue>(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) where TKey : struct
     {
-        return GenerateNumericInternal(keys, values, fdCfg, generator, factory);
+        return GenerateNumericInternal(keys, values, true, fdCfg, generator, factory);
     }
 
     /// <summary>Generates source code for an exact key/value lookup over numeric keys.</summary>
@@ -81,7 +81,7 @@ public static partial class FastDataGenerator
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains unsupported values, or uses an unsupported key type.</exception>
     public static string GenerateKeyed<TKey, TValue>(TKey[] keys, TValue[] values, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, (ReadOnlyMemory<TValue>)values, fdCfg, generator, factory);
+        return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, (ReadOnlyMemory<TValue>)values, true, fdCfg, generator, factory);
     }
 
     /// <summary>Generates source code for an exact membership lookup over string keys.</summary>
@@ -93,7 +93,7 @@ public static partial class FastDataGenerator
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static string Generate(ReadOnlyMemory<string> keys, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        return GenerateStringInternal(keys, ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
+        return GenerateStringInternal(keys, ReadOnlyMemory<byte>.Empty, false, fdCfg, generator, factory);
     }
 
     /// <summary>Generates source code for an exact membership lookup over string keys.</summary>
@@ -105,7 +105,7 @@ public static partial class FastDataGenerator
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static string Generate(string[] keys, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        return GenerateStringInternal(new ReadOnlyMemory<string>(keys), ReadOnlyMemory<byte>.Empty, fdCfg, generator, factory);
+        return GenerateStringInternal(new ReadOnlyMemory<string>(keys), ReadOnlyMemory<byte>.Empty, false, fdCfg, generator, factory);
     }
 
     /// <summary>Generates source code for an exact key/value lookup over string keys.</summary>
@@ -119,7 +119,7 @@ public static partial class FastDataGenerator
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static string GenerateKeyed<TValue>(ReadOnlyMemory<string> keys, ReadOnlyMemory<TValue> values, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        return GenerateStringInternal(keys, values, fdCfg, generator, factory);
+        return GenerateStringInternal(keys, values, true, fdCfg, generator, factory);
     }
 
     /// <summary>Generates source code for an exact key/value lookup over string keys.</summary>
@@ -133,15 +133,15 @@ public static partial class FastDataGenerator
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static string GenerateKeyed<TValue>(string[] keys, TValue[] values, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
-        return GenerateStringInternal(new ReadOnlyMemory<string>(keys), (ReadOnlyMemory<TValue>)values, fdCfg, generator, factory);
+        return GenerateStringInternal(new ReadOnlyMemory<string>(keys), (ReadOnlyMemory<TValue>)values, true, fdCfg, generator, factory);
     }
 
-    private static string GenerateStringInternal<TValue>(ReadOnlyMemory<string> keys, ReadOnlyMemory<TValue> values, StringDataConfig cfg, ICodeGenerator generator, ILoggerFactory? factory = null)
+    private static string GenerateStringInternal<TValue>(ReadOnlyMemory<string> keys, ReadOnlyMemory<TValue> values, bool hasValues, StringDataConfig cfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         if (keys.Length == 0)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
 
-        if (!values.IsEmpty && keys.Length != values.Length)
+        if (hasValues && keys.Length != values.Length)
             throw new InvalidOperationException("The number of values does not match the number of keys.");
 
         factory ??= NullLoggerFactory.Instance;
@@ -255,7 +255,7 @@ public static partial class FastDataGenerator
 
             while (true)
             {
-                Type selectedType = StringStructures.GetBest(keys, !values.IsEmpty, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.AllowApproximation, props.LengthData.UniqueLengths, structureConfig, x => EnsureHashData(x.Span));
+                Type selectedType = StringStructures.GetBest(keys, hasValues, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.AllowApproximation, props.LengthData.UniqueLengths, structureConfig, x => EnsureHashData(x.Span));
                 IStructure<string, TValue, IContext> selectedStructure = StringStructureFactory<TValue>(selectedType, props, () => EnsureHashData(keys.Span), generator.Encoding);
                 IContext? selectedContext = selectedStructure.Create(keys, values);
 
@@ -338,12 +338,12 @@ public static partial class FastDataGenerator
         throw new InvalidOperationException($"Unsupported DataStructure {type.Name}");
     }
 
-    private static string GenerateNumericInternal<TKey, TValue>(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, NumericDataConfig cfg, ICodeGenerator generator, ILoggerFactory? factory = null)
+    private static string GenerateNumericInternal<TKey, TValue>(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, bool hasValues, NumericDataConfig cfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
         if (keys.IsEmpty)
             throw new InvalidOperationException("No data provided. Please provide at least one item to generate code for.");
 
-        if (!values.IsEmpty && keys.Length != values.Length)
+        if (hasValues && keys.Length != values.Length)
             throw new InvalidOperationException("The number of values does not match the number of keys.");
 
         Type type = typeof(TKey);
@@ -417,7 +417,7 @@ public static partial class FastDataGenerator
 
             while (true)
             {
-                Type selType = NumericStructures<TKey>.GetBest(keys, !values.IsEmpty, props.Density, cfg.AllowApproximation, props.DataRanges.Ranges.Count, structureConfig, x => EnsureNumericHash(x.Span));
+                Type selType = NumericStructures<TKey>.GetBest(keys, hasValues, props.Density, cfg.AllowApproximation, props.DataRanges.Ranges.Count, structureConfig, x => EnsureNumericHash(x.Span));
                 IStructure<TKey, TValue, IContext> selStruct = NumericStructureFactory<TKey, TValue>(cfg, selType, props, () => EnsureNumericHash(keys.Span));
                 IContext? selCtx = selStruct.Create(keys, values);
 

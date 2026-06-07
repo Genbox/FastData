@@ -20,7 +20,7 @@ internal static class NumericStructures<TKey>
         if (config.IsEnabled(typeof(RangeStructure<,>)) && typeCode.IsIntegral() && !hasValues && config.CheckItemCountLimits(typeof(RangeStructure<,>), (uint)rangeCount))
             return typeof(RangeStructure<,>);
 
-        if (config.IsEnabled(typeof(BloomFilterStructure<,>)) && allowApproximate)
+        if (config.IsEnabled(typeof(BloomFilterStructure<,>)) && allowApproximate && !hasValues)
             return typeof(BloomFilterStructure<,>);
 
         if (config.IsEnabled(typeof(BitSetStructure<,>)) && typeCode.IsIntegral() && config.CheckDensityLimits(typeof(BitSetStructure<,>), density))
