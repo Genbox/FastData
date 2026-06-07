@@ -75,16 +75,22 @@ public sealed class CPlusPlusBenchmark(DockerManager dockerManager) : BenchmarkB
                                         DoNotOptimize(elapsed);
                                     }
 
+                                    double sum = 0.0;
                                     for (double& result : results)
+                                    {
                                         result = measure_sample();
+                                        sum += result;
+                                    }
 
                                     std::sort(results.begin(), results.end());
+                                    double avg = sum / results.size();
 
                                     std::cout.imbue(std::locale::classic());
                                     std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
                                               << results[0] << ' '
                                               << results[results.size() / 2] << ' '
-                                              << results[results.size() - 1] << '\n';
+                                              << results[results.size() - 1] << ' '
+                                              << avg << '\n';
 
                                     return 0;
                              """)}}

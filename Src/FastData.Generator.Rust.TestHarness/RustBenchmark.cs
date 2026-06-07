@@ -56,12 +56,15 @@ public sealed class RustBenchmark(DockerManager dockerManager) : BenchmarkBase<R
                                        std::hint::black_box(measure_sample());
                                    }
 
+                                   let mut sum = 0.0f64;
                                    for result in results.iter_mut() {
                                        *result = measure_sample();
+                                       sum += *result;
                                    }
 
                                    results.sort_by(|a, b| a.partial_cmp(b).unwrap());
-                                   println!("{} {} {}", results[0], results[results.len() / 2], results[results.len() - 1]);
+                                   let avg = sum / results.len() as f64;
+                                   println!("{} {} {} {}", results[0], results[results.len() / 2], results[results.len() - 1], avg);
                            """)}
          """;
 }

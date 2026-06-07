@@ -73,13 +73,19 @@ public sealed class CSharpBenchmark(DockerManager dockerManager) : BenchmarkBase
                                   GC.WaitForPendingFinalizers();
                                   GC.Collect();
 
+                                  double sum = 0;
                                   for (int i = 0; i < results.Length; i++)
+                                  {
                                       results[i] = MeasureSample();
+                                      sum += results[i];
+                                  }
 
                                   Array.Sort(results);
+                                  double avg = sum / results.Length;
                                   Console.WriteLine(results[0].ToString("R", CultureInfo.InvariantCulture) + " " +
                                                     results[results.Length / 2].ToString("R", CultureInfo.InvariantCulture) + " " +
-                                                    results[^1].ToString("R", CultureInfo.InvariantCulture));
+                                                    results[^1].ToString("R", CultureInfo.InvariantCulture) + " " +
+                                                    avg.ToString("R", CultureInfo.InvariantCulture));
                                   return 0;
                            """)}
          """;

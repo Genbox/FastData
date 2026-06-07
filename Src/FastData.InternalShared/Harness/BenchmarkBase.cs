@@ -10,7 +10,7 @@ public abstract class BenchmarkBase<T>(T bootstrap, DockerManager dockerManager)
     protected T Bootstrap { get; } = bootstrap;
 }
 
-public sealed record BenchmarkResult(double Min, double Median, double Max);
+public sealed record BenchmarkResult(double Min, double Median, double Max, double Avg);
 
 public abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager dockerManager) : HarnessBase(bootstrap, dockerManager)
 {
@@ -43,12 +43,13 @@ public abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager docke
 
         string[] parts = output.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-        if (parts.Length != 3)
+        if (parts.Length != 4)
             throw new InvalidOperationException($"Benchmark output was invalid: '{output}'. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
 
         double min = double.Parse(parts[0], NumberFormatInfo.InvariantInfo);
         double median = double.Parse(parts[1], NumberFormatInfo.InvariantInfo);
         double max = double.Parse(parts[2], NumberFormatInfo.InvariantInfo);
-        return new BenchmarkResult(min, median, max);
+        double avg = double.Parse(parts[3], NumberFormatInfo.InvariantInfo);
+        return new BenchmarkResult(min, median, max, avg);
     }
 }
