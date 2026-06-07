@@ -20,7 +20,7 @@ internal static class Program
 
     private static async Task<int> Main(string[] args)
     {
-        if (!TryParseArgs(args, out string[] filters, out bool showHelp))
+        if (!TryParseArgs(args, out string[] filters, out bool showHelp, out bool dryRun))
             return 1;
 
         if (showHelp)
@@ -28,6 +28,11 @@ internal static class Program
             PrintUsage();
             return 0;
         }
+
+        ITestData[] benchmarkData = TestVectorHelper.GetBenchmarkData().ToArray();
+
+        if (dryRun)
+            return DryRun(benchmarkData, filters);
 
         CpuSelection? cpuSelection = CpuSelector.TryGetSelection();
 
@@ -37,12 +42,11 @@ internal static class Program
             Console.WriteLine($"Benchmark CPU selection: {cpuSelection.CpuSet} (core {cpuSelection.PhysicalCoreIndex}, siblings {cpuSelection.Siblings}, logical {cpuSelection.LogicalProcessorCount}, cores {cpuSelection.PhysicalCoreCount}).");
 
         string cpuSet = cpuSelection?.CpuSet ?? "0";
-        ITestData[] benchmarkData = TestVectorHelper.GetBenchmarkData().ToArray();
         bool ranAny = false;
 
         foreach ((string name, Func<DockerManager, BenchmarkBase> factory) in HarnessFactories)
         {
-            ITestData[] selectedData = benchmarkData.Where(x => MatchesAny(GetBenchmarkName(name, x), filters)).ToArray();
+            ITestData[] selectedData = GetSelectedData(name, benchmarkData, filters);
 
             if (selectedData.Length == 0)
                 continue;
@@ -75,9 +79,10 @@ internal static class Program
         }
     }
 
-    private static bool TryParseArgs(string[] args, out string[] filters, out bool showHelp)
+    private static bool TryParseArgs(string[] args, out string[] filters, out bool showHelp, out bool dryRun)
     {
         showHelp = false;
+        dryRun = false;
         List<string> parsedFilters = [];
 
         for (int i = 0; i < args.Length; i++)
@@ -89,6 +94,12 @@ internal static class Program
                 showHelp = true;
                 filters = [];
                 return true;
+            }
+
+            if (string.Equals(arg, "--dry-run", StringComparison.OrdinalIgnoreCase))
+            {
+                dryRun = true;
+                continue;
             }
 
             if (string.Equals(arg, "--filter", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "-f", StringComparison.OrdinalIgnoreCase))
@@ -125,6 +136,28 @@ internal static class Program
         return true;
     }
 
+    private static int DryRun(ITestData[] benchmarkData, string[] filters)
+    {
+        bool matchedAny = false;
+
+        foreach ((string name, _) in HarnessFactories)
+        {
+            foreach (ITestData data in GetSelectedData(name, benchmarkData, filters))
+            {
+                matchedAny = true;
+                Console.WriteLine(GetBenchmarkName(name, data));
+            }
+        }
+
+        if (matchedAny)
+            return 0;
+
+        Console.Error.WriteLine($"No benchmarks matched filter(s): {string.Join(", ", filters)}");
+        return 1;
+    }
+
+    private static ITestData[] GetSelectedData(string harnessName, IEnumerable<ITestData> benchmarkData, string[] filters) => benchmarkData.Where(x => MatchesAny(GetBenchmarkName(harnessName, x), filters)).ToArray();
+
     private static bool MatchesAny(string benchmarkName, string[] filters) => filters.Any(x => Matches(benchmarkName, x));
 
     private static bool Matches(string benchmarkName, string filter)
@@ -142,10 +175,12 @@ internal static class Program
         Console.WriteLine("Usage:");
         Console.WriteLine("  FastData.BenchmarkHarness.Runner [language]");
         Console.WriteLine("  FastData.BenchmarkHarness.Runner --filter <pattern>");
+        Console.WriteLine("  FastData.BenchmarkHarness.Runner --dry-run [--filter <pattern>]");
         Console.WriteLine();
         Console.WriteLine("Filters use BenchmarkDotNet-style wildcards and match Language.Identifier names, for example:");
         Console.WriteLine("  --filter \"*HashTable*\"");
         Console.WriteLine("  --filter \"CSharp.*Int32*\"");
+        Console.WriteLine("  --dry-run --filter \"Rust.*Pgm*\"");
         Console.WriteLine("  CSharp");
     }
 
