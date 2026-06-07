@@ -1,4 +1,4 @@
-﻿{
+{
   Item1:
 /// @generated
 // This file is auto-generated. Do not edit manually.
@@ -10,7 +10,7 @@
 #include <string_view>
 
 
-class MyData final {
+class FastData final {
 
 
     static constexpr std::array<uint8_t, 4> range_starts = {

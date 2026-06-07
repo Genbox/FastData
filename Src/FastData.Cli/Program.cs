@@ -35,7 +35,7 @@ internal static class Program
         Option<AnalysisLevel> analysisLevelOpt = new Option<AnalysisLevel>("--analysis-level") { Description = "The amount of string-hash analysis to perform.", DefaultValueFactory = _ => AnalysisLevel.Disabled, HelpName = "disabled|fast|balanced|aggressive", Recursive = true };
         Option<bool> allowApproximateOpt = new Option<bool>("--allow-approximate") { Description = "Allow approximate membership lookups, such as Bloom filters, that may return false positives.", Recursive = true };
         Argument<FileInfo> keysFileArg = new Argument<FileInfo>("keys-file") { Description = "The file to read keys from" };
-        Option<string> classNameOpt = new Option<string>("--class-name", "-cn") { Description = "The class name.", DefaultValueFactory = _ => "MyData" };
+        Option<string> classNameOpt = new Option<string>("--class-name", "-cn") { Description = "The class name.", DefaultValueFactory = _ => "FastData" };
 
         // C#-only options
         Option<string?> namespaceOpt = new Option<string?>("--namespace", "-ns") { Description = "The namespace the generated class resides in." };

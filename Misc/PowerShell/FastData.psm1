@@ -9,7 +9,7 @@ function Invoke-FastData
         [string]$StructureType = "Auto",
         [Parameter(Mandatory = $true)] [string]$InputFile,
         [string]$Namespace,
-        [string]$ClassName = "MyData"
+        [string]$ClassName = "FastData"
     )
 
     $libDir = Join-Path $PSScriptRoot "lib"

@@ -1,4 +1,4 @@
-﻿{
+{
   Item1:
 /// @generated
 // This file is auto-generated. Do not edit manually.
@@ -10,7 +10,7 @@
 #include <string_view>
 
 
-class MyData final {
+class FastData final {
 
     static constexpr int32_t Length(std::string_view str) noexcept { return static_cast<int32_t>(str.length()); }
     static uint32_t ReadU8(const std::string_view value, const size_t offset) noexcept { return static_cast<unsigned char>(value[offset]); }

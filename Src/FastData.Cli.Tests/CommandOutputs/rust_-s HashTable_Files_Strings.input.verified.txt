@@ -1,4 +1,4 @@
-﻿{
+{
   Item1:
 //! This file is auto-generated. Do not edit manually.
 //! Structure: HashTable
@@ -15,7 +15,7 @@ fn Length(value: &str) -> i32 { value.len() as i32 }
 fn ReadU8(value: &[u8], offset: usize) -> u32 { unsafe { *value.get_unchecked(offset) as u32 } }
 
 
-pub struct MyData;
+pub struct FastData;
 
 struct E {
     key: &'static str,
@@ -23,7 +23,7 @@ struct E {
     next: i8,
 }
 
-impl MyData {
+impl FastData {
     const BUCKETS: [i8; 2] = [
         1, 2
     ];

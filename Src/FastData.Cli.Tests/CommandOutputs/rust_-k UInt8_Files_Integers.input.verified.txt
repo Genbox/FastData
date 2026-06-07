@@ -1,4 +1,4 @@
-﻿{
+{
   Item1:
 //! This file is auto-generated. Do not edit manually.
 //! Structure: Range
@@ -11,8 +11,8 @@
 use std::ptr;
 
 
-pub struct MyData;
-impl MyData {
+pub struct FastData;
+impl FastData {
 
     const RANGE_STARTS: [u8; 4] = [
         42, 62, 80, 100

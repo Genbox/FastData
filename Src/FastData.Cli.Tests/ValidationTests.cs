@@ -88,7 +88,7 @@ public sealed class ValidationTests : IDisposable
         Assert.Empty(error);
         Assert.True(File.Exists(outputFile));
         string generated = await File.ReadAllTextAsync(outputFile, TestContext.Current.CancellationToken);
-        Assert.Contains("internal static class MyData", generated, StringComparison.Ordinal);
+        Assert.Contains("internal static class FastData", generated, StringComparison.Ordinal);
     }
 
     [Fact]

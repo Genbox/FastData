@@ -1,4 +1,4 @@
-﻿{
+{
   Item1:
 //! This file is auto-generated. Do not edit manually.
 //! Structure: Conditional
@@ -11,8 +11,8 @@
 use std::ptr;
 
 
-pub struct MyData;
-impl MyData {
+pub struct FastData;
+impl FastData {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
