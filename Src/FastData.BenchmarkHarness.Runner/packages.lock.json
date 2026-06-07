@@ -2,6 +2,12 @@
   "version": 2,
   "dependencies": {
     "net10.0": {
+      "ConsolePlot": {
+        "type": "Direct",
+        "requested": "[0.1.0, )",
+        "resolved": "0.1.0",
+        "contentHash": "BOUbzx5R/tV/xYfmqE3pGVi/Hs2loR01RPR/iJNzciIklA6gGxAtdhhTgk6VHW8U2slZKmNGB+QUiBHcX7U5mA=="
+      },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "Transitive",
         "resolved": "5.3.0-2.25625.1",

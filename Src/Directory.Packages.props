@@ -13,5 +13,6 @@
     <PackageVersion Include="JetBrains.Annotations" Version="2025.2.4" />
     <!--benchmark packages-->
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageVersion Include="ConsolePlot" Version="0.1.0" />
   </ItemGroup>
 </Project>
