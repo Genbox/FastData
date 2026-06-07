@@ -16,6 +16,7 @@ public class StructureConfig
         {
             StructureConfig cfg = new StructureConfig();
             cfg.AppendLimit(typeof(BitSetStructure<,>), new ValueDensityMinMaxLimit(0, 0.5f));
+            cfg.AppendLimit(typeof(BitSetStructure<,>), new ValueMinMaxLimit<ulong>(0, int.MaxValue - 1UL));
 
             // Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
             cfg.AppendLimit(typeof(ConditionalStructure<,>), new ItemCountMinMaxLimit(0, 400));
@@ -69,6 +70,22 @@ public class StructureConfig
         foreach (ItemCountMinMaxLimit limit in GetLimitsOfType<ItemCountMinMaxLimit>(type))
         {
             if (!limit.IsWithinLimit(itemCount))
+                return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>Checks whether a value satisfies all value limits for a structure.</summary>
+    /// <typeparam name="T">The value type to test.</typeparam>
+    /// <param name="type">The open generic structure type.</param>
+    /// <param name="value">The value to test.</param>
+    /// <returns><see langword="true" /> when all configured value limits pass.</returns>
+    public bool CheckValueLimits<T>(Type type, T value)
+    {
+        foreach (ValueMinMaxLimit<T> limit in GetLimitsOfType<ValueMinMaxLimit<T>>(type))
+        {
+            if (!limit.IsWithinLimit(value))
                 return false;
         }
 

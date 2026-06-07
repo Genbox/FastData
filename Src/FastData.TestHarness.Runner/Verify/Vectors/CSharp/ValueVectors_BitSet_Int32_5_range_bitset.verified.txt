@@ -17,6 +17,16 @@ internal static class FastData
     
     public static bool Contains(int key)
     {
+        if ((key < 1))
+        {
+         return false;
+        }
+
+        if ((key > 5))
+        {
+         return false;
+        }
+
 
 
         ulong offset = (ulong)(key - MinKey);

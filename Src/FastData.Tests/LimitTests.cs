@@ -5,14 +5,16 @@ namespace Genbox.FastData.Tests;
 public class LimitTests
 {
     [Theory]
-    [InlineData(-1)]
-    [InlineData(4)]
-    [InlineData(10)]
-    public void ValueMinMaxLimit_IsWithinLimit_CurrentlyAlwaysTrue(int value)
+    [InlineData(1, false)]
+    [InlineData(2, true)]
+    [InlineData(4, true)]
+    [InlineData(8, true)]
+    [InlineData(9, false)]
+    public void ValueMinMaxLimit_IsWithinLimit_UsesInclusiveBounds(int value, bool expected)
     {
         ValueMinMaxLimit<int> limit = new ValueMinMaxLimit<int>(2, 8);
 
-        Assert.True(limit.IsWithinLimit(value));
+        Assert.Equal(expected, limit.IsWithinLimit(value));
     }
 
     [Theory]

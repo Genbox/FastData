@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
+using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -16,14 +17,16 @@ public sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, Bit
         _props = props;
     }
 
-    public BitSetContext<TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
+    public BitSetContext<TValue>? Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         Debug.Assert(!keys.IsEmpty, "BitSetStructure requires at least one key.");
         Debug.Assert(values.IsEmpty || values.Length == keys.Length, "BitSetStructure requires value count to match key count when values are present.");
-        Debug.Assert(_props.Range < int.MaxValue, "BitSetStructure requires a range that fits in an int-backed dense table.");
 
         if (typeof(TKey) == typeof(float) || typeof(TKey) == typeof(double))
             throw new InvalidOperationException("Floating point values are not supported for BitSets");
+
+        if (_props.Range > int.MaxValue - 1UL)
+            return null;
 
         ReadOnlySpan<TKey> keySpan = keys.Span;
         ReadOnlySpan<TValue> valueSpan = values.Span;
@@ -64,5 +67,9 @@ public sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, Bit
         }
     }
 
-    public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
+    public IEnumerable<IEarlyExit> GetMandatoryExits()
+    {
+        yield return new ValueLessThanEarlyExit<TKey>(_props.DataRanges.Min);
+        yield return new ValueGreaterThanEarlyExit<TKey>(_props.DataRanges.Max);
+    }
 }

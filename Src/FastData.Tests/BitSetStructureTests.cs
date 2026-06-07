@@ -13,8 +13,9 @@ public class BitSetStructureTests
         ReadOnlyMemory<int> values = (int[])[10, 20];
 
         BitSetStructure<ulong, int> structure = new BitSetStructure<ulong, int>(KeyAnalyzer.GetNumericProperties(keys));
-        BitSetContext<int> context = structure.Create(keys, values);
+        BitSetContext<int>? context = structure.Create(keys, values);
 
+        Assert.NotNull(context);
         Assert.Equal(0b1_0000_0001UL, context.BitSet[0]);
         Assert.Equal(new[] { 10, 0, 0, 0, 0, 0, 0, 0, 20 }, context.Values.ToArray());
     }

@@ -18,6 +18,16 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
+        if ((key < 1))
+        {
+         return false;
+        }
+
+        if ((key > 5))
+        {
+         return false;
+        }
+
 
         let offset = (key - Self::MIN_KEY) as u64;
         let word = (offset >> 6) as usize;
