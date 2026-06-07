@@ -12,6 +12,7 @@ public sealed class CPlusPlusBenchmark(DockerManager dockerManager) : BenchmarkB
 {
     protected override string Render(ITestData data) =>
         $$"""
+          #include <algorithm>
           #include <array>
           #include <chrono>
           #include <cstdint>
@@ -29,39 +30,63 @@ public sealed class CPlusPlusBenchmark(DockerManager dockerManager) : BenchmarkB
           {{data.Generate(Bootstrap.Generator)}}
 
           {{Bootstrap.Wrap($$"""
-                                     std::uint64_t found_count = 0;
-                                     auto keys = std::array{ {{FormatList(Range(0, data.QueryCount)
-                                                                          .Select(_ => data.GetRandomKey(Bootstrap.Map))
-                                                                          .ToArray(), s => s)}} };
-                                     std::size_t key_index = 0;
-                                     auto start = std::chrono::steady_clock::now();
+                                    auto keys = std::array{ {{FormatList(data.GetQuerySet(Bootstrap.Map), s => s)}} };
+                                    std::array<double, {{data.MeasurementSampleCount}}> results{};
 
-                                     for (int i = 0; i < {{data.WorkIterations}}; i++)
-                                     {
-                             {{FormatList(Range(0, data.QueryCount).ToArray(), _ =>
-                                 """
-                                         {
-                                             auto key = keys[key_index];
-                                             if (++key_index == keys.size())
-                                                 key_index = 0;
+                                    auto measure_sample = [&]() -> double
+                                    {
+                                        std::uint64_t found_count = 0;
+                                        std::size_t key_index = 0;
+                                        auto start = std::chrono::steady_clock::now();
 
-                                             DoNotOptimize(key);
-                                             found_count += fastdata::contains(key) ? 1 : 0;
-                                         }
-                                 """, "\n")}}
-                                     }
+                                        for (int i = 0; i < {{data.WorkIterations}}; i++)
+                                        {
+                                    {{FormatList(Range(0, data.QueryCount).ToArray(), _ =>
+                                        """
+                                                {
+                                                    auto key = keys[key_index];
+                                                    if (++key_index == keys.size())
+                                                        key_index = 0;
 
-                                     auto end = std::chrono::steady_clock::now();
-                                     double elapsed_ns = std::chrono::duration<double, std::nano>(end - start).count();
-                                     double elapsed_ns_per_call = elapsed_ns / {{Bootstrap.Map.ToValueLabel(data.WorkIterations * data.QueryCount)}};
+                                                    DoNotOptimize(key);
+                                                    found_count += fastdata::contains(key) ? 1 : 0;
+                                                }
+                                        """, "\n")}}
+                                        }
 
-                                     DoNotOptimize(found_count);
+                                        auto end = std::chrono::steady_clock::now();
+                                        double elapsed_ns = std::chrono::duration<double, std::nano>(end - start).count();
+                                        double elapsed_ns_per_call = elapsed_ns / {{Bootstrap.Map.ToValueLabel(data.WorkIterations * data.QueryCount)}};
 
-                                     std::cout.imbue(std::locale::classic());
-                                     std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
-                                               << elapsed_ns_per_call << '\n';
+                                        DoNotOptimize(found_count);
+                                        std::uint64_t expected_found_count = {{Bootstrap.Map.ToValueLabel(data.WorkIterations * data.QueryCount)}};
+                                        if (found_count != expected_found_count)
+                                        {
+                                            std::cerr << "Expected " << expected_found_count << " matches, got " << found_count << ".\n";
+                                            std::exit(2);
+                                        }
 
-                                     return 0;
+                                        return elapsed_ns_per_call;
+                                    };
+
+                                    for (int i = 0; i < {{data.WarmupSampleCount}}; i++)
+                                    {
+                                        double elapsed = measure_sample();
+                                        DoNotOptimize(elapsed);
+                                    }
+
+                                    for (double& result : results)
+                                        result = measure_sample();
+
+                                    std::sort(results.begin(), results.end());
+
+                                    std::cout.imbue(std::locale::classic());
+                                    std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
+                                              << results[0] << ' '
+                                              << results[results.size() / 2] << ' '
+                                              << results[results.size() - 1] << '\n';
+
+                                    return 0;
                              """)}}
           """;
 }

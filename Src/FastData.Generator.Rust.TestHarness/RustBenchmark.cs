@@ -15,36 +15,53 @@ public sealed class RustBenchmark(DockerManager dockerManager) : BenchmarkBase<R
          {data.Generate(Bootstrap.Generator)}
 
          {Bootstrap.Wrap($$"""
-                                   let mut found_count: u64 = 0;
-                                   let keys = [ {{FormatList(Range(0, data.QueryCount)
-                                                             .Select(_ => data.GetRandomKey(Bootstrap.Map))
-                                                             .ToArray(), s => s)}} ];
-                                   let mut key_index: usize = 0;
+                                   let keys = [ {{FormatList(data.GetQuerySet(Bootstrap.Map), s => s)}} ];
+                                   let mut results = [0.0f64; {{data.MeasurementSampleCount}}];
 
-                                   let start = std::time::Instant::now();
+                                   let mut measure_sample = || -> f64 {
+                                       let mut found_count: u64 = 0;
+                                       let mut key_index: usize = 0;
+                                       let start = std::time::Instant::now();
 
-                                   for _ in 0..{{data.WorkIterations}} {
-                           {{FormatList(Range(0, data.QueryCount).ToArray(), _ =>
-                               """
-                                       {
-                                           let key = keys[key_index];
-                                           key_index += 1;
-                                           if key_index == keys.len() {
-                                               key_index = 0;
-                                           }
+                                       for _ in 0..{{data.WorkIterations}} {
+                                   {{FormatList(Range(0, data.QueryCount).ToArray(), _ =>
+                                       """
+                                               {
+                                                   let key = keys[key_index];
+                                                   key_index += 1;
+                                                   if key_index == keys.len() {
+                                                       key_index = 0;
+                                                   }
 
-                                           let key = std::hint::black_box(key);
-                                           found_count += if fastdata::contains(key) { 1 } else { 0 };
+                                                   let key = std::hint::black_box(key);
+                                                   found_count += if fastdata::contains(key) { 1 } else { 0 };
+                                               }
+                                       """, "\n")}}
                                        }
-                               """, "\n")}}
+
+                                       let elapsed_ns = start.elapsed().as_secs_f64() * 1_000_000_000.0;
+                                       let elapsed_ns_per_call = elapsed_ns / {{Bootstrap.Map.ToValueLabel(data.WorkIterations * data.QueryCount)}} as f64;
+
+                                       std::hint::black_box(found_count);
+                                       let expected_found_count: u64 = {{Bootstrap.Map.ToValueLabel(data.WorkIterations * data.QueryCount)}};
+                                       if found_count != expected_found_count {
+                                           eprintln!("Expected {} matches, got {}.", expected_found_count, found_count);
+                                           std::process::exit(2);
+                                       }
+
+                                       elapsed_ns_per_call
+                                   };
+
+                                   for _ in 0..{{data.WarmupSampleCount}} {
+                                       std::hint::black_box(measure_sample());
                                    }
 
-                                   let elapsed_ns = start.elapsed().as_secs_f64() * 1_000_000_000.0;
-                                   let elapsed_ns_per_call = elapsed_ns / {{Bootstrap.Map.ToValueLabel(data.WorkIterations * data.QueryCount)}} as f64;
+                                   for result in results.iter_mut() {
+                                       *result = measure_sample();
+                                   }
 
-                                   std::hint::black_box(found_count);
-
-                                   println!("{}", elapsed_ns_per_call);
+                                   results.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                                   println!("{} {} {}", results[0], results[results.len() / 2], results[results.len() - 1]);
                            """)}
          """;
 }

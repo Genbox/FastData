@@ -19,20 +19,33 @@ internal static class Program
 
     private static async Task Main()
     {
+        CpuSelection? cpuSelection = CpuSelector.TryGetSelection();
+
+        if (cpuSelection is null)
+            Console.WriteLine("Benchmark CPU selection: using default CPU set 0.");
+        else
+            Console.WriteLine($"Benchmark CPU selection: {cpuSelection.CpuSet} (core {cpuSelection.PhysicalCoreIndex}, siblings {cpuSelection.Siblings}, logical {cpuSelection.LogicalProcessorCount}, cores {cpuSelection.PhysicalCoreCount}).");
+
+        string cpuSet = cpuSelection?.CpuSet ?? "0";
+
         foreach (Func<DockerManager, BenchmarkBase> factory in HarnessFactories)
-            await RunHarnessAsync(factory, CancellationToken.None);
+            await RunHarnessAsync(factory, cpuSet, CancellationToken.None);
     }
 
-    private static async ValueTask RunHarnessAsync(Func<DockerManager, BenchmarkBase> harnessFactory, CancellationToken cancellationToken)
+    private static async ValueTask RunHarnessAsync(Func<DockerManager, BenchmarkBase> harnessFactory, string cpuSet, CancellationToken cancellationToken)
     {
-        await using DockerManager dockerManager = new DockerManager();
+        await using DockerManager dockerManager = new DockerManager(cpuSet: cpuSet);
         BenchmarkBase harness = harnessFactory(dockerManager);
 
         foreach (ITestData data in TestVectorHelper.GetBenchmarkData())
         {
-            double res = await harness.RunAsync(data, cancellationToken);
-            string value = res.ToString("0.#################", CultureInfo.InvariantCulture);
-            Console.WriteLine($"{harness.Name,-10} {data.Identifier,-30} {value}");
+            BenchmarkResult result = await harness.RunAsync(data, cancellationToken);
+            string min = FormatResult(result.Min);
+            string median = FormatResult(result.Median);
+            string max = FormatResult(result.Max);
+            Console.WriteLine($"{harness.Name,-10} {data.Identifier,-30} min={min,-18} median={median,-18} max={max}");
         }
     }
+
+    private static string FormatResult(double value) => value.ToString("0.#################", CultureInfo.InvariantCulture);
 }

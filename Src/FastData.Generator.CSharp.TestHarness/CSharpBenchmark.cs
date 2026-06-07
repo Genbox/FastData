@@ -12,58 +12,75 @@ public sealed class CSharpBenchmark(DockerManager dockerManager) : BenchmarkBase
 {
     protected override string Render(ITestData data) =>
         $"""
+         using System;
          using System.Diagnostics;
          using System.Globalization;
 
          {data.Generate(Bootstrap.Generator)}
 
          {Bootstrap.Wrap($$"""
-                                   var keys = new[] { {{FormatList(Range(0, data.QueryCount)
-                                                                   .Select(_ => data.GetRandomKey(Bootstrap.Map))
-                                                                   .ToArray(), s => s)}} };
-                                   int keyIndex = 0;
+                                  [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
+                                  static T BlackBox<T>(T value)
+                                  {
+                                      GC.KeepAlive(value);
+                                      return value;
+                                  }
 
-                                   // Warmup
-                                   for (int i = 0; i < {{data.WarmupIterations}}; i++)
-                                   {
-                                       var key = keys[keyIndex];
-                                       keyIndex++;
-                                       if (keyIndex == keys.Length)
-                                           keyIndex = 0;
+                                  var keys = new[] { {{FormatList(data.GetQuerySet(Bootstrap.Map), s => s)}} };
+                                  double[] results = new double[{{data.MeasurementSampleCount}}];
 
-                                       FastData.Contains(key);
-                                   }
+                                  double MeasureSample()
+                                  {
+                                      int keyIndex = 0;
+                                      int foundCount = 0;
 
-                                   GC.Collect();
-                                   GC.WaitForPendingFinalizers();
-                                   GC.Collect();
+                                      long startTicks = Stopwatch.GetTimestamp();
 
-                                   int foundCount = 0;
+                                      for (int i = 0; i < {{data.WorkIterations}}; i++)
+                                      {
+                                  {{FormatList(Range(0, data.QueryCount).ToArray(), _ =>
+                                      """
+                                              {
+                                                  var key = BlackBox(keys[keyIndex]);
+                                                  keyIndex++;
+                                                  if (keyIndex == keys.Length)
+                                                      keyIndex = 0;
 
-                                   long startTicks = Stopwatch.GetTimestamp();
+                                                  foundCount += FastData.Contains(key) ? 1 : 0;
+                                              }
+                                      """, "\n")}}
+                                      }
 
-                                   for (int i = 0; i < {{data.WorkIterations}}; i++)
-                                   {
-                           {{FormatList(Range(0, data.QueryCount).ToArray(), _ =>
-                               """
-                                       {
-                                           var key = keys[keyIndex];
-                                           keyIndex++;
-                                           if (keyIndex == keys.Length)
-                                               keyIndex = 0;
+                                      long elapsedTicks = Stopwatch.GetTimestamp() - startTicks;
+                                      double ticksPerCall = (double)elapsedTicks / {{Bootstrap.Map.ToValueLabel(data.WorkIterations * data.QueryCount)}};
+                                      double elapsed = ticksPerCall * 1_000_000_000d / Stopwatch.Frequency;
 
-                                           foundCount += FastData.Contains(key) ? 1 : 0;
-                                       }
-                               """, "\n")}}
-                                   }
+                                      GC.KeepAlive(foundCount);
+                                      int expectedFoundCount = {{data.WorkIterations * data.QueryCount}};
+                                      if (foundCount != expectedFoundCount)
+                                      {
+                                          Console.Error.WriteLine($"Expected {expectedFoundCount} matches, got {foundCount}.");
+                                          Environment.Exit(2);
+                                      }
 
-                                   long elapsedTicks = Stopwatch.GetTimestamp() - startTicks;
-                                   double ticksPerCall = (double)elapsedTicks / {{Bootstrap.Map.ToValueLabel(data.WorkIterations * data.QueryCount)}};
-                                   double elapsed = ticksPerCall * 1_000_000_000d / Stopwatch.Frequency;
+                                      return elapsed;
+                                  }
 
-                                   GC.KeepAlive(foundCount);
-                                   Console.WriteLine(elapsed.ToString("R", CultureInfo.InvariantCulture));
-                                   return 0;
+                                  for (int i = 0; i < {{data.WarmupSampleCount}}; i++)
+                                      GC.KeepAlive(MeasureSample());
+
+                                  GC.Collect();
+                                  GC.WaitForPendingFinalizers();
+                                  GC.Collect();
+
+                                  for (int i = 0; i < results.Length; i++)
+                                      results[i] = MeasureSample();
+
+                                  Array.Sort(results);
+                                  Console.WriteLine(results[0].ToString("R", CultureInfo.InvariantCulture) + " " +
+                                                    results[results.Length / 2].ToString("R", CultureInfo.InvariantCulture) + " " +
+                                                    results[^1].ToString("R", CultureInfo.InvariantCulture));
+                                  return 0;
                            """)}
          """;
 }

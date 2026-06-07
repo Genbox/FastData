@@ -71,6 +71,9 @@ public class StringVsBytesBenchmarks
 
         public int GetHashCode(byte[]? obj)
         {
+            if (obj == null)
+                return 0;
+
             unchecked
             {
                 int hash = 17;

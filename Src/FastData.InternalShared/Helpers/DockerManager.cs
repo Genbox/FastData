@@ -12,14 +12,16 @@ public sealed class DockerManager : IAsyncDisposable
     private const string WorkDir = "/work";
     private const string DefaultContainerPrefix = "fastdata";
     private readonly DockerClient _client = new DockerClientConfiguration().CreateClient();
+    private readonly string? _cpuSet;
     private readonly string _containerPrefix;
     private readonly ConcurrentDictionary<string, string> _containersByImage = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
 
-    public DockerManager(string containerPrefix = DefaultContainerPrefix)
+    public DockerManager(string containerPrefix = DefaultContainerPrefix, string? cpuSet = null)
     {
         if (string.IsNullOrWhiteSpace(containerPrefix))
             throw new ArgumentException("Container prefix must be provided.", nameof(containerPrefix));
 
+        _cpuSet = string.IsNullOrWhiteSpace(cpuSet) ? null : cpuSet;
         _containerPrefix = containerPrefix;
         RemoveAllManagedContainersAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
@@ -85,7 +87,8 @@ public sealed class DockerManager : IAsyncDisposable
             HostConfig = new HostConfig
             {
                 AutoRemove = false,
-                Binds = new List<string> { $"{workDir}:{WorkDir}" }
+                Binds = new List<string> { $"{workDir}:{WorkDir}" },
+                CpusetCpus = _cpuSet
             }
         }, cancellationToken).ConfigureAwait(false);
 

@@ -10,13 +10,13 @@ namespace Genbox.FastData.InternalShared.TestClasses;
 public class TestData<TKey>(Type structureType, TKey[] keys) : ITestData, IXunitSerializable
 {
     private readonly TypeCode _keyType = Type.GetTypeCode(typeof(TKey));
-    private readonly Random _rng = new Random(42);
 
     public TKey[] Keys { get; private set; } = keys;
     public Type StructureType { get; private set; } = structureType;
-    public int WarmupIterations { get; } = 1_000_000;
     public int WorkIterations { get; } = 1_000_000;
     public int QueryCount { get; } = 25;
+    public int WarmupSampleCount { get; } = 2;
+    public int MeasurementSampleCount { get; } = 5;
 
     public string Identifier => $"{StructureType.GetFriendlyName()}_{_keyType}_{Keys.Length}";
 
@@ -28,7 +28,16 @@ public class TestData<TKey>(Type structureType, TKey[] keys) : ITestData, IXunit
         return FastDataGenerator.Generate(Keys, new NumericDataConfig { StructureTypeOverride = StructureType }, generator);
     }
 
-    public string GetRandomKey(TypeMap map) => map.ToValueLabel(Keys[_rng.Next(0, Keys.Length)]);
+    public string[] GetQuerySet(TypeMap map)
+    {
+        Random rng = new Random(42);
+        string[] queryKeys = new string[QueryCount];
+
+        for (int i = 0; i < queryKeys.Length; i++)
+            queryKeys[i] = map.ToValueLabel(Keys[rng.Next(0, Keys.Length)]);
+
+        return queryKeys;
+    }
 
     public void Serialize(IXunitSerializationInfo info)
     {

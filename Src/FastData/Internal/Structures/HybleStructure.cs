@@ -11,7 +11,7 @@ namespace Genbox.FastData.Internal.Structures;
 /// Hyble is a displacement-based perfect hash structure.
 /// Construction retries with different seeds. Each attempt multiplies every key's base hash code
 /// by the seed, which changes the approx/bucket distribution via full-avalanche mixing. The winning
-/// seed is stored in <see cref="HybleContext{TKey,TValue}.Seed" /> so the generated hash function can
+/// seed is stored in <see cref="Genbox.FastData.Generators.Contexts.HybleContext.Seed" /> so the generated hash function can
 /// reproduce the exact same mapping at query time by emitting <c>hash(key) * seed</c>.
 /// Approx reduction uses Math.BigMul (multiply-high), matching the original Hyble algorithm.
 /// </summary>
