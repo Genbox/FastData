@@ -2,6 +2,7 @@ using Genbox.FastData.Config;
 using Genbox.FastData.Generator;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Internal.Extensions;
 using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
@@ -17,7 +18,7 @@ public class TestData<TKey>(Type structureType, TKey[] keys) : ITestData, IXunit
     public int WorkIterations { get; } = 1_000_000;
     public int QueryCount { get; } = 25;
 
-    public string Identifier => $"{StructureType}_{_keyType}_{Keys.Length}";
+    public string Identifier => $"{StructureType.GetFriendlyName()}_{_keyType}_{Keys.Length}";
 
     public string Generate(ICodeGenerator generator)
     {
