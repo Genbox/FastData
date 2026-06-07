@@ -1,10 +1,13 @@
 using System.Runtime.InteropServices;
 
-namespace Genbox.FastData.BenchmarkHarness.Runner;
+namespace Genbox.FastData.BenchmarkHarness.Runner.Environment;
 
 internal static partial class CpuSelector
 {
     private const uint ProcessorInformationRelationshipProcessorCore = 0;
+
+    private const int UInt64BitsPerInteger = 64;
+    private const uint ErrorInsufficientBuffer = 122;
 
     public static CpuSelection? TryGetSelection()
     {
@@ -17,7 +20,7 @@ internal static partial class CpuSelector
         if (cores.Length == 0)
             return null;
 
-        int logicalProcessorCount = Environment.ProcessorCount;
+        int logicalProcessorCount = System.Environment.ProcessorCount;
         int targetCoreIndex = Math.Max(1, cores.Length / 2);
 
         CpuCandidate selectedCandidate = new CpuCandidate(0, 0, 0);
@@ -83,7 +86,7 @@ internal static partial class CpuSelector
 
     private static bool TryGetLogicalProcessorTopology(out CoreTopology[] cores)
     {
-        int logicalProcessorCount = Environment.ProcessorCount;
+        int logicalProcessorCount = System.Environment.ProcessorCount;
         cores = Array.Empty<CoreTopology>();
 
         if (logicalProcessorCount <= 1)
@@ -146,12 +149,14 @@ internal static partial class CpuSelector
         }
     }
 
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool GetLogicalProcessorInformation(IntPtr buffer, ref uint returnedLength);
+
     private readonly record struct CoreTopology(int[] LogicalProcessors);
 
     private readonly record struct CpuCandidate(int LogicalProcessor, int CoreIndex, int Siblings);
-
-    private const int UInt64BitsPerInteger = 64;
-    private const uint ErrorInsufficientBuffer = 122;
 
     [StructLayout(LayoutKind.Sequential)]
     private readonly struct SYSTEM_LOGICAL_PROCESSOR_INFORMATION
@@ -163,9 +168,4 @@ internal static partial class CpuSelector
         public readonly uint Reserved2;
         public readonly uint Reserved3;
     }
-
-    [LibraryImport("kernel32.dll", SetLastError = true)]
-    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool GetLogicalProcessorInformation(IntPtr buffer, ref uint returnedLength);
 }

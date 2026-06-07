@@ -28,15 +28,15 @@
       },
       "Verify.XunitV3": {
         "type": "Direct",
-        "requested": "[31.18.0, )",
-        "resolved": "31.18.0",
-        "contentHash": "i8dpAhgPbzOFvIZvRMWQY91QuT3darFfrHgMjsim3gjpLyhtFmIRWNf1e/0ddkffymFCqfshPf0VdezoPDV2VA==",
+        "requested": "[31.19.0, )",
+        "resolved": "31.19.0",
+        "contentHash": "h2Cbk9CIhaSLToa1XM4SM5PBmuR+WjsjWT444emjILfAM8xM7hBq2m7WerRDSpElzWAF0RdWmGo0Ixwz8eCWEg==",
         "dependencies": {
           "Argon": "0.34.0",
           "DiffEngine": "19.2.0",
           "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
           "SimpleInfoName": "3.2.0",
-          "Verify": "31.18.0",
+          "Verify": "31.19.0",
           "xunit.v3.extensibility.core": "3.2.2"
         }
       },
@@ -158,8 +158,8 @@
       },
       "Spectre.Console.Ansi": {
         "type": "Transitive",
-        "resolved": "0.55.2",
-        "contentHash": "tN3KEJQQZwLW9HJnG5YTSAxfBwxsmg1wVuGvhGG2rM+pbl+NGaHU8pDcNofPlOXlgpkbpBMxI5t9o9qPfy3sHQ=="
+        "resolved": "0.56.0",
+        "contentHash": "AAvLsqrwOrKQQ2mKQ02VUN2s90C758ZlDHVjHZ1MfGgd7+vELPayS/j8nTppEAXd1+JHQQjpey/bMGjbmpMmNg=="
       },
       "System.CodeDom": {
         "type": "Transitive",
@@ -173,8 +173,8 @@
       },
       "Verify": {
         "type": "Transitive",
-        "resolved": "31.18.0",
-        "contentHash": "tyP3ze0vw7xBoqgops6nv59BZ4+x5FzntJ64+v0bp9LR4RtY4kG0Z8ZLIECTXlfw0XCy4XNN7lA2pUtaF3J4yw==",
+        "resolved": "31.19.0",
+        "contentHash": "oWDfatb6x5Hv8XHAKc+XfD6KvyH6fXsNPUoETlLtWcGtPfPj3NtFRPPr4c5/HzWtebfQwNkBF64heER2GVOiKg==",
         "dependencies": {
           "Argon": "0.34.0",
           "DiffEngine": "19.2.0",
@@ -242,7 +242,7 @@
           "FastData.Generator.CPlusPlus": "[1.0.0, )",
           "FastData.Generator.CSharp": "[1.0.0, )",
           "FastData.Generator.Rust": "[1.0.0, )",
-          "Spectre.Console": "[0.55.2, )",
+          "Spectre.Console": "[0.56.0, )",
           "System.CommandLine": "[2.0.8, )",
           "System.Linq.Async": "[7.0.1, )"
         }
@@ -339,11 +339,11 @@
       },
       "Spectre.Console": {
         "type": "CentralTransitive",
-        "requested": "[0.55.2, )",
-        "resolved": "0.55.2",
-        "contentHash": "yc0g12YJpmZHofGJLTQX02/uqfzJ6XHRx6pe9rANNjleQptXMHPxD9KI2/DWkXiJWddc+4oizEdGox15c89hhw==",
+        "requested": "[0.56.0, )",
+        "resolved": "0.56.0",
+        "contentHash": "ail4U9yR02kKtaOQl0k/bMid/UkujehsYLa8DsYpsmioYkJYmHIWh5us5HTskP74yYcBLcmdTcxBUpNgg2EwZg==",
         "dependencies": {
-          "Spectre.Console.Ansi": "0.55.2"
+          "Spectre.Console.Ansi": "0.56.0"
         }
       },
       "System.CommandLine": {

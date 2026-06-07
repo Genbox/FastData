@@ -121,11 +121,8 @@ public static class TestVectorHelper
 
     }
 
-    public static IEnumerable<ITestData> GetBenchmarkData()
+    public static IEnumerable<ITestData> GetBenchmarkData(int warmupSampleCount = 5, int sampleCount = 10, int workIterations = 1_000_000, int queryCount = 25, int benchmarkSize = 1000, int keyLengthBenchmarkSize = 128)
     {
-        const int benchmarkSize = 1000;
-        const int keyLengthBenchmarkSize = 128;
-
         int[] intKeys = Enumerable.Range(0, benchmarkSize).ToArray();
         float[] floatKeys = Enumerable.Range(0, benchmarkSize).Select(x => (float)x).ToArray();
         string[] stringKeys = Enumerable.Range(0, benchmarkSize).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).ToArray();
@@ -137,40 +134,43 @@ public static class TestVectorHelper
             typeof(BloomFilterStructure<,>),
             typeof(ConditionalStructure<,>),
             typeof(HashTableStructure<,>),
-            typeof(HashTableCompactStructure<,>),
-            typeof(HybleStructure<,>)
+            typeof(HashTableCompactStructure<,>)
         ];
 
         foreach (Type type in generalTypes)
         {
-            yield return new TestData<int>(type, intKeys);
-            yield return new TestData<float>(type, floatKeys);
-            yield return new TestData<string>(type, stringKeys);
+            yield return CreateTestData(type, intKeys);
+            yield return CreateTestData(type, floatKeys);
+            yield return CreateTestData(type, stringKeys);
         }
 
         Type[] numericTypes = [typeof(BinarySearchInterpolationStructure<,>), typeof(PgmStructure<,>)];
 
         foreach (Type type in numericTypes)
         {
-            yield return new TestData<int>(type, intKeys);
-            yield return new TestData<float>(type, floatKeys);
+            yield return CreateTestData(type, intKeys);
+            yield return CreateTestData(type, floatKeys);
         }
 
         Type[] integralTypes = [typeof(BitSetStructure<,>), typeof(EliasFanoStructure<,>), typeof(RangeStructure<,>), typeof(RrrBitVectorStructure<,>)];
 
         foreach (Type type in integralTypes)
-            yield return new TestData<int>(type, intKeys);
+            yield return CreateTestData(type, intKeys);
 
-        yield return new TestData<int>(typeof(HashTablePerfectStructure<,>), intKeys);
-        yield return new TestData<float>(typeof(HashTablePerfectStructure<,>), [42f]);
-        yield return new TestData<string>(typeof(HashTablePerfectStructure<,>), ["key"]);
+        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), intKeys);
+        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), [42f]);
+        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), ["key"]);
+
+        yield return CreateTestData(typeof(HybleStructure<,>), intKeys);
 
         string[] uniqueLengthStringKeys = Enumerable.Range(1, keyLengthBenchmarkSize).Select(x => new string('a', x)).ToArray();
-        yield return new TestData<string>(typeof(KeyLengthStructure<,>), uniqueLengthStringKeys);
+        yield return CreateTestData(typeof(KeyLengthStructure<,>), uniqueLengthStringKeys);
 
-        yield return new TestData<int>(typeof(SingleValueStructure<,>), [42]);
-        yield return new TestData<float>(typeof(SingleValueStructure<,>), [42f]);
-        yield return new TestData<string>(typeof(SingleValueStructure<,>), ["key"]);
+        yield return CreateTestData(typeof(SingleValueStructure<,>), [42]);
+        yield return CreateTestData(typeof(SingleValueStructure<,>), [42f]);
+        yield return CreateTestData(typeof(SingleValueStructure<,>), ["key"]);
+
+        TestData<TKey> CreateTestData<TKey>(Type type, TKey[] keys) => new TestData<TKey>(type, keys, warmupSampleCount, sampleCount, workIterations, queryCount);
     }
 
     private static IEnumerable<ITestVector> GenerateTestVectors(IEnumerable<DataPair> pairs, string? postfix = null, params Type[] dataStructs)

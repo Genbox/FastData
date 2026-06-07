@@ -7,16 +7,16 @@ using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public class TestData<TKey>(Type structureType, TKey[] keys) : ITestData, IXunitSerializable
+public class TestData<TKey>(Type structureType, TKey[] keys, int warmupCount = 5, int sampleCount = 10, int workIterations = 1_000_000, int queryCount = 25) : ITestData, IXunitSerializable
 {
     private readonly TypeCode _keyType = Type.GetTypeCode(typeof(TKey));
 
     public TKey[] Keys { get; private set; } = keys;
     public Type StructureType { get; private set; } = structureType;
-    public int WorkIterations { get; } = 1_000_000;
-    public int QueryCount { get; } = 25;
-    public int WarmupSampleCount { get; } = 2;
-    public int MeasurementSampleCount { get; } = 5;
+    public int WorkIterations { get; } = workIterations;
+    public int QueryCount { get; } = queryCount;
+    public int WarmupCount { get; } = warmupCount;
+    public int SampleCount { get; } = sampleCount;
 
     public string Identifier => $"{StructureType.GetFriendlyName()}_{_keyType}_{Keys.Length}";
 

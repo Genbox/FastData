@@ -16,7 +16,7 @@ public sealed class RustBenchmark(DockerManager dockerManager) : BenchmarkBase<R
 
          {Bootstrap.Wrap($$"""
                                    let keys = [ {{FormatList(data.GetQuerySet(Bootstrap.Map), s => s)}} ];
-                                   let mut results = [0.0f64; {{data.MeasurementSampleCount}}];
+                                   let mut results = [0.0f64; {{data.SampleCount}}];
 
                                    let mut measure_sample = || -> f64 {
                                        let mut found_count: u64 = 0;
@@ -52,7 +52,7 @@ public sealed class RustBenchmark(DockerManager dockerManager) : BenchmarkBase<R
                                        elapsed_ns_per_call
                                    };
 
-                                   for _ in 0..{{data.WarmupSampleCount}} {
+                                   for _ in 0..{{data.WarmupCount}} {
                                        std::hint::black_box(measure_sample());
                                    }
 

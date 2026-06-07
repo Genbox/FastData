@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Genbox.FastData.BenchmarkHarness.Runner;
+namespace Genbox.FastData.BenchmarkHarness.Runner.Environment;
 
 internal sealed class CpuSelection(int logicalProcessor, int physicalCoreIndex, int siblings, int logicalProcessorCount, int physicalCoreCount)
 {

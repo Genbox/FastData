@@ -31,7 +31,7 @@ public sealed class CPlusPlusBenchmark(DockerManager dockerManager) : BenchmarkB
 
           {{Bootstrap.Wrap($$"""
                                     auto keys = std::array{ {{FormatList(data.GetQuerySet(Bootstrap.Map), s => s)}} };
-                                    std::array<double, {{data.MeasurementSampleCount}}> results{};
+                                    std::array<double, {{data.SampleCount}}> results{};
 
                                     auto measure_sample = [&]() -> double
                                     {
@@ -69,7 +69,7 @@ public sealed class CPlusPlusBenchmark(DockerManager dockerManager) : BenchmarkB
                                         return elapsed_ns_per_call;
                                     };
 
-                                    for (int i = 0; i < {{data.WarmupSampleCount}}; i++)
+                                    for (int i = 0; i < {{data.WarmupCount}}; i++)
                                     {
                                         double elapsed = measure_sample();
                                         DoNotOptimize(elapsed);

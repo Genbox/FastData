@@ -27,7 +27,7 @@ public sealed class CSharpBenchmark(DockerManager dockerManager) : BenchmarkBase
                                   }
 
                                   var keys = new[] { {{FormatList(data.GetQuerySet(Bootstrap.Map), s => s)}} };
-                                  double[] results = new double[{{data.MeasurementSampleCount}}];
+                                  double[] results = new double[{{data.SampleCount}}];
 
                                   double MeasureSample()
                                   {
@@ -66,7 +66,7 @@ public sealed class CSharpBenchmark(DockerManager dockerManager) : BenchmarkBase
                                       return elapsed;
                                   }
 
-                                  for (int i = 0; i < {{data.WarmupSampleCount}}; i++)
+                                  for (int i = 0; i < {{data.WarmupCount}}; i++)
                                       GC.KeepAlive(MeasureSample());
 
                                   GC.Collect();
