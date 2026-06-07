@@ -1,3 +1,7 @@
+$ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
+Set-StrictMode -Version Latest
+
 $Config = "Release"
 $Root = (Resolve-Path "$PSScriptRoot/..").Path
 $PublishDir = "$Root/Publish"
@@ -6,7 +10,7 @@ $Color = "Blue"
 
 $CommonProperties = @("-p:PackAssemblyName=true")
 $LibraryPublishProperties = $CommonProperties + @("-p:GenerateDependencyFile=false")
-$CliPublishProperties = $CommonProperties + @("-p:PublishSingleFile=true", "-p:SelfContained=true", "-p:PublishTrimmed=true", "-p:TargetFrameworks=net9.0", "-p:DebugType=none", "-p:GenerateDocumentationFile=false", "-p:EnableCompressionInSingleFile=true", "-p:InvariantGlobalization=true")
+$CliPublishProperties = $CommonProperties + @("-p:PublishSingleFile=true", "-p:SelfContained=true", "-p:PublishTrimmed=true", "-p:TargetFrameworks=net10.0", "-p:DebugType=none", "-p:GenerateDocumentationFile=false", "-p:EnableCompressionInSingleFile=true", "-p:InvariantGlobalization=true")
 $PackCommonProperties = $CommonProperties + @("-p:ContinuousIntegrationBuild=true")
 
 # Prerequsites
@@ -41,10 +45,10 @@ dotnet publish $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config -r osx-x64 
 Move-Item $PublishDir/Genbox.FastData.Cli $PublishDir/FastData-osx -Force
 
 Write-Host -ForegroundColor $Color "Pack the CLI tool as a dotnet tool (NuGet)"
-dotnet pack $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config @PackCommonProperties -p:PackAsTool=true -p:ToolCommandName=fastdata -p:PackageVersion=$semver -o $PublishDir
+dotnet pack $Root/Src/FastData.Cli/FastData.Cli.csproj -c $Config @PackCommonProperties -p:PackAsTool=true -p:ToolCommandName=fastdata -p:PackageVersion=$version -o $PublishDir
 
 Write-Host -ForegroundColor $Color "Pack the source generator"
-dotnet pack $Root/Src/FastData.SourceGenerator/FastData.SourceGenerator.csproj -c $Config @PackCommonProperties -p:PackageVersion=$semver -o $PublishDir
+dotnet pack $Root/Src/FastData.SourceGenerator/FastData.SourceGenerator.csproj -c $Config @PackCommonProperties -p:PackageVersion=$version -o $PublishDir
 
 Write-Host -ForegroundColor $Color "Pack FastData as a library"
 dotnet pack $Root/Src/FastData/FastData.csproj -c $Config @PackCommonProperties -o $PublishDir
@@ -63,6 +67,7 @@ Write-Host -ForegroundColor $Color "Copy over the psd1 file, and update the vers
 Write-Host -ForegroundColor $Color "Copy over the other PowerShell files"
 Copy-Item $Root/Misc/PowerShell/FastData.psm1 $PublishDir/Genbox.FastData/Genbox.FastData.psm1
 Copy-Item $ArtifactsDir/*.dll $PublishDir/Genbox.FastData/lib/
+Copy-Item $ArtifactsDir/Templates $PublishDir/Genbox.FastData/lib/Templates -Recurse -Force
 
 # We don't want to publish versions with tags like "alpha", "beta", etc.
 if ($version -notlike "*-*") {
