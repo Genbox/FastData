@@ -1,3 +1,4 @@
+using System.Globalization;
 using Genbox.FastData.Generator.Abstracts;
 
 namespace Genbox.FastData.Generator.Definitions;
@@ -11,15 +12,18 @@ public class IntegerTypeDef<T>(string name, T minValue, T maxValue, string minVa
 
     private static string PrintInternal(T value, T MinValue, string minValueStr, T MaxValue, string maxValueStr, Func<T, string>? print)
     {
-        if (value.Equals(MinValue))
+        if (EqualityComparer<T>.Default.Equals(value, MinValue))
             return minValueStr;
 
-        if (value.Equals(MaxValue))
+        if (EqualityComparer<T>.Default.Equals(value, MaxValue))
             return maxValueStr;
 
         if (print != null)
             return print(value);
 
-        return value.ToString();
+        if (value is IFormattable formattable)
+            return formattable.ToString(null, NumberFormatInfo.InvariantInfo);
+
+        return value?.ToString() ?? string.Empty;
     }
 }
