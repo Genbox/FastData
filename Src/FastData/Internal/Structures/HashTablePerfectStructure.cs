@@ -22,15 +22,15 @@ public sealed class HashTablePerfectStructure<TKey, TValue> : IStructure<TKey, T
         Debug.Assert(_hashData.CapacityFactor > 0, "HashTablePerfectStructure requires a positive capacity factor.");
         Debug.Assert(_hashData.HashCodes.Length >= keys.Length, "HashTablePerfectStructure requires one hash code per key.");
         Debug.Assert(_hashData.HashCodesPerfect, "HashTablePerfectStructure requires a perfect hash function.");
-        Debug.Assert((ulong)keys.Length * (ulong)_hashData.CapacityFactor <= int.MaxValue, "HashTablePerfectStructure requires the table to fit in an int-backed array.");
+        Debug.Assert(_hashData.TableSize > 0, "HashTablePerfectStructure requires a positive table size.");
 
         if (!_hashData.HashCodesPerfect)
             throw new InvalidOperationException("HashSetPerfectStructure can only be created with a perfect hash function.");
 
         ReadOnlySpan<TKey> keySpan = keys.Span;
         ReadOnlySpan<TValue> valueSpan = values.Span;
-        ulong size = (ulong)(keySpan.Length * _hashData.CapacityFactor);
-        bool hasEmptySlots = size != (ulong)keySpan.Length;
+        int size = _hashData.TableSize;
+        bool hasEmptySlots = size != keySpan.Length;
         bool storeHashCode = !Type.GetTypeCode(typeof(TKey)).UsesIdentityHash() || hasEmptySlots;
         ulong[] hashCodes = _hashData.HashCodes;
         KeyValuePair<TKey, ulong>[] pairs = new KeyValuePair<TKey, ulong>[size];
@@ -40,14 +40,14 @@ public sealed class HashTablePerfectStructure<TKey, TValue> : IStructure<TKey, T
         {
             ulong sentinel = GetSentinel(_hashData, hashCodes, keySpan.Length);
 
-            for (ulong i = 0; i < size; i++)
+            for (int i = 0; i < size; i++)
                 pairs[i] = new KeyValuePair<TKey, ulong>(default!, sentinel);
         }
 
         //We need to reorder the data to match hashes
         for (int i = 0; i < keySpan.Length; i++)
         {
-            ulong index = hashCodes[i] % size;
+            int index = (int)(hashCodes[i] % (uint)size);
             pairs[index] = new KeyValuePair<TKey, ulong>(keySpan[i], hashCodes[i]);
 
             if (denseValues != null)

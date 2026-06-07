@@ -4,21 +4,23 @@ using Genbox.FastData.Internal.Misc;
 namespace Genbox.FastData.Internal;
 
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
-internal record HashData(ulong[] HashCodes, float CapacityFactor, bool HashCodesUnique, bool HashCodesPerfect, ulong MinHashCode, ulong MaxHashCode)
+internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize, bool HashCodesUnique, bool HashCodesPerfect, ulong MinHashCode, ulong MaxHashCode)
 {
     internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, NumericHashFunc<T> func)
     {
-        if (capacityFactor <= 0)
-            throw new InvalidOperationException("HashCapacityFactor must be greater than 0.");
+        if (float.IsNaN(capacityFactor) || float.IsInfinity(capacityFactor) || capacityFactor <= 0)
+            throw new InvalidOperationException("HashTableCapacityFactor must be a finite value greater than 0.");
 
-        uint size = (uint)(data.Length * capacityFactor);
+        double tableSizeDouble = Math.Ceiling(data.Length * (double)capacityFactor);
 
-        if (size == 0)
-            throw new InvalidOperationException("HashCapacityFactor results in zero-sized hash table.");
+        if (tableSizeDouble > int.MaxValue)
+            throw new InvalidOperationException("HashTableCapacityFactor results in a hash table that is too large.");
 
-        ulong[] hashCodes = new ulong[size];
+        int tableSize = Math.Max(1, (int)tableSizeDouble);
+
+        ulong[] hashCodes = new ulong[data.Length];
         HashSet<ulong> uniqSet = new HashSet<ulong>();
-        SwitchingBitSet perfectTracker = new SwitchingBitSet((int)size, false);
+        SwitchingBitSet perfectTracker = new SwitchingBitSet(tableSize, false);
 
         bool uniq = true;
         bool perfect = true;
@@ -36,10 +38,10 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, bool HashCodes
             if (uniq && !uniqSet.Add(hash)) //The unique check is first so that when it is false, we don't try the other conditions
                 uniq = false;
 
-            if (perfect && !perfectTracker.Add((uint)(hash % size)))
+            if (perfect && !perfectTracker.Add((uint)(hash % (uint)tableSize)))
                 perfect = false;
         }
 
-        return new HashData(hashCodes, capacityFactor, uniq, perfect, minHashCode, maxHashCode);
+        return new HashData(hashCodes, capacityFactor, tableSize, uniq, perfect, minHashCode, maxHashCode);
     }
 }
