@@ -35,7 +35,7 @@ internal sealed class BenchmarkPlotter(PlotSettings settings)
         for (int i = 0; i < histories.Count; i++)
         {
             BenchmarkHistory history = histories[i];
-            (PointPen pen, string style) = GetPlotPen(i);
+            (PointPen pen, string style) = GetPlotPen(i, SystemPointBrushes.Braille);
             AddMedianSeries(plot, history, pen);
             BenchmarkConsole.WriteColoredLinePrefix(i + 1, style, history.Name, $" ({history.Entries.Length} data points)");
         }
@@ -53,22 +53,38 @@ internal sealed class BenchmarkPlotter(PlotSettings settings)
     {
         BenchmarkConsole.WriteHeading(history.Name);
 
+        if (history.Entries.Length == 1)
+        {
+            BenchmarkResultEntry entry = history.Entries[0];
+            BenchmarkConsole.WriteInfo("Median", entry.Median.ToString("0.####", CultureInfo.InvariantCulture));
+            BenchmarkConsole.WriteInfo("Timestamp", FormatTimestamp(entry.TimestampUtc));
+            BenchmarkConsole.WriteInfo("History", "only one data point; at least two are needed to plot a trend");
+            return;
+        }
+
         Plot plot = new Plot(GetPlotWidth(), settings.Height);
-        AddMedianSeries(plot, history, GetPlotPen(0).Pen);
+        AddMedianSeries(plot, history, GetPlotPen(0, SystemPointBrushes.Braille).Pen);
         DrawPlot(plot, history.Entries, history.Entries.Length);
     }
 
     private static void AddMedianSeries(Plot plot, BenchmarkHistory history, PointPen pen)
     {
+        if (history.Entries.Length == 1)
+        {
+            double median = history.Entries[0].Median;
+            plot.AddSeries([1, 2], [median, median], pen);
+            return;
+        }
+
         double[] xs = Enumerable.Range(1, history.Entries.Length).Select(x => (double)x).ToArray();
         double[] medians = history.Entries.Select(x => x.Median).ToArray();
         plot.AddSeries(xs, medians, pen);
     }
 
-    private static (PointPen Pen, string Style) GetPlotPen(int index)
+    private static (PointPen Pen, string Style) GetPlotPen(int index, IPointBrush brush)
     {
         (ConsoleColor plotColor, string style) = PlotColors[index % PlotColors.Length];
-        return (new PointPen(SystemPointBrushes.Braille, plotColor), style);
+        return (new PointPen(brush, plotColor), style);
     }
 
     private void DrawPlot(Plot plot, IEnumerable<BenchmarkResultEntry> entries, int maxDataPointCount)
@@ -85,6 +101,7 @@ internal sealed class BenchmarkPlotter(PlotSettings settings)
         plot.Ticks.IsVisible = true;
         plot.Ticks.DesiredXStep = GetDesiredXStep(maxDataPointCount);
         plot.Ticks.Labels.IsVisible = true;
+        plot.Ticks.Labels.AttachToAxis = false;
         plot.Ticks.Labels.Format = "0";
         plot.Draw();
         plot.Render();

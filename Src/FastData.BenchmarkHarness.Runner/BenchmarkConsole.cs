@@ -31,10 +31,10 @@ internal static class BenchmarkConsole
                       .NoSafeBorder();
 
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(10));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(40));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(25));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(25));
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(30));
-        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(23));
-        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(23));
-        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(29));
         table.AddColumn(new TableColumn(string.Empty).NoWrap());
 
         table.AddRow(
