@@ -90,14 +90,15 @@ internal sealed class BenchmarkRunner(BenchmarkResultStore resultStore, double d
     private BenchmarkResultDelta FormatDelta(double current, double? previous)
     {
         if (previous is null)
-            return new BenchmarkResultDelta("n/a", false);
+            return new BenchmarkResultDelta("n/a", null);
 
         if (previous.Value == 0)
-            return new BenchmarkResultDelta(current == 0 ? "0%" : "n/a", false);
+            return new BenchmarkResultDelta(current == 0 ? "0%" : "n/a", null);
 
         double delta = ((current - previous.Value) / previous.Value) * 100;
         string text = delta.ToString("+0.##;-0.##;0", CultureInfo.InvariantCulture) + "%";
-        return new BenchmarkResultDelta(text, Math.Abs(delta) >= deltaWarningThresholdPercent);
+        string? style = Math.Abs(delta) < deltaWarningThresholdPercent ? null : delta < 0 ? "green" : "red";
+        return new BenchmarkResultDelta(text, style);
     }
 
     private static string FormatResult(double value) => value.ToString("0.####", CultureInfo.InvariantCulture);

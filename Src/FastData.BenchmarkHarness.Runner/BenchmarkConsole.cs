@@ -73,5 +73,5 @@ internal static class BenchmarkConsole
         FormatMetric(label, value) + " (" + FormatDelta(delta) + ")";
 
     private static string FormatDelta(BenchmarkResultDelta delta) =>
-        delta.Warning ? $"[red]{Markup.Escape(delta.Text)}[/]" : Markup.Escape(delta.Text);
+        delta.Style == null ? Markup.Escape(delta.Text) : $"[{delta.Style}]{Markup.Escape(delta.Text)}[/]";
 }
