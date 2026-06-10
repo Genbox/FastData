@@ -8,6 +8,7 @@ internal sealed class BenchmarkSettings
     public int WarmupCount { get; set; } = 3;
     public int SampleCount { get; set; } = 6;
     public int WorkIterations { get; set; } = 1_000_000;
+    public int Parallelism { get; set; } = 1;
     public int QueryCount { get; set; } = 25;
     public int BenchmarkSize { get; set; } = 1000;
     public int KeyLengthBenchmarkSize { get; set; } = 128;
@@ -28,6 +29,7 @@ internal sealed class BenchmarkSettings
         ValidatePositive(WarmupCount, nameof(WarmupCount));
         ValidatePositive(SampleCount, nameof(SampleCount));
         ValidatePositive(WorkIterations, nameof(WorkIterations));
+        ValidatePositive(Parallelism, nameof(Parallelism));
         ValidatePositive(QueryCount, nameof(QueryCount));
         ValidatePositive(BenchmarkSize, nameof(BenchmarkSize));
         ValidatePositive(KeyLengthBenchmarkSize, nameof(KeyLengthBenchmarkSize));

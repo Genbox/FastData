@@ -11,77 +11,76 @@ internal static partial class CpuSelector
 
     public static CpuSelection? TryGetSelection()
     {
-        if (!OperatingSystem.IsWindows())
+        if (!TryGetSelections(1, out CpuSelection[] selections, out _))
             return null;
+
+        return selections[0];
+    }
+
+    public static bool TryGetSelections(int count, out CpuSelection[] selections, out int availableCoreCount)
+    {
+        if (count <= 0)
+            throw new ArgumentOutOfRangeException(nameof(count), count, "Count must be a positive integer.");
+
+        selections = [];
+        availableCoreCount = 0;
+
+        if (!OperatingSystem.IsWindows())
+            return TryGetLogicalProcessorSelections(count, out selections, out availableCoreCount);
 
         if (!TryGetLogicalProcessorTopology(out CoreTopology[] cores))
-            return null;
+            return TryGetLogicalProcessorSelections(count, out selections, out availableCoreCount);
 
         if (cores.Length == 0)
-            return null;
+            return TryGetLogicalProcessorSelections(count, out selections, out availableCoreCount);
 
         int logicalProcessorCount = System.Environment.ProcessorCount;
         int targetCoreIndex = Math.Max(1, cores.Length / 2);
+        CpuCandidate[] candidates = GetSelectableCandidates(cores, targetCoreIndex);
+        availableCoreCount = candidates.Length;
 
-        CpuCandidate selectedCandidate = new CpuCandidate(0, 0, 0);
-        bool hasSelection = false;
+        if (availableCoreCount == 0)
+            return TryGetLogicalProcessorSelections(count, out selections, out availableCoreCount);
+
+        selections = candidates.Take(count).Select(x => new CpuSelection(x.LogicalProcessor, x.CoreIndex, x.Siblings, logicalProcessorCount, cores.Length)).ToArray();
+        return true;
+    }
+
+    private static CpuCandidate[] GetSelectableCandidates(CoreTopology[] cores, int targetCoreIndex)
+    {
+        List<CpuCandidate> candidates = new List<CpuCandidate>();
+
         for (int coreIndex = 0; coreIndex < cores.Length; coreIndex++)
         {
             CoreTopology core = cores[coreIndex];
-
-            foreach (int logicalProcessor in core.LogicalProcessors)
-            {
-                if (logicalProcessor == 0)
-                    continue;
-
-                CpuCandidate candidate = new CpuCandidate(logicalProcessor, coreIndex, core.LogicalProcessors.Length);
-
-                if (!hasSelection)
-                {
-                    selectedCandidate = candidate;
-                    hasSelection = true;
-                    continue;
-                }
-
-                if (candidate.Siblings < selectedCandidate.Siblings)
-                {
-                    selectedCandidate = candidate;
-                    continue;
-                }
-
-                if (candidate.Siblings > selectedCandidate.Siblings)
-                    continue;
-
-                if (candidate.CoreIndex != 0 && selectedCandidate.CoreIndex == 0)
-                {
-                    selectedCandidate = candidate;
-                    continue;
-                }
-
-                if (candidate.CoreIndex == 0 && selectedCandidate.CoreIndex != 0)
-                    continue;
-
-                int candidateDistance = Math.Abs(candidate.CoreIndex - targetCoreIndex);
-                int selectedDistance = Math.Abs(selectedCandidate.CoreIndex - targetCoreIndex);
-
-                if (candidateDistance < selectedDistance)
-                {
-                    selectedCandidate = candidate;
-                    continue;
-                }
-
-                if (candidateDistance > selectedDistance)
-                    continue;
-
-                if (candidate.LogicalProcessor < selectedCandidate.LogicalProcessor)
-                    selectedCandidate = candidate;
-            }
+            int logicalProcessor = core.LogicalProcessors.FirstOrDefault(x => x != 0, -1);
+            if (logicalProcessor >= 0)
+                candidates.Add(new CpuCandidate(logicalProcessor, coreIndex, core.LogicalProcessors.Length));
         }
 
-        if (!hasSelection)
-            return null;
+        return candidates.OrderBy(x => x.Siblings)
+                         .ThenBy(x => x.CoreIndex == 0)
+                         .ThenBy(x => Math.Abs(x.CoreIndex - targetCoreIndex))
+                         .ThenBy(x => x.LogicalProcessor)
+                         .ToArray();
+    }
 
-        return new CpuSelection(selectedCandidate.LogicalProcessor, selectedCandidate.CoreIndex, selectedCandidate.Siblings, logicalProcessorCount, cores.Length);
+    private static bool TryGetLogicalProcessorSelections(int count, out CpuSelection[] selections, out int availableCoreCount)
+    {
+        int logicalProcessorCount = System.Environment.ProcessorCount;
+        int firstProcessor = logicalProcessorCount > 1 ? 1 : 0;
+        availableCoreCount = logicalProcessorCount - firstProcessor;
+
+        if (availableCoreCount <= 0)
+        {
+            selections = [];
+            return false;
+        }
+
+        selections = Enumerable.Range(firstProcessor, Math.Min(count, availableCoreCount))
+                               .Select(x => new CpuSelection(x, x, 1, logicalProcessorCount, logicalProcessorCount))
+                               .ToArray();
+        return true;
     }
 
     private static bool TryGetLogicalProcessorTopology(out CoreTopology[] cores)

@@ -19,6 +19,7 @@ internal sealed class BenchmarkCommandLine(BenchmarkCatalog catalog)
     private readonly Option<int?> _keyLengthBenchmarkSizeOption = new Option<int?>("--key-length-benchmark-size") { Description = "KeyLength benchmark key count." };
     private readonly Option<string[]> _languageOption = new Option<string[]>("--language") { Description = "Language to include: CSharp, CPlusPlus, or Rust. Can be specified multiple times.", AllowMultipleArgumentsPerToken = true };
     private readonly Option<bool> _noAutoCpuOption = new Option<bool>("--no-auto-cpu") { Description = "Disable automatic CPU selection and use CPU 0 unless --cpu-set is provided." };
+    private readonly Option<int?> _parallelismOption = new Option<int?>("--parallelism") { Description = "Number of benchmarks to run concurrently. Default is 1." };
     private readonly Argument<string[]> _patternsArgument = new Argument<string[]>("patterns") { Description = "Optional language shorthands or benchmark filters.", Arity = ArgumentArity.ZeroOrMore };
     private readonly Option<int?> _plotHeightOption = new Option<int?>("--plot-height") { Description = "Plot height." };
     private readonly Option<bool> _plotOption = new Option<bool>("--plot") { Description = "Plot matching benchmark histories." };
@@ -44,6 +45,7 @@ internal sealed class BenchmarkCommandLine(BenchmarkCatalog catalog)
             _warmupOption,
             _samplesOption,
             _workIterationsOption,
+            _parallelismOption,
             _queryCountOption,
             _benchmarkSizeOption,
             _keyLengthBenchmarkSizeOption,
@@ -129,6 +131,7 @@ internal sealed class BenchmarkCommandLine(BenchmarkCatalog catalog)
         ApplyInt(parseResult, _warmupOption, x => settings.WarmupCount = x);
         ApplyInt(parseResult, _samplesOption, x => settings.SampleCount = x);
         ApplyInt(parseResult, _workIterationsOption, x => settings.WorkIterations = x);
+        ApplyInt(parseResult, _parallelismOption, x => settings.Parallelism = x);
         ApplyInt(parseResult, _queryCountOption, x => settings.QueryCount = x);
         ApplyInt(parseResult, _benchmarkSizeOption, x => settings.BenchmarkSize = x);
         ApplyInt(parseResult, _keyLengthBenchmarkSizeOption, x => settings.KeyLengthBenchmarkSize = x);
@@ -162,6 +165,7 @@ internal sealed class BenchmarkCommandLine(BenchmarkCatalog catalog)
             [Key(nameof(BenchmarkSettings.WarmupCount))] = ToString(settings.WarmupCount),
             [Key(nameof(BenchmarkSettings.SampleCount))] = ToString(settings.SampleCount),
             [Key(nameof(BenchmarkSettings.WorkIterations))] = ToString(settings.WorkIterations),
+            [Key(nameof(BenchmarkSettings.Parallelism))] = ToString(settings.Parallelism),
             [Key(nameof(BenchmarkSettings.QueryCount))] = ToString(settings.QueryCount),
             [Key(nameof(BenchmarkSettings.BenchmarkSize))] = ToString(settings.BenchmarkSize),
             [Key(nameof(BenchmarkSettings.KeyLengthBenchmarkSize))] = ToString(settings.KeyLengthBenchmarkSize),

@@ -58,6 +58,8 @@ internal static class BenchmarkConsole
 
     public static void WriteInfo(string label, string value) => AnsiConsole.MarkupLine(CultureInfo.InvariantCulture, "[grey]{0}:[/] {1}", Markup.Escape(label), Markup.Escape(value));
 
+    public static void WriteWarning(string message) => AnsiConsole.MarkupLine(CultureInfo.InvariantCulture, "[yellow]Warning:[/] {0}", Markup.Escape(message));
+
     public static void WriteColoredLinePrefix(int index, string style, string text, string suffix)
     {
         AnsiConsole.Markup(CultureInfo.InvariantCulture, "{0,2}. ", index);
