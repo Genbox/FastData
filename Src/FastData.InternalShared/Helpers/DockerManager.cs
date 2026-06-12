@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using Docker.DotNet;
@@ -11,9 +12,11 @@ public sealed class DockerManager : IAsyncDisposable
 {
     private const string WorkDir = "/work";
     private const string DefaultContainerPrefix = "fastdata";
-    private readonly DockerClient _client = new DockerClientConfiguration().CreateClient();
+    private readonly DockerClientConfiguration _configuration = new DockerClientConfiguration();
+    private readonly DockerClient _client;
     private readonly string? _cpuSet;
     private readonly string _containerPrefix;
+    private readonly string _runId = Guid.NewGuid().ToString("N");
     private readonly ConcurrentDictionary<string, string> _containersByImage = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
 
     public DockerManager(string containerPrefix = DefaultContainerPrefix, string? cpuSet = null)
@@ -23,14 +26,15 @@ public sealed class DockerManager : IAsyncDisposable
 
         _cpuSet = string.IsNullOrWhiteSpace(cpuSet) ? null : cpuSet;
         _containerPrefix = containerPrefix;
-        RemoveAllManagedContainersAsync(CancellationToken.None).GetAwaiter().GetResult();
+        _client = _configuration.CreateClient();
     }
 
     public async ValueTask DisposeAsync()
     {
-        await RemoveAllManagedContainersAsync(CancellationToken.None).ConfigureAwait(false);
+        await RemoveCreatedContainersAsync(CancellationToken.None).ConfigureAwait(false);
         _containersByImage.Clear();
         _client.Dispose();
+        _configuration.Dispose();
     }
 
     public async Task<ProcessResult> RunInContainerAsync(string imageId, string workDir, string command, CancellationToken cancellationToken = default)
@@ -51,12 +55,14 @@ public sealed class DockerManager : IAsyncDisposable
         }
         catch (DockerApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
-            (string repo, string tag) = SplitImage(imageId);
+            (string repo, string? tag) = SplitImage(imageId);
             ImagesCreateParameters parameters = new ImagesCreateParameters
             {
-                FromImage = repo,
-                Tag = tag
+                FromImage = repo
             };
+
+            if (tag != null)
+                parameters.Tag = tag;
 
             await _client.Images.CreateImageAsync(parameters, null, new Progress<JSONMessage>(), cancellationToken).ConfigureAwait(false);
         }
@@ -74,11 +80,16 @@ public sealed class DockerManager : IAsyncDisposable
 
     private async Task<string> CreatePersistentContainerAsync(string imageId, string workDir, CancellationToken cancellationToken)
     {
-        string name = _containerPrefix + "-" + Guid.NewGuid().ToString("N");
+        string name = _containerPrefix + "-" + _runId + "-" + Guid.NewGuid().ToString("N");
         CreateContainerResponse created = await _client.Containers.CreateContainerAsync(new CreateContainerParameters
         {
             Image = imageId,
             Name = name,
+            Labels = new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["genbox.fastdata.owner"] = "DockerManager",
+                ["genbox.fastdata.run-id"] = _runId
+            },
             WorkingDir = WorkDir,
             Cmd = ["/bin/sh", "-c", "sleep infinity"],
             AttachStdout = false,
@@ -121,34 +132,12 @@ public sealed class DockerManager : IAsyncDisposable
         return (standardOutput, standardError, checked((int)execInspect.ExitCode));
     }
 
-    private async Task RemoveAllManagedContainersAsync(CancellationToken cancellationToken)
+    private async Task RemoveCreatedContainersAsync(CancellationToken cancellationToken)
     {
-        IList<ContainerListResponse> containers = await _client.Containers.ListContainersAsync(new ContainersListParameters
-        {
-            All = true
-        }, cancellationToken).ConfigureAwait(false);
-
-        foreach (ContainerListResponse container in containers)
-        {
-            if (!IsManagedContainer(container))
-                continue;
-
-            await RemoveContainerAsync(container.ID, cancellationToken).ConfigureAwait(false);
-        }
-    }
-
-    private bool IsManagedContainer(ContainerListResponse container)
-    {
-        if (container.Names == null || container.Names.Count == 0)
-            return false;
-
-        foreach (string name in container.Names)
-        {
-            if (name.StartsWith("/" + _containerPrefix, StringComparison.Ordinal))
-                return true;
-        }
-
-        return false;
+        // Do not delete by name prefix: tests and benchmark runs can share prefixes concurrently.
+        // Only containers created by this instance are safe to remove here.
+        foreach (string containerId in _containersByImage.Values)
+            await RemoveContainerAsync(containerId, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task RemoveContainerAsync(string containerId, CancellationToken cancellationToken)
@@ -167,8 +156,11 @@ public sealed class DockerManager : IAsyncDisposable
         }
     }
 
-    private static (string Repo, string Tag) SplitImage(string imageId)
+    private static (string Repo, string? Tag) SplitImage(string imageId)
     {
+        if (imageId.Contains('@', StringComparison.Ordinal))
+            return (imageId, null);
+
         int lastColon = imageId.LastIndexOf(':');
         if (lastColon > 0 && lastColon < imageId.Length - 1 && imageId.IndexOf('/', StringComparison.Ordinal) < lastColon)
             return (imageId[..lastColon], imageId[(lastColon + 1)..]);
