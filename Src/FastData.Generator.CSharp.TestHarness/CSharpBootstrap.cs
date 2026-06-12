@@ -35,5 +35,5 @@ public sealed class CSharpBootstrap : BootstrapBase
     private static string GetCommandTemplate(HarnessType type) =>
         type == HarnessType.Test
             ? "dotnet run -c Debug --property PublishAot=false -p:DebugType=None -p:DebugSymbols=false {0}"
-            : "dotnet run -c Release --property PublishAot=false {0}";
+            : "DOTNET_gcServer=0 DOTNET_gcConcurrent=1 DOTNET_ReadyToRun=0 DOTNET_TieredCompilation=0 DOTNET_TieredPGO=0 dotnet run -c Release --property PublishAot=false {0}";
 }
