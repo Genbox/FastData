@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Extensions;
 using Genbox.FastData.Internal.Pgm;
 
 namespace Genbox.FastData.Internal.Structures;

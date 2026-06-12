@@ -5,7 +5,6 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Reinsertion;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Termination;
 using Genbox.FastData.Internal.Misc;
-using Genbox.FastData.Tests.Code;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Genbox.FastData.Tests.Genetics;

@@ -3,7 +3,6 @@ using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Extensions;
 
 namespace Genbox.FastData.Internal.Structures;
 
