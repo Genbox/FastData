@@ -8,7 +8,8 @@ namespace Genbox.FastData.Generator.CPlusPlus.TestHarness;
 
 public sealed class CPlusPlusBootstrap : BootstrapBase
 {
-    public CPlusPlusBootstrap(HarnessType type) : base("CPlusPlus", ".cpp", type, "silkeh/clang", GetCommandTemplate(type))
+    // Benchmarks pin exact image digests so compiler/runtime updates do not silently change results.
+    public CPlusPlusBootstrap(HarnessType type) : base("CPlusPlus", ".cpp", type, "silkeh/clang:21-bookworm@sha256:c735c54928e1b8be46101c9aff2895f72d1bfb6d94f713804528fa2fd0a96dba", GetCommandTemplate(type))
     {
         CPlusPlusLanguageDef langDef = new CPlusPlusLanguageDef();
         Map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.Utf8Bytes);

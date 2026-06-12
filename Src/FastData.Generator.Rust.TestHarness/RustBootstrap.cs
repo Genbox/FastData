@@ -8,7 +8,8 @@ namespace Genbox.FastData.Generator.Rust.TestHarness;
 
 public sealed class RustBootstrap : BootstrapBase
 {
-    public RustBootstrap(HarnessType type) : base("Rust", ".rs", type, "rust:slim-trixie", GetCommandTemplate(type))
+    // Benchmarks pin exact image digests so compiler/runtime updates do not silently change results.
+    public RustBootstrap(HarnessType type) : base("Rust", ".rs", type, "rust:1.96.0-bookworm@sha256:19817ead3289c8c631c73df281e18b59b172f6a31f4f563290f69cddd06c30e9", GetCommandTemplate(type))
     {
         RustLanguageDef langDef = new RustLanguageDef();
         Map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.Utf8Bytes);

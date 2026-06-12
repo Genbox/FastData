@@ -8,7 +8,8 @@ namespace Genbox.FastData.Generator.CSharp.TestHarness;
 
 public sealed class CSharpBootstrap : BootstrapBase
 {
-    public CSharpBootstrap(HarnessType type) : base("CSharp", ".cs", type, "mcr.microsoft.com/dotnet/sdk:latest", GetCommandTemplate(type))
+    // Benchmarks pin exact image digests so compiler/runtime updates do not silently change results.
+    public CSharpBootstrap(HarnessType type) : base("CSharp", ".cs", type, "mcr.microsoft.com/dotnet/sdk:10@sha256:548d93f8a18a1acbe6cc127bc4f47281430d34a9e35c18afa80a8d6741c2adc3", GetCommandTemplate(type))
     {
         CSharpLanguageDef langDef = new CSharpLanguageDef();
         Map = new TypeMap(langDef.TypeDefinitions, GeneratorEncoding.Utf16CodeUnits);

@@ -6,7 +6,8 @@ internal sealed class BenchmarkSettings
     public string[] Filters { get; set; } = [];
     public string[] Languages { get; set; } = [];
     public int WarmupCount { get; set; } = 3;
-    public int SampleCount { get; set; } = 6;
+    // Keep the default odd so the reported median is an observed sample rather than an interpolated value.
+    public int SampleCount { get; set; } = 7;
     public int WorkIterations { get; set; } = 1_000_000;
     public int Parallelism { get; set; } = 1;
     public int QueryCount { get; set; } = 25;
