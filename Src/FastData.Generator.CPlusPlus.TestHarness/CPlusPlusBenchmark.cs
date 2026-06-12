@@ -16,7 +16,6 @@ public sealed class CPlusPlusBenchmark(DockerManager dockerManager) : BenchmarkB
         BenchmarkQuerySet querySet = data.GetQuerySet(Bootstrap.Map);
 
         return $$"""
-                 #include <algorithm>
                  #include <array>
                  #include <chrono>
                  #include <cstdint>
@@ -35,7 +34,6 @@ public sealed class CPlusPlusBenchmark(DockerManager dockerManager) : BenchmarkB
 
                  {{Bootstrap.Wrap($$"""
                                           auto keys = std::array{ {{FormatList(querySet.Keys, s => s)}} };
-                                          std::array<double, {{data.SampleCount}}> results{};
 
                                           auto measure_sample = [&](std::uint64_t& found_count) -> double
                                           {
@@ -73,25 +71,17 @@ public sealed class CPlusPlusBenchmark(DockerManager dockerManager) : BenchmarkB
                                               DoNotOptimize(warmup_found_count);
                                           }
 
-                                          double sum = 0.0;
-                                          std::uint64_t total_found_count = 0;
-                                          for (double& result : results)
+                                          std::cout.imbue(std::locale::classic());
+
+                                          for (int i = 0; i < {{data.SampleCount}}; i++)
                                           {
                                               std::uint64_t sample_found_count = 0;
-                                              result = measure_sample(sample_found_count);
-                                              total_found_count += sample_found_count;
-                                              sum += result;
+                                              double elapsed = measure_sample(sample_found_count);
+
+                                              std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
+                                                        << "sample " << elapsed << ' '
+                                                        << sample_found_count << '\n';
                                           }
-
-                                          std::sort(results.begin(), results.end());
-
-                                          std::cout.imbue(std::locale::classic());
-                                          std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
-                                                    << results[0] << ' '
-                                                    << results[results.size() / 2] << ' '
-                                                    << results[results.size() - 1] << ' '
-                                                    << sum / results.size() << ' '
-                                                    << total_found_count << '\n';
 
                                           return 0;
                                     """)}}

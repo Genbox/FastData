@@ -82,7 +82,8 @@ internal sealed class BenchmarkRunner(BenchmarkResultStore resultStore, double d
         FormatResult(result.Median),
         FormatDelta(result.Median, previousResult?.Median),
         FormatResult(result.Avg),
-        FormatDelta(result.Avg, previousResult?.Avg));
+        FormatDelta(result.Avg, previousResult?.Avg),
+        "n=" + result.FilteredSampleCount.ToString(CultureInfo.InvariantCulture) + "/" + result.Samples.Length.ToString(CultureInfo.InvariantCulture) + " out=" + result.OutlierCount.ToString(CultureInfo.InvariantCulture));
 
     private BenchmarkResultDelta FormatDelta(double current, double? previous)
     {

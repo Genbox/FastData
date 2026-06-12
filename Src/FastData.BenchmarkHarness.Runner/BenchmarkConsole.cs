@@ -32,9 +32,9 @@ internal static class BenchmarkConsole
 
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(10));
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(45));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(20));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(20));
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(25));
-        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(25));
-        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(30));
         table.AddColumn(new TableColumn(string.Empty).NoWrap());
 
         table.AddRow(
@@ -43,7 +43,7 @@ internal static class BenchmarkConsole
             FormatMetric("min", result.Min),
             FormatMetric("max", result.Max),
             FormatDeltaMetric("mid", result.Median, result.MedianDelta),
-            FormatDeltaMetric("avg", result.Avg, result.AvgDelta));
+            FormatDeltaMetric("avg", result.Avg, result.AvgDelta) + " [grey]" + Markup.Escape(result.SampleSummary) + "[/]");
 
         AnsiConsole.Write(table);
     }

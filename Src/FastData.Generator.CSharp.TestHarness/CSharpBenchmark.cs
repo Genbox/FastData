@@ -32,7 +32,6 @@ public sealed class CSharpBenchmark(DockerManager dockerManager) : BenchmarkBase
                                         }
 
                                         var keys = new[] { {{FormatList(querySet.Keys, s => s)}} };
-                                        double[] results = new double[{{data.SampleCount}}];
 
                                         double MeasureSample(out long foundCount)
                                         {
@@ -71,21 +70,12 @@ public sealed class CSharpBenchmark(DockerManager dockerManager) : BenchmarkBase
                                         GC.WaitForPendingFinalizers();
                                         GC.Collect();
 
-                                        double sum = 0;
-                                        long totalFoundCount = 0;
-                                        for (int i = 0; i < results.Length; i++)
+                                        for (int i = 0; i < {{data.SampleCount}}; i++)
                                         {
-                                            results[i] = MeasureSample(out long sampleFoundCount);
-                                            totalFoundCount += sampleFoundCount;
-                                            sum += results[i];
+                                            double elapsed = MeasureSample(out long sampleFoundCount);
+                                            Console.WriteLine("sample " + elapsed.ToString("R", CultureInfo.InvariantCulture) + " " + sampleFoundCount.ToString(CultureInfo.InvariantCulture));
                                         }
 
-                                        Array.Sort(results);
-                                        Console.WriteLine(results[0].ToString("R", CultureInfo.InvariantCulture) + " " +
-                                                          results[results.Length / 2].ToString("R", CultureInfo.InvariantCulture) + " " +
-                                                          results[^1].ToString("R", CultureInfo.InvariantCulture) + " " +
-                                                          (sum / results.Length).ToString("R", CultureInfo.InvariantCulture) + " " +
-                                                          totalFoundCount.ToString(CultureInfo.InvariantCulture));
                                         return 0;
                                   """)}
                 """;

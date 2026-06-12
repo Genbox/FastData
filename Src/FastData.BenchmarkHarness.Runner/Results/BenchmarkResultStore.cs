@@ -48,7 +48,7 @@ internal sealed class BenchmarkResultStore(string resultsDirectory)
     public async Task AppendResultAsync(string benchmarkName, BenchmarkResult result, CancellationToken cancellationToken)
     {
         Directory.CreateDirectory(resultsDirectory);
-        BenchmarkResultEntry entry = new BenchmarkResultEntry(benchmarkName, result.Min, result.Median, result.Max, result.Avg, DateTimeOffset.UtcNow);
+        BenchmarkResultEntry entry = new BenchmarkResultEntry(benchmarkName, result.Min, result.Median, result.Max, result.Avg, DateTimeOffset.UtcNow, result.Samples.Length, result.FilteredSampleCount, result.OutlierCount);
         string json = JsonSerializer.Serialize(entry, JsonOptions);
         await File.AppendAllTextAsync(GetResultPath(benchmarkName), json + System.Environment.NewLine, cancellationToken).ConfigureAwait(false);
     }

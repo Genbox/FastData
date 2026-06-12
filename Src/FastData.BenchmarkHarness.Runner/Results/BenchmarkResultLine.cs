@@ -8,4 +8,5 @@ internal readonly record struct BenchmarkResultLine(
     string Median,
     BenchmarkResultDelta MedianDelta,
     string Avg,
-    BenchmarkResultDelta AvgDelta);
+    BenchmarkResultDelta AvgDelta,
+    string SampleSummary);

@@ -21,7 +21,6 @@ public sealed class RustBenchmark(DockerManager dockerManager) : BenchmarkBase<R
 
                 {Bootstrap.Wrap($$"""
                                          let keys = [ {{FormatList(querySet.Keys, s => s)}} ];
-                                         let mut results = [0.0f64; {{data.SampleCount}}];
 
                                          let mut measure_sample = || -> (f64, u64) {
                                              let mut found_count: u64 = 0;
@@ -54,17 +53,10 @@ public sealed class RustBenchmark(DockerManager dockerManager) : BenchmarkBase<R
                                              std::hint::black_box(found_count);
                                          }
 
-                                         let mut sum = 0.0f64;
-                                         let mut total_found_count: u64 = 0;
-                                         for result in results.iter_mut() {
+                                         for _ in 0..{{data.SampleCount}} {
                                              let (elapsed, found_count) = measure_sample();
-                                             *result = elapsed;
-                                             total_found_count += found_count;
-                                             sum += *result;
+                                             println!("sample {} {}", elapsed, found_count);
                                          }
-
-                                         results.sort_by(|a, b| a.partial_cmp(b).unwrap());
-                                         println!("{} {} {} {} {}", results[0], results[results.len() / 2], results[results.len() - 1], sum / results.len() as f64, total_found_count);
                                   """)}
                 """;
     }
