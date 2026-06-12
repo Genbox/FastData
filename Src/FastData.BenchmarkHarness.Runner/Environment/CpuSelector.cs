@@ -34,7 +34,6 @@ internal static partial class CpuSelector
         if (cores.Length == 0)
             return TryGetLogicalProcessorSelections(count, out selections, out availableCoreCount);
 
-        int logicalProcessorCount = System.Environment.ProcessorCount;
         int targetCoreIndex = Math.Max(1, cores.Length / 2);
         CpuCandidate[] candidates = GetSelectableCandidates(cores, targetCoreIndex);
         availableCoreCount = candidates.Length;
@@ -42,7 +41,7 @@ internal static partial class CpuSelector
         if (availableCoreCount == 0)
             return TryGetLogicalProcessorSelections(count, out selections, out availableCoreCount);
 
-        selections = candidates.Take(count).Select(x => new CpuSelection(x.LogicalProcessor, x.CoreIndex, x.Siblings, logicalProcessorCount, cores.Length)).ToArray();
+        selections = candidates.Take(count).Select(x => new CpuSelection(x.LogicalProcessor)).ToArray();
         return true;
     }
 
@@ -77,9 +76,7 @@ internal static partial class CpuSelector
             return false;
         }
 
-        selections = Enumerable.Range(firstProcessor, Math.Min(count, availableCoreCount))
-                               .Select(x => new CpuSelection(x, x, 1, logicalProcessorCount, logicalProcessorCount))
-                               .ToArray();
+        selections = Enumerable.Range(firstProcessor, Math.Min(count, availableCoreCount)).Select(x => new CpuSelection(x)).ToArray();
         return true;
     }
 

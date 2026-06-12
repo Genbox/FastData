@@ -106,7 +106,7 @@ internal static class Program
         if (!string.IsNullOrWhiteSpace(settings.Cpu.CpuSet))
         {
             if (settings.Parallelism == 1)
-                return new CpuAssignment(settings.Cpu.CpuSet, [("Pinned on core", settings.Cpu.CpuSet + " (configured)"), ("Parallelism", "1")]);
+                return new CpuAssignment(settings.Cpu.CpuSet, GetCpuRows([settings.Cpu.CpuSet], "configured"));
 
             string[] configuredCpuSets = ParseCpuSet(settings.Cpu.CpuSet);
             if (settings.Parallelism > configuredCpuSets.Length)
@@ -130,7 +130,7 @@ internal static class Program
             if (settings.Parallelism > 1)
                 throw new InvalidOperationException($"Parallelism {settings.Parallelism} requires at least {settings.Parallelism} available CPU cores, but automatic CPU selection is unavailable.");
 
-            return new CpuAssignment("0", [("Pinned on core", "0 (auto-select unavailable)")]);
+            return new CpuAssignment("0", GetCpuRows(["0"], "auto unavailable"));
         }
 
         if (settings.Parallelism > availableCoreCount)
@@ -138,8 +138,7 @@ internal static class Program
 
         WarnIfParallelismMayAddNoise(settings.Parallelism, availableCoreCount);
         string[] cpuSets = cpuSelections.Select(x => x.CpuSet).ToArray();
-        string physicalCores = string.Join(", ", cpuSelections.Select(x => x.PhysicalCoreIndex.ToString(CultureInfo.InvariantCulture)));
-        return new CpuAssignment(cpuSets, [("Pinned cores", string.Join(", ", cpuSets) + " (auto-select)"), ("Physical cores", physicalCores), ("Parallelism", settings.Parallelism.ToString(CultureInfo.InvariantCulture))]);
+        return new CpuAssignment(cpuSets, GetCpuRows(cpuSets, "auto"));
     }
 
     private static string[] ParseCpuSet(string value)
@@ -185,11 +184,15 @@ internal static class Program
         return cpu;
     }
 
-    private static (string Label, string Value)[] GetCpuRows(string[] cpuSets, string source) =>
-    [
-        (cpuSets.Length == 1 ? "Pinned on core" : "Pinned cores", string.Join(", ", cpuSets) + " (" + source + ")"),
-        ("Parallelism", cpuSets.Length.ToString(CultureInfo.InvariantCulture))
-    ];
+    private static (string Label, string Value)[] GetCpuRows(string[] cpuSets, string source)
+    {
+        List<(string Label, string Value)> rows = [(cpuSets.Length == 1 ? "CPU set" : "CPU sets", string.Join(", ", cpuSets) + " (" + source + ")")];
+
+        if (cpuSets.Length > 1)
+            rows.Add(("Parallelism", cpuSets.Length.ToString(CultureInfo.InvariantCulture)));
+
+        return rows.ToArray();
+    }
 
     private static void WarnIfParallelismMayAddNoise(int parallelism, int availableCoreCount)
     {
@@ -205,7 +208,7 @@ internal static class Program
         BenchmarkConsole.WriteWarning("Parallel benchmark runs share cache, memory bandwidth, turbo behavior, and Docker overhead. Use --parallelism 1 for lowest-noise measurements.");
     }
 
-    private static CpuAssignment DefaultCpuAssignment() => new CpuAssignment("0", [("Pinned on core", "0 (default)")]);
+    private static CpuAssignment DefaultCpuAssignment() => new CpuAssignment("0", GetCpuRows(["0"], "default"));
 
     private readonly record struct CpuAssignment(string[] CpuSets, (string Label, string Value)[] Rows)
     {
