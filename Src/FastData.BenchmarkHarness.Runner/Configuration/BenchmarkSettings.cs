@@ -13,7 +13,7 @@ internal sealed class BenchmarkSettings
     public int BenchmarkSize { get; set; } = 1000;
     public int KeyLengthBenchmarkSize { get; set; } = 128;
     public double DeltaWarningThresholdPercent { get; set; } = 5;
-    public string ResultsDirectory { get; set; } = "benchmark-results";
+    public string ResultsDirectory { get; set; } = Path.Combine(AppContext.BaseDirectory, "../../../../../BenchmarkResults");
     public CpuSettings Cpu { get; set; } = new CpuSettings();
     public BenchmarkEnvironmentSettings Environment { get; set; } = new BenchmarkEnvironmentSettings();
     public PlotSettings Plot { get; set; } = new PlotSettings();
@@ -52,7 +52,7 @@ internal sealed class BenchmarkSettings
 
     private static void ValidateNonNegative(double value, string name)
     {
-        if (value < 0 || double.IsNaN(value))
+        if (value is < 0 or double.NaN)
             throw new InvalidOperationException(name + " must be zero or a positive number.");
     }
 }
