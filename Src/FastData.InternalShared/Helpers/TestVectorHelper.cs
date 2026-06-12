@@ -158,8 +158,8 @@ public static class TestVectorHelper
             yield return CreateTestData(type, intKeys);
 
         yield return CreateTestData(typeof(HashTablePerfectStructure<,>), intKeys);
-        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), [42f]);
-        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), ["key"]);
+        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), floatKeys);
+        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), stringKeys);
 
         yield return CreateTestData(typeof(HybleStructure<,>), intKeys);
 
