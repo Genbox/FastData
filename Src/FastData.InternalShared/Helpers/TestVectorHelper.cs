@@ -125,7 +125,7 @@ public static class TestVectorHelper
     {
         int[] intKeys = Enumerable.Range(0, benchmarkSize).ToArray();
         float[] floatKeys = Enumerable.Range(0, benchmarkSize).Select(x => (float)x).ToArray();
-        string[] stringKeys = Enumerable.Range(0, benchmarkSize).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).ToArray();
+        float[] perfectFloatHashKeys = CreatePerfectFloatHashKeys(benchmarkSize);
 
         Type[] generalTypes =
         [
@@ -141,7 +141,6 @@ public static class TestVectorHelper
         {
             yield return CreateTestData(type, intKeys);
             yield return CreateTestData(type, floatKeys);
-            yield return CreateTestData(type, stringKeys);
         }
 
         Type[] numericTypes = [typeof(BinarySearchInterpolationStructure<,>), typeof(PgmStructure<,>)];
@@ -158,8 +157,7 @@ public static class TestVectorHelper
             yield return CreateTestData(type, intKeys);
 
         yield return CreateTestData(typeof(HashTablePerfectStructure<,>), intKeys);
-        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), floatKeys);
-        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), stringKeys);
+        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), perfectFloatHashKeys);
 
         yield return CreateTestData(typeof(HybleStructure<,>), intKeys);
 
@@ -171,6 +169,17 @@ public static class TestVectorHelper
         yield return CreateTestData(typeof(SingleValueStructure<,>), ["key"]);
 
         TestData<TKey> CreateTestData<TKey>(Type type, TKey[] keys) => new TestData<TKey>(type, keys, warmupSampleCount, sampleCount, workIterations, queryCount);
+    }
+
+    private static float[] CreatePerfectFloatHashKeys(int size)
+    {
+        float[] keys = new float[size];
+
+        // Default float hashing uses the raw bit pattern when zero is absent.
+        for (int i = 0; i < keys.Length; i++)
+            keys[i] = BitConverter.Int32BitsToSingle(i + 1);
+
+        return keys;
     }
 
     private static IEnumerable<ITestVector> GenerateTestVectors(IEnumerable<DataPair> pairs, string? postfix = null, params Type[] dataStructs)
