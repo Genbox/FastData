@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.Globalization;
 using Genbox.FastData.BenchmarkHarness.Runner.Catalog;
+using Genbox.FastData.InternalShared.TestClasses;
 using Microsoft.Extensions.Configuration;
 
 namespace Genbox.FastData.BenchmarkHarness.Runner.Configuration;
@@ -29,6 +30,7 @@ internal sealed class BenchmarkCommandLine(BenchmarkCatalog catalog)
     private readonly Option<DirectoryInfo?> _resultsDirectoryOption = new Option<DirectoryInfo?>("--results-dir") { Description = "Directory containing benchmark JSONL histories." };
     private readonly Option<int?> _samplesOption = new Option<int?>("--samples") { Description = "Sample count." };
     private readonly Option<int?> _warmupOption = new Option<int?>("--warmup") { Description = "Warmup sample count." };
+    private readonly Option<BenchmarkWorkload?> _workloadOption = new Option<BenchmarkWorkload?>("--workload") { Description = "Benchmark workload: Hit, Miss, or Mixed. Default is Mixed." };
     private readonly Option<int?> _workIterationsOption = new Option<int?>("--work-iterations") { Description = "Work iterations per sample." };
 
     public RootCommand CreateRootCommand(Func<BenchmarkSettings, CancellationToken, Task<int>> action)
@@ -42,6 +44,7 @@ internal sealed class BenchmarkCommandLine(BenchmarkCatalog catalog)
             _individualPlotOption,
             _filterOption,
             _languageOption,
+            _workloadOption,
             _warmupOption,
             _samplesOption,
             _workIterationsOption,
@@ -128,6 +131,9 @@ internal sealed class BenchmarkCommandLine(BenchmarkCatalog catalog)
         if (languages.Count > 0)
             settings.Languages = languages.ToArray();
 
+        if (HasOption(parseResult, _workloadOption) && parseResult.GetValue(_workloadOption) is {} workload)
+            settings.Workload = workload;
+
         ApplyInt(parseResult, _warmupOption, x => settings.WarmupCount = x);
         ApplyInt(parseResult, _samplesOption, x => settings.SampleCount = x);
         ApplyInt(parseResult, _workIterationsOption, x => settings.WorkIterations = x);
@@ -162,6 +168,7 @@ internal sealed class BenchmarkCommandLine(BenchmarkCatalog catalog)
         return new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
         {
             [Key(nameof(BenchmarkSettings.Mode))] = settings.Mode.ToString(),
+            [Key(nameof(BenchmarkSettings.Workload))] = settings.Workload.ToString(),
             [Key(nameof(BenchmarkSettings.WarmupCount))] = ToString(settings.WarmupCount),
             [Key(nameof(BenchmarkSettings.SampleCount))] = ToString(settings.SampleCount),
             [Key(nameof(BenchmarkSettings.WorkIterations))] = ToString(settings.WorkIterations),

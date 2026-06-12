@@ -11,5 +11,5 @@ public interface ITestData
     int WarmupCount { get; }
     int SampleCount { get; }
     string Generate(ICodeGenerator generator);
-    string[] GetQuerySet(TypeMap map);
+    BenchmarkQuerySet GetQuerySet(TypeMap map);
 }

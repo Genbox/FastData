@@ -10,7 +10,7 @@ namespace Genbox.FastData.BenchmarkHarness.Runner.Execution;
 
 internal sealed class BenchmarkRunner(BenchmarkResultStore resultStore, double deltaWarningThresholdPercent)
 {
-    private readonly object _consoleLock = new object();
+    private readonly Lock _consoleLock = new Lock();
 
     public async Task RunAsync(IEnumerable<BenchmarkSelection> selections, string[] cpuSets, CancellationToken cancellationToken)
     {
@@ -30,10 +30,7 @@ internal sealed class BenchmarkRunner(BenchmarkResultStore resultStore, double d
         Task[] workers = new Task[cpuSets.Length];
 
         for (int i = 0; i < cpuSets.Length; i++)
-        {
-            int workerIndex = i;
-            workers[i] = RunWorkerAsync(workerIndex, cpuSets[workerIndex], queue, cancellationToken);
-        }
+            workers[i] = RunWorkerAsync(i, cpuSets[i], queue, cancellationToken);
 
         await Task.WhenAll(workers).ConfigureAwait(false);
     }

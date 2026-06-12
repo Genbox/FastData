@@ -1,3 +1,5 @@
+using Genbox.FastData.InternalShared.TestClasses;
+
 namespace Genbox.FastData.BenchmarkHarness.Runner.Configuration;
 
 internal sealed class BenchmarkSettings
@@ -5,8 +7,9 @@ internal sealed class BenchmarkSettings
     public BenchmarkMode Mode { get; set; } = BenchmarkMode.Run;
     public string[] Filters { get; set; } = [];
     public string[] Languages { get; set; } = [];
+    public BenchmarkWorkload Workload { get; set; } = BenchmarkWorkload.Mixed;
     public int WarmupCount { get; set; } = 3;
-    // Keep the default odd so the reported median is an observed sample rather than an interpolated value.
+    // Keep sample counts odd so the reported median is an observed sample rather than an interpolated value.
     public int SampleCount { get; set; } = 7;
     public int WorkIterations { get; set; } = 1_000_000;
     public int Parallelism { get; set; } = 1;
@@ -40,6 +43,12 @@ internal sealed class BenchmarkSettings
 
         if (Plot.Width < 0)
             throw new InvalidOperationException("Plot.Width must be zero or a positive integer.");
+
+        if (SampleCount % 2 == 0)
+            throw new InvalidOperationException(nameof(SampleCount) + " must be an odd integer so the median is an observed sample.");
+
+        if (!Enum.IsDefined(Workload))
+            throw new InvalidOperationException("Workload must be Hit, Miss, or Mixed.");
 
         if (string.IsNullOrWhiteSpace(ResultsDirectory))
             throw new InvalidOperationException("ResultsDirectory must be provided.");

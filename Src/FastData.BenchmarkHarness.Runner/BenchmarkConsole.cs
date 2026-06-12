@@ -31,7 +31,7 @@ internal static class BenchmarkConsole
                       .NoSafeBorder();
 
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(10));
-        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(40));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(45));
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(25));
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(25));
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(30));

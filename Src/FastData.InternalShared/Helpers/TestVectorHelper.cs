@@ -118,10 +118,9 @@ public static class TestVectorHelper
         // Test range support for non-consecutive data.
         foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 4, 7, 8, 10]], "range_gaps", typeof(RangeStructure<,>)))
             yield return testVector;
-
     }
 
-    public static IEnumerable<ITestData> GetBenchmarkData(int warmupSampleCount = 5, int sampleCount = 10, int workIterations = 1_000_000, int queryCount = 25, int benchmarkSize = 1000, int keyLengthBenchmarkSize = 128)
+    public static IEnumerable<ITestData> GetBenchmarkData(int warmupSampleCount = 5, int sampleCount = 10, int workIterations = 1_000_000, int queryCount = 25, int benchmarkSize = 1000, int keyLengthBenchmarkSize = 128, BenchmarkWorkload workload = BenchmarkWorkload.Mixed)
     {
         int[] intKeys = Enumerable.Range(0, benchmarkSize).ToArray();
         float[] floatKeys = Enumerable.Range(0, benchmarkSize).Select(x => (float)x).ToArray();
@@ -168,7 +167,7 @@ public static class TestVectorHelper
         yield return CreateTestData(typeof(SingleValueStructure<,>), [42f]);
         yield return CreateTestData(typeof(SingleValueStructure<,>), ["key"]);
 
-        TestData<TKey> CreateTestData<TKey>(Type type, TKey[] keys) => new TestData<TKey>(type, keys, warmupSampleCount, sampleCount, workIterations, queryCount);
+        ITestData CreateTestData<TKey>(Type type, TKey[] keys) => new TestData<TKey>(type, keys, workload, warmupSampleCount, sampleCount, workIterations, queryCount);
     }
 
     private static float[] CreatePerfectFloatHashKeys(int size)

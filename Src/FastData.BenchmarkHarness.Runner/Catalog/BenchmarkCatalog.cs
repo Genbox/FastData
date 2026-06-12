@@ -24,7 +24,8 @@ internal sealed class BenchmarkCatalog
         settings.WorkIterations,
         settings.QueryCount,
         settings.BenchmarkSize,
-        settings.KeyLengthBenchmarkSize).ToArray();
+        settings.KeyLengthBenchmarkSize,
+        settings.Workload).ToArray();
 
     public BenchmarkSelection[] Select(ITestData[] benchmarkData, BenchmarkSettings settings)
     {
