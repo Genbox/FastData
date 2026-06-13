@@ -1,0 +1,9 @@
+<#@ include file="Includes\Header.ttinclude" #>
+
+public:
+    <#= MethodAttribute #>
+    <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
+<#= GetMethodHeader(MethodType.Contains) #>
+        return true;
+    }
+<#@ include file="Includes\Footer.ttinclude" #>

@@ -190,17 +190,17 @@ public static partial class FastDataGenerator
         mandatoryExits.AddRange(hashMandatoryExits); // From hash functions
         mandatoryExits.AddRange(structure.GetMandatoryExits()); // From the structure
 
-        List<IEarlyExit> earlyExits = CombineExits(mandatoryExits, analysisExits);
+        List<IEarlyExit> earlyExits = EarlyExitPipeline.Combine(mandatoryExits, analysisExits);
 
         if (cfg.EarlyExitConfig.OptimizeExpression)
-            ReduceExits(earlyExits);
+            EarlyExitPipeline.Reduce(earlyExits);
 
         UsedFunctionVisitor usedVisitor = new UsedFunctionVisitor();
 
         ParameterExpression inputKey = Parameter(typeof(string), "key");
 
         // All exits use "key" - length and char exits are adjusted to work on the original key
-        AnnotatedExpr[] exprs = AnnotateExits(earlyExits, inputKey, usedVisitor);
+        AnnotatedExpr[] exprs = EarlyExitPipeline.Annotate(earlyExits, inputKey, usedVisitor);
 
         // Only emit the length allocation when it is actually referenced: either by an early exit that uses Length(), or by a hash function that takes length as a parameter.
         // We don't have any system-wide mandatory early exits, and only some structures are hash based. It makes this the path of least resistance.
@@ -393,13 +393,13 @@ public static partial class FastDataGenerator
 
         // Early exits are generated from numeric properties and then merged with checks required by the structure itself.
         IEarlyExit[] exitsAnalyzed = NumericEarlyExits<TKey>.GetExits(structureType, props.DataRanges, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig);
-        List<IEarlyExit> exits = CombineExits(structure.GetMandatoryExits(), exitsAnalyzed);
+        List<IEarlyExit> exits = EarlyExitPipeline.Combine(structure.GetMandatoryExits(), exitsAnalyzed);
         if (cfg.EarlyExitConfig.OptimizeExpression)
-            ReduceExits(exits);
+            EarlyExitPipeline.Reduce(exits);
 
         // Convert the early exits into a set of annotated expressions. We assume the input is called "key".
         ParameterExpression inputKey = Parameter(typeof(TKey), "key");
-        AnnotatedExpr[] exprs = AnnotateExits(exits, inputKey, null);
+        AnnotatedExpr[] exprs = EarlyExitPipeline.Annotate(exits, inputKey);
 
         NumericGeneratorConfig genCfg = new NumericGeneratorConfig(structureType, (uint)keys.Length, props.DataRanges.Min, props.DataRanges.Max, exprs, cfg.TypeReductionEnabled, props.HasZero);
 
@@ -440,66 +440,6 @@ public static partial class FastDataGenerator
                 cfg.StructureSettings.GetSetting<bool>(KnownSettings.RoundModuloToPowerOfTwo),
                 cfg.StructureSettings.GetSetting<float>(KnownSettings.RoundModuloToPowerOfTwoThreshold), hashFunc);
         }
-    }
-
-    private static List<IEarlyExit> CombineExits(IEnumerable<IEarlyExit> mandatory, IEnumerable<IEarlyExit> candidates)
-    {
-        List<IEarlyExit> exits = new List<IEarlyExit>(8);
-
-        foreach (IEarlyExit exit in mandatory)
-            AddExit(exit);
-
-        foreach (IEarlyExit exit in candidates)
-            AddExit(exit);
-
-        return exits;
-
-        void AddExit(IEarlyExit exit)
-        {
-            for (int i = 0; i < exits.Count; i++)
-            {
-                if (EqualityComparer<IEarlyExit>.Default.Equals(exit, exits[i]))
-                    return;
-            }
-
-            exits.Add(exit);
-        }
-    }
-
-    private static void ReduceExits(List<IEarlyExit> exits)
-    {
-        // Some early exits are reducible. For example, a LengthLessThan with a value of 3 is worse than one with 4.
-        // So if there are competing exits, we take the one with the best bounds.
-        for (int i = exits.Count - 1; i >= 0; i--)
-        {
-            IEarlyExit current = exits[i];
-
-            for (int j = exits.Count - 1; j >= 0; j--)
-            {
-                if (i == j)
-                    continue;
-
-                if (current.IsWorseThan(exits[j]))
-                {
-                    exits.RemoveAt(i);
-                    break;
-                }
-            }
-        }
-    }
-
-    private static AnnotatedExpr[] AnnotateExits(List<IEarlyExit> exits, ParameterExpression inputKey, UsedFunctionVisitor? usedVisitor)
-    {
-        AnnotatedExpr[] exprs = new AnnotatedExpr[exits.Count];
-
-        for (int i = 0; i < exits.Count; i++)
-        {
-            Expression expression = exits[i].GetExpression(inputKey);
-            usedVisitor?.Visit(expression);
-            exprs[i] = new AnnotatedExpr(expression, ExprKind.EarlyExit);
-        }
-
-        return exprs;
     }
 
     private static IStructure<TKey, TValue, IContext> NumericStructureFactory<TKey, TValue>(DataConfig cfg, Type type, NumericKeyProperties<TKey> props, Func<HashData> getHashData)

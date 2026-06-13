@@ -39,10 +39,12 @@ public class TestData<TKey>(Type structureType, TKey[] keys, BenchmarkWorkload w
 
     public BenchmarkQuerySet GetQuerySet(TypeMap map)
     {
+        int expectedFoundCount = BenchmarkQueryHelper.GetExpectedFoundCount(Workload, QueryCount);
+
         Random rng = new Random(42);
         string[] queryKeys = new string[QueryCount];
-        bool[] hitQueries = CreateHitQueries(rng);
-        TKey[] hitKeys = Workload == BenchmarkWorkload.Miss ? [] : CreateHitKeys(rng, ExpectedFoundCount);
+        bool[] hitQueries = BenchmarkQueryHelper.CreateHitQueries(Workload, QueryCount, expectedFoundCount, rng);
+        TKey[] hitKeys = Workload == BenchmarkWorkload.Miss ? [] : CreateHitKeys(rng, expectedFoundCount);
         TKey[] missKeys = Workload == BenchmarkWorkload.Hit ? [] : CreateMissKeys();
         int hitIndex = 0;
         int missIndex = 0;
@@ -53,7 +55,7 @@ public class TestData<TKey>(Type structureType, TKey[] keys, BenchmarkWorkload w
             queryKeys[i] = map.ToValueLabel(key);
         }
 
-        return new BenchmarkQuerySet(queryKeys, ExpectedFoundCount, ValidateFoundCount);
+        return new BenchmarkQuerySet(queryKeys, expectedFoundCount, ValidateFoundCount);
     }
 
     public void Serialize(IXunitSerializationInfo info)
@@ -72,14 +74,6 @@ public class TestData<TKey>(Type structureType, TKey[] keys, BenchmarkWorkload w
 
     public override string ToString() => Identifier;
 
-    private int ExpectedFoundCount => Workload switch
-    {
-        BenchmarkWorkload.Hit => QueryCount,
-        BenchmarkWorkload.Miss => 0,
-        BenchmarkWorkload.Mixed => (QueryCount + 1) / 2,
-        _ => throw new InvalidOperationException($"Unsupported benchmark workload '{Workload}'.")
-    };
-
     private bool ValidateFoundCount => StructureType != typeof(BloomFilterStructure<,>);
 
     private TKey[] CreateMissKeys()
@@ -96,7 +90,7 @@ public class TestData<TKey>(Type structureType, TKey[] keys, BenchmarkWorkload w
     private TKey[] CreateHitKeys(Random rng, int hitCount)
     {
         TKey[] shuffledKeys = (TKey[])Keys.Clone();
-        Shuffle(shuffledKeys, rng);
+        BenchmarkQueryHelper.Shuffle(shuffledKeys, rng);
 
         if (hitCount <= shuffledKeys.Length)
             return shuffledKeys[..hitCount];
@@ -106,30 +100,5 @@ public class TestData<TKey>(Type structureType, TKey[] keys, BenchmarkWorkload w
             hitKeys[i] = shuffledKeys[i % shuffledKeys.Length];
 
         return hitKeys;
-    }
-
-    private bool[] CreateHitQueries(Random rng)
-    {
-        bool[] hitQueries = new bool[QueryCount];
-
-        if (Workload == BenchmarkWorkload.Miss)
-            return hitQueries;
-
-        int hitCount = Workload == BenchmarkWorkload.Hit ? QueryCount : ExpectedFoundCount;
-
-        for (int i = 0; i < hitCount; i++)
-            hitQueries[i] = true;
-
-        Shuffle(hitQueries, rng);
-        return hitQueries;
-    }
-
-    private static void Shuffle<TValue>(TValue[] values, Random rng)
-    {
-        for (int i = values.Length - 1; i > 0; i--)
-        {
-            int j = rng.Next(0, i + 1);
-            (values[i], values[j]) = (values[j], values[i]);
-        }
     }
 }

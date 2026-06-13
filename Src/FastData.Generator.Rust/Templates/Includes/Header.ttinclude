@@ -33,9 +33,14 @@
 use std::ptr;
 <#= Type.GetTypeCode(Model.ValueType) == TypeCode.Object ? TypeMap.GetObjectDeclaration(Model.ValueType).Trim() : string.Empty #>
 <#
-    if (GeneratorConfig is StringGeneratorConfig strCfg2)
+    GeneratorFunction rustHelperFunctions = GeneratorConfig is StringGeneratorConfig strCfg2 ? strCfg2.GeneratorFunctions
+        : GeneratorConfig is EarlyExitOnlyGeneratorConfig eeCfg2 ? eeCfg2.GeneratorFunctions
+        : 0;
+    bool isIgnoreCase = GeneratorConfig is StringGeneratorConfig strCfg2a && strCfg2a.IgnoreCase;
+
+    if (isIgnoreCase || rustHelperFunctions != 0)
     {
-        if (strCfg2.IgnoreCase || (strCfg2.GeneratorFunctions & (GeneratorFunction.UnitAtAsciiLower | GeneratorFunction.EqualsAtAsciiLower)) != 0)
+        if (isIgnoreCase || (rustHelperFunctions & (GeneratorFunction.UnitAtAsciiLower | GeneratorFunction.EqualsAtAsciiLower)) != 0)
         {
 #>
 fn ToAsciiLower(value: u32) -> u32 {
@@ -50,7 +55,7 @@ fn ToAsciiLower(value: u32) -> u32 {
 <#
         }
 
-        if (strCfg2.IgnoreCase)
+        if (isIgnoreCase)
         {
 #>
 fn case_insensitive_equals(left: &str, right: &str) -> bool {
@@ -168,7 +173,7 @@ fn EqualsAtAsciiLower(value: &str, offset: i32, fragment: &str) -> bool {
 
         foreach (KeyValuePair<GeneratorFunction, string> kv in map)
         {
-            if ((strCfg2.GeneratorFunctions & kv.Key) == 0)
+            if ((rustHelperFunctions & kv.Key) == 0)
                 continue;
 #>
 <#= kv.Value #>
@@ -176,17 +181,20 @@ fn EqualsAtAsciiLower(value: &str, offset: i32, fragment: &str) -> bool {
 <#
         }
 
-        AdditionalData[]? addData = strCfg2.HashInfo?.AdditionalData;
-        if (addData != null)
+        if (GeneratorConfig is StringGeneratorConfig strCfg2b)
         {
-            foreach (AdditionalData data in addData)
+            AdditionalData[]? addData = strCfg2b.HashInfo?.AdditionalData;
+            if (addData != null)
             {
+                foreach (AdditionalData data in addData)
+                {
 #>
 const <#= data.Name #>: [<#= TypeMap.GetTypeName(data.Type) #>; <#= data.Values.Length #>] = [
 <#= FormatHelper.FormatColumns(data.Values.Cast<object>(), data.Values.Length, x => TypeMap.ToValueLabel(x), 8) #>
 ];
 
 <#
+                }
             }
         }
     }

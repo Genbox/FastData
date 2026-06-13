@@ -14,7 +14,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
 {
     public async Task<int> RunAsync(Settings settings, CancellationToken cancellationToken)
     {
-        ITestData[] benchmarkData = TestVectorHelper.GetBenchmarkData(
+        ITestData[] structureBenchmarks = TestVectorHelper.GetBenchmarkData(
             settings.WarmupCount,
             settings.MinSampleCount,
             settings.MaxSampleCount,
@@ -23,6 +23,17 @@ internal sealed class Application(BenchmarkCatalog catalog)
             settings.KeyLengthBenchmarkSize,
             settings.Workload,
             settings.MaxError).ToArray();
+
+        ITestData[] earlyExitBenchmarks = TestVectorHelper.GetEarlyExitBenchmarkData(
+            settings.WarmupCount,
+            settings.MinSampleCount,
+            settings.MaxSampleCount,
+            settings.TargetIterationTimeMs,
+            settings.BenchmarkSize,
+            settings.Workload,
+            settings.MaxError).ToArray();
+
+        ITestData[] benchmarkData = [..structureBenchmarks, ..earlyExitBenchmarks];
         ResultStore resultStore = new ResultStore(settings.ResultsDirectory);
 
         return settings.Mode switch

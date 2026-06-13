@@ -260,6 +260,9 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
                     EpsilonRecursive = pgmCtx.EpsilonRecursive
                 };
 
+            case EarlyExitOnlyContext:
+                return null;
+
             default:
                 throw new InvalidOperationException("No template mapping found for context type: " + context.GetType().FullName);
         }
