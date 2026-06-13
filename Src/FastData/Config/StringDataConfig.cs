@@ -8,6 +8,8 @@ public sealed class StringDataConfig : DataConfig
     public StringDataConfig()
     {
         StructureSettings.AddDefault(KnownSettings.HashTableCapacityFactor, 1f);
+        StructureSettings.AddDefault(KnownSettings.RoundModuloToPowerOfTwo, true);
+        StructureSettings.AddDefault(KnownSettings.RoundModuloToPowerOfTwoThreshold, 0.125f);
     }
 
     /// <summary>Enable case-insensitive lookups for string keys.</summary>

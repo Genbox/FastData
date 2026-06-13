@@ -1,0 +1,56 @@
+/// @generated
+// This file is auto-generated. Do not edit manually.
+// Structure: HashTable
+#include <array>
+#include <cstring>
+#include <cstdint>
+#include <limits>
+#include <string_view>
+
+
+class fastdata final {
+
+
+    struct e {
+        int32_t key;
+        int8_t next;
+        e(const int32_t key, const int8_t next)
+           : key(key), next(next) {}
+    };
+
+    static constexpr std::array<int8_t, 8> buckets = {
+        1, 2, 3, 4, 5, 6, 7, 0
+    };
+
+    inline static const std::array<e, 7> entries = {
+        e(0, -1), e(1, -1), e(2, -1), e(3, -1), e(4, -1), e(5, -1), e(6, -1)
+    };
+
+    static constexpr uint64_t get_hash(const int32_t value) noexcept {
+        return static_cast<uint64_t>(value);
+    }
+
+public:
+    [[nodiscard]]
+    static constexpr bool contains(const int32_t key) noexcept {
+
+        const uint64_t hash = get_hash(key);
+        const size_t index = hash % 8;
+        int8_t i = static_cast<int8_t>(buckets[index] - 1);
+
+        while (i >= 0) {
+            const auto& entry = entries[i];
+
+            if (entry.key == key)
+                return true;
+
+            i = entry.next;
+        }
+
+        return false;
+    }
+
+    static constexpr size_t item_count = 7;
+    static constexpr int32_t min_key = 0;
+    static constexpr int32_t max_key = 6;
+};

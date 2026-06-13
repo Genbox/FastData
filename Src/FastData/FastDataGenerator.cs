@@ -301,7 +301,10 @@ public static partial class FastDataGenerator
             Encoding encoding = StringHelper.GetEncoding(generator.Encoding);
             byte[] buffer = new byte[props.LengthData.MaxByteLength];
 
-            HashData hashData = HashData.Create(keySpan, cfg.StructureSettings.GetSetting<float>(KnownSettings.HashTableCapacityFactor), x =>
+            HashData hashData = HashData.Create(keySpan,
+                cfg.StructureSettings.GetSetting<float>(KnownSettings.HashTableCapacityFactor),
+                cfg.StructureSettings.GetSetting<bool>(KnownSettings.RoundModuloToPowerOfTwo),
+                cfg.StructureSettings.GetSetting<float>(KnownSettings.RoundModuloToPowerOfTwoThreshold), x =>
             {
                 int byteCount = encoding.GetBytes(x, 0, x.Length, buffer, 0);
                 return hashFunc(buffer, byteCount);
@@ -432,7 +435,10 @@ public static partial class FastDataGenerator
         HashData GetNumericHash(ReadOnlySpan<TKey> keySpan)
         {
             NumericHashFunc<TKey> hashFunc = DefaultNumericHash.GetHashFunc<TKey>(props.HasZero);
-            return HashData.Create(keySpan, cfg.StructureSettings.GetSetting<float>(KnownSettings.HashTableCapacityFactor), hashFunc);
+            return HashData.Create(keySpan,
+                cfg.StructureSettings.GetSetting<float>(KnownSettings.HashTableCapacityFactor),
+                cfg.StructureSettings.GetSetting<bool>(KnownSettings.RoundModuloToPowerOfTwo),
+                cfg.StructureSettings.GetSetting<float>(KnownSettings.RoundModuloToPowerOfTwoThreshold), hashFunc);
         }
     }
 

@@ -57,6 +57,24 @@ internal static class BitOperations
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static bool IsPow2(uint value) => value != 0 && (value & (value - 1)) == 0;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static uint RoundUpToPowerOf2(uint value)
+    {
+        if (value <= 1)
+            return 1;
+
+        value--;
+        value |= value >> 1;
+        value |= value >> 2;
+        value |= value >> 4;
+        value |= value >> 8;
+        value |= value >> 16;
+        return value + 1;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static uint RotateLeft(uint value, int offset) => (value << offset) | (value >> (32 - offset));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

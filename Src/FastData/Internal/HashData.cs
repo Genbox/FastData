@@ -1,29 +1,19 @@
+using System.Numerics;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal;
 
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
-internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize, bool HashCodesUnique, bool HashCodesPerfect, ulong MinHashCode, ulong MaxHashCode)
+internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize, bool RoundModuloToPowerOfTwo, float RoundModuloToPowerOfTwoThreshold, bool HashCodesPerfect, ulong MinHashCode, ulong MaxHashCode)
 {
-    internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, NumericHashFunc<T> func)
+    internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, NumericHashFunc<T> func) => Create(data, capacityFactor, false, 0, func);
+
+    internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, bool roundModuloToPowerOfTwo, float roundModuloToPowerOfTwoThreshold, NumericHashFunc<T> func)
     {
-        if (float.IsNaN(capacityFactor) || float.IsInfinity(capacityFactor) || capacityFactor <= 0)
-            throw new InvalidOperationException("HashTableCapacityFactor must be a finite value greater than 0.");
-
-        double tableSizeDouble = Math.Ceiling(data.Length * (double)capacityFactor);
-
-        if (tableSizeDouble > int.MaxValue)
-            throw new InvalidOperationException("HashTableCapacityFactor results in a hash table that is too large.");
-
-        int tableSize = Math.Max(1, (int)tableSizeDouble);
-
+        int baseTableSize = GetBaseTableSize(data.Length, capacityFactor);
         ulong[] hashCodes = new ulong[data.Length];
-        HashSet<ulong> uniqSet = new HashSet<ulong>();
-        SwitchingBitSet perfectTracker = new SwitchingBitSet(tableSize, false);
 
-        bool uniq = true;
-        bool perfect = true;
         ulong minHashCode = ulong.MaxValue;
         ulong maxHashCode = ulong.MinValue;
 
@@ -34,14 +24,75 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
 
             minHashCode = Math.Min(minHashCode, hash);
             maxHashCode = Math.Max(maxHashCode, hash);
-
-            if (uniq && !uniqSet.Add(hash)) //The unique check is first so that when it is false, we don't try the other conditions
-                uniq = false;
-
-            if (perfect && !perfectTracker.Add((uint)(hash % (uint)tableSize)))
-                perfect = false;
         }
 
-        return new HashData(hashCodes, capacityFactor, tableSize, uniq, perfect, minHashCode, maxHashCode);
+        int tableSize = GetModuloLength(baseTableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, hashCodes);
+        bool perfect = CountBucketCollisions(hashCodes, tableSize) == 0;
+        return new HashData(hashCodes, capacityFactor, tableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, perfect, minHashCode, maxHashCode);
+    }
+
+    internal int GetModuloLength(int length) => GetModuloLength(length, RoundModuloToPowerOfTwo, RoundModuloToPowerOfTwoThreshold);
+
+    private static int GetBaseTableSize(int count, float capacityFactor)
+    {
+        if (float.IsNaN(capacityFactor) || float.IsInfinity(capacityFactor) || capacityFactor <= 0)
+            throw new InvalidOperationException("HashTableCapacityFactor must be a finite value greater than 0.");
+
+        double tableSize = Math.Ceiling(count * (double)capacityFactor);
+
+        if (tableSize > int.MaxValue)
+            throw new InvalidOperationException("HashTableCapacityFactor results in a hash table that is too large.");
+
+        return Math.Max(1, (int)tableSize);
+    }
+
+    private static int GetModuloLength(int length, bool roundModuloToPowerOfTwo, float roundingThreshold, ReadOnlySpan<ulong> hashCodes = default)
+    {
+        if (length <= 0)
+            throw new InvalidOperationException("Modulo length must be greater than zero.");
+
+        uint current = (uint)length;
+
+        if (!roundModuloToPowerOfTwo || BitOperations.IsPow2(current))
+            return length;
+
+        if (float.IsNaN(roundingThreshold) || float.IsInfinity(roundingThreshold) || roundingThreshold < 0)
+            throw new InvalidOperationException("RoundModuloToPowerOfTwoThreshold must be a finite value greater than or equal to zero.");
+
+        uint rounded = BitOperations.RoundUpToPowerOf2(current);
+
+        if (rounded > int.MaxValue)
+            return length;
+
+        double overhead = (double)(rounded - current) / rounded;
+        if (overhead > roundingThreshold)
+            return length;
+
+        int roundedLength = (int)rounded;
+
+        if (hashCodes.IsEmpty)
+            return roundedLength;
+
+        int currentCollisions = CountBucketCollisions(hashCodes, length);
+        int roundedCollisions = CountBucketCollisions(hashCodes, roundedLength);
+
+        if (roundedCollisions > currentCollisions)
+            return length;
+
+        return roundedLength;
+    }
+
+    private static int CountBucketCollisions(ReadOnlySpan<ulong> hashCodes, int length)
+    {
+        SwitchingBitSet tracker = new SwitchingBitSet(length, false);
+        int collisions = 0;
+
+        for (int i = 0; i < hashCodes.Length; i++)
+        {
+            if (!tracker.Add((uint)(hashCodes[i] % (uint)length)))
+                collisions++;
+        }
+
+        return collisions;
     }
 }

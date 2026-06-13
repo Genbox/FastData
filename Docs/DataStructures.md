@@ -78,7 +78,7 @@ Complexity below is the amortized time for a single query after generated code h
 * Complexity: O(1)
 * Compressed: Yes: `64 * ceil((10 * n) / 64)` bits
 
-`BloomFilter` is selected only when approximate matching is allowed. The current implementation allocates 10 bits per key and sets two bits per key from the hash. It can return false positives, so it is valid for membership pre-filtering but not exact key/value lookup.
+`BloomFilter` is selected only when approximate matching is allowed. The current implementation allocates 10 bits per key and sets two bits per key from the hash. It can return false positives, so it is valid for membership pre-filtering but not exact key/value lookup. `RoundModuloToPowerOfTwo` is enabled by default, so the bitset word length can be rounded up to the next power of two if the extra word count is within `RoundModuloToPowerOfTwoThreshold`. The threshold is a ratio, so the default `0.125` allows up to 12.5% extra slots.
 
 ## Conditional
 
@@ -105,7 +105,7 @@ Complexity below is the amortized time for a single query after generated code h
 * Complexity: O(1) amortized; worst-case O(n) if all entries collide into one bucket
 * Compressed: No
 
-`HashTable` is the general fallback for large or irregular datasets. It emits a bucket array and an entry array. Here `B` is the bucket length, currently `n * HashCapacityFactor`; `I(x)` is the selected signed index width after type reduction; and `H` is 64 when entries store hash codes, otherwise 0. Each entry stores the key, a `Next` index for separate chaining, and an optional hash code. Numeric keys use identity-style hashing where possible. String keys use either the default string hash or a dataset-specific hash expression when analysis is enabled.
+`HashTable` is the general fallback for large or irregular datasets. It emits a bucket array and an entry array. Here `B` is the bucket length, normally `n * HashTableCapacityFactor`; `I(x)` is the selected signed index width after type reduction; and `H` is 64 when entries store hash codes, otherwise 0. `RoundModuloToPowerOfTwo` is enabled by default, so `B` can be rounded up to the next power of two if the extra bucket count is within `RoundModuloToPowerOfTwoThreshold`. Each entry stores the key, a `Next` index for separate chaining, and an optional hash code. Numeric keys use identity-style hashing where possible. String keys use either the default string hash or a dataset-specific hash expression when analysis is enabled.
 
 ## HashTableCompact
 
@@ -123,7 +123,7 @@ Complexity below is the amortized time for a single query after generated code h
 * Complexity: O(1)
 * Compressed: No
 
-`HashTablePerfect` is selected when all generated hash codes are unique for the dataset. Here `B` is the entry table length, currently `n * HashCapacityFactor`, and `H` is 64 when entries store hash codes, otherwise 0. It emits one entry array indexed directly by `hash % B`, with no bucket array and no collision-chain metadata. If `HashCapacityFactor` creates empty slots, or the key type does not use identity hashing, entries also store a 64-bit hash code to distinguish empty slots and verify matches.
+`HashTablePerfect` is selected when all generated hash codes are unique for the dataset. Here `B` is the entry table length, normally `n * HashTableCapacityFactor`, with the same optional power-of-two rounding as `HashTable`, and `H` is 64 when entries store hash codes, otherwise 0. It emits one entry array indexed directly by `hash % B`, with no bucket array and no collision-chain metadata. If `HashTableCapacityFactor` or modulo rounding creates empty slots, or the key type does not use identity hashing, entries also store a 64-bit hash code to distinguish empty slots and verify matches.
 
 ## KeyLength
 

@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using Docker.DotNet;

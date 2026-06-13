@@ -31,6 +31,21 @@ public abstract class FeatureTestBase
     }
 
     [Fact]
+    public async Task RoundModuloToPowerOfTwoSupport()
+    {
+        NumericDataConfig config = new NumericDataConfig();
+        config.StructureTypeOverride = typeof(HashTableStructure<,>);
+        config.EarlyExitConfig.Disabled = true;
+
+        int[] keys = [0, 1, 2, 3, 4, 5, 6];
+        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
+        string id = nameof(RoundModuloToPowerOfTwoSupport);
+        await VerifyFeatureAsync(Harness.Name, id, source);
+
+        Assert.Equal(1, await Harness.RunContainsAsync(source, id, keys, [7, 8], TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
     public async Task FractionalFloatingPointLiteralsMatch()
     {
         NumericDataConfig config = new NumericDataConfig();

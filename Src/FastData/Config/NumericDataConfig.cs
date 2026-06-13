@@ -6,6 +6,8 @@ public sealed class NumericDataConfig : DataConfig
     public NumericDataConfig()
     {
         StructureSettings.AddDefault(KnownSettings.HashTableCapacityFactor, 1f);
+        StructureSettings.AddDefault(KnownSettings.RoundModuloToPowerOfTwo, true);
+        StructureSettings.AddDefault(KnownSettings.RoundModuloToPowerOfTwoThreshold, 0.125f);
         StructureSettings.AddDefault(KnownSettings.EliasFanoSkipQuantum, 128);
         StructureSettings.AddDefault(KnownSettings.PgmEpsilon, 64);
         StructureSettings.AddDefault(KnownSettings.PgmEpsilonRecursive, 4);

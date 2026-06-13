@@ -23,18 +23,18 @@ public sealed class BloomFilterStructure<TKey, TValue> : IStructure<TKey, TValue
         int capacity = keys.Length;
         int bits = checked(capacity * BitsPerKey);
 
-        uint length = (uint)((bits + 63) / 64);
+        int length = _hashData.GetModuloLength((bits + 63) / 64);
         ulong[] bitset = new ulong[length];
         ulong[] hashCodes = _hashData.HashCodes;
 
         for (int i = 0; i < capacity; i++)
         {
             ulong hash = hashCodes[i];
-            uint index = (uint)(hash % length);
+            int index = (int)(hash % (uint)length);
             uint shift1 = unchecked((uint)hash & 63u);
             uint shift2 = unchecked((uint)(hash >> 8) & 63u);
             ulong mask = (1UL << (int)shift1) | (1UL << (int)shift2);
-            bitset[(int)index] |= mask;
+            bitset[index] |= mask;
         }
 
         return new BloomFilterContext(bitset);
