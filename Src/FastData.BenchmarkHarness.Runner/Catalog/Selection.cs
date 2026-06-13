@@ -4,4 +4,4 @@ using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.BenchmarkHarness.Runner.Catalog;
 
-internal sealed record BenchmarkSelection(string Name, Func<DockerManager, BenchmarkBase> Factory, ITestData[] Data);
+internal sealed record Selection(Func<DockerManager, BenchmarkBase> Factory, ITestData[] Data);

@@ -46,6 +46,37 @@ public abstract class HarnessBase(BootstrapBase bootstrap, DockerManager dockerM
         return res;
     }
 
+    protected async Task BuildProgramAsync(string program, string id, CancellationToken cancellationToken = default)
+    {
+        string fileName = id + bootstrap.Ext;
+        string fullPath = Path.Combine(bootstrap.RootDir, fileName);
+        await File.WriteAllTextAsync(fullPath, program, cancellationToken).ConfigureAwait(false);
+
+        if (bootstrap.BuildCommandTemplate == null)
+            return;
+
+        string command = string.Format(CultureInfo.InvariantCulture, bootstrap.BuildCommandTemplate, fileName, id);
+        ProcessResult res = await dockerManager.RunInContainerAsync(bootstrap.DockerImage, bootstrap.RootDir, command, cancellationToken).ConfigureAwait(false);
+
+        if (res.ExitCode != 0)
+            throw new InvalidOperationException($"Failed to compile benchmark. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
+    }
+
+    protected async Task<ProcessResult> RunProgramAsync(string id, string arguments, CancellationToken cancellationToken = default)
+    {
+        if (bootstrap.RunCommandTemplate == null)
+            throw new InvalidOperationException("The bootstrap does not define a benchmark run command.");
+
+        string fileName = id + bootstrap.Ext;
+        string command = string.Format(CultureInfo.InvariantCulture, bootstrap.RunCommandTemplate, fileName, id, arguments);
+        ProcessResult res = await dockerManager.RunInContainerAsync(bootstrap.DockerImage, bootstrap.RootDir, command, cancellationToken).ConfigureAwait(false);
+
+        if (res.ExitCode != 0)
+            throw new InvalidOperationException($"Failed to run benchmark. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
+
+        return res;
+    }
+
     public override string ToString() => bootstrap.Name;
 
     private static bool HasError(string standardError)

@@ -9,7 +9,7 @@ namespace Genbox.FastData.Generator.CSharp.TestHarness;
 public sealed class CSharpBootstrap : BootstrapBase
 {
     // Benchmarks pin exact image digests so compiler/runtime updates do not silently change results.
-    public CSharpBootstrap(HarnessType type) : base("CSharp", ".cs", type, CreateMap(), "mcr.microsoft.com/dotnet/sdk:10@sha256:548d93f8a18a1acbe6cc127bc4f47281430d34a9e35c18afa80a8d6741c2adc3", GetCommandTemplate(type)) { }
+    public CSharpBootstrap(HarnessType type) : base("CSharp", ".cs", type, CreateMap(), "mcr.microsoft.com/dotnet/sdk:10@sha256:548d93f8a18a1acbe6cc127bc4f47281430d34a9e35c18afa80a8d6741c2adc3", GetCommandTemplate(type), GetBuildCommandTemplate(type), GetRunCommandTemplate(type)) { }
 
     public override ICodeGenerator Generator => new CSharpCodeGenerator(new CSharpCodeGeneratorConfig("FastData"));
 
@@ -36,4 +36,12 @@ public sealed class CSharpBootstrap : BootstrapBase
         type == HarnessType.Test
             ? "dotnet run -c Debug --property PublishAot=false -p:DebugType=None -p:DebugSymbols=false {0}"
             : "DOTNET_gcServer=0 DOTNET_gcConcurrent=1 DOTNET_ReadyToRun=0 DOTNET_TieredCompilation=0 DOTNET_TieredPGO=0 dotnet run -c Release --property PublishAot=false {0}";
+
+    private static string? GetBuildCommandTemplate(HarnessType type) => type == HarnessType.Benchmark
+        ? "dotnet publish -c Release --property PublishAot=false -p:DebugType=None -p:DebugSymbols=false -o {1}-out {0}"
+        : null;
+
+    private static string? GetRunCommandTemplate(HarnessType type) => type == HarnessType.Benchmark
+        ? "DOTNET_gcServer=0 DOTNET_gcConcurrent=1 DOTNET_ReadyToRun=0 DOTNET_TieredCompilation=0 DOTNET_TieredPGO=0 /bin/sh -c \"if [ -f {1}-out/{1}.dll ]; then dotnet {1}-out/{1}.dll {2}; else {1}-out/{1} {2}; fi\""
+        : null;
 }

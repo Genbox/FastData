@@ -1,10 +1,9 @@
 using System.Globalization;
-using Genbox.FastData.BenchmarkHarness.Runner.Results;
 using Spectre.Console;
 
 namespace Genbox.FastData.BenchmarkHarness.Runner;
 
-internal static class BenchmarkConsole
+internal static class ConsoleOutput
 {
     private static readonly IAnsiConsole ErrorConsole = AnsiConsole.Create(new AnsiConsoleSettings { Out = new AnsiConsoleOutput(Console.Error) });
 
@@ -23,7 +22,7 @@ internal static class BenchmarkConsole
         AnsiConsole.Write(table);
     }
 
-    public static void WriteBenchmarkResult(BenchmarkResultLine result)
+    public static void WriteBenchmarkResult(ResultLine result, double warningThreshold)
     {
         Table table = new Table()
                       .Border(TableBorder.None)
@@ -32,9 +31,12 @@ internal static class BenchmarkConsole
 
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(10));
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(45));
-        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(20));
-        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(20));
-        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(25));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(14));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(14));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(22));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(22));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(14));
+        table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(14));
         table.AddColumn(new TableColumn(string.Empty).NoWrap());
 
         table.AddRow(
@@ -42,13 +44,18 @@ internal static class BenchmarkConsole
             Markup.Escape(result.DataIdentifier),
             FormatMetric("min", result.Min),
             FormatMetric("max", result.Max),
-            FormatDeltaMetric("mid", result.Median, result.MedianDelta),
-            FormatDeltaMetric("avg", result.Avg, result.AvgDelta) + " [grey]" + Markup.Escape(result.SampleSummary) + "[/]");
+            FormatDeltaMetric("mid", result.Median, result.PreviousMedian, warningThreshold),
+            FormatDeltaMetric("avg", result.Avg, result.PreviousAvg, warningThreshold),
+            FormatMetric("err", result.Error),
+            FormatMetric("std", result.StdDev),
+            FormatMetric("out", $"{result.Outliers.ToString(CultureInfo.InvariantCulture)}/{result.Samples.ToString(CultureInfo.InvariantCulture)}"));
 
         AnsiConsole.Write(table);
     }
 
     public static void WriteError(string message) => ErrorConsole.MarkupLine(CultureInfo.InvariantCulture, "[red]{0}[/]", Markup.Escape(message));
+
+    public static void WriteDebug(string message) => AnsiConsole.MarkupLine(CultureInfo.InvariantCulture, "[grey]Debug:[/] {0}", Markup.Escape(message));
 
     public static void WriteHeading(string text)
     {
@@ -67,11 +74,24 @@ internal static class BenchmarkConsole
         AnsiConsole.MarkupLine(Markup.Escape(suffix));
     }
 
-    private static string FormatMetric(string label, string value) => $"[grey]{label}:[/] {Markup.Escape(value)}";
+    private static string FormatMetric(string label, double value) => $"[grey]{label}:[/] {value.ToString("0.0000", CultureInfo.InvariantCulture)}";
 
-    private static string FormatDeltaMetric(string label, string value, BenchmarkResultDelta delta) =>
-        FormatMetric(label, value) + " (" + FormatDelta(delta) + ")";
+    private static string FormatMetric(string label, string value) => $"[grey]{label}:[/] {value}";
 
-    private static string FormatDelta(BenchmarkResultDelta delta) =>
-        delta.Style == null ? Markup.Escape(delta.Text) : $"[{delta.Style}]{Markup.Escape(delta.Text)}[/]";
+    private static string FormatDeltaMetric(string label, double value, double? previous, double warningThreshold) => $"{FormatMetric(label, value)} ({FormatDelta(value, previous, warningThreshold)})";
+
+    private static string FormatDelta(double current, double? previous, double warningThreshold)
+    {
+        if (previous is null)
+            return "n/a";
+
+        if (previous.Value == 0)
+            return current == 0 ? "0%" : "n/a";
+
+        double delta = ((current - previous.Value) / previous.Value) * 100;
+        string text = delta.ToString("+0.00;-0.00;0.00", CultureInfo.InvariantCulture) + "%";
+        string? style = Math.Abs(delta) < warningThreshold ? null :
+            delta < 0 ? "green" : "red";
+        return style == null ? text : $"[{style}]{text}[/]";
+    }
 }

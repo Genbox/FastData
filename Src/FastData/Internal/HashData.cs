@@ -26,11 +26,12 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
             maxHashCode = Math.Max(maxHashCode, hash);
         }
 
-        int tableSize = GetModuloLength(baseTableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, hashCodes);
-        bool perfect = CountBucketCollisions(hashCodes, tableSize) == 0;
+        int tableSize = GetModuloLength(baseTableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, hashCodes, out int collisions);
+        bool perfect = collisions == 0;
         return new HashData(hashCodes, capacityFactor, tableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, perfect, minHashCode, maxHashCode);
     }
 
+    /// <summary>Round <paramref name="length" /> to the next power of two if within threshold. Does not compare collisions because callers use this for non-bucket dimensions (e.g. bloom filter word count).</summary>
     internal int GetModuloLength(int length) => GetModuloLength(length, RoundModuloToPowerOfTwo, RoundModuloToPowerOfTwoThreshold);
 
     private static int GetBaseTableSize(int count, float capacityFactor)
@@ -46,7 +47,7 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
         return Math.Max(1, (int)tableSize);
     }
 
-    private static int GetModuloLength(int length, bool roundModuloToPowerOfTwo, float roundingThreshold, ReadOnlySpan<ulong> hashCodes = default)
+    private static int GetModuloLength(int length, bool roundModuloToPowerOfTwo, float roundingThreshold)
     {
         if (length <= 0)
             throw new InvalidOperationException("Modulo length must be greater than zero.");
@@ -61,24 +62,59 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
 
         uint rounded = BitOperations.RoundUpToPowerOf2(current);
 
-        if (rounded > int.MaxValue)
+        if (rounded == 0 || rounded > int.MaxValue)
             return length;
 
         double overhead = (double)(rounded - current) / rounded;
         if (overhead > roundingThreshold)
             return length;
 
-        int roundedLength = (int)rounded;
+        return (int)rounded;
+    }
 
-        if (hashCodes.IsEmpty)
-            return roundedLength;
+    private static int GetModuloLength(int length, bool roundModuloToPowerOfTwo, float roundingThreshold, ReadOnlySpan<ulong> hashCodes, out int collisions)
+    {
+        if (length <= 0)
+            throw new InvalidOperationException("Modulo length must be greater than zero.");
+
+        uint current = (uint)length;
+
+        if (!roundModuloToPowerOfTwo || BitOperations.IsPow2(current))
+        {
+            collisions = CountBucketCollisions(hashCodes, length);
+            return length;
+        }
+
+        if (float.IsNaN(roundingThreshold) || float.IsInfinity(roundingThreshold) || roundingThreshold < 0)
+            throw new InvalidOperationException("RoundModuloToPowerOfTwoThreshold must be a finite value greater than or equal to zero.");
+
+        uint rounded = BitOperations.RoundUpToPowerOf2(current);
+
+        if (rounded == 0 || rounded > int.MaxValue)
+        {
+            collisions = CountBucketCollisions(hashCodes, length);
+            return length;
+        }
+
+        double overhead = (double)(rounded - current) / rounded;
+        if (overhead > roundingThreshold)
+        {
+            collisions = CountBucketCollisions(hashCodes, length);
+            return length;
+        }
+
+        int roundedLength = (int)rounded;
 
         int currentCollisions = CountBucketCollisions(hashCodes, length);
         int roundedCollisions = CountBucketCollisions(hashCodes, roundedLength);
 
         if (roundedCollisions > currentCollisions)
+        {
+            collisions = currentCollisions;
             return length;
+        }
 
+        collisions = roundedCollisions;
         return roundedLength;
     }
 

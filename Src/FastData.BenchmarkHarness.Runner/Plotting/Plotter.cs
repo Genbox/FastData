@@ -6,7 +6,7 @@ using Genbox.FastData.BenchmarkHarness.Runner.Results;
 
 namespace Genbox.FastData.BenchmarkHarness.Runner.Plotting;
 
-internal sealed class BenchmarkPlotter(PlotSettings settings)
+internal sealed class Plotter(PlotSettings settings)
 {
     private static readonly (ConsoleColor PlotColor, string Style)[] PlotColors =
     [
@@ -26,48 +26,53 @@ internal sealed class BenchmarkPlotter(PlotSettings settings)
         (ConsoleColor.Gray, "grey")
     ];
 
-    public void PlotCombined(IReadOnlyList<BenchmarkHistory> histories)
+    public void PlotCombined(IReadOnlyList<History> histories)
     {
-        BenchmarkConsole.WriteHeading("Median benchmark history");
+        if (histories.Count == 0)
+            return;
 
-        Plot plot = new Plot(GetPlotWidth(), settings.Height);
+        ConsoleOutput.WriteHeading("Median benchmark history");
+
+        int plotWidth = GetPlotWidth();
+        Plot plot = new Plot(plotWidth, settings.Height);
 
         for (int i = 0; i < histories.Count; i++)
         {
-            BenchmarkHistory history = histories[i];
+            History history = histories[i];
             (PointPen pen, string style) = GetPlotPen(i, SystemPointBrushes.Braille);
             AddMedianSeries(plot, history, pen);
-            BenchmarkConsole.WriteColoredLinePrefix(i + 1, style, history.Name, $" ({history.Entries.Length} data points)");
+            ConsoleOutput.WriteColoredLinePrefix(i + 1, style, history.Name, $" ({history.Entries.Length} data points)");
         }
 
-        DrawPlot(plot, histories.SelectMany(x => x.Entries), histories.Max(x => x.Entries.Length));
+        DrawPlot(plot, histories.SelectMany(x => x.Entries), histories.Max(x => x.Entries.Length), plotWidth);
     }
 
-    public void PlotIndividual(IEnumerable<BenchmarkHistory> histories)
+    public void PlotIndividual(IEnumerable<History> histories)
     {
-        foreach (BenchmarkHistory history in histories)
+        foreach (History history in histories)
             PlotHistory(history);
     }
 
-    private void PlotHistory(BenchmarkHistory history)
+    private void PlotHistory(History history)
     {
-        BenchmarkConsole.WriteHeading(history.Name);
+        ConsoleOutput.WriteHeading(history.Name);
 
         if (history.Entries.Length == 1)
         {
-            BenchmarkResultEntry entry = history.Entries[0];
-            BenchmarkConsole.WriteInfo("Median", entry.Median.ToString("0.####", CultureInfo.InvariantCulture));
-            BenchmarkConsole.WriteInfo("Timestamp", FormatTimestamp(entry.TimestampUtc));
-            BenchmarkConsole.WriteInfo("History", "only one data point; at least two are needed to plot a trend");
+            ResultEntry entry = history.Entries[0];
+            ConsoleOutput.WriteInfo("Median", entry.Median.ToString("0.####", CultureInfo.InvariantCulture));
+            ConsoleOutput.WriteInfo("Timestamp", FormatTimestamp(entry.TimestampUtc));
+            ConsoleOutput.WriteInfo("History", "only one data point; at least two are needed to plot a trend");
             return;
         }
 
-        Plot plot = new Plot(GetPlotWidth(), settings.Height);
+        int plotWidth = GetPlotWidth();
+        Plot plot = new Plot(plotWidth, settings.Height);
         AddMedianSeries(plot, history, GetPlotPen(0, SystemPointBrushes.Braille).Pen);
-        DrawPlot(plot, history.Entries, history.Entries.Length);
+        DrawPlot(plot, history.Entries, history.Entries.Length, plotWidth);
     }
 
-    private static void AddMedianSeries(Plot plot, BenchmarkHistory history, PointPen pen)
+    private static void AddMedianSeries(Plot plot, History history, PointPen pen)
     {
         if (history.Entries.Length == 1)
         {
@@ -87,19 +92,23 @@ internal sealed class BenchmarkPlotter(PlotSettings settings)
         return (new PointPen(brush, plotColor), style);
     }
 
-    private void DrawPlot(Plot plot, IEnumerable<BenchmarkResultEntry> entries, int maxDataPointCount)
+    private void DrawPlot(Plot plot, IEnumerable<ResultEntry> entries, int maxDataPointCount, int plotWidth)
     {
-        BenchmarkResultEntry[] entryArray = entries.ToArray();
+        ResultEntry[] entryArray = entries.ToArray();
+
+        if (entryArray.Length == 0)
+            return;
+
         DateTimeOffset minTimestamp = entryArray.Min(x => x.TimestampUtc);
         DateTimeOffset maxTimestamp = entryArray.Max(x => x.TimestampUtc);
 
-        BenchmarkConsole.WriteInfo("X axis", "result number");
-        BenchmarkConsole.WriteInfo("Y axis", "median");
-        BenchmarkConsole.WriteInfo("Timestamp range", $"{FormatTimestamp(minTimestamp)} to {FormatTimestamp(maxTimestamp)}");
+        ConsoleOutput.WriteInfo("X axis", "result number");
+        ConsoleOutput.WriteInfo("Y axis", "median");
+        ConsoleOutput.WriteInfo("Timestamp range", $"{FormatTimestamp(minTimestamp)} to {FormatTimestamp(maxTimestamp)}");
         plot.Axis.IsVisible = true;
         plot.Grid.IsVisible = true;
         plot.Ticks.IsVisible = true;
-        plot.Ticks.DesiredXStep = GetDesiredXStep(maxDataPointCount);
+        plot.Ticks.DesiredXStep = GetDesiredXStep(maxDataPointCount, plotWidth);
         plot.Ticks.Labels.IsVisible = true;
         plot.Ticks.Labels.AttachToAxis = false;
         plot.Ticks.Labels.Format = "0";
@@ -107,10 +116,10 @@ internal sealed class BenchmarkPlotter(PlotSettings settings)
         plot.Render();
     }
 
-    private int GetDesiredXStep(int maxDataPointCount)
+    private int GetDesiredXStep(int maxDataPointCount, int plotWidth)
     {
         int targetTickCount = Math.Clamp(maxDataPointCount, 2, settings.MaxXTickLabels);
-        return Math.Max(8, GetPlotWidth() / targetTickCount);
+        return Math.Max(8, plotWidth / targetTickCount);
     }
 
     private int GetPlotWidth()
@@ -121,7 +130,14 @@ internal sealed class BenchmarkPlotter(PlotSettings settings)
         if (Console.IsOutputRedirected)
             return 100;
 
-        return Math.Clamp(Console.WindowWidth - 1, 60, 140);
+        try
+        {
+            return Math.Clamp(Console.WindowWidth - 1, 60, 140);
+        }
+        catch (IOException)
+        {
+            return 100;
+        }
     }
 
     private static string FormatTimestamp(DateTimeOffset timestamp) => timestamp.UtcDateTime.ToString("yyyy'-'MM'-'dd HH':'mm':'ss 'UTC'", CultureInfo.InvariantCulture);

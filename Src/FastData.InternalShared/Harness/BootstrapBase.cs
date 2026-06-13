@@ -6,7 +6,7 @@ namespace Genbox.FastData.InternalShared.Harness;
 
 public abstract class BootstrapBase
 {
-    protected BootstrapBase(string name, string ext, HarnessType type, TypeMap map, string dockerImage, string commandTemplate)
+    protected BootstrapBase(string name, string ext, HarnessType type, TypeMap map, string dockerImage, string commandTemplate, string? buildCommandTemplate = null, string? runCommandTemplate = null)
     {
         Name = name;
         Ext = ext;
@@ -14,6 +14,8 @@ public abstract class BootstrapBase
         Map = map;
         DockerImage = dockerImage;
         CommandTemplate = commandTemplate;
+        BuildCommandTemplate = buildCommandTemplate;
+        RunCommandTemplate = runCommandTemplate;
         RootDir = Path.Combine(Path.GetTempPath(), "FastData", name, type.ToString());
 
         if (!Directory.Exists(RootDir))
@@ -26,6 +28,8 @@ public abstract class BootstrapBase
     public TypeMap Map { get; }
     public string DockerImage { get; }
     public string CommandTemplate { get; }
+    public string? BuildCommandTemplate { get; }
+    public string? RunCommandTemplate { get; }
     public string RootDir { get; }
     public abstract ICodeGenerator Generator { get; }
 

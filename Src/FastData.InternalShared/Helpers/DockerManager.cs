@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using Docker.DotNet;
 using Docker.DotNet.Models;
@@ -26,6 +27,28 @@ public sealed class DockerManager : IAsyncDisposable
         _cpuSet = string.IsNullOrWhiteSpace(cpuSet) ? null : cpuSet;
         _containerPrefix = containerPrefix;
         _client = _configuration.CreateClient();
+    }
+
+    public static async Task<string?> GetAvailabilityErrorAsync(CancellationToken cancellationToken = default)
+    {
+        using DockerClientConfiguration configuration = new DockerClientConfiguration();
+        using DockerClient client = configuration.CreateClient();
+        using CancellationTokenSource timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutSource.CancelAfter(TimeSpan.FromSeconds(5));
+
+        try
+        {
+            await client.System.PingAsync(timeoutSource.Token).ConfigureAwait(false);
+            return null;
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return "Docker daemon did not respond within 5 seconds.";
+        }
+        catch (Exception ex) when (ex is DockerApiException or HttpRequestException or IOException or TimeoutException)
+        {
+            return "Docker daemon is not available: " + ex.Message;
+        }
     }
 
     public async ValueTask DisposeAsync()

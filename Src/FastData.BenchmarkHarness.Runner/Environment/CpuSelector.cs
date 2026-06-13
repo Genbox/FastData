@@ -5,90 +5,96 @@ namespace Genbox.FastData.BenchmarkHarness.Runner.Environment;
 internal static partial class CpuSelector
 {
     private const uint ProcessorInformationRelationshipProcessorCore = 0;
-
-    private const int UInt64BitsPerInteger = 64;
     private const uint ErrorInsufficientBuffer = 122;
 
-    public static CpuSelection? TryGetSelection()
+    public static bool TryGetCpuSet(out string? cpuSet)
     {
-        if (!TryGetSelections(1, out CpuSelection[] selections, out _))
-            return null;
-
-        return selections[0];
-    }
-
-    public static bool TryGetSelections(int count, out CpuSelection[] selections, out int availableCoreCount)
-    {
-        if (count <= 0)
-            throw new ArgumentOutOfRangeException(nameof(count), count, "Count must be a positive integer.");
-
-        selections = [];
-        availableCoreCount = 0;
+        cpuSet = null;
 
         if (!OperatingSystem.IsWindows())
-            return TryGetLogicalProcessorSelections(count, out selections, out availableCoreCount);
+            return TryGetLogicalProcessorCpuSet(out cpuSet);
 
-        if (!TryGetLogicalProcessorTopology(out CoreTopology[] cores))
-            return TryGetLogicalProcessorSelections(count, out selections, out availableCoreCount);
-
-        if (cores.Length == 0)
-            return TryGetLogicalProcessorSelections(count, out selections, out availableCoreCount);
+        if (!TryGetLogicalProcessorTopology(out CoreTopology[] cores) || cores.Length == 0)
+            return TryGetLogicalProcessorCpuSet(out cpuSet);
 
         int targetCoreIndex = Math.Max(1, cores.Length / 2);
-        CpuCandidate[] candidates = GetSelectableCandidates(cores, targetCoreIndex);
-        availableCoreCount = candidates.Length;
+        CpuCandidate? best = GetBestCandidate(cores, targetCoreIndex);
 
-        if (availableCoreCount == 0)
-            return TryGetLogicalProcessorSelections(count, out selections, out availableCoreCount);
+        if (best is null)
+            return TryGetLogicalProcessorCpuSet(out cpuSet);
 
-        selections = candidates.Take(count).Select(x => new CpuSelection(x.LogicalProcessor)).ToArray();
+        cpuSet = FormatCpuIndex(best.Value.LogicalProcessor);
         return true;
     }
 
-    private static CpuCandidate[] GetSelectableCandidates(CoreTopology[] cores, int targetCoreIndex)
+    private static CpuCandidate? GetBestCandidate(CoreTopology[] cores, int targetCoreIndex)
     {
-        List<CpuCandidate> candidates = new List<CpuCandidate>();
+        CpuCandidate? best = null;
 
         for (int coreIndex = 0; coreIndex < cores.Length; coreIndex++)
         {
             CoreTopology core = cores[coreIndex];
             int logicalProcessor = core.LogicalProcessors.FirstOrDefault(x => x != 0, -1);
-            if (logicalProcessor >= 0)
-                candidates.Add(new CpuCandidate(logicalProcessor, coreIndex, core.LogicalProcessors.Length));
+
+            if (logicalProcessor < 0)
+                continue;
+
+            CpuCandidate candidate = new CpuCandidate(logicalProcessor, coreIndex, core.LogicalProcessors.Length);
+
+            if (best is null || IsBetterCandidate(candidate, best.Value, targetCoreIndex))
+                best = candidate;
         }
 
-        return candidates.OrderBy(x => x.Siblings)
-                         .ThenBy(x => x.CoreIndex == 0)
-                         .ThenBy(x => Math.Abs(x.CoreIndex - targetCoreIndex))
-                         .ThenBy(x => x.LogicalProcessor)
-                         .ToArray();
+        return best;
     }
 
-    private static bool TryGetLogicalProcessorSelections(int count, out CpuSelection[] selections, out int availableCoreCount)
+    private static bool IsBetterCandidate(CpuCandidate candidate, CpuCandidate current, int targetCoreIndex)
+    {
+        // Prefer fewer siblings (physical cores without hyperthreading).
+        if (candidate.Siblings != current.Siblings)
+            return candidate.Siblings < current.Siblings;
+
+        // Avoid core 0 (often handles interrupts and OS scheduler work).
+        bool candidateIsCore0 = candidate.CoreIndex == 0;
+        bool currentIsCore0 = current.CoreIndex == 0;
+
+        if (candidateIsCore0 != currentIsCore0)
+            return !candidateIsCore0;
+
+        // Prefer cores closest to the middle of the topology.
+        int candidateDistance = Math.Abs(candidate.CoreIndex - targetCoreIndex);
+        int currentDistance = Math.Abs(current.CoreIndex - targetCoreIndex);
+
+        if (candidateDistance != currentDistance)
+            return candidateDistance < currentDistance;
+
+        // Tiebreaker: lowest logical processor index.
+        return candidate.LogicalProcessor < current.LogicalProcessor;
+    }
+
+    private static bool TryGetLogicalProcessorCpuSet(out string? cpuSet)
     {
         int logicalProcessorCount = System.Environment.ProcessorCount;
-        int firstProcessor = logicalProcessorCount > 1 ? 1 : 0;
-        availableCoreCount = logicalProcessorCount - firstProcessor;
 
-        if (availableCoreCount <= 0)
+        if (logicalProcessorCount <= 1)
         {
-            selections = [];
+            cpuSet = null;
             return false;
         }
 
-        selections = Enumerable.Range(firstProcessor, Math.Min(count, availableCoreCount)).Select(x => new CpuSelection(x)).ToArray();
+        // Skip processor 0 to avoid OS scheduler noise.
+        cpuSet = FormatCpuIndex(1);
         return true;
     }
+
+    private static string FormatCpuIndex(int logicalProcessor) => logicalProcessor.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     private static bool TryGetLogicalProcessorTopology(out CoreTopology[] cores)
     {
         int logicalProcessorCount = System.Environment.ProcessorCount;
-        cores = Array.Empty<CoreTopology>();
+        cores = [];
 
         if (logicalProcessorCount <= 1)
-            return false;
-
-        if (logicalProcessorCount > UInt64BitsPerInteger)
             return false;
 
         uint bufferSize = 0;
@@ -108,6 +114,9 @@ internal static partial class CpuSelector
             int entryCount = checked((int)(bufferSize / (uint)entrySize));
             List<CoreTopology> coreList = new List<CoreTopology>();
 
+            // Cap iteration to 64 bits since ProcessorMask is a UIntPtr (64-bit max on x64).
+            int maxProcessorIndex = Math.Min(logicalProcessorCount, 64);
+
             for (int i = 0; i < entryCount; i++)
             {
                 IntPtr entryPointer = IntPtr.Add(buffer, i * entrySize);
@@ -121,7 +130,7 @@ internal static partial class CpuSelector
                     ? entry.ProcessorMask.ToUInt64()
                     : entry.ProcessorMask.ToUInt32();
 
-                for (int processorIndex = 0; processorIndex < logicalProcessorCount; processorIndex++)
+                for (int processorIndex = 0; processorIndex < maxProcessorIndex; processorIndex++)
                 {
                     if ((processorMask & (1UL << processorIndex)) == 0)
                         continue;
@@ -154,14 +163,15 @@ internal static partial class CpuSelector
 
     private readonly record struct CpuCandidate(int LogicalProcessor, int CoreIndex, int Siblings);
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Explicit, Size = 32)]
     private readonly struct SYSTEM_LOGICAL_PROCESSOR_INFORMATION
     {
+        [FieldOffset(0)]
         public readonly UIntPtr ProcessorMask;
+
+        [FieldOffset(8)]
         public readonly uint Relationship;
-        public readonly uint ProcessorCoreFlags;
-        public readonly uint Reserved1;
-        public readonly uint Reserved2;
-        public readonly uint Reserved3;
+
+        // Bytes 12-15 are padding on x64. The union starts at offset 16.
     }
 }

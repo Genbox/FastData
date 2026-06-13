@@ -1,6 +1,6 @@
 namespace Genbox.FastData.BenchmarkHarness.Runner.Configuration;
 
-internal enum BenchmarkMode
+internal enum RunMode
 {
     Run,
     DryRun,

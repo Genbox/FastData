@@ -1,1 +1,1 @@
-{"name":"CSharp.HashTablePerfect_Single_1000_Mixed","min":7.0504506,"median":7.13937472,"max":7.2063498,"avg":7.125499222857143,"timestampUtc":"2026-06-12T21:13:08.7883385+00:00"}
+{"name":"CSharp.HashTablePerfect_Single_1000_Mixed","min":1.4272221412790351,"median":1.4923991640293783,"max":1.613987591807488,"avg":1.5026267480742819,"error":0.027046094633963357,"stdDev":0.04649584332443346,"timestampUtc":"2026-06-13T19:33:25.1743448+00:00"}

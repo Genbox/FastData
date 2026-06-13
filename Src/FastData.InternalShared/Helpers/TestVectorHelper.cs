@@ -120,7 +120,7 @@ public static class TestVectorHelper
             yield return testVector;
     }
 
-    public static IEnumerable<ITestData> GetBenchmarkData(int warmupSampleCount = 5, int sampleCount = 10, int workIterations = 1_000_000, int queryCount = 25, int benchmarkSize = 1000, int keyLengthBenchmarkSize = 128, BenchmarkWorkload workload = BenchmarkWorkload.Mixed)
+    public static IEnumerable<ITestData> GetBenchmarkData(int warmupSampleCount = 5, int minSampleCount = 10, int maxSampleCount = 10, int targetIterationTimeMs = 100, int benchmarkSize = 1000, int keyLengthBenchmarkSize = 128, BenchmarkWorkload workload = BenchmarkWorkload.Mixed, double maxErrorPercent = 2.0d)
     {
         int[] intKeys = Enumerable.Range(0, benchmarkSize).ToArray();
         float[] floatKeys = Enumerable.Range(0, benchmarkSize).Select(x => (float)x).ToArray();
@@ -163,11 +163,7 @@ public static class TestVectorHelper
         string[] uniqueLengthStringKeys = Enumerable.Range(1, keyLengthBenchmarkSize).Select(x => new string('a', x)).ToArray();
         yield return CreateTestData(typeof(KeyLengthStructure<,>), uniqueLengthStringKeys);
 
-        yield return CreateTestData(typeof(SingleValueStructure<,>), [42]);
-        yield return CreateTestData(typeof(SingleValueStructure<,>), [42f]);
-        yield return CreateTestData(typeof(SingleValueStructure<,>), ["key"]);
-
-        ITestData CreateTestData<TKey>(Type type, TKey[] keys) => new TestData<TKey>(type, keys, workload, warmupSampleCount, sampleCount, workIterations, queryCount);
+        ITestData CreateTestData<TKey>(Type type, TKey[] keys) => new TestData<TKey>(type, keys, workload, warmupSampleCount, minSampleCount, maxSampleCount, targetIterationTimeMs, maxErrorPercent);
     }
 
     private static float[] CreatePerfectFloatHashKeys(int size)

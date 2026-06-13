@@ -6,10 +6,13 @@ namespace Genbox.FastData.InternalShared.TestClasses;
 public interface ITestData
 {
     string Identifier { get; }
-    int WorkIterations { get; }
+    double MaxErrorPercent { get; }
+    int TargetIterationTimeMs { get; }
+    Type KeyType { get; }
     int QueryCount { get; }
     int WarmupCount { get; }
-    int SampleCount { get; }
+    int MinSampleCount { get; }
+    int MaxSampleCount { get; }
     string Generate(ICodeGenerator generator);
     BenchmarkQuerySet GetQuerySet(TypeMap map);
 }
