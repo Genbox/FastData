@@ -1,11 +1,10 @@
-<#@ import namespace="System.Linq" #>
 <#@ include file="Includes\Header.ttinclude" #>
 <#@ parameter type="Genbox.FastData.Generators.Contexts.HashTableContext" name="Context" #>
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HashTableTemplateData" name="Data" #>
 
 <#
     string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
-    string bucketType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestIntType(Context.Buckets.Length) : TypeMap.GetTypeName(typeof(int));
+    string bucketType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestIntType(Math.Max(Context.Buckets.Length, Data.Entries.Length)) : TypeMap.GetTypeName(typeof(int));
 #>
     [StructLayout(LayoutKind.Auto)]
     private struct E

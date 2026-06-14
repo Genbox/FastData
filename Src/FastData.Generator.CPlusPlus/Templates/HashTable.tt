@@ -4,7 +4,7 @@
 
 <#
     string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
-    string bucketType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestIntType((long)Context.Buckets.Length) : "int64_t";
+    string bucketType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestIntType(Math.Max(Context.Buckets.Length, Data.Entries.Length)) : TypeMap.GetTypeName(typeof(int));
 #>
     struct e {
         <#= KeyTypeName #> key;

@@ -4,7 +4,7 @@
 
 <#
     string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
-    string indexType = TypeMap.GetSmallestIntType((long)Context.Buckets.Length);
+    string bucketType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestIntType(Math.Max(Context.Buckets.Length, Data.Entries.Length)) : TypeMap.GetTypeName(typeof(int));
 #>
 struct E {
     key: <#= StoredKeyTypeName #>,
@@ -14,7 +14,7 @@ struct E {
 #>    hash_code: u64,
 <#
     }
-#>    next: <#= indexType #>,
+#>    next: <#= bucketType #>,
 <#
     if (Data.ValueCount > 0)
     {
@@ -24,7 +24,7 @@ struct E {
 #>}
 
 <#@ include file="Includes\ImplHeader.ttinclude" #>
-    <#= FieldModifier #>BUCKETS: [<#= indexType #>; <#= Context.Buckets.Length.ToStringInvariant() #>] = [
+    <#= FieldModifier #>BUCKETS: [<#= bucketType #>; <#= Context.Buckets.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Context.Buckets, (_, x) => x.ToStringInvariant(), 8) #>
     ];
 
@@ -44,7 +44,7 @@ struct E {
 <#= GetMethodHeader(MethodType.Contains) #>
         let hash = <#= HashCall #>;
         let index = <#= GetMod("hash", (ulong)Context.Buckets.Length) #>;
-        let mut i: <#= indexType #> = (Self::BUCKETS[index as usize] as <#= indexType #>) - 1;
+        let mut i: <#= bucketType #> = (Self::BUCKETS[index as usize] as <#= bucketType #>) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
@@ -71,7 +71,7 @@ struct E {
 <#= GetMethodHeader(MethodType.TryLookup) #>
         let hash = <#= HashCall #>;
         let index = <#= GetMod("hash", (ulong)Context.Buckets.Length) #>;
-        let mut i: <#= indexType #> = (Self::BUCKETS[index as usize] as <#= indexType #>) - 1;
+        let mut i: <#= bucketType #> = (Self::BUCKETS[index as usize] as <#= bucketType #>) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
