@@ -23,15 +23,11 @@ internal static class FastData
     };
 
     private static readonly byte[] _bucketStarts = new byte[] {
-        0, 2, 2, 2
-    };
-
-    private static readonly byte[] _bucketCounts = new byte[] {
-        2, 0, 0, 2
+        0, 1, 2, 2, 3, 4
     };
 
     private static readonly E[] _entries = {
-        new E(0, ulong.MinValue), new E(1, 4607182418800017408ul), new E(double.MinValue, 18442240474082181119ul), new E(double.MaxValue, 9218868437227405311ul)
+        new E(0, ulong.MinValue), new E(double.MaxValue, 9218868437227405311ul), new E(1, 4607182418800017408ul), new E(double.MinValue, 18442240474082181119ul)
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -54,10 +50,9 @@ internal static class FastData
 
 
         ulong hash = Hash(key);
-        int index = (int)(hash % 4);
+        int index = (int)(hash % 5);
         int start = (int)_bucketStarts[index];
-        int count = (int)_bucketCounts[index];
-        int end = start + count;
+        int end = (int)_bucketStarts[index + 1];
 
         for (int i = start; i < end; i++)
         {

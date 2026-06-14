@@ -20,19 +20,16 @@ class fastdata final {
            : key(key), hash_code(hash_code) {}
     };
 
-    static constexpr std::array<uint8_t, 13> bucket_starts = {
-        0, 0, 0, 2, 4, 4, 5, 5, 5, 7, 
-        8, 10, 11
-    };
-
-    static constexpr std::array<uint8_t, 13> bucket_counts = {
-        0, 0, 2, 2, 0, 1, 0, 0, 2, 1, 
-        2, 1, 2
+    static constexpr std::array<uint8_t, 33> bucket_starts = {
+        0, 1, 2, 2, 3, 4, 4, 4, 5, 5, 
+        5, 5, 5, 5, 5, 5, 6, 6, 7, 7, 
+        7, 7, 8, 9, 9, 9, 9, 9, 10, 11, 
+        11, 12, 13
     };
 
     inline static const std::array<e, 13> entries = {
-        e(u8"å", 11144404053037306560), e(u8"è", 11144404032678215327), e(u8"ç", 11144404049905138678), e(u8"ê", 11144404029546047445), e(u8"ö", 11144404023281711681), e(u8"é", 11144404034244299268), e(u8"ü", 11144404013885208035), e(u8"ä", 11144404051471222619), e(u8"æ", 11144404048339054737), e(u8"ø", 11144404007620872271), 
-        e(u8"à", 11144404045206886855), e(u8"ß", 11144404062433810206), e(u8"ñ", 11144404021715627740)
+        e(u8"å", 11144404053037306560), e(u8"ö", 11144404023281711681), e(u8"ü", 11144404013885208035), e(u8"é", 11144404034244299268), e(u8"à", 11144404045206886855), e(u8"ø", 11144404007620872271), e(u8"æ", 11144404048339054737), e(u8"ê", 11144404029546047445), e(u8"ç", 11144404049905138678), e(u8"ä", 11144404051471222619), 
+        e(u8"ñ", 11144404021715627740), e(u8"ß", 11144404062433810206), e(u8"è", 11144404032678215327)
     };
 
     static constexpr uint64_t get_hash(const std::string_view value, int32_t length) noexcept {
@@ -57,10 +54,9 @@ public:
         int32_t length = Length(key);
 
         const uint64_t hash = get_hash(key, length);
-        const size_t index = hash % 13;
+        const size_t index = hash % 32;
         const size_t start = static_cast<size_t>(bucket_starts[index]);
-        const size_t count = static_cast<size_t>(bucket_counts[index]);
-        const size_t end = start + count;
+        const size_t end = static_cast<size_t>(bucket_starts[index + 1]);
 
         for (size_t i = start; i < end; i++) {
             const auto& entry = entries[i];

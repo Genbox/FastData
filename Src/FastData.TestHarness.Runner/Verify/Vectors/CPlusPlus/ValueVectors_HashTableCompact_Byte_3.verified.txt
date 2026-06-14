@@ -17,16 +17,12 @@ class fastdata final {
            : key(key) {}
     };
 
-    static constexpr std::array<uint8_t, 3> bucket_starts = {
-        0, 2, 3
-    };
-
-    static constexpr std::array<uint8_t, 3> bucket_counts = {
-        2, 1, 0
+    static constexpr std::array<uint8_t, 5> bucket_starts = {
+        0, 1, 2, 2, 3
     };
 
     inline static const std::array<e, 3> entries = {
-        e(0), e(std::numeric_limits<uint8_t>::max()), e(1)
+        e(0), e(1), e(std::numeric_limits<uint8_t>::max())
     };
 
     static constexpr uint64_t get_hash(const uint8_t value) noexcept {
@@ -38,10 +34,9 @@ public:
     static constexpr bool contains(const uint8_t key) noexcept {
 
         const uint64_t hash = get_hash(key);
-        const size_t index = hash % 3;
+        const size_t index = hash % 4;
         const size_t start = static_cast<size_t>(bucket_starts[index]);
-        const size_t count = static_cast<size_t>(bucket_counts[index]);
-        const size_t end = start + count;
+        const size_t end = static_cast<size_t>(bucket_starts[index + 1]);
 
         for (size_t i = start; i < end; i++) {
             const auto& entry = entries[i];

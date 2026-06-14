@@ -22,14 +22,16 @@ struct E {
 }
 
 impl fastdata {
-    const BUCKETS: [i8; 13] = [
-        0, 0, 7, 9, 0, 11, 0, 0, 13, 3, 
-        12, 2, 10
+    const BUCKETS: [i8; 32] = [
+        4, 11, 0, 13, 8, 0, 0, 2, 0, 0, 
+        0, 0, 0, 0, 0, 12, 0, 5, 0, 0, 
+        0, 9, 6, 0, 0, 0, 0, 3, 10, 0, 
+        1, 7
     ];
 
     const ENTRIES: [E; 13] = [
-        E { hash_code: 11144404062433810206, next: -1, key: "ß" }, E { hash_code: 11144404045206886855, next: -1, key: "à" }, E { hash_code: 11144404051471222619, next: -1, key: "ä" }, E { hash_code: 11144404053037306560, next: -1, key: "å" }, E { hash_code: 11144404048339054737, next: -1, key: "æ" }, E { hash_code: 11144404049905138678, next: -1, key: "ç" }, E { hash_code: 11144404032678215327, next: 3, key: "è" }, E { hash_code: 11144404034244299268, next: -1, key: "é" }, E { hash_code: 11144404029546047445, next: 5, key: "ê" }, E { hash_code: 11144404021715627740, next: 0, key: "ñ" }, 
-        E { hash_code: 11144404023281711681, next: -1, key: "ö" }, E { hash_code: 11144404007620872271, next: 4, key: "ø" }, E { hash_code: 11144404013885208035, next: 7, key: "ü" }
+        E { hash_code: 11144404062433810206, next: -1, key: "ß" }, E { hash_code: 11144404045206886855, next: -1, key: "à" }, E { hash_code: 11144404051471222619, next: -1, key: "ä" }, E { hash_code: 11144404053037306560, next: -1, key: "å" }, E { hash_code: 11144404048339054737, next: -1, key: "æ" }, E { hash_code: 11144404049905138678, next: -1, key: "ç" }, E { hash_code: 11144404032678215327, next: -1, key: "è" }, E { hash_code: 11144404034244299268, next: -1, key: "é" }, E { hash_code: 11144404029546047445, next: -1, key: "ê" }, E { hash_code: 11144404021715627740, next: -1, key: "ñ" }, 
+        E { hash_code: 11144404023281711681, next: -1, key: "ö" }, E { hash_code: 11144404007620872271, next: -1, key: "ø" }, E { hash_code: 11144404013885208035, next: -1, key: "ü" }
     ];
 
     #[inline]
@@ -54,7 +56,7 @@ impl fastdata {
         let mut length: i32 = Length(key);
 
         let hash = unsafe { Self::get_hash(key, length) };
-        let index = hash % 13u64;
+        let index = hash % 32u64;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 
         while i >= 0 {

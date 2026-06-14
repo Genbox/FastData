@@ -21,16 +21,12 @@ struct E {
 }
 
 impl fastdata {
-    const BUCKET_STARTS: [u8; 3] = [
-        0, 1, 3
-    ];
-
-    const BUCKET_COUNTS: [u8; 3] = [
-        1, 2, 0
+    const BUCKET_STARTS: [u8; 6] = [
+        0, 0, 1, 1, 2, 3
     ];
 
     const ENTRIES: [E; 3] = [
-        E { hash_code: 9198652691199425319, key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }, E { hash_code: 18225461187723808291, key: "a" }, E { hash_code: 16750939634977259983, key: "item" }
+        E { hash_code: 18225461187723808291, key: "a" }, E { hash_code: 16750939634977259983, key: "item" }, E { hash_code: 9198652691199425319, key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
     ];
 
     #[inline]
@@ -55,10 +51,9 @@ impl fastdata {
         let mut length: i32 = Length(key);
 
         let hash = unsafe { Self::get_hash(key, length) };
-        let index = (hash % 3u64) as usize;
+        let index = (hash % 5u64) as usize;
         let start = Self::BUCKET_STARTS[index] as usize;
-        let count = Self::BUCKET_COUNTS[index] as usize;
-        let end = start + count;
+        let end = Self::BUCKET_STARTS[index + 1] as usize;
 
         for i in start..end {
             let entry = &Self::ENTRIES[i];

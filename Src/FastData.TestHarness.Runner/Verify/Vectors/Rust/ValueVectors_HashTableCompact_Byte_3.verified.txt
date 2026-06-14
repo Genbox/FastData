@@ -16,16 +16,12 @@ struct E {
 }
 
 impl fastdata {
-    const BUCKET_STARTS: [u8; 3] = [
-        0, 2, 3
-    ];
-
-    const BUCKET_COUNTS: [u8; 3] = [
-        2, 1, 0
+    const BUCKET_STARTS: [u8; 5] = [
+        0, 1, 2, 2, 3
     ];
 
     const ENTRIES: [E; 3] = [
-        E { key: u8::MIN }, E { key: u8::MAX }, E { key: 1 }
+        E { key: u8::MIN }, E { key: 1 }, E { key: u8::MAX }
     ];
 
     #[inline(always)]
@@ -37,10 +33,9 @@ impl fastdata {
     pub fn contains(key: u8) -> bool {
 
         let hash = Self::get_hash(key);
-        let index = (hash % 3u64) as usize;
+        let index = (hash % 4u64) as usize;
         let start = Self::BUCKET_STARTS[index] as usize;
-        let count = Self::BUCKET_COUNTS[index] as usize;
-        let end = start + count;
+        let end = Self::BUCKET_STARTS[index + 1] as usize;
 
         for i in start..end {
             let entry = &Self::ENTRIES[i];

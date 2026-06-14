@@ -28,7 +28,7 @@ internal static class FastData
          return false;
         }
 
-        if (((((uint)key - 2u) <= 9u) && ((731ul & (1ul << (int)(ulong)((uint)key - 2u))) != ulong.MinValue)))
+        if ((((((((int)((uint)key & 255u) >> 6) == 0) && ((5266ul & (1ul << ((int)((uint)key & 255u) & 63))) == ulong.MinValue)) || (((int)((uint)key & 255u) >> 6) == 1)) || (((int)((uint)key & 255u) >> 6) == 2)) || (((int)((uint)key & 255u) >> 6) == 3)))
         {
          return false;
         }

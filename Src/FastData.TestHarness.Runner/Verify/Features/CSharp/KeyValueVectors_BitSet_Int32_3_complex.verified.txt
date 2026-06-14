@@ -22,10 +22,6 @@ public class Person
 
 };
 
-    private static readonly ulong[] _bitset = new ulong[] {
-        7ul
-    };
-
     private static readonly Person[] _values = {
         new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
     };
@@ -41,8 +37,7 @@ public class Person
 
 
         ulong offset = (ulong)(key - MinKey);
-        int word = (int)(offset >> 6);
-        return (_bitset[word] & (1UL << (int)(offset & 63))) != 0;
+        return true;
     }
 
     
@@ -57,13 +52,6 @@ public class Person
 
 
         ulong offset = (ulong)(key - MinKey);
-        int word = (int)(offset >> 6);
-        if ((_bitset[word] & (1UL << (int)(offset & 63))) == 0)
-        {
-            value = default;
-            return false;
-        }
-
         value = _values[(int)offset];
         return true;
     }

@@ -16,7 +16,7 @@ struct E {
 }
 
 impl fastdata {
-    const BUCKET_STARTS: [u8; 100] = [
+    const BUCKET_STARTS: [u8; 101] = [
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 
@@ -26,20 +26,8 @@ impl fastdata {
         60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 
         70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 
         80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 
-        90, 91, 92, 93, 94, 95, 96, 97, 98, 99
-    ];
-
-    const BUCKET_COUNTS: [u8; 100] = [
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+        90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 
+        100
     ];
 
     const ENTRIES: [E; 100] = [
@@ -66,8 +54,7 @@ impl fastdata {
         let hash = Self::get_hash(key);
         let index = (hash % 100u64) as usize;
         let start = Self::BUCKET_STARTS[index] as usize;
-        let count = Self::BUCKET_COUNTS[index] as usize;
-        let end = start + count;
+        let end = Self::BUCKET_STARTS[index + 1] as usize;
 
         for i in start..end {
             let entry = &Self::ENTRIES[i];

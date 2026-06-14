@@ -19,12 +19,12 @@ class fastdata final {
            : key(key), next(next), hash_code(hash_code) {}
     };
 
-    static constexpr std::array<int8_t, 5> buckets = {
-        0, 1, 4, 3, 5
+    static constexpr std::array<int8_t, 7> buckets = {
+        0, 2, 0, 3, 1, 4, 5
     };
 
     inline static const std::array<e, 5> entries = {
-        e(1.0f, -1, 1065353216ull), e(2.0f, -1, 1073741824ull), e(3.0f, -1, 1077936128ull), e(4.0f, -1, 1082130432ull), e(5.0f, 1, 1084227584ull)
+        e(1.0f, -1, 1065353216ull), e(2.0f, -1, 1073741824ull), e(3.0f, -1, 1077936128ull), e(4.0f, -1, 1082130432ull), e(5.0f, -1, 1084227584ull)
     };
 
     static uint64_t get_hash(const float value) noexcept {
@@ -38,7 +38,7 @@ public:
     static constexpr bool contains(const float key) noexcept {
 
         const uint64_t hash = get_hash(key);
-        const size_t index = hash % 5;
+        const size_t index = hash % 7;
         int8_t i = static_cast<int8_t>(buckets[index] - 1);
 
         while (i >= 0) {

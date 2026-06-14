@@ -17,12 +17,12 @@ struct E {
 }
 
 impl fastdata {
-    const BUCKETS: [i8; 3] = [
-        3, 2, 0
+    const BUCKETS: [i8; 4] = [
+        1, 2, 0, 3
     ];
 
     const ENTRIES: [E; 3] = [
-        E { next: -1, key: u8::MIN }, E { next: -1, key: 1 }, E { next: 0, key: u8::MAX }
+        E { next: -1, key: u8::MIN }, E { next: -1, key: 1 }, E { next: -1, key: u8::MAX }
     ];
 
     #[inline(always)]
@@ -34,7 +34,7 @@ impl fastdata {
     pub fn contains(key: u8) -> bool {
 
         let hash = Self::get_hash(key);
-        let index = hash % 3u64;
+        let index = hash % 4u64;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 
         while i >= 0 {

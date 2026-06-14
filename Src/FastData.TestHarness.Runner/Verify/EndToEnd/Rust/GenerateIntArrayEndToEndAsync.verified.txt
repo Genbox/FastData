@@ -28,7 +28,7 @@ impl fastdata {
          return false;
         }
 
-        if (((((key as u32).wrapping_sub(2)) <= 9) && ((731 & (1 << (((((key as u32).wrapping_sub(2)) as u64) as i32) as u32))) != u64::MIN)))
+        if ((((((((((key as u32) & 255) as i32) >> (6 as u32)) == 0) && ((5266 & (1 << (((((key as u32) & 255) as i32) & 63) as u32))) == u64::MIN)) || (((((key as u32) & 255) as i32) >> (6 as u32)) == 1)) || (((((key as u32) & 255) as i32) >> (6 as u32)) == 2)) || (((((key as u32) & 255) as i32) >> (6 as u32)) == 3)))
         {
          return false;
         }

@@ -17,12 +17,8 @@ class fastdata final {
            : key(key) {}
     };
 
-    static constexpr std::array<uint8_t, 4> bucket_starts = {
-        0, 1, 2, 3
-    };
-
-    static constexpr std::array<uint8_t, 4> bucket_counts = {
-        1, 1, 1, 1
+    static constexpr std::array<uint8_t, 5> bucket_starts = {
+        0, 1, 2, 3, 4
     };
 
     inline static const std::array<e, 4> entries = {
@@ -40,8 +36,7 @@ public:
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 4;
         const size_t start = static_cast<size_t>(bucket_starts[index]);
-        const size_t count = static_cast<size_t>(bucket_counts[index]);
-        const size_t end = start + count;
+        const size_t end = static_cast<size_t>(bucket_starts[index + 1]);
 
         for (size_t i = start; i < end; i++) {
             const auto& entry = entries[i];

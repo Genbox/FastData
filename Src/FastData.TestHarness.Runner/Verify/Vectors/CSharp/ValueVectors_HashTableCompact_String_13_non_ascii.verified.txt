@@ -25,18 +25,14 @@ internal static class FastData
     };
 
     private static readonly byte[] _bucketStarts = new byte[] {
-        0, 2, 4, 6, 6, 7, 8, 9, 10, 13, 
-        13, 13, 13
-    };
-
-    private static readonly byte[] _bucketCounts = new byte[] {
-        2, 2, 2, 0, 1, 1, 1, 1, 3, 0, 
-        0, 0, 0
+        0, 0, 1, 1, 1, 2, 3, 4, 5, 6, 
+        7, 7, 8, 8, 9, 10, 11, 11, 12, 12, 
+        12, 13, 13, 13
     };
 
     private static readonly E[] _entries = {
-        new E("ß", 18225461065569260893ul), new E("ö", 18225461004491987194ul), new E("å", 18225460981000728079ul), new E("è", 18225461001359819312ul), new E("ç", 18225460977868560197ul), new E("ê", 18225460998227651430ul), new E("ñ", 18225461012322406899ul), new E("à", 18225460988831147784ul), new E("ø", 18225461026417162368ul), new E("ä", 18225460982566812020ul), 
-        new E("æ", 18225460979434644138ul), new E("é", 18225460999793735371ul), new E("ü", 18225461020152826604ul)
+        new E("ê", 18225460998227651430ul), new E("é", 18225460999793735371ul), new E("ñ", 18225461012322406899ul), new E("à", 18225460988831147784ul), new E("è", 18225461001359819312ul), new E("ç", 18225460977868560197ul), new E("ø", 18225461026417162368ul), new E("æ", 18225460979434644138ul), new E("ö", 18225461004491987194ul), new E("å", 18225460981000728079ul), 
+        new E("ß", 18225461065569260893ul), new E("ä", 18225460982566812020ul), new E("ü", 18225461020152826604ul)
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -67,10 +63,9 @@ internal static class FastData
 
 
         ulong hash = Hash(key, length * 2);
-        int index = (int)(hash % 13);
+        int index = (int)(hash % 23);
         int start = (int)_bucketStarts[index];
-        int count = (int)_bucketCounts[index];
-        int end = start + count;
+        int end = (int)_bucketStarts[index + 1];
 
         for (int i = start; i < end; i++)
         {

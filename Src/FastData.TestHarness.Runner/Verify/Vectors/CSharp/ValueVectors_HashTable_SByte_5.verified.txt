@@ -23,11 +23,11 @@ internal static class FastData
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
-        3, 4, 5, 1, 0
+        3, 4, 0, 0, 0, 2, 0, 5, 1, 0
     };
 
     private static readonly E[] _entries = {
-        new E(sbyte.MinValue, -1), new E(-1, -1), new E(0, 1), new E(1, -1), new E(sbyte.MaxValue, -1)
+        new E(sbyte.MinValue, -1), new E(-1, -1), new E(0, -1), new E(1, -1), new E(sbyte.MaxValue, -1)
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -45,7 +45,7 @@ internal static class FastData
 
 
         ulong hash = Hash(key);
-        int index = (int)(hash % 5);
+        int index = (int)(hash % 10);
         sbyte i = (sbyte)(_buckets[index] - 1);
 
         while (i >= 0)

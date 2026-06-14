@@ -21,19 +21,16 @@ struct E {
 }
 
 impl fastdata {
-    const BUCKET_STARTS: [u8; 13] = [
-        0, 0, 0, 2, 4, 4, 5, 5, 5, 7, 
-        8, 10, 11
-    ];
-
-    const BUCKET_COUNTS: [u8; 13] = [
-        0, 0, 2, 2, 0, 1, 0, 0, 2, 1, 
-        2, 1, 2
+    const BUCKET_STARTS: [u8; 33] = [
+        0, 1, 2, 2, 3, 4, 4, 4, 5, 5, 
+        5, 5, 5, 5, 5, 5, 6, 6, 7, 7, 
+        7, 7, 8, 9, 9, 9, 9, 9, 10, 11, 
+        11, 12, 13
     ];
 
     const ENTRIES: [E; 13] = [
-        E { hash_code: 11144404053037306560, key: "å" }, E { hash_code: 11144404032678215327, key: "è" }, E { hash_code: 11144404049905138678, key: "ç" }, E { hash_code: 11144404029546047445, key: "ê" }, E { hash_code: 11144404023281711681, key: "ö" }, E { hash_code: 11144404034244299268, key: "é" }, E { hash_code: 11144404013885208035, key: "ü" }, E { hash_code: 11144404051471222619, key: "ä" }, E { hash_code: 11144404048339054737, key: "æ" }, E { hash_code: 11144404007620872271, key: "ø" }, 
-        E { hash_code: 11144404045206886855, key: "à" }, E { hash_code: 11144404062433810206, key: "ß" }, E { hash_code: 11144404021715627740, key: "ñ" }
+        E { hash_code: 11144404053037306560, key: "å" }, E { hash_code: 11144404023281711681, key: "ö" }, E { hash_code: 11144404013885208035, key: "ü" }, E { hash_code: 11144404034244299268, key: "é" }, E { hash_code: 11144404045206886855, key: "à" }, E { hash_code: 11144404007620872271, key: "ø" }, E { hash_code: 11144404048339054737, key: "æ" }, E { hash_code: 11144404029546047445, key: "ê" }, E { hash_code: 11144404049905138678, key: "ç" }, E { hash_code: 11144404051471222619, key: "ä" }, 
+        E { hash_code: 11144404021715627740, key: "ñ" }, E { hash_code: 11144404062433810206, key: "ß" }, E { hash_code: 11144404032678215327, key: "è" }
     ];
 
     #[inline]
@@ -58,10 +55,9 @@ impl fastdata {
         let mut length: i32 = Length(key);
 
         let hash = unsafe { Self::get_hash(key, length) };
-        let index = (hash % 13u64) as usize;
+        let index = (hash % 32u64) as usize;
         let start = Self::BUCKET_STARTS[index] as usize;
-        let count = Self::BUCKET_COUNTS[index] as usize;
-        let end = start + count;
+        let end = Self::BUCKET_STARTS[index + 1] as usize;
 
         for i in start..end {
             let entry = &Self::ENTRIES[i];

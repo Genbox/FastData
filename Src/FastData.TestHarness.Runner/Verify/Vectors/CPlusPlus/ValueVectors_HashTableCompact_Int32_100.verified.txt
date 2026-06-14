@@ -17,7 +17,7 @@ class fastdata final {
            : key(key) {}
     };
 
-    static constexpr std::array<uint8_t, 100> bucket_starts = {
+    static constexpr std::array<uint8_t, 101> bucket_starts = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 
@@ -27,20 +27,8 @@ class fastdata final {
         60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 
         70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 
         80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 
-        90, 91, 92, 93, 94, 95, 96, 97, 98, 99
-    };
-
-    static constexpr std::array<uint8_t, 100> bucket_counts = {
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+        90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 
+        100
     };
 
     inline static const std::array<e, 100> entries = {
@@ -67,8 +55,7 @@ public:
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 100;
         const size_t start = static_cast<size_t>(bucket_starts[index]);
-        const size_t count = static_cast<size_t>(bucket_counts[index]);
-        const size_t end = start + count;
+        const size_t end = static_cast<size_t>(bucket_starts[index + 1]);
 
         for (size_t i = start; i < end; i++) {
             const auto& entry = entries[i];

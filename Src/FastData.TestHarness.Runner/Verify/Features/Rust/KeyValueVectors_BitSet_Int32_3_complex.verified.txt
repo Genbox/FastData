@@ -21,10 +21,6 @@ impl Person {
 pub struct fastdata;
 impl fastdata {
 
-    const BITSET: [u64; 1] = [
-        7
-    ];
-
     const VALUES: [&'static Person; 3] = [
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
     ];
@@ -37,8 +33,7 @@ impl fastdata {
 
 
         let offset = (key - Self::MIN_KEY) as u64;
-        let word = (offset >> 6) as usize;
-        (Self::BITSET[word] & (1u64 << (offset & 63))) != 0
+        true
     }
 
     #[must_use]
@@ -50,11 +45,6 @@ impl fastdata {
 
 
         let offset = (key - Self::MIN_KEY) as u64;
-        let word = (offset >> 6) as usize;
-        if (Self::BITSET[word] & (1u64 << (offset & 63))) == 0 {
-            return None;
-        }
-
         Some(Self::VALUES[offset as usize])
     }
 
