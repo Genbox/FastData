@@ -26,10 +26,6 @@ struct E {
 <#= FormatHelper.FormatColumns(Context.BucketStarts, (_, x) => x.ToStringInvariant(), 8) #>
     ];
 
-    <#= FieldModifier #>BUCKET_COUNTS: [<#= indexType #>; <#= Context.BucketCounts.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.BucketCounts, (_, x) => x.ToStringInvariant(), 8) #>
-    ];
-
     <#= FieldModifier #>ENTRIES: [E; <#= Data.Entries.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
@@ -45,10 +41,9 @@ struct E {
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
         let hash = <#= HashCall #>;
-        let index = (<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>) as usize;
+        let index = (<#= GetMod("hash", (ulong)(Context.BucketStarts.Length - 1)) #>) as usize;
         let start = Self::BUCKET_STARTS[index] as usize;
-        let count = Self::BUCKET_COUNTS[index] as usize;
-        let end = start + count;
+        let end = Self::BUCKET_STARTS[index + 1] as usize;
 
         for i in start..end {
             let entry = &Self::ENTRIES[i];
@@ -73,10 +68,9 @@ struct E {
     <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
 <#= GetMethodHeader(MethodType.TryLookup) #>
         let hash = <#= HashCall #>;
-        let index = (<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>) as usize;
+        let index = (<#= GetMod("hash", (ulong)(Context.BucketStarts.Length - 1)) #>) as usize;
         let start = Self::BUCKET_STARTS[index] as usize;
-        let count = Self::BUCKET_COUNTS[index] as usize;
-        let end = start + count;
+        let end = Self::BUCKET_STARTS[index + 1] as usize;
 
         for i in start..end {
             let entry = &Self::ENTRIES[i];

@@ -4,11 +4,10 @@ using Genbox.FastData.Generators.Contexts.Misc;
 namespace Genbox.FastData.Generators.Contexts;
 
 /// <summary>Provides a context for compact hash table-based data structures.</summary>
-/// <param name="bucketStarts">The array of bucket start indices.</param>
-/// <param name="bucketCounts">The array of bucket item counts.</param>
+/// <param name="bucketStarts">The array of bucket start indices. The final element is the sentinel end index.</param>
 /// <param name="entries">The array of hash table entries.</param>
 /// <param name="storeHashCode">If set to true, you should only generate a hash set that checks the value.</param>
-public sealed class HashTableCompactContext<TKey, TValue>(int[] bucketStarts, int[] bucketCounts, HashTableCompactEntry<TKey>[] entries, bool storeHashCode, ReadOnlyMemory<TValue> values) : HashTableCompactContext(bucketStarts, bucketCounts, storeHashCode)
+public sealed class HashTableCompactContext<TKey, TValue>(int[] bucketStarts, HashTableCompactEntry<TKey>[] entries, bool storeHashCode, ReadOnlyMemory<TValue> values) : HashTableCompactContext(bucketStarts, storeHashCode)
 {
     /// <summary>Gets the array of hash table entries.</summary>
     public HashTableCompactEntry<TKey>[] Entries { get; } = entries;
@@ -18,13 +17,10 @@ public sealed class HashTableCompactContext<TKey, TValue>(int[] bucketStarts, in
 }
 
 /// <summary>Provides compact bucket data shared by compact hash-table generated structures.</summary>
-public abstract class HashTableCompactContext(int[] bucketStarts, int[] bucketCounts, bool storeHashCode) : IContext
+public abstract class HashTableCompactContext(int[] bucketStarts, bool storeHashCode) : IContext
 {
-    /// <summary>Gets the array of bucket start indices.</summary>
+    /// <summary>Gets the array of bucket start indices. The final element is the sentinel end index.</summary>
     public int[] BucketStarts { get; } = bucketStarts;
-
-    /// <summary>Gets the array of bucket item counts.</summary>
-    public int[] BucketCounts { get; } = bucketCounts;
 
     /// <summary>Indicates whether the hash table should store the hash code or only the value.</summary>
     public bool StoreHashCode { get; } = storeHashCode;

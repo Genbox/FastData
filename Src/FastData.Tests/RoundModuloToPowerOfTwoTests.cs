@@ -74,8 +74,7 @@ public class RoundModuloToPowerOfTwoTests
         HashTableCompactStructure<int, byte> structure = new HashTableCompactStructure<int, byte>(hashData);
         HashTableCompactContext<int, byte> context = structure.Create(keys, ReadOnlyMemory<byte>.Empty);
 
-        Assert.Equal(expectedLength, context.BucketStarts.Length);
-        Assert.Equal(expectedLength, context.BucketCounts.Length);
+        Assert.Equal(expectedLength + 1, context.BucketStarts.Length);
     }
 
     [Theory]

@@ -45,10 +45,6 @@
 <#= FormatHelper.FormatColumns(Context.BucketStarts, static x => x.ToStringInvariant(), 8) #>
     };
 
-    <#= FieldModifier(true) #>std::array<<#= indexType #>, <#= Context.BucketCounts.Length.ToStringInvariant() #>> bucket_counts = {
-<#= FormatHelper.FormatColumns(Context.BucketCounts, static x => x.ToStringInvariant(), 8) #>
-    };
-
     <#= FieldModifier(false) #>std::array<e, <#= Data.Entries.Length.ToStringInvariant() #>> entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
@@ -65,10 +61,9 @@ public:
     <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.Contains) #>
         const uint64_t hash = <#= HashCall #>;
-        const size_t index = <#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>;
+        const size_t index = <#= GetMod("hash", (ulong)(Context.BucketStarts.Length - 1)) #>;
         const size_t start = static_cast<size_t>(bucket_starts[index]);
-        const size_t count = static_cast<size_t>(bucket_counts[index]);
-        const size_t end = start + count;
+        const size_t end = static_cast<size_t>(bucket_starts[index + 1]);
 
         for (size_t i = start; i < end; i++) {
             const auto& entry = entries[i];
@@ -93,10 +88,9 @@ public:
     <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.TryLookup) #>
         const uint64_t hash = <#= HashCall #>;
-        const size_t index = <#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>;
+        const size_t index = <#= GetMod("hash", (ulong)(Context.BucketStarts.Length - 1)) #>;
         const size_t start = static_cast<size_t>(bucket_starts[index]);
-        const size_t count = static_cast<size_t>(bucket_counts[index]);
-        const size_t end = start + count;
+        const size_t end = static_cast<size_t>(bucket_starts[index + 1]);
 
         for (size_t i = start; i < end; i++) {
             const auto& entry = entries[i];

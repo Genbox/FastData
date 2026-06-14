@@ -36,7 +36,7 @@ public sealed class HashTableCompactStructure<TKey, TValue> : IStructure<TKey, T
             bucketCounts[(int)(hashCode % (uint)size)]++;
         }
 
-        int[] bucketStarts = new int[size];
+        int[] bucketStarts = new int[size + 1];
         int position = 0;
 
         for (int i = 0; i < bucketCounts.Length; i++)
@@ -44,6 +44,8 @@ public sealed class HashTableCompactStructure<TKey, TValue> : IStructure<TKey, T
             bucketStarts[i] = position;
             position += bucketCounts[i];
         }
+
+        bucketStarts[bucketStarts.Length - 1] = position;
 
         HashTableCompactEntry<TKey>[] entries = new HashTableCompactEntry<TKey>[keySpan.Length];
         TValue[]? denseValues = values.IsEmpty ? null : new TValue[keySpan.Length];
@@ -61,7 +63,7 @@ public sealed class HashTableCompactStructure<TKey, TValue> : IStructure<TKey, T
                 denseValues[index] = valueSpan[i];
         }
 
-        return new HashTableCompactContext<TKey, TValue>(bucketStarts, bucketCounts, entries, !Type.GetTypeCode(typeof(TKey)).UsesIdentityHash(), denseValues);
+        return new HashTableCompactContext<TKey, TValue>(bucketStarts, entries, !Type.GetTypeCode(typeof(TKey)).UsesIdentityHash(), denseValues);
     }
 
     public IEnumerable<IEarlyExit> GetMandatoryExits() => [];

@@ -54,10 +54,6 @@
 <#= FormatHelper.FormatColumns(Context.BucketStarts, TypeMap.ToValueLabel, 8) #>
     };
 
-    <#= FieldModifier #><#= indexType #>[] _bucketCounts = new <#= indexType #>[] {
-<#= FormatHelper.FormatColumns(Context.BucketCounts, TypeMap.ToValueLabel, 8) #>
-    };
-
     <#= FieldModifier #>E[] _entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
@@ -75,10 +71,9 @@
 <#= GetMethodHeader(MethodType.Contains) #>
 
         ulong hash = <#= HashCall #>;
-        int index = (int)(<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>);
+        int index = (int)(<#= GetMod("hash", (ulong)(Context.BucketStarts.Length - 1)) #>);
         int start = (int)_bucketStarts[index];
-        int count = (int)_bucketCounts[index];
-        int end = start + count;
+        int end = (int)_bucketStarts[index + 1];
 
         for (int i = start; i < end; i++)
         {
@@ -106,10 +101,9 @@
 <#= GetMethodHeader(MethodType.TryLookup) #>
 
         ulong hash = <#= HashCall #>;
-        int index = (int)(<#= GetMod("hash", (ulong)Context.BucketStarts.Length) #>);
+        int index = (int)(<#= GetMod("hash", (ulong)(Context.BucketStarts.Length - 1)) #>);
         int start = (int)_bucketStarts[index];
-        int count = (int)_bucketCounts[index];
-        int end = start + count;
+        int end = (int)_bucketStarts[index + 1];
 
         for (int i = start; i < end; i++)
         {
