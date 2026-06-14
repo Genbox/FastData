@@ -14,9 +14,9 @@ public static class TypeHelper
 
     public static object ConvertValueToType(ulong value, Type type)
     {
-        if (type == typeof(byte)) return (byte)value;
-        if (type == typeof(ushort)) return (ushort)value;
-        if (type == typeof(uint)) return (uint)value;
+        if (type == typeof(byte)) return unchecked((byte)value);
+        if (type == typeof(ushort)) return unchecked((ushort)value);
+        if (type == typeof(uint)) return unchecked((uint)value);
         if (type == typeof(ulong)) return value;
 
         throw new InvalidOperationException($"Unsupported type: {type.Name}");
