@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using System.Reflection;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Expressions;
 
@@ -75,7 +74,7 @@ public class AllocationGatherTransform : IExprTransform
 
     private sealed class AllocationGatherState
     {
-        public Dictionary<CallSignature, ParameterExpression> Variables { get; } = new Dictionary<CallSignature, ParameterExpression>(CallSignatureComparer.Instance);
+        public Dictionary<MethodCallSignature, ParameterExpression> Variables { get; } = new Dictionary<MethodCallSignature, ParameterExpression>();
     }
 
     private sealed class AllocationGatherVisitor(AllocationGatherState state) : ExpressionVisitor
@@ -92,7 +91,7 @@ public class AllocationGatherTransform : IExprTransform
                     arguments.Add(Visit(argument));
 
                 MethodCallExpression updatedCall = node.Update(instance, arguments);
-                CallSignature signature = CallSignature.Create(updatedCall);
+                MethodCallSignature signature = MethodCallSignature.Create(updatedCall);
 
                 if (!state.Variables.TryGetValue(signature, out ParameterExpression? variable))
                 {
@@ -125,115 +124,5 @@ public class AllocationGatherTransform : IExprTransform
 
             return baseName;
         }
-    }
-
-    private readonly struct CallSignature(MethodInfo method, ArgumentSignature[] arguments)
-    {
-        public MethodInfo Method { get; } = method;
-        public ArgumentSignature[] Arguments { get; } = arguments;
-
-        public static CallSignature Create(MethodCallExpression node)
-        {
-            ArgumentSignature[] args = new ArgumentSignature[node.Arguments.Count];
-            for (int i = 0; i < node.Arguments.Count; i++)
-                args[i] = ArgumentSignature.Create(node.Arguments[i]);
-
-            return new CallSignature(node.Method, args);
-        }
-    }
-
-    private readonly struct ArgumentSignature : IEquatable<ArgumentSignature>
-    {
-        private ArgumentSignature(ArgumentKind kind, Type type, object? value, string? name, string? text)
-        {
-            Kind = kind;
-            Type = type;
-            Value = value;
-            Name = name;
-            Text = text;
-        }
-
-        public ArgumentKind Kind { get; }
-        public Type Type { get; }
-        public object? Value { get; }
-        public string? Name { get; }
-        public string? Text { get; }
-
-        public static ArgumentSignature Create(Expression expression)
-        {
-            if (expression is ConstantExpression constant)
-                return new ArgumentSignature(ArgumentKind.Constant, constant.Type, constant.Value, null, null);
-
-            if (expression is ParameterExpression parameter)
-                return new ArgumentSignature(ArgumentKind.Parameter, parameter.Type, null, parameter.Name, null);
-
-            return new ArgumentSignature(ArgumentKind.Other, expression.Type, null, null, expression.ToString());
-        }
-
-        public bool Equals(ArgumentSignature other)
-        {
-            if (Kind != other.Kind || Type != other.Type)
-                return false;
-
-            return Kind switch
-            {
-                ArgumentKind.Constant => Equals(Value, other.Value),
-                ArgumentKind.Parameter => string.Equals(Name, other.Name, StringComparison.Ordinal),
-                ArgumentKind.Other => string.Equals(Text, other.Text, StringComparison.Ordinal),
-                _ => false
-            };
-        }
-
-        public override bool Equals(object? obj) => obj is ArgumentSignature other && Equals(other);
-
-        public override int GetHashCode()
-        {
-            HashCode hash = new HashCode();
-            hash.Add(Kind);
-            hash.Add(Type);
-            hash.Add(Value);
-            hash.Add(Name, StringComparer.Ordinal);
-            hash.Add(Text, StringComparer.Ordinal);
-            return hash.ToHashCode();
-        }
-    }
-
-    private sealed class CallSignatureComparer : IEqualityComparer<CallSignature>
-    {
-        public static readonly CallSignatureComparer Instance = new CallSignatureComparer();
-
-        public bool Equals(CallSignature x, CallSignature y)
-        {
-            if (!Equals(x.Method, y.Method))
-                return false;
-
-            if (x.Arguments.Length != y.Arguments.Length)
-                return false;
-
-            for (int i = 0; i < x.Arguments.Length; i++)
-            {
-                if (!x.Arguments[i].Equals(y.Arguments[i]))
-                    return false;
-            }
-
-            return true;
-        }
-
-        public int GetHashCode(CallSignature obj)
-        {
-            HashCode hash = new HashCode();
-            hash.Add(obj.Method);
-            foreach (ArgumentSignature arg in obj.Arguments)
-                hash.Add(arg);
-
-            return hash.ToHashCode();
-        }
-    }
-
-    private enum ArgumentKind
-    {
-        Constant,
-        Parameter,
-        Other
     }
 }
