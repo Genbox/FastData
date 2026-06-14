@@ -276,6 +276,9 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
             DataConfig fdCfg = runtimeKeyType == typeof(string) ? new StringDataConfig() : new NumericDataConfig();
 
+            if (fdCfg is StringDataConfig defaultStringCfg)
+                defaultStringCfg.StringAnalyzerConfig = new StringAnalyzerConfig();
+
             object? structureArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.StructureType)).Value.Value;
             if (structureArg != null)
                 fdCfg.StructureTypeOverride = MapStructureType((StructureType)structureArg);
