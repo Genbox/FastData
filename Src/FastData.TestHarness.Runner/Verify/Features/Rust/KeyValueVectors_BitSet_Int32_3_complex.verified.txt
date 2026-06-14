@@ -30,12 +30,7 @@ impl fastdata {
     ];
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if ((key < 1))
-        {
-         return false;
-        }
-
-        if ((key > 3))
+        if ((((key as u32).wrapping_sub(1)) > 2))
         {
          return false;
         }
@@ -48,12 +43,7 @@ impl fastdata {
 
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
-        if ((key < 1))
-        {
-         return None;
-        }
-
-        if ((key > 3))
+        if ((((key as u32).wrapping_sub(1)) > 2))
         {
          return None;
         }

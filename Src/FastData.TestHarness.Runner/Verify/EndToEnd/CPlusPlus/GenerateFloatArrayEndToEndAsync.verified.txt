@@ -19,12 +19,7 @@ class fastdata final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
-        if ((key < 1.25f))
-        {
-         return false;
-        }
-
-        if ((key > 9.0f))
+        if (((key < 1.25f) || (key > 9.0f)))
         {
          return false;
         }

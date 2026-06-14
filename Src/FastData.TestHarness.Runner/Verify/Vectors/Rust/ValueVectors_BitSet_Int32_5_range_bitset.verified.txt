@@ -18,12 +18,7 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: i32) -> bool {
-        if ((key < 1))
-        {
-         return false;
-        }
-
-        if ((key > 5))
+        if ((((key as u32).wrapping_sub(1)) > 4))
         {
          return false;
         }

@@ -27,12 +27,7 @@ internal static class FastData
     public static bool Contains(string key)
     {
         int length = Length(key);
-        if ((length < 1))
-        {
-         return false;
-        }
-
-        if ((length > 3))
+        if (((uint)(length - 1) > 2u))
         {
          return false;
         }
@@ -46,13 +41,7 @@ internal static class FastData
     public static bool TryLookup(string key, out int value)
     {
         int length = Length(key);
-        if ((length < 1))
-        {
-         value = default;
-         return false;
-        }
-
-        if ((length > 3))
+        if (((uint)(length - 1) > 2u))
         {
          value = default;
          return false;

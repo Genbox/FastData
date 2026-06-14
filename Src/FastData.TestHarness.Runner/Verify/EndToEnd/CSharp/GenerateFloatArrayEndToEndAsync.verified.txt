@@ -18,12 +18,7 @@ internal static class FastData
     
     public static bool Contains(float key)
     {
-        if ((key < 1.25f))
-        {
-         return false;
-        }
-
-        if ((key > 9f))
+        if (((key < 1.25f) || (key > 9f)))
         {
          return false;
         }

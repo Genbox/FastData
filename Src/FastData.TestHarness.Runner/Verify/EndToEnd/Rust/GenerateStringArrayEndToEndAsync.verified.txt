@@ -28,22 +28,12 @@ impl fastdata {
     pub fn contains(key: &str) -> bool {
         let mut length: i32 = Length(key);
         let mut unitAt0: u32 = UnitAt(key, 0);
-        if ((length < 5))
+        if ((((length - 5) as u32) > 2))
         {
          return false;
         }
 
-        if ((length > 7))
-        {
-         return false;
-        }
-
-        if ((unitAt0 < 97))
-        {
-         return false;
-        }
-
-        if ((unitAt0 > 100))
+        if (((unitAt0.wrapping_sub(97)) > 3))
         {
          return false;
         }

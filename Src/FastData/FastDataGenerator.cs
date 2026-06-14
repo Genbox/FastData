@@ -215,6 +215,9 @@ public static partial class FastDataGenerator
             new DeduplicateAllocationTransform()
         ]).ToArray();
 
+        if (cfg.EarlyExitConfig.Optimize)
+            EarlyExitPipeline.OptimizeExpressions(transformed);
+
         foreach (AnnotatedExpr expr in transformed)
             usedVisitor.Visit(expr.Expression);
 
@@ -305,10 +308,10 @@ public static partial class FastDataGenerator
                 cfg.StructureSettings.GetSetting<float>(KnownSettings.HashTableCapacityFactor),
                 cfg.StructureSettings.GetSetting<bool>(KnownSettings.RoundModuloToPowerOfTwo),
                 cfg.StructureSettings.GetSetting<float>(KnownSettings.RoundModuloToPowerOfTwoThreshold), x =>
-            {
-                int byteCount = encoding.GetBytes(x, 0, x.Length, buffer, 0);
-                return hashFunc(buffer, byteCount);
-            });
+                {
+                    int byteCount = encoding.GetBytes(x, 0, x.Length, buffer, 0);
+                    return hashFunc(buffer, byteCount);
+                });
 
             return (hashData, new StringHashInfo(expression, stringHash.AdditionalData));
         }
@@ -401,6 +404,9 @@ public static partial class FastDataGenerator
         // Convert the early exits into a set of annotated expressions. We assume the input is called "key".
         ParameterExpression inputKey = Parameter(typeof(TKey), "key");
         AnnotatedExpr[] exprs = EarlyExitPipeline.Annotate(exits, inputKey);
+
+        if (cfg.EarlyExitConfig.Optimize)
+            EarlyExitPipeline.OptimizeExpressions(exprs);
 
         NumericGeneratorConfig genCfg = new NumericGeneratorConfig(structureType, (uint)keys.Length, props.DataRanges.Min, props.DataRanges.Max, exprs, cfg.TypeReductionEnabled, props.HasZero);
 

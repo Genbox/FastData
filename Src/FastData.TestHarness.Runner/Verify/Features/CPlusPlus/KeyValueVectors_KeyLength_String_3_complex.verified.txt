@@ -33,12 +33,7 @@ public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
         int32_t length = Length(key);
-        if ((length < 1))
-        {
-         return false;
-        }
-
-        if ((length > 3))
+        if ((static_cast<uint32_t>((length - 1)) > 2u))
         {
          return false;
         }
@@ -51,13 +46,7 @@ public:
     [[nodiscard]]
     static bool try_lookup(const std::string_view key, const Person*& value) noexcept {
         int32_t length = Length(key);
-        if ((length < 1))
-        {
-         value = nullptr;
-         return false;
-        }
-
-        if ((length > 3))
+        if ((static_cast<uint32_t>((length - 1)) > 2u))
         {
          value = nullptr;
          return false;

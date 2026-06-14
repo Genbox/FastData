@@ -19,12 +19,7 @@ internal static class FastData
     public static bool Contains(string key)
     {
         int length = Length(key);
-        if ((length < 3))
-        {
-         return false;
-        }
-
-        if ((length > 10))
+        if (((uint)(length - 3) > 7u))
         {
          return false;
         }

@@ -22,22 +22,12 @@ internal static class FastData
     {
         int length = Length(key);
         uint unitAt0 = UnitAt(key, 0);
-        if ((length < 5))
+        if (((uint)(length - 5) > 2u))
         {
          return false;
         }
 
-        if ((length > 7))
-        {
-         return false;
-        }
-
-        if ((unitAt0 < 97u))
-        {
-         return false;
-        }
-
-        if ((unitAt0 > 100u))
+        if (((unitAt0 - 97u) > 3u))
         {
          return false;
         }

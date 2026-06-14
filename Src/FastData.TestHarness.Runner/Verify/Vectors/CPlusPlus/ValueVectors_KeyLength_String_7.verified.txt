@@ -20,12 +20,7 @@ public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
         int32_t length = Length(key);
-        if ((length < 3))
-        {
-         return false;
-        }
-
-        if ((length > 10))
+        if ((static_cast<uint32_t>((length - 3)) > 7u))
         {
          return false;
         }

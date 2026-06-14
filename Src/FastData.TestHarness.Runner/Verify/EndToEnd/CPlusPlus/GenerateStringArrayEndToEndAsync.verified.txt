@@ -23,22 +23,12 @@ public:
     static constexpr bool contains(const std::string_view key) noexcept {
         int32_t length = Length(key);
         uint32_t unitAt0 = UnitAt(key, 0);
-        if ((length < 5))
+        if ((static_cast<uint32_t>((length - 5)) > 2u))
         {
          return false;
         }
 
-        if ((length > 7))
-        {
-         return false;
-        }
-
-        if ((unitAt0 < 97u))
-        {
-         return false;
-        }
-
-        if ((unitAt0 > 100u))
+        if (((unitAt0 - 97u) > 3u))
         {
          return false;
         }
