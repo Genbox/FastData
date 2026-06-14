@@ -90,6 +90,7 @@ public class NumericEarlyExitsTests
         cfg.DisableEarlyExit(typeof(ValueBitMaskEarlyExit));
         cfg.DisableEarlyExit(typeof(ValueLessThanEarlyExit<>));
         cfg.DisableEarlyExit(typeof(ValueGreaterThanEarlyExit<>));
+        cfg.DisableEarlyExit(typeof(ValueBitSetEarlyExit<>));
         cfg.MaxCandidates = 3;
         cfg.MinRejectionRatio = 0f;
 

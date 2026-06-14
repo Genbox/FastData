@@ -72,9 +72,95 @@ internal static class NumericEarlyExits<TKey>
             (TKey Start, TKey End) current = dataRanges.Ranges[i];
             (TKey Start, TKey End) next = dataRanges.Ranges[i + 1];
 
-            //TODO: Find smaller ranges (even ranges of 1) and pack them into bitmaps
-
             yield return new ValueInRangeEarlyExit<TKey>(current.End, next.Start);
+        }
+
+        // Pack consecutive small gaps into a single bitmap check when they fit within 64 positions.
+        // This covers cases where many small gaps (including singletons) are close together.
+        if (config.IsEarlyExitEnabled(typeof(ValueBitSetEarlyExit<>)) && typeCode.IsIntegral() && dataRanges.Ranges.Count > 2)
+        {
+            foreach (IEarlyExit packed in PackGapsIntoBitmap(dataRanges))
+                yield return packed;
+        }
+    }
+
+    private static IEnumerable<IEarlyExit> PackGapsIntoBitmap(DataRanges<TKey> dataRanges)
+    {
+        // Collect all gap values (values NOT in any data range) between consecutive ranges.
+        // Then try to fit consecutive gap regions into a single 64-bit bitmap.
+        TypeCode typeCode = Type.GetTypeCode(typeof(TKey));
+
+        // Build a converter from unsigned back to TKey. For unsigned types we use the direct converter,
+        // for signed types we need to go through the signed converter with unchecked semantics.
+        Func<ulong, TKey> fromUlong;
+        Func<TKey, ulong> toUlong = typeCode.GetUnsignedValueConverter<TKey>();
+
+        if (typeCode.IsUnsigned())
+        {
+            fromUlong = typeCode.GetUnsignedKeyConverter<TKey>();
+        }
+        else
+        {
+            Func<long, TKey> fromSigned = typeCode.GetSignedKeyConverter<TKey>();
+            fromUlong = v => fromSigned(unchecked((long)v));
+        }
+
+        // Build a list of (gapStart, gapEnd) in unsigned space, where gapStart/gapEnd are the exclusive bounds of data ranges.
+        // The actual missing values are the integers strictly between current.End and next.Start.
+        List<(ulong Start, ulong End)> gapRegions = new List<(ulong, ulong)>();
+
+        for (int i = 0; i < dataRanges.Ranges.Count - 1; i++)
+        {
+            ulong gapStart = toUlong(dataRanges.Ranges[i].End);
+            ulong gapEnd = toUlong(dataRanges.Ranges[i + 1].Start);
+
+            // The missing values are (gapStart, gapEnd) exclusive, i.e., gapStart+1 to gapEnd-1.
+            if (unchecked(gapEnd - gapStart) > 1)
+                gapRegions.Add((gapStart, gapEnd));
+        }
+
+        if (gapRegions.Count < 2)
+            yield break;
+
+        // Try sliding windows of consecutive gap regions that fit within 64 positions.
+        for (int start = 0; start < gapRegions.Count; start++)
+        {
+            ulong bitmapStart = gapRegions[start].Start + 1; // First missing value
+            ulong missingBitSet = 0;
+            int gapsIncluded = 0;
+
+            for (int end = start; end < gapRegions.Count; end++)
+            {
+                ulong lastMissing = gapRegions[end].End - 1; // Last missing value in this gap
+                ulong span = unchecked(lastMissing - bitmapStart);
+
+                if (span >= 64)
+                    break;
+
+                // Add all missing values from this gap to the bitmap
+                ulong gapFirst = gapRegions[end].Start + 1;
+                ulong gapLast = gapRegions[end].End - 1;
+
+                for (ulong v = gapFirst; v <= gapLast; v++)
+                {
+                    int bit = (int)unchecked(v - bitmapStart);
+                    missingBitSet |= 1UL << bit;
+                }
+
+                gapsIncluded = end - start + 1;
+            }
+
+            // Only emit a bitmap if it covers at least 2 gap regions (otherwise the individual ValueInRangeEarlyExit is simpler)
+            if (gapsIncluded >= 2 && missingBitSet != 0)
+            {
+                ulong lastGapEnd = gapRegions[start + gapsIncluded - 1].End;
+                TKey bitmapStartKey = fromUlong(bitmapStart);
+                TKey bitmapEndKey = fromUlong(lastGapEnd - 1);
+                yield return new ValueBitSetEarlyExit<TKey>(bitmapStartKey, bitmapEndKey, missingBitSet);
+
+                // Skip past the gaps we just packed
+                start += gapsIncluded - 1;
+            }
         }
     }
 
@@ -107,14 +193,19 @@ internal static class NumericEarlyExits<TKey>
 
     private static double GetRejectionRatio(IEarlyExit exit, double domainSize)
     {
-        double ratio = exit is ValueBitMaskEarlyExit bitMask ? 1d - GetBitMaskAcceptedDensity(bitMask.Mask) :
-            domainSize <= 0d ? 0d : exit.KeyspaceSize / domainSize;
+        double ratio;
+        if (exit is ValueBitMaskEarlyExit bitMask)
+            ratio = 1d - GetBitMaskAcceptedDensity(bitMask.Mask);
+        else
+            ratio = domainSize <= 0d ? 0d : exit.KeyspaceSize / domainSize;
+
         return ClampRatio(ratio);
     }
 
     private static double GetEstimatedCost(IEarlyExit exit) => exit switch
     {
         ValueInRangeEarlyExit<TKey> => 2d,
+        ValueBitSetEarlyExit<TKey> => 3d,
         ValueBitMaskEarlyExit => 1.25d,
         _ => 1d
     };
