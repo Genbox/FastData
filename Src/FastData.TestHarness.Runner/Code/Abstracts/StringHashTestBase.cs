@@ -36,15 +36,17 @@ public abstract class StringHashTestBase
             StructureTypeOverride = typeof(HashTableStructure<,>),
             StringAnalyzerConfig = new StringAnalyzerConfig
             {
+                SubstringAnalyzerConfig = null,
                 BruteForceAnalyzerConfig = new BruteForceAnalyzerConfig(),
                 GeneticAnalyzerConfig = null,
-                GPerfAnalyzerConfig = null
+                GPerfAnalyzerConfig = null,
+                BenchmarkIterations = 0
             }
         };
 
         config.EarlyExitConfig.Disabled = true;
 
-        string[] keys = ["test1", "test2"];
+        string[] keys = ["k0", "k2"];
         string source = FastDataGenerator.Generate(keys, config, Generator);
 
         await VerifyStringHashAsync(HarnessName, nameof(BruteForceStringHashSource), source);

@@ -22,20 +22,20 @@ struct E {
 }
 
 impl fastdata {
-    const BUCKETS: [i8; 2] = [
-        0, 2
+    const BUCKETS: [i8; 3] = [
+        1, 0, 2
     ];
 
     const ENTRIES: [E; 2] = [
-        E { hash_code: 117, next: -1, key: "test1" }, E { hash_code: 117, next: 0, key: "test2" }
+        E { hash_code: 48, next: -1, key: "k0" }, E { hash_code: 50, next: -1, key: "k2" }
     ];
 
     #[inline]
     unsafe fn get_hash(value: &str, mut length: i32) -> u64 {
         let data = value.as_bytes();
         let mut hash: u64 = u64::MIN;
-        hash = (((1 | hash).wrapping_add((hash.wrapping_mul(hash)))) ^ (ReadU8(data, (length - 5) as usize) as u64));
-        hash = (hash ^ (hash >> (36 as u32)));
+        hash = (ReadU8(data, 1 as usize) as u64);
+        hash = hash;
 
         return hash;
     }
@@ -45,7 +45,7 @@ impl fastdata {
         let mut length: i32 = Length(key);
 
         let hash = unsafe { Self::get_hash(key, length) };
-        let index = hash % 2u64;
+        let index = hash % 3u64;
         let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
 
         while i >= 0 {
@@ -60,8 +60,8 @@ impl fastdata {
     }
 
     pub const ITEM_COUNT: usize = 2;
-    pub const MIN_KEY_LENGTH: i32 = 5;
-    pub const MAX_KEY_LENGTH: i32 = 5;
+    pub const MIN_KEY_LENGTH: i32 = 2;
+    pub const MAX_KEY_LENGTH: i32 = 2;
     pub const HAS_NUMBER: bool = true;
     pub const HAS_UPPERCASE: bool = false;
     pub const HAS_LOWERCASE: bool = true;
