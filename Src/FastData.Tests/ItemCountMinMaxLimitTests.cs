@@ -5,13 +5,15 @@ namespace Genbox.FastData.Tests;
 public class ItemCountMinMaxLimitTests
 {
     [Theory]
-    [InlineData(0u)]
-    [InlineData(5u)]
-    [InlineData(10u)]
-    public void IsWithinLimit_CurrentlyAlwaysTrue(uint value)
+    [InlineData(1u, false)]
+    [InlineData(2u, true)]
+    [InlineData(5u, true)]
+    [InlineData(8u, true)]
+    [InlineData(9u, false)]
+    public void IsWithinLimit_UsesInclusiveBounds(uint value, bool expected)
     {
         ItemCountMinMaxLimit limit = new ItemCountMinMaxLimit(2, 8);
 
-        Assert.True(limit.IsWithinLimit(value));
+        Assert.Equal(expected, limit.IsWithinLimit(value));
     }
 }
