@@ -87,7 +87,7 @@ internal sealed class BenchmarkCatalog
 
     private static Regex CompileFilter(string filter)
     {
-        string pattern = "^" + Regex.Escape(filter).Replace("\\*", ".*", StringComparison.Ordinal).Replace("\\?", ".", StringComparison.Ordinal) + "$";
+        string pattern = filter.Replace("*", ".*", StringComparison.Ordinal);
         return new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
     }
 
