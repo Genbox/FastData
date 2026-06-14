@@ -15,7 +15,7 @@ $PackCommonProperties = $CommonProperties + @("-p:ContinuousIntegrationBuild=tru
 
 # Prerequsites
 Write-Host -ForegroundColor $Color "Installing prerequisites"
-dotnet tool install --global minver-cli
+dotnet tool update --global minver-cli
 
 Write-Host -ForegroundColor $Color "Clean up from previous publishes"
 Remove-Item -Path $PublishDir/* -Recurse -Force -ErrorAction Ignore | Out-Null
