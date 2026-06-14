@@ -47,15 +47,12 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
     public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<string> data)
     {
         MinHeap<Candidate> heap = new MinHeap<Candidate>(config.MaxReturned);
-        BruteForceStringHash spec = new BruteForceStringHash { IgnoreCase = ignoreCase };
         BruteForceGenerator segGen = new BruteForceGenerator(8);
         ArraySegment[] segments = segGen.Generate(props).ToArray();
 
         int leftAttempts = config.MaxAttempts;
         foreach (ArraySegment segment in segments)
         {
-            spec.Segment = segment;
-
             // try every mixer
             foreach (IMixerGenerator mixGen in _mixers)
             {
@@ -63,7 +60,6 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
 
                 while (mixGen.TryGet(out Mixer mixer))
                 {
-                    spec.Mixer = mixer;
                     LogMixer(logger, ExpressionHelper.Print(mixer));
 
                     // for each mixer, try every avalanche
@@ -73,7 +69,7 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
 
                         while (avGen.TryGet(out Avalanche avalanche))
                         {
-                            spec.Avalanche = avalanche;
+                            BruteForceStringHash spec = new BruteForceStringHash(segment, mixer, avalanche) { IgnoreCase = ignoreCase };
                             LogAvalanche(logger, ExpressionHelper.Print(avalanche));
 
                             Candidate current = sim.Run(data, spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));
