@@ -154,7 +154,8 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
                 return new BitSetTemplateData
                 {
                     Values = bsCtx.Values.ToObjects(),
-                    ValueCount = bsCtx.Values.Length
+                    ValueCount = bsCtx.Values.Length,
+                    HasOccupancy = bsCtx.HasOccupancy
                 };
 
             case HashTableContext<TKey, TValue> hashCtx:

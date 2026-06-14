@@ -10,6 +10,7 @@ public sealed class NumericDataConfig : DataConfig
         StructureSettings.AddDefault(KnownSettings.RoundModuloToPowerOfTwo, true);
         StructureSettings.AddDefault(KnownSettings.RoundModuloToPowerOfTwoThreshold, 0.125f);
         StructureSettings.AddDefault(KnownSettings.EliasFanoSkipQuantum, 128);
+        StructureSettings.AddDefault(KnownSettings.DenseIntegralValueMaxRangeFactor, 2f);
         StructureSettings.AddDefault(KnownSettings.PgmEpsilon, 64);
         StructureSettings.AddDefault(KnownSettings.PgmEpsilonRecursive, 4);
     }

@@ -6,7 +6,8 @@ namespace Genbox.FastData.Internal;
 
 internal static class NumericStructures<TKey>
 {
-    internal static Type GetBest(ReadOnlyMemory<TKey> keys, bool hasValues, float density, bool allowApproximate, int rangeCount, ulong range, StructureConfig config, Func<ReadOnlyMemory<TKey>, HashData> getHashData)
+    internal static Type GetBest(ReadOnlyMemory<TKey> keys, bool hasValues, float density, bool allowApproximate, int rangeCount, ulong range,
+        float denseIntegralValueMaxRangeFactor, StructureConfig config, Func<ReadOnlyMemory<TKey>, HashData> getHashData)
     {
         uint keyCount = (uint)keys.Length;
 
@@ -23,7 +24,11 @@ internal static class NumericStructures<TKey>
         if (config.IsEnabled(typeof(BloomFilterStructure<,>)) && allowApproximate && !hasValues)
             return typeof(BloomFilterStructure<,>);
 
-        if (config.IsEnabled(typeof(BitSetStructure<,>)) && typeCode.IsIntegral() && config.CheckValueLimits(typeof(BitSetStructure<,>), range) && config.CheckDensityLimits(typeof(BitSetStructure<,>), density))
+        if (hasValues && config.IsEnabled(typeof(BitSetStructure<,>)) && typeCode.IsIntegral() && config.CheckValueLimits(typeof(BitSetStructure<,>), range) &&
+            IsDenseIntegralValueRangeAccepted(keyCount, range, denseIntegralValueMaxRangeFactor))
+            return typeof(BitSetStructure<,>);
+
+        if (!hasValues && config.IsEnabled(typeof(BitSetStructure<,>)) && typeCode.IsIntegral() && config.CheckValueLimits(typeof(BitSetStructure<,>), range) && config.CheckDensityLimits(typeof(BitSetStructure<,>), density))
             return typeof(BitSetStructure<,>);
 
         if (config.IsEnabled(typeof(ConditionalStructure<,>)) && config.CheckItemCountLimits(typeof(ConditionalStructure<,>), keyCount))
@@ -47,5 +52,14 @@ internal static class NumericStructures<TKey>
             return typeof(HashTableStructure<,>);
 
         throw new InvalidOperationException("No enabled numeric structure matched the requested configuration.");
+
+        static bool IsDenseIntegralValueRangeAccepted(uint keyCount, ulong range, float maxRangeFactor)
+        {
+            if (float.IsNaN(maxRangeFactor) || float.IsInfinity(maxRangeFactor) || maxRangeFactor < 1f)
+                return false;
+
+            double slots = range + 1.0;
+            return slots <= keyCount * (double)maxRangeFactor;
+        }
     }
 }

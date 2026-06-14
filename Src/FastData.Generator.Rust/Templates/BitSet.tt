@@ -3,11 +3,17 @@
 <#@ parameter type="Genbox.FastData.Generators.Contexts.BitSetContext" name="Context" #>
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.BitSetTemplateData" name="Data" #>
 
+<#
+    if (Data.HasOccupancy)
+    {
+#>
     <#= FieldModifier #>BITSET: [u64; <#= Context.BitSet.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Context.BitSet, TypeMap.ToValueLabel, 8) #>
     ];
 
 <#
+    }
+
     if (Data.ValueCount > 0)
     {
 #>
@@ -21,8 +27,21 @@
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
         let offset = (<#= LookupKeyName #> - Self::MIN_KEY) as u64;
+<#
+        if (Data.HasOccupancy)
+        {
+#>
         let word = (offset >> 6) as usize;
         (Self::BITSET[word] & (1u64 << (offset & 63))) != 0
+<#
+        }
+        else
+        {
+#>
+        true
+<#
+        }
+#>
     }
 <#
     if (Data.ValueCount > 0)
@@ -33,11 +52,18 @@
     <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
 <#= GetMethodHeader(MethodType.TryLookup) #>
         let offset = (<#= LookupKeyName #> - Self::MIN_KEY) as u64;
+<#
+        if (Data.HasOccupancy)
+        {
+#>
         let word = (offset >> 6) as usize;
         if (Self::BITSET[word] & (1u64 << (offset & 63))) == 0 {
             return None;
         }
 
+<#
+        }
+#>
         Some(Self::VALUES[offset as usize])
     }
 <#

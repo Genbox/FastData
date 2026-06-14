@@ -2,11 +2,17 @@
 <#@ parameter type="Genbox.FastData.Generators.Contexts.BitSetContext" name="Context" #>
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.BitSetTemplateData" name="Data" #>
 
+<#
+    if (Data.HasOccupancy)
+    {
+#>
     <#= FieldModifier #>ulong[] _bitset = new ulong[] {
 <#= FormatHelper.FormatColumns(Context.BitSet, TypeMap.ToValueLabel, 8) #>
     };
 
 <#
+    }
+
     if (Data.ValueCount > 0)
     {
 #>
@@ -23,8 +29,21 @@
 <#= GetMethodHeader(MethodType.Contains) #>
 
         ulong offset = (ulong)(<#= LookupKeyName #> - MinKey);
+<#
+        if (Data.HasOccupancy)
+        {
+#>
         int word = (int)(offset >> 6);
         return (_bitset[word] & (1UL << (int)(offset & 63))) != 0;
+<#
+        }
+        else
+        {
+#>
+        return true;
+<#
+        }
+#>
     }
 <#
     if (Data.ValueCount > 0)
@@ -37,6 +56,10 @@
 <#= GetMethodHeader(MethodType.TryLookup) #>
 
         ulong offset = (ulong)(<#= LookupKeyName #> - MinKey);
+<#
+        if (Data.HasOccupancy)
+        {
+#>
         int word = (int)(offset >> 6);
         if ((_bitset[word] & (1UL << (int)(offset & 63))) == 0)
         {
@@ -44,6 +67,9 @@
             return false;
         }
 
+<#
+        }
+#>
         value = _values[(int)offset];
         return true;
     }

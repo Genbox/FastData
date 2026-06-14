@@ -32,7 +32,8 @@ public sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, Bit
         ReadOnlySpan<TValue> valueSpan = values.Span;
 
         int range = (int)(_props.Range + 1);
-        ulong[] bitset = new ulong[(range + 63) / 64];
+        bool hasOccupancy = values.IsEmpty || !_props.IsConsecutive;
+        ulong[] bitset = hasOccupancy ? new ulong[(range + 63) / 64] : [];
         TValue[]? denseValues = values.IsEmpty ? null : new TValue[range];
 
         TypeCode typeCode = Type.GetTypeCode(typeof(TKey));
@@ -54,13 +55,16 @@ public sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, Bit
                 SetEntry((ulong)(conv(keySpan[i]) - minKey), denseValues == null ? default! : valueSpan[i]);
         }
 
-        return new BitSetContext<TValue>(bitset, denseValues);
+        return new BitSetContext<TValue>(bitset, denseValues, hasOccupancy);
 
         void SetEntry(ulong offset, TValue value)
         {
             Debug.Assert(offset <= _props.Range, "BitSetStructure requires every key to be within the analyzed numeric range.");
-            int word = (int)(offset >> 6);
-            bitset[word] |= 1UL << (int)(offset & 63);
+            if (hasOccupancy)
+            {
+                int word = (int)(offset >> 6);
+                bitset[word] |= 1UL << (int)(offset & 63);
+            }
 
             if (denseValues != null)
                 denseValues[(int)offset] = value;

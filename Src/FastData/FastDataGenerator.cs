@@ -427,7 +427,8 @@ public static partial class FastDataGenerator
 
             while (true)
             {
-                Type selType = NumericStructures<TKey>.GetBest(keys, hasValues, props.Density, cfg.AllowApproximation, props.DataRanges.Ranges.Count, props.Range, structureConfig, x => EnsureNumericHash(x.Span));
+                Type selType = NumericStructures<TKey>.GetBest(keys, hasValues, props.Density, cfg.AllowApproximation, props.DataRanges.Ranges.Count, props.Range,
+                    cfg.StructureSettings.GetSetting<float>(KnownSettings.DenseIntegralValueMaxRangeFactor), structureConfig, x => EnsureNumericHash(x.Span));
                 IStructure<TKey, TValue, IContext> selStruct = NumericStructureFactory<TKey, TValue>(cfg, selType, props, () => EnsureNumericHash(keys.Span));
                 IContext? selCtx = selStruct.Create(keys, values);
 

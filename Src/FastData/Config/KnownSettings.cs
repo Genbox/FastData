@@ -7,6 +7,7 @@ public static class KnownSettings
     public const string RoundModuloToPowerOfTwo = nameof(RoundModuloToPowerOfTwo);
     public const string RoundModuloToPowerOfTwoThreshold = nameof(RoundModuloToPowerOfTwoThreshold);
     public const string EliasFanoSkipQuantum = nameof(EliasFanoSkipQuantum);
+    public const string DenseIntegralValueMaxRangeFactor = nameof(DenseIntegralValueMaxRangeFactor);
     public const string PgmEpsilon = nameof(PgmEpsilon);
     public const string PgmEpsilonRecursive = nameof(PgmEpsilonRecursive);
 }
