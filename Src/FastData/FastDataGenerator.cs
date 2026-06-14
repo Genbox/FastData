@@ -190,10 +190,10 @@ public static partial class FastDataGenerator
         mandatoryExits.AddRange(hashMandatoryExits); // From hash functions
         mandatoryExits.AddRange(structure.GetMandatoryExits()); // From the structure
 
-        List<IEarlyExit> earlyExits = EarlyExitPipeline.Combine(mandatoryExits, analysisExits);
+        List<IEarlyExit> earlyExits = EarlyExitPipeline.CombineAndDedup(mandatoryExits, analysisExits);
 
-        if (cfg.EarlyExitConfig.OptimizeExpression)
-            EarlyExitPipeline.Reduce(earlyExits);
+        if (cfg.EarlyExitConfig.Optimize)
+            EarlyExitPipeline.Optimize<string>(earlyExits);
 
         UsedFunctionVisitor usedVisitor = new UsedFunctionVisitor();
 
@@ -393,9 +393,10 @@ public static partial class FastDataGenerator
 
         // Early exits are generated from numeric properties and then merged with checks required by the structure itself.
         IEarlyExit[] exitsAnalyzed = NumericEarlyExits<TKey>.GetExits(structureType, props.DataRanges, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig);
-        List<IEarlyExit> exits = EarlyExitPipeline.Combine(structure.GetMandatoryExits(), exitsAnalyzed);
-        if (cfg.EarlyExitConfig.OptimizeExpression)
-            EarlyExitPipeline.Reduce(exits);
+        List<IEarlyExit> exits = EarlyExitPipeline.CombineAndDedup(structure.GetMandatoryExits(), exitsAnalyzed);
+
+        if (cfg.EarlyExitConfig.Optimize)
+            EarlyExitPipeline.Optimize<TKey>(exits);
 
         // Convert the early exits into a set of annotated expressions. We assume the input is called "key".
         ParameterExpression inputKey = Parameter(typeof(TKey), "key");

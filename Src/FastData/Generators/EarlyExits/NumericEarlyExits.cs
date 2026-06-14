@@ -12,7 +12,7 @@ internal static class NumericEarlyExits<TKey>
     public static IEarlyExit[] GetExits(Type structureType, DataRanges<TKey> dataRanges, ulong range, ulong bitMask, uint itemCount, EarlyExitConfig config)
     {
         // First we build a set of candidates.
-        IEarlyExit[] candidates = ProduceCandidates(structureType, dataRanges, range, bitMask, itemCount, config).ToArray();
+        IEarlyExit[] candidates = ProduceCandidates(structureType, dataRanges, bitMask, itemCount, config).ToArray();
 
         // If the user turned off early exits, or none was produced, we exit here.
         if (candidates.Length == 0)
@@ -29,7 +29,7 @@ internal static class NumericEarlyExits<TKey>
         return GetTopExits(candidates, range, config.MaxCandidates).ToArray();
     }
 
-    private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, DataRanges<TKey> dataRanges, ulong range, ulong bitMask, uint itemCount, EarlyExitConfig config)
+    private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, DataRanges<TKey> dataRanges, ulong bitMask, uint itemCount, EarlyExitConfig config)
     {
         if (config.Disabled)
             yield break;

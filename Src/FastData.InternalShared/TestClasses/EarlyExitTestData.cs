@@ -45,8 +45,8 @@ public sealed class EarlyExitTestData<TKey>(
     public string Generate(ICodeGenerator generator)
     {
         // Run exits through the pipeline
-        List<IEarlyExit> exitList = EarlyExitPipeline.Combine([], Exits);
-        EarlyExitPipeline.Reduce(exitList);
+        List<IEarlyExit> exitList = EarlyExitPipeline.CombineAndDedup([], Exits);
+        EarlyExitPipeline.Optimize<TKey>(exitList);
 
         ParameterExpression inputKey = Expression.Parameter(typeof(TKey), "key");
         AnnotatedExpr[] annotated = EarlyExitPipeline.Annotate(exitList, inputKey);

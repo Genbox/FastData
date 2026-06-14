@@ -19,7 +19,7 @@ public class EarlyExitConfig
             EarlyExitConfig cfg = new EarlyExitConfig();
             cfg.MinItemCount = 3;
             cfg.MaxCandidates = 4;
-            cfg.OptimizeExpression = true;
+            cfg.Optimize = true;
             cfg.MinRejectionRatio = 0.05f;
 
             // These don't support early exits
@@ -44,7 +44,7 @@ public class EarlyExitConfig
     public int MaxCandidates { get; set; }
 
     /// <summary>When enabled, early exit expressions are optimized</summary>
-    public bool OptimizeExpression { get; set; }
+    public bool Optimize { get; set; }
 
     /// <summary>Gets or sets the minimum fraction of the observed keyspace an early exit must reject to be kept.</summary>
     public float MinRejectionRatio { get; set; }

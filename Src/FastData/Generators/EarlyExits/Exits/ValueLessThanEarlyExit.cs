@@ -35,7 +35,7 @@ public sealed record ValueLessThanEarlyExit<T>(T Value) : ValueComparisonEarlyEx
 
     protected override BinaryExpression Compare(Expression left, Expression right) => LessThan(left, right);
 
-    public override bool IsWorseThan(IEarlyExit other) => other is ValueLessThanEarlyExit<T> otherExit && Comparer<T>.Default.Compare(Value, otherExit.Value) < 0;
+    public override bool IsWorseThan(IEarlyExit other) => other is ValueRangeEarlyExit<T> || (other is ValueLessThanEarlyExit<T> otherExit && Comparer<T>.Default.Compare(Value, otherExit.Value) < 0);
 
     private static ulong ClampToUInt64(double value)
     {
