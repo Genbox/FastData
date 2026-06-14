@@ -55,13 +55,13 @@ internal static class StringEarlyExits
             if (config.IsEarlyExitEnabled(typeof(LengthGreaterThanEarlyExit)) && max < int.MaxValue)
                 yield return new LengthGreaterThanEarlyExit(max);
 
-            if (config.IsEarlyExitEnabled(typeof(StringLengthRangeEarlyExit)))
+            if (config.IsEarlyExitEnabled(typeof(LengthInRangeEarlyExit)))
             {
                 for (int i = 0; i < ranges.Ranges.Count - 1; i++)
                 {
                     (int Start, int End) current = ranges.Ranges[i];
                     (int Start, int End) next = ranges.Ranges[i + 1];
-                    yield return new StringLengthRangeEarlyExit(current.End, next.Start);
+                    yield return new LengthInRangeEarlyExit(current.End, next.Start);
                 }
             }
 
@@ -196,7 +196,7 @@ internal static class StringEarlyExits
     private static double GetEstimatedCost(IEarlyExit exit) => exit switch
     {
         LengthLessThanEarlyExit or LengthGreaterThanEarlyExit or LengthNotEqualEarlyExit => 1d,
-        StringLengthRangeEarlyExit => 2d,
+        LengthInRangeEarlyExit => 2d,
         LengthBitmapEarlyExit => 2d,
         UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit or UnitAtNotEqualEarlyExit => 2d,
         UnitAtBitmapEarlyExit => 4d,

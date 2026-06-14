@@ -6,10 +6,10 @@ namespace Genbox.FastData.Tests;
 public class EarlyExitRangeTests
 {
     [Fact]
-    public void StringLengthRangeEarlyExit_KeyspaceAndWorseThan()
+    public void LengthInRangeEarlyExit_KeyspaceAndWorseThan()
     {
-        StringLengthRangeEarlyExit outer = new StringLengthRangeEarlyExit(2, 8);
-        StringLengthRangeEarlyExit inner = new StringLengthRangeEarlyExit(3, 5);
+        LengthInRangeEarlyExit outer = new LengthInRangeEarlyExit(2, 8);
+        LengthInRangeEarlyExit inner = new LengthInRangeEarlyExit(3, 5);
 
         Assert.False(outer.IsWorseThan(inner));
         Assert.True(inner.IsWorseThan(outer));
@@ -17,9 +17,9 @@ public class EarlyExitRangeTests
     }
 
     [Fact]
-    public void StringLengthRangeEarlyExit_ExpressionIsExclusive()
+    public void LengthInRangeEarlyExit_ExpressionIsExclusive()
     {
-        StringLengthRangeEarlyExit exit = new StringLengthRangeEarlyExit(2, 5);
+        LengthInRangeEarlyExit exit = new LengthInRangeEarlyExit(2, 5);
         ParameterExpression parameter = Expression.Parameter(typeof(string), "s");
         Func<string, bool> func = Expression.Lambda<Func<string, bool>>(exit.GetExpression(parameter), parameter).Compile();
 

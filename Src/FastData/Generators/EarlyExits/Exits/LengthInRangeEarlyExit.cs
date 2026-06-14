@@ -5,7 +5,7 @@ using Genbox.FastData.Generators.Abstracts;
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // Length(inputKey) > Min && Length(inputKey) < Max;
-public sealed record StringLengthRangeEarlyExit(int Min, int Max) : IEarlyExit
+public sealed record LengthInRangeEarlyExit(int Min, int Max) : IEarlyExit
 {
     public Expression GetExpression(ParameterExpression key)
     {
@@ -18,7 +18,7 @@ public sealed record StringLengthRangeEarlyExit(int Min, int Max) : IEarlyExit
 
     public bool IsWorseThan(IEarlyExit other)
     {
-        if (other is not StringLengthRangeEarlyExit otherExit)
+        if (other is not LengthInRangeEarlyExit otherExit)
             return false;
 
         if (Min == otherExit.Min && Max == otherExit.Max)

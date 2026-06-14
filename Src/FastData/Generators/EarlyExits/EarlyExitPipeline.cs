@@ -140,7 +140,7 @@ internal static class EarlyExitPipeline
         exits.RemoveAt(second);
         exits.RemoveAt(first);
 
-        ValueRangeEarlyExit<TKey> range = new ValueRangeEarlyExit<TKey>(lt.Value, gt.Value, lt.KeyspaceSize, gt.KeyspaceSize);
+        ValueOutOfRangeEarlyExit<TKey> range = new ValueOutOfRangeEarlyExit<TKey>(lt.Value, gt.Value, lt.KeyspaceSize, gt.KeyspaceSize);
         exits.Insert(first, range); //Insert the new compound at the first early exit we saw
     }
 
@@ -176,7 +176,7 @@ internal static class EarlyExitPipeline
         exits.RemoveAt(second);
         exits.RemoveAt(first);
 
-        LengthRangeEarlyExit range = new LengthRangeEarlyExit(lt.Value, gt.Value);
+        LengthOutOfRangeEarlyExit range = new LengthOutOfRangeEarlyExit(lt.Value, gt.Value);
         exits.Insert(first, range); //Insert the new compound at the first early exit we saw
     }
 
@@ -197,7 +197,7 @@ internal static class EarlyExitPipeline
                 if (exits[j] is not UnitAtGreaterThanEarlyExit gt || gt.Offset != lt.Offset)
                     continue;
 
-                UnitAtRangeEarlyExit compound = new UnitAtRangeEarlyExit(lt.Value, gt.Value, lt.Offset);
+                UnitAtOutOfRangeEarlyExit compound = new UnitAtOutOfRangeEarlyExit(lt.Value, gt.Value, lt.Offset);
 
                 int first = Math.Min(i, j);
                 int second = Math.Max(i, j);

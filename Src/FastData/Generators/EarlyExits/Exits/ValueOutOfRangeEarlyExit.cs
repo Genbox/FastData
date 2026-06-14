@@ -10,7 +10,7 @@ namespace Genbox.FastData.Generators.EarlyExits.Exits;
 /// or an <c>OrElse</c> comparison for floating-point types.</summary>
 /// <remarks>For integral types the expression is <c>(unsigned)(key - Min) &gt; (unsigned)(Max - Min)</c>.
 /// For floating-point types the expression is <c>key &lt; Min || key &gt; Max</c>.</remarks>
-public sealed record ValueRangeEarlyExit<T>(T Min, T Max, ulong LessThanKeyspace, ulong GreaterThanKeyspace) : IEarlyExit
+public sealed record ValueOutOfRangeEarlyExit<T>(T Min, T Max, ulong LessThanKeyspace, ulong GreaterThanKeyspace) : IEarlyExit
 {
     public ulong KeyspaceSize => LessThanKeyspace + GreaterThanKeyspace;
 

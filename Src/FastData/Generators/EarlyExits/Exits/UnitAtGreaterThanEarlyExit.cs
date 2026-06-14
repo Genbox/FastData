@@ -17,5 +17,5 @@ public sealed record UnitAtGreaterThanEarlyExit(char Value, int Offset = 0) : Me
         return Compare(Call(methodInfo, key, Constant(Offset)), Constant((uint)Value, typeof(uint)));
     }
 
-    public override bool IsWorseThan(IEarlyExit other) => (other is UnitAtRangeEarlyExit oor && Offset == oor.Offset) || (other is UnitAtGreaterThanEarlyExit otherExit && Offset == otherExit.Offset && Value > otherExit.Value);
+    public override bool IsWorseThan(IEarlyExit other) => (other is UnitAtOutOfRangeEarlyExit range && Offset == range.Offset && Value >= range.Max) || (other is UnitAtGreaterThanEarlyExit otherExit && Offset == otherExit.Offset && Value > otherExit.Value);
 }

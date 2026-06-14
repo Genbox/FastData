@@ -10,5 +10,5 @@ public sealed record LengthLessThanEarlyExit(int Value) : MethodComparisonEarlyE
     public override ulong KeyspaceSize => (ulong)Value;
     protected override BinaryExpression Compare(Expression left, Expression right) => LessThan(left, right);
 
-    public override bool IsWorseThan(IEarlyExit other) => other is LengthRangeEarlyExit || (other is LengthLessThanEarlyExit otherExit && Value < otherExit.Value) || (other is LengthNotEqualEarlyExit exact && Value == exact.Value);
+    public override bool IsWorseThan(IEarlyExit other) => (other is LengthOutOfRangeEarlyExit range && Value <= range.Min) || (other is LengthLessThanEarlyExit otherExit && Value < otherExit.Value) || (other is LengthNotEqualEarlyExit exact && Value == exact.Value);
 }

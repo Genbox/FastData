@@ -49,7 +49,7 @@ public class StringEarlyExitsTests
 
         Assert.Contains(exits, static x => x is LengthLessThanEarlyExit { Value: 1 });
         Assert.Contains(exits, static x => x is LengthGreaterThanEarlyExit { Value: 10 });
-        Assert.Contains(exits, static x => x is StringLengthRangeEarlyExit { Min: 1, Max: 10 });
+        Assert.Contains(exits, static x => x is LengthInRangeEarlyExit { Min: 1, Max: 10 });
 
         LengthBitmapEarlyExit bitmap = exits.OfType<LengthBitmapEarlyExit>().First();
         Assert.Equal(513UL, bitmap.BitSet);
