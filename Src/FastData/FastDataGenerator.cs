@@ -306,6 +306,7 @@ public static partial class FastDataGenerator
 
             HashData hashData = HashData.Create(keySpan,
                 cfg.StructureSettings.GetSetting<float>(KnownSettings.HashTableCapacityFactor),
+                cfg.StructureSettings.GetSetting<bool>(KnownSettings.OptimizeHashTableBucketSize),
                 cfg.StructureSettings.GetSetting<bool>(KnownSettings.RoundModuloToPowerOfTwo),
                 cfg.StructureSettings.GetSetting<float>(KnownSettings.RoundModuloToPowerOfTwoThreshold), x =>
                 {
@@ -444,6 +445,7 @@ public static partial class FastDataGenerator
             NumericHashFunc<TKey> hashFunc = DefaultNumericHash.GetHashFunc<TKey>(props.HasZero);
             return HashData.Create(keySpan,
                 cfg.StructureSettings.GetSetting<float>(KnownSettings.HashTableCapacityFactor),
+                cfg.StructureSettings.GetSetting<bool>(KnownSettings.OptimizeHashTableBucketSize),
                 cfg.StructureSettings.GetSetting<bool>(KnownSettings.RoundModuloToPowerOfTwo),
                 cfg.StructureSettings.GetSetting<float>(KnownSettings.RoundModuloToPowerOfTwoThreshold), hashFunc);
         }

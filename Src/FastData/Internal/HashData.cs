@@ -5,11 +5,13 @@ using Genbox.FastData.Internal.Misc;
 namespace Genbox.FastData.Internal;
 
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
-internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize, bool RoundModuloToPowerOfTwo, float RoundModuloToPowerOfTwoThreshold, bool HashCodesPerfect, ulong MinHashCode, ulong MaxHashCode)
+internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize, bool OptimizeHashTableBucketSize, bool RoundModuloToPowerOfTwo, float RoundModuloToPowerOfTwoThreshold, bool HashCodesPerfect, ulong MinHashCode, ulong MaxHashCode)
 {
-    internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, NumericHashFunc<T> func) => Create(data, capacityFactor, false, 0, func);
+    internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, NumericHashFunc<T> func) => Create(data, capacityFactor, false, false, 0, func);
 
-    internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, bool roundModuloToPowerOfTwo, float roundModuloToPowerOfTwoThreshold, NumericHashFunc<T> func)
+    internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, bool roundModuloToPowerOfTwo, float roundModuloToPowerOfTwoThreshold, NumericHashFunc<T> func) => Create(data, capacityFactor, false, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, func);
+
+    internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, bool optimizeHashTableBucketSize, bool roundModuloToPowerOfTwo, float roundModuloToPowerOfTwoThreshold, NumericHashFunc<T> func)
     {
         int baseTableSize = GetBaseTableSize(data.Length, capacityFactor);
         ulong[] hashCodes = new ulong[data.Length];
@@ -26,9 +28,10 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
             maxHashCode = Math.Max(maxHashCode, hash);
         }
 
-        int tableSize = GetModuloLength(baseTableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, hashCodes, out int collisions);
+        int tableSize = optimizeHashTableBucketSize ? GetOptimizedBucketTableSize(baseTableSize, hashCodes, out int collisions) : baseTableSize;
+        tableSize = GetModuloLength(tableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, hashCodes, out collisions);
         bool perfect = collisions == 0;
-        return new HashData(hashCodes, capacityFactor, tableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, perfect, minHashCode, maxHashCode);
+        return new HashData(hashCodes, capacityFactor, tableSize, optimizeHashTableBucketSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, perfect, minHashCode, maxHashCode);
     }
 
     /// <summary>Round <paramref name="length" /> to the next power of two if within threshold. Does not compare collisions because callers use this for non-bucket dimensions (e.g. bloom filter word count).</summary>
@@ -116,6 +119,45 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
 
         collisions = roundedCollisions;
         return roundedLength;
+    }
+
+    private static int GetOptimizedBucketTableSize(int baseLength, ReadOnlySpan<ulong> hashCodes, out int collisions)
+    {
+        const double AcceptableCollisionRate = 0.05;
+        const int LargeInputSizeThreshold = 1000;
+        const int MaxSmallBucketTableMultiplier = 16;
+        const int MaxLargeBucketTableMultiplier = 3;
+        const int MaxCandidateCount = 256;
+
+        collisions = CountBucketCollisions(hashCodes, baseLength);
+
+        if (collisions == 0)
+            return baseLength;
+
+        if (baseLength == int.MaxValue)
+            return baseLength;
+
+        int multiplier = hashCodes.Length >= LargeInputSizeThreshold ? MaxLargeBucketTableMultiplier : MaxSmallBucketTableMultiplier;
+        long maxByMultiplier = (long)hashCodes.Length * multiplier;
+        long maxByCandidates = (long)baseLength + MaxCandidateCount;
+        int maxLength = (int)Math.Min(int.MaxValue, Math.Max(baseLength, Math.Min(maxByMultiplier, maxByCandidates)));
+        int bestLength = baseLength;
+
+        for (int candidate = baseLength + 1; candidate <= maxLength; candidate++)
+        {
+            int candidateCollisions = CountBucketCollisions(hashCodes, candidate);
+
+            if (candidateCollisions >= collisions)
+                continue;
+
+            bestLength = candidate;
+            collisions = candidateCollisions;
+
+            if (candidateCollisions / (double)hashCodes.Length <= AcceptableCollisionRate)
+                break;
+        }
+
+        return bestLength;
     }
 
     private static int CountBucketCollisions(ReadOnlySpan<ulong> hashCodes, int length)

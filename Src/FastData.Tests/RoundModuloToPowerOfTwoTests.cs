@@ -51,6 +51,42 @@ public class RoundModuloToPowerOfTwoTests
         Assert.Equal(4, context.BitSet.Length);
     }
 
+    [Fact]
+    public void NumericConfigDefaultsEnableBucketSizeOptimization()
+    {
+        NumericDataConfig config = new NumericDataConfig { StructureTypeOverride = typeof(HashTableStructure<,>) };
+        config.StructureSettings.SetSetting(KnownSettings.RoundModuloToPowerOfTwo, false);
+
+        CapturingGenerator generator = new CapturingGenerator();
+        FastDataGenerator.Generate([0, 6, 12], config, generator);
+        HashTableContext<int, byte> context = Assert.IsType<HashTableContext<int, byte>>(generator.Context);
+
+        Assert.Equal(5, context.Buckets.Length);
+    }
+
+    [Fact]
+    public void HashTableOptimizesBucketSizeWhenEnabled()
+    {
+        int[] keys = [0, 6, 12];
+        HashData hashData = HashData.Create(keys, 1f, true, false, 0, static x => (ulong)x);
+        HashTableStructure<int, byte> structure = new HashTableStructure<int, byte>(hashData);
+        HashTableContext<int, byte> context = structure.Create(keys, ReadOnlyMemory<byte>.Empty);
+
+        Assert.Equal(5, context.Buckets.Length);
+        Assert.True(hashData.HashCodesPerfect);
+    }
+
+    [Fact]
+    public void HashTableBucketOptimizationPreservesPowerOfTwoRounding()
+    {
+        int[] keys = [0, 1, 2, 3, 4, 5, 6];
+        HashData hashData = HashData.Create(keys, 1f, true, true, 0.15f, static x => (ulong)x);
+        HashTableStructure<int, byte> structure = new HashTableStructure<int, byte>(hashData);
+        HashTableContext<int, byte> context = structure.Create(keys, ReadOnlyMemory<byte>.Empty);
+
+        Assert.Equal(8, context.Buckets.Length);
+    }
+
     [Theory]
     [InlineData(0.15f, 8)]
     [InlineData(0.10f, 7)]
