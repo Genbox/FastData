@@ -136,13 +136,105 @@ public class NumericEarlyExitsTests
         Assert.True(exit.KeyspaceSize / ((1003u - 1000u) + 1d) >= 0.5d);
     }
 
+    [Fact]
+    public void GetExits_CharKeys_EmitsLowByteBitmapExit()
+    {
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.DisableEarlyExit(typeof(ValueBitMaskEarlyExit));
+        cfg.DisableEarlyExit(typeof(ValueLessThanEarlyExit<>));
+        cfg.DisableEarlyExit(typeof(ValueGreaterThanEarlyExit<>));
+        cfg.MinRejectionRatio = 0f;
+
+        char[] keys = ['a', 'e', 'i', 'm', 'q', 'u', 'y', '}', '\u0081'];
+        DataRanges<char> dataRanges = new DataRanges<char>(1);
+        dataRanges.Add('a', '\u0081');
+
+        IEarlyExit[] exits = NumericEarlyExits<char>.GetExits(typeof(ConditionalStructure<,>), keys, dataRanges, '\u0081' - 'a', 0, (uint)keys.Length, cfg);
+
+        ValueLowByteBitmapEarlyExit exit = Assert.IsType<ValueLowByteBitmapEarlyExit>(Assert.Single(exits));
+        Assert.Equal(247UL, exit.KeyspaceSize);
+    }
+
+    [Fact]
+    public void GetExits_IntKeys_EmitsLowByteBitmapExit()
+    {
+        EarlyExitConfig cfg = LowByteOnlyConfig();
+        int[] keys = [0x100, 0x200, 0x300, 0x400, 0x500, 0x600, 0x700, 0x800, 0x900];
+        DataRanges<int> dataRanges = new DataRanges<int>(1);
+        dataRanges.Add(0x100, 0x900);
+
+        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(typeof(ConditionalStructure<,>), keys, dataRanges, 0x800, 0, (uint)keys.Length, cfg);
+
+        ValueLowByteBitmapEarlyExit exit = Assert.IsType<ValueLowByteBitmapEarlyExit>(Assert.Single(exits));
+        Assert.Equal(255UL, exit.KeyspaceSize);
+        Assert.Equal(1f / 256f, exit.AcceptedDensity);
+    }
+
+    [Fact]
+    public void GetExits_LowByteBitmapDisabled_DoesNotEmitLowByteBitmapExit()
+    {
+        EarlyExitConfig cfg = LowByteOnlyConfig();
+        cfg.DisableEarlyExit(typeof(ValueLowByteBitmapEarlyExit));
+        int[] keys = [0x100, 0x200, 0x300, 0x400, 0x500, 0x600, 0x700, 0x800, 0x900];
+        DataRanges<int> dataRanges = new DataRanges<int>(1);
+        dataRanges.Add(0x100, 0x900);
+
+        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(typeof(ConditionalStructure<,>), keys, dataRanges, 0x800, 0, (uint)keys.Length, cfg);
+
+        Assert.Empty(exits);
+    }
+
+    [Fact]
+    public void GetExits_LowByteDensityTooHigh_DoesNotEmitLowByteBitmapExit()
+    {
+        EarlyExitConfig cfg = LowByteOnlyConfig();
+        int[] keys = Enumerable.Range(0, 129).ToArray();
+        DataRanges<int> dataRanges = new DataRanges<int>(1);
+        dataRanges.Add(0, 128);
+
+        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(typeof(ConditionalStructure<,>), keys, dataRanges, 128, 0, (uint)keys.Length, cfg);
+
+        Assert.Empty(exits);
+    }
+
+    [Fact]
+    public void GetExits_BitSetStructure_DoesNotEmitLowByteBitmapExit()
+    {
+        EarlyExitConfig cfg = LowByteOnlyConfig();
+        int[] keys = [0x100, 0x200, 0x300, 0x400, 0x500, 0x600, 0x700, 0x800, 0x900];
+        DataRanges<int> dataRanges = new DataRanges<int>(1);
+        dataRanges.Add(0x100, 0x900);
+
+        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(typeof(BitSetStructure<,>), keys, dataRanges, 0x800, 0, (uint)keys.Length, cfg);
+
+        Assert.Empty(exits);
+    }
+
     private static IEarlyExit[] GetExits<T>(List<(T Start, T End)> ranges, ulong range, ulong bitMask, uint itemCount, EarlyExitConfig cfg)
     {
+        cfg.DisableEarlyExit(typeof(ValueLowByteBitmapEarlyExit));
+
         DataRanges<T> dataRanges = new DataRanges<T>(ranges.Count);
+        T[] keys = new T[ranges.Count];
 
-        foreach ((T Start, T End) r in ranges)
+        for (int i = 0; i < ranges.Count; i++)
+        {
+            (T Start, T End) r = ranges[i];
             dataRanges.Add(r.Start, r.End);
+            keys[i] = r.Start;
+        }
 
-        return NumericEarlyExits<T>.GetExits(typeof(ArrayStructure<,>), dataRanges, range, bitMask, itemCount, cfg);
+        return NumericEarlyExits<T>.GetExits(typeof(ArrayStructure<,>), keys, dataRanges, range, bitMask, itemCount, cfg);
+    }
+
+    private static EarlyExitConfig LowByteOnlyConfig()
+    {
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.DisableEarlyExit(typeof(ValueBitMaskEarlyExit));
+        cfg.DisableEarlyExit(typeof(ValueLessThanEarlyExit<>));
+        cfg.DisableEarlyExit(typeof(ValueGreaterThanEarlyExit<>));
+        cfg.DisableEarlyExit(typeof(ValueBitSetEarlyExit<>));
+        cfg.MinRejectionRatio = 0f;
+        return cfg;
     }
 }

@@ -4,15 +4,16 @@ using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Analysis.Data;
+using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Generators.EarlyExits;
 
 internal static class NumericEarlyExits<TKey>
 {
-    public static IEarlyExit[] GetExits(Type structureType, DataRanges<TKey> dataRanges, ulong range, ulong bitMask, uint itemCount, EarlyExitConfig config)
+    public static IEarlyExit[] GetExits(Type structureType, ReadOnlyMemory<TKey> keys, DataRanges<TKey> dataRanges, ulong range, ulong bitMask, uint itemCount, EarlyExitConfig config)
     {
         // First we build a set of candidates.
-        IEarlyExit[] candidates = ProduceCandidates(structureType, dataRanges, bitMask, itemCount, config).ToArray();
+        IEarlyExit[] candidates = ProduceCandidates(structureType, keys, dataRanges, bitMask, itemCount, config).ToArray();
 
         // If the user turned off early exits, or none was produced, we exit here.
         if (candidates.Length == 0)
@@ -29,7 +30,7 @@ internal static class NumericEarlyExits<TKey>
         return GetTopExits(candidates, range, config.MaxCandidates).ToArray();
     }
 
-    private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, DataRanges<TKey> dataRanges, ulong bitMask, uint itemCount, EarlyExitConfig config)
+    private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, ReadOnlyMemory<TKey> keys, DataRanges<TKey> dataRanges, ulong bitMask, uint itemCount, EarlyExitConfig config)
     {
         if (config.Disabled)
             yield break;
@@ -43,6 +44,13 @@ internal static class NumericEarlyExits<TKey>
             yield break;
 
         TypeCode typeCode = Type.GetTypeCode(typeof(TKey));
+
+        if (config.IsEarlyExitEnabled(typeof(ValueLowByteBitmapEarlyExit)) && typeCode.IsIntegral() && structureType != typeof(BitSetStructure<,>))
+        {
+            ValueLowByteBitmapEarlyExit? lowByteExit = CreateLowByteBitmapExit(keys, typeCode);
+            if (lowByteExit != null && config.CheckDensityLimits(typeof(ValueLowByteBitmapEarlyExit), lowByteExit.AcceptedDensity))
+                yield return lowByteExit;
+        }
 
         // Represents a mask like 01010011010100 where all the ones are bits that are not set in the input values.
         // When there are too many values, the bitset quickly becomes all ones and the check becomes useless.
@@ -196,6 +204,8 @@ internal static class NumericEarlyExits<TKey>
         double ratio;
         if (exit is ValueBitMaskEarlyExit bitMask)
             ratio = 1d - GetBitMaskAcceptedDensity(bitMask.Mask);
+        else if (exit is ValueLowByteBitmapEarlyExit lowByte)
+            ratio = lowByte.KeyspaceSize / 256d;
         else
             ratio = domainSize <= 0d ? 0d : exit.KeyspaceSize / domainSize;
 
@@ -206,9 +216,37 @@ internal static class NumericEarlyExits<TKey>
     {
         ValueInRangeEarlyExit<TKey> => 2d,
         ValueBitSetEarlyExit<TKey> => 3d,
+        ValueLowByteBitmapEarlyExit => 4d,
         ValueBitMaskEarlyExit => 1.25d,
         _ => 1d
     };
+
+    private static ValueLowByteBitmapEarlyExit? CreateLowByteBitmapExit(ReadOnlyMemory<TKey> keys, TypeCode typeCode)
+    {
+        Func<TKey, ulong> toUlong = typeCode.GetUnsignedValueConverter<TKey>();
+        ulong word0 = 0;
+        ulong word1 = 0;
+        ulong word2 = 0;
+        ulong word3 = 0;
+
+        foreach (TKey key in keys.Span)
+        {
+            int bucket = (int)(toUlong(key) & 0xffUL);
+            ulong bit = 1UL << (bucket & 63);
+
+            switch (bucket >> 6)
+            {
+                case 0: word0 |= bit; break;
+                case 1: word1 |= bit; break;
+                case 2: word2 |= bit; break;
+                case 3: word3 |= bit; break;
+            }
+        }
+
+        return word0 == ulong.MaxValue && word1 == ulong.MaxValue && word2 == ulong.MaxValue && word3 == ulong.MaxValue
+            ? null
+            : new ValueLowByteBitmapEarlyExit(word0, word1, word2, word3);
+    }
 
     private static float GetBitMaskAcceptedDensity(ulong bitMask)
     {
