@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/github/license/Genbox/FastData)](https://github.com/Genbox/FastData/blob/master/LICENSE.txt)
 
-![Docs/FastData.png](./Docs/FastData.png)
+![Docs/Architecture/FastData.png](./Docs/Architecture/FastData.png)
 
 ## Description
 
@@ -129,7 +129,7 @@ As a bonus, we also get some metadata about the dataset as constants, which, whe
 - **High-performance:** The generated data structures are generated without unnecessary branching or virtualization making the compiler produce optimal code.
 - **Key/Value support:** FastData can produce key/value lookup data structures
 
-For more details about the data structures, see [data structures](Docs/DataStructures.md).
+For more details about the data structures, see [data structures](Docs/Architecture/DataStructures.md).
 
 FastData supports several output programming languages.
 
@@ -159,7 +159,7 @@ FastData analyzes the input before emitting code. Numeric keys are analyzed for 
 
 The selected structure depends on that analysis and on the configured limits. Small sets often become direct conditionals or single-value checks, dense integer ranges can become range or bitset lookups, sparse integer sets can use succinct bit vectors, and larger or irregular sets fall back to hash-table variants.
 
-For a deeper explanation, see [how it works](Docs/HowWork.md), [data structures](Docs/DataStructures.md), and [optimizations](Docs/Optimizations.md).
+For a deeper explanation, see [how it works](Docs/Index.md), [data structures](Docs/Architecture/DataStructures.md), and [optimizations](Docs/Optimizations.md).
 
 ## Benchmarks
 

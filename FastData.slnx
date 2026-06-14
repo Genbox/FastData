@@ -30,12 +30,22 @@
         <Project Path="Src/FastData.SourceGenerator/FastData.SourceGenerator.csproj" />
     </Folder>
     <Folder Name="/_Docs/">
-        <File Path="AGENTS.md" />
-        <File Path="Docs/Architecture.md" />
-        <File Path="Docs/DataStructures.md" />
-        <File Path="Docs/HowWork.md" />
-        <File Path="Docs/Optimizations.md" />
+        <File Path="Docs/Index.md" />
         <File Path="README.md" />
+    </Folder>
+    <Folder Name="/_Docs/Architecture/">
+        <File Path="Docs/Architecture/DataStructures.md" />
+        <File Path="Docs/Architecture/EarlyExits.md" />
+        <File Path="Docs/Architecture/Generators.md" />
+        <File Path="Docs/Architecture/Hashing.md" />
+    </Folder>
+    <Folder Name="/_Docs/Development/">
+        <File Path="Docs/Development/CreatingEarlyExits.md" />
+        <File Path="Docs/Development/CreatingGenerators.md" />
+        <File Path="Docs/Development/ProjectStructure.md" />
+    </Folder>
+    <Folder Name="/_Docs/Misc/">
+        <File Path="Docs/Misc/Optimizations.md" />
     </Folder>
     <Folder Name="/_Github/">
         <File Path=".github/FUNDING.yml" />
