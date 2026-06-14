@@ -270,29 +270,11 @@ internal static class ComparisonReduction
 
     internal static Expression RemoveDuplicateCondition(Expression expression)
     {
-        const int comparisonDepth = 2;
+        if (TryGetAnd(expression, out _, out _))
+            return RemoveDuplicateComparisons(expression, ExpressionType.AndAlso, TryGetAnd);
 
-        if (TryGetAnd(expression, out Expression? left, out Expression? right))
-        {
-            if (TryGetComparisonExpression(left, out ExpressionType leftOp, out Expression? leftA, out Expression? leftB)
-                && ContainsMatchingComparison(right, leftOp, leftA, leftB, TryGetAnd, comparisonDepth))
-                return left;
-
-            if (TryGetComparisonExpression(right, out ExpressionType rightOp, out Expression? rightA, out Expression? rightB)
-                && ContainsMatchingComparison(left, rightOp, rightA, rightB, TryGetAnd, comparisonDepth))
-                return left;
-        }
-
-        if (TryGetOr(expression, out Expression? leftOr, out Expression? rightOr))
-        {
-            if (TryGetComparisonExpression(leftOr, out ExpressionType leftOp, out Expression? leftA, out Expression? leftB)
-                && ContainsMatchingComparison(rightOr, leftOp, leftA, leftB, TryGetOr, comparisonDepth))
-                return leftOr;
-
-            if (TryGetComparisonExpression(rightOr, out ExpressionType rightOp, out Expression? rightA, out Expression? rightB)
-                && ContainsMatchingComparison(leftOr, rightOp, rightA, rightB, TryGetOr, comparisonDepth))
-                return leftOr;
-        }
+        if (TryGetOr(expression, out _, out _))
+            return RemoveDuplicateComparisons(expression, ExpressionType.OrElse, TryGetOr);
 
         return expression;
     }
@@ -356,33 +338,63 @@ internal static class ComparisonReduction
         return false;
     }
 
-    private static bool ContainsMatchingComparison(
-        Expression expression,
-        ExpressionType op,
-        Expression left,
-        Expression right,
-        TryGetBinary tryGetBinary,
-        int depth)
+    private static Expression RemoveDuplicateComparisons(Expression expression, ExpressionType nodeType, TryGetBinary tryGetBinary)
     {
-        if (TryGetComparisonExpression(expression, out ExpressionType foundOp, out Expression? foundLeft, out Expression? foundRight)
-            && foundOp == op
-            && ExprHelpers.PropertyMatch(foundLeft, left)
-            && ExprHelpers.PropertyMatch(foundRight, right))
-            return true;
+        List<Expression> expressions = [];
+        Flatten(expression, tryGetBinary, expressions);
 
-        if (depth == 0)
-            return false;
-
-        if (tryGetBinary(expression, out Expression? childLeft, out Expression? childRight))
+        List<Expression> reduced = new List<Expression>(expressions.Count);
+        bool removedDuplicate = false;
+        foreach (Expression child in expressions)
         {
-            if (ContainsMatchingComparison(childLeft, op, left, right, tryGetBinary, depth - 1))
-                return true;
+            if (TryGetComparisonExpression(child, out ExpressionType op, out Expression? left, out Expression? right) && ContainsMatchingComparison(reduced, op, left, right))
+            {
+                removedDuplicate = true;
+                continue;
+            }
 
-            if (ContainsMatchingComparison(childRight, op, left, right, tryGetBinary, depth - 1))
+            reduced.Add(child);
+        }
+
+        if (!removedDuplicate)
+            return expression;
+
+        return RebuildBinaryChain(reduced, nodeType);
+    }
+
+    private static void Flatten(Expression expression, TryGetBinary tryGetBinary, List<Expression> expressions)
+    {
+        if (tryGetBinary(expression, out Expression? left, out Expression? right))
+        {
+            Flatten(left, tryGetBinary, expressions);
+            Flatten(right, tryGetBinary, expressions);
+            return;
+        }
+
+        expressions.Add(expression);
+    }
+
+    private static bool ContainsMatchingComparison(List<Expression> expressions, ExpressionType op, Expression left, Expression right)
+    {
+        foreach (Expression expression in expressions)
+        {
+            if (TryGetComparisonExpression(expression, out ExpressionType foundOp, out Expression? foundLeft, out Expression? foundRight)
+                && foundOp == op
+                && ExprHelpers.PropertyMatch(foundLeft, left)
+                && ExprHelpers.PropertyMatch(foundRight, right))
                 return true;
         }
 
         return false;
+    }
+
+    private static Expression RebuildBinaryChain(List<Expression> expressions, ExpressionType nodeType)
+    {
+        Expression result = expressions[0];
+        for (int i = 1; i < expressions.Count; i++)
+            result = MakeBinary(nodeType, result, expressions[i]);
+
+        return result;
     }
 
     private static bool ContainsOpposingComparison(

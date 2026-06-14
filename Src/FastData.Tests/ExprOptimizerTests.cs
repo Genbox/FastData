@@ -204,6 +204,40 @@ public sealed class ExprOptimizerTests
     }
 
     [Fact]
+    public void OptimizerKeepsNestedAndAlsoSiblingPredicate()
+    {
+        ParameterExpression x = Parameter(typeof(int), "x");
+        ParameterExpression y = Parameter(typeof(int), "y");
+        BinaryExpression a = GreaterThan(x, Constant(0));
+        BinaryExpression b = GreaterThan(y, Constant(0));
+
+        // Valid reduction: a && (a && b) -> a && b. The old duplicate removal incorrectly reduced this to a.
+        BinaryExpression expression = AndAlso(a, AndAlso(a, b));
+
+        AssertOptimizerPreservesSemantics(expression, x, y);
+
+        Func<int, int, bool> optimized = Lambda<Func<int, int, bool>>(ExprOptimizer.Visit(expression), x, y).Compile();
+        Assert.False(optimized(1, -1));
+    }
+
+    [Fact]
+    public void OptimizerKeepsNestedOrElseSiblingPredicate()
+    {
+        ParameterExpression x = Parameter(typeof(int), "x");
+        ParameterExpression y = Parameter(typeof(int), "y");
+        BinaryExpression a = GreaterThan(x, Constant(0));
+        BinaryExpression b = GreaterThan(y, Constant(0));
+
+        // Valid reduction: a || (a || b) -> a || b. The old duplicate removal incorrectly reduced this to a.
+        BinaryExpression expression = OrElse(a, OrElse(a, b));
+
+        AssertOptimizerPreservesSemantics(expression, x, y);
+
+        Func<int, int, bool> optimized = Lambda<Func<int, int, bool>>(ExprOptimizer.Visit(expression), x, y).Compile();
+        Assert.True(optimized(-1, 1));
+    }
+
+    [Fact]
     public async Task RangeOptimizationAndAlsoKeepsHigherBoundWhenReversed()
     {
         // Before: (x > 5) && (x > 3)
@@ -1270,6 +1304,18 @@ public sealed class ExprOptimizerTests
                                                                                   .UseDirectory("Verify/ExpressionOptimizer")
                                                                                   .UseFileName(testName)
                                                                                   .DisableDiff();
+
+    private static void AssertOptimizerPreservesSemantics(Expression expression, ParameterExpression x, ParameterExpression y)
+    {
+        Func<int, int, bool> original = Lambda<Func<int, int, bool>>(expression, x, y).Compile();
+        Func<int, int, bool> optimized = Lambda<Func<int, int, bool>>(ExprOptimizer.Visit(expression), x, y).Compile();
+
+        foreach (int xValue in new[] { -1, 1 })
+        {
+            foreach (int yValue in new[] { -1, 1 })
+                Assert.Equal(original(xValue, yValue), optimized(xValue, yValue));
+        }
+    }
 
     private sealed class BoolHolder
     {
