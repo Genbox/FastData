@@ -23,18 +23,18 @@ struct E {
 
 impl fastdata {
     const BUCKETS: [i8; 2] = [
-        1, 2
+        2, 1
     ];
 
     const ENTRIES: [E; 2] = [
-        E { hash_code: 12638153115695167470, next: -1, key: "test1" }, E { hash_code: 12638153115695167469, next: -1, key: "test2" }
+        E { hash_code: 49, next: -1, key: "test1" }, E { hash_code: 50, next: -1, key: "test2" }
     ];
 
     #[inline]
     unsafe fn get_hash(value: &str, mut length: i32) -> u64 {
         let data = value.as_bytes();
-        let mut hash: u64 = 14695981039346656037;
-        hash = ((hash.wrapping_mul(1099511628211)) ^ (ReadU8(data, (length - 1) as usize) as u64));
+        let mut hash: u64 = u64::MIN;
+        hash = (ReadU8(data, (length - 1) as usize) as u64);
         hash = hash;
 
         return hash;

@@ -11,6 +11,8 @@ internal sealed class Simulator(int length, GeneratorEncoding encoding, int capa
     private readonly Func<string, byte[]> _getBytes = StringHelper.GetBytesFunc(encoding);
     private readonly NoEqualityEmulator _set = new NoEqualityEmulator((uint)(length * capacityFactor));
 
+    internal int UnitSize { get; } = StringHelper.GetSize(encoding);
+
     internal Candidate Run(ReadOnlySpan<string> data, IStringHash stringHash, Func<double>? extraFitness = null)
     {
         _set.SetHash(stringHash.GetExpression().Compile());

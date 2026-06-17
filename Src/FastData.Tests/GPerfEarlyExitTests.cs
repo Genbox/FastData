@@ -56,6 +56,17 @@ public class GPerfEarlyExitTests
         Assert.False((generatorConfig.GeneratorFunctions & GeneratorFunction.IsAsciiOnly) != 0);
     }
 
+    [Fact]
+    public void Generate_IgnoreCaseNonAscii_Throws()
+    {
+        string[] keys = ["\u00c6ther"];
+        StringDataConfig config = new StringDataConfig { IgnoreCase = true };
+        CapturingGenerator generator = new CapturingGenerator(GeneratorEncoding.Utf16CodeUnits);
+
+        InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => FastDataGenerator.Generate(keys, config, generator));
+        Assert.Equal("IgnoreCase is only supported for ASCII string keys.", ex.Message);
+    }
+
     private sealed class CapturingGenerator(GeneratorEncoding encoding = GeneratorEncoding.AsciiBytes) : ICodeGenerator
     {
         public GeneratorConfigBase? Config { get; private set; }

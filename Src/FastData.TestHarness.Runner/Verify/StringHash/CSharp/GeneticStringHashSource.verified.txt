@@ -27,11 +27,11 @@ internal static class FastData
     };
 
     private static readonly sbyte[] _buckets = new sbyte[] {
-        1, 2
+        2, 1
     };
 
     private static readonly E[] _entries = {
-        new E("test1", -1, 12638153115695167470ul), new E("test2", -1, 12638153115695167469ul)
+        new E("test1", -1, 49ul), new E("test2", -1, 50ul)
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -40,8 +40,8 @@ internal static class FastData
         unchecked
         {
         ReadOnlySpan<byte> data = MemoryMarshal.AsBytes(value.AsSpan());
-        ulong hash = 14695981039346656037ul;
-        hash = ((hash * 1099511628211ul) ^ (ulong)ReadU16(data, (length - 2)));
+        ulong hash = ulong.MinValue;
+        hash = (ulong)ReadU16(data, (length - 2));
         hash = hash;
 
         return hash;
@@ -52,7 +52,7 @@ internal static class FastData
     public static bool Contains(string key)
     {
         int length = Length(key);
-        if ((length < 2))
+        if ((length < 1))
         {
          return false;
         }

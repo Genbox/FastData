@@ -172,6 +172,9 @@ public static partial class FastDataGenerator
 
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys.Span, cfg.IgnoreCase, generator.Encoding);
 
+        if (cfg.IgnoreCase && !props.CharacterData.AllAscii)
+            throw new InvalidOperationException("IgnoreCase is only supported for ASCII string keys.");
+
         if (!props.CharacterData.AllAscii && generator.Encoding == GeneratorEncoding.AsciiBytes)
             throw new InvalidOperationException("Your data has non-ASCII in it, and the generator is set to produce an ASCII API. That's not supported.");
 

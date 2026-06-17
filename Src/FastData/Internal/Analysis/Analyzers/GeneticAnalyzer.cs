@@ -147,6 +147,7 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
         ((IntGene)entity.Genes[2]).Value,
         ((IntGene)entity.Genes[3]).Value,
         ((IntGene)entity.Genes[4]).Value,
-        ignoreCase
+        ignoreCase,
+        sim.UnitSize
     );
 }

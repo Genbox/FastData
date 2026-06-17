@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Expressions;
@@ -21,7 +22,7 @@ internal sealed record GeneticStringHash : IStringHash
         0xFF51AFD7ED558CCD, 0xC4CEB9FE1A85EC53 //Murmur
     ];
 
-    internal GeneticStringHash(ArraySegment segment, int mixerSeed, int mixerIterations, int avalancheSeed, int avalancheIterations, bool ignoreCase = false)
+    internal GeneticStringHash(ArraySegment segment, int mixerSeed, int mixerIterations, int avalancheSeed, int avalancheIterations, bool ignoreCase = false, int unitSize = 1)
     {
         Segment = segment;
         MixerSeed = mixerSeed;
@@ -29,6 +30,7 @@ internal sealed record GeneticStringHash : IStringHash
         AvalancheSeed = avalancheSeed;
         AvalancheIterations = avalancheIterations;
         IgnoreCase = ignoreCase;
+        UnitSize = unitSize;
     }
 
     internal ArraySegment Segment { get; }
@@ -37,8 +39,9 @@ internal sealed record GeneticStringHash : IStringHash
     internal int AvalancheSeed { get; }
     internal int AvalancheIterations { get; }
     internal bool IgnoreCase { get; }
+    internal int UnitSize { get; }
     public AdditionalData[]? AdditionalData => null;
-    public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
+    public IEnumerable<IEarlyExit> GetMandatoryExits() => Segment.Length == -1 && Segment.Offset == 0 ? [] : [new LengthLessThanEarlyExit(Segment.GetRequiredLength(UnitSize))];
 
     public Expression<StringHashFunc> GetExpression() => ExpressionHashBuilder.Build([Segment], GetMixer(), GetAvalanche(), IgnoreCase);
 

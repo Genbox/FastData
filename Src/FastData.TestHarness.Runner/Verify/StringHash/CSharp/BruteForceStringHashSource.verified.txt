@@ -52,6 +52,11 @@ internal static class FastData
     public static bool Contains(string key)
     {
         int length = Length(key);
+        if ((length < 2))
+        {
+         return false;
+        }
+
 
 
         ulong hash = Hash(key, length * 2);

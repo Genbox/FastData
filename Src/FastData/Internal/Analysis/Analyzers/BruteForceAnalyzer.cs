@@ -69,7 +69,7 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
 
                         while (avGen.TryGet(out Avalanche avalanche))
                         {
-                            BruteForceStringHash spec = new BruteForceStringHash(segment, mixer, avalanche) { IgnoreCase = ignoreCase };
+                            BruteForceStringHash spec = new BruteForceStringHash(segment, mixer, avalanche, sim.UnitSize) { IgnoreCase = ignoreCase };
                             LogAvalanche(logger, ExpressionHelper.Print(avalanche));
 
                             Candidate current = sim.Run(data, spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));

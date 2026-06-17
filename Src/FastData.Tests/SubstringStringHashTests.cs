@@ -22,7 +22,7 @@ public class SubstringStringHashTests
     [Fact]
     public void GetBestHash_SharedPrefix_UsesRightSubstring()
     {
-        string[] data = Enumerable.Range(0, 16).Select(static x => $"shared-prefix-{x:x4}").ToArray();
+        string[] data = Enumerable.Range(0, 16).Select(static x => new string('a', 5 + x) + $"{x:x}").ToArray();
         Candidate candidate = GetCandidate(data);
         SubstringStringHash hash = Assert.IsType<SubstringStringHash>(candidate.StringHash);
 
@@ -42,6 +42,17 @@ public class SubstringStringHashTests
     }
 
     [Fact]
+    public void GetBestHash_SharedEdges_UsesInteriorSubstring()
+    {
+        string[] data = Enumerable.Range(0, 16).Select(static x => $"aaaa{x:x}zzzz").ToArray();
+        Candidate candidate = GetCandidate(data);
+        SubstringStringHash hash = Assert.IsType<SubstringStringHash>(candidate.StringHash);
+
+        Assert.True(hash.Segment.Offset > 0);
+        AssertLookups(data, hash.GetExpression().Compile());
+    }
+
+    [Fact]
     public void GetMandatoryExits_ReturnsSegmentLengthGuard()
     {
         SubstringStringHash hash = new SubstringStringHash(new ArraySegment(2, 4, Alignment.Right));
@@ -49,6 +60,10 @@ public class SubstringStringHashTests
 
         LengthLessThanEarlyExit length = Assert.IsType<LengthLessThanEarlyExit>(exit);
         Assert.Equal(6, length.Value);
+
+        SubstringStringHash utf16Hash = new SubstringStringHash(new ArraySegment(2, 4, Alignment.Right), false, 2);
+        LengthLessThanEarlyExit utf16Length = Assert.IsType<LengthLessThanEarlyExit>(Assert.Single(utf16Hash.GetMandatoryExits()));
+        Assert.Equal(3, utf16Length.Value);
     }
 
     private static Candidate GetCandidate(string[] data)

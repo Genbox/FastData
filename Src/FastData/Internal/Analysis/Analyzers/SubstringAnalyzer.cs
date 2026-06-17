@@ -11,7 +11,8 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
 internal sealed class SubstringAnalyzer(StringKeyProperties props, SubstringAnalyzerConfig config, Simulator sim, GeneratorEncoding encoding, bool ignoreCase = false) : IStringHashAnalyzer
 {
-    private readonly Func<string, byte[]> _getBytes = StringHelper.GetBytesFunc(encoding);
+    private readonly Func<string, byte[]> _getBytes = encoding == GeneratorEncoding.Unknown ? static _ => [] : StringHelper.GetBytesFunc(encoding);
+    private readonly int _unitSize = encoding == GeneratorEncoding.Unknown ? 1 : sim.UnitSize;
 
     public bool IsAppropriate() => encoding != GeneratorEncoding.Unknown && config.MaxReturned > 0 && config.MaxSliceByteLength > 0 && config.MinUniqueFraction > 0 && (!ignoreCase || props.CharacterData.AllAscii);
 
@@ -23,10 +24,14 @@ internal sealed class SubstringAnalyzer(StringKeyProperties props, SubstringAnal
 
         List<Candidate> candidates = new List<Candidate>(config.MaxReturned * 2);
 
-        for (int length = 1; length <= maxLength; length <<= 1)
+        // Keep segments aligned to the target encoding's lookup unit. For C# this avoids hashing half of a UTF-16 code unit.
+        for (int length = _unitSize; length <= maxLength; length += _unitSize)
         {
-            TryAdd(data, candidates, new ArraySegment(0, length, Alignment.Left));
-            TryAdd(data, candidates, new ArraySegment(0, length, Alignment.Right));
+            for (int offset = 0; offset + length <= props.LengthData.MinByteLength; offset += _unitSize)
+            {
+                TryAdd(data, candidates, new ArraySegment((uint)offset, length, Alignment.Left));
+                TryAdd(data, candidates, new ArraySegment((uint)offset, length, Alignment.Right));
+            }
         }
 
         candidates.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
@@ -46,32 +51,52 @@ internal sealed class SubstringAnalyzer(StringKeyProperties props, SubstringAnal
         if (uniqueFraction < config.MinUniqueFraction)
             return;
 
-        SubstringStringHash stringHash = new SubstringStringHash(segment, ignoreCase);
+        SubstringStringHash stringHash = new SubstringStringHash(segment, ignoreCase, _unitSize);
         candidates.Add(sim.Run(data, stringHash, () => uniqueFraction));
     }
 
     private int CountUnique(ReadOnlySpan<string> data, ArraySegment segment)
     {
-        HashSet<ulong> seen = new HashSet<ulong>();
+        HashSet<byte[]> seen = new HashSet<byte[]>(ByteArrayComparer.Instance);
 
         foreach (string key in data)
         {
             byte[] bytes = _getBytes(key);
-            ulong value = 0;
-            int start = segment.Alignment == Alignment.Right ? bytes.Length - segment.Length : 0;
+            int start = segment.Alignment == Alignment.Right ? bytes.Length - (int)segment.Offset - segment.Length : (int)segment.Offset;
+            byte[] slice = new byte[segment.Length];
 
-            for (int i = 0; i < segment.Length; i++)
+            if (ignoreCase)
             {
-                byte b = bytes[start + i];
-                if (ignoreCase)
-                    b = (byte)(b | 0x20);
-
-                value |= (ulong)b << (i * 8);
+                for (int i = 0; i < slice.Length; i++)
+                    slice[i] = (byte)(bytes[start + i] | 0x20);
+            }
+            else
+            {
+                Array.Copy(bytes, start, slice, 0, slice.Length);
             }
 
-            seen.Add(value);
+            seen.Add(slice);
         }
 
         return seen.Count;
+    }
+
+    private sealed class ByteArrayComparer : IEqualityComparer<byte[]>
+    {
+        internal static ByteArrayComparer Instance { get; } = new ByteArrayComparer();
+
+        public bool Equals(byte[]? x, byte[]? y) => ReferenceEquals(x, y) || (x != null && y != null && x.AsSpan().SequenceEqual(y));
+
+        public int GetHashCode(byte[] obj)
+        {
+            unchecked
+            {
+                int hash = 17;
+                foreach (byte b in obj)
+                    hash = (hash * 31) + b;
+
+                return hash;
+            }
+        }
     }
 }

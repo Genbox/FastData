@@ -26,7 +26,7 @@ public sealed class FastDataAttribute<TKey> : Attribute
     /// <summary>Gets or sets the generated structure type. The default value lets FastData choose automatically.</summary>
     public StructureType StructureType { get; set; }
 
-    /// <summary>Gets or sets a value indicating whether string keys use ordinal-ignore-case comparison.</summary>
+    /// <summary>Gets or sets a value indicating whether ASCII string keys use ordinal-ignore-case comparison.</summary>
     public bool IgnoreCase { get; set; }
 
     /// <summary>Gets or sets the namespace for the generated C# type.</summary>

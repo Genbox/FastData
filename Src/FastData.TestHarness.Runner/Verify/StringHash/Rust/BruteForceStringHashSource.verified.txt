@@ -43,6 +43,11 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: &str) -> bool {
         let mut length: i32 = Length(key);
+        if ((length < 2))
+        {
+         return false;
+        }
+
 
         let hash = unsafe { Self::get_hash(key, length) };
         let index = hash % 3u64;

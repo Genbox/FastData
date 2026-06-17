@@ -13,7 +13,7 @@ public sealed class StringDataConfig : DataConfig
         StructureSettings.AddDefault(KnownSettings.RoundModuloToPowerOfTwoThreshold, 0.125f);
     }
 
-    /// <summary>Enable case-insensitive lookups for string keys.</summary>
+    /// <summary>Enable case-insensitive lookups for ASCII string keys.</summary>
     public bool IgnoreCase { get; set; }
 
     /// <summary>Configuration for analyzers. Set to null to disable analysis.</summary>
