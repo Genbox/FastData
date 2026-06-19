@@ -11,7 +11,7 @@ internal class RustLanguageDef : ILanguageDef
     public IList<ITypeDef> TypeDefinitions => new List<ITypeDef>
     {
         new NullTypeDef("None"),
-        new IntegerTypeDef<char>("char", char.MinValue, char.MaxValue, "char::MIN", "char::MAX", static value => "'" + EscapeChar(value) + "'"),
+        new IntegerTypeDef<char>("u16", char.MinValue, char.MaxValue, "0u16", "u16::MAX", static value => ((int)value).ToString(NumberFormatInfo.InvariantInfo) + "u16"),
         new IntegerTypeDef<sbyte>("i8", sbyte.MinValue, sbyte.MaxValue, "i8::MIN", "i8::MAX"),
         new IntegerTypeDef<byte>("u8", byte.MinValue, byte.MaxValue, "u8::MIN", "u8::MAX"),
         new IntegerTypeDef<short>("i16", short.MinValue, short.MaxValue, "i16::MIN", "i16::MAX"),
@@ -64,11 +64,11 @@ internal class RustLanguageDef : ILanguageDef
     {
         '\0' => "\\0",
         '\n' => "\\n",
-        '\r' => "\\r",
-        '\t' => "\\t",
-        '\\' => "\\\\",
-        '\"' => "\\\"",
-        '\'' => "\\'",
+            '\r' => "\\r",
+            '\t' => "\\t",
+            '\\' => "\\\\",
+            '\"' => "\\\"",
+            '\'' => "\\'",
         < ' ' => "\\u{" + ((int)ch).ToString("X", NumberFormatInfo.InvariantInfo) + "}",
         _ => ch.ToString()
     };

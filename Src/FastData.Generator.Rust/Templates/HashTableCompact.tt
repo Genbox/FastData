@@ -29,7 +29,7 @@ struct E {
     <#= FieldModifier #>ENTRIES: [E; <#= Data.Entries.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        string hashPart = Context.StoreHashCode ? $"hash_code: {x.Hash.ToStringInvariant()}, " : string.Empty;
+        string hashPart = Context.StoreHashCode ? $"hash_code: {TypeMap.ToValueLabel(x.Hash)}, " : string.Empty;
         string valuePart = Data.ValueCount > 0 ? $", value: {valueLabels[i]}" : string.Empty;
         return $"E {{ {hashPart}key: {TypeMap.ToValueLabel(x.Key)}{valuePart} }}";
     }, 8) #>

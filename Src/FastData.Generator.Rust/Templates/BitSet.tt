@@ -4,6 +4,13 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.BitSetTemplateData" name="Data" #>
 
 <#
+    string offsetExpression = Type.GetTypeCode(Model.KeyType) switch
+    {
+        TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 => $"(({LookupKeyName} as i64) - (Self::MIN_KEY as i64)) as u64",
+        TypeCode.Int64 => $"(({LookupKeyName} as i128) - (Self::MIN_KEY as i128)) as u64",
+        _ => $"{LookupKeyName}.wrapping_sub(Self::MIN_KEY) as u64"
+    };
+
     if (Data.HasOccupancy)
     {
 #>
@@ -26,7 +33,7 @@
     <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
-        let offset = (<#= LookupKeyName #> - Self::MIN_KEY) as u64;
+        let offset = <#= offsetExpression #>;
 <#
         if (Data.HasOccupancy)
         {
@@ -51,7 +58,7 @@
     <#= MethodAttribute #>
     <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
 <#= GetMethodHeader(MethodType.TryLookup) #>
-        let offset = (<#= LookupKeyName #> - Self::MIN_KEY) as u64;
+        let offset = <#= offsetExpression #>;
 <#
         if (Data.HasOccupancy)
         {
