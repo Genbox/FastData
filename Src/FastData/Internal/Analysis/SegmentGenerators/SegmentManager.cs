@@ -11,6 +11,7 @@ internal static class SegmentManager
     {
         HashSet<ArraySegment> uniq = new HashSet<ArraySegment>();
 
+        // Collect from every generator before yielding so cross-generator candidates can be ranked by data signal.
         foreach (ISegmentGenerator generator in GetGenerators())
         {
             if (!generator.IsAppropriate(props))
@@ -21,10 +22,12 @@ internal static class SegmentManager
                 Debug.Assert(segment.Length is -1 or >= 1); //Length must always be -1 (unconstrained) or more than 0
 
                 //Only return unique segments
-                if (uniq.Add(segment))
-                    yield return segment;
+                uniq.Add(segment);
             }
         }
+
+        foreach (ArraySegment segment in SegmentScorer.Order(props, uniq))
+            yield return segment;
     }
 
     // Ordered by a mix of complexity and value. DeltaGenerator should produce the best results the fastest.
