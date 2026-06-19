@@ -1,3 +1,4 @@
+using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Enums;
@@ -6,7 +7,7 @@ using Genbox.FastData.Internal.Misc;
 namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
 /// <summary>Creates edge-grams with offsets of 0 and lengths [1..max]</summary>
-internal sealed class EdgeGramGenerator(int maxLength) : ISegmentGenerator
+internal sealed class EdgeGramGenerator(EdgeGramGeneratorConfig config) : ISegmentGenerator
 {
     public bool IsAppropriate(StringKeyProperties props) => true;
 
@@ -14,7 +15,7 @@ internal sealed class EdgeGramGenerator(int maxLength) : ISegmentGenerator
     {
         int len;
 
-        int max = Math.Min(props.LengthData.MinByteLength, maxLength); //We cannot segment above the shortest encoded byte string.
+        int max = Math.Min(props.LengthData.MinByteLength, config.MaxSegmentLength); //We cannot segment above the shortest encoded byte string.
 
         //Generates:
         //[t]est

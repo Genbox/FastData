@@ -3,7 +3,7 @@ using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Enums;
 using Genbox.FastData.Internal.Misc;
 
-namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
+namespace Genbox.FastData.Internal.Analysis;
 
 internal static class SegmentScorer
 {

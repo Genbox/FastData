@@ -122,7 +122,7 @@ internal static class AnalysisTest
 
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        GeneticAnalyzer analyzer = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.Utf16CodeUnits), loggerFactory.CreateLogger<GeneticAnalyzer>());
+        GeneticAnalyzer analyzer = new GeneticAnalyzer(props, new GeneticAnalyzerConfig(), new SegmentGeneratorConfig(), new Simulator(data.Length, GeneratorEncoding.Utf16CodeUnits), loggerFactory.CreateLogger<GeneticAnalyzer>());
         PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());
     }
 

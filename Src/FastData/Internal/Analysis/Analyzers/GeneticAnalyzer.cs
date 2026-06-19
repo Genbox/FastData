@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed partial class GeneticAnalyzer(StringKeyProperties props, GeneticAnalyzerConfig config, Simulator sim, ILogger<GeneticAnalyzer> logger, bool ignoreCase = false) : IStringHashAnalyzer
+internal sealed partial class GeneticAnalyzer(StringKeyProperties props, GeneticAnalyzerConfig geneticConfig, SegmentGeneratorConfig generatorConfig, Simulator sim, ILogger<GeneticAnalyzer> logger, bool ignoreCase = false) : IStringHashAnalyzer
 {
     /*
      This is a genetic algorithm that determines the best configuration from a random population, that via evolution is biased
@@ -87,10 +87,10 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
     public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<string> data)
     {
         GeneticEngineConfig cfg = new GeneticEngineConfig();
-        cfg.PopulationSize = config.PopulationSize;
-        cfg.ShuffleParents = config.ShuffleParents;
+        cfg.PopulationSize = geneticConfig.PopulationSize;
+        cfg.ShuffleParents = geneticConfig.ShuffleParents;
 
-        ArraySegment[] segments = SegmentManager.Generate(props).ToArray();
+        ArraySegment[] segments = SegmentManager.Generate(props, generatorConfig).ToArray();
         LogSegmentCount(logger, segments.Length);
 
         GeneticEngine engine = new GeneticEngine(cfg, [
@@ -101,13 +101,13 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
             new IntGene(nameof(GeneticStringHash.AvalancheIterations), 1, 0, 3)
         ], logger);
 
-        DefaultRandom random = new DefaultRandom(config.RandomSeed);
+        DefaultRandom random = new DefaultRandom(geneticConfig.RandomSeed);
 
         TournamentSelection selection = new TournamentSelection(4, random);
         OnePointCrossOver crossOver = new OnePointCrossOver(random);
         UniformMutation mutation = new UniformMutation(0.05, random);
         EliteReinsertion reinsertion = new EliteReinsertion(0.1);
-        MaxGenerationsTermination termination = new MaxGenerationsTermination(config.MaxGenerations);
+        MaxGenerationsTermination termination = new MaxGenerationsTermination(geneticConfig.MaxGenerations);
 
         MinHeap<Candidate> heap = new MinHeap<Candidate>(10);
 

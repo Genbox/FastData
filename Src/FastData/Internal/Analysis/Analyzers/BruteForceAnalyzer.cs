@@ -47,7 +47,7 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
     public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<string> data)
     {
         MinHeap<Candidate> heap = new MinHeap<Candidate>(config.MaxReturned);
-        BruteForceGenerator segGen = new BruteForceGenerator(8);
+        BruteForceGenerator segGen = new BruteForceGenerator(new BruteForceGeneratorConfig());
         ArraySegment[] segments = SegmentScorer.Order(props, segGen.Generate(props)).ToArray();
         Candidate? bestPerfect = null;
 

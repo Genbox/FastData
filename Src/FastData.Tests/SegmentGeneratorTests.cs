@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
@@ -43,7 +44,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     [Fact]
     public void BruteForceGenerator_InterleavesLeftAndRightSegments()
     {
-        BruteForceGenerator gen = new BruteForceGenerator(8);
+        BruteForceGenerator gen = new BruteForceGenerator(new BruteForceGeneratorConfig());
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(["abcd"], false, GeneratorEncoding.AsciiBytes);
 
         ArraySegment[] res = gen.Generate(props).Take(4).ToArray();
@@ -60,7 +61,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     public void BruteForceGeneratorTest()
     {
         // The generator should provide n*n number of results for strings up to length 8
-        BruteForceGenerator gen = new BruteForceGenerator(8);
+        BruteForceGenerator gen = new BruteForceGenerator(new BruteForceGeneratorConfig());
         Random rng = new Random(42);
 
         byte[] counts = [2, 6, 12, 20, 30, 42, 56, 72, 72, 72];
@@ -79,7 +80,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     public void EdgeGramGeneratorTest()
     {
         // The generator should provide n*n number of results for strings up to length 8
-        EdgeGramGenerator gen = new EdgeGramGenerator(8);
+        EdgeGramGenerator gen = new EdgeGramGenerator(new EdgeGramGeneratorConfig());
         Random rng = new Random(42);
 
         for (int i = 1; i <= 10; i++)
@@ -98,7 +99,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     public void DeltaGeneratorTest()
     {
         // The generator should provide n*n number of results for strings up to length 8
-        DeltaGenerator gen = new DeltaGenerator();
+        DeltaGenerator gen = new DeltaGenerator(new DeltaGeneratorConfig());
         Random rng = new Random(42);
 
         for (int i = 8; i <= 32; i++)
@@ -121,16 +122,16 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     {
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(input, false, GeneratorEncoding.AsciiBytes);
 
-        DeltaGenerator gen = new DeltaGenerator();
+        DeltaGenerator gen = new DeltaGenerator(new DeltaGeneratorConfig());
         Assert.True(gen.IsAppropriate(props)); //We allow delta always
 
-        ArraySegment expected = new ArraySegment(offset, length, Alignment.Left);
         ArraySegment[] res = gen.Generate(props).ToArray();
 
         foreach (ArraySegment segment in res)
             o.WriteLine($"{segment}. res: {string.Join(",", input.Select(x => SegmentHelper.InsertSegmentBounds(x, segment)))}");
 
-        Assert.Equal(expected, res[0]);
+        ArraySegment[] expected = Enumerable.Range(1, length).Select(x => new ArraySegment(offset, x, Alignment.Left)).ToArray();
+        Assert.Equal(expected, res.Take(length).ToArray());
     }
 
     [Theory]
@@ -139,8 +140,34 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     {
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(input, false, GeneratorEncoding.AsciiBytes);
 
-        DeltaGenerator gen = new DeltaGenerator();
+        DeltaGenerator gen = new DeltaGenerator(new DeltaGeneratorConfig());
         Assert.Empty(gen.Generate(props));
+    }
+
+    [Fact]
+    internal void NullGeneratorConfigsDisableSegmentGenerationTest()
+    {
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(["abcd", "abXY"], false, GeneratorEncoding.AsciiBytes);
+        SegmentGeneratorConfig config = new SegmentGeneratorConfig
+        {
+            DeltaGeneratorConfig = null,
+            EdgeGramGeneratorConfig = null,
+            BruteForceGeneratorConfig = null,
+            OffsetGeneratorConfig = null
+        };
+
+        Assert.Empty(SegmentManager.Generate(props, config));
+    }
+
+    [Theory][MemberData(nameof(GetMaxSegmentLengthGenerators))]
+    internal void GeneratorMaxSegmentLengthIsRespectedTest(ISegmentGenerator generator, string[] input, ArraySegment expected, ArraySegment unexpected)
+    {
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(input, false, GeneratorEncoding.AsciiBytes);
+        ArraySegment[] res = generator.Generate(props).ToArray();
+
+        Assert.All(res, segment => Assert.True(segment.Length <= 2, segment.ToString()));
+        Assert.Contains(expected, res);
+        Assert.DoesNotContain(unexpected, res);
     }
 
     private static string[] GenerateStrings(Random rng, int len, int count)
@@ -155,8 +182,15 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
 
     internal static TheoryData<ISegmentGenerator, int> GetGenerators() => new TheoryData<ISegmentGenerator, int>
     {
-        { new BruteForceGenerator(8), 8 },
-        { new EdgeGramGenerator(8), 8 },
-        { new OffsetGenerator(), 8 } // There is no maxlength, but we test up to 8
+        { new BruteForceGenerator(new BruteForceGeneratorConfig()), 8 },
+        { new EdgeGramGenerator(new EdgeGramGeneratorConfig()), 8 },
+        { new OffsetGenerator(new OffsetGeneratorConfig()), 8 } // There is no maxlength, but we test up to 8
+    };
+
+    internal static TheoryData<ISegmentGenerator, string[], ArraySegment, ArraySegment> GetMaxSegmentLengthGenerators() => new TheoryData<ISegmentGenerator, string[], ArraySegment, ArraySegment>
+    {
+        { new DeltaGenerator(new DeltaGeneratorConfig { MaxSegmentLength = 2 }), ["aa", "aaXYZ"], new ArraySegment(2, 2, Alignment.Left), new ArraySegment(2, 3, Alignment.Left) },
+        { new BruteForceGenerator(new BruteForceGeneratorConfig { MaxSegmentLength = 2 }), ["abcd"], new ArraySegment(0, 2, Alignment.Left), new ArraySegment(0, 3, Alignment.Left) },
+        { new EdgeGramGenerator(new EdgeGramGeneratorConfig { MaxSegmentLength = 2 }), ["abcd"], new ArraySegment(0, 2, Alignment.Left), new ArraySegment(0, 3, Alignment.Left) }
     };
 }

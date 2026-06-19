@@ -1,3 +1,4 @@
+using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
@@ -9,10 +10,10 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [MemoryDiagnoser]
 public class SegmentGeneratorsBenchmarks
 {
-    private readonly BruteForceGenerator _bfGen = new BruteForceGenerator(8);
-    private readonly DeltaGenerator _deltaGen = new DeltaGenerator();
-    private readonly EdgeGramGenerator _egGen = new EdgeGramGenerator(8);
-    private readonly OffsetGenerator _ofGen = new OffsetGenerator();
+    private readonly BruteForceGenerator _bfGen = new BruteForceGenerator(new BruteForceGeneratorConfig());
+    private readonly DeltaGenerator _deltaGen = new DeltaGenerator(new DeltaGeneratorConfig());
+    private readonly EdgeGramGenerator _egGen = new EdgeGramGenerator(new EdgeGramGeneratorConfig());
+    private readonly OffsetGenerator _ofGen = new OffsetGenerator(new OffsetGeneratorConfig());
 
     //We start at 8 and go up to 100 to cover as many cases as possible
     private readonly StringKeyProperties _props = KeyAnalyzer.GetStringProperties(Enumerable.Range(8, 100).Select(x => TestHelper.GenerateRandomString(Random.Shared, x)).ToArray(), false, GeneratorEncoding.Utf16CodeUnits);

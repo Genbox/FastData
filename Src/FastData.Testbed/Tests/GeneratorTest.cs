@@ -1,3 +1,4 @@
+using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis;
@@ -15,10 +16,10 @@ internal static class GeneratorTest
         string[] data = ["cake", "fish", "horse", "internet", "word", "what"];
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
 
-        TestGenerators(data, props, new BruteForceGenerator(8));
-        TestGenerators(data, props, new EdgeGramGenerator(8));
-        TestGenerators(data, props, new OffsetGenerator());
-        TestGenerators(data, props, new DeltaGenerator());
+        TestGenerators(data, props, new BruteForceGenerator(new BruteForceGeneratorConfig()));
+        TestGenerators(data, props, new EdgeGramGenerator(new EdgeGramGeneratorConfig()));
+        TestGenerators(data, props, new OffsetGenerator(new OffsetGeneratorConfig()));
+        TestGenerators(data, props, new DeltaGenerator(new DeltaGeneratorConfig()));
     }
 
     private static void TestGenerators(string[] data, StringKeyProperties props, ISegmentGenerator generator)

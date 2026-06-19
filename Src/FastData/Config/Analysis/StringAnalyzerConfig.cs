@@ -11,4 +11,5 @@ public sealed class StringAnalyzerConfig
     public BruteForceAnalyzerConfig? BruteForceAnalyzerConfig { get; set; } = new BruteForceAnalyzerConfig();
     public GeneticAnalyzerConfig? GeneticAnalyzerConfig { get; set; } = new GeneticAnalyzerConfig();
     public GPerfAnalyzerConfig? GPerfAnalyzerConfig { get; set; } = new GPerfAnalyzerConfig();
+    public SegmentGeneratorConfig SegmentGeneratorConfig { get; set; } = new SegmentGeneratorConfig();
 }

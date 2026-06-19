@@ -39,7 +39,7 @@ internal static class HashBenchmark
 
         if (cfg.GeneticAnalyzerConfig != null)
         {
-            GeneticAnalyzer ga = new GeneticAnalyzer(props, cfg.GeneticAnalyzerConfig, sim, factory.CreateLogger<GeneticAnalyzer>(), ignoreCase);
+            GeneticAnalyzer ga = new GeneticAnalyzer(props, cfg.GeneticAnalyzerConfig, cfg.SegmentGeneratorConfig, sim, factory.CreateLogger<GeneticAnalyzer>(), ignoreCase);
             if (ga.IsAppropriate())
                 candidates.AddRange(ga.GetCandidates(data));
         }

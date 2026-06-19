@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
 using Genbox.FastData.Internal.Enums;
@@ -6,8 +6,12 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
-/// <summary>This generator uses the delta map from string analysis to provide segments that avoids areas with identical characters and instead try and target areas of high deltas (differences in characters). It is suitable for large strings where brute-force is infeasible.</summary>
-internal sealed class DeltaGenerator : ISegmentGenerator
+/// <summary>Generates string segments from XOR-based delta maps produced during string analysis.</summary>
+/// <remarks>
+/// Delta maps are fast entropy approximations: a non-zero value indicates that encoded bytes differ at that position across the analyzed keys.
+/// This generator converts contiguous non-zero runs into prefix segments for both left- and right-aligned maps.
+/// </remarks>
+internal sealed class DeltaGenerator(DeltaGeneratorConfig config) : ISegmentGenerator
 {
     public bool IsAppropriate(StringKeyProperties props) => true;
 
@@ -65,71 +69,56 @@ internal sealed class DeltaGenerator : ISegmentGenerator
     As we can see, there are no interesting segments for this particular input when it is right-aligned.
     */
 
+    /// <summary>Generates progressive prefix segments from non-zero delta-map runs.</summary>
+    /// <remarks>
+    /// When <see cref="DeltaGeneratorConfig.MaxSegmentLength"/> is <c>-1</c>, segments are kept within the shortest encoded key length.
+    /// Positive values cap the emitted segment length and allow segments beyond the shortest encoded key length.
+    /// </remarks>
     public IEnumerable<ArraySegment> Generate(StringKeyProperties props)
     {
+        // We start from the left, which is faster due to not having to do right-align checks
         if (props.DeltaData.LeftMap != null)
         {
-            // We start from the left, which is faster due to not having to do right-align checks
-            foreach (ArraySegment segment in CalculateSegments(props.DeltaData.LeftMap))
-            {
-                // Left Alignment: offset + length <= Min
-                int maxLength = (int)(props.LengthData.MinByteLength - segment.Offset);
-                int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
-
-                if (length > 0)
-                    yield return new ArraySegment(segment.Offset, length, Alignment.Left);
-            }
+            foreach (ArraySegment segment in GenerateAligned(props.DeltaData.LeftMap, props.LengthData.MinByteLength, config.MaxSegmentLength, Alignment.Left))
+                yield return segment;
         }
 
+        // Process right-aligned segments
         if (props.DeltaData.RightMap != null)
         {
-            // Process right-aligned segments
-            foreach (ArraySegment segment in CalculateSegments(props.DeltaData.RightMap))
-            {
-                // Right Alignment: offset + length <= Min
-                int maxLength = (int)(props.LengthData.MinByteLength - segment.Offset);
-                int length = maxLength < 0 ? 0 : Math.Min(segment.Length, maxLength);
-
-                if (length > 0)
-                    yield return new ArraySegment(segment.Offset, length, Alignment.Right);
-            }
+            foreach (ArraySegment segment in GenerateAligned(props.DeltaData.RightMap, props.LengthData.MinByteLength, config.MaxSegmentLength, Alignment.Right))
+                yield return segment;
         }
     }
 
-    /// <summary>Returns segments with increasing length. It starts with the highest variance segment first and then continues to lower ones</summary>
-    private static IEnumerable<ArraySegment> CalculateSegments(int[] deltaMap)
+    private static IEnumerable<ArraySegment> GenerateAligned(int[] deltaMap, int minByteLength, int maxSegmentLength, Alignment alignment)
     {
-        // Use the delta map to generate segments.
-        IEnumerable<ArraySegment> segments = GetSegments(deltaMap);
-
-        // We sort the segments in order of variance
-        return segments.OrderByDescending(segment => ComputeVariance(segment, deltaMap));
-    }
-
-    /// <summary>Computes the highest variance (difference between min and max of delta)</summary>
-    private static int ComputeVariance(ArraySegment segment, int[] data)
-    {
-        if (segment.Offset > data.Length)
-            return 0;
-
-        int min = int.MaxValue;
-        int max = int.MinValue;
-        for (uint i = segment.Offset; i < Math.Min(data.Length, segment.Offset + segment.Length); i++)
+        foreach ((uint start, uint offset) in GetSegments(deltaMap))
         {
-            min = Math.Min(data[i], min);
-            max = Math.Max(data[i], max);
+            int runLength = (int)(offset - start);
+            int lengthLimit;
+
+            if (maxSegmentLength == -1)
+            {
+                int remainingMinLength = minByteLength - (int)start;
+                if (remainingMinLength <= 0)
+                    continue;
+
+                lengthLimit = Math.Min(runLength, remainingMinLength);
+            }
+            else
+            {
+                lengthLimit = Math.Min(runLength, maxSegmentLength);
+            }
+
+            for (int length = 1; length <= lengthLimit; length++)
+                yield return new ArraySegment(start, length, alignment);
         }
-
-        int variance = Math.Abs(max - min);
-
-        if (segment.Length == 1)
-            Debug.Assert(variance == 0); //Segments with length 1, should have a variance of 0
-
-        return variance;
     }
 
-    /// <summary>Finds segments in the strings using a delta map</summary>
-    private static IEnumerable<ArraySegment> GetSegments(int[] arr)
+    /// <summary>Finds contiguous non-zero ranges in a delta map.</summary>
+    /// <returns>Ranges with an inclusive start and exclusive offset.</returns>
+    private static IEnumerable<(uint start, uint offset)> GetSegments(int[] arr)
     {
         uint offset = 0;
         while (offset < arr.Length)
@@ -144,7 +133,7 @@ internal sealed class DeltaGenerator : ISegmentGenerator
             while (offset < arr.Length && arr[offset] != 0)
                 offset++;
 
-            yield return new ArraySegment(start, (int)(offset - start), Alignment.Unknown);
+            yield return (start, offset);
         }
     }
 }
