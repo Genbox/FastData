@@ -2,6 +2,7 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Abstracts;
 using Genbox.FastData.Generator.Definitions;
 using Genbox.FastData.Generators.Abstracts;
+using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Generator;
 
@@ -29,6 +30,11 @@ public sealed class TypeMap : ITypeMap
             _index[idx] = spec;
         }
     }
+
+    /// <summary>Gets the string length for the encoding model used by this type map.</summary>
+    /// <param name="value">The string value.</param>
+    /// <returns>The length in the units used by the target-language string type.</returns>
+    public int GetStringLength(string value) => StringHelper.GetLengthFunc(_encoding)(value);
 
     /// <summary>Gets the target-language literal for a null value.</summary>
     /// <returns>The target-language null literal.</returns>

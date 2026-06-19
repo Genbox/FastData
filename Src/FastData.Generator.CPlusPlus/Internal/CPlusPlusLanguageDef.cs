@@ -88,7 +88,7 @@ internal class CPlusPlusLanguageDef : ILanguageDef
 
     private static string EscapeChar(char ch) => ch switch
     {
-        '\0' => "\\0",
+        '\0' => "\\000",
         '\a' => "\\a",
         '\b' => "\\b",
         '\f' => "\\f",
@@ -99,7 +99,7 @@ internal class CPlusPlusLanguageDef : ILanguageDef
         '\\' => "\\\\",
         '\"' => "\\\"",
         '\'' => "\\'",
-        < ' ' => "\\u" + ((int)ch).ToString("X4", NumberFormatInfo.InvariantInfo),
+        < ' ' => "\\" + Convert.ToString(ch, 8).PadLeft(3, '0'),
         _ => ch.ToString()
     };
 

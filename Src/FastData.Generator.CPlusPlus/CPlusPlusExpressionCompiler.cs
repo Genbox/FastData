@@ -47,7 +47,7 @@ public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompile
     {
         if (node.Object != null && node.Arguments.Count > 0 && node.Arguments[0] is ConstantExpression constExpr && constExpr.Value is string literal)
         {
-            int length = literal.Length;
+            int length = map.GetStringLength(literal);
 
             Visit(node.Object);
             if (isPrefix)

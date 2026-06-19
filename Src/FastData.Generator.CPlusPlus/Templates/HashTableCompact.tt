@@ -48,7 +48,7 @@
     <#= FieldModifier(false) #>std::array<e, <#= Data.Entries.Length.ToStringInvariant() #>> entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        string hashPart = Context.StoreHashCode ? $", {x.Hash.ToStringInvariant()}" : string.Empty;
+        string hashPart = Context.StoreHashCode ? $", {TypeMap.ToValueLabel(x.Hash)}" : string.Empty;
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : string.Empty;
         return $"e({TypeMap.ToValueLabel(x.Key)}{hashPart}{valuePart})";
     }, 8) #>
