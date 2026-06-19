@@ -25,7 +25,11 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
         for (int i = 0; i < config.PopulationSize; i++)
         {
             Entity p = new Entity(genes); // Clone the genes into each entity
-            p.ForceMutate(random);
+
+            // Keep one unmutated entity as the analyzer's hot-start; the rest preserve population diversity.
+            if (i != 0)
+                p.ForceMutate(random);
+
             population.Add(ref p);
         }
 
