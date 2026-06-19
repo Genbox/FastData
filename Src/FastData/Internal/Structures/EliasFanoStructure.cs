@@ -26,7 +26,9 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         Debug.Assert(!keys.IsEmpty, "EliasFanoStructure requires at least one key.");
         Debug.Assert(values.IsEmpty || values.Length == keys.Length, "EliasFanoStructure requires value count to match key count when values are present.");
         Debug.Assert(_skipQuantum > 0, "EliasFanoStructure requires a positive skip quantum.");
-        Debug.Assert((_skipQuantum & (_skipQuantum - 1)) == 0, "EliasFanoStructure requires skip quantum to be a power of two.");
+
+        if (_skipQuantum <= 0 || (_skipQuantum & (_skipQuantum - 1)) != 0)
+            throw new InvalidOperationException("EliasFanoSkipQuantum must be positive and a power of two.");
 
         ReadOnlySpan<TKey> keysSpan = keys.Span;
 
