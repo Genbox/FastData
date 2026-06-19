@@ -14,26 +14,17 @@ internal sealed class BruteForceGenerator(int maxLength) : ISegmentGenerator
     {
         int max = Math.Min(props.LengthData.MinByteLength, maxLength); //We cannot segment above the shortest encoded byte string.
 
-        //Generates:
-        //[t]est
-        //[te]st
-        //[tes]t
-
         for (uint offset = 0; offset < max; offset++)
         {
             for (int length = 1; length <= max - offset; length++)
+            {
+                //Generates paired prefix/suffix candidates:
+                //[t]est, tes[t]
+                //[te]st, te[st]
+                //[tes]t, t[est]
                 yield return new ArraySegment(offset, length, Alignment.Left);
-        }
-
-        //Generates:
-        //tes[t]
-        //te[st]
-        //t[est]
-
-        for (uint offset = 0; offset < max; offset++)
-        {
-            for (int length = 1; length <= max - offset; length++)
                 yield return new ArraySegment(offset, length, Alignment.Right);
+            }
         }
     }
 }

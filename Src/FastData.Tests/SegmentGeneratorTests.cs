@@ -41,6 +41,22 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     }
 
     [Fact]
+    public void BruteForceGenerator_InterleavesLeftAndRightSegments()
+    {
+        BruteForceGenerator gen = new BruteForceGenerator(8);
+        StringKeyProperties props = KeyAnalyzer.GetStringProperties(["abcd"], false, GeneratorEncoding.AsciiBytes);
+
+        ArraySegment[] res = gen.Generate(props).Take(4).ToArray();
+
+        Assert.Equal([
+            new ArraySegment(0, 1, Alignment.Left),
+            new ArraySegment(0, 1, Alignment.Right),
+            new ArraySegment(0, 2, Alignment.Left),
+            new ArraySegment(0, 2, Alignment.Right)
+        ], res);
+    }
+
+    [Fact]
     public void BruteForceGeneratorTest()
     {
         // The generator should provide n*n number of results for strings up to length 8
