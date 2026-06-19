@@ -93,7 +93,7 @@ internal static class HashBenchmark
                 //If the not-perfect is faster, it has to be so by 25% before we pick it over a perfect hash.
                 //E.g. we still want the perfect, even if it is 25% slower
 
-                double threshold = p.Time + (p.Time * cfg.PerfectHashThreshold);
+                double threshold = p.Time * (1.0 - cfg.PerfectHashThreshold);
 
                 if (np.Time < threshold)
                     return np;
