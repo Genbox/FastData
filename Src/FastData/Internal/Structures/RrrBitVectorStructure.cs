@@ -36,8 +36,10 @@ public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValu
             return null; // We cannot produce the data structure. Try next.
 
         ulong universe = (maxValue - minValue) + 1UL;
-        ulong blockCount64 = ((universe + BlockSize) - 1UL) / BlockSize;
-        Debug.Assert(blockCount64 <= int.MaxValue, "RrrBitVectorStructure requires a block count that fits in an int-backed table.");
+        ulong blockCount64 = (universe / BlockSize) + (universe % BlockSize == 0 ? 0UL : 1UL);
+
+        if (blockCount64 > int.MaxValue)
+            return null; // The generated table is int-indexed. Try the next structure instead.
 
         int blockCount = (int)blockCount64;
         byte[] classes = new byte[blockCount];
