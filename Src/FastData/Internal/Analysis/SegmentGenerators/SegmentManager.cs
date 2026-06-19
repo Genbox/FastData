@@ -27,5 +27,6 @@ internal static class SegmentManager
         }
     }
 
-    private static IEnumerable<ISegmentGenerator> GetGenerators() => [new BruteForceGenerator(8), new EdgeGramGenerator(8), new DeltaGenerator(), new OffsetGenerator()];
+    // Ordered by a mix of complexity and value. DeltaGenerator should produce the best results the fastest.
+    private static IEnumerable<ISegmentGenerator> GetGenerators() => [new DeltaGenerator(), new EdgeGramGenerator(8), new BruteForceGenerator(8), new OffsetGenerator()];
 }
