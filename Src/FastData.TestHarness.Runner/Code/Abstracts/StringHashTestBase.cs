@@ -36,7 +36,6 @@ public abstract class StringHashTestBase
             StructureTypeOverride = typeof(HashTableStructure<,>),
             StringAnalyzerConfig = new StringAnalyzerConfig
             {
-                SubstringAnalyzerConfig = null,
                 BruteForceAnalyzerConfig = new BruteForceAnalyzerConfig(),
                 GeneticAnalyzerConfig = null,
                 GPerfAnalyzerConfig = null,

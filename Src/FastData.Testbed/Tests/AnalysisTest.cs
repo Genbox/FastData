@@ -112,7 +112,7 @@ internal static class AnalysisTest
 
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
         using SerilogLoggerFactory loggerFactory = new SerilogLoggerFactory(_logConf);
-        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), new Simulator(data.Length, GeneratorEncoding.Utf16CodeUnits), loggerFactory.CreateLogger<BruteForceAnalyzer>());
+        BruteForceAnalyzer analyzer = new BruteForceAnalyzer(props, new BruteForceAnalyzerConfig(), new SegmentGeneratorConfig(), new Simulator(data.Length, GeneratorEncoding.Utf16CodeUnits), loggerFactory.CreateLogger<BruteForceAnalyzer>());
         PrintCandidate(analyzer.GetCandidates(data).OrderByDescending(x => x.Fitness).FirstOrDefault());
     }
 

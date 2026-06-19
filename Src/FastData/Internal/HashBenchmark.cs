@@ -19,20 +19,13 @@ internal static class HashBenchmark
         //Run each of the analyzers
         List<Candidate> candidates = new List<Candidate>(16);
 
-        if (cfg.SubstringAnalyzerConfig != null)
-        {
-            SubstringAnalyzer sa = new SubstringAnalyzer(props, cfg.SubstringAnalyzerConfig, sim, encoding, ignoreCase);
-            if (sa.IsAppropriate())
-                candidates.AddRange(sa.GetCandidates(data));
-        }
-
         //We always add the default hash as a candidate
         if (includeDefault)
             candidates.Add(sim.Run(data, DefaultStringHash.GetInstance(encoding, ignoreCase)));
 
         if (cfg.BruteForceAnalyzerConfig != null)
         {
-            BruteForceAnalyzer bf = new BruteForceAnalyzer(props, cfg.BruteForceAnalyzerConfig, sim, factory.CreateLogger<BruteForceAnalyzer>(), ignoreCase);
+            BruteForceAnalyzer bf = new BruteForceAnalyzer(props, cfg.BruteForceAnalyzerConfig, cfg.SegmentGeneratorConfig, sim, factory.CreateLogger<BruteForceAnalyzer>(), ignoreCase);
             if (bf.IsAppropriate())
                 candidates.AddRange(bf.GetCandidates(data));
         }

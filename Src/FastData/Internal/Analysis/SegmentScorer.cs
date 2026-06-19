@@ -8,7 +8,10 @@ namespace Genbox.FastData.Internal.Analysis;
 internal static class SegmentScorer
 {
     [SuppressMessage("Performance", "MA0159:Use \'Order\' instead of \'OrderBy\'", Justification = ".NET Standard 2.0 does not have that method")]
-    internal static IEnumerable<ArraySegment> Order(StringKeyProperties props, IEnumerable<ArraySegment> segments) => segments.OrderByDescending(x => x, new SegmentComparer(props));
+    internal static IEnumerable<ArraySegment> Order(StringKeyProperties props, IEnumerable<ArraySegment> segments)
+    {
+        return segments.OrderByDescending(x => x, new SegmentComparer(props));
+    }
 
     private sealed class SegmentComparer(StringKeyProperties props) : IComparer<ArraySegment>
     {

@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, BruteForceAnalyzerConfig config, Simulator sim, ILogger<BruteForceAnalyzer> logger, bool ignoreCase = false) : IStringHashAnalyzer
+internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, BruteForceAnalyzerConfig config, SegmentGeneratorConfig generatorConfig, Simulator sim, ILogger<BruteForceAnalyzer> logger, bool ignoreCase = false) : IStringHashAnalyzer
 {
     private static readonly ulong[] Seeds =
     [
@@ -47,8 +47,7 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
     public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<string> data)
     {
         MinHeap<Candidate> heap = new MinHeap<Candidate>(config.MaxReturned);
-        BruteForceGenerator segGen = new BruteForceGenerator(new BruteForceGeneratorConfig());
-        ArraySegment[] segments = SegmentScorer.Order(props, segGen.Generate(props)).ToArray();
+        ArraySegment[] segments = SegmentManager.Generate(props, generatorConfig).ToArray();
         Candidate? bestPerfect = null;
 
         int attempts = 0;
