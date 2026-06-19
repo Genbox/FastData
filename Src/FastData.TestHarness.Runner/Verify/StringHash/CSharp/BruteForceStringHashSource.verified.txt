@@ -10,7 +10,7 @@ internal static class FastData
 {
 
     private static int Length(string str) => str.Length;
-    private static uint ReadU16(ReadOnlySpan<byte> ptr, int offset) => Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr), offset));
+    private static uint ReadU32(ReadOnlySpan<byte> ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr), offset));
 
     [StructLayout(LayoutKind.Auto)]
     private struct E
@@ -31,7 +31,7 @@ internal static class FastData
     };
 
     private static readonly E[] _entries = {
-        new E("k0", -1, 18442240474082193405ul), new E("k2", -1, 18442240474082193916ul)
+        new E("k0", -1, 3145843ul), new E("k2", -1, 3276914ul)
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -41,8 +41,8 @@ internal static class FastData
         {
         ReadOnlySpan<byte> data = MemoryMarshal.AsBytes(value.AsSpan());
         ulong hash = ulong.MinValue;
-        hash = (hash - (ulong)ReadU16(data, 1));
-        hash = (hash ^ (hash >> 12));
+        hash = (ulong)ReadU32(data, (length - 4));
+        hash = (hash ^ (hash >> 17));
 
         return hash;
         }

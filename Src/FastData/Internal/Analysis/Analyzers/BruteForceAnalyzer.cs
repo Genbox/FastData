@@ -48,44 +48,64 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
     {
         MinHeap<Candidate> heap = new MinHeap<Candidate>(config.MaxReturned);
         BruteForceGenerator segGen = new BruteForceGenerator(8);
-        ArraySegment[] segments = segGen.Generate(props).ToArray();
+        ArraySegment[] segments = SegmentScorer.Order(props, segGen.Generate(props)).ToArray();
+        Candidate? bestPerfect = null;
 
-        int leftAttempts = config.MaxAttempts;
-        foreach (ArraySegment segment in segments)
+        int attempts = 0;
+
+        // Try each hash shape across every likely segment before increasing hash complexity.
+        foreach (IMixerGenerator mixGen in _mixers)
         {
-            // try every mixer
-            foreach (IMixerGenerator mixGen in _mixers)
-            {
-                mixGen.Reset();
+            mixGen.Reset();
 
-                while (mixGen.TryGet(out Mixer mixer))
-                {
+            while (mixGen.TryGet(out Mixer mixer))
+            {
+                if (logger.IsEnabled(LogLevel.Trace))
                     LogMixer(logger, ExpressionHelper.Print(mixer));
 
-                    // for each mixer, try every avalanche
-                    foreach (IAvalancheGenerator avGen in _avalanchers)
-                    {
-                        avGen.Reset();
+                foreach (IAvalancheGenerator avGen in _avalanchers)
+                {
+                    avGen.Reset();
 
-                        while (avGen.TryGet(out Avalanche avalanche))
-                        {
-                            BruteForceStringHash spec = new BruteForceStringHash(segment, mixer, avalanche, sim.UnitSize) { IgnoreCase = ignoreCase };
+                    while (avGen.TryGet(out Avalanche avalanche))
+                    {
+                        if (logger.IsEnabled(LogLevel.Trace))
                             LogAvalanche(logger, ExpressionHelper.Print(avalanche));
 
+                        foreach (ArraySegment segment in segments)
+                        {
+                            BruteForceStringHash spec = new BruteForceStringHash(segment, mixer, avalanche, sim.UnitSize) { IgnoreCase = ignoreCase };
                             Candidate current = sim.Run(data, spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));
 
-                            if (heap.Add(current.Fitness, current))
+                            // A perfect candidate can score lower than a simple non-perfect one, so keep it outside the heap too.
+                            if (current.Collisions == 0 && (bestPerfect == null || current.Fitness > bestPerfect.Fitness))
+                                bestPerfect = current;
+
+                            if (heap.Add(current.Fitness, current) && logger.IsEnabled(LogLevel.Debug))
                                 LogBetterCandidate(logger, current.Fitness, current.Collisions, ExpressionHelper.Print(mixer), ExpressionHelper.Print(avalanche));
 
-                            if (heap.HasMaxFitness || leftAttempts-- == 0)
-                                return heap.Items.Select(x => x.Item2);
+                            attempts++;
+
+                            if (current.Collisions == 0 || heap.HasMaxFitness || attempts >= config.MaxAttempts)
+                                return GetResults(heap, bestPerfect);
                         }
                     }
                 }
             }
         }
 
-        return heap.Items.Select(x => x.Item2);
+        return GetResults(heap, bestPerfect);
+    }
+
+    private static Candidate[] GetResults(MinHeap<Candidate> heap, Candidate? bestPerfect)
+    {
+        List<Candidate> results = heap.Items.Select(static x => x.Item2).ToList();
+
+        // Ensure the final selector sees the best perfect candidate even if blended fitness evicted it from the heap.
+        if (bestPerfect != null && !results.Exists(candidate => ReferenceEquals(candidate, bestPerfect)))
+            results.Add(bestPerfect);
+
+        return results.ToArray();
     }
 
     private sealed class MixerIdentity : SimpleMixerGen
