@@ -13,9 +13,9 @@ pub struct fastdata;
 impl fastdata {
 
     #[must_use]
-    pub fn contains(key: char) -> bool {
+    pub fn contains(key: u16) -> bool {
 
-        if key == char::MIN || key == 'a' || key == '' {
+        if key == 0u16 || key == 97u16 || key == 127u16 {
             return true;
         }
 
@@ -23,6 +23,6 @@ impl fastdata {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_KEY: char = char::MIN;
-    pub const MAX_KEY: char = '';
+    pub const MIN_KEY: u16 = 0u16;
+    pub const MAX_KEY: u16 = 127u16;
 }

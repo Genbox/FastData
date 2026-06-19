@@ -12,12 +12,12 @@ use std::ptr;
 pub struct fastdata;
 impl fastdata {
 
-    const KEYS: [char; 3] = [
-        char::MIN, 'a', ''
+    const KEYS: [u16; 3] = [
+        0u16, 97u16, 127u16
     ];
 
     #[must_use]
-    pub fn contains(key: char) -> bool {
+    pub fn contains(key: u16) -> bool {
 
         for entry in Self::KEYS.iter() {
             if *entry == key {
@@ -28,6 +28,6 @@ impl fastdata {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_KEY: char = char::MIN;
-    pub const MAX_KEY: char = '';
+    pub const MIN_KEY: u16 = 0u16;
+    pub const MAX_KEY: u16 = 127u16;
 }

@@ -24,7 +24,7 @@ impl fastdata {
         }
 
 
-        let offset = (key - Self::MIN_KEY) as u64;
+        let offset = ((key as i64) - (Self::MIN_KEY as i64)) as u64;
         let word = (offset >> 6) as usize;
         (Self::BITSET[word] & (1u64 << (offset & 63))) != 0
     }

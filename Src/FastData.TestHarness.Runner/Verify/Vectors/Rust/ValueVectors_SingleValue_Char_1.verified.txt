@@ -13,12 +13,12 @@ pub struct fastdata;
 impl fastdata {
 
     #[must_use]
-    pub fn contains(key: char) -> bool {
+    pub fn contains(key: u16) -> bool {
 
-        key == 'a'
+        key == 97u16
     }
 
     pub const ITEM_COUNT: usize = 1;
-    pub const MIN_KEY: char = 'a';
-    pub const MAX_KEY: char = 'a';
+    pub const MIN_KEY: u16 = 97u16;
+    pub const MAX_KEY: u16 = 97u16;
 }

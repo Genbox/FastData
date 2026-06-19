@@ -12,7 +12,7 @@ use std::ptr;
 pub struct fastdata;
 
 struct E {
-    key: char,
+    key: u16,
     next: i8,
 }
 
@@ -22,16 +22,16 @@ impl fastdata {
     ];
 
     const ENTRIES: [E; 3] = [
-        E { next: -1, key: char::MIN }, E { next: -1, key: 'a' }, E { next: -1, key: '' }
+        E { next: -1, key: 0u16 }, E { next: -1, key: 97u16 }, E { next: -1, key: 127u16 }
     ];
 
     #[inline(always)]
-    fn get_hash(value: char) -> u64 {
+    fn get_hash(value: u16) -> u64 {
         value as u64
     }
 
     #[must_use]
-    pub fn contains(key: char) -> bool {
+    pub fn contains(key: u16) -> bool {
 
         let hash = Self::get_hash(key);
         let index = hash % 4u64;
@@ -49,6 +49,6 @@ impl fastdata {
     }
 
     pub const ITEM_COUNT: usize = 3;
-    pub const MIN_KEY: char = char::MIN;
-    pub const MAX_KEY: char = '';
+    pub const MIN_KEY: u16 = 0u16;
+    pub const MAX_KEY: u16 = 127u16;
 }

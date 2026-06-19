@@ -23,7 +23,7 @@ class fastdata final {
     };
 
     inline static const std::array<e, 5> entries = {
-        e(0.0f, 0), e(std::numeric_limits<float>::lowest(), 4286578687), e(1.0f, 1065353216), e(-1.0f, 3212836864), e(std::numeric_limits<float>::max(), 2139095039)
+        e(0.0f, 0), e(std::numeric_limits<float>::lowest(), 4286578687ull), e(1.0f, 1065353216ull), e(-1.0f, 3212836864ull), e(std::numeric_limits<float>::max(), 2139095039ull)
     };
 
     static uint64_t get_hash(const float value) noexcept {
