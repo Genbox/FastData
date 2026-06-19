@@ -11,10 +11,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
 internal sealed class SubstringAnalyzer(StringKeyProperties props, SubstringAnalyzerConfig config, Simulator sim, GeneratorEncoding encoding, bool ignoreCase = false) : IStringHashAnalyzer
 {
-    private readonly Func<string, byte[]> _getBytes = encoding == GeneratorEncoding.Unknown ? static _ => [] : StringHelper.GetBytesFunc(encoding);
-    private readonly int _unitSize = encoding == GeneratorEncoding.Unknown ? 1 : sim.UnitSize;
-
-    public bool IsAppropriate() => encoding != GeneratorEncoding.Unknown && config.MaxReturned > 0 && config.MaxSliceByteLength > 0 && config.MinUniqueFraction > 0 && (!ignoreCase || props.CharacterData.AllAscii);
+    public bool IsAppropriate() => !ignoreCase || props.CharacterData.AllAscii;
 
     public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<string> data)
     {
@@ -25,9 +22,9 @@ internal sealed class SubstringAnalyzer(StringKeyProperties props, SubstringAnal
         List<Candidate> candidates = new List<Candidate>(config.MaxReturned * 2);
 
         // Keep segments aligned to the target encoding's lookup unit. For C# this avoids hashing half of a UTF-16 code unit.
-        for (int length = _unitSize; length <= maxLength; length += _unitSize)
+        for (int length = sim.UnitSize; length <= maxLength; length += sim.UnitSize)
         {
-            for (int offset = 0; offset + length <= props.LengthData.MinByteLength; offset += _unitSize)
+            for (int offset = 0; offset + length <= props.LengthData.MinByteLength; offset += sim.UnitSize)
             {
                 TryAdd(data, candidates, new ArraySegment((uint)offset, length, Alignment.Left));
                 TryAdd(data, candidates, new ArraySegment((uint)offset, length, Alignment.Right));
@@ -51,7 +48,7 @@ internal sealed class SubstringAnalyzer(StringKeyProperties props, SubstringAnal
         if (uniqueFraction < config.MinUniqueFraction)
             return;
 
-        SubstringStringHash stringHash = new SubstringStringHash(segment, ignoreCase, _unitSize);
+        SubstringStringHash stringHash = new SubstringStringHash(segment, ignoreCase, sim.UnitSize);
         candidates.Add(sim.Run(data, stringHash, () => uniqueFraction));
     }
 
@@ -61,7 +58,7 @@ internal sealed class SubstringAnalyzer(StringKeyProperties props, SubstringAnal
 
         foreach (string key in data)
         {
-            byte[] bytes = _getBytes(key);
+            byte[] bytes = StringHelper.GetBytesFunc(encoding)(key);
             int start = segment.Alignment == Alignment.Right ? bytes.Length - (int)segment.Offset - segment.Length : (int)segment.Offset;
             byte[] slice = new byte[segment.Length];
 
