@@ -3,14 +3,7 @@ using Genbox.FastData.Generators.Abstracts;
 namespace Genbox.FastData.Generators.Contexts;
 
 /// <summary>Provides Elias-Fano encoded data and original keys for generated structures.</summary>
-public sealed class EliasFanoContext<TKey>(ReadOnlyMemory<TKey> keys, int lowerBitCount, ulong lowerMask, ulong[] upperBits, ulong[] lowerBits, int upperBitLength, int sampleRateShift, int[] samplePositions, long minValue, long maxValue) : EliasFanoContext(lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions, minValue, maxValue)
-{
-    /// <summary>Gets the sorted keys represented by the encoded data.</summary>
-    public ReadOnlyMemory<TKey> Keys { get; } = keys;
-}
-
-/// <summary>Provides Elias-Fano encoded data for generated structures.</summary>
-public abstract class EliasFanoContext(int lowerBitCount, ulong lowerMask, ulong[] upperBits, ulong[] lowerBits, int upperBitLength, int sampleRateShift, int[] samplePositions, long minValue, long maxValue) : IContext
+public sealed class EliasFanoContext(int lowerBitCount, ulong lowerMask, ulong[] upperBits, ulong[] lowerBits, int upperBitLength, int sampleRateShift, int[] samplePositions, long minValue, long maxValue) : IContext
 {
     /// <summary>Gets the number of lower bits stored separately for each value.</summary>
     public int LowerBitCount { get; } = lowerBitCount;

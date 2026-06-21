@@ -230,9 +230,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
                 };
 
             case RrrBitVectorContext:
-                return null;
-
-            case EliasFanoContext<TKey>:
+            case EliasFanoContext:
                 return null;
 
             case PgmContext<TKey, TValue> pgmCtx when typeof(TKey).IsValueType:

@@ -8,7 +8,7 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, EliasFanoContext<TKey>>
+public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, EliasFanoContext>
 {
     private readonly TKey _maxValue;
     private readonly TKey _minValue;
@@ -21,7 +21,7 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         _skipQuantum = skipQuantum;
     }
 
-    public EliasFanoContext<TKey>? Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
+    public EliasFanoContext? Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {
         Debug.Assert(!keys.IsEmpty, "EliasFanoStructure requires at least one key.");
         Debug.Assert(values.IsEmpty || values.Length == keys.Length, "EliasFanoStructure requires value count to match key count when values are present.");
@@ -95,7 +95,7 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         int sampleRateShift = BitOperations.TrailingZeroCount((uint)_skipQuantum);
         int[] samplePositions = BuildSamples(upperBits, upperBitLength, _skipQuantum);
 
-        return new EliasFanoContext<TKey>(keys, lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions, effectiveMinValue, max);
+        return new EliasFanoContext(lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions, effectiveMinValue, max);
     }
 
     public IEnumerable<IEarlyExit> GetMandatoryExits()
