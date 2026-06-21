@@ -28,7 +28,7 @@ internal sealed record GPerfStringHash : IStringHash
     internal int MinLen { get; }
     internal bool HashIncludesLength { get; }
 
-    public AdditionalData[] AdditionalData => [new AdditionalData(nameof(AssociationValues), typeof(int), AssociationValues)];
+    public AdditionalData[]? AdditionalData => Positions.Length == 0 ? null : [new AdditionalData(nameof(AssociationValues), typeof(int), AssociationValues)];
     public IEnumerable<IEarlyExit> GetMandatoryExits() => _mandatoryExits;
 
     private static IEarlyExit[] CreateMandatoryExits(GeneratorEncoding encoding, bool sevenBit, int mandatoryMinLength)
@@ -50,14 +50,14 @@ internal sealed record GPerfStringHash : IStringHash
         ParameterExpression length = Parameter(typeof(int), "length");
         ParameterExpression hash = Variable(typeof(ulong), "hash");
 
-        PropertyInfo assoProp = typeof(GPerfStringHash).GetProperty(nameof(AssociationValues), BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)!;
-        Expression asso = Property(Constant(this, typeof(GPerfStringHash)), assoProp);
-
         List<Expression> ex =
         [
             // hash = length or 0UL, matching gperf's optional length contribution.
             Assign(hash, HashIncludesLength ? Convert(length, typeof(ulong)) : Constant(0UL))
         ];
+
+        PropertyInfo assoProp = typeof(GPerfStringHash).GetProperty(nameof(AssociationValues), BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)!;
+        Expression asso = Property(Constant(this, typeof(GPerfStringHash)), assoProp);
 
         // Positions are selected by the analyzer and sorted in gperf order. A selected position contributes only when it exists
         // for the current logical length.

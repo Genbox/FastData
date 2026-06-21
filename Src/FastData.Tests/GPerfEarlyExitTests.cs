@@ -31,7 +31,6 @@ public class GPerfEarlyExitTests
         Assert.NotNull(generatorConfig.HashInfo);
         Assert.True((generatorConfig.GeneratorFunctions & GeneratorFunction.Length) != 0);
         Assert.True((generatorConfig.GeneratorFunctions & GeneratorFunction.IsAsciiOnly) != 0);
-        Assert.NotNull(generatorConfig.HashInfo.AdditionalData);
     }
 
     [Fact]
