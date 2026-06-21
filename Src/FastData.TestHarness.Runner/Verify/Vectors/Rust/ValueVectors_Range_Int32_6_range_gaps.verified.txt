@@ -20,6 +20,11 @@ impl fastdata {
         2, 4, 8, 10
     ];
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        Self::RANGE_STARTS.iter().zip(Self::RANGE_ENDS.iter()).flat_map(|(start, end)| *start..=*end)
+    }
+
+    #[must_use]
     pub fn contains(key: i32) -> bool {
 
         for i in 0..4 {

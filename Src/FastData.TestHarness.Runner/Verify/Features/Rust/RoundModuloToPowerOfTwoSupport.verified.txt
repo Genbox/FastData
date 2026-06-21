@@ -1,4 +1,4 @@
-//! This file is auto-generated. Do not edit manually.
+﻿//! This file is auto-generated. Do not edit manually.
 //! Structure: HashTable
 #![allow(non_camel_case_types)]
 #![allow(unused_parens)]
@@ -28,6 +28,11 @@ impl fastdata {
     #[inline(always)]
     fn get_hash(value: i32) -> u64 {
         value as u64
+    }
+
+    #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        Self::ENTRIES.iter().map(|entry| entry.key)
     }
 
     #[must_use]

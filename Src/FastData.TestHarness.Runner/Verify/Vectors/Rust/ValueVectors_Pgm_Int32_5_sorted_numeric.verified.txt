@@ -16,6 +16,14 @@ impl fastdata {
         1, 2, 3, 4, 5
     ];
 
+    #[must_use]
+    pub fn key_slice() -> &'static [i32] { &Self::KEYS }
+
+    #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        Self::KEYS.iter().copied()
+    }
+
     const SEG_KEYS: [i32; 3] = [
         1, 6, i32::MAX
     ];

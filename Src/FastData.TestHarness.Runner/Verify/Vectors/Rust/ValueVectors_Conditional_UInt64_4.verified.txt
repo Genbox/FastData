@@ -13,6 +13,10 @@ pub struct fastdata;
 impl fastdata {
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = u64> {
+        [u64::MIN, 1, 2, u64::MAX].iter().copied()
+    }
+    #[must_use]
     pub fn contains(key: u64) -> bool {
 
         if key == u64::MIN || key == 1 || key == 2 || key == u64::MAX {

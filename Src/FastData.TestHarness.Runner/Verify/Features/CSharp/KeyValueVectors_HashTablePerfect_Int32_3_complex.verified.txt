@@ -3,6 +3,7 @@
 // Structure: HashTablePerfect
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -45,6 +46,24 @@ public class Person
         unchecked
         {
         return (ulong)value;
+        }
+    }
+
+    public static IEnumerable<int> Keys
+    {
+        get
+        {
+            for (int i = 0; i < _entries.Length; i++)
+                yield return _entries[i].Key;
+        }
+    }
+
+    public static IEnumerable<Person> Values
+    {
+        get
+        {
+            for (int i = 0; i < _entries.Length; i++)
+                yield return _entries[i].Value;
         }
     }
 

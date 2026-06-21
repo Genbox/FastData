@@ -16,6 +16,8 @@
 <#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
     };
 
+<#= ArrayAccessProperties("_keys", "_values", Data.ValueCount) #>
+
     <#= MethodAttribute #>
     <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
     {

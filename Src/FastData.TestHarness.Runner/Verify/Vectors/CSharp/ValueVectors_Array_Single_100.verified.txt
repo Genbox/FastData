@@ -3,6 +3,7 @@
 // Structure: Array
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -23,6 +24,10 @@ internal static class FastData
         80f, 81f, 82f, 83f, 84f, 85f, 86f, 87f, 88f, 89f, 
         90f, 91f, 92f, 93f, 94f, 95f, 96f, 97f, 98f, 99f
     };
+
+    public static IEnumerable<float> Keys => _keys;
+
+    public static ReadOnlySpan<float> KeySpan => _keys;
 
     
     public static bool Contains(float key)

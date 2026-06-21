@@ -13,6 +13,10 @@ pub struct fastdata;
 impl fastdata {
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = f32> {
+        std::iter::once(1f32)
+    }
+    #[must_use]
     pub fn contains(key: f32) -> bool {
 
         key == 1f32

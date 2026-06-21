@@ -2,6 +2,7 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: SingleValue
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
@@ -14,11 +15,32 @@ struct Person {
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
-    static inline const auto stored_value = Person(1, u8"Bob", new Person(4, u8"Anna", nullptr));
+    static constexpr std::array<int32_t, 1> key_items = { 1 };
+    inline static const std::array<Person, 1> value_items = { Person(1, u8"Bob", new Person(4, u8"Anna", nullptr)) };
 public:
+    [[nodiscard]]
+    static constexpr direct_access_view<int32_t> keys() noexcept { return direct_access_view<int32_t>(key_items.data(), 1); }
+
+    [[nodiscard]]
+    static direct_access_view<Person> values() noexcept { return direct_access_view<Person>(value_items.data(), 1); }
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 
@@ -29,7 +51,7 @@ public:
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
 
         if (key == 1) {
-            value = &stored_value;
+            value = &value_items[0];
             return true;
         }
 

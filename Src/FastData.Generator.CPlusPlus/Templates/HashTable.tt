@@ -58,6 +58,8 @@
 <#= HashSource #>
 
 public:
+<#= EntryIterators("e", "entries", "_entry->key", "_entry->value", Data.ValueCount) #>
+
     <#= MethodAttribute #>
     <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.Contains) #>

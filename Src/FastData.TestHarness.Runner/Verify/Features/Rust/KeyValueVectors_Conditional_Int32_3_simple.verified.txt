@@ -16,6 +16,15 @@ impl fastdata {
         1, 2, 3
     ];
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        [1, 2, 3].iter().copied()
+    }
+
+    #[must_use]
+    pub fn values() -> impl Iterator<Item = i32> {
+        Self::VALUES.iter().copied()
+    }
+    #[must_use]
     pub fn contains(key: i32) -> bool {
 
         if key == 1 || key == 2 || key == 3 {

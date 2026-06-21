@@ -13,6 +13,22 @@
     }
 #>
     <#= MethodAttribute #>
+    <#= MethodModifier #>fn keys() -> impl Iterator<Item = <#= StoredKeyTypeName #>> {
+        std::iter::once(<#= itemLabel #>)
+    }
+<#
+    if (Data.Value != null)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn values() -> impl Iterator<Item = <#= StoredValueTypeName #>> {
+        std::iter::once(Self::STORED_VALUE)
+    }
+<#
+    }
+#>
+    <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
         <#= GetEqual(LookupKeyName, itemLabel) #>

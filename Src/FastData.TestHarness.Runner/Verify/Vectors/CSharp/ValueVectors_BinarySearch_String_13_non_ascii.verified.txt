@@ -3,6 +3,7 @@
 // Structure: BinarySearch
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -14,6 +15,10 @@ internal static class FastData
         "ß", "à", "ä", "å", "æ", "ç", "è", "é", "ê", "ñ", 
         "ö", "ø", "ü"
     };
+
+    public static IEnumerable<string> Keys => _keys;
+
+    public static ReadOnlySpan<string> KeySpan => _keys;
 
     
     public static bool Contains(string key)

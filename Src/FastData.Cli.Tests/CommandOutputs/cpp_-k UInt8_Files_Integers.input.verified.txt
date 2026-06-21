@@ -1,14 +1,30 @@
-{
+﻿{
   Item1:
 /// @generated
 // This file is auto-generated. Do not edit manually.
 // Structure: Range
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
+
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
 
 class FastData final {
 
@@ -21,6 +37,38 @@ class FastData final {
         42, 62, 80, 100
     };
 public:
+    class key_iterator final {
+        size_t _range;
+        uint8_t _key;
+
+    public:
+        key_iterator(const size_t range, const uint8_t key) noexcept : _range(range), _key(key) {}
+
+        key_iterator& operator++() noexcept {
+            if (_key == range_ends[_range]) {
+                ++_range;
+                if (_range < range_starts.size())
+                    _key = range_starts[_range];
+            }
+            else {
+                ++_key;
+            }
+
+            return *this;
+        }
+
+        [[nodiscard]] bool operator!=(const key_iterator& other) const noexcept { return _range != other._range; }
+        [[nodiscard]] uint8_t operator*() const noexcept { return _key; }
+    };
+    class key_range final {
+    public:
+        [[nodiscard]] key_iterator begin() const noexcept { return key_iterator(0, range_starts[0]); }
+        [[nodiscard]] key_iterator end() const noexcept { return key_iterator(range_starts.size(), 100); }
+    };
+
+    [[nodiscard]]
+    static key_range keys() noexcept { return key_range(); }
+
     [[nodiscard]]
     static constexpr bool contains(const uint8_t key) noexcept {
 

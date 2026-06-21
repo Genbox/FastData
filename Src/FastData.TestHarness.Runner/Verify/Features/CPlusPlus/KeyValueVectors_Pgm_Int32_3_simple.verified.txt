@@ -2,23 +2,44 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Pgm
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
-    inline static const std::array<int32_t, 3> values = {
+    inline static const std::array<int32_t, 3> value_items = {
         1, 2, 3
     };
-    static constexpr std::array<int32_t, 3> keys = {
+    static constexpr std::array<int32_t, 3> key_items = {
         1, 2, 3
     };
 
 public:
+    [[nodiscard]]
+    static constexpr direct_access_view<int32_t> keys() noexcept { return direct_access_view<int32_t>(key_items.data(), 3); }
+
+    [[nodiscard]]
+    static direct_access_view<int32_t> values() noexcept { return direct_access_view<int32_t>(value_items.data(), 3); }
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 
@@ -32,7 +53,7 @@ public:
 
         while (lo < hi) {
             const size_t mid = lo + ((hi - lo) >> 1);
-            const int32_t mid_key = keys[mid];
+            const int32_t mid_key = key_items[mid];
             if (mid_key == key)
                 return true;
             if (mid_key < key)
@@ -57,10 +78,10 @@ public:
 
         while (lo < hi) {
             const size_t mid = lo + ((hi - lo) >> 1);
-            const int32_t mid_key = keys[mid];
+            const int32_t mid_key = key_items[mid];
 
             if (mid_key == key) {
-                value = &values[mid];
+                value = &value_items[mid];
                 return true;
             }
 

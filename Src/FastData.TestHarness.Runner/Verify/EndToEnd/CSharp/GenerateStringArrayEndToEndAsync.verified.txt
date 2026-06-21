@@ -3,6 +3,7 @@
 // Structure: Array
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -16,6 +17,10 @@ internal static class FastData
     private static readonly string[] _keys = new string[] {
         "alpha", "bravo", "charlie", "delta"
     };
+
+    public static IEnumerable<string> Keys => _keys;
+
+    public static ReadOnlySpan<string> KeySpan => _keys;
 
     
     public static bool Contains(string key)

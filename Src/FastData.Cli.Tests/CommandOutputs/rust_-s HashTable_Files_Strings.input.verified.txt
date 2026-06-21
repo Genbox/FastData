@@ -1,4 +1,4 @@
-{
+﻿{
   Item1:
 //! This file is auto-generated. Do not edit manually.
 //! Structure: HashTable
@@ -47,6 +47,11 @@ impl FastData {
         hash = ((352654597 as u64).wrapping_add((hash.wrapping_mul(1566083941))));
 
         return hash;
+    }
+
+    #[must_use]
+    pub fn keys() -> impl Iterator<Item = &'static str> {
+        Self::ENTRIES.iter().map(|entry| entry.key)
     }
 
     #[must_use]

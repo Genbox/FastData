@@ -20,6 +20,22 @@ impl fastdata {
     ];
 
     #[must_use]
+    pub fn key_slice() -> &'static [i32] { &Self::KEYS }
+
+    #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        Self::KEYS.iter().copied()
+    }
+
+    #[must_use]
+    pub fn value_slice() -> &'static [i32] { &Self::VALUES }
+
+    #[must_use]
+    pub fn values() -> impl Iterator<Item = i32> {
+        Self::VALUES.iter().copied()
+    }
+
+    #[must_use]
     pub fn contains(key: i32) -> bool {
 
         let mut pos: i32 = ((22.333334_f32 as f64) * ((key as u32).wrapping_sub(1 as u32)) as f64) as i32;

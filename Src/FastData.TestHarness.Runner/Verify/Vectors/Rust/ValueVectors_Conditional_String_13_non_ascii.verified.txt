@@ -13,6 +13,10 @@ pub struct fastdata;
 impl fastdata {
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = &'static str> {
+        ["ß", "à", "ä", "å", "æ", "ç", "è", "é", "ê", "ñ", "ö", "ø", "ü"].iter().copied()
+    }
+    #[must_use]
     pub fn contains(key: &str) -> bool {
 
         if key == "ß" || key == "à" || key == "ä" || key == "å" || key == "æ" || key == "ç" || key == "è" || key == "é" || key == "ê" || key == "ñ" || key == "ö" || key == "ø" || key == "ü" {

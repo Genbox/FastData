@@ -8,6 +8,55 @@
     public string PostMethodModifier => " noexcept";
     public string LookupKeyName => "key";
     public string HashCall => Type.GetTypeCode(Model.KeyType) == TypeCode.String ? $"get_hash({LookupKeyName}, length)" : $"get_hash({LookupKeyName})";
+    public string KeyDirectAccessProperty(string fieldName, int count) =>
+        $$"""
+        {{MethodAttribute}}
+            static constexpr direct_access_view<{{KeyTypeName}}> keys() noexcept { return direct_access_view<{{KeyTypeName}}>({{fieldName}}.data(), {{count.ToStringInvariant()}}); }
+        """;
+
+    public string ValueDirectAccessProperty(string fieldName, int count) =>
+        $$"""
+        {{MethodAttribute}}
+            static direct_access_view<{{ValueTypeName}}> values() noexcept { return direct_access_view<{{ValueTypeName}}>({{fieldName}}.data(), {{count.ToStringInvariant()}}); }
+        """;
+
+    public string ArrayAccessProperties(string keyField, int keyCount, string valueField, int valueCount)
+    {
+        string result = $"    {KeyDirectAccessProperty(keyField, keyCount)}";
+        if (valueCount > 0)
+            result += $"\n\n    {ValueDirectAccessProperty(valueField, valueCount)}";
+        return result;
+    }
+
+    private string EntryIteratorPair(string name, string entryTypeName, string arrayName, string typeName, string deref) =>
+        $$"""
+            class {{name}}_iterator final {
+                const {{entryTypeName}}* _entry;
+
+            public:
+                explicit {{name}}_iterator(const {{entryTypeName}}* entry) noexcept : _entry(entry) {}
+
+                {{name}}_iterator& operator++() noexcept { ++_entry; return *this; }
+                [[nodiscard]] bool operator!=(const {{name}}_iterator& other) const noexcept { return _entry != other._entry; }
+                [[nodiscard]] const {{typeName}}& operator*() const noexcept { return {{deref}}; }
+            };
+
+            class {{name}}_range final {
+            public:
+                [[nodiscard]] {{name}}_iterator begin() const noexcept { return {{name}}_iterator({{arrayName}}.data()); }
+                [[nodiscard]] {{name}}_iterator end() const noexcept { return {{name}}_iterator({{arrayName}}.data() + {{arrayName}}.size()); }
+            };
+
+            [[nodiscard]]
+            static {{name}}_range {{name}}s() noexcept { return {{name}}_range(); }
+        """;
+
+    public string EntryIterators(string entryTypeName, string arrayName, string keyDeref, string valueDeref, int valueCount) =>
+        valueCount > 0
+            ? EntryIteratorPair("key", entryTypeName, arrayName, KeyTypeName, keyDeref)
+              + "\n"
+              + EntryIteratorPair("value", entryTypeName, arrayName, ValueTypeName, valueDeref)
+            : EntryIteratorPair("key", entryTypeName, arrayName, KeyTypeName, keyDeref);
 
     public string HashSource
     {
@@ -41,14 +90,7 @@
 
     public string GetMod(string var1, ulong var2) => $"{var1} % {var2.ToStringInvariant()}";
 
-    public string GetMethodHeader(MethodType methodType)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        sb.Append(GetEarlyExits(methodType, GeneratorConfig.EarlyExits));
-
-        return sb.ToString();
-    }
+    public string GetMethodHeader(MethodType methodType) => GetEarlyExits(methodType, GeneratorConfig.EarlyExits);
 
     private string GetHashModifier()
     {

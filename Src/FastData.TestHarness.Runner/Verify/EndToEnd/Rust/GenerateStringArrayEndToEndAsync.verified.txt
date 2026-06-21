@@ -25,6 +25,14 @@ impl fastdata {
     ];
 
     #[must_use]
+    pub fn key_slice() -> &'static [&'static str] { &Self::KEYS }
+
+    #[must_use]
+    pub fn keys() -> impl Iterator<Item = &'static str> {
+        Self::KEYS.iter().copied()
+    }
+
+    #[must_use]
     pub fn contains(key: &str) -> bool {
         let mut length: i32 = Length(key);
         let mut unitAt0: u32 = UnitAt(key, 0);

@@ -23,6 +23,15 @@ impl fastdata {
 
     const STORED_VALUE: &'static Person = &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None)));
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        std::iter::once(1)
+    }
+
+    #[must_use]
+    pub fn values() -> impl Iterator<Item = &'static Person> {
+        std::iter::once(Self::STORED_VALUE)
+    }
+    #[must_use]
     pub fn contains(key: i32) -> bool {
 
         key == 1

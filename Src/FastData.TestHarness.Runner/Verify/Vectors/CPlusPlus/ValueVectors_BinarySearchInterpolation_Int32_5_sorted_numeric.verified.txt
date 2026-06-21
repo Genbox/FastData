@@ -2,28 +2,46 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: BinarySearchInterpolation
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
-    static constexpr std::array<int32_t, 5> keys = {
+    static constexpr std::array<int32_t, 5> key_items = {
         1, 2, 3, 4, 5
     };
 
 public:
     [[nodiscard]]
+    static constexpr direct_access_view<int32_t> keys() noexcept { return direct_access_view<int32_t>(key_items.data(), 5); }
+    [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 
         int32_t lo = 0;
         int32_t hi = 4;
-        while (lo <= hi && key >= keys[lo] && key <= keys[hi]) {
-            const int32_t lo_key = keys[lo];
-            const int32_t hi_key = keys[hi];
+        while (lo <= hi && key >= key_items[lo] && key <= key_items[hi]) {
+            const int32_t lo_key = key_items[lo];
+            const int32_t hi_key = key_items[hi];
 
             if (lo_key == hi_key) {
                 if (lo_key == key)
@@ -41,7 +59,7 @@ public:
             else if (mid > hi)
                 mid = hi;
 
-            const int32_t mid_key = keys[mid];
+            const int32_t mid_key = key_items[mid];
             if (mid_key == key)
                 return true;
             if (mid_key < key)

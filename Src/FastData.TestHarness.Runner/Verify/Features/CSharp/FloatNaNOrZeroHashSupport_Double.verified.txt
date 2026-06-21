@@ -3,6 +3,7 @@
 // Structure: HashTable
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -38,6 +39,15 @@ internal static class FastData
         unchecked
         {
         return Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<double, byte>(ref value));
+        }
+    }
+
+    public static IEnumerable<double> Keys
+    {
+        get
+        {
+            for (int i = 0; i < _entries.Length; i++)
+                yield return _entries[i].Key;
         }
     }
 

@@ -73,6 +73,31 @@
 
 <#= HashSource #>
 
+    <#= MethodModifier #>IEnumerable<<#= KeyTypeName #>> Keys
+    {
+        get
+        {
+            for (int i = 0; i < _entries.Length; i++)
+                yield return <#= useEntryStruct ? "_entries[i].Key" : "_entries[i]" #>;
+        }
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodModifier #>IEnumerable<<#= ValueTypeName #>> Values
+    {
+        get
+        {
+            for (int i = 0; i < _entries.Length; i++)
+                yield return _entries[i].Value;
+        }
+    }
+<#
+    }
+#>
+
     <#= MethodAttribute #>
     <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
     {

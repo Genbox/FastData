@@ -16,13 +16,79 @@
     if (Data.ValueCount > 0)
     {
 #>
-    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> value_items = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
     };
 <#
     }
 #>
 public:
+    class offset_iterator {
+    protected:
+        uint64_t _offset;
+
+        static constexpr uint64_t offset_count() noexcept { return static_cast<uint64_t>(max_key - min_key) + 1; }
+
+        void advance() noexcept {
+<#
+    if (Data.HasOccupancy)
+    {
+#>            while (_offset < offset_count()) {
+                const size_t word = static_cast<size_t>(_offset >> 6);
+                if ((bitset[word] & (1ULL << (_offset & 63))) != 0)
+                    return;
+
+                ++_offset;
+            }
+<#
+    }
+#>        }
+
+    public:
+        explicit offset_iterator(const uint64_t offset) noexcept : _offset(offset) { advance(); }
+
+        offset_iterator& operator++() noexcept { ++_offset; advance(); return *this; }
+        [[nodiscard]] bool operator!=(const offset_iterator& other) const noexcept { return _offset != other._offset; }
+        [[nodiscard]] uint64_t offset() const noexcept { return _offset; }
+    };
+
+    class key_iterator final : public offset_iterator {
+    public:
+        using offset_iterator::offset_iterator;
+        [[nodiscard]] <#= KeyTypeName #> operator*() const noexcept { return static_cast<<#= KeyTypeName #>>(min_key + _offset); }
+    };
+
+    class key_range final {
+    public:
+        [[nodiscard]] key_iterator begin() const noexcept { return key_iterator(0); }
+        [[nodiscard]] key_iterator end() const noexcept { return key_iterator(static_cast<uint64_t>(max_key - min_key) + 1); }
+    };
+
+    [[nodiscard]]
+    static key_range keys() noexcept { return key_range(); }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    class value_iterator final : public offset_iterator {
+    public:
+        using offset_iterator::offset_iterator;
+        [[nodiscard]] const <#= ValueTypeName #>& operator*() const noexcept { return value_items[static_cast<size_t>(_offset)]; }
+    };
+
+    class value_range final {
+    public:
+        [[nodiscard]] value_iterator begin() const noexcept { return value_iterator(0); }
+        [[nodiscard]] value_iterator end() const noexcept { return value_iterator(static_cast<uint64_t>(max_key - min_key) + 1); }
+    };
+
+    [[nodiscard]]
+    static value_range values() noexcept { return value_range(); }
+<#
+    }
+#>
+
     <#= MethodAttribute #>
     <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.Contains) #>
@@ -65,7 +131,7 @@ public:
 <#
         }
 #>
-        value = &values[static_cast<size_t>(offset)];
+        value = &value_items[static_cast<size_t>(offset)];
         return true;
     }
 <#

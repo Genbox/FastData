@@ -8,6 +8,7 @@
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Rust" #>
+<#@ import namespace="Genbox.FastData.Config" #>
 <#@ import namespace="Genbox.FastData.Generators" #>
 <#@ import namespace="Genbox.FastData.Generators.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generators.Abstracts" #>

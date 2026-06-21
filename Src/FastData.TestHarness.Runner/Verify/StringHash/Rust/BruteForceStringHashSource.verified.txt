@@ -41,6 +41,11 @@ impl fastdata {
     }
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = &'static str> {
+        Self::ENTRIES.iter().map(|entry| entry.key)
+    }
+
+    #[must_use]
     pub fn contains(key: &str) -> bool {
         let mut length: i32 = Length(key);
         if ((length < 2))

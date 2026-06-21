@@ -23,6 +23,55 @@
 <#
     }
 #>
+    <#= MethodModifier #>IEnumerable<<#= KeyTypeName #>> Keys
+    {
+        get
+        {
+            for (<#= KeyTypeName #> key = MinKey; key <= MaxKey; key++)
+            {
+<#
+        if (Data.HasOccupancy)
+        {
+#>                ulong offset = (ulong)(key - MinKey);
+                int word = (int)(offset >> 6);
+                if ((_bitset[word] & (1UL << (int)(offset & 63))) == 0)
+                    continue;
+
+<#
+        }
+#>                yield return key;
+            }
+        }
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodModifier #>IEnumerable<<#= ValueTypeName #>> Values
+    {
+        get
+        {
+            for (<#= KeyTypeName #> key = MinKey; key <= MaxKey; key++)
+            {
+                ulong offset = (ulong)(key - MinKey);
+<#
+        if (Data.HasOccupancy)
+        {
+#>                int word = (int)(offset >> 6);
+                if ((_bitset[word] & (1UL << (int)(offset & 63))) == 0)
+                    continue;
+
+<#
+        }
+#>                yield return _values[(int)offset];
+            }
+        }
+    }
+<#
+    }
+#>
+
     <#= MethodAttribute #>
     <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
     {

@@ -7,7 +7,7 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class SingleValueStructure<TKey, TValue> : IStructure<TKey, TValue, SingleValueContext<TKey, TValue>>
 {
-    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration | StructureCapability.DirectAccess;
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration;
 
     public SingleValueContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

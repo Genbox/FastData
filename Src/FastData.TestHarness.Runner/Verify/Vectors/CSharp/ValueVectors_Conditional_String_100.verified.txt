@@ -3,6 +3,7 @@
 // Structure: Conditional
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -10,6 +11,112 @@ internal static class FastData
 {
 
 
+    public static IEnumerable<string> Keys
+    {
+        get
+        {
+            yield return "0";
+            yield return "1";
+            yield return "10";
+            yield return "11";
+            yield return "12";
+            yield return "13";
+            yield return "14";
+            yield return "15";
+            yield return "16";
+            yield return "17";
+            yield return "18";
+            yield return "19";
+            yield return "2";
+            yield return "20";
+            yield return "21";
+            yield return "22";
+            yield return "23";
+            yield return "24";
+            yield return "25";
+            yield return "26";
+            yield return "27";
+            yield return "28";
+            yield return "29";
+            yield return "3";
+            yield return "30";
+            yield return "31";
+            yield return "32";
+            yield return "33";
+            yield return "34";
+            yield return "35";
+            yield return "36";
+            yield return "37";
+            yield return "38";
+            yield return "39";
+            yield return "4";
+            yield return "40";
+            yield return "41";
+            yield return "42";
+            yield return "43";
+            yield return "44";
+            yield return "45";
+            yield return "46";
+            yield return "47";
+            yield return "48";
+            yield return "49";
+            yield return "5";
+            yield return "50";
+            yield return "51";
+            yield return "52";
+            yield return "53";
+            yield return "54";
+            yield return "55";
+            yield return "56";
+            yield return "57";
+            yield return "58";
+            yield return "59";
+            yield return "6";
+            yield return "60";
+            yield return "61";
+            yield return "62";
+            yield return "63";
+            yield return "64";
+            yield return "65";
+            yield return "66";
+            yield return "67";
+            yield return "68";
+            yield return "69";
+            yield return "7";
+            yield return "70";
+            yield return "71";
+            yield return "72";
+            yield return "73";
+            yield return "74";
+            yield return "75";
+            yield return "76";
+            yield return "77";
+            yield return "78";
+            yield return "79";
+            yield return "8";
+            yield return "80";
+            yield return "81";
+            yield return "82";
+            yield return "83";
+            yield return "84";
+            yield return "85";
+            yield return "86";
+            yield return "87";
+            yield return "88";
+            yield return "89";
+            yield return "9";
+            yield return "90";
+            yield return "91";
+            yield return "92";
+            yield return "93";
+            yield return "94";
+            yield return "95";
+            yield return "96";
+            yield return "97";
+            yield return "98";
+            yield return "99";
+        }
+    }
     
     public static bool Contains(string key)
     {

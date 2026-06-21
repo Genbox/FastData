@@ -17,6 +17,16 @@ impl fastdata {
     ];
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        (Self::MIN_KEY..=Self::MAX_KEY).filter(|key| {
+            let key = *key;
+            let offset = ((key as i64) - (Self::MIN_KEY as i64)) as u64;
+            let word = (offset >> 6) as usize;
+            (Self::BITSET[word] & (1u64 << (offset & 63))) != 0
+        })
+    }
+
+    #[must_use]
     pub fn contains(key: i32) -> bool {
         if ((((key as u32).wrapping_sub(1)) > 4))
         {

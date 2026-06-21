@@ -3,6 +3,7 @@
 // Structure: BinarySearch
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -13,6 +14,10 @@ internal static class FastData
     private static readonly float[] _keys = new float[] {
         float.MinValue, -1f, 0f, 1f, float.MaxValue
     };
+
+    public static IEnumerable<float> Keys => _keys;
+
+    public static ReadOnlySpan<float> KeySpan => _keys;
 
     
     public static bool Contains(float key)

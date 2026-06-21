@@ -3,6 +3,7 @@
 // Structure: Conditional
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -10,6 +11,15 @@ internal static class StaticData
 {
 
 
+    public static IEnumerable<string> Keys
+    {
+        get
+        {
+            yield return "item1";
+            yield return "item2";
+            yield return "item3";
+        }
+    }
     
     public static bool Contains(string key)
     {

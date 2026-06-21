@@ -17,6 +17,14 @@ impl fastdata {
     ];
 
     #[must_use]
+    pub fn key_slice() -> &'static [f64] { &Self::KEYS }
+
+    #[must_use]
+    pub fn keys() -> impl Iterator<Item = f64> {
+        Self::KEYS.iter().copied()
+    }
+
+    #[must_use]
     pub fn contains(key: f64) -> bool {
 
         let mut lo: usize = 0;

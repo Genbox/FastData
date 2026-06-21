@@ -7,6 +7,28 @@
     public string MethodAttribute => "";
     public string LookupKeyName => "key";
     public string HashCall => Type.GetTypeCode(Model.KeyType) == TypeCode.String ? $"Hash({LookupKeyName}, length * 2)" : $"Hash({LookupKeyName})";
+    public string KeyEnumerationProperty(string expression) => $"{MethodModifier}IEnumerable<{KeyTypeName}> Keys => {expression};";
+    public string ValueEnumerationProperty(string expression) => $"{MethodModifier}IEnumerable<{ValueTypeName}> Values => {expression};";
+    public string KeyDirectAccessProperty(string expression) => $"{MethodModifier}ReadOnlySpan<{KeyTypeName}> KeySpan => {expression};";
+    public string ValueDirectAccessProperty(string expression) => $"{MethodModifier}ReadOnlySpan<{ValueTypeName}> ValueSpan => {expression};";
+
+    public string ArrayAccessProperties(string keyField, string valueField, int valueCount)
+    {
+        string result = $"""
+                             {KeyEnumerationProperty(keyField)}
+
+                             {KeyDirectAccessProperty(keyField)}
+                         """;
+        if (valueCount > 0)
+            result += $"""
+
+
+                             {ValueEnumerationProperty(valueField)}
+
+                             {ValueDirectAccessProperty(valueField)}
+                         """;
+        return result;
+    }
 
     public string HashSource
     {
@@ -45,14 +67,7 @@
 
     public string GetMod(string var1, ulong var2) => $"{var1} % {var2.ToStringInvariant()}";
 
-    public string GetMethodHeader(MethodType type)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        sb.Append(GetEarlyExits(type, GeneratorConfig.EarlyExits));
-
-        return sb.ToString();
-    }
+    public string GetMethodHeader(MethodType methodType) => GetEarlyExits(methodType, GeneratorConfig.EarlyExits);
 
     private string GetEarlyExits(MethodType methodType, AnnotatedExpr[] earlyExits)
     {

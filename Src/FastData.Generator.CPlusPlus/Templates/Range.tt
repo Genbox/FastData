@@ -16,6 +16,73 @@
     }
 #>
 public:
+<#
+    if (Data.RangeCount == 1)
+    {
+#>    class key_iterator final {
+        uint64_t _offset;
+
+        static constexpr <#= KeyTypeName #> start = <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #>;
+        static constexpr <#= KeyTypeName #> end_key = <#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>;
+
+    public:
+        constexpr explicit key_iterator(const uint64_t offset) noexcept : _offset(offset) {}
+
+        constexpr key_iterator& operator++() noexcept { ++_offset; return *this; }
+        [[nodiscard]] constexpr bool operator!=(const key_iterator& other) const noexcept { return _offset != other._offset; }
+        [[nodiscard]] constexpr <#= KeyTypeName #> operator*() const noexcept { return static_cast<<#= KeyTypeName #>>(start + _offset); }
+        [[nodiscard]] static constexpr uint64_t count() noexcept { return static_cast<uint64_t>(end_key - start) + 1; }
+    };
+<#
+    }
+    else
+    {
+#>    class key_iterator final {
+        size_t _range;
+        <#= KeyTypeName #> _key;
+
+    public:
+        key_iterator(const size_t range, const <#= KeyTypeName #> key) noexcept : _range(range), _key(key) {}
+
+        key_iterator& operator++() noexcept {
+            if (_key == range_ends[_range]) {
+                ++_range;
+                if (_range < range_starts.size())
+                    _key = range_starts[_range];
+            }
+            else {
+                ++_key;
+            }
+
+            return *this;
+        }
+
+        [[nodiscard]] bool operator!=(const key_iterator& other) const noexcept { return _range != other._range; }
+        [[nodiscard]] <#= KeyTypeName #> operator*() const noexcept { return _key; }
+    };
+<#
+    }
+#>
+    class key_range final {
+    public:
+<#
+    if (Data.RangeCount == 1)
+    {
+#>        [[nodiscard]] constexpr key_iterator begin() const noexcept { return key_iterator(0); }
+        [[nodiscard]] constexpr key_iterator end() const noexcept { return key_iterator(key_iterator::count()); }
+<#
+    }
+    else
+    {
+#>        [[nodiscard]] key_iterator begin() const noexcept { return key_iterator(0, range_starts[0]); }
+        [[nodiscard]] key_iterator end() const noexcept { return key_iterator(range_starts.size(), <#= TypeMap.ToValueLabel(Data.Ranges[Data.RangeCount - 1].End) #>); }
+<#
+    }
+#>    };
+
+    [[nodiscard]]
+    static <#= Data.RangeCount == 1 ? "constexpr " : "" #>key_range keys() noexcept { return key_range(); }
+
     <#= MethodAttribute #>
     <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.Contains) #>

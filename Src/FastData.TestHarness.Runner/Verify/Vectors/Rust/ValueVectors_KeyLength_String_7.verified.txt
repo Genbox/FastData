@@ -19,6 +19,11 @@ impl fastdata {
     ];
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = &'static str> {
+        Self::KEYS.iter().filter(|k| !k.is_empty()).copied()
+    }
+
+    #[must_use]
     pub fn contains(key: &str) -> bool {
         let mut length: i32 = Length(key);
         if ((((length - 3) as u32) > 7))

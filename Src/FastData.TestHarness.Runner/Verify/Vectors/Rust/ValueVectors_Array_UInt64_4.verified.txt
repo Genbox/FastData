@@ -17,6 +17,14 @@ impl fastdata {
     ];
 
     #[must_use]
+    pub fn key_slice() -> &'static [u64] { &Self::KEYS }
+
+    #[must_use]
+    pub fn keys() -> impl Iterator<Item = u64> {
+        Self::KEYS.iter().copied()
+    }
+
+    #[must_use]
     pub fn contains(key: u64) -> bool {
 
         for entry in Self::KEYS.iter() {

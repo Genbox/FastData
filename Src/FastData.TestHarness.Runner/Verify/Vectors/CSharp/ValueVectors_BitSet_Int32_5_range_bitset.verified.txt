@@ -3,6 +3,7 @@
 // Structure: BitSet
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -13,6 +14,22 @@ internal static class FastData
     private static readonly ulong[] _bitset = new ulong[] {
         31ul
     };
+
+    public static IEnumerable<int> Keys
+    {
+        get
+        {
+            for (int key = MinKey; key <= MaxKey; key++)
+            {
+                ulong offset = (ulong)(key - MinKey);
+                int word = (int)(offset >> 6);
+                if ((_bitset[word] & (1UL << (int)(offset & 63))) == 0)
+                    continue;
+
+                yield return key;
+            }
+        }
+    }
 
     
     public static bool Contains(int key)

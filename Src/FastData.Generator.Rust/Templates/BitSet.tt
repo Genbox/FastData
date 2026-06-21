@@ -31,6 +31,51 @@
     }
 #>
     <#= MethodAttribute #>
+    <#= MethodModifier #>fn keys() -> impl Iterator<Item = <#= StoredKeyTypeName #>> {
+        (Self::MIN_KEY..=Self::MAX_KEY).filter(|key| {
+            let key = *key;
+<#
+    if (Data.HasOccupancy)
+    {
+#>            let offset = <#= offsetExpression #>;
+            let word = (offset >> 6) as usize;
+            (Self::BITSET[word] & (1u64 << (offset & 63))) != 0
+<#
+    }
+    else
+    {
+#>            true
+<#
+    }
+#>        })
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn values() -> impl Iterator<Item = <#= StoredValueTypeName #>> {
+        (Self::MIN_KEY..=Self::MAX_KEY).filter_map(|key| {
+            let offset = <#= offsetExpression #>;
+<#
+        if (Data.HasOccupancy)
+        {
+#>            let word = (offset >> 6) as usize;
+            if (Self::BITSET[word] & (1u64 << (offset & 63))) == 0 {
+                return None;
+            }
+
+<#
+        }
+#>            Some(Self::VALUES[offset as usize])
+        })
+    }
+<#
+    }
+#>
+
+    <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
         let offset = <#= offsetExpression #>;

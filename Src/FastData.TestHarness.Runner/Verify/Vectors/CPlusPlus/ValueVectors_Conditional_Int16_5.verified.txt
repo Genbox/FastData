@@ -2,16 +2,60 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Conditional
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
 public:
+    class key_iterator final {
+        size_t _index;
+
+    public:
+        constexpr explicit key_iterator(const size_t index) noexcept : _index(index) {}
+
+        constexpr key_iterator& operator++() noexcept { ++_index; return *this; }
+        [[nodiscard]] constexpr bool operator!=(const key_iterator& other) const noexcept { return _index != other._index; }
+        [[nodiscard]] constexpr int16_t operator*() const noexcept {
+            switch (_index) {
+                case 0: return std::numeric_limits<int16_t>::lowest();
+                case 1: return -1;
+                case 2: return 0;
+                case 3: return 1;
+                case 4: return std::numeric_limits<int16_t>::max();
+                default: return std::numeric_limits<int16_t>::lowest();
+            }
+        }
+    };
+
+    class key_range final {
+    public:
+        [[nodiscard]] constexpr key_iterator begin() const noexcept { return key_iterator(0); }
+        [[nodiscard]] constexpr key_iterator end() const noexcept { return key_iterator(5); }
+    };
+
+    [[nodiscard]]
+    static constexpr key_range keys() noexcept { return key_range(); }
     [[nodiscard]]
     static constexpr bool contains(const int16_t key) noexcept {
 

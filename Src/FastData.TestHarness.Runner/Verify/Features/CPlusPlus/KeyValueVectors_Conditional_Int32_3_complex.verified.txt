@@ -2,6 +2,7 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Conditional
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
@@ -14,13 +15,63 @@ struct Person {
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
-    inline static const std::array<Person, 3> values = {
+    inline static const std::array<Person, 3> value_items = {
         Person(1, u8"Bob", new Person(4, u8"Anna", nullptr)), Person(2, u8"Billy", nullptr), Person(3, u8"Bibi", nullptr)
     };
 public:
+    class key_iterator final {
+        size_t _index;
+
+    public:
+        constexpr explicit key_iterator(const size_t index) noexcept : _index(index) {}
+
+        constexpr key_iterator& operator++() noexcept { ++_index; return *this; }
+        [[nodiscard]] constexpr bool operator!=(const key_iterator& other) const noexcept { return _index != other._index; }
+        [[nodiscard]] constexpr int32_t operator*() const noexcept {
+            switch (_index) {
+                case 0: return 1;
+                case 1: return 2;
+                case 2: return 3;
+                default: return 1;
+            }
+        }
+    };
+
+    class key_range final {
+    public:
+        [[nodiscard]] constexpr key_iterator begin() const noexcept { return key_iterator(0); }
+        [[nodiscard]] constexpr key_iterator end() const noexcept { return key_iterator(3); }
+    };
+
+    [[nodiscard]]
+    static constexpr key_range keys() noexcept { return key_range(); }
+
+    class value_range final {
+    public:
+        [[nodiscard]] auto begin() const noexcept { return value_items.begin(); }
+        [[nodiscard]] auto end() const noexcept { return value_items.end(); }
+    };
+
+    [[nodiscard]]
+    static value_range values() noexcept { return value_range(); }
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 
@@ -34,15 +85,15 @@ public:
     static bool try_lookup(const int32_t key, const Person*& value) noexcept {
 
         if (key == 1) {
-            value = &values[0];
+            value = &value_items[0];
             return true;
         }
         if (key == 2) {
-            value = &values[1];
+            value = &value_items[1];
             return true;
         }
         if (key == 3) {
-            value = &values[2];
+            value = &value_items[2];
             return true;
         }
         value = nullptr;

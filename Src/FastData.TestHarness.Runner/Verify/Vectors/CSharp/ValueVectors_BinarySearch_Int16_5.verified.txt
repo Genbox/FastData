@@ -3,6 +3,7 @@
 // Structure: BinarySearch
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -13,6 +14,10 @@ internal static class FastData
     private static readonly short[] _keys = new short[] {
         short.MinValue, -1, 0, 1, short.MaxValue
     };
+
+    public static IEnumerable<short> Keys => _keys;
+
+    public static ReadOnlySpan<short> KeySpan => _keys;
 
     
     public static bool Contains(short key)

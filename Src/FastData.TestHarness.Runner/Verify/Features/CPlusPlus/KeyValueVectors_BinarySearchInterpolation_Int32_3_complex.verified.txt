@@ -2,6 +2,7 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: BinarySearchInterpolation
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
@@ -14,25 +15,45 @@ struct Person {
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
-    inline static const std::array<Person, 3> values = {
+    inline static const std::array<Person, 3> value_items = {
         Person(1, u8"Bob", new Person(4, u8"Anna", nullptr)), Person(2, u8"Billy", nullptr), Person(3, u8"Bibi", nullptr)
     };
-    static constexpr std::array<int32_t, 3> keys = {
+    static constexpr std::array<int32_t, 3> key_items = {
         1, 2, 3
     };
 
 public:
     [[nodiscard]]
+    static constexpr direct_access_view<int32_t> keys() noexcept { return direct_access_view<int32_t>(key_items.data(), 3); }
+
+    [[nodiscard]]
+    static direct_access_view<Person> values() noexcept { return direct_access_view<Person>(value_items.data(), 3); }
+    [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 
         int32_t lo = 0;
         int32_t hi = 2;
-        while (lo <= hi && key >= keys[lo] && key <= keys[hi]) {
-            const int32_t lo_key = keys[lo];
-            const int32_t hi_key = keys[hi];
+        while (lo <= hi && key >= key_items[lo] && key <= key_items[hi]) {
+            const int32_t lo_key = key_items[lo];
+            const int32_t hi_key = key_items[hi];
 
             if (lo_key == hi_key) {
                 if (lo_key == key)
@@ -50,7 +71,7 @@ public:
             else if (mid > hi)
                 mid = hi;
 
-            const int32_t mid_key = keys[mid];
+            const int32_t mid_key = key_items[mid];
             if (mid_key == key)
                 return true;
             if (mid_key < key)
@@ -67,13 +88,13 @@ public:
 
         int32_t lo = 0;
         int32_t hi = 2;
-        while (lo <= hi && key >= keys[lo] && key <= keys[hi]) {
-            const int32_t lo_key = keys[lo];
-            const int32_t hi_key = keys[hi];
+        while (lo <= hi && key >= key_items[lo] && key <= key_items[hi]) {
+            const int32_t lo_key = key_items[lo];
+            const int32_t hi_key = key_items[hi];
 
             if (lo_key == hi_key) {
                 if (lo_key == key) {
-                    value = &values[lo];
+                    value = &value_items[lo];
                     return true;
                 }
 
@@ -89,9 +110,9 @@ public:
             else if (mid > hi)
                 mid = hi;
 
-            const int32_t mid_key = keys[mid];
+            const int32_t mid_key = key_items[mid];
             if (mid_key == key) {
-                value = &values[mid];
+                value = &value_items[mid];
                 return true;
             }
 

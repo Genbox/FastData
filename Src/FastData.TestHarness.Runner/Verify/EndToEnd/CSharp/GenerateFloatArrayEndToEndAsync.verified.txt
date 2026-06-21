@@ -3,6 +3,7 @@
 // Structure: Array
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -14,6 +15,10 @@ internal static class FastData
     private static readonly float[] _keys = new float[] {
         1.25f, 3.5f, 6.75f, 9f
     };
+
+    public static IEnumerable<float> Keys => _keys;
+
+    public static ReadOnlySpan<float> KeySpan => _keys;
 
     
     public static bool Contains(float key)

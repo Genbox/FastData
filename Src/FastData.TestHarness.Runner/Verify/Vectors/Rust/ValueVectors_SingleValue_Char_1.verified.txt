@@ -13,6 +13,10 @@ pub struct fastdata;
 impl fastdata {
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = u16> {
+        std::iter::once(97u16)
+    }
+    #[must_use]
     pub fn contains(key: u16) -> bool {
 
         key == 97u16

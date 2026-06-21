@@ -14,10 +14,19 @@ public abstract class TestBase(BootstrapBase bootstrap, DockerManager dockerMana
     public void Deserialize(IXunitSerializationInfo info) => info.GetValue<string>(nameof(Name));
     protected abstract string RenderContains<TKey>(string source, TKey[] present, TKey[] notPresent);
     protected abstract string RenderTryLookup<TKey, TValue>(string source, TKey[] present, TValue[] presentValues, TKey[] notPresent);
+    protected abstract string RenderKeysEnumeration(string source);
+    protected abstract string RenderValuesEnumeration(string source);
+    protected abstract string RenderDirectAccess(string source);
 
     public async Task<int> RunContainsAsync<TKey>(string source, string id, TKey[] present, TKey[] notPresent, CancellationToken cancellationToken = default) => await RunProgramAsync(RenderContains(source, present, notPresent), id, true, cancellationToken).ConfigureAwait(false);
 
     public async Task<int> RunTryLookupAsync<TKey, TValue>(string source, string id, TKey[] present, TValue[] presentValues, TKey[] notPresent, CancellationToken cancellationToken = default) => await RunProgramAsync(RenderTryLookup(source, present, presentValues, notPresent), id, true, cancellationToken).ConfigureAwait(false);
+
+    public async Task<int> RunKeysEnumerationAsync(string source, string id, CancellationToken cancellationToken = default) => await RunProgramAsync(RenderKeysEnumeration(source), id, true, cancellationToken).ConfigureAwait(false);
+
+    public async Task<int> RunValuesEnumerationAsync(string source, string id, CancellationToken cancellationToken = default) => await RunProgramAsync(RenderValuesEnumeration(source), id, true, cancellationToken).ConfigureAwait(false);
+
+    public async Task<int> RunDirectAccessAsync(string source, string id, CancellationToken cancellationToken = default) => await RunProgramAsync(RenderDirectAccess(source), id, true, cancellationToken).ConfigureAwait(false);
 
     public async Task<int> RunProgramAsync(string program, string id, bool useCache, CancellationToken cancellationToken = default) => (await RunAsync(program, id, useCache, cancellationToken).ConfigureAwait(false)).ExitCode;
 }

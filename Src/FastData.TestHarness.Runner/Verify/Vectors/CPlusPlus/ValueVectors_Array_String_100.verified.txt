@@ -2,17 +2,33 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Array
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
 
-    static constexpr std::array<std::string_view, 100> keys = {
+    static constexpr std::array<std::string_view, 100> key_items = {
         u8"0", u8"1", u8"10", u8"11", u8"12", u8"13", u8"14", u8"15", u8"16", u8"17", 
         u8"18", u8"19", u8"2", u8"20", u8"21", u8"22", u8"23", u8"24", u8"25", u8"26", 
         u8"27", u8"28", u8"29", u8"3", u8"30", u8"31", u8"32", u8"33", u8"34", u8"35", 
@@ -27,10 +43,12 @@ class fastdata final {
 
 public:
     [[nodiscard]]
+    static constexpr direct_access_view<std::string_view> keys() noexcept { return direct_access_view<std::string_view>(key_items.data(), 100); }
+    [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
 
         for (size_t i = 0; i < 100; i++) {
-            if (keys[i] == key)
+            if (key_items[i] == key)
                 return true;
         }
         return false;

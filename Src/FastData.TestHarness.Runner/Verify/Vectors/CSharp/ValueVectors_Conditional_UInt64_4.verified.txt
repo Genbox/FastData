@@ -3,6 +3,7 @@
 // Structure: Conditional
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -10,6 +11,16 @@ internal static class FastData
 {
 
 
+    public static IEnumerable<ulong> Keys
+    {
+        get
+        {
+            yield return ulong.MinValue;
+            yield return 1ul;
+            yield return 2ul;
+            yield return ulong.MaxValue;
+        }
+    }
     
     public static bool Contains(ulong key)
     {

@@ -8,6 +8,7 @@
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
+<#@ import namespace="Genbox.FastData.Config" #>
 <#@ import namespace="Genbox.FastData.Generators" #>
 <#@ import namespace="Genbox.FastData.Generators.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generators.Abstracts" #>
@@ -26,11 +27,27 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: <#= GeneratorConfig.StructureName #>
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 <#= Type.GetTypeCode(Model.ValueType) == TypeCode.Object ? TypeMap.GetObjectDeclaration(Model.ValueType).Trim() : string.Empty #>
+
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
 
 class <#= CPlusPlusConfig.ClassName #> final {
 

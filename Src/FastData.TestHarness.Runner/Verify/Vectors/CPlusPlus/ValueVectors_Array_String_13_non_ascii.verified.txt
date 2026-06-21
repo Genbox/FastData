@@ -2,27 +2,45 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Array
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
 
-    static constexpr std::array<std::string_view, 13> keys = {
+    static constexpr std::array<std::string_view, 13> key_items = {
         u8"ß", u8"à", u8"ä", u8"å", u8"æ", u8"ç", u8"è", u8"é", u8"ê", u8"ñ", 
         u8"ö", u8"ø", u8"ü"
     };
 
 public:
     [[nodiscard]]
+    static constexpr direct_access_view<std::string_view> keys() noexcept { return direct_access_view<std::string_view>(key_items.data(), 13); }
+    [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
 
         for (size_t i = 0; i < 13; i++) {
-            if (keys[i] == key)
+            if (key_items[i] == key)
                 return true;
         }
         return false;

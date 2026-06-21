@@ -1,4 +1,4 @@
-{
+﻿{
   Item1:
 //! This file is auto-generated. Do not edit manually.
 //! Structure: Range
@@ -21,6 +21,11 @@ impl FastData {
     const RANGE_ENDS: [u8; 4] = [
         42, 62, 80, 100
     ];
+    #[must_use]
+    pub fn keys() -> impl Iterator<Item = u8> {
+        Self::RANGE_STARTS.iter().zip(Self::RANGE_ENDS.iter()).flat_map(|(start, end)| *start..=*end)
+    }
+
     #[must_use]
     pub fn contains(key: u8) -> bool {
 

@@ -15,7 +15,38 @@
 <#
     object[] keys = Data.Keys.ToArray();
 #>
+    <#= MethodModifier #>IEnumerable<<#= KeyTypeName #>> Keys
+    {
+        get
+        {
 <#
+    for (int i = 0; i < keys.Length; i++)
+    {
+#>            yield return <#= TypeMap.ToValueLabel(keys[i]) #>;
+<#
+    }
+#>        }
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodModifier #>IEnumerable<<#= ValueTypeName #>> Values
+    {
+        get
+        {
+<#
+        for (int i = 0; i < keys.Length; i++)
+        {
+#>            yield return _values[<#= i.ToStringInvariant() #>];
+<#
+        }
+#>        }
+    }
+<#
+    }
+
     if (CSharpConfig.ConditionalBranchType == BranchType.If)
     {
 #>

@@ -3,6 +3,7 @@
 // Structure: BinarySearch
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -13,6 +14,10 @@ internal static class FastData
     private static readonly ulong[] _keys = new ulong[] {
         ulong.MinValue, 1ul, 2ul, ulong.MaxValue
     };
+
+    public static IEnumerable<ulong> Keys => _keys;
+
+    public static ReadOnlySpan<ulong> KeySpan => _keys;
 
     
     public static bool Contains(ulong key)

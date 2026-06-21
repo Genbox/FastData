@@ -28,13 +28,13 @@
     if (Data.ValueCount > 0)
     {
 #>
-    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> value_items = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
     };
 <#
     }
 #>
-    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
+    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> key_items = {
 <#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
     };
 <#
@@ -158,6 +158,7 @@
 #>
 
 public:
+<#= ArrayAccessProperties("key_items", Data.KeyCount, "value_items", Data.ValueCount) #>
     <#= MethodAttribute #>
     <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.Contains) #>
@@ -189,7 +190,7 @@ public:
 
         while (lo < hi) {
             const size_t mid = lo + ((hi - lo) >> 1);
-            const <#= KeyTypeName #> mid_key = keys[mid];
+            const <#= KeyTypeName #> mid_key = key_items[mid];
             if (mid_key == <#= LookupKeyName #>)
                 return true;
             if (mid_key < <#= LookupKeyName #>)
@@ -212,7 +213,7 @@ public:
 
         while (lo < hi) {
             const size_t mid = lo + ((hi - lo) >> 1);
-            const <#= KeyTypeName #> mid_key = keys[mid];
+            const <#= KeyTypeName #> mid_key = key_items[mid];
             if (mid_key == <#= LookupKeyName #>)
                 return true;
             if (mid_key < <#= LookupKeyName #>)
@@ -262,10 +263,10 @@ public:
 
         while (lo < hi) {
             const size_t mid = lo + ((hi - lo) >> 1);
-            const <#= KeyTypeName #> mid_key = keys[mid];
+            const <#= KeyTypeName #> mid_key = key_items[mid];
 
             if (mid_key == <#= LookupKeyName #>) {
-                value = &values[mid];
+                value = &value_items[mid];
                 return true;
             }
 
@@ -290,10 +291,10 @@ public:
 
         while (lo < hi) {
             const size_t mid = lo + ((hi - lo) >> 1);
-            const <#= KeyTypeName #> mid_key = keys[mid];
+            const <#= KeyTypeName #> mid_key = key_items[mid];
 
             if (mid_key == <#= LookupKeyName #>) {
-                value = &values[mid];
+                value = &value_items[mid];
                 return true;
             }
 

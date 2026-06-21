@@ -2,16 +2,68 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Conditional
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
 public:
+    class key_iterator final {
+        size_t _index;
+
+    public:
+        constexpr explicit key_iterator(const size_t index) noexcept : _index(index) {}
+
+        constexpr key_iterator& operator++() noexcept { ++_index; return *this; }
+        [[nodiscard]] constexpr bool operator!=(const key_iterator& other) const noexcept { return _index != other._index; }
+        [[nodiscard]] constexpr std::string_view operator*() const noexcept {
+            switch (_index) {
+                case 0: return u8"ß";
+                case 1: return u8"à";
+                case 2: return u8"ä";
+                case 3: return u8"å";
+                case 4: return u8"æ";
+                case 5: return u8"ç";
+                case 6: return u8"è";
+                case 7: return u8"é";
+                case 8: return u8"ê";
+                case 9: return u8"ñ";
+                case 10: return u8"ö";
+                case 11: return u8"ø";
+                case 12: return u8"ü";
+                default: return u8"ß";
+            }
+        }
+    };
+
+    class key_range final {
+    public:
+        [[nodiscard]] constexpr key_iterator begin() const noexcept { return key_iterator(0); }
+        [[nodiscard]] constexpr key_iterator end() const noexcept { return key_iterator(13); }
+    };
+
+    [[nodiscard]]
+    static constexpr key_range keys() noexcept { return key_range(); }
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
 

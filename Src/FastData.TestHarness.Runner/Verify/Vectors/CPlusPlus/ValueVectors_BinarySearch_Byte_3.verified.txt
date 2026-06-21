@@ -2,20 +2,38 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: BinarySearch
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
-    static constexpr std::array<uint8_t, 3> keys = {
+    static constexpr std::array<uint8_t, 3> key_items = {
         0, 1, std::numeric_limits<uint8_t>::max()
     };
 
 public:
+    [[nodiscard]]
+    static constexpr direct_access_view<uint8_t> keys() noexcept { return direct_access_view<uint8_t>(key_items.data(), 3); }
     [[nodiscard]]
     static constexpr bool contains(const uint8_t key) noexcept {
 
@@ -23,7 +41,7 @@ public:
         size_t hi = 3;
         while (lo < hi) {
             const size_t mid = lo + ((hi - lo) >> 1);
-            const uint8_t mid_key = keys[mid];
+            const uint8_t mid_key = key_items[mid];
             const int32_t order = mid_key < key ? -1 : (mid_key > key ? 1 : 0);
 
             if (order == 0)

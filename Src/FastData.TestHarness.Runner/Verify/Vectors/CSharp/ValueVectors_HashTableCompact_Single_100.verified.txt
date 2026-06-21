@@ -3,6 +3,7 @@
 // Structure: HashTableCompact
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -68,6 +69,15 @@ internal static class FastData
             bits &= 0x7F80_0000;
 
         return (ulong)bits;
+        }
+    }
+
+    public static IEnumerable<float> Keys
+    {
+        get
+        {
+            for (int i = 0; i < _entries.Length; i++)
+                yield return _entries[i].Key;
         }
     }
 

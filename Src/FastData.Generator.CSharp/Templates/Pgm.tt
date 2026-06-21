@@ -42,6 +42,8 @@
     <#= FieldModifier #><#= KeyTypeName #>[] _keys = new <#= KeyTypeName #>[] {
 <#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
     };
+
+<#= ArrayAccessProperties("_keys", "_values", Data.ValueCount) #>
 <#
     // Only emit segment arrays when there are multiple segments
     if (!singleSegment)

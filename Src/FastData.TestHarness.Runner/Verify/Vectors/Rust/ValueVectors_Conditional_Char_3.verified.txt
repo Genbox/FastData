@@ -13,6 +13,10 @@ pub struct fastdata;
 impl fastdata {
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = u16> {
+        [0u16, 97u16, 127u16].iter().copied()
+    }
+    #[must_use]
     pub fn contains(key: u16) -> bool {
 
         if key == 0u16 || key == 97u16 || key == 127u16 {

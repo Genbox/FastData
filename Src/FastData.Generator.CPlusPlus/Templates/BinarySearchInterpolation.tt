@@ -5,25 +5,26 @@
     if (Data.ValueCount > 0)
     {
 #>
-    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> value_items = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
     };
 <#
     }
 #>
-    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> keys = {
+    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> key_items = {
 <#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
     };
 
 public:
+<#= ArrayAccessProperties("key_items", Data.KeyCount, "value_items", Data.ValueCount) #>
     <#= MethodAttribute #>
     <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.Contains) #>
         int32_t lo = 0;
         int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
-        while (lo <= hi && <#= LookupKeyName #> >= keys[lo] && <#= LookupKeyName #> <= keys[hi]) {
-            const <#= KeyTypeName #> lo_key = keys[lo];
-            const <#= KeyTypeName #> hi_key = keys[hi];
+        while (lo <= hi && <#= LookupKeyName #> >= key_items[lo] && <#= LookupKeyName #> <= key_items[hi]) {
+            const <#= KeyTypeName #> lo_key = key_items[lo];
+            const <#= KeyTypeName #> hi_key = key_items[hi];
 
             if (lo_key == hi_key) {
                 if (lo_key == <#= LookupKeyName #>)
@@ -41,7 +42,7 @@ public:
             else if (mid > hi)
                 mid = hi;
 
-            const <#= KeyTypeName #> mid_key = keys[mid];
+            const <#= KeyTypeName #> mid_key = key_items[mid];
             if (mid_key == <#= LookupKeyName #>)
                 return true;
             if (mid_key < <#= LookupKeyName #>)
@@ -62,13 +63,13 @@ public:
 <#= GetMethodHeader(MethodType.TryLookup) #>
         int32_t lo = 0;
         int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
-        while (lo <= hi && <#= LookupKeyName #> >= keys[lo] && <#= LookupKeyName #> <= keys[hi]) {
-            const <#= KeyTypeName #> lo_key = keys[lo];
-            const <#= KeyTypeName #> hi_key = keys[hi];
+        while (lo <= hi && <#= LookupKeyName #> >= key_items[lo] && <#= LookupKeyName #> <= key_items[hi]) {
+            const <#= KeyTypeName #> lo_key = key_items[lo];
+            const <#= KeyTypeName #> hi_key = key_items[hi];
 
             if (lo_key == hi_key) {
                 if (lo_key == <#= LookupKeyName #>) {
-                    value = &values[lo];
+                    value = &value_items[lo];
                     return true;
                 }
 
@@ -84,9 +85,9 @@ public:
             else if (mid > hi)
                 mid = hi;
 
-            const <#= KeyTypeName #> mid_key = keys[mid];
+            const <#= KeyTypeName #> mid_key = key_items[mid];
             if (mid_key == <#= LookupKeyName #>) {
-                value = &values[mid];
+                value = &value_items[mid];
                 return true;
             }
 

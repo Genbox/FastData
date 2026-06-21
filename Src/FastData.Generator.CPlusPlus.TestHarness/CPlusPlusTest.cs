@@ -53,4 +53,54 @@ public sealed class CPlusPlusTest(DockerManager manager) : TestBase<CPlusPlusBoo
                                   return 1;
                           """)}
          """;
+
+    protected override string RenderKeysEnumeration(string source) =>
+        $"""
+         #include <string>
+         #include <iostream>
+
+         {source}
+
+         {Bootstrap.Wrap("""
+                                  int count = 0;
+                                  for ([[maybe_unused]] auto key : fastdata::keys())
+                                      count++;
+                                  if (count != fastdata::item_count)
+                                      return 0;
+                                  return 1;
+                          """)}
+         """;
+
+    protected override string RenderValuesEnumeration(string source) =>
+        $"""
+         #include <string>
+         #include <iostream>
+
+         {source}
+
+         {Bootstrap.Wrap("""
+                                  int count = 0;
+                                  for ([[maybe_unused]] auto v : fastdata::values()) {
+                                      count++;
+                                  }
+                                  if (count != fastdata::item_count)
+                                      return 0;
+                                  return 1;
+                          """)}
+         """;
+
+    protected override string RenderDirectAccess(string source) =>
+        $"""
+         #include <string>
+         #include <iostream>
+
+         {source}
+
+         {Bootstrap.Wrap("""
+                                  auto ks = fastdata::keys();
+                                  if (ks.size() != fastdata::item_count)
+                                      return 0;
+                                  return 1;
+                          """)}
+         """;
 }

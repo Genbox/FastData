@@ -25,6 +25,15 @@ impl fastdata {
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
     ];
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        [1, 2, 3].iter().copied()
+    }
+
+    #[must_use]
+    pub fn values() -> impl Iterator<Item = &'static Person> {
+        Self::VALUES.iter().copied()
+    }
+    #[must_use]
     pub fn contains(key: i32) -> bool {
 
         if key == 1 || key == 2 || key == 3 {

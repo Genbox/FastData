@@ -3,6 +3,7 @@
 // Structure: Conditional
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -10,6 +11,25 @@ internal static class FastData
 {
 
 
+    public static IEnumerable<string> Keys
+    {
+        get
+        {
+            yield return "ß";
+            yield return "à";
+            yield return "ä";
+            yield return "å";
+            yield return "æ";
+            yield return "ç";
+            yield return "è";
+            yield return "é";
+            yield return "ê";
+            yield return "ñ";
+            yield return "ö";
+            yield return "ø";
+            yield return "ü";
+        }
+    }
     
     public static bool Contains(string key)
     {

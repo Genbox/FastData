@@ -35,6 +35,16 @@ impl fastdata {
     ];
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = &'static str> {
+        Self::KEYS.iter().filter(|k| !k.is_empty()).copied()
+    }
+
+    #[must_use]
+    pub fn values() -> impl Iterator<Item = &'static Person> {
+        Self::KEYS.iter().enumerate().filter(|(_, k)| !k.is_empty()).map(|(i, _)| Self::VALUES[Self::OFFSETS[i] as usize])
+    }
+
+    #[must_use]
     pub fn contains(key: &str) -> bool {
         let mut length: i32 = Length(key);
         if ((((length - 1) as u32) > 2))

@@ -2,17 +2,33 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Array
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
 
-    static constexpr std::array<float, 100> keys = {
+    static constexpr std::array<float, 100> key_items = {
         0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 
         10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 
         20.0f, 21.0f, 22.0f, 23.0f, 24.0f, 25.0f, 26.0f, 27.0f, 28.0f, 29.0f, 
@@ -27,10 +43,12 @@ class fastdata final {
 
 public:
     [[nodiscard]]
+    static constexpr direct_access_view<float> keys() noexcept { return direct_access_view<float>(key_items.data(), 100); }
+    [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
 
         for (size_t i = 0; i < 100; i++) {
-            if (keys[i] == key)
+            if (key_items[i] == key)
                 return true;
         }
         return false;

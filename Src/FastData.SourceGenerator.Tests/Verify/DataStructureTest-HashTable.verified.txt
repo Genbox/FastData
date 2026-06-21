@@ -3,6 +3,7 @@
 // Structure: HashTable
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -52,6 +53,15 @@ internal static class StaticData
         hash = (352654597ul + (hash * 1566083941ul));
 
         return hash;
+        }
+    }
+
+    public static IEnumerable<string> Keys
+    {
+        get
+        {
+            for (int i = 0; i < _entries.Length; i++)
+                yield return _entries[i].Key;
         }
     }
 

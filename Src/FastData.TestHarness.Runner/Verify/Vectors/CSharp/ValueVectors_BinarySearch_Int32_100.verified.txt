@@ -3,6 +3,7 @@
 // Structure: BinarySearch
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -22,6 +23,10 @@ internal static class FastData
         80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 
         90, 91, 92, 93, 94, 95, 96, 97, 98, 99
     };
+
+    public static IEnumerable<int> Keys => _keys;
+
+    public static ReadOnlySpan<int> KeySpan => _keys;
 
     
     public static bool Contains(int key)

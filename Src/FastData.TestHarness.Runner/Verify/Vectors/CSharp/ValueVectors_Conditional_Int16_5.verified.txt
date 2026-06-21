@@ -3,6 +3,7 @@
 // Structure: Conditional
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -10,6 +11,17 @@ internal static class FastData
 {
 
 
+    public static IEnumerable<short> Keys
+    {
+        get
+        {
+            yield return short.MinValue;
+            yield return -1;
+            yield return 0;
+            yield return 1;
+            yield return short.MaxValue;
+        }
+    }
     
     public static bool Contains(short key)
     {

@@ -3,6 +3,7 @@
 // Structure: Conditional
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -26,6 +27,25 @@ public class Person
         new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
     };
 
+    public static IEnumerable<int> Keys
+    {
+        get
+        {
+            yield return 1;
+            yield return 2;
+            yield return 3;
+        }
+    }
+
+    public static IEnumerable<Person> Values
+    {
+        get
+        {
+            yield return _values[0];
+            yield return _values[1];
+            yield return _values[2];
+        }
+    }
     
     public static bool Contains(int key)
     {

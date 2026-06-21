@@ -3,6 +3,7 @@
 // Structure: Array
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -14,6 +15,10 @@ internal static class FastData
     private static readonly sbyte[] _keys = new sbyte[] {
         sbyte.MinValue, -1, 0, 1, sbyte.MaxValue
     };
+
+    public static IEnumerable<sbyte> Keys => _keys;
+
+    public static ReadOnlySpan<sbyte> KeySpan => _keys;
 
     
     public static bool Contains(sbyte key)

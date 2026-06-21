@@ -2,11 +2,27 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: HashTablePerfect
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
+
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
 
 class fastdata final {
 
@@ -21,6 +37,26 @@ class fastdata final {
     }
 
 public:
+    class key_iterator final {
+        const int32_t* _entry;
+
+    public:
+        explicit key_iterator(const int32_t* entry) noexcept : _entry(entry) {}
+
+        key_iterator& operator++() noexcept { ++_entry; return *this; }
+        [[nodiscard]] bool operator!=(const key_iterator& other) const noexcept { return _entry != other._entry; }
+        [[nodiscard]] const int32_t& operator*() const noexcept { return *_entry; }
+    };
+
+    class key_range final {
+    public:
+        [[nodiscard]] key_iterator begin() const noexcept { return key_iterator(entries.data()); }
+        [[nodiscard]] key_iterator end() const noexcept { return key_iterator(entries.data() + entries.size()); }
+    };
+
+    [[nodiscard]]
+    static key_range keys() noexcept { return key_range(); }
+
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 

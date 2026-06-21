@@ -6,13 +6,58 @@
     if (Data.ValueCount > 0)
     {
 #>
-    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> values = {
+    <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> value_items = {
 <#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
     };
 <#
     }
 #>
 public:
+    class key_iterator final {
+        size_t _index;
+
+    public:
+        constexpr explicit key_iterator(const size_t index) noexcept : _index(index) {}
+
+        constexpr key_iterator& operator++() noexcept { ++_index; return *this; }
+        [[nodiscard]] constexpr bool operator!=(const key_iterator& other) const noexcept { return _index != other._index; }
+        [[nodiscard]] constexpr <#= KeyTypeName #> operator*() const noexcept {
+            switch (_index) {
+<#
+    for (int i = 0; i < keys.Length; i++)
+    {
+#>                case <#= i.ToStringInvariant() #>: return <#= TypeMap.ToValueLabel(keys[i]) #>;
+<#
+    }
+#>                default: return <#= TypeMap.ToValueLabel(keys[0]) #>;
+            }
+        }
+    };
+
+    class key_range final {
+    public:
+        [[nodiscard]] constexpr key_iterator begin() const noexcept { return key_iterator(0); }
+        [[nodiscard]] constexpr key_iterator end() const noexcept { return key_iterator(<#= keys.Length.ToStringInvariant() #>); }
+    };
+
+    [[nodiscard]]
+    static constexpr key_range keys() noexcept { return key_range(); }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    class value_range final {
+    public:
+        [[nodiscard]] auto begin() const noexcept { return value_items.begin(); }
+        [[nodiscard]] auto end() const noexcept { return value_items.end(); }
+    };
+
+    [[nodiscard]]
+    static value_range values() noexcept { return value_range(); }
+<#
+    }
+#>
     <#= MethodAttribute #>
     <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.Contains) #>
@@ -33,7 +78,7 @@ public:
     for (int i = 0; i < keys.Length; i++)
     {
 #>        if (<#= GetEqual(LookupKeyName, TypeMap.ToValueLabel(keys[i])) #>) {
-            value = &values[<#= i.ToStringInvariant() #>];
+            value = &value_items[<#= i.ToStringInvariant() #>];
             return true;
         }
 <#

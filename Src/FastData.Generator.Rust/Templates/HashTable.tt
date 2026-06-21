@@ -39,6 +39,8 @@ struct E {
 
 <#= HashSource #>
 
+<#= EntryIterators("ENTRIES", "entry.key", "entry.value", Data.ValueCount) #>
+
     <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>

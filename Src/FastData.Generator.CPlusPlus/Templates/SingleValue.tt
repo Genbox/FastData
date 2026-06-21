@@ -4,14 +4,25 @@
 <#
     string itemLabel = TypeMap.ToValueLabel(Data.Item);
 #>
+    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, 1> key_items = { <#= itemLabel #> };
 <#
     if (Data.Value != null)
     {
-#>    static inline const auto stored_value = <#= TypeMap.ToValueLabel(Data.Value) #>;
+#>    inline static const std::array<<#= ValueTypeName #>, 1> value_items = { <#= TypeMap.ToValueLabel(Data.Value) #> };
 <#
     }
 #>
 public:
+    <#= KeyDirectAccessProperty("key_items", 1) #>
+<#
+    if (Data.Value != null)
+    {
+#>
+
+    <#= ValueDirectAccessProperty("value_items", 1) #>
+<#
+    }
+#>
     <#= MethodAttribute #>
     <#= MethodModifier(true) #>bool contains(const <#= KeyTypeName #> key)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.Contains) #>
@@ -26,7 +37,7 @@ public:
     <#= MethodModifier(false) #>bool try_lookup(const <#= KeyTypeName #> key, const <#= ValueTypeName #>*& value)<#= PostMethodModifier #> {
 <#= GetMethodHeader(MethodType.TryLookup) #>
         if (<#= GetEqual(LookupKeyName, itemLabel) #>) {
-            value = &stored_value;
+            value = &value_items[0];
             return true;
         }
 

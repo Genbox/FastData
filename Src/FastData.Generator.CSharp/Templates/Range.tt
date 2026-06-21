@@ -15,6 +15,29 @@
 <#
     }
 #>
+    <#= MethodModifier #>IEnumerable<<#= KeyTypeName #>> Keys
+    {
+        get
+        {
+<#
+    if (Data.RangeCount == 1)
+    {
+#>            for (<#= KeyTypeName #> key = <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #>; key <= <#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>; key++)
+                yield return key;
+<#
+    }
+    else
+    {
+#>            for (int i = 0; i < _rangeStarts.Length; i++)
+            {
+                for (<#= KeyTypeName #> key = _rangeStarts[i]; key <= _rangeEnds[i]; key++)
+                    yield return key;
+            }
+<#
+    }
+#>        }
+    }
+
     <#= MethodAttribute #>
     <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
     {

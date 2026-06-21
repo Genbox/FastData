@@ -25,6 +25,22 @@ impl fastdata {
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
     ];
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        (Self::MIN_KEY..=Self::MAX_KEY).filter(|key| {
+            let key = *key;
+            true
+        })
+    }
+
+    #[must_use]
+    pub fn values() -> impl Iterator<Item = &'static Person> {
+        (Self::MIN_KEY..=Self::MAX_KEY).filter_map(|key| {
+            let offset = ((key as i64) - (Self::MIN_KEY as i64)) as u64;
+            Some(Self::VALUES[offset as usize])
+        })
+    }
+
+    #[must_use]
     pub fn contains(key: i32) -> bool {
         if ((((key as u32).wrapping_sub(1)) > 2))
         {

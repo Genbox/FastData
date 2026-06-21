@@ -3,6 +3,7 @@
 // Structure: Range
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -17,6 +18,18 @@ internal static class FastData
     private static readonly int[] _rangeEnds = new int[] {
         2, 4, 8, 10
     };
+    public static IEnumerable<int> Keys
+    {
+        get
+        {
+            for (int i = 0; i < _rangeStarts.Length; i++)
+            {
+                for (int key = _rangeStarts[i]; key <= _rangeEnds[i]; key++)
+                    yield return key;
+            }
+        }
+    }
+
     
     public static bool Contains(int key)
     {

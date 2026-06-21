@@ -16,6 +16,8 @@
 <#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
     ];
 
+<#= ArrayAccessProperties("KEYS", "VALUES", Data.ValueCount) #>
+
     <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>

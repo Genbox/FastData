@@ -13,6 +13,10 @@ pub struct fastdata;
 impl fastdata {
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        [i32::MIN, -1, 0, 1, i32::MAX].iter().copied()
+    }
+    #[must_use]
     pub fn contains(key: i32) -> bool {
 
         if key == i32::MIN || key == -1 || key == 0 || key == 1 || key == i32::MAX {

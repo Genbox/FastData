@@ -30,6 +30,11 @@ impl fastdata {
     }
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = i64> {
+        Self::ENTRIES.iter().map(|entry| entry.key)
+    }
+
+    #[must_use]
     pub fn contains(key: i64) -> bool {
 
         let hash = Self::get_hash(key);

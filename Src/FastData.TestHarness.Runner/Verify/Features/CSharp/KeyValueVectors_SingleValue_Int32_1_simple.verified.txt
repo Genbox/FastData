@@ -3,6 +3,7 @@
 // Structure: SingleValue
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -11,6 +12,21 @@ internal static class FastData
 
 
     private static readonly int _storedValue = 1;
+    public static IEnumerable<int> Keys
+    {
+        get
+        {
+            yield return 1;
+        }
+    }
+
+    public static IEnumerable<int> Values
+    {
+        get
+        {
+            yield return _storedValue;
+        }
+    }
     
     public static bool Contains(int key)
     {

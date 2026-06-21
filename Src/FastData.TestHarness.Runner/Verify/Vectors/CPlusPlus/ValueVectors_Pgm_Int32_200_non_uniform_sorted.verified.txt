@@ -2,16 +2,32 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Pgm
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
-    static constexpr std::array<int32_t, 200> keys = {
+    static constexpr std::array<int32_t, 200> key_items = {
         153, 157, 162, 168, 175, 183, 192, 195, 199, 204, 
         210, 217, 225, 234, 237, 241, 246, 252, 259, 267, 
         276, 279, 283, 338, 344, 351, 359, 368, 371, 375, 
@@ -36,6 +52,8 @@ class fastdata final {
 
 public:
     [[nodiscard]]
+    static constexpr direct_access_view<int32_t> keys() noexcept { return direct_access_view<int32_t>(key_items.data(), 200); }
+    [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 
         const double product = static_cast<double>(0.1645983f) * static_cast<double>(static_cast<uint32_t>(key) - static_cast<uint32_t>(153));
@@ -48,7 +66,7 @@ public:
 
         while (lo < hi) {
             const size_t mid = lo + ((hi - lo) >> 1);
-            const int32_t mid_key = keys[mid];
+            const int32_t mid_key = key_items[mid];
             if (mid_key == key)
                 return true;
             if (mid_key < key)

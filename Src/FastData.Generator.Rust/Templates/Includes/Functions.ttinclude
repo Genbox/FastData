@@ -7,6 +7,41 @@
     public string FieldModifier => "const ";
     public string LookupKeyName => "key";
     public string HashCall => Type.GetTypeCode(Model.KeyType) == TypeCode.String ? $"unsafe {{ Self::get_hash({LookupKeyName}, length) }}" : $"Self::get_hash({LookupKeyName})";
+    public string KeyDirectAccessProperty(string fieldName) =>
+        $$"""
+        {{MethodAttribute}}
+            {{MethodModifier}}fn key_slice() -> &'static [{{StoredKeyTypeName}}] { &Self::{{fieldName}} }
+        """;
+
+    public string ValueDirectAccessProperty(string fieldName) =>
+        $$"""
+        {{MethodAttribute}}
+            {{MethodModifier}}fn value_slice() -> &'static [{{StoredValueTypeName}}] { &Self::{{fieldName}} }
+        """;
+
+    private string IteratorMethod(string name, string typeName, string body) =>
+        $$"""
+            {{MethodAttribute}}
+            {{MethodModifier}}fn {{name}}() -> impl Iterator<Item = {{typeName}}> {
+                {{body}}
+            }
+        """;
+
+    public string ArrayAccessProperties(string keyField, string valueField, int valueCount)
+    {
+        string result = $"    {KeyDirectAccessProperty(keyField)}\n\n{IteratorMethod("keys", StoredKeyTypeName, $"Self::{keyField}.iter().copied()")}";
+        if (valueCount > 0)
+            result += $"\n\n    {ValueDirectAccessProperty(valueField)}\n\n{IteratorMethod("values", StoredValueTypeName, $"Self::{valueField}.iter().copied()")}";
+        return result;
+    }
+
+    public string EntryIterators(string arrayName, string keyExpr, string valueExpr, int valueCount)
+    {
+        string result = IteratorMethod("keys", StoredKeyTypeName, $"Self::{arrayName}.iter().map(|entry| {keyExpr})");
+        if (valueCount > 0)
+            result += $"\n\n{IteratorMethod("values", StoredValueTypeName, $"Self::{arrayName}.iter().map(|entry| {valueExpr})")}";
+        return result;
+    }
 
     public string InputKeyTypeName
     {
@@ -92,14 +127,7 @@
 
     public string GetMod(string var1, ulong var2) => $"{var1} % {var2.ToStringInvariant()}u64";
 
-    public string GetMethodHeader(MethodType methodType)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        sb.Append(GetEarlyExits(methodType, GeneratorConfig.EarlyExits));
-
-        return sb.ToString();
-    }
+    public string GetMethodHeader(MethodType methodType) => GetEarlyExits(methodType, GeneratorConfig.EarlyExits);
 
     private string GetHash()
     {

@@ -2,16 +2,155 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Conditional
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
 public:
+    class key_iterator final {
+        size_t _index;
+
+    public:
+        constexpr explicit key_iterator(const size_t index) noexcept : _index(index) {}
+
+        constexpr key_iterator& operator++() noexcept { ++_index; return *this; }
+        [[nodiscard]] constexpr bool operator!=(const key_iterator& other) const noexcept { return _index != other._index; }
+        [[nodiscard]] constexpr float operator*() const noexcept {
+            switch (_index) {
+                case 0: return 0.0f;
+                case 1: return 1.0f;
+                case 2: return 2.0f;
+                case 3: return 3.0f;
+                case 4: return 4.0f;
+                case 5: return 5.0f;
+                case 6: return 6.0f;
+                case 7: return 7.0f;
+                case 8: return 8.0f;
+                case 9: return 9.0f;
+                case 10: return 10.0f;
+                case 11: return 11.0f;
+                case 12: return 12.0f;
+                case 13: return 13.0f;
+                case 14: return 14.0f;
+                case 15: return 15.0f;
+                case 16: return 16.0f;
+                case 17: return 17.0f;
+                case 18: return 18.0f;
+                case 19: return 19.0f;
+                case 20: return 20.0f;
+                case 21: return 21.0f;
+                case 22: return 22.0f;
+                case 23: return 23.0f;
+                case 24: return 24.0f;
+                case 25: return 25.0f;
+                case 26: return 26.0f;
+                case 27: return 27.0f;
+                case 28: return 28.0f;
+                case 29: return 29.0f;
+                case 30: return 30.0f;
+                case 31: return 31.0f;
+                case 32: return 32.0f;
+                case 33: return 33.0f;
+                case 34: return 34.0f;
+                case 35: return 35.0f;
+                case 36: return 36.0f;
+                case 37: return 37.0f;
+                case 38: return 38.0f;
+                case 39: return 39.0f;
+                case 40: return 40.0f;
+                case 41: return 41.0f;
+                case 42: return 42.0f;
+                case 43: return 43.0f;
+                case 44: return 44.0f;
+                case 45: return 45.0f;
+                case 46: return 46.0f;
+                case 47: return 47.0f;
+                case 48: return 48.0f;
+                case 49: return 49.0f;
+                case 50: return 50.0f;
+                case 51: return 51.0f;
+                case 52: return 52.0f;
+                case 53: return 53.0f;
+                case 54: return 54.0f;
+                case 55: return 55.0f;
+                case 56: return 56.0f;
+                case 57: return 57.0f;
+                case 58: return 58.0f;
+                case 59: return 59.0f;
+                case 60: return 60.0f;
+                case 61: return 61.0f;
+                case 62: return 62.0f;
+                case 63: return 63.0f;
+                case 64: return 64.0f;
+                case 65: return 65.0f;
+                case 66: return 66.0f;
+                case 67: return 67.0f;
+                case 68: return 68.0f;
+                case 69: return 69.0f;
+                case 70: return 70.0f;
+                case 71: return 71.0f;
+                case 72: return 72.0f;
+                case 73: return 73.0f;
+                case 74: return 74.0f;
+                case 75: return 75.0f;
+                case 76: return 76.0f;
+                case 77: return 77.0f;
+                case 78: return 78.0f;
+                case 79: return 79.0f;
+                case 80: return 80.0f;
+                case 81: return 81.0f;
+                case 82: return 82.0f;
+                case 83: return 83.0f;
+                case 84: return 84.0f;
+                case 85: return 85.0f;
+                case 86: return 86.0f;
+                case 87: return 87.0f;
+                case 88: return 88.0f;
+                case 89: return 89.0f;
+                case 90: return 90.0f;
+                case 91: return 91.0f;
+                case 92: return 92.0f;
+                case 93: return 93.0f;
+                case 94: return 94.0f;
+                case 95: return 95.0f;
+                case 96: return 96.0f;
+                case 97: return 97.0f;
+                case 98: return 98.0f;
+                case 99: return 99.0f;
+                default: return 0.0f;
+            }
+        }
+    };
+
+    class key_range final {
+    public:
+        [[nodiscard]] constexpr key_iterator begin() const noexcept { return key_iterator(0); }
+        [[nodiscard]] constexpr key_iterator end() const noexcept { return key_iterator(100); }
+    };
+
+    [[nodiscard]]
+    static constexpr key_range keys() noexcept { return key_range(); }
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
 

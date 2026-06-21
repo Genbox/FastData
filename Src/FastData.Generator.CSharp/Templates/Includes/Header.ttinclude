@@ -9,6 +9,7 @@
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Config" #>
 <#@ import namespace="Genbox.FastData.Generators.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generators" #>
 <#@ import namespace="Genbox.FastData.Generators.Abstracts" #>
@@ -44,6 +45,7 @@
 // Structure: <#= GeneratorConfig.StructureName #>
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

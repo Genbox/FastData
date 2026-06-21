@@ -2,26 +2,44 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: Array
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
 
-    static constexpr std::array<uint64_t, 4> keys = {
+    static constexpr std::array<uint64_t, 4> key_items = {
         0, 1ull, 2ull, std::numeric_limits<uint64_t>::max()
     };
 
 public:
     [[nodiscard]]
+    static constexpr direct_access_view<uint64_t> keys() noexcept { return direct_access_view<uint64_t>(key_items.data(), 4); }
+    [[nodiscard]]
     static constexpr bool contains(const uint64_t key) noexcept {
 
         for (size_t i = 0; i < 4; i++) {
-            if (keys[i] == key)
+            if (key_items[i] == key)
                 return true;
         }
         return false;

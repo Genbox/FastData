@@ -3,6 +3,8 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.KeyLengthTemplateData" name="Data" #>
 
 <#
+    object[] values = Data.Values.ToArray();
+
     if (Data.ValueCount > 0)
     {
 #>    <#= FieldModifier #>int[] _offsets = {
@@ -10,7 +12,7 @@
     };
 
     <#= FieldModifier #><#= ValueTypeName #>[] _values = {
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
     };
 
 <#
@@ -19,6 +21,37 @@
     <#= FieldModifier #><#= KeyTypeName #>[] _keys = {
 <#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
     };
+
+    <#= MethodModifier #>IEnumerable<<#= KeyTypeName #>> Keys
+    {
+        get
+        {
+            for (int i = 0; i < _keys.Length; i++)
+            {
+                if (_keys[i] != null)
+                    yield return _keys[i]!;
+            }
+        }
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodModifier #>IEnumerable<<#= ValueTypeName #>> Values
+    {
+        get
+        {
+            for (int i = 0; i < _keys.Length; i++)
+            {
+                if (_keys[i] != null)
+                    yield return _values[_offsets[i]];
+            }
+        }
+    }
+<#
+    }
+#>
 
     <#= MethodAttribute #>
     <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)

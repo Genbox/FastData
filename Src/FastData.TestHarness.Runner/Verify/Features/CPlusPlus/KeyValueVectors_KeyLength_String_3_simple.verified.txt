@@ -2,11 +2,27 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: KeyLength
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 
+
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
 
 class fastdata final {
 
@@ -16,14 +32,58 @@ class fastdata final {
         0, 1, 2
     };
 
-    inline static const std::array<int32_t, 3> values = {
+    inline static const std::array<int32_t, 3> value_items = {
         1, 2, 3
     };
-    static constexpr std::array<std::string_view, 3> keys = {
+    static constexpr std::array<std::string_view, 3> key_items = {
         u8"a", u8"aa", u8"aaa"
     };
-
 public:
+    class index_iterator {
+    protected:
+        size_t _index;
+
+        void advance() noexcept {
+            while (_index < key_items.size() && key_items[_index].data() == nullptr)
+                ++_index;
+        }
+
+    public:
+        explicit index_iterator(const size_t index) noexcept : _index(index) { advance(); }
+
+        index_iterator& operator++() noexcept { ++_index; advance(); return *this; }
+        [[nodiscard]] bool operator!=(const index_iterator& other) const noexcept { return _index != other._index; }
+    };
+
+    class key_iterator final : public index_iterator {
+    public:
+        using index_iterator::index_iterator;
+        [[nodiscard]] const std::string_view& operator*() const noexcept { return key_items[_index]; }
+    };
+
+    class key_range final {
+    public:
+        [[nodiscard]] key_iterator begin() const noexcept { return key_iterator(0); }
+        [[nodiscard]] key_iterator end() const noexcept { return key_iterator(key_items.size()); }
+    };
+
+    [[nodiscard]]
+    static key_range keys() noexcept { return key_range(); }
+
+    class value_iterator final : public index_iterator {
+    public:
+        using index_iterator::index_iterator;
+        [[nodiscard]] const int32_t& operator*() const noexcept { return value_items[offsets[_index]]; }
+    };
+
+    class value_range final {
+    public:
+        [[nodiscard]] value_iterator begin() const noexcept { return value_iterator(0); }
+        [[nodiscard]] value_iterator end() const noexcept { return value_iterator(key_items.size()); }
+    };
+
+    [[nodiscard]]
+    static value_range values() noexcept { return value_range(); }
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
         int32_t length = Length(key);
@@ -34,7 +94,7 @@ public:
 
 
         size_t idx = key.length() - 1;
-        return key == keys[idx];
+        return key == key_items[idx];
     }
 
     [[nodiscard]]
@@ -48,8 +108,8 @@ public:
 
 
         size_t idx = key.length() - 1;
-        if (key == keys[idx]) {
-            value = &values[offsets[idx]];
+        if (key == key_items[idx]) {
+            value = &value_items[offsets[idx]];
             return true;
         }
 

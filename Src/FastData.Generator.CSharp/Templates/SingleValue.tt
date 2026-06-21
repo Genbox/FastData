@@ -2,12 +2,35 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.SingleValueTemplateData" name="Data" #>
 <#
     string itemLabel = TypeMap.ToValueLabel(Data.Item);
-
+#>
+<#
     if (Data.Value != null)
     {
 #>
 
     private static readonly <#= ValueTypeName #> _storedValue = <#= TypeMap.ToValueLabel(Data.Value) #>;
+<#
+    }
+#>
+    <#= MethodModifier #>IEnumerable<<#= KeyTypeName #>> Keys
+    {
+        get
+        {
+            yield return <#= itemLabel #>;
+        }
+    }
+<#
+    if (Data.Value != null)
+    {
+#>
+
+    <#= MethodModifier #>IEnumerable<<#= ValueTypeName #>> Values
+    {
+        get
+        {
+            yield return _storedValue;
+        }
+    }
 <#
     }
 #>

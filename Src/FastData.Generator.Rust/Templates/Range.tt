@@ -17,6 +17,21 @@
     }
 #>
     <#= MethodAttribute #>
+    <#= MethodModifier #>fn keys() -> impl Iterator<Item = <#= StoredKeyTypeName #>> {
+<#
+    if (Data.RangeCount == 1)
+    {
+#>        <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #>..=<#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>
+<#
+    }
+    else
+    {
+#>        Self::RANGE_STARTS.iter().zip(Self::RANGE_ENDS.iter()).flat_map(|(start, end)| *start..=*end)
+<#
+    }
+#>    }
+
+    <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
 <#

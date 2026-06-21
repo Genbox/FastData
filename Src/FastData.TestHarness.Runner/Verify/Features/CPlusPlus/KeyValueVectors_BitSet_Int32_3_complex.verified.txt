@@ -2,6 +2,7 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: BitSet
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
@@ -14,13 +15,75 @@ struct Person {
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
 };
 
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
+};
+
 class fastdata final {
 
 
-    inline static const std::array<Person, 3> values = {
+    inline static const std::array<Person, 3> value_items = {
         Person(1, u8"Bob", new Person(4, u8"Anna", nullptr)), Person(2, u8"Billy", nullptr), Person(3, u8"Bibi", nullptr)
     };
 public:
+    class offset_iterator {
+    protected:
+        uint64_t _offset;
+
+        static constexpr uint64_t offset_count() noexcept { return static_cast<uint64_t>(max_key - min_key) + 1; }
+
+        void advance() noexcept {
+        }
+
+    public:
+        explicit offset_iterator(const uint64_t offset) noexcept : _offset(offset) { advance(); }
+
+        offset_iterator& operator++() noexcept { ++_offset; advance(); return *this; }
+        [[nodiscard]] bool operator!=(const offset_iterator& other) const noexcept { return _offset != other._offset; }
+        [[nodiscard]] uint64_t offset() const noexcept { return _offset; }
+    };
+
+    class key_iterator final : public offset_iterator {
+    public:
+        using offset_iterator::offset_iterator;
+        [[nodiscard]] int32_t operator*() const noexcept { return static_cast<int32_t>(min_key + _offset); }
+    };
+
+    class key_range final {
+    public:
+        [[nodiscard]] key_iterator begin() const noexcept { return key_iterator(0); }
+        [[nodiscard]] key_iterator end() const noexcept { return key_iterator(static_cast<uint64_t>(max_key - min_key) + 1); }
+    };
+
+    [[nodiscard]]
+    static key_range keys() noexcept { return key_range(); }
+
+    class value_iterator final : public offset_iterator {
+    public:
+        using offset_iterator::offset_iterator;
+        [[nodiscard]] const Person& operator*() const noexcept { return value_items[static_cast<size_t>(_offset)]; }
+    };
+
+    class value_range final {
+    public:
+        [[nodiscard]] value_iterator begin() const noexcept { return value_iterator(0); }
+        [[nodiscard]] value_iterator end() const noexcept { return value_iterator(static_cast<uint64_t>(max_key - min_key) + 1); }
+    };
+
+    [[nodiscard]]
+    static value_range values() noexcept { return value_range(); }
+
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
         if (((static_cast<uint32_t>(key) - 1u) > 2u))
@@ -43,7 +106,7 @@ public:
 
 
         const uint64_t offset = static_cast<uint64_t>(key - min_key);
-        value = &values[static_cast<size_t>(offset)];
+        value = &value_items[static_cast<size_t>(offset)];
         return true;
     }
 

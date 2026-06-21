@@ -2,6 +2,7 @@
 // This file is auto-generated. Do not edit manually.
 // Structure: HashTable
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <cstdint>
 #include <limits>
@@ -12,6 +13,21 @@ struct Person {
     const Person* other;
 
     constexpr Person(const int32_t age, const std::string_view name, const Person* other) noexcept : age(age), name(name), other(other) { }
+};
+
+template<typename T>
+class direct_access_view final {
+    const T* _data;
+    size_t _size;
+
+public:
+    constexpr direct_access_view(const T* data, const size_t size) noexcept : _data(data), _size(size) {}
+
+    [[nodiscard]] constexpr const T* data() const noexcept { return _data; }
+    [[nodiscard]] constexpr size_t size() const noexcept { return _size; }
+    [[nodiscard]] constexpr const T& operator[](const size_t index) const noexcept { return _data[index]; }
+    [[nodiscard]] constexpr const T* begin() const noexcept { return _data; }
+    [[nodiscard]] constexpr const T* end() const noexcept { return _data + _size; }
 };
 
 class fastdata final {
@@ -38,6 +54,45 @@ class fastdata final {
     }
 
 public:
+    class key_iterator final {
+        const e* _entry;
+
+    public:
+        explicit key_iterator(const e* entry) noexcept : _entry(entry) {}
+
+        key_iterator& operator++() noexcept { ++_entry; return *this; }
+        [[nodiscard]] bool operator!=(const key_iterator& other) const noexcept { return _entry != other._entry; }
+        [[nodiscard]] const int32_t& operator*() const noexcept { return _entry->key; }
+    };
+
+    class key_range final {
+    public:
+        [[nodiscard]] key_iterator begin() const noexcept { return key_iterator(entries.data()); }
+        [[nodiscard]] key_iterator end() const noexcept { return key_iterator(entries.data() + entries.size()); }
+    };
+
+    [[nodiscard]]
+    static key_range keys() noexcept { return key_range(); }
+    class value_iterator final {
+        const e* _entry;
+
+    public:
+        explicit value_iterator(const e* entry) noexcept : _entry(entry) {}
+
+        value_iterator& operator++() noexcept { ++_entry; return *this; }
+        [[nodiscard]] bool operator!=(const value_iterator& other) const noexcept { return _entry != other._entry; }
+        [[nodiscard]] const Person& operator*() const noexcept { return _entry->value; }
+    };
+
+    class value_range final {
+    public:
+        [[nodiscard]] value_iterator begin() const noexcept { return value_iterator(entries.data()); }
+        [[nodiscard]] value_iterator end() const noexcept { return value_iterator(entries.data() + entries.size()); }
+    };
+
+    [[nodiscard]]
+    static value_range values() noexcept { return value_range(); }
+
     [[nodiscard]]
     static constexpr bool contains(const int32_t key) noexcept {
 

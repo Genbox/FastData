@@ -13,6 +13,11 @@ pub struct fastdata;
 impl fastdata {
 
     #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        1..=5
+    }
+
+    #[must_use]
     pub fn contains(key: i32) -> bool {
 
         key >= 1 && key <= 5

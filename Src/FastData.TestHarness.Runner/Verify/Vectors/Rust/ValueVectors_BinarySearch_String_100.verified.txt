@@ -26,6 +26,14 @@ impl fastdata {
     ];
 
     #[must_use]
+    pub fn key_slice() -> &'static [&'static str] { &Self::KEYS }
+
+    #[must_use]
+    pub fn keys() -> impl Iterator<Item = &'static str> {
+        Self::KEYS.iter().copied()
+    }
+
+    #[must_use]
     pub fn contains(key: &str) -> bool {
 
         let mut lo: usize = 0;
