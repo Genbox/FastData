@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
@@ -10,6 +11,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, BitSetContext<TValue>>
 {
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration;
+
     private readonly NumericKeyProperties<TKey> _props;
 
     internal BitSetStructure(NumericKeyProperties<TKey> props)

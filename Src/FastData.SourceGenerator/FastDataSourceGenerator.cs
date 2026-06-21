@@ -15,6 +15,7 @@ using AttributeClassType = Genbox.FastData.SourceGenerator.Attributes.ClassType;
 using AttributeClassVisibility = Genbox.FastData.SourceGenerator.Attributes.ClassVisibility;
 using CSharpClassType = Genbox.FastData.Generator.CSharp.Enums.ClassType;
 using CSharpClassVisibility = Genbox.FastData.Generator.CSharp.Enums.ClassVisibility;
+using StructureCapability = Genbox.FastData.SourceGenerator.Attributes.StructureCapability;
 
 namespace Genbox.FastData.SourceGenerator;
 
@@ -282,6 +283,10 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             object? structureArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.StructureType)).Value.Value;
             if (structureArg != null)
                 fdCfg.StructureTypeOverride = MapStructureType((StructureType)structureArg);
+
+            object? requiredFunctionsArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.RequiredCapability)).Value.Value;
+            if (requiredFunctionsArg != null)
+                fdCfg.RequiredCapability = (Genbox.FastData.Config.StructureCapability)(int)(StructureCapability)requiredFunctionsArg;
 
             object? ignoreCaseArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.IgnoreCase)).Value.Value;
             if (ignoreCaseArg is true)

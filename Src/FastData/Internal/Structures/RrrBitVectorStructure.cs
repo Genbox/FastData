@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
@@ -8,6 +9,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValue, RrrBitVectorContext>
 {
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership;
+
     private const int BlockSize = 15;
     private readonly TKey _maxValue;
     private readonly TKey _minValue;

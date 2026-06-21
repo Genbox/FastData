@@ -96,6 +96,24 @@ Use the provided `TypeMap` for target-language type names and literal handling. 
 
 Respect the generator encoding selected by the language generator. Existing generators use UTF-16 code units for C# and UTF-8 bytes for C++ and Rust.
 
+### Required Functions
+
+The data structure selection logic validates required functions and chooses a compatible structure before template rendering.
+
+Required function values are:
+
+- `None`: no additional generated capabilities are required.
+- `Membership`: generated code must support exact membership checks.
+- `KeyValueLookup`: generated code must support key/value lookups.
+- `Enumeration`: generated code must support lazy or native target-language iteration over exact keys and values.
+- `DirectAccess`: generated code must support direct contiguous access to exact generated keys and values.
+
+`Enumeration` means lazy or native target-language iteration over exact keys and values. Use idiomatic APIs for the language, such as `IEnumerable<T>` in C#, `keys()`/`values()` ranges with `begin()`/`end()` in C++, and iterators in Rust.
+
+`DirectAccess` means contiguous access to exact generated keys and values. Use target-language contiguous views, such as `ReadOnlySpan<T>` in C#, C++17-compatible `keys()`/`values()` views with `data()`, `size()`, `operator[]`, `begin()`, and `end()`, or slices in Rust.
+
+Reuse the arrays, entries, offsets, ranges, or encoded storage already required by the selected lookup structure. If a structure cannot enumerate exact data without extra occupancy information or lossy decoding, do not advertise the capability until the structure representation can support it correctly.
+
 ## Public API Shape
 
 Every generated structure should expose consistent public API methods for membership and lookup according to the generator's language conventions.

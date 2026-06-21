@@ -1,4 +1,5 @@
 using Genbox.FastData.Config.Limits;
+using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Config;
@@ -92,7 +93,7 @@ public class StructureConfig
         return true;
     }
 
-    internal bool IsEnabled(Type structureType) => !_disabled.Contains(structureType);
+    internal bool IsEnabled(Type structureType, StructureCapability requiredCapabilities) => !_disabled.Contains(structureType) && StructureCapabilityHelper.Supports(structureType, requiredCapabilities);
 
     /// <summary>Needed to avoid mutating user's reference of the config. Internally FastData uses it to temporarily disable a structure or make other changes.</summary>
     internal StructureConfig Clone()

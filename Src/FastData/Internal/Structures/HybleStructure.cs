@@ -1,6 +1,7 @@
 using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Numerics;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
@@ -17,6 +18,8 @@ namespace Genbox.FastData.Internal.Structures;
 /// </summary>
 public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, HybleContext<TKey, TValue>>
 {
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration;
+
     private const uint MaxDisplacementBase = ushort.MaxValue - 64;
     private const uint DefaultKeysPerBucket = 5;
     private const uint DefaultDisplacementSearchStride = 57;

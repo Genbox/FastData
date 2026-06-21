@@ -60,7 +60,7 @@ public class BitSetStructureTests
         ReadOnlyMemory<int> keys = (int[])[0, 1, 10];
 
         Type selected = NumericStructures<int>.GetBest(keys, true, KeyAnalyzer.GetNumericProperties(keys).Density,
-            false, 2, 10, 2f, StructureConfig.Default,
+            false, 2, 10, StructureCapability.Membership | StructureCapability.KeyValueLookup, 2f, StructureConfig.Default,
             static _ => throw new InvalidOperationException("Hash data should not be needed."));
 
         Assert.Equal(typeof(ConditionalStructure<,>), selected);

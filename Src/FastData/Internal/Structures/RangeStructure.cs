@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Extensions;
@@ -9,6 +10,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class RangeStructure<TKey, TValue> : IStructure<TKey, TValue, RangeContext<TKey>>
 {
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.Enumeration;
+
     private readonly (TKey Start, TKey End)[] _ranges;
 
     internal RangeStructure(DataRanges<TKey> ranges)

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
@@ -10,6 +11,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, EliasFanoContext>
 {
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership;
+
     private readonly TKey _maxValue;
     private readonly TKey _minValue;
     private readonly int _skipQuantum;

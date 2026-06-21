@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
@@ -7,6 +8,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class BloomFilterStructure<TKey, TValue> : IStructure<TKey, TValue, BloomFilterContext>
 {
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership;
+
     private const int BitsPerKey = 10;
     private readonly HashData _hashData;
 

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
@@ -8,6 +9,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmContext<TKey, TValue>> where TKey : notnull
 {
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration | StructureCapability.DirectAccess;
+
     private static readonly TKey _sentinel = PgmTypeTraits<TKey>.MaxValue;
 
     private readonly int _epsilon;

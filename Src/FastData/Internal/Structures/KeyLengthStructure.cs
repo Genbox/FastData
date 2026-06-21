@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
@@ -10,6 +11,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class KeyLengthStructure<TKey, TValue> : IStructure<TKey, TValue, KeyLengthContext<TValue>>
 {
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration;
+
     private readonly GeneratorEncoding _encoding;
     private readonly int _maxLength;
     private readonly int _minLength;

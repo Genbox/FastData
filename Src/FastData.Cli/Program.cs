@@ -32,6 +32,7 @@ internal static class Program
         Option<bool> ignoreCaseOpt = new Option<bool>("--ignore-case", "-ic") { Description = "Use case-insensitive lookups for ASCII string keys.", Recursive = true };
         Option<FileInfo?> valuesFileOpt = new Option<FileInfo?>("--values-file", "-v") { Description = "The file to read values from. The number of values must match the number of keys.", Recursive = true };
         Option<KeyType> valueTypeOpt = new Option<KeyType>("--value-type") { Description = "The type of data in the values file.", DefaultValueFactory = _ => KeyType.String, HelpName = "char|double|int16|int32|int64|int8|single|string|uint16|uint32|uint64|uint8", Recursive = true };
+        Option<StructureCapability> requiredFunctionsOpt = new Option<StructureCapability>("--required-functions") { Description = "Capabilities required from the generated data structure.", DefaultValueFactory = _ => StructureCapability.None, HelpName = "membership|keyvaluelookup|enumeration|directaccess", Recursive = true };
         Option<AnalysisLevel> analysisLevelOpt = new Option<AnalysisLevel>("--analysis-level") { Description = "The amount of string-hash analysis to perform.", DefaultValueFactory = _ => AnalysisLevel.Disabled, HelpName = "disabled|fast|balanced|aggressive", Recursive = true };
         Option<bool> allowApproximateOpt = new Option<bool>("--allow-approximate") { Description = "Allow approximate membership lookups, such as Bloom filters, that may return false positives.", Recursive = true };
         Argument<FileInfo> keysFileArg = new Argument<FileInfo>("keys-file") { Description = "The file to read keys from" };
@@ -50,6 +51,7 @@ internal static class Program
             pr.GetValue(keyTypeOpt),
             pr.GetValue(valueTypeOpt),
             pr.GetValue(structureTypeOpt),
+            pr.GetValue(requiredFunctionsOpt),
             pr.GetValue(ignoreCaseOpt),
             pr.GetValue(allowApproximateOpt),
             pr.GetValue(analysisLevelOpt));
@@ -63,6 +65,7 @@ internal static class Program
         rootCmd.Options.Add(outputFileOpt);
         rootCmd.Options.Add(keyTypeOpt);
         rootCmd.Options.Add(structureTypeOpt);
+        rootCmd.Options.Add(requiredFunctionsOpt);
         rootCmd.Options.Add(ignoreCaseOpt);
         rootCmd.Options.Add(valuesFileOpt);
         rootCmd.Options.Add(valueTypeOpt);
@@ -109,7 +112,7 @@ internal static class Program
     private static async Task RunAsync(CommonOptions opts, ICodeGenerator generator, CancellationToken token)
     {
         bool hasValues = opts.ValuesFile != null;
-        ValidateOptions(opts.KeyType, hasValues, opts.StructureType, opts.IgnoreCase, opts.AnalysisLevel, opts.AllowApproximation);
+        ValidateOptions(opts.KeyType, hasValues, opts.StructureType, opts.RequiredCapability, opts.IgnoreCase, opts.AnalysisLevel, opts.AllowApproximation);
 
         Type? structureTypeOverride = MapStructureType(opts.StructureType);
 
@@ -117,11 +120,13 @@ internal static class Program
         {
             IgnoreCase = opts.IgnoreCase,
             AllowApproximation = opts.AllowApproximation,
+            RequiredCapability = opts.RequiredCapability,
             StringAnalyzerConfig = CreateStringAnalyzerConfig(opts.AnalysisLevel)
         };
         NumericDataConfig numericConfig = new NumericDataConfig
         {
-            AllowApproximation = opts.AllowApproximation
+            AllowApproximation = opts.AllowApproximation,
+            RequiredCapability = opts.RequiredCapability
         };
 
         if (structureTypeOverride != null)
@@ -141,7 +146,7 @@ internal static class Program
             await File.WriteAllTextAsync(opts.OutputFile.FullName, source, token).ConfigureAwait(false);
     }
 
-    private static void ValidateOptions(KeyType keyType, bool hasValues, StructureType structureType, bool ignoreCase, AnalysisLevel analysisLevel, bool allowApproximate)
+    private static void ValidateOptions(KeyType keyType, bool hasValues, StructureType structureType, StructureCapability requiredCapability, bool ignoreCase, AnalysisLevel analysisLevel, bool allowApproximate)
     {
         if (ignoreCase && keyType != KeyType.String)
             throw new InvalidOperationException("IgnoreCase is only supported for string keys.");
@@ -151,6 +156,9 @@ internal static class Program
 
         if (allowApproximate && hasValues)
             throw new InvalidOperationException("Approximate matching is only supported for membership lookups.");
+
+        if (!hasValues && requiredCapability.HasFlag(StructureCapability.KeyValueLookup))
+            throw new InvalidOperationException("KeyValueLookup requires --values-file.");
 
         if (structureType == StructureType.BloomFilter && !allowApproximate)
             throw new InvalidOperationException("BloomFilter is approximate and requires --allow-approximate.");
@@ -389,6 +397,7 @@ internal static class Program
         KeyType KeyType,
         KeyType ValueType,
         StructureType StructureType,
+        StructureCapability RequiredCapability,
         bool IgnoreCase,
         bool AllowApproximation,
         AnalysisLevel AnalysisLevel);

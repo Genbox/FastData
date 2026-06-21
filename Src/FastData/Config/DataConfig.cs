@@ -12,6 +12,9 @@ public abstract class DataConfig
     /// <summary>Enable approximate matching using a Bloom filter.</summary>
     public bool AllowApproximation { get; set; }
 
+    /// <summary>Gets or sets generated data-structure capabilities required by the caller.</summary>
+    public StructureCapability RequiredCapability { get; set; }
+
     /// <summary>Override the type of structure to create. Mostly used for internal testing.</summary>
     public Type? StructureTypeOverride { get; set; }
 

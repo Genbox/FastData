@@ -15,7 +15,7 @@ public sealed class EarlyExitTestData<TKey>(
     IEarlyExit[] exits,
     TKey[] hitKeys,
     TKey[] missKeys,
-    GeneratorFunction requiredFunctions,
+    GeneratorFunction generatorFunctions,
     string exitName,
     BenchmarkWorkload workload,
     int warmupCount = 5,
@@ -29,7 +29,7 @@ public sealed class EarlyExitTestData<TKey>(
     public IEarlyExit[] Exits { get; private set; } = exits;
     public TKey[] HitKeys { get; private set; } = hitKeys;
     public TKey[] MissKeys { get; private set; } = missKeys;
-    public GeneratorFunction RequiredFunctions { get; private set; } = requiredFunctions;
+    public GeneratorFunction GeneratorFunctions { get; private set; } = generatorFunctions;
     public string ExitName { get; private set; } = exitName;
     public BenchmarkWorkload Workload { get; private set; } = workload;
     public double MaxErrorPercent { get; } = maxErrorPercent;
@@ -52,9 +52,9 @@ public sealed class EarlyExitTestData<TKey>(
         AnnotatedExpr[] annotated = EarlyExitPipeline.Annotate(exitList, inputKey);
 
         // For string exits, we need to apply the allocation gather and deduplication transforms
-        if (typeof(TKey) == typeof(string) && RequiredFunctions.HasFlag(GeneratorFunction.Length))
+        if (typeof(TKey) == typeof(string) && GeneratorFunctions.HasFlag(GeneratorFunction.Length))
         {
-            System.Reflection.MethodInfo methodInfo = typeof(GeneratorFunctions).GetMethod(nameof(GeneratorFunctions.Length), [typeof(string)])!;
+            System.Reflection.MethodInfo methodInfo = typeof(GeneratorFunctions).GetMethod(nameof(Generators.GeneratorFunctions.Length), [typeof(string)])!;
             ParameterExpression length = Expression.Variable(typeof(int), "length");
             AnnotatedExpr lengthAlloc = AnnotatedExpr.Allocation(Expression.Assign(length, Expression.Call(methodInfo, inputKey)));
 
@@ -66,7 +66,7 @@ public sealed class EarlyExitTestData<TKey>(
             ]).ToArray();
         }
 
-        EarlyExitOnlyGeneratorConfig config = new EarlyExitOnlyGeneratorConfig(annotated, RequiredFunctions);
+        EarlyExitOnlyGeneratorConfig config = new EarlyExitOnlyGeneratorConfig(annotated, GeneratorFunctions);
         EarlyExitOnlyContext context = new EarlyExitOnlyContext();
 
         return generator.Generate<TKey, byte>(config, context);
@@ -110,7 +110,7 @@ public sealed class EarlyExitTestData<TKey>(
         MissKeys = info.GetValue<TKey[]>(nameof(MissKeys));
         Workload = info.GetValue<BenchmarkWorkload>(nameof(Workload));
         Exits = [];
-        RequiredFunctions = GeneratorFunction.None;
+        GeneratorFunctions = GeneratorFunction.None;
     }
 
     public override string ToString() => Identifier;

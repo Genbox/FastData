@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Contexts.Misc;
@@ -9,6 +10,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class HashTableCompactStructure<TKey, TValue> : IStructure<TKey, TValue, HashTableCompactContext<TKey, TValue>>
 {
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration;
+
     private readonly HashData _hashData;
 
     internal HashTableCompactStructure(HashData hashData)

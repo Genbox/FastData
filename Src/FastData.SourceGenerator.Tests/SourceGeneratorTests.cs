@@ -22,7 +22,7 @@ public class SourceGeneratorTests
         Assert.Contains("StaticData", output, StringComparison.Ordinal); //It must contain the name we gave it
 
         //Compile the output to code and test
-        Func<string, bool> func = CompilationHelper.GetDelegate<Func<string, bool>>(output, false);
+        Func<string, bool> func = CompilationHelper.GetDelegate<Func<string, bool>>(output, t => t[0], m => m.Single(x => x.Name == "Contains"), false);
         Assert.True(func("item1")); //It must return true for the 3 items we gave
         Assert.True(func("item2"));
         Assert.True(func("item3"));
@@ -42,7 +42,7 @@ public class SourceGeneratorTests
         Assert.Contains("StaticData", output, StringComparison.Ordinal); //It must contain the name we gave it
 
         //Compile the output to code and test
-        Func<string, bool> contains = CompilationHelper.GetDelegate<Func<string, bool>>(output, false);
+        Func<string, bool> contains = CompilationHelper.GetDelegate<Func<string, bool>>(output, t => t[0], m => m.Single(x => x.Name == "Contains"), false);
         Assert.True(contains("item1")); //It must return true for the 3 items we gave
         Assert.True(contains("item2"));
         Assert.True(contains("item3"));
@@ -146,7 +146,7 @@ public class SourceGeneratorTests
 
         string output = RunGenerator(source);
 
-        Func<string, bool> contains = CompilationHelper.GetDelegate<Func<string, bool>>(output, false);
+        Func<string, bool> contains = CompilationHelper.GetDelegate<Func<string, bool>>(output, t => t[0], m => m.Single(x => x.Name == "Contains"), false);
         Assert.True(contains("item1"));
         Assert.True(contains("item2"));
         Assert.True(contains("item3"));

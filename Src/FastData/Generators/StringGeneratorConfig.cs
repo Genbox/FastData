@@ -1,4 +1,5 @@
 using Genbox.FastData.Enums;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Generators.Expressions;
 using Genbox.FastData.Generators.StringHash.Framework;
@@ -9,7 +10,7 @@ namespace Genbox.FastData.Generators;
 /// <summary>Provides configuration data for string code generators in the FastData library.</summary>
 public sealed class StringGeneratorConfig : GeneratorConfigBase
 {
-    internal StringGeneratorConfig(Type structureType, uint itemCount, int minLen, int maxLen, bool ignoreCase, CharacterClass classes, GeneratorEncoding encoding, AnnotatedExpr[] earlyExits, bool typeReductionEnabled, StringHashInfo? hashInfo, GeneratorFunction generatorFunctions) : base(structureType.GetFriendlyName(), earlyExits, itemCount, typeReductionEnabled)
+    internal StringGeneratorConfig(Type structureType, uint itemCount, int minLen, int maxLen, bool ignoreCase, CharacterClass classes, GeneratorEncoding encoding, AnnotatedExpr[] earlyExits, bool typeReductionEnabled, StringHashInfo? hashInfo, GeneratorFunction generatorFunctions, StructureCapability requiredCapabilities) : base(structureType.GetFriendlyName(), earlyExits, itemCount, typeReductionEnabled, requiredCapabilities)
     {
         // We reduce the dependencies in generators by only providing a subset of StringKeyProperties
         Constants = new StringConstants

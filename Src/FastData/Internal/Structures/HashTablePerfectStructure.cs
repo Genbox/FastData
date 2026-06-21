@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Extensions;
@@ -8,6 +9,8 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class HashTablePerfectStructure<TKey, TValue> : IStructure<TKey, TValue, HashTablePerfectContext<TKey, TValue>>
 {
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup;
+
     private readonly HashData _hashData;
 
     internal HashTablePerfectStructure(HashData hashData)

@@ -143,6 +143,8 @@ public static partial class FastDataGenerator
         if (hasValues && keys.Length != values.Length)
             throw new InvalidOperationException("The number of values does not match the number of keys.");
 
+        StructureCapability requiredCapabilities = GetRequiredCapabilities(cfg, hasValues);
+
         factory ??= NullLoggerFactory.Instance;
 
         ILogger logger = factory.CreateLogger(typeof(FastDataGenerator));
@@ -228,7 +230,7 @@ public static partial class FastDataGenerator
         if (cacheHashInfo != null)
             usedVisitor.Visit(cacheHashInfo.Expression);
 
-        StringGeneratorConfig genCfg = new StringGeneratorConfig(structureType, (uint)keys.Length, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.IgnoreCase, props.CharacterData.CharacterClasses, generator.Encoding, transformed, cfg.TypeReductionEnabled, cacheHashInfo, usedVisitor.Functions);
+        StringGeneratorConfig genCfg = new StringGeneratorConfig(structureType, (uint)keys.Length, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.IgnoreCase, props.CharacterData.CharacterClasses, generator.Encoding, transformed, cfg.TypeReductionEnabled, cacheHashInfo, usedVisitor.Functions, requiredCapabilities);
 
         return generator.Generate<string, TValue>(genCfg, res);
 
@@ -245,6 +247,7 @@ public static partial class FastDataGenerator
 
         (Type StructureType, IStructure<string, TValue, IContext> Structure, IContext Context) CreateSelectedStringStructure(Type selectedType)
         {
+            ValidateCapabilities(selectedType, requiredCapabilities);
             IStructure<string, TValue, IContext> selectedStructure = StringStructureFactory<TValue>(selectedType, props, () => EnsureHashData(keys.Span), generator.Encoding);
             IContext? selectedContext = selectedStructure.Create(keys, values);
 
@@ -260,7 +263,7 @@ public static partial class FastDataGenerator
 
             while (true)
             {
-                Type selectedType = StringStructures.GetBest(keys, hasValues, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.AllowApproximation, props.LengthData.UniqueLengths, structureConfig, x => EnsureHashData(x.Span));
+                Type selectedType = StringStructures.GetBest(keys, hasValues, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.AllowApproximation, props.LengthData.UniqueLengths, requiredCapabilities, structureConfig, x => EnsureHashData(x.Span));
                 IStructure<string, TValue, IContext> selectedStructure = StringStructureFactory<TValue>(selectedType, props, () => EnsureHashData(keys.Span), generator.Encoding);
                 IContext? selectedContext = selectedStructure.Create(keys, values);
 
@@ -355,6 +358,8 @@ public static partial class FastDataGenerator
         if (hasValues && keys.Length != values.Length)
             throw new InvalidOperationException("The number of values does not match the number of keys.");
 
+        StructureCapability requiredCapabilities = GetRequiredCapabilities(cfg, hasValues);
+
         Type type = typeof(TKey);
 
         if (type != typeof(char) && type != typeof(sbyte) && type != typeof(byte) && type != typeof(short) && type != typeof(ushort) && type != typeof(int) && type != typeof(uint) && type != typeof(long) && type != typeof(ulong) && type != typeof(float) && type != typeof(double))
@@ -412,12 +417,13 @@ public static partial class FastDataGenerator
         if (cfg.EarlyExitConfig.Optimize)
             EarlyExitPipeline.OptimizeExpressions(exprs);
 
-        NumericGeneratorConfig genCfg = new NumericGeneratorConfig(structureType, (uint)keys.Length, props.DataRanges.Min, props.DataRanges.Max, exprs, cfg.TypeReductionEnabled, props.HasZero);
+        NumericGeneratorConfig genCfg = new NumericGeneratorConfig(structureType, (uint)keys.Length, props.DataRanges.Min, props.DataRanges.Max, exprs, cfg.TypeReductionEnabled, props.HasZero, requiredCapabilities);
 
         return generator.Generate<TKey, TValue>(genCfg, ctx);
 
         (Type StructureType, IStructure<TKey, TValue, IContext> Structure, IContext Context) CreateSelectedNumericStructure(Type selType)
         {
+            ValidateCapabilities(selType, requiredCapabilities);
             IStructure<TKey, TValue, IContext> selStruct = NumericStructureFactory<TKey, TValue>(cfg, selType, props, () => EnsureNumericHash(keys.Span));
             IContext? selCtx = selStruct.Create(keys, values);
 
@@ -430,7 +436,7 @@ public static partial class FastDataGenerator
 
             while (true)
             {
-                Type selType = NumericStructures<TKey>.GetBest(keys, hasValues, props.Density, cfg.AllowApproximation, props.DataRanges.Ranges.Count, props.Range,
+                Type selType = NumericStructures<TKey>.GetBest(keys, hasValues, props.Density, cfg.AllowApproximation, props.DataRanges.Ranges.Count, props.Range, requiredCapabilities,
                     cfg.StructureSettings.GetSetting<float>(KnownSettings.DenseIntegralValueMaxRangeFactor), structureConfig, x => EnsureNumericHash(x.Span));
                 IStructure<TKey, TValue, IContext> selStruct = NumericStructureFactory<TKey, TValue>(cfg, selType, props, () => EnsureNumericHash(keys.Span));
                 IContext? selCtx = selStruct.Create(keys, values);
@@ -504,5 +510,27 @@ public static partial class FastDataGenerator
 
             return base.VisitMethodCall(node);
         }
+    }
+
+    private static StructureCapability GetRequiredCapabilities(DataConfig cfg, bool hasValues)
+    {
+        if (!hasValues && cfg.RequiredCapability.HasFlag(StructureCapability.KeyValueLookup))
+            throw new InvalidOperationException("KeyValueLookup requires values. Use GenerateKeyed or provide a values file.");
+
+        StructureCapability capabilities = cfg.RequiredCapability | StructureCapability.Membership;
+
+        if (hasValues)
+            capabilities |= StructureCapability.KeyValueLookup;
+
+        return capabilities;
+    }
+
+    private static void ValidateCapabilities(Type structureType, StructureCapability requiredCapabilities)
+    {
+        if (StructureCapabilityHelper.Supports(structureType, requiredCapabilities))
+            return;
+
+        StructureCapability capabilities = StructureCapabilityHelper.GetStructureCapability(structureType);
+        throw new InvalidOperationException($"Structure {structureType.Name} does not support the required functions {requiredCapabilities}. Supported functions: {capabilities}.");
     }
 }
