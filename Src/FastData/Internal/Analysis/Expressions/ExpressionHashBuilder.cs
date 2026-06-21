@@ -196,7 +196,7 @@ internal static class ExpressionHashBuilder
     }
 
     /// <summary>Builds a call to the generated unaligned read helper for a 1, 2, 4, or 8 byte chunk.</summary>
-    private static Expression GetReadFunc(Expression data, Expression idx, int length, bool ignoreCase)
+    internal static Expression GetReadFunc(Expression data, Expression idx, int length, bool ignoreCase)
     {
         GeneratorFunction func = length switch
         {

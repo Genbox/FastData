@@ -21,7 +21,10 @@ internal static class HashBenchmark
 
         //We always add the default hash as a candidate
         if (includeDefault)
+        {
             candidates.Add(sim.Run(data, DefaultStringHash.GetInstance(encoding, ignoreCase)));
+            candidates.Add(sim.Run(data, PositionLengthStringHash.CreateFirstLastLength(encoding)));
+        }
 
         if (cfg.BruteForceAnalyzerConfig != null)
         {
