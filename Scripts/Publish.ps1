@@ -1,3 +1,9 @@
+param(
+    [string]$NuGetKey = $env:NUGET_KEY,
+    [string]$PwshGKey = $env:PWSHG_KEY,
+    [string]$GitHubToken = $env:GITHUB_TOKEN
+)
+
 $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $true
 Set-StrictMode -Version Latest
@@ -78,18 +84,18 @@ $FileListText = ($FileList | ForEach-Object { "                          '$($_.R
 
 # We don't want to publish versions with tags like "alpha", "beta", etc.
 if ($version -notlike "*-*") {
-    if ($env:PWSHG_KEY) {
+    if ($PwshGKey) {
         Write-Host -ForegroundColor $Color "Publish PowerShell to PowerShell Gallery"
-        Publish-Module -Path "$PublishDir/Genbox.FastData/" -NuGetApiKey $env:PWSHG_KEY
+        Publish-Module -Path "$PublishDir/Genbox.FastData/" -NuGetApiKey $PwshGKey
     }
     else {
         Write-Host -ForegroundColor Yellow "Skipping PowerShell publish: PWSHG_KEY not set."
     }
 
-    if ($env:NUGET_KEY) {
+    if ($NuGetKey) {
         Write-Host -ForegroundColor $Color "Publish dotnet tool to NuGet"
         Get-ChildItem -Path "$PublishDir/*.nupkg" | ForEach-Object {
-            dotnet nuget push --skip-duplicate $_.FullName --api-key $env:NUGET_KEY --source https://api.nuget.org/v3/index.json
+            dotnet nuget push --skip-duplicate $_.FullName --api-key $NuGetKey --source https://api.nuget.org/v3/index.json
         }
     }
     else {
