@@ -18,8 +18,6 @@ namespace Genbox.FastData.Internal.Structures;
 /// </summary>
 public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, HybleContext<TKey, TValue>>
 {
-    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup;
-
     private const uint MaxDisplacementBase = ushort.MaxValue - 64;
     private const uint DefaultKeysPerBucket = 5;
     private const uint DefaultDisplacementSearchStride = 57;
@@ -33,6 +31,8 @@ public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hybl
     {
         _hashData = hashData;
     }
+
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup;
 
     public HybleContext<TKey, TValue>? Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

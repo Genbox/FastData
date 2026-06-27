@@ -11,8 +11,6 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 public class CaseInsensitiveComparerBenchmarks
 {
     private const int TargetLength = 24;
-    private string _target = "thisismystringwithcasing";
-    private string _myString = "ThisIsMyStringWithCasing";
 
     private static readonly byte[] Downcase =
     [
@@ -35,6 +33,8 @@ public class CaseInsensitiveComparerBenchmarks
         240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254,
         255
     ];
+    private string _myString = "ThisIsMyStringWithCasing";
+    private string _target = "thisismystringwithcasing";
 
     [Benchmark]public bool WithKeyNormalization() => _myString.ToLowerInvariant() == _target;
     [Benchmark]public bool WithComparer() => StringComparer.OrdinalIgnoreCase.Equals(_myString, _target);

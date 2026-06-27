@@ -15,6 +15,8 @@ public class TestData<TKey>(Type structureType, TKey[] keys, BenchmarkWorkload w
     public TKey[] Keys { get; private set; } = keys;
     public BenchmarkWorkload Workload { get; private set; } = workload;
     public Type StructureType { get; private set; } = structureType;
+
+    private bool ValidateFoundCount => StructureType != typeof(BloomFilterStructure<,>);
     public double MaxErrorPercent { get; } = maxErrorPercent;
     public int TargetIterationTimeMs { get; } = targetIterationTimeMs;
     public Type KeyType => typeof(TKey);
@@ -73,8 +75,6 @@ public class TestData<TKey>(Type structureType, TKey[] keys, BenchmarkWorkload w
     }
 
     public override string ToString() => Identifier;
-
-    private bool ValidateFoundCount => StructureType != typeof(BloomFilterStructure<,>);
 
     private TKey[] CreateMissKeys()
     {

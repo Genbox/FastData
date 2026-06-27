@@ -25,16 +25,16 @@ public sealed class GPerfAnalyzerConfig : IAnalyzerConfig
     /// <summary>Disables the keyword length contribution to the hash, matching gperf's <c>--no-strlen</c> option.</summary>
     public bool NoLength { get; set; }
 
-    /// <summary>Initial value used for associated values. The gperf default is 0. Ignored when <see cref="Random"/> is enabled or <see cref="MultipleIterations"/> is greater than 0.</summary>
+    /// <summary>Initial value used for associated values. The gperf default is 0. Ignored when <see cref="Random" /> is enabled or <see cref="MultipleIterations" /> is greater than 0.</summary>
     public int InitialAssociationValue { get; set; }
 
-    /// <summary>Jump value used while resolving associated-value collisions. The gperf default is 5; even non-zero values are rounded up by the analyzer. Ignored when <see cref="MultipleIterations"/> is greater than 0.</summary>
+    /// <summary>Jump value used while resolving associated-value collisions. The gperf default is 5; even non-zero values are rounded up by the analyzer. Ignored when <see cref="MultipleIterations" /> is greater than 0.</summary>
     public int Jump { get; set; } = 5;
 
     /// <summary>Number of alternative initial/jump pairs to try, matching gperf's <c>--multiple-iterations</c> option. A value of 0 uses the configured initial and jump values once; values greater than 0 use gperf's generated initial/jump sequence.</summary>
     public int MultipleIterations { get; set; }
 
-    /// <summary>Randomly initializes associated values, matching gperf's <c>--random</c> option. Supersedes <see cref="InitialAssociationValue"/> unless <see cref="MultipleIterations"/> is greater than 0.</summary>
+    /// <summary>Randomly initializes associated values, matching gperf's <c>--random</c> option. Supersedes <see cref="InitialAssociationValue" /> unless <see cref="MultipleIterations" /> is greater than 0.</summary>
     public bool Random { get; set; }
 
     /// <summary>Optional seed for deterministic random-mode tests. gperf seeds from the current time.</summary>

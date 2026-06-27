@@ -9,14 +9,14 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class HashTablePerfectStructure<TKey, TValue> : IStructure<TKey, TValue, HashTablePerfectContext<TKey, TValue>>
 {
-    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup;
-
     private readonly HashData _hashData;
 
     internal HashTablePerfectStructure(HashData hashData)
     {
         _hashData = hashData;
     }
+
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup;
 
     public HashTablePerfectContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

@@ -10,14 +10,14 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class HashTableStructure<TKey, TValue> : IStructure<TKey, TValue, HashTableContext<TKey, TValue>>
 {
-    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration;
-
     private readonly HashData _hashData;
 
     internal HashTableStructure(HashData hashData)
     {
         _hashData = hashData;
     }
+
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration;
 
     public HashTableContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

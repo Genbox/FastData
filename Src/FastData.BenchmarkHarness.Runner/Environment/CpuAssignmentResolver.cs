@@ -1,3 +1,4 @@
+using System.Globalization;
 using Genbox.FastData.BenchmarkHarness.Runner.Configuration;
 
 namespace Genbox.FastData.BenchmarkHarness.Runner.Environment;
@@ -43,7 +44,7 @@ internal static class CpuAssignmentResolver
 
     private static int ValidateCpuIndex(string value, string cpuSet)
     {
-        if (!int.TryParse(value, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int cpu) || cpu < 0)
+        if (!int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out int cpu) || cpu < 0)
             throw new InvalidOperationException($"CPU set '{cpuSet}' contains invalid CPU index '{value}'.");
 
         return cpu;

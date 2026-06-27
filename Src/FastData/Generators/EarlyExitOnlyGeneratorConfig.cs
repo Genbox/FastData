@@ -1,5 +1,4 @@
 using Genbox.FastData.Config;
-using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Generators.Expressions;
 
 namespace Genbox.FastData.Generators;

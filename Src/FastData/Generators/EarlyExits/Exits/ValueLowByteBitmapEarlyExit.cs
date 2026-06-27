@@ -9,6 +9,8 @@ namespace Genbox.FastData.Generators.EarlyExits.Exits;
 // The filter represents all 8 low bits: 256 buckets stored as four 64-bit words.
 public sealed record ValueLowByteBitmapEarlyExit(ulong Word0, ulong Word1, ulong Word2, ulong Word3) : IEarlyExit
 {
+    public float AcceptedDensity => (BitOperations.PopCount(Word0) + BitOperations.PopCount(Word1) + BitOperations.PopCount(Word2) + BitOperations.PopCount(Word3)) / 256f;
+
     public Expression GetExpression(ParameterExpression key)
     {
         Type keyType = key.Type;
@@ -41,8 +43,6 @@ public sealed record ValueLowByteBitmapEarlyExit(ulong Word0, ulong Word1, ulong
     }
 
     public bool IsWorseThan(IEarlyExit other) => false;
-
-    public float AcceptedDensity => (BitOperations.PopCount(Word0) + BitOperations.PopCount(Word1) + BitOperations.PopCount(Word2) + BitOperations.PopCount(Word3)) / 256f;
 
     public ulong KeyspaceSize => 256UL - (ulong)(BitOperations.PopCount(Word0) + BitOperations.PopCount(Word1) + BitOperations.PopCount(Word2) + BitOperations.PopCount(Word3));
 }

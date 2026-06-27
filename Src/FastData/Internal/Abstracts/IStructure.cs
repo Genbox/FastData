@@ -5,9 +5,8 @@ namespace Genbox.FastData.Internal.Abstracts;
 
 public interface IStructure
 {
-    IEnumerable<IEarlyExit> GetMandatoryExits();
-
     StructureCapability SupportedCapabilities { get; }
+    IEnumerable<IEarlyExit> GetMandatoryExits();
 }
 
 internal interface IStructure<TKey, TValue, out TContext> : IStructure where TContext : class, IContext

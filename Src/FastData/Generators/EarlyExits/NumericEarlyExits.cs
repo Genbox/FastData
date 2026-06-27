@@ -104,9 +104,7 @@ internal static class NumericEarlyExits<TKey>
         Func<TKey, ulong> toUlong = typeCode.GetUnsignedValueConverter<TKey>();
 
         if (typeCode.IsUnsigned())
-        {
             fromUlong = typeCode.GetUnsignedKeyConverter<TKey>();
-        }
         else
         {
             Func<long, TKey> fromSigned = typeCode.GetSignedKeyConverter<TKey>();
@@ -155,13 +153,13 @@ internal static class NumericEarlyExits<TKey>
                     missingBitSet |= 1UL << bit;
                 }
 
-                gapsIncluded = end - start + 1;
+                gapsIncluded = (end - start) + 1;
             }
 
             // Only emit a bitmap if it covers at least 2 gap regions (otherwise the individual ValueInRangeEarlyExit is simpler)
             if (gapsIncluded >= 2 && missingBitSet != 0)
             {
-                ulong lastGapEnd = gapRegions[start + gapsIncluded - 1].End;
+                ulong lastGapEnd = gapRegions[(start + gapsIncluded) - 1].End;
                 TKey bitmapStartKey = fromUlong(bitmapStart);
                 TKey bitmapEndKey = fromUlong(lastGapEnd - 1);
                 yield return new ValueBitSetEarlyExit<TKey>(bitmapStartKey, bitmapEndKey, missingBitSet);

@@ -31,19 +31,6 @@ internal sealed record GPerfStringHash : IStringHash
     public AdditionalData[]? AdditionalData => Positions.Length == 0 ? null : [new AdditionalData(nameof(AssociationValues), typeof(int), AssociationValues)];
     public IEnumerable<IEarlyExit> GetMandatoryExits() => _mandatoryExits;
 
-    private static IEarlyExit[] CreateMandatoryExits(GeneratorEncoding encoding, bool sevenBit, int mandatoryMinLength)
-    {
-        List<IEarlyExit> exits = new List<IEarlyExit>(2);
-
-        if (mandatoryMinLength > 0)
-            exits.Add(new LengthLessThanEarlyExit(mandatoryMinLength));
-
-        if (encoding == GeneratorEncoding.AsciiBytes || sevenBit)
-            exits.Add(new IsAsciiOnlyEarlyExit());
-
-        return exits.ToArray();
-    }
-
     public Expression<StringHashFunc> GetExpression()
     {
         ParameterExpression value = Parameter(typeof(byte[]), "data");
@@ -78,6 +65,19 @@ internal sealed record GPerfStringHash : IStringHash
 
         BlockExpression body = Block([hash], ex);
         return Lambda<StringHashFunc>(body, value, length);
+    }
+
+    private static IEarlyExit[] CreateMandatoryExits(GeneratorEncoding encoding, bool sevenBit, int mandatoryMinLength)
+    {
+        List<IEarlyExit> exits = new List<IEarlyExit>(2);
+
+        if (mandatoryMinLength > 0)
+            exits.Add(new LengthLessThanEarlyExit(mandatoryMinLength));
+
+        if (encoding == GeneratorEncoding.AsciiBytes || sevenBit)
+            exits.Add(new IsAsciiOnlyEarlyExit());
+
+        return exits.ToArray();
     }
 
     private UnaryExpression GetPosition(Expression asso, Expression value, Expression length, int pos)

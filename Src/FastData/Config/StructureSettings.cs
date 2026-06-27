@@ -2,8 +2,8 @@ namespace Genbox.FastData.Config;
 
 public class StructureSettings
 {
-    private readonly Dictionary<string, object> _settings = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, object> _defaultSettings = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, object> _settings = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
     internal void AddDefault(string key, object value) => _defaultSettings.Add(key, value);
 

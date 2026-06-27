@@ -11,8 +11,6 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class KeyLengthStructure<TKey, TValue> : IStructure<TKey, TValue, KeyLengthContext<TValue>>
 {
-    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration;
-
     private readonly GeneratorEncoding _encoding;
     private readonly int _maxLength;
     private readonly int _minLength;
@@ -23,6 +21,8 @@ public sealed class KeyLengthStructure<TKey, TValue> : IStructure<TKey, TValue, 
         _maxLength = maxLength;
         _encoding = encoding;
     }
+
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration;
 
     public KeyLengthContext<TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

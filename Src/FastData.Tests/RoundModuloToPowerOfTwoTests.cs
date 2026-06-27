@@ -141,9 +141,8 @@ public class RoundModuloToPowerOfTwoTests
 
     private sealed class CapturingGenerator : ICodeGenerator
     {
-        public GeneratorEncoding Encoding => GeneratorEncoding.Utf8Bytes;
-
         public IContext? Context { get; private set; }
+        public GeneratorEncoding Encoding => GeneratorEncoding.Utf8Bytes;
 
         public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
         {

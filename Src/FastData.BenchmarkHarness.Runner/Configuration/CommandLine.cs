@@ -17,6 +17,7 @@ internal sealed class CommandLine(string[] languageNames)
     private readonly Option<string[]> _languageOption = new Option<string[]>("--language") { Description = "Language to include: CSharp, CPlusPlus, or Rust. Can be specified multiple times.", AllowMultipleArgumentsPerToken = true };
     private readonly Option<double?> _maxErrorOption = new Option<double?>("--max-error") { Description = "Maximum relative error percent for adaptive measurement. Default is 2." };
     private readonly Option<int?> _maxSamplesOption = new Option<int?>("--max-samples") { Description = "Maximum sample count for adaptive measurement." };
+    private readonly Option<int?> _minSamplesOption = new Option<int?>("--min-samples") { Description = "Minimum sample count for adaptive measurement." };
     private readonly Option<bool> _noAutoCpuOption = new Option<bool>("--no-auto-cpu") { Description = "Disable automatic CPU selection and use CPU 0 unless --cpu-set is provided." };
     private readonly Argument<string[]> _patternsArgument = new Argument<string[]>("patterns") { Description = "Optional language shorthands or benchmark filters.", Arity = ArgumentArity.ZeroOrMore };
     private readonly Option<int?> _plotHeightOption = new Option<int?>("--plot-height") { Description = "Plot height." };
@@ -24,9 +25,8 @@ internal sealed class CommandLine(string[] languageNames)
     private readonly Option<int?> _plotWidthOption = new Option<int?>("--plot-width") { Description = "Plot width. Zero uses console width." };
     private readonly Option<Guid?> _powerPlanOption = new Option<Guid?>("--power-plan") { Description = "Power plan GUID to activate for benchmark runs." };
     private readonly Option<DirectoryInfo?> _resultsDirectoryOption = new Option<DirectoryInfo?>("--results-dir") { Description = "Directory containing benchmark JSONL histories." };
-    private readonly Option<int?> _minSamplesOption = new Option<int?>("--min-samples") { Description = "Minimum sample count for adaptive measurement." };
-    private readonly Option<int?> _warmupOption = new Option<int?>("--warmup") { Description = "Warmup sample count." };
     private readonly Option<int?> _targetIterationTimeOption = new Option<int?>("--target-ms") { Description = "Target elapsed time per measured iteration in milliseconds." };
+    private readonly Option<int?> _warmupOption = new Option<int?>("--warmup") { Description = "Warmup sample count." };
     private readonly Option<BenchmarkWorkload?> _workloadOption = new Option<BenchmarkWorkload?>("--workload") { Description = "Benchmark workload: Hit, Miss, or Mixed. Default is Mixed." };
 
     public RootCommand CreateRootCommand(Func<Settings, CancellationToken, Task<int>> action)

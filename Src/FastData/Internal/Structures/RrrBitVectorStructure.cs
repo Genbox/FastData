@@ -9,8 +9,6 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValue, RrrBitVectorContext>
 {
-    public StructureCapability SupportedCapabilities => StructureCapability.Membership;
-
     private const int BlockSize = 15;
     private readonly TKey _maxValue;
     private readonly TKey _minValue;
@@ -20,6 +18,8 @@ public sealed class RrrBitVectorStructure<TKey, TValue> : IStructure<TKey, TValu
         _minValue = minValue;
         _maxValue = maxValue;
     }
+
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership;
 
     public RrrBitVectorContext? Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

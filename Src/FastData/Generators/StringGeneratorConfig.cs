@@ -1,5 +1,5 @@
-using Genbox.FastData.Enums;
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Generators.Expressions;
 using Genbox.FastData.Generators.StringHash.Framework;

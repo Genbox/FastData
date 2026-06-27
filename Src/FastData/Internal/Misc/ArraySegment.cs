@@ -13,7 +13,7 @@ internal readonly record struct ArraySegment(uint Offset, int Length, Alignment 
     internal int GetRequiredLength(int unitSize)
     {
         int bytes = Length == -1 ? (int)Offset : (int)Offset + Length;
-        return (bytes + unitSize - 1) / unitSize;
+        return ((bytes + unitSize) - 1) / unitSize;
     }
 
     public override string ToString() => $"{Offset}|{Length}|{Alignment}";

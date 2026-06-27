@@ -369,7 +369,7 @@ public class GPerfAnalyzerTests
     public void GetCandidates_AsciiBytes_ReturnsLengthAndAsciiOnlyMandatoryExits()
     {
         string[] data = ["a", "bb", "ccc"];
-        Candidate candidate = GetCandidate(data, false, GeneratorEncoding.AsciiBytes);
+        Candidate candidate = GetCandidate(data, false);
         GPerfStringHash hash = Assert.IsType<GPerfStringHash>(candidate.StringHash);
         IEarlyExit[] exits = hash.GetMandatoryExits().ToArray();
 

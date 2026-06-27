@@ -43,9 +43,7 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
                 Output.AppendLine(";");
             }
             else
-            {
                 Output.AppendLine($"let mut {v.Name}: {typeName};");
-            }
         }
 
         foreach (Expression expr in node.Expressions)

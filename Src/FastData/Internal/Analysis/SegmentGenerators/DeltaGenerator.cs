@@ -71,7 +71,7 @@ internal sealed class DeltaGenerator(DeltaGeneratorConfig config) : ISegmentGene
 
     /// <summary>Generates progressive prefix segments from non-zero delta-map runs.</summary>
     /// <remarks>
-    /// When <see cref="DeltaGeneratorConfig.MaxSegmentLength"/> is <c>-1</c>, segments are kept within the shortest encoded key length.
+    /// When <see cref="DeltaGeneratorConfig.MaxSegmentLength" /> is <c>-1</c>, segments are kept within the shortest encoded key length.
     /// Positive values cap the emitted segment length and allow segments beyond the shortest encoded key length.
     /// </remarks>
     public IEnumerable<ArraySegment> Generate(StringKeyProperties props)
@@ -107,9 +107,7 @@ internal sealed class DeltaGenerator(DeltaGeneratorConfig config) : ISegmentGene
                 lengthLimit = Math.Min(runLength, remainingMinLength);
             }
             else
-            {
                 lengthLimit = Math.Min(runLength, maxSegmentLength);
-            }
 
             for (int length = 1; length <= lengthLimit; length++)
                 yield return new ArraySegment(start, length, alignment);

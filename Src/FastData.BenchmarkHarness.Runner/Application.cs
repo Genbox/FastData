@@ -151,7 +151,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
         (string Label, string Value)[] rows =
         [
             ("Workload", $"Type: {settings.Workload}, Count: {settings.BenchmarkSize.ToString("N0", NumberFormatInfo.InvariantInfo)}, KeyLength: {settings.KeyLengthBenchmarkSize.ToString("N0", NumberFormatInfo.InvariantInfo)}"),
-            ("Loop", $"Warmup: {settings.WarmupCount.ToString(NumberFormatInfo.InvariantInfo)}, Samples: {settings.MinSampleCount.ToString(NumberFormatInfo.InvariantInfo)}-{settings.MaxSampleCount.ToString(NumberFormatInfo.InvariantInfo)}, Target: {settings.TargetIterationTimeMs.ToString(NumberFormatInfo.InvariantInfo)}ms, MaxError: {settings.MaxError.ToString(NumberFormatInfo.InvariantInfo)}%"),
+            ("Loop", $"Warmup: {settings.WarmupCount.ToString(NumberFormatInfo.InvariantInfo)}, Samples: {settings.MinSampleCount.ToString(NumberFormatInfo.InvariantInfo)}-{settings.MaxSampleCount.ToString(NumberFormatInfo.InvariantInfo)}, Target: {settings.TargetIterationTimeMs.ToString(NumberFormatInfo.InvariantInfo)}ms, MaxError: {settings.MaxError.ToString(NumberFormatInfo.InvariantInfo)}%")
         ];
 
         return settings.Debug ? [..rows, ("Debug", "Enabled")] : rows;

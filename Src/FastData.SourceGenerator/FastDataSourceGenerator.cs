@@ -286,7 +286,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
             object? requiredFunctionsArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.RequiredCapability)).Value.Value;
             if (requiredFunctionsArg != null)
-                fdCfg.RequiredCapability = (Genbox.FastData.Config.StructureCapability)(int)(StructureCapability)requiredFunctionsArg;
+                fdCfg.RequiredCapability = (Config.StructureCapability)(int)(StructureCapability)requiredFunctionsArg;
 
             object? ignoreCaseArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.IgnoreCase)).Value.Value;
             if (ignoreCaseArg is true)

@@ -10,8 +10,6 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class RangeStructure<TKey, TValue> : IStructure<TKey, TValue, RangeContext<TKey>>
 {
-    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.Enumeration;
-
     private readonly (TKey Start, TKey End)[] _ranges;
 
     internal RangeStructure(DataRanges<TKey> ranges)
@@ -21,6 +19,8 @@ public sealed class RangeStructure<TKey, TValue> : IStructure<TKey, TValue, Rang
         Debug.Assert(Type.GetTypeCode(typeof(TKey)).IsIntegral(), "RangeStructure requires integral keys.");
         _ranges = ranges.Ranges.ToArray();
     }
+
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.Enumeration;
 
     public RangeContext<TKey> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values) => new RangeContext<TKey>(_ranges);
 

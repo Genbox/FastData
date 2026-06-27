@@ -55,11 +55,10 @@ public class ValueLowByteBitmapEarlyExitTests
 
     private sealed class CapturingGenerator : ICodeGenerator
     {
-        public GeneratorEncoding Encoding => GeneratorEncoding.Utf16CodeUnits;
-
         public IContext? Context { get; private set; }
 
         public GeneratorConfigBase? Config { get; private set; }
+        public GeneratorEncoding Encoding => GeneratorEncoding.Utf16CodeUnits;
 
         public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
         {

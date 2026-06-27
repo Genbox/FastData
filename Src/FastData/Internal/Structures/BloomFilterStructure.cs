@@ -8,8 +8,6 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class BloomFilterStructure<TKey, TValue> : IStructure<TKey, TValue, BloomFilterContext>
 {
-    public StructureCapability SupportedCapabilities => StructureCapability.Membership;
-
     private const int BitsPerKey = 10;
     private readonly HashData _hashData;
 
@@ -17,6 +15,8 @@ public sealed class BloomFilterStructure<TKey, TValue> : IStructure<TKey, TValue
     {
         _hashData = hashData;
     }
+
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership;
 
     public BloomFilterContext Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

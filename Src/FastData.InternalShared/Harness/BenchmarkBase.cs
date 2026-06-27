@@ -280,7 +280,7 @@ public abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager docke
                 filtered.Add(timing);
         }
 
-        int minRetainedSamples = (int)Math.Ceiling(timings.Length * 2d / 3d);
+        int minRetainedSamples = (int)Math.Ceiling((timings.Length * 2d) / 3d);
         if (filtered.Count < minRetainedSamples)
             return sortedTimings;
 
@@ -299,7 +299,7 @@ public abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager docke
                 filtered.Add(timing);
         }
 
-        int minRetainedSamples = (int)Math.Ceiling(timings.Length * 2d / 3d);
+        int minRetainedSamples = (int)Math.Ceiling((timings.Length * 2d) / 3d);
         if (filtered.Count < minRetainedSamples)
             return sortedTimings;
 
@@ -335,7 +335,7 @@ public abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager docke
             return invocations * 2;
         }
 
-        double scaled = Math.Ceiling(invocations * targetIterationTimeNs / elapsed);
+        double scaled = Math.Ceiling((invocations * targetIterationTimeNs) / elapsed);
         if (!double.IsFinite(scaled) || scaled > long.MaxValue)
             throw new InvalidOperationException($"Benchmark '{Name}.{data.Identifier}' requires too many invocations to reach target iteration time {data.TargetIterationTimeMs.ToString(NumberFormatInfo.InvariantInfo)}ms.");
 
@@ -386,7 +386,7 @@ public abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager docke
 
         int degreesOfFreedom = sampleCount - 1;
         double criticalValue = degreesOfFreedom <= StudentTCriticalValues999.Length ? StudentTCriticalValues999[degreesOfFreedom - 1] : NormalCriticalValue999;
-        return criticalValue * stdDev / Math.Sqrt(sampleCount);
+        return (criticalValue * stdDev) / Math.Sqrt(sampleCount);
     }
 
     private static bool IsWithinTargetError(ITestData data, BenchmarkResult result) => RelativeError(result) <= data.MaxErrorPercent / 100d;

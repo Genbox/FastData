@@ -9,7 +9,7 @@ namespace Genbox.FastData.Generator.CPlusPlus.TestHarness;
 public sealed class CPlusPlusBootstrap : BootstrapBase
 {
     // Benchmarks pin exact image digests so compiler/runtime updates do not silently change results.
-    public CPlusPlusBootstrap(HarnessType type) : base("CPlusPlus", ".cpp", type, CreateMap(), "silkeh/clang:21-bookworm@sha256:c735c54928e1b8be46101c9aff2895f72d1bfb6d94f713804528fa2fd0a96dba", GetCommandTemplate(type), GetBuildCommandTemplate(type), GetRunCommandTemplate(type)) { }
+    public CPlusPlusBootstrap(HarnessType type) : base("CPlusPlus", ".cpp", type, CreateMap(), "silkeh/clang:21-bookworm@sha256:c735c54928e1b8be46101c9aff2895f72d1bfb6d94f713804528fa2fd0a96dba", GetCommandTemplate(type), GetBuildCommandTemplate(type), GetRunCommandTemplate(type)) {}
 
     public override ICodeGenerator Generator => new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig("fastdata"));
 

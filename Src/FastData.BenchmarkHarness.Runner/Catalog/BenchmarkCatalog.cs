@@ -19,6 +19,8 @@ internal sealed class BenchmarkCatalog
         new Descriptor("Rust", x => new RustBenchmark(x))
     ];
 
+    public string[] LanguageNames => _descriptors.Select(x => x.Name).ToArray();
+
     public Selection[] Select(ITestData[] benchmarkData, Settings settings)
     {
         List<Selection> selections = [];
@@ -44,8 +46,6 @@ internal sealed class BenchmarkCatalog
                 yield return new History(name, entries);
         }
     }
-
-    public string[] LanguageNames => _descriptors.Select(x => x.Name).ToArray();
 
     public static string GetBenchmarkName(string harnessName, ITestData data) => harnessName + "." + data.Identifier;
 

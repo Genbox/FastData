@@ -11,8 +11,6 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, EliasFanoContext>
 {
-    public StructureCapability SupportedCapabilities => StructureCapability.Membership;
-
     private readonly TKey _maxValue;
     private readonly TKey _minValue;
     private readonly int _skipQuantum;
@@ -23,6 +21,8 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         _maxValue = maxValue;
         _skipQuantum = skipQuantum;
     }
+
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership;
 
     public EliasFanoContext? Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

@@ -121,9 +121,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
                 Output.AppendLine(";");
             }
             else
-            {
                 Output.AppendLine($"{typeName} {v.Name};");
-            }
         }
 
         foreach (Expression expr in node.Expressions)

@@ -1,12 +1,13 @@
 using System.Linq.Expressions;
+using System.Reflection;
 using Genbox.FastData.Generator;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.EarlyExits;
-using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Generators.Expressions;
+using Genbox.FastData.Generators.Helpers;
 using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
@@ -54,12 +55,12 @@ public sealed class EarlyExitTestData<TKey>(
         // For string exits, we need to apply the allocation gather and deduplication transforms
         if (typeof(TKey) == typeof(string) && GeneratorFunctions.HasFlag(GeneratorFunction.Length))
         {
-            System.Reflection.MethodInfo methodInfo = typeof(GeneratorFunctions).GetMethod(nameof(Generators.GeneratorFunctions.Length), [typeof(string)])!;
+            MethodInfo methodInfo = typeof(GeneratorFunctions).GetMethod(nameof(Generators.GeneratorFunctions.Length), [typeof(string)])!;
             ParameterExpression length = Expression.Variable(typeof(int), "length");
             AnnotatedExpr lengthAlloc = AnnotatedExpr.Allocation(Expression.Assign(length, Expression.Call(methodInfo, inputKey)));
 
             AnnotatedExpr[] combined = [lengthAlloc, ..annotated];
-            annotated = Generators.Helpers.ExpressionHelper.Transform(combined,
+            annotated = ExpressionHelper.Transform(combined,
             [
                 new AllocationGatherTransform(),
                 new DeduplicateAllocationTransform()

@@ -55,7 +55,7 @@ internal static class ExpressionHashBuilder
 
     /// <summary>Produces a hash expression for one or more string byte segments.</summary>
     /// <remarks>
-    /// Fixed-size segments are emitted as straight-line chunked reads. A single full-tail segment, represented by <see cref="ArraySegment.Length"/> equal to -1,
+    /// Fixed-size segments are emitted as straight-line chunked reads. A single full-tail segment, represented by <see cref="ArraySegment.Length" /> equal to -1,
     /// emits a throughput-oriented loop: four independent 8-byte mixer lanes for 32-byte blocks, then 8/4/2/1-byte tail handling, followed by the avalanche.
     /// </remarks>
     internal static Expression<StringHashFunc> Build(ArraySegment[] segments, Mixer mixer, Avalanche avalanche, bool ignoreCase = false, ulong initialSeed = 0UL)
@@ -107,7 +107,7 @@ internal static class ExpressionHashBuilder
     }
 
     /// <summary>Adds the full-tail hash body for an unconstrained segment.</summary>
-    /// <remarks>The generated expression mutates <paramref name="length"/> into the number of unread bytes and <paramref name="offset"/> into the current read position.</remarks>
+    /// <remarks>The generated expression mutates <paramref name="length" /> into the number of unread bytes and <paramref name="offset" /> into the current read position.</remarks>
     private static void BuildFullHash(List<Expression> ex, ArraySegment seg, Expression length, Expression input, Expression hash, Expression offset, Mixer mixer, bool ignoreCase, ulong initialSeed)
     {
         ParameterExpression v1 = Variable(typeof(ulong), "v1");

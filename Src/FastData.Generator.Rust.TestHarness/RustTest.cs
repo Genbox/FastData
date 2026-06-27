@@ -61,15 +61,15 @@ public sealed class RustTest(DockerManager manager) : TestBase<RustBootstrap>(ne
          {source}
 
          {Bootstrap.Wrap("""
-                                  let mut count: usize = 0;
-                                  for _key in fastdata::keys() {
-                                      count += 1;
-                                  }
-                                  if count != fastdata::ITEM_COUNT as usize {
-                                      std::process::exit(0);
-                                  }
-                                  std::process::exit(1);
-                          """)}
+                                 let mut count: usize = 0;
+                                 for _key in fastdata::keys() {
+                                     count += 1;
+                                 }
+                                 if count != fastdata::ITEM_COUNT as usize {
+                                     std::process::exit(0);
+                                 }
+                                 std::process::exit(1);
+                         """)}
          """;
 
     protected override string RenderValuesEnumeration(string source) =>
@@ -79,15 +79,15 @@ public sealed class RustTest(DockerManager manager) : TestBase<RustBootstrap>(ne
          {source}
 
          {Bootstrap.Wrap("""
-                                  let mut count: usize = 0;
-                                  for _v in fastdata::values() {
-                                      count += 1;
-                                  }
-                                  if count != fastdata::ITEM_COUNT as usize {
-                                      std::process::exit(0);
-                                  }
-                                  std::process::exit(1);
-                          """)}
+                                 let mut count: usize = 0;
+                                 for _v in fastdata::values() {
+                                     count += 1;
+                                 }
+                                 if count != fastdata::ITEM_COUNT as usize {
+                                     std::process::exit(0);
+                                 }
+                                 std::process::exit(1);
+                         """)}
          """;
 
     protected override string RenderDirectAccess(string source) =>
@@ -97,11 +97,11 @@ public sealed class RustTest(DockerManager manager) : TestBase<RustBootstrap>(ne
          {source}
 
          {Bootstrap.Wrap("""
-                                  let ks = fastdata::key_slice();
-                                  if ks.len() != fastdata::ITEM_COUNT as usize {
-                                      std::process::exit(0);
-                                  }
-                                  std::process::exit(1);
-                          """)}
+                                 let ks = fastdata::key_slice();
+                                 if ks.len() != fastdata::ITEM_COUNT as usize {
+                                     std::process::exit(0);
+                                 }
+                                 std::process::exit(1);
+                         """)}
          """;
 }

@@ -31,11 +31,6 @@ public sealed class TypeMap : ITypeMap
         }
     }
 
-    /// <summary>Gets the string length for the encoding model used by this type map.</summary>
-    /// <param name="value">The string value.</param>
-    /// <returns>The length in the units used by the target-language string type.</returns>
-    public int GetStringLength(string value) => StringHelper.GetLengthFunc(_encoding)(value);
-
     /// <summary>Gets the target-language literal for a null value.</summary>
     /// <returns>The target-language null literal.</returns>
     public string GetNull() => _index[0].PrintObj(this, null);
@@ -52,6 +47,11 @@ public sealed class TypeMap : ITypeMap
 
         return res.Name;
     }
+
+    /// <summary>Gets the string length for the encoding model used by this type map.</summary>
+    /// <param name="value">The string value.</param>
+    /// <returns>The length in the units used by the target-language string type.</returns>
+    public int GetStringLength(string value) => StringHelper.GetLengthFunc(_encoding)(value);
 
     /// <summary>Gets the type definition for a CLR type.</summary>
     /// <typeparam name="T">The CLR type.</typeparam>

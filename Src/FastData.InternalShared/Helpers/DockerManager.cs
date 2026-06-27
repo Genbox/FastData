@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using Docker.DotNet;
 using Docker.DotNet.Models;
@@ -12,12 +11,12 @@ public sealed class DockerManager : IAsyncDisposable
 {
     private const string WorkDir = "/work";
     private const string DefaultContainerPrefix = "fastdata";
-    private readonly DockerClientConfiguration _configuration = new DockerClientConfiguration();
     private readonly DockerClient _client;
-    private readonly string? _cpuSet;
+    private readonly DockerClientConfiguration _configuration = new DockerClientConfiguration();
     private readonly string _containerPrefix;
-    private readonly string _runId = Guid.NewGuid().ToString("N");
     private readonly ConcurrentDictionary<string, string> _containersByImage = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
+    private readonly string? _cpuSet;
+    private readonly string _runId = Guid.NewGuid().ToString("N");
 
     public DockerManager(string containerPrefix = DefaultContainerPrefix, string? cpuSet = null)
     {
@@ -27,6 +26,14 @@ public sealed class DockerManager : IAsyncDisposable
         _cpuSet = string.IsNullOrWhiteSpace(cpuSet) ? null : cpuSet;
         _containerPrefix = containerPrefix;
         _client = _configuration.CreateClient();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await RemoveCreatedContainersAsync(CancellationToken.None).ConfigureAwait(false);
+        _containersByImage.Clear();
+        _client.Dispose();
+        _configuration.Dispose();
     }
 
     public static async Task<string?> GetAvailabilityErrorAsync(CancellationToken cancellationToken = default)
@@ -49,14 +56,6 @@ public sealed class DockerManager : IAsyncDisposable
         {
             return "Docker daemon is not available: " + ex.Message;
         }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await RemoveCreatedContainersAsync(CancellationToken.None).ConfigureAwait(false);
-        _containersByImage.Clear();
-        _client.Dispose();
-        _configuration.Dispose();
     }
 
     public async Task<ProcessResult> RunInContainerAsync(string imageId, string workDir, string command, CancellationToken cancellationToken = default)

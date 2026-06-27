@@ -51,13 +51,13 @@ public sealed class CSharpTest(DockerManager manager) : TestBase<CSharpBootstrap
          {source}
 
          {Bootstrap.Wrap("""
-                                  int count = 0;
-                                  foreach (var key in FastData.Keys)
-                                      count++;
-                                  if (count != FastData.ItemCount)
-                                      return 0;
-                                  return 1;
-                          """)}
+                                 int count = 0;
+                                 foreach (var key in FastData.Keys)
+                                     count++;
+                                 if (count != FastData.ItemCount)
+                                     return 0;
+                                 return 1;
+                         """)}
          """;
 
     protected override string RenderValuesEnumeration(string source) =>
@@ -65,13 +65,13 @@ public sealed class CSharpTest(DockerManager manager) : TestBase<CSharpBootstrap
          {source}
 
          {Bootstrap.Wrap("""
-                                  int count = 0;
-                                  foreach (var v in FastData.Values)
-                                      count++;
-                                  if (count != FastData.ItemCount)
-                                      return 0;
-                                  return 1;
-                          """)}
+                                 int count = 0;
+                                 foreach (var v in FastData.Values)
+                                     count++;
+                                 if (count != FastData.ItemCount)
+                                     return 0;
+                                 return 1;
+                         """)}
          """;
 
     protected override string RenderDirectAccess(string source) =>
@@ -79,9 +79,9 @@ public sealed class CSharpTest(DockerManager manager) : TestBase<CSharpBootstrap
          {source}
 
          {Bootstrap.Wrap("""
-                                  if (FastData.KeySpan.Length != FastData.ItemCount)
-                                      return 0;
-                                  return 1;
-                          """)}
+                                 if (FastData.KeySpan.Length != FastData.ItemCount)
+                                     return 0;
+                                 return 1;
+                         """)}
          """;
 }

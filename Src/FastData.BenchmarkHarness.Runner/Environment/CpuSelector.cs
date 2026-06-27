@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace Genbox.FastData.BenchmarkHarness.Runner.Environment;
@@ -87,7 +88,7 @@ internal static partial class CpuSelector
         return true;
     }
 
-    private static string FormatCpuIndex(int logicalProcessor) => logicalProcessor.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    private static string FormatCpuIndex(int logicalProcessor) => logicalProcessor.ToString(CultureInfo.InvariantCulture);
 
     private static bool TryGetLogicalProcessorTopology(out CoreTopology[] cores)
     {

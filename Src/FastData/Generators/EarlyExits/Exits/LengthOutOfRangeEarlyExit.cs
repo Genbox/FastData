@@ -4,8 +4,10 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
-/// <summary>Rejects strings whose length falls outside the observed [Min, Max] range using a single unsigned subtraction check:
-/// <c>(uint)(Length(key) - Min) &gt; (uint)(Max - Min)</c>.</summary>
+/// <summary>
+/// Rejects strings whose length falls outside the observed [Min, Max] range using a single unsigned subtraction check:
+/// <c>(uint)(Length(key) - Min) &gt; (uint)(Max - Min)</c>.
+/// </summary>
 public sealed record LengthOutOfRangeEarlyExit(int Min, int Max) : IEarlyExit
 {
     public ulong KeyspaceSize => (ulong)Min + (ulong)(int.MaxValue - Max);

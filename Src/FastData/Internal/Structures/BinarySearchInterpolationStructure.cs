@@ -9,10 +9,7 @@ public sealed class BinarySearchInterpolationStructure<TKey, TValue> : IStructur
 {
     public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration | StructureCapability.DirectAccess;
 
-    public BinarySearchInterpolationContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
-    {
-        return new BinarySearchInterpolationContext<TKey, TValue>(keys, values);
-    }
+    public BinarySearchInterpolationContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values) => new BinarySearchInterpolationContext<TKey, TValue>(keys, values);
 
     public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 }

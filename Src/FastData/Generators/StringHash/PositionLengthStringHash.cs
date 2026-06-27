@@ -3,17 +3,17 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Generators.StringHash.Framework;
-using Genbox.FastData.Internal.Analysis.Expressions;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Analysis.Expressions;
 using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Generators.StringHash;
 
 internal sealed record PositionLengthStringHash : IStringHash
 {
+    private readonly bool _ignoreCase;
     private readonly int _minUnitLength;
     private readonly int _readSize;
-    private readonly bool _ignoreCase;
 
     internal PositionLengthStringHash(int[] positions, bool includeLength, int minUnitLength, int readSize, bool ignoreCase)
     {
@@ -27,12 +27,6 @@ internal sealed record PositionLengthStringHash : IStringHash
     internal int[] Positions { get; }
     internal bool IncludeLength { get; }
     public AdditionalData[]? AdditionalData => null;
-
-    internal static PositionLengthStringHash CreateFirstLastLength(GeneratorEncoding encoding, bool ignoreCase = false)
-    {
-        int unitSize = StringHelper.GetSize(encoding);
-        return new PositionLengthStringHash([0, -1], true, 1, unitSize, ignoreCase);
-    }
 
     public IEnumerable<IEarlyExit> GetMandatoryExits() => _minUnitLength > 0 ? [new LengthLessThanEarlyExit(_minUnitLength)] : [];
 
@@ -60,6 +54,12 @@ internal sealed record PositionLengthStringHash : IStringHash
 
         BlockExpression body = Block([hash], ex);
         return Lambda<StringHashFunc>(body, value, length);
+    }
+
+    internal static PositionLengthStringHash CreateFirstLastLength(GeneratorEncoding encoding, bool ignoreCase = false)
+    {
+        int unitSize = StringHelper.GetSize(encoding);
+        return new PositionLengthStringHash([0, -1], true, 1, unitSize, ignoreCase);
     }
 
     private UnaryExpression ReadPosition(Expression value, Expression length, int pos)

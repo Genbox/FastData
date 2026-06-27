@@ -2,14 +2,17 @@ using System.Linq.Expressions;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Extensions;
 using static Genbox.FastData.Generators.Helpers.TypeHelper;
-using Convert = System.Convert;
 
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
-/// <summary>Rejects keys outside the observed [Min, Max] range using a single unsigned subtraction check for integral types,
-/// or an <c>OrElse</c> comparison for floating-point types.</summary>
-/// <remarks>For integral types the expression is <c>(unsigned)(key - Min) &gt; (unsigned)(Max - Min)</c>.
-/// For floating-point types the expression is <c>key &lt; Min || key &gt; Max</c>.</remarks>
+/// <summary>
+/// Rejects keys outside the observed [Min, Max] range using a single unsigned subtraction check for integral types,
+/// or an <c>OrElse</c> comparison for floating-point types.
+/// </summary>
+/// <remarks>
+/// For integral types the expression is <c>(unsigned)(key - Min) &gt; (unsigned)(Max - Min)</c>.
+/// For floating-point types the expression is <c>key &lt; Min || key &gt; Max</c>.
+/// </remarks>
 public sealed record ValueOutOfRangeEarlyExit<T>(T Min, T Max, ulong LessThanKeyspace, ulong GreaterThanKeyspace) : IEarlyExit
 {
     public ulong KeyspaceSize => LessThanKeyspace + GreaterThanKeyspace;

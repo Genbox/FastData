@@ -9,8 +9,6 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmContext<TKey, TValue>> where TKey : notnull
 {
-    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration | StructureCapability.DirectAccess;
-
     private static readonly TKey _sentinel = PgmTypeTraits<TKey>.MaxValue;
 
     private readonly int _epsilon;
@@ -25,6 +23,8 @@ public sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmCon
         _epsilon = epsilon;
         _epsilonRecursive = epsilonRecursive;
     }
+
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration | StructureCapability.DirectAccess;
 
     public PgmContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

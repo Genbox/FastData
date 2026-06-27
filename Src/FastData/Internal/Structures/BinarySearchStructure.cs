@@ -9,10 +9,7 @@ public sealed class BinarySearchStructure<TKey, TValue> : IStructure<TKey, TValu
 {
     public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration | StructureCapability.DirectAccess;
 
-    public BinarySearchContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
-    {
-        return new BinarySearchContext<TKey, TValue>(keys, values);
-    }
+    public BinarySearchContext<TKey, TValue> Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values) => new BinarySearchContext<TKey, TValue>(keys, values);
 
     public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 }

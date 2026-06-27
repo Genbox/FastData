@@ -64,11 +64,11 @@ internal class RustLanguageDef : ILanguageDef
     {
         '\0' => "\\0",
         '\n' => "\\n",
-            '\r' => "\\r",
-            '\t' => "\\t",
-            '\\' => "\\\\",
-            '\"' => "\\\"",
-            '\'' => "\\'",
+        '\r' => "\\r",
+        '\t' => "\\t",
+        '\\' => "\\\\",
+        '\"' => "\\\"",
+        '\'' => "\\'",
         < ' ' => "\\u{" + ((int)ch).ToString("X", NumberFormatInfo.InvariantInfo) + "}",
         _ => ch.ToString()
     };

@@ -11,14 +11,14 @@ namespace Genbox.FastData.Internal.Structures;
 
 public sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, BitSetContext<TValue>>
 {
-    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration;
-
     private readonly NumericKeyProperties<TKey> _props;
 
     internal BitSetStructure(NumericKeyProperties<TKey> props)
     {
         _props = props;
     }
+
+    public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration;
 
     public BitSetContext<TValue>? Create(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values)
     {

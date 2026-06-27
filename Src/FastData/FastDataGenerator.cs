@@ -497,21 +497,6 @@ public static partial class FastDataGenerator
         throw new InvalidOperationException($"Unsupported DataStructure {type}");
     }
 
-    private sealed class UsedFunctionVisitor : ExpressionVisitor
-    {
-        internal GeneratorFunction Functions { get; private set; }
-
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-            if (!Enum.TryParse(node.Method.Name, false, out GeneratorFunction value))
-                throw new InvalidOperationException($"The method '{node.Method.Name}' is unknown.");
-
-            Functions |= value;
-
-            return base.VisitMethodCall(node);
-        }
-    }
-
     private static StructureCapability GetRequiredCapabilities(DataConfig cfg, bool hasValues)
     {
         if (!hasValues && cfg.RequiredCapability.HasFlag(StructureCapability.KeyValueLookup))
@@ -532,5 +517,20 @@ public static partial class FastDataGenerator
 
         StructureCapability capabilities = StructureCapabilityHelper.GetStructureCapability(structureType);
         throw new InvalidOperationException($"Structure {structureType.Name} does not support the required functions {requiredCapabilities}. Supported functions: {capabilities}.");
+    }
+
+    private sealed class UsedFunctionVisitor : ExpressionVisitor
+    {
+        internal GeneratorFunction Functions { get; private set; }
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            if (!Enum.TryParse(node.Method.Name, false, out GeneratorFunction value))
+                throw new InvalidOperationException($"The method '{node.Method.Name}' is unknown.");
+
+            Functions |= value;
+
+            return base.VisitMethodCall(node);
+        }
     }
 }
