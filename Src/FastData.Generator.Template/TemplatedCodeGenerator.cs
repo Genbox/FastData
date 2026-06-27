@@ -13,7 +13,6 @@ namespace Genbox.FastData.Generator.Template;
 /// <summary>Base class for T4 template-based language generators.</summary>
 public abstract class TemplatedCodeGenerator : ICodeGenerator
 {
-    private readonly string _languageName;
     private readonly TemplateManager _manager;
     private readonly TypeMap _map;
 
@@ -24,7 +23,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
         _map = new TypeMap(languageDef.TypeDefinitions, Encoding);
 
         string typeName = GetType().Name;
-        _languageName = typeName.Substring(0, typeName.Length - 13);
+        string languageName = typeName.Substring(0, typeName.Length - 13);
 
 #if RELEASE
         const bool release = true;
@@ -32,11 +31,15 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
         const bool release = false;
 #endif
 
-        _manager = new TemplateManager(_languageName, Path.Combine(Path.GetTempPath(), "FastData"), release);
+        _manager = new TemplateManager(languageName, Path.Combine(Path.GetTempPath(), "FastData"), release);
+
+        string assemblyPath = GetType().Assembly.Location;
+        string assemblyDir = Path.GetDirectoryName(assemblyPath) ?? AppContext.BaseDirectory;
+        TemplateDir = Path.Combine(assemblyDir, "Templates", languageName);
     }
 
     /// <summary>Gets the directory containing the templates for the current target language.</summary>
-    protected string TemplateDir => Path.Combine(AppContext.BaseDirectory, "Templates", _languageName);
+    protected string TemplateDir { get; }
 
     /// <inheritdoc />
     public GeneratorEncoding Encoding { get; }
