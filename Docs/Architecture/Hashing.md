@@ -37,6 +37,7 @@ This matching is important: the core pipeline hashes the input keys at generatio
 
 `HashBenchmark.GetBestHash()` always includes `DefaultStringHash` when `includeDefault` is true. It then runs each configured analyzer whose `IsAppropriate()` returns true:
 
+* `PositionLengthAnalyzer`
 * `BruteForceAnalyzer`
 * `GeneticAnalyzer`
 * `GPerfAnalyzer`
@@ -68,6 +69,26 @@ After selection, `HashData.Create()` computes final hash codes and the final tab
 It is available for ASCII bytes, UTF-8 bytes, and UTF-16 code units. When `IgnoreCase` is enabled it applies the same byte-level case folding in the expression builder as the other expression-based hashes.
 
 The default hash has no additional data and no mandatory early exits.
+
+## Position/Length Analyzer
+
+`PositionLengthAnalyzer` emits a small fixed set of simple hashes based on the first encoded unit, the last encoded unit, and the encoded input length. It is intended as a cheap candidate source for common keyword sets where edge characters and length distinguish many keys.
+
+By default it returns these permutations:
+
+* length only.
+* first character.
+* first character plus length.
+* last character.
+* last character plus length.
+* first and last character.
+* first and last character plus length.
+
+The analyzer prunes candidates that cannot distinguish the analyzed keys. Length variants are emitted only when encoded lengths vary. First-character variants are emitted only when first characters vary, and last-character variants are emitted only when last characters vary. When every key is exactly one encoded unit long, last-character candidates are skipped because the first and last positions are equivalent.
+
+`PositionLengthAnalyzerConfig.IncludeLength` disables length-contribution variants when set to `false`. `PositionLengthAnalyzerConfig.IncludeLastChar` disables last-character variants when set to `false`. Disabling both leaves only useful first-character candidates, which avoids the extra length and tail-position work that can be expensive in generated C-like languages.
+
+Set `StringAnalyzerConfig.PositionLengthAnalyzerConfig` to `null` to disable this analyzer entirely.
 
 ## Brute-Force Analyzer
 
@@ -148,7 +169,7 @@ Hash structures call this generated `Hash()` method and then apply the structure
 
 ## Configuration
 
-`StringAnalyzerConfig` enables all three analyzers by default and controls final benchmarking:
+`StringAnalyzerConfig` enables all four analyzers by default and controls final benchmarking:
 
 * `BenchmarkIterations`: number of repeated hash calls used for timing candidates.
 * `PerfectHashThreshold`: fixed at `0.25` in the current public config.
@@ -167,6 +188,7 @@ The framework is optimized for generated lookup code rather than general-purpose
 
 * it only needs to perform well for the known input set and expected misses.
 * perfect modulo distribution is more valuable than general avalanche quality when `HashTablePerfect` is possible.
+* position/length hashes are fast to evaluate, prune low-value permutations, and can be restricted to first-character-only when length or last-character access is expensive in the target language.
 * short segments can beat whole-string hashes when they are distinctive enough.
 * gperf can produce very compact and fast hashes, but only when its position and association search succeeds.
 * the default hash keeps generation reliable when analysis is disabled or analyzers fail to improve on the baseline.

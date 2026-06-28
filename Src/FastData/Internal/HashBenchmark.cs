@@ -19,11 +19,17 @@ internal static class HashBenchmark
         //Run each of the analyzers
         List<Candidate> candidates = new List<Candidate>(16);
 
-        //We always add the default hash as a candidate
+        //Add the default hash as a candidate when requested
         if (includeDefault)
         {
             candidates.Add(sim.Run(data, DefaultStringHash.GetInstance(encoding, ignoreCase)));
-            candidates.Add(sim.Run(data, PositionLengthStringHash.CreateFirstLastLength(encoding)));
+        }
+
+        if (cfg.PositionLengthAnalyzerConfig != null)
+        {
+            PositionLengthAnalyzer pla = new PositionLengthAnalyzer(props, cfg.PositionLengthAnalyzerConfig, sim, ignoreCase);
+            if (pla.IsAppropriate())
+                candidates.AddRange(pla.GetCandidates(data));
         }
 
         if (cfg.BruteForceAnalyzerConfig != null)
