@@ -7,10 +7,10 @@ public class ValueHelperBenchmarks
 {
     private char[] _charKeys = null!;
     private short[] _int16Keys = null!;
-    private ushort[] _uint16Keys = null!;
     private int[] _int32Keys = null!;
-    private uint[] _uint32Keys = null!;
     private long[] _int64Keys = null!;
+    private ushort[] _uint16Keys = null!;
+    private uint[] _uint32Keys = null!;
     private ulong[] _uint64Keys = null!;
 
     [Params(65536)]

@@ -6,7 +6,7 @@ namespace Genbox.FastData.Internal;
 
 internal static class ValueHelper
 {
-    internal static void GetCharMinMax(char[] keys, out char min, out char max)
+    internal static void GetCharMinMax(ReadOnlySpan<char> keys, out char min, out char max)
     {
         int length = keys.Length;
         int vectorSize = Vector<ushort>.Count;
@@ -18,7 +18,7 @@ internal static class ValueHelper
         }
 
         // Vector<T> does not support char, but char ordering matches its UTF-16 code-unit value.
-        Span<ushort> span = MemoryMarshal.Cast<char, ushort>(keys.AsSpan());
+        ReadOnlySpan<ushort> span = MemoryMarshal.Cast<char, ushort>(keys);
         ref ushort keyValuesRef = ref MemoryMarshal.GetReference(span);
 
         Vector<ushort> min0 = LoadVector(ref keyValuesRef, 0);
@@ -78,27 +78,27 @@ internal static class ValueHelper
 
         min = (char)localMin;
         max = (char)localMax;
-    }
 
-    private static void GetCharMinMaxScalar(char[] keys, out char min, out char max)
-    {
-        ref char keysRef = ref keys[0];
-        min = keysRef;
-        max = keysRef;
-
-        for (int i = 1; i < keys.Length; i++)
+        static void GetCharMinMaxScalar(ReadOnlySpan<char> keys, out char min, out char max)
         {
-            char key = Unsafe.Add(ref keysRef, i);
+            ref char keysRef = ref MemoryMarshal.GetReference(keys);
+            min = keysRef;
+            max = keysRef;
 
-            if (key < min)
-                min = key;
+            for (int i = 1; i < keys.Length; i++)
+            {
+                char key = Unsafe.Add(ref keysRef, i);
 
-            if (key > max)
-                max = key;
+                if (key < min)
+                    min = key;
+
+                if (key > max)
+                    max = key;
+            }
         }
     }
 
-    internal static void GetInt16MinMax(short[] keys, out short min, out short max)
+    internal static void GetInt16MinMax(ReadOnlySpan<short> keys, out short min, out short max)
     {
         int length = keys.Length;
         int vectorSize = Vector<short>.Count;
@@ -109,7 +109,7 @@ internal static class ValueHelper
             return;
         }
 
-        ref short keysRef = ref keys[0];
+        ref short keysRef = ref MemoryMarshal.GetReference(keys);
 
         Vector<short> min0 = LoadVector(ref keysRef, 0);
         Vector<short> max0 = min0;
@@ -168,27 +168,27 @@ internal static class ValueHelper
 
         min = localMin;
         max = localMax;
-    }
 
-    private static void GetInt16MinMaxScalar(short[] keys, out short min, out short max)
-    {
-        ref short keysRef = ref keys[0];
-        min = keysRef;
-        max = keysRef;
-
-        for (int i = 1; i < keys.Length; i++)
+        static void GetInt16MinMaxScalar(ReadOnlySpan<short> keys, out short min, out short max)
         {
-            short key = Unsafe.Add(ref keysRef, i);
+            ref short keysRef = ref MemoryMarshal.GetReference(keys);
+            min = keysRef;
+            max = keysRef;
 
-            if (key < min)
-                min = key;
+            for (int i = 1; i < keys.Length; i++)
+            {
+                short key = Unsafe.Add(ref keysRef, i);
 
-            if (key > max)
-                max = key;
+                if (key < min)
+                    min = key;
+
+                if (key > max)
+                    max = key;
+            }
         }
     }
 
-    internal static void GetUInt16MinMax(ushort[] keys, out ushort min, out ushort max)
+    internal static void GetUInt16MinMax(ReadOnlySpan<ushort> keys, out ushort min, out ushort max)
     {
         int length = keys.Length;
         int vectorSize = Vector<ushort>.Count;
@@ -199,7 +199,7 @@ internal static class ValueHelper
             return;
         }
 
-        ref ushort keysRef = ref keys[0];
+        ref ushort keysRef = ref MemoryMarshal.GetReference(keys);
 
         Vector<ushort> min0 = LoadVector(ref keysRef, 0);
         Vector<ushort> max0 = min0;
@@ -258,27 +258,27 @@ internal static class ValueHelper
 
         min = localMin;
         max = localMax;
-    }
 
-    private static void GetUInt16MinMaxScalar(ushort[] keys, out ushort min, out ushort max)
-    {
-        ref ushort keysRef = ref keys[0];
-        min = keysRef;
-        max = keysRef;
-
-        for (int i = 1; i < keys.Length; i++)
+        static void GetUInt16MinMaxScalar(ReadOnlySpan<ushort> keys, out ushort min, out ushort max)
         {
-            ushort key = Unsafe.Add(ref keysRef, i);
+            ref ushort keysRef = ref MemoryMarshal.GetReference(keys);
+            min = keysRef;
+            max = keysRef;
 
-            if (key < min)
-                min = key;
+            for (int i = 1; i < keys.Length; i++)
+            {
+                ushort key = Unsafe.Add(ref keysRef, i);
 
-            if (key > max)
-                max = key;
+                if (key < min)
+                    min = key;
+
+                if (key > max)
+                    max = key;
+            }
         }
     }
 
-    internal static void GetInt32MinMax(int[] keys, out int min, out int max)
+    internal static void GetInt32MinMax(ReadOnlySpan<int> keys, out int min, out int max)
     {
         int length = keys.Length;
         int vectorSize = Vector<int>.Count;
@@ -289,7 +289,7 @@ internal static class ValueHelper
             return;
         }
 
-        ref int keysRef = ref keys[0];
+        ref int keysRef = ref MemoryMarshal.GetReference(keys);
 
         Vector<int> min0 = LoadVector(ref keysRef, 0);
         Vector<int> max0 = min0;
@@ -348,6 +348,24 @@ internal static class ValueHelper
 
         min = localMin;
         max = localMax;
+
+        static void GetInt32MinMaxScalar(ReadOnlySpan<int> keys, out int min, out int max)
+        {
+            ref int keysRef = ref MemoryMarshal.GetReference(keys);
+            min = keysRef;
+            max = keysRef;
+
+            for (int i = 1; i < keys.Length; i++)
+            {
+                int key = Unsafe.Add(ref keysRef, i);
+
+                if (key < min)
+                    min = key;
+
+                if (key > max)
+                    max = key;
+            }
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -358,25 +376,7 @@ internal static class ValueHelper
             ref Unsafe.As<T, byte>(ref Unsafe.Add(ref source, elementOffset)));
     }
 
-    private static void GetInt32MinMaxScalar(int[] keys, out int min, out int max)
-    {
-        ref int keysRef = ref keys[0];
-        min = keysRef;
-        max = keysRef;
-
-        for (int i = 1; i < keys.Length; i++)
-        {
-            int key = Unsafe.Add(ref keysRef, i);
-
-            if (key < min)
-                min = key;
-
-            if (key > max)
-                max = key;
-        }
-    }
-
-    internal static void GetUInt32MinMax(uint[] keys, out uint min, out uint max)
+    internal static void GetUInt32MinMax(ReadOnlySpan<uint> keys, out uint min, out uint max)
     {
         int length = keys.Length;
         int vectorSize = Vector<uint>.Count;
@@ -387,7 +387,7 @@ internal static class ValueHelper
             return;
         }
 
-        ref uint keysRef = ref keys[0];
+        ref uint keysRef = ref MemoryMarshal.GetReference(keys);
 
         Vector<uint> min0 = LoadVector(ref keysRef, 0);
         Vector<uint> max0 = min0;
@@ -446,27 +446,27 @@ internal static class ValueHelper
 
         min = localMin;
         max = localMax;
-    }
 
-    private static void GetUInt32MinMaxScalar(uint[] keys, out uint min, out uint max)
-    {
-        ref uint keysRef = ref keys[0];
-        min = keysRef;
-        max = keysRef;
-
-        for (int i = 1; i < keys.Length; i++)
+        static void GetUInt32MinMaxScalar(ReadOnlySpan<uint> keys, out uint min, out uint max)
         {
-            uint key = Unsafe.Add(ref keysRef, i);
+            ref uint keysRef = ref MemoryMarshal.GetReference(keys);
+            min = keysRef;
+            max = keysRef;
 
-            if (key < min)
-                min = key;
+            for (int i = 1; i < keys.Length; i++)
+            {
+                uint key = Unsafe.Add(ref keysRef, i);
 
-            if (key > max)
-                max = key;
+                if (key < min)
+                    min = key;
+
+                if (key > max)
+                    max = key;
+            }
         }
     }
 
-    internal static void GetInt64MinMax(long[] keys, out long min, out long max)
+    internal static void GetInt64MinMax(ReadOnlySpan<long> keys, out long min, out long max)
     {
         int length = keys.Length;
         int vectorSize = Vector<long>.Count;
@@ -477,7 +477,7 @@ internal static class ValueHelper
             return;
         }
 
-        ref long keysRef = ref keys[0];
+        ref long keysRef = ref MemoryMarshal.GetReference(keys);
 
         Vector<long> min0 = LoadVector(ref keysRef, 0);
         Vector<long> max0 = min0;
@@ -536,27 +536,27 @@ internal static class ValueHelper
 
         min = localMin;
         max = localMax;
-    }
 
-    private static void GetInt64MinMaxScalar(long[] keys, out long min, out long max)
-    {
-        ref long keysRef = ref keys[0];
-        min = keysRef;
-        max = keysRef;
-
-        for (int i = 1; i < keys.Length; i++)
+        static void GetInt64MinMaxScalar(ReadOnlySpan<long> keys, out long min, out long max)
         {
-            long key = Unsafe.Add(ref keysRef, i);
+            ref long keysRef = ref MemoryMarshal.GetReference(keys);
+            min = keysRef;
+            max = keysRef;
 
-            if (key < min)
-                min = key;
+            for (int i = 1; i < keys.Length; i++)
+            {
+                long key = Unsafe.Add(ref keysRef, i);
 
-            if (key > max)
-                max = key;
+                if (key < min)
+                    min = key;
+
+                if (key > max)
+                    max = key;
+            }
         }
     }
 
-    internal static void GetUInt64MinMax(ulong[] keys, out ulong min, out ulong max)
+    internal static void GetUInt64MinMax(ReadOnlySpan<ulong> keys, out ulong min, out ulong max)
     {
         int length = keys.Length;
         int vectorSize = Vector<ulong>.Count;
@@ -567,7 +567,7 @@ internal static class ValueHelper
             return;
         }
 
-        ref ulong keysRef = ref keys[0];
+        ref ulong keysRef = ref MemoryMarshal.GetReference(keys);
 
         Vector<ulong> min0 = LoadVector(ref keysRef, 0);
         Vector<ulong> max0 = min0;
@@ -626,23 +626,23 @@ internal static class ValueHelper
 
         min = localMin;
         max = localMax;
-    }
 
-    private static void GetUInt64MinMaxScalar(ulong[] keys, out ulong min, out ulong max)
-    {
-        ref ulong keysRef = ref keys[0];
-        min = keysRef;
-        max = keysRef;
-
-        for (int i = 1; i < keys.Length; i++)
+        static void GetUInt64MinMaxScalar(ReadOnlySpan<ulong> keys, out ulong min, out ulong max)
         {
-            ulong key = Unsafe.Add(ref keysRef, i);
+            ref ulong keysRef = ref MemoryMarshal.GetReference(keys);
+            min = keysRef;
+            max = keysRef;
 
-            if (key < min)
-                min = key;
+            for (int i = 1; i < keys.Length; i++)
+            {
+                ulong key = Unsafe.Add(ref keysRef, i);
 
-            if (key > max)
-                max = key;
+                if (key < min)
+                    min = key;
+
+                if (key > max)
+                    max = key;
+            }
         }
     }
 }

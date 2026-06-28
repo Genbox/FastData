@@ -162,7 +162,7 @@ public static partial class FastDataGenerator
         StringComparer comparer = cfg.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
         int oldCount = keys.Length;
-        Deduplication.DeduplicateKeys(cfg, ref keys, ref values, comparer, comparer);
+        Deduplication.DeduplicateStringKeys(cfg, ref keys, ref values, comparer, comparer);
         int newCount = keys.Length;
 
         if (oldCount == newCount)
@@ -387,7 +387,7 @@ public static partial class FastDataGenerator
         LogKeyType(logger, type.Name);
 
         int oldCount = keys.Length;
-        Deduplication.DeduplicateKeys(cfg, ref keys, ref values, EqualityComparer<TKey>.Default, Comparer<TKey>.Default);
+        Deduplication.DeduplicateNumericKeys(cfg, ref keys, ref values);
         int newCount = keys.Length;
 
         if (oldCount == newCount) // No duplicates removed
