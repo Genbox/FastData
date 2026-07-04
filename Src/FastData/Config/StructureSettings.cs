@@ -7,7 +7,7 @@ public class StructureSettings
 
     internal void AddDefault(string key, object value) => _defaultSettings.Add(key, value);
 
-    public void SetSetting(string key, object value) => _settings.Add(key, value);
+    public void SetSetting(string key, object value) => _settings[key] = value;
 
     public T GetSetting<T>(string key)
     {
