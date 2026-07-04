@@ -24,7 +24,12 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
         _map = new TypeMap(languageDef.TypeDefinitions, Encoding);
 
         string typeName = GetType().Name;
-        string languageName = typeName.Substring(0, typeName.Length - 13);
+        const string suffix = "CodeGenerator";
+
+        if (!typeName.EndsWith(suffix, StringComparison.Ordinal))
+            throw new InvalidOperationException($"Generator class name '{typeName}' must end with '{suffix}'.");
+
+        string languageName = typeName.Substring(0, typeName.Length - suffix.Length);
 
 #if RELEASE
         const bool release = true;
