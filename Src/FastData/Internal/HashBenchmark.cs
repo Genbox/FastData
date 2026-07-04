@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.StringHash;
@@ -6,6 +7,7 @@ using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
+using Genbox.FastData.Internal.Helpers;
 using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal;
@@ -69,13 +71,19 @@ internal static class HashBenchmark
         perfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
         notPerfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
 
+        // Use a real key for benchmarking so the timing reflects actual data patterns (e.g., data-dependent branches in hash functions).
+        // Pick the median-length key as a representative sample.
         byte[] testBytes = new byte[props.LengthData.MaxByteLength];
+
+        string sampleKey = data[data.Length / 2];
+        Encoding enc = StringHelper.GetEncoding(encoding);
+        int testLength = enc.GetBytes(sampleKey, 0, sampleKey.Length, testBytes, 0);
 
         //We start with the perfect results (if any)
         if (perfect.Count > 0)
         {
             foreach (Candidate candidate in perfect)
-                Benchmark(testBytes, cfg.BenchmarkIterations, candidate);
+                Benchmark(testBytes, testLength, cfg.BenchmarkIterations, candidate);
 
             //Sort by time
             perfect.Sort(static (a, b) => a.Time.CompareTo(b.Time));
@@ -84,7 +92,7 @@ internal static class HashBenchmark
             if (notPerfect.Count > 0)
             {
                 Candidate np = notPerfect[0];
-                Benchmark(testBytes, cfg.BenchmarkIterations, np);
+                Benchmark(testBytes, testLength, cfg.BenchmarkIterations, np);
 
                 //If the perfect is faster, we use that one.
                 Candidate p = perfect[0];
@@ -108,13 +116,13 @@ internal static class HashBenchmark
 
         //If there are no perfect candidates, we benchmark all the not-perfect candidates
         foreach (Candidate candidate in notPerfect)
-            Benchmark(testBytes, cfg.BenchmarkIterations, candidate);
+            Benchmark(testBytes, testLength, cfg.BenchmarkIterations, candidate);
 
         notPerfect.Sort(static (a, b) => a.Time.CompareTo(b.Time));
         return notPerfect[0];
     }
 
-    private static void Benchmark(byte[] data, int iterations, Candidate candidate)
+    private static void Benchmark(byte[] data, int length, int iterations, Candidate candidate)
     {
         //The candidate has already been benchmarked. Do nothing.
         if (candidate.Time >= double.Epsilon)
@@ -127,12 +135,12 @@ internal static class HashBenchmark
 
         //Warmup
         for (int i = 0; i < iterations; i++)
-            func(data, data.Length);
+            func(data, length);
 
         Stopwatch sw = Stopwatch.StartNew();
 
         for (int i = 0; i < iterations; i++)
-            func(data, data.Length);
+            func(data, length);
 
         sw.Stop();
 
