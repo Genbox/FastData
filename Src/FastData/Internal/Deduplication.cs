@@ -1306,7 +1306,7 @@ internal static class Deduplication
         if (valueCount != 0 && range > MaxMappedRangeWithValues)
             return false;
 
-        return (long)range <= (long)keyCount * MaxMappedRangeToKeyCountFactor;
+        return range <= (long)keyCount * MaxMappedRangeToKeyCountFactor;
     }
 
     private static T[] CopySlice<T>(ReadOnlySpan<T> data, int length)

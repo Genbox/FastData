@@ -17,7 +17,7 @@ public static class GeneratorFunctions
     {
         uint unit = UnitAt(str, offset);
         uint candidate = unit | 0x20u;
-        return candidate - 'a' <= 'z' - 'a' ? candidate : unit;
+        return unchecked(candidate - 'a') <= 'z' - 'a' ? candidate : unit;
     }
 
     public static int Length(string str) => str.Length;
@@ -42,8 +42,8 @@ public static class GeneratorFunctions
             uint leftCandidate = left | 0x20u;
             uint rightCandidate = right | 0x20u;
 
-            left = leftCandidate - 'a' <= 'z' - 'a' ? leftCandidate : left;
-            right = rightCandidate - 'a' <= 'z' - 'a' ? rightCandidate : right;
+            left = unchecked(leftCandidate - 'a') <= 'z' - 'a' ? leftCandidate : left;
+            right = unchecked(rightCandidate - 'a') <= 'z' - 'a' ? rightCandidate : right;
 
             if (left != right)
                 return false;

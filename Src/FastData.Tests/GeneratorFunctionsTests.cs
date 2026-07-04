@@ -13,6 +13,14 @@ public class GeneratorFunctionsTests
     }
 
     [Theory]
+    [InlineData("1", 0, '1')]
+    [InlineData("AbC", 1, 'b')]
+    public void UnitAtAsciiLower_ReturnsExpectedUnit(string value, int offset, char expected)
+    {
+        Assert.Equal(expected, GeneratorFunctions.UnitAtAsciiLower(value, offset));
+    }
+
+    [Theory]
     [InlineData("prefix", 0, "pre")]
     [InlineData("prefix", -3, "fix")]
     public void EqualsAt_ReturnsTrueWhenFragmentFitsAtOffset(string value, int offset, string fragment)
@@ -23,6 +31,7 @@ public class GeneratorFunctionsTests
     [Theory]
     [InlineData("prefix", 0, "PRE")]
     [InlineData("prefix", -3, "FIX")]
+    [InlineData("AbC123", 0, "abc123")]
     public void EqualsAtAsciiLower_ReturnsTrueWhenFragmentFitsAtOffset(string value, int offset, string fragment)
     {
         Assert.True(GeneratorFunctions.EqualsAtAsciiLower(value, offset, fragment));
