@@ -14,6 +14,11 @@ public sealed class CSharpCodeGenerator(CSharpCodeGeneratorConfig csCfg) : Templ
         if (genCfg is StringGeneratorConfig { IgnoreCase: true } && csCfg.ConditionalBranchType == BranchType.Switch)
             throw new InvalidOperationException("C# switch generation does not support IgnoreCase. Use BranchType.If when IgnoreCase is enabled.");
 
+        ValidateIdentifier(csCfg.ClassName, nameof(csCfg.ClassName));
+
+        if (csCfg.Namespace != null)
+            ValidateIdentifier(csCfg.Namespace, nameof(csCfg.Namespace));
+
         string templatePath = Path.Combine(TemplateDir, genCfg.StructureName + ".tt");
         string templateSource = File.ReadAllText(templatePath);
 

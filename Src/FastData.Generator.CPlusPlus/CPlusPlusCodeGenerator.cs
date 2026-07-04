@@ -17,6 +17,8 @@ public sealed class CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cppCfg) 
                 throw new InvalidOperationException("C++ generator does not support chars outside ASCII. Please use a different data type or reduce the max value to 127 or lower.");
         }
 
+        ValidateIdentifier(cppCfg.ClassName, nameof(cppCfg.ClassName));
+
         string templatePath = Path.Combine(TemplateDir, genCfg.StructureName + ".tt");
         string templateSource = File.ReadAllText(templatePath);
 

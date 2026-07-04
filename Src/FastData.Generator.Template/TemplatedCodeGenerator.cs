@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Abstracts;
 using Genbox.FastData.Generator.Template.Abstracts;
@@ -73,6 +74,25 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
     /// <param name="variables">The variables exposed to the template.</param>
     /// <returns>The generated source code.</returns>
     protected abstract string GenerateTemplated<TKey, TValue>(GeneratorConfigBase genCfg, TemplateManager manager, Dictionary<string, object?> variables);
+
+    /// <summary>Validates that a name is a valid identifier for use in generated code (class names, namespaces).</summary>
+    /// <param name="name">The identifier to validate.</param>
+    /// <param name="paramName">The parameter name for error messages.</param>
+    /// <exception cref="ArgumentException">Thrown when the name is not a valid identifier.</exception>
+    protected static void ValidateIdentifier(string name, string paramName)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Identifier must not be null or whitespace.", paramName);
+
+        // Allow dotted names for namespaces (e.g., "MyApp.Data"), but each segment must be a valid identifier.
+        string[] segments = name.Split('.');
+
+        foreach (string segment in segments)
+        {
+            if (segment.Length == 0 || !Regex.IsMatch(segment, "^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture))
+                throw new ArgumentException($"'{name}' is not a valid identifier. Each segment must start with a letter or underscore and contain only letters, digits, or underscores.", paramName);
+        }
+    }
 
     private static ITemplateData? CreateContextModel<TKey, TValue>(IContext context)
     {

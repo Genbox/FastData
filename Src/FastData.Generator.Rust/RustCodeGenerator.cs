@@ -10,6 +10,8 @@ public sealed class RustCodeGenerator(RustCodeGeneratorConfig rustCfg) : Templat
 {
     protected override string GenerateTemplated<TKey, TValue>(GeneratorConfigBase genCfg, TemplateManager manager, Dictionary<string, object?> variables)
     {
+        ValidateIdentifier(rustCfg.ClassName, nameof(rustCfg.ClassName));
+
         string templatePath = Path.Combine(TemplateDir, genCfg.StructureName + ".tt");
         string templateSource = File.ReadAllText(templatePath);
 
