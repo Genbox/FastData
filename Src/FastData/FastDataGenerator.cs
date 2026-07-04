@@ -184,7 +184,7 @@ public static partial class FastDataGenerator
 
         StringHashInfo? cacheHashInfo = null;
         HashData? cacheHashData = null;
-        IEnumerable<IEarlyExit> hashMandatoryExits = [];
+        IEnumerable<IEarlyExit> cacheHashExits = [];
 
         (Type structureType, IStructure<string, TValue, IContext> structure, IContext res) = cfg.StructureTypeOverride != null ? CreateSelectedStringStructure(cfg.StructureTypeOverride) : CreateBestStringStructure();
         LogStructureType(logger, structureType.Name);
@@ -192,7 +192,9 @@ public static partial class FastDataGenerator
         IEarlyExit[] analysisExits = StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase, (uint)keys.Length);
         List<IEarlyExit> mandatoryExits = new List<IEarlyExit>();
 
-        mandatoryExits.AddRange(hashMandatoryExits); // From hash functions
+        // Hash mandatory exits are populated by EnsureHashData during structure selection/creation.
+        // They are read here after structure creation is complete, so the array is guaranteed to be populated if the selected structure is hash-based.
+        mandatoryExits.AddRange(cacheHashExits); // From hash functions
         mandatoryExits.AddRange(structure.GetMandatoryExits()); // From the structure
 
         List<IEarlyExit> earlyExits = EarlyExitPipeline.CombineAndDedup(mandatoryExits, analysisExits);
@@ -280,13 +282,11 @@ public static partial class FastDataGenerator
                 return cacheHashData;
 
             // Hash analysis can be expensive, so structure selection and structure creation share the same result.
-            (HashData hashData, StringHashInfo hashInfo) = GetStringHash(keySpan);
-            cacheHashData = hashData;
-            cacheHashInfo = hashInfo;
-            return hashData;
+            (cacheHashData, cacheHashInfo, cacheHashExits) = GetStringHash(keySpan);
+            return cacheHashData;
         }
 
-        (HashData, StringHashInfo) GetStringHash(ReadOnlySpan<string> keySpan)
+        (HashData, StringHashInfo, IEnumerable<IEarlyExit>) GetStringHash(ReadOnlySpan<string> keySpan)
         {
             IStringHash stringHash;
 
@@ -305,7 +305,7 @@ public static partial class FastDataGenerator
 
             Expression<StringHashFunc> expression = stringHash.GetExpression();
             StringHashFunc hashFunc = expression.Compile();
-            hashMandatoryExits = stringHash.GetMandatoryExits();
+            IEnumerable<IEarlyExit> hashExits = stringHash.GetMandatoryExits();
 
             Encoding encoding = StringHelper.GetEncoding(generator.Encoding);
             byte[] buffer = new byte[props.LengthData.MaxByteLength];
@@ -320,7 +320,7 @@ public static partial class FastDataGenerator
                     return hashFunc(buffer, byteCount);
                 });
 
-            return (hashData, new StringHashInfo(expression, stringHash.AdditionalData));
+            return (hashData, new StringHashInfo(expression, stringHash.AdditionalData), hashExits);
         }
     }
 
