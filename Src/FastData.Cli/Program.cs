@@ -406,11 +406,14 @@ internal static class Program
 
     private sealed class PooledArray<T>(int initialCapacity = 1024)
     {
-        private T[] _buffer = ArrayPool<T>.Shared.Rent(initialCapacity);
+        private T[]? _buffer = ArrayPool<T>.Shared.Rent(initialCapacity);
         private int _count;
 
         public void Add(in T item)
         {
+            if (_buffer == null)
+                throw new ObjectDisposedException(nameof(PooledArray<T>), "Buffer has already been consumed by ToArray().");
+
             if (_count == _buffer.Length)
             {
                 T[] newBuf = ArrayPool<T>.Shared.Rent(_buffer.Length * 2);
@@ -423,9 +426,13 @@ internal static class Program
 
         public T[] ToArray()
         {
+            if (_buffer == null)
+                throw new ObjectDisposedException(nameof(PooledArray<T>), "Buffer has already been consumed by ToArray().");
+
             T[] result = new T[_count];
             Array.Copy(_buffer, result, _count);
             ArrayPool<T>.Shared.Return(_buffer, true);
+            _buffer = null;
             return result;
         }
     }
