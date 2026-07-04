@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using Genbox.FastData.Config;
 using Genbox.FastData.Config.Analysis;
@@ -68,7 +69,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                     }
 
                     if (obj is Exception ex)
-                        throw ex;
+                        ExceptionDispatchInfo.Capture(ex).Throw();
 
                     if (obj is CombinedConfig combinedCfg)
                     {
@@ -125,7 +126,10 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             }
             catch (Exception e)
             {
-                spc.ReportDiagnostic(Diagnostic.Create(GenerationError, null, e.Message));
+                // Include the full exception details (type, message, and stack trace) so users
+                // can diagnose generation failures. InnerException is included for reflection-invoked methods.
+                Exception actual = e is TargetInvocationException { InnerException: not null } tie ? tie.InnerException : e;
+                spc.ReportDiagnostic(Diagnostic.Create(GenerationError, null, actual.ToString()));
             }
         });
     }
