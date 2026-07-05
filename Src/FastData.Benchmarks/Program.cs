@@ -34,8 +34,7 @@ internal static class Program
                                          GenericBenchmarksValidator.DontFailOnError,
                                          DeferredExecutionValidator.FailOnError,
                                          ParamsAllValuesValidator.FailOnError,
-                                         ParamsValidator.FailOnError)
-                                     .WithOption(ConfigOptions.DisableLogFile, true);
+                                         ParamsValidator.FailOnError);
 
         BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, config);
     }
