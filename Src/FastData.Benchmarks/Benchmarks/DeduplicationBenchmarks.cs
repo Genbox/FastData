@@ -3,512 +3,266 @@ using Genbox.FastData.Internal;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
-[MemoryDiagnoser]
+[HideColumns("Gen0", "Gen1", "Gen2")]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
 public class DeduplicationBenchmarks
 {
-    private const int Count = 1000;
+    private const int RangeCount = 1000;
+    private const int RangeSize = 200;
+    private const int BitSetCount = 16_384;
+    private const int BitSetRangeStep = 97;
 
-    private byte[] _byteKeys = null!;
-    private char[] _charKeys = null!;
-    private int[] _intKeys = null!;
-    private int[] _intValues = null!;
-    private int[] _int32AllDuplicateKeys = null!;
-    private int[] _int32AllUniqueKeys = null!;
-    private int[] _int32HalfDuplicateKeys = null!;
-    private int[] _int32RandomSparseKeys = null!;
-    private int[] _int32ReverseSortedKeys = null!;
-    private long[] _longKeys = null!;
-    private sbyte[] _sbyteKeys = null!;
-    private char[] _sortedCharKeys = null!;
-    private short[] _sortedInt16Keys = null!;
-    private int[] _sortedInt32Keys = null!;
-    private long[] _sortedInt64Keys = null!;
-    private ushort[] _sortedUInt16Keys = null!;
-    private uint[] _sortedUInt32Keys = null!;
-    private ulong[] _sortedUInt64Keys = null!;
-    private short[] _shortKeys = null!;
-    private uint[] _uintKeys = null!;
-    private ulong[] _ulongKeys = null!;
-    private ushort[] _ushortKeys = null!;
+    private byte[] _rangeUInt8Keys = null!;
+    private sbyte[] _rangeInt8Keys = null!;
+    private char[] _rangeCharKeys = null!;
+    private short[] _rangeInt16Keys = null!;
+    private ushort[] _rangeUInt16Keys = null!;
+    private int[] _rangeInt32Keys = null!;
+    private uint[] _rangeUInt32Keys = null!;
+    private long[] _rangeInt64Keys = null!;
+    private ulong[] _rangeUInt64Keys = null!;
+    private int[] _bitSetInt32Keys = null!;
+    private uint[] _bitSetUInt32Keys = null!;
+    private long[] _bitSetInt64Keys = null!;
+    private ulong[] _bitSetUInt64Keys = null!;
 
     [GlobalSetup]
     public void Setup()
     {
-        Random rng = new Random(42);
+        _rangeUInt8Keys = new byte[RangeCount];
+        _rangeInt8Keys = new sbyte[RangeCount];
+        _rangeCharKeys = new char[RangeCount];
+        _rangeInt16Keys = new short[RangeCount];
+        _rangeUInt16Keys = new ushort[RangeCount];
+        _rangeInt32Keys = new int[RangeCount];
+        _rangeUInt32Keys = new uint[RangeCount];
+        _rangeInt64Keys = new long[RangeCount];
+        _rangeUInt64Keys = new ulong[RangeCount];
+        _bitSetInt32Keys = new int[BitSetCount];
+        _bitSetUInt32Keys = new uint[BitSetCount];
+        _bitSetInt64Keys = new long[BitSetCount];
+        _bitSetUInt64Keys = new ulong[BitSetCount];
 
-        _byteKeys = new byte[Count];
-        _sbyteKeys = new sbyte[Count];
-        _charKeys = new char[Count];
-        _shortKeys = new short[Count];
-        _ushortKeys = new ushort[Count];
-        _intKeys = new int[Count];
-        _uintKeys = new uint[Count];
-        _longKeys = new long[Count];
-        _ulongKeys = new ulong[Count];
-        _intValues = new int[Count];
-        _int32AllDuplicateKeys = new int[Count];
-        _int32AllUniqueKeys = new int[Count];
-        _int32HalfDuplicateKeys = new int[Count];
-        _int32RandomSparseKeys = new int[Count];
-        _int32ReverseSortedKeys = new int[Count];
-        _sortedCharKeys = new char[Count];
-        _sortedInt16Keys = new short[Count];
-        _sortedUInt16Keys = new ushort[Count];
-        _sortedInt32Keys = new int[Count];
-        _sortedUInt32Keys = new uint[Count];
-        _sortedInt64Keys = new long[Count];
-        _sortedUInt64Keys = new ulong[Count];
-
-        for (int i = 0; i < Count; i++)
+        for (int i = 0; i < RangeCount; i++)
         {
-            int value = rng.Next(0, 200);
-            _byteKeys[i] = (byte)value;
-            _sbyteKeys[i] = (sbyte)rng.Next(-100, 100);
-            _charKeys[i] = (char)value;
-            _shortKeys[i] = (short)rng.Next(-100, 100);
-            _ushortKeys[i] = (ushort)value;
-            _intKeys[i] = rng.Next(-100, 100);
-            _uintKeys[i] = (uint)value;
-            _longKeys[i] = rng.NextInt64(-100, 100);
-            _ulongKeys[i] = (ulong)value;
-            _intValues[i] = i;
+            int value = i * 997 % RangeSize;
+            _rangeUInt8Keys[i] = (byte)value;
+            _rangeInt8Keys[i] = (sbyte)(value - 100);
+            _rangeCharKeys[i] = (char)value;
+            _rangeInt16Keys[i] = (short)(value - 100);
+            _rangeUInt16Keys[i] = (ushort)value;
+            _rangeInt32Keys[i] = value - 100;
+            _rangeUInt32Keys[i] = (uint)value;
+            _rangeInt64Keys[i] = value - 100L;
+            _rangeUInt64Keys[i] = (ulong)value;
+        }
 
-            int sortedValue = i / 2;
-            _sortedCharKeys[i] = (char)sortedValue;
-            _sortedInt16Keys[i] = (short)(sortedValue - 250);
-            _sortedUInt16Keys[i] = (ushort)sortedValue;
-            _sortedInt32Keys[i] = sortedValue - 250;
-            _sortedUInt32Keys[i] = (uint)sortedValue;
-            _sortedInt64Keys[i] = sortedValue - 250L;
-            _sortedUInt64Keys[i] = (ulong)sortedValue;
-
-            _int32AllDuplicateKeys[i] = 42;
-            _int32AllUniqueKeys[i] = i;
-            _int32HalfDuplicateKeys[i] = i * 997 % (Count / 2);
-            _int32RandomSparseKeys[i] = rng.Next(0, Count * 1000);
-            _int32ReverseSortedKeys[i] = Count - i - 1;
+        for (int i = 0; i < BitSetCount; i++)
+        {
+            int value = i % (BitSetCount / 2) * BitSetRangeStep;
+            _bitSetInt32Keys[i] = value - 100_000;
+            _bitSetUInt32Keys[i] = (uint)value + 1_000_000u;
+            _bitSetInt64Keys[i] = value - 100_000L;
+            _bitSetUInt64Keys[i] = (ulong)value + 1_000_000ul;
         }
     }
 
-    [BenchmarkCategory("ByteRandomDense"), Benchmark(Baseline = true)]
-    public int GenericByteRandomDense()
+    [BenchmarkCategory("UInt8Range"), Benchmark(Baseline = true)]
+    public int BaselineUInt8Range()
     {
-        byte[] keys = Copy(_byteKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<byte>.Default, Comparer<byte>.Default);
+        byte[] keys = Copy(_rangeUInt8Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<byte>.Default, Comparer<byte>.Default);
     }
 
-    [BenchmarkCategory("ByteRandomDense"), Benchmark]
-    public int FastDataByteRandomDense()
+    [BenchmarkCategory("UInt8Range"), Benchmark]
+    public int FastDataUInt8Range()
     {
-        byte[] keys = Copy(_byteKeys);
+        byte[] keys = Copy(_rangeUInt8Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("SByteRandomDense"), Benchmark(Baseline = true)]
-    public int GenericSByteRandomDense()
+    [BenchmarkCategory("Int8Range"), Benchmark(Baseline = true)]
+    public int BaselineInt8Range()
     {
-        sbyte[] keys = Copy(_sbyteKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<sbyte>.Default, Comparer<sbyte>.Default);
+        sbyte[] keys = Copy(_rangeInt8Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<sbyte>.Default, Comparer<sbyte>.Default);
     }
 
-    [BenchmarkCategory("SByteRandomDense"), Benchmark]
-    public int FastDataSByteRandomDense()
+    [BenchmarkCategory("Int8Range"), Benchmark]
+    public int FastDataInt8Range()
     {
-        sbyte[] keys = Copy(_sbyteKeys);
+        sbyte[] keys = Copy(_rangeInt8Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("CharRandomDense"), Benchmark(Baseline = true)]
-    public int GenericCharRandomDense()
+    [BenchmarkCategory("CharRange"), Benchmark(Baseline = true)]
+    public int BaselineCharRange()
     {
-        char[] keys = Copy(_charKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<char>.Default, Comparer<char>.Default);
+        char[] keys = Copy(_rangeCharKeys);
+        return BaselineDeduplicate(keys, EqualityComparer<char>.Default, Comparer<char>.Default);
     }
 
-    [BenchmarkCategory("CharRandomDense"), Benchmark]
-    public int FastDataCharRandomDense()
+    [BenchmarkCategory("CharRange"), Benchmark]
+    public int FastDataCharRange()
     {
-        char[] keys = Copy(_charKeys);
+        char[] keys = Copy(_rangeCharKeys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("Int16RandomDense"), Benchmark(Baseline = true)]
-    public int GenericInt16RandomDense()
+    [BenchmarkCategory("Int16Range"), Benchmark(Baseline = true)]
+    public int BaselineInt16Range()
     {
-        short[] keys = Copy(_shortKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<short>.Default, Comparer<short>.Default);
+        short[] keys = Copy(_rangeInt16Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<short>.Default, Comparer<short>.Default);
     }
 
-    [BenchmarkCategory("Int16RandomDense"), Benchmark]
-    public int FastDataInt16RandomDense()
+    [BenchmarkCategory("Int16Range"), Benchmark]
+    public int FastDataInt16Range()
     {
-        short[] keys = Copy(_shortKeys);
+        short[] keys = Copy(_rangeInt16Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("UInt16RandomDense"), Benchmark(Baseline = true)]
-    public int GenericUInt16RandomDense()
+    [BenchmarkCategory("UInt16Range"), Benchmark(Baseline = true)]
+    public int BaselineUInt16Range()
     {
-        ushort[] keys = Copy(_ushortKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<ushort>.Default, Comparer<ushort>.Default);
+        ushort[] keys = Copy(_rangeUInt16Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<ushort>.Default, Comparer<ushort>.Default);
     }
 
-    [BenchmarkCategory("UInt16RandomDense"), Benchmark]
-    public int FastDataUInt16RandomDense()
+    [BenchmarkCategory("UInt16Range"), Benchmark]
+    public int FastDataUInt16Range()
     {
-        ushort[] keys = Copy(_ushortKeys);
+        ushort[] keys = Copy(_rangeUInt16Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("UInt32RandomDense"), Benchmark(Baseline = true)]
-    public int GenericUInt32RandomDense()
+    [BenchmarkCategory("Int32Range"), Benchmark(Baseline = true)]
+    public int BaselineInt32Range()
     {
-        uint[] keys = Copy(_uintKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<uint>.Default, Comparer<uint>.Default);
+        int[] keys = Copy(_rangeInt32Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<int>.Default, Comparer<int>.Default);
     }
 
-    [BenchmarkCategory("UInt32RandomDense"), Benchmark]
-    public int FastDataUInt32RandomDense()
+    [BenchmarkCategory("Int32Range"), Benchmark]
+    public int FastDataInt32Range()
     {
-        uint[] keys = Copy(_uintKeys);
+        int[] keys = Copy(_rangeInt32Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("Int64RandomDense"), Benchmark(Baseline = true)]
-    public int GenericInt64RandomDense()
+    [BenchmarkCategory("UInt32Range"), Benchmark(Baseline = true)]
+    public int BaselineUInt32Range()
     {
-        long[] keys = Copy(_longKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<long>.Default, Comparer<long>.Default);
+        uint[] keys = Copy(_rangeUInt32Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<uint>.Default, Comparer<uint>.Default);
     }
 
-    [BenchmarkCategory("Int64RandomDense"), Benchmark]
-    public int FastDataInt64RandomDense()
+    [BenchmarkCategory("UInt32Range"), Benchmark]
+    public int FastDataUInt32Range()
     {
-        long[] keys = Copy(_longKeys);
+        uint[] keys = Copy(_rangeUInt32Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("UInt64RandomDense"), Benchmark(Baseline = true)]
-    public int GenericUInt64RandomDense()
+    [BenchmarkCategory("Int64Range"), Benchmark(Baseline = true)]
+    public int BaselineInt64Range()
     {
-        ulong[] keys = Copy(_ulongKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<ulong>.Default, Comparer<ulong>.Default);
+        long[] keys = Copy(_rangeInt64Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<long>.Default, Comparer<long>.Default);
     }
 
-    [BenchmarkCategory("UInt64RandomDense"), Benchmark]
-    public int FastDataUInt64RandomDense()
+    [BenchmarkCategory("Int64Range"), Benchmark]
+    public int FastDataInt64Range()
     {
-        ulong[] keys = Copy(_ulongKeys);
+        long[] keys = Copy(_rangeInt64Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("Int32RandomDense"), Benchmark(Baseline = true)]
-    public int GenericInt32RandomDense()
+    [BenchmarkCategory("UInt64Range"), Benchmark(Baseline = true)]
+    public int BaselineUInt64Range()
     {
-        int[] keys = Copy(_intKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<int>.Default, Comparer<int>.Default);
+        ulong[] keys = Copy(_rangeUInt64Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<ulong>.Default, Comparer<ulong>.Default);
     }
 
-    [BenchmarkCategory("Int32RandomDense"), Benchmark]
-    public int FastDataInt32RandomDense()
+    [BenchmarkCategory("UInt64Range"), Benchmark]
+    public int FastDataUInt64Range()
     {
-        int[] keys = Copy(_intKeys);
+        ulong[] keys = Copy(_rangeUInt64Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("Int32SortedDuplicates"), Benchmark(Baseline = true)]
-    public int GenericInt32SortedDuplicates()
+    [BenchmarkCategory("Int32BitSet"), Benchmark(Baseline = true)]
+    public int BaselineInt32BitSet()
     {
-        int[] keys = Copy(_sortedInt32Keys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<int>.Default, Comparer<int>.Default);
+        int[] keys = Copy(_bitSetInt32Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<int>.Default, Comparer<int>.Default);
     }
 
-    [BenchmarkCategory("Int32SortedDuplicates"), Benchmark]
-    public int FastDataInt32SortedDuplicates()
+    [BenchmarkCategory("Int32BitSet"), Benchmark]
+    public int FastDataInt32BitSet()
     {
-        int[] keys = Copy(_sortedInt32Keys);
+        int[] keys = Copy(_bitSetInt32Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("Int32ReverseSorted"), Benchmark(Baseline = true)]
-    public int GenericInt32ReverseSorted()
+    [BenchmarkCategory("UInt32BitSet"), Benchmark(Baseline = true)]
+    public int BaselineUInt32BitSet()
     {
-        int[] keys = Copy(_int32ReverseSortedKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<int>.Default, Comparer<int>.Default);
+        uint[] keys = Copy(_bitSetUInt32Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<uint>.Default, Comparer<uint>.Default);
     }
 
-    [BenchmarkCategory("Int32ReverseSorted"), Benchmark]
-    public int FastDataInt32ReverseSorted()
+    [BenchmarkCategory("UInt32BitSet"), Benchmark]
+    public int FastDataUInt32BitSet()
     {
-        int[] keys = Copy(_int32ReverseSortedKeys);
+        uint[] keys = Copy(_bitSetUInt32Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("Int32RandomSparse"), Benchmark(Baseline = true)]
-    public int GenericInt32RandomSparse()
+    [BenchmarkCategory("Int64BitSet"), Benchmark(Baseline = true)]
+    public int BaselineInt64BitSet()
     {
-        int[] keys = Copy(_int32RandomSparseKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<int>.Default, Comparer<int>.Default);
+        long[] keys = Copy(_bitSetInt64Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<long>.Default, Comparer<long>.Default);
     }
 
-    [BenchmarkCategory("Int32RandomSparse"), Benchmark]
-    public int FastDataInt32RandomSparse()
+    [BenchmarkCategory("Int64BitSet"), Benchmark]
+    public int FastDataInt64BitSet()
     {
-        int[] keys = Copy(_int32RandomSparseKeys);
+        long[] keys = Copy(_bitSetInt64Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("Int32AllUnique"), Benchmark(Baseline = true)]
-    public int GenericInt32AllUnique()
+    [BenchmarkCategory("UInt64BitSet"), Benchmark(Baseline = true)]
+    public int BaselineUInt64BitSet()
     {
-        int[] keys = Copy(_int32AllUniqueKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<int>.Default, Comparer<int>.Default);
+        ulong[] keys = Copy(_bitSetUInt64Keys);
+        return BaselineDeduplicate(keys, EqualityComparer<ulong>.Default, Comparer<ulong>.Default);
     }
 
-    [BenchmarkCategory("Int32AllUnique"), Benchmark]
-    public int FastDataInt32AllUnique()
+    [BenchmarkCategory("UInt64BitSet"), Benchmark]
+    public int FastDataUInt64BitSet()
     {
-        int[] keys = Copy(_int32AllUniqueKeys);
+        ulong[] keys = Copy(_bitSetUInt64Keys);
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
         return uniqueCount;
     }
 
-    [BenchmarkCategory("Int32AllDuplicates"), Benchmark(Baseline = true)]
-    public int GenericInt32AllDuplicates()
-    {
-        int[] keys = Copy(_int32AllDuplicateKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<int>.Default, Comparer<int>.Default);
-    }
-
-    [BenchmarkCategory("Int32AllDuplicates"), Benchmark]
-    public int FastDataInt32AllDuplicates()
-    {
-        int[] keys = Copy(_int32AllDuplicateKeys);
-        Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("Int32HalfDuplicates"), Benchmark(Baseline = true)]
-    public int GenericInt32HalfDuplicates()
-    {
-        int[] keys = Copy(_int32HalfDuplicateKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<int>.Default, Comparer<int>.Default);
-    }
-
-    [BenchmarkCategory("Int32HalfDuplicates"), Benchmark]
-    public int FastDataInt32HalfDuplicates()
-    {
-        int[] keys = Copy(_int32HalfDuplicateKeys);
-        Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("Int16RandomDenseWithValues"), Benchmark(Baseline = true)]
-    public int GenericInt16RandomDenseWithValues()
-    {
-        short[] keys = Copy(_shortKeys);
-        int[] values = Copy(_intValues);
-        return GenericDeduplicateWithSort(keys, values, EqualityComparer<short>.Default, Comparer<short>.Default);
-    }
-
-    [BenchmarkCategory("Int16RandomDenseWithValues"), Benchmark]
-    public int FastDataInt16RandomDenseWithValues()
-    {
-        short[] keys = Copy(_shortKeys);
-        int[] values = Copy(_intValues);
-        Deduplication.DeduplicateNumericKeysInternal(keys, values, out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("UInt16RandomDenseWithValues"), Benchmark(Baseline = true)]
-    public int GenericUInt16RandomDenseWithValues()
-    {
-        ushort[] keys = Copy(_ushortKeys);
-        int[] values = Copy(_intValues);
-        return GenericDeduplicateWithSort(keys, values, EqualityComparer<ushort>.Default, Comparer<ushort>.Default);
-    }
-
-    [BenchmarkCategory("UInt16RandomDenseWithValues"), Benchmark]
-    public int FastDataUInt16RandomDenseWithValues()
-    {
-        ushort[] keys = Copy(_ushortKeys);
-        int[] values = Copy(_intValues);
-        Deduplication.DeduplicateNumericKeysInternal(keys, values, out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("Int32RandomDenseWithValues"), Benchmark(Baseline = true)]
-    public int GenericInt32RandomDenseWithValues()
-    {
-        int[] keys = Copy(_intKeys);
-        int[] values = Copy(_intValues);
-        return GenericDeduplicateWithSort(keys, values, EqualityComparer<int>.Default, Comparer<int>.Default);
-    }
-
-    [BenchmarkCategory("Int32RandomDenseWithValues"), Benchmark]
-    public int FastDataInt32RandomDenseWithValues()
-    {
-        int[] keys = Copy(_intKeys);
-        int[] values = Copy(_intValues);
-        Deduplication.DeduplicateNumericKeysInternal(keys, values, out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("UInt32RandomDenseWithValues"), Benchmark(Baseline = true)]
-    public int GenericUInt32RandomDenseWithValues()
-    {
-        uint[] keys = Copy(_uintKeys);
-        int[] values = Copy(_intValues);
-        return GenericDeduplicateWithSort(keys, values, EqualityComparer<uint>.Default, Comparer<uint>.Default);
-    }
-
-    [BenchmarkCategory("UInt32RandomDenseWithValues"), Benchmark]
-    public int FastDataUInt32RandomDenseWithValues()
-    {
-        uint[] keys = Copy(_uintKeys);
-        int[] values = Copy(_intValues);
-        Deduplication.DeduplicateNumericKeysInternal(keys, values, out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("Int64RandomDenseWithValues"), Benchmark(Baseline = true)]
-    public int GenericInt64RandomDenseWithValues()
-    {
-        long[] keys = Copy(_longKeys);
-        int[] values = Copy(_intValues);
-        return GenericDeduplicateWithSort(keys, values, EqualityComparer<long>.Default, Comparer<long>.Default);
-    }
-
-    [BenchmarkCategory("Int64RandomDenseWithValues"), Benchmark]
-    public int FastDataInt64RandomDenseWithValues()
-    {
-        long[] keys = Copy(_longKeys);
-        int[] values = Copy(_intValues);
-        Deduplication.DeduplicateNumericKeysInternal(keys, values, out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("UInt64RandomDenseWithValues"), Benchmark(Baseline = true)]
-    public int GenericUInt64RandomDenseWithValues()
-    {
-        ulong[] keys = Copy(_ulongKeys);
-        int[] values = Copy(_intValues);
-        return GenericDeduplicateWithSort(keys, values, EqualityComparer<ulong>.Default, Comparer<ulong>.Default);
-    }
-
-    [BenchmarkCategory("UInt64RandomDenseWithValues"), Benchmark]
-    public int FastDataUInt64RandomDenseWithValues()
-    {
-        ulong[] keys = Copy(_ulongKeys);
-        int[] values = Copy(_intValues);
-        Deduplication.DeduplicateNumericKeysInternal(keys, values, out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("CharSorted"), Benchmark(Baseline = true)]
-    public int GenericCharSorted()
-    {
-        char[] keys = Copy(_sortedCharKeys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<char>.Default, Comparer<char>.Default);
-    }
-
-    [BenchmarkCategory("CharSorted"), Benchmark]
-    public int FastDataCharSorted()
-    {
-        char[] keys = Copy(_sortedCharKeys);
-        Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("Int16Sorted"), Benchmark(Baseline = true)]
-    public int GenericInt16Sorted()
-    {
-        short[] keys = Copy(_sortedInt16Keys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<short>.Default, Comparer<short>.Default);
-    }
-
-    [BenchmarkCategory("Int16Sorted"), Benchmark]
-    public int FastDataInt16Sorted()
-    {
-        short[] keys = Copy(_sortedInt16Keys);
-        Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("UInt16Sorted"), Benchmark(Baseline = true)]
-    public int GenericUInt16Sorted()
-    {
-        ushort[] keys = Copy(_sortedUInt16Keys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<ushort>.Default, Comparer<ushort>.Default);
-    }
-
-    [BenchmarkCategory("UInt16Sorted"), Benchmark]
-    public int FastDataUInt16Sorted()
-    {
-        ushort[] keys = Copy(_sortedUInt16Keys);
-        Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("UInt32Sorted"), Benchmark(Baseline = true)]
-    public int GenericUInt32Sorted()
-    {
-        uint[] keys = Copy(_sortedUInt32Keys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<uint>.Default, Comparer<uint>.Default);
-    }
-
-    [BenchmarkCategory("UInt32Sorted"), Benchmark]
-    public int FastDataUInt32Sorted()
-    {
-        uint[] keys = Copy(_sortedUInt32Keys);
-        Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("Int64Sorted"), Benchmark(Baseline = true)]
-    public int GenericInt64Sorted()
-    {
-        long[] keys = Copy(_sortedInt64Keys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<long>.Default, Comparer<long>.Default);
-    }
-
-    [BenchmarkCategory("Int64Sorted"), Benchmark]
-    public int FastDataInt64Sorted()
-    {
-        long[] keys = Copy(_sortedInt64Keys);
-        Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
-        return uniqueCount;
-    }
-
-    [BenchmarkCategory("UInt64Sorted"), Benchmark(Baseline = true)]
-    public int GenericUInt64Sorted()
-    {
-        ulong[] keys = Copy(_sortedUInt64Keys);
-        return GenericDeduplicateWithSort(keys, EqualityComparer<ulong>.Default, Comparer<ulong>.Default);
-    }
-
-    [BenchmarkCategory("UInt64Sorted"), Benchmark]
-    public int FastDataUInt64Sorted()
-    {
-        ulong[] keys = Copy(_sortedUInt64Keys);
-        Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
-        return uniqueCount;
-    }
-
-    private static int GenericDeduplicateWithSort<TKey>(TKey[] keys, IEqualityComparer<TKey> equalityComparer, IComparer<TKey> sortComparer)
+    private static int BaselineDeduplicate<TKey>(TKey[] keys, IEqualityComparer<TKey> equalityComparer, IComparer<TKey> sortComparer)
     {
         Array.Sort(keys, sortComparer);
 
@@ -526,35 +280,6 @@ public class DeduplicationBenchmarks
                 continue;
 
             keys[uniqueCount] = key;
-            current = key;
-            uniqueCount++;
-        }
-
-        return uniqueCount;
-    }
-
-    private static int GenericDeduplicateWithSort<TKey, TValue>(TKey[] keys, TValue[] values, IEqualityComparer<TKey> equalityComparer, IComparer<TKey> sortComparer)
-    {
-        Array.Sort(keys, values, sortComparer);
-
-        if (keys.Length is 0 or 1)
-            return keys.Length;
-
-        TKey current = keys[0];
-        int uniqueCount = 1;
-
-        for (int i = 1; i < keys.Length; i++)
-        {
-            TKey key = keys[i];
-
-            if (equalityComparer.Equals(key, current))
-                continue;
-
-            keys[uniqueCount] = key;
-
-            if (uniqueCount != i)
-                values[uniqueCount] = values[i];
-
             current = key;
             uniqueCount++;
         }
