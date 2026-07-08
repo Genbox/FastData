@@ -78,7 +78,7 @@ Complexity below is the amortized time for a single query after generated code h
 * Complexity: O(1)
 * Compressed: Yes: `64 * ceil((10 * n) / 64)` bits
 
-`BloomFilter` is selected only when approximate matching is allowed. The current implementation allocates 10 bits per key and sets two bits per key from the hash. It can return false positives, so it is valid for membership pre-filtering but not exact key/value lookup. `RoundModuloToPowerOfTwo` is enabled by default, so the bitset word length can be rounded up to the next power of two if the extra word count is within `RoundModuloToPowerOfTwoThreshold`. The threshold is a ratio, so the default `0.125` allows up to 12.5% extra slots.
+`BloomFilter` is selected only when approximate matching is allowed. The current implementation allocates about 10 bits per key, then sets two bits inside one selected 64-bit word. The word index and both bit positions are derived from the same hash value, so the false-positive rate is closer to 3-5% on typical large sets than the roughly 1% expected from an optimal 10-bit/key Bloom filter. It is valid for compact membership pre-filtering when false positives are acceptable, but not for exact key/value lookup or callers that require a specific false-positive bound. `RoundModuloToPowerOfTwo` is enabled by default, so the bitset word length can be rounded up to the next power of two if the extra word count is within `RoundModuloToPowerOfTwoThreshold`. The threshold is a ratio, so the default `0.125` allows up to 12.5% extra slots.
 
 ## Conditional
 

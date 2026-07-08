@@ -147,7 +147,7 @@ Common CLI options include:
 * `--structure-type`, `-s`: force a structure instead of automatic selection.
 * `--ignore-case`, `-ic`: enable ordinal-ignore-case lookups for string keys.
 * `--analysis-level`: string-hash analysis level. Use `disabled`, `fast`, `balanced`, or `aggressive`.
-* `--allow-approximate`: allow approximate membership lookups such as Bloom filters.
+* `--allow-approximate`: allow approximate membership lookups such as Bloom filters, which can return false positives.
 * `--required-functions`: require generated support for `membership`, `key-value-lookup`, `enumeration`, or `directaccess`.
 * `--class-name`, `-cn`: generated class or struct name.
 * `--output-file`, `-o`: write generated source to a file instead of standard output.

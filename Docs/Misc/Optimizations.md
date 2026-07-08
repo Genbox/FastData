@@ -38,7 +38,7 @@ Dense integral datasets can be represented by one bit per possible value in the 
 
 ### Bloom filter
 
-When approximate matching is enabled, FastData can use a Bloom filter for membership checks. This trades exactness for compact memory and constant-time rejection.
+When approximate matching is enabled, FastData can use a Bloom filter for membership checks. This trades exactness for compact memory and constant-time rejection. The current filter stores about 10 bits per key but uses two probes within a single 64-bit word, so expect practical false-positive rates around 3-5% rather than the roughly 1% of an optimal 10-bit/key Bloom filter.
 
 ### RRR bit vector and Elias-Fano
 
