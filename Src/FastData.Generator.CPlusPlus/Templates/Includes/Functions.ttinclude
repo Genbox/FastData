@@ -95,7 +95,7 @@
     private string GetHashModifier()
     {
         TypeCode keyType = Type.GetTypeCode(Model.KeyType);
-        return keyType is TypeCode.Single or TypeCode.Double or TypeCode.Int64 or TypeCode.UInt64 ? "static " : "static constexpr ";
+        return keyType is TypeCode.Single or TypeCode.Double ? "static " : "static constexpr ";
     }
 
     private string GetEarlyExits(MethodType methodType, AnnotatedExpr[] earlyExits)

@@ -33,7 +33,8 @@ internal static class NumericStructures<TKey>
         if (config.IsEnabled(typeof(ConditionalStructure<,>), reqCap) && config.CheckItemCountLimits(typeof(ConditionalStructure<,>), keyCount))
             return typeof(ConditionalStructure<,>);
 
-        if (config.IsEnabled(typeof(RrrBitVectorStructure<,>), reqCap) && typeCode.IsIntegral() && !hasValues && config.CheckItemCountLimits(typeof(RrrBitVectorStructure<,>), keyCount) && config.CheckDensityLimits(typeof(RrrBitVectorStructure<,>), density))
+        if (config.IsEnabled(typeof(RrrBitVectorStructure<,>), reqCap) && typeCode.IsIntegral() && !hasValues && config.CheckItemCountLimits(typeof(RrrBitVectorStructure<,>), keyCount) &&
+            config.CheckDensityLimits(typeof(RrrBitVectorStructure<,>), density) && config.CheckValueLimits(typeof(RrrBitVectorStructure<,>), range))
             return typeof(RrrBitVectorStructure<,>);
 
         if (config.IsEnabled(typeof(EliasFanoStructure<,>), reqCap) && typeCode.IsIntegral() && !hasValues && config.CheckItemCountLimits(typeof(EliasFanoStructure<,>), keyCount) && config.CheckDensityLimits(typeof(EliasFanoStructure<,>), density))

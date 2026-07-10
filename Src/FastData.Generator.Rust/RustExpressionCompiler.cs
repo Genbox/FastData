@@ -8,57 +8,16 @@ namespace Genbox.FastData.Generator.Rust;
 [SuppressMessage("Correctness", "SS004:Implement Equals() and GetHashcode() methods for a type used in a collection.")]
 public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
 {
-    protected override Expression VisitBlock(BlockExpression node)
+    protected override void WriteVariableDeclaration(ParameterExpression v, string typeName, Expression? init)
     {
-        // Build a map from variable to its initializer expression, so we can emit
-        // combined declaration-with-initializer statements (e.g. "let mut length: i32 = Length(key);")
-        // instead of separate declaration and assignment lines.
-        Dictionary<ParameterExpression, Expression> initializers = new Dictionary<ParameterExpression, Expression>();
-        HashSet<Expression> inlinedExprs = new HashSet<Expression>();
-
-        foreach (Expression expr in node.Expressions)
+        if (init != null)
         {
-            if (expr is BinaryExpression { NodeType: ExpressionType.Assign, Left: ParameterExpression left } assign
-                && node.Variables.Contains(left)
-                && !initializers.ContainsKey(left))
-            {
-                initializers[left] = assign.Right;
-                inlinedExprs.Add(expr);
-            }
+            Output.Append($"let mut {v.Name}: {typeName} = ");
+            Visit(init);
+            Output.AppendLine(";");
         }
-
-        foreach (ParameterExpression v in node.Variables)
-        {
-            Type t = v.Type;
-
-            if (v.Type.IsArray)
-                t = v.Type.GetElementType()!;
-
-            string typeName = $"{map.GetTypeName(t)}{(v.Type.IsArray ? "[]" : string.Empty)}";
-
-            if (initializers.TryGetValue(v, out Expression? init))
-            {
-                Output.Append($"let mut {v.Name}: {typeName} = ");
-                Visit(init);
-                Output.AppendLine(";");
-            }
-            else
-                Output.AppendLine($"let mut {v.Name}: {typeName};");
-        }
-
-        foreach (Expression expr in node.Expressions)
-        {
-            if (inlinedExprs.Contains(expr))
-                continue;
-
-            Visit(expr);
-            if (expr is LoopExpression or ConditionalExpression)
-                Output.AppendLine();
-            else
-                Output.AppendLine(";");
-        }
-
-        return node;
+        else
+            Output.AppendLine($"let mut {v.Name}: {typeName};");
     }
 
     protected override Expression VisitMember(MemberExpression node)
@@ -220,6 +179,12 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
 
             if (wrappingAssignMethod != null)
             {
+                // The target is emitted on both sides of the assignment ("lhs = lhs.wrapping_op(rhs)"), so it
+                // must be a side-effect-free, cheap-to-repeat expression. A bare parameter reference is the
+                // only shape we guarantee that for; anything else would silently duplicate evaluation.
+                if (node.Left is not ParameterExpression)
+                    throw new NotSupportedException($"Wrapping compound assignment requires a simple parameter target, but got {node.Left.NodeType}.");
+
                 Visit(node.Left);
                 Output.Append(" = ");
                 Visit(node.Left);

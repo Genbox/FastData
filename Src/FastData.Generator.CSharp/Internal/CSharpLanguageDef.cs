@@ -127,7 +127,7 @@ internal class CSharpLanguageDef : ILanguageDef
         StringBuilder sb = new StringBuilder();
 
         foreach (PropertyInfo property in properties)
-            sb.AppendLine($"    {RenderType(map, property.PropertyType)} {property.Name} {{ get; set; }}");
+            sb.AppendLine($"    public {RenderType(map, property.PropertyType)} {property.Name} {{ get; set; }}");
 
         return sb.ToString();
     }

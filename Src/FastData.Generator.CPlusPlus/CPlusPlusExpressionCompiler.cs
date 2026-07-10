@@ -47,6 +47,12 @@ public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompile
     {
         if (node.Object != null && node.Arguments.Count > 0 && node.Arguments[0] is ConstantExpression constExpr && constExpr.Value is string literal)
         {
+            // The receiver is emitted multiple times below (length check + compare args), so it must be a
+            // side-effect-free, cheap-to-repeat expression. A bare parameter reference is the only shape we
+            // guarantee that for; anything else would silently duplicate evaluation in the generated code.
+            if (node.Object is not ParameterExpression)
+                throw new NotSupportedException($"{nameof(RenderStringCompare)} requires a simple parameter receiver, but got {node.Object.NodeType}.");
+
             int length = map.GetStringLength(literal);
 
             Visit(node.Object);

@@ -40,12 +40,13 @@ public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
         int32_t length = Length(key);
-        uint32_t unitAt0 = UnitAt(key, 0);
+        uint32_t unitAt0;
         if ((static_cast<uint32_t>((length - 5)) > 2u))
         {
          return false;
         }
 
+        unitAt0 = UnitAt(key, 0);
         if (((unitAt0 - 97u) > 3u))
         {
          return false;

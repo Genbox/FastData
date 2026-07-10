@@ -136,6 +136,44 @@ public sealed class ExprOptimizerEdgeCaseTests
     }
 
     [Fact]
+    public void NestedSubtractWithSubtractInnerPreservesSemantics()
+    {
+        // (x - 2) - 3 -> x - 5, not x - (2 - 3) = x + 1
+        ParameterExpression parameter = Parameter(typeof(int), "x");
+        BinaryExpression expression = Subtract(Subtract(parameter, Constant(2)), Constant(3));
+
+        Expression optimized = Visit(expression);
+
+        Func<int, int> original = Lambda<Func<int, int>>(expression, parameter).Compile();
+        Func<int, int> actual = Lambda<Func<int, int>>(optimized, parameter).Compile();
+        Assert.Equal(original(10), actual(10));
+    }
+
+    [Fact]
+    public void OrOfAndAndNegatedOrIsNotOverSimplified()
+    {
+        // (a && !b) || !(a || c) must not collapse to (!c || a) && !a: that formula drops b and is
+        // wrong whenever b != c (e.g. a=true, b=false, c=false: original=true, wrong-formula=false).
+        ParameterExpression a = Parameter(typeof(bool), "a");
+        ParameterExpression b = Parameter(typeof(bool), "b");
+        ParameterExpression c = Parameter(typeof(bool), "c");
+        Expression expression = OrElse(AndAlso(a, Not(b)), Not(OrElse(a, c)));
+
+        Expression optimized = Visit(expression);
+
+        Func<bool, bool, bool, bool> original = Lambda<Func<bool, bool, bool, bool>>(expression, a, b, c).Compile();
+        Func<bool, bool, bool, bool> actual = Lambda<Func<bool, bool, bool, bool>>(optimized, a, b, c).Compile();
+
+        for (int mask = 0; mask < 8; mask++)
+        {
+            bool av = (mask & 1) != 0;
+            bool bv = (mask & 2) != 0;
+            bool cv = (mask & 4) != 0;
+            Assert.Equal(original(av, bv, cv), actual(av, bv, cv));
+        }
+    }
+
+    [Fact]
     public void NestedMultiplyWithNonMultiplyInnerPreservesSemantics()
     {
         ParameterExpression parameter = Parameter(typeof(int), "x");

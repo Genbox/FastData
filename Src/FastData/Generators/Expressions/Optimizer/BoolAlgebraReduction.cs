@@ -657,21 +657,14 @@ internal static class BoolAlgebraReduction
             }
 
             {
+                // (P && !R) || !(P || T), with R == T -> !R
                 if (TryGetAnd(leftOr, out Expression? leftValue, out Expression? leftNot)
-                    && TryGetNot(leftNot, out Expression? _)
+                    && TryGetNot(leftNot, out Expression? leftNotValue)
                     && TryGetNot(rightOr, out Expression? rightOrNot)
                     && TryGetOr(rightOrNot, out Expression? rightOrLeft, out Expression? rightOrRight)
-                    && PropertyMatch(rightOrLeft, leftValue))
-                    return AndAlso(OrElse(Not(rightOrRight), leftValue), Not(rightOrLeft));
-            }
-
-            {
-                if (TryGetAnd(leftOr, out Expression? leftValue, out Expression? leftNot)
-                    && TryGetNot(leftNot, out Expression? _)
-                    && TryGetNot(rightOr, out Expression? rightOrNot)
-                    && TryGetOr(rightOrNot, out Expression? rightOrLeft, out Expression? rightOrRight)
-                    && PropertyMatch(rightOrLeft, leftValue))
-                    return AndAlso(OrElse(leftValue, Not(rightOrRight)), Not(rightOrLeft));
+                    && PropertyMatch(rightOrLeft, leftValue)
+                    && PropertyMatch(leftNotValue, rightOrRight))
+                    return Not(rightOrRight);
             }
 
             {

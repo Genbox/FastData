@@ -16,7 +16,9 @@ public class StructureConfig
         get
         {
             StructureConfig cfg = new StructureConfig();
-            cfg.AppendLimit(typeof(BitSetStructure<,>), new ValueDensityMinMaxLimit(0, 0.5f));
+
+            // This representation scales with the observed span, so reserve automatic selection for dense data and let sparse data use compressed forms.
+            cfg.AppendLimit(typeof(BitSetStructure<,>), new ValueDensityMinMaxLimit(0.5f, 1));
             cfg.AppendLimit(typeof(BitSetStructure<,>), new ValueMinMaxLimit<ulong>(0, int.MaxValue - 1UL));
 
             // Experiments show it is at the ~500-element boundary that Conditional starts to become slower. Use 400 to be safe.
@@ -24,6 +26,9 @@ public class StructureConfig
             cfg.AppendLimit(typeof(KeyLengthStructure<,>), new ValueDensityMinMaxLimit(0.75f, 1));
             cfg.AppendLimit(typeof(RrrBitVectorStructure<,>), new ItemCountMinMaxLimit(512, uint.MaxValue));
             cfg.AppendLimit(typeof(RrrBitVectorStructure<,>), new ValueDensityMinMaxLimit(0, 0.015625f)); // 1 / 64
+
+            // RRR stores one small entry per block, so cap automatic selection before sparse spans produce huge generated tables.
+            cfg.AppendLimit(typeof(RrrBitVectorStructure<,>), new ValueMinMaxLimit<ulong>(0, (64UL * 1024UL * 1024UL) - 1UL));
             cfg.AppendLimit(typeof(EliasFanoStructure<,>), new ItemCountMinMaxLimit(256, uint.MaxValue));
             cfg.AppendLimit(typeof(EliasFanoStructure<,>), new ValueDensityMinMaxLimit(0, 0.083333f)); // 1 / 12
             cfg.AppendLimit(typeof(RangeStructure<,>), new ItemCountMinMaxLimit(1, 100));

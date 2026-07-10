@@ -17,7 +17,7 @@ public abstract class EndToEndTestsBase
         config.StructureTypeOverride = typeof(ArrayStructure<,>);
 
         string output = FastDataGenerator.Generate(keys, config, Harness.Generator);
-        string id = nameof(GenerateIntArrayEndToEndAsync);
+        const string id = nameof(GenerateIntArrayEndToEndAsync);
         await VerifyEndToEndAsync(Harness.Name, id, output);
 
         int[] notPresent = [2, 11];
@@ -32,7 +32,7 @@ public abstract class EndToEndTestsBase
         config.StructureTypeOverride = typeof(ArrayStructure<,>);
 
         string output = FastDataGenerator.Generate(keys, config, Harness.Generator);
-        string id = nameof(GenerateFloatArrayEndToEndAsync);
+        const string id = nameof(GenerateFloatArrayEndToEndAsync);
         await VerifyEndToEndAsync(Harness.Name, id, output);
 
         float[] notPresent = [2f, 8f];
@@ -47,7 +47,7 @@ public abstract class EndToEndTestsBase
         config.StructureTypeOverride = typeof(ArrayStructure<,>);
 
         string output = FastDataGenerator.Generate(keys, config, Harness.Generator);
-        string id = nameof(GenerateStringArrayEndToEndAsync);
+        const string id = nameof(GenerateStringArrayEndToEndAsync);
         await VerifyEndToEndAsync(Harness.Name, id, output);
 
         string[] notPresent = ["echo", "foxtrot"];

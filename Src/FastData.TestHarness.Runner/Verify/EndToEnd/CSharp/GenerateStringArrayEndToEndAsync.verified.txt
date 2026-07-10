@@ -26,12 +26,13 @@ internal static class FastData
     public static bool Contains(string key)
     {
         int length = Length(key);
-        uint unitAt0 = UnitAt(key, 0);
+        uint unitAt0;
         if (((uint)(length - 5) > 2u))
         {
          return false;
         }
 
+        unitAt0 = UnitAt(key, 0);
         if (((unitAt0 - 97u) > 3u))
         {
          return false;

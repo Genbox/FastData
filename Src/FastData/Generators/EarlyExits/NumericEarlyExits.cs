@@ -131,24 +131,27 @@ internal static class NumericEarlyExits<TKey>
         // Try sliding windows of consecutive gap regions that fit within 64 positions.
         for (int start = 0; start < gapRegions.Count; start++)
         {
-            ulong bitmapStart = gapRegions[start].Start + 1; // First missing value
+            ulong bitmapStart = unchecked(gapRegions[start].Start + 1); // First missing value
             ulong missingBitSet = 0;
             int gapsIncluded = 0;
 
             for (int end = start; end < gapRegions.Count; end++)
             {
-                ulong lastMissing = gapRegions[end].End - 1; // Last missing value in this gap
+                ulong lastMissing = unchecked(gapRegions[end].End - 1); // Last missing value in this gap
                 ulong span = unchecked(lastMissing - bitmapStart);
 
                 if (span >= 64)
                     break;
 
                 // Add all missing values from this gap to the bitmap
-                ulong gapFirst = gapRegions[end].Start + 1;
-                ulong gapLast = gapRegions[end].End - 1;
+                ulong gapFirst = unchecked(gapRegions[end].Start + 1);
+                ulong gapLast = unchecked(gapRegions[end].End - 1);
 
-                for (ulong v = gapFirst; v <= gapLast; v++)
+                // Iterate by length instead of an inclusive unsigned upper bound; ranges ending at zero can wrap to the maximum value.
+                ulong gapValueCount = unchecked(gapLast - gapFirst) + 1;
+                for (ulong offset = 0; offset < gapValueCount; offset++)
                 {
+                    ulong v = gapFirst + offset;
                     int bit = (int)unchecked(v - bitmapStart);
                     missingBitSet |= 1UL << bit;
                 }
@@ -161,7 +164,7 @@ internal static class NumericEarlyExits<TKey>
             {
                 ulong lastGapEnd = gapRegions[(start + gapsIncluded) - 1].End;
                 TKey bitmapStartKey = fromUlong(bitmapStart);
-                TKey bitmapEndKey = fromUlong(lastGapEnd - 1);
+                TKey bitmapEndKey = fromUlong(unchecked(lastGapEnd - 1));
                 yield return new ValueBitSetEarlyExit<TKey>(bitmapStartKey, bitmapEndKey, missingBitSet);
 
                 // Skip past the gaps we just packed

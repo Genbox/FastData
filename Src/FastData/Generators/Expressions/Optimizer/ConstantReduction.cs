@@ -454,20 +454,20 @@ internal static class ConstantReduction
     {
         try
         {
+            // (x - 1) - 2 -> x - (1 + 2) -> x - 3
             return (lConst.Value, rConst.Value) switch
             {
-                // (x - 1) - 2 -> x - 3
-                (float l, float r) => Subtract(expr, Constant(l - r, lConst.Type)),
-                (double l, double r) => Subtract(expr, Constant(l - r, lConst.Type)),
-                (decimal l, decimal r) => Subtract(expr, Constant(l - r, lConst.Type)),
-                (int l, int r) => Subtract(expr, Constant(unchecked(l - r), lConst.Type)),
-                (long l, long r) => Subtract(expr, Constant(unchecked(l - r), lConst.Type)),
-                (uint l, uint r) => Subtract(expr, Constant(unchecked(l - r), lConst.Type)),
-                (ulong l, ulong r) => Subtract(expr, Constant(unchecked(l - r), lConst.Type)),
-                (short l, short r) => Subtract(expr, Constant(unchecked((short)(l - r)), lConst.Type)),
-                (ushort l, ushort r) => Subtract(expr, Constant(unchecked((ushort)(l - r)), lConst.Type)),
-                (sbyte l, sbyte r) => Subtract(expr, Constant(unchecked((sbyte)(l - r)), lConst.Type)),
-                (byte l, byte r) => Subtract(expr, Constant(unchecked((byte)(l - r)), lConst.Type)),
+                (float l, float r) => Subtract(expr, Constant(l + r, lConst.Type)),
+                (double l, double r) => Subtract(expr, Constant(l + r, lConst.Type)),
+                (decimal l, decimal r) => Subtract(expr, Constant(l + r, lConst.Type)),
+                (int l, int r) => Subtract(expr, Constant(unchecked(l + r), lConst.Type)),
+                (long l, long r) => Subtract(expr, Constant(unchecked(l + r), lConst.Type)),
+                (uint l, uint r) => Subtract(expr, Constant(unchecked(l + r), lConst.Type)),
+                (ulong l, ulong r) => Subtract(expr, Constant(unchecked(l + r), lConst.Type)),
+                (short l, short r) => Subtract(expr, Constant(unchecked((short)(l + r)), lConst.Type)),
+                (ushort l, ushort r) => Subtract(expr, Constant(unchecked((ushort)(l + r)), lConst.Type)),
+                (sbyte l, sbyte r) => Subtract(expr, Constant(unchecked((sbyte)(l + r)), lConst.Type)),
+                (byte l, byte r) => Subtract(expr, Constant(unchecked((byte)(l + r)), lConst.Type)),
                 _ => null
             };
         }

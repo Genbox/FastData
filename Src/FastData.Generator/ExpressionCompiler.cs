@@ -88,8 +88,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 
     protected override Expression VisitBlock(BlockExpression node)
     {
-        // Build a map from variable to its initializer expression, so we can emit
-        // combined declaration-with-initializer statements (e.g. "int length = Length(key);")
+        // Build a map from variable to its initializer expression, so we can emit combined declaration-with-initializer statements (e.g. "int length = Length(key);")
         // instead of separate declaration and assignment lines.
         Dictionary<ParameterExpression, Expression> initializers = new Dictionary<ParameterExpression, Expression>();
         HashSet<Expression> inlinedExprs = new HashSet<Expression>();
@@ -102,7 +101,10 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
             {
                 initializers[left] = assign.Right;
                 inlinedExprs.Add(expr);
+                continue;
             }
+
+            break;
         }
 
         foreach (ParameterExpression v in node.Variables)
@@ -114,14 +116,8 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 
             string typeName = $"{map.GetTypeName(t)}{(v.Type.IsArray ? "[]" : "")}";
 
-            if (initializers.TryGetValue(v, out Expression? init))
-            {
-                Output.Append($"{typeName} {v.Name} = ");
-                Visit(init);
-                Output.AppendLine(";");
-            }
-            else
-                Output.AppendLine($"{typeName} {v.Name};");
+            initializers.TryGetValue(v, out Expression? init);
+            WriteVariableDeclaration(v, typeName, init);
         }
 
         foreach (Expression expr in node.Expressions)
@@ -136,6 +132,19 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
                 Output.AppendLine(";");
         }
         return node;
+    }
+
+    /// <summary>Renders a single block-scoped variable declaration, with its initializer if one was inlined.</summary>
+    protected virtual void WriteVariableDeclaration(ParameterExpression v, string typeName, Expression? init)
+    {
+        if (init != null)
+        {
+            Output.Append($"{typeName} {v.Name} = ");
+            Visit(init);
+            Output.AppendLine(";");
+        }
+        else
+            Output.AppendLine($"{typeName} {v.Name};");
     }
 
     protected override Expression VisitBinary(BinaryExpression node)
@@ -187,7 +196,8 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
             double x => map.ToValueLabel(x),
             string x => map.ToValueLabel(x),
             bool x => map.ToValueLabel(x),
-            _ => "unknown"
+            null => map.GetNull(),
+            _ => throw new NotSupportedException($"Constants of type '{node.Type}' are not supported.")
         };
 
         Output.Append(str);
@@ -252,40 +262,48 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 
     protected override Expression VisitLoop(LoopExpression node)
     {
-        if (node.Body is ConditionalExpression cond && cond.IfFalse is GotoExpression ge && ge.Kind == GotoExpressionKind.Break)
-        {
-            Output.Append("while (");
-            Visit(cond.Test);
-            Output.AppendLine(")");
-            Output.AppendLine("{");
-            Output.IncrementIndent();
-            Visit(cond.IfTrue);
-            Output.DecrementIndent();
-            Output.AppendLine("}");
+        if (node.Body is not ConditionalExpression { IfFalse: GotoExpression { Kind: GotoExpressionKind.Break } ge } cond)
+            throw new NotSupportedException($"Loop expression does not match the supported 'while (test) {{ ... }} break;' shape: {node}");
 
-            if (ge.Value != null)
-            {
-                Output.Append("return ");
-                Visit(ge.Value);
-                Output.Append(";");
-            }
+        Output.Append("while (");
+        Visit(cond.Test);
+        Output.AppendLine(")");
+        Output.AppendLine("{");
+        Output.IncrementIndent();
+        Visit(cond.IfTrue);
+        Output.DecrementIndent();
+        Output.AppendLine("}");
+
+        if (ge.Value != null)
+        {
+            Output.Append("return ");
+            Visit(ge.Value);
+            Output.Append(";");
         }
         return node;
     }
 
     protected override Expression VisitGoto(GotoExpression node)
     {
-        if (node.Kind == GotoExpressionKind.Break)
+        switch (node.Kind)
         {
-            if (node.Value != null)
-            {
-                Output.Append("return ");
-                Visit(node.Value);
-            }
-            else Output.Append("break");
+            case GotoExpressionKind.Break:
+                if (node.Value != null)
+                {
+                    Output.Append("return ");
+                    Visit(node.Value);
+                }
+                else
+                    Output.Append("break");
+                break;
+
+            case GotoExpressionKind.Continue:
+                Output.Append("continue");
+                break;
+
+            default:
+                throw new NotSupportedException($"Goto kind {node.Kind} is not supported.");
         }
-        else if (node.Kind == GotoExpressionKind.Continue)
-            Output.Append("continue");
         return node;
     }
 
