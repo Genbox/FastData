@@ -168,6 +168,52 @@ public class StringEarlyExitsTests
     }
 
     [Fact]
+    public void GetExits_UnitAtInRangeProducedForFirstAndLastCharGaps()
+    {
+        // First chars: a, b, d, e (gap at 'c'). Last chars: m, n, p, q (gap at 'o').
+        string[] keys = ["apple_m", "banana_n", "date_p", "egg_q"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0f;
+        cfg.MinItemCount = 0;
+
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
+
+        Assert.Contains(exits, static x => x is UnitAtInRangeEarlyExit { Min: 'b', Max: 'd', Offset: 0 });
+        Assert.Contains(exits, static x => x is UnitAtInRangeEarlyExit { Min: 'n', Max: 'p', Offset: -1 });
+    }
+
+    [Fact]
+    public void GetExits_UnitAtInRangeNotProducedWhenIgnoreCase()
+    {
+        string[] keys = ["Apple_m", "Banana_n", "Date_p", "Egg_q"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 50;
+        cfg.MinRejectionRatio = 0f;
+        cfg.MinItemCount = 0;
+
+        IEarlyExit[] exits = GetExits(keys, true, cfg);
+
+        Assert.DoesNotContain(exits, static x => x is UnitAtInRangeEarlyExit);
+    }
+
+    [Fact]
+    public void GetExits_UnitAtInRangeKeepsMinimumLengthGuardWhenNotTopCandidate()
+    {
+        string[] keys = ["a", new string('x', 98) + "m", new string('y', 99) + "o", new string('z', 100) + "q"];
+        EarlyExitConfig cfg = EarlyExitConfig.Default;
+        cfg.MaxCandidates = 3;
+
+        IEarlyExit[] exits = GetExits(keys, false, cfg);
+
+        int guardIndex = Array.FindIndex(exits, static x => x is LengthLessThanEarlyExit { Value: 1 });
+        int unitIndex = Array.FindIndex(exits, static x => x is UnitAtInRangeEarlyExit or UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit or UnitAtNotEqualEarlyExit or UnitAtBitmapEarlyExit);
+        Assert.True(unitIndex >= 0);
+        Assert.True(guardIndex >= 0);
+        Assert.True(guardIndex < unitIndex);
+    }
+
+    [Fact]
     public void IsAsciiOnlyEarlyExit_RejectsOnlyNonAsciiInput()
     {
         ParameterExpression parameter = Expression.Parameter(typeof(string), "key");

@@ -93,6 +93,12 @@ internal static class StringEarlyExits
             if (config.IsEarlyExitEnabled(typeof(UnitAtBitmapEarlyExit)) && config.CheckDensityLimits(typeof(UnitAtBitmapEarlyExit), firstMap.Density))
                 yield return new UnitAtBitmapEarlyExit(firstMap.Low, firstMap.High, ignoreCase);
 
+            if (!ignoreCase && config.IsEarlyExitEnabled(typeof(UnitAtInRangeEarlyExit)))
+            {
+                foreach (IEarlyExit exit in GetUnitAtGaps(firstMap, 0))
+                    yield return exit;
+            }
+
             // Accessing the last char/byte is slow in languages that don't cache string length
             AsciiMap lastMap = props.CharacterData.LastCharMap;
             if (config.IsEarlyExitEnabled(typeof(UnitAtNotEqualEarlyExit)) && lastMap.BitCount == 1) //1 bit means all last units are the same
@@ -109,7 +115,52 @@ internal static class StringEarlyExits
 
             if (config.IsEarlyExitEnabled(typeof(UnitAtBitmapEarlyExit)) && config.CheckDensityLimits(typeof(UnitAtBitmapEarlyExit), lastMap.Density))
                 yield return new UnitAtBitmapEarlyExit(lastMap.Low, lastMap.High, ignoreCase, -1);
+
+            if (!ignoreCase && config.IsEarlyExitEnabled(typeof(UnitAtInRangeEarlyExit)))
+            {
+                foreach (IEarlyExit exit in GetUnitAtGaps(lastMap, -1))
+                    yield return exit;
+            }
         }
+    }
+
+    // Walks the observed-character bitmap and yields one UnitAtInRangeEarlyExit per gap between adjacent runs of observed characters.
+    private static IEnumerable<IEarlyExit> GetUnitAtGaps(AsciiMap map, int offset)
+    {
+        (int Start, int End)? previous = null;
+
+        foreach ((int Start, int End) range in GetSetRanges(map))
+        {
+            if (previous is { } prev)
+                yield return new UnitAtInRangeEarlyExit((char)prev.End, (char)range.Start, offset);
+
+            previous = range;
+        }
+    }
+
+    // Returns contiguous runs of observed (set) characters in the map's bitmap, in ascending order.
+    private static IEnumerable<(int Start, int End)> GetSetRanges(AsciiMap map)
+    {
+        if (map.BitCount == 0)
+            yield break;
+
+        int start = -1;
+
+        for (int value = map.Min; value <= map.Max; value++)
+        {
+            bool set = value < 64 ? (map.Low & (1UL << value)) != 0 : (map.High & (1UL << (value - 64))) != 0;
+
+            if (set)
+                start = start == -1 ? value : start;
+            else if (start != -1)
+            {
+                yield return (start, value - 1);
+                start = -1;
+            }
+        }
+
+        if (start != -1)
+            yield return (start, map.Max);
     }
 
     private static IEarlyExit[] GetTopExits(IEarlyExit[] candidates, StringKeyProperties props, int maxCandidates)
@@ -122,31 +173,48 @@ internal static class StringEarlyExits
 
     private static IEarlyExit[] EnsureUnitAtLengthGuard(IEarlyExit[] exits, StringKeyProperties props, EarlyExitConfig config)
     {
-        // This function ensures we have a length check BEFORE all others when UnitAt is being used.
+        // This function ensures we have a length check BEFORE all others when a fixed-offset check (UnitAt/EqualsAt) is being used.
 
-        if (!Array.Exists(exits, RequiresNonEmptyString))
+        int requiredLength = 0;
+        foreach (IEarlyExit exit in exits)
+            requiredLength = Math.Max(requiredLength, GetRequiredLength(exit));
+
+        if (requiredLength == 0)
             return exits;
 
-        IEarlyExit? guard = Array.Find(exits, RejectsEmptyString);
+        IEarlyExit? guard = Array.Find(exits, x => GuardsLength(x, requiredLength));
 
         if (guard == null)
         {
-            int minLength = props.LengthData.LengthRanges.Min;
-            if (minLength <= 0 || !config.IsEarlyExitEnabled(typeof(LengthLessThanEarlyExit)))
-                return exits.Where(static x => !RequiresNonEmptyString(x)).ToArray();
+            if (!config.IsEarlyExitEnabled(typeof(LengthLessThanEarlyExit)))
+                return exits.Where(x => GetRequiredLength(x) == 0).ToArray();
 
-            guard = new LengthLessThanEarlyExit(minLength);
+            // The observed minimum is normally >= requiredLength already (the offset/fragment came from real keys),
+            // but Max() keeps this correct even if that assumption is ever violated by a future candidate source.
+            guard = new LengthLessThanEarlyExit(Math.Max(requiredLength, props.LengthData.LengthRanges.Min));
         }
 
         return exits.Prepend(guard).Distinct().ToArray();
     }
 
-    private static bool RequiresNonEmptyString(IEarlyExit exit) => exit is UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit or UnitAtNotEqualEarlyExit or UnitAtBitmapEarlyExit;
-
-    private static bool RejectsEmptyString(IEarlyExit exit) => exit switch
+    // Returns the minimum string length a fixed-offset check needs to read safely, or 0 if the exit has no such requirement.
+    private static int GetRequiredLength(IEarlyExit exit) => exit switch
     {
-        LengthLessThanEarlyExit lessThan => lessThan.Value > 0,
-        LengthNotEqualEarlyExit notEqual => notEqual.Value != 0,
+        UnitAtLessThanEarlyExit u => RequiredLengthForOffset(u.Offset),
+        UnitAtGreaterThanEarlyExit u => RequiredLengthForOffset(u.Offset),
+        UnitAtNotEqualEarlyExit u => RequiredLengthForOffset(u.Offset),
+        UnitAtBitmapEarlyExit u => RequiredLengthForOffset(u.Offset),
+        UnitAtInRangeEarlyExit u => RequiredLengthForOffset(u.Offset),
+        EqualsAtEarlyExit e => e.Offset >= 0 ? e.Offset + e.Fragment.Length : -e.Offset,
+        _ => 0
+    };
+
+    private static int RequiredLengthForOffset(int offset) => offset >= 0 ? offset + 1 : -offset;
+
+    private static bool GuardsLength(IEarlyExit exit, int requiredLength) => exit switch
+    {
+        LengthLessThanEarlyExit lessThan => lessThan.Value >= requiredLength,
+        LengthNotEqualEarlyExit notEqual => notEqual.Value >= requiredLength,
         _ => false
     };
 
@@ -199,6 +267,7 @@ internal static class StringEarlyExits
         LengthInRangeEarlyExit => 2d,
         LengthBitmapEarlyExit => 2d,
         UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit or UnitAtNotEqualEarlyExit => 2d,
+        UnitAtInRangeEarlyExit => 3d,
         UnitAtBitmapEarlyExit => 4d,
         EqualsAtEarlyExit equalsAt => Math.Max(2d, equalsAt.Fragment.Length),
         _ => 1d
@@ -217,6 +286,9 @@ internal static class StringEarlyExits
 
         if (exit is UnitAtBitmapEarlyExit e4)
             return e4.Offset >= 0 ? firstSpan : lastSpan;
+
+        if (exit is UnitAtInRangeEarlyExit e5)
+            return e5.Offset >= 0 ? firstSpan : lastSpan;
 
         return lengthSpan;
     }
