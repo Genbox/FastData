@@ -60,7 +60,6 @@
     </Folder>
     <Folder Name="/_Imports/" />
     <Folder Name="/_Imports/Local/">
-        <File Path="Locals/Benchmarks.props" />
         <File Path="Locals/Directory.Build.props" />
         <File Path="Locals/Directory.Packages.props" />
         <File Path="Locals/Library.props" />

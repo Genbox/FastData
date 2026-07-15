@@ -5,12 +5,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <!-- We include the usual things that benchmark imports do, because we disable it project wide -->
-  <ItemGroup>
-    <Using Include="BenchmarkDotNet.Attributes" />
-    <PackageReference Include="BenchmarkDotNet" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Genbox.FastFilter" />
   </ItemGroup>
