@@ -244,7 +244,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         Output.AppendLine(")");
         Output.AppendLine("{");
         Output.IncrementIndent();
-        Visit(node.IfTrue);
+        VisitStatement(node.IfTrue);
         Output.DecrementIndent();
         Output.AppendLine("}");
 
@@ -253,7 +253,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
             Output.AppendLine("else");
             Output.AppendLine("{");
             Output.IncrementIndent();
-            Visit(node.IfFalse);
+            VisitStatement(node.IfFalse);
             Output.DecrementIndent();
             Output.AppendLine("}");
         }
@@ -305,6 +305,13 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
                 throw new NotSupportedException($"Goto kind {node.Kind} is not supported.");
         }
         return node;
+    }
+
+    private void VisitStatement(Expression node)
+    {
+        Visit(node);
+        if (node is not BlockExpression and not LoopExpression and not ConditionalExpression)
+            Output.AppendLine(";");
     }
 
     private static string GetBinaryOperator(ExpressionType type) => type switch

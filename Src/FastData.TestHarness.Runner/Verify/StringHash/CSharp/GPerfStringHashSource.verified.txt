@@ -71,7 +71,6 @@ internal static class FastData
         ReadOnlySpan<byte> data = MemoryMarshal.AsBytes(value.AsSpan());
         ulong hash = ulong.MinValue;
         hash += (ulong)AssociationValues[(int)data[8]];
-        hash;
 
         return hash;
         }
