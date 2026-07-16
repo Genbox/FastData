@@ -1,22 +1,21 @@
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator;
 using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generators.Abstracts;
-using Genbox.FastData.Internal.Extensions;
-using Genbox.FastData.Internal.Structures;
 using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public class TestData<TKey>(Type structureType, TKey[] keys, BenchmarkWorkload workload, int warmupCount = 5, int minSampleCount = 10, int maxSampleCount = 10, int targetIterationTimeMs = 100, double maxErrorPercent = 2.0d) : ITestData, IXunitSerializable
+public class TestData<TKey>(StructureType structureType, TKey[] keys, BenchmarkWorkload workload, int warmupCount = 5, int minSampleCount = 10, int maxSampleCount = 10, int targetIterationTimeMs = 100, double maxErrorPercent = 2.0d) : ITestData, IXunitSerializable
 {
     private readonly TypeCode _keyType = Type.GetTypeCode(typeof(TKey));
 
     public TKey[] Keys { get; private set; } = keys;
     public BenchmarkWorkload Workload { get; private set; } = workload;
-    public Type StructureType { get; private set; } = structureType;
+    public StructureType StructureType { get; private set; } = structureType;
 
-    private bool ValidateFoundCount => StructureType != typeof(BloomFilterStructure<,>);
+    private bool ValidateFoundCount => StructureType != StructureType.BloomFilter;
     public double MaxErrorPercent { get; } = maxErrorPercent;
     public int TargetIterationTimeMs { get; } = targetIterationTimeMs;
     public Type KeyType => typeof(TKey);
@@ -25,7 +24,7 @@ public class TestData<TKey>(Type structureType, TKey[] keys, BenchmarkWorkload w
     public int MinSampleCount { get; } = minSampleCount;
     public int MaxSampleCount { get; } = maxSampleCount;
 
-    public string Identifier => $"{StructureType.GetFriendlyName()}_{_keyType}_{Keys.Length}_{Workload}";
+    public string Identifier => $"{StructureType}_{_keyType}_{Keys.Length}_{Workload}";
 
     public string Generate(ICodeGenerator generator)
     {
@@ -69,7 +68,7 @@ public class TestData<TKey>(Type structureType, TKey[] keys, BenchmarkWorkload w
 
     public void Deserialize(IXunitSerializationInfo info)
     {
-        StructureType = info.GetValue<Type>(nameof(StructureType));
+        StructureType = info.GetValue<StructureType>(nameof(StructureType));
         Keys = info.GetValue<TKey[]>(nameof(Keys));
         Workload = info.GetValue<BenchmarkWorkload>(nameof(Workload));
     }

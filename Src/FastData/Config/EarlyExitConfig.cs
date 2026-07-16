@@ -1,6 +1,6 @@
 using Genbox.FastData.Config.Limits;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.EarlyExits.Exits;
-using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Config;
 
@@ -8,7 +8,7 @@ namespace Genbox.FastData.Config;
 public class EarlyExitConfig
 {
     private readonly HashSet<Type> _disabled = new HashSet<Type>();
-    private readonly HashSet<Type> _disabledForStructure = new HashSet<Type>();
+    private readonly HashSet<StructureType> _disabledForStructure = new HashSet<StructureType>();
     private readonly Dictionary<Type, List<ILimit>> _limits = new Dictionary<Type, List<ILimit>>();
 
     /// <summary>Gets the default early-exit configuration.</summary>
@@ -23,8 +23,8 @@ public class EarlyExitConfig
             cfg.MinRejectionRatio = 0.05f;
 
             // These don't support early exits
-            cfg.DisableForStructure(typeof(RangeStructure<,>));
-            cfg.DisableForStructure(typeof(SingleValueStructure<,>));
+            cfg.DisableForStructure(StructureType.Range);
+            cfg.DisableForStructure(StructureType.SingleValue);
 
             cfg.AppendLimit(typeof(ValueBitMaskEarlyExit), new ValueDensityMinMaxLimit(0, 0.25f));
             cfg.AppendLimit(typeof(ValueLowByteBitmapEarlyExit), new ValueDensityMinMaxLimit(0, 0.50f));
@@ -55,8 +55,8 @@ public class EarlyExitConfig
     public void DisableEarlyExit(Type earlyExitType) => _disabled.Add(earlyExitType);
 
     /// <summary>Disables generated early exits for a specific structure type.</summary>
-    /// <param name="structureType">The open generic structure type.</param>
-    public void DisableForStructure(Type structureType) => _disabledForStructure.Add(structureType);
+    /// <param name="structureType">The structure type.</param>
+    public void DisableForStructure(StructureType structureType) => _disabledForStructure.Add(structureType);
 
     /// <summary>Adds a limit for a specific early-exit type.</summary>
     /// <param name="type">The early-exit type.</param>
@@ -82,7 +82,7 @@ public class EarlyExitConfig
 
     internal bool IsEarlyExitEnabled(Type earlyExitType) => !_disabled.Contains(earlyExitType);
 
-    internal bool IsEnabledForStructure(Type structureType) => !_disabledForStructure.Contains(structureType);
+    internal bool IsEnabledForStructure(StructureType structureType) => !_disabledForStructure.Contains(structureType);
 
     private IEnumerable<T> GetLimitsOfType<T>(Type type) where T : ILimit
     {

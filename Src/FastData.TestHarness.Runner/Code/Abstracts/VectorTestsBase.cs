@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Internal;
-using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.TestClasses;
 using Genbox.FastData.TestHarness.Runner.Code.Theory;
@@ -39,7 +39,7 @@ public abstract class VectorTestsBase
 
         string id = $"{nameof(ValueVectors)}_{vector.Identifier}";
         await VerifyVectorAsync(Harness.Name, id, source);
-        TKey[] notPresent = vector.StructureType == typeof(BloomFilterStructure<,>) ? [] : vector.NotPresent;
+        TKey[] notPresent = vector.StructureType == StructureType.BloomFilter ? [] : vector.NotPresent;
         Assert.Equal(1, await Harness.RunContainsAsync(source, id, vector.Keys, notPresent, TestContext.Current.CancellationToken));
 
         if (StructureCapabilityHelper.Supports(vector.StructureType, StructureCapability.Enumeration))
@@ -74,7 +74,7 @@ public abstract class VectorTestsBase
 
         string id = $"{nameof(KeyValueVectors)}_{vector.Identifier}";
         await VerifyFeatureAsync(Harness.Name, id, source);
-        TKey[] notPresent = vector.StructureType == typeof(BloomFilterStructure<,>) ? [] : vector.NotPresent;
+        TKey[] notPresent = vector.StructureType == StructureType.BloomFilter ? [] : vector.NotPresent;
         Assert.Equal(1, await Harness.RunTryLookupAsync(source, id, vector.Keys, vector.Values, notPresent, TestContext.Current.CancellationToken));
 
         if (StructureCapabilityHelper.Supports(vector.StructureType, StructureCapability.Enumeration))

@@ -1,6 +1,6 @@
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
-using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Harness;
 using static Genbox.FastData.TestHarness.Runner.Code.VerifyHelper;
 
@@ -14,7 +14,7 @@ public abstract class FeatureTestBase
     public async Task FloatNaNOrZeroHashSupport()
     {
         NumericDataConfig config = new NumericDataConfig();
-        config.StructureTypeOverride = typeof(HashTableStructure<,>);
+        config.StructureTypeOverride = StructureType.HashTable;
         config.EarlyExitConfig.Disabled = true;
 
         float[] floats = [1f, 2f, 3f, 4f, 5f];
@@ -34,7 +34,7 @@ public abstract class FeatureTestBase
     public async Task RoundModuloToPowerOfTwoSupport()
     {
         NumericDataConfig config = new NumericDataConfig();
-        config.StructureTypeOverride = typeof(HashTableStructure<,>);
+        config.StructureTypeOverride = StructureType.HashTable;
         config.EarlyExitConfig.Disabled = true;
 
         int[] keys = [0, 1, 2, 3, 4, 5, 6];
@@ -49,7 +49,7 @@ public abstract class FeatureTestBase
     public async Task FractionalFloatingPointLiteralsMatch()
     {
         NumericDataConfig config = new NumericDataConfig();
-        config.StructureTypeOverride = typeof(ArrayStructure<,>);
+        config.StructureTypeOverride = StructureType.Array;
         config.EarlyExitConfig.Disabled = true;
 
         float[] floats = [1.25f, 2.5f, 3.75f];
@@ -66,7 +66,7 @@ public abstract class FeatureTestBase
     public async Task IgnoreCaseSupport(bool ignoreCase)
     {
         StringDataConfig config = new StringDataConfig();
-        config.StructureTypeOverride = typeof(BinarySearchStructure<,>);
+        config.StructureTypeOverride = StructureType.BinarySearch;
         config.EarlyExitConfig.Disabled = true;
         config.IgnoreCase = ignoreCase;
 
@@ -87,7 +87,7 @@ public abstract class FeatureTestBase
     public async Task SpecialCharacterStringLiteralsCompileAndMatch()
     {
         StringDataConfig config = new StringDataConfig();
-        config.StructureTypeOverride = typeof(ArrayStructure<,>);
+        config.StructureTypeOverride = StructureType.Array;
         config.EarlyExitConfig.Disabled = true;
 
         string[] keys = ["quote\"key", "slash\\key", "line\nkey", "tab\tkey"];
@@ -101,7 +101,7 @@ public abstract class FeatureTestBase
     public async Task TypeReductionSupported(bool enabled)
     {
         NumericDataConfig config = new NumericDataConfig();
-        config.StructureTypeOverride = typeof(HashTableStructure<,>);
+        config.StructureTypeOverride = StructureType.HashTable;
         config.EarlyExitConfig.Disabled = true;
         config.TypeReductionEnabled = enabled;
 

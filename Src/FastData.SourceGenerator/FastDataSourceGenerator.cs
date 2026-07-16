@@ -7,7 +7,6 @@ using System.Text;
 using Genbox.FastData.Config;
 using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Generator.CSharp;
-using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.SourceGenerator.Attributes;
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
@@ -17,6 +16,8 @@ using AttributeClassVisibility = Genbox.FastData.SourceGenerator.Attributes.Clas
 using CSharpClassType = Genbox.FastData.Generator.CSharp.Enums.ClassType;
 using CSharpClassVisibility = Genbox.FastData.Generator.CSharp.Enums.ClassVisibility;
 using StructureCapability = Genbox.FastData.SourceGenerator.Attributes.StructureCapability;
+using AttributeStructureType = Genbox.FastData.SourceGenerator.Attributes.StructureType;
+using CoreStructureType = Genbox.FastData.Enums.StructureType;
 
 namespace Genbox.FastData.SourceGenerator;
 
@@ -286,7 +287,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
             object? structureArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.StructureType)).Value.Value;
             if (structureArg != null)
-                fdCfg.StructureTypeOverride = MapStructureType((StructureType)structureArg);
+                fdCfg.StructureTypeOverride = (CoreStructureType)(byte)(AttributeStructureType)structureArg;
 
             object? requiredFunctionsArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.RequiredCapability)).Value.Value;
             if (requiredFunctionsArg != null)
@@ -408,28 +409,6 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
     }
 
     private static Diagnostic CreateConfigurationDiagnostic(Location? location, string message) => Diagnostic.Create(ConfigurationError, location, message);
-
-    private static Type? MapStructureType(StructureType structureType) => structureType switch
-    {
-        StructureType.Auto => null,
-        StructureType.Array => typeof(ArrayStructure<,>),
-        StructureType.BinarySearch => typeof(BinarySearchStructure<,>),
-        StructureType.BinarySearchInterpolation => typeof(BinarySearchInterpolationStructure<,>),
-        StructureType.BitSet => typeof(BitSetStructure<,>),
-        StructureType.BloomFilter => typeof(BloomFilterStructure<,>),
-        StructureType.Conditional => typeof(ConditionalStructure<,>),
-        StructureType.EliasFano => typeof(EliasFanoStructure<,>),
-        StructureType.HashTableCompact => typeof(HashTableCompactStructure<,>),
-        StructureType.HashTablePerfect => typeof(HashTablePerfectStructure<,>),
-        StructureType.HashTable => typeof(HashTableStructure<,>),
-        StructureType.Hyble => typeof(HybleStructure<,>),
-        StructureType.KeyLength => typeof(KeyLengthStructure<,>),
-        StructureType.Pgm => typeof(PgmStructure<,>),
-        StructureType.Range => typeof(RangeStructure<,>),
-        StructureType.RrrBitVector => typeof(RrrBitVectorStructure<,>),
-        StructureType.SingleValue => typeof(SingleValueStructure<,>),
-        _ => throw new ArgumentOutOfRangeException(nameof(structureType), structureType, "Unsupported structure type.")
-    };
 
     private static CSharpClassVisibility MapClassVisibility(AttributeClassVisibility classVisibility) => classVisibility switch
     {

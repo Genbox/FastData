@@ -1,8 +1,8 @@
 using System.Globalization;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
-using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Misc;
 using Genbox.FastData.InternalShared.TestClasses;
 
@@ -15,21 +15,21 @@ public static class TestVectorHelper
         // First we try with a simple value
         int[] simpleValues = [1, 2, 3];
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1]], [[simpleValues[0]]], "simple", typeof(SingleValueStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1]], [[simpleValues[0]]], "simple", StructureType.SingleValue))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([["a", "aa", "aaa"]], [simpleValues], "simple", typeof(KeyLengthStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([["a", "aa", "aaa"]], [simpleValues], "simple", StructureType.KeyLength))
             yield return testVector;
 
         foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], [simpleValues], "simple",
-                     typeof(ArrayStructure<,>),
-                     typeof(BinarySearchStructure<,>),
-                     typeof(BinarySearchInterpolationStructure<,>),
-                     typeof(ConditionalStructure<,>),
-                     typeof(HashTableStructure<,>),
-                     typeof(HashTablePerfectStructure<,>),
-                     typeof(HybleStructure<,>),
-                     typeof(PgmStructure<,>)))
+                     StructureType.Array,
+                     StructureType.BinarySearch,
+                     StructureType.BinarySearchInterpolation,
+                     StructureType.Conditional,
+                     StructureType.HashTable,
+                     StructureType.HashTablePerfect,
+                     StructureType.Hyble,
+                     StructureType.Pgm))
             yield return testVector;
 
         // Then we try with complex values
@@ -40,86 +40,86 @@ public static class TestVectorHelper
             new Person { Age = 3, Name = "Bibi" }
         ];
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1]], [[complexValues[0]]], "complex", typeof(SingleValueStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1]], [[complexValues[0]]], "complex", StructureType.SingleValue))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([["a", "aa", "aaa"]], [complexValues], "complex", typeof(KeyLengthStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([["a", "aa", "aaa"]], [complexValues], "complex", StructureType.KeyLength))
             yield return testVector;
 
         foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], [complexValues], "complex",
-                     typeof(ArrayStructure<,>),
-                     typeof(BinarySearchStructure<,>),
-                     typeof(BinarySearchInterpolationStructure<,>),
-                     typeof(BitSetStructure<,>),
-                     typeof(ConditionalStructure<,>),
-                     typeof(HashTableStructure<,>),
-                     typeof(HashTablePerfectStructure<,>),
-                     typeof(HybleStructure<,>),
-                     typeof(PgmStructure<,>)))
+                     StructureType.Array,
+                     StructureType.BinarySearch,
+                     StructureType.BinarySearchInterpolation,
+                     StructureType.BitSet,
+                     StructureType.Conditional,
+                     StructureType.HashTable,
+                     StructureType.HashTablePerfect,
+                     StructureType.Hyble,
+                     StructureType.Pgm))
             yield return testVector;
     }
 
     public static IEnumerable<ITestVector> GetValueTestVectors()
     {
-        foreach (ITestVector testVector in GenerateTestVectors(GetSingleValues(), null, typeof(SingleValueStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors(GetSingleValues(), null, StructureType.SingleValue))
             yield return testVector;
 
         foreach (ITestVector testVector in GenerateTestVectors(GetEdgeCaseValues(), null,
-                     typeof(ArrayStructure<,>),
-                     typeof(BinarySearchStructure<,>),
-                     typeof(ConditionalStructure<,>),
-                     typeof(HashTableStructure<,>),
-                     typeof(HashTableCompactStructure<,>)))
+                     StructureType.Array,
+                     StructureType.BinarySearch,
+                     StructureType.Conditional,
+                     StructureType.HashTable,
+                     StructureType.HashTableCompact))
             yield return testVector;
 
         foreach (ITestVector testVector in GenerateTestVectors(GetDataOfSize(100), null,
-                     typeof(ArrayStructure<,>),
-                     typeof(BloomFilterStructure<,>),
-                     typeof(BinarySearchStructure<,>),
-                     typeof(ConditionalStructure<,>),
-                     typeof(HashTableStructure<,>),
-                     typeof(HashTableCompactStructure<,>)))
+                     StructureType.Array,
+                     StructureType.BloomFilter,
+                     StructureType.BinarySearch,
+                     StructureType.Conditional,
+                     StructureType.HashTable,
+                     StructureType.HashTableCompact))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors(GetNaturallySparseIntData(1000), "natural_sparse", typeof(EliasFanoStructure<,>), typeof(RrrBitVectorStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors(GetNaturallySparseIntData(1000), "natural_sparse", StructureType.EliasFano, StructureType.RrrBitVector))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors(GetNaturallySparseNegativeIntData(1000), "natural_sparse_negative", typeof(EliasFanoStructure<,>), typeof(RrrBitVectorStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors(GetNaturallySparseNegativeIntData(1000), "natural_sparse_negative", StructureType.EliasFano, StructureType.RrrBitVector))
             yield return testVector;
 
         // We don't include a length of 1, 2 and 4 to check if uniq length structures emit null buckets correctly
-        foreach (ITestVector testVector in GenerateTestVectors([["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]], null, typeof(KeyLengthStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]], null, StructureType.KeyLength))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], null, typeof(HashTablePerfectStructure<,>), typeof(HybleStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], null, StructureType.HashTablePerfect, StructureType.Hyble))
             yield return testVector;
 
         // Strings with characters that are not in the ASCII range
         foreach (ITestVector testVector in GenerateTestVectors([["æ", "à", "ä", "ö", "ü", "ß", "é", "è", "ê", "ç", "ñ", "ø", "å"]], "non_ascii",
-                     typeof(ArrayStructure<,>),
-                     typeof(BloomFilterStructure<,>),
-                     typeof(BinarySearchStructure<,>),
-                     typeof(ConditionalStructure<,>),
-                     typeof(HashTableCompactStructure<,>),
-                     typeof(HashTableStructure<,>)))
+                     StructureType.Array,
+                     StructureType.BloomFilter,
+                     StructureType.BinarySearch,
+                     StructureType.Conditional,
+                     StructureType.HashTableCompact,
+                     StructureType.HashTable))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "sorted_numeric", typeof(BinarySearchInterpolationStructure<,>), typeof(PgmStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "sorted_numeric", StructureType.BinarySearchInterpolation, StructureType.Pgm))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1f, 2f, 3f, 4f, 5f]], "sorted_numeric", typeof(BinarySearchInterpolationStructure<,>), typeof(PgmStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1f, 2f, 3f, 4f, 5f]], "sorted_numeric", StructureType.BinarySearchInterpolation, StructureType.Pgm))
             yield return testVector;
 
         // Larger sorted, non-uniform numeric dataset for structures that depend on value distribution.
-        foreach (ITestVector testVector in GenerateTestVectors(GetNonUniformSortedIntData(200), "non_uniform_sorted", typeof(BinarySearchInterpolationStructure<,>), typeof(PgmStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors(GetNonUniformSortedIntData(200), "non_uniform_sorted", StructureType.BinarySearchInterpolation, StructureType.Pgm))
             yield return testVector;
 
         // Test range/bitset support. RangeStructure is selected when range count is low.
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "range_bitset", typeof(RangeStructure<,>), typeof(BitSetStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "range_bitset", StructureType.Range, StructureType.BitSet))
             yield return testVector;
 
         // Test range support for non-consecutive data.
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 4, 7, 8, 10]], "range_gaps", typeof(RangeStructure<,>)))
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 4, 7, 8, 10]], "range_gaps", StructureType.Range))
             yield return testVector;
     }
 
@@ -129,44 +129,44 @@ public static class TestVectorHelper
         float[] floatKeys = Enumerable.Range(0, benchmarkSize).Select(x => (float)x).ToArray();
         float[] perfectFloatHashKeys = CreatePerfectFloatHashKeys(benchmarkSize);
 
-        Type[] generalTypes =
+        StructureType[] generalTypes =
         [
-            typeof(ArrayStructure<,>),
-            typeof(BinarySearchStructure<,>),
-            typeof(BloomFilterStructure<,>),
-            typeof(ConditionalStructure<,>),
-            typeof(HashTableStructure<,>),
-            typeof(HashTableCompactStructure<,>)
+            StructureType.Array,
+            StructureType.BinarySearch,
+            StructureType.BloomFilter,
+            StructureType.Conditional,
+            StructureType.HashTable,
+            StructureType.HashTableCompact
         ];
 
-        foreach (Type type in generalTypes)
+        foreach (StructureType type in generalTypes)
         {
             yield return CreateTestData(type, intKeys);
             yield return CreateTestData(type, floatKeys);
         }
 
-        Type[] numericTypes = [typeof(BinarySearchInterpolationStructure<,>), typeof(PgmStructure<,>)];
+        StructureType[] numericTypes = [StructureType.BinarySearchInterpolation, StructureType.Pgm];
 
-        foreach (Type type in numericTypes)
+        foreach (StructureType type in numericTypes)
         {
             yield return CreateTestData(type, intKeys);
             yield return CreateTestData(type, floatKeys);
         }
 
-        Type[] integralTypes = [typeof(BitSetStructure<,>), typeof(EliasFanoStructure<,>), typeof(RangeStructure<,>), typeof(RrrBitVectorStructure<,>)];
+        StructureType[] integralTypes = [StructureType.BitSet, StructureType.EliasFano, StructureType.Range, StructureType.RrrBitVector];
 
-        foreach (Type type in integralTypes)
+        foreach (StructureType type in integralTypes)
             yield return CreateTestData(type, intKeys);
 
-        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), intKeys);
-        yield return CreateTestData(typeof(HashTablePerfectStructure<,>), perfectFloatHashKeys);
+        yield return CreateTestData(StructureType.HashTablePerfect, intKeys);
+        yield return CreateTestData(StructureType.HashTablePerfect, perfectFloatHashKeys);
 
-        yield return CreateTestData(typeof(HybleStructure<,>), intKeys);
+        yield return CreateTestData(StructureType.Hyble, intKeys);
 
         string[] uniqueLengthStringKeys = Enumerable.Range(1, keyLengthBenchmarkSize).Select(x => new string('a', x)).ToArray();
-        yield return CreateTestData(typeof(KeyLengthStructure<,>), uniqueLengthStringKeys);
+        yield return CreateTestData(StructureType.KeyLength, uniqueLengthStringKeys);
 
-        ITestData CreateTestData<TKey>(Type type, TKey[] keys) => new TestData<TKey>(type, keys, workload, warmupSampleCount, minSampleCount, maxSampleCount, targetIterationTimeMs, maxErrorPercent);
+        ITestData CreateTestData<TKey>(StructureType type, TKey[] keys) => new TestData<TKey>(type, keys, workload, warmupSampleCount, minSampleCount, maxSampleCount, targetIterationTimeMs, maxErrorPercent);
     }
 
     public static IEnumerable<ITestData> GetEarlyExitBenchmarkData(int warmupSampleCount = 5, int minSampleCount = 10, int maxSampleCount = 10, int targetIterationTimeMs = 100, int benchmarkSize = 1000, BenchmarkWorkload workload = BenchmarkWorkload.Mixed, double maxErrorPercent = 2.0d)
@@ -254,13 +254,13 @@ public static class TestVectorHelper
         return keys;
     }
 
-    private static IEnumerable<ITestVector> GenerateTestVectors(IEnumerable<DataPair> pairs, string? postfix = null, params Type[] dataStructs)
+    private static IEnumerable<ITestVector> GenerateTestVectors(IEnumerable<DataPair> pairs, string? postfix = null, params StructureType[] dataStructs)
     {
         foreach ((object[] keys, object[] notInKeys, object[]? values) in pairs)
         {
             Type keyType = keys[0].GetType();
 
-            foreach (Type st in dataStructs)
+            foreach (StructureType st in dataStructs)
             {
                 //Convert object[] to T[]
                 Array keysArr = Array.CreateInstance(keyType, keys.Length);
@@ -291,12 +291,12 @@ public static class TestVectorHelper
         }
     }
 
-    private static IEnumerable<ITestVector> GenerateTestVectors<TKey>(IEnumerable<TKey[]> keySets, string? postfix = null, params Type[] dataStructs)
+    private static IEnumerable<ITestVector> GenerateTestVectors<TKey>(IEnumerable<TKey[]> keySets, string? postfix = null, params StructureType[] dataStructs)
     {
         return GenerateTestVectors(keySets.Select(x => new DataPair(x.Cast<object>().ToArray(), [])), postfix, dataStructs);
     }
 
-    private static IEnumerable<ITestVector> GenerateTestVectors<TKey, TValue>(TKey[][] keySets, TValue[][] valueSets, string? postFix = null, params Type[] dataStructs)
+    private static IEnumerable<ITestVector> GenerateTestVectors<TKey, TValue>(TKey[][] keySets, TValue[][] valueSets, string? postFix = null, params StructureType[] dataStructs)
     {
         if (keySets.Length != valueSets.Length)
             throw new InvalidOperationException("The number of key sets does not match the number of value sets.");

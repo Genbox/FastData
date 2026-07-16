@@ -19,7 +19,7 @@ public sealed class CSharpCodeGenerator(CSharpCodeGeneratorConfig csCfg) : Templ
         if (csCfg.Namespace != null)
             ValidateIdentifier(csCfg.Namespace, nameof(csCfg.Namespace));
 
-        string templatePath = Path.Combine(TemplateDir, genCfg.StructureName + ".tt");
+        string templatePath = Path.Combine(TemplateDir, genCfg.StructureType.ToString() + ".tt");
         string templateSource = File.ReadAllText(templatePath);
 
         variables["CSharpConfig"] = csCfg;

@@ -3,7 +3,6 @@ using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
-using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Tests;
 
@@ -15,7 +14,7 @@ public class GPerfEarlyExitTests
         string[] keys = ["a", "bb", "ccc", "dddd"];
         StringDataConfig config = new StringDataConfig
         {
-            StructureTypeOverride = typeof(HashTableStructure<,>),
+            StructureTypeOverride = StructureType.HashTable,
             StringAnalyzerConfig = new StringAnalyzerConfig
             {
                 BruteForceAnalyzerConfig = null,
@@ -39,7 +38,7 @@ public class GPerfEarlyExitTests
         string[] keys = ["\u00e9", "abc", "\u65e5\u672c"];
         StringDataConfig config = new StringDataConfig
         {
-            StructureTypeOverride = typeof(HashTableStructure<,>),
+            StructureTypeOverride = StructureType.HashTable,
             StringAnalyzerConfig = new StringAnalyzerConfig
             {
                 BruteForceAnalyzerConfig = null,

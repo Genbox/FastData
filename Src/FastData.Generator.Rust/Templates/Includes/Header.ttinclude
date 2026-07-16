@@ -24,7 +24,7 @@
 <#@ parameter type="Genbox.FastData.Generators.GeneratorConfigBase" name="GeneratorConfig" #>
 <#@ include file="Functions.ttinclude" #>
 //! This file is auto-generated. Do not edit manually.
-//! Structure: <#= GeneratorConfig.StructureName #>
+//! Structure: <#= GeneratorConfig.StructureType.ToString() #>
 #![allow(non_camel_case_types)]
 #![allow(unused_parens)]
 #![allow(missing_docs)]

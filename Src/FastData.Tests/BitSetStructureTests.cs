@@ -1,4 +1,5 @@
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Analysis;
@@ -58,11 +59,11 @@ public class BitSetStructureTests
     {
         ReadOnlyMemory<int> keys = (int[])[0, 1, 10];
 
-        Type selected = NumericStructures<int>.GetBest(keys, true, KeyAnalyzer.GetNumericProperties(keys).Density,
+        StructureType selected = NumericStructures<int>.GetBest(keys, true, KeyAnalyzer.GetNumericProperties(keys).Density,
             false, 2, 10, StructureCapability.Membership | StructureCapability.KeyValueLookup, 2f, StructureConfig.Default,
             static _ => throw new InvalidOperationException("Hash data should not be needed."));
 
-        Assert.Equal(typeof(ConditionalStructure<,>), selected);
+        Assert.Equal(StructureType.Conditional, selected);
     }
 
     [Fact]

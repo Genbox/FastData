@@ -4,8 +4,8 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp;
-using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Helpers;
 
 namespace Genbox.FastData.Benchmarks;
@@ -44,16 +44,16 @@ internal static class Program
         // This code is used to generate the files in the Generated folder.
 
         int[] sizes = [1, 5, 10, 50, 100, 500, 1000];
-        Type[] structures = [typeof(ArrayStructure<,>), typeof(ConditionalStructure<,>), typeof(BinarySearchStructure<,>), typeof(HashTableStructure<,>)];
+        StructureType[] structures = [StructureType.Array, StructureType.Conditional, StructureType.BinarySearch, StructureType.HashTable];
 
-        foreach (Type type in structures)
+        foreach (StructureType type in structures)
         {
             foreach (int size in sizes)
                 DoStructure(type, size);
         }
     }
 
-    private static void DoStructure(Type type, int size)
+    private static void DoStructure(StructureType type, int size)
     {
         Random rng = new Random(42);
         string[] data = Enumerable.Range(0, size).Select(_ => TestHelper.GenerateRandomString(rng, rng.Next(5, 10))).ToArray();

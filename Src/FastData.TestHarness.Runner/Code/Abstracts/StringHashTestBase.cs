@@ -1,7 +1,7 @@
 using Genbox.FastData.Config;
 using Genbox.FastData.Config.Analysis;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
-using Genbox.FastData.Internal.Structures;
 using static Genbox.FastData.TestHarness.Runner.Code.VerifyHelper;
 
 namespace Genbox.FastData.TestHarness.Runner.Code.Abstracts;
@@ -16,7 +16,7 @@ public abstract class StringHashTestBase
     {
         StringDataConfig config = new StringDataConfig
         {
-            StructureTypeOverride = typeof(HashTableStructure<,>),
+            StructureTypeOverride = StructureType.HashTable,
             StringAnalyzerConfig = null
         };
 
@@ -33,7 +33,7 @@ public abstract class StringHashTestBase
     {
         StringDataConfig config = new StringDataConfig
         {
-            StructureTypeOverride = typeof(HashTableStructure<,>),
+            StructureTypeOverride = StructureType.HashTable,
             StringAnalyzerConfig = new StringAnalyzerConfig
             {
                 BruteForceAnalyzerConfig = new BruteForceAnalyzerConfig(),
@@ -56,7 +56,7 @@ public abstract class StringHashTestBase
     {
         StringDataConfig config = new StringDataConfig
         {
-            StructureTypeOverride = typeof(HashTableStructure<,>),
+            StructureTypeOverride = StructureType.HashTable,
             StringAnalyzerConfig = new StringAnalyzerConfig
             {
                 BruteForceAnalyzerConfig = null,
@@ -79,7 +79,7 @@ public abstract class StringHashTestBase
     {
         StringDataConfig config = new StringDataConfig
         {
-            StructureTypeOverride = typeof(HashTableStructure<,>),
+            StructureTypeOverride = StructureType.HashTable,
             StringAnalyzerConfig = new StringAnalyzerConfig
             {
                 BruteForceAnalyzerConfig = null,

@@ -1,16 +1,16 @@
 using System.Numerics;
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Generators.Extensions;
 using Genbox.FastData.Internal.Analysis.Data;
-using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Generators.EarlyExits;
 
 internal static class NumericEarlyExits<TKey>
 {
-    public static IEarlyExit[] GetExits(Type structureType, ReadOnlyMemory<TKey> keys, DataRanges<TKey> dataRanges, ulong range, ulong bitMask, uint itemCount, EarlyExitConfig config)
+    public static IEarlyExit[] GetExits(StructureType structureType, ReadOnlyMemory<TKey> keys, DataRanges<TKey> dataRanges, ulong range, ulong bitMask, uint itemCount, EarlyExitConfig config)
     {
         // First we build a set of candidates.
         IEarlyExit[] candidates = ProduceCandidates(structureType, keys, dataRanges, bitMask, itemCount, config).ToArray();
@@ -30,7 +30,7 @@ internal static class NumericEarlyExits<TKey>
         return GetTopExits(candidates, range, config.MaxCandidates).ToArray();
     }
 
-    private static IEnumerable<IEarlyExit> ProduceCandidates(Type structureType, ReadOnlyMemory<TKey> keys, DataRanges<TKey> dataRanges, ulong bitMask, uint itemCount, EarlyExitConfig config)
+    private static IEnumerable<IEarlyExit> ProduceCandidates(StructureType structureType, ReadOnlyMemory<TKey> keys, DataRanges<TKey> dataRanges, ulong bitMask, uint itemCount, EarlyExitConfig config)
     {
         if (config.Disabled)
             yield break;
@@ -45,7 +45,7 @@ internal static class NumericEarlyExits<TKey>
 
         TypeCode typeCode = Type.GetTypeCode(typeof(TKey));
 
-        if (config.IsEarlyExitEnabled(typeof(ValueLowByteBitmapEarlyExit)) && typeCode.IsIntegral() && structureType != typeof(BitSetStructure<,>))
+        if (config.IsEarlyExitEnabled(typeof(ValueLowByteBitmapEarlyExit)) && typeCode.IsIntegral() && structureType != StructureType.BitSet)
         {
             ValueLowByteBitmapEarlyExit? lowByteExit = CreateLowByteBitmapExit(keys, typeCode);
             if (lowByteExit != null && config.CheckDensityLimits(typeof(ValueLowByteBitmapEarlyExit), lowByteExit.AcceptedDensity))

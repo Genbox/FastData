@@ -186,8 +186,9 @@ public static partial class FastDataGenerator
         HashData? cacheHashData = null;
         IEnumerable<IEarlyExit> cacheHashExits = [];
 
-        (Type structureType, IStructure<string, TValue, IContext> structure, IContext res) = cfg.StructureTypeOverride != null ? CreateSelectedStringStructure(cfg.StructureTypeOverride) : CreateBestStringStructure();
-        LogStructureType(logger, structureType.Name);
+        StructureType? structureTypeOverride = cfg.StructureTypeOverride is {} value && value != StructureType.Auto ? value : null;
+        (StructureType structureType, IStructure<string, TValue, IContext> structure, IContext res) = structureTypeOverride.HasValue ? CreateSelectedStringStructure(structureTypeOverride.Value) : CreateBestStringStructure();
+        LogStructureType(logger, structureType.ToString());
 
         IEarlyExit[] analysisExits = StringEarlyExits.GetExits(structureType, props, cfg.EarlyExitConfig, cfg.IgnoreCase, (uint)keys.Length);
         List<IEarlyExit> mandatoryExits = new List<IEarlyExit>();
@@ -247,25 +248,25 @@ public static partial class FastDataGenerator
             return [AnnotatedExpr.Allocation(Assign(length, Call(methodInfo, key)))];
         }
 
-        (Type StructureType, IStructure<string, TValue, IContext> Structure, IContext Context) CreateSelectedStringStructure(Type selectedType)
+        (StructureType StructureType, IStructure<string, TValue, IContext> Structure, IContext Context) CreateSelectedStringStructure(StructureType selectedType)
         {
             ValidateCapabilities(selectedType, requiredCapabilities);
             IStructure<string, TValue, IContext> selectedStructure = StringStructureFactory<TValue>(selectedType, props, () => EnsureHashData(keys.Span), generator.Encoding);
             IContext? selectedContext = selectedStructure.Create(keys, values);
 
             if (selectedContext == null)
-                throw new InvalidOperationException($"The selected structure {selectedType.Name} failed to create.");
+                throw new InvalidOperationException($"The selected structure {selectedType} failed to create.");
 
             return (selectedType, selectedStructure, selectedContext);
         }
 
-        (Type StructureType, IStructure<string, TValue, IContext> Structure, IContext Context) CreateBestStringStructure()
+        (StructureType StructureType, IStructure<string, TValue, IContext> Structure, IContext Context) CreateBestStringStructure()
         {
             StructureConfig structureConfig = cfg.StructureConfig.Clone();
 
             while (true)
             {
-                Type selectedType = StringStructures.GetBest(keys, hasValues, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.AllowApproximation, props.LengthData.UniqueLengths, requiredCapabilities, structureConfig, x => EnsureHashData(x.Span));
+                StructureType selectedType = StringStructures.GetBest(keys, hasValues, props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, cfg.AllowApproximation, props.LengthData.UniqueLengths, requiredCapabilities, structureConfig, x => EnsureHashData(x.Span));
                 IStructure<string, TValue, IContext> selectedStructure = StringStructureFactory<TValue>(selectedType, props, () => EnsureHashData(keys.Span), generator.Encoding);
                 IContext? selectedContext = selectedStructure.Create(keys, values);
 
@@ -324,31 +325,20 @@ public static partial class FastDataGenerator
         }
     }
 
-    private static IStructure<string, TValue, IContext> StringStructureFactory<TValue>(Type type, StringKeyProperties props, Func<HashData> getHashData, GeneratorEncoding encoding)
+    private static IStructure<string, TValue, IContext> StringStructureFactory<TValue>(StructureType type, StringKeyProperties props, Func<HashData> getHashData, GeneratorEncoding encoding) => type switch
     {
-        if (type == typeof(ArrayStructure<,>))
-            return new ArrayStructure<string, TValue>();
-        if (type == typeof(BinarySearchStructure<,>))
-            return new BinarySearchStructure<string, TValue>();
-        if (type == typeof(BloomFilterStructure<,>))
-            return new BloomFilterStructure<string, TValue>(getHashData());
-        if (type == typeof(ConditionalStructure<,>))
-            return new ConditionalStructure<string, TValue>();
-        if (type == typeof(HashTableStructure<,>))
-            return new HashTableStructure<string, TValue>(getHashData());
-        if (type == typeof(HashTableCompactStructure<,>))
-            return new HashTableCompactStructure<string, TValue>(getHashData());
-        if (type == typeof(HashTablePerfectStructure<,>))
-            return new HashTablePerfectStructure<string, TValue>(getHashData());
-        if (type == typeof(HybleStructure<,>))
-            return new HybleStructure<string, TValue>(getHashData());
-        if (type == typeof(KeyLengthStructure<,>))
-            return new KeyLengthStructure<string, TValue>(props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, encoding);
-        if (type == typeof(SingleValueStructure<,>))
-            return new SingleValueStructure<string, TValue>();
-
-        throw new InvalidOperationException($"Unsupported DataStructure {type.Name}");
-    }
+        StructureType.Array => new ArrayStructure<string, TValue>(),
+        StructureType.BinarySearch => new BinarySearchStructure<string, TValue>(),
+        StructureType.BloomFilter => new BloomFilterStructure<string, TValue>(getHashData()),
+        StructureType.Conditional => new ConditionalStructure<string, TValue>(),
+        StructureType.HashTable => new HashTableStructure<string, TValue>(getHashData()),
+        StructureType.HashTableCompact => new HashTableCompactStructure<string, TValue>(getHashData()),
+        StructureType.HashTablePerfect => new HashTablePerfectStructure<string, TValue>(getHashData()),
+        StructureType.Hyble => new HybleStructure<string, TValue>(getHashData()),
+        StructureType.KeyLength => new KeyLengthStructure<string, TValue>(props.LengthData.LengthRanges.Min, props.LengthData.LengthRanges.Max, encoding),
+        StructureType.SingleValue => new SingleValueStructure<string, TValue>(),
+        _ => throw new InvalidOperationException($"Unsupported DataStructure {type}")
+    };
 
     private static string GenerateNumericInternal<TKey, TValue>(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, bool hasValues, NumericDataConfig cfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
@@ -400,8 +390,9 @@ public static partial class FastDataGenerator
 
         HashData? cacheHashData = null;
 
-        (Type structureType, IStructure<TKey, TValue, IContext> structure, IContext ctx) = cfg.StructureTypeOverride != null ? CreateSelectedNumericStructure(cfg.StructureTypeOverride) : CreateBestNumericStructure();
-        LogStructureType(logger, structureType.Name);
+        StructureType? structureTypeOverride = cfg.StructureTypeOverride is {} value && value != StructureType.Auto ? value : null;
+        (StructureType structureType, IStructure<TKey, TValue, IContext> structure, IContext ctx) = structureTypeOverride.HasValue ? CreateSelectedNumericStructure(structureTypeOverride.Value) : CreateBestNumericStructure();
+        LogStructureType(logger, structureType.ToString());
 
         // Early exits are generated from numeric properties and then merged with checks required by the structure itself.
         IEarlyExit[] exitsAnalyzed = NumericEarlyExits<TKey>.GetExits(structureType, keys, props.DataRanges, props.Range, props.BitMask, (uint)keys.Length, cfg.EarlyExitConfig);
@@ -421,22 +412,22 @@ public static partial class FastDataGenerator
 
         return generator.Generate<TKey, TValue>(genCfg, ctx);
 
-        (Type StructureType, IStructure<TKey, TValue, IContext> Structure, IContext Context) CreateSelectedNumericStructure(Type selType)
+        (StructureType StructureType, IStructure<TKey, TValue, IContext> Structure, IContext Context) CreateSelectedNumericStructure(StructureType selType)
         {
             ValidateCapabilities(selType, requiredCapabilities);
             IStructure<TKey, TValue, IContext> selStruct = NumericStructureFactory<TKey, TValue>(cfg, selType, props, () => EnsureNumericHash(keys.Span));
             IContext? selCtx = selStruct.Create(keys, values);
 
-            return selCtx == null ? throw new InvalidOperationException($"The selected structure {selType.Name} failed to create.") : (selType, selStruct, selCtx);
+            return selCtx == null ? throw new InvalidOperationException($"The selected structure {selType} failed to create.") : (selType, selStruct, selCtx);
         }
 
-        (Type StructureType, IStructure<TKey, TValue, IContext> Structure, IContext Context) CreateBestNumericStructure()
+        (StructureType StructureType, IStructure<TKey, TValue, IContext> Structure, IContext Context) CreateBestNumericStructure()
         {
             StructureConfig structureConfig = cfg.StructureConfig.Clone();
 
             while (true)
             {
-                Type selType = NumericStructures<TKey>.GetBest(keys, hasValues, props.Density, cfg.AllowApproximation, props.DataRanges.Ranges.Count, props.Range, requiredCapabilities,
+                StructureType selType = NumericStructures<TKey>.GetBest(keys, hasValues, props.Density, cfg.AllowApproximation, props.DataRanges.Ranges.Count, props.Range, requiredCapabilities,
                     cfg.StructureSettings.GetSetting<float>(KnownSettings.DenseIntegralValueMaxRangeFactor), structureConfig, x => EnsureNumericHash(x.Span));
                 IStructure<TKey, TValue, IContext> selStruct = NumericStructureFactory<TKey, TValue>(cfg, selType, props, () => EnsureNumericHash(keys.Span));
                 IContext? selCtx = selStruct.Create(keys, values);
@@ -461,41 +452,25 @@ public static partial class FastDataGenerator
         }
     }
 
-    private static IStructure<TKey, TValue, IContext> NumericStructureFactory<TKey, TValue>(DataConfig cfg, Type type, NumericKeyProperties<TKey> props, Func<HashData> getHashData)
+    private static IStructure<TKey, TValue, IContext> NumericStructureFactory<TKey, TValue>(DataConfig cfg, StructureType type, NumericKeyProperties<TKey> props, Func<HashData> getHashData) => type switch
     {
-        if (type == typeof(ArrayStructure<,>))
-            return new ArrayStructure<TKey, TValue>();
-        if (type == typeof(BinarySearchStructure<,>))
-            return new BinarySearchStructure<TKey, TValue>();
-        if (type == typeof(BinarySearchInterpolationStructure<,>))
-            return new BinarySearchInterpolationStructure<TKey, TValue>();
-        if (type == typeof(BitSetStructure<,>))
-            return new BitSetStructure<TKey, TValue>(props);
-        if (type == typeof(BloomFilterStructure<,>))
-            return new BloomFilterStructure<TKey, TValue>(getHashData());
-        if (type == typeof(ConditionalStructure<,>))
-            return new ConditionalStructure<TKey, TValue>();
-        if (type == typeof(EliasFanoStructure<,>))
-            return new EliasFanoStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, cfg.StructureSettings.GetSetting<int>(KnownSettings.EliasFanoSkipQuantum));
-        if (type == typeof(HashTableStructure<,>))
-            return new HashTableStructure<TKey, TValue>(getHashData());
-        if (type == typeof(HashTableCompactStructure<,>))
-            return new HashTableCompactStructure<TKey, TValue>(getHashData());
-        if (type == typeof(HashTablePerfectStructure<,>))
-            return new HashTablePerfectStructure<TKey, TValue>(getHashData());
-        if (type == typeof(HybleStructure<,>))
-            return new HybleStructure<TKey, TValue>(getHashData());
-        if (type == typeof(RangeStructure<,>))
-            return new RangeStructure<TKey, TValue>(props.DataRanges);
-        if (type == typeof(RrrBitVectorStructure<,>))
-            return new RrrBitVectorStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max);
-        if (type == typeof(SingleValueStructure<,>))
-            return new SingleValueStructure<TKey, TValue>();
-        if (type == typeof(PgmStructure<,>))
-            return new PgmStructure<TKey, TValue>(cfg.StructureSettings.GetSetting<int>(KnownSettings.PgmEpsilon), cfg.StructureSettings.GetSetting<int>(KnownSettings.PgmEpsilonRecursive));
-
-        throw new InvalidOperationException($"Unsupported DataStructure {type}");
-    }
+        StructureType.Array => new ArrayStructure<TKey, TValue>(),
+        StructureType.BinarySearch => new BinarySearchStructure<TKey, TValue>(),
+        StructureType.BinarySearchInterpolation => new BinarySearchInterpolationStructure<TKey, TValue>(),
+        StructureType.BitSet => new BitSetStructure<TKey, TValue>(props),
+        StructureType.BloomFilter => new BloomFilterStructure<TKey, TValue>(getHashData()),
+        StructureType.Conditional => new ConditionalStructure<TKey, TValue>(),
+        StructureType.EliasFano => new EliasFanoStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, cfg.StructureSettings.GetSetting<int>(KnownSettings.EliasFanoSkipQuantum)),
+        StructureType.HashTable => new HashTableStructure<TKey, TValue>(getHashData()),
+        StructureType.HashTableCompact => new HashTableCompactStructure<TKey, TValue>(getHashData()),
+        StructureType.HashTablePerfect => new HashTablePerfectStructure<TKey, TValue>(getHashData()),
+        StructureType.Hyble => new HybleStructure<TKey, TValue>(getHashData()),
+        StructureType.Range => new RangeStructure<TKey, TValue>(props.DataRanges),
+        StructureType.RrrBitVector => new RrrBitVectorStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max),
+        StructureType.SingleValue => new SingleValueStructure<TKey, TValue>(),
+        StructureType.Pgm => new PgmStructure<TKey, TValue>(cfg.StructureSettings.GetSetting<int>(KnownSettings.PgmEpsilon), cfg.StructureSettings.GetSetting<int>(KnownSettings.PgmEpsilonRecursive)),
+        _ => throw new InvalidOperationException($"Unsupported DataStructure {type}")
+    };
 
     private static StructureCapability GetRequiredCapabilities(DataConfig cfg, bool hasValues)
     {
@@ -510,13 +485,13 @@ public static partial class FastDataGenerator
         return capabilities;
     }
 
-    private static void ValidateCapabilities(Type structureType, StructureCapability requiredCapabilities)
+    private static void ValidateCapabilities(StructureType structureType, StructureCapability requiredCapabilities)
     {
         if (StructureCapabilityHelper.Supports(structureType, requiredCapabilities))
             return;
 
         StructureCapability capabilities = StructureCapabilityHelper.GetStructureCapability(structureType);
-        throw new InvalidOperationException($"Structure {structureType.Name} does not support the required functions {requiredCapabilities}. Supported functions: {capabilities}.");
+        throw new InvalidOperationException($"Structure {structureType} does not support the required functions {requiredCapabilities}. Supported functions: {capabilities}.");
     }
 
     private sealed class UsedFunctionVisitor : ExpressionVisitor

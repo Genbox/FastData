@@ -1,7 +1,7 @@
 using System.Reflection;
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus.TestHarness;
-using Genbox.FastData.Internal.Structures;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.TestHarness.Runner.Code.Abstracts;
 
@@ -16,7 +16,7 @@ public sealed class CPlusPlusFeatureTests(DockerCPlusPlusFixture fixture) : Feat
     public void StringKeysWithNulBytesAreRejected()
     {
         StringDataConfig config = new StringDataConfig();
-        config.StructureTypeOverride = typeof(ArrayStructure<,>);
+        config.StructureTypeOverride = StructureType.Array;
         config.EarlyExitConfig.Disabled = true;
 
         string[] keys = ["valid", "nul\0key"];

@@ -1,44 +1,44 @@
 using Genbox.FastData.Config;
-using Genbox.FastData.Internal.Structures;
+using Genbox.FastData.Enums;
 
 namespace Genbox.FastData.Internal;
 
 internal static class StringStructures
 {
-    internal static Type GetBest(ReadOnlyMemory<string> keys, bool hasValues, int minLength, int maxLength, bool allowApproximate, bool lengthsUnique, StructureCapability reqCap, StructureConfig config, Func<ReadOnlyMemory<string>, HashData> getHashData)
+    internal static StructureType GetBest(ReadOnlyMemory<string> keys, bool hasValues, int minLength, int maxLength, bool allowApproximate, bool lengthsUnique, StructureCapability reqCap, StructureConfig config, Func<ReadOnlyMemory<string>, HashData> getHashData)
     {
         uint keyCount = (uint)keys.Length;
 
-        if (config.IsEnabled(typeof(SingleValueStructure<,>), reqCap) && keyCount == 1)
-            return typeof(SingleValueStructure<,>);
+        if (config.IsEnabled(StructureType.SingleValue, reqCap) && keyCount == 1)
+            return StructureType.SingleValue;
 
-        if (config.IsEnabled(typeof(BloomFilterStructure<,>), reqCap) && allowApproximate && !hasValues)
-            return typeof(BloomFilterStructure<,>);
+        if (config.IsEnabled(StructureType.BloomFilter, reqCap) && allowApproximate && !hasValues)
+            return StructureType.BloomFilter;
 
         float density = (float)keyCount / ((maxLength - minLength) + 1);
 
-        if (config.IsEnabled(typeof(KeyLengthStructure<,>), reqCap) && lengthsUnique && config.CheckDensityLimits(typeof(KeyLengthStructure<,>), density))
-            return typeof(KeyLengthStructure<,>);
+        if (config.IsEnabled(StructureType.KeyLength, reqCap) && lengthsUnique && config.CheckDensityLimits(StructureType.KeyLength, density))
+            return StructureType.KeyLength;
 
-        if (config.IsEnabled(typeof(ConditionalStructure<,>), reqCap) && config.CheckItemCountLimits(typeof(ConditionalStructure<,>), keyCount))
-            return typeof(ConditionalStructure<,>);
+        if (config.IsEnabled(StructureType.Conditional, reqCap) && config.CheckItemCountLimits(StructureType.Conditional, keyCount))
+            return StructureType.Conditional;
 
         HashData hashData = getHashData(keys);
 
-        if (config.IsEnabled(typeof(HashTablePerfectStructure<,>), reqCap) && hashData.HashCodesPerfect)
-            return typeof(HashTablePerfectStructure<,>);
+        if (config.IsEnabled(StructureType.HashTablePerfect, reqCap) && hashData.HashCodesPerfect)
+            return StructureType.HashTablePerfect;
 
-        if (config.IsEnabled(typeof(HybleStructure<,>), reqCap))
-            return typeof(HybleStructure<,>);
+        if (config.IsEnabled(StructureType.Hyble, reqCap))
+            return StructureType.Hyble;
 
-        if (config.IsEnabled(typeof(HashTableStructure<,>), reqCap))
-            return typeof(HashTableStructure<,>);
+        if (config.IsEnabled(StructureType.HashTable, reqCap))
+            return StructureType.HashTable;
 
-        if (config.IsEnabled(typeof(BinarySearchStructure<,>), reqCap))
-            return typeof(BinarySearchStructure<,>);
+        if (config.IsEnabled(StructureType.BinarySearch, reqCap))
+            return StructureType.BinarySearch;
 
-        if (config.IsEnabled(typeof(ArrayStructure<,>), reqCap))
-            return typeof(ArrayStructure<,>);
+        if (config.IsEnabled(StructureType.Array, reqCap))
+            return StructureType.Array;
 
         throw new InvalidOperationException("No enabled string structure matched the requested configuration.");
     }

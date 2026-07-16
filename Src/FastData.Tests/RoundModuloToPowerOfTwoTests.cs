@@ -13,7 +13,7 @@ public class RoundModuloToPowerOfTwoTests
     [Fact]
     public void NumericConfigDefaultsEnableHashTableRounding()
     {
-        NumericDataConfig config = new NumericDataConfig { StructureTypeOverride = typeof(HashTableStructure<,>) };
+        NumericDataConfig config = new NumericDataConfig { StructureTypeOverride = StructureType.HashTable };
 
         CapturingGenerator generator = new CapturingGenerator();
         FastDataGenerator.Generate([0, 1, 2, 3, 4, 5, 6], config, generator);
@@ -25,7 +25,7 @@ public class RoundModuloToPowerOfTwoTests
     [Fact]
     public void NumericConfigDefaultsDoNotRoundOutsideThreshold()
     {
-        NumericDataConfig config = new NumericDataConfig { StructureTypeOverride = typeof(HashTableStructure<,>) };
+        NumericDataConfig config = new NumericDataConfig { StructureTypeOverride = StructureType.HashTable };
 
         CapturingGenerator generator = new CapturingGenerator();
         FastDataGenerator.Generate([0, 1, 2, 3, 4, 5], config, generator);
@@ -40,7 +40,7 @@ public class RoundModuloToPowerOfTwoTests
         NumericDataConfig config = new NumericDataConfig
         {
             AllowApproximation = true,
-            StructureTypeOverride = typeof(BloomFilterStructure<,>)
+            StructureTypeOverride = StructureType.BloomFilter
         };
         config.StructureSettings.SetSetting(KnownSettings.RoundModuloToPowerOfTwoThreshold, 0.34f);
 
@@ -54,7 +54,7 @@ public class RoundModuloToPowerOfTwoTests
     [Fact]
     public void NumericConfigDefaultsEnableBucketSizeOptimization()
     {
-        NumericDataConfig config = new NumericDataConfig { StructureTypeOverride = typeof(HashTableStructure<,>) };
+        NumericDataConfig config = new NumericDataConfig { StructureTypeOverride = StructureType.HashTable };
         config.StructureSettings.SetSetting(KnownSettings.RoundModuloToPowerOfTwo, false);
 
         CapturingGenerator generator = new CapturingGenerator();

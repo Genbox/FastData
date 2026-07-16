@@ -1,5 +1,5 @@
 using Genbox.FastData.Config;
-using Genbox.FastData.Internal.Structures;
+using Genbox.FastData.Enums;
 using Genbox.FastData.InternalShared.Harness;
 using static Genbox.FastData.TestHarness.Runner.Code.VerifyHelper;
 
@@ -14,7 +14,7 @@ public abstract class EndToEndTestsBase
     {
         int[] keys = [1, 4, 7, 10, 12];
         NumericDataConfig config = new NumericDataConfig();
-        config.StructureTypeOverride = typeof(ArrayStructure<,>);
+        config.StructureTypeOverride = StructureType.Array;
 
         string output = FastDataGenerator.Generate(keys, config, Harness.Generator);
         const string id = nameof(GenerateIntArrayEndToEndAsync);
@@ -29,7 +29,7 @@ public abstract class EndToEndTestsBase
     {
         float[] keys = [1.25f, 3.5f, 6.75f, 9.0f];
         NumericDataConfig config = new NumericDataConfig();
-        config.StructureTypeOverride = typeof(ArrayStructure<,>);
+        config.StructureTypeOverride = StructureType.Array;
 
         string output = FastDataGenerator.Generate(keys, config, Harness.Generator);
         const string id = nameof(GenerateFloatArrayEndToEndAsync);
@@ -44,7 +44,7 @@ public abstract class EndToEndTestsBase
     {
         string[] keys = ["alpha", "bravo", "charlie", "delta"];
         StringDataConfig config = new StringDataConfig();
-        config.StructureTypeOverride = typeof(ArrayStructure<,>);
+        config.StructureTypeOverride = StructureType.Array;
 
         string output = FastDataGenerator.Generate(keys, config, Harness.Generator);
         const string id = nameof(GenerateStringArrayEndToEndAsync);

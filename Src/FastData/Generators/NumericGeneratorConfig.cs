@@ -1,13 +1,13 @@
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Expressions;
-using Genbox.FastData.Internal.Extensions;
 
 namespace Genbox.FastData.Generators;
 
 /// <summary>Provides configuration data for numeric code generators in the FastData library.</summary>
 public sealed class NumericGeneratorConfig : GeneratorConfigBase
 {
-    internal NumericGeneratorConfig(Type structureType, uint itemCount, object minValue, object maxValue, AnnotatedExpr[] earlyExits, bool typeReductionEnabled, bool hasZero, StructureCapability requiredCapabilities) : base(structureType.GetFriendlyName(), earlyExits, itemCount, typeReductionEnabled, requiredCapabilities)
+    internal NumericGeneratorConfig(StructureType structureType, uint itemCount, object minValue, object maxValue, AnnotatedExpr[] earlyExits, bool typeReductionEnabled, bool hasZero, StructureCapability requiredCapabilities) : base(structureType, earlyExits, itemCount, typeReductionEnabled, requiredCapabilities)
     {
         Constants = new NumericConstants(minValue, maxValue);
         HasZero = hasZero;

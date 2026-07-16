@@ -1,5 +1,6 @@
 using System.Numerics;
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Internal.Analysis.Data;
@@ -9,7 +10,7 @@ namespace Genbox.FastData.Generators.EarlyExits;
 
 internal static class StringEarlyExits
 {
-    internal static IEarlyExit[] GetExits(Type structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase, uint itemCount)
+    internal static IEarlyExit[] GetExits(StructureType structureType, StringKeyProperties props, EarlyExitConfig config, bool ignoreCase, uint itemCount)
     {
         if (config.Disabled)
             return [];

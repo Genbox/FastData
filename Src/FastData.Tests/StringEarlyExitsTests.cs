@@ -29,7 +29,7 @@ public class StringEarlyExitsTests
     {
         string[] keys = ["alpha", "bravo", "charlie"];
         EarlyExitConfig cfg = EarlyExitConfig.Default;
-        cfg.DisableForStructure(typeof(ArrayStructure<,>));
+        cfg.DisableForStructure(StructureType.Array);
 
         IEarlyExit[] exits = GetExits(keys, false, cfg);
 
@@ -229,6 +229,6 @@ public class StringEarlyExitsTests
     private static IEarlyExit[] GetExits(string[] keys, bool ignoreCase, EarlyExitConfig config)
     {
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(keys, ignoreCase, GeneratorEncoding.Utf16CodeUnits);
-        return StringEarlyExits.GetExits(typeof(ArrayStructure<,>), props, config, ignoreCase, (uint)keys.Length);
+        return StringEarlyExits.GetExits(StructureType.Array, props, config, ignoreCase, (uint)keys.Length);
     }
 }

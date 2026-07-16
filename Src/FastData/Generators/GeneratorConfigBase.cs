@@ -1,13 +1,14 @@
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Expressions;
 
 namespace Genbox.FastData.Generators;
 
 /// <summary>Provides configuration data for code generators in the FastData library.</summary>
-public abstract class GeneratorConfigBase(string structureName, AnnotatedExpr[] earlyExits, uint itemCount, bool typeReductionEnabled, StructureCapability requiredCapabilities)
+public abstract class GeneratorConfigBase(StructureType structureType, AnnotatedExpr[] earlyExits, uint itemCount, bool typeReductionEnabled, StructureCapability requiredCapabilities)
 {
-    /// <summary>Name of the structure being generated.</summary>
-    public string StructureName { get; } = structureName;
+    /// <summary>The structure being generated.</summary>
+    public StructureType StructureType { get; } = structureType;
 
     /// <summary>Gets the set of early exit strategies used by the generator to optimize code generation.</summary>
     public AnnotatedExpr[] EarlyExits { get; } = earlyExits;

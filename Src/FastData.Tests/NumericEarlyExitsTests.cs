@@ -1,4 +1,5 @@
 using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
 using Genbox.FastData.Generators.EarlyExits.Exits;
@@ -23,7 +24,7 @@ public class NumericEarlyExitsTests
     public void GetExits_DisabledForStructure_ReturnsEmpty()
     {
         EarlyExitConfig cfg = EarlyExitConfig.Default;
-        cfg.DisableForStructure(typeof(ArrayStructure<,>));
+        cfg.DisableForStructure(StructureType.Array);
 
         IEarlyExit[] exits = GetExits([(10, 10), (20, 20)], 10, 2, 10, cfg);
         Assert.Empty(exits);
@@ -149,7 +150,7 @@ public class NumericEarlyExitsTests
         DataRanges<char> dataRanges = new DataRanges<char>(1);
         dataRanges.Add('a', '\u0081');
 
-        IEarlyExit[] exits = NumericEarlyExits<char>.GetExits(typeof(ConditionalStructure<,>), keys, dataRanges, '\u0081' - 'a', 0, (uint)keys.Length, cfg);
+        IEarlyExit[] exits = NumericEarlyExits<char>.GetExits(StructureType.Conditional, keys, dataRanges, '\u0081' - 'a', 0, (uint)keys.Length, cfg);
 
         ValueLowByteBitmapEarlyExit exit = Assert.IsType<ValueLowByteBitmapEarlyExit>(Assert.Single(exits));
         Assert.Equal(247UL, exit.KeyspaceSize);
@@ -163,7 +164,7 @@ public class NumericEarlyExitsTests
         DataRanges<int> dataRanges = new DataRanges<int>(1);
         dataRanges.Add(0x100, 0x900);
 
-        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(typeof(ConditionalStructure<,>), keys, dataRanges, 0x800, 0, (uint)keys.Length, cfg);
+        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(StructureType.Conditional, keys, dataRanges, 0x800, 0, (uint)keys.Length, cfg);
 
         ValueLowByteBitmapEarlyExit exit = Assert.IsType<ValueLowByteBitmapEarlyExit>(Assert.Single(exits));
         Assert.Equal(255UL, exit.KeyspaceSize);
@@ -179,7 +180,7 @@ public class NumericEarlyExitsTests
         DataRanges<int> dataRanges = new DataRanges<int>(1);
         dataRanges.Add(0x100, 0x900);
 
-        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(typeof(ConditionalStructure<,>), keys, dataRanges, 0x800, 0, (uint)keys.Length, cfg);
+        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(StructureType.Conditional, keys, dataRanges, 0x800, 0, (uint)keys.Length, cfg);
 
         Assert.Empty(exits);
     }
@@ -192,7 +193,7 @@ public class NumericEarlyExitsTests
         DataRanges<int> dataRanges = new DataRanges<int>(1);
         dataRanges.Add(0, 128);
 
-        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(typeof(ConditionalStructure<,>), keys, dataRanges, 128, 0, (uint)keys.Length, cfg);
+        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(StructureType.Conditional, keys, dataRanges, 128, 0, (uint)keys.Length, cfg);
 
         Assert.Empty(exits);
     }
@@ -205,7 +206,7 @@ public class NumericEarlyExitsTests
         DataRanges<int> dataRanges = new DataRanges<int>(1);
         dataRanges.Add(0x100, 0x900);
 
-        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(typeof(BitSetStructure<,>), keys, dataRanges, 0x800, 0, (uint)keys.Length, cfg);
+        IEarlyExit[] exits = NumericEarlyExits<int>.GetExits(StructureType.BitSet, keys, dataRanges, 0x800, 0, (uint)keys.Length, cfg);
 
         Assert.Empty(exits);
     }
@@ -224,7 +225,7 @@ public class NumericEarlyExitsTests
             keys[i] = r.Start;
         }
 
-        return NumericEarlyExits<T>.GetExits(typeof(ArrayStructure<,>), keys, dataRanges, range, bitMask, itemCount, cfg);
+        return NumericEarlyExits<T>.GetExits(StructureType.Array, keys, dataRanges, range, bitMask, itemCount, cfg);
     }
 
     private static EarlyExitConfig LowByteOnlyConfig()

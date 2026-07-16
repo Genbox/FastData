@@ -9,12 +9,12 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Genbox.FastData.Config;
 using Genbox.FastData.Config.Analysis;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CPlusPlus;
 using Genbox.FastData.Generator.CSharp;
 using Genbox.FastData.Generator.CSharp.Enums;
 using Genbox.FastData.Generator.Rust;
 using Genbox.FastData.Generators.Abstracts;
-using Genbox.FastData.Internal.Structures;
 using Spectre.Console;
 
 namespace Genbox.FastData.Cli;
@@ -114,26 +114,20 @@ internal static class Program
         bool hasValues = opts.ValuesFile != null;
         ValidateOptions(opts.KeyType, hasValues, opts.StructureType, opts.RequiredCapability, opts.IgnoreCase, opts.AnalysisLevel, opts.AllowApproximation);
 
-        Type? structureTypeOverride = MapStructureType(opts.StructureType);
-
         StringDataConfig stringConfig = new StringDataConfig
         {
             IgnoreCase = opts.IgnoreCase,
             AllowApproximation = opts.AllowApproximation,
             RequiredCapability = opts.RequiredCapability,
+            StructureTypeOverride = opts.StructureType,
             StringAnalyzerConfig = CreateStringAnalyzerConfig(opts.AnalysisLevel)
         };
         NumericDataConfig numericConfig = new NumericDataConfig
         {
             AllowApproximation = opts.AllowApproximation,
-            RequiredCapability = opts.RequiredCapability
+            RequiredCapability = opts.RequiredCapability,
+            StructureTypeOverride = opts.StructureType
         };
-
-        if (structureTypeOverride != null)
-        {
-            stringConfig.StructureTypeOverride = structureTypeOverride;
-            numericConfig.StructureTypeOverride = structureTypeOverride;
-        }
 
         Array keys = await ParseFileAsync(opts.InputFile.FullName, opts.KeyType, token).ConfigureAwait(false);
         Array? values = opts.ValuesFile == null ? null : await ParseFileAsync(opts.ValuesFile.FullName, opts.ValueType, token).ConfigureAwait(false);
@@ -181,35 +175,13 @@ internal static class Program
         StructureType.HashTablePerfect or StructureType.HashTable or StructureType.Hyble or
         StructureType.KeyLength or StructureType.SingleValue;
 
-    private static bool IsNumericStructureSupported(StructureType structureType) => structureType is not StructureType.KeyLength;
+    private static bool IsNumericStructureSupported(StructureType structureType) => structureType is not (StructureType.KeyLength or StructureType.None);
 
     private static bool IsValueStructureSupported(StructureType structureType) => structureType is
         StructureType.Auto or StructureType.Array or StructureType.BinarySearch or
         StructureType.BinarySearchInterpolation or StructureType.BitSet or StructureType.Conditional or
         StructureType.HashTableCompact or StructureType.HashTablePerfect or StructureType.HashTable or
         StructureType.Hyble or StructureType.KeyLength or StructureType.SingleValue;
-
-    private static Type? MapStructureType(StructureType structureType) => structureType switch
-    {
-        StructureType.Auto => null,
-        StructureType.Array => typeof(ArrayStructure<,>),
-        StructureType.BinarySearch => typeof(BinarySearchStructure<,>),
-        StructureType.BinarySearchInterpolation => typeof(BinarySearchInterpolationStructure<,>),
-        StructureType.BitSet => typeof(BitSetStructure<,>),
-        StructureType.BloomFilter => typeof(BloomFilterStructure<,>),
-        StructureType.Conditional => typeof(ConditionalStructure<,>),
-        StructureType.EliasFano => typeof(EliasFanoStructure<,>),
-        StructureType.HashTableCompact => typeof(HashTableCompactStructure<,>),
-        StructureType.HashTablePerfect => typeof(HashTablePerfectStructure<,>),
-        StructureType.HashTable => typeof(HashTableStructure<,>),
-        StructureType.Hyble => typeof(HybleStructure<,>),
-        StructureType.KeyLength => typeof(KeyLengthStructure<,>),
-        StructureType.Pgm => typeof(PgmStructure<,>),
-        StructureType.Range => typeof(RangeStructure<,>),
-        StructureType.RrrBitVector => typeof(RrrBitVectorStructure<,>),
-        StructureType.SingleValue => typeof(SingleValueStructure<,>),
-        _ => throw new ArgumentOutOfRangeException(nameof(structureType), structureType, "Unsupported structure type.")
-    };
 
     private static StringAnalyzerConfig? CreateStringAnalyzerConfig(AnalysisLevel analysisLevel) => analysisLevel switch
     {

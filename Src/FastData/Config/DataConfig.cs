@@ -1,3 +1,5 @@
+using Genbox.FastData.Enums;
+
 namespace Genbox.FastData.Config;
 
 /// <summary>Base configuration shared by numeric and string data generation.</summary>
@@ -15,8 +17,8 @@ public abstract class DataConfig
     /// <summary>Gets or sets generated data-structure capabilities required by the caller.</summary>
     public StructureCapability RequiredCapability { get; set; }
 
-    /// <summary>Override the type of structure to create. Mostly used for internal testing.</summary>
-    public Type? StructureTypeOverride { get; set; }
+    /// <summary>Override the type of structure to create.</summary>
+    public StructureType? StructureTypeOverride { get; set; }
 
     /// <summary>When enabled, data structures will be generated with the smallest possible internal data types to lower memory.</summary>
     public bool TypeReductionEnabled { get; set; } = true;

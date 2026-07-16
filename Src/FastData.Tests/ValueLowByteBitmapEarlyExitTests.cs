@@ -49,7 +49,7 @@ public class ValueLowByteBitmapEarlyExitTests
         ConditionalContext<char, int> context = Assert.IsType<ConditionalContext<char, int>>(generator.Context);
         Assert.True(context.Keys.Span.SequenceEqual(SparseKeys));
         Assert.True(context.Values.Span.SequenceEqual(DenseValues));
-        Assert.Equal("Conditional", generator.Config?.StructureName);
+        Assert.Equal(StructureType.Conditional, generator.Config?.StructureType);
         Assert.NotEmpty(generator.Config?.EarlyExits ?? []);
     }
 

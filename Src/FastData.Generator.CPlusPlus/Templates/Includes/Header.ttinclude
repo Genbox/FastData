@@ -25,7 +25,7 @@
 <#@ include file="Functions.ttinclude" #>
 /// @generated
 // This file is auto-generated. Do not edit manually.
-// Structure: <#= GeneratorConfig.StructureName #>
+// Structure: <#= GeneratorConfig.StructureType.ToString() #>
 #include <array>
 #include <cstddef>
 #include <cstring>
