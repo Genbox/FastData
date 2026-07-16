@@ -41,7 +41,7 @@ class fastdata final {
         e(0), e(1ull), e(2ull), e(std::numeric_limits<uint64_t>::max())
     };
 
-    static uint64_t get_hash(const uint64_t value) noexcept {
+    static constexpr uint64_t get_hash(const uint64_t value) noexcept {
         return static_cast<uint64_t>(value);
     }
 
