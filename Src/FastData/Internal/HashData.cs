@@ -5,7 +5,7 @@ using Genbox.FastData.Internal.Misc;
 namespace Genbox.FastData.Internal;
 
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
-internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize, bool OptimizeHashTableBucketSize, bool RoundModuloToPowerOfTwo, float RoundModuloToPowerOfTwoThreshold, bool HashCodesPerfect, ulong MinHashCode, ulong MaxHashCode)
+internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize, bool OptimizeHashTableBucketSize, bool RoundModuloToPowerOfTwo, float RoundModuloToPowerOfTwoThreshold, bool HashCodesPerfect, int CollisionCount, ulong MinHashCode, ulong MaxHashCode)
 {
     internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, NumericHashFunc<T> func) => Create(data, capacityFactor, false, false, 0, func);
 
@@ -31,7 +31,7 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
         int tableSize = optimizeHashTableBucketSize ? GetOptimizedBucketTableSize(baseTableSize, hashCodes, out int collisions) : baseTableSize;
         tableSize = GetModuloLength(tableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, hashCodes, out collisions);
         bool perfect = collisions == 0;
-        return new HashData(hashCodes, capacityFactor, tableSize, optimizeHashTableBucketSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, perfect, minHashCode, maxHashCode);
+        return new HashData(hashCodes, capacityFactor, tableSize, optimizeHashTableBucketSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, perfect, collisions, minHashCode, maxHashCode);
     }
 
     /// <summary>Round <paramref name="length" /> to the next power of two if within threshold. Does not compare collisions because callers use this for non-bucket dimensions (e.g. bloom filter word count).</summary>
