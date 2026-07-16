@@ -10,7 +10,7 @@ internal static class Program
         StringDataConfig config = new StringDataConfig();
         CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpCodeGeneratorConfig("Dogs"));
 
-        string source = FastDataGenerator.Generate(["Labrador", "German Shepherd", "Golden Retriever"], config, generator);
-        Console.WriteLine(source);
+        StringGenerationResult result = FastDataGenerator.Generate(["Labrador", "German Shepherd", "Golden Retriever"], config, generator);
+        Console.WriteLine(result.Source);
     }
 }

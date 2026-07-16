@@ -209,10 +209,10 @@ internal static class Program
         if (values == null)
         {
             if (keyType == typeof(string))
-                return FastDataGenerator.Generate((string[])keys, (StringDataConfig)config, generator);
+                return FastDataGenerator.Generate((string[])keys, (StringDataConfig)config, generator).Source;
 
             MethodInfo mi = GetGenerateMethod(nameof(FastDataGenerator.Generate), 1, 4, 0).MakeGenericMethod(keyType);
-            return (string)mi.Invoke(null, [keys, config, generator, null])!;
+            return ((NumericGenerationResult)mi.Invoke(null, [keys, config, generator, null])!).Source;
         }
 
         Type valueType = values.GetType().GetElementType() ?? throw new InvalidOperationException("Value array element type is missing.");
@@ -220,11 +220,11 @@ internal static class Program
         if (keyType == typeof(string))
         {
             MethodInfo mi = GetGenerateMethod(nameof(FastDataGenerator.GenerateKeyed), 1, 5, 0).MakeGenericMethod(valueType);
-            return (string)mi.Invoke(null, [keys, values, config, generator, null])!;
+            return ((StringGenerationResult)mi.Invoke(null, [keys, values, config, generator, null])!).Source;
         }
 
         MethodInfo keyed = GetGenerateMethod(nameof(FastDataGenerator.GenerateKeyed), 2, 5, 0).MakeGenericMethod(keyType, valueType);
-        return (string)keyed.Invoke(null, [keys, values, config, generator, null])!;
+        return ((NumericGenerationResult)keyed.Invoke(null, [keys, values, config, generator, null])!).Source;
     }
 
     private static MethodInfo GetGenerateMethod(string name, int genericArgCount, int paramCount, int memoryParamCount)

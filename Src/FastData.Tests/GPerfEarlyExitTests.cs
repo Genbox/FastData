@@ -24,12 +24,15 @@ public class GPerfEarlyExitTests
         };
 
         CapturingGenerator generator = new CapturingGenerator();
-        FastDataGenerator.Generate(keys, config, generator);
+        StringGenerationResult result = FastDataGenerator.Generate(keys, config, generator);
 
         StringGeneratorConfig generatorConfig = Assert.IsType<StringGeneratorConfig>(generator.Config);
         Assert.NotNull(generatorConfig.HashInfo);
         Assert.True((generatorConfig.GeneratorFunctions & GeneratorFunction.Length) != 0);
         Assert.True((generatorConfig.GeneratorFunctions & GeneratorFunction.IsAsciiOnly) != 0);
+        Assert.Equal(StructureType.HashTable, result.StructureType);
+        Assert.Equal("GPerfStringHash", result.StringHashName);
+        Assert.Contains("IsAsciiOnlyEarlyExit", result.EarlyExits);
     }
 
     [Fact]

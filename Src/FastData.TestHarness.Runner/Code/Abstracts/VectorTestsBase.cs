@@ -25,14 +25,14 @@ public abstract class VectorTestsBase
             StringDataConfig config = new StringDataConfig();
             config.StructureTypeOverride = vector.StructureType;
             config.EarlyExitConfig.Disabled = true;
-            source = FastDataGenerator.Generate(strKeys, config, Harness.Generator);
+            source = FastDataGenerator.Generate(strKeys, config, Harness.Generator).Source;
         }
         else
         {
             NumericDataConfig config = new NumericDataConfig();
             config.StructureTypeOverride = vector.StructureType;
             config.EarlyExitConfig.Disabled = true;
-            source = FastDataGenerator.Generate(vector.Keys, config, Harness.Generator);
+            source = FastDataGenerator.Generate(vector.Keys, config, Harness.Generator).Source;
         }
 
         Assert.NotEmpty(source);
@@ -60,14 +60,14 @@ public abstract class VectorTestsBase
             StringDataConfig config = new StringDataConfig();
             config.StructureTypeOverride = vector.StructureType;
             config.EarlyExitConfig.Disabled = true;
-            source = FastDataGenerator.GenerateKeyed(strKeys, vector.Values, config, Harness.Generator);
+            source = FastDataGenerator.GenerateKeyed(strKeys, vector.Values, config, Harness.Generator).Source;
         }
         else
         {
             NumericDataConfig config = new NumericDataConfig();
             config.StructureTypeOverride = vector.StructureType;
             config.EarlyExitConfig.Disabled = true;
-            source = FastDataGenerator.GenerateKeyed(vector.Keys, vector.Values, config, Harness.Generator);
+            source = FastDataGenerator.GenerateKeyed(vector.Keys, vector.Values, config, Harness.Generator).Source;
         }
 
         Assert.NotEmpty(source);

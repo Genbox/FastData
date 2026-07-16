@@ -63,7 +63,7 @@ internal static class Program
         StringDataConfig config = new StringDataConfig();
         config.StructureTypeOverride = type;
 
-        string source = FastDataGenerator.Generate(data, config, generator);
-        File.WriteAllText("Gen-" + type + "-" + size + ".cs", source);
+        StringGenerationResult result = FastDataGenerator.Generate(data, config, generator);
+        File.WriteAllText("Gen-" + type + "-" + size + ".cs", result.Source);
     }
 }

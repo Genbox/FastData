@@ -33,9 +33,9 @@ public class TestData<TKey>(StructureType structureType, TKey[] keys, BenchmarkW
         EarlyExitConfig earlyExitConfig = new EarlyExitConfig { Disabled = true };
 
         if (Keys is string[] strArr)
-            return FastDataGenerator.Generate(strArr, new StringDataConfig { StructureTypeOverride = StructureType, EarlyExitConfig = earlyExitConfig }, generator);
+            return FastDataGenerator.Generate(strArr, new StringDataConfig { StructureTypeOverride = StructureType, EarlyExitConfig = earlyExitConfig }, generator).Source;
 
-        return FastDataGenerator.Generate(Keys, new NumericDataConfig { StructureTypeOverride = StructureType, EarlyExitConfig = earlyExitConfig }, generator);
+        return FastDataGenerator.Generate(Keys, new NumericDataConfig { StructureTypeOverride = StructureType, EarlyExitConfig = earlyExitConfig }, generator).Source;
     }
 
     public BenchmarkQuerySet GetQuerySet(TypeMap map)

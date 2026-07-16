@@ -18,13 +18,13 @@ public abstract class FeatureTestBase
         config.EarlyExitConfig.Disabled = true;
 
         float[] floats = [1f, 2f, 3f, 4f, 5f];
-        string source = FastDataGenerator.Generate(floats, config, Harness.Generator);
+        string source = FastDataGenerator.Generate(floats, config, Harness.Generator).Source;
         string id = $"{nameof(FloatNaNOrZeroHashSupport)}_Float";
         await VerifyFeatureAsync(Harness.Name, id, source);
         Assert.Equal(1, await Harness.RunContainsAsync(source, id, floats, [], TestContext.Current.CancellationToken));
 
         double[] doubles = [1.0, 2.0, 3.0, 4.0, 5.0];
-        source = FastDataGenerator.Generate(doubles, config, Harness.Generator);
+        source = FastDataGenerator.Generate(doubles, config, Harness.Generator).Source;
         id = $"{nameof(FloatNaNOrZeroHashSupport)}_Double";
         await VerifyFeatureAsync(Harness.Name, id, source);
         Assert.Equal(1, await Harness.RunContainsAsync(source, id, doubles, [], TestContext.Current.CancellationToken));
@@ -38,8 +38,8 @@ public abstract class FeatureTestBase
         config.EarlyExitConfig.Disabled = true;
 
         int[] keys = [0, 1, 2, 3, 4, 5, 6];
-        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
-        string id = nameof(RoundModuloToPowerOfTwoSupport);
+        string source = FastDataGenerator.Generate(keys, config, Harness.Generator).Source;
+        const string id = nameof(RoundModuloToPowerOfTwoSupport);
         await VerifyFeatureAsync(Harness.Name, id, source);
 
         Assert.Equal(1, await Harness.RunContainsAsync(source, id, keys, [7, 8], TestContext.Current.CancellationToken));
@@ -53,11 +53,11 @@ public abstract class FeatureTestBase
         config.EarlyExitConfig.Disabled = true;
 
         float[] floats = [1.25f, 2.5f, 3.75f];
-        string source = FastDataGenerator.Generate(floats, config, Harness.Generator);
+        string source = FastDataGenerator.Generate(floats, config, Harness.Generator).Source;
         Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(FractionalFloatingPointLiteralsMatch) + "_Float", floats, [1.2f, 2.4f], TestContext.Current.CancellationToken));
 
         double[] doubles = [1.23, 2.5, 3.75];
-        source = FastDataGenerator.Generate(doubles, config, Harness.Generator);
+        source = FastDataGenerator.Generate(doubles, config, Harness.Generator).Source;
         Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(FractionalFloatingPointLiteralsMatch) + "_Double", doubles, [1.2, 2.4], TestContext.Current.CancellationToken));
     }
 
@@ -71,7 +71,7 @@ public abstract class FeatureTestBase
         config.IgnoreCase = ignoreCase;
 
         string[] keys = ["Alpha", "bravo", "CHARLIE"];
-        string source = FastDataGenerator.Generate(keys, config, GetIgnoreCaseGenerator(ignoreCase));
+        string source = FastDataGenerator.Generate(keys, config, GetIgnoreCaseGenerator(ignoreCase)).Source;
 
         string id = $"{nameof(IgnoreCaseSupport)}_{(ignoreCase ? "IgnoreCase" : "Ordinal")}";
         await VerifyFeatureAsync(Harness.Name, id, source);
@@ -91,7 +91,7 @@ public abstract class FeatureTestBase
         config.EarlyExitConfig.Disabled = true;
 
         string[] keys = ["quote\"key", "slash\\key", "line\nkey", "tab\tkey"];
-        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
+        string source = FastDataGenerator.Generate(keys, config, Harness.Generator).Source;
 
         Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(SpecialCharacterStringLiteralsCompileAndMatch), keys, ["missing"], TestContext.Current.CancellationToken));
     }
@@ -106,7 +106,7 @@ public abstract class FeatureTestBase
         config.TypeReductionEnabled = enabled;
 
         byte[] keys = [byte.MinValue, 1, byte.MaxValue];
-        string source = FastDataGenerator.Generate(keys, config, Harness.Generator);
+        string source = FastDataGenerator.Generate(keys, config, Harness.Generator).Source;
 
         string id = $"{nameof(TypeReductionSupported)}_{enabled}";
         await VerifyFeatureAsync(Harness.Name, id, source);

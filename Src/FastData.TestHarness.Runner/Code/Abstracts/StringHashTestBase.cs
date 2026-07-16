@@ -23,7 +23,7 @@ public abstract class StringHashTestBase
         config.EarlyExitConfig.Disabled = true;
 
         string[] keys = ["test1", "test2"];
-        string source = FastDataGenerator.Generate(keys, config, Generator);
+        string source = FastDataGenerator.Generate(keys, config, Generator).Source;
 
         await VerifyStringHashAsync(HarnessName, nameof(DefaultStringHashSource), source);
     }
@@ -46,7 +46,7 @@ public abstract class StringHashTestBase
         config.EarlyExitConfig.Disabled = true;
 
         string[] keys = ["k0", "k2"];
-        string source = FastDataGenerator.Generate(keys, config, Generator);
+        string source = FastDataGenerator.Generate(keys, config, Generator).Source;
 
         await VerifyStringHashAsync(HarnessName, nameof(BruteForceStringHashSource), source);
     }
@@ -69,7 +69,7 @@ public abstract class StringHashTestBase
         config.EarlyExitConfig.Disabled = true;
 
         string[] keys = ["test1", "test2"];
-        string source = FastDataGenerator.Generate(keys, config, Generator);
+        string source = FastDataGenerator.Generate(keys, config, Generator).Source;
 
         await VerifyStringHashAsync(HarnessName, nameof(GeneticStringHashSource), source);
     }
@@ -91,7 +91,7 @@ public abstract class StringHashTestBase
         config.EarlyExitConfig.Disabled = true;
 
         string[] keys = ["test1", "test2"];
-        string source = FastDataGenerator.Generate(keys, config, Generator);
+        string source = FastDataGenerator.Generate(keys, config, Generator).Source;
 
         await VerifyStringHashAsync(HarnessName, nameof(GPerfStringHashSource), source);
     }

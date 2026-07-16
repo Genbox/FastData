@@ -86,7 +86,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                         {
                             Type keyType = keys.GetType().GetElementType() ?? throw new InvalidOperationException("Key array element type is missing.");
                             if (keyType == typeof(string))
-                                source = FastDataGenerator.Generate((string[])keys, (StringDataConfig)fdCfg, generator);
+                                source = FastDataGenerator.Generate((string[])keys, (StringDataConfig)fdCfg, generator).Source;
                             else
                             {
                                 object keyMemory = CreateReadOnlyMemory(keys);
@@ -94,7 +94,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                                 // The attribute key type is only known through Roslyn metadata, so invocation uses the runtime array element type.
                                 MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.Generate), 1, 4, 1)
                                     .MakeGenericMethod(keyType);
-                                source = (string)mi.Invoke(null, [keyMemory, fdCfg, generator, null])!;
+                                source = ((NumericGenerationResult)mi.Invoke(null, [keyMemory, fdCfg, generator, null])!).Source;
                             }
                         }
                         else
@@ -105,7 +105,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                             {
                                 MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.GenerateKeyed), 1, 5, 0)
                                     .MakeGenericMethod(valueType);
-                                source = (string)mi.Invoke(null, [keys, values, fdCfg, generator, null])!;
+                                source = ((StringGenerationResult)mi.Invoke(null, [keys, values, fdCfg, generator, null])!).Source;
                             }
                             else
                             {
@@ -115,7 +115,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                                 // Key/value generation is invoked the same way to keep the incremental pipeline type-agnostic.
                                 MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.GenerateKeyed), 2, 5, 2)
                                     .MakeGenericMethod(keyType, valueType);
-                                source = (string)mi.Invoke(null, [keyMemory, valueMemory, fdCfg, generator, null])!;
+                                source = ((NumericGenerationResult)mi.Invoke(null, [keyMemory, valueMemory, fdCfg, generator, null])!).Source;
                             }
                         }
 
