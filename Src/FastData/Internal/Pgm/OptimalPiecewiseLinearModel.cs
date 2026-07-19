@@ -292,25 +292,17 @@ internal sealed class OptimalPiecewiseLinearModel<T> where T : notnull
         }
     }
 
-    private sealed class IntegralModel : IModel
+    private sealed class IntegralModel(int epsilon) : IModel
     {
-        private readonly int _epsilon;
-        private readonly List<Point> _lower;
-        private readonly Point[] _rectangle;
-        private readonly List<Point> _upper;
+        private readonly int _epsilon = epsilon;
+        private readonly List<Point> _lower = new List<Point>(1 << 16);
+        private readonly Point[] _rectangle = new Point[4];
+        private readonly List<Point> _upper = new List<Point>(1 << 16);
         private Int128 _firstX;
         private Int128 _lastX;
         private int _lowerStart;
         private int _pointsInHull;
         private int _upperStart;
-
-        public IntegralModel(int epsilon)
-        {
-            _epsilon = epsilon;
-            _lower = new List<Point>(1 << 16);
-            _upper = new List<Point>(1 << 16);
-            _rectangle = new Point[4];
-        }
 
         public bool AddPoint(T xValue, int y)
         {
