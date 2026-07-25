@@ -255,7 +255,7 @@ internal static partial class Deduplication
                 }
             }
 
-            range = max - min + 1;
+            range = (max - min) + 1;
             return true;
         }
 
@@ -380,7 +380,7 @@ internal static partial class Deduplication
                 }
             }
 
-            range = max - min + 1;
+            range = (max - min) + 1;
             return true;
         }
 
@@ -505,7 +505,7 @@ internal static partial class Deduplication
                 }
             }
 
-            range = max - min + 1;
+            range = (max - min) + 1;
             return true;
         }
 

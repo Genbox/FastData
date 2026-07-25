@@ -7,21 +7,18 @@ namespace Genbox.FastData.Internal.Encodings;
 
 /// <summary>
 /// vu128 efficient variable-length integer encoding. Vu128 supports up to u128 bit, but this implementation is limited to u64 values.
-///
 /// Values in the range [0, 2^7) are encoded as a single byte with the same bits as the original value. The MSB is zero.
 /// Values in the range [2^7, 2^28) are encoded as a unary length prefix, followed by (length*7) bits in little endian order.
 /// Values in the range [2^28, 2^64) are encoded as a binary length prefix, followed by payload bytes, in little-endian order.
-///
 /// Reference: John Millikin, vu128: Efficient variable-length integers, https://john-millikin.com/vu128-efficient-variable-length-integers
 /// Source: https://github.com/jmillikin/rust-vu128
 /// </summary>
 internal sealed class Vu128Encoding : IIntegerEncoding
 {
+    internal const int MaxUInt32EncodedLength = 5;
     internal static Vu128Encoding Instance { get; } = new Vu128Encoding();
 
     public int MaxEncodedLength => 9;
-
-    internal const int MaxUInt32EncodedLength = 5;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetEncodedLength(ulong value)
@@ -32,36 +29,6 @@ internal sealed class Vu128Encoding : IIntegerEncoding
         const int LenMask = 0b111;
         int len = (BitOperations.LeadingZeroCount(value) >> 3) ^ LenMask;
         return len + 2;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetEncodedLength(uint value)
-    {
-        switch (value)
-        {
-            case < 0x80:
-                return 1;
-            case < 0x4000:
-                return 2;
-            case < 0x200000:
-                return 3;
-            case < 0x10000000:
-                return 4;
-        }
-
-        return MaxUInt32EncodedLength;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetEncodedLength(float value)
-    {
-        return GetEncodedLength(ReverseEndianness(ReadUnaligned<uint>(ref As<float, byte>(ref value))));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetEncodedLength(double value)
-    {
-        return GetEncodedLength(ReverseEndianness(ReadUnaligned<ulong>(ref As<double, byte>(ref value))));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -109,62 +76,6 @@ internal sealed class Vu128Encoding : IIntegerEncoding
             destination[0] = (byte)(0xf0 | len);
             return len + 2;
         }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Encode(uint value, Span<byte> destination)
-    {
-        unchecked
-        {
-            if (value < 0x80)
-            {
-                destination[0] = (byte)value;
-                return 1;
-            }
-
-            if (value < 0x10000000)
-            {
-                if (value < 0x00004000)
-                {
-                    value <<= 2;
-                    destination[0] = (byte)(0x80 | ((byte)value >> 2));
-                    destination[1] = (byte)(value >> 8);
-                    return 2;
-                }
-
-                if (value < 0x00200000)
-                {
-                    value <<= 3;
-                    destination[0] = (byte)(0xc0 | ((byte)value >> 3));
-                    destination[1] = (byte)(value >> 8);
-                    destination[2] = (byte)(value >> 16);
-                    return 3;
-                }
-
-                value <<= 4;
-                destination[0] = (byte)(0xe0 | ((byte)value >> 4));
-                destination[1] = (byte)(value >> 8);
-                destination[2] = (byte)(value >> 16);
-                destination[3] = (byte)(value >> 24);
-                return 4;
-            }
-
-            destination[0] = 0xf3;
-            WriteUInt32LittleEndian(destination.Slice(1), value);
-            return MaxUInt32EncodedLength;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Encode(float value, Span<byte> destination)
-    {
-        return Encode(ReverseEndianness(ReadUnaligned<uint>(ref As<float, byte>(ref value))), destination);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Encode(double value, Span<byte> destination)
-    {
-        return Encode(ReverseEndianness(ReadUnaligned<ulong>(ref As<double, byte>(ref value))), destination);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -227,6 +138,80 @@ internal sealed class Vu128Encoding : IIntegerEncoding
         bytesRead = length;
         return true;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int GetEncodedLength(uint value)
+    {
+        switch (value)
+        {
+            case < 0x80:
+                return 1;
+            case < 0x4000:
+                return 2;
+            case < 0x200000:
+                return 3;
+            case < 0x10000000:
+                return 4;
+        }
+
+        return MaxUInt32EncodedLength;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int GetEncodedLength(float value) => GetEncodedLength(ReverseEndianness(ReadUnaligned<uint>(ref As<float, byte>(ref value))));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int GetEncodedLength(double value) => GetEncodedLength(ReverseEndianness(ReadUnaligned<ulong>(ref As<double, byte>(ref value))));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Encode(uint value, Span<byte> destination)
+    {
+        unchecked
+        {
+            if (value < 0x80)
+            {
+                destination[0] = (byte)value;
+                return 1;
+            }
+
+            if (value < 0x10000000)
+            {
+                if (value < 0x00004000)
+                {
+                    value <<= 2;
+                    destination[0] = (byte)(0x80 | ((byte)value >> 2));
+                    destination[1] = (byte)(value >> 8);
+                    return 2;
+                }
+
+                if (value < 0x00200000)
+                {
+                    value <<= 3;
+                    destination[0] = (byte)(0xc0 | ((byte)value >> 3));
+                    destination[1] = (byte)(value >> 8);
+                    destination[2] = (byte)(value >> 16);
+                    return 3;
+                }
+
+                value <<= 4;
+                destination[0] = (byte)(0xe0 | ((byte)value >> 4));
+                destination[1] = (byte)(value >> 8);
+                destination[2] = (byte)(value >> 16);
+                destination[3] = (byte)(value >> 24);
+                return 4;
+            }
+
+            destination[0] = 0xf3;
+            WriteUInt32LittleEndian(destination.Slice(1), value);
+            return MaxUInt32EncodedLength;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Encode(float value, Span<byte> destination) => Encode(ReverseEndianness(ReadUnaligned<uint>(ref As<float, byte>(ref value))), destination);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Encode(double value, Span<byte> destination) => Encode(ReverseEndianness(ReadUnaligned<ulong>(ref As<double, byte>(ref value))), destination);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryDecode(ReadOnlySpan<byte> source, out uint value, out int bytesRead)

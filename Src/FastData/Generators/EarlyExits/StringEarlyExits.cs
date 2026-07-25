@@ -132,7 +132,7 @@ internal static class StringEarlyExits
 
         foreach ((int Start, int End) range in GetSetRanges(map))
         {
-            if (previous is { } prev)
+            if (previous is {} prev)
                 yield return new UnitAtInRangeEarlyExit((char)prev.End, (char)range.Start, offset);
 
             previous = range;

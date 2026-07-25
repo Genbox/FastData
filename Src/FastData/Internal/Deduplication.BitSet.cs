@@ -209,7 +209,7 @@ internal static partial class Deduplication
             }
 
             GetUInt32MinMax(keys, out min, out uint max);
-            range = max - min + 1UL;
+            range = (max - min) + 1UL;
             return IsBitSetRangeUsable(keys.Length, range);
         }
 
@@ -228,7 +228,7 @@ internal static partial class Deduplication
                 else if (key > max)
                     max = key;
 
-                if (!IsBitSetRangeUsable(keys.Length, max - min + 1UL))
+                if (!IsBitSetRangeUsable(keys.Length, (max - min) + 1UL))
                     return false;
             }
 

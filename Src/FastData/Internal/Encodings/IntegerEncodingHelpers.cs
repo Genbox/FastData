@@ -1,4 +1,3 @@
-using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using static System.Buffers.Binary.BinaryPrimitives;
 using static System.Numerics.BitOperations;
@@ -28,23 +27,23 @@ internal static class IntegerEncodingHelpers
                     WriteUInt16BigEndian(destination.Slice(1), (ushort)value);
                     return;
                 case 4:
-                    BinaryPrimitives.WriteUInt32BigEndian(destination, (uint)value);
+                    WriteUInt32BigEndian(destination, (uint)value);
                     return;
                 case 5:
                     destination[0] = (byte)(value >> 32);
-                    BinaryPrimitives.WriteUInt32BigEndian(destination.Slice(1), (uint)value);
+                    WriteUInt32BigEndian(destination.Slice(1), (uint)value);
                     return;
                 case 6:
                     WriteUInt16BigEndian(destination, (ushort)(value >> 32));
-                    BinaryPrimitives.WriteUInt32BigEndian(destination.Slice(2), (uint)value);
+                    WriteUInt32BigEndian(destination.Slice(2), (uint)value);
                     return;
                 case 7:
                     destination[0] = (byte)(value >> 48);
                     WriteUInt16BigEndian(destination.Slice(1), (ushort)(value >> 32));
-                    BinaryPrimitives.WriteUInt32BigEndian(destination.Slice(3), (uint)value);
+                    WriteUInt32BigEndian(destination.Slice(3), (uint)value);
                     return;
                 default:
-                    BinaryPrimitives.WriteUInt64BigEndian(destination, value);
+                    WriteUInt64BigEndian(destination, value);
                     return;
             }
         }
@@ -56,11 +55,11 @@ internal static class IntegerEncodingHelpers
         1 => source[0],
         2 => ReadUInt16BigEndian(source),
         3 => ((ulong)source[0] << 16) | ReadUInt16BigEndian(source.Slice(1)),
-        4 => BinaryPrimitives.ReadUInt32BigEndian(source),
-        5 => ((ulong)source[0] << 32) | BinaryPrimitives.ReadUInt32BigEndian(source.Slice(1)),
-        6 => ((ulong)ReadUInt16BigEndian(source) << 32) | BinaryPrimitives.ReadUInt32BigEndian(source.Slice(2)),
-        7 => ((ulong)source[0] << 48) | ((ulong)ReadUInt16BigEndian(source.Slice(1)) << 32) | BinaryPrimitives.ReadUInt32BigEndian(source.Slice(3)),
-        _ => BinaryPrimitives.ReadUInt64BigEndian(source)
+        4 => ReadUInt32BigEndian(source),
+        5 => ((ulong)source[0] << 32) | ReadUInt32BigEndian(source.Slice(1)),
+        6 => ((ulong)ReadUInt16BigEndian(source) << 32) | ReadUInt32BigEndian(source.Slice(2)),
+        7 => ((ulong)source[0] << 48) | ((ulong)ReadUInt16BigEndian(source.Slice(1)) << 32) | ReadUInt32BigEndian(source.Slice(3)),
+        _ => ReadUInt64BigEndian(source)
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -81,7 +80,7 @@ internal static class IntegerEncodingHelpers
                     WriteUInt16BigEndian(destination.Slice(1), (ushort)value);
                     return;
                 default:
-                    BinaryPrimitives.WriteUInt32BigEndian(destination, value);
+                    WriteUInt32BigEndian(destination, value);
                     return;
             }
         }
@@ -142,8 +141,8 @@ internal static class IntegerEncodingHelpers
     internal static uint ReadUInt32LE(ReadOnlySpan<byte> source, int length) => length switch
     {
         1 => source[0],
-        2 => (uint)source[0] | ((uint)source[1] << 8),
-        3 => (uint)source[0] | ((uint)source[1] << 8) | ((uint)source[2] << 16),
+        2 => source[0] | ((uint)source[1] << 8),
+        3 => source[0] | ((uint)source[1] << 8) | ((uint)source[2] << 16),
         _ => ReadUInt32LittleEndian(source)
     };
 }

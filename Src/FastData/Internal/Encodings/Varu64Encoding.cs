@@ -120,5 +120,4 @@ internal sealed class Varu64Encoding : IIntegerEncoding
         bytesRead = 1 + payloadLength;
         return true;
     }
-
 }

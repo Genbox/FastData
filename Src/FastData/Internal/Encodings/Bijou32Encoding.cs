@@ -43,6 +43,28 @@ internal sealed class Bijou32Encoding : IIntegerEncoding
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Encode(ulong value, Span<byte> destination)
+    {
+        if (value > uint.MaxValue)
+            throw new ArgumentOutOfRangeException(nameof(value), value, "bijou32 supports values up to 2^32-1.");
+
+        return Encode((uint)value, destination);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryDecode(ReadOnlySpan<byte> source, out ulong value, out int bytesRead)
+    {
+        if (!TryDecode(source, out uint decoded, out bytesRead))
+        {
+            value = 0;
+            return false;
+        }
+
+        value = decoded;
+        return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetEncodedLength(uint value)
     {
         if (value < Bounds[0])
@@ -51,15 +73,6 @@ internal sealed class Bijou32Encoding : IIntegerEncoding
         int bitWidth = 32 - BitOperations.LeadingZeroCount(value);
         int candidate = ((bitWidth - 1) / 8) + 2;
         return value < Bounds[candidate - 2] ? candidate - 1 : candidate;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Encode(ulong value, Span<byte> destination)
-    {
-        if (value > uint.MaxValue)
-            throw new ArgumentOutOfRangeException(nameof(value), value, "bijou32 supports values up to 2^32-1.");
-
-        return Encode((uint)value, destination);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -78,24 +91,11 @@ internal sealed class Bijou32Encoding : IIntegerEncoding
             if (value < Bounds[tier - 1])
                 tier--;
 
-            destination[0] = (byte)(TagThreshold + tier - 1);
+            destination[0] = (byte)((TagThreshold + tier) - 1);
             uint payload = value - Offsets[tier];
             IntegerEncodingHelpers.WriteUInt32BE(payload, tier, destination.Slice(1));
             return tier + 1;
         }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryDecode(ReadOnlySpan<byte> source, out ulong value, out int bytesRead)
-    {
-        if (!TryDecode(source, out uint decoded, out bytesRead))
-        {
-            value = 0;
-            return false;
-        }
-
-        value = decoded;
-        return true;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

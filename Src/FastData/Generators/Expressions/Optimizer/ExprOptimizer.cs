@@ -48,9 +48,9 @@ internal static class ExprOptimizer
 
     private static List<Func<Expression, Expression>> AllMethods { get; } =
     [
-        ..ConstantReductions,
-        ..ComparisonReductions,
-        ..BooleanAlgebraReductions
+        .. ConstantReductions,
+        .. ComparisonReductions,
+        .. BooleanAlgebraReductions
     ];
 
     public static Expression Visit(Expression exp) => DoReduction(VisitChildren(exp));

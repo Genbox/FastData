@@ -68,7 +68,7 @@ internal sealed class Bijou64Encoding : IIntegerEncoding
             if (value < Bounds[tier - 1])
                 tier--;
 
-            destination[0] = (byte)(TagThreshold + tier - 1);
+            destination[0] = (byte)((TagThreshold + tier) - 1);
             ulong payload = value - Offsets[tier];
             IntegerEncodingHelpers.WriteUInt64BE(payload, tier, destination.Slice(1));
             return tier + 1;

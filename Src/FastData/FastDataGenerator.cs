@@ -515,6 +515,3 @@ public static partial class FastDataGenerator
         }
     }
 }
-
-public readonly record struct StringGenerationResult(string Source, string[] EarlyExits, string? StringHashName, StructureType StructureType);
-public readonly record struct NumericGenerationResult(string Source, string[] EarlyExits, StructureType StructureType);

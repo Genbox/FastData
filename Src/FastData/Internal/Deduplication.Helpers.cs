@@ -52,5 +52,5 @@ internal static partial class Deduplication
 
     // Spread samples from the first to the last item so clustered prefixes do not hide a wide range later in the input.
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int GetSampleIndex(int sampleIndex, int sampleCount, int lastIndex) => (int)((long)sampleIndex * lastIndex / (sampleCount - 1));
+    private static int GetSampleIndex(int sampleIndex, int sampleCount, int lastIndex) => (int)(((long)sampleIndex * lastIndex) / (sampleCount - 1));
 }

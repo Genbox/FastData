@@ -1511,8 +1511,6 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 
     private sealed class Step
     {
-        public Step? _next;
-
         // Exclusive upper bound for the _asso_values[c] of this step. A power of 2.
         public int AssoValueMax;
         public uint[] Changing = [];
@@ -1525,6 +1523,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 
         // The characters whose values will be determined after this step.
         public bool[] Undetermined = [];
+        public Step? _next;
 
 #if DEBUG
 

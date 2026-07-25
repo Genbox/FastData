@@ -370,11 +370,8 @@ internal static class ValueHelper
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Vector<T> LoadVector<T>(ref T source, int elementOffset)
-        where T : struct
-    {
-        return Unsafe.ReadUnaligned<Vector<T>>(
-            ref Unsafe.As<T, byte>(ref Unsafe.Add(ref source, elementOffset)));
-    }
+        where T : struct => Unsafe.ReadUnaligned<Vector<T>>(
+        ref Unsafe.As<T, byte>(ref Unsafe.Add(ref source, elementOffset)));
 
     internal static void GetUInt32MinMax(ReadOnlySpan<uint> keys, out uint min, out uint max)
     {
