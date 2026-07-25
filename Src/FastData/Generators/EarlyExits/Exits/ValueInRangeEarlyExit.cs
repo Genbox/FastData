@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Extensions;
-using static Genbox.FastData.Generators.Helpers.TypeHelper;
+using Genbox.FastData.Generators.Helpers;
 using Convert = System.Convert;
 
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
@@ -67,9 +67,6 @@ public sealed record ValueInRangeEarlyExit<T>(T Min, T Max) : IEarlyExit
 
     private Expression BuildUnsignedSubtraction(ParameterExpression key, TypeCode typeCode)
     {
-        Type keyType = key.Type;
-        Type unsignedType = GetUnsignedType(keyType);
-
         Func<T, ulong> toUlong = typeCode.GetUnsignedValueConverter<T>();
         ulong minVal = toUlong(Min);
         ulong maxVal = toUlong(Max);
@@ -78,13 +75,7 @@ public sealed record ValueInRangeEarlyExit<T>(T Min, T Max) : IEarlyExit
         if (keyspaceSize == 0)
             return Constant(false);
 
-        Expression keyUnsigned = keyType == unsignedType ? key : Convert(key, unsignedType);
-        object lowerConst = ConvertValueToType(unchecked(minVal + 1), unsignedType);
-        Expression lower = Constant(lowerConst, unsignedType);
-        Expression diff = Subtract(keyUnsigned, lower);
-        object rangeConst = ConvertValueToType(unchecked(keyspaceSize - 1), unsignedType);
-        Expression range = Constant(rangeConst, unsignedType);
-
+        (BinaryExpression diff, ConstantExpression range) = IntegralExpressionHelper.CreateUnsignedRange(key, typeCode, unchecked(minVal + 1), unchecked(keyspaceSize - 1));
         return LessThanOrEqual(diff, range);
     }
 }

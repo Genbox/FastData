@@ -34,7 +34,7 @@ internal static class FastData
     
     public static bool Contains(int key)
     {
-        if ((((uint)key - 1u) > 4u))
+        if ((unchecked(((uint)key - 1u)) > 4u))
         {
          return false;
         }

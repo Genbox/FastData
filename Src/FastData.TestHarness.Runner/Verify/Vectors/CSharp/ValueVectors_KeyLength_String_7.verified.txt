@@ -32,7 +32,7 @@ internal static class FastData
     public static bool Contains(string key)
     {
         int length = Length(key);
-        if (((uint)(length - 3) > 7u))
+        if ((unchecked((uint)(length - 3)) > 7u))
         {
          return false;
         }

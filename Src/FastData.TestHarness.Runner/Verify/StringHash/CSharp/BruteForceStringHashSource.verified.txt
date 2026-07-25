@@ -42,7 +42,7 @@ internal static class FastData
         {
         ReadOnlySpan<byte> data = MemoryMarshal.AsBytes(value.AsSpan());
         ulong hash = ulong.MinValue;
-        hash = (ulong)ReadU32(data, (length - 4));
+        hash = unchecked((ulong)ReadU32(data, (length - 4)));
         hash = (hash ^ (hash >> 17));
 
         return hash;

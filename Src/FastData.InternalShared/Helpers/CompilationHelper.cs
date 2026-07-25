@@ -54,6 +54,7 @@ public static class CompilationHelper
 
         CSharpCompilationOptions options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary,
             optimizationLevel: release ? OptimizationLevel.Release : OptimizationLevel.Debug,
+            checkOverflow: !release,
             allowUnsafe: true,
             platform: Platform.X64,
             warningLevel: 0,

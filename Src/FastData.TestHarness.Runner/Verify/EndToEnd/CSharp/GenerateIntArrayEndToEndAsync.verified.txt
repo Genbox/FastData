@@ -23,17 +23,17 @@ internal static class FastData
     
     public static bool Contains(int key)
     {
-        if ((((uint)key - 1u) > 11u))
+        if ((unchecked(((uint)key - 1u)) > 11u))
         {
          return false;
         }
 
-        if ((((uint)key & 4294967280u) != uint.MinValue))
+        if (((unchecked((uint)key) & 4294967280u) != uint.MinValue))
         {
          return false;
         }
 
-        if ((((((((int)((uint)key & 255u) >> 6) == 0) && ((5266ul & (1ul << ((int)((uint)key & 255u) & 63))) == ulong.MinValue)) || (((int)((uint)key & 255u) >> 6) == 1)) || (((int)((uint)key & 255u) >> 6) == 2)) || (((int)((uint)key & 255u) >> 6) == 3)))
+        if (((((((unchecked((int)((uint)key & 255u)) >> 6) == 0) && ((5266ul & (1ul << (unchecked((int)((uint)key & 255u)) & 63))) == ulong.MinValue)) || ((unchecked((int)((uint)key & 255u)) >> 6) == 1)) || ((unchecked((int)((uint)key & 255u)) >> 6) == 2)) || ((unchecked((int)((uint)key & 255u)) >> 6) == 3)))
         {
          return false;
         }

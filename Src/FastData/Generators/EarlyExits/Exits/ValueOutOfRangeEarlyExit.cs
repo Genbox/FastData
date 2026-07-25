@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Extensions;
-using static Genbox.FastData.Generators.Helpers.TypeHelper;
+using Genbox.FastData.Generators.Helpers;
 
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
@@ -34,30 +34,11 @@ public sealed record ValueOutOfRangeEarlyExit<T>(T Min, T Max, ulong LessThanKey
 
     private Expression BuildUnsignedSubtraction(ParameterExpression key, TypeCode typeCode)
     {
-        Type keyType = key.Type;
-        Type unsignedType = GetUnsignedType(keyType);
-
-        // Pre-compute min and range as unsigned constants to avoid runtime signed-to-unsigned conversions
-        // that may produce invalid code in some target languages (e.g., Rust cannot negate unsigned literals).
         Func<T, ulong> toUlong = typeCode.GetUnsignedValueConverter<T>();
         ulong minVal = toUlong(Min);
         ulong maxVal = toUlong(Max);
         ulong rangeVal = unchecked(maxVal - minVal);
-
-        // Convert key to unsigned type
-        Expression keyUnsigned = keyType == unsignedType ? key : Convert(key, unsignedType);
-
-        // Use pre-computed unsigned min constant
-        object minConst = ConvertValueToType(minVal, unsignedType);
-        Expression minUnsigned = Constant(minConst, unsignedType);
-
-        // (unsigned)(key) - unsignedMin
-        Expression diff = Subtract(keyUnsigned, minUnsigned);
-
-        // Pre-computed (unsigned)(max - min)
-        object rangeConst = ConvertValueToType(rangeVal, unsignedType);
-        Expression range = Constant(rangeConst, unsignedType);
-
+        (BinaryExpression diff, ConstantExpression range) = IntegralExpressionHelper.CreateUnsignedRange(key, typeCode, minVal, rangeVal);
         return GreaterThan(diff, range);
     }
 }

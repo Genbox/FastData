@@ -1,1 +1,1 @@
-﻿(((uint)UnitAt(inputKey, -1) < 64u) || ((216172782113783808ul & (1ul << (int)((uint)UnitAt(inputKey, -1) & 63u))) == ulong.MinValue))
+﻿((unchecked((uint)UnitAt(inputKey, -1)) < 64u) || ((216172782113783808ul & (1ul << unchecked((int)((uint)UnitAt(inputKey, -1) & 63u)))) == ulong.MinValue))

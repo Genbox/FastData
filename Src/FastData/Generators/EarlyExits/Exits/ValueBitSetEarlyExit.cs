@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using System.Numerics;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Extensions;
-using static Genbox.FastData.Generators.Helpers.TypeHelper;
+using Genbox.FastData.Generators.Helpers;
 
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
@@ -11,23 +11,13 @@ public sealed record ValueBitSetEarlyExit<T>(T Start, T End, ulong MissingBitSet
 {
     public Expression GetExpression(ParameterExpression key)
     {
-        Type keyType = key.Type;
-        Type unsignedType = GetUnsignedType(keyType);
-        TypeCode typeCode = Type.GetTypeCode(keyType);
+        TypeCode typeCode = Type.GetTypeCode(key.Type);
         Func<T, ulong> toUlong = typeCode.GetUnsignedValueConverter<T>();
         ulong startVal = toUlong(Start);
         ulong endVal = toUlong(End);
-
-        Expression keyValue = keyType == unsignedType ? key : Convert(key, unsignedType);
-        object startConst = ConvertValueToType(startVal, unsignedType);
-        Expression start = Constant(startConst, unsignedType);
-        Expression diff = Subtract(keyValue, start);
-        object rangeConst = ConvertValueToType(unchecked(endVal - startVal), unsignedType);
-        Expression range = Constant(rangeConst, unsignedType);
+        (BinaryExpression diff, ConstantExpression range) = IntegralExpressionHelper.CreateUnsignedRange(key, typeCode, startVal, unchecked(endVal - startVal));
         Expression inRange = LessThanOrEqual(diff, range);
-
-        Expression offset = unsignedType == typeof(ulong) ? diff : Convert(diff, typeof(ulong));
-        Expression shift = Convert(offset, typeof(int));
+        Expression shift = Convert(diff, typeof(int));
         Expression bit = LeftShift(Constant(1UL), shift);
         Expression masked = And(Constant(MissingBitSet), bit);
         Expression missing = NotEqual(masked, Constant(0UL));
