@@ -7,7 +7,7 @@ namespace Genbox.FastData.Generators.Contexts;
 /// <param name="buckets">The array of bucket indices.</param>
 /// <param name="entries">The array of hash set entries.</param>
 /// <param name="storeHashCode">If set to true, you should only generate a hash set that checks the value.</param>
-public sealed class HashTableContext<TKey, TValue>(int[] buckets, HashTableEntry<TKey>[] entries, bool storeHashCode, ReadOnlyMemory<TValue> values) : HashTableContext(buckets, storeHashCode)
+public sealed class HashTableContext<TKey, TValue>(int[] buckets, HashTableEntry<TKey>[] entries, bool storeHashCode, ReadOnlyMemory<TValue> values) : HashTableContext(buckets, entries.LongLength, storeHashCode)
 {
     /// <summary>Gets the array of hash set entries.</summary>
     public HashTableEntry<TKey>[] Entries { get; } = entries;
@@ -17,11 +17,14 @@ public sealed class HashTableContext<TKey, TValue>(int[] buckets, HashTableEntry
 }
 
 /// <summary>Provides bucket data shared by hash-table generated structures.</summary>
-public abstract class HashTableContext(int[] buckets, bool storeHashCode) : IContext
+public abstract class HashTableContext(int[] buckets, long entryCount, bool storeHashCode) : IContext
 {
     /// <summary>Gets the array of bucket indices.</summary>
     public int[] Buckets { get; } = buckets;
 
     /// <summary>Indicates whether the hash set should store the hash code or only the value.</summary>
     public bool StoreHashCode { get; } = storeHashCode;
+
+    /// <inheritdoc />
+    public virtual long GetOverheadBytes() => (Buckets.LongLength * sizeof(int)) + (entryCount * sizeof(int)) + (StoreHashCode ? entryCount * sizeof(ulong) : 0);
 }

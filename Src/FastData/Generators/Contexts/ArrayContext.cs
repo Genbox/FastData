@@ -10,4 +10,7 @@ public sealed class ArrayContext<TKey, TValue>(ReadOnlyMemory<TKey> keys, ReadOn
 
     /// <summary>Gets the values emitted into the generated structure.</summary>
     public ReadOnlyMemory<TValue> Values { get; } = values;
+
+    /// <inheritdoc />
+    public long GetOverheadBytes() => 0;
 }

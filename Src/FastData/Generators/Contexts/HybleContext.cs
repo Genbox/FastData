@@ -29,4 +29,7 @@ public abstract class HybleContext(ushort[] displacements, uint approxRange, uin
     /// emit <c>hash(key) * Seed</c> to reproduce the same approx/bucket mapping at query time.
     /// </summary>
     public ulong Seed { get; } = seed;
+
+    /// <inheritdoc />
+    public long GetOverheadBytes() => Displacements.LongLength * sizeof(ushort);
 }

@@ -10,4 +10,7 @@ public sealed class BinarySearchContext<TKey, TValue>(ReadOnlyMemory<TKey> keys,
 
     /// <summary>Gets the values emitted into the generated structure.</summary>
     public ReadOnlyMemory<TValue> Values { get; } = values;
+
+    /// <inheritdoc />
+    public long GetOverheadBytes() => 0;
 }

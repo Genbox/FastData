@@ -7,7 +7,7 @@ namespace Genbox.FastData.Generators.Contexts;
 /// <param name="bucketStarts">The array of bucket start indices. The final element is the sentinel end index.</param>
 /// <param name="entries">The array of hash table entries.</param>
 /// <param name="storeHashCode">If set to true, you should only generate a hash set that checks the value.</param>
-public sealed class HashTableCompactContext<TKey, TValue>(int[] bucketStarts, HashTableCompactEntry<TKey>[] entries, bool storeHashCode, ReadOnlyMemory<TValue> values) : HashTableCompactContext(bucketStarts, storeHashCode)
+public sealed class HashTableCompactContext<TKey, TValue>(int[] bucketStarts, HashTableCompactEntry<TKey>[] entries, bool storeHashCode, ReadOnlyMemory<TValue> values) : HashTableCompactContext(bucketStarts, entries.LongLength, storeHashCode)
 {
     /// <summary>Gets the array of hash table entries.</summary>
     public HashTableCompactEntry<TKey>[] Entries { get; } = entries;
@@ -17,11 +17,14 @@ public sealed class HashTableCompactContext<TKey, TValue>(int[] bucketStarts, Ha
 }
 
 /// <summary>Provides compact bucket data shared by compact hash-table generated structures.</summary>
-public abstract class HashTableCompactContext(int[] bucketStarts, bool storeHashCode) : IContext
+public abstract class HashTableCompactContext(int[] bucketStarts, long entryCount, bool storeHashCode) : IContext
 {
     /// <summary>Gets the array of bucket start indices. The final element is the sentinel end index.</summary>
     public int[] BucketStarts { get; } = bucketStarts;
 
     /// <summary>Indicates whether the hash table should store the hash code or only the value.</summary>
     public bool StoreHashCode { get; } = storeHashCode;
+
+    /// <inheritdoc />
+    public virtual long GetOverheadBytes() => (BucketStarts.LongLength * sizeof(int)) + (StoreHashCode ? entryCount * sizeof(ulong) : 0);
 }

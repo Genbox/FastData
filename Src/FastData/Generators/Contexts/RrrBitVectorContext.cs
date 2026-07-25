@@ -19,4 +19,7 @@ public sealed class RrrBitVectorContext(ulong minValue, ulong maxValue, int bloc
 
     /// <summary>Gets the offset table for each compressed block.</summary>
     public uint[] Offsets { get; } = offsets;
+
+    /// <inheritdoc />
+    public long GetOverheadBytes() => (Classes.LongLength * sizeof(byte)) + (Offsets.LongLength * sizeof(uint));
 }

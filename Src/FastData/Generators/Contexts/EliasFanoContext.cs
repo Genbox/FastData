@@ -31,4 +31,7 @@ public sealed class EliasFanoContext(int lowerBitCount, ulong lowerMask, ulong[]
 
     /// <summary>Gets the maximum original value represented by the structure.</summary>
     public long MaxValue { get; } = maxValue;
+
+    /// <inheritdoc />
+    public long GetOverheadBytes() => (UpperBits.LongLength * sizeof(ulong)) + (LowerBits.LongLength * sizeof(ulong)) + (SamplePositions.LongLength * sizeof(int));
 }

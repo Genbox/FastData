@@ -7,4 +7,7 @@ public sealed class BloomFilterContext(ulong[] bitSet) : IContext
 {
     /// <summary>Gets the Bloom filter bitset.</summary>
     public ulong[] BitSet { get; } = bitSet;
+
+    /// <inheritdoc />
+    public long GetOverheadBytes() => BitSet.LongLength * sizeof(ulong);
 }

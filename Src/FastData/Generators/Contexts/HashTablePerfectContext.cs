@@ -5,7 +5,7 @@ namespace Genbox.FastData.Generators.Contexts;
 /// <summary>Provides a context for perfect hash set-based data structures.</summary>
 /// <param name="data">The array of key-value pairs and their hash codes.</param>
 /// <param name="storeHashCode">If set to true, you should only generate a hash set that checks the value.</param>
-public sealed class HashTablePerfectContext<TKey, TValue>(KeyValuePair<TKey, ulong>[] data, bool storeHashCode, ReadOnlyMemory<TValue> values) : HashTablePerfectContext(storeHashCode)
+public sealed class HashTablePerfectContext<TKey, TValue>(KeyValuePair<TKey, ulong>[] data, bool storeHashCode, ReadOnlyMemory<TValue> values) : HashTablePerfectContext(data.LongLength, storeHashCode)
 {
     /// <summary>Gets the array of items and their hash codes.</summary>
     public KeyValuePair<TKey, ulong>[] Data { get; } = data;
@@ -15,8 +15,11 @@ public sealed class HashTablePerfectContext<TKey, TValue>(KeyValuePair<TKey, ulo
 }
 
 /// <summary>Provides metadata shared by perfect-hash generated structures.</summary>
-public abstract class HashTablePerfectContext(bool storeHashCode) : IContext
+public abstract class HashTablePerfectContext(long entryCount, bool storeHashCode) : IContext
 {
     /// <summary>Indicates whether the hash set should store the hash code or only the value.</summary>
     public bool StoreHashCode { get; } = storeHashCode;
+
+    /// <inheritdoc />
+    public virtual long GetOverheadBytes() => StoreHashCode ? entryCount * sizeof(ulong) : 0;
 }

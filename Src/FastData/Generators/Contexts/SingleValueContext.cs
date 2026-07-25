@@ -7,4 +7,7 @@ public sealed class SingleValueContext<TKey, TValue>(TKey key, ReadOnlyMemory<TV
 {
     public TKey Key { get; } = key;
     public ReadOnlyMemory<TValue> Values { get; } = values;
+
+    /// <inheritdoc />
+    public long GetOverheadBytes() => 0;
 }

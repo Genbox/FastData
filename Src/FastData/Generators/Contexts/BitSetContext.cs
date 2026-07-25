@@ -17,4 +17,7 @@ public abstract class BitSetContext(ulong[] bitSet, bool hasOccupancy = true) : 
 
     /// <summary>Indicates whether generated lookup must test an occupancy bit before indexing values.</summary>
     public bool HasOccupancy { get; } = hasOccupancy;
+
+    /// <inheritdoc />
+    public long GetOverheadBytes() => BitSet.LongLength * sizeof(ulong);
 }

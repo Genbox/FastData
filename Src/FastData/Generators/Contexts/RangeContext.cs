@@ -6,4 +6,7 @@ namespace Genbox.FastData.Generators.Contexts;
 public sealed class RangeContext<TKey>(ReadOnlyMemory<(TKey Start, TKey End)> ranges) : IContext
 {
     public ReadOnlyMemory<(TKey Start, TKey End)> Ranges { get; } = ranges;
+
+    /// <inheritdoc />
+    public long GetOverheadBytes() => 0;
 }

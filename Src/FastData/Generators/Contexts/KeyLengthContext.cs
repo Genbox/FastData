@@ -22,4 +22,7 @@ public abstract class KeyLengthContext(string?[] lengths, int minLength, int[] v
 
     /// <summary>Gets offsets that map length entries to values.</summary>
     public int[] ValueOffsets { get; } = valueOffsets;
+
+    /// <inheritdoc />
+    public virtual long GetOverheadBytes() => ValueOffsets.LongLength * sizeof(int);
 }
