@@ -2,7 +2,7 @@
   Item1:
 /// @generated
 // This file is auto-generated. Do not edit manually.
-// Structure: Range
+// Structure: Conditional
 #include <array>
 #include <cstddef>
 #include <cstring>
@@ -29,53 +29,54 @@ public:
 class FastData final {
 
 
-    static constexpr std::array<uint8_t, 4> range_starts = {
-        42, 62, 80, 100
-    };
-
-    static constexpr std::array<uint8_t, 4> range_ends = {
-        42, 62, 80, 100
-    };
 public:
     class key_iterator final {
-        size_t _range;
-        uint8_t _key;
+        size_t _index;
 
     public:
-        key_iterator(const size_t range, const uint8_t key) noexcept : _range(range), _key(key) {}
+        constexpr explicit key_iterator(const size_t index) noexcept : _index(index) {}
 
-        key_iterator& operator++() noexcept {
-            if (_key == range_ends[_range]) {
-                ++_range;
-                if (_range < range_starts.size())
-                    _key = range_starts[_range];
+        constexpr key_iterator& operator++() noexcept { ++_index; return *this; }
+        [[nodiscard]] constexpr bool operator!=(const key_iterator& other) const noexcept { return _index != other._index; }
+        [[nodiscard]] constexpr uint8_t operator*() const noexcept {
+            switch (_index) {
+                case 0: return 42;
+                case 1: return 62;
+                case 2: return 80;
+                case 3: return 100;
+                default: return 42;
             }
-            else {
-                ++_key;
-            }
-
-            return *this;
         }
-
-        [[nodiscard]] bool operator!=(const key_iterator& other) const noexcept { return _range != other._range; }
-        [[nodiscard]] uint8_t operator*() const noexcept { return _key; }
     };
+
     class key_range final {
     public:
-        [[nodiscard]] key_iterator begin() const noexcept { return key_iterator(0, range_starts[0]); }
-        [[nodiscard]] key_iterator end() const noexcept { return key_iterator(range_starts.size(), 100); }
+        [[nodiscard]] constexpr key_iterator begin() const noexcept { return key_iterator(0); }
+        [[nodiscard]] constexpr key_iterator end() const noexcept { return key_iterator(4); }
     };
 
     [[nodiscard]]
-    static key_range keys() noexcept { return key_range(); }
-
+    static constexpr key_range keys() noexcept { return key_range(); }
     [[nodiscard]]
     static constexpr bool contains(const uint8_t key) noexcept {
-
-        for (size_t i = 0; i < 4; ++i) {
-            if (key >= range_starts[i] && key <= range_ends[i])
-                return true;
+        if (((static_cast<uint32_t>(key) - 42u) > 58u))
+        {
+         return false;
         }
+
+        if (((key & 129) != 0))
+        {
+         return false;
+        }
+
+        if ((((static_cast<uint32_t>(key) - 43u) <= 56u) && ((144115050636378111ull & (1ull << static_cast<int32_t>((static_cast<uint32_t>(key) - 43u)))) != 0)))
+        {
+         return false;
+        }
+
+
+        if (key == 42 || key == 62 || key == 80 || key == 100)
+            return true;
 
         return false;
     }

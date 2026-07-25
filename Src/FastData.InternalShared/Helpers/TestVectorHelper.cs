@@ -104,22 +104,14 @@ public static class TestVectorHelper
                      StructureType.HashTable))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "sorted_numeric", StructureType.BinarySearchInterpolation, StructureType.Pgm))
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "sorted_numeric", StructureType.BinarySearchInterpolation, StructureType.BitSet, StructureType.Pgm, StructureType.Range))
             yield return testVector;
 
         foreach (ITestVector testVector in GenerateTestVectors([[1f, 2f, 3f, 4f, 5f]], "sorted_numeric", StructureType.BinarySearchInterpolation, StructureType.Pgm))
             yield return testVector;
 
         // Larger sorted, non-uniform numeric dataset for structures that depend on value distribution.
-        foreach (ITestVector testVector in GenerateTestVectors(GetNonUniformSortedIntData(200), "non_uniform_sorted", StructureType.BinarySearchInterpolation, StructureType.Pgm))
-            yield return testVector;
-
-        // Test range/bitset support. RangeStructure is selected when range count is low.
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3, 4, 5]], "range_bitset", StructureType.Range, StructureType.BitSet))
-            yield return testVector;
-
-        // Test range support for non-consecutive data.
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 4, 7, 8, 10]], "range_gaps", StructureType.Range))
+        foreach (ITestVector testVector in GenerateTestVectors(GetNonUniformSortedIntData(200), "non_uniform_sorted", StructureType.BinarySearchInterpolation, StructureType.Pgm, StructureType.Range))
             yield return testVector;
     }
 

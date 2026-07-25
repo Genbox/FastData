@@ -1,0 +1,29 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: Range
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+
+pub struct fastdata;
+impl fastdata {
+
+    #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        1..=5
+    }
+
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+
+        key >= 1 && key <= 5
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 5;
+}

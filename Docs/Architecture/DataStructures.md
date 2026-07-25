@@ -138,10 +138,12 @@ Complexity below is the amortized time for a single query after generated code h
 
 * Supports: Numeric keys
 * Values: No
-* Complexity: O(r)
+* Complexity: O(r) for fewer than eight ranges; O(log r) otherwise
 * Compressed: Yes. `2 * r * keyBits` where `r` is the number of ranges
 
-`Range` stores consecutive numeric keys as ranges. For a single range, the generated code embeds the start/end constants directly in the comparison. For multiple ranges, it emits separate start and end arrays.
+`Range` stores consecutive integral keys as ranges. For a single range, the generated code embeds the start/end constants directly in the comparison. For multiple ranges, it emits separate start and end arrays. Membership uses an early-terminating linear scan for fewer than eight ranges and binary-searches the range starts otherwise.
+
+Automatic selection requires membership-only integral data and applies the configured range-count limits. A single range is always accepted because it is emitted as two constants. Multiple ranges are accepted only when their `2 * r` endpoints use fewer key slots than the original `n` keys (`2 * r < n`), preventing mostly-singleton datasets from being expanded by range encoding.
 
 ## RrrBitVector
 

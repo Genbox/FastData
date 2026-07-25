@@ -22,16 +22,26 @@
 <#
     if (Data.RangeCount == 1)
     {
-#>            for (<#= KeyTypeName #> key = <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #>; key <= <#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>; key++)
+#>            for (<#= KeyTypeName #> key = <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #>; ; key++)
+            {
                 yield return key;
+
+                if (key == <#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>)
+                    break;
+            }
 <#
     }
     else
     {
 #>            for (int i = 0; i < _rangeStarts.Length; i++)
             {
-                for (<#= KeyTypeName #> key = _rangeStarts[i]; key <= _rangeEnds[i]; key++)
+                for (<#= KeyTypeName #> key = _rangeStarts[i]; ; key++)
+                {
                     yield return key;
+
+                    if (key == _rangeEnds[i])
+                        break;
+                }
             }
 <#
     }
@@ -50,16 +60,39 @@
         return <#= LookupKeyName #> >= <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #> && <#= LookupKeyName #> <= <#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>;
 <#
     }
-    else
+    else if (Data.RangeCount < 8)
     {
 #>
         for (int i = 0; i < <#= Data.RangeCount.ToStringInvariant() #>; i++)
         {
-            if (<#= LookupKeyName #> >= _rangeStarts[i] && <#= LookupKeyName #> <= _rangeEnds[i])
+            if (<#= LookupKeyName #> < _rangeStarts[i])
+                return false;
+
+            if (<#= LookupKeyName #> <= _rangeEnds[i])
                 return true;
         }
 
         return false;
+<#
+    }
+    else
+    {
+#>
+        int low = 0;
+        int high = <#= Data.RangeCount.ToStringInvariant() #>;
+
+        while (low < high)
+        {
+            int middle = low + ((high - low) >> 1);
+
+            if (<#= LookupKeyName #> < _rangeStarts[middle])
+                high = middle;
+            else
+                low = middle + 1;
+        }
+
+        int rangeIndex = low - 1;
+        return rangeIndex >= 0 && <#= LookupKeyName #> <= _rangeEnds[rangeIndex];
 <#
     }
 #>

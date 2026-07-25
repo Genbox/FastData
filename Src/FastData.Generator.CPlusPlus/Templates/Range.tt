@@ -93,15 +93,39 @@ public:
         return <#= LookupKeyName #> >= <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #> && <#= LookupKeyName #> <= <#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>;
 <#
     }
-    else
+    else if (Data.RangeCount < 8)
     {
 #>
         for (size_t i = 0; i < <#= Data.RangeCount.ToStringInvariant() #>; ++i) {
-            if (<#= LookupKeyName #> >= range_starts[i] && <#= LookupKeyName #> <= range_ends[i])
+            if (<#= LookupKeyName #> < range_starts[i])
+                return false;
+
+            if (<#= LookupKeyName #> <= range_ends[i])
                 return true;
         }
 
         return false;
+<#
+    }
+    else
+    {
+#>
+        size_t low = 0;
+        size_t high = <#= Data.RangeCount.ToStringInvariant() #>;
+
+        while (low < high) {
+            const size_t middle = low + ((high - low) >> 1);
+
+            if (<#= LookupKeyName #> < range_starts[middle])
+                high = middle;
+            else
+                low = middle + 1;
+        }
+
+        if (low == 0)
+            return false;
+
+        return <#= LookupKeyName #> <= range_ends[low - 1];
 <#
     }
 #>

@@ -1,7 +1,7 @@
 ﻿{
   Item1:
 //! This file is auto-generated. Do not edit manually.
-//! Structure: Range
+//! Structure: Conditional
 #![allow(non_camel_case_types)]
 #![allow(unused_parens)]
 #![allow(missing_docs)]
@@ -14,25 +14,30 @@ use std::ptr;
 pub struct FastData;
 impl FastData {
 
-    const RANGE_STARTS: [u8; 4] = [
-        42, 62, 80, 100
-    ];
-
-    const RANGE_ENDS: [u8; 4] = [
-        42, 62, 80, 100
-    ];
     #[must_use]
     pub fn keys() -> impl Iterator<Item = u8> {
-        Self::RANGE_STARTS.iter().zip(Self::RANGE_ENDS.iter()).flat_map(|(start, end)| *start..=*end)
+        [42, 62, 80, 100].iter().copied()
     }
-
     #[must_use]
     pub fn contains(key: u8) -> bool {
+        if ((((key as u32).wrapping_sub(42)) > 58))
+        {
+         return false;
+        }
 
-        for i in 0..4 {
-            if key >= Self::RANGE_STARTS[i] && key <= Self::RANGE_ENDS[i] {
-                return true;
-            }
+        if (((key & 129) != u8::MIN))
+        {
+         return false;
+        }
+
+        if (((((key as u32).wrapping_sub(43)) <= 56) && ((144115050636378111 & (1 << ((((key as u32).wrapping_sub(43)) as i32) as u32))) != u64::MIN)))
+        {
+         return false;
+        }
+
+
+        if key == 42 || key == 62 || key == 80 || key == 100 {
+            return true;
         }
 
         false

@@ -1,0 +1,45 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: BitSet
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+
+pub struct fastdata;
+impl fastdata {
+
+    const BITSET: [u64; 1] = [
+        31
+    ];
+
+    #[must_use]
+    pub fn keys() -> impl Iterator<Item = i32> {
+        (Self::MIN_KEY..=Self::MAX_KEY).filter(|key| {
+            let key = *key;
+            let offset = ((key as i64) - (Self::MIN_KEY as i64)) as u64;
+            let word = (offset >> 6) as usize;
+            (Self::BITSET[word] & (1u64 << (offset & 63))) != 0
+        })
+    }
+
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+        if ((((key as u32).wrapping_sub(1)) > 4))
+        {
+         return false;
+        }
+
+
+        let offset = ((key as i64) - (Self::MIN_KEY as i64)) as u64;
+        let word = (offset >> 6) as usize;
+        (Self::BITSET[word] & (1u64 << (offset & 63))) != 0
+    }
+
+    pub const ITEM_COUNT: usize = 5;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 5;
+}

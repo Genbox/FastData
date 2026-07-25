@@ -17,7 +17,8 @@ internal static class NumericStructures<TKey>
 
         // Floating-point min/max ranges are not exact for sparse keys: [1.0, 3.0] would also accept 2.0.
         // Keep RangeStructure to integral keys where ranges represent discrete consecutive values.
-        if (config.IsEnabled(StructureType.Range, reqCap) && typeCode.IsIntegral() && !hasValues && config.CheckItemCountLimits(StructureType.Range, (uint)rangeCount))
+        if (config.IsEnabled(StructureType.Range, reqCap) && typeCode.IsIntegral() && !hasValues && IsRangeCompressionAccepted(keyCount, rangeCount) &&
+            config.CheckItemCountLimits(StructureType.Range, (uint)rangeCount))
             return StructureType.Range;
 
         if (config.IsEnabled(StructureType.BloomFilter, reqCap) && allowApproximate && !hasValues)
@@ -66,6 +67,12 @@ internal static class NumericStructures<TKey>
 
             double slots = range + 1.0;
             return slots <= keyCount * (double)maxRangeFactor;
+        }
+
+        static bool IsRangeCompressionAccepted(uint keyCount, int rangeCount)
+        {
+            // A single range is emitted as two constants. Multiple ranges use two endpoints each.
+            return rangeCount == 1 || (ulong)(uint)rangeCount * 2UL < keyCount;
         }
     }
 }
