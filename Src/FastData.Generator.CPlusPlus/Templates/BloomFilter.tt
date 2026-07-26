@@ -2,7 +2,7 @@
 <#@ parameter type="Genbox.FastData.Generators.Contexts.BloomFilterContext" name="Context" #>
 
     <#= FieldModifier(true) #>std::array<uint64_t, <#= Context.BitSet.Length.ToStringInvariant() #>> bloom = {
-<#= FormatHelper.FormatColumns(Context.BitSet, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.BitSet, x => TypeMap.GetValueLiteral(x), 8) #>
     };
 
 <#= HashSource #>

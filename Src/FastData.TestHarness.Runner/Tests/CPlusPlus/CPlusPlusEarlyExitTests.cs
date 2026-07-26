@@ -1,5 +1,4 @@
 using Genbox.FastData.Generator.CPlusPlus.TestHarness;
-using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.InternalShared.Harness.Enums;
 using Genbox.FastData.TestHarness.Runner.Code.Abstracts;
 
@@ -43,7 +42,7 @@ public sealed class CPlusPlusEarlyExitTests(DockerCPlusPlusFixture fixture) : Ea
           }
 
           {{Bootstrap.Wrap($"""
-                                    {Bootstrap.Map.GetTypeName(value.GetType())} inputKey = {Bootstrap.Map.ToValueLabel(value)};
+                                    {Bootstrap.Map.GetTypeName(value.GetType())} inputKey = {Bootstrap.Map.GetValueLiteral(value)};
                                     return {expression} ? 1 : 0;
                             """)}}
           """;

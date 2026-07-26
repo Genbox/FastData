@@ -14,9 +14,9 @@
     bool singleSegment = Data.SegmentCount == 1;
     bool hasRecursiveLevels = Data.EpsilonRecursive > 0 && Data.LevelsOffsets.Length > 2;
     int linearSearchThreshold = 64;
-    Type interceptType = !singleSegment && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestSignedType(Data.Segments.Min(x => x.Intercept), Data.Segments.Max(x => x.Intercept)) : typeof(int);
+    Type interceptType = !singleSegment && GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestSignedStorageType(Data.Segments.Min(x => x.Intercept), Data.Segments.Max(x => x.Intercept)) : typeof(int);
 
-    string segKeyConst = singleSegment ? TypeMap.ToValueLabel(Data.Segments[0].Key) : "";
+    string segKeyConst = singleSegment ? TypeMap.GetValueLiteral(Data.Segments[0].Key) : "";
     float seg0Slope = singleSegment ? Data.Segments[0].Slope : 0;
     int seg0Intercept = singleSegment ? Data.Segments[0].Intercept : 0;
     int seg0MaxProduct = singleSegment ? Math.Max(0, Data.KeyCount - seg0Intercept) : 0;
@@ -30,13 +30,13 @@
     {
 #>
     <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> value_items = {
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.GetValueLiteral, 8) #>
     };
 <#
     }
 #>
     <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> key_items = {
-<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.GetValueLiteral, 8) #>
     };
 <#
     if (!singleSegment)
@@ -44,7 +44,7 @@
 #>
 
     <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.Segments.Length.ToStringInvariant() #>> seg_keys = {
-<#= FormatHelper.FormatColumns(Data.Segments.Select(s => s.Key), Data.Segments.Length, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Segments.Select(s => s.Key), Data.Segments.Length, TypeMap.GetValueLiteral, 8) #>
     };
 
     <#= FieldModifier(true) #>std::array<float, <#= Data.Segments.Length.ToStringInvariant() #>> seg_slopes = {
@@ -52,7 +52,7 @@
     };
 
     <#= FieldModifier(true) #>std::array<<#= TypeMap.GetTypeName(interceptType) #>, <#= Data.Segments.Length.ToStringInvariant() #>> seg_intercepts = {
-<#= FormatHelper.FormatColumns(Data.Segments, x => TypeMap.ToValueLabel(x.Intercept, interceptType), 8) #>
+<#= FormatHelper.FormatColumns(Data.Segments, x => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x.Intercept, interceptType)), 8) #>
     };
 
     static constexpr int32_t evaluate_segment(const size_t seg, const <#= KeyTypeName #> key) noexcept {

@@ -13,16 +13,16 @@
         TypeCode.Int64 => $"({LookupKeyName} ^ i64::MIN) as u64",
         _ => throw new InvalidOperationException("RRR bitvector only supports integral key types.")
     };
-    Type offsetType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Context.Offsets.Max()) : typeof(uint);
+    Type offsetType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType(Context.Offsets.Max()) : typeof(uint);
 #>
-    const RRR_MIN_VALUE: u64 = <#= TypeMap.ToValueLabel(Context.MinValue) #>;
-    const RRR_MAX_VALUE: u64 = <#= TypeMap.ToValueLabel(Context.MaxValue) #>;
+    const RRR_MIN_VALUE: u64 = <#= TypeMap.GetValueLiteral(Context.MinValue) #>;
+    const RRR_MAX_VALUE: u64 = <#= TypeMap.GetValueLiteral(Context.MaxValue) #>;
     const RRR_BLOCK_SIZE: i32 = <#= Context.BlockSize #>;
     <#= FieldModifier #>RRR_CLASSES: [u8; <#= Context.Classes.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.Classes, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.Classes, x => TypeMap.GetValueLiteral(x), 8) #>
     ];
     <#= FieldModifier #>RRR_OFFSETS: [<#= TypeMap.GetTypeName(offsetType) #>; <#= Context.Offsets.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.Offsets, (_, x) => TypeMap.ToValueLabel(x, offsetType), 8) #>
+<#= FormatHelper.FormatColumns(Context.Offsets, (_, x) => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x, offsetType)), 8) #>
     ];
 
     <#= MethodAttribute #>

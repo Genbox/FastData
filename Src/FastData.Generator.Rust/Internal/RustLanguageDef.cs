@@ -92,12 +92,12 @@ internal class RustLanguageDef : ILanguageDef
     private static string PrintValue(TypeMap map, object? value)
     {
         if (value == null)
-            return "None";
+            return map.GetValueLiteral(null);
 
         Type type = value.GetType();
 
-        if (type.IsPrimitive || type == typeof(string))
-            return map.Get(type).PrintObj(map, value);
+        if (type.IsPrimitive || type.IsEnum || type == typeof(string))
+            return map.GetValueLiteral(value);
 
         if (type.IsArray)
             throw new NotSupportedException("Arrays are not yet supported as a type");
@@ -108,7 +108,7 @@ internal class RustLanguageDef : ILanguageDef
             object? val = p.GetValue(value);
 
             if (val == null)
-                return "None";
+                return map.GetValueLiteral(null);
 
             string inner = PrintValue(map, val);
             return IsPropertyNullable(p) ? $"Some({inner})" : inner;

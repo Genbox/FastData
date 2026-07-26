@@ -15,10 +15,10 @@
     bool singleSegment = Data.SegmentCount == 1;
     bool hasRecursiveLevels = Data.EpsilonRecursive > 0 && Data.LevelsOffsets.Length > 2;
     int linearSearchThreshold = 64;
-    Type interceptType = !singleSegment && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestSignedType(Data.Segments.Min(x => x.Intercept), Data.Segments.Max(x => x.Intercept)) : typeof(int);
+    Type interceptType = !singleSegment && GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestSignedStorageType(Data.Segments.Min(x => x.Intercept), Data.Segments.Max(x => x.Intercept)) : typeof(int);
 
     // Single-segment constants
-    string segKeyConst = singleSegment ? TypeMap.ToValueLabel(Data.Segments[0].Key) : "";
+    string segKeyConst = singleSegment ? TypeMap.GetValueLiteral(Data.Segments[0].Key) : "";
     float seg0Slope = singleSegment ? Data.Segments[0].Slope : 0;
     int seg0Intercept = singleSegment ? Data.Segments[0].Intercept : 0;
 
@@ -34,14 +34,14 @@
     {
 #>
     <#= FieldModifier #><#= ValueTypeName #>[] _values = {
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.GetValueLiteral, 8) #>
     };
 
 <#
     }
 #>
     <#= FieldModifier #><#= KeyTypeName #>[] _keys = new <#= KeyTypeName #>[] {
-<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.GetValueLiteral, 8) #>
     };
 
 <#= ArrayAccessProperties("_keys", "_values", Data.ValueCount) #>
@@ -52,7 +52,7 @@
 #>
 
     <#= FieldModifier #><#= KeyTypeName #>[] _segKeys = new <#= KeyTypeName #>[] {
-<#= FormatHelper.FormatColumns(Data.Segments.Select(s => s.Key), Data.Segments.Length, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Segments.Select(s => s.Key), Data.Segments.Length, TypeMap.GetValueLiteral, 8) #>
     };
 
     <#= FieldModifier #>float[] _segSlopes = new float[] {
@@ -60,7 +60,7 @@
     };
 
     <#= FieldModifier #><#= TypeMap.GetTypeName(interceptType) #>[] _segIntercepts = new <#= TypeMap.GetTypeName(interceptType) #>[] {
-<#= FormatHelper.FormatColumns(Data.Segments, x => TypeMap.ToValueLabel(x.Intercept, interceptType), 8) #>
+<#= FormatHelper.FormatColumns(Data.Segments, x => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x.Intercept, interceptType)), 8) #>
     };
 <#
     }

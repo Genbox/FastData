@@ -7,8 +7,8 @@
 <#@ import namespace="Genbox.FastData.Generator.CSharp" #>
 <#@ import namespace="Genbox.FastData.Generator.CSharp.Enums" #>
 <#@ import namespace="Genbox.FastData.Generator.Enums" #>
-<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generator.Extensions" #>
+<#@ import namespace="Genbox.FastData.Generator.Helpers" #>
 <#@ import namespace="Genbox.FastData.Config" #>
 <#@ import namespace="Genbox.FastData.Generators.Helpers" #>
 <#@ import namespace="Genbox.FastData.Generators" #>
@@ -114,11 +114,11 @@ bool IsAsciiOnly(string value)
             {
                 foreach (AdditionalData data in addData)
                 {
-                    Type additionalDataType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestNonNegativeIntegerType(data.Type, data.Values) : data.Type;
+                    Type additionalDataType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestNonNegativeStorageType(data.Type, data.Values) : data.Type;
                     string additionalDataTypeName = TypeMap.GetTypeName(additionalDataType);
 #>
     private static readonly <#= additionalDataTypeName #>[] <#= data.Name #> = new <#= additionalDataTypeName #>[] {
-<#= FormatHelper.FormatColumns(data.Values.Cast<object>(), data.Values.Length, x => TypeMap.ToValueLabel(x, additionalDataType), 8) #>
+<#= FormatHelper.FormatColumns(data.Values.Cast<object>(), data.Values.Length, x => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x, additionalDataType)), 8) #>
     };
 
 <#

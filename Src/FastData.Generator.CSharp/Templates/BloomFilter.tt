@@ -2,7 +2,7 @@
 <#@ parameter type="Genbox.FastData.Generators.Contexts.BloomFilterContext" name="Context" #>
 
     <#= FieldModifier #>ulong[] _bloom = new ulong[] {
-<#= FormatHelper.FormatColumns(Context.BitSet, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.BitSet, x => TypeMap.GetValueLiteral(x), 8) #>
     };
 
 <#= HashSource #>

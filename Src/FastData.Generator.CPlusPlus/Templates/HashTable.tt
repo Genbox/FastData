@@ -3,10 +3,10 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HashTableTemplateData" name="Data" #>
 
 <#
-    string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
-    Type bucketType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType((ulong)Context.Buckets.Max()) : typeof(int);
-    Type nextType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestSignedType(Data.Entries.Min(x => x.Next), Data.Entries.Max(x => x.Next)) : typeof(int);
-    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
+    string[] valueLabels = Data.Values.Select(TypeMap.GetValueLiteral).ToArray();
+    Type bucketType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType((ulong)Context.Buckets.Max()) : typeof(int);
+    Type nextType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestSignedStorageType(-1, Data.Entries.Max(x => x.Next)) : typeof(int);
+    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
 #>
     struct e {
         <#= KeyTypeName #> key;
@@ -45,15 +45,15 @@
     };
 
     <#= FieldModifier(true) #>std::array<<#= TypeMap.GetTypeName(bucketType) #>, <#= Context.Buckets.Length.ToStringInvariant() #>> buckets = {
-<#= FormatHelper.FormatColumns(Context.Buckets, x => TypeMap.ToValueLabel(x, bucketType), 8) #>
+<#= FormatHelper.FormatColumns(Context.Buckets, x => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x, bucketType)), 8) #>
     };
 
     <#= FieldModifier(false) #>std::array<e, <#= Data.Entries.Length.ToStringInvariant() #>> entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        string hashPart = Context.StoreHashCode ? $", {TypeMap.ToValueLabel(x.Hash, hashType)}" : string.Empty;
+        string hashPart = Context.StoreHashCode ? $", {TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x.Hash, hashType))}" : string.Empty;
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : string.Empty;
-        return $"e({TypeMap.ToValueLabel(x.Key)}, {TypeMap.ToValueLabel(x.Next, nextType)}{hashPart}{valuePart})";
+        return $"e({TypeMap.GetValueLiteral(x.Key)}, {TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x.Next, nextType))}{hashPart}{valuePart})";
     }, 8) #>
     };
 

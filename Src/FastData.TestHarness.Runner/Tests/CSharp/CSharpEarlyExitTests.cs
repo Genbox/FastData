@@ -1,5 +1,4 @@
 using Genbox.FastData.Generator.CSharp.TestHarness;
-using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.InternalShared.Harness.Enums;
 using Genbox.FastData.TestHarness.Runner.Code.Abstracts;
 
@@ -24,7 +23,7 @@ public sealed class CSharpEarlyExitTests(DockerCSharpFixture fixture) : EarlyExi
 
               public static int Main()
               {
-                  {{Bootstrap.Map.GetTypeName(value.GetType())}} inputKey = {{Bootstrap.Map.ToValueLabel(value)}};
+                  {{Bootstrap.Map.GetTypeName(value.GetType())}} inputKey = {{Bootstrap.Map.GetValueLiteral(value)}};
                   return {{expression}} ? 1 : 0;
               }
           }

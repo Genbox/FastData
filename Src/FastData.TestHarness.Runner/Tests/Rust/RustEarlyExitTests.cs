@@ -1,4 +1,3 @@
-using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generator.Rust.TestHarness;
 using Genbox.FastData.InternalShared.Harness.Enums;
 using Genbox.FastData.TestHarness.Runner.Code.Abstracts;
@@ -50,7 +49,7 @@ public sealed class RustEarlyExitTests(DockerRustFixture fixture) : EarlyExitTes
           }
 
           {{Bootstrap.Wrap($"""
-                                    let inputKey = {Bootstrap.Map.ToValueLabel(value)};
+                                    let inputKey = {Bootstrap.Map.GetValueLiteral(value)};
                                     std::process::exit(({expression}) as i32);
                             """)}}
           """;

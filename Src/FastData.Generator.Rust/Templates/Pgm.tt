@@ -19,9 +19,9 @@
     bool singleSegment = Data.SegmentCount == 1;
     bool hasRecursiveLevels = Data.EpsilonRecursive > 0 && Data.LevelsOffsets.Length > 2;
     int linearSearchThreshold = 64;
-    Type interceptType = !singleSegment && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestSignedType(Data.Segments.Min(x => x.Intercept), Data.Segments.Max(x => x.Intercept)) : typeof(int);
+    Type interceptType = !singleSegment && GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestSignedStorageType(Data.Segments.Min(x => x.Intercept), Data.Segments.Max(x => x.Intercept)) : typeof(int);
 
-    string segKeyConst = singleSegment ? TypeMap.ToValueLabel(Data.Segments[0].Key) : "";
+    string segKeyConst = singleSegment ? TypeMap.GetValueLiteral(Data.Segments[0].Key) : "";
     float seg0Slope = singleSegment ? Data.Segments[0].Slope : 0;
     int seg0Intercept = singleSegment ? Data.Segments[0].Intercept : 0;
 
@@ -34,13 +34,13 @@
     {
 #>
     <#= FieldModifier #>VALUES: [<#= StoredValueTypeName #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.GetValueLiteral, 8) #>
     ];
 <#
     }
 #>
     <#= FieldModifier #>KEYS: [<#= StoredKeyTypeName #>; <#= Data.KeyCount.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.GetValueLiteral, 8) #>
     ];
 
 <#= ArrayAccessProperties("KEYS", "VALUES", Data.ValueCount) #>
@@ -50,7 +50,7 @@
 #>
 
     <#= FieldModifier #>SEG_KEYS: [<#= StoredKeyTypeName #>; <#= Data.Segments.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Segments.Select(s => s.Key), Data.Segments.Length, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Segments.Select(s => s.Key), Data.Segments.Length, TypeMap.GetValueLiteral, 8) #>
     ];
 
     <#= FieldModifier #>SEG_SLOPES: [f32; <#= Data.Segments.Length.ToStringInvariant() #>] = [
@@ -58,7 +58,7 @@
     ];
 
     <#= FieldModifier #>SEG_INTERCEPTS: [<#= TypeMap.GetTypeName(interceptType) #>; <#= Data.Segments.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Segments, x => TypeMap.ToValueLabel(x.Intercept, interceptType), 8) #>
+<#= FormatHelper.FormatColumns(Data.Segments, x => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x.Intercept, interceptType)), 8) #>
     ];
 
     fn evaluate_segment(seg: usize, key: <#= InputKeyTypeName #>) -> i32 {

@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Genbox.FastData.Generator;
-using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
@@ -86,7 +85,7 @@ public sealed class EarlyExitTestData<TKey>(
         for (int i = 0; i < queryKeys.Length; i++)
         {
             TKey key = hitQueries[i] ? HitKeys[hitIndex++ % HitKeys.Length] : MissKeys[missIndex++ % MissKeys.Length];
-            queryKeys[i] = map.ToValueLabel(key);
+            queryKeys[i] = map.GetValueLiteral(key);
         }
 
         return new BenchmarkQuerySet(queryKeys, expectedFoundCount, true);

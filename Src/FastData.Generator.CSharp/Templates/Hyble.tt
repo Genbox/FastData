@@ -3,10 +3,10 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HybleTemplateData" name="Data" #>
 
 <#
-    string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
+    string[] valueLabels = Data.Values.Select(TypeMap.GetValueLiteral).ToArray();
     bool useEntryStruct = Data.ValueCount > 0;
     string entryTypeName = useEntryStruct ? "E" : KeyTypeName;
-    Type displacementType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Context.Displacements.Max()) : typeof(ushort);
+    Type displacementType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType(Context.Displacements.Max()) : typeof(ushort);
 #>
 <#
     if (useEntryStruct)
@@ -32,14 +32,14 @@
 <#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, (i, x) =>
     {
         if (!useEntryStruct)
-            return TypeMap.ToValueLabel(x);
+            return TypeMap.GetValueLiteral(x);
 
-        return $"new E({TypeMap.ToValueLabel(x)}, {valueLabels[i]})";
+        return $"new E({TypeMap.GetValueLiteral(x)}, {valueLabels[i]})";
     }, 8) #>
     };
 
     <#= FieldModifier #><#= TypeMap.GetTypeName(displacementType) #>[] _displacements = {
-<#= FormatHelper.FormatColumns(Data.Displacements, (_, x) => TypeMap.ToValueLabel(x, displacementType), 8) #>
+<#= FormatHelper.FormatColumns(Data.Displacements, (_, x) => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x, displacementType)), 8) #>
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

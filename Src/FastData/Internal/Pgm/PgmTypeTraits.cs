@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using Genbox.FastData.Generators.Helpers;
 using Convert = System.Convert;
 
 namespace Genbox.FastData.Internal.Pgm;
@@ -7,8 +8,8 @@ namespace Genbox.FastData.Internal.Pgm;
 internal static class PgmTypeTraits<T> where T : notnull
 {
     public static readonly bool IsFloatingPoint = typeof(T) == typeof(float) || typeof(T) == typeof(double);
-    public static readonly bool IsSignedInteger = typeof(T) == typeof(sbyte) || typeof(T) == typeof(short) || typeof(T) == typeof(int) || typeof(T) == typeof(long);
-    public static readonly bool IsUnsignedInteger = typeof(T) == typeof(byte) || typeof(T) == typeof(char) || typeof(T) == typeof(ushort) || typeof(T) == typeof(uint) || typeof(T) == typeof(ulong);
+    private static readonly bool IsSignedInteger = IntegralTypeHelper.IsSigned(typeof(T));
+    private static readonly bool IsUnsignedInteger = IntegralTypeHelper.IsUnsigned(typeof(T));
 
     public static T MaxValue
     {

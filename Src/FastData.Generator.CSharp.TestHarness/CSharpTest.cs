@@ -1,4 +1,3 @@
-using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.Harness.Enums;
 using Genbox.FastData.InternalShared.Helpers;
@@ -14,12 +13,12 @@ public sealed class CSharpTest(DockerManager manager) : TestBase<CSharpBootstrap
 
          {Bootstrap.Wrap($"""
                                   {FormatList(present, x => $"""
-                                                                 if (!FastData.Contains({Bootstrap.Map.ToValueLabel(x)}))
+                                                                 if (!FastData.Contains({Bootstrap.Map.GetValueLiteral(x)}))
                                                                      return 0;
                                                              """, "\n")}
 
                                   {FormatList(notPresent, x => $"""
-                                                                    if (FastData.Contains({Bootstrap.Map.ToValueLabel(x)}))
+                                                                    if (FastData.Contains({Bootstrap.Map.GetValueLiteral(x)}))
                                                                         return 0;
                                                                 """, "\n")}
 
@@ -33,12 +32,12 @@ public sealed class CSharpTest(DockerManager manager) : TestBase<CSharpBootstrap
 
          {Bootstrap.Wrap($"""
                                   {FormatList(present, x => $"""
-                                                                 if (!FastData.TryLookup({Bootstrap.Map.ToValueLabel(x)}, out _))
+                                                                 if (!FastData.TryLookup({Bootstrap.Map.GetValueLiteral(x)}, out _))
                                                                      return 0;
                                                              """, "\n")}
 
                                   {FormatList(notPresent, x => $"""
-                                                                    if (FastData.TryLookup({Bootstrap.Map.ToValueLabel(x)}, out _))
+                                                                    if (FastData.TryLookup({Bootstrap.Map.GetValueLiteral(x)}, out _))
                                                                         return 0;
                                                                 """, "\n")}
 

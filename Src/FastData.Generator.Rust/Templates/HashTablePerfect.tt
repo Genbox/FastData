@@ -3,10 +3,10 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HashTablePerfectTemplateData" name="Data" #>
 
 <#
-    string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
+    string[] valueLabels = Data.Values.Select(TypeMap.GetValueLiteral).ToArray();
     bool useEntryStruct = Context.StoreHashCode || Data.ValueCount > 0;
     string entryTypeName = useEntryStruct ? "E" : StoredKeyTypeName;
-    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
+    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
 #>
 <#
     if (useEntryStruct)
@@ -34,11 +34,11 @@
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
         if (!useEntryStruct)
-            return TypeMap.ToValueLabel(x.Key);
+            return TypeMap.GetValueLiteral(x.Key);
 
-        string hashPart = Context.StoreHashCode ? $"hash_code: {TypeMap.ToValueLabel(x.Hash, hashType)}, " : string.Empty;
+        string hashPart = Context.StoreHashCode ? $"hash_code: {TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x.Hash, hashType))}, " : string.Empty;
         string valuePart = Data.ValueCount > 0 ? $", value: {valueLabels[i]}" : string.Empty;
-        return $"E {{ {hashPart}key: {TypeMap.ToValueLabel(x.Key)}{valuePart} }}";
+        return $"E {{ {hashPart}key: {TypeMap.GetValueLiteral(x.Key)}{valuePart} }}";
     }, 8) #>
     ];
 

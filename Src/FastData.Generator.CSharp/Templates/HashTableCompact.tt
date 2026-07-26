@@ -3,9 +3,9 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HashTableCompactTemplateData" name="Data" #>
 
 <#
-    string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
-    Type indexType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType((ulong)Context.BucketStarts.Max()) : typeof(uint);
-    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
+    string[] valueLabels = Data.Values.Select(TypeMap.GetValueLiteral).ToArray();
+    Type indexType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType((ulong)Context.BucketStarts.Max()) : typeof(uint);
+    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
 #>
     [StructLayout(LayoutKind.Auto)]
     private struct E
@@ -52,15 +52,15 @@
     };
 
     <#= FieldModifier #><#= TypeMap.GetTypeName(indexType) #>[] _bucketStarts = new <#= TypeMap.GetTypeName(indexType) #>[] {
-<#= FormatHelper.FormatColumns(Context.BucketStarts, x => TypeMap.ToValueLabel(x, indexType), 8) #>
+<#= FormatHelper.FormatColumns(Context.BucketStarts, x => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x, indexType)), 8) #>
     };
 
     <#= FieldModifier #>E[] _entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        string hashPart = Context.StoreHashCode ? $", {TypeMap.ToValueLabel(x.Hash, hashType)}" : "";
+        string hashPart = Context.StoreHashCode ? $", {TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x.Hash, hashType))}" : "";
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
-        return $"new E({TypeMap.ToValueLabel(x.Key)}{hashPart}{valuePart})";
+        return $"new E({TypeMap.GetValueLiteral(x.Key)}{hashPart}{valuePart})";
     }, 8) #>
     };
 

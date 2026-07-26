@@ -8,11 +8,11 @@
     long maxValue = Context.MaxValue;
     long maxValueNormalized = Context.MaxValue - Context.MinValue;
 #>
-    const MIN_VALUE: i64 = <#= TypeMap.ToValueLabel(minValue) #>;
-    const MAX_VALUE: i64 = <#= TypeMap.ToValueLabel(maxValue) #>;
-    const MAX_VALUE_NORMALIZED: i64 = <#= TypeMap.ToValueLabel(maxValueNormalized) #>;
+    const MIN_VALUE: i64 = <#= TypeMap.GetValueLiteral(minValue) #>;
+    const MAX_VALUE: i64 = <#= TypeMap.GetValueLiteral(maxValue) #>;
+    const MAX_VALUE_NORMALIZED: i64 = <#= TypeMap.GetValueLiteral(maxValueNormalized) #>;
     <#= FieldModifier #>UPPER_BITS: [u64; <#= Context.UpperBits.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.UpperBits, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.UpperBits, x => TypeMap.GetValueLiteral(x), 8) #>
     ];
 <#
     if (Context.LowerBitCount != 0)
@@ -20,17 +20,17 @@
 #>
 
     <#= FieldModifier #>LOWER_BITS: [u64; <#= Context.LowerBits.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.LowerBits, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.LowerBits, x => TypeMap.GetValueLiteral(x), 8) #>
     ];
 
-    const LOWER_MASK: u64 = <#= TypeMap.ToValueLabel(Context.LowerMask) #>;
+    const LOWER_MASK: u64 = <#= TypeMap.GetValueLiteral(Context.LowerMask) #>;
 <#
     }
 #>
 
     const SAMPLE_RATE_SHIFT: i32 = <#= Context.SampleRateShift #>;
     <#= FieldModifier #>SAMPLE_POSITIONS: [i32; <#= Context.SamplePositions.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.SamplePositions, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.SamplePositions, x => TypeMap.GetValueLiteral(x), 8) #>
     ];
 
     <#= MethodAttribute #>

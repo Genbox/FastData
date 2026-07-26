@@ -15,7 +15,7 @@
     {
 #>
     <#= FieldModifier #>BITSET: [u64; <#= Context.BitSet.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.BitSet, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.BitSet, x => TypeMap.GetValueLiteral(x), 8) #>
     ];
 
 <#
@@ -25,7 +25,7 @@
     {
 #>
     <#= FieldModifier #>VALUES: [<#= StoredValueTypeName #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.GetValueLiteral, 8) #>
     ];
 <#
     }

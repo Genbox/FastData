@@ -3,7 +3,7 @@
 
 <#
     Type rangeType = GeneratorConfig.TypeReductionEnabled && Data.RangeCount > 1
-        ? TypeMap.GetSmallestIntegerType(Model.KeyType, Data.Ranges[0].Start, Data.Ranges[^1].End)
+        ? IntegralTypeReducer.GetSmallestStorageType(Model.KeyType, Data.Ranges[0].Start, Data.Ranges[^1].End)
         : Model.KeyType;
     string rangeTypeName = TypeMap.GetTypeName(rangeType);
     bool rangeTypeReduced = rangeType != Model.KeyType;
@@ -13,11 +13,11 @@
     {
 #>
     <#= FieldModifier #><#= rangeTypeName #>[] _rangeStarts = new <#= rangeTypeName #>[] {
-<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.Start, rangeType), 8) #>
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x.Start, rangeType)), 8) #>
     };
 
     <#= FieldModifier #><#= rangeTypeName #>[] _rangeEnds = new <#= rangeTypeName #>[] {
-<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.End, rangeType), 8) #>
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x.End, rangeType)), 8) #>
     };
 <#
     }
@@ -29,11 +29,11 @@
 <#
     if (Data.RangeCount == 1)
     {
-#>            for (<#= KeyTypeName #> key = <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #>; ; key++)
+#>            for (<#= KeyTypeName #> key = <#= TypeMap.GetValueLiteral(Data.Ranges[0].Start) #>; ; key++)
             {
                 yield return key;
 
-                if (key == <#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>)
+                if (key == <#= TypeMap.GetValueLiteral(Data.Ranges[0].End) #>)
                     break;
             }
 <#
@@ -64,7 +64,7 @@
     if (Data.RangeCount == 1)
     {
 #>
-        return <#= LookupKeyName #> >= <#= TypeMap.ToValueLabel(Data.Ranges[0].Start) #> && <#= LookupKeyName #> <= <#= TypeMap.ToValueLabel(Data.Ranges[0].End) #>;
+        return <#= LookupKeyName #> >= <#= TypeMap.GetValueLiteral(Data.Ranges[0].Start) #> && <#= LookupKeyName #> <= <#= TypeMap.GetValueLiteral(Data.Ranges[0].End) #>;
 <#
     }
     else if (Data.RangeCount < 8)

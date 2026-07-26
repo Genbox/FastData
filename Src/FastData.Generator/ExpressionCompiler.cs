@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator;
 
@@ -183,20 +182,20 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 
         string str = node.Value switch
         {
-            char x => map.ToValueLabel(x),
-            sbyte x => map.ToValueLabel(x),
-            byte x => map.ToValueLabel(x),
-            short x => map.ToValueLabel(x),
-            ushort x => map.ToValueLabel(x),
-            int x => map.ToValueLabel(x),
-            uint x => map.ToValueLabel(x),
-            long x => map.ToValueLabel(x),
-            ulong x => map.ToValueLabel(x),
-            float x => map.ToValueLabel(x),
-            double x => map.ToValueLabel(x),
-            string x => map.ToValueLabel(x),
-            bool x => map.ToValueLabel(x),
-            null => map.GetNull(),
+            char x => map.GetValueLiteral(x),
+            sbyte x => map.GetValueLiteral(x),
+            byte x => map.GetValueLiteral(x),
+            short x => map.GetValueLiteral(x),
+            ushort x => map.GetValueLiteral(x),
+            int x => map.GetValueLiteral(x),
+            uint x => map.GetValueLiteral(x),
+            long x => map.GetValueLiteral(x),
+            ulong x => map.GetValueLiteral(x),
+            float x => map.GetValueLiteral(x),
+            double x => map.GetValueLiteral(x),
+            string x => map.GetValueLiteral(x),
+            bool x => map.GetValueLiteral(x),
+            null => map.GetValueLiteral(null),
             _ => throw new NotSupportedException($"Constants of type '{node.Type}' are not supported.")
         };
 

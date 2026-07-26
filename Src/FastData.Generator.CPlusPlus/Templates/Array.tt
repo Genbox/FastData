@@ -6,14 +6,14 @@
     {
 #>
     <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> value_items = {
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.GetValueLiteral, 8) #>
     };
 <#
     }
 #>
 
     <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> key_items = {
-<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.GetValueLiteral, 8) #>
     };
 
 public:

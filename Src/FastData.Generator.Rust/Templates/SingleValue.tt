@@ -3,12 +3,12 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.SingleValueTemplateData" name="Data" #>
 
 <#
-    string itemLabel = TypeMap.ToValueLabel(Data.Item);
+    string itemLabel = TypeMap.GetValueLiteral(Data.Item);
 #>
 <#
     if (Data.Value != null)
     {
-#>    const STORED_VALUE: <#= StoredValueTypeName #> = <#= TypeMap.ToValueLabel(Data.Value) #>;
+#>    const STORED_VALUE: <#= StoredValueTypeName #> = <#= TypeMap.GetValueLiteral(Data.Value) #>;
 <#
     }
 #>

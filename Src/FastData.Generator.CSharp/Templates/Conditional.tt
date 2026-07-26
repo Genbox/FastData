@@ -6,7 +6,7 @@
     {
 #>
     <#= FieldModifier #><#= ValueTypeName #>[] _values = {
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.GetValueLiteral, 8) #>
     };
 
 <#
@@ -22,7 +22,7 @@
 <#
     for (int i = 0; i < keys.Length; i++)
     {
-#>            yield return <#= TypeMap.ToValueLabel(keys[i]) #>;
+#>            yield return <#= TypeMap.GetValueLiteral(keys[i]) #>;
 <#
     }
 #>        }
@@ -56,7 +56,7 @@
 <#= GetMethodHeader(MethodType.Contains) #>
 
     <#
-#>    return <#= FormatHelper.FormatList(keys, x => GetEqual(LookupKeyName, TypeMap.ToValueLabel(x)), " || ") #>;
+#>    return <#= FormatHelper.FormatList(keys, x => GetEqual(LookupKeyName, TypeMap.GetValueLiteral(x)), " || ") #>;
     }
 <#
         if (Data.ValueCount > 0)
@@ -70,7 +70,7 @@
     <#
             for (int i = 0; i < keys.Length; i++)
             {
-#>    if (<#= GetEqual(LookupKeyName, TypeMap.ToValueLabel(keys[i])) #>)
+#>    if (<#= GetEqual(LookupKeyName, TypeMap.GetValueLiteral(keys[i])) #>)
         {
             value = _values[<#= i.ToStringInvariant() #>];
             return true;
@@ -97,7 +97,7 @@
 
         switch (<#= LookupKeyName #>)
         {
-<#= FormatHelper.FormatList(keys, x => $"            case {TypeMap.ToValueLabel(x)}:", "\n") #>
+<#= FormatHelper.FormatList(keys, x => $"            case {TypeMap.GetValueLiteral(x)}:", "\n") #>
                 return true;
             default:
                 return false;
@@ -117,7 +117,7 @@
     <#
                 for (int i = 0; i < keys.Length; i++)
                 {
-    #>        case <#= TypeMap.ToValueLabel(keys[i]) #>:
+    #>        case <#= TypeMap.GetValueLiteral(keys[i]) #>:
                 value = _values[<#= i.ToStringInvariant() #>];
                 return true;
     <#

@@ -7,13 +7,13 @@
     {
 #>
     <#= FieldModifier #>VALUES: [<#= StoredValueTypeName #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.GetValueLiteral, 8) #>
     ];
 <#
     }
 #>
     <#= FieldModifier #>KEYS: [<#= StoredKeyTypeName #>; <#= Data.KeyCount.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.GetValueLiteral, 8) #>
     ];
 
 <#= ArrayAccessProperties("KEYS", "VALUES", Data.ValueCount) #>

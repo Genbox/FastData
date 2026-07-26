@@ -7,11 +7,11 @@
     long maxValueNormalized = Context.MaxValue - Context.MinValue;
 #>
     private const int _lowerBitCount = <#= Context.LowerBitCount #>;
-    private const long _minValue = <#= TypeMap.ToValueLabel(minValue) #>;
-    private const long _maxValue = <#= TypeMap.ToValueLabel(maxValue) #>;
-    private const long _maxValueNormalized = <#= TypeMap.ToValueLabel(maxValueNormalized) #>;
+    private const long _minValue = <#= TypeMap.GetValueLiteral(minValue) #>;
+    private const long _maxValue = <#= TypeMap.GetValueLiteral(maxValue) #>;
+    private const long _maxValueNormalized = <#= TypeMap.GetValueLiteral(maxValueNormalized) #>;
     <#= FieldModifier #>ulong[] _upperBits = new ulong[] {
-<#= FormatHelper.FormatColumns(Context.UpperBits, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.UpperBits, x => TypeMap.GetValueLiteral(x), 8) #>
     };
 <#
     if (Context.LowerBitCount != 0)
@@ -19,17 +19,17 @@
 #>
 
     <#= FieldModifier #>ulong[] _lowerBits = new ulong[] {
-<#= FormatHelper.FormatColumns(Context.LowerBits, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.LowerBits, x => TypeMap.GetValueLiteral(x), 8) #>
     };
 
-    private const ulong _lowerMask = <#= TypeMap.ToValueLabel(Context.LowerMask) #>;
+    private const ulong _lowerMask = <#= TypeMap.GetValueLiteral(Context.LowerMask) #>;
 <#
     }
 #>
 
     private const int _sampleRateShift = <#= Context.SampleRateShift #>;
     <#= FieldModifier #>int[] _samplePositions = new int[] {
-<#= FormatHelper.FormatColumns(Context.SamplePositions, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.SamplePositions, x => TypeMap.GetValueLiteral(x), 8) #>
     };
 
     <#= MethodAttribute #>

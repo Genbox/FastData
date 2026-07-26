@@ -1,14 +1,14 @@
 <#@ include file="Includes\Header.ttinclude" #>
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.SingleValueTemplateData" name="Data" #>
 <#
-    string itemLabel = TypeMap.ToValueLabel(Data.Item);
+    string itemLabel = TypeMap.GetValueLiteral(Data.Item);
 #>
 <#
     if (Data.Value != null)
     {
 #>
 
-    private static readonly <#= ValueTypeName #> _storedValue = <#= TypeMap.ToValueLabel(Data.Value) #>;
+    private static readonly <#= ValueTypeName #> _storedValue = <#= TypeMap.GetValueLiteral(Data.Value) #>;
 <#
     }
 #>

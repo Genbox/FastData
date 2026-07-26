@@ -2,13 +2,13 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.SingleValueTemplateData" name="Data" #>
 
 <#
-    string itemLabel = TypeMap.ToValueLabel(Data.Item);
+    string itemLabel = TypeMap.GetValueLiteral(Data.Item);
 #>
     <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, 1> key_items = { <#= itemLabel #> };
 <#
     if (Data.Value != null)
     {
-#>    inline static const std::array<<#= ValueTypeName #>, 1> value_items = { <#= TypeMap.ToValueLabel(Data.Value) #> };
+#>    inline static const std::array<<#= ValueTypeName #>, 1> value_items = { <#= TypeMap.GetValueLiteral(Data.Value) #> };
 <#
     }
 #>

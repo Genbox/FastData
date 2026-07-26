@@ -8,14 +8,14 @@
     {
 #>
     <#= FieldModifier #>VALUES: [<#= StoredValueTypeName #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.GetValueLiteral, 8) #>
     ];
 <#
     }
 #>
     <#= MethodAttribute #>
     <#= MethodModifier #>fn keys() -> impl Iterator<Item = <#= StoredKeyTypeName #>> {
-        [<#= FormatHelper.FormatList(keys, TypeMap.ToValueLabel, ", ") #>].iter().copied()
+        [<#= FormatHelper.FormatList(keys, TypeMap.GetValueLiteral, ", ") #>].iter().copied()
     }
 <#
     if (Data.ValueCount > 0)
@@ -32,7 +32,7 @@
     <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
-        if <#= FormatHelper.FormatList(keys, x => GetEqual(LookupKeyName, TypeMap.ToValueLabel(x)), " || ") #> {
+        if <#= FormatHelper.FormatList(keys, x => GetEqual(LookupKeyName, TypeMap.GetValueLiteral(x)), " || ") #> {
             return true;
         }
 
@@ -49,7 +49,7 @@
 <#
     for (int i = 0; i < keys.Length; i++)
     {
-#>        if <#= GetEqual(LookupKeyName, TypeMap.ToValueLabel(keys[i])) #> {
+#>        if <#= GetEqual(LookupKeyName, TypeMap.GetValueLiteral(keys[i])) #> {
             return Some(Self::VALUES[<#= i.ToStringInvariant() #>]);
         }
 <#

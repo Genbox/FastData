@@ -13,16 +13,16 @@
     };
 
     string helperModifier = FieldModifier.Contains(" static ", StringComparison.Ordinal) ? "private static " : "private ";
-    Type offsetType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Context.Offsets.Max()) : typeof(uint);
+    Type offsetType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType(Context.Offsets.Max()) : typeof(uint);
 #>
-    private const ulong _rrrMinValue = <#= TypeMap.ToValueLabel(Context.MinValue) #>;
-    private const ulong _rrrMaxValue = <#= TypeMap.ToValueLabel(Context.MaxValue) #>;
+    private const ulong _rrrMinValue = <#= TypeMap.GetValueLiteral(Context.MinValue) #>;
+    private const ulong _rrrMaxValue = <#= TypeMap.GetValueLiteral(Context.MaxValue) #>;
     private const int _rrrBlockSize = <#= Context.BlockSize #>;
     <#= FieldModifier #>byte[] _rrrClasses = new byte[] {
-<#= FormatHelper.FormatColumns(Context.Classes, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.Classes, x => TypeMap.GetValueLiteral(x), 8) #>
     };
     <#= FieldModifier #><#= TypeMap.GetTypeName(offsetType) #>[] _rrrOffsets = new <#= TypeMap.GetTypeName(offsetType) #>[] {
-<#= FormatHelper.FormatColumns(Context.Offsets, x => TypeMap.ToValueLabel(x, offsetType), 8) #>
+<#= FormatHelper.FormatColumns(Context.Offsets, x => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x, offsetType)), 8) #>
     };
 
     <#= MethodAttribute #>

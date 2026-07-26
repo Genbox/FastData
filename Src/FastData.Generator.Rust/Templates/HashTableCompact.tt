@@ -3,9 +3,9 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.HashTableCompactTemplateData" name="Data" #>
 
 <#
-    string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
-    Type indexType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType((ulong)Context.BucketStarts.Max()) : typeof(uint);
-    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
+    string[] valueLabels = Data.Values.Select(TypeMap.GetValueLiteral).ToArray();
+    Type indexType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType((ulong)Context.BucketStarts.Max()) : typeof(uint);
+    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
 #>
 struct E {
     key: <#= StoredKeyTypeName #>,
@@ -24,15 +24,15 @@ struct E {
 
 <#@ include file="Includes\ImplHeader.ttinclude" #>
     <#= FieldModifier #>BUCKET_STARTS: [<#= TypeMap.GetTypeName(indexType) #>; <#= Context.BucketStarts.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.BucketStarts, (_, x) => TypeMap.ToValueLabel(x, indexType), 8) #>
+<#= FormatHelper.FormatColumns(Context.BucketStarts, (_, x) => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x, indexType)), 8) #>
     ];
 
     <#= FieldModifier #>ENTRIES: [E; <#= Data.Entries.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        string hashPart = Context.StoreHashCode ? $"hash_code: {TypeMap.ToValueLabel(x.Hash, hashType)}, " : string.Empty;
+        string hashPart = Context.StoreHashCode ? $"hash_code: {TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x.Hash, hashType))}, " : string.Empty;
         string valuePart = Data.ValueCount > 0 ? $", value: {valueLabels[i]}" : string.Empty;
-        return $"E {{ {hashPart}key: {TypeMap.ToValueLabel(x.Key)}{valuePart} }}";
+        return $"E {{ {hashPart}key: {TypeMap.GetValueLiteral(x.Key)}{valuePart} }}";
     }, 8) #>
     ];
 

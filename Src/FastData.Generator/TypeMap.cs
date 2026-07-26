@@ -31,9 +31,47 @@ public sealed class TypeMap : ITypeMap
         }
     }
 
-    /// <summary>Gets the target-language literal for a null value.</summary>
-    /// <returns>The target-language null literal.</returns>
-    public string GetNull() => _index[0].PrintObj(this, null);
+    /// <summary>Gets the target-language literal for a value based on its runtime type.</summary>
+    /// <param name="value">The value, or <see langword="null" />.</param>
+    /// <returns>The target-language value literal.</returns>
+    public string GetValueLiteral(object? value)
+    {
+        if (value == null)
+        {
+            ITypeDef? definition = _index[(int)TypeCode.Empty];
+
+            if (definition == null)
+                throw new InvalidOperationException("No null type definition was registered.");
+
+            return definition.PrintObj(this, null!);
+        }
+
+        return Get(value.GetType()).PrintObj(this, value);
+    }
+
+    /// <summary>Gets the target-language declaration for an object type.</summary>
+    /// <param name="type">The object type.</param>
+    /// <returns>The target-language object declaration.</returns>
+    public string GetObjectDeclaration(Type type)
+    {
+        if (type == null)
+            throw new ArgumentNullException(nameof(type), "The object type cannot be null.");
+
+        ValidateSupportedType(type);
+
+        if (Type.GetTypeCode(type) != TypeCode.Object)
+            throw new ArgumentException("The type must be an object type.", nameof(type));
+
+        ITypeDef? definition = _index[(int)TypeCode.Object];
+
+        if (definition == null)
+            throw new InvalidOperationException("No object type definition was registered.");
+
+        if (definition is not IObjectTypeDef objectDefinition)
+            throw new InvalidOperationException("The registered object type definition does not support object declarations.");
+
+        return objectDefinition.PrintDeclaration(this, type);
+    }
 
     /// <summary>Gets the target-language type name for a CLR type.</summary>
     /// <param name="type">The CLR type.</param>
@@ -42,7 +80,7 @@ public sealed class TypeMap : ITypeMap
     {
         ITypeDef res = Get(type);
 
-        if (res is ObjectTypeDef)
+        if (res is IObjectTypeDef)
             return type.Name;
 
         return res.Name;
@@ -63,6 +101,11 @@ public sealed class TypeMap : ITypeMap
     /// <returns>The type definition for <paramref name="type" />.</returns>
     public ITypeDef Get(Type type)
     {
+        if (type == null)
+            throw new ArgumentNullException(nameof(type), "The CLR type cannot be null.");
+
+        ValidateSupportedType(type);
+
         ITypeDef? res = _index[(int)Type.GetTypeCode(type)];
 
         if (res == null)
@@ -72,5 +115,14 @@ public sealed class TypeMap : ITypeMap
             res = dyn.Get(_encoding).StringTypeDef;
 
         return res;
+    }
+
+    private static void ValidateSupportedType(Type type)
+    {
+        if (type.IsEnum)
+            throw new NotSupportedException("Enum types are not supported by the type map.");
+
+        if (type == typeof(nint) || type == typeof(nuint))
+            throw new NotSupportedException("Native integer types are not supported by the type map.");
     }
 }

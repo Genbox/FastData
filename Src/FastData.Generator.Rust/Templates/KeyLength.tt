@@ -6,20 +6,20 @@
 <#
     if (Data.ValueCount > 0)
     {
-        Type offsetType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType((ulong)Context.ValueOffsets.Max()) : typeof(int);
+        Type offsetType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType((ulong)Context.ValueOffsets.Max()) : typeof(int);
 #>
     <#= FieldModifier #>OFFSETS: [<#= TypeMap.GetTypeName(offsetType) #>; <#= Context.ValueOffsets.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.ValueOffsets, (_, x) => TypeMap.ToValueLabel(x, offsetType), 8) #>
+<#= FormatHelper.FormatColumns(Context.ValueOffsets, (_, x) => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x, offsetType)), 8) #>
     ];
 
     <#= FieldModifier #>VALUES: [<#= StoredValueTypeName #>; <#= Data.ValueCount.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.GetValueLiteral, 8) #>
     ];
 <#
     }
 #>
     <#= FieldModifier #>KEYS: [<#= StoredKeyTypeName #>; <#= Data.KeyCount.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, item => item == null ? "\"\"" : TypeMap.ToValueLabel(item), 8) #>
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, item => item == null ? "\"\"" : TypeMap.GetValueLiteral(item), 8) #>
     ];
 
     <#= MethodAttribute #>

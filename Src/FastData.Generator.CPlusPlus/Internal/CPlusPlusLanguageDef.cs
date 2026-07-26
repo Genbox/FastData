@@ -121,12 +121,12 @@ internal class CPlusPlusLanguageDef : ILanguageDef
     private static string PrintValue(TypeMap map, object? value, bool objectAsValue)
     {
         if (value == null)
-            return map.GetNull();
+            return map.GetValueLiteral(null);
 
         Type type = value.GetType();
 
-        if (type.IsPrimitive || type == typeof(string))
-            return map.Get(type).PrintObj(map, value);
+        if (type.IsPrimitive || type.IsEnum || type == typeof(string))
+            return map.GetValueLiteral(value);
 
         if (type.IsArray)
         {
@@ -143,7 +143,7 @@ internal class CPlusPlusLanguageDef : ILanguageDef
     private static string RenderType(TypeMap map, Type type)
     {
         if (type.IsArray)
-            return $"std::vector<{RenderType(map, type.GetElementType())}>";
+            return $"std::vector<{RenderType(map, type.GetElementType()!)}>";
 
         if (Type.GetTypeCode(type) == TypeCode.Object)
             return type.Name + "*";

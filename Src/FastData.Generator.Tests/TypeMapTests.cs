@@ -1,7 +1,6 @@
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Abstracts;
 using Genbox.FastData.Generator.Definitions;
-using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.Tests;
 
@@ -20,17 +19,30 @@ public class TypeMapTests
     }
 
     [Fact]
-    public void GetNullReturnsNullLabel()
+    public void GetValueLiteralReturnsRegisteredNullLiteral()
     {
-        ITypeDef[] defs =
-        [
-            new NullTypeDef("null"),
-            new StringTypeDef("string", Identity)
-        ];
-
+        ITypeDef[] defs = [new NullTypeDef("nil")];
         TypeMap map = new TypeMap(defs, GeneratorEncoding.Utf8Bytes);
 
-        Assert.Equal("null", map.GetNull());
+        Assert.Equal("nil", map.GetValueLiteral(null));
+    }
+
+    [Fact]
+    public void GetValueLiteralThrowsWhenNullDefinitionIsMissing()
+    {
+        TypeMap map = new TypeMap([], GeneratorEncoding.Utf8Bytes);
+
+        Assert.Throws<InvalidOperationException>(() => map.GetValueLiteral(null));
+    }
+
+    [Fact]
+    public void GetValueLiteralDispatchesUsingBoxedRuntimeTypeWithoutObjectDefinition()
+    {
+        ITypeDef[] defs = [new IntegerTypeDef<int>("int", int.MinValue, int.MaxValue, "min", "max", value => $"int:{value}")];
+        TypeMap map = new TypeMap(defs, GeneratorEncoding.Utf8Bytes);
+        object value = 42;
+
+        Assert.Equal("int:42", map.GetValueLiteral(value));
     }
 
     [Fact]
@@ -47,100 +59,90 @@ public class TypeMapTests
     }
 
     [Fact]
-    public void GetTypeNameUsesRuntimeTypeNameForObject()
+    public void GetObjectDeclarationUsesObjectDefinition()
     {
-        ObjectTypeDef objectDef = new ObjectTypeDef((_, type) => type.Name, (_, value) => value.ToString() ?? string.Empty);
+        ObjectTypeDef objectDef = new ObjectTypeDef((_, type) => $"object {type.Name}", (_, value) => value.ToString() ?? string.Empty);
         ITypeDef[] defs = [objectDef];
         TypeMap map = new TypeMap(defs, GeneratorEncoding.Utf8Bytes);
 
-        Assert.Equal(nameof(CustomObject), map.GetTypeName(typeof(CustomObject)));
+        Assert.Equal("object CustomObject", map.GetObjectDeclaration(typeof(CustomObject)));
     }
 
     [Fact]
-    public void GetThrowsWhenTypeIsMissing()
+    public void GetObjectDeclarationRejectsPrimitiveType()
     {
-        ITypeDef[] defs = [new StringTypeDef("string", Identity)];
+        TypeMap map = new TypeMap([], GeneratorEncoding.Utf8Bytes);
+
+        Assert.Throws<ArgumentException>(() => map.GetObjectDeclaration(typeof(int)));
+    }
+
+    [Fact]
+    public void GetObjectDeclarationThrowsWhenDefinitionLacksCapability()
+    {
+        ITypeDef[] defs = [new ValueOnlyObjectTypeDef()];
         TypeMap map = new TypeMap(defs, GeneratorEncoding.Utf8Bytes);
 
-        Assert.Throws<InvalidOperationException>(map.Get<int>);
-    }
-
-    [Theory]
-    [InlineData(-129L, "short")]
-    [InlineData(sbyte.MinValue, "sbyte")]
-    [InlineData(sbyte.MaxValue, "sbyte")]
-    [InlineData(short.MinValue - 1L, "int")]
-    [InlineData(short.MinValue, "short")]
-    [InlineData(short.MaxValue, "short")]
-    [InlineData(int.MinValue - 1L, "long")]
-    [InlineData(int.MinValue, "int")]
-    [InlineData(int.MaxValue, "int")]
-    public void GetSmallestIntTypeRespectsBounds(long value, string expected)
-    {
-        TypeMap map = CreateIntegerTypeMap();
-
-        Assert.Equal(expected, map.GetSmallestSignedTypeName(value));
-    }
-
-    [Theory]
-    [InlineData(0UL, typeof(byte))]
-    [InlineData(byte.MaxValue, typeof(byte))]
-    [InlineData(byte.MaxValue + 1UL, typeof(ushort))]
-    [InlineData(ushort.MaxValue, typeof(ushort))]
-    [InlineData(ushort.MaxValue + 1UL, typeof(uint))]
-    [InlineData(uint.MaxValue, typeof(uint))]
-    [InlineData(uint.MaxValue + 1UL, typeof(ulong))]
-    [InlineData(ulong.MaxValue, typeof(ulong))]
-    public void GetSmallestUIntStorageTypeRespectsBoundaries(ulong maxValue, Type expected)
-    {
-        TypeMap map = CreateIntegerTypeMap();
-
-        Assert.Equal(expected, map.GetSmallestUnsignedType(maxValue));
-    }
-
-    [Theory]
-    [InlineData(sbyte.MinValue, sbyte.MaxValue, typeof(sbyte))]
-    [InlineData(-129L, sbyte.MaxValue, typeof(short))]
-    [InlineData(sbyte.MinValue, 128L, typeof(short))]
-    [InlineData(short.MinValue, short.MaxValue, typeof(short))]
-    [InlineData(short.MinValue - 1L, short.MaxValue, typeof(int))]
-    [InlineData(short.MinValue, short.MaxValue + 1L, typeof(int))]
-    [InlineData(int.MinValue, int.MaxValue, typeof(int))]
-    [InlineData(int.MinValue - 1L, int.MaxValue, typeof(long))]
-    [InlineData(int.MinValue, int.MaxValue + 1L, typeof(long))]
-    public void GetSmallestIntStorageTypeCoversSignedInterval(long minValue, long maxValue, Type expected)
-    {
-        TypeMap map = CreateIntegerTypeMap();
-
-        Assert.Equal(expected, map.GetSmallestSignedType(minValue, maxValue));
+        Assert.Throws<InvalidOperationException>(() => map.GetObjectDeclaration(typeof(CustomObject)));
     }
 
     [Fact]
-    public void GetSmallestIntStorageTypeRejectsReversedInterval()
+    public void GetObjectDeclarationThrowsWhenDefinitionIsMissing()
     {
-        TypeMap map = CreateIntegerTypeMap();
+        TypeMap map = new TypeMap([], GeneratorEncoding.Utf8Bytes);
 
-        Assert.Throws<ArgumentException>(() => map.GetSmallestSignedType(1, 0));
+        Assert.Throws<InvalidOperationException>(() => map.GetObjectDeclaration(typeof(CustomObject)));
     }
+
+    [Fact]
+    public void GetValueLiteralThrowsWhenRuntimeTypeIsMissing()
+    {
+        TypeMap map = new TypeMap([], GeneratorEncoding.Utf8Bytes);
+
+        Assert.Throws<InvalidOperationException>(() => map.GetValueLiteral(42));
+    }
+
+    [Theory]
+    [MemberData(nameof(GetUnsupportedValues))]
+    public void GetValueLiteralRejectsUnsupportedRuntimeTypes(object value)
+    {
+        ObjectTypeDef objectDef = new ObjectTypeDef((_, type) => type.Name, (_, item) => item.ToString() ?? string.Empty);
+        IntegerTypeDef<int> integerDef = new IntegerTypeDef<int>("int", int.MinValue, int.MaxValue, "min", "max");
+        TypeMap map = new TypeMap([objectDef, integerDef], GeneratorEncoding.Utf8Bytes);
+
+        Assert.Throws<NotSupportedException>(() => map.GetValueLiteral(value));
+    }
+
+    [Theory]
+    [InlineData(typeof(nint))]
+    [InlineData(typeof(nuint))]
+    public void GetObjectDeclarationRejectsNativeIntegerTypes(Type type)
+    {
+        ObjectTypeDef objectDef = new ObjectTypeDef((_, valueType) => valueType.Name, (_, value) => value.ToString() ?? string.Empty);
+        TypeMap map = new TypeMap([objectDef], GeneratorEncoding.Utf8Bytes);
+
+        Assert.Throws<NotSupportedException>(() => map.GetObjectDeclaration(type));
+    }
+
+    public static TheoryData<object> GetUnsupportedValues() =>
+    [
+        SampleEnum.Value,
+        (nint)1,
+        (nuint)1
+    ];
 
     private static string Identity(string value) => value;
 
-    private static TypeMap CreateIntegerTypeMap()
-    {
-        ITypeDef[] defs =
-        [
-            new IntegerTypeDef<sbyte>("sbyte", sbyte.MinValue, sbyte.MaxValue, "sbyte.MinValue", "sbyte.MaxValue"),
-            new IntegerTypeDef<byte>("byte", byte.MinValue, byte.MaxValue, "byte.MinValue", "byte.MaxValue"),
-            new IntegerTypeDef<short>("short", short.MinValue, short.MaxValue, "short.MinValue", "short.MaxValue"),
-            new IntegerTypeDef<ushort>("ushort", ushort.MinValue, ushort.MaxValue, "ushort.MinValue", "ushort.MaxValue"),
-            new IntegerTypeDef<int>("int", int.MinValue, int.MaxValue, "int.MinValue", "int.MaxValue"),
-            new IntegerTypeDef<uint>("uint", uint.MinValue, uint.MaxValue, "uint.MinValue", "uint.MaxValue"),
-            new IntegerTypeDef<long>("long", long.MinValue, long.MaxValue, "long.MinValue", "long.MaxValue"),
-            new IntegerTypeDef<ulong>("ulong", ulong.MinValue, ulong.MaxValue, "ulong.MinValue", "ulong.MaxValue")
-        ];
+    private static class CustomObject;
 
-        return new TypeMap(defs, GeneratorEncoding.Utf8Bytes);
+    private enum SampleEnum
+    {
+        Value
     }
 
-    private sealed class CustomObject;
+    private sealed class ValueOnlyObjectTypeDef : ITypeDef
+    {
+        public TypeCode KeyType => TypeCode.Object;
+        public string Name => "object";
+        public Func<TypeMap, object, string> PrintObj => (_, value) => value.ToString() ?? string.Empty;
+    }
 }

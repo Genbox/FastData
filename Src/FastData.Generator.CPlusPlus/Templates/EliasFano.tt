@@ -7,11 +7,11 @@
     long maxValue = Context.MaxValue;
     long maxValueNormalized = Context.MaxValue - Context.MinValue;
 #>
-    static constexpr int64_t min_value = <#= TypeMap.ToValueLabel(minValue) #>;
-    static constexpr int64_t max_value = <#= TypeMap.ToValueLabel(maxValue) #>;
-    static constexpr int64_t max_value_normalized = <#= TypeMap.ToValueLabel(maxValueNormalized) #>;
+    static constexpr int64_t min_value = <#= TypeMap.GetValueLiteral(minValue) #>;
+    static constexpr int64_t max_value = <#= TypeMap.GetValueLiteral(maxValue) #>;
+    static constexpr int64_t max_value_normalized = <#= TypeMap.GetValueLiteral(maxValueNormalized) #>;
     <#= FieldModifier(true) #>std::array<uint64_t, <#= Context.UpperBits.Length.ToStringInvariant() #>> upper_bits = {
-<#= FormatHelper.FormatColumns(Context.UpperBits, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.UpperBits, x => TypeMap.GetValueLiteral(x), 8) #>
     };
 <#
     if (Context.LowerBitCount != 0)
@@ -19,17 +19,17 @@
 #>
 
     <#= FieldModifier(true) #>std::array<uint64_t, <#= Context.LowerBits.Length.ToStringInvariant() #>> lower_bits = {
-<#= FormatHelper.FormatColumns(Context.LowerBits, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.LowerBits, x => TypeMap.GetValueLiteral(x), 8) #>
     };
 
-    static constexpr uint64_t lower_mask = <#= TypeMap.ToValueLabel(Context.LowerMask) #>;
+    static constexpr uint64_t lower_mask = <#= TypeMap.GetValueLiteral(Context.LowerMask) #>;
 <#
     }
 #>
 
     static constexpr int32_t sample_rate_shift = <#= Context.SampleRateShift #>;
     <#= FieldModifier(true) #>std::array<int32_t, <#= Context.SamplePositions.Length.ToStringInvariant() #>> sample_positions = {
-<#= FormatHelper.FormatColumns(Context.SamplePositions, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Context.SamplePositions, x => TypeMap.GetValueLiteral(x), 8) #>
     };
 
     static constexpr int popcount(uint64_t value) noexcept {

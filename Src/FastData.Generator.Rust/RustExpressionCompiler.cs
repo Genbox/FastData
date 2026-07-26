@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generators;
 
 namespace Genbox.FastData.Generator.Rust;
@@ -119,7 +118,7 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
     {
         if (node.Value is char ch)
         {
-            Output.Append(map.ToValueLabel(ch));
+            Output.Append(map.GetValueLiteral(ch));
             return node;
         }
 
@@ -224,7 +223,7 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
             Output.Append(".").Append(methodName).Append("(");
 
             if (node.Arguments[0] is ConstantExpression constExpr && constExpr.Value is string literal)
-                Output.Append(map.ToValueLabel(literal));
+                Output.Append(map.GetValueLiteral(literal));
             else
                 Visit(node.Arguments[0]);
 

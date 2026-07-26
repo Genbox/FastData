@@ -1,4 +1,3 @@
-using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.Harness.Enums;
 using Genbox.FastData.InternalShared.Helpers;
@@ -16,13 +15,13 @@ public sealed class RustTest(DockerManager manager) : TestBase<RustBootstrap>(ne
 
          {Bootstrap.Wrap($"""
                                   {FormatList(present, x => $$"""
-                                                                  if !fastdata::contains({{Bootstrap.Map.ToValueLabel(x)}}) {
+                                                                  if !fastdata::contains({{Bootstrap.Map.GetValueLiteral(x)}}) {
                                                                       std::process::exit(0);
                                                                   }
                                                               """, "\n")}
 
                                   {FormatList(notPresent, x => $$"""
-                                                                     if fastdata::contains({{Bootstrap.Map.ToValueLabel(x)}}) {
+                                                                     if fastdata::contains({{Bootstrap.Map.GetValueLiteral(x)}}) {
                                                                          std::process::exit(0);
                                                                      }
                                                                  """, "\n")}
@@ -39,13 +38,13 @@ public sealed class RustTest(DockerManager manager) : TestBase<RustBootstrap>(ne
 
          {Bootstrap.Wrap($"""
                                   {FormatList(present, x => $$"""
-                                                                  if fastdata::try_lookup({{Bootstrap.Map.ToValueLabel(x)}}).is_none() {
+                                                                  if fastdata::try_lookup({{Bootstrap.Map.GetValueLiteral(x)}}).is_none() {
                                                                       std::process::exit(0);
                                                                   }
                                                               """, "\n")}
 
                                   {FormatList(notPresent, x => $$"""
-                                                                     if fastdata::try_lookup({{Bootstrap.Map.ToValueLabel(x)}}).is_some() {
+                                                                     if fastdata::try_lookup({{Bootstrap.Map.GetValueLiteral(x)}}).is_some() {
                                                                          std::process::exit(0);
                                                                      }
                                                                  """, "\n")}

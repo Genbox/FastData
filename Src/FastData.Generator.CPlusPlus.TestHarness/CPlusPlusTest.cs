@@ -1,4 +1,3 @@
-using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.InternalShared.Harness;
 using Genbox.FastData.InternalShared.Harness.Enums;
 using Genbox.FastData.InternalShared.Helpers;
@@ -17,12 +16,12 @@ public sealed class CPlusPlusTest(DockerManager manager) : TestBase<CPlusPlusBoo
 
          {Bootstrap.Wrap($"""
                                   {FormatList(present, x => $"""
-                                                                 if (!fastdata::contains({Bootstrap.Map.ToValueLabel(x)}))
+                                                                 if (!fastdata::contains({Bootstrap.Map.GetValueLiteral(x)}))
                                                                      return 0;
                                                              """, "\n")}
 
                                   {FormatList(notPresent, x => $"""
-                                                                    if (fastdata::contains({Bootstrap.Map.ToValueLabel(x)}))
+                                                                    if (fastdata::contains({Bootstrap.Map.GetValueLiteral(x)}))
                                                                         return 0;
                                                                 """, "\n")}
 
@@ -41,12 +40,12 @@ public sealed class CPlusPlusTest(DockerManager manager) : TestBase<CPlusPlusBoo
                                   const {Bootstrap.Map.GetTypeName(presentValues[0].GetType())}* res;
 
                                   {FormatList(present, x => $"""
-                                                                 if (!fastdata::try_lookup({Bootstrap.Map.ToValueLabel(x)}, res))
+                                                                 if (!fastdata::try_lookup({Bootstrap.Map.GetValueLiteral(x)}, res))
                                                                      return 0;
                                                              """, "\n")}
 
                                   {FormatList(notPresent, x => $"""
-                                                                    if (fastdata::try_lookup({Bootstrap.Map.ToValueLabel(x)}, res))
+                                                                    if (fastdata::try_lookup({Bootstrap.Map.GetValueLiteral(x)}, res))
                                                                         return 0;
                                                                 """, "\n")}
 

@@ -5,20 +5,20 @@
 <#
     if (Data.ValueCount > 0)
     {
-        Type offsetType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType((ulong)Context.ValueOffsets.Max()) : typeof(int);
+        Type offsetType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType((ulong)Context.ValueOffsets.Max()) : typeof(int);
 #>
     <#= FieldModifier(true) #>std::array<<#= TypeMap.GetTypeName(offsetType) #>, <#= Context.ValueOffsets.Length.ToStringInvariant() #>> offsets = {
-<#= FormatHelper.FormatColumns(Context.ValueOffsets, x => TypeMap.ToValueLabel(x, offsetType), 8) #>
+<#= FormatHelper.FormatColumns(Context.ValueOffsets, x => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x, offsetType)), 8) #>
     };
 
     <#= FieldModifier(false) #>std::array<<#= ValueTypeName #>, <#= Data.ValueCount.ToStringInvariant() #>> value_items = {
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.GetValueLiteral, 8) #>
     };
 <#
     }
 #>
     <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.KeyCount.ToStringInvariant() #>> key_items = {
-<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, item => item == null ? "{}" : TypeMap.ToValueLabel(item), 8) #>
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, item => item == null ? "{}" : TypeMap.GetValueLiteral(item), 8) #>
     };
 public:
     class index_iterator {

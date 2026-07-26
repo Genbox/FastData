@@ -6,14 +6,14 @@
     {
 #>
     <#= FieldModifier #><#= ValueTypeName #>[] _values = {
-<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Values, Data.ValueCount, TypeMap.GetValueLiteral, 8) #>
     };
 
 <#
     }
 #>
     <#= FieldModifier #><#= KeyTypeName #>[] _keys = new <#= KeyTypeName #>[] {
-<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.ToValueLabel, 8) #>
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, TypeMap.GetValueLiteral, 8) #>
     };
 
 <#= ArrayAccessProperties("_keys", "_values", Data.ValueCount) #>

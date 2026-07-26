@@ -1,7 +1,6 @@
 using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator;
-using Genbox.FastData.Generator.Extensions;
 using Genbox.FastData.Generators.Abstracts;
 using Xunit.Sdk;
 
@@ -53,7 +52,7 @@ public class TestData<TKey>(StructureType structureType, TKey[] keys, BenchmarkW
         for (int i = 0; i < queryKeys.Length; i++)
         {
             TKey key = hitQueries[i] ? hitKeys[hitIndex++ % hitKeys.Length] : missKeys[missIndex++ % missKeys.Length];
-            queryKeys[i] = map.ToValueLabel(key);
+            queryKeys[i] = map.GetValueLiteral(key);
         }
 
         return new BenchmarkQuerySet(queryKeys, expectedFoundCount, ValidateFoundCount);

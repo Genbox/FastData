@@ -16,8 +16,8 @@
     if (GeneratorConfig is NumericGeneratorConfig numCfg)
     {
 #>
-    static constexpr <#= TypeMap.GetTypeName(numCfg.Constants.MinValue.GetType()) #> min_key = <#= TypeMap.ToValueLabel(numCfg.Constants.MinValue, numCfg.Constants.MinValue.GetType()) #>;
-    static constexpr <#= TypeMap.GetTypeName(numCfg.Constants.MaxValue.GetType()) #> max_key = <#= TypeMap.ToValueLabel(numCfg.Constants.MaxValue, numCfg.Constants.MaxValue.GetType()) #>;
+    static constexpr <#= TypeMap.GetTypeName(numCfg.Constants.MinValue.GetType()) #> min_key = <#= TypeMap.GetValueLiteral(numCfg.Constants.MinValue) #>;
+    static constexpr <#= TypeMap.GetTypeName(numCfg.Constants.MaxValue.GetType()) #> max_key = <#= TypeMap.GetValueLiteral(numCfg.Constants.MaxValue) #>;
 <#
     }
 #>

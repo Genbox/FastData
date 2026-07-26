@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using Genbox.FastData.Generator.Extensions;
 
 namespace Genbox.FastData.Generator.CPlusPlus;
 
@@ -61,7 +60,7 @@ public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompile
                 Output.Append(".compare(0, ")
                       .Append(length)
                       .Append(", ")
-                      .Append(map.ToValueLabel(literal))
+                      .Append(map.GetValueLiteral(literal))
                       .Append(") == 0");
             }
             else
@@ -77,7 +76,7 @@ public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompile
                       .Append(", ")
                       .Append(length)
                       .Append(", ")
-                      .Append(map.ToValueLabel(literal))
+                      .Append(map.GetValueLiteral(literal))
                       .Append(") == 0");
             }
 
