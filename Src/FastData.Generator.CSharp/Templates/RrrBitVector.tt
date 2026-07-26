@@ -13,6 +13,7 @@
     };
 
     string helperModifier = FieldModifier.Contains(" static ", StringComparison.Ordinal) ? "private static " : "private ";
+    Type offsetType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Context.Offsets.Max()) : typeof(uint);
 #>
     private const ulong _rrrMinValue = <#= TypeMap.ToValueLabel(Context.MinValue) #>;
     private const ulong _rrrMaxValue = <#= TypeMap.ToValueLabel(Context.MaxValue) #>;
@@ -20,8 +21,8 @@
     <#= FieldModifier #>byte[] _rrrClasses = new byte[] {
 <#= FormatHelper.FormatColumns(Context.Classes, TypeMap.ToValueLabel, 8) #>
     };
-    <#= FieldModifier #>uint[] _rrrOffsets = new uint[] {
-<#= FormatHelper.FormatColumns(Context.Offsets, TypeMap.ToValueLabel, 8) #>
+    <#= FieldModifier #><#= TypeMap.GetTypeName(offsetType) #>[] _rrrOffsets = new <#= TypeMap.GetTypeName(offsetType) #>[] {
+<#= FormatHelper.FormatColumns(Context.Offsets, x => TypeMap.ToValueLabel(x, offsetType), 8) #>
     };
 
     <#= MethodAttribute #>
@@ -39,7 +40,7 @@
         if (classValue == 0)
             return false;
 
-        uint rank = _rrrOffsets[blockIndex];
+        uint rank = (uint)_rrrOffsets[blockIndex];
         return DecodeBit(classValue, rank, bitInBlock);
     }
 

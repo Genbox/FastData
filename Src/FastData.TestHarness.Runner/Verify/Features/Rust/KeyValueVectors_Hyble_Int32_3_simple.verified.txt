@@ -21,8 +21,8 @@ impl fastdata {
         E { key: 1, value: 1 }, E { key: 1, value: 1 }, E { key: 2, value: 2 }, E { key: 3, value: 3 }
     ];
 
-    const DISPLACEMENTS: [u16; 1] = [
-        0
+    const DISPLACEMENTS: [u8; 1] = [
+        u8::MIN
     ];
 
     #[inline(always)]

@@ -10,13 +10,13 @@ use std::ptr;
 
 fn Length(value: &str) -> i32 { value.len() as i32 }
 
-const AssociationValues: [i32; 256] = [
+const AssociationValues: [u8; 256] = [
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
         2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 
-        0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+        u8::MIN, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
@@ -44,17 +44,17 @@ pub struct fastdata;
 
 struct E {
     key: &'static str,
-    hash_code: u64,
+    hash_code: u8,
     next: i8,
 }
 
 impl fastdata {
-    const BUCKETS: [i8; 2] = [
+    const BUCKETS: [u8; 2] = [
         2, 1
     ];
 
     const ENTRIES: [E; 2] = [
-        E { hash_code: 1, next: -1, key: "test1" }, E { hash_code: u64::MIN, next: -1, key: "test2" }
+        E { hash_code: 1, next: -1, key: "test1" }, E { hash_code: u8::MIN, next: -1, key: "test2" }
     ];
 
     #[inline]
@@ -83,14 +83,14 @@ impl fastdata {
 
         let hash = unsafe { Self::get_hash(key, length) };
         let index = hash % 2u64;
-        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+        let mut i: i32 = (Self::BUCKETS[index as usize] as i32) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.hash_code == hash && entry.key == key {
+            if (entry.hash_code as u64) == hash && entry.key == key {
                 return true;
             }
-            i = entry.next;
+            i = entry.next as i32;
         }
 
         false

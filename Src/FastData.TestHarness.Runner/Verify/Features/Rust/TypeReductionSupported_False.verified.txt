@@ -47,7 +47,7 @@ impl fastdata {
             if entry.key == key {
                 return true;
             }
-            i = entry.next;
+            i = entry.next as i32;
         }
 
         false

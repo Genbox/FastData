@@ -13,16 +13,16 @@ pub struct fastdata;
 
 struct E {
     key: f32,
-    hash_code: u64,
+    hash_code: u32,
 }
 
 impl fastdata {
     const BUCKET_STARTS: [u8; 7] = [
-        0, 1, 2, 3, 3, 4, 5
+        u8::MIN, 1, 2, 3, 3, 4, 5
     ];
 
     const ENTRIES: [E; 5] = [
-        E { hash_code: u64::MIN, key: 0f32 }, E { hash_code: 4286578687, key: f32::MIN }, E { hash_code: 1065353216, key: 1f32 }, E { hash_code: 3212836864, key: -1f32 }, E { hash_code: 2139095039, key: f32::MAX }
+        E { hash_code: u32::MIN, key: 0f32 }, E { hash_code: 4286578687, key: f32::MIN }, E { hash_code: 1065353216, key: 1f32 }, E { hash_code: 3212836864, key: -1f32 }, E { hash_code: 2139095039, key: f32::MAX }
     ];
 
     #[inline(always)]
@@ -50,7 +50,7 @@ impl fastdata {
 
         for i in start..end {
             let entry = &Self::ENTRIES[i];
-            if entry.hash_code == hash && entry.key == key {
+            if (entry.hash_code as u64) == hash && entry.key == key {
                 return true;
             }
         }

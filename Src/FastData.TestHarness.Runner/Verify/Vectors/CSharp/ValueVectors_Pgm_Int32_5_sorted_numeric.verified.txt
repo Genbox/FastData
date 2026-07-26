@@ -27,7 +27,7 @@ internal static class FastData
         13.8f, 0.0f, 0.0f
     };
 
-    private static readonly int[] _segIntercepts = new int[] {
+    private static readonly sbyte[] _segIntercepts = new sbyte[] {
         0, 5, 5
     };
 
@@ -38,7 +38,7 @@ internal static class FastData
         {
             double diff = (uint)key - (uint)_segKeys[seg];
             int pos = (int)(long)(_segSlopes[seg] * diff);
-            return pos < 0 ? 0 : pos + _segIntercepts[seg];
+            return pos < 0 ? 0 : pos + (int)_segIntercepts[seg];
         }
     }
 
@@ -56,7 +56,7 @@ internal static class FastData
         }
 
         int pos = EvaluateSegment(seg, key);
-        int nextIntercept = _segIntercepts[seg + 1];
+        int nextIntercept = (int)_segIntercepts[seg + 1];
         if (pos > nextIntercept) pos = nextIntercept;
         return pos;
     }

@@ -35,6 +35,8 @@ Complexity below is the amortized time for a single query after generated code h
 
 `n` means the number of stored keys. Average memory assumes large `n`, so word-rounding effects such as `ceil(... / 64)` are ignored. For fixed-width numeric keys, one key slot is 8 bits for `byte`/`sbyte`, 16 bits for `char`/`short`/`ushort`, 32 bits for `int`/`uint`/`float`, and 64 bits for `long`/`ulong`/`double`. For strings on a 64-bit target, use 64 bits/key for a C# string reference or 128 bits/key for a C++ `std::string_view` / Rust `&str`, then add string literal payload bits.
 
+`TypeReductionEnabled` is enabled by default. When enabled, generated integral metadata uses the smallest compatible built-in fixed-width type that covers the actual emitted values. Unsigned fields remain unsigned, while sentinel-bearing and signed-arithmetic fields retain signed storage; nonnegative GPerf association values may switch from signed to unsigned storage. This includes indexes, offsets, displacements, cached hashes, range boundaries, model intercepts, and packed-word arrays. Lookup code widens reduced values before arithmetic or bit operations. Disabling type reduction preserves each structure's canonical metadata types.
+
 ## Array
 
 * Supports: Numeric and string keys
@@ -105,7 +107,7 @@ Complexity below is the amortized time for a single query after generated code h
 * Complexity: O(1) amortized; worst-case O(n) if all entries collide into one bucket
 * Compressed: No
 
-`HashTable` is the general fallback for large or irregular datasets. It emits a bucket array and an entry array. Here `B` is the bucket length, `I(x)` is the selected signed index width after type reduction, and `H` is 64 when entries store hash codes, otherwise 0. FastData first computes the base bucket length as `ceil(n * HashTableCapacityFactor)`. `OptimizeHashTableBucketSize` is enabled by default; when enabled, FastData treats the base length as a starting point and scans a bounded set of larger candidate bucket counts, choosing a size with fewer or acceptable collisions. `RoundModuloToPowerOfTwo` is enabled by default and runs after bucket-size optimization, so `B` can be rounded up to the next power of two if the extra bucket count is within `RoundModuloToPowerOfTwoThreshold` and rounding does not increase collisions. Each entry stores the key, a `Next` index for separate chaining, and an optional hash code. Numeric keys use identity-style hashing where possible. String keys use either the default string hash or a dataset-specific hash expression when analysis is enabled.
+`HashTable` is the general fallback for large or irregular datasets. It emits a bucket array and an entry array. Bucket indexes use the smallest unsigned type covering the actual bucket values, while `Next` uses the smallest signed type covering its actual values and the `-1` sentinel. Cached hashes use the smallest unsigned type covering the generated hashes. FastData first computes the base bucket length as `ceil(n * HashTableCapacityFactor)`. `OptimizeHashTableBucketSize` is enabled by default; when enabled, FastData treats the base length as a starting point and scans a bounded set of larger candidate bucket counts, choosing a size with fewer or acceptable collisions. `RoundModuloToPowerOfTwo` is enabled by default and runs after bucket-size optimization, so `B` can be rounded up to the next power of two if the extra bucket count is within `RoundModuloToPowerOfTwoThreshold` and rounding does not increase collisions. Each entry stores the key, a `Next` index for separate chaining, and an optional hash code. Numeric keys use identity-style hashing where possible. String keys use either the default string hash or a dataset-specific hash expression when analysis is enabled.
 
 ## HashTableCompact
 
@@ -123,7 +125,7 @@ Complexity below is the amortized time for a single query after generated code h
 * Complexity: O(1)
 * Compressed: No
 
-`HashTablePerfect` is selected when all generated hash codes are unique for the dataset. Here `B` is the entry table length, normally `n * HashTableCapacityFactor`, with the same optional power-of-two rounding as `HashTable`, and `H` is 64 when entries store hash codes, otherwise 0. It emits one entry array indexed directly by `hash % B`, with no bucket array and no collision-chain metadata. If `HashTableCapacityFactor` or modulo rounding creates empty slots, or the key type does not use identity hashing, entries also store a 64-bit hash code to distinguish empty slots and verify matches.
+`HashTablePerfect` is selected when all generated hash codes are unique for the dataset. Here `B` is the entry table length, normally `n * HashTableCapacityFactor`, with the same optional power-of-two rounding as `HashTable`. It emits one entry array indexed directly by `hash % B`, with no bucket array and no collision-chain metadata. If `HashTableCapacityFactor` or modulo rounding creates empty slots, or the key type does not use identity hashing, entries also store a cached hash using the smallest unsigned type that covers all hashes and the empty-slot sentinel.
 
 ## KeyLength
 
@@ -132,16 +134,16 @@ Complexity below is the amortized time for a single query after generated code h
 * Complexity: O(1)
 * Compressed: No
 
-`KeyLength` uses string length as the index when every key length is unique and the length range is dense enough. The generated key table has one slot for every length in `[minLength, maxLength]`, so gaps still consume key slots. Empty length slots do not add string payload. With values, it also emits an `int` offset array of length `L` and a compact value array of length `n`, but value-related storage is not included above.
+`KeyLength` uses string length as the index when every key length is unique and the length range is dense enough. The generated key table has one slot for every length in `[minLength, maxLength]`, so gaps still consume key slots. Empty length slots do not add string payload. With values, it also emits a type-reduced unsigned offset array of length `L` and a compact value array of length `n`, but value-related storage is not included above.
 
 ## Range
 
 * Supports: Numeric keys
 * Values: No
 * Complexity: O(r) for fewer than eight ranges; O(log r) otherwise
-* Compressed: Yes. `2 * r * keyBits` where `r` is the number of ranges
+* Compressed: Yes. `2 * r * boundaryBits` where `r` is the number of ranges and `boundaryBits` is the emitted boundary width (`keyBits` when type reduction is disabled)
 
-`Range` stores consecutive integral keys as ranges. For a single range, the generated code embeds the start/end constants directly in the comparison. For multiple ranges, it emits separate start and end arrays. Membership uses an early-terminating linear scan for fewer than eight ranges and binary-searches the range starts otherwise.
+`Range` stores consecutive integral keys as ranges. For a single range, the generated code embeds the start/end constants directly in the comparison. For multiple ranges, it emits separate start and end arrays using the smallest same-signedness type that covers every boundary. Membership uses an early-terminating linear scan for fewer than eight ranges and binary-searches the range starts otherwise.
 
 Automatic selection requires membership-only integral data and applies the configured range-count limits. A single range is always accepted because it is emitted as two constants. Multiple ranges are accepted only when their `2 * r` endpoints use fewer key slots than the original `n` keys (`2 * r < n`), preventing mostly-singleton datasets from being expanded by range encoding.
 

@@ -15,8 +15,8 @@ internal static class FastData
     private struct E
     {
         internal float Key;
-        internal ulong HashCode;
-        internal E(float key, ulong hashCode)
+        internal uint HashCode;
+        internal E(float key, uint hashCode)
         {
             Key = key;
         HashCode = hashCode;
@@ -24,7 +24,7 @@ internal static class FastData
     };
 
     private static readonly byte[] _bucketStarts = new byte[] {
-        0, 1, 1, 2, 3, 5, 5, 6, 7, 7, 
+        byte.MinValue, 1, 1, 2, 3, 5, 5, 6, 7, 7, 
         7, 7, 8, 9, 10, 10, 11, 11, 12, 12, 
         13, 14, 14, 15, 15, 16, 16, 16, 16, 17, 
         18, 19, 20, 21, 22, 23, 23, 23, 24, 25, 
@@ -46,16 +46,16 @@ internal static class FastData
     };
 
     private static readonly E[] _entries = {
-        new E(0f, ulong.MinValue), new E(72f, 1116733440ul), new E(29f, 1105723392ul), new E(12f, 1094713344ul), new E(85f, 1118437376ul), new E(98f, 1120141312ul), new E(39f, 1109131264ul), new E(52f, 1112539136ul), new E(21f, 1101529088ul), new E(8f, 1090519040ul), 
-        new E(66f, 1115947008ul), new E(79f, 1117650944ul), new E(92f, 1119354880ul), new E(36f, 1108344832ul), new E(6f, 1086324736ul), new E(49f, 1111752704ul), new E(62f, 1115160576ul), new E(26f, 1104150528ul), new E(73f, 1116864512ul), new E(4f, 1082130432ul), 
-        new E(86f, 1118568448ul), new E(33f, 1107558400ul), new E(99f, 1120272384ul), new E(46f, 1110966272ul), new E(18f, 1099956224ul), new E(3f, 1077936128ul), new E(59f, 1114374144ul), new E(67f, 1116078080ul), new E(80f, 1117782016ul), new E(31f, 1106771968ul), 
-        new E(13f, 1095761920ul), new E(93f, 1119485952ul), new E(2f, 1073741824ul), new E(43f, 1110179840ul), new E(56f, 1113587712ul), new E(23f, 1102577664ul), new E(9f, 1091567616ul), new E(74f, 1116995584ul), new E(87f, 1118699520ul), new E(40f, 1109393408ul), 
-        new E(1f, 1065353216ul), new E(53f, 1112801280ul), new E(68f, 1116209152ul), new E(28f, 1105199104ul), new E(81f, 1117913088ul), new E(94f, 1119617024ul), new E(37f, 1108606976ul), new E(50f, 1112014848ul), new E(20f, 1101004800ul), new E(63f, 1115422720ul), 
-        new E(75f, 1117126656ul), new E(88f, 1118830592ul), new E(34f, 1107820544ul), new E(14f, 1096810496ul), new E(47f, 1111228416ul), new E(60f, 1114636288ul), new E(25f, 1103626240ul), new E(10f, 1092616192ul), new E(69f, 1116340224ul), new E(82f, 1118044160ul), 
-        new E(95f, 1119748096ul), new E(44f, 1110441984ul), new E(17f, 1099431936ul), new E(7f, 1088421888ul), new E(57f, 1113849856ul), new E(76f, 1117257728ul), new E(30f, 1106247680ul), new E(89f, 1118961664ul), new E(5f, 1084227584ul), new E(41f, 1109655552ul), 
-        new E(54f, 1113063424ul), new E(22f, 1102053376ul), new E(70f, 1116471296ul), new E(83f, 1118175232ul), new E(96f, 1119879168ul), new E(38f, 1108869120ul), new E(15f, 1097859072ul), new E(51f, 1112276992ul), new E(64f, 1115684864ul), new E(27f, 1104674816ul), 
-        new E(11f, 1093664768ul), new E(77f, 1117388800ul), new E(90f, 1119092736ul), new E(35f, 1108082688ul), new E(48f, 1111490560ul), new E(19f, 1100480512ul), new E(61f, 1114898432ul), new E(71f, 1116602368ul), new E(84f, 1118306304ul), new E(32f, 1107296256ul), 
-        new E(97f, 1120010240ul), new E(45f, 1110704128ul), new E(58f, 1114112000ul), new E(24f, 1103101952ul), new E(65f, 1115815936ul), new E(78f, 1117519872ul), new E(91f, 1119223808ul), new E(42f, 1109917696ul), new E(16f, 1098907648ul), new E(55f, 1113325568ul)
+        new E(0f, uint.MinValue), new E(72f, 1116733440u), new E(29f, 1105723392u), new E(12f, 1094713344u), new E(85f, 1118437376u), new E(98f, 1120141312u), new E(39f, 1109131264u), new E(52f, 1112539136u), new E(21f, 1101529088u), new E(8f, 1090519040u), 
+        new E(66f, 1115947008u), new E(79f, 1117650944u), new E(92f, 1119354880u), new E(36f, 1108344832u), new E(6f, 1086324736u), new E(49f, 1111752704u), new E(62f, 1115160576u), new E(26f, 1104150528u), new E(73f, 1116864512u), new E(4f, 1082130432u), 
+        new E(86f, 1118568448u), new E(33f, 1107558400u), new E(99f, 1120272384u), new E(46f, 1110966272u), new E(18f, 1099956224u), new E(3f, 1077936128u), new E(59f, 1114374144u), new E(67f, 1116078080u), new E(80f, 1117782016u), new E(31f, 1106771968u), 
+        new E(13f, 1095761920u), new E(93f, 1119485952u), new E(2f, 1073741824u), new E(43f, 1110179840u), new E(56f, 1113587712u), new E(23f, 1102577664u), new E(9f, 1091567616u), new E(74f, 1116995584u), new E(87f, 1118699520u), new E(40f, 1109393408u), 
+        new E(1f, 1065353216u), new E(53f, 1112801280u), new E(68f, 1116209152u), new E(28f, 1105199104u), new E(81f, 1117913088u), new E(94f, 1119617024u), new E(37f, 1108606976u), new E(50f, 1112014848u), new E(20f, 1101004800u), new E(63f, 1115422720u), 
+        new E(75f, 1117126656u), new E(88f, 1118830592u), new E(34f, 1107820544u), new E(14f, 1096810496u), new E(47f, 1111228416u), new E(60f, 1114636288u), new E(25f, 1103626240u), new E(10f, 1092616192u), new E(69f, 1116340224u), new E(82f, 1118044160u), 
+        new E(95f, 1119748096u), new E(44f, 1110441984u), new E(17f, 1099431936u), new E(7f, 1088421888u), new E(57f, 1113849856u), new E(76f, 1117257728u), new E(30f, 1106247680u), new E(89f, 1118961664u), new E(5f, 1084227584u), new E(41f, 1109655552u), 
+        new E(54f, 1113063424u), new E(22f, 1102053376u), new E(70f, 1116471296u), new E(83f, 1118175232u), new E(96f, 1119879168u), new E(38f, 1108869120u), new E(15f, 1097859072u), new E(51f, 1112276992u), new E(64f, 1115684864u), new E(27f, 1104674816u), 
+        new E(11f, 1093664768u), new E(77f, 1117388800u), new E(90f, 1119092736u), new E(35f, 1108082688u), new E(48f, 1111490560u), new E(19f, 1100480512u), new E(61f, 1114898432u), new E(71f, 1116602368u), new E(84f, 1118306304u), new E(32f, 1107296256u), 
+        new E(97f, 1120010240u), new E(45f, 1110704128u), new E(58f, 1114112000u), new E(24f, 1103101952u), new E(65f, 1115815936u), new E(78f, 1117519872u), new E(91f, 1119223808u), new E(42f, 1109917696u), new E(16f, 1098907648u), new E(55f, 1113325568u)
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -95,7 +95,7 @@ internal static class FastData
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && entry.Key == key)
+            if ((ulong)entry.HashCode == hash && entry.Key == key)
                 return true;
         }
 

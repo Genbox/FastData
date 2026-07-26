@@ -6,6 +6,7 @@
     string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
     bool useEntryStruct = Data.ValueCount > 0;
     string entryTypeName = useEntryStruct ? "e" : KeyTypeName;
+    Type displacementType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Context.Displacements.Max()) : typeof(ushort);
 #>
 <#
     if (useEntryStruct)
@@ -31,8 +32,8 @@
     }, 8) #>
     };
 
-    <#= FieldModifier(false) #>std::array<uint16_t, <#= Data.Displacements.Length.ToStringInvariant() #>> displacements = {
-<#= FormatHelper.FormatColumns(Data.Displacements, (_, x) => x.ToStringInvariant(), 8) #>
+    <#= FieldModifier(false) #>std::array<<#= TypeMap.GetTypeName(displacementType) #>, <#= Data.Displacements.Length.ToStringInvariant() #>> displacements = {
+<#= FormatHelper.FormatColumns(Data.Displacements, (_, x) => TypeMap.ToValueLabel(x, displacementType), 8) #>
     };
 
 <#= HashSource #>

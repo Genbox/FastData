@@ -2,15 +2,22 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.RangeTemplateData" name="Data" #>
 
 <#
+    Type rangeType = GeneratorConfig.TypeReductionEnabled && Data.RangeCount > 1
+        ? TypeMap.GetSmallestIntegerType(Model.KeyType, Data.Ranges[0].Start, Data.Ranges[^1].End)
+        : Model.KeyType;
+    string rangeTypeName = TypeMap.GetTypeName(rangeType);
+    bool rangeTypeReduced = rangeType != Model.KeyType;
+    Func<string, string> toKeyType = value => rangeTypeReduced ? $"static_cast<{KeyTypeName}>({value})" : value;
+
     if (Data.RangeCount > 1)
     {
 #>
-    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.RangeCount.ToStringInvariant() #>> range_starts = {
-<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.Start), 8) #>
+    <#= FieldModifier(true) #>std::array<<#= rangeTypeName #>, <#= Data.RangeCount.ToStringInvariant() #>> range_starts = {
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.Start, rangeType), 8) #>
     };
 
-    <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, <#= Data.RangeCount.ToStringInvariant() #>> range_ends = {
-<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.End), 8) #>
+    <#= FieldModifier(true) #>std::array<<#= rangeTypeName #>, <#= Data.RangeCount.ToStringInvariant() #>> range_ends = {
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.End, rangeType), 8) #>
     };
 <#
     }
@@ -45,10 +52,10 @@ public:
         key_iterator(const size_t range, const <#= KeyTypeName #> key) noexcept : _range(range), _key(key) {}
 
         key_iterator& operator++() noexcept {
-            if (_key == range_ends[_range]) {
+            if (_key == <#= toKeyType("range_ends[_range]") #>) {
                 ++_range;
                 if (_range < range_starts.size())
-                    _key = range_starts[_range];
+                    _key = <#= toKeyType("range_starts[_range]") #>;
             }
             else {
                 ++_key;
@@ -74,7 +81,7 @@ public:
     }
     else
     {
-#>        [[nodiscard]] key_iterator begin() const noexcept { return key_iterator(0, range_starts[0]); }
+#>        [[nodiscard]] key_iterator begin() const noexcept { return key_iterator(0, <#= toKeyType("range_starts[0]") #>); }
         [[nodiscard]] key_iterator end() const noexcept { return key_iterator(range_starts.size(), <#= TypeMap.ToValueLabel(Data.Ranges[Data.RangeCount - 1].End) #>); }
 <#
     }
@@ -97,10 +104,10 @@ public:
     {
 #>
         for (size_t i = 0; i < <#= Data.RangeCount.ToStringInvariant() #>; ++i) {
-            if (<#= LookupKeyName #> < range_starts[i])
+            if (<#= LookupKeyName #> < <#= toKeyType("range_starts[i]") #>)
                 return false;
 
-            if (<#= LookupKeyName #> <= range_ends[i])
+            if (<#= LookupKeyName #> <= <#= toKeyType("range_ends[i]") #>)
                 return true;
         }
 
@@ -116,7 +123,7 @@ public:
         while (low < high) {
             const size_t middle = low + ((high - low) >> 1);
 
-            if (<#= LookupKeyName #> < range_starts[middle])
+            if (<#= LookupKeyName #> < <#= toKeyType("range_starts[middle]") #>)
                 high = middle;
             else
                 low = middle + 1;
@@ -125,7 +132,7 @@ public:
         if (low == 0)
             return false;
 
-        return <#= LookupKeyName #> <= range_ends[low - 1];
+        return <#= LookupKeyName #> <= <#= toKeyType("range_ends[low - 1]") #>;
 <#
     }
 #>

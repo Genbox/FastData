@@ -15,8 +15,8 @@ internal static class FastData
     private struct E
     {
         internal float Key;
-        internal ulong HashCode;
-        internal E(float key, ulong hashCode)
+        internal uint HashCode;
+        internal E(float key, uint hashCode)
         {
             Key = key;
         HashCode = hashCode;
@@ -24,11 +24,11 @@ internal static class FastData
     };
 
     private static readonly byte[] _bucketStarts = new byte[] {
-        0, 1, 2, 3, 3, 4, 5
+        byte.MinValue, 1, 2, 3, 3, 4, 5
     };
 
     private static readonly E[] _entries = {
-        new E(0f, ulong.MinValue), new E(float.MinValue, 4286578687ul), new E(1f, 1065353216ul), new E(-1f, 3212836864ul), new E(float.MaxValue, 2139095039ul)
+        new E(0f, uint.MinValue), new E(float.MinValue, 4286578687u), new E(1f, 1065353216u), new E(-1f, 3212836864u), new E(float.MaxValue, 2139095039u)
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -68,7 +68,7 @@ internal static class FastData
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && entry.Key == key)
+            if ((ulong)entry.HashCode == hash && entry.Key == key)
                 return true;
         }
 

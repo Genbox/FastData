@@ -30,17 +30,17 @@ class fastdata final {
     struct e {
         float key;
         int8_t next;
-        uint64_t hash_code;
-        e(const float key, const int8_t next, const uint64_t hash_code)
+        uint32_t hash_code;
+        e(const float key, const int8_t next, const uint32_t hash_code)
            : key(key), next(next), hash_code(hash_code) {}
     };
 
-    static constexpr std::array<int8_t, 6> buckets = {
+    static constexpr std::array<uint8_t, 6> buckets = {
         3, 1, 4, 0, 2, 5
     };
 
     inline static const std::array<e, 5> entries = {
-        e(std::numeric_limits<float>::lowest(), -1, 4286578687ull), e(-1.0f, -1, 3212836864ull), e(0.0f, -1, 0), e(1.0f, -1, 1065353216ull), e(std::numeric_limits<float>::max(), -1, 2139095039ull)
+        e(std::numeric_limits<float>::lowest(), -1, 4286578687u), e(-1.0f, -1, 3212836864u), e(0.0f, -1, 0), e(1.0f, -1, 1065353216u), e(std::numeric_limits<float>::max(), -1, 2139095039u)
     };
 
     static uint64_t get_hash(const float value) noexcept {
@@ -77,12 +77,12 @@ public:
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 6;
-        int8_t i = static_cast<int8_t>(buckets[index] - 1);
+        int32_t i = static_cast<int32_t>(buckets[index]) - 1;
 
         while (i >= 0) {
             const auto& entry = entries[i];
 
-            if (entry.hash_code == hash && entry.key == key)
+            if (static_cast<uint64_t>(entry.hash_code) == hash && entry.key == key)
                 return true;
 
             i = entry.next;

@@ -13,6 +13,7 @@
         TypeCode.Int64 => $"({LookupKeyName} ^ i64::MIN) as u64",
         _ => throw new InvalidOperationException("RRR bitvector only supports integral key types.")
     };
+    Type offsetType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Context.Offsets.Max()) : typeof(uint);
 #>
     const RRR_MIN_VALUE: u64 = <#= TypeMap.ToValueLabel(Context.MinValue) #>;
     const RRR_MAX_VALUE: u64 = <#= TypeMap.ToValueLabel(Context.MaxValue) #>;
@@ -20,8 +21,8 @@
     <#= FieldModifier #>RRR_CLASSES: [u8; <#= Context.Classes.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Context.Classes, TypeMap.ToValueLabel, 8) #>
     ];
-    <#= FieldModifier #>RRR_OFFSETS: [u32; <#= Context.Offsets.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.Offsets, TypeMap.ToValueLabel, 8) #>
+    <#= FieldModifier #>RRR_OFFSETS: [<#= TypeMap.GetTypeName(offsetType) #>; <#= Context.Offsets.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.Offsets, (_, x) => TypeMap.ToValueLabel(x, offsetType), 8) #>
     ];
 
     <#= MethodAttribute #>
@@ -38,7 +39,7 @@
             return false;
         }
 
-        let rank = Self::RRR_OFFSETS[block_index as usize];
+        let rank = Self::RRR_OFFSETS[block_index as usize] as u32;
         Self::decode_bit(class_value, rank, bit_in_block)
     }
 

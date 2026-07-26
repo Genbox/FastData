@@ -16,8 +16,8 @@ internal static class FastData
         1, 1, 2, 3
     };
 
-    private static readonly ushort[] _displacements = {
-        0
+    private static readonly byte[] _displacements = {
+        byte.MinValue
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

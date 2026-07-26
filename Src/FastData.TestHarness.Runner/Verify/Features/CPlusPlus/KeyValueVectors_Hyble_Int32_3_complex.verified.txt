@@ -45,7 +45,7 @@ class fastdata final {
         e(1, Person(1, u8"Bob", new Person(4, u8"Anna", nullptr))), e(1, Person(1, u8"Bob", new Person(4, u8"Anna", nullptr))), e(2, Person(2, u8"Billy", nullptr)), e(3, Person(3, u8"Bibi", nullptr))
     };
 
-    inline static const std::array<uint16_t, 1> displacements = {
+    inline static const std::array<uint8_t, 1> displacements = {
         0
     };
 

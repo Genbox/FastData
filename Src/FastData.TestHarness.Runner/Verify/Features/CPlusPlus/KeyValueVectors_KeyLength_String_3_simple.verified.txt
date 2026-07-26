@@ -28,7 +28,7 @@ class fastdata final {
 
     static constexpr int32_t Length(std::string_view str) noexcept { return static_cast<int32_t>(str.length()); }
 
-    static constexpr std::array<int32_t, 3> offsets = {
+    static constexpr std::array<uint8_t, 3> offsets = {
         0, 1, 2
     };
 

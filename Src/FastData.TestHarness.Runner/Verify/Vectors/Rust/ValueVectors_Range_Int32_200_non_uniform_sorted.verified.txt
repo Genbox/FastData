@@ -12,7 +12,7 @@ use std::ptr;
 pub struct fastdata;
 impl fastdata {
 
-    const RANGE_STARTS: [i32; 200] = [
+    const RANGE_STARTS: [i16; 200] = [
         153, 157, 162, 168, 175, 183, 192, 195, 199, 204, 
         210, 217, 225, 234, 237, 241, 246, 252, 259, 267, 
         276, 279, 283, 338, 344, 351, 359, 368, 371, 375, 
@@ -35,7 +35,7 @@ impl fastdata {
         1691, 1696, 1702, 1709, 1717, 1726, 1729, 1733, 1738, 1744
     ];
 
-    const RANGE_ENDS: [i32; 200] = [
+    const RANGE_ENDS: [i16; 200] = [
         153, 157, 162, 168, 175, 183, 192, 195, 199, 204, 
         210, 217, 225, 234, 237, 241, 246, 252, 259, 267, 
         276, 279, 283, 338, 344, 351, 359, 368, 371, 375, 
@@ -59,7 +59,7 @@ impl fastdata {
     ];
     #[must_use]
     pub fn keys() -> impl Iterator<Item = i32> {
-        Self::RANGE_STARTS.iter().zip(Self::RANGE_ENDS.iter()).flat_map(|(start, end)| *start..=*end)
+        Self::RANGE_STARTS.iter().zip(Self::RANGE_ENDS.iter()).flat_map(|(start, end)| *start as i32..=*end as i32)
     }
 
     #[must_use]
@@ -71,7 +71,7 @@ impl fastdata {
         while low < high {
             let middle = low + ((high - low) >> 1);
 
-            if key < Self::RANGE_STARTS[middle] {
+            if key < Self::RANGE_STARTS[middle] as i32 {
                 high = middle;
             }
             else {
@@ -79,7 +79,7 @@ impl fastdata {
             }
         }
 
-        low > 0 && key <= Self::RANGE_ENDS[low - 1]
+        low > 0 && key <= Self::RANGE_ENDS[low - 1] as i32
     }
 
     pub const ITEM_COUNT: usize = 200;

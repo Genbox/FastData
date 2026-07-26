@@ -39,7 +39,7 @@ class fastdata final {
         e(1, 1), e(1, 1), e(2, 2), e(3, 3)
     };
 
-    inline static const std::array<uint16_t, 1> displacements = {
+    inline static const std::array<uint8_t, 1> displacements = {
         0
     };
 

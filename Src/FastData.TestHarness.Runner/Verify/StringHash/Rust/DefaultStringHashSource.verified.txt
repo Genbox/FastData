@@ -22,7 +22,7 @@ struct E {
 }
 
 impl fastdata {
-    const BUCKETS: [i8; 2] = [
+    const BUCKETS: [u8; 2] = [
         1, 2
     ];
 
@@ -58,14 +58,14 @@ impl fastdata {
 
         let hash = unsafe { Self::get_hash(key, length) };
         let index = hash % 2u64;
-        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+        let mut i: i32 = (Self::BUCKETS[index as usize] as i32) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
-            if entry.hash_code == hash && entry.key == key {
+            if (entry.hash_code as u64) == hash && entry.key == key {
                 return true;
             }
-            i = entry.next;
+            i = entry.next as i32;
         }
 
         false

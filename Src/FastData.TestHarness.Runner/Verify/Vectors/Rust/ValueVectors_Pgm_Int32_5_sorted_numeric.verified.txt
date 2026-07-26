@@ -32,13 +32,13 @@ impl fastdata {
         13.8_f32, 0.0_f32, 0.0_f32
     ];
 
-    const SEG_INTERCEPTS: [i32; 3] = [
-        0_i32, 5_i32, 5_i32
+    const SEG_INTERCEPTS: [i8; 3] = [
+        0, 5, 5
     ];
 
     fn evaluate_segment(seg: usize, key: i32) -> i32 {
         let pos: i32 = ((Self::SEG_SLOPES[seg] as f64) * ((key as u32).wrapping_sub(Self::SEG_KEYS[seg] as u32)) as f64) as i32;
-        if pos < 0 { 0 } else { pos + Self::SEG_INTERCEPTS[seg] }
+        if pos < 0 { 0 } else { pos + Self::SEG_INTERCEPTS[seg] as i32 }
     }
 
     fn get_segment_pos(key: i32) -> i32 {
@@ -54,7 +54,7 @@ impl fastdata {
         }
 
         let mut pos: i32 = Self::evaluate_segment(seg, key);
-        let next_intercept: i32 = Self::SEG_INTERCEPTS[seg + 1];
+        let next_intercept: i32 = Self::SEG_INTERCEPTS[seg + 1] as i32;
         if pos > next_intercept { pos = next_intercept; }
         pos
     }

@@ -18,7 +18,7 @@ struct E {
 
 impl fastdata {
     const BUCKET_STARTS: [u8; 6] = [
-        0, 1, 2, 2, 3, 4
+        u8::MIN, 1, 2, 2, 3, 4
     ];
 
     const ENTRIES: [E; 4] = [
@@ -50,7 +50,7 @@ impl fastdata {
 
         for i in start..end {
             let entry = &Self::ENTRIES[i];
-            if entry.hash_code == hash && entry.key == key {
+            if (entry.hash_code as u64) == hash && entry.key == key {
                 return true;
             }
         }

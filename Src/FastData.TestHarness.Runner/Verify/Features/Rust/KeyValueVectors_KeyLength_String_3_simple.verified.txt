@@ -14,8 +14,8 @@ fn Length(value: &str) -> i32 { value.len() as i32 }
 pub struct fastdata;
 impl fastdata {
 
-    const OFFSETS: [i32; 3] = [
-        0, 1, 2
+    const OFFSETS: [u8; 3] = [
+        u8::MIN, 1, 2
     ];
 
     const VALUES: [i32; 3] = [

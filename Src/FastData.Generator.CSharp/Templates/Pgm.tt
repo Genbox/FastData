@@ -15,6 +15,7 @@
     bool singleSegment = Data.SegmentCount == 1;
     bool hasRecursiveLevels = Data.EpsilonRecursive > 0 && Data.LevelsOffsets.Length > 2;
     int linearSearchThreshold = 64;
+    Type interceptType = !singleSegment && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestSignedType(Data.Segments.Min(x => x.Intercept), Data.Segments.Max(x => x.Intercept)) : typeof(int);
 
     // Single-segment constants
     string segKeyConst = singleSegment ? TypeMap.ToValueLabel(Data.Segments[0].Key) : "";
@@ -58,8 +59,8 @@
 <#= FormatHelper.FormatColumns(Data.Segments.Select(s => (object)s.Slope), Data.Segments.Length, o => formatSlope((float)o), 8) #>
     };
 
-    <#= FieldModifier #>int[] _segIntercepts = new int[] {
-<#= FormatHelper.FormatColumns(Data.Segments.Select(s => (object)s.Intercept), Data.Segments.Length, o => ((int)o).ToStringInvariant(), 8) #>
+    <#= FieldModifier #><#= TypeMap.GetTypeName(interceptType) #>[] _segIntercepts = new <#= TypeMap.GetTypeName(interceptType) #>[] {
+<#= FormatHelper.FormatColumns(Data.Segments, x => TypeMap.ToValueLabel(x.Intercept, interceptType), 8) #>
     };
 <#
     }
@@ -77,12 +78,12 @@
         {
             double diff = <#= string.Format(csharpDiffExpr, "_segKeys[seg]") #>;
             int pos = (int)(long)(_segSlopes[seg] * diff);
-            return pos < 0 ? 0 : pos + _segIntercepts[seg];
+            return pos < 0 ? 0 : pos + (int)_segIntercepts[seg];
         }
 <#      } else { #>
         double diff = <#= string.Format(csharpDiffExpr, "_segKeys[seg]") #>;
         int pos = (int)(long)(_segSlopes[seg] * diff);
-        return pos < 0 ? 0 : pos + _segIntercepts[seg];
+        return pos < 0 ? 0 : pos + (int)_segIntercepts[seg];
 <#      } #>
     }
 
@@ -104,7 +105,7 @@
         }
 
         int pos = EvaluateSegment(seg, key);
-        int nextIntercept = _segIntercepts[seg + 1];
+        int nextIntercept = (int)_segIntercepts[seg + 1];
         if (pos > nextIntercept) pos = nextIntercept;
         return pos;
 <#
@@ -127,7 +128,7 @@
 
         {
             int pos = EvaluateSegment(seg, key);
-            int nextIntercept = _segIntercepts[seg + 1];
+            int nextIntercept = (int)_segIntercepts[seg + 1];
             if (pos > nextIntercept) pos = nextIntercept;
 
             int lo = pos - <#= (epsRec + 1).ToStringInvariant() #>;
@@ -169,7 +170,7 @@
 
         {
             int pos = EvaluateSegment(seg, key);
-            int nextIntercept = _segIntercepts[seg + 1];
+            int nextIntercept = (int)_segIntercepts[seg + 1];
             if (pos > nextIntercept) pos = nextIntercept;
             return pos;
         }

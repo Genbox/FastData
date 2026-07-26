@@ -32,17 +32,17 @@ class fastdata final {
     struct e {
         std::string_view key;
         int8_t next;
-        uint64_t hash_code;
-        e(const std::string_view key, const int8_t next, const uint64_t hash_code)
+        uint8_t hash_code;
+        e(const std::string_view key, const int8_t next, const uint8_t hash_code)
            : key(key), next(next), hash_code(hash_code) {}
     };
 
-    static constexpr std::array<int8_t, 3> buckets = {
+    static constexpr std::array<uint8_t, 3> buckets = {
         1, 0, 2
     };
 
     inline static const std::array<e, 2> entries = {
-        e(u8"k0", -1, 48ull), e(u8"k2", -1, 50ull)
+        e(u8"k0", -1, 48), e(u8"k2", -1, 50)
     };
 
     static constexpr uint64_t get_hash(const std::string_view value, int32_t length) noexcept {
@@ -86,12 +86,12 @@ public:
 
         const uint64_t hash = get_hash(key, length);
         const size_t index = hash % 3;
-        int8_t i = static_cast<int8_t>(buckets[index] - 1);
+        int32_t i = static_cast<int32_t>(buckets[index]) - 1;
 
         while (i >= 0) {
             const auto& entry = entries[i];
 
-            if (entry.hash_code == hash && entry.key == key)
+            if (static_cast<uint64_t>(entry.hash_code) == hash && entry.key == key)
                 return true;
 
             i = entry.next;

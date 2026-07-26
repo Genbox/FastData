@@ -27,7 +27,7 @@ struct E {
 }
 
 impl fastdata {
-    const BUCKETS: [i8; 3] = [
+    const BUCKETS: [u8; 3] = [
         3, 1, 2
     ];
 
@@ -55,14 +55,14 @@ impl fastdata {
 
         let hash = Self::get_hash(key);
         let index = hash % 3u64;
-        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+        let mut i: i32 = (Self::BUCKETS[index as usize] as i32) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
             if entry.key == key {
                 return true;
             }
-            i = entry.next;
+            i = entry.next as i32;
         }
 
         false
@@ -73,14 +73,14 @@ impl fastdata {
 
         let hash = Self::get_hash(key);
         let index = hash % 3u64;
-        let mut i: i8 = (Self::BUCKETS[index as usize] as i8) - 1;
+        let mut i: i32 = (Self::BUCKETS[index as usize] as i32) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
             if entry.key == key {
                 return Some(entry.value);
             }
-            i = entry.next;
+            i = entry.next as i32;
         }
 
         None

@@ -4,17 +4,19 @@
 
 <#
     string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
-    string bucketType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestIntType(Math.Max(Context.Buckets.Length, Data.Entries.Length)) : TypeMap.GetTypeName(typeof(int));
+    Type bucketType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType((ulong)Context.Buckets.Max()) : typeof(int);
+    Type nextType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestSignedType(Data.Entries.Min(x => x.Next), Data.Entries.Max(x => x.Next)) : typeof(int);
+    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
 #>
 struct E {
     key: <#= StoredKeyTypeName #>,
 <#
     if (Context.StoreHashCode)
     {
-#>    hash_code: u64,
+#>    hash_code: <#= TypeMap.GetTypeName(hashType) #>,
 <#
     }
-#>    next: <#= bucketType #>,
+#>    next: <#= TypeMap.GetTypeName(nextType) #>,
 <#
     if (Data.ValueCount > 0)
     {
@@ -24,16 +26,16 @@ struct E {
 #>}
 
 <#@ include file="Includes\ImplHeader.ttinclude" #>
-    <#= FieldModifier #>BUCKETS: [<#= bucketType #>; <#= Context.Buckets.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.Buckets, (_, x) => x.ToStringInvariant(), 8) #>
+    <#= FieldModifier #>BUCKETS: [<#= TypeMap.GetTypeName(bucketType) #>; <#= Context.Buckets.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.Buckets, (_, x) => TypeMap.ToValueLabel(x, bucketType), 8) #>
     ];
 
     <#= FieldModifier #>ENTRIES: [E; <#= Data.Entries.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        string hashPart = Context.StoreHashCode ? $"hash_code: {TypeMap.ToValueLabel(x.Hash)}, " : string.Empty;
+        string hashPart = Context.StoreHashCode ? $"hash_code: {TypeMap.ToValueLabel(x.Hash, hashType)}, " : string.Empty;
         string valuePart = Data.ValueCount > 0 ? $", value: {valueLabels[i]}" : string.Empty;
-        return $"E {{ {hashPart}next: {TypeMap.ToValueLabel(x.Next)}, key: {TypeMap.ToValueLabel(x.Key)}{valuePart} }}";
+        return $"E {{ {hashPart}next: {TypeMap.ToValueLabel(x.Next, nextType)}, key: {TypeMap.ToValueLabel(x.Key)}{valuePart} }}";
     }, 8) #>
     ];
 
@@ -46,19 +48,19 @@ struct E {
 <#= GetMethodHeader(MethodType.Contains) #>
         let hash = <#= HashCall #>;
         let index = <#= GetMod("hash", (ulong)Context.Buckets.Length) #>;
-        let mut i: <#= bucketType #> = (Self::BUCKETS[index as usize] as <#= bucketType #>) - 1;
+        let mut i: i32 = (Self::BUCKETS[index as usize] as i32) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
             if <#
     if (Context.StoreHashCode)
     {
-#>entry.hash_code == hash && <#
+#>(entry.hash_code as u64) == hash && <#
     }
 #><#= GetEqual("entry.key", LookupKeyName) #> {
                 return true;
             }
-            i = entry.next;
+            i = entry.next as i32;
         }
 
         false
@@ -73,19 +75,19 @@ struct E {
 <#= GetMethodHeader(MethodType.TryLookup) #>
         let hash = <#= HashCall #>;
         let index = <#= GetMod("hash", (ulong)Context.Buckets.Length) #>;
-        let mut i: <#= bucketType #> = (Self::BUCKETS[index as usize] as <#= bucketType #>) - 1;
+        let mut i: i32 = (Self::BUCKETS[index as usize] as i32) - 1;
 
         while i >= 0 {
             let entry = &Self::ENTRIES[i as usize];
             if <#
     if (Context.StoreHashCode)
     {
-#>entry.hash_code == hash && <#
+#>(entry.hash_code as u64) == hash && <#
     }
 #><#= GetEqual("entry.key", LookupKeyName) #> {
                 return Some(entry.value);
             }
-            i = entry.next;
+            i = entry.next as i32;
         }
 
         None

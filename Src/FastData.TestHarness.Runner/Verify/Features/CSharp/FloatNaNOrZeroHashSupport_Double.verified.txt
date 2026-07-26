@@ -25,8 +25,8 @@ internal static class FastData
         }
     };
 
-    private static readonly sbyte[] _buckets = new sbyte[] {
-        0, 0, 1, 5, 2, 3, 4
+    private static readonly byte[] _buckets = new byte[] {
+        byte.MinValue, byte.MinValue, 1, 5, 2, 3, 4
     };
 
     private static readonly E[] _entries = {
@@ -58,13 +58,13 @@ internal static class FastData
 
         ulong hash = Hash(key);
         int index = (int)(hash % 7);
-        sbyte i = (sbyte)(_buckets[index] - 1);
+        int i = (int)_buckets[index] - 1;
 
         while (i >= 0)
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && entry.Key == key)
+            if ((ulong)entry.HashCode == hash && entry.Key == key)
                 return true;
 
             i = entry.Next;

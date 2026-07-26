@@ -11,7 +11,7 @@ internal static class FastData
 {
 
 
-    private static readonly int[] _rangeStarts = new int[] {
+    private static readonly short[] _rangeStarts = new short[] {
         153, 157, 162, 168, 175, 183, 192, 195, 199, 204, 
         210, 217, 225, 234, 237, 241, 246, 252, 259, 267, 
         276, 279, 283, 338, 344, 351, 359, 368, 371, 375, 
@@ -34,7 +34,7 @@ internal static class FastData
         1691, 1696, 1702, 1709, 1717, 1726, 1729, 1733, 1738, 1744
     };
 
-    private static readonly int[] _rangeEnds = new int[] {
+    private static readonly short[] _rangeEnds = new short[] {
         153, 157, 162, 168, 175, 183, 192, 195, 199, 204, 
         210, 217, 225, 234, 237, 241, 246, 252, 259, 267, 
         276, 279, 283, 338, 344, 351, 359, 368, 371, 375, 
@@ -62,11 +62,11 @@ internal static class FastData
         {
             for (int i = 0; i < _rangeStarts.Length; i++)
             {
-                for (int key = _rangeStarts[i]; ; key++)
+                for (int key = (int)_rangeStarts[i]; ; key++)
                 {
                     yield return key;
 
-                    if (key == _rangeEnds[i])
+                    if (key == (int)_rangeEnds[i])
                         break;
                 }
             }
@@ -85,14 +85,14 @@ internal static class FastData
         {
             int middle = low + ((high - low) >> 1);
 
-            if (key < _rangeStarts[middle])
+            if (key < (int)_rangeStarts[middle])
                 high = middle;
             else
                 low = middle + 1;
         }
 
         int rangeIndex = low - 1;
-        return rangeIndex >= 0 && key <= _rangeEnds[rangeIndex];
+        return rangeIndex >= 0 && key <= (int)_rangeEnds[rangeIndex];
     }
 
     public const int ItemCount = 200;

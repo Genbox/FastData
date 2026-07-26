@@ -13,12 +13,12 @@ pub struct fastdata;
 
 struct E {
     key: f32,
-    hash_code: u64,
+    hash_code: u32,
 }
 
 impl fastdata {
     const BUCKET_STARTS: [u8; 182] = [
-        0, 1, 1, 2, 3, 5, 5, 6, 7, 7, 
+        u8::MIN, 1, 1, 2, 3, 5, 5, 6, 7, 7, 
         7, 7, 8, 9, 10, 10, 11, 11, 12, 12, 
         13, 14, 14, 15, 15, 16, 16, 16, 16, 17, 
         18, 19, 20, 21, 22, 23, 23, 23, 24, 25, 
@@ -40,7 +40,7 @@ impl fastdata {
     ];
 
     const ENTRIES: [E; 100] = [
-        E { hash_code: u64::MIN, key: 0f32 }, E { hash_code: 1116733440, key: 72f32 }, E { hash_code: 1105723392, key: 29f32 }, E { hash_code: 1094713344, key: 12f32 }, E { hash_code: 1118437376, key: 85f32 }, E { hash_code: 1120141312, key: 98f32 }, E { hash_code: 1109131264, key: 39f32 }, E { hash_code: 1112539136, key: 52f32 }, E { hash_code: 1101529088, key: 21f32 }, E { hash_code: 1090519040, key: 8f32 }, 
+        E { hash_code: u32::MIN, key: 0f32 }, E { hash_code: 1116733440, key: 72f32 }, E { hash_code: 1105723392, key: 29f32 }, E { hash_code: 1094713344, key: 12f32 }, E { hash_code: 1118437376, key: 85f32 }, E { hash_code: 1120141312, key: 98f32 }, E { hash_code: 1109131264, key: 39f32 }, E { hash_code: 1112539136, key: 52f32 }, E { hash_code: 1101529088, key: 21f32 }, E { hash_code: 1090519040, key: 8f32 }, 
         E { hash_code: 1115947008, key: 66f32 }, E { hash_code: 1117650944, key: 79f32 }, E { hash_code: 1119354880, key: 92f32 }, E { hash_code: 1108344832, key: 36f32 }, E { hash_code: 1086324736, key: 6f32 }, E { hash_code: 1111752704, key: 49f32 }, E { hash_code: 1115160576, key: 62f32 }, E { hash_code: 1104150528, key: 26f32 }, E { hash_code: 1116864512, key: 73f32 }, E { hash_code: 1082130432, key: 4f32 }, 
         E { hash_code: 1118568448, key: 86f32 }, E { hash_code: 1107558400, key: 33f32 }, E { hash_code: 1120272384, key: 99f32 }, E { hash_code: 1110966272, key: 46f32 }, E { hash_code: 1099956224, key: 18f32 }, E { hash_code: 1077936128, key: 3f32 }, E { hash_code: 1114374144, key: 59f32 }, E { hash_code: 1116078080, key: 67f32 }, E { hash_code: 1117782016, key: 80f32 }, E { hash_code: 1106771968, key: 31f32 }, 
         E { hash_code: 1095761920, key: 13f32 }, E { hash_code: 1119485952, key: 93f32 }, E { hash_code: 1073741824, key: 2f32 }, E { hash_code: 1110179840, key: 43f32 }, E { hash_code: 1113587712, key: 56f32 }, E { hash_code: 1102577664, key: 23f32 }, E { hash_code: 1091567616, key: 9f32 }, E { hash_code: 1116995584, key: 74f32 }, E { hash_code: 1118699520, key: 87f32 }, E { hash_code: 1109393408, key: 40f32 }, 
@@ -77,7 +77,7 @@ impl fastdata {
 
         for i in start..end {
             let entry = &Self::ENTRIES[i];
-            if entry.hash_code == hash && entry.key == key {
+            if (entry.hash_code as u64) == hash && entry.key == key {
                 return true;
             }
         }

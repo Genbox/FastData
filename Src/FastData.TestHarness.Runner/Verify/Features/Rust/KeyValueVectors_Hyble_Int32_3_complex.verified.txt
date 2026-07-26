@@ -30,8 +30,8 @@ impl fastdata {
         E { key: 1, value: &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))) }, E { key: 1, value: &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))) }, E { key: 2, value: &Person::new(2, "Billy", None) }, E { key: 3, value: &Person::new(3, "Bibi", None) }
     ];
 
-    const DISPLACEMENTS: [u16; 1] = [
-        0
+    const DISPLACEMENTS: [u8; 1] = [
+        u8::MIN
     ];
 
     #[inline(always)]

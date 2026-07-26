@@ -17,7 +17,7 @@ struct E {
 
 impl fastdata {
     const BUCKET_STARTS: [u8; 5] = [
-        0, 1, 2, 3, 4
+        u8::MIN, 1, 2, 3, 4
     ];
 
     const ENTRIES: [E; 4] = [

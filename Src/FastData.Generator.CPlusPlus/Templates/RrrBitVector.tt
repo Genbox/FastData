@@ -12,6 +12,7 @@
         TypeCode.Int64 => $"static_cast<uint64_t>({LookupKeyName} ^ std::numeric_limits<int64_t>::lowest())",
         _ => throw new InvalidOperationException("RRR bitvector only supports integral key types.")
     };
+    Type offsetType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Context.Offsets.Max()) : typeof(uint);
 #>
     static constexpr uint64_t rrr_min_value = <#= TypeMap.ToValueLabel(Context.MinValue) #>;
     static constexpr uint64_t rrr_max_value = <#= TypeMap.ToValueLabel(Context.MaxValue) #>;
@@ -19,8 +20,8 @@
     <#= FieldModifier(true) #>std::array<uint8_t, <#= Context.Classes.Length.ToStringInvariant() #>> rrr_classes = {
 <#= FormatHelper.FormatColumns(Context.Classes, TypeMap.ToValueLabel, 8) #>
     };
-    <#= FieldModifier(true) #>std::array<uint32_t, <#= Context.Offsets.Length.ToStringInvariant() #>> rrr_offsets = {
-<#= FormatHelper.FormatColumns(Context.Offsets, TypeMap.ToValueLabel, 8) #>
+    <#= FieldModifier(true) #>std::array<<#= TypeMap.GetTypeName(offsetType) #>, <#= Context.Offsets.Length.ToStringInvariant() #>> rrr_offsets = {
+<#= FormatHelper.FormatColumns(Context.Offsets, x => TypeMap.ToValueLabel(x, offsetType), 8) #>
     };
 
     static constexpr int32_t binomial(int32_t n, int32_t k) noexcept {
@@ -80,7 +81,7 @@ public:
         if (class_value == 0)
             return false;
 
-        const uint32_t rank = rrr_offsets[static_cast<size_t>(block_index)];
+        const uint32_t rank = static_cast<uint32_t>(rrr_offsets[static_cast<size_t>(block_index)]);
         return decode_bit(class_value, rank, bit_in_block);
     }
 <#@ include file="Includes\Footer.ttinclude" #>

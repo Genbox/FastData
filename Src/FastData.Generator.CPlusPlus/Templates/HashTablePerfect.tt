@@ -6,6 +6,7 @@
     string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
     bool useEntryStruct = Context.StoreHashCode || Data.ValueCount > 0;
     string entryTypeName = useEntryStruct ? "e" : KeyTypeName;
+    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
 #>
 <#
     if (useEntryStruct)
@@ -15,7 +16,7 @@
 <#
         if (Context.StoreHashCode)
         {
-#>        uint64_t hash_code;
+#>        <#= TypeMap.GetTypeName(hashType) #> hash_code;
 <#
         }
         if (Data.ValueCount > 0)
@@ -27,7 +28,7 @@
         constexpr e(const <#= KeyTypeName #> key<#
         if (Context.StoreHashCode)
         {
-#>, const uint64_t hash_code<#
+#>, const <#= TypeMap.GetTypeName(hashType) #> hash_code<#
         }
         if (Data.ValueCount > 0)
         {
@@ -55,7 +56,7 @@
         if (!useEntryStruct)
             return TypeMap.ToValueLabel(x.Key);
 
-        string hashPart = Context.StoreHashCode ? $", {TypeMap.ToValueLabel(x.Hash)}" : string.Empty;
+        string hashPart = Context.StoreHashCode ? $", {TypeMap.ToValueLabel(x.Hash, hashType)}" : string.Empty;
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : string.Empty;
         return $"e({TypeMap.ToValueLabel(x.Key)}{hashPart}{valuePart})";
     }, 8) #>
@@ -76,7 +77,7 @@ public:
         return <#
     if (useEntryStruct && Context.StoreHashCode)
     {
-#>entry.hash_code == hash && <#
+#>static_cast<uint64_t>(entry.hash_code) == hash && <#
     }
 #><#= GetEqual(LookupKeyName, useEntryStruct ? "entry.key" : "entry") #>;
     }
@@ -95,7 +96,7 @@ public:
         if (<#
         if (Context.StoreHashCode)
         {
-#>entry.hash_code == hash && <#
+#>static_cast<uint64_t>(entry.hash_code) == hash && <#
         }
 #><#= GetEqual(LookupKeyName, "entry.key") #>) {
             value = &entry.value;

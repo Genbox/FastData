@@ -16,8 +16,8 @@ internal static class FastData
     {
         internal float Key;
         internal sbyte Next;
-        internal ulong HashCode;
-        internal E(float key, sbyte next, ulong hashCode)
+        internal uint HashCode;
+        internal E(float key, sbyte next, uint hashCode)
         {
             Key = key;
             Next = next;
@@ -25,12 +25,12 @@ internal static class FastData
         }
     };
 
-    private static readonly sbyte[] _buckets = new sbyte[] {
-        0, 2, 0, 3, 1, 4, 5
+    private static readonly byte[] _buckets = new byte[] {
+        byte.MinValue, 2, byte.MinValue, 3, 1, 4, 5
     };
 
     private static readonly E[] _entries = {
-        new E(1f, -1, 1065353216ul), new E(2f, -1, 1073741824ul), new E(3f, -1, 1077936128ul), new E(4f, -1, 1082130432ul), new E(5f, -1, 1084227584ul)
+        new E(1f, -1, 1065353216u), new E(2f, -1, 1073741824u), new E(3f, -1, 1077936128u), new E(4f, -1, 1082130432u), new E(5f, -1, 1084227584u)
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -58,13 +58,13 @@ internal static class FastData
 
         ulong hash = Hash(key);
         int index = (int)(hash % 7);
-        sbyte i = (sbyte)(_buckets[index] - 1);
+        int i = (int)_buckets[index] - 1;
 
         while (i >= 0)
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && entry.Key == key)
+            if ((ulong)entry.HashCode == hash && entry.Key == key)
                 return true;
 
             i = entry.Next;

@@ -3,15 +3,22 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.RangeTemplateData" name="Data" #>
 
 <#
+    Type rangeType = GeneratorConfig.TypeReductionEnabled && Data.RangeCount > 1
+        ? TypeMap.GetSmallestIntegerType(Model.KeyType, Data.Ranges[0].Start, Data.Ranges[^1].End)
+        : Model.KeyType;
+    string rangeTypeName = TypeMap.GetTypeName(rangeType);
+    bool rangeTypeReduced = rangeType != Model.KeyType;
+    Func<string, string> toKeyType = value => rangeTypeReduced ? $"{value} as {StoredKeyTypeName}" : value;
+
     if (Data.RangeCount > 1)
     {
 #>
-    <#= FieldModifier #>RANGE_STARTS: [<#= StoredKeyTypeName #>; <#= Data.RangeCount.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.Start), 8) #>
+    <#= FieldModifier #>RANGE_STARTS: [<#= rangeTypeName #>; <#= Data.RangeCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.Start, rangeType), 8) #>
     ];
 
-    <#= FieldModifier #>RANGE_ENDS: [<#= StoredKeyTypeName #>; <#= Data.RangeCount.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.End), 8) #>
+    <#= FieldModifier #>RANGE_ENDS: [<#= rangeTypeName #>; <#= Data.RangeCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.End, rangeType), 8) #>
     ];
 <#
     }
@@ -26,7 +33,7 @@
     }
     else
     {
-#>        Self::RANGE_STARTS.iter().zip(Self::RANGE_ENDS.iter()).flat_map(|(start, end)| *start..=*end)
+#>        Self::RANGE_STARTS.iter().zip(Self::RANGE_ENDS.iter()).flat_map(|(start, end)| <#= toKeyType("*start") #>..=<#= toKeyType("*end") #>)
 <#
     }
 #>    }
@@ -45,11 +52,11 @@
     {
 #>
         for i in 0..<#= Data.RangeCount.ToStringInvariant() #> {
-            if <#= LookupKeyName #> < Self::RANGE_STARTS[i] {
+            if <#= LookupKeyName #> < <#= toKeyType("Self::RANGE_STARTS[i]") #> {
                 return false;
             }
 
-            if <#= LookupKeyName #> <= Self::RANGE_ENDS[i] {
+            if <#= LookupKeyName #> <= <#= toKeyType("Self::RANGE_ENDS[i]") #> {
                 return true;
             }
         }
@@ -66,7 +73,7 @@
         while low < high {
             let middle = low + ((high - low) >> 1);
 
-            if <#= LookupKeyName #> < Self::RANGE_STARTS[middle] {
+            if <#= LookupKeyName #> < <#= toKeyType("Self::RANGE_STARTS[middle]") #> {
                 high = middle;
             }
             else {
@@ -74,7 +81,7 @@
             }
         }
 
-        low > 0 && <#= LookupKeyName #> <= Self::RANGE_ENDS[low - 1]
+        low > 0 && <#= LookupKeyName #> <= <#= toKeyType("Self::RANGE_ENDS[low - 1]") #>
 <#
     }
 #>

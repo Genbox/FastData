@@ -4,14 +4,15 @@
 
 <#
     string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
-    string indexType = TypeMap.GetSmallestUIntType((ulong)Data.Entries.Length);
+    Type indexType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType((ulong)Context.BucketStarts.Max()) : typeof(uint);
+    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
 #>
     struct e {
         <#= KeyTypeName #> key;
 <#
     if (Context.StoreHashCode)
     {
-#>        uint64_t hash_code;
+#>        <#= TypeMap.GetTypeName(hashType) #> hash_code;
 <#
     }
     if (Data.ValueCount > 0)
@@ -22,7 +23,7 @@
 #>        e(const <#= KeyTypeName #> key<#
     if (Context.StoreHashCode)
     {
-#>, const uint64_t hash_code<#
+#>, const <#= TypeMap.GetTypeName(hashType) #> hash_code<#
     }
     if (Data.ValueCount > 0)
     {
@@ -41,14 +42,14 @@
 #> {}
     };
 
-    <#= FieldModifier(true) #>std::array<<#= indexType #>, <#= Context.BucketStarts.Length.ToStringInvariant() #>> bucket_starts = {
-<#= FormatHelper.FormatColumns(Context.BucketStarts, static x => x.ToStringInvariant(), 8) #>
+    <#= FieldModifier(true) #>std::array<<#= TypeMap.GetTypeName(indexType) #>, <#= Context.BucketStarts.Length.ToStringInvariant() #>> bucket_starts = {
+<#= FormatHelper.FormatColumns(Context.BucketStarts, x => TypeMap.ToValueLabel(x, indexType), 8) #>
     };
 
     <#= FieldModifier(false) #>std::array<e, <#= Data.Entries.Length.ToStringInvariant() #>> entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        string hashPart = Context.StoreHashCode ? $", {TypeMap.ToValueLabel(x.Hash)}" : string.Empty;
+        string hashPart = Context.StoreHashCode ? $", {TypeMap.ToValueLabel(x.Hash, hashType)}" : string.Empty;
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : string.Empty;
         return $"e({TypeMap.ToValueLabel(x.Key)}{hashPart}{valuePart})";
     }, 8) #>
@@ -73,7 +74,7 @@ public:
             if (<#
     if (Context.StoreHashCode)
     {
-#>entry.hash_code == hash && <#
+#>static_cast<uint64_t>(entry.hash_code) == hash && <#
     }
 #><#= GetEqual("entry.key", LookupKeyName) #>)
                 return true;
@@ -100,7 +101,7 @@ public:
             if (<#
         if (Context.StoreHashCode)
         {
-#>entry.hash_code == hash && <#
+#>static_cast<uint64_t>(entry.hash_code) == hash && <#
         }
 #><#= GetEqual("entry.key", LookupKeyName) #>) {
                 value = &entry.value;

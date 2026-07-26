@@ -34,7 +34,7 @@ class fastdata final {
            : key(key), next(next) {}
     };
 
-    static constexpr std::array<int8_t, 9> buckets = {
+    static constexpr std::array<uint8_t, 9> buckets = {
         3, 4, 0, 0, 0, 0, 2, 5, 1
     };
 
@@ -72,7 +72,7 @@ public:
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 9;
-        int8_t i = static_cast<int8_t>(buckets[index] - 1);
+        int32_t i = static_cast<int32_t>(buckets[index]) - 1;
 
         while (i >= 0) {
             const auto& entry = entries[i];

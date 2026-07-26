@@ -4,7 +4,8 @@
 
 <#
     string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
-    string indexType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUIntType((ulong)Data.Entries.Length) : TypeMap.GetTypeName(typeof(uint));
+    Type indexType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType((ulong)Context.BucketStarts.Max()) : typeof(uint);
+    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
 #>
     [StructLayout(LayoutKind.Auto)]
     private struct E
@@ -13,7 +14,7 @@
 <#
     if (Context.StoreHashCode)
     {
-#>        internal ulong HashCode;
+#>        internal <#= TypeMap.GetTypeName(hashType) #> HashCode;
 <#
     }
 #><#
@@ -25,7 +26,7 @@
 #>        internal E(<#= KeyTypeName #> key<#
     if (Context.StoreHashCode)
     {
-#>, ulong hashCode<#
+#>, <#= TypeMap.GetTypeName(hashType) #> hashCode<#
     }
 #><#
     if (Data.ValueCount > 0)
@@ -50,14 +51,14 @@
 #>    }
     };
 
-    <#= FieldModifier #><#= indexType #>[] _bucketStarts = new <#= indexType #>[] {
-<#= FormatHelper.FormatColumns(Context.BucketStarts, TypeMap.ToValueLabel, 8) #>
+    <#= FieldModifier #><#= TypeMap.GetTypeName(indexType) #>[] _bucketStarts = new <#= TypeMap.GetTypeName(indexType) #>[] {
+<#= FormatHelper.FormatColumns(Context.BucketStarts, x => TypeMap.ToValueLabel(x, indexType), 8) #>
     };
 
     <#= FieldModifier #>E[] _entries = {
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        string hashPart = Context.StoreHashCode ? $", {TypeMap.ToValueLabel(x.Hash)}" : "";
+        string hashPart = Context.StoreHashCode ? $", {TypeMap.ToValueLabel(x.Hash, hashType)}" : "";
         string valuePart = Data.ValueCount > 0 ? $", {valueLabels[i]}" : "";
         return $"new E({TypeMap.ToValueLabel(x.Key)}{hashPart}{valuePart})";
     }, 8) #>
@@ -107,7 +108,7 @@
             if (<#
     if (Context.StoreHashCode)
     {
-#>entry.HashCode == hash && <#
+#>(ulong)entry.HashCode == hash && <#
     }
 #><#= GetEqual("entry.Key", LookupKeyName) #>)
                 return true;
@@ -137,7 +138,7 @@
             if (<#
         if (Context.StoreHashCode)
         {
-#> entry.HashCode == hash && <#
+#> (ulong)entry.HashCode == hash && <#
         }
 #><#= GetEqual("entry.Key", LookupKeyName) #>)
             {

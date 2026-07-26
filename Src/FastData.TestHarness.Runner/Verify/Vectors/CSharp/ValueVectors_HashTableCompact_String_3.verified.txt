@@ -26,7 +26,7 @@ internal static class FastData
     };
 
     private static readonly byte[] _bucketStarts = new byte[] {
-        0, 0, 1, 1, 2, 3
+        byte.MinValue, byte.MinValue, 1, 1, 2, 3
     };
 
     private static readonly E[] _entries = {
@@ -78,7 +78,7 @@ internal static class FastData
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && StringComparer.Ordinal.Equals(entry.Key, key))
+            if ((ulong)entry.HashCode == hash && StringComparer.Ordinal.Equals(entry.Key, key))
                 return true;
         }
 

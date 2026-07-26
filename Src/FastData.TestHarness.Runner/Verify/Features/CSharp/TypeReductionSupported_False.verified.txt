@@ -56,7 +56,7 @@ internal static class FastData
 
         ulong hash = Hash(key);
         int index = (int)(hash % 4);
-        int i = (int)(_buckets[index] - 1);
+        int i = (int)_buckets[index] - 1;
 
         while (i >= 0)
         {

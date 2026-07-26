@@ -17,9 +17,9 @@ internal static class FastData
     private struct E
     {
         internal string Key;
-        internal short Next;
+        internal sbyte Next;
         internal ulong HashCode;
-        internal E(string key, short next, ulong hashCode)
+        internal E(string key, sbyte next, ulong hashCode)
         {
             Key = key;
             Next = next;
@@ -27,25 +27,25 @@ internal static class FastData
         }
     };
 
-    private static readonly short[] _buckets = new short[] {
-        0, 64, 41, 80, 33, 32, 0, 13, 0, 49, 
-        98, 0, 0, 0, 0, 0, 0, 63, 40, 83, 
-        34, 29, 0, 2, 75, 50, 91, 0, 0, 0, 
-        0, 0, 0, 62, 67, 82, 11, 30, 0, 1, 
-        76, 51, 92, 0, 0, 0, 0, 0, 0, 61, 
-        66, 0, 12, 0, 0, 0, 73, 52, 93, 0, 
-        0, 17, 0, 0, 0, 60, 0, 0, 0, 0, 
-        0, 0, 74, 77, 94, 0, 0, 16, 0, 0, 
-        0, 59, 0, 0, 0, 0, 0, 0, 71, 78, 
-        0, 0, 0, 15, 0, 0, 0, 58, 85, 0, 
-        27, 0, 68, 0, 72, 0, 0, 0, 0, 14, 
-        0, 0, 0, 37, 84, 89, 28, 0, 57, 0, 
-        69, 0, 0, 0, 0, 21, 0, 0, 0, 36, 
-        87, 88, 25, 0, 46, 0, 70, 95, 0, 0, 
-        23, 20, 0, 0, 0, 39, 86, 0, 26, 0, 
-        35, 90, 47, 96, 99, 0, 22, 19, 0, 0, 
-        65, 38, 81, 0, 31, 0, 24, 79, 48, 97, 
-        100, 0, 0, 18, 0
+    private static readonly byte[] _buckets = new byte[] {
+        byte.MinValue, 64, 41, 80, 33, 32, byte.MinValue, 13, byte.MinValue, 49, 
+        98, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, 63, 40, 83, 
+        34, 29, byte.MinValue, 2, 75, 50, 91, byte.MinValue, byte.MinValue, byte.MinValue, 
+        byte.MinValue, byte.MinValue, byte.MinValue, 62, 67, 82, 11, 30, byte.MinValue, 1, 
+        76, 51, 92, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, 61, 
+        66, byte.MinValue, 12, byte.MinValue, byte.MinValue, byte.MinValue, 73, 52, 93, byte.MinValue, 
+        byte.MinValue, 17, byte.MinValue, byte.MinValue, byte.MinValue, 60, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, 
+        byte.MinValue, byte.MinValue, 74, 77, 94, byte.MinValue, byte.MinValue, 16, byte.MinValue, byte.MinValue, 
+        byte.MinValue, 59, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, 71, 78, 
+        byte.MinValue, byte.MinValue, byte.MinValue, 15, byte.MinValue, byte.MinValue, byte.MinValue, 58, 85, byte.MinValue, 
+        27, byte.MinValue, 68, byte.MinValue, 72, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, 14, 
+        byte.MinValue, byte.MinValue, byte.MinValue, 37, 84, 89, 28, byte.MinValue, 57, byte.MinValue, 
+        69, byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue, 21, byte.MinValue, byte.MinValue, byte.MinValue, 36, 
+        87, 88, 25, byte.MinValue, 46, byte.MinValue, 70, 95, byte.MinValue, byte.MinValue, 
+        23, 20, byte.MinValue, byte.MinValue, byte.MinValue, 39, 86, byte.MinValue, 26, byte.MinValue, 
+        35, 90, 47, 96, 99, byte.MinValue, 22, 19, byte.MinValue, byte.MinValue, 
+        65, 38, 81, byte.MinValue, 31, byte.MinValue, 24, 79, 48, 97, 
+        100, byte.MinValue, byte.MinValue, 18, byte.MinValue
     };
 
     private static readonly E[] _entries = {
@@ -99,13 +99,13 @@ internal static class FastData
 
         ulong hash = Hash(key, length * 2);
         int index = (int)(hash % 175);
-        short i = (short)(_buckets[index] - 1);
+        int i = (int)_buckets[index] - 1;
 
         while (i >= 0)
         {
             ref E entry = ref _entries[i];
 
-            if (entry.HashCode == hash && StringComparer.Ordinal.Equals(entry.Key, key))
+            if ((ulong)entry.HashCode == hash && StringComparer.Ordinal.Equals(entry.Key, key))
                 return true;
 
             i = entry.Next;

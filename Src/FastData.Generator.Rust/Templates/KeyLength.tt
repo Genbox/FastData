@@ -6,9 +6,10 @@
 <#
     if (Data.ValueCount > 0)
     {
+        Type offsetType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType((ulong)Context.ValueOffsets.Max()) : typeof(int);
 #>
-    <#= FieldModifier #>OFFSETS: [i32; <#= Context.ValueOffsets.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.ValueOffsets, (_, x) => x.ToStringInvariant(), 8) #>
+    <#= FieldModifier #>OFFSETS: [<#= TypeMap.GetTypeName(offsetType) #>; <#= Context.ValueOffsets.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.ValueOffsets, (_, x) => TypeMap.ToValueLabel(x, offsetType), 8) #>
     ];
 
     <#= FieldModifier #>VALUES: [<#= StoredValueTypeName #>; <#= Data.ValueCount.ToStringInvariant() #>] = [

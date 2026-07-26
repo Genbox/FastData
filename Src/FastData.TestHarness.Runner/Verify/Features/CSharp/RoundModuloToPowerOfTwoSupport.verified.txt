@@ -23,8 +23,8 @@ internal static class FastData
         }
     };
 
-    private static readonly sbyte[] _buckets = new sbyte[] {
-        1, 2, 3, 4, 5, 6, 7, 0
+    private static readonly byte[] _buckets = new byte[] {
+        1, 2, 3, 4, 5, 6, 7, byte.MinValue
     };
 
     private static readonly E[] _entries = {
@@ -56,7 +56,7 @@ internal static class FastData
 
         ulong hash = Hash(key);
         int index = (int)(hash % 8);
-        sbyte i = (sbyte)(_buckets[index] - 1);
+        int i = (int)_buckets[index] - 1;
 
         while (i >= 0)
         {

@@ -2,15 +2,22 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.RangeTemplateData" name="Data" #>
 
 <#
+    Type rangeType = GeneratorConfig.TypeReductionEnabled && Data.RangeCount > 1
+        ? TypeMap.GetSmallestIntegerType(Model.KeyType, Data.Ranges[0].Start, Data.Ranges[^1].End)
+        : Model.KeyType;
+    string rangeTypeName = TypeMap.GetTypeName(rangeType);
+    bool rangeTypeReduced = rangeType != Model.KeyType;
+    Func<string, string> toKeyType = value => rangeTypeReduced ? $"({KeyTypeName}){value}" : value;
+
     if (Data.RangeCount > 1)
     {
 #>
-    <#= FieldModifier #><#= KeyTypeName #>[] _rangeStarts = new <#= KeyTypeName #>[] {
-<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.Start), 8) #>
+    <#= FieldModifier #><#= rangeTypeName #>[] _rangeStarts = new <#= rangeTypeName #>[] {
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.Start, rangeType), 8) #>
     };
 
-    <#= FieldModifier #><#= KeyTypeName #>[] _rangeEnds = new <#= KeyTypeName #>[] {
-<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.End), 8) #>
+    <#= FieldModifier #><#= rangeTypeName #>[] _rangeEnds = new <#= rangeTypeName #>[] {
+<#= FormatHelper.FormatColumns(Data.Ranges, x => TypeMap.ToValueLabel(x.End, rangeType), 8) #>
     };
 <#
     }
@@ -35,11 +42,11 @@
     {
 #>            for (int i = 0; i < _rangeStarts.Length; i++)
             {
-                for (<#= KeyTypeName #> key = _rangeStarts[i]; ; key++)
+                for (<#= KeyTypeName #> key = <#= toKeyType("_rangeStarts[i]") #>; ; key++)
                 {
                     yield return key;
 
-                    if (key == _rangeEnds[i])
+                    if (key == <#= toKeyType("_rangeEnds[i]") #>)
                         break;
                 }
             }
@@ -65,10 +72,10 @@
 #>
         for (int i = 0; i < <#= Data.RangeCount.ToStringInvariant() #>; i++)
         {
-            if (<#= LookupKeyName #> < _rangeStarts[i])
+            if (<#= LookupKeyName #> < <#= toKeyType("_rangeStarts[i]") #>)
                 return false;
 
-            if (<#= LookupKeyName #> <= _rangeEnds[i])
+            if (<#= LookupKeyName #> <= <#= toKeyType("_rangeEnds[i]") #>)
                 return true;
         }
 
@@ -85,14 +92,14 @@
         {
             int middle = low + ((high - low) >> 1);
 
-            if (<#= LookupKeyName #> < _rangeStarts[middle])
+            if (<#= LookupKeyName #> < <#= toKeyType("_rangeStarts[middle]") #>)
                 high = middle;
             else
                 low = middle + 1;
         }
 
         int rangeIndex = low - 1;
-        return rangeIndex >= 0 && <#= LookupKeyName #> <= _rangeEnds[rangeIndex];
+        return rangeIndex >= 0 && <#= LookupKeyName #> <= <#= toKeyType("_rangeEnds[rangeIndex]") #>;
 <#
     }
 #>

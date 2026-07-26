@@ -17,8 +17,8 @@ impl fastdata {
         1, 1, 2, 3
     ];
 
-    const DISPLACEMENTS: [u16; 1] = [
-        0
+    const DISPLACEMENTS: [u8; 1] = [
+        u8::MIN
     ];
 
     #[inline(always)]

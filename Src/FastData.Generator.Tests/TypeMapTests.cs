@@ -75,11 +75,52 @@ public class TypeMapTests
     [InlineData(int.MinValue - 1L, "long")]
     [InlineData(int.MinValue, "int")]
     [InlineData(int.MaxValue, "int")]
-    public void GetSmallestIntTypeRespectsSignedLowerBounds(long value, string expected)
+    public void GetSmallestIntTypeRespectsBounds(long value, string expected)
     {
         TypeMap map = CreateIntegerTypeMap();
 
-        Assert.Equal(expected, map.GetSmallestIntType(value));
+        Assert.Equal(expected, map.GetSmallestSignedTypeName(value));
+    }
+
+    [Theory]
+    [InlineData(0UL, typeof(byte))]
+    [InlineData(byte.MaxValue, typeof(byte))]
+    [InlineData(byte.MaxValue + 1UL, typeof(ushort))]
+    [InlineData(ushort.MaxValue, typeof(ushort))]
+    [InlineData(ushort.MaxValue + 1UL, typeof(uint))]
+    [InlineData(uint.MaxValue, typeof(uint))]
+    [InlineData(uint.MaxValue + 1UL, typeof(ulong))]
+    [InlineData(ulong.MaxValue, typeof(ulong))]
+    public void GetSmallestUIntStorageTypeRespectsBoundaries(ulong maxValue, Type expected)
+    {
+        TypeMap map = CreateIntegerTypeMap();
+
+        Assert.Equal(expected, map.GetSmallestUnsignedType(maxValue));
+    }
+
+    [Theory]
+    [InlineData(sbyte.MinValue, sbyte.MaxValue, typeof(sbyte))]
+    [InlineData(-129L, sbyte.MaxValue, typeof(short))]
+    [InlineData(sbyte.MinValue, 128L, typeof(short))]
+    [InlineData(short.MinValue, short.MaxValue, typeof(short))]
+    [InlineData(short.MinValue - 1L, short.MaxValue, typeof(int))]
+    [InlineData(short.MinValue, short.MaxValue + 1L, typeof(int))]
+    [InlineData(int.MinValue, int.MaxValue, typeof(int))]
+    [InlineData(int.MinValue - 1L, int.MaxValue, typeof(long))]
+    [InlineData(int.MinValue, int.MaxValue + 1L, typeof(long))]
+    public void GetSmallestIntStorageTypeCoversSignedInterval(long minValue, long maxValue, Type expected)
+    {
+        TypeMap map = CreateIntegerTypeMap();
+
+        Assert.Equal(expected, map.GetSmallestSignedType(minValue, maxValue));
+    }
+
+    [Fact]
+    public void GetSmallestIntStorageTypeRejectsReversedInterval()
+    {
+        TypeMap map = CreateIntegerTypeMap();
+
+        Assert.Throws<ArgumentException>(() => map.GetSmallestSignedType(1, 0));
     }
 
     private static string Identity(string value) => value;
@@ -89,9 +130,13 @@ public class TypeMapTests
         ITypeDef[] defs =
         [
             new IntegerTypeDef<sbyte>("sbyte", sbyte.MinValue, sbyte.MaxValue, "sbyte.MinValue", "sbyte.MaxValue"),
+            new IntegerTypeDef<byte>("byte", byte.MinValue, byte.MaxValue, "byte.MinValue", "byte.MaxValue"),
             new IntegerTypeDef<short>("short", short.MinValue, short.MaxValue, "short.MinValue", "short.MaxValue"),
+            new IntegerTypeDef<ushort>("ushort", ushort.MinValue, ushort.MaxValue, "ushort.MinValue", "ushort.MaxValue"),
             new IntegerTypeDef<int>("int", int.MinValue, int.MaxValue, "int.MinValue", "int.MaxValue"),
-            new IntegerTypeDef<long>("long", long.MinValue, long.MaxValue, "long.MinValue", "long.MaxValue")
+            new IntegerTypeDef<uint>("uint", uint.MinValue, uint.MaxValue, "uint.MinValue", "uint.MaxValue"),
+            new IntegerTypeDef<long>("long", long.MinValue, long.MaxValue, "long.MinValue", "long.MaxValue"),
+            new IntegerTypeDef<ulong>("ulong", ulong.MinValue, ulong.MaxValue, "ulong.MinValue", "ulong.MaxValue")
         ];
 
         return new TypeMap(defs, GeneratorEncoding.Utf8Bytes);

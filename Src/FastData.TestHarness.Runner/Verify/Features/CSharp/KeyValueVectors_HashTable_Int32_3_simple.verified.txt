@@ -25,7 +25,7 @@ internal static class FastData
         }
     };
 
-    private static readonly sbyte[] _buckets = new sbyte[] {
+    private static readonly byte[] _buckets = new byte[] {
         3, 1, 2
     };
 
@@ -67,7 +67,7 @@ internal static class FastData
 
         ulong hash = Hash(key);
         int index = (int)(hash % 3);
-        sbyte i = (sbyte)(_buckets[index] - 1);
+        int i = (int)_buckets[index] - 1;
 
         while (i >= 0)
         {
@@ -89,7 +89,7 @@ internal static class FastData
 
         ulong hash = Hash(key);
         int index = (int)(hash % 3);
-        sbyte i = (sbyte)(_buckets[index] - 1);
+        int i = (int)_buckets[index] - 1;
 
         while (i >= 0)
         {

@@ -24,8 +24,8 @@ public class Person
 };
     private static int Length(string str) => str.Length;
 
-    private static readonly int[] _offsets = {
-        0, 1, 2
+    private static readonly byte[] _offsets = {
+        byte.MinValue, 1, 2
     };
 
     private static readonly Person[] _values = {

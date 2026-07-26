@@ -4,14 +4,15 @@
 
 <#
     string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
-    string indexType = TypeMap.GetSmallestUIntType((ulong)Data.Entries.Length);
+    Type indexType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType((ulong)Context.BucketStarts.Max()) : typeof(uint);
+    Type hashType = Context.StoreHashCode && GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Data.Entries.Max(x => x.Hash)) : typeof(ulong);
 #>
 struct E {
     key: <#= StoredKeyTypeName #>,
 <#
     if (Context.StoreHashCode)
     {
-#>    hash_code: u64,
+#>    hash_code: <#= TypeMap.GetTypeName(hashType) #>,
 <#
     }
     if (Data.ValueCount > 0)
@@ -22,14 +23,14 @@ struct E {
 #>}
 
 <#@ include file="Includes\ImplHeader.ttinclude" #>
-    <#= FieldModifier #>BUCKET_STARTS: [<#= indexType #>; <#= Context.BucketStarts.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Context.BucketStarts, (_, x) => x.ToStringInvariant(), 8) #>
+    <#= FieldModifier #>BUCKET_STARTS: [<#= TypeMap.GetTypeName(indexType) #>; <#= Context.BucketStarts.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.BucketStarts, (_, x) => TypeMap.ToValueLabel(x, indexType), 8) #>
     ];
 
     <#= FieldModifier #>ENTRIES: [E; <#= Data.Entries.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Data.Entries, (i, x) =>
     {
-        string hashPart = Context.StoreHashCode ? $"hash_code: {TypeMap.ToValueLabel(x.Hash)}, " : string.Empty;
+        string hashPart = Context.StoreHashCode ? $"hash_code: {TypeMap.ToValueLabel(x.Hash, hashType)}, " : string.Empty;
         string valuePart = Data.ValueCount > 0 ? $", value: {valueLabels[i]}" : string.Empty;
         return $"E {{ {hashPart}key: {TypeMap.ToValueLabel(x.Key)}{valuePart} }}";
     }, 8) #>
@@ -52,7 +53,7 @@ struct E {
             if <#
     if (Context.StoreHashCode)
     {
-#>entry.hash_code == hash && <#
+#>(entry.hash_code as u64) == hash && <#
     }
 #><#= GetEqual("entry.key", LookupKeyName) #> {
                 return true;
@@ -79,7 +80,7 @@ struct E {
             if <#
         if (Context.StoreHashCode)
         {
-#>entry.hash_code == hash && <#
+#>(entry.hash_code as u64) == hash && <#
         }
 #><#= GetEqual("entry.key", LookupKeyName) #> {
                 return Some(entry.value);

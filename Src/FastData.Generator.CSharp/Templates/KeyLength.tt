@@ -7,8 +7,9 @@
 
     if (Data.ValueCount > 0)
     {
-#>    <#= FieldModifier #>int[] _offsets = {
-<#= FormatHelper.FormatColumns(Context.ValueOffsets, TypeMap.ToValueLabel, 8) #>
+        Type offsetType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType((ulong)Context.ValueOffsets.Max()) : typeof(int);
+#>    <#= FieldModifier #><#= TypeMap.GetTypeName(offsetType) #>[] _offsets = {
+<#= FormatHelper.FormatColumns(Context.ValueOffsets, x => TypeMap.ToValueLabel(x, offsetType), 8) #>
     };
 
     <#= FieldModifier #><#= ValueTypeName #>[] _values = {

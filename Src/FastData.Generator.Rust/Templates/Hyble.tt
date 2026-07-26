@@ -6,6 +6,7 @@
     string[] valueLabels = Data.Values.Select(TypeMap.ToValueLabel).ToArray();
     bool useEntryStruct = Data.ValueCount > 0;
     string entryTypeName = useEntryStruct ? "E" : StoredKeyTypeName;
+    Type displacementType = GeneratorConfig.TypeReductionEnabled ? TypeMap.GetSmallestUnsignedType(Context.Displacements.Max()) : typeof(ushort);
 #>
 <#
     if (useEntryStruct)
@@ -29,8 +30,8 @@
     }, 8) #>
     ];
 
-    <#= FieldModifier #>DISPLACEMENTS: [u16; <#= Data.Displacements.Length.ToStringInvariant() #>] = [
-<#= FormatHelper.FormatColumns(Data.Displacements, (_, x) => x.ToStringInvariant(), 8) #>
+    <#= FieldModifier #>DISPLACEMENTS: [<#= TypeMap.GetTypeName(displacementType) #>; <#= Data.Displacements.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Displacements, (_, x) => TypeMap.ToValueLabel(x, displacementType), 8) #>
     ];
 
 <#= HashSource #>
