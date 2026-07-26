@@ -17,6 +17,7 @@ public class GPerfEarlyExitTests
             StructureTypeOverride = StructureType.HashTable,
             StringAnalyzerConfig = new StringAnalyzerConfig
             {
+                PositionLengthAnalyzerConfig = null,
                 BruteForceAnalyzerConfig = null,
                 GeneticAnalyzerConfig = null,
                 GPerfAnalyzerConfig = new GPerfAnalyzerConfig()
@@ -44,6 +45,7 @@ public class GPerfEarlyExitTests
             StructureTypeOverride = StructureType.HashTable,
             StringAnalyzerConfig = new StringAnalyzerConfig
             {
+                PositionLengthAnalyzerConfig = null,
                 BruteForceAnalyzerConfig = null,
                 GeneticAnalyzerConfig = null,
                 GPerfAnalyzerConfig = new GPerfAnalyzerConfig()

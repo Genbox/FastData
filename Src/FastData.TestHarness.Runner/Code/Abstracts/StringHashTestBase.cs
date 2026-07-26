@@ -59,6 +59,7 @@ public abstract class StringHashTestBase
             StructureTypeOverride = StructureType.HashTable,
             StringAnalyzerConfig = new StringAnalyzerConfig
             {
+                PositionLengthAnalyzerConfig = null,
                 BruteForceAnalyzerConfig = null,
                 GeneticAnalyzerConfig = new GeneticAnalyzerConfig { RandomSeed = 42 }, // We set the seed for stable runs
                 GPerfAnalyzerConfig = null,
@@ -82,6 +83,7 @@ public abstract class StringHashTestBase
             StructureTypeOverride = StructureType.HashTable,
             StringAnalyzerConfig = new StringAnalyzerConfig
             {
+                PositionLengthAnalyzerConfig = null,
                 BruteForceAnalyzerConfig = null,
                 GeneticAnalyzerConfig = null,
                 GPerfAnalyzerConfig = new GPerfAnalyzerConfig()
