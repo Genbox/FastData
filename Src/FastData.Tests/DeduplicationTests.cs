@@ -8,7 +8,7 @@ public class DeduplicationTests
     [Fact]
     public void DeduplicateNumericKeys_UInt8Keys_SortsAndCompacts()
     {
-        byte[] keys = Enumerable.Range(0, 128).Select(static value => (byte)(127 - value % 64)).ToArray();
+        byte[] keys = Enumerable.Range(0, 128).Select(static value => (byte)(127 - (value % 64))).ToArray();
 
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
 
@@ -19,7 +19,7 @@ public class DeduplicationTests
     [Fact]
     public void DeduplicateNumericKeys_UInt16Keys_SortsAndCompacts()
     {
-        ushort[] keys = Enumerable.Range(0, 128).Select(static value => (ushort)(300 - value % 64)).ToArray();
+        ushort[] keys = Enumerable.Range(0, 128).Select(static value => (ushort)(300 - (value % 64))).ToArray();
 
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
 

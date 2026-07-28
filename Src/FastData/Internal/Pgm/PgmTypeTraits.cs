@@ -113,17 +113,9 @@ internal static class PgmTypeTraits<T> where T : notnull
     public static T NextAfter(T value)
     {
         if (typeof(T) == typeof(float))
-#if NETSTANDARD2_0
-            return (T)(object)MathCompat.BitIncrement((float)(object)value);
-#else
             return (T)(object)MathF.BitIncrement((float)(object)value);
-#endif
         if (typeof(T) == typeof(double))
-#if NETSTANDARD2_0
-            return (T)(object)MathCompat.BitIncrement((double)(object)value);
-#else
             return (T)(object)Math.BitIncrement((double)(object)value);
-#endif
         return AddOne(value);
     }
 
@@ -131,17 +123,9 @@ internal static class PgmTypeTraits<T> where T : notnull
     public static T PreviousValue(T value)
     {
         if (typeof(T) == typeof(float))
-#if NETSTANDARD2_0
-            return (T)(object)MathCompat.BitDecrement((float)(object)value);
-#else
             return (T)(object)MathF.BitDecrement((float)(object)value);
-#endif
         if (typeof(T) == typeof(double))
-#if NETSTANDARD2_0
-            return (T)(object)MathCompat.BitDecrement((double)(object)value);
-#else
             return (T)(object)Math.BitDecrement((double)(object)value);
-#endif
         throw new NotSupportedException("PreviousValue is only supported for floating-point types.");
     }
 }

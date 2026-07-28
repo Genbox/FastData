@@ -4,7 +4,6 @@ using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.EarlyExits;
 using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Internal.Analysis.Data;
-using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Tests;
 

@@ -69,10 +69,7 @@ internal static class NumericStructures<TKey>
             return slots <= keyCount * (double)maxRangeFactor;
         }
 
-        static bool IsRangeCompressionAccepted(uint keyCount, int rangeCount)
-        {
-            // A single range is emitted as two constants. Multiple ranges use two endpoints each.
-            return rangeCount == 1 || (ulong)(uint)rangeCount * 2UL < keyCount;
-        }
+        // A single range is emitted as two constants. Multiple ranges use two endpoints each.
+        static bool IsRangeCompressionAccepted(uint keyCount, int rangeCount) => rangeCount == 1 || (uint)rangeCount * 2UL < keyCount;
     }
 }

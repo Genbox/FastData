@@ -6,7 +6,6 @@ using Genbox.FastData.Generators.EarlyExits;
 using Genbox.FastData.Generators.EarlyExits.Exits;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Tests;
 

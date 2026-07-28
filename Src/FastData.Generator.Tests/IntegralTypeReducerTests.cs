@@ -85,7 +85,7 @@ public class IntegralTypeReducerTests
     {
         Assert.Equal(typeof(byte), IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(uint), new uint[] { 0, 255 }));
         Assert.Equal(typeof(ushort), IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(ulong), new ulong[] { 256, 65_535 }));
-        Assert.Equal(typeof(byte), IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(char), new char[] { (char)0, (char)255 }));
+        Assert.Equal(typeof(byte), IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(char), new[] { (char)0, (char)255 }));
     }
 
     [Fact]

@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Reflection;
 using Genbox.FastData.Generator.Abstracts;
-using Genbox.FastData.Generator.Compat;
 using Genbox.FastData.Generator.Definitions;
 
 namespace Genbox.FastData.Generator.Rust.Internal;

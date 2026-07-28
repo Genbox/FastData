@@ -210,8 +210,8 @@ public static class TestVectorHelper
         ulong charBitmapHigh = (1ul << ('a' - 64)) | (1ul << ('b' - 64)) | (1ul << ('c' - 64)) | (1ul << ('d' - 64)) | (1ul << ('e' - 64)) | (1ul << ('f' - 64));
 
         yield return CreateEarlyExitData([new UnitAtBitmapEarlyExit(0ul, charBitmapHigh, false)],
-            Enumerable.Range(0, stringSize).Select(x => ((char)('a' + (x % 6))) + "test").ToArray(),
-            Enumerable.Range(0, stringSize).Select(x => ((char)('g' + (x % 20))) + "test").ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => (char)('a' + (x % 6)) + "test").ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => (char)('g' + (x % 20)) + "test").ToArray(),
             GeneratorFunction.UnitAt | GeneratorFunction.Length, "UnitAtBitmap");
 
         // --- Combined exits ---
@@ -227,8 +227,8 @@ public static class TestVectorHelper
             GeneratorFunction.Length, "LengthLessThan_LengthGreaterThan");
 
         yield return CreateEarlyExitData([new LengthLessThanEarlyExit(3), new UnitAtBitmapEarlyExit(0ul, charBitmapHigh, false)],
-            Enumerable.Range(0, stringSize).Select(x => ((char)('a' + (x % 6))) + new string('x', (x % 10) + 2)).ToArray(),
-            Enumerable.Range(0, stringSize).Select(x => x % 2 == 0 ? new string('g', 1) : ((char)('g' + (x % 20))) + "test").ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => (char)('a' + (x % 6)) + new string('x', (x % 10) + 2)).ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => x % 2 == 0 ? new string('g', 1) : (char)('g' + (x % 20)) + "test").ToArray(),
             GeneratorFunction.UnitAt | GeneratorFunction.Length, "LengthLessThan_UnitAtBitmap");
 
         ITestData CreateEarlyExitData<TKey>(IEarlyExit[] exits, TKey[] hitKeys, TKey[] missKeys, GeneratorFunction functions, string name) =>

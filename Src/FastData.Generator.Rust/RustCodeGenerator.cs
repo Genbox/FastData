@@ -12,7 +12,7 @@ public sealed class RustCodeGenerator(RustCodeGeneratorConfig rustCfg) : Templat
     {
         ValidateIdentifier(rustCfg.ClassName, nameof(rustCfg.ClassName));
 
-        string templatePath = Path.Combine(TemplateDir, genCfg.StructureType.ToString() + ".tt");
+        string templatePath = Path.Combine(TemplateDir, genCfg.StructureType + ".tt");
         string templateSource = File.ReadAllText(templatePath);
 
         variables["RustConfig"] = rustCfg;

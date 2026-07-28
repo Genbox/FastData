@@ -19,7 +19,7 @@ public sealed class CPlusPlusCodeGenerator(CPlusPlusCodeGeneratorConfig cppCfg) 
 
         ValidateIdentifier(cppCfg.ClassName, nameof(cppCfg.ClassName));
 
-        string templatePath = Path.Combine(TemplateDir, genCfg.StructureType.ToString() + ".tt");
+        string templatePath = Path.Combine(TemplateDir, genCfg.StructureType + ".tt");
         string templateSource = File.ReadAllText(templatePath);
 
         variables["CPlusPlusConfig"] = cppCfg;

@@ -497,7 +497,7 @@ public class IntegerEncodingTests(ITestOutputHelper output)
                     continue;
                 }
 
-                double percent = values.Average(x => encoding.GetEncodedLength(x) / 8.0 * 100.0);
+                double percent = values.Average(x => (encoding.GetEncodedLength(x) / 8.0) * 100.0);
                 cells.Add(percent.ToString("0.#", CultureInfo.InvariantCulture) + "%");
                 if (percent < bestPercent)
                 {

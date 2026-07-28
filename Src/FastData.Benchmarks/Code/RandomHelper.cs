@@ -1,6 +1,8 @@
+using System.Buffers.Binary;
+
 namespace Genbox.FastData.Benchmarks.Code;
 
-using static System.Buffers.Binary.BinaryPrimitives;
+using static BinaryPrimitives;
 
 internal static class RandomHelper
 {

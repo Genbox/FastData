@@ -1,12 +1,12 @@
+using Genbox.FastData.Config;
+using Genbox.FastData.Enums;
+using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Structures;
 #if NETSTANDARD2_0
 using System.Runtime.Serialization;
 #else
 using System.Runtime.CompilerServices;
 #endif
-using Genbox.FastData.Config;
-using Genbox.FastData.Enums;
-using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Structures;
 
 namespace Genbox.FastData.Internal;
 
