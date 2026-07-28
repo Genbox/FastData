@@ -182,15 +182,38 @@ public static class TestVectorHelper
             Enumerable.Range(501, benchmarkSize).ToArray(),
             GeneratorFunction.None, "ValueGreaterThan");
 
+        yield return CreateEarlyExitData([new ValueNotEqualEarlyExit<int>(500)],
+            Enumerable.Repeat(500, benchmarkSize).ToArray(),
+            Enumerable.Range(0, benchmarkSize).Select(x => x >= 500 ? x + 1 : x).ToArray(),
+            GeneratorFunction.None, "ValueNotEqual");
+
         yield return CreateEarlyExitData([new ValueInRangeEarlyExit<int>(400, 600)],
             Enumerable.Range(0, benchmarkSize).Select(x => x % 401).ToArray(),
             Enumerable.Range(0, benchmarkSize).Select(x => 401 + (x % 199)).ToArray(),
             GeneratorFunction.None, "ValueInRange");
 
+        ValueLessThanEarlyExit<int> valueLowerBound = new ValueLessThanEarlyExit<int>(400);
+        ValueGreaterThanEarlyExit<int> valueUpperBound = new ValueGreaterThanEarlyExit<int>(600);
+        yield return CreateEarlyExitData([new ValueOutOfRangeEarlyExit<int>(400, 600, valueLowerBound.KeyspaceSize, valueUpperBound.KeyspaceSize)],
+            Enumerable.Range(0, benchmarkSize).Select(x => 400 + (x % 201)).ToArray(),
+            Enumerable.Range(0, benchmarkSize).Select(x => x % 2 == 0 ? x % 400 : 601 + x).ToArray(),
+            GeneratorFunction.None, "ValueOutOfRange");
+
         yield return CreateEarlyExitData([new ValueBitMaskEarlyExit(0x00FF00ul)],
             Enumerable.Range(0, benchmarkSize).Select(x => x % 256).ToArray(),
             Enumerable.Range(0, benchmarkSize).Select(x => 256 + x).ToArray(),
             GeneratorFunction.None, "ValueBitMask");
+
+        const ulong missingEvenOffsets = 0x5555555555555555ul;
+        yield return CreateEarlyExitData([new ValueBitSetEarlyExit<int>(500, 563, missingEvenOffsets)],
+            Enumerable.Range(0, benchmarkSize).Select(x => 501 + ((x % 32) * 2)).ToArray(),
+            Enumerable.Range(0, benchmarkSize).Select(x => 500 + ((x % 32) * 2)).ToArray(),
+            GeneratorFunction.None, "ValueBitSet");
+
+        yield return CreateEarlyExitData([new ValueLowByteBitmapEarlyExit(0x00000000FFFFFFFFul, 0, 0, 0)],
+            Enumerable.Range(0, benchmarkSize).Select(x => x % 32).ToArray(),
+            Enumerable.Range(0, benchmarkSize).Select(x => 32 + (x % 224)).ToArray(),
+            GeneratorFunction.None, "ValueLowByteBitmap");
 
         // --- Individual string exits ---
 
@@ -207,6 +230,21 @@ public static class TestVectorHelper
             Enumerable.Range(1, stringSize).Select(x => new string('b', x + 10)).ToArray(),
             GeneratorFunction.Length, "LengthGreaterThan");
 
+        yield return CreateEarlyExitData([new LengthNotEqualEarlyExit(8)],
+            Enumerable.Repeat(new string('a', 8), stringSize).ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => new string('b', (x % 7) + 1)).ToArray(),
+            GeneratorFunction.Length, "LengthNotEqual");
+
+        yield return CreateEarlyExitData([new LengthInRangeEarlyExit(5, 10)],
+            Enumerable.Range(0, stringSize).Select(x => new string('a', x % 2 == 0 ? 5 : 10)).ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => new string('b', 6 + (x % 4))).ToArray(),
+            GeneratorFunction.Length, "LengthInRange");
+
+        yield return CreateEarlyExitData([new LengthOutOfRangeEarlyExit(5, 15)],
+            Enumerable.Range(0, stringSize).Select(x => new string('a', 5 + (x % 11))).ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => new string('b', x % 2 == 0 ? 4 : 16)).ToArray(),
+            GeneratorFunction.Length, "LengthOutOfRange");
+
         ulong lengthBitmap = (1ul << 2) | (1ul << 4) | (1ul << 6) | (1ul << 8);
         yield return CreateEarlyExitData([new LengthBitmapEarlyExit(lengthBitmap)],
             Enumerable.Range(0, stringSize).Select(x => new string('a', new[] { 3, 5, 7, 9 }[x % 4])).ToArray(),
@@ -220,17 +258,42 @@ public static class TestVectorHelper
             Enumerable.Range(0, stringSize).Select(x => (char)('g' + (x % 20)) + "test").ToArray(),
             GeneratorFunction.UnitAt | GeneratorFunction.Length, "UnitAtBitmap");
 
+        yield return CreateEarlyExitData([new UnitAtLessThanEarlyExit('m')],
+            Enumerable.Range(0, stringSize).Select(x => (char)('m' + (x % 14)) + "test").ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => (char)('a' + (x % 12)) + "test").ToArray(),
+            GeneratorFunction.UnitAt, "UnitAtLessThan");
+
+        yield return CreateEarlyExitData([new UnitAtGreaterThanEarlyExit('m')],
+            Enumerable.Range(0, stringSize).Select(x => (char)('a' + (x % 13)) + "test").ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => (char)('n' + (x % 13)) + "test").ToArray(),
+            GeneratorFunction.UnitAt, "UnitAtGreaterThan");
+
+        yield return CreateEarlyExitData([new UnitAtNotEqualEarlyExit('m', false)],
+            Enumerable.Repeat("mtest", stringSize).ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => (char)('a' + (x % 12)) + "test").ToArray(),
+            GeneratorFunction.UnitAt, "UnitAtNotEqual");
+
+        yield return CreateEarlyExitData([new UnitAtInRangeEarlyExit('d', 'm')],
+            Enumerable.Range(0, stringSize).Select(x => (x % 2 == 0 ? 'd' : 'm') + "test").ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => (char)('e' + (x % 8)) + "test").ToArray(),
+            GeneratorFunction.UnitAt, "UnitAtInRange");
+
+        yield return CreateEarlyExitData([new UnitAtOutOfRangeEarlyExit('d', 'm')],
+            Enumerable.Range(0, stringSize).Select(x => (char)('d' + (x % 10)) + "test").ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => (x % 2 == 0 ? 'c' : 'n') + "test").ToArray(),
+            GeneratorFunction.UnitAt, "UnitAtOutOfRange");
+
+        yield return CreateEarlyExitData([new EqualsAtEarlyExit("pre", 0, false)],
+            Enumerable.Range(0, stringSize).Select(x => $"pre{x}").ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => $"other{x}").ToArray(),
+            GeneratorFunction.EqualsAt, "EqualsAt");
+
+        yield return CreateEarlyExitData([new IsAsciiOnlyEarlyExit()],
+            Enumerable.Range(0, stringSize).Select(x => $"ascii-{x}").ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => $"non-ascii-\u00e9-{x}").ToArray(),
+            GeneratorFunction.IsAsciiOnly, "IsAsciiOnly");
+
         // --- Combined exits ---
-
-        yield return CreateEarlyExitData([new ValueLessThanEarlyExit<int>(100), new ValueGreaterThanEarlyExit<int>(900)],
-            Enumerable.Range(100, 801).Take(benchmarkSize).ToArray(),
-            Enumerable.Range(0, benchmarkSize).Select(x => x < benchmarkSize / 2 ? x % 100 : 901 + (x % 100)).ToArray(),
-            GeneratorFunction.None, "ValueLessThan_ValueGreaterThan");
-
-        yield return CreateEarlyExitData([new LengthLessThanEarlyExit(5), new LengthGreaterThanEarlyExit(15)],
-            Enumerable.Range(0, stringSize).Select(x => new string('a', (x % 11) + 5)).ToArray(),
-            Enumerable.Range(0, stringSize).Select(x => x % 2 == 0 ? new string('b', (x % 4) + 1) : new string('b', (x % 10) + 16)).ToArray(),
-            GeneratorFunction.Length, "LengthLessThan_LengthGreaterThan");
 
         yield return CreateEarlyExitData([new LengthLessThanEarlyExit(3), new UnitAtBitmapEarlyExit(0ul, charBitmapHigh, false)],
             Enumerable.Range(0, stringSize).Select(x => (char)('a' + (x % 6)) + new string('x', (x % 10) + 2)).ToArray(),
