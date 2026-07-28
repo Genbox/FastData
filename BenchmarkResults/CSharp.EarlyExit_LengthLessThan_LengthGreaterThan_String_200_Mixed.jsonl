@@ -1,1 +1,2 @@
 {"name":"CSharp.EarlyExit_LengthLessThan_LengthGreaterThan_String_200_Mixed","min":2.883914571152931,"median":2.9295129717946677,"max":2.9703144783574005,"avg":2.930108941794735,"error":0.023153716607817742,"stdDev":0.021658000881834196,"timestampUtc":"2026-06-14T22:25:33.2875314+00:00"}
+{"name":"CSharp.EarlyExit_LengthLessThan_LengthGreaterThan_String_200_Mixed","min":3.0627283922946003,"median":3.112503959349854,"max":3.183978746357768,"avg":3.121285399879221,"error":0.05612750448401052,"stdDev":0.04058386318211153,"timestampUtc":"2026-07-28T18:51:52.0631505+00:00"}
