@@ -26,6 +26,7 @@ public static class TestVectorHelper
                      StructureType.BinarySearch,
                      StructureType.BinarySearchInterpolation,
                      StructureType.Conditional,
+                     StructureType.ConstMap,
                      StructureType.HashTable,
                      StructureType.HashTablePerfect,
                      StructureType.Hyble,
@@ -91,7 +92,7 @@ public static class TestVectorHelper
         foreach (ITestVector testVector in GenerateTestVectors([["aaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa"]], null, StructureType.KeyLength))
             yield return testVector;
 
-        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], null, StructureType.HashTablePerfect, StructureType.Hyble))
+        foreach (ITestVector testVector in GenerateTestVectors([[1, 2, 3]], null, StructureType.ConstMap, StructureType.HashTablePerfect, StructureType.Hyble))
             yield return testVector;
 
         // Strings with characters that are not in the ASCII range
@@ -100,6 +101,7 @@ public static class TestVectorHelper
                      StructureType.BloomFilter,
                      StructureType.BinarySearch,
                      StructureType.Conditional,
+                     StructureType.ConstMap,
                      StructureType.HashTableCompact,
                      StructureType.HashTable))
             yield return testVector;
@@ -127,6 +129,7 @@ public static class TestVectorHelper
             StructureType.BinarySearch,
             StructureType.BloomFilter,
             StructureType.Conditional,
+            StructureType.ConstMap,
             StructureType.HashTable,
             StructureType.HashTableCompact
         ];
@@ -154,6 +157,9 @@ public static class TestVectorHelper
         yield return CreateTestData(StructureType.HashTablePerfect, perfectFloatHashKeys);
 
         yield return CreateTestData(StructureType.Hyble, intKeys);
+
+        string[] stringKeys = Enumerable.Range(0, benchmarkSize).Select(static x => $"item-{x}").ToArray();
+        yield return CreateTestData(StructureType.ConstMap, stringKeys);
 
         string[] uniqueLengthStringKeys = Enumerable.Range(1, keyLengthBenchmarkSize).Select(x => new string('a', x)).ToArray();
         yield return CreateTestData(StructureType.KeyLength, uniqueLengthStringKeys);

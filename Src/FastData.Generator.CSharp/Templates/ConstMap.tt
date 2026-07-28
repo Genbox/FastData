@@ -1,0 +1,134 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.ConstMapContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.ConstMapTemplateData" name="Data" #>
+
+<#
+    string[] valueLabels = Data.Values.Select(TypeMap.GetValueLiteral).ToArray();
+    bool useEntryStruct = Data.ValueCount > 0;
+    string entryTypeName = useEntryStruct ? "E" : KeyTypeName;
+    Type dataType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType(Context.Data.Max()) : typeof(uint);
+#>
+<#
+    if (useEntryStruct)
+    {
+#>
+    [StructLayout(LayoutKind.Auto)]
+    private struct E
+    {
+        internal <#= KeyTypeName #> Key;
+        internal <#= ValueTypeName #> Value;
+
+        internal E(<#= KeyTypeName #> key, <#= ValueTypeName #> value)
+        {
+            Key = key;
+            Value = value;
+        }
+    }
+<#
+    }
+#>
+
+    <#= FieldModifier #><#= entryTypeName #>[] _entries = {
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, (i, x) =>
+    {
+        if (!useEntryStruct)
+            return TypeMap.GetValueLiteral(x);
+
+        return $"new E({TypeMap.GetValueLiteral(x)}, {valueLabels[i]})";
+    }, 8) #>
+    };
+
+    <#= FieldModifier #><#= TypeMap.GetTypeName(dataType) #>[] _data = {
+<#= FormatHelper.FormatColumns(Context.Data, (_, x) => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x, dataType)), 8) #>
+    };
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong Murmur64(ulong hash)
+    {
+        unchecked
+        {
+            hash ^= hash >> 33;
+            hash *= 0xff51afd7ed558ccd;
+            hash ^= hash >> 33;
+            hash *= 0xc4ceb9fe1a85ec53;
+            hash ^= hash >> 33;
+            return hash;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static uint Reduce64(ulong hash, uint range)
+    {
+#if NET5_0_OR_GREATER
+        return (uint)Math.BigMul(hash, range, out _);
+#else
+        unchecked
+        {
+            ulong lo = (uint)hash;
+            ulong hi = hash >> 32;
+            ulong loProduct = lo * range;
+            ulong hiProduct = hi * range;
+            ulong carry = (loProduct >> 32) + (uint)hiProduct;
+            return (uint)((carry >> 32) + (hiProduct >> 32));
+        }
+#endif
+    }
+
+<#= HashSource #>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool Contains(<#= KeyTypeName #> key)
+    {
+<#= GetMethodHeader(MethodType.Contains) #>
+
+        ulong hash = Murmur64(unchecked(<#= HashCall #> + <#= TypeMap.GetValueLiteral(Context.Seed) #>));
+        uint mask = <#= TypeMap.GetValueLiteral(Context.SegmentLength - 1) #>;
+        uint h0 = Reduce64(hash, <#= TypeMap.GetValueLiteral(Context.SegmentCountLength) #>);
+        uint h1 = (h0 + <#= TypeMap.GetValueLiteral(Context.SegmentLength) #>) ^ (unchecked((uint)(hash >> 18)) & mask);
+        uint h2 = (h0 + (2 * <#= TypeMap.GetValueLiteral(Context.SegmentLength) #>)) ^ (unchecked((uint)hash) & mask);
+        uint candidate = (uint)_data[h0] ^ (uint)_data[h1] ^ (uint)_data[h2];
+
+        if (candidate >= <#= TypeMap.GetValueLiteral((uint)Data.KeyCount) #>)
+            return false;
+
+        ref var entry = ref _entries[candidate];
+        return <#= GetEqual(LookupKeyName, useEntryStruct ? "entry.Key" : "entry") #>;
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>bool TryLookup(<#= KeyTypeName #> key, out <#= ValueTypeName #> value)
+    {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+
+        ulong hash = Murmur64(unchecked(<#= HashCall #> + <#= TypeMap.GetValueLiteral(Context.Seed) #>));
+        uint mask = <#= TypeMap.GetValueLiteral(Context.SegmentLength - 1) #>;
+        uint h0 = Reduce64(hash, <#= TypeMap.GetValueLiteral(Context.SegmentCountLength) #>);
+        uint h1 = (h0 + <#= TypeMap.GetValueLiteral(Context.SegmentLength) #>) ^ (unchecked((uint)(hash >> 18)) & mask);
+        uint h2 = (h0 + (2 * <#= TypeMap.GetValueLiteral(Context.SegmentLength) #>)) ^ (unchecked((uint)hash) & mask);
+        uint candidate = (uint)_data[h0] ^ (uint)_data[h1] ^ (uint)_data[h2];
+
+        if (candidate >= <#= TypeMap.GetValueLiteral((uint)Data.KeyCount) #>)
+        {
+            value = default;
+            return false;
+        }
+
+        ref E entry = ref _entries[candidate];
+
+        if (<#= GetEqual(LookupKeyName, "entry.Key") #>)
+        {
+            value = entry.Value;
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

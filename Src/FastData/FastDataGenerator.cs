@@ -294,7 +294,11 @@ public static partial class FastDataGenerator
         {
             IStringHash stringHash;
 
-            if (cfg.StringAnalyzerConfig != null)
+            if (structureTypeOverride == StructureType.ConstMap)
+            {
+                stringHash = XxHash64StringHash.GetInstance(generator.Encoding, cfg.IgnoreCase);
+            }
+            else if (cfg.StringAnalyzerConfig != null)
             {
                 Candidate candidate = HashBenchmark.GetBestHash(keySpan, props, cfg.StringAnalyzerConfig, factory, generator.Encoding, true, cfg.IgnoreCase);
                 LogStringHashFitness(logger, candidate.Fitness);
@@ -335,6 +339,7 @@ public static partial class FastDataGenerator
         StructureType.BinarySearch => new BinarySearchStructure<string, TValue>(),
         StructureType.BloomFilter => new BloomFilterStructure<string, TValue>(getHashData()),
         StructureType.Conditional => new ConditionalStructure<string, TValue>(),
+        StructureType.ConstMap => new ConstMapStructure<string, TValue>(getHashData()),
         StructureType.HashTable => new HashTableStructure<string, TValue>(getHashData()),
         StructureType.HashTableCompact => new HashTableCompactStructure<string, TValue>(getHashData()),
         StructureType.HashTablePerfect => new HashTablePerfectStructure<string, TValue>(getHashData()),
@@ -466,6 +471,7 @@ public static partial class FastDataGenerator
         StructureType.BitSet => new BitSetStructure<TKey, TValue>(props),
         StructureType.BloomFilter => new BloomFilterStructure<TKey, TValue>(getHashData()),
         StructureType.Conditional => new ConditionalStructure<TKey, TValue>(),
+        StructureType.ConstMap => new ConstMapStructure<TKey, TValue>(getHashData()),
         StructureType.EliasFano => new EliasFanoStructure<TKey, TValue>(props.DataRanges.Min, props.DataRanges.Max, cfg.StructureSettings.GetSetting<int>(KnownSettings.EliasFanoSkipQuantum)),
         StructureType.HashTable => new HashTableStructure<TKey, TValue>(getHashData()),
         StructureType.HashTableCompact => new HashTableCompactStructure<TKey, TValue>(getHashData()),

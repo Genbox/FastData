@@ -1,0 +1,95 @@
+<#@ include file="Includes\Header.ttinclude" #>
+<#@ parameter type="Genbox.FastData.Generators.Contexts.ConstMapContext" name="Context" #>
+<#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.ConstMapTemplateData" name="Data" #>
+
+<#
+    string[] valueLabels = Data.Values.Select(TypeMap.GetValueLiteral).ToArray();
+    bool useEntryStruct = Data.ValueCount > 0;
+    string entryTypeName = useEntryStruct ? "E" : StoredKeyTypeName;
+    Type dataType = GeneratorConfig.TypeReductionEnabled ? IntegralTypeReducer.GetSmallestUnsignedStorageType(Context.Data.Max()) : typeof(uint);
+#>
+<#
+    if (useEntryStruct)
+    {
+#>struct E {
+    key: <#= StoredKeyTypeName #>,
+    value: <#= StoredValueTypeName #>,
+}
+<#
+    }
+#>
+
+<#@ include file="Includes\ImplHeader.ttinclude" #>
+    <#= FieldModifier #>ENTRIES: [<#= entryTypeName #>; <#= Data.KeyCount.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Data.Keys, Data.KeyCount, (i, x) =>
+    {
+        if (!useEntryStruct)
+            return TypeMap.GetValueLiteral(x);
+
+        return $"E {{ key: {TypeMap.GetValueLiteral(x)}, value: {valueLabels[i]} }}";
+    }, 8) #>
+    ];
+
+    <#= FieldModifier #>DATA: [<#= TypeMap.GetTypeName(dataType) #>; <#= Context.Data.Length.ToStringInvariant() #>] = [
+<#= FormatHelper.FormatColumns(Context.Data, (_, x) => TypeMap.GetValueLiteral(IntegralValueConverter.ConvertChecked(x, dataType)), 8) #>
+    ];
+
+<#= HashSource #>
+
+    #[inline(always)]
+    fn murmur64(mut hash: u64) -> u64 {
+        hash ^= hash >> 33;
+        hash = hash.wrapping_mul(0xff51afd7ed558ccdu64);
+        hash ^= hash >> 33;
+        hash = hash.wrapping_mul(0xc4ceb9fe1a85ec53u64);
+        hash ^= hash >> 33;
+        hash
+    }
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
+<#= GetMethodHeader(MethodType.Contains) #>
+        let hash = Self::murmur64(<#= HashCall #>.wrapping_add(<#= Context.Seed.ToStringInvariant() #>u64));
+        let segment_mask = <#= (Context.SegmentLength - 1).ToStringInvariant() #>u32;
+        let h0 = ((hash as u128 * <#= Context.SegmentCountLength.ToStringInvariant() #>u128) >> 64) as u32;
+        let h1 = (h0 + <#= Context.SegmentLength.ToStringInvariant() #>u32) ^ (((hash >> 18) as u32) & segment_mask);
+        let h2 = (h0 + <#= (2 * Context.SegmentLength).ToStringInvariant() #>u32) ^ ((hash as u32) & segment_mask);
+        let candidate: u32 = (Self::DATA[h0 as usize] as u32) ^ (Self::DATA[h1 as usize] as u32) ^ (Self::DATA[h2 as usize] as u32);
+
+        if candidate >= <#= Data.KeyCount.ToStringInvariant() #>u32 {
+            return false;
+        }
+
+        let entry = &Self::ENTRIES[candidate as usize];
+        <#= GetEqual(LookupKeyName, useEntryStruct ? "entry.key" : "*entry") #>
+    }
+<#
+    if (Data.ValueCount > 0)
+    {
+#>
+
+    <#= MethodAttribute #>
+    <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
+<#= GetMethodHeader(MethodType.TryLookup) #>
+        let hash = Self::murmur64(<#= HashCall #>.wrapping_add(<#= Context.Seed.ToStringInvariant() #>u64));
+        let segment_mask = <#= (Context.SegmentLength - 1).ToStringInvariant() #>u32;
+        let h0 = ((hash as u128 * <#= Context.SegmentCountLength.ToStringInvariant() #>u128) >> 64) as u32;
+        let h1 = (h0 + <#= Context.SegmentLength.ToStringInvariant() #>u32) ^ (((hash >> 18) as u32) & segment_mask);
+        let h2 = (h0 + <#= (2 * Context.SegmentLength).ToStringInvariant() #>u32) ^ ((hash as u32) & segment_mask);
+        let candidate: u32 = (Self::DATA[h0 as usize] as u32) ^ (Self::DATA[h1 as usize] as u32) ^ (Self::DATA[h2 as usize] as u32);
+
+        if candidate >= <#= Data.KeyCount.ToStringInvariant() #>u32 {
+            return None;
+        }
+
+        let entry = &Self::ENTRIES[candidate as usize];
+        if <#= GetEqual(LookupKeyName, "entry.key") #> {
+            return Some(entry.value);
+        }
+
+        None
+    }
+<#
+    }
+#>
+<#@ include file="Includes\Footer.ttinclude" #>

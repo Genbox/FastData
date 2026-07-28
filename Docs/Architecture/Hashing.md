@@ -9,7 +9,7 @@ This document focuses on the string hash generation framework. The central imple
 
 ## Pipeline
 
-String hash generation runs only when a selected string structure needs hash data, such as `BloomFilter`, `HashTable`, `HashTableCompact`, `HashTablePerfect`, or `Hyble`.
+String hash generation runs only when a selected string structure needs hash data, such as `BloomFilter`, `ConstMap`, `HashTable`, `HashTableCompact`, `HashTablePerfect`, or `Hyble`.
 
 The flow is:
 

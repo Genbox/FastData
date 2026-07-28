@@ -33,6 +33,7 @@ internal static class StructureCapabilityHelper
         StructureType.BitSet => typeof(BitSetStructure<,>),
         StructureType.BloomFilter => typeof(BloomFilterStructure<,>),
         StructureType.Conditional => typeof(ConditionalStructure<,>),
+        StructureType.ConstMap => typeof(ConstMapStructure<,>),
         StructureType.EliasFano => typeof(EliasFanoStructure<,>),
         StructureType.HashTableCompact => typeof(HashTableCompactStructure<,>),
         StructureType.HashTablePerfect => typeof(HashTablePerfectStructure<,>),

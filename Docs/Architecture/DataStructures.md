@@ -91,6 +91,19 @@ Complexity below is the amortized time for a single query after generated code h
 
 `Conditional` emits language-level conditions or switches. It is the default choice for small datasets because compilers can optimize the emitted branches well. The default item-count limit is conservative because branch-heavy code becomes slower as the set grows.
 
+## ConstMap
+
+* Supports: Numeric and string keys
+* Values: Yes
+* Complexity: O(1)
+* Compressed: Yes. Approximately `1.125 * n * candidateBits` bits for large datasets
+
+`ConstMap` uses a binary-fuse XOR table to recover a candidate ordinal with one generated base hash, a seeded finalizer, and three table reads. The ordinal indexes a compact key or key/value entry. Generated code bounds-checks the ordinal and compares the complete key, so membership and key/value misses are exact rather than fingerprint-based. This also allows arbitrary generated value types instead of restricting values to XOR-compatible integers. The construction follows [Binary Fuse Filters: Fast and Smaller Than Xor Filters](https://arxiv.org/abs/2201.05041).
+
+The canonical context stores 32-bit cells. With type reduction enabled, generated cells use the smallest unsigned built-in type covering the constructed table values, commonly 8 bits through 256 keys, 16 bits through 65,536 keys, and 32 bits above that. Key and value storage is excluded from the formula, consistent with the memory model above.
+
+Construction is deterministic and retries bounded seeds when the binary-fuse graph cannot be peeled. It fails when two stored keys have the same generated 64-bit base hash because no seeded permutation can separate them. ConstMap is currently available only when explicitly requested; automatic selection continues to use the established structures until cross-language benchmark thresholds are available.
+
 ## EliasFano
 
 * Supports: Integral numeric keys

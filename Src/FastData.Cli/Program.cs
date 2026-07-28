@@ -171,7 +171,7 @@ internal static class Program
 
     private static bool IsStringStructureSupported(StructureType structureType) => structureType is
         StructureType.Auto or StructureType.Array or StructureType.BinarySearch or
-        StructureType.BloomFilter or StructureType.Conditional or StructureType.HashTableCompact or
+        StructureType.BloomFilter or StructureType.Conditional or StructureType.ConstMap or StructureType.HashTableCompact or
         StructureType.HashTablePerfect or StructureType.HashTable or StructureType.Hyble or
         StructureType.KeyLength or StructureType.SingleValue;
 
@@ -180,7 +180,7 @@ internal static class Program
     private static bool IsValueStructureSupported(StructureType structureType) => structureType is
         StructureType.Auto or StructureType.Array or StructureType.BinarySearch or
         StructureType.BinarySearchInterpolation or StructureType.BitSet or StructureType.Conditional or
-        StructureType.HashTableCompact or StructureType.HashTablePerfect or StructureType.HashTable or
+        StructureType.ConstMap or StructureType.HashTableCompact or StructureType.HashTablePerfect or StructureType.HashTable or
         StructureType.Hyble or StructureType.KeyLength or StructureType.SingleValue;
 
     private static StringAnalyzerConfig? CreateStringAnalyzerConfig(AnalysisLevel analysisLevel) => analysisLevel switch

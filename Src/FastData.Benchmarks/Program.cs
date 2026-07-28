@@ -44,7 +44,7 @@ internal static class Program
         // This code is used to generate the files in the Generated folder.
 
         int[] sizes = [1, 5, 10, 50, 100, 500, 1000];
-        StructureType[] structures = [StructureType.Array, StructureType.Conditional, StructureType.BinarySearch, StructureType.HashTable];
+        StructureType[] structures = [StructureType.Array, StructureType.Conditional, StructureType.BinarySearch, StructureType.ConstMap, StructureType.HashTable];
 
         foreach (StructureType type in structures)
         {
@@ -58,12 +58,12 @@ internal static class Program
         Random rng = new Random(42);
         string[] data = Enumerable.Range(0, size).Select(_ => TestHelper.GenerateRandomString(rng, rng.Next(5, 10))).ToArray();
 
-        CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpCodeGeneratorConfig("fastdata"));
+        CSharpCodeGenerator generator = new CSharpCodeGenerator(new CSharpCodeGeneratorConfig($"{type}Structure_String_{size}"));
 
         StringDataConfig config = new StringDataConfig();
         config.StructureTypeOverride = type;
 
         StringGenerationResult result = FastDataGenerator.Generate(data, config, generator);
-        File.WriteAllText("Gen-" + type + "-" + size + ".cs", result.Source);
+        File.WriteAllText($"Gen-{type}Structure-{size}.cs", result.Source);
     }
 }

@@ -1,0 +1,62 @@
+//! This file is auto-generated. Do not edit manually.
+//! Structure: ConstMap
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+
+pub struct fastdata;
+
+
+impl fastdata {
+    const ENTRIES: [i32; 3] = [
+        1, 2, 3
+    ];
+
+    const DATA: [u8; 24] = [
+        u8::MIN, u8::MIN, u8::MIN, 1, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 2, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, 1, u8::MIN, u8::MIN
+    ];
+
+    #[inline(always)]
+    fn get_hash(value: i32) -> u64 {
+        value as u64
+    }
+
+    #[inline(always)]
+    fn murmur64(mut hash: u64) -> u64 {
+        hash ^= hash >> 33;
+        hash = hash.wrapping_mul(0xff51afd7ed558ccdu64);
+        hash ^= hash >> 33;
+        hash = hash.wrapping_mul(0xc4ceb9fe1a85ec53u64);
+        hash ^= hash >> 33;
+        hash
+    }
+
+    #[must_use]
+    pub fn contains(key: i32) -> bool {
+
+        let hash = Self::murmur64(Self::get_hash(key).wrapping_add(10451216379200822465u64));
+        let segment_mask = 7u32;
+        let h0 = ((hash as u128 * 8u128) >> 64) as u32;
+        let h1 = (h0 + 8u32) ^ (((hash >> 18) as u32) & segment_mask);
+        let h2 = (h0 + 16u32) ^ ((hash as u32) & segment_mask);
+        let candidate: u32 = (Self::DATA[h0 as usize] as u32) ^ (Self::DATA[h1 as usize] as u32) ^ (Self::DATA[h2 as usize] as u32);
+
+        if candidate >= 3u32 {
+            return false;
+        }
+
+        let entry = &Self::ENTRIES[candidate as usize];
+        key == *entry
+    }
+
+    pub const ITEM_COUNT: usize = 3;
+    pub const MIN_KEY: i32 = 1;
+    pub const MAX_KEY: i32 = 3;
+}

@@ -140,6 +140,15 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
                     ValueCount = conCtx.Values.Length
                 };
 
+            case ConstMapContext<TKey, TValue> constMapCtx:
+                return new ConstMapTemplateData
+                {
+                    Keys = constMapCtx.Keys.ToObjects(),
+                    KeyCount = constMapCtx.Keys.Length,
+                    Values = constMapCtx.Values.ToObjects(),
+                    ValueCount = constMapCtx.Values.Length
+                };
+
             case SingleValueContext<TKey, TValue> singleCtx:
                 return new SingleValueTemplateData
                 {

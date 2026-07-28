@@ -57,5 +57,8 @@ public enum StructureType : byte
     SingleValue = 16,
 
     [Description("Indicates that no data structure is involved.")]
-    None = 17
+    None = 17,
+
+    [Description("Uses a binary-fuse XOR table to recover and verify a candidate key index.")]
+    ConstMap = 18
 }

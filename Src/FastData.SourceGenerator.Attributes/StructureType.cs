@@ -53,5 +53,8 @@ public enum StructureType : byte
     RrrBitVector = 15,
 
     [Description("Emits a direct equality check for a dataset with one unique key.")]
-    SingleValue = 16
+    SingleValue = 16,
+
+    [Description("Uses a binary-fuse XOR table to recover and verify a candidate key index.")]
+    ConstMap = 18
 }

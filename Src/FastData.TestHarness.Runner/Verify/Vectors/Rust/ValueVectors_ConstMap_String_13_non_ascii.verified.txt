@@ -1,0 +1,173 @@
+﻿//! This file is auto-generated. Do not edit manually.
+//! Structure: ConstMap
+#![allow(non_camel_case_types)]
+#![allow(unused_parens)]
+#![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(unused_unsafe)]
+use std::ptr;
+
+fn Length(value: &str) -> i32 { value.len() as i32 }
+
+fn ReadU8(value: &[u8], offset: usize) -> u32 { unsafe { *value.get_unchecked(offset) as u32 } }
+
+fn ReadU32(value: &[u8], offset: usize) -> u32 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u32) } }
+
+fn ReadU64(value: &[u8], offset: usize) -> u64 { unsafe { ptr::read_unaligned(value.as_ptr().add(offset) as *const u64) } }
+
+
+pub struct fastdata;
+
+
+impl fastdata {
+    const ENTRIES: [&'static str; 13] = [
+        "ß", "à", "ä", "å", "æ", "ç", "è", "é", "ê", "ñ", 
+        "ö", "ø", "ü"
+    ];
+
+    const DATA: [u8; 48] = [
+        11, u8::MIN, u8::MIN, 14, u8::MIN, u8::MIN, u8::MIN, 2, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 7, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 2, u8::MIN, u8::MIN, u8::MIN, 
+        u8::MIN, u8::MIN, u8::MIN, u8::MIN, u8::MIN, 11, 2, 15, u8::MIN, 6, 
+        13, u8::MIN, u8::MIN, u8::MIN, 14, 1, 4, u8::MIN
+    ];
+
+    #[inline]
+    unsafe fn get_hash(value: &str, mut length: i32) -> u64 {
+        let data = value.as_bytes();
+        let mut offset: i32 = 0;
+        let mut remaining: i32 = length;
+        let mut hash: u64;
+        let mut round: u64;
+        let mut v1: u64;
+        let mut v2: u64;
+        let mut v3: u64;
+        let mut v4: u64;
+        if ((remaining >= 32))
+        {
+         v1 = 6983438078262162902;
+         v2 = 14029467366897019727;
+         v3 = u64::MIN;
+         v4 = 7046029288634856825;
+         while ((remaining >= 32))
+         {
+          v1 = (v1.wrapping_add(((ReadU64(data, offset as usize) as u64).wrapping_mul(14029467366897019727))));
+          v1 = ((v1 << (31 as u32)) | (v1 >> (33 as u32)));
+          v1 = (v1.wrapping_mul(11400714785074694791));
+          v2 = (v2.wrapping_add(((ReadU64(data, (offset + 8) as usize) as u64).wrapping_mul(14029467366897019727))));
+          v2 = ((v2 << (31 as u32)) | (v2 >> (33 as u32)));
+          v2 = (v2.wrapping_mul(11400714785074694791));
+          v3 = (v3.wrapping_add(((ReadU64(data, (offset + 16) as usize) as u64).wrapping_mul(14029467366897019727))));
+          v3 = ((v3 << (31 as u32)) | (v3 >> (33 as u32)));
+          v3 = (v3.wrapping_mul(11400714785074694791));
+          v4 = (v4.wrapping_add(((ReadU64(data, (offset + 24) as usize) as u64).wrapping_mul(14029467366897019727))));
+          v4 = ((v4 << (31 as u32)) | (v4 >> (33 as u32)));
+          v4 = (v4.wrapping_mul(11400714785074694791));
+          offset += 32;
+          remaining -= 32;
+         }
+
+         hash = ((((v1 << (1 as u32)) | (v1 >> (63 as u32))).wrapping_add(((v2 << (7 as u32)) | (v2 >> (57 as u32))))).wrapping_add((((v3 << (12 as u32)) | (v3 >> (52 as u32))).wrapping_add(((v4 << (18 as u32)) | (v4 >> (46 as u32)))))));
+         round = ((u64::MIN as u64).wrapping_add((v1.wrapping_mul(14029467366897019727))));
+         round = ((round << (31 as u32)) | (round >> (33 as u32)));
+         round = (round.wrapping_mul(11400714785074694791));
+         hash = (hash ^ round);
+         hash = ((hash.wrapping_mul(11400714785074694791)).wrapping_add(9650029242287828579));
+         round = ((u64::MIN as u64).wrapping_add((v2.wrapping_mul(14029467366897019727))));
+         round = ((round << (31 as u32)) | (round >> (33 as u32)));
+         round = (round.wrapping_mul(11400714785074694791));
+         hash = (hash ^ round);
+         hash = ((hash.wrapping_mul(11400714785074694791)).wrapping_add(9650029242287828579));
+         round = ((u64::MIN as u64).wrapping_add((v3.wrapping_mul(14029467366897019727))));
+         round = ((round << (31 as u32)) | (round >> (33 as u32)));
+         round = (round.wrapping_mul(11400714785074694791));
+         hash = (hash ^ round);
+         hash = ((hash.wrapping_mul(11400714785074694791)).wrapping_add(9650029242287828579));
+         round = ((u64::MIN as u64).wrapping_add((v4.wrapping_mul(14029467366897019727))));
+         round = ((round << (31 as u32)) | (round >> (33 as u32)));
+         round = (round.wrapping_mul(11400714785074694791));
+         hash = (hash ^ round);
+         hash = ((hash.wrapping_mul(11400714785074694791)).wrapping_add(9650029242287828579));
+        }
+        else
+        {
+         hash = 2870177450012600261;
+        }
+
+        hash = hash.wrapping_add((length as u64));
+        while ((remaining >= 8))
+        {
+         round = ((u64::MIN as u64).wrapping_add(((ReadU64(data, offset as usize) as u64).wrapping_mul(14029467366897019727))));
+         round = ((round << (31 as u32)) | (round >> (33 as u32)));
+         round = (round.wrapping_mul(11400714785074694791));
+         hash = (hash ^ round);
+         hash = ((((hash << (27 as u32)) | (hash >> (37 as u32))).wrapping_mul(11400714785074694791)).wrapping_add(9650029242287828579));
+         offset += 8;
+         remaining -= 8;
+        }
+
+        if ((remaining >= 4))
+        {
+         hash = (hash ^ ((ReadU32(data, offset as usize) as u64).wrapping_mul(11400714785074694791)));
+         hash = ((((hash << (23 as u32)) | (hash >> (41 as u32))).wrapping_mul(14029467366897019727)).wrapping_add(1609587929392839161));
+         offset += 4;
+         remaining -= 4;
+        }
+
+        while ((remaining > 0))
+        {
+         hash = (hash ^ ((ReadU8(data, offset as usize) as u64).wrapping_mul(2870177450012600261)));
+         hash = (((hash << (11 as u32)) | (hash >> (53 as u32))).wrapping_mul(11400714785074694791));
+         offset += 1;
+         remaining -= 1;
+        }
+
+        hash = (hash ^ (hash >> (33 as u32)));
+        hash = (hash.wrapping_mul(14029467366897019727));
+        hash = (hash ^ (hash >> (29 as u32)));
+        hash = (hash.wrapping_mul(1609587929392839161));
+        hash = (hash ^ (hash >> (32 as u32)));
+
+        return hash;
+    }
+
+    #[inline(always)]
+    fn murmur64(mut hash: u64) -> u64 {
+        hash ^= hash >> 33;
+        hash = hash.wrapping_mul(0xff51afd7ed558ccdu64);
+        hash ^= hash >> 33;
+        hash = hash.wrapping_mul(0xc4ceb9fe1a85ec53u64);
+        hash ^= hash >> 33;
+        hash
+    }
+
+    #[must_use]
+    pub fn contains(key: &str) -> bool {
+        let mut length: i32 = Length(key);
+
+        let hash = Self::murmur64(unsafe { Self::get_hash(key, length) }.wrapping_add(10451216379200822465u64));
+        let segment_mask = 15u32;
+        let h0 = ((hash as u128 * 16u128) >> 64) as u32;
+        let h1 = (h0 + 16u32) ^ (((hash >> 18) as u32) & segment_mask);
+        let h2 = (h0 + 32u32) ^ ((hash as u32) & segment_mask);
+        let candidate: u32 = (Self::DATA[h0 as usize] as u32) ^ (Self::DATA[h1 as usize] as u32) ^ (Self::DATA[h2 as usize] as u32);
+
+        if candidate >= 13u32 {
+            return false;
+        }
+
+        let entry = &Self::ENTRIES[candidate as usize];
+        key == *entry
+    }
+
+    pub const ITEM_COUNT: usize = 13;
+    pub const MIN_KEY_LENGTH: i32 = 2;
+    pub const MAX_KEY_LENGTH: i32 = 2;
+    pub const HAS_NUMBER: bool = false;
+    pub const HAS_UPPERCASE: bool = false;
+    pub const HAS_LOWERCASE: bool = true;
+    pub const HAS_SYMBOL: bool = false;
+    pub const HAS_WHITESPACE: bool = false;
+}

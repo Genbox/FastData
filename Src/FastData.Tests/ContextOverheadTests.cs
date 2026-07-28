@@ -74,13 +74,15 @@ public class ContextOverheadTests
     }
 
     [Fact]
-    public void HybleAndKeyLengthCountIndexMetadataOnly()
+    public void IndexedContextsCountIndexMetadataOnly()
     {
         HybleContext<int, string> hyble = new HybleContext<int, string>(new KeyValuePair<int, ulong>[5], new ushort[3], 5, 3, 1, new string[5]);
+        ConstMapContext<int, string> constMap = new ConstMapContext<int, string>(new int[5], new string[5], new uint[7], 1, 4, 4);
         KeyLengthContext<string> keyLength = new KeyLengthContext<string>(new string?[10], 1, new string[2], new int[4]);
         KeyLengthContext<string> keyLengthWithoutValues = new KeyLengthContext<string>(new string?[10], 1, ReadOnlyMemory<string>.Empty, []);
 
         Assert.Equal(6, hyble.GetOverheadBytes());
+        Assert.Equal(28, constMap.GetOverheadBytes());
         Assert.Equal(16, keyLength.GetOverheadBytes());
         Assert.Equal(0, keyLengthWithoutValues.GetOverheadBytes());
     }
