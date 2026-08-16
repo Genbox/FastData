@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Security.Cryptography;
 using System.Text;
 using Genbox.FastData.Config;
 using Genbox.FastData.Config.Analysis;
@@ -40,99 +41,91 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        IncrementalValueProvider<ImmutableArray<object>> p = context.CompilationProvider
-                                                                    .SelectMany((comp, token) =>
-                                                                    {
-                                                                        try
-                                                                        {
-                                                                            return Transform(comp, token).ToArray();
-                                                                        }
-                                                                        catch (Exception e)
-                                                                        {
-                                                                            return [e];
-                                                                        }
-                                                                    })
-                                                                    .Collect();
-
-        context.RegisterSourceOutput(p, (spc, specs) =>
+        IncrementalValuesProvider<object> specs = context.CompilationProvider.SelectMany((compilation, token) =>
         {
-            if (spc.CancellationToken.IsCancellationRequested)
-                return;
-
             try
             {
-                foreach (object obj in specs)
-                {
-                    if (obj is Diagnostic diagnostic)
-                    {
-                        spc.ReportDiagnostic(diagnostic);
-                        continue;
-                    }
-
-                    if (obj is Exception ex)
-                        ExceptionDispatchInfo.Capture(ex).Throw();
-
-                    if (obj is CombinedConfig combinedCfg)
-                    {
-                        Array keys = combinedCfg.Keys;
-                        Array? values = combinedCfg.Values;
-                        DataConfig fdCfg = combinedCfg.FDConfig;
-                        CSharpCodeGenerator generator = new CSharpCodeGenerator(combinedCfg.CSConfig);
-
-                        Type genType = typeof(FastDataGenerator);
-
-                        string source;
-                        if (values == null)
-                        {
-                            Type keyType = keys.GetType().GetElementType() ?? throw new InvalidOperationException("Key array element type is missing.");
-                            if (keyType == typeof(string))
-                                source = FastDataGenerator.Generate((string[])keys, (StringDataConfig)fdCfg, generator).Source;
-                            else
-                            {
-                                object keyMemory = CreateReadOnlyMemory(keys);
-
-                                // The attribute key type is only known through Roslyn metadata, so invocation uses the runtime array element type.
-                                MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.Generate), 1, 4, 1)
-                                    .MakeGenericMethod(keyType);
-                                source = ((NumericGenerationResult)mi.Invoke(null, [keyMemory, fdCfg, generator, null])!).Source;
-                            }
-                        }
-                        else
-                        {
-                            Type keyType = keys.GetType().GetElementType() ?? throw new InvalidOperationException("Key array element type is missing.");
-                            Type valueType = values.GetType().GetElementType() ?? throw new InvalidOperationException("Value array element type is missing.");
-                            if (keyType == typeof(string))
-                            {
-                                MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.GenerateKeyed), 1, 5, 0)
-                                    .MakeGenericMethod(valueType);
-                                source = ((StringGenerationResult)mi.Invoke(null, [keys, values, fdCfg, generator, null])!).Source;
-                            }
-                            else
-                            {
-                                object keyMemory = CreateReadOnlyMemory(keys);
-                                object valueMemory = CreateReadOnlyMemory(values);
-
-                                // Key/value generation is invoked the same way to keep the incremental pipeline type-agnostic.
-                                MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.GenerateKeyed), 2, 5, 2)
-                                    .MakeGenericMethod(keyType, valueType);
-                                source = ((NumericGenerationResult)mi.Invoke(null, [keyMemory, valueMemory, fdCfg, generator, null])!).Source;
-                            }
-                        }
-
-                        spc.AddSource(combinedCfg.CSConfig.ClassName + ".g.cs", SourceText.From(source, Encoding.UTF8));
-                    }
-                    else
-                        throw new InvalidOperationException("Unknown object type: " + obj.GetType().Name);
-                }
+                return Transform(compilation, token).ToArray();
             }
-            catch (Exception e)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                // Include the full exception details (type, message, and stack trace) so users
-                // can diagnose generation failures. InnerException is included for reflection-invoked methods.
-                Exception actual = e is TargetInvocationException { InnerException: not null } tie ? tie.InnerException : e;
-                spc.ReportDiagnostic(Diagnostic.Create(GenerationError, null, actual.ToString()));
+                return [ex];
             }
         });
+
+        context.RegisterSourceOutput(specs, static (spc, item) => EmitItem(spc, item));
+    }
+
+    private static void EmitItem(SourceProductionContext spc, object item)
+    {
+        if (spc.CancellationToken.IsCancellationRequested)
+            return;
+
+        if (item is Diagnostic diagnostic)
+        {
+            spc.ReportDiagnostic(diagnostic);
+            return;
+        }
+
+        try
+        {
+            if (item is Exception ex)
+                ExceptionDispatchInfo.Capture(ex).Throw();
+
+            if (item is not CombinedConfig combinedCfg)
+                throw new InvalidOperationException("Unknown object type: " + item.GetType().Name);
+
+            Array keys = combinedCfg.Keys;
+            Array? values = combinedCfg.Values;
+            DataConfig fdCfg = combinedCfg.FDConfig;
+            CSharpCodeGenerator generator = new CSharpCodeGenerator(combinedCfg.CSConfig);
+            Type genType = typeof(FastDataGenerator);
+
+            string source;
+            if (values == null)
+            {
+                Type keyType = keys.GetType().GetElementType() ?? throw new InvalidOperationException("Key array element type is missing.");
+                if (keyType == typeof(string))
+                    source = FastDataGenerator.Generate((string[])keys, (StringDataConfig)fdCfg, generator).Source;
+                else
+                {
+                    object keyMemory = CreateReadOnlyMemory(keys);
+
+                    // The attribute key type is only known through Roslyn metadata, so invocation uses the runtime array element type.
+                    MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.Generate), 1, 4, 1)
+                        .MakeGenericMethod(keyType);
+                    source = ((NumericGenerationResult)mi.Invoke(null, [keyMemory, fdCfg, generator, null])!).Source;
+                }
+            }
+            else
+            {
+                Type keyType = keys.GetType().GetElementType() ?? throw new InvalidOperationException("Key array element type is missing.");
+                Type valueType = values.GetType().GetElementType() ?? throw new InvalidOperationException("Value array element type is missing.");
+                if (keyType == typeof(string))
+                {
+                    MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.GenerateKeyed), 1, 5, 0)
+                        .MakeGenericMethod(valueType);
+                    source = ((StringGenerationResult)mi.Invoke(null, [keys, values, fdCfg, generator, null])!).Source;
+                }
+                else
+                {
+                    object keyMemory = CreateReadOnlyMemory(keys);
+                    object valueMemory = CreateReadOnlyMemory(values);
+
+                    // Key/value generation is invoked the same way to keep the incremental pipeline type-agnostic.
+                    MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.GenerateKeyed), 2, 5, 2)
+                        .MakeGenericMethod(keyType, valueType);
+                    source = ((NumericGenerationResult)mi.Invoke(null, [keyMemory, valueMemory, fdCfg, generator, null])!).Source;
+                }
+            }
+
+            spc.AddSource(combinedCfg.CSConfig.ClassName + ".g.cs", SourceText.From(source, Encoding.UTF8));
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Exception actual = UnwrapTargetInvocationException(ex);
+            spc.ReportDiagnostic(Diagnostic.Create(GenerationError, null, actual.ToString()));
+        }
     }
 
     private static IEnumerable<object> Transform(Compilation c, CancellationToken token)
@@ -159,217 +152,168 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             if (!AreEqualSymbols(ad.AttributeClass, fdAttr) && !AreEqualSymbols(ad.AttributeClass, fdKvAttr))
                 continue;
 
-            Location? location = ad.ApplicationSyntaxReference?.GetSyntax(token).GetLocation();
+            Location? location = null;
+            object item;
 
-            if (ad.ConstructorArguments.Length is not (2 or 3))
+            try
             {
-                yield return CreateConfigurationDiagnostic(location, "Expected 2 constructor arguments");
-                continue;
+                location = ad.ApplicationSyntaxReference?.GetSyntax(token).GetLocation();
+                item = TransformAttribute(ad, names, location);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                Exception actual = UnwrapTargetInvocationException(ex);
+                item = Diagnostic.Create(GenerationError, location, actual.ToString());
             }
 
-            TypedConstant nameType = ad.ConstructorArguments[0];
-
-            string? name = (string?)nameType.Value;
-
-            if (name == null || name.Length == 0)
-            {
-                yield return CreateConfigurationDiagnostic(location, "Name is null or empty");
-                continue;
-            }
-
-            if (!names.Add(name))
-            {
-                yield return CreateConfigurationDiagnostic(location, $"The name '{name}' is duplicated elsewhere");
-                continue;
-            }
-
-            ImmutableArray<TypedConstant> keys = ad.ConstructorArguments[1].Values;
-
-            if (keys.Length == 0)
-            {
-                yield return CreateConfigurationDiagnostic(location, $"There are no keys in '{name}'");
-                continue;
-            }
-
-            ITypeSymbol genericArg0 = ad.AttributeClass.TypeArguments[0];
-
-            if (!Enum.TryParse<SupportedKeyType>(genericArg0.Name, true, out _))
-            {
-                yield return CreateConfigurationDiagnostic(location, $"FastData does not support '{genericArg0.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}' as generic argument for '{name}'");
-                continue;
-            }
-
-            Type? runtimeKeyType = ToRuntimeType(genericArg0);
-            if (runtimeKeyType == null)
-            {
-                yield return CreateConfigurationDiagnostic(location, $"Unable to map '{genericArg0.Name}' to a runtime type.");
-                continue;
-            }
-
-            //We uniq the keys and throw on duplicates
-            HashSet<object> uniqueKeys = new HashSet<object>();
-            bool invalid = false;
-
-            foreach (TypedConstant value in keys)
-            {
-                if (value.Value == null)
-                {
-                    yield return CreateConfigurationDiagnostic(location, "Null value in dataset");
-                    invalid = true;
-                    break;
-                }
-
-                if (value.Value is string str && str.Length == 0)
-                {
-                    yield return CreateConfigurationDiagnostic(location, "Empty string values are not supported");
-                    invalid = true;
-                    break;
-                }
-
-                if (!uniqueKeys.Add(value.Value))
-                {
-                    yield return CreateConfigurationDiagnostic(location, $"Duplicate value: {value.Value}");
-                    invalid = true;
-                    break;
-                }
-            }
-
-            if (invalid)
-                continue;
-
-            //Copy out the values to avoid hanging on to Roslyn references later on
-            Array keysArr = Array.CreateInstance(runtimeKeyType, keys.Length);
-            for (int i = 0; i < keys.Length; i++)
-                keysArr.SetValue(keys[i].Value, i);
-
-            Array? valueArr = null;
-
-            if (ad.ConstructorArguments.Length == 3) //Lazy check for key/value attribute
-            {
-                ImmutableArray<TypedConstant> values = ad.ConstructorArguments[2].Values;
-                ITypeSymbol genericArg1 = ad.AttributeClass.TypeArguments[1];
-
-                Type? runtimeValueType = ToRuntimeType(genericArg1);
-                if (runtimeValueType == null)
-                {
-                    yield return CreateConfigurationDiagnostic(location, $"Unable to map '{genericArg1.Name}' to a runtime type.");
-                    continue;
-                }
-
-                if (values.Length != keys.Length)
-                {
-                    yield return CreateConfigurationDiagnostic(location, $"The number of values does not match the number of keys for '{name}'.");
-                    continue;
-                }
-
-                valueArr = Array.CreateInstance(runtimeValueType, values.Length);
-
-                for (int i = 0; i < valueArr.Length; i++)
-                {
-                    if (values[i].Value == null)
-                    {
-                        yield return CreateConfigurationDiagnostic(location, "Null value in dataset");
-                        invalid = true;
-                        break;
-                    }
-
-                    valueArr.SetValue(values[i].Value, i);
-                }
-
-                if (invalid)
-                    continue;
-            }
-
-            DataConfig fdCfg = runtimeKeyType == typeof(string) ? new StringDataConfig() : new NumericDataConfig();
-
-            if (fdCfg is StringDataConfig defaultStringCfg)
-                defaultStringCfg.StringAnalyzerConfig = new StringAnalyzerConfig();
-
-            object? structureArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.StructureType)).Value.Value;
-            if (structureArg != null)
-                fdCfg.StructureTypeOverride = (CoreStructureType)(byte)(AttributeStructureType)structureArg;
-
-            object? requiredFunctionsArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.RequiredCapability)).Value.Value;
-            if (requiredFunctionsArg != null)
-                fdCfg.RequiredCapability = (Config.StructureCapability)(int)(StructureCapability)requiredFunctionsArg;
-
-            object? ignoreCaseArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.IgnoreCase)).Value.Value;
-            if (ignoreCaseArg is true)
-            {
-                if (fdCfg is not StringDataConfig stringCfg)
-                {
-                    yield return CreateConfigurationDiagnostic(location, "IgnoreCase is only supported for string keys.");
-                    continue;
-                }
-
-                stringCfg.IgnoreCase = true;
-            }
-
-            CSharpCodeGeneratorConfig csCfg = new CSharpCodeGeneratorConfig(name);
-            BindValue(() => csCfg.Namespace, ad.NamedArguments);
-
-            object? classVisibilityArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.ClassVisibility)).Value.Value;
-            if (classVisibilityArg != null)
-                csCfg.ClassVisibility = MapClassVisibility((AttributeClassVisibility)classVisibilityArg);
-
-            object? classTypeArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.ClassType)).Value.Value;
-            if (classTypeArg != null)
-                csCfg.ClassType = MapClassType((AttributeClassType)classTypeArg);
-
-            //We need logic for analysis level
-            object? alArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.AnalysisLevel)).Value.Value;
-            if (alArg != null)
-            {
-                AnalysisLevel al = (AnalysisLevel)alArg;
-
-                if (fdCfg is not StringDataConfig stringCfg)
-                {
-                    yield return CreateConfigurationDiagnostic(location, "AnalysisLevel is only supported for string keys.");
-                    continue;
-                }
-
-                stringCfg.StringAnalyzerConfig = al switch
-                {
-                    AnalysisLevel.Disabled => null,
-                    AnalysisLevel.Fast => new StringAnalyzerConfig
-                    {
-                        BruteForceAnalyzerConfig = new BruteForceAnalyzerConfig
-                        {
-                            MaxAttempts = 1000
-                        },
-                        GeneticAnalyzerConfig = new GeneticAnalyzerConfig
-                        {
-                            PopulationSize = 16,
-                            MaxGenerations = 8
-                        },
-                        GPerfAnalyzerConfig = new GPerfAnalyzerConfig
-                        {
-                            MaxPositions = 64
-                        }
-                    },
-                    AnalysisLevel.Balanced => new StringAnalyzerConfig(),
-                    AnalysisLevel.Aggressive => new StringAnalyzerConfig
-                    {
-                        BruteForceAnalyzerConfig = new BruteForceAnalyzerConfig
-                        {
-                            MaxAttempts = 157_464
-                        },
-                        GeneticAnalyzerConfig = new GeneticAnalyzerConfig
-                        {
-                            PopulationSize = 64,
-                            MaxGenerations = 100
-                        },
-                        GPerfAnalyzerConfig = new GPerfAnalyzerConfig
-                        {
-                            MaxPositions = 255
-                        }
-                    },
-                    _ => throw new ArgumentOutOfRangeException("Unsupported AnalysisLevel: " + al)
-                };
-            }
-
-            yield return new CombinedConfig(keysArr, valueArr, fdCfg, csCfg);
+            yield return item;
         }
+    }
+
+    private static object TransformAttribute(AttributeData ad, HashSet<string> names, Location? location)
+    {
+        if (ad.ConstructorArguments.Length is not (2 or 3))
+            return CreateConfigurationDiagnostic(location, "Expected 2 constructor arguments");
+
+        string? nameValue = (string?)ad.ConstructorArguments[0].Value;
+
+        if (string.IsNullOrEmpty(nameValue))
+            return CreateConfigurationDiagnostic(location, "Name is null or empty");
+
+        string name = nameValue!;
+
+        if (!names.Add(name))
+            return CreateConfigurationDiagnostic(location, $"The name '{name}' is duplicated elsewhere");
+
+        ImmutableArray<TypedConstant> keys = ad.ConstructorArguments[1].Values;
+
+        if (keys.Length == 0)
+            return CreateConfigurationDiagnostic(location, $"There are no keys in '{name}'");
+
+        ITypeSymbol genericArg0 = ad.AttributeClass!.TypeArguments[0];
+
+        if (!Enum.TryParse<SupportedKeyType>(genericArg0.Name, true, out _))
+            return CreateConfigurationDiagnostic(location, $"FastData does not support '{genericArg0.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}' as generic argument for '{name}'");
+
+        Type? runtimeKeyType = ToRuntimeType(genericArg0);
+        if (runtimeKeyType == null)
+            return CreateConfigurationDiagnostic(location, $"Unable to map '{genericArg0.Name}' to a runtime type.");
+
+        HashSet<object> uniqueKeys = new HashSet<object>();
+        foreach (TypedConstant value in keys)
+        {
+            if (value.Value == null)
+                return CreateConfigurationDiagnostic(location, "Null value in dataset");
+
+            if (value.Value is string { Length: 0 })
+                return CreateConfigurationDiagnostic(location, "Empty string values are not supported");
+
+            if (!uniqueKeys.Add(value.Value))
+                return CreateConfigurationDiagnostic(location, $"Duplicate value: {value.Value}");
+        }
+
+        // Copy out the values to avoid retaining Roslyn symbols in later incremental stages.
+        Array keysArr = Array.CreateInstance(runtimeKeyType, keys.Length);
+        for (int i = 0; i < keys.Length; i++)
+            keysArr.SetValue(keys[i].Value, i);
+
+        Array? valueArr = null;
+        if (ad.ConstructorArguments.Length == 3)
+        {
+            ImmutableArray<TypedConstant> values = ad.ConstructorArguments[2].Values;
+            ITypeSymbol genericArg1 = ad.AttributeClass.TypeArguments[1];
+            Type? runtimeValueType = ToRuntimeType(genericArg1);
+
+            if (runtimeValueType == null)
+                return CreateConfigurationDiagnostic(location, $"Unable to map '{genericArg1.Name}' to a runtime type.");
+
+            if (values.Length != keys.Length)
+                return CreateConfigurationDiagnostic(location, $"The number of values does not match the number of keys for '{name}'.");
+
+            valueArr = Array.CreateInstance(runtimeValueType, values.Length);
+            for (int i = 0; i < valueArr.Length; i++)
+            {
+                if (values[i].Value == null)
+                    return CreateConfigurationDiagnostic(location, "Null value in dataset");
+
+                valueArr.SetValue(values[i].Value, i);
+            }
+        }
+
+        DataConfig fdCfg = runtimeKeyType == typeof(string) ? new StringDataConfig() : new NumericDataConfig();
+
+        if (fdCfg is StringDataConfig defaultStringCfg)
+            defaultStringCfg.StringAnalyzerConfig = new StringAnalyzerConfig();
+
+        object? structureArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.StructureType)).Value.Value;
+        if (structureArg != null)
+            fdCfg.StructureTypeOverride = (CoreStructureType)(byte)(AttributeStructureType)structureArg;
+
+        object? requiredFunctionsArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.RequiredCapability)).Value.Value;
+        if (requiredFunctionsArg != null)
+            fdCfg.RequiredCapability = (Config.StructureCapability)(int)(StructureCapability)requiredFunctionsArg;
+
+        object? ignoreCaseArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.IgnoreCase)).Value.Value;
+        if (ignoreCaseArg is true)
+        {
+            if (fdCfg is not StringDataConfig stringCfg)
+                return CreateConfigurationDiagnostic(location, "IgnoreCase is only supported for string keys.");
+
+            stringCfg.IgnoreCase = true;
+        }
+
+        CSharpCodeGeneratorConfig csCfg = new CSharpCodeGeneratorConfig(name);
+        BindValue(() => csCfg.Namespace, ad.NamedArguments);
+
+        object? classVisibilityArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.ClassVisibility)).Value.Value;
+        if (classVisibilityArg != null)
+            csCfg.ClassVisibility = MapClassVisibility((AttributeClassVisibility)classVisibilityArg);
+
+        object? classTypeArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.ClassType)).Value.Value;
+        if (classTypeArg != null)
+            csCfg.ClassType = MapClassType((AttributeClassType)classTypeArg);
+
+        object? alArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.AnalysisLevel)).Value.Value;
+        if (alArg != null)
+        {
+            AnalysisLevel al = (AnalysisLevel)alArg;
+
+            if (fdCfg is not StringDataConfig stringCfg)
+                return CreateConfigurationDiagnostic(location, "AnalysisLevel is only supported for string keys.");
+
+            stringCfg.StringAnalyzerConfig = al switch
+            {
+                AnalysisLevel.Disabled => null,
+                AnalysisLevel.Fast => new StringAnalyzerConfig
+                {
+                    BruteForceAnalyzerConfig = new BruteForceAnalyzerConfig { MaxAttempts = 1000 },
+                    GeneticAnalyzerConfig = new GeneticAnalyzerConfig { PopulationSize = 16, MaxGenerations = 8 },
+                    GPerfAnalyzerConfig = new GPerfAnalyzerConfig { MaxPositions = 64 }
+                },
+                AnalysisLevel.Balanced => new StringAnalyzerConfig(),
+                AnalysisLevel.Aggressive => new StringAnalyzerConfig
+                {
+                    BruteForceAnalyzerConfig = new BruteForceAnalyzerConfig { MaxAttempts = 157_464 },
+                    GeneticAnalyzerConfig = new GeneticAnalyzerConfig { PopulationSize = 64, MaxGenerations = 100 },
+                    GPerfAnalyzerConfig = new GPerfAnalyzerConfig { MaxPositions = 255 }
+                },
+                _ => throw new InvalidOperationException("Unsupported AnalysisLevel: " + al)
+            };
+        }
+
+        // Source generation must not depend on benchmark timing or process-random seeds.
+        if (fdCfg is StringDataConfig { StringAnalyzerConfig: { } analyzerConfig })
+        {
+            analyzerConfig.BenchmarkIterations = 0;
+
+            if (analyzerConfig.GeneticAnalyzerConfig != null)
+                analyzerConfig.GeneticAnalyzerConfig.RandomSeed = 1;
+
+            if (analyzerConfig.GPerfAnalyzerConfig is { Random: true } gperfConfig)
+                gperfConfig.RandomSeed = 1;
+        }
+
+        return new CombinedConfig(keysArr, valueArr, fdCfg, csCfg, GetIncrementalKey(ad));
     }
 
     public static Type? ToRuntimeType(ITypeSymbol symbol)
@@ -409,6 +353,51 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
     }
 
     private static Diagnostic CreateConfigurationDiagnostic(Location? location, string message) => Diagnostic.Create(ConfigurationError, location, message);
+
+    private static string GetIncrementalKey(AttributeData attribute)
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.Append(attribute.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+
+        foreach (TypedConstant argument in attribute.ConstructorArguments)
+            AppendTypedConstant(builder, argument);
+
+        foreach (KeyValuePair<string, TypedConstant> argument in attribute.NamedArguments.OrderBy(static x => x.Key, StringComparer.Ordinal))
+        {
+            builder.Append('|').Append(argument.Key);
+            AppendTypedConstant(builder, argument.Value);
+        }
+
+        byte[] payload = Encoding.UTF8.GetBytes(builder.ToString());
+
+        using SHA256 sha256 = SHA256.Create();
+        return Convert.ToBase64String(sha256.ComputeHash(payload));
+    }
+
+    private static void AppendTypedConstant(StringBuilder builder, TypedConstant constant)
+    {
+        builder.Append('|').Append(constant.Type?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+
+        if (constant.Kind == TypedConstantKind.Array)
+        {
+            builder.Append('[').Append(constant.Values.Length);
+            foreach (TypedConstant item in constant.Values)
+                AppendTypedConstant(builder, item);
+            builder.Append(']');
+            return;
+        }
+
+        string value = Convert.ToString(constant.Value, System.Globalization.CultureInfo.InvariantCulture) ?? "<null>";
+        builder.Append(':').Append(value.Length).Append(':').Append(value);
+    }
+
+    private static Exception UnwrapTargetInvocationException(Exception exception)
+    {
+        while (exception is TargetInvocationException { InnerException: not null } targetInvocation)
+            exception = targetInvocation.InnerException;
+
+        return exception;
+    }
 
     private static CSharpClassVisibility MapClassVisibility(AttributeClassVisibility classVisibility) => classVisibility switch
     {
