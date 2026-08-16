@@ -73,6 +73,9 @@ internal class CSharpLanguageDef : ILanguageDef
         '\\' => "\\\\",
         '\"' => "\\\"",
         '\'' => "\\'",
+        '\u0085' => "\\u0085",
+        '\u2028' => "\\u2028",
+        '\u2029' => "\\u2029",
         < ' ' => "\\u" + ((int)ch).ToString("X4", NumberFormatInfo.InvariantInfo),
         _ => ch.ToString()
     };
