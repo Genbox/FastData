@@ -12,26 +12,26 @@ use std::ptr;
 pub struct fastdata;
 impl fastdata {
 
-    const KEYS: [f32; 5] = [
-        1f32, 2f32, 3f32, 4f32, 5f32
+    const KEYS: [f64; 2] = [
+        f64::MIN, f64::MAX
     ];
 
     #[must_use]
-    pub fn key_slice() -> &'static [f32] { &Self::KEYS }
+    pub fn key_slice() -> &'static [f64] { &Self::KEYS }
 
     #[must_use]
-    pub fn keys() -> impl Iterator<Item = f32> {
+    pub fn keys() -> impl Iterator<Item = f64> {
         Self::KEYS.iter().copied()
     }
 
     #[must_use]
-    pub fn contains(key: f32) -> bool {
+    pub fn contains(key: f64) -> bool {
 
         let mut lo: i32 = 0;
-        let mut hi: i32 = 4;
+        let mut hi: i32 = 1;
         while lo <= hi && key >= Self::KEYS[lo as usize] && key <= Self::KEYS[hi as usize] {
-            let lo_key: f32 = Self::KEYS[lo as usize];
-            let hi_key: f32 = Self::KEYS[hi as usize];
+            let lo_key: f64 = Self::KEYS[lo as usize];
+            let hi_key: f64 = Self::KEYS[hi as usize];
 
             if lo_key == hi_key {
                 if lo_key == key {
@@ -55,7 +55,7 @@ impl fastdata {
                 mid = hi;
             }
 
-            let mid_key: f32 = Self::KEYS[mid as usize];
+            let mid_key: f64 = Self::KEYS[mid as usize];
             if mid_key == key {
                 return true;
             }
@@ -69,7 +69,7 @@ impl fastdata {
         false
     }
 
-    pub const ITEM_COUNT: usize = 5;
-    pub const MIN_KEY: f32 = 1f32;
-    pub const MAX_KEY: f32 = 5f32;
+    pub const ITEM_COUNT: usize = 2;
+    pub const MIN_KEY: f64 = f64::MIN;
+    pub const MAX_KEY: f64 = f64::MAX;
 }

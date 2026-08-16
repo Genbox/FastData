@@ -60,9 +60,13 @@ impl fastdata {
                 break;
             }
 
-            let range = (hi_key as f64) - (lo_key as f64);
-            let offset = (key as f64) - (lo_key as f64);
-            let mut mid: i32 = lo + ((offset * ((hi - lo) as f64)) / range) as i32;
+            let lo_value = lo_key as f64;
+            let hi_value = hi_key as f64;
+            let mut mid: i32 = if lo_value == hi_value {
+                lo + ((hi - lo) >> 1)
+            } else {
+                lo + ((((key as f64) - lo_value) * ((hi - lo) as f64)) / (hi_value - lo_value)) as i32
+            };
 
             if mid < lo {
                 mid = lo;

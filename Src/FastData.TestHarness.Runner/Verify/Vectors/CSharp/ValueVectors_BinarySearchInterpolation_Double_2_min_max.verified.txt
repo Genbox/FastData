@@ -11,25 +11,25 @@ internal static class FastData
 {
 
 
-    private static readonly float[] _keys = new float[] {
-        1f, 2f, 3f, 4f, 5f
+    private static readonly double[] _keys = new double[] {
+        double.MinValue, double.MaxValue
     };
 
-    public static IEnumerable<float> Keys => _keys;
+    public static IEnumerable<double> Keys => _keys;
 
-    public static ReadOnlySpan<float> KeySpan => _keys;
+    public static ReadOnlySpan<double> KeySpan => _keys;
 
     
-    public static bool Contains(float key)
+    public static bool Contains(double key)
     {
 
 
         int lo = 0;
-        int hi = 4;
+        int hi = 1;
         while (lo <= hi && key >= _keys[lo] && key <= _keys[hi])
         {
-            float loKey = _keys[lo];
-            float hiKey = _keys[hi];
+            double loKey = _keys[lo];
+            double hiKey = _keys[hi];
 
             if (loKey == hiKey)
             {
@@ -50,7 +50,7 @@ internal static class FastData
             else if (i > hi)
                 i = hi;
 
-            float midKey = _keys[i];
+            double midKey = _keys[i];
             if (midKey == key)
                 return true;
             if (midKey < key)
@@ -62,7 +62,7 @@ internal static class FastData
         return false;
     }
 
-    public const int ItemCount = 5;
-    public const float MinKey = 1f;
-    public const float MaxKey = 5f;
+    public const int ItemCount = 2;
+    public const double MinKey = double.MinValue;
+    public const double MaxKey = double.MaxValue;
 }

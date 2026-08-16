@@ -112,6 +112,9 @@ public static class TestVectorHelper
         foreach (ITestVector testVector in GenerateTestVectors([[1f, 2f, 3f, 4f, 5f]], "sorted_numeric", StructureType.BinarySearchInterpolation, StructureType.Pgm))
             yield return testVector;
 
+        foreach (ITestVector testVector in GenerateTestVectors([new DataPair([double.MinValue, double.MaxValue], [0.0])], "min_max", StructureType.BinarySearchInterpolation))
+            yield return testVector;
+
         // Larger sorted, non-uniform numeric dataset for structures that depend on value distribution.
         foreach (ITestVector testVector in GenerateTestVectors(GetNonUniformSortedIntData(200), "non_uniform_sorted", StructureType.BinarySearchInterpolation, StructureType.Pgm, StructureType.Range))
             yield return testVector;

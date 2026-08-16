@@ -58,9 +58,11 @@ internal static class FastData
                 break;
             }
 
-            double range = (double)hiKey - (double)loKey;
-            double offset = (double)key - (double)loKey;
-            int i = lo + (int)((offset * (hi - lo)) / range);
+            double loValue = (double)loKey;
+            double hiValue = (double)hiKey;
+            int i = loValue == hiValue
+                ? lo + ((hi - lo) >> 1)
+                : lo + (int)((((double)key - loValue) * (hi - lo)) / (hiValue - loValue));
 
             if (i < lo)
                 i = lo;
