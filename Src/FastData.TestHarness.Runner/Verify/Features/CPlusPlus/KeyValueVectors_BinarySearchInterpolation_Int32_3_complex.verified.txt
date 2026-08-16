@@ -62,9 +62,15 @@ public:
                 break;
             }
 
-            const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
-            const double offset = static_cast<double>(key) - static_cast<double>(lo_key);
-            int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+            const double lo_value = static_cast<double>(lo_key);
+            const double hi_value = static_cast<double>(hi_key);
+            int32_t mid = lo + ((hi - lo) >> 1);
+
+            if (lo_value != hi_value) {
+                const double estimate = ((static_cast<double>(key) - lo_value) * (hi - lo)) / (hi_value - lo_value);
+                if (estimate >= 0.0 && estimate <= static_cast<double>(hi - lo))
+                    mid = lo + static_cast<int32_t>(estimate);
+            }
 
             if (mid < lo)
                 mid = lo;
@@ -101,9 +107,15 @@ public:
                 break;
             }
 
-            const double range = static_cast<double>(hi_key) - static_cast<double>(lo_key);
-            const double offset = static_cast<double>(key) - static_cast<double>(lo_key);
-            int32_t mid = lo + static_cast<int32_t>((offset * (hi - lo)) / range);
+            const double lo_value = static_cast<double>(lo_key);
+            const double hi_value = static_cast<double>(hi_key);
+            int32_t mid = lo + ((hi - lo) >> 1);
+
+            if (lo_value != hi_value) {
+                const double estimate = ((static_cast<double>(key) - lo_value) * (hi - lo)) / (hi_value - lo_value);
+                if (estimate >= 0.0 && estimate <= static_cast<double>(hi - lo))
+                    mid = lo + static_cast<int32_t>(estimate);
+            }
 
             if (mid < lo)
                 mid = lo;

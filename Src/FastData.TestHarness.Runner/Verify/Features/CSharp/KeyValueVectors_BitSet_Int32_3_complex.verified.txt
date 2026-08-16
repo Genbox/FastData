@@ -31,9 +31,11 @@ public class Person
     {
         get
         {
-            for (int key = MinKey; key <= MaxKey; key++)
+            for (int key = MinKey; ; key++)
             {
                 yield return key;
+                if (key == MaxKey)
+                    break;
             }
         }
     }
@@ -42,10 +44,12 @@ public class Person
     {
         get
         {
-            for (int key = MinKey; key <= MaxKey; key++)
+            for (int key = MinKey; ; key++)
             {
                 ulong offset = (ulong)(key - MinKey);
                 yield return _values[(int)offset];
+                if (key == MaxKey)
+                    break;
             }
         }
     }
