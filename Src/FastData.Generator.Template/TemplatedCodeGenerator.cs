@@ -31,10 +31,10 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
 
         string languageName = typeName.Substring(0, typeName.Length - suffix.Length);
 
-#if RELEASE
-        const bool release = true;
-#else
+#if DEBUG
         const bool release = false;
+#else
+        const bool release = true;
 #endif
 
         _manager = new TemplateManager(languageName, Path.Combine(Path.GetTempPath(), "FastData"), release);
