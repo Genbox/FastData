@@ -6,7 +6,7 @@
 #>
     <#= FieldModifier(true) #>std::array<<#= KeyTypeName #>, 1> key_items = { <#= itemLabel #> };
 <#
-    if (Data.Value != null)
+    if (Data.HasValue)
     {
 #>    inline static const std::array<<#= ValueTypeName #>, 1> value_items = { <#= TypeMap.GetValueLiteral(Data.Value) #> };
 <#
@@ -15,7 +15,7 @@
 public:
     <#= KeyDirectAccessProperty("key_items", 1) #>
 <#
-    if (Data.Value != null)
+    if (Data.HasValue)
     {
 #>
 
@@ -29,7 +29,7 @@ public:
         return <#= GetEqual(LookupKeyName, itemLabel) #>;
     }
 <#
-    if (Data.Value != null)
+    if (Data.HasValue)
     {
 #>
 

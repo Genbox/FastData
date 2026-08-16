@@ -153,6 +153,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
                 return new SingleValueTemplateData
                 {
                     Item = singleCtx.Key,
+                    HasValue = !singleCtx.Values.IsEmpty,
                     Value = singleCtx.Values.IsEmpty ? null : singleCtx.Values.Span[0]
                 };
 

@@ -4,7 +4,7 @@
     string itemLabel = TypeMap.GetValueLiteral(Data.Item);
 #>
 <#
-    if (Data.Value != null)
+    if (Data.HasValue)
     {
 #>
 
@@ -20,7 +20,7 @@
         }
     }
 <#
-    if (Data.Value != null)
+    if (Data.HasValue)
     {
 #>
 
@@ -41,7 +41,7 @@
         return <#= GetEqual(LookupKeyName, itemLabel) #>;
     }
 <#
-    if (Data.Value != null)
+    if (Data.HasValue)
     {
 #>
 

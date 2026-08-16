@@ -6,7 +6,7 @@
     string itemLabel = TypeMap.GetValueLiteral(Data.Item);
 #>
 <#
-    if (Data.Value != null)
+    if (Data.HasValue)
     {
 #>    const STORED_VALUE: <#= StoredValueTypeName #> = <#= TypeMap.GetValueLiteral(Data.Value) #>;
 <#
@@ -17,7 +17,7 @@
         std::iter::once(<#= itemLabel #>)
     }
 <#
-    if (Data.Value != null)
+    if (Data.HasValue)
     {
 #>
 
@@ -34,7 +34,7 @@
         <#= GetEqual(LookupKeyName, itemLabel) #>
     }
 <#
-    if (Data.Value != null)
+    if (Data.HasValue)
     {
 #>
 
