@@ -11,7 +11,7 @@ public sealed class CSharpCodeGenerator(CSharpCodeGeneratorConfig csCfg) : Templ
 {
     protected override string GenerateTemplated<TKey, TValue>(GeneratorConfigBase genCfg, TemplateManager manager, Dictionary<string, object?> variables)
     {
-        if (genCfg is StringGeneratorConfig { IgnoreCase: true } && csCfg.ConditionalBranchType == BranchType.Switch)
+        if (genCfg is StringGeneratorConfig { IgnoreCase: true, StructureType: StructureType.Conditional } && csCfg.ConditionalBranchType == BranchType.Switch)
             throw new InvalidOperationException("C# switch generation does not support IgnoreCase. Use BranchType.If when IgnoreCase is enabled.");
 
         ValidateIdentifier(csCfg.ClassName, nameof(csCfg.ClassName));
