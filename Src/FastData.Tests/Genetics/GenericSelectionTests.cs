@@ -126,10 +126,10 @@ public class GenericSelectionTests
 
     public static TheoryData<object> GetSelectionsWithRandom() =>
     [
-        new BoltzmannSelection(1, SharedRandom.Instance),
-        new RankSelection(SharedRandom.Instance),
-        new RouletteWheelSelection(SharedRandom.Instance),
-        new StochasticUniversalSamplingSelection(SharedRandom.Instance),
-        new TournamentSelection(4, SharedRandom.Instance)
+        new BoltzmannSelection(1, new DefaultRandom(42)),
+        new RankSelection(new DefaultRandom(42)),
+        new RouletteWheelSelection(new DefaultRandom(42)),
+        new StochasticUniversalSamplingSelection(new DefaultRandom(42)),
+        new TournamentSelection(4, new DefaultRandom(42))
     ];
 }
