@@ -14,8 +14,6 @@ impl fastdata {
 
     const LOWER_BIT_COUNT: i32 = 4;
     const MIN_VALUE: i64 = -198273;
-    const MAX_VALUE: i64 = -171245;
-    const MAX_VALUE_NORMALIZED: i64 = 27028;
     const UPPER_BITS: [u64; 43] = [
         11535226534270511963, 12106474960098863798, 6125096337533130166, 234237026632379757, u64::MIN, 13066832212270252032, 13066470108627522901, 7686357402408463021, 6150468668486583659, 111804763, 
         u64::MIN, 6149669047885452651, 12310028189108448091, 12298627261436439222, 391144710509778358, u64::MIN, 15756642456625479680, 13066832213171322906, 13066470108638652421, 7686357402409855489, 
@@ -50,8 +48,8 @@ impl fastdata {
         }
 
 
-        let value = (key as i64) - Self::MIN_VALUE;
-        let high = value >> (Self::LOWER_BIT_COUNT as u32);
+        let value = (key as u64).wrapping_sub(Self::MIN_VALUE as u64);
+        let high = (value >> (Self::LOWER_BIT_COUNT as u32)) as i64;
 
         let position = if high == 0 { 0 } else { Self::select_zero(high - 1) + 1 };
         if position < 0 {

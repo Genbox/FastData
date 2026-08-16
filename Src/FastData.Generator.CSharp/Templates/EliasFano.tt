@@ -3,13 +3,9 @@
 
 <#
     long minValue = Context.MinValue;
-    long maxValue = Context.MaxValue;
-    long maxValueNormalized = Context.MaxValue - Context.MinValue;
 #>
     private const int _lowerBitCount = <#= Context.LowerBitCount #>;
     private const long _minValue = <#= TypeMap.GetValueLiteral(minValue) #>;
-    private const long _maxValue = <#= TypeMap.GetValueLiteral(maxValue) #>;
-    private const long _maxValueNormalized = <#= TypeMap.GetValueLiteral(maxValueNormalized) #>;
     <#= FieldModifier #>ulong[] _upperBits = new ulong[] {
 <#= FormatHelper.FormatColumns(Context.UpperBits, x => TypeMap.GetValueLiteral(x), 8) #>
     };
@@ -40,16 +36,16 @@
     <#
     if (minValue >= 0)
     {
-#>    long value = (long)<#= LookupKeyName #>;
+#>    ulong value = (ulong)<#= LookupKeyName #>;
     <#
     }
     else
     {
-#>    long value = (long)<#= LookupKeyName #> - _minValue;
+#>    ulong value = unchecked((ulong)(long)<#= LookupKeyName #> - (ulong)_minValue);
     <#
     }
 #>
-    long high = value >> _lowerBitCount;
+    long high = (long)(value >> _lowerBitCount);
 
         long position = high == 0 ? 0 : SelectZero(high - 1) + 1;
         if (position < 0)

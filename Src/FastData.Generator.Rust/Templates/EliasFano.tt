@@ -5,12 +5,8 @@
     const LOWER_BIT_COUNT: i32 = <#= Context.LowerBitCount #>;
 <#
     long minValue = Context.MinValue;
-    long maxValue = Context.MaxValue;
-    long maxValueNormalized = Context.MaxValue - Context.MinValue;
 #>
     const MIN_VALUE: i64 = <#= TypeMap.GetValueLiteral(minValue) #>;
-    const MAX_VALUE: i64 = <#= TypeMap.GetValueLiteral(maxValue) #>;
-    const MAX_VALUE_NORMALIZED: i64 = <#= TypeMap.GetValueLiteral(maxValueNormalized) #>;
     <#= FieldModifier #>UPPER_BITS: [u64; <#= Context.UpperBits.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Context.UpperBits, x => TypeMap.GetValueLiteral(x), 8) #>
     ];
@@ -39,16 +35,16 @@
 <#
     if (minValue >= 0)
     {
-#>        let value = <#= LookupKeyName #> as i64;
+#>        let value = <#= LookupKeyName #> as u64;
 <#
     }
     else
     {
-#>        let value = (<#= LookupKeyName #> as i64) - Self::MIN_VALUE;
+#>        let value = (<#= LookupKeyName #> as u64).wrapping_sub(Self::MIN_VALUE as u64);
 <#
     }
 #>
-        let high = value >> (Self::LOWER_BIT_COUNT as u32);
+        let high = (value >> (Self::LOWER_BIT_COUNT as u32)) as i64;
 
         let position = if high == 0 { 0 } else { Self::select_zero(high - 1) + 1 };
         if position < 0 {

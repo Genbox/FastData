@@ -49,14 +49,20 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         Debug.Assert(AllKeysInRange(keysSpan, conv, min, max), "EliasFanoStructure requires every key to be within the provided min/max range.");
 
         long effectiveMinValue = min < 0 ? min : 0;
-        long maxValueNormalized = max - effectiveMinValue;
+        ulong maxValueNormalized = unchecked((ulong)max - (ulong)effectiveMinValue);
 
-        long factor = maxValueNormalized / count;
-        int lowerBitCount = factor <= 0 ? 0 : BitOperations.Log2((ulong)factor);
-        int upperBitLength = (int)(count + (maxValueNormalized >> lowerBitCount));
+        ulong factor = maxValueNormalized / (uint)count;
+        int lowerBitCount = factor == 0 ? 0 : BitOperations.Log2(factor);
+        ulong upperBitLengthValue = (uint)count + (maxValueNormalized >> lowerBitCount);
+        if (upperBitLengthValue > int.MaxValue)
+            return null; // Upper-bit positions and samples are int-indexed.
 
-        ulong[] upperBits = new ulong[(upperBitLength + 63) / 64];
-        ulong[] lowerBits = new ulong[((count * lowerBitCount) + 63) / 64];
+        int upperBitLength = (int)upperBitLengthValue;
+        int upperWordCount = (int)((upperBitLengthValue + 63) / 64);
+        int lowerWordCount = GetLowerWordCount(count, lowerBitCount);
+
+        ulong[] upperBits = new ulong[upperWordCount];
+        ulong[] lowerBits = new ulong[lowerWordCount];
         ulong lowerMask = 0;
 
         //Small optimization: If there are no lower bits, we can simply operate on upper bits.
@@ -64,8 +70,8 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         {
             for (int i = 0; i < keysSpan.Length; i++)
             {
-                long value = conv(keysSpan[i]) - effectiveMinValue;
-                int index = (int)(value + i);
+                ulong value = unchecked((ulong)conv(keysSpan[i]) - (ulong)effectiveMinValue);
+                int index = (int)(value + (uint)i);
                 upperBits[index >> 6] |= 1UL << (index & 63);
             }
         }
@@ -75,15 +81,15 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
 
             for (int i = 0; i < keysSpan.Length; i++)
             {
-                long value = conv(keysSpan[i]) - effectiveMinValue;
-                int index = (int)((value >> lowerBitCount) + i);
+                ulong value = unchecked((ulong)conv(keysSpan[i]) - (ulong)effectiveMinValue);
+                int index = (int)((value >> lowerBitCount) + (uint)i);
                 upperBits[index >> 6] |= 1UL << (index & 63);
 
                 long bitPosition = (long)i * lowerBitCount;
                 int block = (int)(bitPosition >> 6);
                 int shift = (int)(bitPosition & 63);
 
-                ulong low = (ulong)value & lowerMask;
+                ulong low = value & lowerMask;
                 lowerBits[block] |= low << shift;
 
                 if (shift + lowerBitCount > 64)
@@ -99,6 +105,15 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         int[] samplePositions = BuildSamples(upperBits, upperBitLength, _skipQuantum);
 
         return new EliasFanoContext(lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions, effectiveMinValue, max);
+    }
+
+    internal static int GetLowerWordCount(int count, int lowerBitCount)
+    {
+        Debug.Assert(count >= 0, "EliasFanoStructure requires a non-negative item count.");
+        Debug.Assert(lowerBitCount is >= 0 and <= 63, "EliasFanoStructure requires a valid lower-bit count.");
+
+        ulong bitLength = (ulong)(uint)count * (uint)lowerBitCount;
+        return (int)((bitLength + 63) / 64);
     }
 
     public IEnumerable<IEarlyExit> GetMandatoryExits()

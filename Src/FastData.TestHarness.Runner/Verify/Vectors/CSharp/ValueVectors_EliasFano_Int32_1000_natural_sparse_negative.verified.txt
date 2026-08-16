@@ -13,8 +13,6 @@ internal static class FastData
 
     private const int _lowerBitCount = 4;
     private const long _minValue = -198273l;
-    private const long _maxValue = -171245l;
-    private const long _maxValueNormalized = 27028l;
     private static readonly ulong[] _upperBits = new ulong[] {
         11535226534270511963ul, 12106474960098863798ul, 6125096337533130166ul, 234237026632379757ul, ulong.MinValue, 13066832212270252032ul, 13066470108627522901ul, 7686357402408463021ul, 6150468668486583659ul, 111804763ul, 
         ulong.MinValue, 6149669047885452651ul, 12310028189108448091ul, 12298627261436439222ul, 391144710509778358ul, ulong.MinValue, 15756642456625479680ul, 13066832213171322906ul, 13066470108638652421ul, 7686357402409855489ul, 
@@ -51,8 +49,8 @@ internal static class FastData
 
 
 
-        long value = (long)key - _minValue;
-        long high = value >> _lowerBitCount;
+        ulong value = unchecked((ulong)(long)key - (ulong)_minValue);
+        long high = (long)(value >> _lowerBitCount);
 
         long position = high == 0 ? 0 : SelectZero(high - 1) + 1;
         if (position < 0)

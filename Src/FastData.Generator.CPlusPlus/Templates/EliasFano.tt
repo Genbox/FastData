@@ -4,12 +4,8 @@
     static constexpr int32_t lower_bit_count = <#= Context.LowerBitCount #>;
 <#
     long minValue = Context.MinValue;
-    long maxValue = Context.MaxValue;
-    long maxValueNormalized = Context.MaxValue - Context.MinValue;
 #>
     static constexpr int64_t min_value = <#= TypeMap.GetValueLiteral(minValue) #>;
-    static constexpr int64_t max_value = <#= TypeMap.GetValueLiteral(maxValue) #>;
-    static constexpr int64_t max_value_normalized = <#= TypeMap.GetValueLiteral(maxValueNormalized) #>;
     <#= FieldModifier(true) #>std::array<uint64_t, <#= Context.UpperBits.Length.ToStringInvariant() #>> upper_bits = {
 <#= FormatHelper.FormatColumns(Context.UpperBits, x => TypeMap.GetValueLiteral(x), 8) #>
     };
@@ -120,16 +116,16 @@ public:
 <#
     if (minValue >= 0)
     {
-#>        const int64_t value = static_cast<int64_t>(<#= LookupKeyName #>);
+#>        const uint64_t value = static_cast<uint64_t>(<#= LookupKeyName #>);
 <#
     }
     else
     {
-#>        const int64_t value = static_cast<int64_t>(<#= LookupKeyName #>) - min_value;
+#>        const uint64_t value = static_cast<uint64_t>(<#= LookupKeyName #>) - static_cast<uint64_t>(min_value);
 <#
     }
 #>
-        const int64_t high = value >> lower_bit_count;
+        const int64_t high = static_cast<int64_t>(value >> lower_bit_count);
 
         int64_t position = high == 0 ? 0 : select_zero(high - 1) + 1;
         if (position < 0)

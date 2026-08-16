@@ -29,8 +29,6 @@ class fastdata final {
 
     static constexpr int32_t lower_bit_count = 4;
     static constexpr int64_t min_value = -198273ll;
-    static constexpr int64_t max_value = -171245ll;
-    static constexpr int64_t max_value_normalized = 27028ll;
     static constexpr std::array<uint64_t, 43> upper_bits = {
         11535226534270511963ull, 12106474960098863798ull, 6125096337533130166ull, 234237026632379757ull, 0, 13066832212270252032ull, 13066470108627522901ull, 7686357402408463021ull, 6150468668486583659ull, 111804763ull, 
         0, 6149669047885452651ull, 12310028189108448091ull, 12298627261436439222ull, 391144710509778358ull, 0, 15756642456625479680ull, 13066832213171322906ull, 13066470108638652421ull, 7686357402409855489ull, 
@@ -147,8 +145,8 @@ public:
         }
 
 
-        const int64_t value = static_cast<int64_t>(key) - min_value;
-        const int64_t high = value >> lower_bit_count;
+        const uint64_t value = static_cast<uint64_t>(key) - static_cast<uint64_t>(min_value);
+        const int64_t high = static_cast<int64_t>(value >> lower_bit_count);
 
         int64_t position = high == 0 ? 0 : select_zero(high - 1) + 1;
         if (position < 0)
