@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Immutable;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -17,28 +17,34 @@ namespace Genbox.FastData.Generator.Template.Helpers;
 /// <summary>Used for handling and rendering templates</summary>
 public class TemplateManager
 {
-    private readonly string _cacheDirectory;
+    private static readonly ConcurrentDictionary<string, Lazy<Type>> _compiledTypes = new ConcurrentDictionary<string, Lazy<Type>>(StringComparer.Ordinal);
+
     private readonly string _classNamespace;
     private readonly bool _release;
 
-    public TemplateManager(string language, string workDir, bool release)
+    public TemplateManager(string language, bool release)
     {
         _classNamespace = "Genbox.FastData.TemplateCache." + language;
-        _cacheDirectory = Path.Combine(workDir, "TemplateCache", language);
         _release = release;
-
-        if (!Directory.Exists(_cacheDirectory))
-            Directory.CreateDirectory(_cacheDirectory);
     }
 
     public string Render(string filePath, string source, Dictionary<string, object?> variables)
     {
-        string className = Path.GetFileNameWithoutExtension(filePath);
+        TemplateCompilation template = PrepareTemplate(filePath, source, variables);
+        Lazy<Type> lazyType = GetCompiledTemplateType(template);
+        Type templateType;
 
-        TemplateGenerator generator = CreateGenerator(variables);
-        string assemblyPath = CompileTemplateAssembly(generator, filePath, source, className);
+        try
+        {
+            templateType = lazyType.Value;
+        }
+        catch
+        {
+            RemoveCompiledType(template.AssemblyName, lazyType);
+            throw;
+        }
 
-        return ExecuteCompiledTemplate(className, assemblyPath, variables);
+        return ExecuteCompiledTemplate(templateType, variables);
     }
 
     private static TemplateGenerator CreateGenerator(Dictionary<string, object?> variables)
@@ -59,8 +65,10 @@ public class TemplateManager
         return generator;
     }
 
-    private string CompileTemplateAssembly(TemplateGenerator generator, string filePath, string source, string className)
+    private TemplateCompilation PrepareTemplate(string filePath, string source, Dictionary<string, object?> variables)
     {
+        string className = Path.GetFileNameWithoutExtension(filePath);
+        TemplateGenerator generator = CreateGenerator(variables);
         ParsedTemplate parsed = generator.ParseTemplate(filePath, source);
 
         TemplateSettings settings = TemplatingEngine.GetSettings(generator, parsed);
@@ -71,43 +79,45 @@ public class TemplateManager
         settings.Namespace = _classNamespace;
 
         string preprocessed = generator.PreprocessTemplate(parsed, filePath, source, settings, out string[] references);
+        string[] referencePaths = GetMetadataReferencePaths(generator, settings, references);
+        string configuration = _release ? "Release\n" : "Debug\n";
+        string assemblyName = className + "." + GetHash(configuration + preprocessed + "\n" + string.Join("\n", referencePaths));
 
-        string name = className + "." + GetShortHash(preprocessed) + ".dll";
-        string assemblyPath = Path.Combine(_cacheDirectory, name);
-
-        if (File.Exists(assemblyPath))
-            return assemblyPath;
-
-        if (generator.Errors.HasErrors)
-            throw new InvalidOperationException($"Failed to preprocess template '{filePath}':\n{FormatErrors(generator.Errors)}");
-
-        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(preprocessed, new CSharpParseOptions(LanguageVersion.Latest));
-
-        CSharpCompilation compilation = CSharpCompilation.Create(
-            name,
-            [syntaxTree],
-            GetMetadataReferences(generator, settings, references),
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, optimizationLevel: _release ? OptimizationLevel.Release : OptimizationLevel.Debug));
-
-        ImmutableArray<Diagnostic> diagnostics = compilation.GetDiagnostics();
-
-        if (diagnostics.Any(x => x.Severity == DiagnosticSeverity.Error))
-            throw new InvalidOperationException($"Failed to compile template '{filePath}':\n{FormatDiagnostics(diagnostics)}");
-
-        string pdbPath = Path.ChangeExtension(assemblyPath, ".pdb");
-        EmitResult emitResult = compilation.Emit(assemblyPath, pdbPath);
-
-        if (!emitResult.Success)
-            throw new InvalidOperationException($"Failed to emit template '{filePath}':\n{FormatDiagnostics(emitResult.Diagnostics)}");
-
-        return assemblyPath;
+        return new TemplateCompilation(generator, referencePaths, filePath, preprocessed, assemblyName, _classNamespace + "." + className);
     }
 
-    private string ExecuteCompiledTemplate(string className, string assemblyPath, Dictionary<string, object?> variables)
+    private Type CompileTemplate(TemplateCompilation template)
     {
-        Assembly assembly = Assembly.Load(File.ReadAllBytes(assemblyPath));
-        string typeName = _classNamespace + "." + className;
-        Type templateType = assembly.GetType(typeName, true);
+        if (template.Generator.Errors.HasErrors)
+            throw new InvalidOperationException($"Failed to preprocess template '{template.FilePath}':\n{FormatErrors(template.Generator.Errors)}");
+
+        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(template.Preprocessed, new CSharpParseOptions(LanguageVersion.Latest));
+
+        CSharpCompilation compilation = CSharpCompilation.Create(
+            template.AssemblyName,
+            [syntaxTree],
+            template.ReferencePaths.Select(path => MetadataReference.CreateFromFile(path)),
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, optimizationLevel: _release ? OptimizationLevel.Release : OptimizationLevel.Debug));
+
+        using MemoryStream assemblyStream = new MemoryStream();
+        EmitResult emitResult = compilation.Emit(assemblyStream);
+
+        if (!emitResult.Success)
+            throw new InvalidOperationException($"Failed to compile template '{template.FilePath}':\n{FormatDiagnostics(emitResult.Diagnostics)}");
+
+        Assembly assembly = Assembly.Load(assemblyStream.ToArray());
+        return assembly.GetType(template.TypeName, true)!;
+    }
+
+    private Lazy<Type> GetCompiledTemplateType(TemplateCompilation template)
+    {
+        Lazy<Type> candidate = new Lazy<Type>(() => CompileTemplate(template), LazyThreadSafetyMode.ExecutionAndPublication);
+        return _compiledTypes.GetOrAdd(template.AssemblyName, candidate);
+    }
+
+    private static string ExecuteCompiledTemplate(Type templateType, Dictionary<string, object?> variables)
+    {
+        string typeName = templateType.FullName ?? templateType.Name;
         object instance = Activator.CreateInstance(templateType) ?? throw new InvalidOperationException($"Failed to create template instance for '{typeName}'.");
 
         TextTemplatingSession session = new TextTemplatingSession();
@@ -146,10 +156,26 @@ public class TemplateManager
 
         string? str = result.ToString();
 
-        return str.Trim();
+        return str!.Trim();
     }
 
-    private static IEnumerable<MetadataReference> GetMetadataReferences(TemplateGenerator generator, TemplateSettings settings, string[] references)
+    private static void RemoveCompiledType(string assemblyName, Lazy<Type> lazyType)
+    {
+        ICollection<KeyValuePair<string, Lazy<Type>>> entries = _compiledTypes;
+        entries.Remove(new KeyValuePair<string, Lazy<Type>>(assemblyName, lazyType));
+    }
+
+    private sealed class TemplateCompilation(TemplateGenerator generator, string[] referencePaths, string filePath, string preprocessed, string assemblyName, string typeName)
+    {
+        public TemplateGenerator Generator { get; } = generator;
+        public string[] ReferencePaths { get; } = referencePaths;
+        public string FilePath { get; } = filePath;
+        public string Preprocessed { get; } = preprocessed;
+        public string AssemblyName { get; } = assemblyName;
+        public string TypeName { get; } = typeName;
+    }
+
+    private static string[] GetMetadataReferencePaths(TemplateGenerator generator, TemplateSettings settings, string[] references)
     {
         HashSet<string> paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         AddReferencePaths(paths, references);
@@ -170,7 +196,9 @@ public class TemplateManager
 
         paths.Add(Path.Combine(AppContext.BaseDirectory, "System.CodeDom.dll"));
 
-        return paths.Select(r => MetadataReference.CreateFromFile(r));
+        string[] sortedPaths = paths.ToArray();
+        Array.Sort(sortedPaths, StringComparer.OrdinalIgnoreCase);
+        return sortedPaths;
     }
 
     private static void AddReferencePaths(HashSet<string> referencePaths, ICollection<string> references)
@@ -184,7 +212,7 @@ public class TemplateManager
         }
     }
 
-    private static string GetShortHash(string source)
+    private static string GetHash(string source)
     {
         byte[] bytes = Encoding.UTF8.GetBytes(source);
         byte[] hash;
@@ -192,7 +220,7 @@ public class TemplateManager
         using (SHA256 sha256 = SHA256.Create())
             hash = sha256.ComputeHash(bytes);
 
-        return BitConverter.ToString(hash).Replace("-", string.Empty).Substring(0, 8);
+        return Convert.ToBase64String(hash).TrimEnd('=').Replace('+', '-').Replace('/', '_');
     }
 
     private static void AddTemplateReference(TemplateGenerator generator, Type type)

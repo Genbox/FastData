@@ -155,6 +155,11 @@
         "resolved": "3.2.0",
         "contentHash": "K8ivHRbPWfncijk62Dan/r/z55gwq3aFzqB6yFlD9X0bbpIaacHyHH2cpcIdz0FECUpERUZTwxts0z4gRWpQpA=="
       },
+      "System.CodeDom": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "CPc6tWO1LAer3IzfZufDBRL+UZQcj5uS207NHALQzP84Vp/z6wF0Aa0YZImOQY8iStY0A2zI/e3ihKNPfUm8XA=="
+      },
       "Verify": {
         "type": "Transitive",
         "resolved": "31.24.2",
@@ -226,6 +231,14 @@
           "FastData": "[1.0.0, )"
         }
       },
+      "fastdata.generator.template": {
+        "type": "Project",
+        "dependencies": {
+          "FastData.Generator": "[1.0.0, )",
+          "Microsoft.CodeAnalysis.CSharp": "[5.6.0, )",
+          "Mono.TextTemplating": "[3.0.0, )"
+        }
+      },
       "fastdata.internalshared": {
         "type": "Project",
         "dependencies": {
@@ -267,6 +280,15 @@
         "contentHash": "zkFxGYUvdxAvIKTyXHrmW+Sux53D4SezD9dMyZ6hrwwzPQJNuwCRy1f5W7AvYTqacEGhWF2XderRQG1OvbV8og==",
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10"
+        }
+      },
+      "Mono.TextTemplating": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "YqueG52R/Xej4VVbKuRIodjiAhV0HR/XVbLbNrJhCZnzjnSjgMJ/dCdV0akQQxavX6hp/LC6rqLGLcXeQYU7XA==",
+        "dependencies": {
+          "System.CodeDom": "6.0.0"
         }
       },
       "Newtonsoft.Json": {

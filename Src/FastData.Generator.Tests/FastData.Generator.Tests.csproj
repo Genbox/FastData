@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
+    <ProjectReference Include="..\FastData.Generator.Template\FastData.Generator.Template.csproj" />
   </ItemGroup>
 
 </Project>

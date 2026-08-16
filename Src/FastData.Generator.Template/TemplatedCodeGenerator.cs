@@ -37,7 +37,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
         const bool release = true;
 #endif
 
-        _manager = new TemplateManager(languageName, Path.Combine(Path.GetTempPath(), "FastData"), release);
+        _manager = new TemplateManager(languageName, release);
 
         string assemblyPath = GetType().Assembly.Location;
         string assemblyDir = Path.GetDirectoryName(assemblyPath) ?? AppContext.BaseDirectory;
