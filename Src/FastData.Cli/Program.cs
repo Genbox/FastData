@@ -104,7 +104,8 @@ internal static class Program
         }
         catch (Exception e)
         {
-            await Console.Error.WriteLineAsync("An error happened: " + e.Message).ConfigureAwait(false);
+            Exception actual = UnwrapTargetInvocationException(e);
+            await Console.Error.WriteLineAsync("An error happened: " + actual.Message).ConfigureAwait(false);
             return -1;
         }
     }
@@ -181,7 +182,7 @@ internal static class Program
         StructureType.Auto or StructureType.Array or StructureType.BinarySearch or
         StructureType.BinarySearchInterpolation or StructureType.BitSet or StructureType.Conditional or
         StructureType.ConstMap or StructureType.HashTableCompact or StructureType.HashTablePerfect or StructureType.HashTable or
-        StructureType.Hyble or StructureType.KeyLength or StructureType.SingleValue;
+        StructureType.Hyble or StructureType.KeyLength or StructureType.Pgm or StructureType.SingleValue;
 
     private static StringAnalyzerConfig? CreateStringAnalyzerConfig(AnalysisLevel analysisLevel) => analysisLevel switch
     {
@@ -256,6 +257,14 @@ internal static class Program
             throw new InvalidOperationException($"Unable to find '{name}' overload.");
 
         return method;
+    }
+
+    private static Exception UnwrapTargetInvocationException(Exception exception)
+    {
+        while (exception is TargetInvocationException { InnerException: not null } targetInvocation)
+            exception = targetInvocation.InnerException;
+
+        return exception;
     }
 
     private static async Task<Array> ParseFileAsync(string filePath, KeyType keyType, CancellationToken token) => keyType switch
