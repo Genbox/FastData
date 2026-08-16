@@ -65,6 +65,20 @@ internal static class HashBenchmark
                 notPerfect.Add(candidate);
         }
 
+        if (cfg.BenchmarkIterations == 0)
+        {
+            List<Candidate> preferred = perfect.Count > 0 ? perfect : notPerfect;
+            Candidate best = preferred[0];
+
+            for (int i = 1; i < preferred.Count; i++)
+            {
+                if (preferred[i].Fitness > best.Fitness)
+                    best = preferred[i];
+            }
+
+            return best;
+        }
+
         //Sort both on fitness
         perfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
         notPerfect.Sort(static (a, b) => b.Fitness.CompareTo(a.Fitness));
