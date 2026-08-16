@@ -75,12 +75,15 @@ internal static class NumericEarlyExits<TKey>
         // Less/GreaterThan does not cover ranges within the observed values. Instead, we use the RLE map coming from KeyAnalyzer to determine
         // where there is data, and build a set of empty ranges (where there is no data), which we can use as early exits.
         // Gaps can consist of a range of values, or singletons (a range where start == end).
-        for (int i = 0; i < dataRanges.Ranges.Count - 1; i++)
+        if (config.IsEarlyExitEnabled(typeof(ValueInRangeEarlyExit<>)))
         {
-            (TKey Start, TKey End) current = dataRanges.Ranges[i];
-            (TKey Start, TKey End) next = dataRanges.Ranges[i + 1];
+            for (int i = 0; i < dataRanges.Ranges.Count - 1; i++)
+            {
+                (TKey Start, TKey End) current = dataRanges.Ranges[i];
+                (TKey Start, TKey End) next = dataRanges.Ranges[i + 1];
 
-            yield return new ValueInRangeEarlyExit<TKey>(current.End, next.Start);
+                yield return new ValueInRangeEarlyExit<TKey>(current.End, next.Start);
+            }
         }
 
         // Pack consecutive small gaps into a single bitmap check when they fit within 64 positions.
