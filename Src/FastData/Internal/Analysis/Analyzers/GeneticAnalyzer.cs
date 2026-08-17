@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Generators.StringHash;
@@ -20,6 +22,8 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
 internal sealed partial class GeneticAnalyzer(StringKeyProperties props, GeneticAnalyzerConfig geneticConfig, SegmentGeneratorConfig generatorConfig, Simulator sim, ILogger<GeneticAnalyzer> logger, bool ignoreCase = false) : IStringHashAnalyzer
 {
+    private readonly Dictionary<GeneticSimulationKey, (double Fitness, int Collisions)> _simulationCache = new Dictionary<GeneticSimulationKey, (double, int)>();
+
     /*
      This is a genetic algorithm that determines the best configuration from a random population, that via evolution is biased
      to converge into a better configuration (if possible).
@@ -86,6 +90,8 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
 
     public IEnumerable<Candidate> GetCandidates(ReadOnlySpan<string> data)
     {
+        _simulationCache.Clear();
+
         GeneticEngineConfig cfg = new GeneticEngineConfig();
         cfg.PopulationSize = geneticConfig.PopulationSize;
         cfg.ShuffleParents = geneticConfig.ShuffleParents;
@@ -130,11 +136,34 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
 
     private void Simulation(ReadOnlySpan<string> data, ref Entity entity)
     {
-        //Convert entity to GeneticArrayHash
-        GeneticStringHash spec = CopyGenes(ref entity);
+        GeneticSimulationKey key = new GeneticSimulationKey(
+            ((ArraySegmentGene)entity.Genes[0]).Value,
+            ((IntGene)entity.Genes[1]).Value,
+            ((IntGene)entity.Genes[2]).Value,
+            ((IntGene)entity.Genes[3]).Value,
+            ((IntGene)entity.Genes[4]).Value
+        );
+
+        if (_simulationCache.TryGetValue(key, out (double Fitness, int Collisions) cached))
+        {
+            entity.Fitness = cached.Fitness;
+            entity.Tag = cached.Collisions;
+            return;
+        }
+
+        GeneticStringHash spec = new GeneticStringHash(
+            key.Segment,
+            key.MixerSeed,
+            key.MixerIterations,
+            key.AvalancheSeed,
+            key.AvalancheIterations,
+            ignoreCase,
+            sim.UnitSize
+        );
 
         //Run the simulation
         Candidate candidate = sim.Run(spec, expression => FitnessHelper.CalculateFitness(props, spec.Segment, expression));
+        _simulationCache.Add(key, (candidate.Fitness, candidate.Collisions));
 
         //Copy over the fitness value
         entity.Fitness = candidate.Fitness;
@@ -150,4 +179,7 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
         ignoreCase,
         sim.UnitSize
     );
+
+    [StructLayout(LayoutKind.Auto)]
+    private readonly record struct GeneticSimulationKey(ArraySegment Segment, int MixerSeed, int MixerIterations, int AvalancheSeed, int AvalancheIterations);
 }
