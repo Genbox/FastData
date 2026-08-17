@@ -3,6 +3,7 @@ using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Internal.Abstracts;
+using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Structures;
 
@@ -46,7 +47,7 @@ public sealed class ConstMapStructure<TKey, TValue> : IStructure<TKey, TValue, C
         occupied[keys.Length] = 1;
 
         ulong rngCounter = 1;
-        ulong seed = SplitMix64(ref rngCounter);
+        ulong seed = SplitMix64.Next(ref rngCounter);
         uint[] startPos = [];
 
         for (int iteration = 1; iteration <= MaxIterations; iteration++)
@@ -205,7 +206,7 @@ public sealed class ConstMapStructure<TKey, TValue> : IStructure<TKey, TValue, C
             Array.Clear(t2Count, 0, t2Count.Length);
             Array.Clear(t2Hash, 0, t2Hash.Length);
             Array.Clear(t2Id, 0, t2Id.Length);
-            seed = SplitMix64(ref rngCounter);
+            seed = SplitMix64.Next(ref rngCounter);
         }
 
         return null;
@@ -296,18 +297,6 @@ public sealed class ConstMapStructure<TKey, TValue> : IStructure<TKey, TValue, C
             hash *= 0xc4ceb9fe1a85ec53;
             hash ^= hash >> 33;
             return hash;
-        }
-    }
-
-    private static ulong SplitMix64(ref ulong seed)
-    {
-        unchecked
-        {
-            seed += 0x9E3779B97F4A7C15;
-            ulong value = seed;
-            value = (value ^ (value >> 30)) * 0xBF58476D1CE4E5B9;
-            value = (value ^ (value >> 27)) * 0x94D049BB133111EB;
-            return value ^ (value >> 31);
         }
     }
 }
