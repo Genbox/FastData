@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [MemoryDiagnoser]
-[InProcess]
 public class GPerfAnalyzerBenchmarks
 {
     private readonly string[] _data;
@@ -25,10 +24,13 @@ public class GPerfAnalyzerBenchmarks
         _simulator = new Simulator(_data, GeneratorEncoding.AsciiBytes);
     }
 
+    [Params(false, true)]
+    public bool IgnoreCase { get; set; }
+
     [Benchmark]
     public object ConstructHash()
     {
-        GPerfAnalyzer analyzer = new GPerfAnalyzer(_data.Length, _props, new GPerfAnalyzerConfig(), _simulator, NullLogger<GPerfAnalyzer>.Instance, GeneratorEncoding.AsciiBytes, false);
+        GPerfAnalyzer analyzer = new GPerfAnalyzer(_data.Length, _props, new GPerfAnalyzerConfig(), _simulator, NullLogger<GPerfAnalyzer>.Instance, GeneratorEncoding.AsciiBytes, IgnoreCase);
 
         foreach (Candidate candidate in analyzer.GetCandidates(_data))
             return candidate;

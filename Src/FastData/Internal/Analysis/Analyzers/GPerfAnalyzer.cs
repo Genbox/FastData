@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -75,9 +76,9 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
         int maxLen = 0;
 
         List<Keyword> keywords = new List<Keyword>(data.Length);
-
         byte[][] encodedData = _sim.EncodedData;
         Debug.Assert(encodedData.Length == data.Length);
+
         for (int i = 0; i < data.Length; i++)
         {
             string s = data[i];
@@ -484,14 +485,19 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
     private int[] FindAlphaIncrements(List<Keyword> keywords, int maxKeyLen, SelectedPositions positions)
     {
         bool trace = _logger.IsEnabled(LogLevel.Trace);
-        uint duplicatesGoal = CountDuplicates(keywords, positions, ComputeAlphaUnify(), null, _hashIncludesLength);
+        HashSet<Keyword> duplicateDetector = new HashSet<Keyword>(GetSelectedCharsComparer(_hashIncludesLength));
+#if NET6_0_OR_GREATER
+        duplicateDetector.EnsureCapacity(keywords.Count);
+#endif
+        uint duplicatesGoal = CountDuplicates(keywords, positions, ComputeAlphaUnify(), null, duplicateDetector);
         if (trace)
             LogGPerfDebug(_logger, "duplicates_goal: " + duplicatesGoal);
 
         int alphaIncLength = Math.Max(maxKeyLen, positions.MaxFixedPosition + 1);
         int[] alphaInc = new int[alphaIncLength];
-        uint[]? alphaUnify = _ignoreCase ? ComputeAlphaUnify(keywords, positions, alphaInc, ComputeAlphaSize(alphaInc)) : null;
-        uint duplicatesCurrent = CountDuplicates(keywords, positions, alphaUnify, alphaInc, _hashIncludesLength);
+        uint[]? alphaUnifyWorkspace = null;
+        uint[]? alphaUnify = _ignoreCase ? ComputeAlphaUnify(keywords, positions, alphaInc, ComputeAlphaSize(alphaInc), ref alphaUnifyWorkspace) : null;
+        uint duplicatesCurrent = CountDuplicates(keywords, positions, alphaUnify, alphaInc, duplicateDetector);
         if (trace)
             LogGPerfDebug(_logger, "current_duplicates_count: " + duplicatesCurrent);
 
@@ -527,8 +533,8 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                     {
                         alphaInc.CopyTo(attempt, 0);
                         attempt[indices[j]] += inc;
-                        uint[]? attemptAlphaUnify = _ignoreCase ? ComputeAlphaUnify(keywords, positions, attempt, ComputeAlphaSize(attempt)) : null;
-                        uint tryDuplicatesCount = CountDuplicates(keywords, positions, attemptAlphaUnify, attempt, _hashIncludesLength);
+                        uint[]? attemptAlphaUnify = _ignoreCase ? ComputeAlphaUnify(keywords, positions, attempt, ComputeAlphaSize(attempt), ref alphaUnifyWorkspace) : null;
+                        uint tryDuplicatesCount = CountDuplicates(keywords, positions, attemptAlphaUnify, attempt, duplicateDetector);
                         if (trace)
                             LogGPerfDebug(_logger, "try_duplicates_count: " + tryDuplicatesCount);
 
@@ -591,6 +597,12 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 
     private uint[]? ComputeAlphaUnify(List<Keyword> keywords, SelectedPositions positions, int[] alphaInc, int alphaSize)
     {
+        uint[]? workspace = null;
+        return ComputeAlphaUnify(keywords, positions, alphaInc, alphaSize, ref workspace);
+    }
+
+    private uint[]? ComputeAlphaUnify(List<Keyword> keywords, SelectedPositions positions, int[] alphaInc, int alphaSize, ref uint[]? workspace)
+    {
         if (!_ignoreCase)
             return null;
 
@@ -598,7 +610,12 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
         // With increments, selected characters require:
         // asso_values[tolower(c) + alpha_inc[i]] == asso_values[toupper(c) + alpha_inc[i]].
         // These unifications can extend outside the ASCII-letter range, but every chain remains a multiple of 32 apart.
-        uint[] alphaUnify = CreateIdentityAlphaUnify(alphaSize);
+        if (workspace == null || workspace.Length < alphaSize)
+            workspace = new uint[alphaSize];
+
+        uint[] alphaUnify = workspace;
+        for (uint c = 0; c < alphaSize; c++)
+            alphaUnify[c] = c;
 
         foreach (Keyword keyword in keywords)
         {
@@ -659,7 +676,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
         return true;
     }
 
-    private static uint CountDuplicates(List<Keyword> keywords, SelectedPositions positions, uint[]? alphaUnify, int[]? alphaInc, bool hashIncludesLength)
+    private static uint CountDuplicates(List<Keyword> keywords, SelectedPositions positions, uint[]? alphaUnify, int[]? alphaInc, HashSet<Keyword> duplicateDetector)
     {
         // Counts #K - #projection(K). The result is independent of keyword order.
         if (alphaInc == null)
@@ -673,13 +690,13 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 keyword.InitSelCharsMultiset(positions, alphaInc, alphaUnify);
         }
 
-        HashSet<Keyword> set = new HashSet<Keyword>(GetSelectedCharsComparer(hashIncludesLength));
+        duplicateDetector.Clear();
 
         uint duplicates = 0;
 
         foreach (Keyword keyword in keywords)
         {
-            if (!set.Add(keyword))
+            if (!duplicateDetector.Add(keyword))
                 duplicates++;
         }
 
@@ -1336,47 +1353,64 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             EquivalenceClass? partition = null;
             EquivalenceClass? partitionLast = null;
             List<EquivalenceClass> classes = new List<EquivalenceClass>();
+            int maxSelectedChars = 0;
 
             foreach (Keyword keyword in keywords)
             {
-                // Compute the undetermined characters for this keyword.
-                uint[] undeterminedChars = new uint[keyword.SelCharsLength];
-                int undeterminedCharsLength = 0;
+                if (keyword.SelCharsLength > maxSelectedChars)
+                    maxSelectedChars = keyword.SelCharsLength;
+            }
 
-                for (int i = 0; i < keyword.SelCharsLength; i++)
+            uint[] scratch = ArrayPool<uint>.Shared.Rent(maxSelectedChars);
+            try
+            {
+                foreach (Keyword keyword in keywords)
                 {
-                    if (undetermined[keyword.SelChars[i]])
-                        undeterminedChars[undeterminedCharsLength++] = keyword.SelChars[i];
+                    // Compute the undetermined characters for this keyword.
+                    int undeterminedCharsLength = 0;
+
+                    for (int i = 0; i < keyword.SelCharsLength; i++)
+                    {
+                        if (undetermined[keyword.SelChars[i]])
+                            scratch[undeterminedCharsLength++] = keyword.SelChars[i];
+                    }
+
+                    // Look up the equivalence class to which this keyword belongs.
+                    EquivalenceClass? equClass;
+                    for (equClass = partition; equClass != null; equClass = equClass.Next)
+                    {
+                        if (equClass.UndeterminedCharsLength == undeterminedCharsLength && Equals(equClass.UndeterminedChars, scratch, undeterminedCharsLength))
+                            break;
+                    }
+
+                    if (equClass == null)
+                    {
+                        uint[] storedChars = new uint[undeterminedCharsLength];
+                        Array.Copy(scratch, storedChars, undeterminedCharsLength);
+
+                        equClass = new EquivalenceClass();
+                        equClass.UndeterminedChars = storedChars;
+                        equClass.UndeterminedCharsLength = undeterminedCharsLength;
+                        classes.Add(equClass);
+
+                        // Console.WriteLine("un " + undeterminedCharsLength);
+                        if (partition != null)
+                            partitionLast!.Next = equClass;
+                        else
+                            partition = equClass;
+
+                        partitionLast = equClass;
+                    }
+
+                    // Add the keyword to the equivalence class.
+                    equClass.Keywords.Add(keyword);
+
+                    equClass.Cardinality++;
                 }
-
-                // Look up the equivalence class to which this keyword belongs.
-                EquivalenceClass? equClass;
-                for (equClass = partition; equClass != null; equClass = equClass.Next)
-                {
-                    if (equClass.UndeterminedCharsLength == undeterminedCharsLength && Equals(equClass.UndeterminedChars, undeterminedChars, undeterminedCharsLength))
-                        break;
-                }
-
-                if (equClass == null)
-                {
-                    equClass = new EquivalenceClass();
-                    equClass.UndeterminedChars = undeterminedChars;
-                    equClass.UndeterminedCharsLength = undeterminedCharsLength;
-                    classes.Add(equClass);
-
-                    // Console.WriteLine("un " + undeterminedCharsLength);
-                    if (partition != null)
-                        partitionLast.Next = equClass;
-                    else
-                        partition = equClass;
-
-                    partitionLast = equClass;
-                }
-
-                // Add the keyword to the equivalence class.
-                equClass.Keywords.Add(keyword);
-
-                equClass.Cardinality++;
+            }
+            finally
+            {
+                ArrayPool<uint>.Shared.Return(scratch);
             }
 
             if (classes.Count <= 1)
