@@ -27,6 +27,32 @@ public class DeduplicationTests
         Assert.Equal(Enumerable.Range(237, 64).Select(static value => (ushort)value), keys.AsSpan(0, uniqueCount).ToArray());
     }
 
+    [Theory]
+    [InlineData(1025)]
+    [InlineData(16384)]
+    public void DeduplicateNumericKeys_LargeUInt8Keys_SortsAndCompacts(int count)
+    {
+        byte[] keys = Enumerable.Range(0, count).Select(static value => (byte)(value * 997 % 200)).ToArray();
+
+        Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
+
+        Assert.Equal(200, uniqueCount);
+        Assert.Equal(Enumerable.Range(0, 200).Select(static value => (byte)value), keys.AsSpan(0, uniqueCount).ToArray());
+    }
+
+    [Theory]
+    [InlineData(1025)]
+    [InlineData(16384)]
+    public void DeduplicateNumericKeys_LargeUInt16Keys_SortsAndCompacts(int count)
+    {
+        ushort[] keys = Enumerable.Range(0, count).Select(static value => (ushort)(10000 + value * 997 % 200)).ToArray();
+
+        Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
+
+        Assert.Equal(200, uniqueCount);
+        Assert.Equal(Enumerable.Range(10000, 200).Select(static value => (ushort)value), keys.AsSpan(0, uniqueCount).ToArray());
+    }
+
     [Fact]
     public void DeduplicateNumericKeys_Int32Keys_SortsAndKeepsValuesAligned()
     {
