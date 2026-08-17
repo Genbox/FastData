@@ -1,4 +1,7 @@
+using System.Buffers;
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Misc;
 
@@ -7,6 +10,9 @@ namespace Genbox.FastData.Internal;
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
 internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize, bool OptimizeHashTableBucketSize, bool RoundModuloToPowerOfTwo, float RoundModuloToPowerOfTwoThreshold, bool HashCodesPerfect, int CollisionCount, ulong MinHashCode, ulong MaxHashCode)
 {
+    private const int MaxBitSetWords = 131_072;
+    private const int StackallocWordThreshold = 256;
+
     internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, NumericHashFunc<T> func) => Create(data, capacityFactor, false, false, 0, func);
 
     internal static HashData Create<T>(ReadOnlySpan<T> data, float capacityFactor, bool roundModuloToPowerOfTwo, float roundModuloToPowerOfTwoThreshold, NumericHashFunc<T> func) => Create(data, capacityFactor, false, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, func);
@@ -28,8 +34,9 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
             maxHashCode = Math.Max(maxHashCode, hash);
         }
 
-        int tableSize = optimizeHashTableBucketSize ? GetOptimizedBucketTableSize(baseTableSize, hashCodes, out int collisions) : baseTableSize;
-        tableSize = GetModuloLength(tableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, hashCodes, out collisions);
+        int collisions = -1;
+        int tableSize = optimizeHashTableBucketSize ? GetOptimizedBucketTableSize(baseTableSize, hashCodes, out collisions) : baseTableSize;
+        tableSize = GetModuloLength(tableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, hashCodes, collisions, out collisions);
         bool perfect = collisions == 0;
         return new HashData(hashCodes, capacityFactor, tableSize, optimizeHashTableBucketSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, perfect, collisions, minHashCode, maxHashCode);
     }
@@ -75,7 +82,7 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
         return (int)rounded;
     }
 
-    private static int GetModuloLength(int length, bool roundModuloToPowerOfTwo, float roundingThreshold, ReadOnlySpan<ulong> hashCodes, out int collisions)
+    private static int GetModuloLength(int length, bool roundModuloToPowerOfTwo, float roundingThreshold, ReadOnlySpan<ulong> hashCodes, int knownCollisions, out int collisions)
     {
         if (length <= 0)
             throw new InvalidOperationException("Modulo length must be greater than zero.");
@@ -84,7 +91,7 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
 
         if (!roundModuloToPowerOfTwo || BitOperations.IsPow2(current))
         {
-            collisions = CountBucketCollisions(hashCodes, length);
+            collisions = knownCollisions >= 0 ? knownCollisions : CountBucketCollisions(hashCodes, length);
             return length;
         }
 
@@ -95,20 +102,20 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
 
         if (rounded == 0 || rounded > int.MaxValue)
         {
-            collisions = CountBucketCollisions(hashCodes, length);
+            collisions = knownCollisions >= 0 ? knownCollisions : CountBucketCollisions(hashCodes, length);
             return length;
         }
 
         double overhead = (double)(rounded - current) / rounded;
         if (overhead > roundingThreshold)
         {
-            collisions = CountBucketCollisions(hashCodes, length);
+            collisions = knownCollisions >= 0 ? knownCollisions : CountBucketCollisions(hashCodes, length);
             return length;
         }
 
         int roundedLength = (int)rounded;
 
-        int currentCollisions = CountBucketCollisions(hashCodes, length);
+        int currentCollisions = knownCollisions >= 0 ? knownCollisions : CountBucketCollisions(hashCodes, length);
         int roundedCollisions = CountBucketCollisions(hashCodes, roundedLength);
 
         if (roundedCollisions > currentCollisions)
@@ -121,26 +128,83 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
         return roundedLength;
     }
 
-    private static int GetOptimizedBucketTableSize(int baseLength, ReadOnlySpan<ulong> hashCodes, out int collisions)
+    internal static int GetOptimizedBucketTableSize(int baseLength, ReadOnlySpan<ulong> hashCodes, out int collisions)
     {
-        const double AcceptableCollisionRate = 0.05;
         const int LargeInputSizeThreshold = 1000;
         const int MaxSmallBucketTableMultiplier = 16;
         const int MaxLargeBucketTableMultiplier = 3;
         const int MaxCandidateCount = 256;
+
+        if (baseLength == int.MaxValue)
+        {
+            collisions = CountBucketCollisions(hashCodes, baseLength);
+            return baseLength;
+        }
+
+        int multiplier = hashCodes.Length >= LargeInputSizeThreshold ? MaxLargeBucketTableMultiplier : MaxSmallBucketTableMultiplier;
+        long maxByMultiplier = (long)hashCodes.Length * multiplier;
+        long maxByCandidates = (long)baseLength + MaxCandidateCount;
+        int maxLength = (int)Math.Min(int.MaxValue, Math.Max(baseLength, Math.Min(maxByMultiplier, maxByCandidates)));
+
+        int wordLength = GetWordLength(maxLength);
+        if (wordLength > MaxBitSetWords)
+            return GetOptimizedBucketTableSizeFallback(baseLength, maxLength, hashCodes, out collisions);
+
+        if (wordLength <= StackallocWordThreshold)
+        {
+            Span<ulong> stackBits = stackalloc ulong[wordLength];
+            return GetOptimizedBucketTableSize(baseLength, maxLength, hashCodes, stackBits, out collisions);
+        }
+
+        ulong[] rentedBits = ArrayPool<ulong>.Shared.Rent(wordLength);
+
+        try
+        {
+            return GetOptimizedBucketTableSize(baseLength, maxLength, hashCodes, rentedBits.AsSpan(0, wordLength), out collisions);
+        }
+        finally
+        {
+            ArrayPool<ulong>.Shared.Return(rentedBits);
+        }
+    }
+
+    private static int GetOptimizedBucketTableSize(int baseLength, int maxLength, ReadOnlySpan<ulong> hashCodes, Span<ulong> bits, out int collisions)
+    {
+        const double AcceptableCollisionRate = 0.05;
+
+        collisions = CountBucketCollisions(hashCodes, baseLength, bits);
+
+        if (collisions == 0)
+            return baseLength;
+
+        int bestLength = baseLength;
+
+        for (int candidate = baseLength + 1; candidate <= maxLength; candidate++)
+        {
+            int candidateCollisions = CountBucketCollisions(hashCodes, candidate, bits);
+
+            if (candidateCollisions >= collisions)
+                continue;
+
+            bestLength = candidate;
+            collisions = candidateCollisions;
+
+            if (candidateCollisions / (double)hashCodes.Length <= AcceptableCollisionRate)
+                break;
+        }
+
+        return bestLength;
+    }
+
+    private static int GetOptimizedBucketTableSizeFallback(int baseLength, int maxLength, ReadOnlySpan<ulong> hashCodes, out int collisions)
+    {
+        const double AcceptableCollisionRate = 0.05;
 
         collisions = CountBucketCollisions(hashCodes, baseLength);
 
         if (collisions == 0)
             return baseLength;
 
-        if (baseLength == int.MaxValue)
-            return baseLength;
-
-        int multiplier = hashCodes.Length >= LargeInputSizeThreshold ? MaxLargeBucketTableMultiplier : MaxSmallBucketTableMultiplier;
-        long maxByMultiplier = (long)hashCodes.Length * multiplier;
-        long maxByCandidates = (long)baseLength + MaxCandidateCount;
-        int maxLength = (int)Math.Min(int.MaxValue, Math.Max(baseLength, Math.Min(maxByMultiplier, maxByCandidates)));
         int bestLength = baseLength;
 
         for (int candidate = baseLength + 1; candidate <= maxLength; candidate++)
@@ -162,6 +226,53 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
 
     private static int CountBucketCollisions(ReadOnlySpan<ulong> hashCodes, int length)
     {
+        int wordLength = GetWordLength(length);
+
+        if (wordLength > MaxBitSetWords)
+            return CountBucketCollisionsFallback(hashCodes, length);
+
+        if (wordLength <= StackallocWordThreshold)
+        {
+            Span<ulong> stackBits = stackalloc ulong[wordLength];
+            return CountBucketCollisions(hashCodes, length, stackBits);
+        }
+
+        ulong[] rentedBits = ArrayPool<ulong>.Shared.Rent(wordLength);
+
+        try
+        {
+            return CountBucketCollisions(hashCodes, length, rentedBits.AsSpan(0, wordLength));
+        }
+        finally
+        {
+            ArrayPool<ulong>.Shared.Return(rentedBits);
+        }
+    }
+
+    private static int CountBucketCollisions(ReadOnlySpan<ulong> hashCodes, int length, Span<ulong> bits)
+    {
+        bits.Slice(0, GetWordLength(length)).Clear();
+        ref ulong bitsRef = ref MemoryMarshal.GetReference(bits);
+        int collisions = 0;
+
+        for (int i = 0; i < hashCodes.Length; i++)
+        {
+            uint bucket = (uint)(hashCodes[i] % (uint)length);
+            nint wordIndex = (nint)(bucket >> 6);
+            ulong mask = 1UL << ((int)bucket & 63);
+            ref ulong word = ref Unsafe.Add(ref bitsRef, wordIndex);
+
+            if ((word & mask) != 0)
+                collisions++;
+            else
+                word |= mask;
+        }
+
+        return collisions;
+    }
+
+    private static int CountBucketCollisionsFallback(ReadOnlySpan<ulong> hashCodes, int length)
+    {
         SwitchingBitSet tracker = new SwitchingBitSet(length, false);
         int collisions = 0;
 
@@ -173,4 +284,6 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
 
         return collisions;
     }
+
+    private static int GetWordLength(int length) => (int)(((long)length + 63) >> 6);
 }

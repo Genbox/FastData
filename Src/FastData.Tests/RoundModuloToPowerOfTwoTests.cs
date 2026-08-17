@@ -76,6 +76,32 @@ public class RoundModuloToPowerOfTwoTests
         Assert.True(hashData.HashCodesPerfect);
     }
 
+    [Theory]
+    [InlineData(32)]
+    [InlineData(256)]
+    [InlineData(1_000)]
+    public void HashTableBucketOptimizationMatchesReference(int count)
+    {
+        int[] keys = new int[count];
+        ulong[] hashCodes = new ulong[count];
+        ulong state = 0x9e3779b97f4a7c15UL;
+
+        for (int i = 0; i < count; i++)
+        {
+            keys[i] = i;
+            state ^= state >> 12;
+            state ^= state << 25;
+            state ^= state >> 27;
+            hashCodes[i] = unchecked(state * 0x2545f4914f6cdd1dUL);
+        }
+
+        HashData hashData = HashData.Create(keys, 1f, true, false, 0, key => hashCodes[key]);
+        (int ExpectedLength, int ExpectedCollisions) expected = GetExpectedBucketSize(hashCodes);
+
+        Assert.Equal(expected.ExpectedLength, hashData.TableSize);
+        Assert.Equal(expected.ExpectedCollisions, hashData.CollisionCount);
+    }
+
     [Fact]
     public void HashTableBucketOptimizationPreservesPowerOfTwoRounding()
     {
@@ -137,6 +163,49 @@ public class RoundModuloToPowerOfTwoTests
         BloomFilterContext context = structure.Create(keys, ReadOnlyMemory<byte>.Empty);
 
         Assert.Equal(expectedLength, context.BitSet.Length);
+    }
+
+    private static (int Length, int Collisions) GetExpectedBucketSize(ReadOnlySpan<ulong> hashCodes)
+    {
+        int baseLength = hashCodes.Length;
+        int collisions = CountCollisions(hashCodes, baseLength);
+        if (collisions == 0)
+            return (baseLength, collisions);
+
+        int multiplier = hashCodes.Length >= 1_000 ? 3 : 16;
+        long maxByMultiplier = (long)hashCodes.Length * multiplier;
+        long maxByCandidates = (long)baseLength + 256;
+        int maxLength = (int)Math.Min(int.MaxValue, Math.Max(baseLength, Math.Min(maxByMultiplier, maxByCandidates)));
+        int bestLength = baseLength;
+
+        for (int candidate = baseLength + 1; candidate <= maxLength; candidate++)
+        {
+            int candidateCollisions = CountCollisions(hashCodes, candidate);
+            if (candidateCollisions >= collisions)
+                continue;
+
+            bestLength = candidate;
+            collisions = candidateCollisions;
+
+            if (candidateCollisions / (double)hashCodes.Length <= 0.05)
+                break;
+        }
+
+        return (bestLength, collisions);
+    }
+
+    private static int CountCollisions(ReadOnlySpan<ulong> hashCodes, int length)
+    {
+        HashSet<uint> buckets = new HashSet<uint>();
+        int collisions = 0;
+
+        for (int i = 0; i < hashCodes.Length; i++)
+        {
+            if (!buckets.Add((uint)(hashCodes[i] % (uint)length)))
+                collisions++;
+        }
+
+        return collisions;
     }
 
     private sealed class CapturingGenerator : ICodeGenerator
