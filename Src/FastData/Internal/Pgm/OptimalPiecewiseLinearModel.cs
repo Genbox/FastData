@@ -16,12 +16,12 @@ internal sealed class OptimalPiecewiseLinearModel<T> where T : notnull
 {
     private readonly IModel _model;
 
-    public OptimalPiecewiseLinearModel(int epsilon)
+    public OptimalPiecewiseLinearModel(int epsilon, int capacity)
     {
         if (PgmTypeTraits<T>.IsFloatingPoint)
-            _model = new FloatingModel(epsilon);
+            _model = new FloatingModel(epsilon, capacity);
         else
-            _model = new IntegralModel(epsilon);
+            _model = new IntegralModel(epsilon, capacity);
     }
 
     public bool AddPoint(T xValue, int y) => _model.AddPoint(xValue, y);
@@ -64,11 +64,11 @@ internal sealed class OptimalPiecewiseLinearModel<T> where T : notnull
         (double x, double y) GetIntersection();
     }
 
-    private sealed class FloatingModel(int epsilon) : IModel
+    private sealed class FloatingModel(int epsilon, int capacity) : IModel
     {
-        private readonly List<Point> _lower = new List<Point>(1 << 16);
+        private readonly List<Point> _lower = new List<Point>(capacity);
         private readonly Point[] _rectangle = new Point[4];
-        private readonly List<Point> _upper = new List<Point>(1 << 16);
+        private readonly List<Point> _upper = new List<Point>(capacity);
         private double _firstX;
         private double _lastX;
         private int _lowerStart;
@@ -292,12 +292,12 @@ internal sealed class OptimalPiecewiseLinearModel<T> where T : notnull
         }
     }
 
-    private sealed class IntegralModel(int epsilon) : IModel
+    private sealed class IntegralModel(int epsilon, int capacity) : IModel
     {
         private readonly int _epsilon = epsilon;
-        private readonly List<Point> _lower = new List<Point>(1 << 16);
+        private readonly List<Point> _lower = new List<Point>(capacity);
         private readonly Point[] _rectangle = new Point[4];
-        private readonly List<Point> _upper = new List<Point>(1 << 16);
+        private readonly List<Point> _upper = new List<Point>(capacity);
         private Int128 _firstX;
         private Int128 _lastX;
         private int _lowerStart;

@@ -93,7 +93,8 @@ public sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmCon
         Debug.Assert(epsilon > 0, "PGM segmentation requires a positive epsilon.");
 
         int c = 0;
-        OptimalPiecewiseLinearModel<TKey> opt = new OptimalPiecewiseLinearModel<TKey>(epsilon);
+        int capacity = (int)Math.Min(((long)end - start) + 1, 1 << 16);
+        OptimalPiecewiseLinearModel<TKey> opt = new OptimalPiecewiseLinearModel<TKey>(epsilon, capacity);
 
         void AddPoint(TKey x, int y)
         {
