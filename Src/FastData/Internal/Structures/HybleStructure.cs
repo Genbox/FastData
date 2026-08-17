@@ -1,6 +1,8 @@
 using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
@@ -45,16 +47,23 @@ public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hybl
         int keyCount = keySpan.Length;
         ulong[] baseHashCodes = _hashData.HashCodes;
 
+        if (!TryComputeApproxRange((uint)keyCount, out uint approxRange) ||
+            !TryComputeBucketLayout((uint)keyCount, DefaultKeysPerBucket, out uint bucketCount, out uint bucketMask))
+            return null;
+
+        BuildWorkspace workspace = new BuildWorkspace(keyCount, (int)bucketCount, approxRange);
+        ref ulong baseHashesRef = ref MemoryMarshal.GetReference(baseHashCodes.AsSpan());
+        ref ulong seededHashesRef = ref MemoryMarshal.GetReference(workspace.Hashes.AsSpan());
+
         ulong seed = InitialSeed;
         for (uint attempt = 0; attempt < MaxSeedAttempts; attempt++)
         {
             // seed is always odd (InitialSeed is odd, SeedMult is odd, odd*odd=odd always),
             // so it is always coprime to 2^64 — guaranteeing a bijective multiplier.
-            ulong[] seededHashes = new ulong[keyCount];
             for (int i = 0; i < keyCount; i++)
-                unchecked { seededHashes[i] = baseHashCodes[i] * seed; }
+                unchecked { Unsafe.Add(ref seededHashesRef, i) = Unsafe.Add(ref baseHashesRef, i) * seed; }
 
-            if (TryBuild(keySpan, valueSpan, seededHashes, seed, out HybleContext<TKey, TValue>? result))
+            if (TryBuild(keySpan, valueSpan, workspace, approxRange, bucketMask, seed, out HybleContext<TKey, TValue>? result))
                 return result;
 
             unchecked { seed *= SeedMult; }
@@ -65,33 +74,27 @@ public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hybl
 
     public IEnumerable<IEarlyExit> GetMandatoryExits() => [];
 
-    private static bool TryBuild(ReadOnlySpan<TKey> keySpan, ReadOnlySpan<TValue> valueSpan, ulong[] hashes, ulong seed, out HybleContext<TKey, TValue>? result)
+    private static bool TryBuild(ReadOnlySpan<TKey> keySpan, ReadOnlySpan<TValue> valueSpan, BuildWorkspace workspace, uint approxRange, uint bucketMask, ulong seed, out HybleContext<TKey, TValue>? result)
     {
         Debug.Assert(!keySpan.IsEmpty, "HybleStructure requires at least one key.");
         Debug.Assert(valueSpan.IsEmpty || valueSpan.Length == keySpan.Length, "HybleStructure requires value count to match key count when values are present.");
-        Debug.Assert(hashes.Length >= keySpan.Length, "HybleStructure requires one hash code per key.");
+        Debug.Assert(workspace.Hashes.Length >= keySpan.Length, "HybleStructure requires one hash code per key.");
         Debug.Assert((seed & 1UL) == 1UL, "HybleStructure requires an odd seed to preserve hash bijection.");
 
         int keyCount = keySpan.Length;
-        uint numKeys = (uint)keyCount;
-
-        if (!TryComputeApproxRange(numKeys, out uint approxRange))
-        {
-            result = null;
-            return false;
-        }
-
-        if (!TryComputeBucketLayout(numKeys, DefaultKeysPerBucket, out uint bucketCount, out uint bucketMask))
-        {
-            result = null;
-            return false;
-        }
+        ulong[] hashes = workspace.Hashes;
+        uint[] approxs = workspace.Approxs;
+        int[] bucketsByKey = workspace.BucketsByKey;
+        int[] bucketCounts = workspace.BucketCounts;
+        int[] bucketStarts = workspace.BucketStarts;
+        int[] bucketOffsets = workspace.BucketOffsets;
+        int[] bucketOrder = workspace.BucketOrder;
+        int[] bucketKeyIndices = workspace.BucketKeyIndices;
+        ushort[] displacements = workspace.Displacements;
+        byte[] freeBitmap = workspace.FreeBitmap;
+        Array.Clear(bucketCounts, 0, bucketCounts.Length);
 
         // Step 1: Hash and classify keys into buckets
-        uint[] approxs = new uint[keyCount];
-        int[] bucketsByKey = new int[keyCount];
-        int[] bucketCounts = new int[bucketCount];
-
         for (int i = 0; i < keyCount; i++)
         {
             (uint approx, int bucket) = ToApproxBucket(hashes[i], approxRange, bucketMask);
@@ -101,13 +104,8 @@ public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hybl
         }
 
         // Step 2: Build prefix-sum index for bucket membership
-        int[] bucketStarts = new int[bucketCount + 1];
-        int[] bucketOffsets = new int[bucketCount];
-        int[] bucketOrder = new int[bucketCount];
-        int[] bucketKeyIndices = new int[keyCount];
-
         bucketStarts[0] = 0;
-        for (int i = 0; i < (int)bucketCount; i++)
+        for (int i = 0; i < bucketCounts.Length; i++)
         {
             bucketStarts[i + 1] = bucketStarts[i] + bucketCounts[i];
             bucketOffsets[i] = bucketStarts[i];
@@ -136,12 +134,8 @@ public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hybl
         });
 
         // Step 5: Find displacements
-        ushort[] displacements = new ushort[bucketCount];
-        ulong bitmapBits = approxRange + (ulong)ushort.MaxValue;
-        int bitmapByteLength = (int)((bitmapBits + 7) / 8) + 7; // +7 padding for 8-byte ReadMask reads near the end
-        byte[] freeBitmap = new byte[bitmapByteLength];
-        for (int i = 0; i < freeBitmap.Length; i++)
-            freeBitmap[i] = byte.MaxValue;
+        Array.Clear(displacements, 0, displacements.Length);
+        freeBitmap.AsSpan().Fill(byte.MaxValue);
 
         for (int order = 0; order < bucketOrder.Length; order++)
         {
@@ -445,5 +439,36 @@ public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hybl
             if (candidate == 0)
                 throw new InvalidOperationException("Unable to find a sentinel hash value.");
         }
+    }
+
+    private sealed class BuildWorkspace
+    {
+        internal BuildWorkspace(int keyCount, int bucketCount, uint approxRange)
+        {
+            Hashes = new ulong[keyCount];
+            Approxs = new uint[keyCount];
+            BucketsByKey = new int[keyCount];
+            BucketCounts = new int[bucketCount];
+            BucketStarts = new int[bucketCount + 1];
+            BucketOffsets = new int[bucketCount];
+            BucketOrder = new int[bucketCount];
+            BucketKeyIndices = new int[keyCount];
+            Displacements = new ushort[bucketCount];
+
+            ulong bitmapBits = approxRange + (ulong)ushort.MaxValue;
+            int bitmapByteLength = (int)((bitmapBits + 7) / 8) + 7;
+            FreeBitmap = new byte[bitmapByteLength];
+        }
+
+        internal ulong[] Hashes { get; }
+        internal uint[] Approxs { get; }
+        internal int[] BucketsByKey { get; }
+        internal int[] BucketCounts { get; }
+        internal int[] BucketStarts { get; }
+        internal int[] BucketOffsets { get; }
+        internal int[] BucketOrder { get; }
+        internal int[] BucketKeyIndices { get; }
+        internal ushort[] Displacements { get; }
+        internal byte[] FreeBitmap { get; }
     }
 }
