@@ -56,7 +56,6 @@ internal static class KeyAnalyzer
         // We wire up the delegates here to avoid branching in the foreach below
 
         // Get the generator-specific string length and byte conversion.
-        Func<string, int> getLength = StringHelper.GetLengthFunc(encoding);
         Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(encoding);
         Func<char, char> getChar = ignoreCase ? char.ToLowerInvariant : static c => c;
 
@@ -71,7 +70,7 @@ internal static class KeyAnalyzer
 
             minByteLength = Math.Min(minByteLength, bytes.Length);
             maxByteLength = Math.Max(maxByteLength, bytes.Length);
-            uniqLengths.Add(getLength(str));
+            uniqLengths.Add(encoding == GeneratorEncoding.Utf16CodeUnits ? str.Length : bytes.Length);
 
             firstCharMap.Add(getChar(str[0]));
             lastCharMap.Add(getChar(str[str.Length - 1]));

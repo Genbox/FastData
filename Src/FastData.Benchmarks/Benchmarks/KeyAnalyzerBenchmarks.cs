@@ -9,6 +9,9 @@ public class KeyAnalyzerBenchmarks
 {
     private readonly string[] _data;
 
+    [Params(GeneratorEncoding.Utf16CodeUnits, GeneratorEncoding.Utf8Bytes)]
+    public GeneratorEncoding Encoding { get; set; }
+
     public KeyAnalyzerBenchmarks()
     {
         Random rng = new Random(42);
@@ -16,5 +19,5 @@ public class KeyAnalyzerBenchmarks
     }
 
     [Benchmark]
-    public object GetStringProperties() => KeyAnalyzer.GetStringProperties(_data, false, GeneratorEncoding.Utf16CodeUnits);
+    public object GetStringProperties() => KeyAnalyzer.GetStringProperties(_data, false, Encoding);
 }

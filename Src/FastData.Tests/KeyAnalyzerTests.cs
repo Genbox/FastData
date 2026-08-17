@@ -101,6 +101,21 @@ public class KeyAnalyzerTests
             Assert.True(ContainsLength(lengthData.LengthRanges, length));
     }
 
+    [Theory]
+    [InlineData(GeneratorEncoding.Utf8Bytes, "é", 2)]
+    [InlineData(GeneratorEncoding.Utf8Bytes, "😀", 4)]
+    [InlineData(GeneratorEncoding.Utf16Bytes, "é", 2)]
+    [InlineData(GeneratorEncoding.Utf16Bytes, "😀", 4)]
+    [InlineData(GeneratorEncoding.Utf16CodeUnits, "é", 1)]
+    [InlineData(GeneratorEncoding.Utf16CodeUnits, "😀", 2)]
+    public void GetStringProperties_UsesEncodingLength(GeneratorEncoding encoding, string value, int expectedLength)
+    {
+        StringKeyProperties properties = GetStringProperties([value], false, encoding);
+
+        Assert.Equal(expectedLength, properties.LengthData.LengthRanges.Min);
+        Assert.Equal(expectedLength, properties.LengthData.LengthRanges.Max);
+    }
+
     [Fact]
     public void GetStringProperties_CharRange_Test()
     {
