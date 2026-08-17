@@ -49,8 +49,8 @@ public class TemplateManagerTests
     {
         TemplateManager manager = new TemplateManager("ConcurrencyTests", false);
         Task<string>[] tasks = Enumerable.Range(0, 8)
-            .Select(index => Task.Run(() => manager.Render("Echo.tt", _template, CreateVariables(index.ToString(CultureInfo.InvariantCulture)))))
-            .ToArray();
+                                         .Select(index => Task.Run(() => manager.Render("Echo.tt", _template, CreateVariables(index.ToString(CultureInfo.InvariantCulture)))))
+                                         .ToArray();
 
         string[] results = await Task.WhenAll(tasks);
 
@@ -59,5 +59,5 @@ public class TemplateManagerTests
 
     private static Dictionary<string, object?> CreateVariables(string value) => new Dictionary<string, object?> { { "Value", value } };
 
-    private sealed class ReferenceMarker { }
+    private sealed class ReferenceMarker {}
 }

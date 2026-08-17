@@ -33,7 +33,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
             settings.Workload,
             settings.MaxError).ToArray();
 
-        ITestData[] benchmarkData = [..structureBenchmarks, ..earlyExitBenchmarks];
+        ITestData[] benchmarkData = [.. structureBenchmarks, .. earlyExitBenchmarks];
         ResultStore resultStore = new ResultStore(settings.ResultsDirectory);
 
         return settings.Mode switch
@@ -154,7 +154,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
             ("Loop", $"Warmup: {settings.WarmupCount.ToString(NumberFormatInfo.InvariantInfo)}, Samples: {settings.MinSampleCount.ToString(NumberFormatInfo.InvariantInfo)}-{settings.MaxSampleCount.ToString(NumberFormatInfo.InvariantInfo)}, Target: {settings.TargetIterationTimeMs.ToString(NumberFormatInfo.InvariantInfo)}ms, MaxError: {settings.MaxError.ToString(NumberFormatInfo.InvariantInfo)}%")
         ];
 
-        return settings.Debug ? [..rows, ("Debug", "Enabled")] : rows;
+        return settings.Debug ? [.. rows, ("Debug", "Enabled")] : rows;
     }
 
     private static int WriteNoBenchmarksMatched(Settings settings)

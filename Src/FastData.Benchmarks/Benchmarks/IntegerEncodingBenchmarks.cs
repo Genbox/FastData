@@ -12,8 +12,8 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 public class IntegerEncodingBenchmarks
 {
     private readonly byte[] _encoded = new byte[10 * 4096];
-    private readonly int[] _offsets = new int[4096];
     private readonly int[] _lengths = new int[4096];
+    private readonly int[] _offsets = new int[4096];
     private IIntegerEncoding _encoding = null!;
     private ulong[] _values = null!;
 

@@ -9,7 +9,6 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers;
 internal sealed class Simulator
 {
     private readonly int _capacity;
-    private readonly byte[][] _data;
     private readonly NoEqualityEmulator _set;
 
     internal Simulator(ReadOnlySpan<string> data, GeneratorEncoding encoding, int capacityFactor = 1)
@@ -19,14 +18,14 @@ internal sealed class Simulator
         UnitSize = StringHelper.GetSize(encoding);
 
         Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(encoding);
-        _data = new byte[data.Length][];
+        EncodedData = new byte[data.Length][];
 
         for (int i = 0; i < data.Length; i++)
-            _data[i] = getBytes(data[i]);
+            EncodedData[i] = getBytes(data[i]);
     }
 
     internal int UnitSize { get; }
-    internal byte[][] EncodedData => _data;
+    internal byte[][] EncodedData { get; }
 
     internal Candidate Run(IStringHash stringHash, Func<Expression, double>? extraFitness = null)
     {
@@ -34,7 +33,7 @@ internal sealed class Simulator
         _set.SetHash(expression.Compile());
 
         int collisions = 0;
-        foreach (byte[] bytes in _data)
+        foreach (byte[] bytes in EncodedData)
         {
             if (!_set.Add(bytes))
                 collisions++;

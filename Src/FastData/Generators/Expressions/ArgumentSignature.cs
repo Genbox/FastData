@@ -12,7 +12,7 @@ internal static class ArgumentSignature
 
         return kind switch
         {
-            ArgumentKind.Constant => object.Equals(((ConstantExpression)left).Value, ((ConstantExpression)right).Value),
+            ArgumentKind.Constant => Equals(((ConstantExpression)left).Value, ((ConstantExpression)right).Value),
             ArgumentKind.Parameter => string.Equals(((ParameterExpression)left).Name, ((ParameterExpression)right).Name, StringComparison.Ordinal),
             ArgumentKind.Other => string.Equals(left.ToString(), right.ToString(), StringComparison.Ordinal),
             _ => false

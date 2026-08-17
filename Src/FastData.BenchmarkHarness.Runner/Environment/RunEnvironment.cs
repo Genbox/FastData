@@ -42,12 +42,12 @@ internal sealed class RunEnvironment : IDisposable
 
         if (!WindowsPowerPlan.IsSupported)
         {
-            ConsoleOutput.WriteBenchmarkSetup([osRow, cpuCountRow, ("Power plan", "skipped (not Windows)"), cpuRow, ..extraRows]);
+            ConsoleOutput.WriteBenchmarkSetup([osRow, cpuCountRow, ("Power plan", "skipped (not Windows)"), cpuRow, .. extraRows]);
             return new RunEnvironment(null);
         }
 
         WindowsPowerPlanState state = WindowsPowerPlan.Apply(settings.PowerPlan);
-        ConsoleOutput.WriteBenchmarkSetup([osRow, cpuCountRow, ("Power plan", state.PowerPlanDisplay), ("Processor AC", state.ProcessorAcDisplay), cpuRow, ..extraRows]);
+        ConsoleOutput.WriteBenchmarkSetup([osRow, cpuCountRow, ("Power plan", state.PowerPlanDisplay), ("Processor AC", state.ProcessorAcDisplay), cpuRow, .. extraRows]);
         return new RunEnvironment(state);
     }
 }

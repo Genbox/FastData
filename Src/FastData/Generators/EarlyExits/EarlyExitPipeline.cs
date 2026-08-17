@@ -136,6 +136,7 @@ internal static class EarlyExitPipeline
 
         int first = Math.Min(ltIdx, gtIdx);
         int second = Math.Max(ltIdx, gtIdx);
+
         // Remove the later index first so the earlier index remains valid.
         exits.RemoveAt(second);
         exits.RemoveAt(first);
@@ -172,6 +173,7 @@ internal static class EarlyExitPipeline
 
         int first = Math.Min(ltIdx, gtIdx);
         int second = Math.Max(ltIdx, gtIdx);
+
         // Remove the later index first so the earlier index remains valid.
         exits.RemoveAt(second);
         exits.RemoveAt(first);

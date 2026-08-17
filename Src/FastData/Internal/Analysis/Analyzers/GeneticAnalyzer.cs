@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Generators.Helpers;

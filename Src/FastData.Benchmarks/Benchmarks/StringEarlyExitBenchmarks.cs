@@ -7,13 +7,13 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
 public class StringEarlyExitBenchmarks
 {
-    private string _value = "hello world";
-    private int _min = 3;
-    private int _max = 42;
     private ulong[] _bitset = [2828, 4848];
     private ulong _firstLow = 60;
     private ulong _lastLow = 60;
+    private int _max = 42;
+    private int _min = 3;
     private ulong _stringMask = 0xFF93FF93FF9AFF97UL;
+    private string _value = "hello world";
 
     [Benchmark]public bool LengthEqual() => _value.Length != 49;
 

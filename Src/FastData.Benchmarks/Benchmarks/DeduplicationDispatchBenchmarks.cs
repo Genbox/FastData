@@ -21,7 +21,7 @@ public class DeduplicationDispatchBenchmarks
 
         for (int i = 0; i < Count; i++)
         {
-            int value = i * 997 % 200;
+            int value = (i * 997) % 200;
             _byteKeys[i] = (byte)value;
             _uint16Keys[i] = (ushort)(10000 + value);
         }

@@ -9,14 +9,14 @@ public class KeyAnalyzerBenchmarks
 {
     private readonly string[] _data;
 
-    [Params(GeneratorEncoding.Utf16CodeUnits, GeneratorEncoding.Utf8Bytes)]
-    public GeneratorEncoding Encoding { get; set; }
-
     public KeyAnalyzerBenchmarks()
     {
         Random rng = new Random(42);
         _data = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(rng, 50)).ToArray();
     }
+
+    [Params(GeneratorEncoding.Utf16CodeUnits, GeneratorEncoding.Utf8Bytes)]
+    public GeneratorEncoding Encoding { get; set; }
 
     [Benchmark]
     public object GetStringProperties() => KeyAnalyzer.GetStringProperties(_data, false, Encoding);

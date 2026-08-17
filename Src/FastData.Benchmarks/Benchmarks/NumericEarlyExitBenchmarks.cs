@@ -8,16 +8,16 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
 public class NumericEarlyExitBenchmarks
 {
-    private int _min = 3;
-    private int _max = 42;
-    private int _value = 7;
-    private byte _byteMin = 42;
     private byte _byteMax = 100;
+    private byte _byteMin = 42;
     private byte _byteValue = 41;
-    private sbyte _sbyteMin = -10;
+    private int _max = 42;
+    private int _min = 3;
     private sbyte _sbyteMax = 20;
+    private sbyte _sbyteMin = -10;
     private sbyte _sbyteValue = -11;
     private Vector256<int> _simdSet = Vector256.Create(3, 5, 7, 11, 13, 17, 19, 23);
+    private int _value = 7;
 
     [Benchmark]public bool ValueRange() => _value < _min || _value > _max;
 

@@ -165,16 +165,6 @@ public class TemplateManager
         entries.Remove(new KeyValuePair<string, Lazy<Type>>(assemblyName, lazyType));
     }
 
-    private sealed class TemplateCompilation(TemplateGenerator generator, string[] referencePaths, string filePath, string preprocessed, string assemblyName, string typeName)
-    {
-        public TemplateGenerator Generator { get; } = generator;
-        public string[] ReferencePaths { get; } = referencePaths;
-        public string FilePath { get; } = filePath;
-        public string Preprocessed { get; } = preprocessed;
-        public string AssemblyName { get; } = assemblyName;
-        public string TypeName { get; } = typeName;
-    }
-
     private static string[] GetMetadataReferencePaths(TemplateGenerator generator, TemplateSettings settings, string[] references)
     {
         HashSet<string> paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -260,5 +250,15 @@ public class TemplateManager
         }
 
         return sb.ToString();
+    }
+
+    private sealed class TemplateCompilation(TemplateGenerator generator, string[] referencePaths, string filePath, string preprocessed, string assemblyName, string typeName)
+    {
+        public TemplateGenerator Generator { get; } = generator;
+        public string[] ReferencePaths { get; } = referencePaths;
+        public string FilePath { get; } = filePath;
+        public string Preprocessed { get; } = preprocessed;
+        public string AssemblyName { get; } = assemblyName;
+        public string TypeName { get; } = typeName;
     }
 }

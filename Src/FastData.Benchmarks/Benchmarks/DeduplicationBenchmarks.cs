@@ -11,20 +11,20 @@ public class DeduplicationBenchmarks
     private const int RangeSize = 200;
     private const int BitSetCount = 16_384;
     private const int BitSetRangeStep = 97;
-
-    private byte[] _rangeUInt8Keys = null!;
-    private sbyte[] _rangeInt8Keys = null!;
+    private int[] _bitSetInt32Keys = null!;
+    private long[] _bitSetInt64Keys = null!;
+    private uint[] _bitSetUInt32Keys = null!;
+    private ulong[] _bitSetUInt64Keys = null!;
     private char[] _rangeCharKeys = null!;
     private short[] _rangeInt16Keys = null!;
-    private ushort[] _rangeUInt16Keys = null!;
     private int[] _rangeInt32Keys = null!;
-    private uint[] _rangeUInt32Keys = null!;
     private long[] _rangeInt64Keys = null!;
+    private sbyte[] _rangeInt8Keys = null!;
+    private ushort[] _rangeUInt16Keys = null!;
+    private uint[] _rangeUInt32Keys = null!;
     private ulong[] _rangeUInt64Keys = null!;
-    private int[] _bitSetInt32Keys = null!;
-    private uint[] _bitSetUInt32Keys = null!;
-    private long[] _bitSetInt64Keys = null!;
-    private ulong[] _bitSetUInt64Keys = null!;
+
+    private byte[] _rangeUInt8Keys = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -45,7 +45,7 @@ public class DeduplicationBenchmarks
 
         for (int i = 0; i < RangeCount; i++)
         {
-            int value = i * 997 % RangeSize;
+            int value = (i * 997) % RangeSize;
             _rangeUInt8Keys[i] = (byte)value;
             _rangeInt8Keys[i] = (sbyte)(value - 100);
             _rangeCharKeys[i] = (char)value;
@@ -59,7 +59,7 @@ public class DeduplicationBenchmarks
 
         for (int i = 0; i < BitSetCount; i++)
         {
-            int value = i % (BitSetCount / 2) * BitSetRangeStep;
+            int value = (i % (BitSetCount / 2)) * BitSetRangeStep;
             _bitSetInt32Keys[i] = value - 100_000;
             _bitSetUInt32Keys[i] = (uint)value + 1_000_000u;
             _bitSetInt64Keys[i] = value - 100_000L;

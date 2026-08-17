@@ -107,6 +107,12 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
         return new EliasFanoContext(lowerBitCount, lowerMask, upperBits, lowerBits, upperBitLength, sampleRateShift, samplePositions, effectiveMinValue, max);
     }
 
+    public IEnumerable<IEarlyExit> GetMandatoryExits()
+    {
+        yield return new ValueLessThanEarlyExit<TKey>(_minValue);
+        yield return new ValueGreaterThanEarlyExit<TKey>(_maxValue);
+    }
+
     internal static int GetLowerWordCount(int count, int lowerBitCount)
     {
         Debug.Assert(count >= 0, "EliasFanoStructure requires a non-negative item count.");
@@ -114,12 +120,6 @@ public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, 
 
         ulong bitLength = (ulong)(uint)count * (uint)lowerBitCount;
         return (int)((bitLength + 63) / 64);
-    }
-
-    public IEnumerable<IEarlyExit> GetMandatoryExits()
-    {
-        yield return new ValueLessThanEarlyExit<TKey>(_minValue);
-        yield return new ValueGreaterThanEarlyExit<TKey>(_maxValue);
     }
 
     private static int[] BuildSamples(ulong[] words, int bitLength, int sampleRate)

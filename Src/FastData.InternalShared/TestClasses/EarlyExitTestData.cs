@@ -58,7 +58,7 @@ public sealed class EarlyExitTestData<TKey>(
             ParameterExpression length = Expression.Variable(typeof(int), "length");
             AnnotatedExpr lengthAlloc = AnnotatedExpr.Allocation(Expression.Assign(length, Expression.Call(methodInfo, inputKey)));
 
-            AnnotatedExpr[] combined = [lengthAlloc, ..annotated];
+            AnnotatedExpr[] combined = [lengthAlloc, .. annotated];
             annotated = ExpressionHelper.Transform(combined,
             [
                 new AllocationGatherTransform(),
