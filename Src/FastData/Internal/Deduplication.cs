@@ -80,16 +80,13 @@ internal static partial class Deduplication
         if (TryCompactSortedInput(keys, values, out uniqueCount))
             return;
 
-        if (ShouldUseBitSet(keys.Length))
-        {
-            if (TryDeduplicateWithBitSet(keys, values, out uniqueCount))
-                return;
-        }
-        else
-        {
-            if (TryDeduplicateWithRange(keys, values, out uniqueCount))
-                return;
-        }
+        if (ShouldUseBitSet(keys.Length) && TryDeduplicateWithBitSet(keys, values, out uniqueCount))
+            return;
+
+        // The bitset implementation only supports 32- and 64-bit integer types. Always try the bounded range implementation afterward so large byte,
+        // sbyte, char, Int16, and UInt16 inputs retain their specialized linear path instead of falling back to sorting.
+        if (TryDeduplicateWithRange(keys, values, out uniqueCount))
+            return;
 
         SortFallback(keys, values, Comparer<TKey>.Default);
         CompactSorted(keys, values, out uniqueCount);
