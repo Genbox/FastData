@@ -2,58 +2,47 @@ using System.Linq.Expressions;
 
 namespace Genbox.FastData.Generators.Expressions;
 
-internal readonly struct ArgumentSignature : IEquatable<ArgumentSignature>
+internal static class ArgumentSignature
 {
-    private ArgumentSignature(ArgumentKind kind, Type type, object? value, string? name, string? text)
+    internal static bool Equals(Expression left, Expression right)
     {
-        Kind = kind;
-        Type = type;
-        Value = value;
-        Name = name;
-        Text = text;
-    }
-
-    private ArgumentKind Kind { get; }
-    private Type Type { get; }
-    private object? Value { get; }
-    private string? Name { get; }
-    private string? Text { get; }
-
-    public static ArgumentSignature Create(Expression expression)
-    {
-        if (expression is ConstantExpression constant)
-            return new ArgumentSignature(ArgumentKind.Constant, constant.Type, constant.Value, null, null);
-
-        if (expression is ParameterExpression parameter)
-            return new ArgumentSignature(ArgumentKind.Parameter, parameter.Type, null, parameter.Name, null);
-
-        return new ArgumentSignature(ArgumentKind.Other, expression.Type, null, null, expression.ToString());
-    }
-
-    public bool Equals(ArgumentSignature other)
-    {
-        if (Kind != other.Kind || Type != other.Type)
+        ArgumentKind kind = GetKind(left);
+        if (kind != GetKind(right) || left.Type != right.Type)
             return false;
 
-        return Kind switch
+        return kind switch
         {
-            ArgumentKind.Constant => Equals(Value, other.Value),
-            ArgumentKind.Parameter => string.Equals(Name, other.Name, StringComparison.Ordinal),
-            ArgumentKind.Other => string.Equals(Text, other.Text, StringComparison.Ordinal),
+            ArgumentKind.Constant => object.Equals(((ConstantExpression)left).Value, ((ConstantExpression)right).Value),
+            ArgumentKind.Parameter => string.Equals(((ParameterExpression)left).Name, ((ParameterExpression)right).Name, StringComparison.Ordinal),
+            ArgumentKind.Other => string.Equals(left.ToString(), right.ToString(), StringComparison.Ordinal),
             _ => false
         };
     }
 
-    public override bool Equals(object? obj) => obj is ArgumentSignature other && Equals(other);
-
-    public override int GetHashCode()
+    internal static void AddHashCode(ref HashCode hash, Expression expression)
     {
-        HashCode hash = new HashCode();
-        hash.Add(Kind);
-        hash.Add(Type);
-        hash.Add(Value);
-        hash.Add(Name, StringComparer.Ordinal);
-        hash.Add(Text, StringComparer.Ordinal);
-        return hash.ToHashCode();
+        ArgumentKind kind = GetKind(expression);
+        hash.Add(kind);
+        hash.Add(expression.Type);
+
+        switch (kind)
+        {
+            case ArgumentKind.Constant:
+                hash.Add(((ConstantExpression)expression).Value);
+                break;
+            case ArgumentKind.Parameter:
+                hash.Add(((ParameterExpression)expression).Name, StringComparer.Ordinal);
+                break;
+            case ArgumentKind.Other:
+                hash.Add(expression.ToString(), StringComparer.Ordinal);
+                break;
+        }
     }
+
+    private static ArgumentKind GetKind(Expression expression) => expression switch
+    {
+        ConstantExpression => ArgumentKind.Constant,
+        ParameterExpression => ArgumentKind.Parameter,
+        _ => ArgumentKind.Other
+    };
 }

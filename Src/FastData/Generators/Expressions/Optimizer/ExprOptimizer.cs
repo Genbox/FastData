@@ -181,15 +181,28 @@ internal static class ExprOptimizer
             {
                 MethodCallExpression call = (MethodCallExpression)expression;
                 Expression? obj = call.Object == null ? null : Visit(call.Object);
-                Expression[] args = call.Arguments.ToArray();
-                Expression[] visitedArgs = new Expression[args.Length];
-                for (int i = 0; i < args.Length; i++)
-                    visitedArgs[i] = Visit(args[i]);
+                Expression[]? visitedArgs = null;
+                for (int i = 0; i < call.Arguments.Count; i++)
+                {
+                    Expression argument = call.Arguments[i];
+                    Expression visited = Visit(argument);
 
-                if (call.Object == obj && args.SequenceEqual(visitedArgs))
+                    if (visitedArgs != null)
+                        visitedArgs[i] = visited;
+                    else if (!ReferenceEquals(visited, argument))
+                    {
+                        visitedArgs = new Expression[call.Arguments.Count];
+                        for (int j = 0; j < i; j++)
+                            visitedArgs[j] = call.Arguments[j];
+
+                        visitedArgs[i] = visited;
+                    }
+                }
+
+                if (call.Object == obj && visitedArgs == null)
                     return call;
 
-                return Call(obj, call.Method, visitedArgs);
+                return visitedArgs == null ? Call(obj, call.Method, call.Arguments) : Call(obj, call.Method, visitedArgs);
             }
             case ExpressionType.Lambda:
             {
@@ -198,7 +211,7 @@ internal static class ExprOptimizer
                 if (body == lambda.Body)
                     return lambda;
 
-                return Lambda(lambda.Type, Visit(body), lambda.Parameters);
+                return Lambda(lambda.Type, body, lambda.Parameters);
             }
             case ExpressionType.TypeIs:
             {

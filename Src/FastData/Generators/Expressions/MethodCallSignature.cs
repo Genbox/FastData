@@ -1,30 +1,21 @@
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Genbox.FastData.Generators.Expressions;
 
-internal readonly struct MethodCallSignature(MethodInfo method, ArgumentSignature[] arguments) : IEquatable<MethodCallSignature>
+internal readonly struct MethodCallSignature(MethodCallExpression node) : IEquatable<MethodCallSignature>
 {
-    private MethodInfo Method { get; } = method;
-    private ArgumentSignature[] Arguments { get; } = arguments;
+    private MethodCallExpression Node { get; } = node;
 
-    public static MethodCallSignature Create(MethodCallExpression node)
-    {
-        ArgumentSignature[] args = new ArgumentSignature[node.Arguments.Count];
-        for (int i = 0; i < node.Arguments.Count; i++)
-            args[i] = ArgumentSignature.Create(node.Arguments[i]);
-
-        return new MethodCallSignature(node.Method, args);
-    }
+    public static MethodCallSignature Create(MethodCallExpression node) => new MethodCallSignature(node);
 
     public bool Equals(MethodCallSignature other)
     {
-        if (!Equals(Method, other.Method) || Arguments.Length != other.Arguments.Length)
+        if (!Equals(Node.Method, other.Node.Method) || Node.Arguments.Count != other.Node.Arguments.Count)
             return false;
 
-        for (int i = 0; i < Arguments.Length; i++)
+        for (int i = 0; i < Node.Arguments.Count; i++)
         {
-            if (!Arguments[i].Equals(other.Arguments[i]))
+            if (!ArgumentSignature.Equals(Node.Arguments[i], other.Node.Arguments[i]))
                 return false;
         }
 
@@ -36,9 +27,10 @@ internal readonly struct MethodCallSignature(MethodInfo method, ArgumentSignatur
     public override int GetHashCode()
     {
         HashCode hash = new HashCode();
-        hash.Add(Method);
-        foreach (ArgumentSignature arg in Arguments)
-            hash.Add(arg);
+        hash.Add(Node.Method);
+
+        for (int i = 0; i < Node.Arguments.Count; i++)
+            ArgumentSignature.AddHashCode(ref hash, Node.Arguments[i]);
 
         return hash.ToHashCode();
     }

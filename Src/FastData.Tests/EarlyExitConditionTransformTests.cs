@@ -13,7 +13,9 @@ public class EarlyExitConditionTransformTests
         EarlyExitConditionTransform transform = new EarlyExitConditionTransform(body);
 
         AnnotatedExpr expr = AnnotatedExpr.EarlyExit(Expression.Constant(true));
-        AnnotatedExpr transformed = Assert.Single(transform.Transform(expr, transform.CreateState()));
+        List<AnnotatedExpr> output = new List<AnnotatedExpr>();
+        transform.Transform(expr, transform.CreateState(), output);
+        AnnotatedExpr transformed = Assert.Single(output);
 
         ConditionalExpression conditional = Assert.IsType<ConditionalExpression>(transformed.Expression);
         Assert.Same(expr.Expression, conditional.Test);
@@ -28,7 +30,9 @@ public class EarlyExitConditionTransformTests
         EarlyExitConditionTransform transform = new EarlyExitConditionTransform(new List<Expression>());
         AnnotatedExpr expr = new AnnotatedExpr(Expression.Constant(1), ExprKind.Assignment);
 
-        AnnotatedExpr transformed = Assert.Single(transform.Transform(expr, transform.CreateState()));
+        List<AnnotatedExpr> output = new List<AnnotatedExpr>();
+        transform.Transform(expr, transform.CreateState(), output);
+        AnnotatedExpr transformed = Assert.Single(output);
 
         Assert.Same(expr.Expression, transformed.Expression);
         Assert.Equal(expr.Kind, transformed.Kind);

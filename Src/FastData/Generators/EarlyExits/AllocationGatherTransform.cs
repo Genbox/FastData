@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Genbox.FastData.Generators.Abstracts;
@@ -61,35 +62,38 @@ public class AllocationGatherTransform : IExprTransform
 
     public object CreateState() => new AllocationGatherState();
 
-    public IEnumerable<AnnotatedExpr> Transform(AnnotatedExpr expr, object state)
+    public void Transform(AnnotatedExpr expr, object state, List<AnnotatedExpr> output)
     {
-        AllocationGatherVisitor visitor = new AllocationGatherVisitor((AllocationGatherState)state);
+        AllocationGatherVisitor visitor = ((AllocationGatherState)state).Visitor;
+        visitor.Reset();
         Expression updated = visitor.Visit(expr.Expression) ?? expr.Expression;
 
         foreach (Expression assignment in visitor.Assignments)
-            yield return new AnnotatedExpr(assignment, ExprKind.Assignment);
+            output.Add(new AnnotatedExpr(assignment, ExprKind.Assignment));
 
-        yield return new AnnotatedExpr(updated, expr.Kind);
+        output.Add(new AnnotatedExpr(updated, expr.Kind));
     }
 
     private sealed class AllocationGatherState
     {
+        internal AllocationGatherState() => Visitor = new AllocationGatherVisitor(this);
+
         public Dictionary<MethodCallSignature, ParameterExpression> Variables { get; } = new Dictionary<MethodCallSignature, ParameterExpression>();
+        internal AllocationGatherVisitor Visitor { get; }
     }
 
     private sealed class AllocationGatherVisitor(AllocationGatherState state) : ExpressionVisitor
     {
         public List<Expression> Assignments { get; } = new List<Expression>();
 
+        internal void Reset() => Assignments.Clear();
+
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             if (node.Method.DeclaringType == typeof(GeneratorFunctions) && node.Type != typeof(bool))
             {
                 Expression? instance = node.Object == null ? null : Visit(node.Object);
-                List<Expression> arguments = new List<Expression>(node.Arguments.Count);
-                foreach (Expression argument in node.Arguments)
-                    arguments.Add(Visit(argument));
-
+                ReadOnlyCollection<Expression> arguments = Visit(node.Arguments);
                 MethodCallExpression updatedCall = node.Update(instance, arguments);
                 MethodCallSignature signature = MethodCallSignature.Create(updatedCall);
 

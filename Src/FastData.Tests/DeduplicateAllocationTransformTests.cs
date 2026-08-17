@@ -21,7 +21,10 @@ public class DeduplicateAllocationTransformTests
 
         DeduplicateAllocationTransform transform = new DeduplicateAllocationTransform();
         object state = transform.CreateState();
-        AnnotatedExpr[] transformed = expressions.SelectMany(x => transform.Transform(x, state)).ToArray();
+        List<AnnotatedExpr> transformed = new List<AnnotatedExpr>();
+
+        foreach (AnnotatedExpr expression in expressions)
+            transform.Transform(expression, state, transformed);
 
         Assert.Single(transformed);
         Assert.Same(expressions[0].Expression, transformed[0].Expression);
@@ -34,7 +37,8 @@ public class DeduplicateAllocationTransformTests
         AnnotatedExpr expression = AnnotatedExpr.Allocation(Expression.Assign(length, Expression.Variable(typeof(int), "length")));
 
         DeduplicateAllocationTransform transform = new DeduplicateAllocationTransform();
-        AnnotatedExpr[] transformed = transform.Transform(expression, transform.CreateState()).ToArray();
+        List<AnnotatedExpr> transformed = new List<AnnotatedExpr>();
+        transform.Transform(expression, transform.CreateState(), transformed);
 
         Assert.Empty(transformed);
     }

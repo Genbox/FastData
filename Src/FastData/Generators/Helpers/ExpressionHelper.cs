@@ -25,31 +25,22 @@ public static class ExpressionHelper
     public static IEnumerable<AnnotatedExpr> Transform(ICollection<AnnotatedExpr> expressions, ICollection<IExprTransform> transforms)
     {
         if (transforms.Count == 0)
-        {
-            foreach (AnnotatedExpr expression in expressions)
-                yield return expression;
-
-            yield break;
-        }
+            return expressions;
 
         // Apply transforms sequentially so each stage sees the previous output.
-        IEnumerable<AnnotatedExpr> current = expressions;
+        ICollection<AnnotatedExpr> current = expressions;
 
         foreach (IExprTransform trans in transforms)
         {
             object state = trans.CreateState();
-            List<AnnotatedExpr> next = new List<AnnotatedExpr>();
+            List<AnnotatedExpr> next = new List<AnnotatedExpr>(current.Count + 8);
 
             foreach (AnnotatedExpr expr in current)
-            {
-                foreach (AnnotatedExpr newExpr in trans.Transform(expr, state))
-                    next.Add(newExpr);
-            }
+                trans.Transform(expr, state, next);
 
             current = next;
         }
 
-        foreach (AnnotatedExpr expr in current)
-            yield return expr;
+        return current;
     }
 }

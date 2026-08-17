@@ -14,16 +14,16 @@ public sealed class DeduplicateAllocationTransform : IExprTransform
 {
     public object CreateState() => new DeduplicateAllocationState();
 
-    public IEnumerable<AnnotatedExpr> Transform(AnnotatedExpr expr, object state)
+    public void Transform(AnnotatedExpr expr, object state, List<AnnotatedExpr> output)
     {
         if (expr.Kind != ExprKind.Assignment || expr.Expression is not BinaryExpression { NodeType: ExpressionType.Assign } assignment)
         {
-            yield return expr;
-            yield break;
+            output.Add(expr);
+            return;
         }
 
         if (IsSelfAssignment(assignment))
-            yield break;
+            return;
 
         // Only method-call allocations are deduplicated. Other assignments can have side effects or carry values that are
         // not safely comparable by the call signature rules below.
@@ -33,10 +33,10 @@ public sealed class DeduplicateAllocationTransform : IExprTransform
             MethodCallSignature signature = MethodCallSignature.Create(call);
 
             if (!dedupeState.Seen.Add(signature))
-                yield break;
+                return;
         }
 
-        yield return expr;
+        output.Add(expr);
     }
 
     private static bool IsSelfAssignment(BinaryExpression assignment)

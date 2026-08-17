@@ -5,5 +5,5 @@ namespace Genbox.FastData.Generators.Abstracts;
 public interface IExprTransform
 {
     object CreateState();
-    IEnumerable<AnnotatedExpr> Transform(AnnotatedExpr expr, object state);
+    void Transform(AnnotatedExpr expr, object state, List<AnnotatedExpr> output);
 }
