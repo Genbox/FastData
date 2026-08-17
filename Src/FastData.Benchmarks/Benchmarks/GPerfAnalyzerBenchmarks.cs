@@ -22,7 +22,7 @@ public class GPerfAnalyzerBenchmarks
         _data = Enumerable.Range(1, 100).Select(_ => TestHelper.GenerateRandomString(rng, 50)).ToArray();
 
         _props = KeyAnalyzer.GetStringProperties(_data, false, GeneratorEncoding.AsciiBytes);
-        _simulator = new Simulator(_data.Length, GeneratorEncoding.AsciiBytes);
+        _simulator = new Simulator(_data, GeneratorEncoding.AsciiBytes);
     }
 
     [Benchmark]

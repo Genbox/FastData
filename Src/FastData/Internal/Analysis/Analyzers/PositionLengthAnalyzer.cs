@@ -19,25 +19,25 @@ internal sealed class PositionLengthAnalyzer(StringKeyProperties props, Position
         List<Candidate> candidates = new List<Candidate>(7);
 
         if (lengthUseful)
-            candidates.Add(sim.Run(data, Create([], true)));
+            candidates.Add(sim.Run(Create([], true)));
 
         if (firstCharUseful)
-            candidates.Add(sim.Run(data, Create([0], false)));
+            candidates.Add(sim.Run(Create([0], false)));
 
         if (firstCharUseful && lengthUseful)
-            candidates.Add(sim.Run(data, Create([0], true)));
+            candidates.Add(sim.Run(Create([0], true)));
 
         if (lastCharUseful && lastCharDistinct)
-            candidates.Add(sim.Run(data, Create([-1], false)));
+            candidates.Add(sim.Run(Create([-1], false)));
 
         if (lastCharUseful && lastCharDistinct && lengthUseful)
-            candidates.Add(sim.Run(data, Create([-1], true)));
+            candidates.Add(sim.Run(Create([-1], true)));
 
         if (firstCharUseful && lastCharUseful && lastCharDistinct)
-            candidates.Add(sim.Run(data, Create([0, -1], false)));
+            candidates.Add(sim.Run(Create([0, -1], false)));
 
         if (firstCharUseful && lastCharUseful && lastCharDistinct && lengthUseful)
-            candidates.Add(sim.Run(data, Create([0, -1], true)));
+            candidates.Add(sim.Run(Create([0, -1], true)));
 
         return candidates;
     }

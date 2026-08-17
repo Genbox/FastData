@@ -74,7 +74,7 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
                         foreach (ArraySegment segment in segments)
                         {
                             BruteForceStringHash spec = new BruteForceStringHash(segment, mixer, avalanche, sim.UnitSize) { IgnoreCase = ignoreCase };
-                            Candidate current = sim.Run(data, spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));
+                            Candidate current = sim.Run(spec, expression => FitnessHelper.CalculateFitness(props, spec.Segment, expression));
 
                             // A perfect candidate can score lower than a simple non-perfect one, so keep it outside the heap too.
                             if (current.Collisions == 0 && (bestPerfect == null || current.Fitness > bestPerfect.Fitness))

@@ -16,14 +16,14 @@ internal static class HashBenchmark
 {
     internal static Candidate GetBestHash(ReadOnlySpan<string> data, StringKeyProperties props, StringAnalyzerConfig cfg, ILoggerFactory factory, GeneratorEncoding encoding, bool includeDefault, bool ignoreCase = false)
     {
-        Simulator sim = new Simulator(data.Length, encoding);
+        Simulator sim = new Simulator(data, encoding);
 
         //Run each of the analyzers
         List<Candidate> candidates = new List<Candidate>(16);
 
         //Add the default hash as a candidate when requested
         if (includeDefault)
-            candidates.Add(sim.Run(data, DefaultStringHash.GetInstance(encoding, ignoreCase)));
+            candidates.Add(sim.Run(DefaultStringHash.GetInstance(encoding, ignoreCase)));
 
         if (cfg.PositionLengthAnalyzerConfig != null)
         {

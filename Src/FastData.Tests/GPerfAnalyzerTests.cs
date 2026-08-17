@@ -421,7 +421,7 @@ public class GPerfAnalyzerTests
     {
         string[] data = GetSmtpHeaderFields();
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, true, GeneratorEncoding.AsciiBytes);
-        Simulator sim = new Simulator(data.Length, GeneratorEncoding.AsciiBytes);
+        Simulator sim = new Simulator(data, GeneratorEncoding.AsciiBytes);
         GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), sim, NullLogger<GPerfAnalyzer>.Instance, GeneratorEncoding.AsciiBytes, true);
 
         Assert.True(analyzer.IsAppropriate());
@@ -444,7 +444,7 @@ public class GPerfAnalyzerTests
         static void AssertAppropriate(string[] data, bool ignoreCase, GeneratorEncoding encoding, GPerfAnalyzerConfig config)
         {
             StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, ignoreCase, encoding);
-            Simulator sim = new Simulator(data.Length, encoding);
+            Simulator sim = new Simulator(data, encoding);
             GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, config, sim, NullLogger<GPerfAnalyzer>.Instance, encoding, ignoreCase);
 
             Assert.True(analyzer.IsAppropriate());
@@ -453,7 +453,7 @@ public class GPerfAnalyzerTests
         static void AssertInappropriate(string[] data, bool ignoreCase, GeneratorEncoding encoding)
         {
             StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, ignoreCase, encoding);
-            Simulator sim = new Simulator(data.Length, encoding);
+            Simulator sim = new Simulator(data, encoding);
             GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, new GPerfAnalyzerConfig(), sim, NullLogger<GPerfAnalyzer>.Instance, encoding, ignoreCase);
 
             Assert.False(analyzer.IsAppropriate());
@@ -466,7 +466,7 @@ public class GPerfAnalyzerTests
         string[] data = ["\u00e9a", "\u00e9b"];
         GPerfAnalyzerConfig config = new GPerfAnalyzerConfig { SevenBit = true };
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, false, GeneratorEncoding.Utf8Bytes);
-        Simulator sim = new Simulator(data.Length, GeneratorEncoding.Utf8Bytes);
+        Simulator sim = new Simulator(data, GeneratorEncoding.Utf8Bytes);
         GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, config, sim, NullLogger<GPerfAnalyzer>.Instance, GeneratorEncoding.Utf8Bytes, false);
 
         Assert.True(analyzer.IsAppropriate());
@@ -476,7 +476,7 @@ public class GPerfAnalyzerTests
     private static Candidate GetCandidate(string[] data, bool ignoreCase, GeneratorEncoding encoding = GeneratorEncoding.AsciiBytes, GPerfAnalyzerConfig? config = null)
     {
         StringKeyProperties props = KeyAnalyzer.GetStringProperties(data, ignoreCase, encoding);
-        Simulator sim = new Simulator(data.Length, encoding);
+        Simulator sim = new Simulator(data, encoding);
         GPerfAnalyzer analyzer = new GPerfAnalyzer(data.Length, props, config ?? new GPerfAnalyzerConfig(), sim, NullLogger<GPerfAnalyzer>.Instance, encoding, ignoreCase);
 
         Assert.True(analyzer.IsAppropriate());

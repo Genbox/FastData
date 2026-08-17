@@ -134,7 +134,7 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
         GeneticStringHash spec = CopyGenes(ref entity);
 
         //Run the simulation
-        Candidate candidate = sim.Run(data, spec, () => FitnessHelper.CalculateFitness(props, spec.Segment, spec.GetExpression()));
+        Candidate candidate = sim.Run(spec, expression => FitnessHelper.CalculateFitness(props, spec.Segment, expression));
 
         //Copy over the fitness value
         entity.Fitness = candidate.Fitness;

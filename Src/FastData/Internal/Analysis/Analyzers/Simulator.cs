@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Abstracts;
@@ -5,23 +6,36 @@ using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
 
-internal sealed class Simulator(int length, GeneratorEncoding encoding, int capacityFactor = 1)
+internal sealed class Simulator
 {
-    private readonly int _capacity = length * capacityFactor;
-    private readonly Func<string, byte[]> _getBytes = StringHelper.GetBytesFunc(encoding);
-    private readonly NoEqualityEmulator _set = new NoEqualityEmulator((uint)(length * capacityFactor));
+    private readonly int _capacity;
+    private readonly byte[][] _data;
+    private readonly NoEqualityEmulator _set;
 
-    internal int UnitSize { get; } = StringHelper.GetSize(encoding);
-
-    internal Candidate Run(ReadOnlySpan<string> data, IStringHash stringHash, Func<double>? extraFitness = null)
+    internal Simulator(ReadOnlySpan<string> data, GeneratorEncoding encoding, int capacityFactor = 1)
     {
-        _set.SetHash(stringHash.GetExpression().Compile());
+        _capacity = data.Length * capacityFactor;
+        _set = new NoEqualityEmulator((uint)_capacity);
+        UnitSize = StringHelper.GetSize(encoding);
+
+        Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(encoding);
+        _data = new byte[data.Length][];
+
+        for (int i = 0; i < data.Length; i++)
+            _data[i] = getBytes(data[i]);
+    }
+
+    internal int UnitSize { get; }
+    internal byte[][] EncodedData => _data;
+
+    internal Candidate Run(IStringHash stringHash, Func<Expression, double>? extraFitness = null)
+    {
+        Expression<StringHashFunc> expression = stringHash.GetExpression();
+        _set.SetHash(expression.Compile());
 
         int collisions = 0;
-        foreach (string str in data)
+        foreach (byte[] bytes in _data)
         {
-            byte[] bytes = _getBytes(str);
-
             if (!_set.Add(bytes))
                 collisions++;
         }
@@ -31,7 +45,7 @@ internal sealed class Simulator(int length, GeneratorEncoding encoding, int capa
         double fitness = (_capacity - collisions) / (double)_capacity;
 
         if (extraFitness != null)
-            fitness = (fitness + extraFitness()) * 0.5;
+            fitness = (fitness + extraFitness(expression)) * 0.5;
 
         return new Candidate(stringHash, fitness, collisions);
     }

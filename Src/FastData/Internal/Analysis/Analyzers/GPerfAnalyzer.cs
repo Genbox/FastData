@@ -7,7 +7,6 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Helpers;
 using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers;
@@ -72,16 +71,17 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
         if (_props.LengthData.MinByteLength == 0)
             return [];
 
-        Func<string, byte[]> getBytes = StringHelper.GetBytesFunc(_encoding);
-
         int minLen = int.MaxValue;
         int maxLen = 0;
 
         List<Keyword> keywords = new List<Keyword>(data.Length);
 
-        foreach (string s in data)
+        byte[][] encodedData = _sim.EncodedData;
+        Debug.Assert(encodedData.Length == data.Length);
+        for (int i = 0; i < data.Length; i++)
         {
-            byte[] bytes = getBytes(s);
+            string s = data[i];
+            byte[] bytes = encodedData[i];
 
             if (bytes.Length == 0)
                 return [];
@@ -184,7 +184,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
         // We convert keywords to KeyValuePair to keep Keyword internal
         GPerfStringHash stringHash = new GPerfStringHash(table.Values, alphaInc, positions.Descending, minLen, _hashIncludesLength, _encoding, _options.SevenBit, _props.LengthData.LengthRanges.Min);
 
-        Candidate candidate = _sim.Run(data, stringHash);
+        Candidate candidate = _sim.Run(stringHash);
         LogCandidate(_logger, candidate.Fitness, candidate.Collisions);
 
         return [candidate];

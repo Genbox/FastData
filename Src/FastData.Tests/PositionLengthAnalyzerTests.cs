@@ -107,7 +107,7 @@ public class PositionLengthAnalyzerTests
     private static PositionLengthStringHash[] GetHashes(PositionLengthAnalyzerConfig config, string[] data)
     {
         StringKeyProperties props = GetStringProperties(data, false, GeneratorEncoding.AsciiBytes);
-        Simulator sim = new Simulator(data.Length, GeneratorEncoding.AsciiBytes);
+        Simulator sim = new Simulator(data, GeneratorEncoding.AsciiBytes);
         PositionLengthAnalyzer analyzer = new PositionLengthAnalyzer(props, config, sim);
 
         Assert.True(analyzer.IsAppropriate());
