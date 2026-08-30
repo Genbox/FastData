@@ -12,7 +12,7 @@ internal sealed class CSharpBootstrap : BootstrapBase
     // running MSBuild and restore for every file-based app.
     private const string TestCommand = "rsp=/tmp/fastdata-csharp-refs.rsp; " +
                                        "if [ ! -f \"$rsp\" ]; then find /usr/share/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.9/ref/net10.0 -maxdepth 1 -name '*.dll' -printf '-r:%p\\n' > \"$rsp\"; fi; " +
-                                       "dotnet /usr/share/dotnet/sdk/10.0.301/Roslyn/bincore/csc.dll -shared -nologo -noconfig -nostdlib+ -debug- -optimize- -langversion:latest -target:exe -out:/tmp/{1}.dll @\"$rsp\" {0} && " +
+                                       "dotnet /usr/share/dotnet/sdk/10.0.301/Roslyn/bincore/csc.dll -shared -nologo -noconfig -nostdlib+ -debug- -optimize- -langversion:latest -target:exe -out:/tmp/{1}.dll @\"$rsp\" {0} || exit 2; " +
                                        "dotnet exec --runtimeconfig /usr/share/dotnet/sdk/10.0.301/Roslyn/bincore/csc.runtimeconfig.json /tmp/{1}.dll";
 
     // Benchmarks pin exact image digests so compiler/runtime updates do not silently change results.

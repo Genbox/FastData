@@ -39,8 +39,8 @@ internal abstract class HarnessBase(BootstrapBase bootstrap, DockerManager docke
 
         ProcessResult res = await dockerManager.RunInContainerAsync(BootstrapInstance.DockerImage, BootstrapInstance.RootDir, command, cancellationToken).ConfigureAwait(false);
 
-        if (res.ExitCode != 0 && HasError(res.StandardError))
-            throw new InvalidOperationException($"Failed to compile or run. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
+        if (res.ExitCode != 0 && (res.ExitCode != 1 || HasError(res.StandardError)))
+            throw new InvalidOperationException($"Failed to compile or run. Exit code: {res.ExitCode}\nSTDOUT:\n{res.StandardOutput}\nSTDERR:\n{res.StandardError}");
 
         if (cacheEnabled && res.ExitCode == 1)
             await File.WriteAllTextAsync(hashFile, programHash, cancellationToken).ConfigureAwait(false);
