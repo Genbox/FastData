@@ -3,7 +3,7 @@ using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.TestHarness.Runner.Code.Theory;
 
-public sealed class KeyValueVectors : TheoryData<ITestVector>
+public sealed class KeyValueVectors : TheoryData<object>
 {
     public KeyValueVectors()
     {

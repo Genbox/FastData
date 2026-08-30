@@ -8,7 +8,7 @@ using Genbox.FastData.Internal.Analysis.Data;
 
 namespace Genbox.FastData.Internal.Structures;
 
-public sealed class RangeStructure<TKey, TValue> : IStructure<TKey, TValue, RangeContext<TKey>>
+internal sealed class RangeStructure<TKey, TValue> : IStructure<TKey, TValue, RangeContext<TKey>>
 {
     private readonly (TKey Start, TKey End)[] _ranges;
 

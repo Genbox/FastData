@@ -4,12 +4,18 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generators.EarlyExits.Abstracts;
 
+/// <summary>Provides a base for early exits that reject ASCII units absent from a two-word bitmap.</summary>
+/// <param name="Low">The bitmap for unit values from 0 through 63.</param>
+/// <param name="High">The bitmap for unit values from 64 through 127.</param>
 public abstract record UnitBitmapEarlyExitBase(ulong Low, ulong High) : IEarlyExit
 {
+    /// <inheritdoc />
     public abstract Expression GetExpression(ParameterExpression key);
 
+    /// <inheritdoc />
     public bool IsWorseThan(IEarlyExit other) => false;
 
+    /// <inheritdoc />
     public ulong KeyspaceSize
     {
         get
@@ -20,6 +26,9 @@ public abstract record UnitBitmapEarlyExitBase(ulong Low, ulong High) : IEarlyEx
         }
     }
 
+    /// <summary>Builds an expression that tests whether a unit is absent from the bitmap.</summary>
+    /// <param name="charCall">The expression that produces the unit value.</param>
+    /// <returns>An expression that is <see langword="true" /> when the unit is absent.</returns>
     protected Expression BuildBitmapExpression(Expression charCall)
     {
         Expression valueExpr = Convert(charCall, typeof(uint));

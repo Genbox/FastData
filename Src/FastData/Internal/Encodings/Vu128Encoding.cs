@@ -32,6 +32,30 @@ internal sealed class Vu128Encoding : IIntegerEncoding
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int GetEncodedLength(uint value)
+    {
+        switch (value)
+        {
+            case < 0x80:
+                return 1;
+            case < 0x4000:
+                return 2;
+            case < 0x200000:
+                return 3;
+            case < 0x10000000:
+                return 4;
+        }
+
+        return MaxUInt32EncodedLength;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int GetEncodedLength(float value) => GetEncodedLength(ReverseEndianness(ReadUnaligned<uint>(ref As<float, byte>(ref value))));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int GetEncodedLength(double value) => GetEncodedLength(ReverseEndianness(ReadUnaligned<ulong>(ref As<double, byte>(ref value))));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Encode(ulong value, Span<byte> destination)
     {
         unchecked
@@ -77,6 +101,56 @@ internal sealed class Vu128Encoding : IIntegerEncoding
             return len + 2;
         }
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Encode(uint value, Span<byte> destination)
+    {
+        unchecked
+        {
+            if (value < 0x80)
+            {
+                destination[0] = (byte)value;
+                return 1;
+            }
+
+            if (value < 0x10000000)
+            {
+                if (value < 0x00004000)
+                {
+                    value <<= 2;
+                    destination[0] = (byte)(0x80 | ((byte)value >> 2));
+                    destination[1] = (byte)(value >> 8);
+                    return 2;
+                }
+
+                if (value < 0x00200000)
+                {
+                    value <<= 3;
+                    destination[0] = (byte)(0xc0 | ((byte)value >> 3));
+                    destination[1] = (byte)(value >> 8);
+                    destination[2] = (byte)(value >> 16);
+                    return 3;
+                }
+
+                value <<= 4;
+                destination[0] = (byte)(0xe0 | ((byte)value >> 4));
+                destination[1] = (byte)(value >> 8);
+                destination[2] = (byte)(value >> 16);
+                destination[3] = (byte)(value >> 24);
+                return 4;
+            }
+
+            destination[0] = 0xf3;
+            WriteUInt32LittleEndian(destination.Slice(1), value);
+            return MaxUInt32EncodedLength;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Encode(float value, Span<byte> destination) => Encode(ReverseEndianness(ReadUnaligned<uint>(ref As<float, byte>(ref value))), destination);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Encode(double value, Span<byte> destination) => Encode(ReverseEndianness(ReadUnaligned<ulong>(ref As<double, byte>(ref value))), destination);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryDecode(ReadOnlySpan<byte> source, out ulong value, out int bytesRead)
@@ -138,80 +212,6 @@ internal sealed class Vu128Encoding : IIntegerEncoding
         bytesRead = length;
         return true;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetEncodedLength(uint value)
-    {
-        switch (value)
-        {
-            case < 0x80:
-                return 1;
-            case < 0x4000:
-                return 2;
-            case < 0x200000:
-                return 3;
-            case < 0x10000000:
-                return 4;
-        }
-
-        return MaxUInt32EncodedLength;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetEncodedLength(float value) => GetEncodedLength(ReverseEndianness(ReadUnaligned<uint>(ref As<float, byte>(ref value))));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetEncodedLength(double value) => GetEncodedLength(ReverseEndianness(ReadUnaligned<ulong>(ref As<double, byte>(ref value))));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Encode(uint value, Span<byte> destination)
-    {
-        unchecked
-        {
-            if (value < 0x80)
-            {
-                destination[0] = (byte)value;
-                return 1;
-            }
-
-            if (value < 0x10000000)
-            {
-                if (value < 0x00004000)
-                {
-                    value <<= 2;
-                    destination[0] = (byte)(0x80 | ((byte)value >> 2));
-                    destination[1] = (byte)(value >> 8);
-                    return 2;
-                }
-
-                if (value < 0x00200000)
-                {
-                    value <<= 3;
-                    destination[0] = (byte)(0xc0 | ((byte)value >> 3));
-                    destination[1] = (byte)(value >> 8);
-                    destination[2] = (byte)(value >> 16);
-                    return 3;
-                }
-
-                value <<= 4;
-                destination[0] = (byte)(0xe0 | ((byte)value >> 4));
-                destination[1] = (byte)(value >> 8);
-                destination[2] = (byte)(value >> 16);
-                destination[3] = (byte)(value >> 24);
-                return 4;
-            }
-
-            destination[0] = 0xf3;
-            WriteUInt32LittleEndian(destination.Slice(1), value);
-            return MaxUInt32EncodedLength;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Encode(float value, Span<byte> destination) => Encode(ReverseEndianness(ReadUnaligned<uint>(ref As<float, byte>(ref value))), destination);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Encode(double value, Span<byte> destination) => Encode(ReverseEndianness(ReadUnaligned<ulong>(ref As<double, byte>(ref value))), destination);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryDecode(ReadOnlySpan<byte> source, out uint value, out int bytesRead)

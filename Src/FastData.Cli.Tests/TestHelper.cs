@@ -8,7 +8,7 @@ internal static class TestHelper
 
     internal static async Task<(string Output, string Error)> RunAsync(params string[] args)
     {
-        (int _, string output, string error) = await RunWithExitCodeAsync(args);
+        (int _, string output, string error) = await RunWithExitCodeAsync(args).ConfigureAwait(false);
         return (output, error);
     }
 
@@ -19,15 +19,19 @@ internal static class TestHelper
 
         try
         {
-            await using StringWriter outputWriter = new StringWriter();
-            await using StringWriter errorWriter = new StringWriter();
+            StringWriter outputWriter = new StringWriter();
+            StringWriter errorWriter = new StringWriter();
 
-            Console.SetOut(outputWriter);
-            Console.SetError(errorWriter);
+            await using (outputWriter.ConfigureAwait(false))
+            await using (errorWriter.ConfigureAwait(false))
+            {
+                Console.SetOut(outputWriter);
+                Console.SetError(errorWriter);
 
-            int exitCode = await Program.Main(args);
+                int exitCode = await Program.Main(args).ConfigureAwait(false);
 
-            return (exitCode, outputWriter.ToString(), errorWriter.ToString());
+                return (exitCode, outputWriter.ToString(), errorWriter.ToString());
+            }
         }
         finally
         {
@@ -39,7 +43,7 @@ internal static class TestHelper
     internal static async Task<string> WriteTempFileAsync(List<string> tracker, string content, string extension = ".input")
     {
         string path = GetTempFilePath(tracker, extension);
-        await File.WriteAllTextAsync(path, content + "\n", Utf8NoBom);
+        await File.WriteAllTextAsync(path, content + "\n", Utf8NoBom, TestContext.Current.CancellationToken).ConfigureAwait(false);
         return path;
     }
 
@@ -61,8 +65,14 @@ internal static class TestHelper
                 if (File.Exists(path))
                     File.Delete(path);
             }
-            catch (IOException) {}
-            catch (UnauthorizedAccessException) {}
+            catch (IOException)
+            {
+                // Cleanup is best-effort; another process may still hold the temporary file.
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Cleanup is best-effort when the temporary file's permissions changed.
+            }
         }
     }
 }

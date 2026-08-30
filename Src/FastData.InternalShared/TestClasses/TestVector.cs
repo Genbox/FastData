@@ -3,12 +3,12 @@ using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public class TestVector<TKey, TValue>(StructureType type, TKey[] keys, TKey[] notPresent, TValue[] values, string? postfix = null) : TestVector<TKey>(type, keys, notPresent, postfix)
+internal class TestVector<TKey, TValue>(StructureType type, TKey[] keys, TKey[] notPresent, TValue[] values, string? postfix = null) : TestVector<TKey>(type, keys, notPresent, postfix)
 {
     public TValue[] Values { get; } = values;
 }
 
-public class TestVector<TKey>(StructureType type, TKey[] keys, TKey[] notPresent, string? postfix = null) : ITestVector
+internal class TestVector<TKey>(StructureType type, TKey[] keys, TKey[] notPresent, string? postfix = null) : ITestVector
 {
     private readonly TypeCode _keyType = Type.GetTypeCode(typeof(TKey));
 
@@ -23,7 +23,7 @@ public class TestVector<TKey>(StructureType type, TKey[] keys, TKey[] notPresent
     }
 
     public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(Identifier), Identifier);
-    public void Deserialize(IXunitSerializationInfo info) => Identifier = info.GetValue<string>(nameof(Identifier));
+    public void Deserialize(IXunitSerializationInfo info) => Identifier = info.GetValue<string>(nameof(Identifier)) ?? throw new InvalidOperationException("The serialized identifier is missing.");
 
     public override string ToString() => Identifier;
 }

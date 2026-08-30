@@ -12,11 +12,13 @@ namespace Genbox.FastData.TestHarness.Runner.Code.Abstracts;
 [SuppressMessage("Usage", "xUnit1039:The type argument to theory data is not compatible with the type of the corresponding test method parameter")]
 public abstract class VectorTestsBase
 {
-    protected abstract TestBase Harness { get; }
+    private protected abstract TestBase Harness { get; }
 
     [Theory]
     [ClassData(typeof(ValueVectors))]
-    public async Task ValueVectors<TKey>(TestVector<TKey> vector)
+    public Task ValueVectors(object vector) => (Task)ValueVectorsCoreAsync((dynamic)vector);
+
+    private async Task ValueVectorsCoreAsync<TKey>(TestVector<TKey> vector)
     {
         string source;
 
@@ -38,20 +40,22 @@ public abstract class VectorTestsBase
         Assert.NotEmpty(source);
 
         string id = $"{nameof(ValueVectors)}_{vector.Identifier}";
-        await VerifyVectorAsync(Harness.Name, id, source);
+        await VerifyVectorAsync(Harness.Name, id, source).ConfigureAwait(false);
         TKey[] notPresent = vector.StructureType == StructureType.BloomFilter ? [] : vector.NotPresent;
-        Assert.Equal(1, await Harness.RunContainsAsync(source, id, vector.Keys, notPresent, TestContext.Current.CancellationToken));
+        Assert.Equal(1, await Harness.RunContainsAsync(source, id, vector.Keys, notPresent, TestContext.Current.CancellationToken).ConfigureAwait(false));
 
         if (StructureCapabilityHelper.Supports(vector.StructureType, StructureCapability.Enumeration))
-            Assert.Equal(1, await Harness.RunKeysEnumerationAsync(source, id + "_keys", TestContext.Current.CancellationToken));
+            Assert.Equal(1, await Harness.RunKeysEnumerationAsync(source, id + "_keys", TestContext.Current.CancellationToken).ConfigureAwait(false));
 
         if (StructureCapabilityHelper.Supports(vector.StructureType, StructureCapability.DirectAccess))
-            Assert.Equal(1, await Harness.RunDirectAccessAsync(source, id + "_direct", TestContext.Current.CancellationToken));
+            Assert.Equal(1, await Harness.RunDirectAccessAsync(source, id + "_direct", TestContext.Current.CancellationToken).ConfigureAwait(false));
     }
 
     [Theory]
     [ClassData(typeof(KeyValueVectors))]
-    public async Task KeyValueVectors<TKey, TValue>(TestVector<TKey, TValue> vector) where TValue : notnull
+    public Task KeyValueVectors(object vector) => (Task)KeyValueVectorsCoreAsync((dynamic)vector);
+
+    private async Task KeyValueVectorsCoreAsync<TKey, TValue>(TestVector<TKey, TValue> vector) where TValue : notnull
     {
         string source;
 
@@ -73,17 +77,17 @@ public abstract class VectorTestsBase
         Assert.NotEmpty(source);
 
         string id = $"{nameof(KeyValueVectors)}_{vector.Identifier}";
-        await VerifyFeatureAsync(Harness.Name, id, source);
+        await VerifyFeatureAsync(Harness.Name, id, source).ConfigureAwait(false);
         TKey[] notPresent = vector.StructureType == StructureType.BloomFilter ? [] : vector.NotPresent;
-        Assert.Equal(1, await Harness.RunTryLookupAsync(source, id, vector.Keys, vector.Values, notPresent, TestContext.Current.CancellationToken));
+        Assert.Equal(1, await Harness.RunTryLookupAsync(source, id, vector.Keys, vector.Values, notPresent, TestContext.Current.CancellationToken).ConfigureAwait(false));
 
         if (StructureCapabilityHelper.Supports(vector.StructureType, StructureCapability.Enumeration))
         {
-            Assert.Equal(1, await Harness.RunKeysEnumerationAsync(source, id + "_keys", TestContext.Current.CancellationToken));
-            Assert.Equal(1, await Harness.RunValuesEnumerationAsync(source, id + "_values", TestContext.Current.CancellationToken));
+            Assert.Equal(1, await Harness.RunKeysEnumerationAsync(source, id + "_keys", TestContext.Current.CancellationToken).ConfigureAwait(false));
+            Assert.Equal(1, await Harness.RunValuesEnumerationAsync(source, id + "_values", TestContext.Current.CancellationToken).ConfigureAwait(false));
         }
 
         if (StructureCapabilityHelper.Supports(vector.StructureType, StructureCapability.DirectAccess))
-            Assert.Equal(1, await Harness.RunDirectAccessAsync(source, id + "_direct", TestContext.Current.CancellationToken));
+            Assert.Equal(1, await Harness.RunDirectAccessAsync(source, id + "_direct", TestContext.Current.CancellationToken).ConfigureAwait(false));
     }
 }

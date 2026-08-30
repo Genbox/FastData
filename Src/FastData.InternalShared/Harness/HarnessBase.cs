@@ -8,19 +8,21 @@ using Genbox.FastData.InternalShared.Misc;
 
 namespace Genbox.FastData.InternalShared.Harness;
 
-public abstract class HarnessBase(BootstrapBase bootstrap, DockerManager dockerManager)
+internal abstract class HarnessBase(BootstrapBase bootstrap, DockerManager dockerManager)
 {
-    public string Name => bootstrap.Name;
-    public ICodeGenerator Generator => bootstrap.Generator;
+    private protected BootstrapBase BootstrapInstance { get; } = bootstrap;
+
+    public string Name => BootstrapInstance.Name;
+    public ICodeGenerator Generator => BootstrapInstance.Generator;
 
     protected async Task<ProcessResult> RunAsync(string program, string id, bool useCache, CancellationToken cancellationToken = default)
     {
-        string fileName = id + bootstrap.Ext;
-        string fullPath = Path.Combine(bootstrap.RootDir, fileName);
+        string fileName = id + BootstrapInstance.Ext;
+        string fullPath = Path.Combine(BootstrapInstance.RootDir, fileName);
 
-        string command = string.Format(CultureInfo.InvariantCulture, bootstrap.CommandTemplate, fileName, id);
+        string command = string.Format(CultureInfo.InvariantCulture, BootstrapInstance.CommandTemplate, fileName, id);
 
-        bool cacheEnabled = bootstrap.Type == HarnessType.Test && useCache;
+        bool cacheEnabled = BootstrapInstance.Type == HarnessType.Test && useCache;
         string hashFile = string.Empty;
         string programHash = string.Empty;
 
@@ -35,7 +37,7 @@ public abstract class HarnessBase(BootstrapBase bootstrap, DockerManager dockerM
 
         await File.WriteAllTextAsync(fullPath, program, cancellationToken).ConfigureAwait(false);
 
-        ProcessResult res = await dockerManager.RunInContainerAsync(bootstrap.DockerImage, bootstrap.RootDir, command, cancellationToken).ConfigureAwait(false);
+        ProcessResult res = await dockerManager.RunInContainerAsync(BootstrapInstance.DockerImage, BootstrapInstance.RootDir, command, cancellationToken).ConfigureAwait(false);
 
         if (res.ExitCode != 0 && HasError(res.StandardError))
             throw new InvalidOperationException($"Failed to compile or run. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
@@ -48,15 +50,15 @@ public abstract class HarnessBase(BootstrapBase bootstrap, DockerManager dockerM
 
     protected async Task BuildProgramAsync(string program, string id, CancellationToken cancellationToken = default)
     {
-        string fileName = id + bootstrap.Ext;
-        string fullPath = Path.Combine(bootstrap.RootDir, fileName);
+        string fileName = id + BootstrapInstance.Ext;
+        string fullPath = Path.Combine(BootstrapInstance.RootDir, fileName);
         await File.WriteAllTextAsync(fullPath, program, cancellationToken).ConfigureAwait(false);
 
-        if (bootstrap.BuildCommandTemplate == null)
+        if (BootstrapInstance.BuildCommandTemplate == null)
             return;
 
-        string command = string.Format(CultureInfo.InvariantCulture, bootstrap.BuildCommandTemplate, fileName, id);
-        ProcessResult res = await dockerManager.RunInContainerAsync(bootstrap.DockerImage, bootstrap.RootDir, command, cancellationToken).ConfigureAwait(false);
+        string command = string.Format(CultureInfo.InvariantCulture, BootstrapInstance.BuildCommandTemplate, fileName, id);
+        ProcessResult res = await dockerManager.RunInContainerAsync(BootstrapInstance.DockerImage, BootstrapInstance.RootDir, command, cancellationToken).ConfigureAwait(false);
 
         if (res.ExitCode != 0)
             throw new InvalidOperationException($"Failed to compile benchmark. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
@@ -64,12 +66,12 @@ public abstract class HarnessBase(BootstrapBase bootstrap, DockerManager dockerM
 
     protected async Task<ProcessResult> RunProgramAsync(string id, string arguments, CancellationToken cancellationToken = default)
     {
-        if (bootstrap.RunCommandTemplate == null)
+        if (BootstrapInstance.RunCommandTemplate == null)
             throw new InvalidOperationException("The bootstrap does not define a benchmark run command.");
 
-        string fileName = id + bootstrap.Ext;
-        string command = string.Format(CultureInfo.InvariantCulture, bootstrap.RunCommandTemplate, fileName, id, arguments);
-        ProcessResult res = await dockerManager.RunInContainerAsync(bootstrap.DockerImage, bootstrap.RootDir, command, cancellationToken).ConfigureAwait(false);
+        string fileName = id + BootstrapInstance.Ext;
+        string command = string.Format(CultureInfo.InvariantCulture, BootstrapInstance.RunCommandTemplate, fileName, id, arguments);
+        ProcessResult res = await dockerManager.RunInContainerAsync(BootstrapInstance.DockerImage, BootstrapInstance.RootDir, command, cancellationToken).ConfigureAwait(false);
 
         if (res.ExitCode != 0)
             throw new InvalidOperationException($"Failed to run benchmark. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
@@ -77,7 +79,7 @@ public abstract class HarnessBase(BootstrapBase bootstrap, DockerManager dockerM
         return res;
     }
 
-    public override string ToString() => bootstrap.Name;
+    public override string ToString() => BootstrapInstance.Name;
 
     private static bool HasError(string standardError)
     {

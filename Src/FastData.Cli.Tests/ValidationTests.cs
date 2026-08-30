@@ -250,7 +250,7 @@ public sealed class ValidationTests : IDisposable
         encoding ??= new UTF8Encoding(false);
 
         string path = GetTempFilePath(_tempFiles, ".input");
-        await File.WriteAllTextAsync(path, content + "\n", encoding);
+        await File.WriteAllTextAsync(path, content + "\n", encoding, TestContext.Current.CancellationToken).ConfigureAwait(false);
         return path;
     }
 }

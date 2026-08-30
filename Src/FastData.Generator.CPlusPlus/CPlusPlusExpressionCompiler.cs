@@ -1,11 +1,19 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 namespace Genbox.FastData.Generator.CPlusPlus;
 
+/// <summary>Renders FastData expression trees as C++ source code.</summary>
+/// <param name="map">The type map used to render C++ types and values.</param>
+[SuppressMessage("Maintainability", "CA1510:Use ArgumentNullException throw helper", Justification = "The target frameworks do not consistently provide ArgumentNullException.ThrowIfNull.")]
 public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
 {
+    /// <inheritdoc />
     protected override Expression VisitMember(MemberExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Expression != null && node.Member.Name == nameof(string.Length) && node.Expression.Type == typeof(string))
         {
             Visit(node.Expression);
@@ -16,8 +24,12 @@ public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompile
         return base.VisitMember(node);
     }
 
+    /// <inheritdoc />
     protected override Expression VisitMethodCall(MethodCallExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Method.DeclaringType == typeof(string))
         {
             if (node.Method.Name == nameof(string.StartsWith))
@@ -29,11 +41,15 @@ public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompile
         return base.VisitMethodCall(node);
     }
 
+    /// <inheritdoc />
     protected override Expression VisitUnary(UnaryExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.NodeType == ExpressionType.Convert)
         {
-            Output.Append("static_cast<").Append(map.GetTypeName(node.Type)).Append(">(");
+            Output.Append("static_cast<").Append(Map.GetTypeName(node.Type)).Append(">(");
             Visit(node.Operand);
             Output.Append(")");
             return node;
@@ -52,7 +68,7 @@ public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompile
             if (node.Object is not ParameterExpression)
                 throw new NotSupportedException($"{nameof(RenderStringCompare)} requires a simple parameter receiver, but got {node.Object.NodeType}.");
 
-            int length = map.GetStringLength(literal);
+            int length = Map.GetStringLength(literal);
 
             Visit(node.Object);
             if (isPrefix)
@@ -60,7 +76,7 @@ public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompile
                 Output.Append(".compare(0, ")
                       .Append(length)
                       .Append(", ")
-                      .Append(map.GetValueLiteral(literal))
+                      .Append(Map.GetValueLiteral(literal))
                       .Append(") == 0");
             }
             else
@@ -76,7 +92,7 @@ public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompile
                       .Append(", ")
                       .Append(length)
                       .Append(", ")
-                      .Append(map.GetValueLiteral(literal))
+                      .Append(Map.GetValueLiteral(literal))
                       .Append(") == 0");
             }
 

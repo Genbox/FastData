@@ -6,7 +6,7 @@ using Genbox.FastData.InternalShared.Harness.Enums;
 
 namespace Genbox.FastData.Generator.CSharp.TestHarness;
 
-public sealed class CSharpBootstrap : BootstrapBase
+internal sealed class CSharpBootstrap : BootstrapBase
 {
     // Correctness tests compile hundreds of independent programs. Invoke Roslyn directly to avoid
     // running MSBuild and restore for every file-based app.

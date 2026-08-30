@@ -11,6 +11,9 @@ public class MinHeapTests
     [InlineData(new double[] { 1, 2, 3, 4 }, new double[] { 2, 4, 3 })] // If we insert a larger item, it should persist
     public void GenericTest(double[] input, double[] expected)
     {
+        ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(expected);
+
         MinHeap<bool> buffer = new MinHeap<bool>(expected.Length);
 
         foreach (double value in input)

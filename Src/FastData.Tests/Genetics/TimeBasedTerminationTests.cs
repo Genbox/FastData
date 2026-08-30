@@ -5,11 +5,11 @@ namespace Genbox.FastData.Tests.Genetics;
 public class TimeBasedTerminationTests
 {
     [Fact]
-    public void DoesNotExpireBeforeDuration()
+    public async Task DoesNotExpireBeforeDurationAsync()
     {
         TimeBasedTermination termination = new TimeBasedTermination(TimeSpan.FromMinutes(1));
 
-        Thread.Sleep(5);
+        await Task.Delay(5, TestContext.Current.CancellationToken);
 
         Assert.False(termination.Process(0, 0));
     }

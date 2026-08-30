@@ -5,7 +5,7 @@ using static Genbox.FastData.Generator.Helpers.FormatHelper;
 
 namespace Genbox.FastData.Generator.CSharp.TestHarness;
 
-public sealed class CSharpTest(DockerManager manager) : TestBase<CSharpBootstrap>(new CSharpBootstrap(HarnessType.Test), manager)
+internal sealed class CSharpTest(DockerManager manager) : TestBase<CSharpBootstrap>(new CSharpBootstrap(HarnessType.Test), manager)
 {
     protected override string RenderContains<TKey>(string source, TKey[] present, TKey[] notPresent) =>
         $"""

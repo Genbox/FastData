@@ -1,21 +1,33 @@
 using System.Linq.Expressions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Genbox.FastData.Generator.CSharp;
 
+/// <summary>Renders FastData expression trees as C# source code.</summary>
+/// <param name="map">The type map used to render C# types and values.</param>
+[SuppressMessage("Maintainability", "CA1510:Use ArgumentNullException throw helper", Justification = "The netstandard2.0 target does not provide ArgumentNullException.ThrowIfNull.")]
 public sealed class CSharpExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
 {
     private int _uncheckedContextDepth;
 
+    /// <inheritdoc />
     protected override Expression VisitBinary(BinaryExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (_uncheckedContextDepth == 0 && IsUncheckedBinary(node.NodeType) && IsIntegral(node.Type))
             return VisitUnchecked(node, () => base.VisitBinary(node));
 
         return base.VisitBinary(node);
     }
 
+    /// <inheritdoc />
     protected override Expression VisitBlock(BlockExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Expressions.Count == 0 ||
             node.Expressions[node.Expressions.Count - 1] is not ParameterExpression result ||
             !node.Variables.Any(variable => ReferenceEquals(variable, result)))
@@ -27,8 +39,12 @@ public sealed class CSharpExpressionCompiler(TypeMap map) : ExpressionCompiler(m
         return node;
     }
 
+    /// <inheritdoc />
     protected override Expression VisitUnary(UnaryExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (_uncheckedContextDepth == 0 && IsUncheckedUnary(node.NodeType) && IsIntegral(node.Type))
             return VisitUnchecked(node, () => base.VisitUnary(node));
 

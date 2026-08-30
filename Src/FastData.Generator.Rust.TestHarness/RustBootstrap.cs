@@ -6,7 +6,7 @@ using Genbox.FastData.InternalShared.Harness.Enums;
 
 namespace Genbox.FastData.Generator.Rust.TestHarness;
 
-public sealed class RustBootstrap : BootstrapBase
+internal sealed class RustBootstrap : BootstrapBase
 {
     // Benchmarks pin exact image digests so compiler/runtime updates do not silently change results.
     public RustBootstrap(HarnessType type) : base("Rust", ".rs", type, CreateMap(), "rust:1.96.0-bookworm@sha256:19817ead3289c8c631c73df281e18b59b172f6a31f4f563290f69cddd06c30e9", GetCommandTemplate(type), GetBuildCommandTemplate(type), GetRunCommandTemplate(type)) {}

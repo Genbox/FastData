@@ -12,10 +12,17 @@ namespace Genbox.FastData.Generators.EarlyExits;
 /// </remarks>
 public sealed class DeduplicateAllocationTransform : IExprTransform
 {
+    /// <inheritdoc />
     public object CreateState() => new DeduplicateAllocationState();
 
-    public void Transform(AnnotatedExpr expr, object state, List<AnnotatedExpr> output)
+    /// <inheritdoc />
+    public void Transform(AnnotatedExpr expr, object state, ICollection<AnnotatedExpr> output)
     {
+        if (state is not DeduplicateAllocationState dedupeState)
+            throw new ArgumentException("State must have been created by this transform.", nameof(state));
+        if (output == null)
+            throw new ArgumentNullException(nameof(output));
+
         if (expr.Kind != ExprKind.Assignment || expr.Expression is not BinaryExpression { NodeType: ExpressionType.Assign } assignment)
         {
             output.Add(expr);
@@ -29,7 +36,6 @@ public sealed class DeduplicateAllocationTransform : IExprTransform
         // not safely comparable by the call signature rules below.
         if (assignment.Right is MethodCallExpression call)
         {
-            DeduplicateAllocationState dedupeState = (DeduplicateAllocationState)state;
             MethodCallSignature signature = MethodCallSignature.Create(call);
 
             if (!dedupeState.Seen.Add(signature))

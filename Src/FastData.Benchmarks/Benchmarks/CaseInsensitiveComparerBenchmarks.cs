@@ -7,7 +7,6 @@ using System.Runtime.Intrinsics.X86;
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [SuppressMessage("ReSharper", "ConvertToConstant.Local")]
-[SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
 public class CaseInsensitiveComparerBenchmarks
 {
     private const int TargetLength = 24;
@@ -33,10 +32,12 @@ public class CaseInsensitiveComparerBenchmarks
         240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254,
         255
     ];
-    private string _myString = "ThisIsMyStringWithCasing";
-    private string _target = "thisismystringwithcasing";
+    private readonly string _myString = "ThisIsMyStringWithCasing";
+    private readonly string _target = "thisismystringwithcasing";
 
+#pragma warning disable CA1862, SS049 // This benchmark intentionally measures the allocation cost of normalizing a key.
     [Benchmark]public bool WithKeyNormalization() => _myString.ToLowerInvariant() == _target;
+#pragma warning restore CA1862, SS049
     [Benchmark]public bool WithComparer() => StringComparer.OrdinalIgnoreCase.Equals(_myString, _target);
     [Benchmark]public bool WithScalar() => WithScalar(_myString, _target);
     [Benchmark]public bool WithUnsafe() => WithUnsafe(_myString, _target);
@@ -65,6 +66,7 @@ public class CaseInsensitiveComparerBenchmarks
         return true;
     }
 
+#pragma warning disable S6640 // Unsafe string access is the implementation being measured.
     private static unsafe bool WithUnsafe(string s1, string s2)
     {
         fixed (char* p1 = s1)
@@ -90,6 +92,7 @@ public class CaseInsensitiveComparerBenchmarks
 
         return true;
     }
+#pragma warning restore S6640
 
     private static bool WithSwar(string s1, string s2)
     {
@@ -243,6 +246,7 @@ public class CaseInsensitiveComparerBenchmarks
         return Sse2.Or(value, mask);
     }
 
+#pragma warning disable S6640 // Unsafe string access is the implementation being measured.
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe bool OptimizedCaseSensitive(string s1, string s2)
     {
@@ -309,4 +313,5 @@ public class CaseInsensitiveComparerBenchmarks
             return false;
         }
     }
+#pragma warning restore S6640
 }

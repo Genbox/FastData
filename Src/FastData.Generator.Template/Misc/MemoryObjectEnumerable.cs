@@ -2,8 +2,12 @@ using System.Collections;
 
 namespace Genbox.FastData.Generator.Template.Misc;
 
+/// <summary>Enumerates a read-only memory region as boxed objects without first copying its contents.</summary>
+/// <typeparam name="T">The element type.</typeparam>
+/// <param name="memory">The memory region to enumerate.</param>
 public sealed class MemoryObjectEnumerable<T>(ReadOnlyMemory<T> memory) : IEnumerable<object>
 {
+    /// <inheritdoc />
     public IEnumerator<object> GetEnumerator() => new Enumerator(memory);
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -12,7 +16,7 @@ public sealed class MemoryObjectEnumerable<T>(ReadOnlyMemory<T> memory) : IEnume
     {
         private int _index = -1;
 
-        public object Current => memory.Span[_index];
+        public object Current => memory.Span[_index]!;
 
         object IEnumerator.Current => Current;
 

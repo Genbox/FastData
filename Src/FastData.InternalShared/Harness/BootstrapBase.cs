@@ -4,7 +4,7 @@ using Genbox.FastData.InternalShared.Harness.Enums;
 
 namespace Genbox.FastData.InternalShared.Harness;
 
-public abstract class BootstrapBase
+internal abstract class BootstrapBase
 {
     protected BootstrapBase(string name, string ext, HarnessType type, TypeMap map, string dockerImage, string commandTemplate, string? buildCommandTemplate = null, string? runCommandTemplate = null)
     {

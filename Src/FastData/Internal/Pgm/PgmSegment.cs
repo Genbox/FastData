@@ -6,7 +6,7 @@ namespace Genbox.FastData.Internal.Pgm;
 /// int which is equivalent since the value is always non-negative by construction. Slope is float,
 /// matching the reference default Floating template parameter.
 /// </remarks>
-public readonly struct PgmSegment<T> where T : notnull
+public readonly struct PgmSegment<T>
 {
     /// <summary>Gets the first key that this segment indexes.</summary>
     public T Key { get; }
@@ -17,6 +17,10 @@ public readonly struct PgmSegment<T> where T : notnull
     /// <summary>Gets the intercept of the linear model. Always non-negative by construction.</summary>
     public int Intercept { get; }
 
+    /// <summary>Initializes a PGM segment.</summary>
+    /// <param name="key">The first key indexed by the segment.</param>
+    /// <param name="slope">The slope of the linear model.</param>
+    /// <param name="intercept">The non-negative intercept of the linear model.</param>
     public PgmSegment(T key, float slope, int intercept)
     {
         Key = key;
@@ -39,6 +43,9 @@ public readonly struct PgmSegment<T> where T : notnull
         Intercept = (int)intercept;
     }
 
+    /// <summary>Estimates the position of a key.</summary>
+    /// <param name="key">The key to evaluate.</param>
+    /// <returns>The estimated position.</returns>
     public int Evaluate(T key)
     {
         unchecked
@@ -46,26 +53,26 @@ public readonly struct PgmSegment<T> where T : notnull
             double diff;
             if (typeof(T) == typeof(int))
             {
-                uint k = (uint)(int)(object)key;
-                uint s = (uint)(int)(object)Key;
+                uint k = (uint)(int)(object)key!;
+                uint s = (uint)(int)(object)Key!;
                 diff = k - s;
             }
             else if (typeof(T) == typeof(long))
             {
-                ulong k = (ulong)(long)(object)key;
-                ulong s = (ulong)(long)(object)Key;
+                ulong k = (ulong)(long)(object)key!;
+                ulong s = (ulong)(long)(object)Key!;
                 diff = k - s;
             }
             else if (typeof(T) == typeof(uint))
             {
-                uint k = (uint)(object)key;
-                uint s = (uint)(object)Key;
+                uint k = (uint)(object)key!;
+                uint s = (uint)(object)Key!;
                 diff = k - s;
             }
             else if (typeof(T) == typeof(ulong))
             {
-                ulong k = (ulong)(object)key;
-                ulong s = (ulong)(object)Key;
+                ulong k = (ulong)(object)key!;
+                ulong s = (ulong)(object)Key!;
                 diff = k - s;
             }
             else if (PgmTypeTraits<T>.IsFloatingPoint)

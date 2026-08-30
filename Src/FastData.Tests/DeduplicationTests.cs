@@ -78,7 +78,7 @@ public class DeduplicationTests
         Deduplication.DeduplicateNumericKeysInternal(keys, Array.Empty<int>(), out int uniqueCount);
 
         long[] uniqueKeys = keys.AsSpan(0, uniqueCount).ToArray();
-        Assert.Equal(uniqueKeys.OrderBy(static key => key), uniqueKeys);
+        Assert.Equal(uniqueKeys.Order(), uniqueKeys);
         Assert.Equal(uniqueKeys.Distinct(), uniqueKeys);
     }
 
@@ -103,8 +103,8 @@ public class DeduplicationTests
         Assert.Equal(4, uniqueCount);
 
         string[] uniqueKeys = keys.AsSpan(0, uniqueCount).ToArray();
-        Assert.Equal(uniqueKeys.OrderBy(static key => key, StringComparer.Ordinal), uniqueKeys);
-        Assert.Equal(uniqueKeys.Distinct(), uniqueKeys);
+        Assert.Equal(uniqueKeys.Order(StringComparer.Ordinal), uniqueKeys, StringComparer.Ordinal);
+        Assert.Equal(uniqueKeys.Distinct(StringComparer.Ordinal), uniqueKeys, StringComparer.Ordinal);
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class DeduplicationTests
 
         Assert.Equal(10, keys.Length);
         int[] uniqueKeys = keys.ToArray();
-        Assert.Equal(uniqueKeys.OrderBy(static key => key), uniqueKeys);
+        Assert.Equal(uniqueKeys.Order(), uniqueKeys);
         Assert.Equal(uniqueKeys.Distinct(), uniqueKeys);
     }
 }

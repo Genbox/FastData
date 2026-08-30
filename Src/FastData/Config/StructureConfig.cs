@@ -42,7 +42,7 @@ public class StructureConfig
     /// <param name="limit">The limit to apply when the structure is considered.</param>
     public void AppendLimit(StructureType type, ILimit limit)
     {
-        if (!_limits.TryGetValue(type, out List<ILimit> list))
+        if (!_limits.TryGetValue(type, out List<ILimit>? list))
             _limits[type] = list = new List<ILimit>();
 
         list.Add(limit);

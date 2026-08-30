@@ -18,7 +18,7 @@ namespace Genbox.FastData.Internal.Structures;
 /// reproduce the exact same mapping at query time by emitting <c>hash(key) * seed</c>.
 /// Approx reduction uses Math.BigMul (multiply-high), matching the original Hyble algorithm.
 /// </summary>
-public sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, HybleContext<TKey, TValue>>
+internal sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, HybleContext<TKey, TValue>>
 {
     private const uint MaxDisplacementBase = ushort.MaxValue - 64;
     private const uint DefaultKeysPerBucket = 5;

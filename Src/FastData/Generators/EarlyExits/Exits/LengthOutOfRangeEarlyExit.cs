@@ -8,10 +8,14 @@ namespace Genbox.FastData.Generators.EarlyExits.Exits;
 /// Rejects strings whose length falls outside the observed [Min, Max] range using a single unsigned subtraction check:
 /// <c>(uint)(Length(key) - Min) &gt; (uint)(Max - Min)</c>.
 /// </summary>
+/// <param name="Min">The inclusive minimum accepted length.</param>
+/// <param name="Max">The inclusive maximum accepted length.</param>
 public sealed record LengthOutOfRangeEarlyExit(int Min, int Max) : IEarlyExit
 {
+    /// <inheritdoc />
     public ulong KeyspaceSize => (ulong)Min + (ulong)(int.MaxValue - Max);
 
+    /// <inheritdoc />
     public Expression GetExpression(ParameterExpression key)
     {
         MethodInfo methodInfo = typeof(GeneratorFunctions).GetMethod(nameof(GeneratorFunctions.Length), [typeof(string)])!;
@@ -25,5 +29,6 @@ public sealed record LengthOutOfRangeEarlyExit(int Min, int Max) : IEarlyExit
         return GreaterThan(diff, range);
     }
 
+    /// <inheritdoc />
     public bool IsWorseThan(IEarlyExit other) => false;
 }

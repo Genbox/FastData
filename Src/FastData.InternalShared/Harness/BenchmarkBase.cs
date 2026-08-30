@@ -5,12 +5,12 @@ using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.InternalShared.Harness;
 
-public abstract class BenchmarkBase<T>(T bootstrap, DockerManager dockerManager) : BenchmarkBase(bootstrap, dockerManager) where T : BootstrapBase
+internal abstract class BenchmarkBase<T>(T bootstrap, DockerManager dockerManager) : BenchmarkBase(bootstrap, dockerManager) where T : BootstrapBase
 {
     protected T Bootstrap { get; } = bootstrap;
 }
 
-public abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager dockerManager) : HarnessBase(bootstrap, dockerManager)
+internal abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager dockerManager) : HarnessBase(bootstrap, dockerManager)
 {
     private const int MinSamplesForOutlierFiltering = 7;
     private const int MaxPilotIterations = 20;
@@ -308,7 +308,7 @@ public abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager docke
 
     private void ValidateFoundCount(ITestData data, BenchmarkResult result, long invocations)
     {
-        BenchmarkQuerySet querySet = data.GetQuerySet(bootstrap.Map);
+        BenchmarkQuerySet querySet = data.GetQuerySet(BootstrapInstance.Map);
 
         if (!querySet.ValidateFoundCount)
             return;

@@ -47,6 +47,7 @@ internal static class ConstantReduction
         return expr;
     }
 
+    [SuppressMessage("Maintainability", "MA0140:Both if and else branch have identical code", Justification = "The checked and unchecked branches intentionally differ only by overflow context, which this rule does not distinguish.")]
     internal static Expression EvaluateConstantMath(Expression expr)
     {
         // 2 + 3 -> 5
@@ -93,14 +94,14 @@ internal static class ConstantReduction
                         (decimal l, decimal r) when ceLeft.Type == typeof(decimal) => Constant(l + r, ceLeft.Type),
                         (float l, float r) when ceLeft.Type == typeof(float) => Constant(l + r, ceLeft.Type),
                         (double l, double r) when ceLeft.Type == typeof(double) => Constant(l + r, ceLeft.Type),
-                        (int l, int r) when ceLeft.Type == typeof(int) => Constant(chk ? checked(l + r) : l + r, ceLeft.Type),
-                        (long l, long r) when ceLeft.Type == typeof(long) => Constant(chk ? checked(l + r) : l + r, ceLeft.Type),
-                        (uint l, uint r) when ceLeft.Type == typeof(uint) => Constant(chk ? checked(l + r) : l + r, ceLeft.Type),
-                        (ulong l, ulong r) when ceLeft.Type == typeof(ulong) => Constant(chk ? checked(l + r) : l + r, ceLeft.Type),
-                        (short l, short r) when ceLeft.Type == typeof(short) => Constant(chk ? checked((short)(l + r)) : (short)(l + r), ceLeft.Type),
-                        (ushort l, ushort r) when ceLeft.Type == typeof(ushort) => Constant(chk ? checked((ushort)(l + r)) : (ushort)(l + r), ceLeft.Type),
-                        (sbyte l, sbyte r) when ceLeft.Type == typeof(sbyte) => Constant(chk ? checked((sbyte)(l + r)) : (sbyte)(l + r), ceLeft.Type),
-                        (byte l, byte r) when ceLeft.Type == typeof(byte) => Constant(chk ? checked((byte)(l + r)) : (byte)(l + r), ceLeft.Type),
+                        (int l, int r) when ceLeft.Type == typeof(int) => Constant(chk ? checked(l + r) : unchecked(l + r), ceLeft.Type),
+                        (long l, long r) when ceLeft.Type == typeof(long) => Constant(chk ? checked(l + r) : unchecked(l + r), ceLeft.Type),
+                        (uint l, uint r) when ceLeft.Type == typeof(uint) => Constant(chk ? checked(l + r) : unchecked(l + r), ceLeft.Type),
+                        (ulong l, ulong r) when ceLeft.Type == typeof(ulong) => Constant(chk ? checked(l + r) : unchecked(l + r), ceLeft.Type),
+                        (short l, short r) when ceLeft.Type == typeof(short) => Constant(chk ? checked((short)(l + r)) : unchecked((short)(l + r)), ceLeft.Type),
+                        (ushort l, ushort r) when ceLeft.Type == typeof(ushort) => Constant(chk ? checked((ushort)(l + r)) : unchecked((ushort)(l + r)), ceLeft.Type),
+                        (sbyte l, sbyte r) when ceLeft.Type == typeof(sbyte) => Constant(chk ? checked((sbyte)(l + r)) : unchecked((sbyte)(l + r)), ceLeft.Type),
+                        (byte l, byte r) when ceLeft.Type == typeof(byte) => Constant(chk ? checked((byte)(l + r)) : unchecked((byte)(l + r)), ceLeft.Type),
                         _ => expr
                     },
                     ExpressionType.Subtract or ExpressionType.SubtractChecked => (ceLeft.Value, ceRight.Value) switch
@@ -108,14 +109,14 @@ internal static class ConstantReduction
                         (decimal l, decimal r) when ceLeft.Type == typeof(decimal) => Constant(l - r, ceLeft.Type),
                         (float l, float r) when ceLeft.Type == typeof(float) => Constant(l - r, ceLeft.Type),
                         (double l, double r) when ceLeft.Type == typeof(double) => Constant(l - r, ceLeft.Type),
-                        (int l, int r) when ceLeft.Type == typeof(int) => Constant(chk ? checked(l - r) : l - r, ceLeft.Type),
-                        (long l, long r) when ceLeft.Type == typeof(long) => Constant(chk ? checked(l - r) : l - r, ceLeft.Type),
-                        (uint l, uint r) when ceLeft.Type == typeof(uint) => Constant(chk ? checked(l - r) : l - r, ceLeft.Type),
-                        (ulong l, ulong r) when ceLeft.Type == typeof(ulong) => Constant(chk ? checked(l - r) : l - r, ceLeft.Type),
-                        (short l, short r) when ceLeft.Type == typeof(short) => Constant(chk ? checked((short)(l - r)) : (short)(l - r), ceLeft.Type),
-                        (ushort l, ushort r) when ceLeft.Type == typeof(ushort) => Constant(chk ? checked((ushort)(l - r)) : (ushort)(l - r), ceLeft.Type),
-                        (sbyte l, sbyte r) when ceLeft.Type == typeof(sbyte) => Constant(chk ? checked((sbyte)(l - r)) : (sbyte)(l - r), ceLeft.Type),
-                        (byte l, byte r) when ceLeft.Type == typeof(byte) => Constant(chk ? checked((byte)(l - r)) : (byte)(l - r), ceLeft.Type),
+                        (int l, int r) when ceLeft.Type == typeof(int) => Constant(chk ? checked(l - r) : unchecked(l - r), ceLeft.Type),
+                        (long l, long r) when ceLeft.Type == typeof(long) => Constant(chk ? checked(l - r) : unchecked(l - r), ceLeft.Type),
+                        (uint l, uint r) when ceLeft.Type == typeof(uint) => Constant(chk ? checked(l - r) : unchecked(l - r), ceLeft.Type),
+                        (ulong l, ulong r) when ceLeft.Type == typeof(ulong) => Constant(chk ? checked(l - r) : unchecked(l - r), ceLeft.Type),
+                        (short l, short r) when ceLeft.Type == typeof(short) => Constant(chk ? checked((short)(l - r)) : unchecked((short)(l - r)), ceLeft.Type),
+                        (ushort l, ushort r) when ceLeft.Type == typeof(ushort) => Constant(chk ? checked((ushort)(l - r)) : unchecked((ushort)(l - r)), ceLeft.Type),
+                        (sbyte l, sbyte r) when ceLeft.Type == typeof(sbyte) => Constant(chk ? checked((sbyte)(l - r)) : unchecked((sbyte)(l - r)), ceLeft.Type),
+                        (byte l, byte r) when ceLeft.Type == typeof(byte) => Constant(chk ? checked((byte)(l - r)) : unchecked((byte)(l - r)), ceLeft.Type),
                         _ => expr
                     },
                     ExpressionType.Multiply or ExpressionType.MultiplyChecked => (ceLeft.Value, ceRight.Value) switch
@@ -123,14 +124,14 @@ internal static class ConstantReduction
                         (decimal l, decimal r) when ceLeft.Type == typeof(decimal) => Constant(l * r, ceLeft.Type),
                         (float l, float r) when ceLeft.Type == typeof(float) => Constant(l * r, ceLeft.Type),
                         (double l, double r) when ceLeft.Type == typeof(double) => Constant(l * r, ceLeft.Type),
-                        (int l, int r) when ceLeft.Type == typeof(int) => Constant(chk ? checked(l * r) : l * r, ceLeft.Type),
-                        (long l, long r) when ceLeft.Type == typeof(long) => Constant(chk ? checked(l * r) : l * r, ceLeft.Type),
-                        (uint l, uint r) when ceLeft.Type == typeof(uint) => Constant(chk ? checked(l * r) : l * r, ceLeft.Type),
-                        (ulong l, ulong r) when ceLeft.Type == typeof(ulong) => Constant(chk ? checked(l * r) : l * r, ceLeft.Type),
-                        (short l, short r) when ceLeft.Type == typeof(short) => Constant(chk ? checked((short)(l * r)) : (short)(l * r), ceLeft.Type),
-                        (ushort l, ushort r) when ceLeft.Type == typeof(ushort) => Constant(chk ? checked((ushort)(l * r)) : (ushort)(l * r), ceLeft.Type),
-                        (sbyte l, sbyte r) when ceLeft.Type == typeof(sbyte) => Constant(chk ? checked((sbyte)(l * r)) : (sbyte)(l * r), ceLeft.Type),
-                        (byte l, byte r) when ceLeft.Type == typeof(byte) => Constant(chk ? checked((byte)(l * r)) : (byte)(l * r), ceLeft.Type),
+                        (int l, int r) when ceLeft.Type == typeof(int) => Constant(chk ? checked(l * r) : unchecked(l * r), ceLeft.Type),
+                        (long l, long r) when ceLeft.Type == typeof(long) => Constant(chk ? checked(l * r) : unchecked(l * r), ceLeft.Type),
+                        (uint l, uint r) when ceLeft.Type == typeof(uint) => Constant(chk ? checked(l * r) : unchecked(l * r), ceLeft.Type),
+                        (ulong l, ulong r) when ceLeft.Type == typeof(ulong) => Constant(chk ? checked(l * r) : unchecked(l * r), ceLeft.Type),
+                        (short l, short r) when ceLeft.Type == typeof(short) => Constant(chk ? checked((short)(l * r)) : unchecked((short)(l * r)), ceLeft.Type),
+                        (ushort l, ushort r) when ceLeft.Type == typeof(ushort) => Constant(chk ? checked((ushort)(l * r)) : unchecked((ushort)(l * r)), ceLeft.Type),
+                        (sbyte l, sbyte r) when ceLeft.Type == typeof(sbyte) => Constant(chk ? checked((sbyte)(l * r)) : unchecked((sbyte)(l * r)), ceLeft.Type),
+                        (byte l, byte r) when ceLeft.Type == typeof(byte) => Constant(chk ? checked((byte)(l * r)) : unchecked((byte)(l * r)), ceLeft.Type),
                         _ => expr
                     },
                     ExpressionType.Divide => (ceLeft.Value, ceRight.Value) switch
@@ -177,30 +178,29 @@ internal static class ConstantReduction
         }
 
         if (nodeType == ExpressionType.Add && be.Right.NodeType == ExpressionType.Constant
-                                           && be.Left is BinaryExpression beLeft
-                                           && beLeft.NodeType == ExpressionType.Add
-                                           && be.Right is ConstantExpression right)
+                                            && be.Left is BinaryExpression beLeft
+                                            && beLeft.NodeType == ExpressionType.Add
+                                            && be.Right is ConstantExpression right
+                                            && beLeft.Method == null
+                                            && be.Method == null)
         {
-            if (beLeft.Method == null && be.Method == null)
-            {
-                if (beLeft.Left.NodeType == ExpressionType.Constant && beLeft.Left is ConstantExpression beLeftLeft && beLeftLeft.Type == right.Type)
-                    return AddConstants(beLeft.Right, beLeftLeft, right) ?? expr;
+            if (beLeft.Left.NodeType == ExpressionType.Constant && beLeft.Left is ConstantExpression addLeftConstant && addLeftConstant.Type == right.Type)
+                return AddConstants(beLeft.Right, addLeftConstant, right) ?? expr;
 
-                if (beLeft.Right.NodeType == ExpressionType.Constant && beLeft.Right is ConstantExpression beLeftRight && beLeftRight.Type == right.Type)
-                    return AddConstants(beLeft.Left, beLeftRight, right) ?? expr;
-            }
+            if (beLeft.Right.NodeType == ExpressionType.Constant && beLeft.Right is ConstantExpression addRightConstant && addRightConstant.Type == right.Type)
+                return AddConstants(beLeft.Left, addRightConstant, right) ?? expr;
         }
 
         if (nodeType == ExpressionType.Subtract && be.Right.NodeType == ExpressionType.Constant
-                                                && be.Left is BinaryExpression beLeft2
-                                                && beLeft2.NodeType == ExpressionType.Subtract
-                                                && be.Right is ConstantExpression rightSub
-                                                && beLeft2.Method == null
-                                                && be.Method == null)
-        {
-            if (beLeft2.Right.NodeType == ExpressionType.Constant && beLeft2.Right is ConstantExpression beLeftRight && beLeftRight.Type == rightSub.Type)
-                return SubtractConstants(beLeft2.Left, beLeftRight, rightSub) ?? expr;
-        }
+                                                 && be.Left is BinaryExpression beLeft2
+                                                 && beLeft2.NodeType == ExpressionType.Subtract
+                                                 && be.Right is ConstantExpression rightSub
+                                                 && beLeft2.Method == null
+                                                 && be.Method == null
+                                                 && beLeft2.Right.NodeType == ExpressionType.Constant
+                                                 && beLeft2.Right is ConstantExpression subtractRightConstant
+                                                 && subtractRightConstant.Type == rightSub.Type)
+            return SubtractConstants(beLeft2.Left, subtractRightConstant, rightSub) ?? expr;
 
         if (nodeType == ExpressionType.Multiply && be.Right.NodeType == ExpressionType.Constant
                                                 && be.Left is BinaryExpression beLeft3
@@ -209,11 +209,11 @@ internal static class ConstantReduction
                                                 && beLeft3.Method == null
                                                 && be.Method == null)
         {
-            if (beLeft3.Left.NodeType == ExpressionType.Constant && beLeft3.Left is ConstantExpression beLeftLeft && beLeftLeft.Type == rightMul.Type)
-                return MultiplyConstants(beLeft3.Right, beLeftLeft, rightMul) ?? expr;
+            if (beLeft3.Left.NodeType == ExpressionType.Constant && beLeft3.Left is ConstantExpression multiplyLeftConstant && multiplyLeftConstant.Type == rightMul.Type)
+                return MultiplyConstants(beLeft3.Right, multiplyLeftConstant, rightMul) ?? expr;
 
-            if (beLeft3.Right.NodeType == ExpressionType.Constant && beLeft3.Right is ConstantExpression beLeftRight && beLeftRight.Type == rightMul.Type)
-                return MultiplyConstants(beLeft3.Left, beLeftRight, rightMul) ?? expr;
+            if (beLeft3.Right.NodeType == ExpressionType.Constant && beLeft3.Right is ConstantExpression multiplyRightConstant && multiplyRightConstant.Type == rightMul.Type)
+                return MultiplyConstants(beLeft3.Left, multiplyRightConstant, rightMul) ?? expr;
         }
 
         if (be.Right.NodeType == ExpressionType.Constant && be.Right is ConstantExpression beRight && nodeType is ExpressionType.Add or ExpressionType.AddChecked or ExpressionType.Subtract or ExpressionType.SubtractChecked)
@@ -278,14 +278,13 @@ internal static class ConstantReduction
             }
         }
 
-        if (expr.NodeType == ExpressionType.Modulo && expr is BinaryExpression beMod)
-        {
-            if (beMod.Right.NodeType == ExpressionType.Constant && beMod.Right is ConstantExpression rConst)
-            {
-                if (IsIntegralType(rConst.Type) && IsOne(rConst))
-                    return CreateZeroConstant(beMod.Type);
-            }
-        }
+        if (expr.NodeType == ExpressionType.Modulo
+            && expr is BinaryExpression beMod
+            && beMod.Right.NodeType == ExpressionType.Constant
+            && beMod.Right is ConstantExpression rConst
+            && IsIntegralType(rConst.Type)
+            && IsOne(rConst))
+            return CreateZeroConstant(beMod.Type);
 
         return expr;
     }
@@ -423,7 +422,7 @@ internal static class ConstantReduction
         return expr;
     }
 
-    private static Expression? AddConstants(Expression expr, ConstantExpression lConst, ConstantExpression rConst)
+    private static BinaryExpression? AddConstants(Expression expr, ConstantExpression lConst, ConstantExpression rConst)
     {
         try
         {
@@ -450,7 +449,7 @@ internal static class ConstantReduction
         }
     }
 
-    private static Expression? SubtractConstants(Expression expr, ConstantExpression lConst, ConstantExpression rConst)
+    private static BinaryExpression? SubtractConstants(Expression expr, ConstantExpression lConst, ConstantExpression rConst)
     {
         try
         {
@@ -477,7 +476,7 @@ internal static class ConstantReduction
         }
     }
 
-    private static Expression? MultiplyConstants(Expression expr, ConstantExpression lConst, ConstantExpression rConst)
+    private static BinaryExpression? MultiplyConstants(Expression expr, ConstantExpression lConst, ConstantExpression rConst)
     {
         try
         {

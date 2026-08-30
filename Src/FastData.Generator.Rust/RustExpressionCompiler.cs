@@ -4,11 +4,18 @@ using Genbox.FastData.Generators;
 
 namespace Genbox.FastData.Generator.Rust;
 
+/// <summary>Renders FastData expression trees as Rust source code.</summary>
+/// <param name="map">The type map used to render Rust types and values.</param>
 [SuppressMessage("Correctness", "SS004:Implement Equals() and GetHashcode() methods for a type used in a collection.")]
+[SuppressMessage("Maintainability", "CA1510:Use ArgumentNullException throw helper", Justification = "The target frameworks do not consistently provide ArgumentNullException.ThrowIfNull.")]
 public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
 {
+    /// <inheritdoc />
     protected override void WriteVariableDeclaration(ParameterExpression v, string typeName, Expression? init)
     {
+        if (v == null)
+            throw new ArgumentNullException(nameof(v));
+
         if (init != null)
         {
             Output.Append($"let mut {v.Name}: {typeName} = ");
@@ -19,8 +26,12 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
             Output.AppendLine($"let mut {v.Name}: {typeName};");
     }
 
+    /// <inheritdoc />
     protected override Expression VisitMember(MemberExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Expression is ConstantExpression)
         {
             // Captured constant members (e.g. GPerf association values) are emitted at
@@ -40,8 +51,12 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
         return base.VisitMember(node);
     }
 
+    /// <inheritdoc />
     protected override Expression VisitIndex(IndexExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Object != null && node.Object.Type == typeof(string) && node.Indexer?.Name == "Chars")
         {
             Visit(node.Object);
@@ -61,8 +76,12 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
         return base.VisitIndex(node);
     }
 
+    /// <inheritdoc />
     protected override Expression VisitMethodCall(MethodCallExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Method.DeclaringType == typeof(string))
         {
             if (node.Method.Name == nameof(string.StartsWith))
@@ -94,8 +113,12 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
         return base.VisitMethodCall(node);
     }
 
+    /// <inheritdoc />
     protected override Expression VisitUnary(UnaryExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.NodeType == ExpressionType.Not)
         {
             Output.Append("!");
@@ -107,26 +130,34 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
         {
             Output.Append("(");
             Visit(node.Operand);
-            Output.Append(" as ").Append(map.GetTypeName(node.Type)).Append(")");
+            Output.Append(" as ").Append(Map.GetTypeName(node.Type)).Append(")");
             return node;
         }
 
         return base.VisitUnary(node);
     }
 
+    /// <inheritdoc />
     protected override Expression VisitConstant(ConstantExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Value is char ch)
         {
-            Output.Append(map.GetValueLiteral(ch));
+            Output.Append(Map.GetValueLiteral(ch));
             return node;
         }
 
         return base.VisitConstant(node);
     }
 
+    /// <inheritdoc />
     protected override Expression VisitBinary(BinaryExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.NodeType == ExpressionType.ArrayIndex)
         {
             Visit(node.Left);
@@ -208,7 +239,7 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
         {
             Output.Append('(');
             Visit(expression);
-            Output.Append(" as ").Append(map.GetTypeName(type)).Append(')');
+            Output.Append(" as ").Append(Map.GetTypeName(type)).Append(')');
             return;
         }
 
@@ -223,7 +254,7 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
             Output.Append(".").Append(methodName).Append("(");
 
             if (node.Arguments[0] is ConstantExpression constExpr && constExpr.Value is string literal)
-                Output.Append(map.GetValueLiteral(literal));
+                Output.Append(Map.GetValueLiteral(literal));
             else
                 Visit(node.Arguments[0]);
 

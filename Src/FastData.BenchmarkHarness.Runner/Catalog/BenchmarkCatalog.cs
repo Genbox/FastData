@@ -12,6 +12,8 @@ namespace Genbox.FastData.BenchmarkHarness.Runner.Catalog;
 
 internal sealed class BenchmarkCatalog
 {
+    private static readonly TimeSpan FilterMatchTimeout = TimeSpan.FromSeconds(1);
+
     private readonly Descriptor[] _descriptors =
     [
         new Descriptor("CSharp", x => new CSharpBenchmark(x)),
@@ -88,7 +90,7 @@ internal sealed class BenchmarkCatalog
     private static Regex CompileFilter(string filter)
     {
         string pattern = filter.Replace("*", ".*", StringComparison.Ordinal);
-        return new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
+        return new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled, FilterMatchTimeout);
     }
 
     private sealed record Descriptor(string Name, Func<DockerManager, BenchmarkBase> Factory);

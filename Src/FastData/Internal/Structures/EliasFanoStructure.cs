@@ -9,7 +9,7 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-public sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, EliasFanoContext>
+internal sealed class EliasFanoStructure<TKey, TValue> : IStructure<TKey, TValue, EliasFanoContext>
 {
     private readonly TKey _maxValue;
     private readonly TKey _minValue;

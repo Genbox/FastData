@@ -7,6 +7,7 @@ namespace Genbox.FastData.Generators.Contexts;
 /// <param name="bucketStarts">The array of bucket start indices. The final element is the sentinel end index.</param>
 /// <param name="entries">The array of hash table entries.</param>
 /// <param name="storeHashCode">If set to true, you should only generate a hash set that checks the value.</param>
+/// <param name="values">The values associated with the keys.</param>
 public sealed class HashTableCompactContext<TKey, TValue>(int[] bucketStarts, HashTableCompactEntry<TKey>[] entries, bool storeHashCode, ReadOnlyMemory<TValue> values) : HashTableCompactContext(bucketStarts, entries.LongLength, storeHashCode)
 {
     /// <summary>Gets the array of hash table entries.</summary>

@@ -5,7 +5,7 @@ using static Genbox.FastData.Generator.Helpers.FormatHelper;
 
 namespace Genbox.FastData.Generator.CPlusPlus.TestHarness;
 
-public sealed class CPlusPlusTest(DockerManager manager) : TestBase<CPlusPlusBootstrap>(new CPlusPlusBootstrap(HarnessType.Test), manager)
+internal sealed class CPlusPlusTest(DockerManager manager) : TestBase<CPlusPlusBootstrap>(new CPlusPlusBootstrap(HarnessType.Test), manager)
 {
     protected override string RenderContains<TKey>(string source, TKey[] present, TKey[] notPresent) =>
         $"""
@@ -37,7 +37,7 @@ public sealed class CPlusPlusTest(DockerManager manager) : TestBase<CPlusPlusBoo
          {source}
 
          {Bootstrap.Wrap($"""
-                                  const {Bootstrap.Map.GetTypeName(presentValues[0].GetType())}* res;
+                                  const {Bootstrap.Map.GetTypeName(typeof(TValue))}* res;
 
                                   {FormatList(present, x => $"""
                                                                  if (!fastdata::try_lookup({Bootstrap.Map.GetValueLiteral(x)}, res))

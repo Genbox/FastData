@@ -6,6 +6,7 @@ using Genbox.FastData.Generators.Expressions;
 
 namespace Genbox.FastData.Generators.EarlyExits;
 
+/// <summary>Reuses repeated generator helper calls by assigning their results to local variables on first use.</summary>
 public class AllocationGatherTransform : IExprTransform
 {
     /*
@@ -60,11 +61,18 @@ public class AllocationGatherTransform : IExprTransform
         }
     */
 
+    /// <inheritdoc />
     public object CreateState() => new AllocationGatherState();
 
-    public void Transform(AnnotatedExpr expr, object state, List<AnnotatedExpr> output)
+    /// <inheritdoc />
+    public void Transform(AnnotatedExpr expr, object state, ICollection<AnnotatedExpr> output)
     {
-        AllocationGatherVisitor visitor = ((AllocationGatherState)state).Visitor;
+        if (state is not AllocationGatherState gatherState)
+            throw new ArgumentException("State must have been created by this transform.", nameof(state));
+        if (output == null)
+            throw new ArgumentNullException(nameof(output));
+
+        AllocationGatherVisitor visitor = gatherState.Visitor;
         visitor.Reset();
         Expression updated = visitor.Visit(expr.Expression) ?? expr.Expression;
 
@@ -122,7 +130,7 @@ public class AllocationGatherTransform : IExprTransform
                 if (arg is ConstantExpression constant && constant.Value != null)
                 {
                     string value = constant.Value.ToString()!;
-                    baseName += value.StartsWith("-", StringComparison.Ordinal) ? "Neg" + value.Substring(1) : value;
+                    baseName += value.Length > 0 && value[0] == '-' ? "Neg" + value.TrimStart('-') : value;
                 }
             }
 

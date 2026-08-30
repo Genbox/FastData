@@ -10,7 +10,7 @@ namespace Genbox.FastData.TestHarness.Runner.Tests.CPlusPlus;
 [Collection("Docker-CPlusPlus")]
 public sealed class CPlusPlusFeatureTests(DockerCPlusPlusFixture fixture) : FeatureTestBase
 {
-    protected override TestBase Harness { get; } = new CPlusPlusTest(fixture.DockerManager);
+    private protected override TestBase Harness { get; } = new CPlusPlusTest(fixture.DockerManager);
 
     [Fact]
     public void StringKeysWithNulBytesAreRejected()

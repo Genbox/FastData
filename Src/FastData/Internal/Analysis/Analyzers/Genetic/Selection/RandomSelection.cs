@@ -6,6 +6,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 
 /// <summary>Selects parents at random</summary>
 /// <param name="avoidDuplicates">If set, there is a lower chance that duplicates will be returned</param>
+/// <param name="random">The random source used to choose parents.</param>
 internal sealed class RandomSelection(bool avoidDuplicates, IRandom random) : ISelection
 {
     public void Process(StaticArray<Entity> population, List<int> parents, int maxParents)

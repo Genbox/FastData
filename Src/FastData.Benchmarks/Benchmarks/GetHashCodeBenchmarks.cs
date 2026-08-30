@@ -21,37 +21,203 @@ public class GetHashCodeBenchmarks
 
     private const int _iterations = 1000;
 
-    [BenchmarkCategory("I8"), Benchmark(Baseline = true)]public uint I8HashCode() { uint val = 0; for (int i = 0; i < _iterations; i++) val += (uint)_i8.GetHashCode(); return val; }
-    [BenchmarkCategory("I8"), Benchmark]public ulong I8FastHash() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += (ulong)_i8; return val; }
+    [BenchmarkCategory("I8"), Benchmark(Baseline = true)]
+    public uint I8HashCode()
+    {
+        uint value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (uint)_i8.GetHashCode();
+        return value;
+    }
 
-    [BenchmarkCategory("U8"), Benchmark(Baseline = true)]public uint U8HashCode() { uint val = 0; for (int i = 0; i < _iterations; i++) val += (uint)_u8.GetHashCode(); return val; }
-    [BenchmarkCategory("U8"), Benchmark]public ulong U8FastHash() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += (ulong)_u8; return val; }
+    [BenchmarkCategory("I8"), Benchmark]
+    public ulong I8FastHash()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (ulong)_i8;
+        return value;
+    }
 
-    [BenchmarkCategory("I16"), Benchmark(Baseline = true)]public uint I16HashCode() { uint val = 0; for (int i = 0; i < _iterations; i++) val += (uint)_i16.GetHashCode(); return val; }
-    [BenchmarkCategory("I16"), Benchmark]public ulong I16FastHash() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += (ulong)_i16; return val; }
+    [BenchmarkCategory("U8"), Benchmark(Baseline = true)]
+    public uint U8HashCode()
+    {
+        uint value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (uint)_u8.GetHashCode();
+        return value;
+    }
 
-    [BenchmarkCategory("U16"), Benchmark(Baseline = true)]public uint U16HashCode() { uint val = 0; for (int i = 0; i < _iterations; i++) val += (uint)_u16.GetHashCode(); return val; }
-    [BenchmarkCategory("U16"), Benchmark]public ulong U16FastHash() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += (ulong)_u16; return val; }
+    [BenchmarkCategory("U8"), Benchmark]
+    public ulong U8FastHash()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += _u8;
+        return value;
+    }
 
-    [BenchmarkCategory("I32"), Benchmark(Baseline = true)]public uint I32HashCode() { uint val = 0; for (int i = 0; i < _iterations; i++) val += (uint)_i32.GetHashCode(); return val; }
-    [BenchmarkCategory("I32"), Benchmark]public ulong I32FastHash() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += (ulong)_i32; return val; }
+    [BenchmarkCategory("I16"), Benchmark(Baseline = true)]
+    public uint I16HashCode()
+    {
+        uint value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (uint)_i16.GetHashCode();
+        return value;
+    }
 
-    [BenchmarkCategory("U32"), Benchmark(Baseline = true)]public uint U32HashCode() { uint val = 0; for (int i = 0; i < _iterations; i++) val += (uint)_u32.GetHashCode(); return val; }
-    [BenchmarkCategory("U32"), Benchmark]public ulong U32FastHash() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += (ulong)_u32; return val; }
+    [BenchmarkCategory("I16"), Benchmark]
+    public ulong I16FastHash()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (ulong)_i16;
+        return value;
+    }
 
-    [BenchmarkCategory("I64"), Benchmark(Baseline = true)]public uint I64HashCode() { uint val = 0; for (int i = 0; i < _iterations; i++) val += (uint)_i64.GetHashCode(); return val; }
-    [BenchmarkCategory("I64"), Benchmark]public ulong I64FastHash() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += (ulong)_i64; return val; }
+    [BenchmarkCategory("U16"), Benchmark(Baseline = true)]
+    public uint U16HashCode()
+    {
+        uint value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (uint)_u16.GetHashCode();
+        return value;
+    }
 
-    [BenchmarkCategory("U64"), Benchmark(Baseline = true)]public uint U64HashCode() { uint val = 0; for (int i = 0; i < _iterations; i++) val += (uint)_u64.GetHashCode(); return val; }
-    [BenchmarkCategory("U64"), Benchmark]public ulong U64FastHash() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += (ulong)_u64; return val; }
+    [BenchmarkCategory("U16"), Benchmark]
+    public ulong U16FastHash()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += _u16;
+        return value;
+    }
 
-    [BenchmarkCategory("F32"), Benchmark(Baseline = true)]public uint F32HashCode() { uint val = 0; for (int i = 0; i < _iterations; i++) val += (uint)_f32.GetHashCode(); return val; }
-    [BenchmarkCategory("F32"), Benchmark]public ulong F32FastHash() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += HashF32(_f32); return val; }
-    [BenchmarkCategory("F32"), Benchmark]public ulong F32FastHashAlt() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += HashF32Alt(_f32); return val; }
+    [BenchmarkCategory("I32"), Benchmark(Baseline = true)]
+    public uint I32HashCode()
+    {
+        uint value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (uint)_i32.GetHashCode();
+        return value;
+    }
 
-    [BenchmarkCategory("F64"), Benchmark(Baseline = true)]public uint F64HashCode() { uint val = 0; for (int i = 0; i < _iterations; i++) val += (uint)_f64.GetHashCode(); return val; }
-    [BenchmarkCategory("F64"), Benchmark]public ulong F64FastHash() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += HashF64(_f64); return val; }
-    [BenchmarkCategory("F64"), Benchmark]public ulong F64FastHashAlt() { ulong val = 0; for (int i = 0; i < _iterations; i++) val += HashF64Alt(_f64); return val; }
+    [BenchmarkCategory("I32"), Benchmark]
+    public ulong I32FastHash()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (ulong)_i32;
+        return value;
+    }
+
+    [BenchmarkCategory("U32"), Benchmark(Baseline = true)]
+    public uint U32HashCode()
+    {
+        uint value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (uint)_u32.GetHashCode();
+        return value;
+    }
+
+    [BenchmarkCategory("U32"), Benchmark]
+    public ulong U32FastHash()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += _u32;
+        return value;
+    }
+
+    [BenchmarkCategory("I64"), Benchmark(Baseline = true)]
+    public uint I64HashCode()
+    {
+        uint value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (uint)_i64.GetHashCode();
+        return value;
+    }
+
+    [BenchmarkCategory("I64"), Benchmark]
+    public ulong I64FastHash()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (ulong)_i64;
+        return value;
+    }
+
+    [BenchmarkCategory("U64"), Benchmark(Baseline = true)]
+    public uint U64HashCode()
+    {
+        uint value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (uint)_u64.GetHashCode();
+        return value;
+    }
+
+    [BenchmarkCategory("U64"), Benchmark]
+    public ulong U64FastHash()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += _u64;
+        return value;
+    }
+
+    [BenchmarkCategory("F32"), Benchmark(Baseline = true)]
+    public uint F32HashCode()
+    {
+        uint value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (uint)_f32.GetHashCode();
+        return value;
+    }
+
+    [BenchmarkCategory("F32"), Benchmark]
+    public ulong F32FastHash()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += HashF32(_f32);
+        return value;
+    }
+
+    [BenchmarkCategory("F32"), Benchmark]
+    public ulong F32FastHashAlt()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += HashF32Alt(_f32);
+        return value;
+    }
+
+    [BenchmarkCategory("F64"), Benchmark(Baseline = true)]
+    public uint F64HashCode()
+    {
+        uint value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += (uint)_f64.GetHashCode();
+        return value;
+    }
+
+    [BenchmarkCategory("F64"), Benchmark]
+    public ulong F64FastHash()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += HashF64(_f64);
+        return value;
+    }
+
+    [BenchmarkCategory("F64"), Benchmark]
+    public ulong F64FastHashAlt()
+    {
+        ulong value = 0;
+        for (int i = 0; i < _iterations; i++)
+            value += HashF64Alt(_f64);
+        return value;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ulong HashF32(float value)

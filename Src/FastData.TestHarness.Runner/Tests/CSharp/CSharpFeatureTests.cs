@@ -10,7 +10,7 @@ namespace Genbox.FastData.TestHarness.Runner.Tests.CSharp;
 [Collection("Docker-CSharp")]
 public sealed class CSharpFeatureTests(DockerCSharpFixture fixture) : FeatureTestBase
 {
-    protected override TestBase Harness { get; } = new CSharpTest(fixture.DockerManager);
+    private protected override TestBase Harness { get; } = new CSharpTest(fixture.DockerManager);
 
     protected override ICodeGenerator GetIgnoreCaseGenerator(bool ignoreCase)
     {

@@ -121,7 +121,7 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
             Entity localEntity = entity;
             GeneticStringHash hash = CopyGenes(ref localEntity);
 
-            int collisions = (int)entity.Tag!;
+            int collisions = entity.Tag;
 
             if (heap.Add(entity.Fitness, new Candidate(hash, entity.Fitness, collisions)))
                 LogBetterCandidate(logger, entity.Fitness, collisions, ExpressionHelper.Print(hash.GetExpression()));

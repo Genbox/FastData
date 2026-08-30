@@ -1,6 +1,6 @@
 namespace Genbox.FastData.InternalShared.Harness.Enums;
 
-public enum HarnessType
+internal enum HarnessType
 {
     Unknown,
     Benchmark,

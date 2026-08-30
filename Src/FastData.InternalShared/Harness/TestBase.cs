@@ -3,12 +3,12 @@ using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.Harness;
 
-public abstract class TestBase<T>(T bootstrap, DockerManager manager) : TestBase(bootstrap, manager) where T : BootstrapBase
+internal abstract class TestBase<T>(T bootstrap, DockerManager manager) : TestBase(bootstrap, manager) where T : BootstrapBase
 {
     protected T Bootstrap { get; } = bootstrap;
 }
 
-public abstract class TestBase(BootstrapBase bootstrap, DockerManager dockerManager) : HarnessBase(bootstrap, dockerManager), IXunitSerializable
+internal abstract class TestBase(BootstrapBase bootstrap, DockerManager dockerManager) : HarnessBase(bootstrap, dockerManager), IXunitSerializable
 {
     public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(Name), Name);
     public void Deserialize(IXunitSerializationInfo info) => info.GetValue<string>(nameof(Name));

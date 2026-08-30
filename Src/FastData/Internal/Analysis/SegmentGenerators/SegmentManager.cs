@@ -47,7 +47,7 @@ internal static class SegmentManager
             yield return new BruteForceGenerator(config.BruteForceGeneratorConfig);
 
         if (config.OffsetGeneratorConfig != null)
-            yield return new OffsetGenerator(config.OffsetGeneratorConfig);
+            yield return new OffsetGenerator();
     }
 
     private sealed class SegmentComparer(StringKeyProperties props) : IComparer<ArraySegment>

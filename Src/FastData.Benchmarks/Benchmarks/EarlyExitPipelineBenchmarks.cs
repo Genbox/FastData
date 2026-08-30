@@ -36,7 +36,8 @@ public class EarlyExitPipelineBenchmarks
 
         _transforms = [new AllocationGatherTransform(), new DeduplicateAllocationTransform()];
 
-        if (ExpressionHelper.Transform(_expressions, _transforms).Count() != Count + 5)
+        int expectedCount = Count + 5;
+        if (ExpressionHelper.Transform(_expressions, _transforms).Take(expectedCount + 1).Count() != expectedCount)
             throw new InvalidOperationException("Unexpected early-exit transform output count.");
     }
 

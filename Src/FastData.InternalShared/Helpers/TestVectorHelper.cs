@@ -8,8 +8,11 @@ using Genbox.FastData.InternalShared.TestClasses;
 
 namespace Genbox.FastData.InternalShared.Helpers;
 
-public static class TestVectorHelper
+internal static class TestVectorHelper
 {
+    private static readonly int[] OddLengths = [3, 5, 7, 9];
+    private static readonly int[] EvenLengths = [2, 4, 6, 8];
+
     public static IEnumerable<ITestVector> GetKeyValueTestVectors()
     {
         // First we try with a simple value
@@ -250,8 +253,8 @@ public static class TestVectorHelper
 
         ulong lengthBitmap = (1ul << 2) | (1ul << 4) | (1ul << 6) | (1ul << 8);
         yield return CreateEarlyExitData([new LengthBitmapEarlyExit(lengthBitmap)],
-            Enumerable.Range(0, stringSize).Select(x => new string('a', new[] { 3, 5, 7, 9 }[x % 4])).ToArray(),
-            Enumerable.Range(0, stringSize).Select(x => new string('b', new[] { 2, 4, 6, 8 }[x % 4])).ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => new string('a', OddLengths[x % OddLengths.Length])).ToArray(),
+            Enumerable.Range(0, stringSize).Select(x => new string('b', EvenLengths[x % EvenLengths.Length])).ToArray(),
             GeneratorFunction.Length, "LengthBitmap");
 
         ulong charBitmapHigh = (1ul << ('a' - 64)) | (1ul << ('b' - 64)) | (1ul << ('c' - 64)) | (1ul << ('d' - 64)) | (1ul << ('e' - 64)) | (1ul << ('f' - 64));

@@ -298,7 +298,7 @@ public class IntegerEncodingTests(ITestOutputHelper output)
     [MemberData(nameof(GetKnownVectors))]
     internal void KnownVectorMatches(IIntegerEncoding encoding, ulong value, string expectedHex)
     {
-        Span<byte> buffer = stackalloc byte[encoding.MaxEncodedLength];
+        Span<byte> buffer = new byte[encoding.MaxEncodedLength];
         int length = encoding.Encode(value, buffer);
 
         Assert.Equal(expectedHex, ToHex(buffer[..length]));
@@ -311,7 +311,7 @@ public class IntegerEncodingTests(ITestOutputHelper output)
     [MemberData(nameof(GetBijou32Vectors))]
     internal void Bijou32KnownVectorMatches(uint value, string expectedHex)
     {
-        Span<byte> buffer = stackalloc byte[Bijou32Encoding.Instance.MaxEncodedLength];
+        Span<byte> buffer = new byte[Bijou32Encoding.Instance.MaxEncodedLength];
         int length = Bijou32Encoding.Instance.Encode(value, buffer);
 
         Assert.Equal(expectedHex, ToHex(buffer[..length]));
@@ -346,7 +346,7 @@ public class IntegerEncodingTests(ITestOutputHelper output)
     [Fact]
     internal void Vu128EncodeDoesNotOverwriteAfterReturnedLength()
     {
-        Span<byte> buffer = stackalloc byte[Vu128Encoding.Instance.MaxEncodedLength];
+        Span<byte> buffer = new byte[Vu128Encoding.Instance.MaxEncodedLength];
         buffer.Fill(0xcc);
 
         int length = Vu128Encoding.Instance.Encode(0x10000000UL, buffer);
@@ -374,7 +374,7 @@ public class IntegerEncodingTests(ITestOutputHelper output)
     [MemberData(nameof(GetVu128DoubleVectors))]
     internal void Vu128DoubleKnownVectorMatches(double value, string expectedHex)
     {
-        Span<byte> buffer = stackalloc byte[Vu128Encoding.Instance.MaxEncodedLength];
+        Span<byte> buffer = new byte[Vu128Encoding.Instance.MaxEncodedLength];
         int length = Vu128Encoding.Instance.Encode(value, buffer);
 
         Assert.Equal(expectedHex, ToHex(buffer[..length]));
@@ -389,7 +389,7 @@ public class IntegerEncodingTests(ITestOutputHelper output)
     {
         foreach (IIntegerEncoding encoding in Encodings)
         {
-            Span<byte> buffer = stackalloc byte[encoding.MaxEncodedLength];
+            Span<byte> buffer = new byte[encoding.MaxEncodedLength];
             foreach (ulong value in RoundTripValues)
             {
                 if (encoding == QuicEncoding.Instance && value > QuicEncoding.MaxValue)
@@ -409,7 +409,7 @@ public class IntegerEncodingTests(ITestOutputHelper output)
     {
         foreach (IIntegerEncoding encoding in Encodings)
         {
-            Span<byte> buffer = stackalloc byte[encoding.MaxEncodedLength];
+            Span<byte> buffer = new byte[encoding.MaxEncodedLength];
             ulong value = encoding == QuicEncoding.Instance ? 15_293UL : 16_384UL;
             int length = encoding.Encode(value, buffer);
 
@@ -530,7 +530,7 @@ public class IntegerEncodingTests(ITestOutputHelper output)
     {
         byte[] bytes = new byte[hex.Length / 2];
         for (int i = 0; i < bytes.Length; i++)
-            bytes[i] = byte.Parse(hex.Substring(i * 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            bytes[i] = byte.Parse(hex.AsSpan(i * 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
 
         return bytes;
     }

@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Genbox.FastData.Internal.Pgm;
 
+/// <summary>Builds optimal piecewise-linear segments for PGM indexes.</summary>
 /// <remarks>
 /// Based on the reference OptimalPiecewiseLinearModel (piecewise_linear_model.hpp).
 /// The reference uses a single C++ template parameterized on LargeSigned&lt;T&gt; with if-constexpr
@@ -12,7 +13,7 @@ namespace Genbox.FastData.Internal.Pgm;
 /// Epsilon is not defensively validated (by design).
 /// </remarks>
 [SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality")]
-internal sealed class OptimalPiecewiseLinearModel<T> where T : notnull
+internal sealed class OptimalPiecewiseLinearModel<T>
 {
     private readonly IModel _model;
 
@@ -276,7 +277,7 @@ internal sealed class OptimalPiecewiseLinearModel<T> where T : notnull
         }
 
         [StructLayout(LayoutKind.Auto)]
-        private readonly struct Slope(double dx, double dy) : IComparable<Slope>
+        private readonly struct Slope(double dx, double dy) : IComparable<Slope>, IEquatable<Slope>
         {
             public double Dx { get; } = dx;
             public double Dy { get; } = dy;
@@ -286,6 +287,18 @@ internal sealed class OptimalPiecewiseLinearModel<T> where T : notnull
                 double left = Dy * other.Dx;
                 double right = Dx * other.Dy;
                 return left.CompareTo(right);
+            }
+
+            public bool Equals(Slope other) => Dx.Equals(other.Dx) && Dy.Equals(other.Dy);
+
+            public override bool Equals(object? obj) => obj is Slope other && Equals(other);
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (Dx.GetHashCode() * 397) ^ Dy.GetHashCode();
+                }
             }
 
             public static explicit operator double(Slope s) => s.Dx == 0 ? 0 : s.Dy / s.Dx;
@@ -506,7 +519,7 @@ internal sealed class OptimalPiecewiseLinearModel<T> where T : notnull
         }
 
         [StructLayout(LayoutKind.Auto)]
-        private readonly struct Slope(Int128 dx, Int128 dy) : IComparable<Slope>
+        private readonly struct Slope(Int128 dx, Int128 dy) : IComparable<Slope>, IEquatable<Slope>
         {
             public Int128 Dx { get; } = dx;
             public Int128 Dy { get; } = dy;
@@ -516,6 +529,18 @@ internal sealed class OptimalPiecewiseLinearModel<T> where T : notnull
                 Int128 left = Dy * other.Dx;
                 Int128 right = Dx * other.Dy;
                 return left.CompareTo(right);
+            }
+
+            public bool Equals(Slope other) => Dx.Equals(other.Dx) && Dy.Equals(other.Dy);
+
+            public override bool Equals(object? obj) => obj is Slope other && Equals(other);
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (Dx.GetHashCode() * 397) ^ Dy.GetHashCode();
+                }
             }
 
             public static explicit operator double(Slope s)

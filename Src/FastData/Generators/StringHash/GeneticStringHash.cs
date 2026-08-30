@@ -10,7 +10,8 @@ using static Genbox.FastData.Generators.Helpers.ExpressionHelper;
 
 namespace Genbox.FastData.Generators.StringHash;
 
-[SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
+[SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Seeded pseudorandomness deterministically synthesizes hash expressions and is not used for security.")]
+[SuppressMessage("Security", "S2245:Using pseudorandom number generators is security-sensitive", Justification = "Seeded pseudorandomness deterministically synthesizes hash expressions and is not used for security.")]
 internal sealed record GeneticStringHash : IStringHash
 {
     // A good seed has the following properties:

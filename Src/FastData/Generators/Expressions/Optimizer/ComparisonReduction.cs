@@ -316,17 +316,11 @@ internal static class ComparisonReduction
             if (lCe.Type != rCe.Type || lCe.Value == null || rCe.Value == null)
                 return false;
 
-            if (lCe.Value is double ld && rCe.Value is double rd)
-            {
-                if (double.IsNaN(ld) || double.IsNaN(rd))
-                    return false;
-            }
+            if (lCe.Value is double ld && rCe.Value is double rd && (double.IsNaN(ld) || double.IsNaN(rd)))
+                return false;
 
-            if (lCe.Value is float lf && rCe.Value is float rf)
-            {
-                if (float.IsNaN(lf) || float.IsNaN(rf))
-                    return false;
-            }
+            if (lCe.Value is float lf && rCe.Value is float rf && (float.IsNaN(lf) || float.IsNaN(rf)))
+                return false;
 
             if (lCe.Value is IComparable lComp && rCe.Value is IComparable rComp)
             {

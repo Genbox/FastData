@@ -369,10 +369,10 @@ public class TimeComplexity
             Vector128<int> eq2 = Sse2.CompareEqual(valueVector, v2);
             Vector128<int> eq3 = Sse2.CompareEqual(valueVector, v3);
 
-            ulong eqMask = (ulong)Sse2.MoveMask(eq0.AsByte())
-                           | ((ulong)Sse2.MoveMask(eq1.AsByte()) << 16)
-                           | ((ulong)Sse2.MoveMask(eq2.AsByte()) << 32)
-                           | ((ulong)Sse2.MoveMask(eq3.AsByte()) << 48);
+            ulong eqMask = (uint)Sse2.MoveMask(eq0.AsByte())
+                           | ((ulong)(uint)Sse2.MoveMask(eq1.AsByte()) << 16)
+                           | ((ulong)(uint)Sse2.MoveMask(eq2.AsByte()) << 32)
+                           | ((ulong)(uint)Sse2.MoveMask(eq3.AsByte()) << 48);
 
             if (eqMask != 0)
                 return node;
@@ -416,8 +416,8 @@ public class TimeComplexity
 
             Vector256<int> eq0 = Avx2.CompareEqual(valueVector, v0);
             Vector256<int> eq1 = Avx2.CompareEqual(valueVector, v1);
-            ulong eqMask = (ulong)Avx2.MoveMask(eq0.AsByte())
-                           | ((ulong)Avx2.MoveMask(eq1.AsByte()) << 32);
+            ulong eqMask = (uint)Avx2.MoveMask(eq0.AsByte())
+                           | ((ulong)(uint)Avx2.MoveMask(eq1.AsByte()) << 32);
 
             if (eqMask != 0)
                 return node;

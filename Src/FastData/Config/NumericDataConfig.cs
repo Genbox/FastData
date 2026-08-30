@@ -3,6 +3,7 @@ namespace Genbox.FastData.Config;
 /// <summary>Configuration for generating numeric-key lookup structures.</summary>
 public sealed class NumericDataConfig : DataConfig
 {
+    /// <summary>Initializes a new instance with the default numeric structure settings.</summary>
     public NumericDataConfig()
     {
         StructureSettings.AddDefault(KnownSettings.HashTableCapacityFactor, 1f);

@@ -3,6 +3,7 @@ namespace Genbox.FastData.SourceGenerator.Attributes;
 /// <summary>Specifies the type of class to generate.</summary>
 public enum ClassType
 {
+    /// <summary>No class kind has been selected.</summary>
     Unknown = 0,
 
     /// <summary>It will generate a static class with static methods and properties.</summary>

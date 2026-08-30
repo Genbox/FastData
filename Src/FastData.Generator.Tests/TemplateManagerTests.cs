@@ -38,7 +38,7 @@ public class TemplateManagerTests
         const string typeName = "Genbox.FastData.TemplateCache.ReferenceTests.ReferenceEcho";
 
         manager.Render("ReferenceEcho.tt", "output", []);
-        manager.Render("ReferenceEcho.tt", "output", new Dictionary<string, object?> { { "Unused", new ReferenceMarker() } });
+        manager.Render("ReferenceEcho.tt", "output", new Dictionary<string, object?>(StringComparer.Ordinal) { { "Unused", ReferenceMarker.Value } });
 
         int loadedTemplates = AppDomain.CurrentDomain.GetAssemblies().Count(assembly => assembly.GetType(typeName, false) != null);
         Assert.Equal(2, loadedTemplates);
@@ -49,15 +49,18 @@ public class TemplateManagerTests
     {
         TemplateManager manager = new TemplateManager("ConcurrencyTests", false);
         Task<string>[] tasks = Enumerable.Range(0, 8)
-                                         .Select(index => Task.Run(() => manager.Render("Echo.tt", _template, CreateVariables(index.ToString(CultureInfo.InvariantCulture)))))
+                                         .Select(index => Task.Run(() => manager.Render("Echo.tt", _template, CreateVariables(index.ToString(CultureInfo.InvariantCulture))), TestContext.Current.CancellationToken))
                                          .ToArray();
 
         string[] results = await Task.WhenAll(tasks);
 
-        Assert.Equal(Enumerable.Range(0, 8).Select(index => index.ToString(CultureInfo.InvariantCulture)), results);
+        Assert.Equal(Enumerable.Range(0, 8).Select(index => index.ToString(CultureInfo.InvariantCulture)), results, StringComparer.Ordinal);
     }
 
-    private static Dictionary<string, object?> CreateVariables(string value) => new Dictionary<string, object?> { { "Value", value } };
+    private static Dictionary<string, object?> CreateVariables(string value) => new Dictionary<string, object?>(StringComparer.Ordinal) { { "Value", value } };
 
-    private sealed class ReferenceMarker {}
+    private enum ReferenceMarker
+    {
+        Value
+    }
 }

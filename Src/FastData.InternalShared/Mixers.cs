@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace Genbox.FastData.InternalShared;
 
-public static class Mixers
+internal static class Mixers
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ulong Murmur_64(ulong h)

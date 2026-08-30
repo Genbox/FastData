@@ -7,5 +7,5 @@ namespace Genbox.FastData.TestHarness.Runner.Tests.CPlusPlus;
 [Collection("Docker-CPlusPlus")]
 public sealed class CPlusPlusVectorTests(DockerCPlusPlusFixture fixture) : VectorTestsBase
 {
-    protected override TestBase Harness { get; } = new CPlusPlusTest(fixture.DockerManager);
+    private protected override TestBase Harness { get; } = new CPlusPlusTest(fixture.DockerManager);
 }

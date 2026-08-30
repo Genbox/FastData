@@ -13,6 +13,9 @@ public static class TypeCodeExtensions
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
 
+    /// <summary>Gets the storage width of a supported primitive type.</summary>
+    /// <param name="type">The type code to inspect.</param>
+    /// <returns>The width in bits.</returns>
     public static byte GetBitWidth(this TypeCode type) => type switch
     {
         TypeCode.SByte or TypeCode.Byte => 8,
@@ -32,6 +35,9 @@ public static class TypeCodeExtensions
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
 
+    /// <summary>Determines whether a type code represents a floating-point type.</summary>
+    /// <param name="type">The type code to inspect.</param>
+    /// <returns><see langword="true" /> for a floating-point type; otherwise, <see langword="false" />.</returns>
     public static bool IsFloatingPoint(this TypeCode type) => type switch
     {
         TypeCode.Single or TypeCode.Double => true,
@@ -49,6 +55,10 @@ public static class TypeCodeExtensions
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
 
+    /// <summary>Gets the minimum value of a supported primitive type.</summary>
+    /// <typeparam name="TKey">The primitive value type.</typeparam>
+    /// <param name="typeCode">The type code that identifies <typeparamref name="TKey" />.</param>
+    /// <returns>The minimum value.</returns>
     public static TKey GetMinValue<TKey>(this TypeCode typeCode) => typeCode switch
     {
         TypeCode.Char => (TKey)(object)char.MinValue,
@@ -65,6 +75,10 @@ public static class TypeCodeExtensions
         _ => throw new InvalidOperationException($"Unsupported numeric type: {typeof(TKey)}")
     };
 
+    /// <summary>Gets the maximum value of a supported primitive type.</summary>
+    /// <typeparam name="TKey">The primitive value type.</typeparam>
+    /// <param name="typeCode">The type code that identifies <typeparamref name="TKey" />.</param>
+    /// <returns>The maximum value.</returns>
     public static TKey GetMaxValue<TKey>(this TypeCode typeCode) => typeCode switch
     {
         TypeCode.Char => (TKey)(object)char.MaxValue,
@@ -81,6 +95,10 @@ public static class TypeCodeExtensions
         _ => throw new InvalidOperationException($"Unsupported numeric type: {typeof(TKey)}")
     };
 
+    /// <summary>Creates a converter from an unsigned integer to a supported key type.</summary>
+    /// <typeparam name="TKey">The destination key type.</typeparam>
+    /// <param name="typeCode">The type code that identifies <typeparamref name="TKey" />.</param>
+    /// <returns>The converter.</returns>
     public static Func<ulong, TKey> GetUnsignedKeyConverter<TKey>(this TypeCode typeCode) => typeCode switch
     {
         TypeCode.Byte => static value => (TKey)(object)(byte)value,
@@ -91,6 +109,10 @@ public static class TypeCodeExtensions
         _ => throw new InvalidOperationException($"Unsupported unsigned type: {typeof(TKey)}")
     };
 
+    /// <summary>Creates a converter from a signed integer to a supported key type.</summary>
+    /// <typeparam name="TKey">The destination key type.</typeparam>
+    /// <param name="typeCode">The type code that identifies <typeparamref name="TKey" />.</param>
+    /// <returns>The converter.</returns>
     public static Func<long, TKey> GetSignedKeyConverter<TKey>(this TypeCode typeCode) => typeCode switch
     {
         TypeCode.SByte => static value => (TKey)(object)(sbyte)value,
@@ -100,6 +122,10 @@ public static class TypeCodeExtensions
         _ => throw new InvalidOperationException($"Unsupported signed type: {typeof(TKey)}")
     };
 
+    /// <summary>Creates a converter from a supported key type to a signed integer.</summary>
+    /// <typeparam name="TKey">The source key type.</typeparam>
+    /// <param name="typeCode">The type code that identifies <typeparamref name="TKey" />.</param>
+    /// <returns>The converter.</returns>
     public static Func<TKey, long> GetSignedValueConverter<TKey>(this TypeCode typeCode) => typeCode switch
     {
         TypeCode.Char => static value => (char)(object)value!,
@@ -116,6 +142,10 @@ public static class TypeCodeExtensions
         _ => throw new InvalidOperationException($"Unsupported signed value type: {typeof(TKey)}")
     };
 
+    /// <summary>Creates a converter from a supported key type to an unsigned integer.</summary>
+    /// <typeparam name="TKey">The source key type.</typeparam>
+    /// <param name="typeCode">The type code that identifies <typeparamref name="TKey" />.</param>
+    /// <returns>The converter.</returns>
     public static Func<TKey, ulong> GetUnsignedValueConverter<TKey>(this TypeCode typeCode) => typeCode switch
     {
         TypeCode.Char => static value => (char)(object)value!,
@@ -132,6 +162,9 @@ public static class TypeCodeExtensions
         _ => throw new InvalidOperationException($"Unsupported unsigned value type: {typeof(TKey)}")
     };
 
+    /// <summary>Determines whether a supported primitive type is unsigned.</summary>
+    /// <param name="typeCode">The type code to inspect.</param>
+    /// <returns><see langword="true" /> for an unsigned type; otherwise, <see langword="false" />.</returns>
     public static bool IsUnsigned(this TypeCode typeCode) => typeCode switch
     {
         TypeCode.Char => true,

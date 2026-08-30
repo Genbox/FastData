@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using Genbox.FastData.Config.Analysis;
@@ -157,7 +158,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             for (int i = 0; i < alphaSize; i++)
             {
                 if (table.Occurrences[i] != 0)
-                    sb.AppendLine($"asso_values[{(char)i}] = {table.Values[i],6}, occurrences[{(char)i}] = {table.Occurrences[i],6}");
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "asso_values[{0}] = {1,6}, occurrences[{0}] = {2,6}", (char)i, table.Values[i], table.Occurrences[i]).AppendLine();
             }
 
             sb.AppendLine("end table dumping");
@@ -174,7 +175,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 field_width = Math.Max(field_width, FormatSelChars(keyword).Length);
 
             foreach (Keyword keyword in keywords)
-                sb.AppendLine($"{keyword.HashValue,11},{keyword.Length,11},{"-1",6}, {FormatSelChars(keyword).PadLeft(field_width)}, {keyword.AllChars}");
+                sb.AppendFormat(CultureInfo.InvariantCulture, "{0,11},{1,11},{2,6}, {3}, {4}", keyword.HashValue, keyword.Length, "-1", FormatSelChars(keyword).PadLeft(field_width), keyword.AllChars).AppendLine();
 
             sb.AppendLine("End dumping list.\n");
 
@@ -455,7 +456,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             return;
 
         StringBuilder sb = new StringBuilder();
-        sb.Append($"{stage} ({CountPositionDuplicates(data, map)}): ");
+        sb.AppendFormat(CultureInfo.InvariantCulture, "{0} ({1}): ", stage, CountPositionDuplicates(data, map));
         bool lastChar = false;
         bool first = true;
         foreach (int i in map.Positions)
@@ -570,7 +571,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                     {
                         if (!first)
                             sb.Append(", ");
-                        sb.Append($"{indices[j] + 1}:+{alphaInc[indices[j]]}");
+                        sb.AppendFormat(CultureInfo.InvariantCulture, "{0}:+{1}", indices[j] + 1, alphaInc[indices[j]]);
                         first = false;
                     }
                 }
@@ -882,6 +883,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
     }
 
     [SuppressMessage("Minor Code Smell", "S1450:Private fields only used as local variables in methods should become local variables")]
+    [SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Randomized search order is not security-sensitive.")]
     private sealed class AssociationTable(ILogger logger, bool hashIncludesLength, GPerfAnalyzerOptions options)
     {
         private int _maxHash;
@@ -945,9 +947,13 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             if (logger.IsEnabled(LogLevel.Trace))
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine($"total non-linked keys = {keywords.Count}" +
-                              $"\nmaximum associated value is {assoValueMax}" +
-                              $"\nmaximum size of generated hash table is {_maxHash}");
+                sb.AppendFormat(
+                      CultureInfo.InvariantCulture,
+                      "total non-linked keys = {0}\nmaximum associated value is {1}\nmaximum size of generated hash table is {2}",
+                      keywords.Count,
+                      assoValueMax,
+                      _maxHash)
+                  .AppendLine();
 
                 sb.AppendLine("\ndumping the keyword list without duplicates");
                 sb.AppendLine("keyword #, keysig, keyword");
@@ -958,7 +964,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 
                 int i = 0;
                 foreach (Keyword keyword in keywords)
-                    sb.AppendLine($"{++i,9}, {FormatSelChars(keyword).PadLeft(field_width)}, {keyword.AllChars}");
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "{0,9}, {1}, {2}", ++i, FormatSelChars(keyword).PadLeft(field_width), keyword.AllChars).AppendLine();
 
                 LogGPerfDebug(logger, sb.ToString());
             }
@@ -1021,6 +1027,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             bestAssoValues.CopyTo(Values, 0);
         }
 
+#pragma warning disable S2245 // Pseudo-randomness is intentional for non-security-sensitive association-table search.
         private Random? CreateRandom()
         {
             if (!options.Random && options.Jump != 0)
@@ -1028,6 +1035,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 
             return options.RandomSeed.HasValue ? new Random(options.RandomSeed.Value) : new Random();
         }
+#pragma warning restore S2245
 
         private static int GetInitialAssociationValueMax(int keywordCount, double sizeMultiple)
         {
@@ -1075,6 +1083,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             CollisionDetector = new BoolArray(_maxHash + 1, logger);
         }
 
+        [SuppressMessage("Performance", "MA0089:Use an overload with char instead of string", Justification = ".NET Standard 2.0 does not provide the char overload.")]
         private void FindAssoValues(List<Keyword> keywords, ref int assoValueMax, int initialAssociationValue, int jump, Random? random, int maxSelCharsLength, int alphaSize, int maxHashBase)
         {
             Array.Clear(Values, 0, Values.Length);
@@ -1186,7 +1195,14 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 for (Step? step = steps; step != null; step = step._next)
                 {
                     stepNum++;
-                    sb.AppendLine($"Step {stepNum} chooses _asso_values[{string.Join(",", step.Changing.Select(x => "'" + (char)x + "'"))}], expected number of iterations between {step.ExpectedLower:F6} and {step.ExpectedUpper:F6}.");
+                    sb.AppendFormat(
+                          CultureInfo.InvariantCulture,
+                          "Step {0} chooses _asso_values[{1}], expected number of iterations between {2:F6} and {3:F6}.",
+                          stepNum,
+                          string.Join(",", step.Changing.Select(x => "'" + (char)x + "'")),
+                          step.ExpectedLower,
+                          step.ExpectedUpper)
+                      .AppendLine();
                     sb.AppendLine("Keyword equivalence classes:");
                     for (EquivalenceClass? cls = step.Partition; cls != null; cls = cls.Next)
                     {
@@ -1279,10 +1295,13 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                         {
                             uint c = step.Changing[i];
                             iter[i]++;
-                            Values[c] = unchecked(Values[c] + jump) & (step.AssoValueMax - 1);
+                            int nextValue = unchecked(Values[c] + jump) & (step.AssoValueMax - 1);
                             if (iter[i] <= bound)
+                            {
+                                Values[c] = nextValue;
                                 goto foundNext;
-                            Values[c] = unchecked(Values[c] - (iter[i] * jump)) & (step.AssoValueMax - 1);
+                            }
+                            Values[c] = unchecked(nextValue - (iter[i] * jump)) & (step.AssoValueMax - 1);
                             iter[i] = 0;
                             i++;
                         }
@@ -1291,10 +1310,13 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                         {
                             uint c = step.Changing[i];
                             iter[i]++;
-                            Values[c] = unchecked(Values[c] + jump) & (step.AssoValueMax - 1);
+                            int nextValue = unchecked(Values[c] + jump) & (step.AssoValueMax - 1);
                             if (iter[i] < bound)
+                            {
+                                Values[c] = nextValue;
                                 goto foundNext;
-                            Values[c] = unchecked(Values[c] - (iter[i] * jump)) & (step.AssoValueMax - 1);
+                            }
+                            Values[c] = unchecked(nextValue - (iter[i] * jump)) & (step.AssoValueMax - 1);
                             iter[i] = 0;
                             i++;
                         }

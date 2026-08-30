@@ -7,5 +7,5 @@ namespace Genbox.FastData.TestHarness.Runner.Tests.CSharp;
 [Collection("Docker-CSharp")]
 public sealed class CSharpEndToEndTests(DockerCSharpFixture fixture) : EndToEndTestsBase
 {
-    protected override TestBase Harness { get; } = new CSharpTest(fixture.DockerManager);
+    private protected override TestBase Harness { get; } = new CSharpTest(fixture.DockerManager);
 }

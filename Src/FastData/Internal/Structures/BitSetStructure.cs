@@ -9,7 +9,7 @@ using Genbox.FastData.Internal.Analysis.Properties;
 
 namespace Genbox.FastData.Internal.Structures;
 
-public sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, BitSetContext<TValue>>
+internal sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, BitSetContext<TValue>>
 {
     private readonly NumericKeyProperties<TKey> _props;
 

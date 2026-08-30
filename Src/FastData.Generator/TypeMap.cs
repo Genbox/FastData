@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Abstracts;
 using Genbox.FastData.Generator.Definitions;
@@ -7,6 +9,7 @@ using Genbox.FastData.Internal.Helpers;
 namespace Genbox.FastData.Generator;
 
 /// <summary>Takes in type definitions and can then be used as a lookup table afterward.</summary>
+[SuppressMessage("Maintainability", "CA1510:Use ArgumentNullException throw helper", Justification = "The netstandard2.0 target does not provide ArgumentNullException.ThrowIfNull.")]
 public sealed class TypeMap : ITypeMap
 {
     private readonly GeneratorEncoding _encoding;
@@ -17,6 +20,9 @@ public sealed class TypeMap : ITypeMap
     /// <param name="encoding">The string encoding model used by the generator.</param>
     public TypeMap(IList<ITypeDef> typeSpecs, GeneratorEncoding encoding)
     {
+        if (typeSpecs == null)
+            throw new ArgumentNullException(nameof(typeSpecs));
+
         _encoding = encoding;
         for (int i = 0; i < typeSpecs.Count; i++)
         {

@@ -4,7 +4,7 @@ namespace Genbox.FastData.TestHarness.Runner.Tests;
 
 public sealed class DockerCSharpFixture : IAsyncDisposable
 {
-    public DockerManager DockerManager { get; } = new DockerManager("fastdata-csharp");
+    internal DockerManager DockerManager { get; } = new DockerManager("fastdata-csharp");
 
     public async ValueTask DisposeAsync()
     {
@@ -14,7 +14,7 @@ public sealed class DockerCSharpFixture : IAsyncDisposable
 
 public sealed class DockerCPlusPlusFixture : IAsyncDisposable
 {
-    public DockerManager DockerManager { get; } = new DockerManager("fastdata-cpp");
+    internal DockerManager DockerManager { get; } = new DockerManager("fastdata-cpp");
 
     public async ValueTask DisposeAsync()
     {
@@ -24,7 +24,7 @@ public sealed class DockerCPlusPlusFixture : IAsyncDisposable
 
 public sealed class DockerRustFixture : IAsyncDisposable
 {
-    public DockerManager DockerManager { get; } = new DockerManager("fastdata-rust");
+    internal DockerManager DockerManager { get; } = new DockerManager("fastdata-rust");
 
     public async ValueTask DisposeAsync()
     {

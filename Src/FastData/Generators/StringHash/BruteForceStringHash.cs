@@ -11,7 +11,7 @@ namespace Genbox.FastData.Generators.StringHash;
 
 internal sealed record BruteForceStringHash : IStringHash
 {
-    //We need this ctor when resuing the object
+    // The reuse path assigns the delegates before invoking GetExpression or ToString.
     internal BruteForceStringHash() {}
 
     internal BruteForceStringHash(ArraySegment segment, Mixer mixer, Avalanche avalanche, int unitSize = 1)
@@ -23,8 +23,8 @@ internal sealed record BruteForceStringHash : IStringHash
     }
 
     internal ArraySegment Segment { get; set; }
-    internal Mixer Mixer { get; set; }
-    internal Avalanche Avalanche { get; set; }
+    internal Mixer Mixer { get; set; } = null!;
+    internal Avalanche Avalanche { get; set; } = null!;
     internal bool IgnoreCase { get; set; }
     internal int UnitSize { get; set; } = 1;
     public AdditionalData[]? AdditionalData => null;

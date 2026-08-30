@@ -2,6 +2,8 @@
 
 #if NETSTANDARD2_0
 
+#nullable enable
+
 using System.Numerics;
 
 namespace System;

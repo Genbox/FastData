@@ -9,9 +9,13 @@ namespace Genbox.FastData.Generators.EarlyExits.Exits;
 /// <c>(Min, Max)</c> exclusive were never observed, using a single unsigned subtraction check.
 /// </summary>
 /// <remarks>Since <see cref="GeneratorFunctions.UnitAt" /> returns <see cref="uint" />, the subtraction is naturally unsigned and no cast is needed.</remarks>
+/// <param name="Min">The exclusive lower bound of the rejected range.</param>
+/// <param name="Max">The exclusive upper bound of the rejected range.</param>
+/// <param name="Offset">The start-relative index, or a negative end-relative index.</param>
 // UnitAt(inputKey, Offset) > Min && UnitAt(inputKey, Offset) < Max;
 public sealed record UnitAtInRangeEarlyExit(char Min, char Max, int Offset = 0) : IEarlyExit
 {
+    /// <inheritdoc />
     public Expression GetExpression(ParameterExpression key)
     {
         if (KeyspaceSize == 0)
@@ -26,6 +30,7 @@ public sealed record UnitAtInRangeEarlyExit(char Min, char Max, int Offset = 0) 
         return LessThanOrEqual(diff, Constant(range, typeof(uint)));
     }
 
+    /// <inheritdoc />
     public bool IsWorseThan(IEarlyExit other)
     {
         if (other is not UnitAtInRangeEarlyExit otherExit || Offset != otherExit.Offset)
@@ -37,6 +42,7 @@ public sealed record UnitAtInRangeEarlyExit(char Min, char Max, int Offset = 0) 
         return Min >= otherExit.Min && Max <= otherExit.Max;
     }
 
+    /// <inheritdoc />
     public ulong KeyspaceSize
     {
         get

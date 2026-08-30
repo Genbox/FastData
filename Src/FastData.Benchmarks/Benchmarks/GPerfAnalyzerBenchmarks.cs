@@ -32,9 +32,7 @@ public class GPerfAnalyzerBenchmarks
     {
         GPerfAnalyzer analyzer = new GPerfAnalyzer(_data.Length, _props, new GPerfAnalyzerConfig(), _simulator, NullLogger<GPerfAnalyzer>.Instance, GeneratorEncoding.AsciiBytes, IgnoreCase);
 
-        foreach (Candidate candidate in analyzer.GetCandidates(_data))
-            return candidate;
-
-        throw new InvalidOperationException("GPerfAnalyzer did not produce a candidate.");
+        return analyzer.GetCandidates(_data).FirstOrDefault()
+               ?? throw new InvalidOperationException("GPerfAnalyzer did not produce a candidate.");
     }
 }

@@ -8,11 +8,27 @@ namespace Genbox.FastData.Tests;
 
 public class KeyAnalyzerTests
 {
+    private static readonly ReadOnlyMemory<char> _consecutiveChars = new[] { 'a', 'b', 'c' };
+    private static readonly ReadOnlyMemory<char> _nonConsecutiveChars = new[] { 'a', 'c' };
+    private static readonly ReadOnlyMemory<int> _consecutiveInts = new[] { 100, 101 };
+    private static readonly ReadOnlyMemory<int> _nonConsecutiveInts = new[] { 100, 102 };
+    private static readonly ReadOnlyMemory<uint> _consecutiveUInts = new[] { 100U, 101U };
+    private static readonly ReadOnlyMemory<uint> _nonConsecutiveUInts = new[] { 100U, 102U };
+    private static readonly ReadOnlyMemory<long> _nonConsecutiveLongs = new[] { 1L, 3L, 4L };
+    private static readonly ReadOnlyMemory<ulong> _consecutiveUlongs = new[] { 1UL, 2UL, 3UL };
+    private static readonly ReadOnlyMemory<ulong> _nonConsecutiveUlongs = new[] { 1UL, 2UL, 4UL };
+    private static readonly ReadOnlyMemory<float> _nonConsecutiveSingles = new[] { 0F, 0.9F, 2F };
+    private static readonly ReadOnlyMemory<double> _nonConsecutiveDoubles = new[] { 0D, 0.9D, 2D };
+    private static readonly ReadOnlyMemory<int> _denseInts = new[] { 10, 11, 12 };
+    private static readonly ReadOnlyMemory<int> _sparseInts = new[] { 0, 100 };
+    private static readonly ReadOnlyMemory<int> _singleInt = new[] { 42 };
+    private static readonly ReadOnlyMemory<float> _nonzeroSingles = new[] { 1.25F, 2.5F };
+
     [Fact]
     public void GetProperties_IsConsecutive_Test()
     {
-        Assert.True(GetNumericProperties<char>(new[] { 'a', 'b', 'c' }).IsConsecutive);
-        Assert.False(GetNumericProperties<char>(new[] { 'a', 'c' }).IsConsecutive);
+        Assert.True(GetNumericProperties<char>(_consecutiveChars).IsConsecutive);
+        Assert.False(GetNumericProperties<char>(_nonConsecutiveChars).IsConsecutive);
 
         Assert.True(GetNumericProperties<sbyte>(new sbyte[] { -1, 0, 1 }).IsConsecutive);
         Assert.False(GetNumericProperties<sbyte>(new sbyte[] { -1, 1, 2 }).IsConsecutive);
@@ -26,35 +42,35 @@ public class KeyAnalyzerTests
         Assert.True(GetNumericProperties<ushort>(new ushort[] { 10, 11, 12 }).IsConsecutive);
         Assert.False(GetNumericProperties<ushort>(new ushort[] { 10, 11, 13 }).IsConsecutive);
 
-        Assert.True(GetNumericProperties<int>(new[] { 100, 101 }).IsConsecutive);
-        Assert.False(GetNumericProperties<int>(new[] { 100, 102 }).IsConsecutive);
+        Assert.True(GetNumericProperties<int>(_consecutiveInts).IsConsecutive);
+        Assert.False(GetNumericProperties<int>(_nonConsecutiveInts).IsConsecutive);
 
-        Assert.True(GetNumericProperties<uint>(new[] { 100u, 101u }).IsConsecutive);
-        Assert.False(GetNumericProperties<uint>(new[] { 100u, 102u }).IsConsecutive);
+        Assert.True(GetNumericProperties<uint>(_consecutiveUInts).IsConsecutive);
+        Assert.False(GetNumericProperties<uint>(_nonConsecutiveUInts).IsConsecutive);
 
         Assert.True(GetNumericProperties<long>(new[] { long.MaxValue - 2, long.MaxValue - 1, long.MaxValue }).IsConsecutive);
-        Assert.False(GetNumericProperties<long>(new[] { 1L, 3L, 4L }).IsConsecutive);
+        Assert.False(GetNumericProperties<long>(_nonConsecutiveLongs).IsConsecutive);
 
-        Assert.True(GetNumericProperties<ulong>(new[] { 1ul, 2ul, 3ul }).IsConsecutive);
-        Assert.False(GetNumericProperties<ulong>(new[] { 1ul, 2ul, 4ul }).IsConsecutive);
+        Assert.True(GetNumericProperties<ulong>(_consecutiveUlongs).IsConsecutive);
+        Assert.False(GetNumericProperties<ulong>(_nonConsecutiveUlongs).IsConsecutive);
 
-        Assert.False(GetNumericProperties<float>(new[] { 0f, 0.9f, 2f }).IsConsecutive);
-        Assert.False(GetNumericProperties<double>(new[] { 0.0d, 0.9d, 2.0d }).IsConsecutive);
+        Assert.False(GetNumericProperties<float>(_nonConsecutiveSingles).IsConsecutive);
+        Assert.False(GetNumericProperties<double>(_nonConsecutiveDoubles).IsConsecutive);
     }
 
     [Fact]
     public void GetProperties_Density_Test()
     {
-        Assert.Equal(1.0f, GetNumericProperties<int>(new[] { 10, 11, 12 }).Density);
-        Assert.Equal(2.0f / 101.0f, GetNumericProperties<int>(new[] { 0, 100 }).Density, 12);
-        Assert.Equal(1.0f, GetNumericProperties<int>(new[] { 42 }).Density);
+        Assert.Equal(1.0f, GetNumericProperties<int>(_denseInts).Density);
+        Assert.Equal(2.0f / 101.0f, GetNumericProperties<int>(_sparseInts).Density, 12);
+        Assert.Equal(1.0f, GetNumericProperties<int>(_singleInt).Density);
     }
 
     [Fact]
     public void GetNumericProperties_FloatHasZero_Test()
     {
         NumericKeyProperties<float> withZero = GetNumericProperties<float>(new[] { -0.0f, 1.25f });
-        NumericKeyProperties<float> withoutZero = GetNumericProperties<float>(new[] { 1.25f, 2.5f });
+        NumericKeyProperties<float> withoutZero = GetNumericProperties<float>(_nonzeroSingles);
 
         Assert.True(withZero.HasZero);
         Assert.False(withoutZero.HasZero);
@@ -77,6 +93,8 @@ public class KeyAnalyzerTests
     [InlineData((object)new[] { "a", "a", "aaa", "aaa" })] //Test duplicates
     public void GetStringProperties_LengthRanges_Test(string[] data)
     {
+        ArgumentNullException.ThrowIfNull(data);
+
         StringKeyProperties res = GetStringProperties(data, false, GeneratorEncoding.Utf16CodeUnits);
         LengthData lengthData = res.LengthData;
 

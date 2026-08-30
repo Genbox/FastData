@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Abstracts;
@@ -12,13 +13,23 @@ using Genbox.FastData.Generators.Contexts;
 namespace Genbox.FastData.Generator.Template;
 
 /// <summary>Base class for T4 template-based language generators.</summary>
+[SuppressMessage("Maintainability", "CA1510:Use ArgumentNullException throw helper", Justification = "The netstandard2.0 target does not provide ArgumentNullException.ThrowIfNull.")]
 public abstract class TemplatedCodeGenerator : ICodeGenerator
 {
     private readonly TemplateManager _manager;
     private readonly TypeMap _map;
 
+    /// <summary>Initializes a new instance of the <see cref="TemplatedCodeGenerator"/> class.</summary>
+    /// <param name="languageDef">The target language definition.</param>
+    /// <param name="encoding">The encoding model used by the target language.</param>
+#if NET10_0_OR_GREATER
+    [UnconditionalSuppressMessage("SingleFile", "IL3000:Avoid accessing Assembly file path when publishing as a single file", Justification = "Template assets are deployed beside each concrete generator assembly and require its physical location.")]
+#endif
     protected TemplatedCodeGenerator(ILanguageDef languageDef, GeneratorEncoding encoding)
     {
+        if (languageDef == null)
+            throw new ArgumentNullException(nameof(languageDef), "The language definition cannot be null.");
+
         Encoding = encoding;
 
         _map = new TypeMap(languageDef.TypeDefinitions, Encoding);
@@ -53,6 +64,9 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
     /// <inheritdoc />
     public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
     {
+        if (context == null)
+            throw new ArgumentNullException(nameof(context), "The generator context cannot be null.");
+
         Dictionary<string, object?> variables = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
         {
             {
@@ -78,6 +92,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
     /// <param name="manager">The template manager used to render and cache templates.</param>
     /// <param name="variables">The variables exposed to the template.</param>
     /// <returns>The generated source code.</returns>
+    [SuppressMessage("Maintainability", "MA0016:Prefer using collection abstraction instead of implementation", Justification = "The concrete dictionary type is part of the established protected generator API.")]
     protected abstract string GenerateTemplated<TKey, TValue>(GeneratorConfigBase genCfg, TemplateManager manager, Dictionary<string, object?> variables);
 
     /// <summary>Validates that a name is a valid identifier for use in generated code (class names, namespaces).</summary>
@@ -94,7 +109,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
 
         foreach (string segment in segments)
         {
-            if (segment.Length == 0 || !Regex.IsMatch(segment, "^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture))
+            if (segment.Length == 0 || !Regex.IsMatch(segment, "^[A-Za-z_][A-Za-z0-9_]*$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture, TimeSpan.FromSeconds(1)))
                 throw new ArgumentException($"'{name}' is not a valid identifier. Each segment must start with a letter or underscore and contain only letters, digits, or underscores.", paramName);
         }
     }
@@ -152,7 +167,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
             case SingleValueContext<TKey, TValue> singleCtx:
                 return new SingleValueTemplateData
                 {
-                    Item = singleCtx.Key,
+                    Item = singleCtx.Key!,
                     HasValue = !singleCtx.Values.IsEmpty,
                     Value = singleCtx.Values.IsEmpty ? null : singleCtx.Values.Span[0]
                 };
@@ -179,7 +194,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
             case KeyLengthContext<TValue> klCtx:
                 return new KeyLengthTemplateData
                 {
-                    Keys = klCtx.Lengths,
+                    Keys = klCtx.Lengths.Cast<object>(),
                     KeyCount = klCtx.Lengths.Length,
                     Values = klCtx.Values.ToObjects(),
                     ValueCount = klCtx.Values.Length
@@ -242,7 +257,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
                 {
                     perfectEntries[i] = new HashTablePerfectEntryTemplateData
                     {
-                        Key = perfectCtx.Data[i].Key,
+                        Key = perfectCtx.Data[i].Key!,
                         Hash = perfectCtx.Data[i].Value
                     };
                 }

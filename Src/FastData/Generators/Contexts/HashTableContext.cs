@@ -7,6 +7,7 @@ namespace Genbox.FastData.Generators.Contexts;
 /// <param name="buckets">The array of bucket indices.</param>
 /// <param name="entries">The array of hash set entries.</param>
 /// <param name="storeHashCode">If set to true, you should only generate a hash set that checks the value.</param>
+/// <param name="values">The values associated with the keys.</param>
 public sealed class HashTableContext<TKey, TValue>(int[] buckets, HashTableEntry<TKey>[] entries, bool storeHashCode, ReadOnlyMemory<TValue> values) : HashTableContext(buckets, entries.LongLength, storeHashCode)
 {
     /// <summary>Gets the array of hash set entries.</summary>

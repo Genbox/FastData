@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
@@ -7,7 +8,7 @@ using Genbox.FastData.Internal.Pgm;
 
 namespace Genbox.FastData.Internal.Structures;
 
-public sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmContext<TKey, TValue>> where TKey : notnull
+internal sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmContext<TKey, TValue>>
 {
     private static readonly TKey _sentinel = PgmTypeTraits<TKey>.MaxValue;
 
@@ -32,7 +33,7 @@ public sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmCon
         Debug.Assert(values.IsEmpty || values.Length == keys.Length, "PgmStructure requires value count to match key count when values are present.");
 
         if (Comparer<TKey>.Default.Compare(keys.Span[keys.Length - 1], PgmTypeTraits<TKey>.MaxValue) == 0)
-            throw new ArgumentException($"The value {_sentinel} is reserved as a sentinel.", nameof(keys));
+            throw new ArgumentException("The value " + System.Convert.ToString(_sentinel, CultureInfo.InvariantCulture) + " is reserved as a sentinel.", nameof(keys));
 
         List<PgmSegment<TKey>> segments = new List<PgmSegment<TKey>>();
         List<int> levelsOffsets = new List<int>();

@@ -1,6 +1,6 @@
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public enum BenchmarkWorkload
+internal enum BenchmarkWorkload
 {
     Hit,
     Miss,

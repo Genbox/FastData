@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 
 namespace Genbox.FastData.Config.Analysis;
 
+/// <summary>Configures prefix and suffix edge-gram segment generation.</summary>
 [PublicAPI]
 public sealed class EdgeGramGeneratorConfig
 {

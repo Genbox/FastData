@@ -18,7 +18,7 @@ internal static class GeneratorTest
 
         TestGenerators(data, props, new BruteForceGenerator(new BruteForceGeneratorConfig()));
         TestGenerators(data, props, new EdgeGramGenerator(new EdgeGramGeneratorConfig()));
-        TestGenerators(data, props, new OffsetGenerator(new OffsetGeneratorConfig()));
+        TestGenerators(data, props, new OffsetGenerator());
         TestGenerators(data, props, new DeltaGenerator(new DeltaGeneratorConfig()));
     }
 
@@ -26,12 +26,12 @@ internal static class GeneratorTest
     {
         Console.WriteLine($"### {generator.GetType().Name}. Appropriate: {generator.IsAppropriate(props)}");
         ArraySegment[] segments = generator.Generate(props).ToArray();
-        Console.WriteLine(string.Join("\n", segments));
+        Console.WriteLine(string.Join('\n', segments));
 
         foreach (ArraySegment s in segments)
         {
             Console.WriteLine("------------------");
-            Console.WriteLine(string.Join("\n", data.Select(x => SegmentHelper.InsertSegmentBounds(x, s))));
+            Console.WriteLine(string.Join('\n', data.Select(x => SegmentHelper.InsertSegmentBounds(x, s))));
         }
     }
 }

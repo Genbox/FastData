@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using Genbox.FastData.BenchmarkHarness.Runner.Catalog;
 using Genbox.FastData.BenchmarkHarness.Runner.Configuration;
 using Genbox.FastData.BenchmarkHarness.Runner.Environment;
@@ -97,7 +98,8 @@ internal sealed class Application(BenchmarkCatalog catalog)
         using RunEnvironment runEnvironment = RunEnvironment.Apply(settings.Environment, GetExtraRows(settings), cpu.Row);
         ThermalStabilization.Run(cpu.CpuSet, settings.Debug ? ConsoleOutput.WriteDebug : null);
 
-        await using DockerManager dockerManager = new DockerManager(cpuSet: cpu.CpuSet);
+        DockerManager dockerManager = new DockerManager(cpuSet: cpu.CpuSet);
+        await using ConfiguredAsyncDisposable dockerManagerScope = dockerManager.ConfigureAwait(false);
 
         foreach (Selection selection in selections)
         {

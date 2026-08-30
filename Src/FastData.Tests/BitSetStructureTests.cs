@@ -9,6 +9,11 @@ namespace Genbox.FastData.Tests;
 
 public class BitSetStructureTests
 {
+    private static readonly string[] _contiguousStringValues = ["zero", "one", "two"];
+    private static readonly int[] _contiguousIntValues = [100, 110, 120];
+    private static readonly int[] _sparseIntValues = [10, 20, 0, 40];
+    private static readonly int[] _wideSparseIntValues = [10, 0, 0, 0, 0, 0, 0, 0, 20];
+
     [Fact]
     public void DenseValues_ContiguousZeroBased_UsesNoOccupancy()
     {
@@ -21,7 +26,7 @@ public class BitSetStructureTests
         Assert.NotNull(context);
         Assert.False(context.HasOccupancy);
         Assert.Empty(context.BitSet);
-        Assert.Equal(new[] { "zero", "one", "two" }, context.Values.ToArray());
+        Assert.Equal(_contiguousStringValues, context.Values.ToArray());
     }
 
     [Fact]
@@ -36,7 +41,7 @@ public class BitSetStructureTests
         Assert.NotNull(context);
         Assert.False(context.HasOccupancy);
         Assert.Empty(context.BitSet);
-        Assert.Equal(new[] { 100, 110, 120 }, context.Values.ToArray());
+        Assert.Equal(_contiguousIntValues, context.Values.ToArray());
     }
 
     [Fact]
@@ -51,7 +56,7 @@ public class BitSetStructureTests
         Assert.NotNull(context);
         Assert.True(context.HasOccupancy);
         Assert.Equal(0b1011UL, context.BitSet[0]);
-        Assert.Equal(new[] { 10, 20, 0, 40 }, context.Values.ToArray());
+        Assert.Equal(_sparseIntValues, context.Values.ToArray());
     }
 
     [Fact]
@@ -77,6 +82,6 @@ public class BitSetStructureTests
 
         Assert.NotNull(context);
         Assert.Equal(0b1_0000_0001UL, context.BitSet[0]);
-        Assert.Equal(new[] { 10, 0, 0, 0, 0, 0, 0, 0, 20 }, context.Values.ToArray());
+        Assert.Equal(_wideSparseIntValues, context.Values.ToArray());
     }
 }

@@ -45,7 +45,7 @@ internal static class Program
 
         // Helper to read common options from a ParseResult
         CommonOptions ReadCommon(ParseResult pr) => new CommonOptions(
-            pr.GetValue(keysFileArg),
+            pr.GetValue(keysFileArg) ?? throw new InvalidOperationException("The keys file is required."),
             pr.GetValue(outputFileOpt),
             pr.GetValue(valuesFileOpt),
             pr.GetValue(keyTypeOpt),
@@ -77,7 +77,7 @@ internal static class Program
 
         csharpCmd.SetAction(async (pr, token) =>
         {
-            CSharpCodeGeneratorConfig genCfg = new CSharpCodeGeneratorConfig(pr.GetValue(classNameOpt))
+            CSharpCodeGeneratorConfig genCfg = new CSharpCodeGeneratorConfig(GetClassName(pr))
             {
                 Namespace = pr.GetValue(namespaceOpt),
                 ClassVisibility = pr.GetValue(classVisibilityOpt),
@@ -88,13 +88,15 @@ internal static class Program
 
         cppCmd.SetAction(async (pr, token) =>
         {
-            await RunAsync(ReadCommon(pr), new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig(pr.GetValue(classNameOpt))), token).ConfigureAwait(false);
+            await RunAsync(ReadCommon(pr), new CPlusPlusCodeGenerator(new CPlusPlusCodeGeneratorConfig(GetClassName(pr))), token).ConfigureAwait(false);
         });
 
         rustCmd.SetAction(async (pr, token) =>
         {
-            await RunAsync(ReadCommon(pr), new RustCodeGenerator(new RustCodeGeneratorConfig(pr.GetValue(classNameOpt))), token).ConfigureAwait(false);
+            await RunAsync(ReadCommon(pr), new RustCodeGenerator(new RustCodeGeneratorConfig(GetClassName(pr))), token).ConfigureAwait(false);
         });
+
+        string GetClassName(ParseResult pr) => pr.GetValue(classNameOpt) ?? throw new InvalidOperationException("The class name is required.");
 
         try
         {
@@ -261,26 +263,26 @@ internal static class Program
 
     private static Exception UnwrapTargetInvocationException(Exception exception)
     {
-        while (exception is TargetInvocationException { InnerException: not null } targetInvocation)
-            exception = targetInvocation.InnerException;
+        while (exception is TargetInvocationException { InnerException: Exception innerException })
+            exception = innerException;
 
         return exception;
     }
 
     private static async Task<Array> ParseFileAsync(string filePath, KeyType keyType, CancellationToken token) => keyType switch
     {
-        KeyType.String => await ParseFileAsync<string>(filePath, static (x, y) => x.Add(StrictUtf8.GetString(y)), token).ConfigureAwait(false),
-        KeyType.Int8 => await ParseFileAsync<sbyte>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
-        KeyType.UInt8 => await ParseFileAsync<byte>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
-        KeyType.Int16 => await ParseFileAsync<short>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
-        KeyType.UInt16 => await ParseFileAsync<ushort>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
-        KeyType.Int32 => await ParseFileAsync<int>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
-        KeyType.UInt32 => await ParseFileAsync<uint>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
-        KeyType.Int64 => await ParseFileAsync<long>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
-        KeyType.UInt64 => await ParseFileAsync<ulong>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
-        KeyType.Single => await ParseFileAsync<float>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
-        KeyType.Double => await ParseFileAsync<double>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
-        KeyType.Char => await ParseFileAsync<char>(filePath, AddParsedChar, token).ConfigureAwait(false),
+        KeyType.String => await ParseFileCoreAsync<string>(filePath, static (x, y) => x.Add(StrictUtf8.GetString(y)), token).ConfigureAwait(false),
+        KeyType.Int8 => await ParseFileCoreAsync<sbyte>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
+        KeyType.UInt8 => await ParseFileCoreAsync<byte>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
+        KeyType.Int16 => await ParseFileCoreAsync<short>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
+        KeyType.UInt16 => await ParseFileCoreAsync<ushort>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
+        KeyType.Int32 => await ParseFileCoreAsync<int>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
+        KeyType.UInt32 => await ParseFileCoreAsync<uint>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
+        KeyType.Int64 => await ParseFileCoreAsync<long>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
+        KeyType.UInt64 => await ParseFileCoreAsync<ulong>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
+        KeyType.Single => await ParseFileCoreAsync<float>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
+        KeyType.Double => await ParseFileCoreAsync<double>(filePath, static (x, y) => AddParsedNumber(x, y, static (source, out value, out bytesConsumed) => Utf8Parser.TryParse(source, out value, out bytesConsumed)), token).ConfigureAwait(false),
+        KeyType.Char => await ParseFileCoreAsync<char>(filePath, AddParsedChar, token).ConfigureAwait(false),
         _ => throw new ArgumentOutOfRangeException(nameof(keyType), keyType, null)
     };
 
@@ -308,7 +310,7 @@ internal static class Program
 
     private static string GetDisplayValue(ReadOnlySpan<byte> source) => Encoding.UTF8.GetString(source);
 
-    private static async Task<T[]> ParseFileAsync<T>(string filePath, Action<PooledArray<T>, ReadOnlySpan<byte>> func, CancellationToken token = default)
+    private static async Task<T[]> ParseFileCoreAsync<T>(string filePath, Action<PooledArray<T>, ReadOnlySpan<byte>> func, CancellationToken token = default)
     {
         PooledArray<T> pool = new PooledArray<T>();
         FileStream stream = File.OpenRead(filePath);

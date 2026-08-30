@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Docker.DotNet;
 using Docker.DotNet.Models;
@@ -7,7 +8,7 @@ using Genbox.FastData.InternalShared.Misc;
 
 namespace Genbox.FastData.InternalShared.Helpers;
 
-public sealed class DockerManager : IAsyncDisposable
+internal sealed class DockerManager : IAsyncDisposable
 {
     private const string WorkDir = "/work";
     private const string DefaultContainerPrefix = "fastdata";
@@ -142,8 +143,10 @@ public sealed class DockerManager : IAsyncDisposable
         ContainerExecCreateResponse created = await _client.Exec.ExecCreateContainerAsync(containerId, execCreateParameters, cancellationToken).ConfigureAwait(false);
         using MultiplexedStream stream = await _client.Exec.StartAndAttachContainerExecAsync(created.ID, false, cancellationToken).ConfigureAwait(false);
 
-        await using MemoryStream stdOut = new MemoryStream();
-        await using MemoryStream stdErr = new MemoryStream();
+        MemoryStream stdOut = new MemoryStream();
+        await using ConfiguredAsyncDisposable stdOutDisposable = stdOut.ConfigureAwait(false);
+        MemoryStream stdErr = new MemoryStream();
+        await using ConfiguredAsyncDisposable stdErrDisposable = stdErr.ConfigureAwait(false);
         await stream.CopyOutputToAsync(Stream.Null, stdOut, stdErr, cancellationToken).ConfigureAwait(false);
 
         ContainerExecInspectResponse execInspect = await _client.Exec.InspectContainerExecAsync(created.ID, cancellationToken).ConfigureAwait(false);

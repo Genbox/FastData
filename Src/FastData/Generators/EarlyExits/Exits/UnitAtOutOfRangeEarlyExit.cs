@@ -9,10 +9,15 @@ namespace Genbox.FastData.Generators.EarlyExits.Exits;
 /// unsigned subtraction check: <c>UnitAt(key, offset) - Min &gt; Max - Min</c>.
 /// </summary>
 /// <remarks>Since <see cref="GeneratorFunctions.UnitAt" /> returns <see cref="uint" />, the subtraction is naturally unsigned and no cast is needed.</remarks>
+/// <param name="Min">The inclusive minimum accepted unit value.</param>
+/// <param name="Max">The inclusive maximum accepted unit value.</param>
+/// <param name="Offset">The start-relative index, or a negative end-relative index.</param>
 public sealed record UnitAtOutOfRangeEarlyExit(char Min, char Max, int Offset = 0) : IEarlyExit
 {
+    /// <inheritdoc />
     public ulong KeyspaceSize => Min + (ulong)(char.MaxValue - Max);
 
+    /// <inheritdoc />
     public Expression GetExpression(ParameterExpression key)
     {
         MethodInfo methodInfo = typeof(GeneratorFunctions).GetMethod(nameof(GeneratorFunctions.UnitAt), [typeof(string), typeof(int)])!;
@@ -27,5 +32,6 @@ public sealed record UnitAtOutOfRangeEarlyExit(char Min, char Max, int Offset = 
         return GreaterThan(diff, range);
     }
 
+    /// <inheritdoc />
     public bool IsWorseThan(IEarlyExit other) => false;
 }

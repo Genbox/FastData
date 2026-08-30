@@ -6,8 +6,7 @@
 
 ## Description
 
-FastData is a code generator that analyzes your data and creates high-performance, read-only data structures for static data with support for key/value and membership queries.
-It supports many output languages (C#, C++, Rust, etc.), ready for inclusion in your project with zero dependencies.
+FastData is a code generator that analyzes your data and creates high-performance, read-only data structures for static data with support for key/value and membership queries. It supports many output languages (C#, C++, Rust, etc.), ready for inclusion in your project with zero dependencies.
 
 ## Download
 

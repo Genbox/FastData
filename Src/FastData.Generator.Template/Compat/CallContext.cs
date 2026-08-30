@@ -4,8 +4,12 @@
 
 namespace System.Runtime.Remoting.Messaging;
 
+/// <summary>Provides the call-context surface required when compiling the T4 templates.</summary>
 public static class CallContext
 {
+    /// <summary>Gets logical call-context data for the specified key.</summary>
+    /// <param name="key">The name of the data item.</param>
+    /// <returns>The stored data, or <see langword="null"/> when no data is available.</returns>
     public static object LogicalGetData(string key)
     {
         return null;

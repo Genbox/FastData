@@ -7,7 +7,7 @@ using static Genbox.FastData.Generator.Helpers.FormatHelper;
 
 namespace Genbox.FastData.Generator.CPlusPlus.TestHarness;
 
-public sealed class CPlusPlusBenchmark(DockerManager dockerManager) : BenchmarkBase<CPlusPlusBootstrap>(new CPlusPlusBootstrap(HarnessType.Benchmark), dockerManager)
+internal sealed class CPlusPlusBenchmark(DockerManager dockerManager) : BenchmarkBase<CPlusPlusBootstrap>(new CPlusPlusBootstrap(HarnessType.Benchmark), dockerManager)
 {
     protected override string Render(ITestData data)
     {

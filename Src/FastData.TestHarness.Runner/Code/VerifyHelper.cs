@@ -6,29 +6,34 @@ internal static class VerifyHelper
         await Verify(source)
               .UseFileName(snapshotId)
               .UseDirectory("../Verify/Features/" + harnessName)
-              .DisableDiff();
+              .DisableDiff()
+              .ConfigureAwait(false);
 
     internal static async Task VerifyVectorAsync(string harnessName, string snapshotId, string source) =>
         await Verify(source)
               .UseFileName(snapshotId)
               .UseDirectory("../Verify/Vectors/" + harnessName)
-              .DisableDiff();
+              .DisableDiff()
+              .ConfigureAwait(false);
 
     internal static async Task VerifyEarlyExitAsync(string harnessName, string snapshotId, string source) =>
         await Verify(source)
               .UseFileName(snapshotId)
               .UseDirectory("../Verify/EarlyExits/" + harnessName)
-              .DisableDiff();
+              .DisableDiff()
+              .ConfigureAwait(false);
 
     internal static async Task VerifyEndToEndAsync(string harnessName, string snapshotId, string source) =>
         await Verify(source)
               .UseFileName(snapshotId)
               .UseDirectory("../Verify/EndToEnd/" + harnessName)
-              .DisableDiff();
+              .DisableDiff()
+              .ConfigureAwait(false);
 
     internal static async Task VerifyStringHashAsync(string harnessName, string snapshotId, string source) =>
         await Verify(source)
               .UseFileName(snapshotId)
               .UseDirectory("../Verify/StringHash/" + harnessName)
-              .DisableDiff();
+              .DisableDiff()
+              .ConfigureAwait(false);
 }

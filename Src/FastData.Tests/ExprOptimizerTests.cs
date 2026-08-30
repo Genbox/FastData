@@ -328,7 +328,7 @@ public sealed class ExprOptimizerTests
         // Before: new BoolHolder { Value = (p && true) }
         // After: new BoolHolder { Value = p }
         ParameterExpression param = Parameter(typeof(bool), "p");
-        PropertyInfo property = typeof(BoolHolder).GetProperty(nameof(BoolHolder.Value), BindingFlags.Instance | BindingFlags.Public)!;
+        PropertyInfo property = typeof(BoolHolder).GetProperty(nameof(BoolHolder.Value), BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)!;
         MemberAssignment binding = Bind(property, AndAlso(param, Constant(true)));
         MemberInitExpression init = MemberInit(New(typeof(BoolHolder)), binding);
 
@@ -986,7 +986,7 @@ public sealed class ExprOptimizerTests
     public async Task OptimizesSemiComplexExpressions(string name, Expression expression)
     {
         Expression optimized = ExprOptimizer.Visit(expression);
-        await VerifyOptimized(optimized, nameof(OptimizesSemiComplexExpressions) + "_" + name);
+        await VerifyOptimizedAsync(optimized, nameof(OptimizesSemiComplexExpressions) + "_" + name);
     }
 
     public static TheoryData<string, Expression> GetSemiComplexExpressions()
@@ -1297,13 +1297,13 @@ public sealed class ExprOptimizerTests
     private static async Task OptimizeAsync(Expression exp, [CallerMemberName]string testName = "")
     {
         Expression optimized = ExprOptimizer.Visit(exp);
-        await VerifyOptimized(optimized, testName);
+        await VerifyOptimizedAsync(optimized, testName).ConfigureAwait(false);
     }
 
-    private static Task VerifyOptimized(Expression optimized, string testName) => Verify(optimized.ToString())
-                                                                                  .UseDirectory("Verify/ExpressionOptimizer")
-                                                                                  .UseFileName(testName)
-                                                                                  .DisableDiff();
+    private static Task VerifyOptimizedAsync(Expression optimized, string testName) => Verify(optimized.ToString())
+                                                                                        .UseDirectory("Verify/ExpressionOptimizer")
+                                                                                        .UseFileName(testName)
+                                                                                        .DisableDiff();
 
     private static void AssertOptimizerPreservesSemantics(Expression expression, ParameterExpression x, ParameterExpression y)
     {

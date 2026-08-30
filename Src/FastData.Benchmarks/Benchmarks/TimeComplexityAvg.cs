@@ -4,6 +4,8 @@ using System.Runtime.Intrinsics.X86;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
+// Search helpers model normal lookup APIs; these traversal benchmarks intentionally discard their return values.
+#pragma warning disable S3241
 public class TimeComplexityAvg
 {
     private int[] _data = null!;
@@ -437,10 +439,10 @@ public class TimeComplexityAvg
             Vector128<int> eq2 = Sse2.CompareEqual(valueVector, v2);
             Vector128<int> eq3 = Sse2.CompareEqual(valueVector, v3);
 
-            ulong eqMask = (ulong)Sse2.MoveMask(eq0.AsByte())
-                           | ((ulong)Sse2.MoveMask(eq1.AsByte()) << 16)
-                           | ((ulong)Sse2.MoveMask(eq2.AsByte()) << 32)
-                           | ((ulong)Sse2.MoveMask(eq3.AsByte()) << 48);
+            ulong eqMask = (uint)Sse2.MoveMask(eq0.AsByte())
+                           | ((ulong)(uint)Sse2.MoveMask(eq1.AsByte()) << 16)
+                           | ((ulong)(uint)Sse2.MoveMask(eq2.AsByte()) << 32)
+                           | ((ulong)(uint)Sse2.MoveMask(eq3.AsByte()) << 48);
 
             if (eqMask != 0)
                 return node;
@@ -484,8 +486,8 @@ public class TimeComplexityAvg
 
             Vector256<int> eq0 = Avx2.CompareEqual(valueVector, v0);
             Vector256<int> eq1 = Avx2.CompareEqual(valueVector, v1);
-            ulong eqMask = (ulong)Avx2.MoveMask(eq0.AsByte())
-                           | ((ulong)Avx2.MoveMask(eq1.AsByte()) << 32);
+            ulong eqMask = (uint)Avx2.MoveMask(eq0.AsByte())
+                           | ((ulong)(uint)Avx2.MoveMask(eq1.AsByte()) << 32);
 
             if (eqMask != 0)
                 return node;
@@ -750,3 +752,4 @@ public class TimeComplexityAvg
         }
     }
 }
+#pragma warning restore S3241

@@ -7,7 +7,7 @@ namespace Genbox.FastData.TestHarness.Runner.Code.Abstracts;
 
 public abstract class EndToEndTestsBase
 {
-    protected abstract TestBase Harness { get; }
+    private protected abstract TestBase Harness { get; }
 
     [Fact]
     public async Task GenerateIntArrayEndToEndAsync()

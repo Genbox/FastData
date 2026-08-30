@@ -8,8 +8,12 @@ using Convert = System.Convert;
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // inputKey < Value;
+/// <summary>Rejects keys that are less than the configured minimum.</summary>
+/// <typeparam name="T">The key type.</typeparam>
+/// <param name="Value">The inclusive minimum accepted value.</param>
 public sealed record ValueLessThanEarlyExit<T>(T Value) : ValueComparisonEarlyExitBase<T>(Value)
 {
+    /// <inheritdoc />
     public override ulong KeyspaceSize
     {
         get
@@ -33,8 +37,10 @@ public sealed record ValueLessThanEarlyExit<T>(T Value) : ValueComparisonEarlyEx
         }
     }
 
+    /// <inheritdoc />
     protected override BinaryExpression Compare(Expression left, Expression right) => LessThan(left, right);
 
+    /// <inheritdoc />
     public override bool IsWorseThan(IEarlyExit other) => (other is ValueOutOfRangeEarlyExit<T> range && Comparer<T>.Default.Compare(Value, range.Min) <= 0) || (other is ValueLessThanEarlyExit<T> otherExit && Comparer<T>.Default.Compare(Value, otherExit.Value) < 0);
 
     private static ulong ClampToUInt64(double value)

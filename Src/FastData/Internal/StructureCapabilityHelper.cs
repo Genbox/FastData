@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Internal.Abstracts;
@@ -14,6 +15,10 @@ internal static class StructureCapabilityHelper
 {
     internal static bool Supports(StructureType structureType, StructureCapability structureCapability) => (GetStructureCapability(structureType) & structureCapability) == structureCapability;
 
+#if NET5_0_OR_GREATER
+    [UnconditionalSuppressMessage("Trimming", "IL2055:Call to MakeGenericType can not be statically analyzed", Justification = "The closed structure types are used only to inspect capabilities, and every generic definition is rooted by a typeof reference below.")]
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with RequiresDynamicCodeAttribute", Justification = "Capability discovery intentionally closes one of the statically rooted structure definitions at runtime.")]
+#endif
     internal static StructureCapability GetStructureCapability(StructureType structureType)
     {
         Type type = GetRuntimeType(structureType);
@@ -49,6 +54,9 @@ internal static class StructureCapabilityHelper
         _ => throw new ArgumentOutOfRangeException(nameof(structureType), structureType, "Unsupported structure type.")
     };
 
+#if NET5_0_OR_GREATER
+    [UnconditionalSuppressMessage("Trimming", "IL2067:Target parameter does not satisfy annotation requirements", Justification = "Uninitialized capability inspection does not invoke constructors, and the structure types are rooted by typeof references.")]
+#endif
     private static object CreateUninitialized(Type type)
     {
 #if NETSTANDARD2_0

@@ -22,15 +22,13 @@ internal class SpeedFactorColumn : IColumn
 
     public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
     {
-        string[] categories = benchmarkCase.Descriptor.Categories.ToArray();
-
-        BenchmarkCase? baseline = summary.BenchmarksCases.FirstOrDefault(b => b.Descriptor.Baseline && b.Descriptor.Categories.Intersect(categories).Any());
+        BenchmarkCase? baseline = FindBaseline(summary, benchmarkCase);
 
         if (baseline == null || baseline == benchmarkCase)
             return "-";
 
-        Statistics? baselineStats = summary[baseline]?.ResultStatistics;
-        Statistics? currentStats = summary[benchmarkCase]?.ResultStatistics;
+        Statistics? baselineStats = FindStatistics(summary, baseline);
+        Statistics? currentStats = FindStatistics(summary, benchmarkCase);
 
         if (baselineStats == null || currentStats == null)
             return "?";
@@ -40,4 +38,40 @@ internal class SpeedFactorColumn : IColumn
     }
 
     public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
+
+    private static BenchmarkCase? FindBaseline(Summary summary, BenchmarkCase benchmarkCase)
+    {
+        foreach (BenchmarkCase candidate in summary.BenchmarksCases)
+        {
+            if (candidate.Descriptor.Baseline && HasSharedCategory(candidate, benchmarkCase))
+                return candidate;
+        }
+
+        return null;
+    }
+
+    private static bool HasSharedCategory(BenchmarkCase left, BenchmarkCase right)
+    {
+        foreach (string leftCategory in left.Descriptor.Categories)
+        {
+            foreach (string rightCategory in right.Descriptor.Categories)
+            {
+                if (string.Equals(leftCategory, rightCategory, StringComparison.Ordinal))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static Statistics? FindStatistics(Summary summary, BenchmarkCase benchmarkCase)
+    {
+        foreach (BenchmarkReport report in summary.Reports)
+        {
+            if (ReferenceEquals(report.BenchmarkCase, benchmarkCase))
+                return report.ResultStatistics;
+        }
+
+        return null;
+    }
 }

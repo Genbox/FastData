@@ -6,7 +6,7 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-public sealed class BloomFilterStructure<TKey, TValue> : IStructure<TKey, TValue, BloomFilterContext>
+internal sealed class BloomFilterStructure<TKey, TValue> : IStructure<TKey, TValue, BloomFilterContext>
 {
     private const int BitsPerKey = 10;
     private readonly HashData _hashData;

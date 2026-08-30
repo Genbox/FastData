@@ -48,5 +48,5 @@ public class SimulatorBenchmarks
     [Benchmark]
     public int RunWithFitness() => _simulator.Run(_bruteForceHash, expression => FitnessHelper.CalculateFitness(_properties, _bruteForceHash.Segment, expression)).Collisions;
 
-    private static Expression Mix(Expression hash, Expression read) => Expression.Add(Expression.Multiply(hash, Expression.Constant(131UL)), read);
+    private static BinaryExpression Mix(Expression hash, Expression read) => Expression.Add(Expression.Multiply(hash, Expression.Constant(131UL)), read);
 }

@@ -11,7 +11,7 @@ namespace Genbox.FastData.Internal.Structures;
 /// Builds an exact map using the binary-fuse construction. The XOR table recovers a candidate
 /// ordinal; generated code then compares the complete key before returning membership or a value.
 /// </summary>
-public sealed class ConstMapStructure<TKey, TValue> : IStructure<TKey, TValue, ConstMapContext<TKey, TValue>>
+internal sealed class ConstMapStructure<TKey, TValue> : IStructure<TKey, TValue, ConstMapContext<TKey, TValue>>
 {
     private const int MaxIterations = 100;
     private const uint MaxSegmentLength = 262_144;

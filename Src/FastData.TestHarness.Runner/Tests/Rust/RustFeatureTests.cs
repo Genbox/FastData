@@ -7,5 +7,5 @@ namespace Genbox.FastData.TestHarness.Runner.Tests.Rust;
 [Collection("Docker-Rust")]
 public sealed class RustFeatureTests(DockerRustFixture fixture) : FeatureTestBase
 {
-    protected override TestBase Harness { get; } = new RustTest(fixture.DockerManager);
+    private protected override TestBase Harness { get; } = new RustTest(fixture.DockerManager);
 }

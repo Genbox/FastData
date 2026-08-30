@@ -3,7 +3,7 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public interface ITestData
+internal interface ITestData
 {
     string Identifier { get; }
     double MaxErrorPercent { get; }

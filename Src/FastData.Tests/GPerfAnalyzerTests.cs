@@ -19,6 +19,10 @@ namespace Genbox.FastData.Tests;
 
 public class GPerfAnalyzerTests
 {
+    private static readonly int[] _thirdBytePosition = [2];
+    private static readonly int[] _descendingBytePositions = [3, 2, 1, 0];
+    private static readonly int[] _twoParsedPositions = [0, 1];
+
     public static IEnumerable<object[]> UpstreamGPerfDataSets()
     {
         // Keyword sets copied from gperf tests.
@@ -38,6 +42,8 @@ public class GPerfAnalyzerTests
     [MemberData(nameof(UpstreamGPerfDataSets))]
     public void GetCandidates_UpstreamGPerfDataSets_GeneratesUsableHash(string name, string[] data, bool ignoreCase)
     {
+        ArgumentNullException.ThrowIfNull(data);
+
         Candidate candidate = GetCandidate(data, ignoreCase);
         StringHashFunc func = candidate.StringHash.GetExpression().Compile();
         AssertRawHashesUnique(name, data, func, GeneratorEncoding.AsciiBytes);
@@ -99,7 +105,7 @@ public class GPerfAnalyzerTests
         GPerfStringHash hash = Assert.IsType<GPerfStringHash>(candidate.StringHash);
         StringHashFunc func = hash.GetExpression().Compile();
 
-        Assert.Equal(new[] { 2 }, hash.Positions);
+        Assert.Equal(_thirdBytePosition, hash.Positions);
         AssertRawHashesUnique("utf8 explicit key position", data, func, GeneratorEncoding.Utf8Bytes);
     }
 
@@ -124,7 +130,7 @@ public class GPerfAnalyzerTests
         Candidate candidate = GetCandidate(data, false, GeneratorEncoding.AsciiBytes, config);
         GPerfStringHash hash = Assert.IsType<GPerfStringHash>(candidate.StringHash);
 
-        Assert.Equal(new[] { 3, 2, 1, 0 }, hash.Positions);
+        Assert.Equal(_descendingBytePositions, hash.Positions);
     }
 
     [Fact]
@@ -205,7 +211,7 @@ public class GPerfAnalyzerTests
     {
         GPerfAnalyzerOptions repeatedCommas = new GPerfAnalyzerConfig { KeyPositions = "1,,2," }.CreateOptions();
 
-        Assert.Equal(new[] { 0, 1 }, repeatedCommas.KeyPositions);
+        Assert.Equal(_twoParsedPositions, repeatedCommas.KeyPositions);
     }
 
     [Fact]
@@ -401,7 +407,7 @@ public class GPerfAnalyzerTests
         GPerfStringHash hash = Assert.IsType<GPerfStringHash>(candidate.StringHash);
         StringHashFunc func = hash.GetExpression().Compile();
 
-        Assert.Equal(new[] { 2 }, hash.Positions);
+        Assert.Equal(_thirdBytePosition, hash.Positions);
         AssertRawHashesUnique("mandatory position outside max positions", data, func, GeneratorEncoding.AsciiBytes);
     }
 

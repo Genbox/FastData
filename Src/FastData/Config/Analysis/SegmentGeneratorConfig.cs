@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 
 namespace Genbox.FastData.Config.Analysis;
 
+/// <summary>Configures the segment generators used to build string-hash candidates.</summary>
 [PublicAPI]
 public sealed class SegmentGeneratorConfig
 {

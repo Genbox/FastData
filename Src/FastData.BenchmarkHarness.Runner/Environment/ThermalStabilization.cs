@@ -10,9 +10,17 @@ internal static class ThermalStabilization
     public static void Run(string cpuSet, Action<string>? debugOutput)
     {
         int cpuIndex = ParseFirstCpuIndex(cpuSet);
-        IntPtr affinityMask = new IntPtr(1L << cpuIndex);
 
         debugOutput?.Invoke($"thermal stabilization start, cpu={cpuIndex.ToString(CultureInfo.InvariantCulture)}, duration={Duration}");
+
+        if (!OperatingSystem.IsLinux() && !OperatingSystem.IsWindows())
+        {
+            RunSpinLoop(Duration);
+            debugOutput?.Invoke("thermal stabilization complete (no affinity support)");
+            return;
+        }
+
+        IntPtr affinityMask = new IntPtr(1L << cpuIndex);
 
         Process process = Process.GetCurrentProcess();
         IntPtr previousAffinity;

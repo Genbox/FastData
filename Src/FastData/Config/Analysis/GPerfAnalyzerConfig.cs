@@ -5,10 +5,12 @@ using JetBrains.Annotations;
 
 namespace Genbox.FastData.Config.Analysis;
 
+/// <summary>Configures gperf-compatible perfect string-hash analysis.</summary>
 [PublicAPI]
 [SuppressMessage("Exceptions usages", "EX005:Use parameter related exception only for method parameters")]
 [SuppressMessage("Major Code Smell", "S3928:Parameter names used into ArgumentException constructors should match an existing one ")]
 [SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality")]
+[SuppressMessage("Usage", "MA0015:Specify the parameter name in ArgumentException", Justification = "Validation runs when configuration properties are materialized, so exceptions identify the invalid property rather than a helper parameter.")]
 public sealed class GPerfAnalyzerConfig : IAnalyzerConfig
 {
     private const int MaxKeyPosition = 255;
@@ -68,16 +70,17 @@ public sealed class GPerfAnalyzerConfig : IAnalyzerConfig
         return (int)maxPositions - 1;
     }
 
+    [SuppressMessage("Globalization", "CA1307:Specify StringComparison for clarity", Justification = "Searching for a single ASCII wildcard has no culture-sensitive semantics, and the StringComparison char overload is unavailable on netstandard2.0.")]
     private static (int[]? Positions, bool UseAll) ParseKeyPositions(string? keyPositions)
     {
-        if (string.IsNullOrWhiteSpace(keyPositions))
+        if (keyPositions == null || string.IsNullOrWhiteSpace(keyPositions))
             return (null, false);
 
         string text = keyPositions.Trim();
         if (text == "*")
             return (null, true);
 
-        if (text.IndexOf('*') >= 0)
+        if (text.Contains('*'))
             throw new ArgumentException("The all-positions wildcard must be the entire key-position expression.", nameof(KeyPositions));
 
         List<int> positions = new List<int>();
@@ -98,6 +101,7 @@ public sealed class GPerfAnalyzerConfig : IAnalyzerConfig
         return (positions.ToArray(), false);
     }
 
+    [SuppressMessage("Globalization", "CA1307:Specify StringComparison for clarity", Justification = "Searching for a single ASCII delimiter has no culture-sensitive semantics, and the StringComparison char overload is unavailable on netstandard2.0.")]
     private static void AddKeyPositionItem(List<int> positions, bool[] seen, string item)
     {
         int rangeSeparator = item.IndexOf('-');

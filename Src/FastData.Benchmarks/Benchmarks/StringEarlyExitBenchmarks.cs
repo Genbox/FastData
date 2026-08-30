@@ -4,16 +4,15 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 
 [DisassemblyDiagnoser]
 [SuppressMessage("ReSharper", "ConvertToConstant.Local")]
-[SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
 public class StringEarlyExitBenchmarks
 {
-    private ulong[] _bitset = [2828, 4848];
-    private ulong _firstLow = 60;
-    private ulong _lastLow = 60;
-    private int _max = 42;
-    private int _min = 3;
-    private ulong _stringMask = 0xFF93FF93FF9AFF97UL;
-    private string _value = "hello world";
+    private readonly ulong[] _bitset = [2828, 4848];
+    private readonly ulong _firstLow = 60;
+    private readonly ulong _lastLow = 60;
+    private readonly int _max = 42;
+    private readonly int _min = 3;
+    private readonly ulong _stringMask = 0xFF93FF93FF9AFF97UL;
+    private readonly string _value = "hello world";
 
     [Benchmark]public bool LengthEqual() => _value.Length != 49;
 

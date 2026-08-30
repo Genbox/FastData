@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Genbox.FastData.Generator.Abstracts;
 using Genbox.FastData.Generator.Definitions;
@@ -80,6 +81,9 @@ internal class CSharpLanguageDef : ILanguageDef
         _ => ch.ToString()
     };
 
+#if NET10_0_OR_GREATER
+    [UnconditionalSuppressMessage("Trimming", "IL2070:Unrecognized value passed to a parameter annotated with DynamicallyAccessedMembersAttribute", Justification = "Object declarations are generated from public properties of runtime user model types.")]
+#endif
     private static string PrintDeclaration(TypeMap map, Type type)
     {
         PropertyInfo[] properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
@@ -94,6 +98,9 @@ internal class CSharpLanguageDef : ILanguageDef
                  """;
     }
 
+#if NET10_0_OR_GREATER
+    [UnconditionalSuppressMessage("Trimming", "IL2075:Unrecognized value passed to a parameter annotated with DynamicallyAccessedMembersAttribute", Justification = "Object literals are generated from public properties of runtime user model instances.")]
+#endif
     private static string PrintValue(TypeMap map, object? value)
     {
         if (value == null)
@@ -129,7 +136,7 @@ internal class CSharpLanguageDef : ILanguageDef
         StringBuilder sb = new StringBuilder();
 
         foreach (PropertyInfo property in properties)
-            sb.AppendLine($"    public {RenderType(map, property.PropertyType)} {property.Name} {{ get; set; }}");
+            sb.Append("    public ").Append(RenderType(map, property.PropertyType)).Append(' ').Append(property.Name).AppendLine(" { get; set; }");
 
         return sb.ToString();
     }
@@ -143,7 +150,7 @@ internal class CSharpLanguageDef : ILanguageDef
         // }
 
         StringBuilder sb = new StringBuilder();
-        sb.Append($"    public {name}(").AppendJoin(", ", properties.Select(x => $"{RenderType(map, x.PropertyType)} {x.Name.ToLowerInvariant()}")).AppendLine(")");
+        sb.Append("    public ").Append(name).Append('(').AppendJoin(", ", properties.Select(x => $"{RenderType(map, x.PropertyType)} {x.Name.ToLowerInvariant()}")).AppendLine(")");
         sb.AppendLine("    {");
         sb.AppendJoin("\n", properties.Select(x => $"        {x.Name} = {x.Name.ToLowerInvariant()};")).AppendLine();
         sb.Append("    }");

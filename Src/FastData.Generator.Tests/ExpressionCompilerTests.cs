@@ -39,7 +39,7 @@ public class ExpressionCompilerTests
     {
         TypeMap map = CreateMap();
         TestCompiler compiler = new TestCompiler(map);
-        MethodInfo method = typeof(string).GetMethod(nameof(string.StartsWith), new[] { typeof(string) })!;
+        MethodInfo method = typeof(string).GetMethod(nameof(string.StartsWith), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly, null, new Type[] { typeof(string) }, null)!;
         Expression expression = Expression.Call(Expression.Constant("hello"), method, Expression.Constant("he"));
 
         string output = compiler.GetCode(expression);

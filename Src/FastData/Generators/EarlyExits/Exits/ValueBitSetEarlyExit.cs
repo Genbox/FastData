@@ -7,10 +7,19 @@ using Genbox.FastData.Generators.Helpers;
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // inputKey >= Start && inputKey <= End && ((MissingBitSet & (1UL << (inputKey - Start))) != 0);
+/// <summary>Rejects integral keys that are marked missing within a bounded 64-value window.</summary>
+/// <typeparam name="T">The integral key type.</typeparam>
+/// <param name="Start">The inclusive value represented by bit zero.</param>
+/// <param name="End">The inclusive upper bound of the bitmap window.</param>
+/// <param name="MissingBitSet">The bitmap whose set bits identify rejected values.</param>
 public sealed record ValueBitSetEarlyExit<T>(T Start, T End, ulong MissingBitSet) : IEarlyExit
 {
+    /// <inheritdoc />
     public Expression GetExpression(ParameterExpression key)
     {
+        if (key == null)
+            throw new ArgumentNullException(nameof(key));
+
         TypeCode typeCode = Type.GetTypeCode(key.Type);
         Func<T, ulong> toUlong = typeCode.GetUnsignedValueConverter<T>();
         ulong startVal = toUlong(Start);
@@ -25,7 +34,9 @@ public sealed record ValueBitSetEarlyExit<T>(T Start, T End, ulong MissingBitSet
         return AndAlso(inRange, missing);
     }
 
+    /// <inheritdoc />
     public bool IsWorseThan(IEarlyExit other) => false;
 
+    /// <inheritdoc />
     public ulong KeyspaceSize => (ulong)BitOperations.PopCount(MissingBitSet);
 }

@@ -5,7 +5,7 @@ using static Genbox.FastData.Generator.Helpers.FormatHelper;
 
 namespace Genbox.FastData.Generator.Rust.TestHarness;
 
-public sealed class RustTest(DockerManager manager) : TestBase<RustBootstrap>(new RustBootstrap(HarnessType.Test), manager)
+internal sealed class RustTest(DockerManager manager) : TestBase<RustBootstrap>(new RustBootstrap(HarnessType.Test), manager)
 {
     protected override string RenderContains<TKey>(string source, TKey[] present, TKey[] notPresent) =>
         $"""

@@ -22,7 +22,7 @@ internal sealed record GPerfStringHash : IStringHash
         _mandatoryExits = CreateMandatoryExits(encoding, sevenBit, mandatoryMinLength >= 0 ? mandatoryMinLength : minLen);
     }
 
-    internal int[] AssociationValues { get; }
+    public int[] AssociationValues { get; }
     internal int[] AlphaIncrements { get; }
     internal int[] Positions { get; }
     internal int MinLen { get; }
@@ -43,7 +43,7 @@ internal sealed record GPerfStringHash : IStringHash
             Assign(hash, HashIncludesLength ? Convert(length, typeof(ulong)) : Constant(0UL))
         ];
 
-        PropertyInfo assoProp = typeof(GPerfStringHash).GetProperty(nameof(AssociationValues), BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)!;
+        PropertyInfo assoProp = typeof(GPerfStringHash).GetProperty(nameof(AssociationValues), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)!;
         Expression asso = Property(Constant(this, typeof(GPerfStringHash)), assoProp);
 
         // Positions are selected by the analyzer and sorted in gperf order. A selected position contributes only when it exists

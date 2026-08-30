@@ -50,7 +50,7 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
 
             if (heap.Add(popBest.Fitness, popBest)) //This creates a copy, which is what we want, since we clear the population array
             {
-                LogBetterCandidate(logger, popBest.Fitness, (int)popBest.Tag, string.Join(", ", popBest.Genes.AsEnumerable()));
+                LogBetterCandidate(logger, popBest.Fitness, popBest.Tag, string.Join(", ", popBest.Genes.AsEnumerable()));
                 bestFitness = popBest.Fitness;
             }
 
@@ -101,7 +101,7 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
         return heap.Items.Select(x => x.Item2);
     }
 
-    private static void Shuffle<T>(IList<T> list, IRandom random)
+    private static void Shuffle(List<int> list, IRandom random)
     {
         for (int i = list.Count - 1; i > 0; i--)
         {

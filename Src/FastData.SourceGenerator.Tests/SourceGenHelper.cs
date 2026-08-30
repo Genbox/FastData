@@ -13,7 +13,7 @@ internal static class SourceGenHelper
     public static string RunSourceGenerator<T>(string source, bool release, out Diagnostic[] compilerDiagnostics, out Diagnostic[] codeGenDiagnostics) where T : IIncrementalGenerator, new()
     {
         RunSourceGenerator<T>(source, release, out codeGenDiagnostics, out Compilation compilation);
-        compilerDiagnostics = compilation.GetDiagnostics().ToArray();
+        compilerDiagnostics = compilation.GetDiagnostics(TestContext.Current.CancellationToken).ToArray();
 
         StringBuilder sb = new StringBuilder();
 
@@ -31,7 +31,7 @@ internal static class SourceGenHelper
         T generator = new T();
 
         CSharpGeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-        driver.RunGeneratorsAndUpdateCompilation(compilation, out outCompilation, out ImmutableArray<Diagnostic> diagnostics);
+        driver.RunGeneratorsAndUpdateCompilation(compilation, out outCompilation, out ImmutableArray<Diagnostic> diagnostics, TestContext.Current.CancellationToken);
 
         codeGenDiagnostics = diagnostics.ToArray();
     }

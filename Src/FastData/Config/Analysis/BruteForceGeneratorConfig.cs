@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 
 namespace Genbox.FastData.Config.Analysis;
 
+/// <summary>Configures exhaustive prefix and suffix segment generation.</summary>
 [PublicAPI]
 public sealed class BruteForceGeneratorConfig
 {

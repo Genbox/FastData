@@ -128,7 +128,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
         ArraySegment[] res = gen.Generate(props).ToArray();
 
         foreach (ArraySegment segment in res)
-            o.WriteLine($"{segment}. res: {string.Join(",", input.Select(x => SegmentHelper.InsertSegmentBounds(x, segment)))}");
+            o.WriteLine($"{segment}. res: {string.Join(',', input.Select(x => SegmentHelper.InsertSegmentBounds(x, segment)))}");
 
         ArraySegment[] expected = Enumerable.Range(1, length).Select(x => new ArraySegment(offset, x, Alignment.Left)).ToArray();
         Assert.Equal(expected, res.Take(length).ToArray());
@@ -184,7 +184,7 @@ public class SegmentGeneratorTests(ITestOutputHelper o)
     {
         { new BruteForceGenerator(new BruteForceGeneratorConfig()), 8 },
         { new EdgeGramGenerator(new EdgeGramGeneratorConfig()), 8 },
-        { new OffsetGenerator(new OffsetGeneratorConfig()), 8 } // There is no maxlength, but we test up to 8
+        { new OffsetGenerator(), 8 } // There is no maxlength, but we test up to 8
     };
 
     internal static TheoryData<ISegmentGenerator, string[], ArraySegment, ArraySegment> GetMaxSegmentLengthGenerators() => new TheoryData<ISegmentGenerator, string[], ArraySegment, ArraySegment>

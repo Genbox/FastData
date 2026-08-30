@@ -8,7 +8,7 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-public sealed class HashTableCompactStructure<TKey, TValue> : IStructure<TKey, TValue, HashTableCompactContext<TKey, TValue>>
+internal sealed class HashTableCompactStructure<TKey, TValue> : IStructure<TKey, TValue, HashTableCompactContext<TKey, TValue>>
 {
     private readonly HashData _hashData;
 

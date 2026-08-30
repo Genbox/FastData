@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Genbox.FastData.BenchmarkHarness.Runner.Results;
@@ -8,7 +9,8 @@ internal static class Utf8LastLineReader
 
     public static async Task<string?> ReadAsync(string path, CancellationToken cancellationToken)
     {
-        await using FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, BufferSize, FileOptions.Asynchronous);
+        FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, BufferSize, FileOptions.Asynchronous);
+        await using ConfiguredAsyncDisposable streamScope = stream.ConfigureAwait(false);
 
         if (stream.Length == 0)
             return null;

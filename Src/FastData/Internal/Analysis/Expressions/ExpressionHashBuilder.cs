@@ -86,9 +86,13 @@ internal static class ExpressionHashBuilder
                 int consumed = 0;
                 while (rem > 0)
                 {
-                    int chunk = rem >= 8 ? 8 :
-                        rem >= 4 ? 4 :
-                        rem >= 2 ? 2 : 1;
+                    int chunk = rem switch
+                    {
+                        >= 8 => 8,
+                        >= 4 => 4,
+                        >= 2 => 2,
+                        _ => 1
+                    };
                     Expression readOffset = consumed == 0 ? offsetExpr : Add(offsetExpr, Constant(consumed));
 
                     // Mixer(hash, Read(data, offset))

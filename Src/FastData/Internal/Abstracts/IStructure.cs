@@ -3,7 +3,7 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Internal.Abstracts;
 
-public interface IStructure
+internal interface IStructure
 {
     StructureCapability SupportedCapabilities { get; }
     IEnumerable<IEarlyExit> GetMandatoryExits();

@@ -7,7 +7,7 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-public sealed class HashTablePerfectStructure<TKey, TValue> : IStructure<TKey, TValue, HashTablePerfectContext<TKey, TValue>>
+internal sealed class HashTablePerfectStructure<TKey, TValue> : IStructure<TKey, TValue, HashTablePerfectContext<TKey, TValue>>
 {
     private readonly HashData _hashData;
 

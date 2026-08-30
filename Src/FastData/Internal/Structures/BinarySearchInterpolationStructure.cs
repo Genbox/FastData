@@ -5,7 +5,7 @@ using Genbox.FastData.Internal.Abstracts;
 
 namespace Genbox.FastData.Internal.Structures;
 
-public sealed class BinarySearchInterpolationStructure<TKey, TValue> : IStructure<TKey, TValue, BinarySearchInterpolationContext<TKey, TValue>>
+internal sealed class BinarySearchInterpolationStructure<TKey, TValue> : IStructure<TKey, TValue, BinarySearchInterpolationContext<TKey, TValue>>
 {
     public StructureCapability SupportedCapabilities => StructureCapability.Membership | StructureCapability.KeyValueLookup | StructureCapability.Enumeration | StructureCapability.DirectAccess;
 

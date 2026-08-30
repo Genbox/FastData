@@ -132,7 +132,10 @@ public class TypeMapTests
 
     private static string Identity(string value) => value;
 
-    private static class CustomObject;
+    private sealed class CustomObject
+    {
+        public override string ToString() => nameof(CustomObject);
+    }
 
     private enum SampleEnum
     {

@@ -8,10 +8,18 @@ using Convert = System.Convert;
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // inputKey > Min && inputKey < Max;
+/// <summary>Rejects keys that fall strictly inside an unobserved range.</summary>
+/// <typeparam name="T">The key type.</typeparam>
+/// <param name="Min">The exclusive lower bound of the rejected range.</param>
+/// <param name="Max">The exclusive upper bound of the rejected range.</param>
 public sealed record ValueInRangeEarlyExit<T>(T Min, T Max) : IEarlyExit
 {
+    /// <inheritdoc />
     public Expression GetExpression(ParameterExpression key)
     {
+        if (key == null)
+            throw new ArgumentNullException(nameof(key));
+
         TypeCode typeCode = Type.GetTypeCode(typeof(T));
 
         if (typeCode.IsIntegral())
@@ -24,6 +32,7 @@ public sealed record ValueInRangeEarlyExit<T>(T Min, T Max) : IEarlyExit
         return AndAlso(lower, upper);
     }
 
+    /// <inheritdoc />
     public bool IsWorseThan(IEarlyExit other)
     {
         if (other is not ValueInRangeEarlyExit<T> otherExit)
@@ -38,6 +47,7 @@ public sealed record ValueInRangeEarlyExit<T>(T Min, T Max) : IEarlyExit
         return minCompare >= 0 && maxCompare <= 0;
     }
 
+    /// <inheritdoc />
     public ulong KeyspaceSize
     {
         get

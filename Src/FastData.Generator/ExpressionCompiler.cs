@@ -5,9 +5,14 @@ namespace Genbox.FastData.Generator;
 
 /// <summary>Converts expression trees used by FastData into target-language source fragments.</summary>
 [SuppressMessage("Correctness", "SS004:Implement Equals() and GetHashcode() methods for a type used in a collection.")]
+[SuppressMessage("Maintainability", "CA1510:Use ArgumentNullException throw helper", Justification = "The netstandard2.0 target does not provide ArgumentNullException.ThrowIfNull.")]
 public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 {
-    protected readonly IndentedStringBuilder Output = new IndentedStringBuilder();
+    /// <summary>Gets the type map used to render target-language types and values.</summary>
+    protected TypeMap Map { get; } = map ?? throw new ArgumentNullException(nameof(map));
+
+    /// <summary>Gets the builder that receives generated source code.</summary>
+    protected IndentedStringBuilder Output { get; } = new IndentedStringBuilder();
 
     /// <summary>Renders an expression tree to source code.</summary>
     /// <param name="expression">The expression tree to render.</param>
@@ -22,13 +27,17 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         return Output.ToString();
     }
 
+    /// <inheritdoc />
     protected override Expression VisitIndex(IndexExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Object != null)
             Visit(node.Object);
         else if (node.Indexer != null)
         {
-            Output.Append(map.GetTypeName(node.Indexer.DeclaringType!))
+            Output.Append(Map.GetTypeName(node.Indexer.DeclaringType!))
                   .Append(".");
         }
 
@@ -44,8 +53,12 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         return node;
     }
 
+    /// <inheritdoc />
     protected override Expression VisitMethodCall(MethodCallExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Object != null)
         {
             Visit(node.Object);
@@ -61,8 +74,12 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         return node;
     }
 
+    /// <inheritdoc />
     protected override Expression VisitMember(MemberExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Expression is ConstantExpression)
         {
             Output.Append(node.Member.Name);
@@ -72,21 +89,29 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         if (node.Expression != null)
             Visit(node.Expression);
         else
-            Output.Append(map.GetTypeName(node.Member.DeclaringType!));
+            Output.Append(Map.GetTypeName(node.Member.DeclaringType!));
 
         Output.Append(".");
         Output.Append(node.Member.Name);
         return node;
     }
 
+    /// <inheritdoc />
     protected override Expression VisitLambda<T>(Expression<T> node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         Visit(node.Body);
         return node;
     }
 
+    /// <inheritdoc />
     protected override Expression VisitBlock(BlockExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         // Build a map from variable to its initializer expression, so we can emit combined declaration-with-initializer statements (e.g. "int length = Length(key);")
         // instead of separate declaration and assignment lines.
         Dictionary<ParameterExpression, Expression> initializers = new Dictionary<ParameterExpression, Expression>();
@@ -113,7 +138,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
             if (v.Type.IsArray)
                 t = v.Type.GetElementType()!;
 
-            string typeName = $"{map.GetTypeName(t)}{(v.Type.IsArray ? "[]" : "")}";
+            string typeName = $"{Map.GetTypeName(t)}{(v.Type.IsArray ? "[]" : "")}";
 
             initializers.TryGetValue(v, out Expression? init);
             WriteVariableDeclaration(v, typeName, init);
@@ -136,6 +161,9 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
     /// <summary>Renders a single block-scoped variable declaration, with its initializer if one was inlined.</summary>
     protected virtual void WriteVariableDeclaration(ParameterExpression v, string typeName, Expression? init)
     {
+        if (v == null)
+            throw new ArgumentNullException(nameof(v));
+
         if (init != null)
         {
             Output.Append($"{typeName} {v.Name} = ");
@@ -146,8 +174,12 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
             Output.AppendLine($"{typeName} {v.Name};");
     }
 
+    /// <inheritdoc />
     protected override Expression VisitBinary(BinaryExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.NodeType == ExpressionType.ArrayIndex)
         {
             Visit(node.Left);
@@ -172,30 +204,34 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         return node;
     }
 
+    /// <inheritdoc />
     protected override Expression VisitConstant(ConstantExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Value is Enum && node.Type.IsEnum)
         {
-            Output.Append(node.Type.Name).Append(".").Append(node.Value.ToString());
+            Output.Append(node.Type.Name).Append(".").Append(node.Value.ToString()!);
             return node;
         }
 
         string str = node.Value switch
         {
-            char x => map.GetValueLiteral(x),
-            sbyte x => map.GetValueLiteral(x),
-            byte x => map.GetValueLiteral(x),
-            short x => map.GetValueLiteral(x),
-            ushort x => map.GetValueLiteral(x),
-            int x => map.GetValueLiteral(x),
-            uint x => map.GetValueLiteral(x),
-            long x => map.GetValueLiteral(x),
-            ulong x => map.GetValueLiteral(x),
-            float x => map.GetValueLiteral(x),
-            double x => map.GetValueLiteral(x),
-            string x => map.GetValueLiteral(x),
-            bool x => map.GetValueLiteral(x),
-            null => map.GetValueLiteral(null),
+            char x => Map.GetValueLiteral(x),
+            sbyte x => Map.GetValueLiteral(x),
+            byte x => Map.GetValueLiteral(x),
+            short x => Map.GetValueLiteral(x),
+            ushort x => Map.GetValueLiteral(x),
+            int x => Map.GetValueLiteral(x),
+            uint x => Map.GetValueLiteral(x),
+            long x => Map.GetValueLiteral(x),
+            ulong x => Map.GetValueLiteral(x),
+            float x => Map.GetValueLiteral(x),
+            double x => Map.GetValueLiteral(x),
+            string x => Map.GetValueLiteral(x),
+            bool x => Map.GetValueLiteral(x),
+            null => Map.GetValueLiteral(null),
             _ => throw new NotSupportedException($"Constants of type '{node.Type}' are not supported.")
         };
 
@@ -203,17 +239,25 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         return node;
     }
 
+    /// <inheritdoc />
     protected override Expression VisitParameter(ParameterExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         Output.Append(node.Name!);
         return node;
     }
 
+    /// <inheritdoc />
     protected override Expression VisitUnary(UnaryExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.NodeType == ExpressionType.Convert)
         {
-            Output.Append("(").Append(map.GetTypeName(node.Type)).Append(")");
+            Output.Append("(").Append(Map.GetTypeName(node.Type)).Append(")");
             Visit(node.Operand);
             return node;
         }
@@ -236,8 +280,12 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         return node;
     }
 
+    /// <inheritdoc />
     protected override Expression VisitConditional(ConditionalExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         Output.Append("if (");
         Visit(node.Test);
         Output.AppendLine(")");
@@ -259,8 +307,12 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         return node;
     }
 
+    /// <inheritdoc />
     protected override Expression VisitLoop(LoopExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         if (node.Body is not ConditionalExpression { IfFalse: GotoExpression { Kind: GotoExpressionKind.Break } ge } cond)
             throw new NotSupportedException($"Loop expression does not match the supported 'while (test) {{ ... }} break;' shape: {node}");
 
@@ -282,8 +334,12 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         return node;
     }
 
+    /// <inheritdoc />
     protected override Expression VisitGoto(GotoExpression node)
     {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
         switch (node.Kind)
         {
             case GotoExpressionKind.Break:

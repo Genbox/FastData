@@ -90,8 +90,11 @@ internal static class ConsoleOutput
 
         double delta = ((current - previous.Value) / previous.Value) * 100;
         string text = delta.ToString("+0.00;-0.00;0.00", CultureInfo.InvariantCulture) + "%";
-        string? style = Math.Abs(delta) < warningThreshold ? null :
-            delta < 0 ? "green" : "red";
+        string? style = null;
+
+        if (Math.Abs(delta) >= warningThreshold)
+            style = delta < 0 ? "green" : "red";
+
         return style == null ? text : $"[{style}]{text}[/]";
     }
 }

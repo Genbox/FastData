@@ -1,6 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Genbox.FastData.InternalShared.Helpers;
 
-public static class TestHelper
+[SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "This helper generates non-security-sensitive test data.")]
+internal static class TestHelper
 {
     private const string _alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 

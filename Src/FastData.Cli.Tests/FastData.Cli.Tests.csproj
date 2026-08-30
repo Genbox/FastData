@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Files\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

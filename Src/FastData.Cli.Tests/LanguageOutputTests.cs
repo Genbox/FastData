@@ -4,42 +4,44 @@ namespace Genbox.FastData.Cli.Tests;
 public class LanguageOutputTests
 {
     [Fact]
-    public async Task CSharpStringOutput() => await VerifyOutput("csharp", "Files/Strings.input");
+    public async Task CSharpStringOutput() => await VerifyOutputAsync("csharp", "Files/Strings.input");
 
     [Fact]
-    public async Task CSharpIntegerOutput() => await VerifyOutput("csharp", "-k UInt8", "Files/Integers.input");
+    public async Task CSharpIntegerOutput() => await VerifyOutputAsync("csharp", "-k UInt8", "Files/Integers.input");
 
     [Fact]
-    public async Task CSharpHashTableOutput() => await VerifyOutput("csharp", "-s HashTable", "Files/Strings.input");
+    public async Task CSharpHashTableOutput() => await VerifyOutputAsync("csharp", "-s HashTable", "Files/Strings.input");
 
     [Fact]
-    public async Task CPlusPlusStringOutput() => await VerifyOutput("cpp", "Files/Strings.input");
+    public async Task CPlusPlusStringOutput() => await VerifyOutputAsync("cpp", "Files/Strings.input");
 
     [Fact]
-    public async Task CPlusPlusIntegerOutput() => await VerifyOutput("cpp", "-k UInt8", "Files/Integers.input");
+    public async Task CPlusPlusIntegerOutput() => await VerifyOutputAsync("cpp", "-k UInt8", "Files/Integers.input");
 
     [Fact]
-    public async Task CPlusPlusHashTableOutput() => await VerifyOutput("cpp", "-s HashTable", "Files/Strings.input");
+    public async Task CPlusPlusHashTableOutput() => await VerifyOutputAsync("cpp", "-s HashTable", "Files/Strings.input");
 
     [Fact]
-    public async Task RustStringOutput() => await VerifyOutput("rust", "Files/Strings.input");
+    public async Task RustStringOutput() => await VerifyOutputAsync("rust", "Files/Strings.input");
 
     [Fact]
-    public async Task RustIntegerOutput() => await VerifyOutput("rust", "-k UInt8", "Files/Integers.input");
+    public async Task RustIntegerOutput() => await VerifyOutputAsync("rust", "-k UInt8", "Files/Integers.input");
 
     [Fact]
-    public async Task RustHashTableOutput() => await VerifyOutput("rust", "-s HashTable", "Files/Strings.input");
+    public async Task RustHashTableOutput() => await VerifyOutputAsync("rust", "-s HashTable", "Files/Strings.input");
 
-    private static async Task VerifyOutput(params string[] args)
+    private static async Task VerifyOutputAsync(params string[] args)
     {
-        string sanitizedFileName = string.Join("_", args);
+        string sanitizedFileName = string.Join('_', args);
 
         foreach (char invalidChar in Path.GetInvalidFileNameChars())
             sanitizedFileName = sanitizedFileName.Replace(invalidChar, '_');
 
-        await Verify(await RunAsync(args))
+        (string output, string error) = await RunAsync(args).ConfigureAwait(false);
+        await Verify((output, error))
               .UseFileName(sanitizedFileName)
               .UseDirectory("CommandOutputs")
-              .DisableDiff();
+              .DisableDiff()
+              .ConfigureAwait(false);
     }
 }

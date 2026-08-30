@@ -15,7 +15,7 @@ internal struct Entity
 
     internal double Fitness { get; set; }
     internal IGene[] Genes { get; }
-    internal object? Tag { get; set; }
+    internal int Tag { get; set; }
 
     internal readonly void ForceMutate(IRandom random)
     {

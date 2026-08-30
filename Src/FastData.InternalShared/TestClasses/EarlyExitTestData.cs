@@ -11,7 +11,7 @@ using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public sealed class EarlyExitTestData<TKey>(
+internal sealed class EarlyExitTestData<TKey>(
     IEarlyExit[] exits,
     TKey[] hitKeys,
     TKey[] missKeys,
@@ -105,9 +105,9 @@ public sealed class EarlyExitTestData<TKey>(
 
     public void Deserialize(IXunitSerializationInfo info)
     {
-        ExitName = info.GetValue<string>(nameof(ExitName));
-        HitKeys = info.GetValue<TKey[]>(nameof(HitKeys));
-        MissKeys = info.GetValue<TKey[]>(nameof(MissKeys));
+        ExitName = info.GetValue<string>(nameof(ExitName)) ?? throw new InvalidOperationException("The serialized exit name is missing.");
+        HitKeys = info.GetValue<TKey[]>(nameof(HitKeys)) ?? throw new InvalidOperationException("The serialized hit keys are missing.");
+        MissKeys = info.GetValue<TKey[]>(nameof(MissKeys)) ?? throw new InvalidOperationException("The serialized miss keys are missing.");
         Workload = info.GetValue<BenchmarkWorkload>(nameof(Workload));
         Exits = [];
         GeneratorFunctions = GeneratorFunction.None;

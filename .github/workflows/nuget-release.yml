@@ -25,6 +25,8 @@ jobs:
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
         with:
           global-json-file: global.json
+          cache: true
+          cache-dependency-path: Src/**/packages.lock.json
       - name: Publish
         shell: pwsh
         run: |

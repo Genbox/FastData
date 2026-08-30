@@ -11,6 +11,8 @@ public class RandomSelectionTests
     [InlineData(false, new[] { 1, 1, 1 })]
     public void IsCorrect(bool avoidDuplicates, int[] expected)
     {
+        ArgumentNullException.ThrowIfNull(expected);
+
         StaticArray<Entity> population = new StaticArray<Entity>(3)
         {
             new Entity([]) { Fitness = 0 },

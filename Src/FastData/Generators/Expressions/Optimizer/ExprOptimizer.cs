@@ -237,26 +237,17 @@ internal static class ExprOptimizer
             case ExpressionType.New:
             {
                 NewExpression @new = (NewExpression)expression;
-                if (@new.Members == null)
-                    return New(@new.Constructor, @new.Arguments.Select(Visit));
-
-                return New(@new.Constructor, @new.Arguments.Select(Visit), @new.Members);
+                return @new.Update(@new.Arguments.Select(Visit));
             }
             case ExpressionType.NewArrayBounds:
             {
                 NewArrayExpression newArrayBounds = (NewArrayExpression)expression;
-                Type? elementType = newArrayBounds.Type.GetElementType();
-                if (elementType == null)
-                    return expression;
-                return NewArrayBounds(elementType, newArrayBounds.Expressions.Select(Visit));
+                return newArrayBounds.Update(newArrayBounds.Expressions.Select(Visit));
             }
             case ExpressionType.NewArrayInit:
             {
                 NewArrayExpression newArrayInit = (NewArrayExpression)expression;
-                Type? elementType = newArrayInit.Type.GetElementType();
-                if (elementType == null)
-                    return expression;
-                return NewArrayInit(elementType, newArrayInit.Expressions.Select(Visit));
+                return newArrayInit.Update(newArrayInit.Expressions.Select(Visit));
             }
             case ExpressionType.Invoke:
             {

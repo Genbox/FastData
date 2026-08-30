@@ -6,7 +6,7 @@ using Xunit.Sdk;
 
 namespace Genbox.FastData.InternalShared.TestClasses;
 
-public class TestData<TKey>(StructureType structureType, TKey[] keys, BenchmarkWorkload workload, int warmupCount = 5, int minSampleCount = 10, int maxSampleCount = 10, int targetIterationTimeMs = 100, double maxErrorPercent = 2.0d) : ITestData, IXunitSerializable
+internal class TestData<TKey>(StructureType structureType, TKey[] keys, BenchmarkWorkload workload, int warmupCount = 5, int minSampleCount = 10, int maxSampleCount = 10, int targetIterationTimeMs = 100, double maxErrorPercent = 2.0d) : ITestData, IXunitSerializable
 {
     private readonly TypeCode _keyType = Type.GetTypeCode(typeof(TKey));
 
@@ -68,7 +68,7 @@ public class TestData<TKey>(StructureType structureType, TKey[] keys, BenchmarkW
     public void Deserialize(IXunitSerializationInfo info)
     {
         StructureType = info.GetValue<StructureType>(nameof(StructureType));
-        Keys = info.GetValue<TKey[]>(nameof(Keys));
+        Keys = info.GetValue<TKey[]>(nameof(Keys)) ?? throw new InvalidOperationException("The serialized keys are missing.");
         Workload = info.GetValue<BenchmarkWorkload>(nameof(Workload));
     }
 

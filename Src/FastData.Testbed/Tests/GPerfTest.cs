@@ -39,7 +39,7 @@ internal static class GPerfTest
 
             string logFile = Path.Combine(path, "fastdata", Path.GetFileNameWithoutExtension(file) + ".output");
 
-            Logger serilog = baseConf.File(logFile, formatProvider: CultureInfo.InvariantCulture).CreateLogger();
+            using Logger serilog = baseConf.File(logFile, formatProvider: CultureInfo.InvariantCulture).CreateLogger();
             using SerilogLoggerFactory factory = new SerilogLoggerFactory(serilog);
 
             string[] data = File.ReadAllLines(file);

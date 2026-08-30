@@ -5,6 +5,7 @@ namespace Genbox.FastData.Config;
 /// <summary>Configuration for generating string-key lookup structures.</summary>
 public sealed class StringDataConfig : DataConfig
 {
+    /// <summary>Initializes a new instance with the default string structure settings.</summary>
     public StringDataConfig()
     {
         StructureSettings.AddDefault(KnownSettings.HashTableCapacityFactor, 1f);

@@ -12,6 +12,8 @@ public class GenericSelectionTests
     [MemberData(nameof(GetSelectionsWithRandom))]
     public void ShouldSelectHighestFitness(object selection)
     {
+        ArgumentNullException.ThrowIfNull(selection);
+
         StaticArray<Entity> population = new StaticArray<Entity>(3)
         {
             new Entity([]) { Fitness = 0.1 },
@@ -45,6 +47,8 @@ public class GenericSelectionTests
     [MemberData(nameof(GetAllSelections))]
     public void AllShouldReturnValidIndexes(object selection)
     {
+        ArgumentNullException.ThrowIfNull(selection);
+
         StaticArray<Entity> population = GeneticsHelper.GeneratePopulation(10, 10, 100);
 
         List<int> selectedIndexes = new List<int>();
@@ -56,11 +60,21 @@ public class GenericSelectionTests
 
     [Theory]
     [MemberData(nameof(GetSeededSelections))]
-    public void ShouldBeDeterministicWithSameSeed(object a, object b) => TestSeed((ISelection)a, (ISelection)b, true);
+    public void ShouldBeDeterministicWithSameSeed(object a, object b)
+    {
+        ArgumentNullException.ThrowIfNull(a);
+        ArgumentNullException.ThrowIfNull(b);
+        TestSeed((ISelection)a, (ISelection)b, true);
+    }
 
     [Theory]
     [MemberData(nameof(GetSeededDiffSelections))]
-    public void ShouldProduceDifferentResultsWithDifferentSeeds(object a, object b) => TestSeed((ISelection)a, (ISelection)b, false);
+    public void ShouldProduceDifferentResultsWithDifferentSeeds(object a, object b)
+    {
+        ArgumentNullException.ThrowIfNull(a);
+        ArgumentNullException.ThrowIfNull(b);
+        TestSeed((ISelection)a, (ISelection)b, false);
+    }
 
     private static void TestSeed(ISelection a, ISelection b, bool equal)
     {

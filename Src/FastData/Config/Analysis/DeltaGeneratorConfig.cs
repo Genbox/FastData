@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 
 namespace Genbox.FastData.Config.Analysis;
 
+/// <summary>Configures segment generation from runs in the input delta map.</summary>
 [PublicAPI]
 public sealed class DeltaGeneratorConfig
 {

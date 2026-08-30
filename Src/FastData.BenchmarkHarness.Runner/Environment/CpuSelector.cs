@@ -162,6 +162,7 @@ internal static partial class CpuSelector
 
     private readonly record struct CoreTopology(int[] LogicalProcessors);
 
+    [StructLayout(LayoutKind.Auto)]
     private readonly record struct CpuCandidate(int LogicalProcessor, int CoreIndex, int Siblings);
 
     [StructLayout(LayoutKind.Explicit, Size = 32)]

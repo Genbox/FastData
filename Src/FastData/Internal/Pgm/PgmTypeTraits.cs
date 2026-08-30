@@ -5,7 +5,7 @@ using Convert = System.Convert;
 
 namespace Genbox.FastData.Internal.Pgm;
 
-internal static class PgmTypeTraits<T> where T : notnull
+internal static class PgmTypeTraits<T>
 {
     public static readonly bool IsFloatingPoint = typeof(T) == typeof(float) || typeof(T) == typeof(double);
     private static readonly bool IsSignedInteger = IntegralTypeHelper.IsSigned(typeof(T));
@@ -32,27 +32,27 @@ internal static class PgmTypeTraits<T> where T : notnull
 
     public static double ToDouble(T value)
     {
-        if (typeof(T) == typeof(float)) return (float)(object)value;
-        if (typeof(T) == typeof(double)) return (double)(object)value;
+        if (typeof(T) == typeof(float)) return (float)(object)value!;
+        if (typeof(T) == typeof(double)) return (double)(object)value!;
         return Convert.ToDouble(value, CultureInfo.InvariantCulture);
     }
 
     public static long ToInt64(T value)
     {
-        if (typeof(T) == typeof(sbyte)) return (sbyte)(object)value;
-        if (typeof(T) == typeof(short)) return (short)(object)value;
-        if (typeof(T) == typeof(int)) return (int)(object)value;
-        if (typeof(T) == typeof(long)) return (long)(object)value;
+        if (typeof(T) == typeof(sbyte)) return (sbyte)(object)value!;
+        if (typeof(T) == typeof(short)) return (short)(object)value!;
+        if (typeof(T) == typeof(int)) return (int)(object)value!;
+        if (typeof(T) == typeof(long)) return (long)(object)value!;
         return Convert.ToInt64(value, CultureInfo.InvariantCulture);
     }
 
     public static ulong ToUInt64(T value)
     {
-        if (typeof(T) == typeof(byte)) return (byte)(object)value;
-        if (typeof(T) == typeof(char)) return (char)(object)value;
-        if (typeof(T) == typeof(ushort)) return (ushort)(object)value;
-        if (typeof(T) == typeof(uint)) return (uint)(object)value;
-        if (typeof(T) == typeof(ulong)) return (ulong)(object)value;
+        if (typeof(T) == typeof(byte)) return (byte)(object)value!;
+        if (typeof(T) == typeof(char)) return (char)(object)value!;
+        if (typeof(T) == typeof(ushort)) return (ushort)(object)value!;
+        if (typeof(T) == typeof(uint)) return (uint)(object)value!;
+        if (typeof(T) == typeof(ulong)) return (ulong)(object)value!;
         return Convert.ToUInt64(value, CultureInfo.InvariantCulture);
     }
 
@@ -94,17 +94,17 @@ internal static class PgmTypeTraits<T> where T : notnull
     {
         unchecked
         {
-            if (typeof(T) == typeof(byte)) return (T)(object)(byte)((byte)(object)a + 1);
-            if (typeof(T) == typeof(sbyte)) return (T)(object)(sbyte)((sbyte)(object)a + 1);
-            if (typeof(T) == typeof(char)) return (T)(object)(char)((char)(object)a + 1);
-            if (typeof(T) == typeof(short)) return (T)(object)(short)((short)(object)a + 1);
-            if (typeof(T) == typeof(ushort)) return (T)(object)(ushort)((ushort)(object)a + 1);
-            if (typeof(T) == typeof(int)) return (T)(object)((int)(object)a + 1);
-            if (typeof(T) == typeof(uint)) return (T)(object)((uint)(object)a + 1);
-            if (typeof(T) == typeof(long)) return (T)(object)((long)(object)a + 1);
-            if (typeof(T) == typeof(ulong)) return (T)(object)((ulong)(object)a + 1);
-            if (typeof(T) == typeof(float)) return (T)(object)((float)(object)a + 1f);
-            if (typeof(T) == typeof(double)) return (T)(object)((double)(object)a + 1d);
+            if (typeof(T) == typeof(byte)) return (T)(object)(byte)((byte)(object)a! + 1);
+            if (typeof(T) == typeof(sbyte)) return (T)(object)(sbyte)((sbyte)(object)a! + 1);
+            if (typeof(T) == typeof(char)) return (T)(object)(char)((char)(object)a! + 1);
+            if (typeof(T) == typeof(short)) return (T)(object)(short)((short)(object)a! + 1);
+            if (typeof(T) == typeof(ushort)) return (T)(object)(ushort)((ushort)(object)a! + 1);
+            if (typeof(T) == typeof(int)) return (T)(object)((int)(object)a! + 1);
+            if (typeof(T) == typeof(uint)) return (T)(object)((uint)(object)a! + 1);
+            if (typeof(T) == typeof(long)) return (T)(object)((long)(object)a! + 1);
+            if (typeof(T) == typeof(ulong)) return (T)(object)((ulong)(object)a! + 1);
+            if (typeof(T) == typeof(float)) return (T)(object)((float)(object)a! + 1f);
+            if (typeof(T) == typeof(double)) return (T)(object)((double)(object)a! + 1d);
             throw new NotSupportedException($"Type {typeof(T)} is not supported.");
         }
     }
@@ -113,9 +113,9 @@ internal static class PgmTypeTraits<T> where T : notnull
     public static T NextAfter(T value)
     {
         if (typeof(T) == typeof(float))
-            return (T)(object)MathF.BitIncrement((float)(object)value);
+            return (T)(object)MathF.BitIncrement((float)(object)value!);
         if (typeof(T) == typeof(double))
-            return (T)(object)Math.BitIncrement((double)(object)value);
+            return (T)(object)Math.BitIncrement((double)(object)value!);
         return AddOne(value);
     }
 
@@ -123,9 +123,9 @@ internal static class PgmTypeTraits<T> where T : notnull
     public static T PreviousValue(T value)
     {
         if (typeof(T) == typeof(float))
-            return (T)(object)MathF.BitDecrement((float)(object)value);
+            return (T)(object)MathF.BitDecrement((float)(object)value!);
         if (typeof(T) == typeof(double))
-            return (T)(object)Math.BitDecrement((double)(object)value);
+            return (T)(object)Math.BitDecrement((double)(object)value!);
         throw new NotSupportedException("PreviousValue is only supported for floating-point types.");
     }
 }

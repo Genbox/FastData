@@ -200,14 +200,24 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
         bool TryGet(out Avalanche op);
     }
 
-    private abstract class MixerGen(int initial, int max) : IMixerGenerator
+    private abstract class MixerGen : IMixerGenerator
     {
-        private int _current = initial;
-        public void Reset() => _current = initial;
+        private readonly int _initial;
+        private readonly int _max;
+        private int _current;
+
+        protected MixerGen(int initial, int max)
+        {
+            _initial = initial;
+            _max = max;
+            _current = initial;
+        }
+
+        public void Reset() => _current = _initial;
 
         public bool TryGet(out Mixer op)
         {
-            if (_current > max)
+            if (_current > _max)
             {
                 op = null!;
                 return false;
@@ -242,14 +252,24 @@ internal sealed partial class BruteForceAnalyzer(StringKeyProperties props, Brut
         protected abstract Mixer GetOperation();
     }
 
-    private abstract class AvalancheGen(int initial, int max) : IAvalancheGenerator
+    private abstract class AvalancheGen : IAvalancheGenerator
     {
-        private int _current = initial;
-        public void Reset() => _current = initial;
+        private readonly int _initial;
+        private readonly int _max;
+        private int _current;
+
+        protected AvalancheGen(int initial, int max)
+        {
+            _initial = initial;
+            _max = max;
+            _current = initial;
+        }
+
+        public void Reset() => _current = _initial;
 
         public bool TryGet(out Avalanche op)
         {
-            if (_current > max)
+            if (_current > _max)
             {
                 op = null!;
                 return false;

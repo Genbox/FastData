@@ -5,6 +5,8 @@ namespace Genbox.FastData.Generators.Contexts;
 /// <summary>Provides a context for key length-based data structures.</summary>
 /// <param name="lengths">An array of lists containing string lengths.</param>
 /// <param name="minLength">The minimum string length.</param>
+/// <param name="values">The values associated with the keys.</param>
+/// <param name="valueOffsets">The value index associated with each length.</param>
 public sealed class KeyLengthContext<TValue>(string?[] lengths, int minLength, ReadOnlyMemory<TValue> values, int[] valueOffsets) : KeyLengthContext(lengths, minLength, valueOffsets)
 {
     /// <summary>Gets the values emitted into the generated structure.</summary>

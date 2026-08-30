@@ -8,7 +8,7 @@ internal sealed class SwitchArray(uint capacity)
     public bool this[uint index]
     {
         get => _data[index] == _counter;
-        set => _data[index] = _counter;
+        set => _data[index] = value ? _counter : 0;
     }
 
     public void Clear()

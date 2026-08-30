@@ -5,8 +5,12 @@ using Genbox.FastData.Generators.Abstracts;
 namespace Genbox.FastData.Generators.EarlyExits.Exits;
 
 // Length(inputKey) > Min && Length(inputKey) < Max;
+/// <summary>Rejects strings whose length falls strictly inside an unobserved range.</summary>
+/// <param name="Min">The exclusive lower bound of the rejected range.</param>
+/// <param name="Max">The exclusive upper bound of the rejected range.</param>
 public sealed record LengthInRangeEarlyExit(int Min, int Max) : IEarlyExit
 {
+    /// <inheritdoc />
     public Expression GetExpression(ParameterExpression key)
     {
         MethodInfo methodInfo = typeof(GeneratorFunctions).GetMethod(nameof(GeneratorFunctions.Length), [typeof(string)])!;
@@ -20,6 +24,7 @@ public sealed record LengthInRangeEarlyExit(int Min, int Max) : IEarlyExit
         return LessThanOrEqual(diff, range);
     }
 
+    /// <inheritdoc />
     public bool IsWorseThan(IEarlyExit other)
     {
         if (other is not LengthInRangeEarlyExit otherExit)
@@ -31,6 +36,7 @@ public sealed record LengthInRangeEarlyExit(int Min, int Max) : IEarlyExit
         return Min >= otherExit.Min && Max <= otherExit.Max;
     }
 
+    /// <inheritdoc />
     public ulong KeyspaceSize
     {
         get

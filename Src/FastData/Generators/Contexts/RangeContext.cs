@@ -5,6 +5,7 @@ namespace Genbox.FastData.Generators.Contexts;
 /// <summary>Provides a context for ranged-based data structures.</summary>
 public sealed class RangeContext<TKey>(ReadOnlyMemory<(TKey Start, TKey End)> ranges) : IContext
 {
+    /// <summary>Gets the inclusive ranges represented by the generated structure.</summary>
     public ReadOnlyMemory<(TKey Start, TKey End)> Ranges { get; } = ranges;
 
     /// <inheritdoc />
