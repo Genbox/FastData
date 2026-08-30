@@ -141,8 +141,7 @@
             RustExpressionCompiler compiler = new RustExpressionCompiler(TypeMap);
             return $"""
                            let data = value.as_bytes();
-                   {compiler.GetCode(strCfg.HashInfo.Expression, 8)}
-                           return hash;
+                   {compiler.GetLambdaBody(strCfg.HashInfo.Expression, 8)}
                    """;
         }
 
@@ -197,19 +196,16 @@
 
         RustExpressionCompiler compiler = new RustExpressionCompiler(TypeMap);
         BlockExpression block = Expression.Block(variables, statements);
-        return block.Expressions.Count == 0 ? string.Empty : compiler.GetCode(block, 8);
+        return compiler.GetStatements(block, 8);
     }
 
     private static ICollection<Expression> GetBody(MethodType methodType) => methodType == MethodType.TryLookup
-        ? [ReturnSymbol("None")]
-        : [ReturnSymbol("false")];
+        ? [ReturnValue(Expression.Default(typeof(object)))]
+        : [ReturnValue(Expression.Constant(false))];
 
-    private static ParameterExpression Symbol(string name) => Expression.Parameter(typeof(object), name);
-
-    private static GotoExpression ReturnSymbol(string symbol)
+    private static GotoExpression ReturnValue(Expression value)
     {
-        ParameterExpression value = Symbol(symbol);
         LabelTarget target = Expression.Label(value.Type);
-        return Expression.MakeGoto(GotoExpressionKind.Break, target, value, value.Type);
+        return Expression.MakeGoto(GotoExpressionKind.Return, target, value, value.Type);
     }
 #>

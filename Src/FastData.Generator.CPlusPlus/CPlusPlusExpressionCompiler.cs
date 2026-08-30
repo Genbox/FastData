@@ -1,11 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 namespace Genbox.FastData.Generator.CPlusPlus;
 
 /// <summary>Renders FastData expression trees as C++ source code.</summary>
 /// <param name="map">The type map used to render C++ types and values.</param>
-[SuppressMessage("Maintainability", "CA1510:Use ArgumentNullException throw helper", Justification = "The target frameworks do not consistently provide ArgumentNullException.ThrowIfNull.")]
 public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
 {
     /// <inheritdoc />

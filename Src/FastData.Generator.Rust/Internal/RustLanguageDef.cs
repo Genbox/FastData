@@ -10,6 +10,7 @@ internal class RustLanguageDef : ILanguageDef
     public IList<ITypeDef> TypeDefinitions => new List<ITypeDef>
     {
         new NullTypeDef("None"),
+        new BooleanTypeDef("bool"),
         new IntegerTypeDef<char>("u16", char.MinValue, char.MaxValue, "0u16", "u16::MAX", static value => ((int)value).ToString(NumberFormatInfo.InvariantInfo) + "u16"),
         new IntegerTypeDef<sbyte>("i8", sbyte.MinValue, sbyte.MaxValue, "i8::MIN", "i8::MAX"),
         new IntegerTypeDef<byte>("u8", byte.MinValue, byte.MaxValue, "u8::MIN", "u8::MAX"),

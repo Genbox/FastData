@@ -1,37 +1,173 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using Genbox.FastData.Generator.Lowered;
 
 namespace Genbox.FastData.Generator;
 
 /// <summary>Converts expression trees used by FastData into target-language source fragments.</summary>
-[SuppressMessage("Correctness", "SS004:Implement Equals() and GetHashcode() methods for a type used in a collection.")]
-[SuppressMessage("Maintainability", "CA1510:Use ArgumentNullException throw helper", Justification = "The netstandard2.0 target does not provide ArgumentNullException.ThrowIfNull.")]
 public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 {
-    /// <summary>Gets the type map used to render target-language types and values.</summary>
-    protected TypeMap Map { get; } = map ?? throw new ArgumentNullException(nameof(map));
+    /// <summary>The output buffer used by derived expression compilers.</summary>
+    [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "This protected field is part of the established derived-compiler API.")]
+    protected readonly IndentedStringBuilder Output = new IndentedStringBuilder();
 
-    /// <summary>Gets the builder that receives generated source code.</summary>
-    protected IndentedStringBuilder Output { get; } = new IndentedStringBuilder();
+    /// <summary>The target-language type map.</summary>
+    [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "This protected field is part of the established derived-compiler API.")]
+    protected readonly TypeMap Map = map;
 
-    /// <summary>Renders an expression tree to source code.</summary>
-    /// <param name="expression">The expression tree to render.</param>
-    /// <param name="indent">The starting indentation level.</param>
-    /// <returns>The rendered source fragment.</returns>
-    public string GetCode(Expression expression, int indent = 0)
+    /// <summary>Renders a lambda as a complete returning method body.</summary>
+    public string GetLambdaBody(LambdaExpression expression, int indent = 0)
+    {
+        expression = EnsureNotNull(expression, nameof(expression));
+
+        string code = RenderProgram(ExpressionProgramLowerer.LowerLambda(expression, GetType().Name), indent);
+        return code.TrimEnd('\r', '\n');
+    }
+
+    /// <summary>Renders a block expression as a statement fragment.</summary>
+    public string GetStatements(BlockExpression expression, int indent = 0) => RenderProgram(ExpressionProgramLowerer.LowerStatements(expression, GetType().Name), indent);
+
+    /// <summary>Renders one validated value expression.</summary>
+    public string GetValue(Expression expression)
+    {
+        ValidatedExpression value = ExpressionProgramLowerer.LowerValue(expression, GetType().Name);
+        Output.Clear();
+        Output.Indent = 0;
+        RenderValue(value);
+        return Output.ToString();
+    }
+
+    private static bool IsAssignment(ExpressionType type) => type is ExpressionType.Assign or ExpressionType.AddAssign or ExpressionType.SubtractAssign or ExpressionType.ExclusiveOrAssign;
+
+    private string RenderProgram(LoweredProgram program, int indent)
     {
         Output.Clear();
         Output.Indent = indent;
-
-        Visit(expression);
+        RenderBlock(program, program.Body);
         return Output.ToString();
+    }
+
+    private void RenderBlock(LoweredProgram program, LoweredBlock block)
+    {
+        foreach (ParameterExpression local in block.Locals)
+        {
+            Type type = local.Type;
+            Type elementType = type.IsArray ? type.GetElementType()! : type;
+            string typeName = $"{Map.GetTypeName(elementType)}{(type.IsArray ? "[]" : "")}";
+            Expression? initializer = program.RequiresDefaultInitialization(local) ? CreateDefaultValue(type) : null;
+            WriteVariableDeclaration(local, typeName, initializer);
+        }
+
+        foreach (LoweredStatement statement in block.Statements)
+        {
+            RenderStatement(program, statement);
+            if (statement is LoweredIfStatement or LoweredWhileStatement)
+                Output.AppendLine();
+        }
+    }
+
+    private void RenderStatement(LoweredProgram program, LoweredStatement statement)
+    {
+        switch (statement)
+        {
+            case LoweredAssignmentStatement assignment:
+                RenderValue(assignment.Operation);
+                Output.AppendLine(";");
+                return;
+
+            case LoweredIfStatement conditional:
+                Output.Append("if (");
+                RenderValue(conditional.Test);
+                Output.AppendLine(")");
+                Output.AppendLine("{");
+                Output.IncrementIndent();
+                RenderBlock(program, conditional.IfTrue);
+                Output.DecrementIndent();
+                Output.AppendLine("}");
+
+                if (conditional.IfFalse != null)
+                {
+                    Output.AppendLine("else");
+                    Output.AppendLine("{");
+                    Output.IncrementIndent();
+                    RenderBlock(program, conditional.IfFalse);
+                    Output.DecrementIndent();
+                    Output.AppendLine("}");
+                }
+                return;
+
+            case LoweredWhileStatement loop:
+                Output.Append("while (");
+                RenderValue(loop.Test);
+                Output.AppendLine(")");
+                Output.AppendLine("{");
+                Output.IncrementIndent();
+                RenderBlock(program, loop.Body);
+                Output.DecrementIndent();
+                Output.AppendLine("}");
+                return;
+
+            case LoweredBlock block:
+                Output.AppendLine("{");
+                Output.IncrementIndent();
+                RenderBlock(program, block);
+                Output.DecrementIndent();
+                Output.AppendLine("}");
+                return;
+
+            case LoweredReturnStatement returnStatement:
+                Output.Append("return");
+                if (returnStatement.Value != null)
+                {
+                    Output.Append(" ");
+                    RenderValue(returnStatement.Value);
+                }
+                Output.AppendLine(";");
+                return;
+
+            case LoweredBreakStatement:
+                Output.AppendLine("break;");
+                return;
+
+            case LoweredContinueStatement:
+                Output.AppendLine("continue;");
+                return;
+
+            default:
+                throw new InvalidOperationException($"Unknown lowered statement '{statement.GetType().Name}'.");
+        }
+    }
+
+    private void RenderValue(ValidatedExpression value) => Visit(value.Source);
+
+    private ConstantExpression CreateDefaultValue(Type type)
+    {
+        if (!type.IsValueType || type.IsEnum)
+            throw new NotSupportedException($"Default initialization of local type '{type}' requires target-specific lowering in {GetType().Name}.");
+
+        object value = Type.GetTypeCode(type) switch
+        {
+            TypeCode.Boolean => false,
+            TypeCode.Char => '\0',
+            TypeCode.SByte => (sbyte)0,
+            TypeCode.Byte => (byte)0,
+            TypeCode.Int16 => (short)0,
+            TypeCode.UInt16 => (ushort)0,
+            TypeCode.Int32 => 0,
+            TypeCode.UInt32 => 0U,
+            TypeCode.Int64 => 0L,
+            TypeCode.UInt64 => 0UL,
+            TypeCode.Single => 0F,
+            TypeCode.Double => 0D,
+            _ => throw new NotSupportedException($"Default initialization of local type '{type}' is not supported by {GetType().Name}.")
+        };
+        return Expression.Constant(value, type);
     }
 
     /// <inheritdoc />
     protected override Expression VisitIndex(IndexExpression node)
     {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
+        node = EnsureNotNull(node, nameof(node));
 
         if (node.Object != null)
             Visit(node.Object);
@@ -56,8 +192,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
     /// <inheritdoc />
     protected override Expression VisitMethodCall(MethodCallExpression node)
     {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
+        node = EnsureNotNull(node, nameof(node));
 
         if (node.Object != null)
         {
@@ -77,8 +212,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
     /// <inheritdoc />
     protected override Expression VisitMember(MemberExpression node)
     {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
+        node = EnsureNotNull(node, nameof(node));
 
         if (node.Expression is ConstantExpression)
         {
@@ -98,71 +232,15 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 
     /// <inheritdoc />
     protected override Expression VisitLambda<T>(Expression<T> node)
-    {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
-
-        Visit(node.Body);
-        return node;
-    }
+        => UnsupportedNode(node, "Lambda expressions must be lowered before rendering.");
 
     /// <inheritdoc />
-    protected override Expression VisitBlock(BlockExpression node)
-    {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
+    protected override Expression VisitBlock(BlockExpression node) => UnsupportedNode(node, "Block expressions must be lowered before rendering.");
 
-        // Build a map from variable to its initializer expression, so we can emit combined declaration-with-initializer statements (e.g. "int length = Length(key);")
-        // instead of separate declaration and assignment lines.
-        Dictionary<ParameterExpression, Expression> initializers = new Dictionary<ParameterExpression, Expression>();
-        HashSet<Expression> inlinedExprs = new HashSet<Expression>();
-
-        foreach (Expression expr in node.Expressions)
-        {
-            if (expr is BinaryExpression { NodeType: ExpressionType.Assign, Left: ParameterExpression left } assign
-                && node.Variables.Contains(left)
-                && !initializers.ContainsKey(left))
-            {
-                initializers[left] = assign.Right;
-                inlinedExprs.Add(expr);
-                continue;
-            }
-
-            break;
-        }
-
-        foreach (ParameterExpression v in node.Variables)
-        {
-            Type t = v.Type;
-
-            if (v.Type.IsArray)
-                t = v.Type.GetElementType()!;
-
-            string typeName = $"{Map.GetTypeName(t)}{(v.Type.IsArray ? "[]" : "")}";
-
-            initializers.TryGetValue(v, out Expression? init);
-            WriteVariableDeclaration(v, typeName, init);
-        }
-
-        foreach (Expression expr in node.Expressions)
-        {
-            if (inlinedExprs.Contains(expr))
-                continue;
-
-            Visit(expr);
-            if (expr is LoopExpression or ConditionalExpression)
-                Output.AppendLine();
-            else
-                Output.AppendLine(";");
-        }
-        return node;
-    }
-
-    /// <summary>Renders a single block-scoped variable declaration, with its initializer if one was inlined.</summary>
+    /// <summary>Renders a single block-scoped variable declaration, with a required default initializer when needed.</summary>
     protected virtual void WriteVariableDeclaration(ParameterExpression v, string typeName, Expression? init)
     {
-        if (v == null)
-            throw new ArgumentNullException(nameof(v));
+        v = EnsureNotNull(v, nameof(v));
 
         if (init != null)
         {
@@ -177,8 +255,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
     /// <inheritdoc />
     protected override Expression VisitBinary(BinaryExpression node)
     {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
+        node = EnsureNotNull(node, nameof(node));
 
         if (node.NodeType == ExpressionType.ArrayIndex)
         {
@@ -189,7 +266,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
             return node;
         }
 
-        bool isAssign = node.NodeType is ExpressionType.Assign or ExpressionType.AddAssign or ExpressionType.SubtractAssign or ExpressionType.ExclusiveOrAssign;
+        bool isAssign = IsAssignment(node.NodeType);
 
         if (!isAssign)
             Output.Append('(');
@@ -207,14 +284,10 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
     /// <inheritdoc />
     protected override Expression VisitConstant(ConstantExpression node)
     {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
+        node = EnsureNotNull(node, nameof(node));
 
         if (node.Value is Enum && node.Type.IsEnum)
-        {
-            Output.Append(node.Type.Name).Append(".").Append(node.Value.ToString()!);
-            return node;
-        }
+            return UnsupportedNode(node, "Enum constants require target-specific lowering.");
 
         string str = node.Value switch
         {
@@ -242,9 +315,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
     /// <inheritdoc />
     protected override Expression VisitParameter(ParameterExpression node)
     {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
-
+        node = EnsureNotNull(node, nameof(node));
         Output.Append(node.Name!);
         return node;
     }
@@ -252,8 +323,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
     /// <inheritdoc />
     protected override Expression VisitUnary(UnaryExpression node)
     {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
+        node = EnsureNotNull(node, nameof(node));
 
         if (node.NodeType == ExpressionType.Convert)
         {
@@ -269,104 +339,84 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
             return node;
         }
 
-        Visit(node.Operand);
-        switch (node.NodeType)
-        {
-            case ExpressionType.PostIncrementAssign: Output.Append("++"); break;
-            case ExpressionType.PostDecrementAssign: Output.Append("--"); break;
-            case ExpressionType.Convert: break;
-            default: throw new NotSupportedException($"Unary operator {node.NodeType} is not supported.");
-        }
+        return UnsupportedNode(node, $"Unary operator {node.NodeType} is not supported.");
+    }
+
+    /// <inheritdoc />
+    protected override Expression VisitConditional(ConditionalExpression node) => UnsupportedNode(node, "Conditional expressions must be lowered before rendering.");
+
+    /// <inheritdoc />
+    protected override Expression VisitDebugInfo(DebugInfoExpression node) => UnsupportedNode(node);
+
+    /// <inheritdoc />
+    protected override Expression VisitDefault(DefaultExpression node)
+    {
+        node = EnsureNotNull(node, nameof(node));
+
+        if (node.Type == typeof(object))
+            Output.Append(Map.GetValueLiteral(null));
+        else
+            Visit(CreateDefaultValue(node.Type));
         return node;
     }
 
     /// <inheritdoc />
-    protected override Expression VisitConditional(ConditionalExpression node)
-    {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
-
-        Output.Append("if (");
-        Visit(node.Test);
-        Output.AppendLine(")");
-        Output.AppendLine("{");
-        Output.IncrementIndent();
-        VisitStatement(node.IfTrue);
-        Output.DecrementIndent();
-        Output.AppendLine("}");
-
-        if (node.IfFalse is not DefaultExpression || node.IfFalse.Type != typeof(void))
-        {
-            Output.AppendLine("else");
-            Output.AppendLine("{");
-            Output.IncrementIndent();
-            VisitStatement(node.IfFalse);
-            Output.DecrementIndent();
-            Output.AppendLine("}");
-        }
-        return node;
-    }
+    protected override Expression VisitDynamic(DynamicExpression node) => UnsupportedNode(node);
 
     /// <inheritdoc />
-    protected override Expression VisitLoop(LoopExpression node)
-    {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
-
-        if (node.Body is not ConditionalExpression { IfFalse: GotoExpression { Kind: GotoExpressionKind.Break } ge } cond)
-            throw new NotSupportedException($"Loop expression does not match the supported 'while (test) {{ ... }} break;' shape: {node}");
-
-        Output.Append("while (");
-        Visit(cond.Test);
-        Output.AppendLine(")");
-        Output.AppendLine("{");
-        Output.IncrementIndent();
-        Visit(cond.IfTrue);
-        Output.DecrementIndent();
-        Output.AppendLine("}");
-
-        if (ge.Value != null)
-        {
-            Output.Append("return ");
-            Visit(ge.Value);
-            Output.Append(";");
-        }
-        return node;
-    }
+    protected override Expression VisitExtension(Expression node) => UnsupportedNode(node);
 
     /// <inheritdoc />
-    protected override Expression VisitGoto(GotoExpression node)
+    protected override Expression VisitInvocation(InvocationExpression node) => UnsupportedNode(node);
+
+    /// <inheritdoc />
+    protected override Expression VisitLabel(LabelExpression node) => UnsupportedNode(node);
+
+    /// <inheritdoc />
+    protected override Expression VisitListInit(ListInitExpression node) => UnsupportedNode(node);
+
+    /// <inheritdoc />
+    protected override Expression VisitMemberInit(MemberInitExpression node) => UnsupportedNode(node);
+
+    /// <inheritdoc />
+    protected override Expression VisitNew(NewExpression node) => UnsupportedNode(node);
+
+    /// <inheritdoc />
+    protected override Expression VisitNewArray(NewArrayExpression node) => UnsupportedNode(node);
+
+    /// <inheritdoc />
+    protected override Expression VisitRuntimeVariables(RuntimeVariablesExpression node) => UnsupportedNode(node);
+
+    /// <inheritdoc />
+    protected override Expression VisitSwitch(SwitchExpression node) => UnsupportedNode(node);
+
+    /// <inheritdoc />
+    protected override Expression VisitTry(TryExpression node) => UnsupportedNode(node);
+
+    /// <inheritdoc />
+    protected override Expression VisitTypeBinary(TypeBinaryExpression node) => UnsupportedNode(node);
+
+    /// <inheritdoc />
+    protected override Expression VisitLoop(LoopExpression node) => UnsupportedNode(node, "Loop expressions must be lowered before rendering.");
+
+    /// <inheritdoc />
+    protected override Expression VisitGoto(GotoExpression node) => UnsupportedNode(node, "Goto expressions must be lowered before rendering.");
+
+    private Expression UnsupportedNode(Expression node, string? reason = null)
     {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
-
-        switch (node.Kind)
-        {
-            case GotoExpressionKind.Break:
-                if (node.Value != null)
-                {
-                    Output.Append("return ");
-                    Visit(node.Value);
-                }
-                else
-                    Output.Append("break");
-                break;
-
-            case GotoExpressionKind.Continue:
-                Output.Append("continue");
-                break;
-
-            default:
-                throw new NotSupportedException($"Goto kind {node.Kind} is not supported.");
-        }
-        return node;
+        node = EnsureNotNull(node, nameof(node));
+        string message = $"Expression node '{node.NodeType}' ({node.GetType().Name}) is not supported by {GetType().Name}.";
+        if (reason != null)
+            message += " " + reason;
+        throw new NotSupportedException(message);
     }
 
-    private void VisitStatement(Expression node)
+    private static T EnsureNotNull<T>(T? value, string parameterName) where T : class
     {
-        Visit(node);
-        if (node is not BlockExpression and not LoopExpression and not ConditionalExpression)
-            Output.AppendLine(";");
+        if (value == null)
+            throw new ArgumentNullException(parameterName, "The expression cannot be null.");
+
+        return value;
     }
 
     private static string GetBinaryOperator(ExpressionType type) => type switch

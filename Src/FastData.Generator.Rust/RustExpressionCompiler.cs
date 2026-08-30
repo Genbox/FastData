@@ -7,7 +7,6 @@ namespace Genbox.FastData.Generator.Rust;
 /// <summary>Renders FastData expression trees as Rust source code.</summary>
 /// <param name="map">The type map used to render Rust types and values.</param>
 [SuppressMessage("Correctness", "SS004:Implement Equals() and GetHashcode() methods for a type used in a collection.")]
-[SuppressMessage("Maintainability", "CA1510:Use ArgumentNullException throw helper", Justification = "The target frameworks do not consistently provide ArgumentNullException.ThrowIfNull.")]
 public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map)
 {
     /// <inheritdoc />

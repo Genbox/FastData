@@ -9,6 +9,7 @@ internal class CPlusPlusLanguageDef : ILanguageDef
     public IList<ITypeDef> TypeDefinitions => new List<ITypeDef>
     {
         new NullTypeDef("nullptr"),
+        new BooleanTypeDef("bool"),
 
         new IntegerTypeDef<char>("char", char.MinValue, (char)127, "0", "127", FormatChar),
         new IntegerTypeDef<sbyte>("int8_t", sbyte.MinValue, sbyte.MaxValue, "std::numeric_limits<int8_t>::lowest()", "std::numeric_limits<int8_t>::max()"),

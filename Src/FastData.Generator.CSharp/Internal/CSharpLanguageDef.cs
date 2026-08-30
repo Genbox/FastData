@@ -10,6 +10,7 @@ internal class CSharpLanguageDef : ILanguageDef
     public IList<ITypeDef> TypeDefinitions => new List<ITypeDef>
     {
         new NullTypeDef("null"),
+        new BooleanTypeDef("bool"),
 
         new IntegerTypeDef<char>("char", char.MinValue, char.MaxValue, "char.MinValue", "char.MaxValue", static value => "'" + EscapeChar(value) + "'"),
         new IntegerTypeDef<sbyte>("sbyte", sbyte.MinValue, sbyte.MaxValue, "sbyte.MinValue", "sbyte.MaxValue"),

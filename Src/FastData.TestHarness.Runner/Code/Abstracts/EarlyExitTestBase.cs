@@ -27,7 +27,7 @@ public abstract class EarlyExitTestBase
 
         ParameterExpression variable = Expression.Variable(vector.Match.GetType(), "inputKey");
         Expression expression = vector.EarlyExit.GetExpression(variable);
-        string source = _compiler.GetCode(expression);
+        string source = _compiler.GetValue(expression);
         await VerifyEarlyExitAsync(_testBase.Name, vector.SnapshotId, source);
 
         string matchProgram = RenderProgram(source, vector.Match);
