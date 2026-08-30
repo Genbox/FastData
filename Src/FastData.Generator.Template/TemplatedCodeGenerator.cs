@@ -13,7 +13,6 @@ using Genbox.FastData.Generators.Contexts;
 namespace Genbox.FastData.Generator.Template;
 
 /// <summary>Base class for T4 template-based language generators.</summary>
-[SuppressMessage("Maintainability", "CA1510:Use ArgumentNullException throw helper", Justification = "The netstandard2.0 target does not provide ArgumentNullException.ThrowIfNull.")]
 public abstract class TemplatedCodeGenerator : ICodeGenerator
 {
     private readonly TemplateManager _manager;

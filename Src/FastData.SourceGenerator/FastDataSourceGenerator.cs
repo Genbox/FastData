@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
@@ -387,7 +388,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        string value = Convert.ToString(constant.Value, System.Globalization.CultureInfo.InvariantCulture) ?? "<null>";
+        string value = Convert.ToString(constant.Value, CultureInfo.InvariantCulture) ?? "<null>";
         builder.Append(':').Append(value.Length).Append(':').Append(value);
     }
 

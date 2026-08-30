@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 using Genbox.FastData.Generator.Rust.Internal;
 using Genbox.FastData.Generator.Template;
 using Genbox.FastData.Generator.Template.Helpers;
@@ -8,7 +6,6 @@ using Genbox.FastData.Generators;
 namespace Genbox.FastData.Generator.Rust;
 
 /// <summary>Generates Rust source code from FastData structure contexts.</summary>
-[SuppressMessage("Maintainability", "CA1510:Use ArgumentNullException throw helper", Justification = "The target frameworks do not consistently provide ArgumentNullException.ThrowIfNull.")]
 public sealed class RustCodeGenerator(RustCodeGeneratorConfig rustCfg) : TemplatedCodeGenerator(new RustLanguageDef(), GeneratorEncoding.Utf8Bytes)
 {
     /// <inheritdoc />
