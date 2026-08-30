@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -24,6 +25,7 @@ public sealed class StringHashInfo(Expression<StringHashFunc> expression, Additi
         return expression;
     }
 
+    [SuppressMessage("ReSharper", "CanSimplifyDictionaryLookupWithTryAdd")]
     private static Dictionary<string, AdditionalData> ValidateAdditionalData(AdditionalData[]? additionalData)
     {
         Dictionary<string, AdditionalData> dataByName = new Dictionary<string, AdditionalData>(StringComparer.Ordinal);

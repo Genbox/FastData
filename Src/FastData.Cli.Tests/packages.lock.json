@@ -66,12 +66,6 @@
         "resolved": "10.32.0.713",
         "contentHash": "7GiMslvghy0n0t7r2oEAVbBeKTnYTXUOQPtZCwuN5FvtM+9vxf4BR4FVrq5o4KYUziHF/5NLR5SHQ3guBqYPow=="
       },
-      "ToStringWithoutOverrideAnalyzer": {
-        "type": "Direct",
-        "requested": "[0.6.0, )",
-        "resolved": "0.6.0",
-        "contentHash": "7GBA+jSpam3NV9IFqTg/ZzUMHytjEnZ0DqGpzHvKWZHV7hGNer71KuDd8rC/+6HwZHswVUzZ14JPt4gi3WhIbw=="
-      },
       "Verify.DiffPlex": {
         "type": "Direct",
         "requested": "[3.3.1, )",
@@ -344,24 +338,6 @@
           "Mono.TextTemplating": "[3.0.0, )"
         }
       },
-      "fastdata.internalshared": {
-        "type": "Project",
-        "dependencies": {
-          "Docker.DotNet": "[3.125.15, )",
-          "Microsoft.CodeAnalysis.CSharp": "[5.6.0, )",
-          "Newtonsoft.Json": "[13.0.4, )",
-          "xunit.v3.extensibility.core": "[3.2.2, )"
-        }
-      },
-      "Docker.DotNet": {
-        "type": "CentralTransitive",
-        "requested": "[3.125.15, )",
-        "resolved": "3.125.15",
-        "contentHash": "XN8FKxVv8Mjmwu104/Hl9lM61pLY675s70gzwSj8KR5pwblo8HfWLcCuinh9kYsqujBkMH4HVRCEcRuU6al4BQ==",
-        "dependencies": {
-          "Newtonsoft.Json": "13.0.1"
-        }
-      },
       "Microsoft.Bcl.AsyncInterfaces": {
         "type": "CentralTransitive",
         "requested": "[10.0.10, )",
@@ -395,12 +371,6 @@
         "dependencies": {
           "System.CodeDom": "6.0.0"
         }
-      },
-      "Newtonsoft.Json": {
-        "type": "CentralTransitive",
-        "requested": "[13.0.4, )",
-        "resolved": "13.0.4",
-        "contentHash": "pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A=="
       },
       "Spectre.Console": {
         "type": "CentralTransitive",
