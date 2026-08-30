@@ -8,6 +8,9 @@ public sealed class HybleTemplateData : ITemplateData
     /// <summary>Gets the lookup keys.</summary>
     public required IEnumerable<object> Keys { get; init; }
 
+    /// <summary>Gets the hashes associated with the lookup keys.</summary>
+    public required IEnumerable<ulong> Hashes { get; init; }
+
     /// <summary>Gets the number of lookup keys.</summary>
     public required int KeyCount { get; init; }
 

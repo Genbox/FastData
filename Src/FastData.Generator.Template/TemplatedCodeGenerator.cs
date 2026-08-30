@@ -272,6 +272,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
                 return new HybleTemplateData
                 {
                     Keys = hybleCtx.Data.Select(x => x.Key).Cast<object>(),
+                    Hashes = hybleCtx.Data.Select(x => x.Value),
                     KeyCount = hybleCtx.Data.Length,
                     Displacements = hybleCtx.Displacements,
                     ApproxRange = hybleCtx.ApproxRange,

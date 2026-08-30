@@ -3,7 +3,7 @@ using Genbox.FastData.Generators.Abstracts;
 namespace Genbox.FastData.Generators.Contexts;
 
 /// <summary>Provides a context for Hyble displacement-based perfect hash structures.</summary>
-public sealed class HybleContext<TKey, TValue>(KeyValuePair<TKey, ulong>[] data, ushort[] displacements, uint approxRange, uint bucketMask, ulong seed, ReadOnlyMemory<TValue> values) : HybleContext(displacements, approxRange, bucketMask, seed)
+public sealed class HybleContext<TKey, TValue>(KeyValuePair<TKey, ulong>[] data, ushort[] displacements, uint approxRange, uint bucketMask, ulong seed, ReadOnlyMemory<TValue> values) : HybleContext(data.LongLength, displacements, approxRange, bucketMask, seed, typeof(TKey) == typeof(string))
 {
     /// <summary>Gets the array of keys indexed by final displacement-computed position.</summary>
     public KeyValuePair<TKey, ulong>[] Data { get; } = data;
@@ -15,6 +15,15 @@ public sealed class HybleContext<TKey, TValue>(KeyValuePair<TKey, ulong>[] data,
 /// <summary>Provides metadata shared by Hyble-generated structures.</summary>
 public abstract class HybleContext(ushort[] displacements, uint approxRange, uint bucketMask, ulong seed) : IContext
 {
+    private readonly long _entryCount;
+
+    /// <summary>Initializes Hyble metadata that optionally retains one full hash per generated entry.</summary>
+    protected HybleContext(long entryCount, ushort[] displacements, uint approxRange, uint bucketMask, ulong seed, bool storeHashCode) : this(displacements, approxRange, bucketMask, seed)
+    {
+        _entryCount = entryCount;
+        StoreHashCode = storeHashCode;
+    }
+
     /// <summary>Gets the per-bucket displacement values.</summary>
     public ushort[] Displacements { get; } = displacements;
 
@@ -30,6 +39,9 @@ public abstract class HybleContext(ushort[] displacements, uint approxRange, uin
     /// </summary>
     public ulong Seed { get; } = seed;
 
+    /// <summary>Indicates whether generated entries should retain their full seeded hash for rejection before string equality.</summary>
+    public bool StoreHashCode { get; }
+
     /// <inheritdoc />
-    public long GetOverheadBytes() => Displacements.LongLength * sizeof(ushort);
+    public long GetOverheadBytes() => (Displacements.LongLength * sizeof(ushort)) + (StoreHashCode ? _entryCount * sizeof(ulong) : 0);
 }

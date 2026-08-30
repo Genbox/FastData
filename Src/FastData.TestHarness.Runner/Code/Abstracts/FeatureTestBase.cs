@@ -96,6 +96,43 @@ public abstract class FeatureTestBase
         Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(SpecialCharacterStringLiteralsCompileAndMatch), keys, ["missing"], TestContext.Current.CancellationToken));
     }
 
+    [Fact]
+    public async Task HybleStringHashFilterMembershipSupport()
+    {
+        StringDataConfig config = new StringDataConfig
+        {
+            StructureTypeOverride = StructureType.Hyble,
+            StringAnalyzerConfig = null
+        };
+        config.EarlyExitConfig.Disabled = true;
+
+        string[] keys = ["alpha-0001", "bravo-0002", "charlie-003", "delta-0004", "echo-00005", "foxtrot-006"];
+        string[] notPresent = ["alpha-0002", "bravo-0003", "charlie-004", "delta-0005", "echo-00006", "foxtrot-007"];
+        string source = FastDataGenerator.Generate(keys, config, Harness.Generator).Source;
+
+        Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(HybleStringHashFilterMembershipSupport), keys, notPresent, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task HybleStringHashFilterIgnoreCaseKeyValueSupport()
+    {
+        StringDataConfig config = new StringDataConfig
+        {
+            StructureTypeOverride = StructureType.Hyble,
+            IgnoreCase = true,
+            StringAnalyzerConfig = null
+        };
+        config.EarlyExitConfig.Disabled = true;
+
+        string[] keys = ["ALPHA-0001", "Bravo-0002", "CHARLIE-003", "Delta-0004", "ECHO-00005", "Foxtrot-006"];
+        string[] lookups = ["alpha-0001", "BRAVO-0002", "charlie-003", "DELTA-0004", "echo-00005", "FOXTROT-006"];
+        string[] notPresent = ["alpha-0002", "bravo-0003", "charlie-004", "delta-0005", "echo-00006", "foxtrot-007"];
+        int[] values = [11, 22, 33, 44, 55, 66];
+        string source = FastDataGenerator.GenerateKeyed(keys, values, config, GetIgnoreCaseGenerator(true)).Source;
+
+        Assert.Equal(1, await Harness.RunTryLookupAsync(source, nameof(HybleStringHashFilterIgnoreCaseKeyValueSupport), lookups, values, notPresent, TestContext.Current.CancellationToken));
+    }
+
     [Theory]
     [InlineData(true), InlineData(false)]
     public async Task TypeReductionSupported(bool enabled)
