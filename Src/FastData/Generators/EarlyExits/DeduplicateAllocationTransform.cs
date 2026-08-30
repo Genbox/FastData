@@ -4,22 +4,20 @@ using Genbox.FastData.Generators.Expressions;
 
 namespace Genbox.FastData.Generators.EarlyExits;
 
-/// <summary>Removes duplicate allocation assignments produced by earlier expression transforms.</summary>
+/// <summary>Removes identity assignments produced by earlier expression transforms.</summary>
 /// <remarks>
 /// Mandatory expressions can intentionally allocate values such as <c>length = Length(key)</c>. The allocation gatherer can
-/// discover the same call later while transforming early exits, so this transform keeps the earliest allocation and drops
-/// later equivalent method-call assignments.
+/// discover the same call later while transforming early exits. It rewrites that repeated allocation to an identity assignment,
+/// which this transform removes without assuming that symbols or helper inputs are immutable.
 /// </remarks>
 public sealed class DeduplicateAllocationTransform : IExprTransform
 {
     /// <inheritdoc />
-    public object CreateState() => new DeduplicateAllocationState();
+    public object CreateState() => new object();
 
     /// <inheritdoc />
     public void Transform(AnnotatedExpr expr, object state, ICollection<AnnotatedExpr> output)
     {
-        if (state is not DeduplicateAllocationState dedupeState)
-            throw new ArgumentException("State must have been created by this transform.", nameof(state));
         if (output == null)
             throw new ArgumentNullException(nameof(output));
 
@@ -29,32 +27,11 @@ public sealed class DeduplicateAllocationTransform : IExprTransform
             return;
         }
 
-        if (IsSelfAssignment(assignment))
+        if (assignment.Left is ParameterExpression left &&
+            assignment.Right is ParameterExpression right &&
+            ReferenceEquals(left, right))
             return;
 
-        // Only method-call allocations are deduplicated. Other assignments can have side effects or carry values that are
-        // not safely comparable by the call signature rules below.
-        if (assignment.Right is MethodCallExpression call)
-        {
-            MethodCallSignature signature = MethodCallSignature.Create(call);
-
-            if (!dedupeState.Seen.Add(signature))
-                return;
-        }
-
         output.Add(expr);
-    }
-
-    private static bool IsSelfAssignment(BinaryExpression assignment)
-    {
-        if (assignment.Left is not ParameterExpression left || assignment.Right is not ParameterExpression right)
-            return false;
-
-        return left.Type == right.Type && string.Equals(left.Name, right.Name, StringComparison.Ordinal);
-    }
-
-    private sealed class DeduplicateAllocationState
-    {
-        public HashSet<MethodCallSignature> Seen { get; } = new HashSet<MethodCallSignature>();
     }
 }

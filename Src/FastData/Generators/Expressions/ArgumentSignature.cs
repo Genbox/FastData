@@ -1,11 +1,17 @@
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 namespace Genbox.FastData.Generators.Expressions;
 
 internal static class ArgumentSignature
 {
-    internal static bool Equals(Expression left, Expression right)
+    internal static bool Equals(Expression? left, Expression? right)
     {
+        if (ReferenceEquals(left, right))
+            return true;
+        if (left == null || right == null)
+            return false;
+
         ArgumentKind kind = GetKind(left);
         if (kind != GetKind(right) || left.Type != right.Type)
             return false;
@@ -13,14 +19,20 @@ internal static class ArgumentSignature
         return kind switch
         {
             ArgumentKind.Constant => Equals(((ConstantExpression)left).Value, ((ConstantExpression)right).Value),
-            ArgumentKind.Parameter => string.Equals(((ParameterExpression)left).Name, ((ParameterExpression)right).Name, StringComparison.Ordinal),
-            ArgumentKind.Other => string.Equals(left.ToString(), right.ToString(), StringComparison.Ordinal),
+            ArgumentKind.Parameter => false,
+            ArgumentKind.Other => false,
             _ => false
         };
     }
 
-    internal static void AddHashCode(ref HashCode hash, Expression expression)
+    internal static void AddHashCode(ref HashCode hash, Expression? expression)
     {
+        if (expression == null)
+        {
+            hash.Add(0);
+            return;
+        }
+
         ArgumentKind kind = GetKind(expression);
         hash.Add(kind);
         hash.Add(expression.Type);
@@ -31,10 +43,8 @@ internal static class ArgumentSignature
                 hash.Add(((ConstantExpression)expression).Value);
                 break;
             case ArgumentKind.Parameter:
-                hash.Add(((ParameterExpression)expression).Name, StringComparer.Ordinal);
-                break;
             case ArgumentKind.Other:
-                hash.Add(expression.ToString(), StringComparer.Ordinal);
+                hash.Add(RuntimeHelpers.GetHashCode(expression));
                 break;
         }
     }

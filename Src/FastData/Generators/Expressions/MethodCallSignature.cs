@@ -10,7 +10,9 @@ internal readonly struct MethodCallSignature(MethodCallExpression node) : IEquat
 
     public bool Equals(MethodCallSignature other)
     {
-        if (!Equals(Node.Method, other.Node.Method) || Node.Arguments.Count != other.Node.Arguments.Count)
+        if (!Equals(Node.Method, other.Node.Method) ||
+            !ArgumentSignature.Equals(Node.Object, other.Node.Object) ||
+            Node.Arguments.Count != other.Node.Arguments.Count)
             return false;
 
         for (int i = 0; i < Node.Arguments.Count; i++)
@@ -28,6 +30,7 @@ internal readonly struct MethodCallSignature(MethodCallExpression node) : IEquat
     {
         HashCode hash = new HashCode();
         hash.Add(Node.Method);
+        ArgumentSignature.AddHashCode(ref hash, Node.Object);
 
         for (int i = 0; i < Node.Arguments.Count; i++)
             ArgumentSignature.AddHashCode(ref hash, Node.Arguments[i]);
