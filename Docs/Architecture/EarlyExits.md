@@ -140,8 +140,8 @@ The flow is:
 6. If `EarlyExitConfig.Optimize` is true, `EarlyExitPipeline.Optimize<string>()` reduces and merges exits.
 7. `EarlyExitPipeline.Annotate()` converts exits to expression trees and a `UsedFunctionVisitor` records which generator helper functions they use.
 8. If any expression or hash needs string length, `FastDataGenerator` prepends a mandatory `length = Length(key)` allocation.
-9. `AllocationGatherTransform` replaces repeated non-boolean `GeneratorFunctions` calls with local variables placed just before first use.
-10. `DeduplicateAllocationTransform` removes duplicate method-call allocations while keeping the earliest allocation.
+9. `AllocationGatherTransform` replaces repeated non-boolean `GeneratorFunctions` calls with local variables placed just before first use. Existing explicit allocations seed the transform, so later uses reference the same expression-tree symbol instead of relying on a matching variable name.
+10. `DeduplicateAllocationTransform` removes only exact identity assignments left by gathering. Helper-call caches are invalidated when their result or an input symbol is assigned, so the pipeline does not assume that expression symbols are immutable.
 11. If expression optimization is enabled, `EarlyExitPipeline.OptimizeExpressions()` simplifies the expression trees.
 12. The expressions are visited again so helper functions introduced by transforms are included in `StringGeneratorConfig`.
 13. The language generator emits the final checks into each generated lookup method.
