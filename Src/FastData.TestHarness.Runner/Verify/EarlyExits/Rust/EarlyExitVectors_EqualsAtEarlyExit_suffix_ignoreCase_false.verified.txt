@@ -1,1 +1,1 @@
-﻿!EqualsAt(inputKey, -3, "suf")
+﻿!EqualsAt(inputKey, -1, "suf")

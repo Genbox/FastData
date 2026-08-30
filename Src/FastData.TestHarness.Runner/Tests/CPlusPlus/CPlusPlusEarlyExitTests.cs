@@ -26,13 +26,13 @@ public sealed class CPlusPlusEarlyExitTests(DockerCPlusPlusFixture fixture) : Ea
 
           static bool EqualsAt(std::string_view str, int32_t offset, std::string_view fragment)
           {
-              size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset;
+              size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() - fragment.length();
               return str.compare(start, fragment.length(), fragment) == 0;
           }
 
           static bool EqualsAtAsciiLower(std::string_view str, int32_t offset, std::string_view fragment)
           {
-              size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() + offset;
+              size_t start = offset >= 0 ? static_cast<size_t>(offset) : str.length() - fragment.length();
               for (size_t i = 0; i < fragment.length(); ++i)
               {
                   if (ToAsciiLower(static_cast<unsigned char>(str[start + i])) != ToAsciiLower(static_cast<unsigned char>(fragment[i])))

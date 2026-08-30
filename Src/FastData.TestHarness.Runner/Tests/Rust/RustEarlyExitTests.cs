@@ -33,13 +33,15 @@ public sealed class RustEarlyExitTests(DockerRustFixture fixture) : EarlyExitTes
           fn Length(value: &str) -> i32 { value.len() as i32 }
 
           fn EqualsAt(value: &str, offset: i32, fragment: &str) -> bool {
-              let start = if offset >= 0 { offset as usize } else { value.len().wrapping_add(offset as usize) };
-              &value[start..start + fragment.len()] == fragment
+              let value_bytes = value.as_bytes();
+              let fragment_bytes = fragment.as_bytes();
+              let start = if offset >= 0 { offset as usize } else { value_bytes.len() - fragment_bytes.len() };
+              &value_bytes[start..start + fragment_bytes.len()] == fragment_bytes
           }
           fn EqualsAtAsciiLower(value: &str, offset: i32, fragment: &str) -> bool {
               let frag_bytes = fragment.as_bytes();
               let value_bytes = value.as_bytes();
-              let start = if offset >= 0 { offset as usize } else { value_bytes.len().wrapping_add(offset as usize) };
+              let start = if offset >= 0 { offset as usize } else { value_bytes.len() - frag_bytes.len() };
               for i in 0..frag_bytes.len() {
                   if ToAsciiLower(value_bytes[start + i] as u32) != ToAsciiLower(frag_bytes[i] as u32) {
                       return false;

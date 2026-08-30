@@ -22,7 +22,7 @@ public class GeneratorFunctionsTests
 
     [Theory]
     [InlineData("prefix", 0, "pre")]
-    [InlineData("prefix", -3, "fix")]
+    [InlineData("prefix", -1, "fix")]
     public void EqualsAt_ReturnsTrueWhenFragmentFitsAtOffset(string value, int offset, string fragment)
     {
         Assert.True(GeneratorFunctions.EqualsAt(value, offset, fragment));
@@ -30,7 +30,7 @@ public class GeneratorFunctionsTests
 
     [Theory]
     [InlineData("prefix", 0, "PRE")]
-    [InlineData("prefix", -3, "FIX")]
+    [InlineData("prefix", -1, "FIX")]
     [InlineData("AbC123", 0, "abc123")]
     public void EqualsAtAsciiLower_ReturnsTrueWhenFragmentFitsAtOffset(string value, int offset, string fragment)
     {

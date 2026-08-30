@@ -55,7 +55,7 @@ public static class GeneratorFunctions
         if (fragment == null)
             throw new ArgumentNullException(nameof(fragment));
 
-        int start = offset >= 0 ? offset : str.Length + offset;
+        int start = offset >= 0 ? offset : str.Length - fragment.Length;
         Debug.Assert(IsValidRange(str, start, fragment.Length), "EqualsAt requires a non-empty string, a valid offset, and a fragment that fits within the string.");
         return string.CompareOrdinal(str, start, fragment, 0, fragment.Length) == 0;
     }
@@ -72,7 +72,7 @@ public static class GeneratorFunctions
         if (fragment == null)
             throw new ArgumentNullException(nameof(fragment));
 
-        int start = offset >= 0 ? offset : str.Length + offset;
+        int start = offset >= 0 ? offset : str.Length - fragment.Length;
         Debug.Assert(IsValidRange(str, start, fragment.Length), "EqualsAtAsciiLower requires a non-empty string, a valid offset, and a fragment that fits within the string.");
 
         for (int i = 0; i < fragment.Length; i++)

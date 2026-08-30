@@ -1,1 +1,1 @@
-﻿!EqualsAtAsciiLower(inputKey, -3, "suf")
+﻿!EqualsAtAsciiLower(inputKey, -1, "suf")

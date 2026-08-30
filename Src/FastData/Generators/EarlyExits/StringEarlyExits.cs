@@ -206,7 +206,7 @@ internal static class StringEarlyExits
         UnitAtNotEqualEarlyExit u => RequiredLengthForOffset(u.Offset),
         UnitAtBitmapEarlyExit u => RequiredLengthForOffset(u.Offset),
         UnitAtInRangeEarlyExit u => RequiredLengthForOffset(u.Offset),
-        EqualsAtEarlyExit e => e.Offset >= 0 ? e.Offset + e.Fragment.Length : -e.Offset,
+        EqualsAtEarlyExit e => e.Offset >= 0 ? e.Offset + e.Fragment.Length : e.Fragment.Length,
         _ => 0
     };
 

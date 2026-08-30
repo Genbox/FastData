@@ -262,7 +262,7 @@ When ignore-case is enabled this uses `UnitAtAsciiLower`.
 
 #### Equals At Offset
 
-`EqualsAtEarlyExit` rejects strings that do not contain an observed fragment at a fixed offset. Offset `0` acts as a prefix check, and a negative offset acts as a suffix check. Input `preOne preTwo preSix` can yield:
+`EqualsAtEarlyExit` rejects strings that do not contain an observed fragment at a fixed offset. Offset `0` acts as a prefix check. Any negative offset means that the fragment must end with the string; target renderers derive the start from the fragment's own length so UTF-16 code units and UTF-8 bytes cannot disagree. Input `preOne preTwo preSix` can yield:
 
 ```csharp
 if (!EqualsAt(value, 0, "pre"))

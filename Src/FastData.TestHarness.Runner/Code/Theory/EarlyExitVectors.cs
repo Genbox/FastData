@@ -24,8 +24,8 @@ public sealed class EarlyExitVectors : TheoryData<EarlyExitVector>
         Add(new EarlyExitVector(new UnitAtBitmapEarlyExit(0ul, (1ul << ('x' - 64)) | (1ul << ('y' - 64)), true, -1), "delta", "proxY", "offset_neg1_ignoreCase_true"));
         Add(new EarlyExitVector(new EqualsAtEarlyExit("pre", 0, false), "alpha", "prefix", "prefix_ignoreCase_false"));
         Add(new EarlyExitVector(new EqualsAtEarlyExit("pre", 0, true), "alpha", "Prelude", "prefix_ignoreCase_true"));
-        Add(new EarlyExitVector(new EqualsAtEarlyExit("suf", -3, false), "ending", "endsuf", "suffix_ignoreCase_false"));
-        Add(new EarlyExitVector(new EqualsAtEarlyExit("suf", -3, true), "ending", "EndSUF", "suffix_ignoreCase_true"));
+        Add(new EarlyExitVector(new EqualsAtEarlyExit("suf", -1, false), "ending", "endsuf", "suffix_ignoreCase_false"));
+        Add(new EarlyExitVector(new EqualsAtEarlyExit("suf", -1, true), "ending", "EndSUF", "suffix_ignoreCase_true"));
         Add(new EarlyExitVector(new ValueLessThanEarlyExit<int>(10), 5, 10));
         Add(new EarlyExitVector(new ValueGreaterThanEarlyExit<int>(20), 42, 20));
         Add(new EarlyExitVector(new ValueNotEqualEarlyExit<int>(10), 11, 10));
