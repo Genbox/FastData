@@ -86,7 +86,8 @@ public:
     static value_range values() noexcept { return value_range(); }
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        int32_t length = Length(key);
+        int32_t length;
+        length = Length(key);
         if ((static_cast<uint32_t>((length - 1)) > 2u))
         {
          return false;
@@ -99,7 +100,8 @@ public:
 
     [[nodiscard]]
     static bool try_lookup(const std::string_view key, const int32_t*& value) noexcept {
-        int32_t length = Length(key);
+        int32_t length;
+        length = Length(key);
         if ((static_cast<uint32_t>((length - 1)) > 2u))
         {
          value = nullptr;

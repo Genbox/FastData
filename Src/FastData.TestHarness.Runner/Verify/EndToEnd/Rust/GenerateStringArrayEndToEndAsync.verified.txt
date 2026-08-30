@@ -34,8 +34,9 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
-        let mut length: i32 = Length(key);
+        let mut length: i32;
         let mut unitAt0: u32;
+        length = Length(key);
         if ((((length - 5) as u32) > 2))
         {
          return false;

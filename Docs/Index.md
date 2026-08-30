@@ -82,6 +82,11 @@ Hashing decisions are still compile-time work: the generated code only contains 
 
 See [Hashing.md](Architecture/Hashing.md) for details.
 
+# Expression compilation
+
+Hash and early-exit expression trees are validated and lowered into structured statement programs before C#, C++, or Rust rendering. Lambda-bearing hash contracts use `Expression<TDelegate>`. One validator owns names, scope, and closed-lambda rules; lowering only tracks active locals and represents nested scopes directly as block statements. Result-bearing lambdas own their explicit return contract, while explicit compiler entry points distinguish lambda bodies, statement blocks, and indentation-free inline values.
+
+See [ExpressionCompilation.md](Architecture/ExpressionCompilation.md) for the lowering boundary and extension rules.
 # Misc
 
 ## Performance optimizations

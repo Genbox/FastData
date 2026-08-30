@@ -39,8 +39,9 @@ public:
     static constexpr direct_access_view<std::string_view> keys() noexcept { return direct_access_view<std::string_view>(key_items.data(), 4); }
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        int32_t length = Length(key);
+        int32_t length;
         uint32_t unitAt0;
+        length = Length(key);
         if ((static_cast<uint32_t>((length - 5)) > 2u))
         {
          return false;

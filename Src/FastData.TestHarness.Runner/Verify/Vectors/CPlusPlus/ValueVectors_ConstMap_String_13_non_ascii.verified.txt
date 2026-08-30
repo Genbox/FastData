@@ -56,14 +56,16 @@ class fastdata final {
 
     static constexpr uint64_t get_hash(const std::string_view value, int32_t length) noexcept {
         const auto data = value;
-        int32_t offset = 0;
-        int32_t remaining = length;
+        int32_t offset;
+        int32_t remaining;
         uint64_t hash;
         uint64_t round;
         uint64_t v1;
         uint64_t v2;
         uint64_t v3;
         uint64_t v4;
+        offset = 0;
+        remaining = length;
         if ((remaining >= 32))
         {
          v1 = 6983438078262162902ull;
@@ -148,14 +150,14 @@ class fastdata final {
         hash = (hash ^ (hash >> 29));
         hash = (hash * 1609587929392839161ull);
         hash = (hash ^ (hash >> 32));
-
         return hash;
     }
 
 public:
     [[nodiscard]]
     static constexpr bool contains(const std::string_view key) noexcept {
-        int32_t length = Length(key);
+        int32_t length;
+        length = Length(key);
 
         const uint64_t hash = murmur64(get_hash(key, length) + 10451216379200822465ULL);
         const uint32_t h0 = static_cast<uint32_t>(static_cast<__uint128_t>(hash) * 16ULL >> 64);

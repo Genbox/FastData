@@ -67,14 +67,16 @@ internal static class FastData
         unchecked
         {
         ReadOnlySpan<byte> data = MemoryMarshal.AsBytes(value.AsSpan());
-        int offset = 0;
-        int remaining = length;
+        int offset;
+        int remaining;
         ulong hash;
         ulong round;
         ulong v1;
         ulong v2;
         ulong v3;
         ulong v4;
+        offset = 0;
+        remaining = length;
         if ((remaining >= 32))
         {
          v1 = 6983438078262162902ul;
@@ -159,7 +161,6 @@ internal static class FastData
         hash = (hash ^ (hash >> 29));
         hash = unchecked((hash * 1609587929392839161ul));
         hash = (hash ^ (hash >> 32));
-
         return hash;
         }
     }
@@ -167,7 +168,8 @@ internal static class FastData
     
     public static bool Contains(string key)
     {
-        int length = Length(key);
+        int length;
+        length = Length(key);
 
 
         ulong hash = Murmur64(unchecked(Hash(key, length * 2) + 10451216379200822465ul));

@@ -63,7 +63,8 @@ public class Person
     
     public static bool Contains(string key)
     {
-        int length = Length(key);
+        int length;
+        length = Length(key);
         if ((unchecked((uint)(length - 1)) > 2u))
         {
          return false;
@@ -77,7 +78,8 @@ public class Person
     
     public static bool TryLookup(string key, out Person value)
     {
-        int length = Length(key);
+        int length;
+        length = Length(key);
         if ((unchecked((uint)(length - 1)) > 2u))
         {
          value = default;

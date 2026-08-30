@@ -37,14 +37,16 @@ impl fastdata {
     #[inline]
     unsafe fn get_hash(value: &str, mut length: i32) -> u64 {
         let data = value.as_bytes();
-        let mut offset: i32 = 0;
-        let mut remaining: i32 = length;
+        let mut offset: i32;
+        let mut remaining: i32;
         let mut hash: u64;
         let mut round: u64;
         let mut v1: u64;
         let mut v2: u64;
         let mut v3: u64;
         let mut v4: u64;
+        offset = 0;
+        remaining = length;
         if ((remaining >= 32))
         {
          v1 = 6983438078262162902;
@@ -129,7 +131,6 @@ impl fastdata {
         hash = (hash ^ (hash >> (29 as u32)));
         hash = (hash.wrapping_mul(1609587929392839161));
         hash = (hash ^ (hash >> (32 as u32)));
-
         return hash;
     }
 
@@ -145,7 +146,8 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
-        let mut length: i32 = Length(key);
+        let mut length: i32;
+        length = Length(key);
 
         let hash = Self::murmur64(unsafe { Self::get_hash(key, length) }.wrapping_add(10451216379200822465u64));
         let segment_mask = 15u32;

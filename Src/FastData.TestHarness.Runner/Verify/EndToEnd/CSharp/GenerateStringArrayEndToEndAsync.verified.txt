@@ -25,8 +25,9 @@ internal static class FastData
     
     public static bool Contains(string key)
     {
-        int length = Length(key);
+        int length;
         uint unitAt0;
+        length = Length(key);
         if ((unchecked((uint)(length - 5)) > 2u))
         {
          return false;

@@ -51,7 +51,8 @@ internal static class FastData
     
     public static bool Contains(string key)
     {
-        int length = Length(key);
+        int length;
+        length = Length(key);
         if ((unchecked((uint)(length - 1)) > 2u))
         {
          return false;
@@ -65,7 +66,8 @@ internal static class FastData
     
     public static bool TryLookup(string key, out int value)
     {
-        int length = Length(key);
+        int length;
+        length = Length(key);
         if ((unchecked((uint)(length - 1)) > 2u))
         {
          value = default;

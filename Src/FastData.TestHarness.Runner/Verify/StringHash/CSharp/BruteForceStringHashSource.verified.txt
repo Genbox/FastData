@@ -41,10 +41,10 @@ internal static class FastData
         unchecked
         {
         ReadOnlySpan<byte> data = MemoryMarshal.AsBytes(value.AsSpan());
-        ulong hash = ulong.MinValue;
+        ulong hash;
+        hash = ulong.MinValue;
         hash = unchecked((ulong)ReadU32(data, (length - 4)));
         hash = (hash ^ (hash >> 17));
-
         return hash;
         }
     }
@@ -61,7 +61,8 @@ internal static class FastData
     
     public static bool Contains(string key)
     {
-        int length = Length(key);
+        int length;
+        length = Length(key);
         if ((length < 2))
         {
          return false;

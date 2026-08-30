@@ -60,10 +60,9 @@ impl fastdata {
     #[inline]
     unsafe fn get_hash(value: &str, mut length: i32) -> u64 {
         let data = value.as_bytes();
-        let mut hash: u64 = u64::MIN;
+        let mut hash: u64;
+        hash = u64::MIN;
         hash = hash.wrapping_add((AssociationValues[((data[(4) as usize] as i32)) as usize] as u64));
-        hash;
-
         return hash;
     }
 
@@ -74,7 +73,8 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: &str) -> bool {
-        let mut length: i32 = Length(key);
+        let mut length: i32;
+        length = Length(key);
         if ((length < 5))
         {
          return false;
