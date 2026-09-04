@@ -31,19 +31,19 @@ internal abstract class HarnessBase(BootstrapBase bootstrap, DockerManager docke
             hashFile = fullPath + ".fastdata.hash";
             programHash = ComputeHash(program);
 
-            if (File.Exists(fullPath) && await HashMatchesAsync(hashFile, programHash, cancellationToken).ConfigureAwait(false))
+            if (File.Exists(fullPath) && await HashMatchesAsync(hashFile, programHash, cancellationToken))
                 return new ProcessResult(1, string.Empty, string.Empty);
         }
 
-        await File.WriteAllTextAsync(fullPath, program, cancellationToken).ConfigureAwait(false);
+        await File.WriteAllTextAsync(fullPath, program, cancellationToken);
 
-        ProcessResult res = await dockerManager.RunInContainerAsync(BootstrapInstance.DockerImage, BootstrapInstance.RootDir, command, cancellationToken).ConfigureAwait(false);
+        ProcessResult res = await dockerManager.RunInContainerAsync(BootstrapInstance.DockerImage, BootstrapInstance.RootDir, command, cancellationToken);
 
         if (res.ExitCode != 0 && (res.ExitCode != 1 || HasError(res.StandardError)))
             throw new InvalidOperationException($"Failed to compile or run. Exit code: {res.ExitCode}\nSTDOUT:\n{res.StandardOutput}\nSTDERR:\n{res.StandardError}");
 
         if (cacheEnabled && res.ExitCode == 1)
-            await File.WriteAllTextAsync(hashFile, programHash, cancellationToken).ConfigureAwait(false);
+            await File.WriteAllTextAsync(hashFile, programHash, cancellationToken);
 
         return res;
     }
@@ -52,13 +52,13 @@ internal abstract class HarnessBase(BootstrapBase bootstrap, DockerManager docke
     {
         string fileName = id + BootstrapInstance.Ext;
         string fullPath = Path.Combine(BootstrapInstance.RootDir, fileName);
-        await File.WriteAllTextAsync(fullPath, program, cancellationToken).ConfigureAwait(false);
+        await File.WriteAllTextAsync(fullPath, program, cancellationToken);
 
         if (BootstrapInstance.BuildCommandTemplate == null)
             return;
 
         string command = string.Format(CultureInfo.InvariantCulture, BootstrapInstance.BuildCommandTemplate, fileName, id);
-        ProcessResult res = await dockerManager.RunInContainerAsync(BootstrapInstance.DockerImage, BootstrapInstance.RootDir, command, cancellationToken).ConfigureAwait(false);
+        ProcessResult res = await dockerManager.RunInContainerAsync(BootstrapInstance.DockerImage, BootstrapInstance.RootDir, command, cancellationToken);
 
         if (res.ExitCode != 0)
             throw new InvalidOperationException($"Failed to compile benchmark. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
@@ -71,7 +71,7 @@ internal abstract class HarnessBase(BootstrapBase bootstrap, DockerManager docke
 
         string fileName = id + BootstrapInstance.Ext;
         string command = string.Format(CultureInfo.InvariantCulture, BootstrapInstance.RunCommandTemplate, fileName, id, arguments);
-        ProcessResult res = await dockerManager.RunInContainerAsync(BootstrapInstance.DockerImage, BootstrapInstance.RootDir, command, cancellationToken).ConfigureAwait(false);
+        ProcessResult res = await dockerManager.RunInContainerAsync(BootstrapInstance.DockerImage, BootstrapInstance.RootDir, command, cancellationToken);
 
         if (res.ExitCode != 0)
             throw new InvalidOperationException($"Failed to run benchmark. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
@@ -94,7 +94,7 @@ internal abstract class HarnessBase(BootstrapBase bootstrap, DockerManager docke
         if (!File.Exists(hashFile))
             return false;
 
-        string storedHash = await File.ReadAllTextAsync(hashFile, cancellationToken).ConfigureAwait(false);
+        string storedHash = await File.ReadAllTextAsync(hashFile, cancellationToken);
         return string.Equals(storedHash, programHash, StringComparison.Ordinal);
     }
 

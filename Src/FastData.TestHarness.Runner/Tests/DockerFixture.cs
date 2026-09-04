@@ -8,7 +8,7 @@ public sealed class DockerCSharpFixture : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await DockerManager.DisposeAsync().ConfigureAwait(false);
+        await DockerManager.DisposeAsync();
     }
 }
 
@@ -18,7 +18,7 @@ public sealed class DockerCPlusPlusFixture : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await DockerManager.DisposeAsync().ConfigureAwait(false);
+        await DockerManager.DisposeAsync();
     }
 }
 
@@ -28,7 +28,7 @@ public sealed class DockerRustFixture : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await DockerManager.DisposeAsync().ConfigureAwait(false);
+        await DockerManager.DisposeAsync();
     }
 }
 

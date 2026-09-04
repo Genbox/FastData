@@ -64,10 +64,10 @@ dotnet_diagnostic.S6580.severity = none # Prefer CA1304 and CA1305; S6580 only a
 
 # Cross-analyzer ownership
 
-# ConfigureAwaitChecker.Analyzer is intentionally not referenced because MA0004 owns ConfigureAwait analysis.
-dotnet_diagnostic.MA0004.severity = error # Use Task.ConfigureAwait; enabled as the single context-aware ConfigureAwait rule
-dotnet_diagnostic.CA2007.severity = none # Consider calling ConfigureAwait on the awaited task; disabled because MA0004 supports context-aware configuration
-dotnet_diagnostic.VSTHRD111.severity = none # Use ConfigureAwait(bool); disabled because MA0004 avoids requiring ConfigureAwait where context capture is intended
+# ConfigureAwait.Fody sets await behavior, so analyzers requiring explicit ConfigureAwait calls are disabled.
+dotnet_diagnostic.MA0004.severity = none # Use Task.ConfigureAwait
+dotnet_diagnostic.CA2007.severity = none # Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.VSTHRD111.severity = none # Use ConfigureAwait(bool)
 
 # Async invocation and delegate conventions
 dotnet_diagnostic.MA0134.severity = error # Observe result of async calls; enabled as the owner for unobserved awaitables in synchronous methods

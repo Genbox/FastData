@@ -31,7 +31,7 @@ internal sealed class DockerManager : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await RemoveCreatedContainersAsync(CancellationToken.None).ConfigureAwait(false);
+        await RemoveCreatedContainersAsync(CancellationToken.None);
         _containersByImage.Clear();
         _client.Dispose();
         _configuration.Dispose();
@@ -46,7 +46,7 @@ internal sealed class DockerManager : IAsyncDisposable
 
         try
         {
-            await client.System.PingAsync(timeoutSource.Token).ConfigureAwait(false);
+            await client.System.PingAsync(timeoutSource.Token);
             return null;
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
@@ -61,10 +61,10 @@ internal sealed class DockerManager : IAsyncDisposable
 
     public async Task<ProcessResult> RunInContainerAsync(string imageId, string workDir, string command, CancellationToken cancellationToken = default)
     {
-        await EnsureImageAsync(imageId, cancellationToken).ConfigureAwait(false);
+        await EnsureImageAsync(imageId, cancellationToken);
 
-        string containerId = await GetOrCreateContainerAsync(imageId, workDir, cancellationToken).ConfigureAwait(false);
-        (string standardOutput, string standardError, int exitCode) = await ExecInContainerAsync(containerId, command, cancellationToken).ConfigureAwait(false);
+        string containerId = await GetOrCreateContainerAsync(imageId, workDir, cancellationToken);
+        (string standardOutput, string standardError, int exitCode) = await ExecInContainerAsync(containerId, command, cancellationToken);
 
         return new ProcessResult(exitCode, standardOutput, standardError);
     }
@@ -73,7 +73,7 @@ internal sealed class DockerManager : IAsyncDisposable
     {
         try
         {
-            await _client.Images.InspectImageAsync(imageId, cancellationToken).ConfigureAwait(false);
+            await _client.Images.InspectImageAsync(imageId, cancellationToken);
         }
         catch (DockerApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
@@ -86,7 +86,7 @@ internal sealed class DockerManager : IAsyncDisposable
             if (tag != null)
                 parameters.Tag = tag;
 
-            await _client.Images.CreateImageAsync(parameters, null, new Progress<JSONMessage>(), cancellationToken).ConfigureAwait(false);
+            await _client.Images.CreateImageAsync(parameters, null, new Progress<JSONMessage>(), cancellationToken);
         }
     }
 
@@ -95,7 +95,7 @@ internal sealed class DockerManager : IAsyncDisposable
         if (_containersByImage.TryGetValue(imageId, out string? containerId))
             return containerId;
 
-        string newContainerId = await CreatePersistentContainerAsync(imageId, workDir, cancellationToken).ConfigureAwait(false);
+        string newContainerId = await CreatePersistentContainerAsync(imageId, workDir, cancellationToken);
         _containersByImage.TryAdd(imageId, newContainerId);
         return newContainerId;
     }
@@ -123,9 +123,9 @@ internal sealed class DockerManager : IAsyncDisposable
                 Binds = new List<string> { $"{workDir}:{WorkDir}" },
                 CpusetCpus = _cpuSet
             }
-        }, cancellationToken).ConfigureAwait(false);
+        }, cancellationToken);
 
-        await _client.Containers.StartContainerAsync(created.ID, new ContainerStartParameters(), cancellationToken).ConfigureAwait(false);
+        await _client.Containers.StartContainerAsync(created.ID, new ContainerStartParameters(), cancellationToken);
 
         return created.ID;
     }
@@ -140,16 +140,16 @@ internal sealed class DockerManager : IAsyncDisposable
             WorkingDir = WorkDir
         };
 
-        ContainerExecCreateResponse created = await _client.Exec.ExecCreateContainerAsync(containerId, execCreateParameters, cancellationToken).ConfigureAwait(false);
-        using MultiplexedStream stream = await _client.Exec.StartAndAttachContainerExecAsync(created.ID, false, cancellationToken).ConfigureAwait(false);
+        ContainerExecCreateResponse created = await _client.Exec.ExecCreateContainerAsync(containerId, execCreateParameters, cancellationToken);
+        using MultiplexedStream stream = await _client.Exec.StartAndAttachContainerExecAsync(created.ID, false, cancellationToken);
 
         MemoryStream stdOut = new MemoryStream();
-        await using ConfiguredAsyncDisposable stdOutDisposable = stdOut.ConfigureAwait(false);
+        await using MemoryStream stdOutDisposable = stdOut;
         MemoryStream stdErr = new MemoryStream();
-        await using ConfiguredAsyncDisposable stdErrDisposable = stdErr.ConfigureAwait(false);
-        await stream.CopyOutputToAsync(Stream.Null, stdOut, stdErr, cancellationToken).ConfigureAwait(false);
+        await using MemoryStream stdErrDisposable = stdErr;
+        await stream.CopyOutputToAsync(Stream.Null, stdOut, stdErr, cancellationToken);
 
-        ContainerExecInspectResponse execInspect = await _client.Exec.InspectContainerExecAsync(created.ID, cancellationToken).ConfigureAwait(false);
+        ContainerExecInspectResponse execInspect = await _client.Exec.InspectContainerExecAsync(created.ID, cancellationToken);
 
         string standardOutput = Encoding.UTF8.GetString(stdOut.ToArray());
         string standardError = Encoding.UTF8.GetString(stdErr.ToArray());
@@ -161,7 +161,7 @@ internal sealed class DockerManager : IAsyncDisposable
         // Do not delete by name prefix: tests and benchmark runs can share prefixes concurrently.
         // Only containers created by this instance are safe to remove here.
         foreach (string containerId in _containersByImage.Values)
-            await RemoveContainerAsync(containerId, cancellationToken).ConfigureAwait(false);
+            await RemoveContainerAsync(containerId, cancellationToken);
     }
 
     private async Task RemoveContainerAsync(string containerId, CancellationToken cancellationToken)
@@ -172,7 +172,7 @@ internal sealed class DockerManager : IAsyncDisposable
             {
                 Force = true,
                 RemoveVolumes = true
-            }, cancellationToken).ConfigureAwait(false);
+            }, cancellationToken);
         }
         catch
         {

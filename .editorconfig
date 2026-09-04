@@ -13,6 +13,10 @@ insert_final_newline = false
 [**/{bin,obj}/**]
 generated_code = true
 
+[*.g.cs]
+generated_code = true
+dotnet_diagnostic.CS1591.severity = none
+
 # Two-space formats
 [*.{appxmanifest,axml,build,config,csproj,css,dbml,discomap,dtd,htm,html,js,json,jsonc,jsproj,lsproj,njsproj,nuspec,proj,props,resjson,resw,resx,StyleCop,targets,tasks,vbproj,xml,xsd,yaml,yml}]
 indent_size = 2

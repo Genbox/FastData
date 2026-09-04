@@ -39,7 +39,7 @@ internal sealed class ResultStore(string resultsDirectory)
         if (!File.Exists(path))
             return null;
 
-        string? lastLine = await Utf8LastLineReader.ReadAsync(path, cancellationToken).ConfigureAwait(false);
+        string? lastLine = await Utf8LastLineReader.ReadAsync(path, cancellationToken);
         if (string.IsNullOrWhiteSpace(lastLine))
             return null;
 
@@ -51,7 +51,7 @@ internal sealed class ResultStore(string resultsDirectory)
         Directory.CreateDirectory(resultsDirectory);
         ResultEntry entry = new ResultEntry(benchmarkName, result.Min, result.Median, result.Max, result.Avg, result.Error, result.StdDev, DateTimeOffset.UtcNow);
         string json = JsonSerializer.Serialize(entry, JsonOptions);
-        await File.AppendAllTextAsync(GetResultPath(benchmarkName), json + System.Environment.NewLine, cancellationToken).ConfigureAwait(false);
+        await File.AppendAllTextAsync(GetResultPath(benchmarkName), json + System.Environment.NewLine, cancellationToken);
     }
 
     private static ResultEntry? DeserializeEntry(string json) => JsonSerializer.Deserialize<ResultEntry>(json, JsonOptions);

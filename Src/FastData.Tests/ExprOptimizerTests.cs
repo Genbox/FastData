@@ -1297,7 +1297,7 @@ public sealed class ExprOptimizerTests
     private static async Task OptimizeAsync(Expression exp, [CallerMemberName]string testName = "")
     {
         Expression optimized = ExprOptimizer.Visit(exp);
-        await VerifyOptimizedAsync(optimized, testName).ConfigureAwait(false);
+        await VerifyOptimizedAsync(optimized, testName);
     }
 
     private static Task VerifyOptimizedAsync(Expression optimized, string testName) => Verify(optimized.ToString())

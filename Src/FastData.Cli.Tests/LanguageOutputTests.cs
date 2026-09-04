@@ -37,11 +37,10 @@ public class LanguageOutputTests
         foreach (char invalidChar in Path.GetInvalidFileNameChars())
             sanitizedFileName = sanitizedFileName.Replace(invalidChar, '_');
 
-        (string output, string error) = await RunAsync(args).ConfigureAwait(false);
+        (string output, string error) = await RunAsync(args);
         await Verify((output, error))
               .UseFileName(sanitizedFileName)
               .UseDirectory("CommandOutputs")
-              .DisableDiff()
-              .ConfigureAwait(false);
+              .DisableDiff();
     }
 }

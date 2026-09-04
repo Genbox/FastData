@@ -10,7 +10,7 @@ internal static class Utf8LastLineReader
     public static async Task<string?> ReadAsync(string path, CancellationToken cancellationToken)
     {
         FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, BufferSize, FileOptions.Asynchronous);
-        await using ConfiguredAsyncDisposable streamScope = stream.ConfigureAwait(false);
+        await using FileStream streamScope = stream;
 
         if (stream.Length == 0)
             return null;
@@ -25,7 +25,7 @@ internal static class Utf8LastLineReader
             remaining -= readLength;
 
             stream.Seek(remaining, SeekOrigin.Begin);
-            await stream.ReadExactlyAsync(buffer.AsMemory(0, readLength), cancellationToken).ConfigureAwait(false);
+            await stream.ReadExactlyAsync(buffer.AsMemory(0, readLength), cancellationToken);
 
             ReadOnlySpan<byte> span = buffer.AsSpan(0, readLength);
             if (lineEnd is null)
@@ -37,10 +37,10 @@ internal static class Utf8LastLineReader
 
             int lineBreakIndex = span.LastIndexOfAny((byte)'\r', (byte)'\n');
             if (lineBreakIndex >= 0)
-                return await ReadRangeAsync(stream, remaining + lineBreakIndex + 1, lineEnd.Value, cancellationToken).ConfigureAwait(false);
+                return await ReadRangeAsync(stream, remaining + lineBreakIndex + 1, lineEnd.Value, cancellationToken);
 
             if (remaining == 0)
-                return await ReadRangeAsync(stream, 0, lineEnd.Value, cancellationToken).ConfigureAwait(false);
+                return await ReadRangeAsync(stream, 0, lineEnd.Value, cancellationToken);
         }
 
         return null;
@@ -74,7 +74,7 @@ internal static class Utf8LastLineReader
 
         byte[] line = new byte[(int)length];
         stream.Seek(start, SeekOrigin.Begin);
-        await stream.ReadExactlyAsync(line.AsMemory(), cancellationToken).ConfigureAwait(false);
+        await stream.ReadExactlyAsync(line.AsMemory(), cancellationToken);
         return Encoding.UTF8.GetString(line);
     }
 }

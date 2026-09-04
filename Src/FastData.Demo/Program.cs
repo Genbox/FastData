@@ -4,4 +4,4 @@ WebApplication app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-await app.RunAsync().ConfigureAwait(false);
+await app.RunAsync();

@@ -8,7 +8,7 @@ internal static class TestHelper
 
     internal static async Task<(string Output, string Error)> RunAsync(params string[] args)
     {
-        (int _, string output, string error) = await RunWithExitCodeAsync(args).ConfigureAwait(false);
+        (int _, string output, string error) = await RunWithExitCodeAsync(args);
         return (output, error);
     }
 
@@ -22,13 +22,13 @@ internal static class TestHelper
             StringWriter outputWriter = new StringWriter();
             StringWriter errorWriter = new StringWriter();
 
-            await using (outputWriter.ConfigureAwait(false))
-            await using (errorWriter.ConfigureAwait(false))
+            await using (outputWriter)
+            await using (errorWriter)
             {
                 Console.SetOut(outputWriter);
                 Console.SetError(errorWriter);
 
-                int exitCode = await Program.Main(args).ConfigureAwait(false);
+                int exitCode = await Program.Main(args);
 
                 return (exitCode, outputWriter.ToString(), errorWriter.ToString());
             }
@@ -43,7 +43,7 @@ internal static class TestHelper
     internal static async Task<string> WriteTempFileAsync(List<string> tracker, string content, string extension = ".input")
     {
         string path = GetTempFilePath(tracker, extension);
-        await File.WriteAllTextAsync(path, content + "\n", Utf8NoBom, TestContext.Current.CancellationToken).ConfigureAwait(false);
+        await File.WriteAllTextAsync(path, content + "\n", Utf8NoBom, TestContext.Current.CancellationToken);
         return path;
     }
 

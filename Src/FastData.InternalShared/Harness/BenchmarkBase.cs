@@ -41,11 +41,11 @@ internal abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager doc
 
         string source = Render(data);
         WriteDebug(data, $"build start, queryCount={FormatCount(data.QueryCount)}, target={data.TargetIterationTimeMs.ToString(NumberFormatInfo.InvariantInfo)}ms, warmups={data.WarmupCount.ToString(NumberFormatInfo.InvariantInfo)}, minSamples={data.MinSampleCount.ToString(NumberFormatInfo.InvariantInfo)}, maxSamples={data.MaxSampleCount.ToString(NumberFormatInfo.InvariantInfo)}, maxError={data.MaxErrorPercent.ToString(NumberFormatInfo.InvariantInfo)}%");
-        await BuildProgramAsync(source, data.Identifier, cancellationToken).ConfigureAwait(false);
+        await BuildProgramAsync(source, data.Identifier, cancellationToken);
         WriteDebug(data, "build complete");
 
-        long invocations = await TuneInvocationsAsync(data, cancellationToken).ConfigureAwait(false);
-        BenchmarkResult result = await MeasureAdaptiveAsync(data, invocations, cancellationToken).ConfigureAwait(false);
+        long invocations = await TuneInvocationsAsync(data, cancellationToken);
+        BenchmarkResult result = await MeasureAdaptiveAsync(data, invocations, cancellationToken);
         ValidateFoundCount(data, result, invocations);
         return result;
     }
@@ -57,7 +57,7 @@ internal abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager doc
 
         while (true)
         {
-            MeasurementSample[] batch = await RunMeasurementAsync(data, invocations, sampleCount, cancellationToken).ConfigureAwait(false);
+            MeasurementSample[] batch = await RunMeasurementAsync(data, invocations, sampleCount, cancellationToken);
             allSamples.AddRange(batch);
 
             BenchmarkResult result = ParseResult(data, allSamples.ToArray(), invocations);
@@ -86,7 +86,7 @@ internal abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager doc
 
         try
         {
-            ProcessResult res = await RunProgramAsync(data.Identifier, FormatArguments(invocations, data.WarmupCount, sampleCount), timeoutSource.Token).ConfigureAwait(false);
+            ProcessResult res = await RunProgramAsync(data.Identifier, FormatArguments(invocations, data.WarmupCount, sampleCount), timeoutSource.Token);
             return ParseMeasurement(res, sampleCount);
         }
         catch (OperationCanceledException ex) when (!cancellationToken.IsCancellationRequested)
@@ -110,7 +110,7 @@ internal abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager doc
             MeasurementSample[] samples;
             try
             {
-                ProcessResult res = await RunProgramAsync(data.Identifier, FormatArguments(invocations, 1, 1), timeoutSource.Token).ConfigureAwait(false);
+                ProcessResult res = await RunProgramAsync(data.Identifier, FormatArguments(invocations, 1, 1), timeoutSource.Token);
                 samples = ParseMeasurement(res, 1);
             }
             catch (OperationCanceledException ex) when (!cancellationToken.IsCancellationRequested)

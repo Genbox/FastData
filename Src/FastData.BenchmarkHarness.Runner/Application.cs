@@ -42,7 +42,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
             RunMode.DryRun => DryRun(benchmarkData, settings),
             RunMode.Plot => Plot(benchmarkData, settings, resultStore, false),
             RunMode.IndividualPlot => Plot(benchmarkData, settings, resultStore, true),
-            RunMode.Run => await RunBenchmarksAsync(benchmarkData, settings, resultStore, cancellationToken).ConfigureAwait(false),
+            RunMode.Run => await RunBenchmarksAsync(benchmarkData, settings, resultStore, cancellationToken),
             _ => throw new InvalidOperationException($"Unsupported benchmark mode '{settings.Mode}'.")
         };
     }
@@ -87,7 +87,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
         if (selections.Length == 0)
             return WriteNoBenchmarksMatched(settings);
 
-        string? dockerAvailabilityError = await DockerManager.GetAvailabilityErrorAsync(cancellationToken).ConfigureAwait(false);
+        string? dockerAvailabilityError = await DockerManager.GetAvailabilityErrorAsync(cancellationToken);
         if (dockerAvailabilityError != null)
         {
             ConsoleOutput.WriteWarning(dockerAvailabilityError + " Start Docker and rerun the benchmark.");
@@ -99,7 +99,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
         ThermalStabilization.Run(cpu.CpuSet, settings.Debug ? ConsoleOutput.WriteDebug : null);
 
         DockerManager dockerManager = new DockerManager(cpuSet: cpu.CpuSet);
-        await using ConfiguredAsyncDisposable dockerManagerScope = dockerManager.ConfigureAwait(false);
+        await using DockerManager dockerManagerScope = dockerManager;
 
         foreach (Selection selection in selections)
         {
@@ -114,8 +114,8 @@ internal sealed class Application(BenchmarkCatalog catalog)
 
                 try
                 {
-                    ResultEntry? previousResult = await resultStore.ReadPreviousResultAsync(benchmarkName, cancellationToken).ConfigureAwait(false);
-                    BenchmarkResult result = await harness.RunAsync(data, cancellationToken).ConfigureAwait(false);
+                    ResultEntry? previousResult = await resultStore.ReadPreviousResultAsync(benchmarkName, cancellationToken);
+                    BenchmarkResult result = await harness.RunAsync(data, cancellationToken);
                     ResultLine resultLine = new ResultLine(
                         harness.Name,
                         data.Identifier,
@@ -132,7 +132,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
 
                     ConsoleOutput.WriteBenchmarkResult(resultLine, settings.WarningThresholdPercent);
 
-                    await resultStore.AppendResultAsync(benchmarkName, result, cancellationToken).ConfigureAwait(false);
+                    await resultStore.AppendResultAsync(benchmarkName, result, cancellationToken);
                 }
                 catch (OperationCanceledException)
                 {

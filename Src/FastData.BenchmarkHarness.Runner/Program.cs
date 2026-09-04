@@ -19,7 +19,7 @@ internal static class Program
         {
             ParseResult parseResult = rootCommand.Parse(args, new ParserConfiguration());
             InvocationConfiguration invocationConfig = new InvocationConfiguration { EnableDefaultExceptionHandler = false };
-            return await parseResult.InvokeAsync(invocationConfig, CancellationToken.None).ConfigureAwait(false);
+            return await parseResult.InvokeAsync(invocationConfig, CancellationToken.None);
         }
         catch (Exception ex)
         {

@@ -35,6 +35,5 @@ public class ExpressionTests
         await Verifier.Verify(obj)
                       .UseDirectory("Verify/EarlyExits")
                       .UseFileName(name)
-                      .DisableDiff()
-                      .ConfigureAwait(false);
+                       .DisableDiff();
 }

@@ -61,7 +61,7 @@ internal sealed class CommandLine(string[] languageNames)
         root.SetAction(async (parseResult, cancellationToken) =>
         {
             Settings settings = LoadSettings(parseResult);
-            return await action(settings, cancellationToken).ConfigureAwait(false);
+            return await action(settings, cancellationToken);
         });
 
         return root;
