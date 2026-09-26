@@ -50,4 +50,15 @@ public class GeneratorFunctionsTests
     {
         Assert.Equal(expected, GeneratorFunctions.IsAsciiOnly(value));
     }
+
+    [Fact]
+    public void IntegerReadsUseLittleEndianByteOrder()
+    {
+        byte[] data = [0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF];
+
+        Assert.Equal(0x01U, GeneratorFunctions.ReadU8(data, 0));
+        Assert.Equal(0x2301U, GeneratorFunctions.ReadU16(data, 0));
+        Assert.Equal(0x67452301U, GeneratorFunctions.ReadU32(data, 0));
+        Assert.Equal(0xEFCDAB8967452301UL, GeneratorFunctions.ReadU64(data, 0));
+    }
 }

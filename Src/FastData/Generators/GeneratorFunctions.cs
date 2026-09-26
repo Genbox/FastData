@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -133,19 +134,19 @@ public static class GeneratorFunctions
     /// <param name="ptr">The source buffer.</param>
     /// <param name="offset">The byte offset.</param>
     /// <returns>The value.</returns>
-    public static uint ReadU16(byte[] ptr, int offset) => Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));
+    public static uint ReadU16(byte[] ptr, int offset) => BinaryPrimitives.ReadUInt16LittleEndian(ptr.AsSpan(offset));
 
     /// <summary>Reads an unaligned unsigned 32-bit value at an offset.</summary>
     /// <param name="ptr">The source buffer.</param>
     /// <param name="offset">The byte offset.</param>
     /// <returns>The value.</returns>
-    public static uint ReadU32(byte[] ptr, int offset) => Unsafe.ReadUnaligned<uint>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));
+    public static uint ReadU32(byte[] ptr, int offset) => BinaryPrimitives.ReadUInt32LittleEndian(ptr.AsSpan(offset));
 
     /// <summary>Reads an unaligned unsigned 64-bit value at an offset.</summary>
     /// <param name="ptr">The source buffer.</param>
     /// <param name="offset">The byte offset.</param>
     /// <returns>The value.</returns>
-    public static ulong ReadU64(byte[] ptr, int offset) => Unsafe.ReadUnaligned<ulong>(ref Unsafe.Add(ref MemoryMarshal.GetReference(ptr.AsSpan()), offset));
+    public static ulong ReadU64(byte[] ptr, int offset) => BinaryPrimitives.ReadUInt64LittleEndian(ptr.AsSpan(offset));
 
     private static bool IsValidIndex(string str, int index) => str.Length > 0 && (uint)index < (uint)str.Length;
     private static bool IsValidRange(string str, int start, int length) => str.Length > 0 && (uint)start <= (uint)str.Length && length <= str.Length - start;
