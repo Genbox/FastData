@@ -53,6 +53,9 @@ internal static class HashBenchmark
                 candidates.AddRange(ha.GetCandidates(data));
         }
 
+        if (cfg.BenchmarkIterations == 0)
+            return GetBestByFitness(candidates);
+
         //Split candidates into perfect and not perfect
         List<Candidate> perfect = new List<Candidate>(candidates.Count);
         List<Candidate> notPerfect = new List<Candidate>(candidates.Count);
@@ -63,20 +66,6 @@ internal static class HashBenchmark
                 perfect.Add(candidate);
             else
                 notPerfect.Add(candidate);
-        }
-
-        if (cfg.BenchmarkIterations == 0)
-        {
-            List<Candidate> preferred = perfect.Count > 0 ? perfect : notPerfect;
-            Candidate best = preferred[0];
-
-            for (int i = 1; i < preferred.Count; i++)
-            {
-                if (preferred[i].Fitness > best.Fitness)
-                    best = preferred[i];
-            }
-
-            return best;
         }
 
         //Sort both on fitness
@@ -132,6 +121,25 @@ internal static class HashBenchmark
 
         notPerfect.Sort(static (a, b) => a.Time.CompareTo(b.Time));
         return notPerfect[0];
+    }
+
+    private static Candidate GetBestByFitness(List<Candidate> candidates)
+    {
+        Candidate? bestPerfect = null;
+        Candidate? bestColliding = null;
+
+        foreach (Candidate candidate in candidates)
+        {
+            if (candidate.Collisions == 0)
+            {
+                if (bestPerfect == null || candidate.Fitness > bestPerfect.Fitness)
+                    bestPerfect = candidate;
+            }
+            else if (bestColliding == null || candidate.Fitness > bestColliding.Fitness)
+                bestColliding = candidate;
+        }
+
+        return bestPerfect ?? bestColliding ?? throw new InvalidOperationException("No string hash candidates were produced.");
     }
 
     private static void Benchmark(byte[] data, int length, int iterations, Candidate candidate)
