@@ -5,7 +5,6 @@ using System.CommandLine.Help;
 using System.CommandLine.Invocation;
 using System.IO.Pipelines;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Genbox.FastData.Config;
 using Genbox.FastData.Config.Analysis;
