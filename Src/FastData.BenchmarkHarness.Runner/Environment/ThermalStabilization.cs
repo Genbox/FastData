@@ -67,7 +67,7 @@ internal static class ThermalStabilization
         while (Stopwatch.GetTimestamp() < deadline)
         {
             for (int i = 0; i < 1000; i++)
-                accumulator = (accumulator * 2654435761u) + 1;
+                accumulator = unchecked((accumulator * 2654435761u) + 1);
         }
 
         // Prevent dead-code elimination of the loop.
