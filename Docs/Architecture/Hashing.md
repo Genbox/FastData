@@ -52,9 +52,9 @@ Selection considers perfect candidates first but still measures speed:
 2. each perfect candidate is benchmarked by repeatedly hashing a byte buffer.
 3. the best colliding candidate is benchmarked too, when one exists.
 4. the fastest perfect candidate wins if it is at least as fast as the best colliding candidate.
-5. otherwise, the colliding candidate wins when its measured time is below `perfectTime + (perfectTime * PerfectHashThreshold)`; with the current default formula, any faster colliding candidate satisfies this check.
+5. otherwise, the colliding candidate wins only when its measured time is below `perfectTime * (1 - PerfectHashThreshold)`.
 
-The default `PerfectHashThreshold` is `0.25`. The code comments describe this as a perfect-hash preference threshold, but the implemented comparison should be read as the source of truth.
+The default `PerfectHashThreshold` is `0.25`, so a colliding candidate must be more than 25% faster to win over a perfect candidate.
 
 After selection, `HashData.Create()` computes final hash codes and the final table size using `HashTableCapacityFactor` and optional power-of-two modulo rounding. `HashData.HashCodesPerfect` means there are no collisions after applying the final table modulo, which allows `StringStructures` to choose `HashTablePerfect`.
 
