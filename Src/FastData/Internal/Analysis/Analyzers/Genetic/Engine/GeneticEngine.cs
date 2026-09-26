@@ -50,7 +50,8 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
 
             if (heap.Add(popBest.Fitness, popBest)) //This creates a copy, which is what we want, since we clear the population array
             {
-                LogBetterCandidate(logger, popBest.Fitness, popBest.Tag, string.Join(", ", popBest.Genes.AsEnumerable()));
+                if (logger.IsEnabled(LogLevel.Debug))
+                    LogBetterCandidate(logger, popBest.Fitness, popBest.Tag, string.Join(", ", popBest.Genes.AsEnumerable()));
                 bestFitness = popBest.Fitness;
             }
 
