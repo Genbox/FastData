@@ -26,6 +26,11 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: f32) -> bool {
+        if (((key != key) || ((key < 1f32) || (key > 5f32))))
+        {
+         return false;
+        }
+
 
         let mut pos: i32 = ((0.50000095_f32 as f64) * ((key as f64) - (1f32 as f64))) as i32;
         if pos < 0 { pos = 0; }

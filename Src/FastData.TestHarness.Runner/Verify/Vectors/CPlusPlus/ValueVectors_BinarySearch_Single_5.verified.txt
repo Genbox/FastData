@@ -36,6 +36,11 @@ public:
     static constexpr direct_access_view<float> keys() noexcept { return direct_access_view<float>(key_items.data(), 5); }
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
+        if ((key != key))
+        {
+         return false;
+        }
+
 
         size_t lo = 0;
         size_t hi = 5;

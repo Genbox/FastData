@@ -26,6 +26,11 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: f64) -> bool {
+        if ((key != key))
+        {
+         return false;
+        }
+
 
         for entry in Self::KEYS.iter() {
             if *entry == key {

@@ -26,6 +26,11 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: f32) -> bool {
+        if ((key != key))
+        {
+         return false;
+        }
+
 
         let mut lo: i32 = 0;
         let mut hi: i32 = 4;

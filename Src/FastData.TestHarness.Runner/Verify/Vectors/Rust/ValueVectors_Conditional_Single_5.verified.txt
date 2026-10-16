@@ -18,6 +18,11 @@ impl fastdata {
     }
     #[must_use]
     pub fn contains(key: f32) -> bool {
+        if ((key != key))
+        {
+         return false;
+        }
+
 
         if key == f32::MIN || key == -1f32 || key == 0f32 || key == 1f32 || key == f32::MAX {
             return true;

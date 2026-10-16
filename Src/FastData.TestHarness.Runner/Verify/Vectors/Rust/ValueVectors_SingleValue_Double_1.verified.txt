@@ -18,6 +18,11 @@ impl fastdata {
     }
     #[must_use]
     pub fn contains(key: f64) -> bool {
+        if ((key != key))
+        {
+         return false;
+        }
+
 
         key == 1f64
     }

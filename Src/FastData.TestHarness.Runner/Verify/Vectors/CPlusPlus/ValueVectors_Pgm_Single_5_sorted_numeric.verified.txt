@@ -36,6 +36,11 @@ public:
     static constexpr direct_access_view<float> keys() noexcept { return direct_access_view<float>(key_items.data(), 5); }
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
+        if (((key != key) || ((key < 1.0f) || (key > 5.0f))))
+        {
+         return false;
+        }
+
 
         const double product = static_cast<double>(0.50000095f) * static_cast<double>(key - 1.0f);
         int32_t pos = product <= 0.0 ? 0 : (product >= static_cast<double>(0) ? 0 : static_cast<int32_t>(product));

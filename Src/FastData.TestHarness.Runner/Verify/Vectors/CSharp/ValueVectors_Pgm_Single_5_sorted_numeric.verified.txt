@@ -22,6 +22,11 @@ internal static class FastData
     
     public static bool Contains(float key)
     {
+        if (((key != key) || ((key < 1f) || (key > 5f))))
+        {
+         return false;
+        }
+
 
 
         double diff = key - 1f;

@@ -36,6 +36,11 @@ public:
     static constexpr direct_access_view<double> keys() noexcept { return direct_access_view<double>(key_items.data(), 2); }
     [[nodiscard]]
     static constexpr bool contains(const double key) noexcept {
+        if ((key != key))
+        {
+         return false;
+        }
+
 
         int32_t lo = 0;
         int32_t hi = 1;

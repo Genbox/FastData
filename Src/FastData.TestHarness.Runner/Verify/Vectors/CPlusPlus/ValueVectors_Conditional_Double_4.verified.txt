@@ -57,6 +57,11 @@ public:
     static constexpr key_range keys() noexcept { return key_range(); }
     [[nodiscard]]
     static constexpr bool contains(const double key) noexcept {
+        if ((key != key))
+        {
+         return false;
+        }
+
 
         if (key == std::numeric_limits<double>::lowest() || key == 0 || key == 1 || key == std::numeric_limits<double>::max())
             return true;

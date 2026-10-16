@@ -26,6 +26,11 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: f32) -> bool {
+        if ((key != key))
+        {
+         return false;
+        }
+
         if (((key < 1.25f32) || (key > 9f32)))
         {
          return false;

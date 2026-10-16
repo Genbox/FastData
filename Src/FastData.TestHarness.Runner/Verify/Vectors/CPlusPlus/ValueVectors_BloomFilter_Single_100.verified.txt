@@ -43,6 +43,11 @@ class fastdata final {
 public:
     [[nodiscard]]
     static constexpr bool contains(const float key) noexcept {
+        if ((key != key))
+        {
+         return false;
+        }
+
 
         const uint64_t hash = get_hash(key);
         const size_t index = hash % 16;

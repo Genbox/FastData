@@ -20,6 +20,11 @@ internal static class FastData
     
     public static bool Contains(double key)
     {
+        if ((key != key))
+        {
+         return false;
+        }
+
 
         return key == 1;
     }

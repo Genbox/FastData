@@ -29,6 +29,11 @@ impl fastdata {
 
     #[must_use]
     pub fn contains(key: f32) -> bool {
+        if ((key != key))
+        {
+         return false;
+        }
+
 
         let hash = Self::get_hash(key);
         let index = (hash % 16u64) as usize;

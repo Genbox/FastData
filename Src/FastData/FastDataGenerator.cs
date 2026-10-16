@@ -468,6 +468,17 @@ public static partial class FastDataGenerator
         if (cfg.EarlyExitConfig.Optimize)
             EarlyExitPipeline.OptimizeExpressions(exprs);
 
+        // NaN must miss even when optional early exits are disabled, before ordering or interpolation.
+        if ((type == typeof(float) || type == typeof(double)) && structureType is not (StructureType.HashTable or StructureType.HashTableCompact or StructureType.HashTablePerfect))
+        {
+            Expression reject = NotEqual(inputKey, inputKey);
+
+            // PGM's predicted position must not overflow on infinity or distant finite queries.
+            if (structureType == StructureType.Pgm)
+                reject = OrElse(reject, OrElse(LessThan(inputKey, Constant(props.DataRanges.Min, type)), GreaterThan(inputKey, Constant(props.DataRanges.Max, type))));
+            exprs = [AnnotatedExpr.EarlyExit(reject), .. exprs];
+        }
+
         NumericGeneratorConfig genCfg = new NumericGeneratorConfig(structureType, (uint)keys.Length, props.DataRanges.Min!, props.DataRanges.Max!, exprs, cfg.TypeReductionEnabled, props.HasZero, requiredCapabilities);
 
         string source = generator.Generate<TKey, TValue>(genCfg, ctx);
