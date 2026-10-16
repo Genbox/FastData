@@ -1,8 +1,4 @@
-using BenchmarkDotNet.Analysers;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Validators;
 using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.CSharp;
@@ -12,32 +8,7 @@ namespace Genbox.FastData.Benchmarks;
 
 internal static class Program
 {
-    private static void Main(string[] args)
-    {
-        IConfig config = ManualConfig.CreateMinimumViable()
-                                     .AddJob(new Job(new RunMode
-                                     {
-                                         LaunchCount = 1,
-                                         WarmupCount = 1,
-                                         MinIterationCount = 10,
-                                         MaxIterationCount = 30
-                                     }))
-                                     .AddAnalyser(EnvironmentAnalyser.Default,
-                                         MinIterationTimeAnalyser.Default,
-                                         RuntimeErrorAnalyser.Default,
-                                         BaselineCustomAnalyzer.Default,
-                                         HideColumnsAnalyser.Default)
-                                     .AddValidator(BaselineValidator.FailOnError,
-                                         SetupCleanupValidator.FailOnError,
-                                         JitOptimizationsValidator.FailOnError,
-                                         RunModeValidator.FailOnError,
-                                         GenericBenchmarksValidator.DontFailOnError,
-                                         DeferredExecutionValidator.FailOnError,
-                                         ParamsAllValuesValidator.FailOnError,
-                                         ParamsValidator.FailOnError);
-
-        BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, config);
-    }
+    private static void Main(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
 
     public static void GenerateFiles()
     {
