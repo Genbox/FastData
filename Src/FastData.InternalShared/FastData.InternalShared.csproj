@@ -20,4 +20,16 @@
     <ProjectReference Include="..\FastData\FastData.csproj" PrivateAssets="All" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.BenchmarkHarness.Runner" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Benchmarks" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator.CPlusPlus.TestHarness" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator.CSharp.TestHarness" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator.Rust.TestHarness" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.SourceGenerator.Tests" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Testbed" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.TestHarness.Runner" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Tests" />
+  </ItemGroup>
+
 </Project>

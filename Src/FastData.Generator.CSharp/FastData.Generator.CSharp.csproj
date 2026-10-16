@@ -29,4 +29,9 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Testbed" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator.CSharp.TestHarness" />
+  </ItemGroup>
+
 </Project>

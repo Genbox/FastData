@@ -27,4 +27,10 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator.CPlusPlus" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator.CSharp" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator.Rust" />
+  </ItemGroup>
+
 </Project>

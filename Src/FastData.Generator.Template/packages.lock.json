@@ -217,17 +217,17 @@
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
       },
-      "fastdata": {
+      "Genbox.FastData": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.10, )",
           "System.Memory": "[4.6.3, )"
         }
       },
-      "fastdata.generator": {
+      "Genbox.FastData.Generator": {
         "type": "Project",
         "dependencies": {
-          "FastData": "[1.0.0, )"
+          "Genbox.FastData": "[1.0.0, )"
         }
       },
       "Microsoft.Bcl.AsyncInterfaces": {
@@ -393,16 +393,16 @@
         "resolved": "6.0.0",
         "contentHash": "CPc6tWO1LAer3IzfZufDBRL+UZQcj5uS207NHALQzP84Vp/z6wF0Aa0YZImOQY8iStY0A2zI/e3ihKNPfUm8XA=="
       },
-      "fastdata": {
+      "Genbox.FastData": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.10, )"
         }
       },
-      "fastdata.generator": {
+      "Genbox.FastData.Generator": {
         "type": "Project",
         "dependencies": {
-          "FastData": "[1.0.0, )"
+          "Genbox.FastData": "[1.0.0, )"
         }
       },
       "Microsoft.Extensions.Logging.Abstractions": {

@@ -274,13 +274,13 @@
           "xunit.v3.runner.common": "[4.0.0]"
         }
       },
-      "fastdata": {
+      "Genbox.FastData": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.10, )"
         }
       },
-      "fastdata.internalshared": {
+      "Genbox.FastData.InternalShared": {
         "type": "Project",
         "dependencies": {
           "Docker.DotNet": "[3.125.15, )",

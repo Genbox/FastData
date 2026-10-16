@@ -143,16 +143,16 @@
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0"
         }
       },
-      "fastdata": {
+      "Genbox.FastData": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.10, )"
         }
       },
-      "fastdata.generator": {
+      "Genbox.FastData.Generator": {
         "type": "Project",
         "dependencies": {
-          "FastData": "[1.0.0, )"
+          "Genbox.FastData": "[1.0.0, )"
         }
       },
       "Microsoft.Bcl.AsyncInterfaces": {

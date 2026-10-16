@@ -12,4 +12,9 @@
     <ProjectReference Include="..\FastData.InternalShared\FastData.InternalShared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.BenchmarkHarness.Runner" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.TestHarness.Runner" />
+  </ItemGroup>
+
 </Project>

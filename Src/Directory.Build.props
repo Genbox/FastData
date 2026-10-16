@@ -16,7 +16,7 @@
 
     <!--Assembly settings-->
     <RootNamespace>Genbox.$(MSBuildProjectName)</RootNamespace>
-    <AssemblyNamePrefix Condition="'$(_IsPacking)' == 'true' OR '$(_IsPublishing)' == 'true'">Genbox.</AssemblyNamePrefix>
+    <AssemblyNamePrefix Condition="'$(PackAssemblyName)' == 'true' OR '$(_IsPacking)' == 'true' OR '$(_IsPublishing)' == 'true'">Genbox.</AssemblyNamePrefix>
     <AssemblyName Condition="'$(AssemblyNamePrefix)' != ''">$(AssemblyNamePrefix)$(MSBuildProjectName)</AssemblyName>
 
     <!--C# settings-->
@@ -30,6 +30,8 @@
     <RestoreUseStaticGraphEvaluation>true</RestoreUseStaticGraphEvaluation>
 
     <!--Package settings-->
+    <!--Keep package identities stable across local builds and prefixed release assemblies.-->
+    <PackageId>Genbox.$(MSBuildProjectName)</PackageId>
     <RepositoryType>Git</RepositoryType>
     <PackageProjectUrl>https://github.com/Genbox/$(MSBuildProjectName)</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

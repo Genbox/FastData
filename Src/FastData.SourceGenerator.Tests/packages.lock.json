@@ -275,7 +275,7 @@
           "xunit.v3.runner.common": "[4.0.0]"
         }
       },
-      "fastdata.internalshared": {
+      "Genbox.FastData.InternalShared": {
         "type": "Project",
         "dependencies": {
           "Docker.DotNet": "[3.125.15, )",
@@ -284,10 +284,10 @@
           "xunit.v3.extensibility.core": "[3.2.2, )"
         }
       },
-      "fastdata.sourcegenerator": {
+      "Genbox.FastData.SourceGenerator": {
         "type": "Project"
       },
-      "fastdata.sourcegenerator.attributes": {
+      "Genbox.FastData.SourceGenerator.Attributes": {
         "type": "Project"
       },
       "Docker.DotNet": {

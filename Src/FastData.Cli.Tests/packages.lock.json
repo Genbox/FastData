@@ -289,51 +289,51 @@
           "xunit.v3.runner.common": "[4.0.0]"
         }
       },
-      "fastdata": {
+      "Genbox.FastData": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.10, )"
         }
       },
-      "fastdata.cli": {
+      "Genbox.FastData.Cli": {
         "type": "Project",
         "dependencies": {
-          "FastData.Generator.CPlusPlus": "[1.0.0, )",
-          "FastData.Generator.CSharp": "[1.0.0, )",
-          "FastData.Generator.Rust": "[1.0.0, )",
+          "Genbox.FastData.Generator.CPlusPlus": "[1.0.0, )",
+          "Genbox.FastData.Generator.CSharp": "[1.0.0, )",
+          "Genbox.FastData.Generator.Rust": "[1.0.0, )",
           "Spectre.Console": "[0.57.2, )",
           "System.CommandLine": "[2.0.10, )",
           "System.Linq.Async": "[7.0.1, )"
         }
       },
-      "fastdata.generator": {
+      "Genbox.FastData.Generator": {
         "type": "Project",
         "dependencies": {
-          "FastData": "[1.0.0, )"
+          "Genbox.FastData": "[1.0.0, )"
         }
       },
-      "fastdata.generator.cplusplus": {
+      "Genbox.FastData.Generator.CPlusPlus": {
         "type": "Project",
         "dependencies": {
-          "FastData.Generator.Template": "[1.0.0, )"
+          "Genbox.FastData.Generator.Template": "[1.0.0, )"
         }
       },
-      "fastdata.generator.csharp": {
+      "Genbox.FastData.Generator.CSharp": {
         "type": "Project",
         "dependencies": {
-          "FastData.Generator.Template": "[1.0.0, )"
+          "Genbox.FastData.Generator.Template": "[1.0.0, )"
         }
       },
-      "fastdata.generator.rust": {
+      "Genbox.FastData.Generator.Rust": {
         "type": "Project",
         "dependencies": {
-          "FastData.Generator.Template": "[1.0.0, )"
+          "Genbox.FastData.Generator.Template": "[1.0.0, )"
         }
       },
-      "fastdata.generator.template": {
+      "Genbox.FastData.Generator.Template": {
         "type": "Project",
         "dependencies": {
-          "FastData.Generator": "[1.0.0, )",
+          "Genbox.FastData.Generator": "[1.0.0, )",
           "Microsoft.CodeAnalysis.CSharp": "[5.6.0, )",
           "Mono.TextTemplating": "[3.0.0, )"
         }

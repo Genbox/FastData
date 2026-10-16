@@ -138,7 +138,7 @@
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
       },
-      "fastdata": {
+      "Genbox.FastData": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.10, )",
@@ -271,7 +271,7 @@
         "resolved": "10.0.10",
         "contentHash": "z/2xXlFw2aLGjHyEm6E0tQ+In6VfzQzTrtArbQ2c0TQE16ZbyDCMGPvaUT9I0s8rgy9sRWlU2P9waW37qV04qA=="
       },
-      "fastdata": {
+      "Genbox.FastData": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.10, )"

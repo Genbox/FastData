@@ -29,4 +29,8 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator.Rust.TestHarness" />
+  </ItemGroup>
+
 </Project>
