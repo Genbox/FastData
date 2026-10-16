@@ -28,5 +28,5 @@ public sealed class PgmContext<TKey, TValue>(ReadOnlyMemory<TKey> keys, ReadOnly
     public int SegmentCount { get; } = segmentCount;
 
     /// <inheritdoc />
-    public long GetOverheadBytes() => SegmentCount == 1 ? 0 : Segments.LongLength * (sizeof(float) + sizeof(int));
+    public long GetOverheadBytes() => SegmentCount == 1 ? 0 : Segments.LongLength * (sizeof(ulong) + sizeof(int));
 }

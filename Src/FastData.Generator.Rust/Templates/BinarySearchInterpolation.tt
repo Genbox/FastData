@@ -3,6 +3,16 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.BinarySearchTemplateData" name="Data" #>
 
 <#
+    bool floatingKey = Model.KeyType == typeof(float) || Model.KeyType == typeof(double);
+    ulong range = unchecked(NumericPrediction.Coordinate(Data.Keys.Last()) - NumericPrediction.Coordinate(Data.Keys.First()));
+    int shift = NumericPrediction.Shift(range);
+    ulong firstReciprocal = range == 0 ? 0 : (((ulong)(Data.KeyCount - 1) << 32) / (range >> shift)) + 1;
+    Func<string, string> coordinate = value => floatingKey ? "Self::coordinate(" + value + ")" : "(" + value + " as u64)";
+#>
+<#@ include file="Includes\NumericPrediction.ttinclude" #>
+
+
+<#
     if (Data.ValueCount > 0)
     {
 #>
@@ -23,6 +33,19 @@
 <#= GetMethodHeader(MethodType.Contains) #>
         let mut lo: i32 = 0;
         let mut hi: i32 = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+<# if (range != 0) { #>
+        if !(<#= LookupKeyName #> >= Self::KEYS[0] && <#= LookupKeyName #> <= Self::KEYS[hi as usize]) {
+            return false;
+        }
+        let first_offset = Self::multiply_high(<#= coordinate(LookupKeyName) #>.wrapping_sub(<#= TypeMap.GetValueLiteral(NumericPrediction.Coordinate(Data.Keys.First())) #>) << <#= 32 - shift #>, <#= TypeMap.GetValueLiteral(firstReciprocal) #>);
+        let first = if first_offset > hi as u64 { hi } else { first_offset as i32 };
+        let first_key = Self::KEYS[first as usize];
+        if first_key == <#= LookupKeyName #> {
+            return true;
+        }
+        if first_key < <#= LookupKeyName #> { lo = first + 1; }
+        else { hi = first - 1; }
+<# } #>
         while lo <= hi && <#= LookupKeyName #> >= Self::KEYS[lo as usize] && <#= LookupKeyName #> <= Self::KEYS[hi as usize] {
             let lo_key: <#= InputKeyTypeName #> = Self::KEYS[lo as usize];
             let hi_key: <#= InputKeyTypeName #> = Self::KEYS[hi as usize];
@@ -35,18 +58,16 @@
                 break;
             }
 
-            let lo_value = lo_key as f64;
-            let hi_value = hi_key as f64;
-            let mut mid: i32 = if lo_value == hi_value {
-                lo + ((hi - lo) >> 1)
+            let range = <#= coordinate("hi_key") #>.wrapping_sub(<#= coordinate("lo_key") #>);
+            let delta = <#= coordinate(LookupKeyName) #>.wrapping_sub(<#= coordinate("lo_key") #>);
+            let normalized_range = range >> <#= shift #>;
+            let mid: i32;
+            if normalized_range < (hi - lo) as u64 {
+                mid = lo + ((hi - lo) >> 1);
             } else {
-                lo + ((((<#= LookupKeyName #> as f64) - lo_value) * ((hi - lo) as f64)) / (hi_value - lo_value)) as i32
-            };
-
-            if mid < lo {
-                mid = lo;
-            } else if mid > hi {
-                mid = hi;
+                let reciprocal = (((hi - lo) as u64) << 32) / normalized_range + 1;
+                let offset = Self::multiply_high(delta << <#= 32 - shift #>, reciprocal);
+                mid = if offset > (hi - lo) as u64 { hi } else { lo + offset as i32 };
             }
 
             let mid_key: <#= InputKeyTypeName #> = Self::KEYS[mid as usize];
@@ -72,6 +93,19 @@
 <#= GetMethodHeader(MethodType.TryLookup) #>
         let mut lo: i32 = 0;
         let mut hi: i32 = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+<# if (range != 0) { #>
+        if !(<#= LookupKeyName #> >= Self::KEYS[0] && <#= LookupKeyName #> <= Self::KEYS[hi as usize]) {
+            return None;
+        }
+        let first_offset = Self::multiply_high(<#= coordinate(LookupKeyName) #>.wrapping_sub(<#= TypeMap.GetValueLiteral(NumericPrediction.Coordinate(Data.Keys.First())) #>) << <#= 32 - shift #>, <#= TypeMap.GetValueLiteral(firstReciprocal) #>);
+        let first = if first_offset > hi as u64 { hi } else { first_offset as i32 };
+        let first_key = Self::KEYS[first as usize];
+        if first_key == <#= LookupKeyName #> {
+            return Some(Self::VALUES[first as usize]);
+        }
+        if first_key < <#= LookupKeyName #> { lo = first + 1; }
+        else { hi = first - 1; }
+<# } #>
         while lo <= hi && <#= LookupKeyName #> >= Self::KEYS[lo as usize] && <#= LookupKeyName #> <= Self::KEYS[hi as usize] {
             let lo_key: <#= InputKeyTypeName #> = Self::KEYS[lo as usize];
             let hi_key: <#= InputKeyTypeName #> = Self::KEYS[hi as usize];
@@ -84,18 +118,16 @@
                 break;
             }
 
-            let lo_value = lo_key as f64;
-            let hi_value = hi_key as f64;
-            let mut mid: i32 = if lo_value == hi_value {
-                lo + ((hi - lo) >> 1)
+            let range = <#= coordinate("hi_key") #>.wrapping_sub(<#= coordinate("lo_key") #>);
+            let delta = <#= coordinate(LookupKeyName) #>.wrapping_sub(<#= coordinate("lo_key") #>);
+            let normalized_range = range >> <#= shift #>;
+            let mid: i32;
+            if normalized_range < (hi - lo) as u64 {
+                mid = lo + ((hi - lo) >> 1);
             } else {
-                lo + ((((<#= LookupKeyName #> as f64) - lo_value) * ((hi - lo) as f64)) / (hi_value - lo_value)) as i32
-            };
-
-            if mid < lo {
-                mid = lo;
-            } else if mid > hi {
-                mid = hi;
+                let reciprocal = (((hi - lo) as u64) << 32) / normalized_range + 1;
+                let offset = Self::multiply_high(delta << <#= 32 - shift #>, reciprocal);
+                mid = if offset > (hi - lo) as u64 { hi } else { lo + offset as i32 };
             }
 
             let mid_key: <#= InputKeyTypeName #> = Self::KEYS[mid as usize];

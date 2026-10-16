@@ -21,6 +21,10 @@ impl Person {
 pub struct fastdata;
 impl fastdata {
 
+    #[inline(always)]
+    fn multiply_high(a: u64, b: u64) -> u64 { ((a as u128 * b as u128) >> 64) as u64 }
+
+
     const VALUES: [&'static Person; 3] = [
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
     ];
@@ -49,6 +53,17 @@ impl fastdata {
 
         let mut lo: i32 = 0;
         let mut hi: i32 = 2;
+        if !(key >= Self::KEYS[0] && key <= Self::KEYS[hi as usize]) {
+            return false;
+        }
+        let first_offset = Self::multiply_high((key as u64).wrapping_sub(1) << 32, 4294967297);
+        let first = if first_offset > hi as u64 { hi } else { first_offset as i32 };
+        let first_key = Self::KEYS[first as usize];
+        if first_key == key {
+            return true;
+        }
+        if first_key < key { lo = first + 1; }
+        else { hi = first - 1; }
         while lo <= hi && key >= Self::KEYS[lo as usize] && key <= Self::KEYS[hi as usize] {
             let lo_key: i32 = Self::KEYS[lo as usize];
             let hi_key: i32 = Self::KEYS[hi as usize];
@@ -61,18 +76,16 @@ impl fastdata {
                 break;
             }
 
-            let lo_value = lo_key as f64;
-            let hi_value = hi_key as f64;
-            let mut mid: i32 = if lo_value == hi_value {
-                lo + ((hi - lo) >> 1)
+            let range = (hi_key as u64).wrapping_sub((lo_key as u64));
+            let delta = (key as u64).wrapping_sub((lo_key as u64));
+            let normalized_range = range >> 0;
+            let mid: i32;
+            if normalized_range < (hi - lo) as u64 {
+                mid = lo + ((hi - lo) >> 1);
             } else {
-                lo + ((((key as f64) - lo_value) * ((hi - lo) as f64)) / (hi_value - lo_value)) as i32
-            };
-
-            if mid < lo {
-                mid = lo;
-            } else if mid > hi {
-                mid = hi;
+                let reciprocal = (((hi - lo) as u64) << 32) / normalized_range + 1;
+                let offset = Self::multiply_high(delta << 32, reciprocal);
+                mid = if offset > (hi - lo) as u64 { hi } else { lo + offset as i32 };
             }
 
             let mid_key: i32 = Self::KEYS[mid as usize];
@@ -94,6 +107,17 @@ impl fastdata {
 
         let mut lo: i32 = 0;
         let mut hi: i32 = 2;
+        if !(key >= Self::KEYS[0] && key <= Self::KEYS[hi as usize]) {
+            return None;
+        }
+        let first_offset = Self::multiply_high((key as u64).wrapping_sub(1) << 32, 4294967297);
+        let first = if first_offset > hi as u64 { hi } else { first_offset as i32 };
+        let first_key = Self::KEYS[first as usize];
+        if first_key == key {
+            return Some(Self::VALUES[first as usize]);
+        }
+        if first_key < key { lo = first + 1; }
+        else { hi = first - 1; }
         while lo <= hi && key >= Self::KEYS[lo as usize] && key <= Self::KEYS[hi as usize] {
             let lo_key: i32 = Self::KEYS[lo as usize];
             let hi_key: i32 = Self::KEYS[hi as usize];
@@ -106,18 +130,16 @@ impl fastdata {
                 break;
             }
 
-            let lo_value = lo_key as f64;
-            let hi_value = hi_key as f64;
-            let mut mid: i32 = if lo_value == hi_value {
-                lo + ((hi - lo) >> 1)
+            let range = (hi_key as u64).wrapping_sub((lo_key as u64));
+            let delta = (key as u64).wrapping_sub((lo_key as u64));
+            let normalized_range = range >> 0;
+            let mid: i32;
+            if normalized_range < (hi - lo) as u64 {
+                mid = lo + ((hi - lo) >> 1);
             } else {
-                lo + ((((key as f64) - lo_value) * ((hi - lo) as f64)) / (hi_value - lo_value)) as i32
-            };
-
-            if mid < lo {
-                mid = lo;
-            } else if mid > hi {
-                mid = hi;
+                let reciprocal = (((hi - lo) as u64) << 32) / normalized_range + 1;
+                let offset = Self::multiply_high(delta << 32, reciprocal);
+                mid = if offset > (hi - lo) as u64 { hi } else { lo + offset as i32 };
             }
 
             let mid_key: i32 = Self::KEYS[mid as usize];

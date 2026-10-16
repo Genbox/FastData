@@ -23,8 +23,8 @@ internal static class FastData
         1, 6, int.MaxValue
     };
 
-    private static readonly float[] _segSlopes = new float[] {
-        13.8f, 0.0f, 0.0f
+    private static readonly ulong[] _segSlopes = new ulong[] {
+        ulong.MaxValue, ulong.MinValue, ulong.MinValue
     };
 
     private static readonly sbyte[] _segIntercepts = new sbyte[] {
@@ -34,12 +34,11 @@ internal static class FastData
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int EvaluateSegment(int seg, int key)
     {
-        unchecked
-        {
-            double diff = (uint)key - (uint)_segKeys[seg];
-            int pos = (int)(long)(_segSlopes[seg] * diff);
-            return pos < 0 ? 0 : pos + (int)_segIntercepts[seg];
-        }
+        ulong diff = unchecked((ulong)key - (ulong)_segKeys[seg]);
+        ulong product = Math.BigMul(_segSlopes[seg], diff, out _);
+        int intercept = (int)_segIntercepts[seg];
+        int maxProduct = 5 - intercept;
+        return (product > (ulong)maxProduct ? maxProduct : (int)product) + intercept;
     }
 
     private static int GetSegmentPos(int key)
@@ -65,12 +64,16 @@ internal static class FastData
     public static bool Contains(int key)
     {
 
+        if (!(key >= _keys[0] && key <= _keys[4]))
+        {
+            return false;
+        }
 
         int pos = GetSegmentPos(key);
 
-        int lo = pos - 64;
+        int lo = pos - 65;
         if (lo < 0) lo = 0;
-        int hi = pos + 66;
+        int hi = pos + 67;
         if (hi > 5) hi = 5;
 
         while (lo < hi)

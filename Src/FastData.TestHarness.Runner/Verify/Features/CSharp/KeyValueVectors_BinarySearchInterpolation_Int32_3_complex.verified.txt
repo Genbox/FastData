@@ -23,6 +23,8 @@ public class Person
 
 };
 
+
+
     private static readonly Person[] _values = {
         new Person(1, "Bob", new Person(4, "Anna", null)), new Person(2, "Billy", null), new Person(3, "Bibi", null)
     };
@@ -46,6 +48,19 @@ public class Person
 
         int lo = 0;
         int hi = 2;
+        if (!(key >= _keys[0] && key <= _keys[hi]))
+        {
+            return false;
+        }
+        ulong firstOffset = Math.BigMul(unchecked(unchecked((ulong)(key)) - 1ul) << 32, 4294967297ul, out _);
+        int first = firstOffset > (ulong)hi ? hi : (int)firstOffset;
+        int firstKey = _keys[first];
+        if (firstKey == key)
+        {
+            return true;
+        }
+        if (firstKey < key) lo = first + 1;
+        else hi = first - 1;
         while (lo <= hi && key >= _keys[lo] && key <= _keys[hi])
         {
             int loKey = _keys[lo];
@@ -59,16 +74,18 @@ public class Person
                 break;
             }
 
-            double loValue = (double)loKey;
-            double hiValue = (double)hiKey;
-            int i = loValue == hiValue
-                ? lo + ((hi - lo) >> 1)
-                : lo + (int)((((double)key - loValue) * (hi - lo)) / (hiValue - loValue));
-
-            if (i < lo)
-                i = lo;
-            else if (i > hi)
-                i = hi;
+            ulong range = unchecked(unchecked((ulong)(hiKey)) - unchecked((ulong)(loKey)));
+            ulong delta = unchecked(unchecked((ulong)(key)) - unchecked((ulong)(loKey)));
+            ulong normalizedRange = range >> 0;
+            int i;
+            if (normalizedRange < (ulong)(hi - lo))
+                i = lo + ((hi - lo) >> 1);
+            else
+            {
+                ulong reciprocal = ((ulong)(hi - lo) << 32) / normalizedRange + 1;
+                ulong offset = Math.BigMul(delta << 32, reciprocal, out _);
+                i = offset > (ulong)(hi - lo) ? hi : lo + (int)offset;
+            }
 
             int midKey = _keys[i];
             if (midKey == key)
@@ -89,6 +106,21 @@ public class Person
 
         int lo = 0;
         int hi = 2;
+        if (!(key >= _keys[0] && key <= _keys[hi]))
+        {
+            value = default;
+            return false;
+        }
+        ulong firstOffset = Math.BigMul(unchecked(unchecked((ulong)(key)) - 1ul) << 32, 4294967297ul, out _);
+        int first = firstOffset > (ulong)hi ? hi : (int)firstOffset;
+        int firstKey = _keys[first];
+        if (firstKey == key)
+        {
+            value = _values[first];
+            return true;
+        }
+        if (firstKey < key) lo = first + 1;
+        else hi = first - 1;
         while (lo <= hi && key >= _keys[lo] && key <= _keys[hi])
         {
             int loKey = _keys[lo];
@@ -105,16 +137,18 @@ public class Person
                 break;
             }
 
-            double loValue = (double)loKey;
-            double hiValue = (double)hiKey;
-            int i = loValue == hiValue
-                ? lo + ((hi - lo) >> 1)
-                : lo + (int)((((double)key - loValue) * (hi - lo)) / (hiValue - loValue));
-
-            if (i < lo)
-                i = lo;
-            else if (i > hi)
-                i = hi;
+            ulong range = unchecked(unchecked((ulong)(hiKey)) - unchecked((ulong)(loKey)));
+            ulong delta = unchecked(unchecked((ulong)(key)) - unchecked((ulong)(loKey)));
+            ulong normalizedRange = range >> 0;
+            int i;
+            if (normalizedRange < (ulong)(hi - lo))
+                i = lo + ((hi - lo) >> 1);
+            else
+            {
+                ulong reciprocal = ((ulong)(hi - lo) << 32) / normalizedRange + 1;
+                ulong offset = Math.BigMul(delta << 32, reciprocal, out _);
+                i = offset > (ulong)(hi - lo) ? hi : lo + (int)offset;
+            }
 
             int midKey = _keys[i];
             if (midKey == key)

@@ -27,6 +27,26 @@ public:
 class fastdata final {
 
 
+    static constexpr uint64_t multiply_high(uint64_t a, uint64_t b) noexcept {
+#if defined(__SIZEOF_INT128__)
+        return static_cast<uint64_t>((static_cast<unsigned __int128>(a) * b) >> 64);
+#else
+        const uint64_t p00 = (a & 0xffffffffULL) * (b & 0xffffffffULL);
+        const uint64_t p01 = (a & 0xffffffffULL) * (b >> 32);
+        const uint64_t p10 = (a >> 32) * (b & 0xffffffffULL);
+        const uint64_t p11 = (a >> 32) * (b >> 32);
+        const uint64_t carry = ((p00 >> 32) + (p01 & 0xffffffffULL) + (p10 & 0xffffffffULL)) >> 32;
+        return p11 + (p01 >> 32) + (p10 >> 32) + carry;
+#endif
+    }
+    static uint64_t coordinate(float key) noexcept {
+        uint32_t bits = 0;
+        if (key != 0) std::memcpy(&bits, &key, sizeof(key));
+        return (bits & 0x80000000U) != 0
+            ? ~bits : bits ^ 0x80000000U;
+    }
+
+
     static constexpr std::array<float, 5> key_items = {
         1.0f, 2.0f, 3.0f, 4.0f, 5.0f
     };
@@ -44,6 +64,17 @@ public:
 
         int32_t lo = 0;
         int32_t hi = 4;
+        if (!(key >= key_items[0] && key <= key_items[hi])) {
+            return false;
+        }
+        const uint64_t first_offset = multiply_high((coordinate(key) - 3212836864ull) << 32, 911ull);
+        const int32_t first = first_offset > static_cast<uint64_t>(hi) ? hi : static_cast<int32_t>(first_offset);
+        const float first_key = key_items[first];
+        if (first_key == key) {
+            return true;
+        }
+        if (first_key < key) lo = first + 1;
+        else hi = first - 1;
         while (lo <= hi && key >= key_items[lo] && key <= key_items[hi]) {
             const float lo_key = key_items[lo];
             const float hi_key = key_items[hi];
@@ -55,20 +86,17 @@ public:
                 break;
             }
 
-            const double lo_value = static_cast<double>(lo_key);
-            const double hi_value = static_cast<double>(hi_key);
-            int32_t mid = lo + ((hi - lo) >> 1);
-
-            if (lo_value != hi_value) {
-                const double estimate = ((static_cast<double>(key) - lo_value) * (hi - lo)) / (hi_value - lo_value);
-                if (estimate >= 0.0 && estimate <= static_cast<double>(hi - lo))
-                    mid = lo + static_cast<int32_t>(estimate);
+            const uint64_t range = coordinate(hi_key) - coordinate(lo_key);
+            const uint64_t delta = coordinate(key) - coordinate(lo_key);
+            const uint64_t normalized_range = range >> 0;
+            int32_t mid;
+            if (normalized_range < static_cast<uint64_t>(hi - lo))
+                mid = lo + ((hi - lo) >> 1);
+            else {
+                const uint64_t reciprocal = (static_cast<uint64_t>(hi - lo) << 32) / normalized_range + 1;
+                const uint64_t offset = multiply_high(delta << 32, reciprocal);
+                mid = offset > static_cast<uint64_t>(hi - lo) ? hi : lo + static_cast<int32_t>(offset);
             }
-
-            if (mid < lo)
-                mid = lo;
-            else if (mid > hi)
-                mid = hi;
 
             const float mid_key = key_items[mid];
             if (mid_key == key)

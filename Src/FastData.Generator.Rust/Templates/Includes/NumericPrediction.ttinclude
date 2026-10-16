@@ -1,0 +1,13 @@
+    #[inline(always)]
+    fn multiply_high(a: u64, b: u64) -> u64 { ((a as u128 * b as u128) >> 64) as u64 }
+<# if (Model.KeyType == typeof(float) || Model.KeyType == typeof(double)) { #>
+    #[inline(always)]
+    fn coordinate(key: <#= InputKeyTypeName #>) -> u64 {
+        let bits = if key == 0.0 { 0 } else { key.to_bits() };
+        (if bits & <#= Model.KeyType == typeof(float) ? "0x80000000_u32" : "0x8000000000000000_u64" #> != 0 {
+            !bits
+        } else {
+            bits ^ <#= Model.KeyType == typeof(float) ? "0x80000000_u32" : "0x8000000000000000_u64" #>
+        }) as u64
+    }
+<# } #>

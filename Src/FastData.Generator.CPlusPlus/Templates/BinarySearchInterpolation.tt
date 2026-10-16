@@ -2,6 +2,16 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.BinarySearchTemplateData" name="Data" #>
 
 <#
+    bool floatingKey = Model.KeyType == typeof(float) || Model.KeyType == typeof(double);
+    ulong range = unchecked(NumericPrediction.Coordinate(Data.Keys.Last()) - NumericPrediction.Coordinate(Data.Keys.First()));
+    int shift = NumericPrediction.Shift(range);
+    ulong firstReciprocal = range == 0 ? 0 : (((ulong)(Data.KeyCount - 1) << 32) / (range >> shift)) + 1;
+    Func<string, string> coordinate = value => floatingKey ? "coordinate(" + value + ")" : "static_cast<uint64_t>(" + value + ")";
+#>
+<#@ include file="Includes\NumericPrediction.ttinclude" #>
+
+
+<#
     if (Data.ValueCount > 0)
     {
 #>
@@ -22,6 +32,19 @@ public:
 <#= GetMethodHeader(MethodType.Contains) #>
         int32_t lo = 0;
         int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+<# if (range != 0) { #>
+        if (!(<#= LookupKeyName #> >= key_items[0] && <#= LookupKeyName #> <= key_items[hi])) {
+            return false;
+        }
+        const uint64_t first_offset = multiply_high((<#= coordinate(LookupKeyName) #> - <#= TypeMap.GetValueLiteral(NumericPrediction.Coordinate(Data.Keys.First())) #>) << <#= 32 - shift #>, <#= TypeMap.GetValueLiteral(firstReciprocal) #>);
+        const int32_t first = first_offset > static_cast<uint64_t>(hi) ? hi : static_cast<int32_t>(first_offset);
+        const <#= KeyTypeName #> first_key = key_items[first];
+        if (first_key == <#= LookupKeyName #>) {
+            return true;
+        }
+        if (first_key < <#= LookupKeyName #>) lo = first + 1;
+        else hi = first - 1;
+<# } #>
         while (lo <= hi && <#= LookupKeyName #> >= key_items[lo] && <#= LookupKeyName #> <= key_items[hi]) {
             const <#= KeyTypeName #> lo_key = key_items[lo];
             const <#= KeyTypeName #> hi_key = key_items[hi];
@@ -33,20 +56,17 @@ public:
                 break;
             }
 
-            const double lo_value = static_cast<double>(lo_key);
-            const double hi_value = static_cast<double>(hi_key);
-            int32_t mid = lo + ((hi - lo) >> 1);
-
-            if (lo_value != hi_value) {
-                const double estimate = ((static_cast<double>(<#= LookupKeyName #>) - lo_value) * (hi - lo)) / (hi_value - lo_value);
-                if (estimate >= 0.0 && estimate <= static_cast<double>(hi - lo))
-                    mid = lo + static_cast<int32_t>(estimate);
+            const uint64_t range = <#= coordinate("hi_key") #> - <#= coordinate("lo_key") #>;
+            const uint64_t delta = <#= coordinate(LookupKeyName) #> - <#= coordinate("lo_key") #>;
+            const uint64_t normalized_range = range >> <#= shift #>;
+            int32_t mid;
+            if (normalized_range < static_cast<uint64_t>(hi - lo))
+                mid = lo + ((hi - lo) >> 1);
+            else {
+                const uint64_t reciprocal = (static_cast<uint64_t>(hi - lo) << 32) / normalized_range + 1;
+                const uint64_t offset = multiply_high(delta << <#= 32 - shift #>, reciprocal);
+                mid = offset > static_cast<uint64_t>(hi - lo) ? hi : lo + static_cast<int32_t>(offset);
             }
-
-            if (mid < lo)
-                mid = lo;
-            else if (mid > hi)
-                mid = hi;
 
             const <#= KeyTypeName #> mid_key = key_items[mid];
             if (mid_key == <#= LookupKeyName #>)
@@ -69,6 +89,21 @@ public:
 <#= GetMethodHeader(MethodType.TryLookup) #>
         int32_t lo = 0;
         int32_t hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+<# if (range != 0) { #>
+        if (!(<#= LookupKeyName #> >= key_items[0] && <#= LookupKeyName #> <= key_items[hi])) {
+            value = nullptr;
+            return false;
+        }
+        const uint64_t first_offset = multiply_high((<#= coordinate(LookupKeyName) #> - <#= TypeMap.GetValueLiteral(NumericPrediction.Coordinate(Data.Keys.First())) #>) << <#= 32 - shift #>, <#= TypeMap.GetValueLiteral(firstReciprocal) #>);
+        const int32_t first = first_offset > static_cast<uint64_t>(hi) ? hi : static_cast<int32_t>(first_offset);
+        const <#= KeyTypeName #> first_key = key_items[first];
+        if (first_key == <#= LookupKeyName #>) {
+            value = &value_items[first];
+            return true;
+        }
+        if (first_key < <#= LookupKeyName #>) lo = first + 1;
+        else hi = first - 1;
+<# } #>
         while (lo <= hi && <#= LookupKeyName #> >= key_items[lo] && <#= LookupKeyName #> <= key_items[hi]) {
             const <#= KeyTypeName #> lo_key = key_items[lo];
             const <#= KeyTypeName #> hi_key = key_items[hi];
@@ -82,20 +117,17 @@ public:
                 break;
             }
 
-            const double lo_value = static_cast<double>(lo_key);
-            const double hi_value = static_cast<double>(hi_key);
-            int32_t mid = lo + ((hi - lo) >> 1);
-
-            if (lo_value != hi_value) {
-                const double estimate = ((static_cast<double>(<#= LookupKeyName #>) - lo_value) * (hi - lo)) / (hi_value - lo_value);
-                if (estimate >= 0.0 && estimate <= static_cast<double>(hi - lo))
-                    mid = lo + static_cast<int32_t>(estimate);
+            const uint64_t range = <#= coordinate("hi_key") #> - <#= coordinate("lo_key") #>;
+            const uint64_t delta = <#= coordinate(LookupKeyName) #> - <#= coordinate("lo_key") #>;
+            const uint64_t normalized_range = range >> <#= shift #>;
+            int32_t mid;
+            if (normalized_range < static_cast<uint64_t>(hi - lo))
+                mid = lo + ((hi - lo) >> 1);
+            else {
+                const uint64_t reciprocal = (static_cast<uint64_t>(hi - lo) << 32) / normalized_range + 1;
+                const uint64_t offset = multiply_high(delta << <#= 32 - shift #>, reciprocal);
+                mid = offset > static_cast<uint64_t>(hi - lo) ? hi : lo + static_cast<int32_t>(offset);
             }
-
-            if (mid < lo)
-                mid = lo;
-            else if (mid > hi)
-                mid = hi;
 
             const <#= KeyTypeName #> mid_key = key_items[mid];
             if (mid_key == <#= LookupKeyName #>) {

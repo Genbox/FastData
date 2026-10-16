@@ -1,0 +1,20 @@
+    static constexpr uint64_t multiply_high(uint64_t a, uint64_t b) noexcept {
+#if defined(__SIZEOF_INT128__)
+        return static_cast<uint64_t>((static_cast<unsigned __int128>(a) * b) >> 64);
+#else
+        const uint64_t p00 = (a & 0xffffffffULL) * (b & 0xffffffffULL);
+        const uint64_t p01 = (a & 0xffffffffULL) * (b >> 32);
+        const uint64_t p10 = (a >> 32) * (b & 0xffffffffULL);
+        const uint64_t p11 = (a >> 32) * (b >> 32);
+        const uint64_t carry = ((p00 >> 32) + (p01 & 0xffffffffULL) + (p10 & 0xffffffffULL)) >> 32;
+        return p11 + (p01 >> 32) + (p10 >> 32) + carry;
+#endif
+    }
+<# if (Model.KeyType == typeof(float) || Model.KeyType == typeof(double)) { #>
+    static uint64_t coordinate(<#= KeyTypeName #> key) noexcept {
+        <#= Model.KeyType == typeof(float) ? "uint32_t" : "uint64_t" #> bits = 0;
+        if (key != 0) std::memcpy(&bits, &key, sizeof(key));
+        return (bits & <#= Model.KeyType == typeof(float) ? "0x80000000U" : "0x8000000000000000ULL" #>) != 0
+            ? ~bits : bits ^ <#= Model.KeyType == typeof(float) ? "0x80000000U" : "0x8000000000000000ULL" #>;
+    }
+<# } #>

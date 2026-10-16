@@ -3,19 +3,8 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.PgmTemplateData" name="Data" #>
 
 <#
-    // Unsigned wrapping subtraction for signed integer types (pgm_index.hpp:256-259)
-    string rustDiffExpr;
-    if (Model.KeyType == typeof(int))
-        rustDiffExpr = "((key as u32).wrapping_sub({0} as u32)) as f64";
-    else if (Model.KeyType == typeof(long))
-        rustDiffExpr = "((key as u64).wrapping_sub({0} as u64)) as f64";
-    else if (Model.KeyType == typeof(uint) || Model.KeyType == typeof(ulong) || Model.KeyType == typeof(byte) || Model.KeyType == typeof(ushort) || Model.KeyType == typeof(char))
-        rustDiffExpr = "key.wrapping_sub({0}) as f64";
-    else if (Model.KeyType == typeof(sbyte) || Model.KeyType == typeof(short))
-        rustDiffExpr = "((key as i64) - ({0} as i64)) as f64";
-    else
-        rustDiffExpr = "((key as f64) - ({0} as f64))";
-
+    bool floatingKey = Model.KeyType == typeof(float) || Model.KeyType == typeof(double);
+    string rustDiffExpr = floatingKey ? "Self::coordinate(key).wrapping_sub(Self::coordinate({0}))" : "(key as u64).wrapping_sub({0} as u64)";
     bool singleSegment = Data.SegmentCount == 1;
     bool hasRecursiveLevels = Data.EpsilonRecursive > 0 && Data.LevelsOffsets.Length > 2;
     int linearSearchThreshold = 64;
@@ -25,11 +14,11 @@
     float seg0Slope = singleSegment ? Data.Segments[0].Slope : 0;
     int seg0Intercept = singleSegment ? Data.Segments[0].Intercept : 0;
 
-    Func<float, string> formatSlope = slope => {
-        string s = slope.ToString("R", System.Globalization.CultureInfo.InvariantCulture);
-        return s.Contains('.') || s.Contains('E') || s.Contains('e') ? s + "_f32" : s + ".0_f32";
-    };
+    Func<float, string> formatSlope = slope => TypeMap.GetValueLiteral(NumericPrediction.Coefficient(slope));
 
+#>
+<#@ include file="Includes\NumericPrediction.ttinclude" #>
+<#
     if (Data.ValueCount > 0)
     {
 #>
@@ -53,7 +42,7 @@
 <#= FormatHelper.FormatColumns(Data.Segments.Select(s => s.Key), Data.Segments.Length, TypeMap.GetValueLiteral, 8) #>
     ];
 
-    <#= FieldModifier #>SEG_SLOPES: [f32; <#= Data.Segments.Length.ToStringInvariant() #>] = [
+    <#= FieldModifier #>SEG_SLOPES: [u64; <#= Data.Segments.Length.ToStringInvariant() #>] = [
 <#= FormatHelper.FormatColumns(Data.Segments.Select(s => (object)s.Slope), Data.Segments.Length, o => formatSlope((float)o), 8) #>
     ];
 
@@ -62,8 +51,10 @@
     ];
 
     fn evaluate_segment(seg: usize, key: <#= InputKeyTypeName #>) -> i32 {
-        let pos: i32 = ((Self::SEG_SLOPES[seg] as f64) * <#= string.Format(rustDiffExpr, "Self::SEG_KEYS[seg]") #>) as i32;
-        if pos < 0 { 0 } else { pos + Self::SEG_INTERCEPTS[seg] as i32 }
+        let product = Self::multiply_high(Self::SEG_SLOPES[seg], <#= string.Format(rustDiffExpr, "Self::SEG_KEYS[seg]") #>);
+        let intercept = Self::SEG_INTERCEPTS[seg] as i32;
+        let max_product = <#= Data.KeyCount.ToStringInvariant() #> - intercept;
+        (if product > max_product as u64 { max_product } else { product as i32 }) + intercept
     }
 
     fn get_segment_pos(key: <#= InputKeyTypeName #>) -> i32 {
@@ -100,7 +91,7 @@
                 int levelEnd = Data.LevelsOffsets[level + 1];
                 int levelSize = levelEnd - levelBegin - 1;
                 int sentinel = levelEnd - 1;
-                int epsRec = Data.EpsilonRecursive;
+                int epsRec = Data.EpsilonRecursive + 1;
                 bool useBinarySearch = epsRec > linearSearchThreshold;
 #>
 
@@ -162,6 +153,9 @@
     <#= MethodAttribute #>
     <#= MethodModifier #>fn contains(key: <#= InputKeyTypeName #>) -> bool {
 <#= GetMethodHeader(MethodType.Contains) #>
+        if !(<#= LookupKeyName #> >= Self::KEYS[0] && <#= LookupKeyName #> <= Self::KEYS[<#= (Data.KeyCount - 1).ToStringInvariant() #>]) {
+            return false;
+        }
 <#
     if (singleSegment)
     {
@@ -174,8 +168,8 @@
         else
         {
 #>
-        let mut pos: i32 = ((<#= formatSlope(seg0Slope) #> as f64) * <#= string.Format(rustDiffExpr, segKeyConst) #>) as i32;
-        if pos < 0 { pos = 0; }
+        let product = Self::multiply_high(<#= formatSlope(seg0Slope) #>, <#= string.Format(rustDiffExpr, segKeyConst) #>);
+        let mut pos: i32 = if product > <#= (Data.KeyCount - seg0Intercept).ToStringInvariant() #>_u64 { <#= (Data.KeyCount - seg0Intercept).ToStringInvariant() #> } else { product as i32 };
 <#          if (seg0Intercept != 0) { #>
         pos += <#= seg0Intercept.ToStringInvariant() #>;
 <#          } #>
@@ -184,9 +178,9 @@
         }
 #>
 
-        let lo_raw: i32 = pos - <#= Data.Epsilon.ToStringInvariant() #>;
+        let lo_raw: i32 = pos - <#= (Data.Epsilon + 1).ToStringInvariant() #>;
         let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
-        let mut hi: usize = (pos as usize) + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+        let mut hi: usize = (pos as usize) + <#= (Data.Epsilon + 3).ToStringInvariant() #>;
         if hi > <#= Data.KeyCount.ToStringInvariant() #> { hi = <#= Data.KeyCount.ToStringInvariant() #>; }
 
         while lo < hi {
@@ -210,9 +204,9 @@
 #>
         let pos: i32 = Self::get_segment_pos(<#= LookupKeyName #>);
 
-        let lo_raw: i32 = pos - <#= Data.Epsilon.ToStringInvariant() #>;
+        let lo_raw: i32 = pos - <#= (Data.Epsilon + 1).ToStringInvariant() #>;
         let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
-        let mut hi: usize = (pos as usize) + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+        let mut hi: usize = (pos as usize) + <#= (Data.Epsilon + 3).ToStringInvariant() #>;
         if hi > <#= Data.KeyCount.ToStringInvariant() #> { hi = <#= Data.KeyCount.ToStringInvariant() #>; }
 
         while lo < hi {
@@ -241,6 +235,9 @@
     <#= MethodAttribute #>
     <#= MethodModifier #>fn try_lookup(key: <#= InputKeyTypeName #>) -> Option<<#= StoredValueTypeName #>> {
 <#= GetMethodHeader(MethodType.TryLookup) #>
+        if !(<#= LookupKeyName #> >= Self::KEYS[0] && <#= LookupKeyName #> <= Self::KEYS[<#= (Data.KeyCount - 1).ToStringInvariant() #>]) {
+            return None;
+        }
 <#
         if (singleSegment)
         {
@@ -253,8 +250,8 @@
             else
             {
 #>
-        let mut pos: i32 = ((<#= formatSlope(seg0Slope) #> as f64) * <#= string.Format(rustDiffExpr, segKeyConst) #>) as i32;
-        if pos < 0 { pos = 0; }
+        let product = Self::multiply_high(<#= formatSlope(seg0Slope) #>, <#= string.Format(rustDiffExpr, segKeyConst) #>);
+        let mut pos: i32 = if product > <#= (Data.KeyCount - seg0Intercept).ToStringInvariant() #>_u64 { <#= (Data.KeyCount - seg0Intercept).ToStringInvariant() #> } else { product as i32 };
 <#              if (seg0Intercept != 0) { #>
         pos += <#= seg0Intercept.ToStringInvariant() #>;
 <#              } #>
@@ -263,9 +260,9 @@
             }
 #>
 
-        let lo_raw: i32 = pos - <#= Data.Epsilon.ToStringInvariant() #>;
+        let lo_raw: i32 = pos - <#= (Data.Epsilon + 1).ToStringInvariant() #>;
         let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
-        let mut hi: usize = (pos as usize) + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+        let mut hi: usize = (pos as usize) + <#= (Data.Epsilon + 3).ToStringInvariant() #>;
         if hi > <#= Data.KeyCount.ToStringInvariant() #> { hi = <#= Data.KeyCount.ToStringInvariant() #>; }
 
         while lo < hi {
@@ -290,9 +287,9 @@
 #>
         let pos: i32 = Self::get_segment_pos(<#= LookupKeyName #>);
 
-        let lo_raw: i32 = pos - <#= Data.Epsilon.ToStringInvariant() #>;
+        let lo_raw: i32 = pos - <#= (Data.Epsilon + 1).ToStringInvariant() #>;
         let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
-        let mut hi: usize = (pos as usize) + <#= (Data.Epsilon + 2).ToStringInvariant() #>;
+        let mut hi: usize = (pos as usize) + <#= (Data.Epsilon + 3).ToStringInvariant() #>;
         if hi > <#= Data.KeyCount.ToStringInvariant() #> { hi = <#= Data.KeyCount.ToStringInvariant() #>; }
 
         while lo < hi {

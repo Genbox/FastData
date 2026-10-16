@@ -3,6 +3,7 @@ using System.Globalization;
 using Genbox.FastData.Config;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
+using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Pgm;
 
@@ -34,6 +35,22 @@ internal sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmC
 
         if (Comparer<TKey>.Default.Compare(keys.Span[keys.Length - 1], PgmTypeTraits<TKey>.MaxValue) == 0)
             throw new ArgumentException("The value " + System.Convert.ToString(_sentinel, CultureInfo.InvariantCulture) + " is reserved as a sentinel.", nameof(keys));
+
+        if (PgmTypeTraits<TKey>.IsFloatingPoint)
+        {
+            ulong[] coordinates = new ulong[keys.Length];
+            for (int i = 0; i < coordinates.Length; i++)
+                coordinates[i] = NumericPrediction.Coordinate(keys.Span[i]!);
+            PgmContext<ulong, TValue> integer = new PgmStructure<ulong, TValue>(_epsilon, _epsilonRecursive).Create(coordinates, values);
+            PgmSegment<TKey>[] mapped = new PgmSegment<TKey>[integer.Segments.Length];
+            for (int i = 0; i < mapped.Length; i++)
+            {
+                PgmSegment<ulong> segment = integer.Segments[i];
+                TKey key = segment.Key == ulong.MaxValue ? _sentinel : NumericPrediction.FloatingKey<TKey>(segment.Key);
+                mapped[i] = new PgmSegment<TKey>(key, segment.Slope, segment.Intercept);
+            }
+            return new PgmContext<TKey, TValue>(keys, values, mapped, integer.LevelsOffsets, _epsilon, _epsilonRecursive, integer.SegmentCount);
+        }
 
         List<PgmSegment<TKey>> segments = new List<PgmSegment<TKey>>();
         List<int> levelsOffsets = new List<int>();

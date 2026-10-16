@@ -11,6 +11,8 @@ internal static class FastData
 {
 
 
+
+
     private static readonly int[] _keys = new int[] {
         153, 157, 162, 168, 175, 183, 192, 195, 199, 204, 
         210, 217, 225, 234, 237, 241, 246, 252, 259, 267, 
@@ -45,6 +47,19 @@ internal static class FastData
 
         int lo = 0;
         int hi = 199;
+        if (!(key >= _keys[0] && key <= _keys[hi]))
+        {
+            return false;
+        }
+        ulong firstOffset = Math.BigMul(unchecked(unchecked((ulong)(key)) - 153ul) << 32, 537208355ul, out _);
+        int first = firstOffset > (ulong)hi ? hi : (int)firstOffset;
+        int firstKey = _keys[first];
+        if (firstKey == key)
+        {
+            return true;
+        }
+        if (firstKey < key) lo = first + 1;
+        else hi = first - 1;
         while (lo <= hi && key >= _keys[lo] && key <= _keys[hi])
         {
             int loKey = _keys[lo];
@@ -58,16 +73,18 @@ internal static class FastData
                 break;
             }
 
-            double loValue = (double)loKey;
-            double hiValue = (double)hiKey;
-            int i = loValue == hiValue
-                ? lo + ((hi - lo) >> 1)
-                : lo + (int)((((double)key - loValue) * (hi - lo)) / (hiValue - loValue));
-
-            if (i < lo)
-                i = lo;
-            else if (i > hi)
-                i = hi;
+            ulong range = unchecked(unchecked((ulong)(hiKey)) - unchecked((ulong)(loKey)));
+            ulong delta = unchecked(unchecked((ulong)(key)) - unchecked((ulong)(loKey)));
+            ulong normalizedRange = range >> 0;
+            int i;
+            if (normalizedRange < (ulong)(hi - lo))
+                i = lo + ((hi - lo) >> 1);
+            else
+            {
+                ulong reciprocal = ((ulong)(hi - lo) << 32) / normalizedRange + 1;
+                ulong offset = Math.BigMul(delta << 32, reciprocal, out _);
+                i = offset > (ulong)(hi - lo) ? hi : lo + (int)offset;
+            }
 
             int midKey = _keys[i];
             if (midKey == key)

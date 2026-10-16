@@ -116,6 +116,6 @@ public class ContextOverheadTests
         PgmContext<int, string> multipleSegments = new PgmContext<int, string>(new int[2], new string[2], segments, [0, 2], 64, 4, 2);
 
         Assert.Equal(0, singleSegment.GetOverheadBytes());
-        Assert.Equal(24, multipleSegments.GetOverheadBytes());
+        Assert.Equal(36, multipleSegments.GetOverheadBytes());
     }
 }

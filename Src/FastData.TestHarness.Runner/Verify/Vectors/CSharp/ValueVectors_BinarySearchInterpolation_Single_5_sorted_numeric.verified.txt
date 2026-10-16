@@ -11,6 +11,14 @@ internal static class FastData
 {
 
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong Coordinate(float key)
+    {
+        uint bits = key == 0 ? 0 : BitConverter.SingleToUInt32Bits(key);
+        return (bits & 0x80000000U) != 0 ? ~bits : bits ^ 0x80000000U;
+    }
+
+
     private static readonly float[] _keys = new float[] {
         1f, 2f, 3f, 4f, 5f
     };
@@ -31,6 +39,19 @@ internal static class FastData
 
         int lo = 0;
         int hi = 4;
+        if (!(key >= _keys[0] && key <= _keys[hi]))
+        {
+            return false;
+        }
+        ulong firstOffset = Math.BigMul(unchecked(Coordinate(key) - 3212836864ul) << 32, 911ul, out _);
+        int first = firstOffset > (ulong)hi ? hi : (int)firstOffset;
+        float firstKey = _keys[first];
+        if (firstKey == key)
+        {
+            return true;
+        }
+        if (firstKey < key) lo = first + 1;
+        else hi = first - 1;
         while (lo <= hi && key >= _keys[lo] && key <= _keys[hi])
         {
             float loKey = _keys[lo];
@@ -44,16 +65,18 @@ internal static class FastData
                 break;
             }
 
-            double loValue = (double)loKey;
-            double hiValue = (double)hiKey;
-            int i = loValue == hiValue
-                ? lo + ((hi - lo) >> 1)
-                : lo + (int)((((double)key - loValue) * (hi - lo)) / (hiValue - loValue));
-
-            if (i < lo)
-                i = lo;
-            else if (i > hi)
-                i = hi;
+            ulong range = unchecked(Coordinate(hiKey) - Coordinate(loKey));
+            ulong delta = unchecked(Coordinate(key) - Coordinate(loKey));
+            ulong normalizedRange = range >> 0;
+            int i;
+            if (normalizedRange < (ulong)(hi - lo))
+                i = lo + ((hi - lo) >> 1);
+            else
+            {
+                ulong reciprocal = ((ulong)(hi - lo) << 32) / normalizedRange + 1;
+                ulong offset = Math.BigMul(delta << 32, reciprocal, out _);
+                i = offset > (ulong)(hi - lo) ? hi : lo + (int)offset;
+            }
 
             float midKey = _keys[i];
             if (midKey == key)

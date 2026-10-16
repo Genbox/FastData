@@ -11,6 +11,12 @@ internal static class FastData
 {
 
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong Coordinate(float key)
+    {
+        uint bits = key == 0 ? 0 : BitConverter.SingleToUInt32Bits(key);
+        return (bits & 0x80000000U) != 0 ? ~bits : bits ^ 0x80000000U;
+    }
     private static readonly float[] _keys = new float[] {
         1f, 2f, 3f, 4f, 5f
     };
@@ -18,6 +24,47 @@ internal static class FastData
     public static IEnumerable<float> Keys => _keys;
 
     public static ReadOnlySpan<float> KeySpan => _keys;
+
+    private static readonly float[] _segKeys = new float[] {
+        1f, 5.0000005f, float.PositiveInfinity
+    };
+
+    private static readonly ulong[] _segSlopes = new ulong[] {
+        66459367636992ul, ulong.MinValue, ulong.MinValue
+    };
+
+    private static readonly sbyte[] _segIntercepts = new sbyte[] {
+        0, 5, 5
+    };
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int EvaluateSegment(int seg, float key)
+    {
+        ulong diff = unchecked(Coordinate(key) - Coordinate(_segKeys[seg]));
+        ulong product = Math.BigMul(_segSlopes[seg], diff, out _);
+        int intercept = (int)_segIntercepts[seg];
+        int maxProduct = 5 - intercept;
+        return (product > (ulong)maxProduct ? maxProduct : (int)product) + intercept;
+    }
+
+    private static int GetSegmentPos(float key)
+    {
+        int seg = 0;
+        int segHi = 1;
+        while (seg < segHi)
+        {
+            int mid = seg + ((segHi - seg) >> 1);
+            if (_segKeys[mid + 1] <= key)
+                seg = mid + 1;
+            else
+                segHi = mid;
+        }
+
+        int pos = EvaluateSegment(seg, key);
+        int nextIntercept = (int)_segIntercepts[seg + 1];
+        if (pos > nextIntercept) pos = nextIntercept;
+        return pos;
+    }
 
     
     public static bool Contains(float key)
@@ -28,16 +75,16 @@ internal static class FastData
         }
 
 
+        if (!(key >= _keys[0] && key <= _keys[4]))
+        {
+            return false;
+        }
 
-        double diff = key - 1f;
-        int pos = (int)(long)(0.50000095f * diff);
-        if (pos < 0) pos = 0;
-        pos += 31;
-        if (pos > 5) pos = 5;
+        int pos = GetSegmentPos(key);
 
-        int lo = pos - 64;
+        int lo = pos - 65;
         if (lo < 0) lo = 0;
-        int hi = pos + 66;
+        int hi = pos + 67;
         if (hi > 5) hi = 5;
 
         while (lo < hi)

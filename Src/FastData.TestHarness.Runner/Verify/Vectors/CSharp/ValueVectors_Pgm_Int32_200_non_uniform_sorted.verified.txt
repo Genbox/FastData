@@ -42,32 +42,32 @@ internal static class FastData
     public static bool Contains(int key)
     {
 
-
-        unchecked
+        if (!(key >= _keys[0] && key <= _keys[199]))
         {
-            double diff = (uint)key - (uint)153;
-            int pos = (int)(long)(0.1645983f * diff);
-            if (pos < 0) pos = 0;
-            if (pos > 200) pos = 200;
-
-            int lo = pos - 64;
-            if (lo < 0) lo = 0;
-            int hi = pos + 66;
-            if (hi > 200) hi = 200;
-
-            while (lo < hi)
-            {
-                int i = lo + ((hi - lo) >> 1);
-                if (_keys[i] == key)
-                    return true;
-                if (_keys[i] < key)
-                    lo = i + 1;
-                else
-                    hi = i;
-            }
-
             return false;
         }
+
+        ulong diff = unchecked((ulong)key - (ulong)153);
+        ulong product = Math.BigMul(3036302734492958720ul, diff, out _);
+        int pos = product > 200UL ? 200 : (int)product;
+
+        int lo = pos - 65;
+        if (lo < 0) lo = 0;
+        int hi = pos + 67;
+        if (hi > 200) hi = 200;
+
+        while (lo < hi)
+        {
+            int i = lo + ((hi - lo) >> 1);
+            if (_keys[i] == key)
+                return true;
+            if (_keys[i] < key)
+                lo = i + 1;
+            else
+                hi = i;
+        }
+
+        return false;
     }
 
     public const int ItemCount = 200;

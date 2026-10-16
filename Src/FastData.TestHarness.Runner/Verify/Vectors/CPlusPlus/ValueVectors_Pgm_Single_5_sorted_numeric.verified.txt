@@ -27,9 +27,63 @@ public:
 class fastdata final {
 
 
+    static constexpr uint64_t multiply_high(uint64_t a, uint64_t b) noexcept {
+#if defined(__SIZEOF_INT128__)
+        return static_cast<uint64_t>((static_cast<unsigned __int128>(a) * b) >> 64);
+#else
+        const uint64_t p00 = (a & 0xffffffffULL) * (b & 0xffffffffULL);
+        const uint64_t p01 = (a & 0xffffffffULL) * (b >> 32);
+        const uint64_t p10 = (a >> 32) * (b & 0xffffffffULL);
+        const uint64_t p11 = (a >> 32) * (b >> 32);
+        const uint64_t carry = ((p00 >> 32) + (p01 & 0xffffffffULL) + (p10 & 0xffffffffULL)) >> 32;
+        return p11 + (p01 >> 32) + (p10 >> 32) + carry;
+#endif
+    }
+    static uint64_t coordinate(float key) noexcept {
+        uint32_t bits = 0;
+        if (key != 0) std::memcpy(&bits, &key, sizeof(key));
+        return (bits & 0x80000000U) != 0
+            ? ~bits : bits ^ 0x80000000U;
+    }
     static constexpr std::array<float, 5> key_items = {
         1.0f, 2.0f, 3.0f, 4.0f, 5.0f
     };
+
+    static constexpr std::array<float, 3> seg_keys = {
+        1.0f, 5.0000005f, std::numeric_limits<float>::infinity()
+    };
+
+    static constexpr std::array<uint64_t, 3> seg_slopes = {
+        66459367636992ull, 0, 0
+    };
+
+    static constexpr std::array<int8_t, 3> seg_intercepts = {
+        0, 5, 5
+    };
+
+    static int32_t evaluate_segment(const size_t seg, const float key) noexcept {
+        const uint64_t product = multiply_high(seg_slopes[seg], (coordinate(key) - coordinate(seg_keys[seg])));
+        const int32_t intercept = static_cast<int32_t>(seg_intercepts[seg]);
+        const int32_t max_product = 5 - intercept;
+        return (product > static_cast<uint64_t>(max_product) ? max_product : static_cast<int32_t>(product)) + intercept;
+    }
+
+    static int32_t get_segment_pos(const float key) noexcept {
+        size_t seg = 0;
+        size_t seg_hi = 1;
+        while (seg < seg_hi) {
+            const size_t mid = seg + ((seg_hi - seg) >> 1);
+            if (seg_keys[mid + 1] <= key)
+                seg = mid + 1;
+            else
+                seg_hi = mid;
+        }
+
+        int32_t pos = evaluate_segment(seg, key);
+        const int32_t next_intercept = static_cast<int32_t>(seg_intercepts[seg + 1]);
+        if (pos > next_intercept) pos = next_intercept;
+        return pos;
+    }
 
 public:
     [[nodiscard]]
@@ -42,13 +96,15 @@ public:
         }
 
 
-        const double product = static_cast<double>(0.50000095f) * static_cast<double>(key - 1.0f);
-        int32_t pos = product <= 0.0 ? 0 : (product >= static_cast<double>(0) ? 0 : static_cast<int32_t>(product));
-        pos += 31;
-        if (pos > 5) pos = 5;
+        if (!(key >= key_items[0] && key <= key_items[4])) {
+            return false;
+        }
+        const int32_t pos = get_segment_pos(key);
 
-        size_t lo = pos >= 64 ? static_cast<size_t>(pos - 64) : 0;
-        size_t hi = static_cast<size_t>(pos) + 66;
+        size_t lo = 0;
+        if (pos >= 65)
+            lo = static_cast<size_t>(pos - 65);
+        size_t hi = static_cast<size_t>(pos) + 67;
         if (hi > 5) hi = 5;
 
         while (lo < hi) {

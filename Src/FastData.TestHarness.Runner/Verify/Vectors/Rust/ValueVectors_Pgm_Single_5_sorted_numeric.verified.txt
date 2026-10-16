@@ -12,6 +12,17 @@ use std::ptr;
 pub struct fastdata;
 impl fastdata {
 
+    #[inline(always)]
+    fn multiply_high(a: u64, b: u64) -> u64 { ((a as u128 * b as u128) >> 64) as u64 }
+    #[inline(always)]
+    fn coordinate(key: f32) -> u64 {
+        let bits = if key == 0.0 { 0 } else { key.to_bits() };
+        (if bits & 0x80000000_u32 != 0 {
+            !bits
+        } else {
+            bits ^ 0x80000000_u32
+        }) as u64
+    }
     const KEYS: [f32; 5] = [
         1f32, 2f32, 3f32, 4f32, 5f32
     ];
@@ -24,6 +35,43 @@ impl fastdata {
         Self::KEYS.iter().copied()
     }
 
+    const SEG_KEYS: [f32; 3] = [
+        1f32, 5.0000005f32, f32::INFINITY
+    ];
+
+    const SEG_SLOPES: [u64; 3] = [
+        66459367636992, u64::MIN, u64::MIN
+    ];
+
+    const SEG_INTERCEPTS: [i8; 3] = [
+        0, 5, 5
+    ];
+
+    fn evaluate_segment(seg: usize, key: f32) -> i32 {
+        let product = Self::multiply_high(Self::SEG_SLOPES[seg], Self::coordinate(key).wrapping_sub(Self::coordinate(Self::SEG_KEYS[seg])));
+        let intercept = Self::SEG_INTERCEPTS[seg] as i32;
+        let max_product = 5 - intercept;
+        (if product > max_product as u64 { max_product } else { product as i32 }) + intercept
+    }
+
+    fn get_segment_pos(key: f32) -> i32 {
+        let mut seg: usize = 0;
+        let mut seg_hi: usize = 1;
+        while seg < seg_hi {
+            let mid: usize = seg + ((seg_hi - seg) >> 1);
+            if Self::SEG_KEYS[mid + 1] <= key {
+                seg = mid + 1;
+            } else {
+                seg_hi = mid;
+            }
+        }
+
+        let mut pos: i32 = Self::evaluate_segment(seg, key);
+        let next_intercept: i32 = Self::SEG_INTERCEPTS[seg + 1] as i32;
+        if pos > next_intercept { pos = next_intercept; }
+        pos
+    }
+
     #[must_use]
     pub fn contains(key: f32) -> bool {
         if (((key != key) || ((key < 1f32) || (key > 5f32))))
@@ -32,14 +80,14 @@ impl fastdata {
         }
 
 
-        let mut pos: i32 = ((0.50000095_f32 as f64) * ((key as f64) - (1f32 as f64))) as i32;
-        if pos < 0 { pos = 0; }
-        pos += 31;
-        if pos > 5 { pos = 5; }
+        if !(key >= Self::KEYS[0] && key <= Self::KEYS[4]) {
+            return false;
+        }
+        let pos: i32 = Self::get_segment_pos(key);
 
-        let lo_raw: i32 = pos - 64;
+        let lo_raw: i32 = pos - 65;
         let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
-        let mut hi: usize = (pos as usize) + 66;
+        let mut hi: usize = (pos as usize) + 67;
         if hi > 5 { hi = 5; }
 
         while lo < hi {

@@ -21,6 +21,8 @@ impl Person {
 pub struct fastdata;
 impl fastdata {
 
+    #[inline(always)]
+    fn multiply_high(a: u64, b: u64) -> u64 { ((a as u128 * b as u128) >> 64) as u64 }
     const VALUES: [&'static Person; 3] = [
         &Person::new(1, "Bob", Some(&Person::new(4, "Anna", None))), &Person::new(2, "Billy", None), &Person::new(3, "Bibi", None)
     ];
@@ -47,13 +49,16 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: i32) -> bool {
 
-        let mut pos: i32 = ((22.333334_f32 as f64) * ((key as u32).wrapping_sub(1 as u32)) as f64) as i32;
-        if pos < 0 { pos = 0; }
+        if !(key >= Self::KEYS[0] && key <= Self::KEYS[2]) {
+            return false;
+        }
+        let product = Self::multiply_high(u64::MAX, (key as u64).wrapping_sub(1 as u64));
+        let mut pos: i32 = if product > 3_u64 { 3 } else { product as i32 };
         if pos > 3 { pos = 3; }
 
-        let lo_raw: i32 = pos - 64;
+        let lo_raw: i32 = pos - 65;
         let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
-        let mut hi: usize = (pos as usize) + 66;
+        let mut hi: usize = (pos as usize) + 67;
         if hi > 3 { hi = 3; }
 
         while lo < hi {
@@ -75,13 +80,16 @@ impl fastdata {
     #[must_use]
     pub fn try_lookup(key: i32) -> Option<&'static Person> {
 
-        let mut pos: i32 = ((22.333334_f32 as f64) * ((key as u32).wrapping_sub(1 as u32)) as f64) as i32;
-        if pos < 0 { pos = 0; }
+        if !(key >= Self::KEYS[0] && key <= Self::KEYS[2]) {
+            return None;
+        }
+        let product = Self::multiply_high(u64::MAX, (key as u64).wrapping_sub(1 as u64));
+        let mut pos: i32 = if product > 3_u64 { 3 } else { product as i32 };
         if pos > 3 { pos = 3; }
 
-        let lo_raw: i32 = pos - 64;
+        let lo_raw: i32 = pos - 65;
         let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
-        let mut hi: usize = (pos as usize) + 66;
+        let mut hi: usize = (pos as usize) + 67;
         if hi > 3 { hi = 3; }
 
         while lo < hi {

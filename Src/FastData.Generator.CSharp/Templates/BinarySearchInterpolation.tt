@@ -2,6 +2,16 @@
 <#@ parameter type="Genbox.FastData.Generator.Template.TemplateData.BinarySearchTemplateData" name="Data" #>
 
 <#
+    bool floatingKey = Model.KeyType == typeof(float) || Model.KeyType == typeof(double);
+    ulong range = unchecked(NumericPrediction.Coordinate(Data.Keys.Last()) - NumericPrediction.Coordinate(Data.Keys.First()));
+    int shift = NumericPrediction.Shift(range);
+    ulong firstReciprocal = range == 0 ? 0 : (((ulong)(Data.KeyCount - 1) << 32) / (range >> shift)) + 1;
+    Func<string, string> coordinate = value => floatingKey ? "Coordinate(" + value + ")" : "unchecked((ulong)(" + value + "))";
+#>
+<#@ include file="Includes\NumericPrediction.ttinclude" #>
+
+
+<#
     if (Data.ValueCount > 0)
     {
 #>
@@ -25,6 +35,21 @@
 
         int lo = 0;
         int hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+<# if (range != 0) { #>
+        if (!(<#= LookupKeyName #> >= _keys[0] && <#= LookupKeyName #> <= _keys[hi]))
+        {
+            return false;
+        }
+        ulong firstOffset = Math.BigMul(unchecked(<#= coordinate(LookupKeyName) #> - <#= TypeMap.GetValueLiteral(NumericPrediction.Coordinate(Data.Keys.First())) #>) << <#= 32 - shift #>, <#= TypeMap.GetValueLiteral(firstReciprocal) #>, out _);
+        int first = firstOffset > (ulong)hi ? hi : (int)firstOffset;
+        <#= KeyTypeName #> firstKey = _keys[first];
+        if (firstKey == <#= LookupKeyName #>)
+        {
+            return true;
+        }
+        if (firstKey < <#= LookupKeyName #>) lo = first + 1;
+        else hi = first - 1;
+<# } #>
         while (lo <= hi && <#= LookupKeyName #> >= _keys[lo] && <#= LookupKeyName #> <= _keys[hi])
         {
             <#= KeyTypeName #> loKey = _keys[lo];
@@ -38,16 +63,18 @@
                 break;
             }
 
-            double loValue = (double)loKey;
-            double hiValue = (double)hiKey;
-            int i = loValue == hiValue
-                ? lo + ((hi - lo) >> 1)
-                : lo + (int)((((double)<#= LookupKeyName #> - loValue) * (hi - lo)) / (hiValue - loValue));
-
-            if (i < lo)
-                i = lo;
-            else if (i > hi)
-                i = hi;
+            ulong range = unchecked(<#= coordinate("hiKey") #> - <#= coordinate("loKey") #>);
+            ulong delta = unchecked(<#= coordinate(LookupKeyName) #> - <#= coordinate("loKey") #>);
+            ulong normalizedRange = range >> <#= shift #>;
+            int i;
+            if (normalizedRange < (ulong)(hi - lo))
+                i = lo + ((hi - lo) >> 1);
+            else
+            {
+                ulong reciprocal = ((ulong)(hi - lo) << 32) / normalizedRange + 1;
+                ulong offset = Math.BigMul(delta << <#= 32 - shift #>, reciprocal, out _);
+                i = offset > (ulong)(hi - lo) ? hi : lo + (int)offset;
+            }
 
             <#= KeyTypeName #> midKey = _keys[i];
             if (midKey == <#= LookupKeyName #>)
@@ -72,6 +99,23 @@
 
         int lo = 0;
         int hi = <#= (Data.KeyCount - 1).ToStringInvariant() #>;
+<# if (range != 0) { #>
+        if (!(<#= LookupKeyName #> >= _keys[0] && <#= LookupKeyName #> <= _keys[hi]))
+        {
+            value = default;
+            return false;
+        }
+        ulong firstOffset = Math.BigMul(unchecked(<#= coordinate(LookupKeyName) #> - <#= TypeMap.GetValueLiteral(NumericPrediction.Coordinate(Data.Keys.First())) #>) << <#= 32 - shift #>, <#= TypeMap.GetValueLiteral(firstReciprocal) #>, out _);
+        int first = firstOffset > (ulong)hi ? hi : (int)firstOffset;
+        <#= KeyTypeName #> firstKey = _keys[first];
+        if (firstKey == <#= LookupKeyName #>)
+        {
+            value = _values[first];
+            return true;
+        }
+        if (firstKey < <#= LookupKeyName #>) lo = first + 1;
+        else hi = first - 1;
+<# } #>
         while (lo <= hi && <#= LookupKeyName #> >= _keys[lo] && <#= LookupKeyName #> <= _keys[hi])
         {
             <#= KeyTypeName #> loKey = _keys[lo];
@@ -88,16 +132,18 @@
                 break;
             }
 
-            double loValue = (double)loKey;
-            double hiValue = (double)hiKey;
-            int i = loValue == hiValue
-                ? lo + ((hi - lo) >> 1)
-                : lo + (int)((((double)<#= LookupKeyName #> - loValue) * (hi - lo)) / (hiValue - loValue));
-
-            if (i < lo)
-                i = lo;
-            else if (i > hi)
-                i = hi;
+            ulong range = unchecked(<#= coordinate("hiKey") #> - <#= coordinate("loKey") #>);
+            ulong delta = unchecked(<#= coordinate(LookupKeyName) #> - <#= coordinate("loKey") #>);
+            ulong normalizedRange = range >> <#= shift #>;
+            int i;
+            if (normalizedRange < (ulong)(hi - lo))
+                i = lo + ((hi - lo) >> 1);
+            else
+            {
+                ulong reciprocal = ((ulong)(hi - lo) << 32) / normalizedRange + 1;
+                ulong offset = Math.BigMul(delta << <#= 32 - shift #>, reciprocal, out _);
+                i = offset > (ulong)(hi - lo) ? hi : lo + (int)offset;
+            }
 
             <#= KeyTypeName #> midKey = _keys[i];
             if (midKey == <#= LookupKeyName #>)

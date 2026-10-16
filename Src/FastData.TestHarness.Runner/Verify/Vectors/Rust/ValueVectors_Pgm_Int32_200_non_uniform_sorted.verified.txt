@@ -12,6 +12,8 @@ use std::ptr;
 pub struct fastdata;
 impl fastdata {
 
+    #[inline(always)]
+    fn multiply_high(a: u64, b: u64) -> u64 { ((a as u128 * b as u128) >> 64) as u64 }
     const KEYS: [i32; 200] = [
         153, 157, 162, 168, 175, 183, 192, 195, 199, 204, 
         210, 217, 225, 234, 237, 241, 246, 252, 259, 267, 
@@ -46,13 +48,16 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: i32) -> bool {
 
-        let mut pos: i32 = ((0.1645983_f32 as f64) * ((key as u32).wrapping_sub(153 as u32)) as f64) as i32;
-        if pos < 0 { pos = 0; }
+        if !(key >= Self::KEYS[0] && key <= Self::KEYS[199]) {
+            return false;
+        }
+        let product = Self::multiply_high(3036302734492958720, (key as u64).wrapping_sub(153 as u64));
+        let mut pos: i32 = if product > 200_u64 { 200 } else { product as i32 };
         if pos > 200 { pos = 200; }
 
-        let lo_raw: i32 = pos - 64;
+        let lo_raw: i32 = pos - 65;
         let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
-        let mut hi: usize = (pos as usize) + 66;
+        let mut hi: usize = (pos as usize) + 67;
         if hi > 200 { hi = 200; }
 
         while lo < hi {

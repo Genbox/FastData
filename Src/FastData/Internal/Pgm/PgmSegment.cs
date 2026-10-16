@@ -1,10 +1,11 @@
+using Genbox.FastData.Generators.Helpers;
+
 namespace Genbox.FastData.Internal.Pgm;
 
 /// <summary>Represents a single segment in a PGM index level. Maps keys to approximate positions via a linear model: pos = slope * (key - Key) + intercept.</summary>
 /// <remarks>
-/// Matches the reference Segment (pgm_index.hpp). The reference uses uint32_t for intercept; we use
-/// int which is equivalent since the value is always non-negative by construction. Slope is float,
-/// matching the reference default Floating template parameter.
+/// Construction stores a binary32 slope and a nonnegative integer intercept. Floating-point keys
+/// use ordered bit coordinates for prediction. Templates encode the slope as a Q0.64 coefficient.
 /// </remarks>
 public readonly struct PgmSegment<T>
 {
@@ -76,7 +77,7 @@ public readonly struct PgmSegment<T>
                 diff = k - s;
             }
             else if (PgmTypeTraits<T>.IsFloatingPoint)
-                diff = PgmTypeTraits<T>.ToDouble(key) - PgmTypeTraits<T>.ToDouble(Key);
+                diff = NumericPrediction.Coordinate(key!) - NumericPrediction.Coordinate(Key!);
             else
             {
                 long k = PgmTypeTraits<T>.ToInt64(key);

@@ -12,6 +12,8 @@ use std::ptr;
 pub struct fastdata;
 impl fastdata {
 
+    #[inline(always)]
+    fn multiply_high(a: u64, b: u64) -> u64 { ((a as u128 * b as u128) >> 64) as u64 }
     const KEYS: [i32; 5] = [
         1, 2, 3, 4, 5
     ];
@@ -28,8 +30,8 @@ impl fastdata {
         1, 6, i32::MAX
     ];
 
-    const SEG_SLOPES: [f32; 3] = [
-        13.8_f32, 0.0_f32, 0.0_f32
+    const SEG_SLOPES: [u64; 3] = [
+        u64::MAX, u64::MIN, u64::MIN
     ];
 
     const SEG_INTERCEPTS: [i8; 3] = [
@@ -37,8 +39,10 @@ impl fastdata {
     ];
 
     fn evaluate_segment(seg: usize, key: i32) -> i32 {
-        let pos: i32 = ((Self::SEG_SLOPES[seg] as f64) * ((key as u32).wrapping_sub(Self::SEG_KEYS[seg] as u32)) as f64) as i32;
-        if pos < 0 { 0 } else { pos + Self::SEG_INTERCEPTS[seg] as i32 }
+        let product = Self::multiply_high(Self::SEG_SLOPES[seg], (key as u64).wrapping_sub(Self::SEG_KEYS[seg] as u64));
+        let intercept = Self::SEG_INTERCEPTS[seg] as i32;
+        let max_product = 5 - intercept;
+        (if product > max_product as u64 { max_product } else { product as i32 }) + intercept
     }
 
     fn get_segment_pos(key: i32) -> i32 {
@@ -62,11 +66,14 @@ impl fastdata {
     #[must_use]
     pub fn contains(key: i32) -> bool {
 
+        if !(key >= Self::KEYS[0] && key <= Self::KEYS[4]) {
+            return false;
+        }
         let pos: i32 = Self::get_segment_pos(key);
 
-        let lo_raw: i32 = pos - 64;
+        let lo_raw: i32 = pos - 65;
         let mut lo: usize = if lo_raw < 0 { 0 } else { lo_raw as usize };
-        let mut hi: usize = (pos as usize) + 66;
+        let mut hi: usize = (pos as usize) + 67;
         if hi > 5 { hi = 5; }
 
         while lo < hi {
