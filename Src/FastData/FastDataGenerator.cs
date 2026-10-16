@@ -579,6 +579,10 @@ public static partial class FastDataGenerator
 
             Functions |= value;
 
+            // Every generator implements UnitAtAsciiLower on top of UnitAt, so the helper must be emitted too.
+            if (value == GeneratorFunction.UnitAtAsciiLower)
+                Functions |= GeneratorFunction.UnitAt;
+
             return base.VisitMethodCall(node);
         }
     }
