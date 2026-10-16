@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -66,6 +67,7 @@ public class TemplateManager
         TemplateGenerator generator = new TemplateGenerator();
         AddTemplateReference(generator, typeof(TypeCode));
         AddTemplateReference(generator, typeof(FormatHelper));
+        AddTemplateReference(generator, typeof(StructureType));
         AddTemplateReference(generator, typeof(Expression));
 
         foreach (KeyValuePair<string, object?> pair in variables)
