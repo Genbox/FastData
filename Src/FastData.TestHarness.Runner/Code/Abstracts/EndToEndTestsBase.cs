@@ -10,6 +10,29 @@ public abstract class EndToEndTestsBase
     private protected abstract TestBase Harness { get; }
 
     [Fact]
+    public async Task IgnoreCaseBinarySearchOrdersAsciiLettersAndPunctuation()
+    {
+        string[] keys = ["A", "[", "_", "Z", "`", "a?"];
+        StringDataConfig config = new StringDataConfig { StructureTypeOverride = StructureType.BinarySearch, IgnoreCase = true };
+        config.EarlyExitConfig.Disabled = true;
+        string source = FastDataGenerator.Generate(keys, config, Harness.Generator).Source;
+        Assert.Equal(1, await Harness.RunContainsAsync(source, nameof(IgnoreCaseBinarySearchOrdersAsciiLettersAndPunctuation),
+            ["a", "[", "_", "z", "`", "A?"], ["b", "!"], TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task SupplementaryAndUpperBmpStringKeysMatch()
+    {
+        string[] keys = ["z", "\U0001F600", "\uE000", "a", "prefix\U0001F600", "prefix\uE000", "m"];
+        string[] missing = ["\uE001", "\U0001F601", "prefix\uE001", "absent"];
+        int[] values = [11, 22, 33, 44, 55, 66, 77];
+        StringDataConfig config = new StringDataConfig { StructureTypeOverride = StructureType.BinarySearch, StringAnalyzerConfig = null };
+        config.EarlyExitConfig.Disabled = true;
+        StringGenerationResult generated = FastDataGenerator.GenerateKeyed(keys, values, config, Harness.Generator);
+        Assert.Equal(1, await Harness.RunTryLookupAsync(generated.Source, nameof(SupplementaryAndUpperBmpStringKeysMatch), keys, values, missing, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
     public async Task GenerateIntArrayEndToEndAsync()
     {
         int[] keys = [1, 4, 7, 10, 12];

@@ -213,9 +213,14 @@ public static partial class FastDataGenerator
         }
 
         StringComparer comparer = cfg.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        IComparer<string> sortComparer = comparer;
+        // Sort in the same order as the generated lookup: UTF-8 byte order differs from .NET's
+        // UTF-16 ordinal order for supplementary characters, and ASCII lowercase folding changes punctuation ordering.
+        if (generator.Encoding == GeneratorEncoding.Utf8Bytes)
+            sortComparer = cfg.IgnoreCase ? Utf8StringComparer.AsciiIgnoreCase : Utf8StringComparer.Ordinal;
 
         int oldCount = keys.Length;
-        Deduplication.DeduplicateStringKeys(cfg, ref keys, ref values, comparer, comparer);
+        Deduplication.DeduplicateStringKeys(cfg, ref keys, ref values, comparer, sortComparer);
         int newCount = keys.Length;
 
         if (oldCount == newCount)
