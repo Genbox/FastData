@@ -4,8 +4,6 @@ using System.Runtime.Intrinsics.X86;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
-// Search helpers model normal lookup APIs; these traversal benchmarks intentionally discard their return values.
-#pragma warning disable S3241
 public class TimeComplexityAvg
 {
     private int[] _data = null!;
@@ -24,88 +22,116 @@ public class TimeComplexityAvg
         BuildK16Tree(_data, out _k16Keys, out _k16Children, out _k16KeyCounts);
     }
 
-    [Benchmark]public void SwitchLookup()
+    [Benchmark]public int SwitchLookup()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            SwitchSearch(Random.Shared.Next(1, _data.Length));
+            result += SwitchSearch(Random.Shared.Next(1, _data.Length)) ? 1 : 0;
+        return result;
     }
 
-    [Benchmark]public void LinearLookup()
+    [Benchmark]public int LinearLookup()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            _data.Contains(Random.Shared.Next(1, _data.Length));
+            result += _data.Contains(Random.Shared.Next(1, _data.Length)) ? 1 : 0;
+        return result;
     }
 
-    [Benchmark]public void BinarySearchLookup()
+    [Benchmark]public int BinarySearchLookup()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            _data.BinarySearch(Random.Shared.Next(1, _data.Length));
+            result += _data.BinarySearch(Random.Shared.Next(1, _data.Length));
+        return result;
     }
 
-    [Benchmark]public void InterpolationSearchLookup()
+    [Benchmark]public int InterpolationSearchLookup()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            InterpolationSearch(_data, Random.Shared.Next(1, _data.Length));
+            result += InterpolationSearch(_data, Random.Shared.Next(1, _data.Length));
+        return result;
     }
 
-    [Benchmark]public void EytzingerLookup()
+    [Benchmark]public int EytzingerLookup()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            EytzingerSearch(_eytzinger, Random.Shared.Next(1, _data.Length));
+            result += EytzingerSearch(_eytzinger, Random.Shared.Next(1, _data.Length));
+        return result;
     }
 
-    [Benchmark]public void HashSetLookup()
+    [Benchmark]public int HashSetLookup()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            _hashSet.Contains(Random.Shared.Next(1, _data.Length));
+            result += _hashSet.Contains(Random.Shared.Next(1, _data.Length)) ? 1 : 0;
+        return result;
     }
 
-    [Benchmark]public void K16LookupLinearCount()
+    [Benchmark]public int K16LookupLinearCount()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            K16SearchLinearCount(_k16Keys, _k16Children, _k16KeyCounts, Random.Shared.Next(1, _data.Length));
+            result += K16SearchLinearCount(_k16Keys, _k16Children, _k16KeyCounts, Random.Shared.Next(1, _data.Length));
+        return result;
     }
 
-    [Benchmark]public void K16LookupBranchlessUnrolled()
+    [Benchmark]public int K16LookupBranchlessUnrolled()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            K16SearchBranchlessUnrolled(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+            result += K16SearchBranchlessUnrolled(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+        return result;
     }
 
-    [Benchmark]public void K16LookupBranchLean()
+    [Benchmark]public int K16LookupBranchLean()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            K16SearchBranchLean(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+            result += K16SearchBranchLean(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+        return result;
     }
 
-    [Benchmark]public void K16LookupBinaryNode()
+    [Benchmark]public int K16LookupBinaryNode()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            K16SearchBinaryNode(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+            result += K16SearchBinaryNode(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+        return result;
     }
 
-    [Benchmark]public void K16LookupSimd128()
+    [Benchmark]public int K16LookupSimd128()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            K16SearchSimd128(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+            result += K16SearchSimd128(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+        return result;
     }
 
-    [Benchmark]public void K16LookupSimd256()
+    [Benchmark]public int K16LookupSimd256()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            K16SearchSimd256(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+            result += K16SearchSimd256(_k16Keys, _k16Children, Random.Shared.Next(1, _data.Length));
+        return result;
     }
 
-    [Benchmark]public void CompressedBloom()
+    [Benchmark]public int CompressedBloom()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            CompressedBloomFilterStructure_Int32_100.Contains(Random.Shared.Next(1, _data.Length));
+            result += CompressedBloomFilterStructure_Int32_100.Contains(Random.Shared.Next(1, _data.Length)) ? 1 : 0;
+        return result;
     }
 
-    [Benchmark]public void EliasFanoEncoded()
+    [Benchmark]public int EliasFanoEncoded()
     {
+        int result = 0;
         for (int i = 0; i < 10000; i++)
-            EliasFanoSetStructure_Int32_100.Contains(Random.Shared.Next(1, _data.Length));
+            result += EliasFanoSetStructure_Int32_100.Contains(Random.Shared.Next(1, _data.Length)) ? 1 : 0;
+        return result;
     }
 
     private static int[] BuildEytzinger(int[] sorted)
@@ -224,6 +250,8 @@ public class TimeComplexityAvg
             for (int i = 0; i < length; i++)
                 keys[keyBase + i] = sorted[start + i];
 
+            // Leaf lengths are nonnegative and at most 16.
+            // ReSharper disable once IntVariableOverflowInCheckedContext
             keyCounts[nodeIndex] = (byte)length;
 
             return nodeIndex;
@@ -752,4 +780,3 @@ public class TimeComplexityAvg
         }
     }
 }
-#pragma warning restore S3241

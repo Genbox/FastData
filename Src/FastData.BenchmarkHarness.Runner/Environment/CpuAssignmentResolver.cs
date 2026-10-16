@@ -16,7 +16,7 @@ internal static class CpuAssignmentResolver
         if (!settings.Cpu.AutoSelect)
             return new CpuAssignment("0", ("CPU set", "0 (default)"));
 
-        if (!CpuSelector.TryGetCpuSet(out string? cpuSet) || cpuSet is null)
+        if (!CpuSelector.TryGetCpuSet(out string? cpuSet) || cpuSet == null)
             return new CpuAssignment("0", ("CPU set", "0 (auto unavailable)"));
 
         return new CpuAssignment(cpuSet, ("CPU set", cpuSet + " (auto)"));

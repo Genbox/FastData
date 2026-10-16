@@ -29,8 +29,8 @@ public class GPerfEarlyExitTests
 
         StringGeneratorConfig generatorConfig = Assert.IsType<StringGeneratorConfig>(generator.Config);
         Assert.NotNull(generatorConfig.HashInfo);
-        Assert.True((generatorConfig.GeneratorFunctions & GeneratorFunction.Length) != GeneratorFunction.None);
-        Assert.True((generatorConfig.GeneratorFunctions & GeneratorFunction.IsAsciiOnly) != GeneratorFunction.None);
+        Assert.True(generatorConfig.GeneratorFunctions.HasFlag(GeneratorFunction.Length));
+        Assert.True(generatorConfig.GeneratorFunctions.HasFlag(GeneratorFunction.IsAsciiOnly));
         Assert.Equal(StructureType.HashTable, result.StructureType);
         Assert.Equal("GPerfStringHash", result.StringHashName);
         Assert.Contains("IsAsciiOnlyEarlyExit", result.EarlyExits, StringComparer.Ordinal);
@@ -56,7 +56,7 @@ public class GPerfEarlyExitTests
         FastDataGenerator.Generate(keys, config, generator);
 
         StringGeneratorConfig generatorConfig = Assert.IsType<StringGeneratorConfig>(generator.Config);
-        Assert.False((generatorConfig.GeneratorFunctions & GeneratorFunction.IsAsciiOnly) != GeneratorFunction.None);
+        Assert.False(generatorConfig.GeneratorFunctions.HasFlag(GeneratorFunction.IsAsciiOnly));
     }
 
     [Fact]

@@ -37,12 +37,9 @@ internal static class ConstantReduction
         // Support static literal fields (no instance expression).
         if (me.Member is FieldInfo fieldInfo
             && fieldInfo.IsLiteral
-            && (me.Type.IsPrimitive || me.Type == typeof(decimal)))
-        {
-            object? rawValue = fieldInfo.GetRawConstantValue();
-            if (rawValue is IComparable literal && literal.GetType() == me.Type)
-                return Constant(literal, me.Type);
-        }
+            && (me.Type.IsPrimitive || me.Type == typeof(decimal))
+            && fieldInfo.GetRawConstantValue() is IComparable literal && literal.GetType() == me.Type)
+            return Constant(literal, me.Type);
 
         return expr;
     }
@@ -149,7 +146,7 @@ internal static class ConstantReduction
                         (byte l, byte r) when ceLeft.Type == typeof(byte) => Constant((byte)(l / r), ceLeft.Type),
                         _ => expr
                     },
-                    ExpressionType.Modulo => (ceLeft.Value, ceRight.Value) switch
+                    _ => (ceLeft.Value, ceRight.Value) switch
                     {
                         (decimal l, decimal r) when ceLeft.Type == typeof(decimal) => Constant(l % r, ceLeft.Type),
                         (float l, float r) when ceLeft.Type == typeof(float) => Constant(l % r, ceLeft.Type),
@@ -163,8 +160,7 @@ internal static class ConstantReduction
                         (sbyte l, sbyte r) when ceLeft.Type == typeof(sbyte) => Constant((sbyte)(l % r), ceLeft.Type),
                         (byte l, byte r) when ceLeft.Type == typeof(byte) => Constant((byte)(l % r), ceLeft.Type),
                         _ => expr
-                    },
-                    _ => expr
+                    }
                 };
             }
             catch (DivideByZeroException)

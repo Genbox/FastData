@@ -519,7 +519,7 @@ public class ExpressionCompilerTests
 
         string output = compiler.GetStatements(expression);
 
-        Assert.Equal(2, output.Split("int difference;", StringSplitOptions.None).Length - 1);
+        Assert.Equal(2, output.Split("int difference;").Length - 1);
     }
 
     [Fact]
@@ -693,8 +693,11 @@ public class ExpressionCompilerTests
 
     private readonly struct TestNumber
     {
+        // Test operators intentionally ignore an operand.
+        // ReSharper disable UnusedParameter.Local
         public static TestNumber operator +(TestNumber left, TestNumber _) => left;
         public static long operator +(TestNumber _, int right) => right;
+        // ReSharper restore UnusedParameter.Local
         public static TestNumber operator ~(TestNumber value) => value;
     }
 

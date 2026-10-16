@@ -19,8 +19,6 @@ internal static class ArgumentSignature
         return kind switch
         {
             ArgumentKind.Constant => Equals(((ConstantExpression)left).Value, ((ConstantExpression)right).Value),
-            ArgumentKind.Parameter => false,
-            ArgumentKind.Other => false,
             _ => false
         };
     }

@@ -82,7 +82,7 @@ internal static class ConsoleOutput
 
     private static string FormatDelta(double current, double? previous, double warningThreshold)
     {
-        if (previous is null)
+        if (previous == null)
             return "n/a";
 
         if (previous.Value == 0)

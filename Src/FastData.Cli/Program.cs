@@ -262,7 +262,7 @@ internal static class Program
 
     private static Exception UnwrapTargetInvocationException(Exception exception)
     {
-        while (exception is TargetInvocationException { InnerException: Exception innerException })
+        while (exception is TargetInvocationException { InnerException: {} innerException })
             exception = innerException;
 
         return exception;

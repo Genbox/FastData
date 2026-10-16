@@ -1,1 +1,27 @@
 # Project-specific EditorConfig overrides belong in this file.
+
+[*.Tests/**.cs]
+# xUnit supplies test inputs; test methods are not public API boundaries.
+dotnet_diagnostic.CA1062.severity = none
+# Keep test data local and independently owned rather than sharing mutable arrays.
+dotnet_diagnostic.CA1861.severity = none
+
+[FastData.Generator.Template/{TemplateData/**,TemplateModel}.cs]
+# Template expressions read these properties through reflection.
+resharper_unused_auto_property_accessor_global_highlighting = none
+
+[FastData.Benchmarks/**.cs]
+# BenchmarkDotNet assigns parameter properties through reflection.
+resharper_unused_auto_property_accessor_global_highlighting = none
+
+[FastData.InternalShared/Misc/Person.cs]
+# Values are serialized and inspected by test tooling.
+resharper_unused_auto_property_accessor_global_highlighting = none
+
+[FastData.TestHarness.Runner/**.cs]
+# Keep test inputs local, as in the unit test projects.
+dotnet_diagnostic.CA1861.severity = none
+
+[FastData.Demo/wwwroot/index.html]
+# InspectCode fails to resolve IDs declared in this same document.
+resharper_html_id_not_resolved_highlighting = none

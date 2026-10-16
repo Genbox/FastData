@@ -114,7 +114,7 @@ internal sealed class ExpressionProgramLowerer
             return;
         }
 
-        if (expression is ConditionalExpression { Type: not null } conditional && conditional.Type != typeof(void))
+        if (expression is ConditionalExpression conditional && conditional.Type != null && conditional.Type != typeof(void))
             throw Unsupported(conditional, "Value-returning conditional expressions require value-context lowering.");
 
         ValidatedExpression value = LowerValue(expression);

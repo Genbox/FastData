@@ -141,35 +141,6 @@ internal static class AnalysisTest
         Console.WriteLine(source + ": " + string.Join(", ", data.Take(5)));
     }
 
-    private static string MutateString(string str, double factor, char[] alphabet)
-    {
-        Debug.Assert(factor > 0 && factor <= 1);
-
-        char[] chars = str.ToCharArray();
-        for (int i = 0; i < chars.Length; i++)
-        {
-            if (Random.Shared.NextDouble() < factor)
-                chars[i] = alphabet[Random.Shared.Next(alphabet.Length)];
-        }
-        return new string(chars);
-    }
-
-    private static string PermuteString(string str, double factor)
-    {
-        Debug.Assert(factor > 0 && factor <= 1);
-
-        char[] chars = str.ToCharArray();
-        int swapCount = (int)(chars.Length * factor);
-
-        for (int i = 0; i < swapCount; i++)
-        {
-            int idx1 = Random.Shared.Next(chars.Length);
-            int idx2 = Random.Shared.Next(chars.Length);
-            (chars[idx1], chars[idx2]) = (chars[idx2], chars[idx1]);
-        }
-        return new string(chars);
-    }
-
     private static string PrependString(string str, double factor)
     {
         Debug.Assert(factor > 0 && factor <= 100);

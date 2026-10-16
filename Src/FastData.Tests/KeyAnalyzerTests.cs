@@ -27,8 +27,8 @@ public class KeyAnalyzerTests
     [Fact]
     public void GetProperties_IsConsecutive_Test()
     {
-        Assert.True(GetNumericProperties<char>(_consecutiveChars).IsConsecutive);
-        Assert.False(GetNumericProperties<char>(_nonConsecutiveChars).IsConsecutive);
+        Assert.True(GetNumericProperties(_consecutiveChars).IsConsecutive);
+        Assert.False(GetNumericProperties(_nonConsecutiveChars).IsConsecutive);
 
         Assert.True(GetNumericProperties<sbyte>(new sbyte[] { -1, 0, 1 }).IsConsecutive);
         Assert.False(GetNumericProperties<sbyte>(new sbyte[] { -1, 1, 2 }).IsConsecutive);
@@ -42,35 +42,35 @@ public class KeyAnalyzerTests
         Assert.True(GetNumericProperties<ushort>(new ushort[] { 10, 11, 12 }).IsConsecutive);
         Assert.False(GetNumericProperties<ushort>(new ushort[] { 10, 11, 13 }).IsConsecutive);
 
-        Assert.True(GetNumericProperties<int>(_consecutiveInts).IsConsecutive);
-        Assert.False(GetNumericProperties<int>(_nonConsecutiveInts).IsConsecutive);
+        Assert.True(GetNumericProperties(_consecutiveInts).IsConsecutive);
+        Assert.False(GetNumericProperties(_nonConsecutiveInts).IsConsecutive);
 
-        Assert.True(GetNumericProperties<uint>(_consecutiveUInts).IsConsecutive);
-        Assert.False(GetNumericProperties<uint>(_nonConsecutiveUInts).IsConsecutive);
+        Assert.True(GetNumericProperties(_consecutiveUInts).IsConsecutive);
+        Assert.False(GetNumericProperties(_nonConsecutiveUInts).IsConsecutive);
 
         Assert.True(GetNumericProperties<long>(new[] { long.MaxValue - 2, long.MaxValue - 1, long.MaxValue }).IsConsecutive);
-        Assert.False(GetNumericProperties<long>(_nonConsecutiveLongs).IsConsecutive);
+        Assert.False(GetNumericProperties(_nonConsecutiveLongs).IsConsecutive);
 
-        Assert.True(GetNumericProperties<ulong>(_consecutiveUlongs).IsConsecutive);
-        Assert.False(GetNumericProperties<ulong>(_nonConsecutiveUlongs).IsConsecutive);
+        Assert.True(GetNumericProperties(_consecutiveUlongs).IsConsecutive);
+        Assert.False(GetNumericProperties(_nonConsecutiveUlongs).IsConsecutive);
 
-        Assert.False(GetNumericProperties<float>(_nonConsecutiveSingles).IsConsecutive);
-        Assert.False(GetNumericProperties<double>(_nonConsecutiveDoubles).IsConsecutive);
+        Assert.False(GetNumericProperties(_nonConsecutiveSingles).IsConsecutive);
+        Assert.False(GetNumericProperties(_nonConsecutiveDoubles).IsConsecutive);
     }
 
     [Fact]
     public void GetProperties_Density_Test()
     {
-        Assert.Equal(1.0f, GetNumericProperties<int>(_denseInts).Density);
-        Assert.Equal(2.0f / 101.0f, GetNumericProperties<int>(_sparseInts).Density, 12);
-        Assert.Equal(1.0f, GetNumericProperties<int>(_singleInt).Density);
+        Assert.Equal(1.0f, GetNumericProperties(_denseInts).Density);
+        Assert.Equal(2.0f / 101.0f, GetNumericProperties(_sparseInts).Density, 12);
+        Assert.Equal(1.0f, GetNumericProperties(_singleInt).Density);
     }
 
     [Fact]
     public void GetNumericProperties_FloatHasZero_Test()
     {
         NumericKeyProperties<float> withZero = GetNumericProperties<float>(new[] { -0.0f, 1.25f });
-        NumericKeyProperties<float> withoutZero = GetNumericProperties<float>(_nonzeroSingles);
+        NumericKeyProperties<float> withoutZero = GetNumericProperties(_nonzeroSingles);
 
         Assert.True(withZero.HasZero);
         Assert.False(withoutZero.HasZero);

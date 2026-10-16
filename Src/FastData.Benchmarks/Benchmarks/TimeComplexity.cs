@@ -154,6 +154,8 @@ public class TimeComplexity
             for (int i = 0; i < length; i++)
                 keys[keyBase + i] = sorted[start + i];
 
+            // Leaf lengths are nonnegative and at most 16.
+            // ReSharper disable once IntVariableOverflowInCheckedContext
             keyCounts[nodeIndex] = (byte)length;
 
             return nodeIndex;

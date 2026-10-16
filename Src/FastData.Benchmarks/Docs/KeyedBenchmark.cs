@@ -61,6 +61,8 @@ public class KeyedBenchmark
             "Labrador", "", "", "", "", "", "", "German Shepherd", "Golden Retriever"
         ];
 
+        // This example benchmarks key lookup while preserving the generated API.
+        // ReSharper disable once OutParameterValueIsAlwaysDiscarded.Local
         public static bool TryLookup(string key, out byte value)
         {
             if ((49280UL & (1UL << (key.Length - 1))) == 0)

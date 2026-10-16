@@ -115,8 +115,5 @@ public class IntegralTypeReducerTests
         { typeof(char), (char)0, (char)255, typeof(byte) }
     };
 
-    private enum SampleEnum
-    {
-        Value
-    }
+    private enum SampleEnum {}
 }

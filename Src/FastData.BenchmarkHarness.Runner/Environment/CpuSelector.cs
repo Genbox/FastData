@@ -21,7 +21,7 @@ internal static partial class CpuSelector
         int targetCoreIndex = Math.Max(1, cores.Length / 2);
         CpuCandidate? best = GetBestCandidate(cores, targetCoreIndex);
 
-        if (best is null)
+        if (best == null)
             return TryGetLogicalProcessorCpuSet(out cpuSet);
 
         cpuSet = FormatCpuIndex(best.Value.LogicalProcessor);
@@ -42,7 +42,7 @@ internal static partial class CpuSelector
 
             CpuCandidate candidate = new CpuCandidate(logicalProcessor, coreIndex, core.LogicalProcessors.Length);
 
-            if (best is null || IsBetterCandidate(candidate, best.Value, targetCoreIndex))
+            if (best == null || IsBetterCandidate(candidate, best.Value, targetCoreIndex))
                 best = candidate;
         }
 

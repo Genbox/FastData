@@ -185,7 +185,7 @@ internal sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmC
         {
             total += counts[i];
             List<OptimalPiecewiseLinearModel<TKey>.CanonicalSegment>? local = results[i];
-            if (local is null)
+            if (local == null)
                 continue;
             foreach (OptimalPiecewiseLinearModel<TKey>.CanonicalSegment cs in local)
                 output(cs);

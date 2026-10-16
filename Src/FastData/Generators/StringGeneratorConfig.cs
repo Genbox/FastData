@@ -3,10 +3,12 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Generators.Expressions;
 using Genbox.FastData.Generators.StringHash.Framework;
+using JetBrains.Annotations;
 
 namespace Genbox.FastData.Generators;
 
 /// <summary>Provides configuration data for string code generators in the FastData library.</summary>
+[PublicAPI]
 public sealed class StringGeneratorConfig : GeneratorConfigBase
 {
     internal StringGeneratorConfig(StructureType structureType, uint itemCount, int minLen, int maxLen, bool ignoreCase, CharacterClass classes, GeneratorEncoding encoding, AnnotatedExpr[] earlyExits, bool typeReductionEnabled, StringHashInfo? hashInfo, GeneratorFunction generatorFunctions, StructureCapability requiredCapabilities) : base(structureType, earlyExits, itemCount, typeReductionEnabled, requiredCapabilities)

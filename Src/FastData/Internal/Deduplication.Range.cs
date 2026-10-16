@@ -370,15 +370,7 @@ internal static partial class Deduplication
             }
 
             if (sampleCount != keys.Length)
-            {
                 GetInt16MinMax(keys, out min, out max);
-
-                if (max - min >= MaxMappedRange)
-                {
-                    range = 0;
-                    return false;
-                }
-            }
 
             range = (max - min) + 1;
             return true;
@@ -495,15 +487,7 @@ internal static partial class Deduplication
             }
 
             if (sampleCount != keys.Length)
-            {
                 GetUInt16MinMax(keys, out min, out max);
-
-                if (max - min >= MaxMappedRange)
-                {
-                    range = 0;
-                    return false;
-                }
-            }
 
             range = (max - min) + 1;
             return true;

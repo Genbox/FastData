@@ -196,7 +196,7 @@ internal abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager doc
                 if (parts.Length != 2)
                     throw new InvalidOperationException($"Benchmark overhead output was invalid: '{output}'. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
 
-                if (pendingOverhead is not null)
+                if (pendingOverhead != null)
                     throw new InvalidOperationException($"Benchmark output contained consecutive overhead lines without a matching sample. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
 
                 pendingOverhead = double.Parse(parts[1], NumberFormatInfo.InvariantInfo);
@@ -209,7 +209,7 @@ internal abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager doc
             if (parts.Length != 3)
                 throw new InvalidOperationException($"Benchmark sample output was invalid: '{output}'. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
 
-            if (pendingOverhead is null)
+            if (pendingOverhead == null)
                 throw new InvalidOperationException($"Benchmark output contained a sample line without a preceding overhead line. Exit code: {res.ExitCode}\nSTDERR:\n{res.StandardError}");
 
             double elapsed = double.Parse(parts[1], NumberFormatInfo.InvariantInfo);

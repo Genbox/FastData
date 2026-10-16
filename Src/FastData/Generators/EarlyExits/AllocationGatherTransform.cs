@@ -81,6 +81,8 @@ public class AllocationGatherTransform : IExprTransform
             AllocationGatherVisitor.IsGatherable(call))
             updated = visitor.RegisterAllocation(variable, call);
         else
+            // ExpressionVisitor has different nullability annotations across target frameworks.
+            // ReSharper disable once ConstantNullCoalescingCondition
             updated = visitor.Visit(expr.Expression) ?? expr.Expression;
 
         foreach (Expression assignment in visitor.Assignments)

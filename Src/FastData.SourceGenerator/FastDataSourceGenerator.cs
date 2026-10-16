@@ -394,7 +394,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
 
     private static Exception UnwrapTargetInvocationException(Exception exception)
     {
-        while (exception is TargetInvocationException { InnerException: not null } targetInvocation)
+        while (exception is TargetInvocationException targetInvocation && targetInvocation.InnerException != null)
             exception = targetInvocation.InnerException;
 
         return exception;

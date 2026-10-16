@@ -69,7 +69,7 @@ internal static partial class WindowsPowerPlan
     {
         try
         {
-            if (previousPowerScheme is null)
+            if (previousPowerScheme == null)
                 return;
 
             if (previousProcessorMinAc is {} processorMinAc)
@@ -189,6 +189,8 @@ internal static partial class WindowsPowerPlan
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool GetSystemPowerStatus(out PowerStatus systemPowerStatus);
 
+    // LocalFree returns null on success; cleanup intentionally ignores its status.
+    // ReSharper disable once UnusedMethodReturnValue.Local
     [LibraryImport("kernel32.dll")]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static partial IntPtr LocalFree(IntPtr memory);

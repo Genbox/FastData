@@ -124,9 +124,8 @@ public class CaseInsensitiveComparerBenchmarks
         ref byte s2ByteRef = ref Unsafe.As<char, byte>(ref s2Ref);
 
         int i = 0;
-        int length = TargetLength;
 
-        for (; i <= length - 16; i += 16)
+        for (; i <= TargetLength - 16; i += 16)
         {
             Vector256<ushort> v = Unsafe.ReadUnaligned<Vector256<ushort>>(ref Unsafe.Add(ref s1ByteRef, i * 2));
             Vector256<ushort> t = Unsafe.ReadUnaligned<Vector256<ushort>>(ref Unsafe.Add(ref s2ByteRef, i * 2));
@@ -137,7 +136,7 @@ public class CaseInsensitiveComparerBenchmarks
                 return false;
         }
 
-        for (; i < length; i++)
+        for (; i < TargetLength; i++)
         {
             uint c1 = Unsafe.Add(ref s1Ref, i);
             if (c1 - 'A' <= 'Z' - 'A')

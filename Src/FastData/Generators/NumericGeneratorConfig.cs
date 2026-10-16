@@ -1,10 +1,12 @@
 using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Expressions;
+using JetBrains.Annotations;
 
 namespace Genbox.FastData.Generators;
 
 /// <summary>Provides configuration data for numeric code generators in the FastData library.</summary>
+[PublicAPI]
 public sealed class NumericGeneratorConfig : GeneratorConfigBase
 {
     internal NumericGeneratorConfig(StructureType structureType, uint itemCount, object minValue, object maxValue, AnnotatedExpr[] earlyExits, bool typeReductionEnabled, bool hasZero, StructureCapability requiredCapabilities) : base(structureType, earlyExits, itemCount, typeReductionEnabled, requiredCapabilities)

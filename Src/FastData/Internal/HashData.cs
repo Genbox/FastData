@@ -4,11 +4,13 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Misc;
+using JetBrains.Annotations;
 
 namespace Genbox.FastData.Internal;
 
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
-internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize, bool OptimizeHashTableBucketSize, bool RoundModuloToPowerOfTwo, float RoundModuloToPowerOfTwoThreshold, bool HashCodesPerfect, int CollisionCount, ulong MinHashCode, ulong MaxHashCode)
+// InspectCode misses the MinHashCode reads in HashTablePerfectStructure.GetSentinel.
+internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize, bool RoundModuloToPowerOfTwo, float RoundModuloToPowerOfTwoThreshold, bool HashCodesPerfect, int CollisionCount, [property: UsedImplicitly]ulong MinHashCode, ulong MaxHashCode)
 {
     private const int MaxBitSetWords = 131_072;
     private const int StackallocWordThreshold = 256;
@@ -38,7 +40,7 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
         int tableSize = optimizeHashTableBucketSize ? GetOptimizedBucketTableSize(baseTableSize, hashCodes, out collisions) : baseTableSize;
         tableSize = GetModuloLength(tableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, hashCodes, collisions, out collisions);
         bool perfect = collisions == 0;
-        return new HashData(hashCodes, capacityFactor, tableSize, optimizeHashTableBucketSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, perfect, collisions, minHashCode, maxHashCode);
+        return new HashData(hashCodes, capacityFactor, tableSize, roundModuloToPowerOfTwo, roundModuloToPowerOfTwoThreshold, perfect, collisions, minHashCode, maxHashCode);
     }
 
     /// <summary>Round <paramref name="length" /> to the next power of two if within threshold. Does not compare collisions because callers use this for non-bucket dimensions (e.g. bloom filter word count).</summary>
