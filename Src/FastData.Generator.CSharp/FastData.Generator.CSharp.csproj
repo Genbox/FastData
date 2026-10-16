@@ -18,15 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\Misc\Compat\CompilerFeatureRequiredAttribute.cs">
-      <Link>Internal\Compat\CompilerFeatureRequiredAttribute.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Misc\Compat\IsExternalInit.cs">
-      <Link>Internal\Compat\IsExternalInit.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Misc\Compat\RequiredMemberAttribute.cs">
-      <Link>Internal\Compat\RequiredMemberAttribute.cs</Link>
-    </Compile>
+    <Compile Include="..\..\Misc\Compat\*.cs" Link="Internal\Compat\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
