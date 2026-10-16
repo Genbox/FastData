@@ -203,4 +203,4 @@ const <#= data.Name #>: [<#= additionalDataTypeName #>; <#= data.Values.Length #
     }
 #>
 
-pub struct <#= RustConfig.ClassName #>;
+pub struct <#= RustConfig.ClassName #>;<# WriteLine(""); #>
