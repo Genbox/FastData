@@ -1,6 +1,6 @@
 using System.Text;
 using Genbox.FastData.Enums;
-using Genbox.FastData.Internal.Helpers;
+using Genbox.FastData.Generators.Helpers;
 
 namespace Genbox.FastData.Tests;
 

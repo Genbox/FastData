@@ -5,13 +5,13 @@ using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Contexts.Misc;
 using Genbox.FastData.Generators.EarlyExits.Exits;
+using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Structures;
 using Microsoft.Extensions.Logging.Abstractions;
 

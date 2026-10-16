@@ -1,9 +1,10 @@
 using System.Text;
 using Genbox.FastData.Enums;
 
-namespace Genbox.FastData.Internal.Helpers;
+namespace Genbox.FastData.Generators.Helpers;
 
-internal static class StringHelper
+/// <summary>Provides string operations for generator encodings.</summary>
+public static class StringHelper
 {
     internal static Encoding GetEncoding(GeneratorEncoding encoding) => encoding switch
     {
@@ -13,7 +14,8 @@ internal static class StringHelper
         _ => throw new InvalidOperationException($"Unsupported encoding: {encoding}")
     };
 
-    internal static Func<string, int> GetLengthFunc(GeneratorEncoding encoding)
+    /// <summary>Returns a function that measures strings in the units of the specified encoding.</summary>
+    public static Func<string, int> GetLengthFunc(GeneratorEncoding encoding)
     {
         if (encoding == GeneratorEncoding.Utf16CodeUnits)
             return static s => s.Length;

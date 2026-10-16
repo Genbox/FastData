@@ -2,7 +2,7 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generator.Abstracts;
 using Genbox.FastData.Generator.Definitions;
 using Genbox.FastData.Generators.Abstracts;
-using Genbox.FastData.Internal.Helpers;
+using Genbox.FastData.Generators.Helpers;
 
 namespace Genbox.FastData.Generator;
 

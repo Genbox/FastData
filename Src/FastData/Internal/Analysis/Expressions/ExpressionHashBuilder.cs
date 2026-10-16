@@ -3,9 +3,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
+using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Enums;
-using Genbox.FastData.Internal.Helpers;
 using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.Expressions;

@@ -2,12 +2,12 @@ using System.Diagnostics;
 using System.Text;
 using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Enums;
+using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Generators.StringHash;
 using Genbox.FastData.Generators.StringHash.Framework;
 using Genbox.FastData.Internal.Analysis;
 using Genbox.FastData.Internal.Analysis.Analyzers;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Helpers;
 using Microsoft.Extensions.Logging;
 
 namespace Genbox.FastData.Internal;

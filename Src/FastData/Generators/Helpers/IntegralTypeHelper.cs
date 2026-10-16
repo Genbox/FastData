@@ -1,8 +1,10 @@
 namespace Genbox.FastData.Generators.Helpers;
 
-internal static class IntegralTypeHelper
+/// <summary>Provides integral type classification and value conversion for generators.</summary>
+public static class IntegralTypeHelper
 {
-    internal static bool IsSigned(Type type) => type == typeof(sbyte)
+    /// <summary>Reports whether the type is a supported signed integer type.</summary>
+    public static bool IsSigned(Type type) => type == typeof(sbyte)
                                                 || type == typeof(short)
                                                 || type == typeof(int)
                                                 || type == typeof(long);
@@ -12,7 +14,8 @@ internal static class IntegralTypeHelper
                                                   || type == typeof(uint)
                                                   || type == typeof(ulong);
 
-    internal static long GetSignedValue(object value) => value switch
+    /// <summary>Converts a boxed signed integer to Int64.</summary>
+    public static long GetSignedValue(object value) => value switch
     {
         sbyte item => item,
         short item => item,
@@ -21,7 +24,8 @@ internal static class IntegralTypeHelper
         _ => throw new ArgumentException("The value must be a supported signed integral type.", nameof(value))
     };
 
-    internal static ulong GetUnsignedValue(object value) => value switch
+    /// <summary>Converts a boxed unsigned integer or character to UInt64.</summary>
+    public static ulong GetUnsignedValue(object value) => value switch
     {
         char item => item,
         byte item => item,

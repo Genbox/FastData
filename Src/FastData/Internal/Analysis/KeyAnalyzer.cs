@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Enums;
+using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Internal.Analysis.Data;
 using Genbox.FastData.Internal.Analysis.Properties;
-using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis;
 

@@ -4,8 +4,8 @@ using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.EarlyExits.Exits;
+using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Internal.Abstracts;
-using Genbox.FastData.Internal.Helpers;
 
 namespace Genbox.FastData.Internal.Structures;
 

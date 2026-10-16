@@ -22,7 +22,6 @@
   <ItemGroup>
     <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Testbed" />
     <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.InternalShared" />
-    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator" />
     <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.TestHarness.Runner" />
   </ItemGroup>
 
