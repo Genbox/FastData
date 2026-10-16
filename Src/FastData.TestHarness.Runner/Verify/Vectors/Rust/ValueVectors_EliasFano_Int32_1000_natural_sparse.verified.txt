@@ -146,11 +146,6 @@ impl fastdata {
             }
 
             let zero_count = zeros.count_ones() as i64;
-            if zero_count == 0 {
-                word_index += 1;
-                continue;
-            }
-
             if zero_rank + zero_count > rank {
                 let rank_in_word = (rank - zero_rank) as i32;
                 let bit_in_word = Self::select_bit_in_word(zeros, rank_in_word);

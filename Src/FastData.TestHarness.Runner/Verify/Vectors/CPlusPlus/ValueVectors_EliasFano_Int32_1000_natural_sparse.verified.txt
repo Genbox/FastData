@@ -120,9 +120,6 @@ class fastdata final {
             }
 
             const int zero_count = popcount(zeros);
-            if (zero_count == 0)
-                continue;
-
             if (zero_rank + zero_count > rank) {
                 const int rank_in_word = static_cast<int>(rank - zero_rank);
                 const int bit_in_word = select_bit_in_word(zeros, rank_in_word);

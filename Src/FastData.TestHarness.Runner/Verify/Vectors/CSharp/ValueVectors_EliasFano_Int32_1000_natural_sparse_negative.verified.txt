@@ -146,9 +146,6 @@ internal static class FastData
             }
 
             int zeroCount = System.Numerics.BitOperations.PopCount(zeros);
-            if (zeroCount == 0)
-                continue;
-
             if (zeroRank + zeroCount > rank)
             {
                 int rankInWord = (int)(rank - zeroRank);
