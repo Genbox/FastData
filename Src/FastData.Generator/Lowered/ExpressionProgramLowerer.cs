@@ -4,7 +4,8 @@ using System.Reflection;
 
 namespace Genbox.FastData.Generator.Lowered;
 
-internal sealed class ExpressionProgramLowerer
+/// <summary>Validates expression trees and lowers control flow to structured statements.</summary>
+public sealed class ExpressionProgramLowerer
 {
     private readonly string _compilerName;
     private readonly Type? _lambdaReturnType;
@@ -17,23 +18,32 @@ internal sealed class ExpressionProgramLowerer
         _lambdaReturnType = lambdaReturnType;
     }
 
-    internal static LoweredProgram LowerLambda(LambdaExpression expression, string compilerName)
+    /// <summary>Lowers a lambda into a structured program.</summary>
+    public static LoweredProgram LowerLambda(LambdaExpression expression, string compilerName)
     {
+        ArgumentNullException.ThrowIfNull(expression);
+
         ExpressionSymbolValidator.ValidateLambda(expression, compilerName);
         ExpressionProgramLowerer lowerer = new ExpressionProgramLowerer(compilerName, expression.ReturnType);
         LoweredBlock body = lowerer.LowerLambdaBody(expression.Body);
         return CreateProgram(body);
     }
 
-    internal static LoweredProgram LowerStatements(BlockExpression expression, string compilerName)
+    /// <summary>Lowers a statement block into a structured program.</summary>
+    public static LoweredProgram LowerStatements(BlockExpression expression, string compilerName)
     {
+        ArgumentNullException.ThrowIfNull(expression);
+
         ExpressionSymbolValidator.ValidateFragment(expression, compilerName);
         ExpressionProgramLowerer lowerer = new ExpressionProgramLowerer(compilerName, null);
         return CreateProgram(lowerer.LowerBlock(expression, BlockTailPolicy.Statements));
     }
 
-    internal static ValidatedExpression LowerValue(Expression expression, string compilerName)
+    /// <summary>Validates a value expression for use in a lowered program.</summary>
+    public static ValidatedExpression LowerValue(Expression expression, string compilerName)
     {
+        ArgumentNullException.ThrowIfNull(expression);
+
         ExpressionSymbolValidator.ValidateFragment(expression, compilerName);
         ExpressionProgramLowerer lowerer = new ExpressionProgramLowerer(compilerName, null);
         return lowerer.LowerValue(expression);
@@ -169,7 +179,7 @@ internal sealed class ExpressionProgramLowerer
         ValidatedExpression value = LowerValue(assignment.Right);
         RequireType(value.Type, targetExpression.Type, assignment, "Assignment value");
 
-        HashSet<ParameterExpression> reads = value.LocalReads;
+        ISet<ParameterExpression> reads = value.LocalReads;
         if (assignment.NodeType != ExpressionType.Assign && assignedLocal != null)
             reads.Add(assignedLocal);
 
