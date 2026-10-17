@@ -11,7 +11,7 @@ internal sealed class ConvergenceTermination(int maxTopResults, double cutoffPer
     {
         _recent[evolutions % _recent.Length] = fitness;
 
-        if (_count++ < _recent.Length)
+        if (_count < _recent.Length && ++_count < _recent.Length)
             return false;
 
         double min = _recent.Min();
