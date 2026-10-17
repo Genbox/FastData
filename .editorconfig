@@ -15,6 +15,7 @@ generated_code = true
 
 [*.g.cs]
 generated_code = true
+# CS1591: Missing XML comment for publicly visible type or member
 dotnet_diagnostic.CS1591.severity = none
 
 # Two-space formats
@@ -105,14 +106,16 @@ resharper_xmldoc_keep_user_linebreaks = true
 resharper_parentheses_non_obvious_operations = multiplicative, additive, shift, bitwise_and, bitwise_exclusive_or, bitwise_inclusive_or
 
 # Non-cryptographic randomness is intentional in tests and benchmarks
-# CA5394: Random is an insecure random number generator. Use cryptographically secure random number generators when randomness is required for security.
-# S2245: Use a cryptographically strong random number generator.
 [**/*Test*/**.cs]
+# CA5394: Do not use insecure randomness
 dotnet_diagnostic.CA5394.severity = none
+# S2245: Using pseudorandom number generators (PRNGs) is security-sensitive
 dotnet_diagnostic.S2245.severity = none
 
 [**/*Benchmark*/**.cs]
+# CA5394: Do not use insecure randomness
 dotnet_diagnostic.CA5394.severity = none
+# S2245: Using pseudorandom number generators (PRNGs) is security-sensitive
 dotnet_diagnostic.S2245.severity = none
 
 # Verify settings
