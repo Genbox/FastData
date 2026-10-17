@@ -2,7 +2,7 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generators.Contexts;
 
-/// <summary>Provides a context for ranged-based data structures.</summary>
+/// <summary>Provides a context for range-based data structures.</summary>
 public sealed class RangeContext<TKey>(ReadOnlyMemory<(TKey Start, TKey End)> ranges) : IContext
 {
     /// <summary>Gets the inclusive ranges represented by the generated structure.</summary>

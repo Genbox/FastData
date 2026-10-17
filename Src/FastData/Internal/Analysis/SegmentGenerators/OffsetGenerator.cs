@@ -5,7 +5,7 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
-/// <summary>Returns segments with offset [0..n-1] and lengths [offset-n]</summary>
+/// <summary>Returns left-aligned full-tail segments starting at each offset in [0..n-1], where n is the shortest encoded key length.</summary>
 internal sealed class OffsetGenerator : ISegmentGenerator
 {
     public bool IsAppropriate(StringKeyProperties props) => true;

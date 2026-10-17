@@ -8,8 +8,8 @@ internal class EliteReinsertion : IReinsertion
 {
     private readonly double _topPercent;
 
-    /// <summary>Reinsert top performer parents into the new generation.</summary>
-    /// <param name="topPercent">The percent to take. Must be 0 to 1</param>
+    /// <summary>Reinserts the top-performing parents into the new generation.</summary>
+    /// <param name="topPercent">The fraction of the population to keep, from 0 to 1.</param>
     public EliteReinsertion(double topPercent)
     {
         if (topPercent is < 0 or > 1)

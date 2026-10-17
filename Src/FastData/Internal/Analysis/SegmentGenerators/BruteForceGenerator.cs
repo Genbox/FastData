@@ -6,7 +6,7 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
-/// <summary>Returns segments with offset [0..max-1] and length [1..max-1]</summary>
+/// <summary>Returns left- and right-aligned segments with offsets [0..max-1] and lengths [1..max-offset], where max is the smaller of the shortest encoded key length and the configured maximum.</summary>
 internal sealed class BruteForceGenerator(BruteForceGeneratorConfig config) : ISegmentGenerator
 {
     public bool IsAppropriate(StringKeyProperties props) => true;

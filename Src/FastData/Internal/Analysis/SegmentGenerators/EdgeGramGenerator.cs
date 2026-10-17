@@ -6,7 +6,7 @@ using Genbox.FastData.Internal.Misc;
 
 namespace Genbox.FastData.Internal.Analysis.SegmentGenerators;
 
-/// <summary>Creates edge-grams with offsets of 0 and lengths [1..max]</summary>
+/// <summary>Creates prefix and suffix edge-grams with lengths [1..max], where max is the smaller of the shortest encoded key length and the configured maximum.</summary>
 internal sealed class EdgeGramGenerator(EdgeGramGeneratorConfig config) : ISegmentGenerator
 {
     public bool IsAppropriate(StringKeyProperties props) => true;

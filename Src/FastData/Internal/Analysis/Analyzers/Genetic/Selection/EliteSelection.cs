@@ -4,13 +4,13 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 
-/// <summary>Select from the top performers.</summary>
+/// <summary>Selects from the top performers.</summary>
 internal sealed class EliteSelection : ISelection
 {
     private readonly double _topPercent;
 
-    /// <summary>Select from the top performers.</summary>
-    /// <param name="topPercent">The percent to take. Must be 0 to 1</param>
+    /// <summary>Selects from the top performers.</summary>
+    /// <param name="topPercent">The fraction of the population to select from, from 0 to 1.</param>
     public EliteSelection(double topPercent)
     {
         if (topPercent is < 0 or > 1)

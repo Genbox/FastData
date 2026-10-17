@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
-/// <summary>Benchmarks where the threshold usually is between a full hash/lookup in a HashSet vs. how long a fixed-position string early exit can be before it no longer makes sense</summary>
+/// <summary>Measures how long a fixed-position string early exit can be before a full HashSet hash and lookup is faster.</summary>
 [SuppressMessage("ReSharper", "ConvertToConstant.Local")]
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
 public class EarlyExitVsLookup

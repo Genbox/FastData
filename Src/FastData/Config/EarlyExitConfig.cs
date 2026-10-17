@@ -44,7 +44,7 @@ public class EarlyExitConfig
     /// <summary>Gets or sets the maximum number of generated early-exit candidates to keep.</summary>
     public int MaxCandidates { get; set; }
 
-    /// <summary>When enabled, early exit expressions are optimized</summary>
+    /// <summary>Gets or sets a value indicating whether early-exit expressions are optimized.</summary>
     public bool Optimize { get; set; }
 
     /// <summary>Gets or sets the minimum fraction of the observed keyspace an early exit must reject to be kept.</summary>

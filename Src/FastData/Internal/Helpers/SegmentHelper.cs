@@ -6,7 +6,7 @@ namespace Genbox.FastData.Internal.Helpers;
 
 internal static class SegmentHelper
 {
-    /// <summary>Inserts [ and ] around the segment of a string. Used for debugging</summary>
+    /// <summary>Inserts [ and ] around the segment of a string. Used for debugging.</summary>
     internal static string InsertSegmentBounds(string input, in ArraySegment segment)
     {
         StringBuilder sb = new StringBuilder(input);

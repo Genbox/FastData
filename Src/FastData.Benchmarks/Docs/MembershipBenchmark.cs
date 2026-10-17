@@ -5,7 +5,7 @@ using Genbox.FastData.Benchmarks.Code;
 
 namespace Genbox.FastData.Benchmarks.Docs;
 
-/// <summary>Benchmark used in Readme</summary>
+/// <summary>Membership benchmark used in the README.</summary>
 [Config(typeof(CustomConfig))]
 public class MembershipBenchmark
 {

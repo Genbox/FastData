@@ -7,7 +7,7 @@ using Genbox.FastData.Internal.Analysis.Expressions;
 
 namespace Genbox.FastData.Generators.StringHash;
 
-/// <summary>Hashes the entire string using DJB2 hash</summary>
+/// <summary>Hashes the entire string using DJB2.</summary>
 internal sealed record DefaultStringHash : IStringHash
 {
     private readonly GeneratorEncoding _encoding;

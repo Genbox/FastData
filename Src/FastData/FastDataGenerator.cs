@@ -27,13 +27,14 @@ namespace Genbox.FastData;
 [SuppressMessage("Major Code Smell", "S4136:Method overloads should be grouped together", Justification = "The public overloads are grouped by numeric and string generation workflows, which keeps the related documentation and implementations together.")]
 public static partial class FastDataGenerator
 {
-    /// <summary>Generates source code for an exact membership lookup over numeric keys.</summary>
+    /// <summary>Generates source code for a membership lookup over numeric keys. The lookup is exact unless <see cref="DataConfig.AllowApproximation" /> is enabled.</summary>
     /// <typeparam name="TKey">The numeric key type.</typeparam>
     /// <param name="keys">The keys to include in the generated lookup.</param>
     /// <param name="fdCfg">The numeric data configuration.</param>
     /// <param name="generator">The target-language code generator.</param>
     /// <param name="factory">Optional logger factory used to report generation decisions.</param>
-    /// <returns>The generated source code.</returns>
+    /// <returns>The generated source code and the selected structure and early exits.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when a required argument is <see langword="null" />.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains unsupported values, or uses an unsupported key type.</exception>
     public static NumericGenerationResult Generate<TKey>(ReadOnlyMemory<TKey> keys, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
@@ -45,13 +46,14 @@ public static partial class FastDataGenerator
         return GenerateNumericInternal(keys, ReadOnlyMemory<byte>.Empty, false, fdCfg, generator, factory);
     }
 
-    /// <summary>Generates source code for an exact membership lookup over numeric keys.</summary>
+    /// <summary>Generates source code for a membership lookup over numeric keys. The lookup is exact unless <see cref="DataConfig.AllowApproximation" /> is enabled.</summary>
     /// <typeparam name="TKey">The numeric key type.</typeparam>
     /// <param name="keys">The keys to include in the generated lookup.</param>
     /// <param name="fdCfg">The numeric data configuration.</param>
     /// <param name="generator">The target-language code generator.</param>
     /// <param name="factory">Optional logger factory used to report generation decisions.</param>
-    /// <returns>The generated source code.</returns>
+    /// <returns>The generated source code and the selected structure and early exits.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when a required argument is <see langword="null" />.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains unsupported values, or uses an unsupported key type.</exception>
     public static NumericGenerationResult Generate<TKey>(TKey[] keys, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
@@ -73,7 +75,8 @@ public static partial class FastDataGenerator
     /// <param name="fdCfg">The numeric data configuration.</param>
     /// <param name="generator">The target-language code generator.</param>
     /// <param name="factory">Optional logger factory used to report generation decisions.</param>
-    /// <returns>The generated source code.</returns>
+    /// <returns>The generated source code and the selected structure and early exits.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when a required argument is <see langword="null" />.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains unsupported values, or uses an unsupported key type.</exception>
     public static NumericGenerationResult GenerateKeyed<TKey, TValue>(ReadOnlyMemory<TKey> keys, ReadOnlyMemory<TValue> values, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null) where TKey : struct
     {
@@ -93,7 +96,8 @@ public static partial class FastDataGenerator
     /// <param name="fdCfg">The numeric data configuration.</param>
     /// <param name="generator">The target-language code generator.</param>
     /// <param name="factory">Optional logger factory used to report generation decisions.</param>
-    /// <returns>The generated source code.</returns>
+    /// <returns>The generated source code and the selected structure and early exits.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when a required argument is <see langword="null" />.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains unsupported values, or uses an unsupported key type.</exception>
     public static NumericGenerationResult GenerateKeyed<TKey, TValue>(TKey[] keys, TValue[] values, NumericDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
@@ -109,12 +113,13 @@ public static partial class FastDataGenerator
         return GenerateNumericInternal((ReadOnlyMemory<TKey>)keys, (ReadOnlyMemory<TValue>)values, true, fdCfg, generator, factory);
     }
 
-    /// <summary>Generates source code for an exact membership lookup over string keys.</summary>
+    /// <summary>Generates source code for a membership lookup over string keys. The lookup is exact unless <see cref="DataConfig.AllowApproximation" /> is enabled.</summary>
     /// <param name="keys">The string keys to include in the generated lookup.</param>
     /// <param name="fdCfg">The string data configuration.</param>
     /// <param name="generator">The target-language code generator.</param>
     /// <param name="factory">Optional logger factory used to report generation decisions.</param>
-    /// <returns>The generated source code.</returns>
+    /// <returns>The generated source code and the selected structure and early exits.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when a required argument is <see langword="null" />.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static StringGenerationResult Generate(ReadOnlyMemory<string> keys, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
@@ -126,12 +131,13 @@ public static partial class FastDataGenerator
         return GenerateStringInternal(keys, ReadOnlyMemory<byte>.Empty, false, fdCfg, generator, factory);
     }
 
-    /// <summary>Generates source code for an exact membership lookup over string keys.</summary>
+    /// <summary>Generates source code for a membership lookup over string keys. The lookup is exact unless <see cref="DataConfig.AllowApproximation" /> is enabled.</summary>
     /// <param name="keys">The string keys to include in the generated lookup.</param>
     /// <param name="fdCfg">The string data configuration.</param>
     /// <param name="generator">The target-language code generator.</param>
     /// <param name="factory">Optional logger factory used to report generation decisions.</param>
-    /// <returns>The generated source code.</returns>
+    /// <returns>The generated source code and the selected structure and early exits.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when a required argument is <see langword="null" />.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static StringGenerationResult Generate(string[] keys, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
@@ -152,7 +158,8 @@ public static partial class FastDataGenerator
     /// <param name="fdCfg">The string data configuration.</param>
     /// <param name="generator">The target-language code generator.</param>
     /// <param name="factory">Optional logger factory used to report generation decisions.</param>
-    /// <returns>The generated source code.</returns>
+    /// <returns>The generated source code and the selected structure and early exits.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when a required argument is <see langword="null" />.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static StringGenerationResult GenerateKeyed<TValue>(ReadOnlyMemory<string> keys, ReadOnlyMemory<TValue> values, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {
@@ -171,7 +178,8 @@ public static partial class FastDataGenerator
     /// <param name="fdCfg">The string data configuration.</param>
     /// <param name="generator">The target-language code generator.</param>
     /// <param name="factory">Optional logger factory used to report generation decisions.</param>
-    /// <returns>The generated source code.</returns>
+    /// <returns>The generated source code and the selected structure and early exits.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when a required argument is <see langword="null" />.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the input is empty, key/value counts differ, contains null or empty strings, or is incompatible with the generator encoding.</exception>
     public static StringGenerationResult GenerateKeyed<TValue>(string[] keys, TValue[] values, StringDataConfig fdCfg, ICodeGenerator generator, ILoggerFactory? factory = null)
     {

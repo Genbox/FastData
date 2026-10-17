@@ -5,7 +5,7 @@ using Genbox.FastData.InternalShared.Helpers;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
-/// <summary>Benchmarks the difference between checking string/byte[]</summary>
+/// <summary>Compares checks over string and byte[] inputs.</summary>
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class StringVsBytesBenchmarks
 {

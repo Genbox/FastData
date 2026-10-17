@@ -35,7 +35,7 @@ internal static class EarlyExitPipeline
         }
     }
 
-    /// <summary>Optimize early exits by reducing the amount and increasing their strength</summary>
+    /// <summary>Optimizes early exits by reducing their number and increasing their strength.</summary>
     internal static void Optimize<TKey>(List<IEarlyExit> exits)
     {
         Reduce(exits);

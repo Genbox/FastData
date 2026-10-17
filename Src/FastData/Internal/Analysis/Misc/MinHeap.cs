@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Internal.Analysis.Misc;
 
-/// <summary>Min-heap of fixed capacity that stores values with associated items. Maintains the smallest element at the root; when full, adding a larger value replaces the root.</summary>
+/// <summary>Fixed-capacity min-heap of scored items. The lowest score is at the root; when full, adding a higher score replaces the root.</summary>
 internal sealed class MinHeap<T>(int capacity)
 {
     private readonly int _capacity = capacity;
@@ -19,8 +19,8 @@ internal sealed class MinHeap<T>(int capacity)
         }
     }
 
-    /// <summary>Adds a new value-item pair. If capacity is not reached, inserts and restores heap. If full and value &gt; root, replaces root and restores heap.</summary>
-    /// <returns>True if the value was better than the best in the heap, otherwise false</returns>
+    /// <summary>Adds a scored item. Below capacity it is inserted; when full, it replaces the root if <paramref name="key" /> exceeds the root's score.</summary>
+    /// <returns><see langword="true" /> if <paramref name="key" /> exceeds every score added so far; otherwise, <see langword="false" />.</returns>
     public bool Add(double key, T value)
     {
         if (_count < _capacity)

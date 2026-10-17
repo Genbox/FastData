@@ -10,7 +10,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
 internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] genes, ILogger logger)
 {
     /// <summary>Runs the evolution process.</summary>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="InvalidOperationException">The population has fewer than two entities, or selection returned no parents.</exception>
     internal IEnumerable<Entity> Evolve<T>(ReadOnlySpan<T> data, Simulation<T> simulation, ISelection selection, ICrossOver crossOver, IMutation mutation, IReinsertion reinsertion, ITermination termination, IRandom random)
     {
         if (config.PopulationSize < 2)

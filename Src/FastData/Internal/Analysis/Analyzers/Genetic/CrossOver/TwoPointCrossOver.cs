@@ -5,7 +5,7 @@ using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Abstracts;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.CrossOver;
 
-/// <summary>Swaps a all genes after a random point and up to another random point</summary>
+/// <summary>Swaps all genes between two random points.</summary>
 internal sealed class TwoPointCrossOver(IRandom random) : ICrossOver
 {
     public void Process(StaticArray<Entity> population, List<int> parents, StaticArray<Entity> newPopulation)

@@ -7,16 +7,16 @@ namespace Genbox.FastData.Generators;
 /// <summary>Provides configuration data for code generators in the FastData library.</summary>
 public abstract class GeneratorConfigBase(StructureType structureType, AnnotatedExpr[] earlyExits, uint itemCount, bool typeReductionEnabled, StructureCapability requiredCapabilities)
 {
-    /// <summary>The structure being generated.</summary>
+    /// <summary>Gets the structure being generated.</summary>
     public StructureType StructureType { get; } = structureType;
 
     /// <summary>Gets the set of early exit strategies used by the generator to optimize code generation.</summary>
     public AnnotatedExpr[] EarlyExits { get; } = earlyExits;
 
-    /// <summary>The number of keys in the dataset</summary>
+    /// <summary>Gets the number of keys in the dataset.</summary>
     public uint ItemCount { get; } = itemCount;
 
-    /// <summary>When enabled, data structures uses the smallest possible fixed-width data types for internal structures</summary>
+    /// <summary>Gets a value indicating whether data structures use the smallest possible fixed-width types for internal storage.</summary>
     public bool TypeReductionEnabled => typeReductionEnabled;
 
     /// <summary>Gets the generated data-structure capabilities required by the caller.</summary>

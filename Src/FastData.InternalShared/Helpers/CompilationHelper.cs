@@ -16,7 +16,7 @@ internal static class CompilationHelper
         return GetDelegate<T>(source, static types => types[0], infos => infos[0], release);
     }
 
-    /// <summary>This is used to wrap a hash function and get it as a delegate</summary>
+    /// <summary>Compiles C# source and returns a delegate for the method chosen by the type and method filters.</summary>
     public static T GetDelegate<T>(string source, Func<Type[], Type> typeFilter, Func<MethodInfo[], MethodInfo> methodFilter, bool release) where T : Delegate
     {
         CSharpCompilation compilation = CreateCompilation(source, release, typeof(T), typeof(DisplayAttribute));

@@ -34,7 +34,7 @@ public sealed class StringGeneratorConfig : GeneratorConfigBase
     /// <summary>Gets string metadata constants emitted with the generated structure.</summary>
     public StringConstants Constants { get; }
 
-    /// <summary>A set of functions used in hashing/comparing string in generated expressions</summary>
+    /// <summary>Gets the helper functions that generated expressions use to hash and compare strings.</summary>
     public GeneratorFunction GeneratorFunctions { get; }
 
     /// <summary>Gets the encoding used for string keys.</summary>

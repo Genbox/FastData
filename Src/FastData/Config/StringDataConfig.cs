@@ -14,9 +14,9 @@ public sealed class StringDataConfig : DataConfig
         StructureSettings.AddDefault(KnownSettings.RoundModuloToPowerOfTwoThreshold, 0.125f);
     }
 
-    /// <summary>Enable case-insensitive lookups for ASCII string keys.</summary>
+    /// <summary>Gets or sets a value indicating whether ASCII string keys are compared case-insensitively.</summary>
     public bool IgnoreCase { get; set; }
 
-    /// <summary>Configuration for analyzers. Set to null to disable analysis.</summary>
+    /// <summary>Gets or sets the string-hash analyzer configuration, or <see langword="null" /> to disable analysis.</summary>
     public StringAnalyzerConfig? StringAnalyzerConfig { get; set; }
 }

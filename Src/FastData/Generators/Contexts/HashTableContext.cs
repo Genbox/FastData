@@ -3,14 +3,14 @@ using Genbox.FastData.Generators.Contexts.Misc;
 
 namespace Genbox.FastData.Generators.Contexts;
 
-/// <summary>Provides a context for hash set chain-based data structure.</summary>
+/// <summary>Provides a context for chained hash-table data structures.</summary>
 /// <param name="buckets">The array of bucket indices.</param>
-/// <param name="entries">The array of hash set entries.</param>
-/// <param name="storeHashCode">If set to true, you should only generate a hash set that checks the value.</param>
+/// <param name="entries">The array of hash-table entries.</param>
+/// <param name="storeHashCode"><see langword="true" /> to store each entry's hash code so lookups compare it before the key; <see langword="false" /> to compare keys only.</param>
 /// <param name="values">The values associated with the keys.</param>
 public sealed class HashTableContext<TKey, TValue>(int[] buckets, HashTableEntry<TKey>[] entries, bool storeHashCode, ReadOnlyMemory<TValue> values) : HashTableContext(buckets, entries.LongLength, storeHashCode)
 {
-    /// <summary>Gets the array of hash set entries.</summary>
+    /// <summary>Gets the array of hash-table entries.</summary>
     public HashTableEntry<TKey>[] Entries { get; } = entries;
 
     /// <summary>Gets the values emitted into the generated structure.</summary>
@@ -23,7 +23,7 @@ public abstract class HashTableContext(int[] buckets, long entryCount, bool stor
     /// <summary>Gets the array of bucket indices.</summary>
     public int[] Buckets { get; } = buckets;
 
-    /// <summary>Indicates whether the hash set should store the hash code or only the value.</summary>
+    /// <summary>Indicates whether entries store their hash codes so lookups compare them before the key.</summary>
     public bool StoreHashCode { get; } = storeHashCode;
 
     /// <inheritdoc />

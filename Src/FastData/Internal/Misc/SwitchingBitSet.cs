@@ -1,6 +1,6 @@
 namespace Genbox.FastData.Internal.Misc;
 
-/// <summary>This class starts out as a bitset, but when too many items are added, it switches to a HashSet</summary>
+/// <summary>Starts as a bitset and switches to a <see cref="HashSet{T}" /> when too many items are added.</summary>
 internal sealed class SwitchingBitSet
 {
     private readonly int _maxBitSetWords;

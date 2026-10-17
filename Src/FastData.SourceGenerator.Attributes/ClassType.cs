@@ -1,17 +1,17 @@
 namespace Genbox.FastData.SourceGenerator.Attributes;
 
-/// <summary>Specifies the type of class to generate.</summary>
+/// <summary>Specifies the shape of the generated C# type.</summary>
 public enum ClassType
 {
-    /// <summary>No class kind has been selected.</summary>
+    /// <summary>No type shape was specified.</summary>
     Unknown = 0,
 
-    /// <summary>It will generate a static class with static methods and properties.</summary>
+    /// <summary>Generate a static class with static members.</summary>
     Static,
 
-    /// <summary>It will generate a class with instance methods and properties.</summary>
+    /// <summary>Generate an instance class with instance members.</summary>
     Instance,
 
-    /// <summary>It will generate a struct with instance methods and properties.</summary>
+    /// <summary>Generate a struct with instance members.</summary>
     Struct
 }

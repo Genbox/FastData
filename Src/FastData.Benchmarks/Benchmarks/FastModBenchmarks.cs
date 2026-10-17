@@ -4,7 +4,7 @@ using Genbox.FastData.Generators.Helpers;
 
 namespace Genbox.FastData.Benchmarks.Benchmarks;
 
-/// <summary>Benchmarks the difference between normal modulus and FastMod</summary>
+/// <summary>Compares normal modulus with FastMod.</summary>
 [SuppressMessage("ReSharper", "ConvertToConstant.Local")]
 public class FastModBenchmarks
 {

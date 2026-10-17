@@ -2,7 +2,7 @@ using Genbox.FastData.Generators.Abstracts;
 
 namespace Genbox.FastData.Generators.Contexts;
 
-/// <summary>Provides Elias-Fano encoded data and original keys for generated structures.</summary>
+/// <summary>Provides Elias-Fano encoded data for generated structures.</summary>
 public sealed class EliasFanoContext(int lowerBitCount, ulong lowerMask, ulong[] upperBits, ulong[] lowerBits, int upperBitLength, int sampleRateShift, int[] samplePositions, long minValue, long maxValue) : IContext
 {
     /// <summary>Gets the number of lower bits stored separately for each value.</summary>

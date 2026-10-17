@@ -5,7 +5,8 @@ namespace Genbox.FastData.Generators.Abstracts;
 /// <summary>Defines the interface for early exit strategies used by code generators.</summary>
 public interface IEarlyExit
 {
-    /// <summary>Gets the number of keys rejected by this early exit.</summary>
+    /// <summary>Gets a heuristic size of the keyspace this early exit rejects.</summary>
+    /// <remarks>Callers divide it by the observed span of the inspected property to estimate a rejection ratio. It is not an exact count of rejected keys.</remarks>
     ulong KeyspaceSize { get; }
 
     /// <summary>Creates the expression that detects whether a key can exit early.</summary>

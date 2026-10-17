@@ -2,7 +2,7 @@ using Genbox.FastData.Generator.Template.Abstracts;
 
 namespace Genbox.FastData.Generator.Template.TemplateData;
 
-/// <summary>Provides data for hybrid bucket lookup templates.</summary>
+/// <summary>Provides data for Hyble displacement-based perfect-hash templates.</summary>
 public sealed class HybleTemplateData : ITemplateData
 {
     /// <summary>Gets the lookup keys.</summary>

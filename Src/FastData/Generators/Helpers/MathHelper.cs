@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace Genbox.FastData.Generators.Helpers;
 
-/// <summary>Provides mathematical helper methods and prime number utilities for code generation and hashing operations.</summary>
+/// <summary>Provides fast-modulus and power-of-two helpers for code generation and hashing.</summary>
 public static class MathHelper
 {
     /// <summary>Calculates a fast modulus multiplier for the given divisor.</summary>

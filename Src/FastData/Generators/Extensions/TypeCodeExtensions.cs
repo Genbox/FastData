@@ -1,10 +1,10 @@
 namespace Genbox.FastData.Generators.Extensions;
 
-/// <summary>Provides extension methods for the <see cref="Type" /> class.</summary>
+/// <summary>Provides extension methods for <see cref="TypeCode" /> values.</summary>
 public static class TypeCodeExtensions
 {
-    /// <summary>Determines whether the specified <see cref="Type" /> represents a numeric type.</summary>
-    /// <param name="type">The data type to check.</param>
+    /// <summary>Determines whether a type code represents a numeric type.</summary>
+    /// <param name="type">The type code to inspect.</param>
     /// <returns><see langword="true" /> if the type is a numeric type; otherwise, <see langword="false" />.</returns>
     public static bool IsNumeric(this TypeCode type) => type switch
     {
@@ -25,9 +25,9 @@ public static class TypeCodeExtensions
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
 
-    /// <summary>Determines whether the specified <see cref="Type" /> represents a numeric type.</summary>
-    /// <param name="type">The data type to check.</param>
-    /// <returns><see langword="true" /> if the type is a numeric type; otherwise, <see langword="false" />.</returns>
+    /// <summary>Determines whether a type code represents an integral type.</summary>
+    /// <param name="type">The type code to inspect.</param>
+    /// <returns><see langword="true" /> if the type is an integral type; otherwise, <see langword="false" />.</returns>
     public static bool IsIntegral(this TypeCode type) => type switch
     {
         TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 or TypeCode.UInt32 or TypeCode.UInt16 or TypeCode.UInt64 or TypeCode.Byte or TypeCode.Char => true,
@@ -45,8 +45,8 @@ public static class TypeCodeExtensions
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
 
-    /// <summary>Determines whether the specified <see cref="Type" /> uses identity hashing.</summary>
-    /// <param name="type">The data type to check.</param>
+    /// <summary>Determines whether a type code uses identity hashing.</summary>
+    /// <param name="type">The type code to inspect.</param>
     /// <returns><see langword="true" /> if the type uses identity hashing; otherwise, <see langword="false" />.</returns>
     public static bool UsesIdentityHash(this TypeCode type) => type switch
     {
