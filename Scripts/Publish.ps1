@@ -69,6 +69,7 @@ Write-Host -ForegroundColor $Color "Pack the source generator"
 Invoke-DotNet pack $Root/Src/FastData.SourceGenerator/FastData.SourceGenerator.csproj -c $Config --no-build @PackCommonProperties -p:PackageVersion=$version -o $PublishDir
 
 Write-Host -ForegroundColor $Color "Pack FastData as a library"
+Invoke-DotNet pack $Root/Src/FastData.Ir/FastData.Ir.csproj -c $Config --no-build @PackCommonProperties -o $PublishDir
 Invoke-DotNet pack $Root/Src/FastData/FastData.csproj -c $Config --no-build @PackCommonProperties -o $PublishDir
 Invoke-DotNet pack $Root/Src/FastData.Generator/FastData.Generator.csproj -c $Config --no-build @PackCommonProperties -o $PublishDir
 Invoke-DotNet pack $Root/Src/FastData.Generator.Template/FastData.Generator.Template.csproj -c $Config --no-build @PackCommonProperties -o $PublishDir

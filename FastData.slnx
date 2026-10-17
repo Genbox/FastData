@@ -102,6 +102,8 @@
     <Project Path="Src/FastData.Demo/FastData.Demo.csproj" />
     <Project Path="Src/FastData.Examples/FastData.Examples.csproj" />
     <Project Path="Src/FastData.InternalShared/FastData.InternalShared.csproj" />
+    <Project Path="Src/FastData.Ir.Tests/FastData.Ir.Tests.csproj" />
+    <Project Path="Src/FastData.Ir/FastData.Ir.csproj" />
     <Project Path="Src/FastData.Testbed/FastData.Testbed.csproj" />
     <Project Path="Src/FastData.TestHarness.Runner/FastData.TestHarness.Runner.csproj" />
     <Project Path="Src/FastData.Tests/FastData.Tests.csproj" />
