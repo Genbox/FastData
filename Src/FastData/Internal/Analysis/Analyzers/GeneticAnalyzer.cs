@@ -98,6 +98,10 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
         ArraySegment[] segments = SegmentManager.Generate(props, generatorConfig).ToArray();
         LogSegmentCount(logger, segments.Length);
 
+        //The segment gene needs at least one segment to choose from
+        if (segments.Length == 0)
+            return [];
+
         GeneticEngine engine = new GeneticEngine(cfg, [
             new ArraySegmentGene(nameof(GeneticStringHash.Segment), segments),
             new IntGene(nameof(GeneticStringHash.MixerSeed), 1, 0, 1000),
