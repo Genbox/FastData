@@ -12,6 +12,17 @@ internal sealed class UniformMutation(double mutationRate, IRandom random) : IMu
 {
     public void Process(StaticArray<Entity> population)
     {
+        if (mutationRate <= 0)
+            return;
+
+        if (mutationRate >= 1)
+        {
+            for (int i = 0; i < population.Count; i++)
+                population[i].ForceMutate(random);
+
+            return;
+        }
+
         for (int i = 0; i < population.Count; i++)
         {
             IGene[] genes = population[i].Genes;
