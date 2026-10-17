@@ -11,6 +11,14 @@ internal static class BitConverterCompat
 {
     extension(BitConverter)
     {
+        public static uint SingleToUInt32Bits(float value) => unchecked((uint)SingleToInt32Bits(value));
+
+        public static float UInt32BitsToSingle(uint value) => Int32BitsToSingle(unchecked((int)value));
+
+        public static ulong DoubleToUInt64Bits(double value) => unchecked((ulong)BitConverter.DoubleToInt64Bits(value));
+
+        public static double UInt64BitsToDouble(ulong value) => BitConverter.Int64BitsToDouble(unchecked((long)value));
+
         public static int SingleToInt32Bits(float value) => new SingleBits { Value = value }.Bits;
 
         public static float Int32BitsToSingle(int value) => new SingleBits { Bits = value }.Value;
