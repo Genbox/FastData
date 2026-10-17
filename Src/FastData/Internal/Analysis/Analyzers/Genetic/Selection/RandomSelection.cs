@@ -9,13 +9,27 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 /// <param name="random">The random source used to choose parents.</param>
 internal sealed class RandomSelection(bool avoidDuplicates, IRandom random) : ISelection
 {
+    private int[] _indices = [];
+
     public void Process(StaticArray<Entity> population, List<int> parents, int maxParents)
     {
         if (avoidDuplicates)
         {
-            parents.AddRange(Enumerable.Range(0, population.Count)
-                                       .OrderBy(_ => random.Next())
-                                       .Take(maxParents));
+            int count = population.Count;
+            if (_indices.Length < count)
+                _indices = new int[count];
+
+            for (int i = 0; i < count; i++)
+                _indices[i] = i;
+
+            int number = Math.Min(count, maxParents);
+            for (int i = 0; i < number; i++)
+            {
+                // Partial Fisher-Yates shuffle: choose each remaining parent uniformly.
+                int selected = i + random.Next(count - i);
+                parents.Add(_indices[selected]);
+                _indices[selected] = _indices[i];
+            }
         }
         else
         {
