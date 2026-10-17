@@ -11,34 +11,27 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 /// </summary>
 internal sealed class RankSelection(IRandom random) : ISelection
 {
+    private double[] _rankWheel = [];
+
     public void Process(StaticArray<Entity> population, List<int> parents, int maxParents)
     {
         int[] indices = GeneHelper.GetSortedByFitness(population);
 
         int count = population.Count;
-        float totalRank = (count * (count + 1)) / 2f;
+        if (_rankWheel.Length < count)
+            _rankWheel = new double[count];
 
-        double[] rankWheel = new double[count];
-        double cumulative = 0.0;
-
+        double totalRank = 0;
         for (int i = 0; i < count; i++)
         {
-            cumulative += (double)(count - i) / totalRank;
-            rankWheel[i] = cumulative;
+            totalRank += count - i;
+            _rankWheel[i] = totalRank;
         }
 
         for (int i = 0; i < maxParents; i++)
         {
-            double r = random.NextDouble();
-
-            for (int j = 0; j < count; j++)
-            {
-                if (rankWheel[j] >= r)
-                {
-                    parents.Add(indices[j]);
-                    break;
-                }
-            }
+            int index = GeneHelper.FindSlice(_rankWheel, count, random.NextDouble() * totalRank);
+            parents.Add(indices[index]);
         }
     }
 }

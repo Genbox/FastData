@@ -1,6 +1,7 @@
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
+using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 
@@ -10,27 +11,34 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 /// </summary>
 internal sealed class RouletteWheelSelection(IRandom random) : ISelection
 {
+    private double[] _wheel = [];
+
     public void Process(StaticArray<Entity> population, List<int> parents, int maxParents)
     {
-        //First we create a sum of all fitness
-        double sum = population.Sum(p => p.Fitness);
-
-        //Then we create the roulette wheel
-        double[] wheel = new double[population.Count];
+        //First we create the roulette wheel. Each entity gets a slice proportional to its fitness.
+        int count = population.Count;
+        if (_wheel.Length < count)
+            _wheel = new double[count];
 
         double cumulative = 0.0;
         for (int i = 0; i < population.Count; i++)
         {
-            cumulative += population[i].Fitness / sum;
-            wheel[i] = cumulative;
+            cumulative += GeneHelper.GetSelectionWeight(population[i].Fitness);
+            _wheel[i] = cumulative;
         }
 
         //Then we randomly select from the population
         for (int i = 0; i < maxParents; i++)
         {
+            //If no entity has any weight, they are all equally likely
+            if (cumulative <= 0)
+            {
+                parents.Add(random.Next(population.Count));
+                continue;
+            }
+
             //Spin the wheel
-            if (wheel[i] >= random.NextDouble())
-                parents.Add(i);
+            parents.Add(GeneHelper.FindSlice(_wheel, count, random.NextDouble() * cumulative));
         }
     }
 }

@@ -14,11 +14,12 @@ public class GenericSelectionTests
     {
         ArgumentNullException.ThrowIfNull(selection);
 
+        //Fitness does not follow the index, so selection by position is detected
         StaticArray<Entity> population = new StaticArray<Entity>(3)
         {
+            new Entity([]) { Fitness = 0.9 },
             new Entity([]) { Fitness = 0.1 },
-            new Entity([]) { Fitness = 0.5 },
-            new Entity([]) { Fitness = 0.9 }
+            new Entity([]) { Fitness = 0.5 }
         };
 
         //We run the selection process 100 times to accumulate the selection pattern
@@ -37,10 +38,10 @@ public class GenericSelectionTests
         foreach (int i in selected)
             counter[i]++;
 
-        //There should only be 3 groups: 0, 1 and 2, and c0 < c1 < c2 must be true
+        //There should only be 3 groups: 0, 1 and 2, and c1 < c2 < c0 must be true
         Assert.Equal(3, counter.Count);
-        Assert.True(counter[0] < counter[1]);
         Assert.True(counter[1] < counter[2]);
+        Assert.True(counter[2] < counter[0]);
     }
 
     [Theory]
@@ -56,6 +57,24 @@ public class GenericSelectionTests
 
         Assert.True(selectedIndexes.Count >= 1, "We expect it to return at least one element");
         Assert.All(selectedIndexes, index => Assert.InRange(index, 0, population.Count - 1));
+    }
+
+    [Theory]
+    [MemberData(nameof(GetAllSelections))]
+    public void AllShouldReturnValidIndexesWithoutPositiveFitness(object selection)
+    {
+        ArgumentNullException.ThrowIfNull(selection);
+
+        foreach (double fitness in (double[])[0, -1])
+        {
+            StaticArray<Entity> population = GeneticsHelper.GeneratePopulation(10, fitness, fitness);
+
+            List<int> selectedIndexes = new List<int>();
+            ((ISelection)selection).Process(population, selectedIndexes, 10);
+
+            Assert.True(selectedIndexes.Count >= 1, "We expect it to return at least one element");
+            Assert.All(selectedIndexes, index => Assert.InRange(index, 0, population.Count - 1));
+        }
     }
 
     [Theory]

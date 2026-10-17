@@ -1,6 +1,7 @@
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Abstracts;
 using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
+using Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Helpers;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 
@@ -12,8 +13,21 @@ internal sealed class StochasticUniversalSamplingSelection(IRandom random) : ISe
 {
     public void Process(StaticArray<Entity> population, List<int> parents, int maxParents)
     {
-        double totalFitness = population.Sum(c => c.Fitness);
-        double step = totalFitness / population.Count;
+        double totalFitness = 0;
+        for (int i = 0; i < population.Count; i++)
+            totalFitness += GeneHelper.GetSelectionWeight(population[i].Fitness);
+
+        //If no entity has any weight, they are all equally likely
+        if (totalFitness <= 0)
+        {
+            for (int i = 0; i < maxParents; i++)
+                parents.Add(random.Next(population.Count));
+
+            return;
+        }
+
+        //The pointers are evenly spaced so that they cover the entire wheel
+        double step = totalFitness / maxParents;
         double start = random.NextDouble() * step;
 
         double sum = 0;
@@ -23,9 +37,9 @@ internal sealed class StochasticUniversalSamplingSelection(IRandom random) : ISe
         {
             double pointer = start + (i * step);
 
-            //Do the int comparison first for perf
-            while (index < population.Count && sum < pointer)
-                sum += population[index++].Fitness;
+            //Move to the first entity whose cumulative weight exceeds the pointer. Do the int comparison first for perf
+            while (index < population.Count && sum <= pointer)
+                sum += GeneHelper.GetSelectionWeight(population[index++].Fitness);
 
             parents.Add(index - 1);
         }

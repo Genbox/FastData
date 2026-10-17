@@ -12,4 +12,26 @@ internal static class GeneHelper
 
         return indices;
     }
+
+    /// <summary>Finds the first cumulative weight greater than the draw, skipping zero-weight entries.</summary>
+    internal static int FindSlice(double[] cumulative, int count, double value)
+    {
+        int low = 0;
+        int high = count - 1;
+
+        while (low < high)
+        {
+            int mid = low + ((high - low) / 2);
+
+            if (cumulative[mid] > value)
+                high = mid;
+            else
+                low = mid + 1;
+        }
+
+        return low;
+    }
+
+    /// <summary>Gets the weight of an entity in fitness-proportionate selection. Negative and NaN fitness gives no weight.</summary>
+    internal static double GetSelectionWeight(double fitness) => fitness > 0 ? fitness : 0;
 }
