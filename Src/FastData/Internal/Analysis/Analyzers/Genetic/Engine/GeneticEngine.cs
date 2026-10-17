@@ -36,7 +36,7 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
         int generation = 0;
 
         //These lists are for reuse. We clear them each generation.
-        List<int> parents = new List<int>();
+        List<int> parents = new List<int>(config.PopulationSize);
         MinHeap<Entity> heap = new MinHeap<Entity>(config.MaxReturned);
 
         double bestFitness = double.MinValue;
@@ -45,14 +45,22 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
         {
             LogGeneration(logger, generation);
 
-            int bestIdx = RunPopulation(data, population, simulation);
-            ref Entity popBest = ref population[bestIdx];
+            RunPopulation(data, population, simulation);
 
-            if (heap.Add(popBest.Fitness, popBest)) //This creates a copy, which is what we want, since we clear the population array
+            for (int i = 0; i < population.Count; i++)
             {
-                if (logger.IsEnabled(LogLevel.Debug))
-                    LogBetterCandidate(logger, popBest.Fitness, popBest.Tag, string.Join(", ", popBest.Genes.AsEnumerable()));
-                bestFitness = popBest.Fitness;
+                ref Entity entity = ref population[i];
+
+                //Elites are carried over between generations, and crossover can recreate an existing entity. We only keep one of each.
+                if (ContainsGenes(heap, ref entity))
+                    continue;
+
+                if (heap.Add(entity.Fitness, entity)) //This creates a copy, which is what we want, since we clear the population array
+                {
+                    if (logger.IsEnabled(LogLevel.Debug))
+                        LogBetterCandidate(logger, entity.Fitness, entity.Tag, string.Join(", ", entity.Genes.AsEnumerable()));
+                    bestFitness = entity.Fitness;
+                }
             }
 
             generation++;
@@ -73,7 +81,7 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
 
             //For simplicity, we assume an equal amount of parents in all our algorithms. We simply remove a parent to make it even.
             if (parents.Count % 2 != 0)
-                parents.Remove(parents[parents.Count - 1]);
+                parents.RemoveAt(parents.Count - 1);
 
             if (parents.Count == 0)
                 throw new InvalidOperationException("There are no parents selected.");
@@ -88,7 +96,7 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
             mutation.Process(newPopulation);
 
             //We re-add some of the parents to the new population.
-            reinsertion.Process(population, newPopulation);
+            reinsertion.Process(population, newPopulation, config.PopulationSize);
 
             //Two parents produce one or two children. Together with death, it makes the population dwindle. To recuperate, we introduce repopulation
             Repopulate(newPopulation, config.PopulationSize, genes, random);
@@ -121,24 +129,20 @@ internal sealed partial class GeneticEngine(GeneticEngineConfig config, IGene[] 
         }
     }
 
-    private static int RunPopulation<T>(ReadOnlySpan<T> data, StaticArray<Entity> population, Simulation<T> simulation)
+    private static bool ContainsGenes(MinHeap<Entity> heap, ref Entity entity)
     {
-        double maxFit = double.MinValue;
-        int bestIdx = 0;
-
-        for (int i = 0; i < population.Count; i++)
+        foreach ((double _, Entity item) in heap.Items)
         {
-            ref Entity entity = ref population[i];
-            simulation(data, ref entity);
-
-            // We keep a running max
-            if (entity.Fitness > maxFit)
-            {
-                maxFit = entity.Fitness;
-                bestIdx = i;
-            }
+            if (item.HasSameGenes(entity))
+                return true;
         }
 
-        return bestIdx;
+        return false;
+    }
+
+    private static void RunPopulation<T>(ReadOnlySpan<T> data, StaticArray<Entity> population, Simulation<T> simulation)
+    {
+        for (int i = 0; i < population.Count; i++)
+            simulation(data, ref population[i]);
     }
 }

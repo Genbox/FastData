@@ -9,7 +9,7 @@ internal class EliteReinsertion : IReinsertion
     private readonly double _topPercent;
 
     /// <summary>Reinserts the top-performing parents into the new generation.</summary>
-    /// <param name="topPercent">The fraction of the population to keep, from 0 to 1.</param>
+    /// <param name="topPercent">The fraction of the configured population size to keep, from 0 to 1.</param>
     public EliteReinsertion(double topPercent)
     {
         if (topPercent is < 0 or > 1)
@@ -18,13 +18,14 @@ internal class EliteReinsertion : IReinsertion
         _topPercent = topPercent;
     }
 
-    public void Process(StaticArray<Entity> population, StaticArray<Entity> newPopulation)
+    public void Process(StaticArray<Entity> population, StaticArray<Entity> newPopulation, int populationSize)
     {
-        //Sort population by fitness
-        int[] indices = GeneHelper.GetSortedByFitness(population);
+        //We only want N percent. It is relative to the configured size, as the population grows when reinserted entities are added on top of the children.
+        int number = Math.Min((int)(populationSize * _topPercent), population.Count);
+        if (number == 0)
+            return;
 
-        //We only want N percent
-        int number = (int)(population.Count * _topPercent);
+        int[] indices = GeneHelper.GetSortedByFitness(population);
 
         for (int i = 0; i < number; i++)
             newPopulation.Add(population[indices[i]]);

@@ -21,11 +21,12 @@ internal sealed class EliteSelection : ISelection
 
     public void Process(StaticArray<Entity> population, List<int> parents, int maxParents)
     {
-        //Sort population by fitness
-        int[] indices = GeneHelper.GetSortedByFitness(population);
-
         //We only want N percent
         int number = Math.Min((int)(population.Count * _topPercent), maxParents);
+        if (number == 0)
+            return;
+
+        int[] indices = GeneHelper.GetSortedByFitness(population);
 
         for (int i = 0; i < number; i++)
             parents.Add(indices[i]);

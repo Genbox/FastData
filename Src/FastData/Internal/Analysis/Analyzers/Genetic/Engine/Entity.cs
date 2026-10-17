@@ -25,4 +25,18 @@ internal struct Entity
         foreach (IGene gene in Genes)
             gene.Mutate(random);
     }
+
+    internal readonly bool HasSameGenes(Entity other)
+    {
+        if (Genes.Length != other.Genes.Length)
+            return false;
+
+        for (int i = 0; i < Genes.Length; i++)
+        {
+            if (!Genes[i].HasSameValue(other.Genes[i]))
+                return false;
+        }
+
+        return true;
+    }
 }

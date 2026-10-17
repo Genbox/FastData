@@ -7,4 +7,5 @@ internal interface IGene
     internal string Name { get; }
     void Mutate(IRandom rng);
     IGene Clone();
+    bool HasSameValue(IGene other);
 }
