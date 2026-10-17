@@ -18,26 +18,28 @@ internal sealed class OnePointCrossOver(IRandom random) : ICrossOver
             IGene[] genesB = population[parents[i + 1]].Genes;
 
             //Two parents produce two children for simplicity
-            IGene[] child1 = new IGene[genesA.Length];
-            IGene[] child2 = new IGene[genesB.Length];
+            Entity firstChild = new Entity(genesA.Length);
+            Entity secondChild = new Entity(genesB.Length);
+            IGene[] child1 = firstChild.Genes;
+            IGene[] child2 = secondChild.Genes;
 
             int swapPoint = random.Next(geneLength);
 
             for (int j = 0; j < swapPoint; j++)
             {
-                child1[j] = genesA[j];
-                child2[j] = genesB[j];
+                child1[j] = genesA[j].Clone();
+                child2[j] = genesB[j].Clone();
             }
 
             for (int j = swapPoint; j < genesA.Length; j++) //All entities have the same number of genes, so does not matter which length we use
             {
-                child1[j] = genesB[j];
-                child2[j] = genesA[j];
+                child1[j] = genesB[j].Clone();
+                child2[j] = genesA[j].Clone();
             }
 
             //Add the children
-            newPopulation.Add(new Entity(child1));
-            newPopulation.Add(new Entity(child2));
+            newPopulation.Add(firstChild);
+            newPopulation.Add(secondChild);
         }
     }
 }

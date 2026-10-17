@@ -17,8 +17,10 @@ internal sealed class TwoPointCrossOver(IRandom random) : ICrossOver
             IGene[] genesA = population[parents[i]].Genes;
             IGene[] genesB = population[parents[i + 1]].Genes;
 
-            IGene[] child1 = new IGene[genesA.Length];
-            IGene[] child2 = new IGene[genesB.Length];
+            Entity firstChild = new Entity(genesA.Length);
+            Entity secondChild = new Entity(genesB.Length);
+            IGene[] child1 = firstChild.Genes;
+            IGene[] child2 = secondChild.Genes;
 
             int point1 = random.Next(geneLength - 1);
             int point2 = random.Next(point1 + 1, geneLength);
@@ -27,18 +29,18 @@ internal sealed class TwoPointCrossOver(IRandom random) : ICrossOver
             {
                 if (j >= point1 && j < point2)
                 {
-                    child1[j] = genesB[j];
-                    child2[j] = genesA[j];
+                    child1[j] = genesB[j].Clone();
+                    child2[j] = genesA[j].Clone();
                 }
                 else
                 {
-                    child1[j] = genesA[j];
-                    child2[j] = genesB[j];
+                    child1[j] = genesA[j].Clone();
+                    child2[j] = genesB[j].Clone();
                 }
             }
 
-            newPopulation.Add(new Entity(child1));
-            newPopulation.Add(new Entity(child2));
+            newPopulation.Add(firstChild);
+            newPopulation.Add(secondChild);
         }
     }
 }

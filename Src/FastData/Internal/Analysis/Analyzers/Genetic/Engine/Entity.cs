@@ -5,10 +5,13 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine;
 
 internal struct Entity
 {
-    internal Entity(IGene[] genes)
+    internal Entity(int geneCount)
     {
-        Genes = new IGene[genes.Length];
+        Genes = new IGene[geneCount];
+    }
 
+    internal Entity(IGene[] genes) : this(genes.Length)
+    {
         for (int i = 0; i < genes.Length; i++)
             Genes[i] = genes[i].Clone();
     }
