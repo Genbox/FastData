@@ -7,11 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compat Include="@(AvailableCompats)" Exclude="MathFCompat" />
     <ProjectReference Include="..\FastData\FastData.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\..\Misc\Compat\*.cs" Link="Internal\Compat\%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

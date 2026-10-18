@@ -5,6 +5,11 @@
     <Error Condition="'$(PackageTags)' == ''" Text="PackageTags must be set before publishing." />
   </Target>
 
+  <ItemGroup>
+    <Compat Update="@(Compat)" Visible="false" />
+    <Compile Include="@(Compat->'$(MSBuildThisFileDirectory)..\Misc\Compat\%(Identity).cs')" Link="Internal\Compat\%(Filename)%(Extension)" Visible="true" />
+  </ItemGroup>
+
   <!--MinVer versioning-->
   <Target Name="ModifyAssemblyVersion" AfterTargets="MinVer">
     <PropertyGroup>

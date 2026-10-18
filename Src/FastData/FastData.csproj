@@ -12,11 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compat Include="@(AvailableCompats)" Exclude="StringBuilderCompat" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\..\Misc\Compat\*.cs" Link="Internal\Compat\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

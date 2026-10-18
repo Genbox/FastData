@@ -85,6 +85,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <_CompatSources Include="$(MSBuildThisFileDirectory)..\Misc\Compat\*.cs" Visible="false" />
+    <AvailableCompats Include="@(_CompatSources->'%(Filename)')" Visible="false" />
+
     <!--Analyzers-->
     <AdditionalFiles Include="../../Imports/BannedSymbols.txt" Condition="Exists('../../Imports/BannedSymbols.txt')" />
 

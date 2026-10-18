@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compat Include="@(AvailableCompats)" Exclude="StringBuilderCompat;MathFCompat" />
     <ProjectReference Include="..\FastData.Generator.Template\FastData.Generator.Template.csproj" />
   </ItemGroup>
 
@@ -15,10 +16,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>Templates\CSharp\%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\..\Misc\Compat\*.cs" Link="Internal\Compat\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
