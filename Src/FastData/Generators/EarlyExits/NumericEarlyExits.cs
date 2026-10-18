@@ -154,7 +154,7 @@ internal static class NumericEarlyExits<TKey>
                 ulong gapValueCount = unchecked(gapLast - gapFirst) + 1;
                 for (ulong offset = 0; offset < gapValueCount; offset++)
                 {
-                    ulong v = gapFirst + offset;
+                    ulong v = unchecked(gapFirst + offset);
                     int bit = (int)unchecked(v - bitmapStart);
                     missingBitSet |= 1UL << bit;
                 }

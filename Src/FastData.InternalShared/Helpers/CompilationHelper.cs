@@ -32,6 +32,17 @@ internal static class CompilationHelper
         return me.CreateDelegate<T>();
     }
 
+    /// <summary>Compiles a source file into a loaded assembly.</summary>
+    public static Assembly GetAssembly(string source, bool release)
+    {
+        CSharpCompilation compilation = CreateCompilation(source, release);
+
+        if (!TryGetAssembly(compilation, out Assembly? assembly, out Diagnostic[] diagnostics))
+            throw new InvalidOperationException("Unable to compile. Errors: " + string.Join(Environment.NewLine, diagnostics.Where(static x => x.Severity == DiagnosticSeverity.Error)));
+
+        return assembly;
+    }
+
     public static CSharpCompilation CreateCompilation(string source, bool release, params Type[] types)
     {
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);

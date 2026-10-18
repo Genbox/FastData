@@ -14,13 +14,14 @@ internal class TestVector<TKey>(StructureType type, TKey[] keys, TKey[] notPrese
 
     public TKey[] Keys { get; } = keys;
     public TKey[] NotPresent { get; } = notPresent;
-    public StructureType StructureType { get; } = type;
 
     public string Identifier
     {
         get => field ??= $"{StructureType}_{_keyType}_{Keys.Length}" + (postfix != null ? $"_{postfix}" : "");
         set;
     }
+
+    public StructureType StructureType { get; } = type;
 
     public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(Identifier), Identifier);
     public void Deserialize(IXunitSerializationInfo info) => Identifier = info.GetValue<string>(nameof(Identifier)) ?? throw new InvalidOperationException("The serialized identifier is missing.");
