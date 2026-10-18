@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator.Ir" />
     <PackageReference Include="System.Memory" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <Compile Include="..\..\Misc\Compat\*.cs" Link="Internal\Compat\%(Filename)%(Extension)" />
   </ItemGroup>

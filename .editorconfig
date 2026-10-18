@@ -105,6 +105,9 @@ resharper_xmldoc_attribute_indent = align_by_first_attribute
 resharper_xmldoc_keep_user_linebreaks = true
 resharper_parentheses_non_obvious_operations = multiplicative, additive, shift, bitwise_and, bitwise_exclusive_or, bitwise_inclusive_or
 
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
+
 # Non-cryptographic randomness is intentional in tests and benchmarks
 [**/*Test*/**.cs]
 # CA5394: Do not use insecure randomness
