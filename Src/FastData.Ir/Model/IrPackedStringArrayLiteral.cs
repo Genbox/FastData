@@ -54,13 +54,26 @@ public sealed record IrPackedStringArrayLiteral : IrArrayLiteralBase
             return new IrStringLiteral(_utf8.GetString(_data, start, length));
 
         char[] units = new char[length / 2];
-        for (int i = 0; i < units.Length; i++)
-            units[i] = (char)(_data[start + (i * 2)] | (_data[start + (i * 2) + 1] << 8));
+        Decode(index, units);
 
         return new IrStringLiteral(new string(units));
     }
 
-    internal int DecodeUtf8(int index, char[] destination) => _utf8.GetChars(_data, _offsets[index], _offsets[index + 1] - _offsets[index], destination, 0);
+    /// <summary>Decodes one encoded slice into caller-provided storage and returns the character count.</summary>
+    internal int Decode(int index, char[] destination)
+    {
+        int start = _offsets[index];
+        int byteLength = _offsets[index + 1] - start;
+
+        if (Encoding == IrTextEncoding.Utf8)
+            return _utf8.GetChars(_data, start, byteLength, destination, 0);
+
+        // Decode code units directly to preserve UTF-16 surrogate values.
+        int characterCount = byteLength / 2;
+        for (int i = 0; i < characterCount; i++)
+            destination[i] = (char)(_data[start + (i * 2)] | (_data[start + (i * 2) + 1] << 8));
+        return characterCount;
+    }
 
     internal void ValidateUtf8(int index) => _utf8.GetCharCount(_data, _offsets[index], _offsets[index + 1] - _offsets[index]);
 }
