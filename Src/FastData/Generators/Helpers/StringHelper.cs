@@ -26,8 +26,33 @@ public static class StringHelper
 
     internal static Func<string, byte[]> GetBytesFunc(GeneratorEncoding encoding)
     {
+        if (encoding == GeneratorEncoding.Utf16CodeUnits)
+        {
+            return static value =>
+            {
+                byte[] bytes = new byte[value.Length * 2];
+                GetBytes(value, bytes, GeneratorEncoding.Utf16CodeUnits);
+                return bytes;
+            };
+        }
+
         Encoding enc = GetEncoding(encoding);
         return enc.GetBytes;
+    }
+
+    internal static int GetBytes(string value, byte[] buffer, GeneratorEncoding encoding)
+    {
+        if (encoding != GeneratorEncoding.Utf16CodeUnits)
+            return GetEncoding(encoding).GetBytes(value, 0, value.Length, buffer, 0);
+
+        // Code-unit positions refer to the original UTF-16 storage, including unpaired surrogates.
+        for (int i = 0; i < value.Length; i++)
+        {
+            buffer[i * 2] = unchecked((byte)value[i]);
+            buffer[(i * 2) + 1] = (byte)(value[i] >> 8);
+        }
+
+        return value.Length * 2;
     }
 
     internal static int GetSize(GeneratorEncoding encoding) => encoding switch

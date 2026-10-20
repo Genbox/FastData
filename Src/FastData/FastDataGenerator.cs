@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
@@ -379,7 +378,6 @@ public static partial class FastDataGenerator
             StringHashFunc hashFunc = expression.Compile();
             IEnumerable<IEarlyExit> hashExits = stringHash.GetMandatoryExits();
 
-            Encoding encoding = StringHelper.GetEncoding(generator.Encoding);
             byte[] buffer = new byte[props.LengthData.MaxByteLength];
 
             HashData hashData = HashData.Create(keySpan,
@@ -388,7 +386,7 @@ public static partial class FastDataGenerator
                 cfg.StructureSettings.GetSetting<bool>(KnownSettings.RoundModuloToPowerOfTwo),
                 cfg.StructureSettings.GetSetting<float>(KnownSettings.RoundModuloToPowerOfTwoThreshold), x =>
                 {
-                    int byteCount = encoding.GetBytes(x, 0, x.Length, buffer, 0);
+                    int byteCount = StringHelper.GetBytes(x, buffer, generator.Encoding);
                     return hashFunc(buffer, byteCount);
                 });
 

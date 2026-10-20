@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Text;
 using Genbox.FastData.Config.Analysis;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators.Helpers;
@@ -77,8 +76,7 @@ internal static class HashBenchmark
         byte[] testBytes = new byte[props.LengthData.MaxByteLength];
 
         string sampleKey = data[data.Length / 2];
-        Encoding enc = StringHelper.GetEncoding(encoding);
-        int testLength = enc.GetBytes(sampleKey, 0, sampleKey.Length, testBytes, 0);
+        int testLength = StringHelper.GetBytes(sampleKey, testBytes, encoding);
 
         //We start with the perfect results (if any)
         if (perfect.Count > 0)
