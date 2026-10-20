@@ -11,7 +11,7 @@ using Genbox.FastData.Ir.Model.Enums;
 namespace Genbox.FastData.Generator.Ir.Lowering;
 
 [SuppressMessage("Correctness", "SS004:Implement Equals() and GetHashcode() methods for a type used in a collection.", Justification = "ParameterExpression instances are scoped symbols whose reference identity is the variable identity.")]
-internal sealed class FrontendExpressions(GeneratorConfigBase config, FastDataProgramBuilder builder, Type keyClrType, IrType keyType)
+internal sealed class FrontendExpressions(GeneratorConfigBase config, FastDataProgramBuilder builder, Type keyClrType)
 {
     private readonly ExpressionTranslator.SharedData _shared = new ExpressionTranslator.SharedData(builder.Program, builder.Keys.FoldFunctionId);
 
@@ -41,7 +41,7 @@ internal sealed class FrontendExpressions(GeneratorConfigBase config, FastDataPr
     // The hash must equal the frontend's: numeric keys use the shared numeric hash, strings the selected hash expression.
     public IrFunctionCallExpression Hash()
     {
-        if (keyType != IrType.String)
+        if (builder.KeyParameterId.Type != IrType.String)
             return Call(builder.Keys.AddNumericHashHelper(), Read(builder.KeyParameterId));
 
         if (config is not StringGeneratorConfig { HashInfo: {} info })

@@ -4,13 +4,12 @@ using Genbox.FastData.Ir.Building;
 using Genbox.FastData.Ir.Interop;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
-using static Genbox.FastData.Generator.Ir.Lowering.LoweringHelpers;
 
 namespace Genbox.FastData.Generator.Ir.DataStructures;
 
-internal sealed class Range<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
+internal static class Range<TKey, TValue>
 {
-    public List<IrStatement> Lower((TKey Start, TKey End)[] ranges)
+    public static IReadOnlyList<IrStatement> Lower(LoweringContext<TKey, TValue> lowering, (TKey Start, TKey End)[] ranges)
     {
         IrDataId starts = lowering.Builder.Program.AddData("rangeStarts", IrClrConverter.FromValue(ranges.Select(static x => x.Start).ToArray()));
         IrDataId ends = lowering.Builder.Program.AddData("rangeEnds", IrClrConverter.FromValue(ranges.Select(static x => x.End).ToArray()));
@@ -22,11 +21,11 @@ internal sealed class Range<TKey, TValue>(LoweringContext<TKey, TValue> lowering
         for (int r = 0; r < ranges.Length; r++)
         {
             firsts[r] = total;
-            total = checked(total + (long)unchecked(lowering.ToUnsigned(ranges[r].End) - lowering.ToUnsigned(ranges[r].Start)) + 1);
+            total = checked(total + (long)unchecked(ToUnsigned(ranges[r].End) - ToUnsigned(ranges[r].Start)) + 1);
         }
 
         IrDataId firstData = lowering.Builder.Program.AddData("rangeFirsts", IrClrConverter.FromValue(firsts));
-        AddRangeCursor(total, starts, firstData, ranges.Length);
+        AddRangeCursor(lowering, total, starts, firstData, ranges.Length);
 
         IrExpression StartAt(IrExpression index) => Index(Read(starts), index);
         IrExpression EndAt(IrExpression index) => Index(Read(ends), index);
@@ -57,19 +56,19 @@ internal sealed class Range<TKey, TValue>(LoweringContext<TKey, TValue> lowering
         return statements;
     }
 
-    private void AddRangeCursor(long total, IrDataId starts, IrDataId firsts, int rangeCount)
+    private static void AddRangeCursor(LoweringContext<TKey, TValue> lowering, long total, IrDataId starts, IrDataId firsts, int rangeCount)
     {
         IrFunctionId next = lowering.Enumeration.AddNext(total - 1);
         IrFunctionBuilder keyAt = lowering.Builder.Program.Function("KeyAt", lowering.KeyType);
         IrVariableId position = keyAt.Parameter("position", IrType.I64);
         IrVariableId range = keyAt.Local("range", IrType.I32);
-        IrExpression offset = Convert(IrType.U64, Subtract(Read(position), Index(Read(firsts), Read(range))), IrType.I64);
-        IrExpression start = Convert(IrType.U64, Index(Read(starts), Read(range)), lowering.KeyType);
+        IrExpression offset = Convert(IrType.U64, Subtract(Read(position), Index(Read(firsts), Read(range))));
+        IrExpression start = Convert(IrType.U64, Index(Read(starts), Read(range)));
 
         // The containing range is the last one whose first position is at or before the requested position.
         List<IrStatement> statements = LowerBound(keyAt.Local, range, rangeCount, index => LessOrEqual(Index(Read(firsts), index), Read(position)));
         statements.Add(Assign(range, Subtract(Read(range), I32(1))));
-        statements.Add(Return(Convert(lowering.KeyType, Add(start, offset), IrType.U64)));
+        statements.Add(Return(Convert(lowering.KeyType, Add(start, offset))));
         keyAt.Define(new IrBlock(statements));
         lowering.Builder.Enumeration = new LookupEnumeration(next, keyAt.Id);
     }

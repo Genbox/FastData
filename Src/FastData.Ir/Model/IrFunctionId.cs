@@ -1,3 +1,4 @@
 namespace Genbox.FastData.Ir.Model;
 
-public readonly record struct IrFunctionId(int Value);
+/// <summary>A typed, scoped identity for a function declaration.</summary>
+public readonly record struct IrFunctionId(int Value, IrType ReturnType);

@@ -10,7 +10,9 @@ A small, portable, intermediate representation language. Used to represent strin
 
 ## Type system
 
-Operations use explicit types to keep behavior portable across backends. Assignments, return values, and call arguments must exactly match their declared types. Conversions are explicit; arithmetic does not promote narrow integers.
+Operations use explicit types to keep behavior portable across backends. Assignments, return values, and call arguments must exactly match their declared types. Conversions are explicit; arithmetic does not promote narrow integers. `Convert(target, value)` reads the source type from the value, bridges character conversions through their unit type, and reuses the value when its type already matches. `Complement(operand)` derives its mask from the operand type. Conversion nodes expose their target through `Type`. `IntegerBits(type, bits)` constructs an integral literal by truncating the bit pattern to the target width and interpreting its signedness; defaults, complements, and interpreter results share this factory.
+
+Every `IrExpression` exposes its result `Type`. Arithmetic derives its type from the left operand, comparisons and logical operations return `Bool`, indexing returns the collection's element type, and conversions carry the target type. Variable, data, field, and function IDs carry their declared types and are used directly to construct reads and calls. Function IDs are available before bodies are defined, so forward calls remain possible. Validation checks these types against their declarations.
 
 ### Booleans
 
@@ -57,9 +59,12 @@ Operations use explicit types to keep behavior portable across backends. Assignm
 - Arrays and records are immutable values.
 - Arrays and records support typed nulls. Equality requires at least one operand to be a null literal.
 
+Packed literals expose transferred buffers through `IReadOnlyList<T>` without allocating read-only wrappers. These views do not grant permission to mutate the buffers through casts or other aliases.
+
 ## Semantics
 
-- Program validation checks declarations, types, bindings, literal representations, definite assignment, and return paths.
+- Expression constructors check local operand and operation rules immediately: binary and logical operands, conversions, array indexing, and field receivers. Assignment constructors check the typed destination, and branch and loop constructors require Boolean conditions. Factories use the same constructors, so invalid operations fail when created rather than when a program is built. Literal constructors also check character ranges, nullable types, aggregate-array element types, packed ASCII values, and packed-string storage boundaries and encoding validity. These errors retain diagnostic codes but have no enclosing function or body path.
+- Declaration constructors require names and non-null types, signatures require non-null return and parameter types, and `IrType.ArrayOf` requires an element type. Program validation checks declarations, reference types against their declarations, call signatures, literal compatibility with the program encoding and record declarations, definite assignment, and return paths. It traverses expressions with one iterative work stack without repeating constructor operand checks. Variable resolution checks declaration types for both reads and assignment targets. Definite-assignment sets track variable positions; flow results carry continuing and break assignment sets as immutable results while the sets themselves are merged in place.
 - Functions have a declared result type and cannot fall through without returning; a nonterminating path is permitted.
 - Locals and parameters can be reassigned; elements and fields are read-only.
 

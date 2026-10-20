@@ -109,18 +109,12 @@ public sealed class IrBuiltinBuilder
         IrVariableId text = function.Parameter("text", IrType.String);
         IrVariableId offset = function.Parameter("byteOffset", IrType.I32);
         IrExpression byteOffset = Convert(IrType.U32, Read(offset));
-        IrExpression value = ReadByte(Read(text), byteOffset);
-
-        if (resultType == IrType.U64)
-            value = Convert(IrType.U64, value);
+        IrExpression value = Convert(resultType, ReadByte(Read(text), byteOffset));
 
         // Unrolled little-endian assembly: byte k is shifted left by 8 * k.
         for (int k = 1; k < size; k++)
         {
-            IrExpression part = ReadByte(Read(text), Add(byteOffset, U32((uint)k)));
-
-            if (resultType == IrType.U64)
-                part = Convert(IrType.U64, part);
+            IrExpression part = Convert(resultType, ReadByte(Read(text), Add(byteOffset, U32((uint)k))));
 
             value = Or(value, ShiftLeft(part, I32(8 * k)));
         }

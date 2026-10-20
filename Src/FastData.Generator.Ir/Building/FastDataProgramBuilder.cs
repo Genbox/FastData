@@ -14,7 +14,6 @@ public sealed class FastDataProgramBuilder
 {
     private readonly List<IrDataId> _constants = new List<IrDataId>();
     private readonly IrFunctionBuilder _find;
-    private readonly IrType _keyType;
 
     /// <summary>Declares Find(key), returning an I32 slot or -1 when absent.</summary>
     /// <param name="keyType">The key type.</param>
@@ -27,7 +26,6 @@ public sealed class FastDataProgramBuilder
         if (fold != null && keyType != IrType.String)
             throw new ArgumentException("A fold requires String keys.", nameof(fold));
 
-        _keyType = keyType;
         Program = new IrProgramBuilder(textEncoding);
         Builtins = new IrBuiltinBuilder(Program, supportedBuiltins);
         Keys = new LookupKeys(Program, Builtins, keyType, fold?.Invoke(Program));
@@ -75,7 +73,7 @@ public sealed class FastDataProgramBuilder
     public FastDataProgram Build(IrBlock body)
     {
         // Ordering helpers assume non-NaN keys; reject NaN before any search strategy can report a hit.
-        if (_keyType.IsFloatingPoint)
+        if (KeyParameterId.Type.IsFloatingPoint)
         {
             IrExpression key = Read(KeyParameterId);
             body = Block(body.Statements.Prepend(If(NotEqual(key, key), Return(I32(-1)))).ToArray());

@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Genbox.FastData.Ir.Internal;
 using Genbox.FastData.Ir.Interop;
 using Genbox.FastData.Ir.Model.Abstracts;
+using Genbox.FastData.Ir.Model.Enums;
 
 namespace Genbox.FastData.Ir.Model;
 
@@ -17,8 +18,8 @@ public sealed record IrPackedArrayLiteral<T> : IrArrayLiteralBase where T : stru
     /// or an explicit type with the same payload.
     /// </summary>
     /// <remarks>
-    /// Callers must stop modifying the array after construction.
-    /// byte also holds Char(Ascii); character ranges are checked during IR validation.
+    /// The buffer is retained without copying. Callers must not modify it through any alias after construction, including views obtained from the literal.
+    /// byte also holds Char(Ascii); character ranges are checked during construction.
     /// </remarks>
     /// <exception cref="ArgumentException">
     /// <paramref name="elementType" /> requires a different payload type, or an inferred type uses an unsupported <typeparamref name="T" />.
@@ -26,13 +27,19 @@ public sealed record IrPackedArrayLiteral<T> : IrArrayLiteralBase where T : stru
     public IrPackedArrayLiteral(T[] values, IrType? elementType = null)
     {
         _values = values;
-        Values = Array.AsReadOnly(_values);
+        Values = _values;
 
         Type = elementType switch
         {
             null => DefaultType ?? throw new ArgumentException($"'{typeof(T)}' is not an IR primitive type.", nameof(elementType)),
             _ => IrType.ArrayOf(Check(elementType))
         };
+
+        if (ElementType.CharacterKind == IrCharacterKind.Ascii)
+        {
+            foreach (byte value in (byte[])(object)values)
+                Require(value <= 0x7F, "Packed character value is outside ASCII.");
+        }
     }
 
     // Null marks an unsupported T so construction reports the argument error on each use.

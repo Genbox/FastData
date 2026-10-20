@@ -10,9 +10,9 @@ using Genbox.FastData.Ir.Model.Enums;
 
 namespace Genbox.FastData.Generator.Ir.DataStructures;
 
-internal sealed class HashTable<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
+internal static class HashTable<TKey, TValue>
 {
-    public IEnumerable<IrStatement> Lower(HashTableContext<TKey, TValue> context)
+    public static IReadOnlyList<IrStatement> Lower(LoweringContext<TKey, TValue> lowering, HashTableContext<TKey, TValue> context)
     {
         HashTableEntry<TKey>[] entries = context.Entries;
         ReadOnlySpan<TValue> values = context.Values.Span;
@@ -47,7 +47,7 @@ internal sealed class HashTable<TKey, TValue>(LoweringContext<TKey, TValue> lowe
 
         IrDataId table = lowering.Builder.Program.AddData("entries", new IrArrayLiteral(IrType.Record(record), records));
 
-        (IrDataId buckets, IrType bucketType) = lowering.Storage.NonNegative("buckets", context.Buckets);
+        IrDataId buckets = lowering.Storage.NonNegative("buckets", context.Buckets);
         if (valueField != null)
             lowering.Builder.Values = new LookupValues(table, valueField);
         lowering.Enumeration.AddCursor(entries.Length,
@@ -56,18 +56,18 @@ internal sealed class HashTable<TKey, TValue>(LoweringContext<TKey, TValue> lowe
 
         IrVariableId hash = lowering.Builder.FindLocal("hash", IrType.U64);
         IrVariableId index = lowering.Builder.FindLocal("i", IrType.I32);
-        IrExpression bucket = Convert(IrType.I32, Binary(BinaryOperation.Modulo, Read(hash), U64((ulong)context.Buckets.Length)), IrType.U64);
+        IrExpression bucket = Convert(IrType.I32, Binary(BinaryOperation.Modulo, Read(hash), U64((ulong)context.Buckets.Length)));
         IrExpression match = lowering.Builder.Keys.Equal(Field(Index(Read(table), Read(index)), keyField), lowering.Key);
         if (hashField != null)
-            match = AndAlso(Equal(Convert(IrType.U64, Field(Index(Read(table), Read(index)), hashField.Value), hashType), Read(hash)), match);
+            match = AndAlso(Equal(Convert(IrType.U64, Field(Index(Read(table), Read(index)), hashField.Value)), Read(hash)), match);
 
         return
         [
             Assign(hash, lowering.Expressions.Hash()),
-            Assign(index, Subtract(Convert(IrType.I32, Index(Read(buckets), bucket), bucketType), I32(1))),
+            Assign(index, Subtract(Convert(IrType.I32, Index(Read(buckets), bucket)), I32(1))),
             While(GreaterOrEqual(Read(index), I32(0)),
                 If(match, Return(Read(index))),
-                Assign(index, Convert(IrType.I32, Field(Index(Read(table), Read(index)), nextField), nextType))),
+                Assign(index, Convert(IrType.I32, Field(Index(Read(table), Read(index)), nextField)))),
             Return(I32(-1))
         ];
     }

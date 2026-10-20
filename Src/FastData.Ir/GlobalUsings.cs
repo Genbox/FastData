@@ -1,0 +1,1 @@
+﻿global using static Genbox.FastData.Ir.Validation.IrValidation;

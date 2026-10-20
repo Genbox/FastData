@@ -140,7 +140,7 @@ public sealed class IrInterpreter
                 return new IrBoolLiteral(logical.Operation == LogicalOperation.AndAlso ? left && IsTrue(logical.Right, frame) : left || IsTrue(logical.Right, frame));
             }
             case IrConversionExpression conversion:
-                return IrOperations.Convert(conversion.Conversion, conversion.TargetType, Evaluate(conversion.Operand, frame));
+                return IrOperations.Convert(conversion.Conversion, conversion.Type, Evaluate(conversion.Operand, frame));
             case IrFunctionCallExpression call:
                 return EvaluateCall(call, frame);
             default:

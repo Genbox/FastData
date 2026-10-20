@@ -3,13 +3,12 @@ using Genbox.FastData.Generator.Ir.Lowering;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
-using static Genbox.FastData.Generator.Ir.Lowering.LoweringHelpers;
 
 namespace Genbox.FastData.Generator.Ir.DataStructures;
 
-internal sealed class BinarySearch<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
+internal static class BinarySearch<TKey, TValue>
 {
-    public List<IrStatement> Lower(ReadOnlyMemory<TKey> keyMemory, ReadOnlyMemory<TValue> valueMemory)
+    public static IReadOnlyList<IrStatement> Lower(LoweringContext<TKey, TValue> lowering, ReadOnlyMemory<TKey> keyMemory, ReadOnlyMemory<TValue> valueMemory)
     {
         TKey[] keys = GetArray(keyMemory);
 

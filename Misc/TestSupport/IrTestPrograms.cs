@@ -16,7 +16,7 @@ internal static class IrTestPrograms
     {
         IrFunction function = new IrFunction("Evaluate", type, [], [], Block(Return(expression)));
         IrProgram program = new IrProgram([function], records: records, textEncoding: encoding);
-        return new IrInterpreter(program).Invoke(new IrFunctionId(0));
+        return new IrInterpreter(program).Invoke(new IrFunctionId(0, type));
     }
 
     public static IrProgram WithLiteral(IrLiteral literal) => new IrProgram([], [new IrData("value", literal)]);

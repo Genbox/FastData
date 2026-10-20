@@ -1,4 +1,5 @@
 using System.Numerics;
+using Genbox.FastData.Ir.Building;
 using Genbox.FastData.Ir.Extensions;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
@@ -206,18 +207,7 @@ internal static class IrOperations
 
     /// <summary>Creates an integral literal from the low bits of a value at the requested type's width.</summary>
     /// <remarks>For signed types, the retained bits are interpreted as a two's-complement value.</remarks>
-    private static IrLiteral Integer(IrType type, BigInteger value) => type.Kind switch
-    {
-        IrTypeKind.I8 => new IrI8Literal(sbyte.CreateTruncating(value)),
-        IrTypeKind.U8 => new IrU8Literal(byte.CreateTruncating(value)),
-        IrTypeKind.I16 => new IrI16Literal(short.CreateTruncating(value)),
-        IrTypeKind.U16 => new IrU16Literal(ushort.CreateTruncating(value)),
-        IrTypeKind.I32 => new IrI32Literal(int.CreateTruncating(value)),
-        IrTypeKind.U32 => new IrU32Literal(uint.CreateTruncating(value)),
-        IrTypeKind.I64 => new IrI64Literal(long.CreateTruncating(value)),
-        IrTypeKind.U64 => new IrU64Literal(ulong.CreateTruncating(value)),
-        _ => throw new NotSupportedException("Expected an integral type.")
-    };
+    private static IrLiteral Integer(IrType type, BigInteger value) => IrFactory.IntegerBits(type, ulong.CreateTruncating(value));
 
     /// <summary>Creates a literal of the target type from the source literal's bit pattern.</summary>
     /// <remarks>

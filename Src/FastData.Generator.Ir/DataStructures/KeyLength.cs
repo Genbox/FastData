@@ -6,9 +6,9 @@ using Genbox.FastData.Ir.Model.Abstracts;
 
 namespace Genbox.FastData.Generator.Ir.DataStructures;
 
-internal sealed class KeyLength<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
+internal static class KeyLength<TKey, TValue>
 {
-    public IEnumerable<IrStatement> Lower(KeyLengthContext<TValue> context)
+    public static IReadOnlyList<IrStatement> Lower(LoweringContext<TKey, TValue> lowering, KeyLengthContext<TValue> context)
     {
         string?[] lengths = context.Lengths;
         IrDataId keys = lowering.Builder.Program.AddData("keys",
@@ -23,9 +23,9 @@ internal sealed class KeyLength<TKey, TValue>(LoweringContext<TKey, TValue> lowe
         }
 
         IrFunctionId next = lowering.Enumeration.AddNext(lengths.Length - 1,
-            p => NotEqual(Index(Read(keys), Convert(IrType.I32, p, IrType.I64)), new IrNullLiteral(IrType.String)));
-        lowering.Enumeration.AddEnumeration(next, p => Index(Read(keys), Convert(IrType.I32, p, IrType.I64)),
-            offsets == null ? null : p => Index(Read(lowering.Builder.Values!.DataId), Index(Read(offsets.Value), Convert(IrType.I32, p, IrType.I64))));
+            p => NotEqual(Index(Read(keys), Convert(IrType.I32, p)), new IrNullLiteral(IrType.String)));
+        lowering.Enumeration.AddEnumeration(next, p => Index(Read(keys), Convert(IrType.I32, p)),
+            offsets == null ? null : p => lowering.ValueAt(Index(Read(offsets.Value), Convert(IrType.I32, p))));
 
         IrVariableId index = lowering.Builder.FindLocal("index", IrType.I32);
         IrExpression stored = Index(Read(keys), Read(index));

@@ -1,5 +1,4 @@
 using System.Globalization;
-using Genbox.FastData.Ir.Building;
 using Genbox.FastData.Ir.Interop;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
@@ -16,7 +15,7 @@ public class IrCharTests
     {
         Assert.NotEqual(IrType.Char(IrCharacterKind.Ascii), IrType.Char(IrCharacterKind.Utf16CodeUnit));
         Assert.False(IrType.Char(IrCharacterKind.Utf16CodeUnit).IsNumeric);
-        Assert.Equal(new IrCharLiteral(IrCharacterKind.Utf16CodeUnit, 0), IrFactory.Default(IrType.Char(IrCharacterKind.Utf16CodeUnit)));
+        Assert.Equal(new IrCharLiteral(IrCharacterKind.Utf16CodeUnit, 0), Default(IrType.Char(IrCharacterKind.Utf16CodeUnit)));
     }
 
     [Theory]
@@ -31,6 +30,18 @@ public class IrCharTests
 
         Assert.Equal(VectorLiteral(unitType, value.ToString(CultureInfo.InvariantCulture)), unit);
         Assert.Equal(character, Evaluate(charType, Convert(charType, unit)));
+    }
+
+    [Theory]
+    [InlineData(IrCharacterKind.Ascii, 0x41u)]
+    [InlineData(IrCharacterKind.Utf16CodeUnit, 0xDC00u)]
+    public void CharacterConversionsBridgeDifferentIntegerWidths(IrCharacterKind characterKind, uint value)
+    {
+        IrCharLiteral character = new IrCharLiteral(characterKind, value);
+        IrLiteral integer = Evaluate(IrType.U64, Convert(IrType.U64, character));
+
+        Assert.Equal(new IrU64Literal(value), integer);
+        Assert.Equal(character, Evaluate(character.Type, Convert(character.Type, integer)));
     }
 
     [Theory]

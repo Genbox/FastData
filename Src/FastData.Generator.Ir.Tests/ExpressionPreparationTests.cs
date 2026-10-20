@@ -21,7 +21,7 @@ public class ExpressionPreparationTests
     {
         FastDataProgramBuilder builder = new FastDataProgramBuilder(IrType.U16);
         IrExpression product = Multiply(Read(builder.KeyParameterId), new IrU16Literal(65535));
-        FastDataProgram lookup = builder.Build(Block(Return(Convert(IrType.I32, product, IrType.U16))));
+        FastDataProgram lookup = builder.Build(Block(Return(Convert(IrType.I32, product))));
         IrBackendCapabilities capabilities = new IrBackendCapabilities(GeneratorEncoding.Utf16CodeUnits, IrBuiltins.All)
         {
             ExplicitWrappingArithmetic = explicitWrapping,
@@ -43,7 +43,7 @@ public class ExpressionPreparationTests
         FastDataProgramBuilder builder = new FastDataProgramBuilder(IrType.U8);
         IrExpression sum = Add(Read(builder.KeyParameterId), new IrU8Literal(3));
         IrExpression product = Multiply(sum, new IrU8Literal(5));
-        FastDataProgram lookup = builder.Build(Block(Return(Convert(IrType.I32, product, IrType.U8))));
+        FastDataProgram lookup = builder.Build(Block(Return(Convert(IrType.I32, product))));
         IrBackendCapabilities capabilities = new IrBackendCapabilities(GeneratorEncoding.Utf16CodeUnits, IrBuiltins.All)
         {
             IntegerPromotionWidth = 32
@@ -51,14 +51,14 @@ public class ExpressionPreparationTests
         PreparedLookup prepared = IrGeneratorPreparation.Prepare(lookup, capabilities);
         IrExpression result = Assert.IsType<IrReturnStatement>(prepared.Functions[0].Body.Statements[0]).Value;
         IrConversionExpression widened = Assert.IsType<IrConversionExpression>(result);
-        Assert.Equal(IrType.I32, widened.TargetType);
+        Assert.Equal(IrType.I32, widened.Type);
         IrConversionExpression narrowedProduct = Assert.IsType<IrConversionExpression>(widened.Operand);
-        Assert.Equal(IrType.U8, narrowedProduct.TargetType);
+        Assert.Equal(IrType.U8, narrowedProduct.Type);
         IrBinaryExpression multiplication = Assert.IsType<IrBinaryExpression>(narrowedProduct.Operand);
         Assert.Equal(BinaryOperation.Multiply, multiplication.Operation);
         Assert.Equal(new IrU8Literal(5), multiplication.Right);
         IrConversionExpression narrowedSum = Assert.IsType<IrConversionExpression>(multiplication.Left);
-        Assert.Equal(IrType.U8, narrowedSum.TargetType);
+        Assert.Equal(IrType.U8, narrowedSum.Type);
         IrBinaryExpression addition = Assert.IsType<IrBinaryExpression>(narrowedSum.Operand);
         Assert.Equal(BinaryOperation.Add, addition.Operation);
         Assert.Equal(builder.KeyParameterId, Assert.IsType<IrVariableExpression>(addition.Left).VariableId);
@@ -83,7 +83,7 @@ public class ExpressionPreparationTests
         Assert.Equal(builder.KeyParameterId, Assert.IsType<IrVariableExpression>(Assert.Single(call.Arguments)).VariableId);
         PreparedFunctionCall apiFind = Assert.IsType<PreparedFunctionCall>(prepared.Api.Find);
         Assert.Equal(find.Name, apiFind.Name);
-        Assert.Equal(new IrVariableId(0), Assert.IsType<IrVariableExpression>(Assert.Single(apiFind.Arguments)).VariableId);
+        Assert.Equal(new IrVariableId(0, IrType.I32), Assert.IsType<IrVariableExpression>(Assert.Single(apiFind.Arguments)).VariableId);
         IrBinaryExpression contains = Assert.IsType<IrBinaryExpression>(prepared.Api.Contains);
         Assert.Equal(BinaryOperation.GreaterThanOrEqual, contains.Operation);
         Assert.Same(apiFind, contains.Left);
@@ -91,7 +91,7 @@ public class ExpressionPreparationTests
         Assert.Equal(IrType.String, prepared.Api.Value!.Type);
         IrIndexExpression value = Assert.IsType<IrIndexExpression>(prepared.Api.Value.Expression);
         Assert.Equal(values, Assert.IsType<IrDataExpression>(value.Collection).DataId);
-        Assert.Equal(new IrVariableId(1), Assert.IsType<IrVariableExpression>(value.Index).VariableId);
+        Assert.Equal(new IrVariableId(1, IrType.I32), Assert.IsType<IrVariableExpression>(value.Index).VariableId);
     }
 
     [Fact]

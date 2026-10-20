@@ -11,9 +11,9 @@ public sealed class PreparedLookupApi
     internal PreparedLookupApi(FastDataProgram lookup, IrDataId? keyStorage, IrDataId? valueStorage, IReadOnlyList<string> names)
     {
         KeyType = lookup.KeyType;
-        IrVariableExpression key = Read(new IrVariableId(0));
-        IrVariableExpression slot = Read(new IrVariableId(1));
-        Find = new PreparedFunctionCall(names[lookup.Contract.FindFunctionId.Value], [key]);
+        IrVariableExpression key = Read(new IrVariableId(0, lookup.KeyType));
+        IrVariableExpression slot = Read(new IrVariableId(1, IrType.I32));
+        Find = new PreparedFunctionCall(names[lookup.Contract.FindFunctionId.Value], [key], IrType.I32);
         Contains = LookupApi.Found(Find);
         Found = LookupApi.Found(slot);
         if (lookup.Contract.Values is {} values)

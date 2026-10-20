@@ -24,13 +24,21 @@ public static class FastDataValidator
         if (contract.Enumeration is {} enumeration)
             ValidateEnumeration(program, enumeration, keyType, valueType, contractPath + ".Enumeration");
 
+        for (int i = 0; i < contract.Constants.Count; i++)
+        {
+            IrDataId id = contract.Constants[i];
+            IrDiagnosticPath path = contractPath.Index("Constants", i);
+            Require(id.Type == program.Resolve(id, path).Type, "Constant reference type does not match its declaration.", path, IrDiagnosticCode.InvalidContract);
+        }
+
         IrBuiltins.Validate(program);
-        return new FastDataProgram(program, contract, keyType, valueType);
+        return new FastDataProgram(program, contract);
     }
 
     private static IrType ValidateValues(IrProgram program, LookupValues values, IrDiagnosticPath path)
     {
         IrData data = program.Resolve(values.DataId, path + ".DataId");
+        Require(values.DataId.Type == data.Type, "Value storage reference type does not match its declaration.", path + ".DataId", IrDiagnosticCode.InvalidContract);
         Require(data.Type.Kind == IrTypeKind.Array && data.Value is not IrNullLiteral, "Value storage must be a non-null array.", path + ".DataId", IrDiagnosticCode.InvalidContract);
         IrType valueType = data.Type.ElementType!;
 
@@ -38,6 +46,7 @@ public static class FastDataValidator
         {
             Require(valueType.Kind == IrTypeKind.Record && valueType.RecordId == field.RecordId, "The value field must belong to the storage array's record type.", path + ".FieldId", IrDiagnosticCode.InvalidContract);
             valueType = program.Resolve(field, path + ".FieldId").Type;
+            Require(field.Type == valueType, "Value field reference type does not match its declaration.", path + ".FieldId", IrDiagnosticCode.InvalidContract);
         }
 
         return valueType;
@@ -62,5 +71,10 @@ public static class FastDataValidator
         Require(function.ReturnType == resultType && function.Parameters.Count == 1 && function.Parameters[0].Type == IrType.I64, "Enumeration requires Next(I64) -> I64, Key(I64) of the key type, and Value(I64) of the value type.", path, IrDiagnosticCode.InvalidContract);
     }
 
-    private static IrFunction ResolveFunction(IrProgram program, IrFunctionId id, IrDiagnosticPath path) => program.ResolveCallable(id, path) as IrFunction ?? throw Fail($"Lookup binding requires a defined function; ID {id.Value} refers to an external declaration.", path, IrDiagnosticCode.InvalidContract);
+    private static IrFunction ResolveFunction(IrProgram program, IrFunctionId id, IrDiagnosticPath path)
+    {
+        IrFunction function = program.ResolveCallable(id, path) as IrFunction ?? throw Fail($"Lookup binding requires a defined function; ID {id.Value} refers to an external declaration.", path, IrDiagnosticCode.InvalidContract);
+        Require(id.ReturnType == function.ReturnType, "Function reference type does not match its declaration.", path, IrDiagnosticCode.InvalidContract);
+        return function;
+    }
 }

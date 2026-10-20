@@ -3,19 +3,18 @@ using Genbox.FastData.Ir.Building;
 using Genbox.FastData.Ir.Interop;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
-using static Genbox.FastData.Generator.Ir.Lowering.LoweringHelpers;
 
 namespace Genbox.FastData.Generator.Ir.DataStructures;
 
-internal sealed class Conditional<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
+internal static class Conditional<TKey, TValue>
 {
-    public List<IrStatement> Lower(ReadOnlyMemory<TKey> keyMemory, ReadOnlyMemory<TValue> values)
+    public static IReadOnlyList<IrStatement> Lower(LoweringContext<TKey, TValue> lowering, ReadOnlyMemory<TKey> keyMemory, ReadOnlyMemory<TValue> values)
     {
         TKey[] keys = GetArray(keyMemory);
         IrLiteral[] literals = keys.Select(static key => IrClrConverter.FromValue(key)).ToArray();
         lowering.AddValues(values);
         lowering.Enumeration.AddCursor(keys.Length,
-            position => KeyAtPosition(literals, position),
+            position => KeyAtPosition(lowering, literals, position),
             lowering.Builder.Values == null ? null : lowering.ValueAt);
 
         List<IrStatement> statements = new List<IrStatement>(keys.Length + 1);
@@ -26,7 +25,7 @@ internal sealed class Conditional<TKey, TValue>(LoweringContext<TKey, TValue> lo
     }
 
     // Conditional structures store no key array, so enumeration selects the literal by position.
-    private IrFunctionCallExpression KeyAtPosition(IrLiteral[] literals, IrExpression position)
+    private static IrFunctionCallExpression KeyAtPosition(LoweringContext<TKey, TValue> lowering, IrLiteral[] literals, IrExpression position)
     {
         IrFunctionBuilder function = lowering.Builder.Program.Function("KeyLiteral", lowering.KeyType);
         IrVariableId index = function.Parameter("position", IrType.I32);

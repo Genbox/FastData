@@ -1,4 +1,4 @@
 namespace Genbox.FastData.Ir.Model;
 
-/// <summary>Program-local identity of immutable data, distinct from writable variables.</summary>
-public readonly record struct IrDataId(int Value);
+/// <summary>A typed, scoped identity for a data declaration.</summary>
+public readonly record struct IrDataId(int Value, IrType Type);

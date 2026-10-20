@@ -24,7 +24,7 @@ public sealed class IrProgramBuilder
     /// <summary>Declares immutable program data.</summary>
     public IrDataId AddData(string name, IrLiteral value)
     {
-        IrDataId id = new IrDataId(_data.Count);
+        IrDataId id = new IrDataId(_data.Count, value.Type);
         _data.Add(new IrData(name, value));
         return id;
     }
@@ -32,7 +32,7 @@ public sealed class IrProgramBuilder
     /// <summary>Reserves a function identity and creates its declaration owner.</summary>
     public IrFunctionBuilder Function(string name, IrType returnType)
     {
-        IrFunctionBuilder function = new IrFunctionBuilder(new IrFunctionId(_callables.Count), name, returnType);
+        IrFunctionBuilder function = new IrFunctionBuilder(new IrFunctionId(_callables.Count, returnType), name);
         _callables.Add((function, null));
         return function;
     }
@@ -40,7 +40,7 @@ public sealed class IrProgramBuilder
     /// <summary>Declares an opaque external symbol whose calls use ordinary IR call expressions.</summary>
     public IrFunctionId ExternalFunction(string symbol, IrFunctionSignature signature)
     {
-        IrFunctionId id = new IrFunctionId(_callables.Count);
+        IrFunctionId id = new IrFunctionId(_callables.Count, signature.ReturnType);
         _callables.Add((null, new IrExternalFunction(symbol, signature)));
         return id;
     }
@@ -56,12 +56,13 @@ public sealed class IrProgramBuilder
     /// <summary>Adds an ordered field to a record.</summary>
     public IrFieldId AddField(IrRecordId recordId, string name, IrType type)
     {
-        IrFieldId id = new IrFieldId(recordId, _records[recordId.Value].Fields.Count);
+        IrFieldId id = new IrFieldId(recordId, _records[recordId.Value].Fields.Count, type);
         _records[recordId.Value].Fields.Add(new IrField(name, type));
         return id;
     }
 
-    /// <summary>Freezes and validates the declarations; throws an <see cref="IrValidationException" /> at the first error.</summary>
+    /// <summary>Snapshots and validates the declarations; throws an <see cref="IrValidationException" /> at the first error.</summary>
+    /// <remarks>Copies mutable builder declaration lists, including function variables and record fields. Later builder declarations do not change previous results. Immutable bodies, literals, and signatures are shared without copying.</remarks>
     public IrProgram Build()
     {
         IReadOnlyList<IrCallable> callables = _callables.Select(static callable => (IrCallable?)callable.Function?.Build() ?? callable.External!).ToArray();

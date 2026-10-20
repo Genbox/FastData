@@ -1,18 +1,17 @@
 using Genbox.FastData.Generator.Ir.Model;
 using Genbox.FastData.Ir.Building;
-using Genbox.FastData.Ir.Interop;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
 
 namespace Genbox.FastData.Generator.Ir.Building;
 
-internal sealed class LookupEnumerationBuilder<TValue>(FastDataProgramBuilder builder, IrType keyType)
+internal sealed class LookupEnumerationBuilder(FastDataProgramBuilder builder)
 {
-    // Array-shaped cursors: positions are slots 0..count-1.
-    public void AddCursor(int count, Func<IrExpression, IrExpression> keyAt, Func<IrExpression, IrExpression>? valueAt)
+    // Array-shaped cursors: callbacks receive I32 slots; the public cursor uses I64 positions.
+    public void AddCursor(int count, Func<IrExpression, IrExpression> keyAt, Func<IrExpression, IrExpression>? valueAt, Func<IrExpression, IrExpression>? occupied = null)
     {
-        IrFunctionId next = AddNext(count - 1);
-        AddEnumeration(next, position => keyAt(Convert(IrType.I32, position, IrType.I64)), valueAt == null ? null : position => valueAt(Convert(IrType.I32, position, IrType.I64)));
+        IrFunctionId next = AddNext(count - 1, occupied == null ? null : position => occupied(Convert(IrType.I32, position)));
+        AddEnumeration(next, position => keyAt(Convert(IrType.I32, position)), valueAt == null ? null : position => valueAt(Convert(IrType.I32, position)));
     }
 
     // Next(position) returns the first position after the given one that is at most last and passes the optional occupancy test, or -1.
@@ -37,20 +36,16 @@ internal sealed class LookupEnumerationBuilder<TValue>(FastDataProgramBuilder bu
 
     public void AddEnumeration(IrFunctionId next, Func<IrExpression, IrExpression> keyAt, Func<IrExpression, IrExpression>? valueAt)
     {
-        IrFunctionBuilder keyFunction = builder.Program.Function("KeyAt", keyType);
-        IrVariableId keyPosition = keyFunction.Parameter("position", IrType.I64);
-        keyFunction.Define(Block(Return(keyAt(Read(keyPosition)))));
+        IrFunctionId keyId = AddAccessor("KeyAt", builder.KeyParameterId.Type, keyAt);
+        IrFunctionId? valueId = builder.Values != null && valueAt != null ? AddAccessor("ValueAt", builder.Values.Type, valueAt) : null;
+        builder.Enumeration = new LookupEnumeration(next, keyId, valueId);
+    }
 
-        IrFunctionId? valueId = null;
-
-        if (builder.Values != null && valueAt != null)
-        {
-            IrFunctionBuilder valueFunction = builder.Program.Function("ValueAt", IrClrConverter.FromClrType(typeof(TValue)));
-            IrVariableId valuePosition = valueFunction.Parameter("position", IrType.I64);
-            valueFunction.Define(Block(Return(valueAt(Read(valuePosition)))));
-            valueId = valueFunction.Id;
-        }
-
-        builder.Enumeration = new LookupEnumeration(next, keyFunction.Id, valueId);
+    private IrFunctionId AddAccessor(string name, IrType type, Func<IrExpression, IrExpression> elementAt)
+    {
+        IrFunctionBuilder function = builder.Program.Function(name, type);
+        IrVariableId position = function.Parameter("position", IrType.I64);
+        function.Define(Block(Return(elementAt(Read(position)))));
+        return function.Id;
     }
 }

@@ -6,17 +6,16 @@ using Genbox.FastData.Ir.Building;
 using Genbox.FastData.Ir.Interop;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
-using static Genbox.FastData.Generator.Ir.Lowering.LoweringHelpers;
 
 namespace Genbox.FastData.Generator.Ir.DataStructures;
 
-internal sealed class EliasFano<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
+internal static class EliasFano<TKey, TValue>
 {
-    private IrFunctionCallExpression PopCount(IrExpression value) => lowering.Builder.Builtins.Call(IrBuiltinOperation.PopCount, value);
-    private IrFunctionCallExpression TrailingZeros(IrExpression value) => lowering.Builder.Builtins.Call(IrBuiltinOperation.TrailingZeroCount, value);
-
-    public List<IrStatement> Lower(EliasFanoContext context)
+    public static IReadOnlyList<IrStatement> Lower(LoweringContext<TKey, TValue> lowering, EliasFanoContext context)
     {
+        IrFunctionCallExpression PopCount(IrExpression value) => lowering.Builder.Builtins.Call(IrBuiltinOperation.PopCount, value);
+        IrFunctionCallExpression TrailingZeros(IrExpression value) => lowering.Builder.Builtins.Call(IrBuiltinOperation.TrailingZeroCount, value);
+
         IrDataId upper = lowering.Builder.Program.AddData("upperBits", IrClrConverter.FromValue(context.UpperBits));
         IrDataId samples = lowering.Builder.Program.AddData("samplePositions", IrClrConverter.FromValue(context.SamplePositions));
         IrFunctionBuilder select = lowering.Builder.Program.Function("SelectZero", IrType.I64);
@@ -30,11 +29,11 @@ internal sealed class EliasFano<TKey, TValue>(LoweringContext<TKey, TValue> lowe
         IrExpression samplePosition = Index(Read(samples), Read(sample));
         List<IrStatement> selectBody =
         [
-            Assign(sample, Int(ShiftRight(Unsigned(Read(wanted), IrType.I64), I32(context.SampleRateShift)), IrType.U64)),
+            Assign(sample, Int(ShiftRight(Unsigned(Read(wanted)), I32(context.SampleRateShift)))),
             If(GreaterOrEqual(Read(sample), I32(context.SamplePositions.Length)), Return(I64(-1))),
-            Assign(zeroRank, Convert(IrType.I64, ShiftLeft(Unsigned(Read(sample), IrType.I32), I32(context.SampleRateShift)), IrType.U64)),
-            Assign(wordIndex, Int(ShiftRight(Unsigned(samplePosition, IrType.I32), I32(6)), IrType.U64)),
-            Assign(startBit, Int(And(Unsigned(samplePosition, IrType.I32), U64(63)), IrType.U64))
+            Assign(zeroRank, Convert(IrType.I64, ShiftLeft(Unsigned(Read(sample)), I32(context.SampleRateShift)))),
+            Assign(wordIndex, Int(ShiftRight(Unsigned(samplePosition), I32(6)))),
+            Assign(startBit, Int(And(Unsigned(samplePosition), U64(63))))
         ];
         List<IrStatement> scan = [Assign(zeros, Xor(Index(Read(upper), Read(wordIndex)), U64(ulong.MaxValue)))];
         int lastBits = context.UpperBitLength & 63;
@@ -43,13 +42,13 @@ internal sealed class EliasFano<TKey, TValue>(LoweringContext<TKey, TValue> lowe
         scan.Add(Assign(zeros, And(Read(zeros), ShiftLeft(U64(ulong.MaxValue), Read(startBit)))));
         scan.Add(Assign(startBit, I32(0)));
         scan.Add(Assign(count, PopCount(Read(zeros))));
-        scan.Add(If(Greater(Add(Read(zeroRank), Convert(IrType.I64, Read(count), IrType.I32)), Read(wanted)),
+        scan.Add(If(Greater(Add(Read(zeroRank), Convert(IrType.I64, Read(count))), Read(wanted)),
             While(Less(Read(zeroRank), Read(wanted)),
                 Assign(zeros, And(Read(zeros), Subtract(Read(zeros), U64(1)))),
                 Assign(zeroRank, Add(Read(zeroRank), I64(1)))),
-            Return(Add(Multiply(Convert(IrType.I64, Read(wordIndex), IrType.I32), I64(64)),
-                Convert(IrType.I64, TrailingZeros(Read(zeros)), IrType.I32)))));
-        scan.Add(Assign(zeroRank, Add(Read(zeroRank), Convert(IrType.I64, Read(count), IrType.I32))));
+            Return(Add(Multiply(Convert(IrType.I64, Read(wordIndex)), I64(64)),
+                Convert(IrType.I64, TrailingZeros(Read(zeros)))))));
+        scan.Add(Assign(zeroRank, Add(Read(zeroRank), Convert(IrType.I64, Read(count)))));
         scan.Add(Increment(wordIndex));
         selectBody.Add(While(Less(Read(wordIndex), I32(context.UpperBits.Length)), scan.ToArray()));
         selectBody.Add(Return(I64(-1)));
@@ -68,19 +67,19 @@ internal sealed class EliasFano<TKey, TValue>(LoweringContext<TKey, TValue> lowe
             If(OrElse(Less(lowering.Key, IrClrConverter.FromValue(numeric.Constants.MinValue)),
                     Greater(lowering.Key, IrClrConverter.FromValue(numeric.Constants.MaxValue))),
                 Return(I32(-1))),
-            Assign(value, Subtract(Unsigned(lowering.Key, lowering.KeyType), U64(unchecked((ulong)context.MinValue)))),
-            Assign(high, Convert(IrType.I64, ShiftRight(Read(value), I32(context.LowerBitCount)), IrType.U64)),
+            Assign(value, Subtract(Unsigned(lowering.Key), U64(unchecked((ulong)context.MinValue)))),
+            Assign(high, Convert(IrType.I64, ShiftRight(Read(value), I32(context.LowerBitCount)))),
             Assign(position, I64(0)),
             If(Greater(Read(high), I64(0)),
                 Assign(position, Call(select.Id, Subtract(Read(high), I64(1)))),
                 If(Less(Read(position), I64(0)), Return(I32(-1))),
                 Assign(position, Add(Read(position), I64(1)))),
             Assign(rank, Subtract(Read(position), Read(high))),
-            If(GreaterOrEqual(Unsigned(Read(rank), IrType.I64), U64(lowering.Config.ItemCount)), Return(I32(-1))),
-            Assign(word, Int(ShiftRight(Unsigned(Read(position), IrType.I64), I32(6)), IrType.U64)),
+            If(GreaterOrEqual(Unsigned(Read(rank)), U64(lowering.Config.ItemCount)), Return(I32(-1))),
+            Assign(word, Int(ShiftRight(Unsigned(Read(position)), I32(6)))),
             If(GreaterOrEqual(Read(word), I32(context.UpperBits.Length)), Return(I32(-1))),
             Assign(window,
-                And(Index(Read(upper), Read(word)), ShiftLeft(U64(ulong.MaxValue), Int(And(Unsigned(Read(position), IrType.I64), U64(63)), IrType.U64))))
+                And(Index(Read(upper), Read(word)), ShiftLeft(U64(ulong.MaxValue), Int(And(Unsigned(Read(position)), U64(63))))))
         ];
         List<IrStatement> loop =
         [
@@ -89,7 +88,7 @@ internal sealed class EliasFano<TKey, TValue>(LoweringContext<TKey, TValue> lowe
                 If(GreaterOrEqual(Read(word), I32(context.UpperBits.Length)), Return(I32(-1))),
                 Assign(window, Index(Read(upper), Read(word)))),
             Assign(currentHigh,
-                Subtract(Add(Multiply(Convert(IrType.I64, Read(word), IrType.I32), I64(64)), Convert(IrType.I64, TrailingZeros(Read(window)), IrType.I32)),
+                Subtract(Add(Multiply(Convert(IrType.I64, Read(word)), I64(64)), Convert(IrType.I64, TrailingZeros(Read(window)))),
                     Read(rank))),
             If(Greater(Read(currentHigh), Read(high)), Return(I32(-1)))
         ];
@@ -105,9 +104,9 @@ internal sealed class EliasFano<TKey, TValue>(LoweringContext<TKey, TValue> lowe
             IrVariableId currentLow = lowering.Builder.FindLocal("currentLow", IrType.U64);
             IrExpression target = And(Read(value), U64(context.LowerMask));
             loop.Add(If(Equal(Read(currentHigh), Read(high)),
-                Assign(lowOffset, Multiply(Unsigned(Read(rank), IrType.I64), U64((ulong)context.LowerBitCount))),
-                Assign(lowWord, Int(ShiftRight(Read(lowOffset), I32(6)), IrType.U64)),
-                Assign(bit, Int(And(Read(lowOffset), U64(63)), IrType.U64)),
+                Assign(lowOffset, Multiply(Unsigned(Read(rank)), U64((ulong)context.LowerBitCount))),
+                Assign(lowWord, Int(ShiftRight(Read(lowOffset), I32(6)))),
+                Assign(bit, Int(And(Read(lowOffset), U64(63)))),
                 Assign(currentLow, ShiftRight(Index(Read(lower), Read(lowWord)), Read(bit))),
                 If(Greater(Add(Read(bit), I32(context.LowerBitCount)), I32(64)),
                     Assign(currentLow, Or(Read(currentLow), ShiftLeft(Index(Read(lower), Add(Read(lowWord), I32(1))), Subtract(I32(64), Read(bit)))))),
@@ -118,7 +117,7 @@ internal sealed class EliasFano<TKey, TValue>(LoweringContext<TKey, TValue> lowe
 
         loop.Add(Assign(window, And(Read(window), Subtract(Read(window), U64(1)))));
         loop.Add(Assign(rank, Add(Read(rank), I64(1))));
-        loop.Add(If(GreaterOrEqual(Unsigned(Read(rank), IrType.I64), U64(lowering.Config.ItemCount)), Return(I32(-1))));
+        loop.Add(If(GreaterOrEqual(Unsigned(Read(rank)), U64(lowering.Config.ItemCount)), Return(I32(-1))));
         body.Add(While(new IrBoolLiteral(true), loop.ToArray()));
         body.Add(Return(I32(-1)));
         return body;

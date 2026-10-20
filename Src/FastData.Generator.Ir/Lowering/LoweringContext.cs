@@ -7,7 +7,6 @@ using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Ir.Interop;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
-using static Genbox.FastData.Generator.Ir.Lowering.LoweringHelpers;
 
 namespace Genbox.FastData.Generator.Ir.Lowering;
 
@@ -16,20 +15,20 @@ internal sealed class LoweringContext<TKey, TValue>
     public LoweringContext(GeneratorConfigBase config, IrBackendCapabilities capabilities)
     {
         Config = config;
-        KeyType = IrClrConverter.FromClrType(typeof(TKey));
+        IrType keyType = IrClrConverter.FromClrType(typeof(TKey));
         bool ignoreCase = config is StringGeneratorConfig { IgnoreCase: true };
-        Builder = new FastDataProgramBuilder(KeyType, capabilities.TextEncoding, ignoreCase ? LookupText.CreateAsciiFold : null, capabilities.SupportedBuiltins);
-        Expressions = new FrontendExpressions(config, Builder, typeof(TKey), KeyType);
-        Enumeration = new LookupEnumerationBuilder<TValue>(Builder, KeyType);
+        Builder = new FastDataProgramBuilder(keyType, capabilities.TextEncoding, ignoreCase ? LookupText.CreateAsciiFold : null, capabilities.SupportedBuiltins);
+        Expressions = new FrontendExpressions(config, Builder, typeof(TKey));
+        Enumeration = new LookupEnumerationBuilder(Builder);
         Storage = new IntegerStorageBuilder(Builder.Program, config.TypeReductionEnabled);
     }
 
     public FastDataProgramBuilder Builder { get; }
     public FrontendExpressions Expressions { get; }
-    public LookupEnumerationBuilder<TValue> Enumeration { get; }
+    public LookupEnumerationBuilder Enumeration { get; }
     public IntegerStorageBuilder Storage { get; }
     public GeneratorConfigBase Config { get; }
-    public IrType KeyType { get; }
+    public IrType KeyType => Builder.KeyParameterId.Type;
     public IrDataId? KeyStorage { get; private set; }
     public IrDataId? ValueStorage { get; private set; }
 
@@ -70,7 +69,7 @@ internal sealed class LoweringContext<TKey, TValue>
         if (values.Length == 0)
             return;
 
-        IrDataId id = Builder.Program.AddData("values", IrClrConverter.FromValue(GetArray(values), IrType.ArrayOf(ValueType()), Builder.Program.Text.Encoding));
+        IrDataId id = Builder.Program.AddData("values", IrClrConverter.FromValue(GetArray(values), encoding: Builder.Program.Text.Encoding));
         Builder.Values = new LookupValues(id);
 
         if (exposeStorage)
@@ -81,20 +80,6 @@ internal sealed class LoweringContext<TKey, TValue>
 
     public IrType ValueType() => IrClrConverter.FromClrType(typeof(TValue));
 
-    public ulong ToUnsigned(TKey value) => value switch
-    {
-        char x => x,
-        sbyte x => unchecked((ulong)x),
-        byte x => x,
-        short x => unchecked((ulong)x),
-        ushort x => x,
-        int x => unchecked((ulong)x),
-        uint x => x,
-        long x => unchecked((ulong)x),
-        ulong x => x,
-        _ => throw new NotSupportedException($"'{typeof(TKey).Name}' keys are not integral.")
-    };
-
     public IrFunctionCallExpression MultiplyHigh(IrExpression a, IrExpression b) => Builder.Builtins.Call(IrBuiltinOperation.MultiplyHigh, a, b);
 
     public IrDataId ArrayLookup(TKey[] keys, ReadOnlyMemory<TValue> values, bool sparse = false)
@@ -102,35 +87,44 @@ internal sealed class LoweringContext<TKey, TValue>
         IrDataId data = AddKeys(keys, !sparse);
         AddValues(values, !sparse);
 
-        if (sparse)
-        {
-            // Padding may repeat a real key; only its canonical lookup slot belongs to enumeration.
-            IrExpression Occupied(IrExpression position)
-            {
-                IrExpression key = Index(Read(data), Int(position, IrType.I64));
-                IrExpression canonical = Equal(Call(Builder.FindFunctionId, key), Int(position, IrType.I64));
-                return KeyType == IrType.String ? AndAlso(NotEqual(key, new IrNullLiteral(IrType.String)), canonical) : canonical;
-            }
+        IrExpression KeyAt(IrExpression position) => Index(Read(data), position);
 
-            IrFunctionId next = Enumeration.AddNext(keys.Length - 1, Occupied);
-            Enumeration.AddEnumeration(next, p => Index(Read(data), Int(p, IrType.I64)), Builder.Values == null ? null : p => ValueAt(Int(p, IrType.I64)));
+        // Padding may repeat a real key; only its canonical lookup slot belongs to enumeration.
+        IrExpression Occupied(IrExpression position)
+        {
+            IrExpression key = KeyAt(position);
+            IrExpression canonical = Equal(Call(Builder.FindFunctionId, key), position);
+            return KeyType == IrType.String ? AndAlso(NotEqual(key, new IrNullLiteral(IrType.String)), canonical) : canonical;
         }
-        else
-            Enumeration.AddCursor(keys.Length, p => Index(Read(data), p), Builder.Values == null ? null : ValueAt);
+
+        Enumeration.AddCursor(keys.Length, KeyAt, Builder.Values == null ? null : ValueAt, sparse ? Occupied : null);
 
         return data;
+    }
+
+    public Func<IrExpression, IrExpression, IrExpression> SparseHashEntries(KeyValuePair<TKey, ulong>[] entries, bool storeHashCode, ReadOnlyMemory<TValue> values)
+    {
+        TKey[] keys = new TKey[entries.Length];
+        ulong[]? hashes = storeHashCode ? new ulong[entries.Length] : null;
+
+        for (int i = 0; i < entries.Length; i++)
+        {
+            keys[i] = entries[i].Key;
+            if (hashes != null)
+                hashes[i] = entries[i].Value;
+        }
+
+        return HashEntries(keys, hashes, values, true);
     }
 
     public Func<IrExpression, IrExpression, IrExpression> HashEntries(TKey[] keys, ulong[]? hashes, ReadOnlyMemory<TValue> values, bool sparse = false)
     {
         IrDataId data = ArrayLookup(keys, values, sparse);
-        (IrDataId Data, IrType Type)? stored = hashes == null ? null : Storage.Unsigned("hashes", hashes, IrType.U64);
+        IrDataId? stored = hashes == null ? null : Storage.Unsigned("hashes", hashes);
         return (index, hash) =>
         {
-            if (stored is {} h)
-                return AndAlso(Equal(Unsigned(Index(Read(h.Data), index), h.Type), hash), Builder.Keys.Equal(Index(Read(data), index), Key));
-
-            return Builder.Keys.Equal(Index(Read(data), index), Key);
+            IrExpression equal = Builder.Keys.Equal(Index(Read(data), index), Key);
+            return stored is {} h ? AndAlso(Equal(Unsigned(Index(Read(h), index)), hash), equal) : equal;
         };
     }
 }

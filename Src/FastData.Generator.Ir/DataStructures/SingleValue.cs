@@ -5,9 +5,9 @@ using Genbox.FastData.Ir.Model.Abstracts;
 
 namespace Genbox.FastData.Generator.Ir.DataStructures;
 
-internal sealed class SingleValue<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
+internal static class SingleValue<TKey, TValue>
 {
-    public IEnumerable<IrStatement> Lower(SingleValueContext<TKey, TValue> context)
+    public static IReadOnlyList<IrStatement> Lower(LoweringContext<TKey, TValue> lowering, SingleValueContext<TKey, TValue> context)
     {
         IrLiteral key = IrClrConverter.FromValue(context.Key);
         lowering.AddValues(context.Values);

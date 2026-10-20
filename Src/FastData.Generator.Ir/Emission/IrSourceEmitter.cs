@@ -89,7 +89,7 @@ public abstract class IrSourceEmitter(PreparedLookup lookup) : StatementWriter
         IrFieldExpression field => Field(Expression(field.Receiver), Lookup.FieldName(field.FieldId)),
         IrLogicalExpression logical => Logical(logical.Operation, Expression(logical.Left), Expression(logical.Right)),
         IrBinaryExpression binary => Binary(binary.Operation, Expression(binary.Left), Expression(binary.Right)),
-        IrConversionExpression conversion => Convert(conversion.TargetType, Expression(conversion.Operand)),
+        IrConversionExpression conversion => Convert(conversion.Type, Expression(conversion.Operand)),
         PreparedNullCheck check => NullCheck(Expression(check.Operand), check.IsNull),
         PreparedWrappingArithmetic arithmetic => Wrapping(arithmetic, Expression(arithmetic.Left), Expression(arithmetic.Right)),
         PreparedStringComparison comparison => StringComparison(comparison.Operation, Expression(comparison.Left), Expression(comparison.Right)),

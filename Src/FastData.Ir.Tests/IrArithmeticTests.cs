@@ -36,8 +36,8 @@ public class IrArithmeticTests
     public void NegationAndComplementInvertTheirValues()
     {
         Assert.Equal(Constant(false), Evaluate(IrType.Bool, Not(Constant(true))));
-        Assert.Equal(Constant((byte)0x55), Evaluate(IrType.U8, Complement(IrType.U8, Constant((byte)0xAA))));
-        Assert.Equal(Constant(-1), Evaluate(IrType.I32, Complement(IrType.I32, Constant(0))));
+        Assert.Equal(Constant((byte)0x55), Evaluate(IrType.U8, Complement(Constant((byte)0xAA))));
+        Assert.Equal(Constant(-1), Evaluate(IrType.I32, Complement(Constant(0))));
     }
 
     [Theory]

@@ -6,6 +6,8 @@ namespace Genbox.FastData.Ir.Model;
 /// <summary>A character of a fixed character kind, stored as its unsigned unit value.</summary>
 public sealed record IrCharLiteral(IrCharacterKind CharacterKind, uint Value) : IrLiteral
 {
+    public IrCharacterKind CharacterKind { get; } = CharacterKind;
+    public uint Value { get; } = IsValid(CharacterKind, Value) ? Value : throw Fail("Character value is outside its character kind.");
     public override IrType Type => IrType.Char(CharacterKind);
 
     /// <summary>Tests whether a unit value belongs to a character kind.</summary>

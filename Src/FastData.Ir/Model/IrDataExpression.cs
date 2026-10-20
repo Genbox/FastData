@@ -6,4 +6,5 @@ namespace Genbox.FastData.Ir.Model;
 public sealed class IrDataExpression(IrDataId dataId) : IrExpression
 {
     public IrDataId DataId { get; } = dataId;
+    public IrType Type => DataId.Type;
 }

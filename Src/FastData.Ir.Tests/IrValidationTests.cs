@@ -11,31 +11,31 @@ namespace Genbox.FastData.Ir.Tests;
 /// <summary>One rejected example per validation rule that backends rely on.</summary>
 public class IrValidationTests
 {
-    private static readonly IrVariableId _condition = new IrVariableId(0);
-    private static readonly IrVariableId _value = new IrVariableId(1);
+    private static readonly IrVariableId _condition = new IrVariableId(0, IrType.Bool);
+    private static readonly IrVariableId _value = new IrVariableId(1, IrType.I32);
 
-    public static TheoryData<IrType, IrExpression> InvalidOperations => new TheoryData<IrType, IrExpression>
+    public static TheoryData<Func<IrExpression>> InvalidOperations => new TheoryData<Func<IrExpression>>
     {
-        { IrType.F32, new IrBinaryExpression(BinaryOperation.Add, Constant(1f), Constant(2f)) },
-        { IrType.F64, new IrBinaryExpression(BinaryOperation.Modulo, Constant(5d), Constant(2d)) },
-        { IrType.I32, new IrBinaryExpression(BinaryOperation.Divide, Constant(7), Constant(2)) },
-        { IrType.I32, new IrBinaryExpression(BinaryOperation.Modulo, Constant(7), Constant(2)) },
-        { IrType.F32, new IrConversionExpression(IrType.F32, ConversionKind.Numeric, Constant(1L)) },
-        { IrType.U32, new IrConversionExpression(IrType.U32, ConversionKind.Numeric, Constant(1d)) },
-        { IrType.U8, new IrConversionExpression(IrType.U8, ConversionKind.BitCast, Constant((sbyte)-1)) },
-        { IrType.Bool, new IrBinaryExpression(BinaryOperation.And, Constant(true), Constant(false)) },
-        { IrType.U32, new IrBinaryExpression(BinaryOperation.ShiftRight, Constant(8u), Constant(2u)) },
-        { IrType.I32, new IrBinaryExpression(BinaryOperation.ShiftLeft, Constant(1), Constant(2)) },
-        { IrType.I32, new IrBinaryExpression(BinaryOperation.Subtract, Constant(1), Constant(2L)) },
-        { IrType.Char(IrCharacterKind.Ascii), new IrBinaryExpression(BinaryOperation.Add, new IrCharLiteral(IrCharacterKind.Ascii, 0x61), new IrCharLiteral(IrCharacterKind.Ascii, 0x61)) },
-        { IrType.Char(IrCharacterKind.Ascii), new IrBinaryExpression(BinaryOperation.And, new IrCharLiteral(IrCharacterKind.Ascii, 0x61), new IrCharLiteral(IrCharacterKind.Ascii, 0x61)) },
-        { IrType.U8, new IrConversionExpression(IrType.U8, ConversionKind.BitCast, new IrCharLiteral(IrCharacterKind.Ascii, 0x61)) },
-        { IrType.U16, new IrConversionExpression(IrType.U16, ConversionKind.Numeric, new IrCharLiteral(IrCharacterKind.Ascii, 0x61)) },
+        () => new IrBinaryExpression(BinaryOperation.Add, Constant(1f), Constant(2f)),
+        () => new IrBinaryExpression(BinaryOperation.Modulo, Constant(5d), Constant(2d)),
+        () => new IrBinaryExpression(BinaryOperation.Divide, Constant(7), Constant(2)),
+        () => new IrBinaryExpression(BinaryOperation.Modulo, Constant(7), Constant(2)),
+        () => new IrConversionExpression(IrType.F32, ConversionKind.Numeric, Constant(1L)),
+        () => new IrConversionExpression(IrType.U32, ConversionKind.Numeric, Constant(1d)),
+        () => new IrConversionExpression(IrType.U8, ConversionKind.BitCast, Constant((sbyte)-1)),
+        () => new IrBinaryExpression(BinaryOperation.And, Constant(true), Constant(false)),
+        () => new IrBinaryExpression(BinaryOperation.ShiftRight, Constant(8u), Constant(2u)),
+        () => new IrBinaryExpression(BinaryOperation.ShiftLeft, Constant(1), Constant(2)),
+        () => new IrBinaryExpression(BinaryOperation.Subtract, Constant(1), Constant(2L)),
+        () => new IrBinaryExpression(BinaryOperation.Add, new IrCharLiteral(IrCharacterKind.Ascii, 0x61), new IrCharLiteral(IrCharacterKind.Ascii, 0x61)),
+        () => new IrBinaryExpression(BinaryOperation.And, new IrCharLiteral(IrCharacterKind.Ascii, 0x61), new IrCharLiteral(IrCharacterKind.Ascii, 0x61)),
+        () => new IrConversionExpression(IrType.U8, ConversionKind.BitCast, new IrCharLiteral(IrCharacterKind.Ascii, 0x61)),
+        () => new IrConversionExpression(IrType.U16, ConversionKind.Numeric, new IrCharLiteral(IrCharacterKind.Ascii, 0x61))
     };
 
     [Theory]
     [MemberData(nameof(InvalidOperations))]
-    public void OperandTypeRulesRejectInvalidOperations(IrType type, IrExpression expression) => Assert.Equal(IrDiagnosticCode.TypeMismatch, Assert.Throws<IrValidationException>(() => Evaluate(type, expression)).Code);
+    public void OperandTypeRulesRejectInvalidOperations(Func<IrExpression> construct) => Assert.Equal(IrDiagnosticCode.TypeMismatch, Assert.Throws<IrValidationException>(() => construct()).Code);
 
     [Theory]
     [InlineData(false)]
@@ -77,8 +77,8 @@ public class IrValidationTests
     {
         Check(Return(true), ReturnValue());
         Assert.Equal(IrDiagnosticCode.TypeMismatch, Reject(Return(true), new IrReturnStatement(Constant(7))));
-        Assert.Equal(IrDiagnosticCode.MissingDeclaration, Reject(Return(true), new IrReturnStatement(Read(new IrVariableId(2)))));
-        Assert.Equal(IrDiagnosticCode.MissingDeclaration, Reject(While(Constant(true)), new IrReturnStatement(Call(new IrFunctionId(1)))));
+        Assert.Equal(IrDiagnosticCode.MissingDeclaration, Reject(Return(true), new IrReturnStatement(new IrVariableExpression(new IrVariableId(2, IrType.Bool)))));
+        Assert.Equal(IrDiagnosticCode.MissingDeclaration, Reject(While(Constant(true)), new IrReturnStatement(new IrFunctionCallExpression(new IrFunctionId(1, IrType.Bool), []))));
         Assert.Equal(IrDiagnosticCode.InvalidProgram, Reject(Return(true), new IrBreakStatement()));
     }
 
@@ -107,8 +107,7 @@ public class IrValidationTests
         IrFunctionBuilder function = builder.Function("Compare", IrType.Bool);
         IrVariableId left = function.Parameter("left", type);
         IrVariableId right = function.Parameter("right", type);
-        function.Define(Block(new IrReturnStatement(Equal(Read(left), Read(right)))));
-        Assert.Equal(IrDiagnosticCode.TypeMismatch, Assert.Throws<IrValidationException>(() => builder.Build()).Code);
+        Assert.Equal(IrDiagnosticCode.TypeMismatch, Assert.Throws<IrValidationException>(() => Equal(Read(left), Read(right))).Code);
     }
 
     [Fact]

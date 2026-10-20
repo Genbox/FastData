@@ -3,13 +3,12 @@ using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
-using static Genbox.FastData.Generator.Ir.Lowering.LoweringHelpers;
 
 namespace Genbox.FastData.Generator.Ir.DataStructures;
 
-internal sealed class BinarySearchInterpolation<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
+internal static class BinarySearchInterpolation<TKey, TValue>
 {
-    public List<IrStatement> Lower(BinarySearchInterpolationContext<TKey, TValue> context)
+    public static IReadOnlyList<IrStatement> Lower(LoweringContext<TKey, TValue> lowering, BinarySearchInterpolationContext<TKey, TValue> context)
     {
         TKey[] keys = GetArray(context.Keys);
         IrDataId data = lowering.ArrayLookup(keys, context.Values);
@@ -38,7 +37,7 @@ internal sealed class BinarySearchInterpolation<TKey, TValue>(LoweringContext<TK
                 lowering.MultiplyHigh(ShiftLeft(Subtract(lowering.Builder.Keys.Coordinate(lowering.Key), U64(NumericPrediction.Coordinate(keys[0]!))), I32(32 - shift)),
                     U64(firstReciprocal))));
             body.Add(Assign(index, Read(high)));
-            body.Add(If(LessOrEqual(Read(offset), Unsigned(Read(high), IrType.I32)), Assign(index, Int(Read(offset), IrType.U64))));
+            body.Add(If(LessOrEqual(Read(offset), Unsigned(Read(high))), Assign(index, Int(Read(offset)))));
             body.Add(If(Equal(At(index), lowering.Key), Return(Read(index))));
             body.Add(Narrow());
         }
@@ -46,15 +45,15 @@ internal sealed class BinarySearchInterpolation<TKey, TValue>(LoweringContext<TK
         body.Add(While(AndAlso(LessOrEqual(Read(low), Read(high)), AndAlso(GreaterOrEqual(lowering.Key, At(low)), LessOrEqual(lowering.Key, At(high)))),
             If(Equal(At(low), At(high)), Return(Read(low))),
             Assign(normalized, ShiftRight(Subtract(lowering.Builder.Keys.Coordinate(At(high)), lowering.Builder.Keys.Coordinate(At(low))), I32(shift))),
-            IfElse(Less(Read(normalized), Unsigned(Subtract(Read(high), Read(low)), IrType.I32)),
+            IfElse(Less(Read(normalized), Unsigned(Subtract(Read(high), Read(low)))),
                 Block(Assign(index, Add(Read(low), HalveNonNegative(Subtract(Read(high), Read(low)))))),
-                Block(Assign(reciprocal, Add(Divide(ShiftLeft(Unsigned(Subtract(Read(high), Read(low)), IrType.I32), I32(32)), Read(normalized)), U64(1))),
+                Block(Assign(reciprocal, Add(Divide(ShiftLeft(Unsigned(Subtract(Read(high), Read(low))), I32(32)), Read(normalized)), U64(1))),
                     Assign(offset,
                         lowering.MultiplyHigh(ShiftLeft(Subtract(lowering.Builder.Keys.Coordinate(lowering.Key), lowering.Builder.Keys.Coordinate(At(low))), I32(32 - shift)),
                             Read(reciprocal))),
                     Assign(index, Read(high)),
-                    If(LessOrEqual(Read(offset), Unsigned(Subtract(Read(high), Read(low)), IrType.I32)),
-                        Assign(index, Add(Read(low), Int(Read(offset), IrType.U64)))))),
+                    If(LessOrEqual(Read(offset), Unsigned(Subtract(Read(high), Read(low)))),
+                        Assign(index, Add(Read(low), Int(Read(offset))))))),
             If(Equal(At(index), lowering.Key), Return(Read(index))),
             Narrow()));
         body.Add(Return(I32(-1)));

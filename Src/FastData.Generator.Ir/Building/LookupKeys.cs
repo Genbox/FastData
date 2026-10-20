@@ -103,7 +103,7 @@ public sealed class LookupKeys
         IrVariableId key = function.Parameter("hashKey", _keyType);
 
         // Convert characters through their unit type to hash their code-unit value.
-        IrBlock body = _keyType.IsFloatingPoint ? FloatingPointHashBody(key) : Block(Return(Convert(IrType.U64, Read(key), _keyType)));
+        IrBlock body = _keyType.IsFloatingPoint ? FloatingPointHashBody(key) : Block(Return(Convert(IrType.U64, Read(key))));
         function.Define(body);
         return function.Id;
     }
@@ -113,7 +113,7 @@ public sealed class LookupKeys
         bool isF32 = _keyType == IrType.F32;
         IrType bitsType = isF32 ? IrType.U32 : IrType.U64;
         IrExpression bits = new IrConversionExpression(bitsType, ConversionKind.BitCast, Read(key));
-        IrExpression unchangedBits = isF32 ? Convert(IrType.U64, bits) : bits;
+        IrExpression unchangedBits = Convert(IrType.U64, bits);
 
         // IEEE equality recognizes both signed zeros; every other representation hashes unchanged.
         return Block(If(IrFactory.Equal(Read(key), Default(_keyType)), Return(U64(0))), Return(unchangedBits));
@@ -125,21 +125,21 @@ public sealed class LookupKeys
         if (_keyType.IsFloatingPoint)
             return Call(_coordinateId ??= AddCoordinate(), value);
 
-        return Convert(IrType.U64, value, _keyType);
+        return Convert(IrType.U64, value);
     }
 
     private IrFunctionId AddCoordinate()
     {
         IrType bitsType = _keyType == IrType.F32 ? IrType.U32 : IrType.U64;
         ulong sign = _keyType == IrType.F32 ? 0x80000000 : 0x8000000000000000;
-        IrLiteral Bits(ulong value) => bitsType == IrType.U32 ? U32((uint)value) : U64(value);
+        IrLiteral Bits(ulong value) => IntegerBits(bitsType, value);
         IrFunctionBuilder function = _program.Function("Coordinate", IrType.U64);
         IrVariableId key = function.Parameter("key", _keyType);
         IrVariableId bits = function.Local("bits", bitsType);
-        function.Define(Block(If(IrFactory.Equal(Read(key), _keyType == IrType.F32 ? new IrF32Literal(0) : new IrF64Literal(0)), Return(U64(sign))),
+        function.Define(Block(If(IrFactory.Equal(Read(key), Default(_keyType)), Return(U64(sign))),
             Assign(bits, new IrConversionExpression(bitsType, ConversionKind.BitCast, Read(key))),
-            If(NotEqual(And(Read(bits), Bits(sign)), Bits(0)), Return(Convert(IrType.U64, Binary(BinaryOperation.ExclusiveOr, Read(bits), Bits(bitsType == IrType.U32 ? uint.MaxValue : ulong.MaxValue)), bitsType))),
-            Return(Convert(IrType.U64, Binary(BinaryOperation.ExclusiveOr, Read(bits), Bits(sign)), bitsType))));
+            If(NotEqual(And(Read(bits), Bits(sign)), Bits(0)), Return(Convert(IrType.U64, Complement(Read(bits))))),
+            Return(Convert(IrType.U64, Xor(Read(bits), Bits(sign))))));
         return function.Id;
     }
 }

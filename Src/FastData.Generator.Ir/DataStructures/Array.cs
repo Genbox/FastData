@@ -1,13 +1,12 @@
 using Genbox.FastData.Generator.Ir.Lowering;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
-using static Genbox.FastData.Generator.Ir.Lowering.LoweringHelpers;
 
 namespace Genbox.FastData.Generator.Ir.DataStructures;
 
-internal sealed class Array<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
+internal static class Array<TKey, TValue>
 {
-    public IEnumerable<IrStatement> Lower(ReadOnlyMemory<TKey> keyMemory, ReadOnlyMemory<TValue> values)
+    public static IReadOnlyList<IrStatement> Lower(LoweringContext<TKey, TValue> lowering, ReadOnlyMemory<TKey> keyMemory, ReadOnlyMemory<TValue> values)
     {
         TKey[] keys = GetArray(keyMemory);
         IrDataId data = lowering.ArrayLookup(keys, values);

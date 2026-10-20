@@ -66,7 +66,7 @@ internal sealed class ExpressionPreparation(IrProgram program, IrFunction functi
                 IrFieldExpression field => (PrepareField(field), program.Resolve(field.FieldId).Type),
                 IrLogicalExpression logical => (PrepareLogical(logical), IrType.Bool),
                 IrBinaryExpression binary => (PrepareBinary(binary), binary.Operation.IsComparison() ? IrType.Bool : TypeOf(binary.Left)),
-                IrConversionExpression conversion => (PrepareConversion(conversion), conversion.TargetType),
+                IrConversionExpression conversion => (PrepareConversion(conversion), conversion.Type),
                 IrFunctionCallExpression call => (PrepareCall(call), program.ResolveCallable(call.FunctionId).Signature.ReturnType),
                 _ => throw new NotSupportedException($"Expression '{current.GetType().Name}' is not supported by target preparation.")
             });
@@ -101,8 +101,8 @@ internal sealed class ExpressionPreparation(IrProgram program, IrFunction functi
     {
         IrExpression operand = Prepared(conversion.Operand);
         if (conversion.Conversion == ConversionKind.BitCast)
-            return new PreparedBitCast(TypeOf(conversion.Operand), conversion.TargetType, operand);
-        return ReferenceEquals(operand, conversion.Operand) ? conversion : new IrConversionExpression(conversion.TargetType, conversion.Conversion, operand);
+            return new PreparedBitCast(TypeOf(conversion.Operand), conversion.Type, operand);
+        return ReferenceEquals(operand, conversion.Operand) ? conversion : new IrConversionExpression(conversion.Type, conversion.Conversion, operand);
     }
 
     private IrExpression PrepareBinary(IrBinaryExpression binary)
@@ -162,10 +162,10 @@ internal sealed class ExpressionPreparation(IrProgram program, IrFunction functi
             if (!IrBuiltins.TryGetOperation(external.Symbol, out IrBuiltinOperation operation))
                 throw new NotSupportedException($"Unknown external function '{external.Symbol}'.");
 
-            return new PreparedBuiltinCall(operation, arguments);
+            return new PreparedBuiltinCall(operation, arguments, call.Type);
         }
 
-        return new PreparedFunctionCall(names[call.FunctionId.Value], arguments);
+        return new PreparedFunctionCall(names[call.FunctionId.Value], arguments, call.Type);
     }
 
     private IrType TypeOf(IrExpression expression) => _prepared[expression].Type;

@@ -14,16 +14,43 @@ public sealed record IrPackedStringArrayLiteral : IrArrayLiteralBase
     private readonly int[] _offsets;
 
     /// <summary>Takes ownership of encoded storage. Callers must stop modifying the arrays after construction.</summary>
-    /// <remarks>Program validation checks boundaries and encoding.</remarks>
+    /// <remarks>The buffers are retained without copying. Callers must not modify them through any alias, including views obtained from the literal. Construction checks storage boundaries and encoding. Program validation checks compatibility with the program encoding.</remarks>
     public IrPackedStringArrayLiteral(IrTextEncoding encoding, byte[] data, int[] offsets, byte[] nullBitmap)
     {
         Encoding = encoding;
         _data = data;
         _offsets = offsets;
         _nullBitmap = nullBitmap;
-        Data = Array.AsReadOnly(data);
-        Offsets = Array.AsReadOnly(offsets);
-        NullBitmap = Array.AsReadOnly(nullBitmap);
+        Data = data;
+        Offsets = offsets;
+        NullBitmap = nullBitmap;
+
+        Require(Enum.IsDefined(encoding), "Unsupported text encoding.");
+        Require(offsets.Length > 0 && offsets[0] == 0 && offsets[Count] == data.Length, "Packed string offsets must cover the buffer.");
+        Require(nullBitmap.Length == 0 || nullBitmap.Length == (Count / 8) + (Count % 8 == 0 ? 0 : 1), "Packed string null bitmap has the wrong length.");
+
+        for (int i = 0; i < Count; i++)
+        {
+            int start = offsets[i];
+            int end = offsets[i + 1];
+            Require(start <= end && end <= data.Length, "Packed string offsets must be ordered and in bounds.");
+            Require(!IsNull(i) || start == end, "Null strings must have empty slices.");
+
+            if (encoding == IrTextEncoding.Utf16)
+                Require((end & 1) == 0, "UTF-16 string boundaries must align to code units.");
+            else
+            {
+                try
+                {
+                    // A valid combined buffer can still have an offset that splits a UTF-8 sequence.
+                    _utf8.GetCharCount(data, start, end - start);
+                }
+                catch (DecoderFallbackException exception)
+                {
+                    throw Fail($"Packed string contains invalid UTF-8: {exception.Message}");
+                }
+            }
+        }
     }
 
     public override IrType Type { get; } = IrType.ArrayOf(IrType.String);
@@ -74,6 +101,4 @@ public sealed record IrPackedStringArrayLiteral : IrArrayLiteralBase
             destination[i] = (char)(_data[start + (i * 2)] | (_data[start + (i * 2) + 1] << 8));
         return characterCount;
     }
-
-    internal void ValidateUtf8(int index) => _utf8.GetCharCount(_data, _offsets[index], _offsets[index + 1] - _offsets[index]);
 }

@@ -5,33 +5,29 @@ using Genbox.FastData.Ir.Building;
 using Genbox.FastData.Ir.Interop;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
-using static Genbox.FastData.Generator.Ir.Lowering.LoweringHelpers;
 
 namespace Genbox.FastData.Generator.Ir.DataStructures;
 
-internal sealed class Pgm<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
+internal static class Pgm<TKey, TValue>
 {
-    public List<IrStatement> Lower(PgmContext<TKey, TValue> context)
+    public static IReadOnlyList<IrStatement> Lower(LoweringContext<TKey, TValue> lowering, PgmContext<TKey, TValue> context)
     {
         IrDataId keys = lowering.ArrayLookup(GetArray(context.Keys), context.Values);
         IrDataId? segmentKeys = null;
         IrDataId? slopes = null;
         IrDataId? intercepts = null;
-        IrType interceptType = IrType.I32;
 
         if (context.SegmentCount > 1)
         {
             segmentKeys = lowering.Builder.Program.AddData("segmentKeys", IrClrConverter.FromValue(context.Segments.Select(static s => s.Key).ToArray()));
             slopes = lowering.Builder.Program.AddData("segmentSlopes",
                 IrClrConverter.FromValue(context.Segments.Select(static s => NumericPrediction.Coefficient(s.Slope)).ToArray()));
-            (IrDataId data, IrType type) = lowering.Storage.Signed("segmentIntercepts", context.Segments, static s => s.Intercept);
-            intercepts = data;
-            interceptType = type;
+            intercepts = lowering.Storage.Signed("segmentIntercepts", context.Segments, static s => s.Intercept);
         }
 
         IrExpression SegmentKey(IrExpression index) => segmentKeys is {} data ? Index(Read(data), index) : IrClrConverter.FromValue(context.Segments[0].Key);
         IrExpression Slope(IrExpression index) => slopes is {} data ? Index(Read(data), index) : U64(NumericPrediction.Coefficient(context.Segments[0].Slope));
-        IrExpression Intercept(IrExpression index) => intercepts is {} data ? Int(Index(Read(data), index), interceptType) : I32(context.Segments[0].Intercept);
+        IrExpression Intercept(IrExpression index) => intercepts is {} data ? Int(Index(Read(data), index)) : I32(context.Segments[0].Intercept);
 
         IrFunctionBuilder evaluate = lowering.Builder.Program.Function("EvaluateSegment", IrType.I32);
         IrVariableId segment = evaluate.Parameter("segment", IrType.I32);
@@ -42,8 +38,8 @@ internal sealed class Pgm<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
         evaluate.Define(Block(Assign(product, lowering.MultiplyHigh(Slope(Read(segment)),
                 Subtract(lowering.Builder.Keys.Coordinate(Read(key)), lowering.Builder.Keys.Coordinate(SegmentKey(Read(segment)))))),
             Assign(max, Subtract(I32(context.Keys.Length), intercept)),
-            If(Greater(Read(product), Unsigned(Read(max), IrType.I32)), Return(I32(context.Keys.Length))),
-            Return(Add(Int(Read(product), IrType.U64), intercept))));
+            If(Greater(Read(product), Unsigned(Read(max))), Return(I32(context.Keys.Length))),
+            Return(Add(Int(Read(product)), intercept))));
 
         IrVariableId segmentIndex = lowering.Builder.FindLocal("segment", IrType.I32);
         IrVariableId position = lowering.Builder.FindLocal("position", IrType.I32);

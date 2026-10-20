@@ -53,7 +53,7 @@ public sealed class PreparedLookup
         HashSet<IrDataId> exports = new HashSet<IrDataId>(lookup.Contract.Constants);
         return lookup.Program.Data.Select((data, i) =>
         {
-            bool exported = exports.Contains(new IrDataId(i));
+            bool exported = exports.Contains(new IrDataId(i, data.Type));
             string name = exported ? data.Name : PreparedNames.Name("fdData", i);
             return new PreparedData(name, data.Value, exported);
         }).ToArray();

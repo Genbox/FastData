@@ -3,16 +3,15 @@ using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Ir.Interop;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
-using static Genbox.FastData.Generator.Ir.Lowering.LoweringHelpers;
 
 namespace Genbox.FastData.Generator.Ir.DataStructures;
 
-internal sealed class RrrBitVector<TKey, TValue>(LoweringContext<TKey, TValue> lowering)
+internal static class RrrBitVector<TKey, TValue>
 {
-    public IEnumerable<IrStatement> Lower(RrrBitVectorContext context)
+    public static IReadOnlyList<IrStatement> Lower(LoweringContext<TKey, TValue> lowering, RrrBitVectorContext context)
     {
         IrDataId classes = lowering.Builder.Program.AddData("classes", IrClrConverter.FromValue(context.Classes));
-        (IrDataId offsets, IrType offsetType) = lowering.Storage.Unsigned("offsets", context.Offsets, IrType.U32);
+        IrDataId offsets = lowering.Storage.Unsigned("offsets", context.Offsets);
 
         // RRR blocks use combinatorial ranks. Precompute the small binomial table once during generation.
         int width = context.BlockSize + 1;
@@ -34,7 +33,7 @@ internal sealed class RrrBitVector<TKey, TValue>(LoweringContext<TKey, TValue> l
         IrVariableId rank = lowering.Builder.FindLocal("rank", IrType.U32);
         IrVariableId bit = lowering.Builder.FindLocal("bit", IrType.I32);
         IrVariableId combination = lowering.Builder.FindLocal("combination", IrType.U32);
-        IrExpression mapped = Unsigned(lowering.Key, lowering.KeyType);
+        IrExpression mapped = Unsigned(lowering.Key);
 
         if (lowering.KeyType.IsSignedIntegral)
         {
@@ -46,10 +45,10 @@ internal sealed class RrrBitVector<TKey, TValue>(LoweringContext<TKey, TValue> l
         [
             Assign(normalized, Subtract(mapped, U64(context.MinValue))),
             If(Greater(Read(normalized), U64(context.MaxValue - context.MinValue)), Return(I32(-1))),
-            Assign(block, Int(Divide(Read(normalized), U64((ulong)context.BlockSize)), IrType.U64)),
-            Assign(target, Int(Mod(Read(normalized), U64((ulong)context.BlockSize)), IrType.U64)),
-            Assign(remaining, Int(Index(Read(classes), Read(block)), IrType.U8)),
-            Assign(rank, Convert(IrType.U32, Index(Read(offsets), Read(block)), offsetType)),
+            Assign(block, Int(Divide(Read(normalized), U64((ulong)context.BlockSize)))),
+            Assign(target, Int(Mod(Read(normalized), U64((ulong)context.BlockSize)))),
+            Assign(remaining, Int(Index(Read(classes), Read(block)))),
+            Assign(rank, Convert(IrType.U32, Index(Read(offsets), Read(block)))),
             Assign(bit, I32(context.BlockSize - 1)),
             While(GreaterOrEqual(Read(bit), Read(target)),
                 If(Equal(Read(remaining), I32(0)), Return(I32(-1))),

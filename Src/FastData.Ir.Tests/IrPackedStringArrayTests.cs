@@ -17,8 +17,8 @@ public class IrPackedStringArrayTests
     {
         string?[] values = ["", null, "a\0z", "é😀", encoding == IrTextEncoding.Utf16 ? "\uD800" : "last"];
         IrPackedStringArrayLiteral packed = new IrText(encoding).PackStrings(values);
-        IrDataId strings = new IrDataId(0);
-        IrVariableId index = new IrVariableId(0);
+        IrDataId strings = new IrDataId(0, packed.Type);
+        IrVariableId index = new IrVariableId(0, IrType.I32);
         IrBlock body = Block(Return(Index(Read(strings), Read(index))));
         IrFunction function = new IrFunction("Read", IrType.String, [new IrVariable("index", IrType.I32)], [], body);
         IrProgram program = new IrProgram([function], [new IrData("strings", packed)], textEncoding: encoding);
@@ -27,7 +27,7 @@ public class IrPackedStringArrayTests
         for (int i = 0; i < values.Length; i++)
         {
             IrLiteral expected = values[i] is {} value ? new IrStringLiteral(value) : new IrNullLiteral(IrType.String);
-            Assert.Equal(expected, interpreter.Invoke(new IrFunctionId(0), I32(i)));
+            Assert.Equal(expected, interpreter.Invoke(new IrFunctionId(0, IrType.String), I32(i)));
             Assert.Equal(values[i] == null, packed.IsNull(i));
         }
 
@@ -51,14 +51,12 @@ public class IrPackedStringArrayTests
     [Fact]
     public void StringArraysRequirePackedStorage()
     {
-        IrArrayLiteral strings = new IrArrayLiteral(IrType.String, [new IrStringLiteral("value")]);
-        Assert.Equal(IrDiagnosticCode.InvalidProgram, Assert.Throws<IrValidationException>(() => new IrProgram([], [new IrData("strings", strings)])).Code);
+        Assert.Equal(IrDiagnosticCode.InvalidProgram, Assert.Throws<IrValidationException>(() => new IrArrayLiteral(IrType.String, [new IrStringLiteral("value")])).Code);
     }
 
     [Fact]
     public void Utf8StringBoundariesMustContainCompleteSequences()
     {
-        IrPackedStringArrayLiteral packed = new IrPackedStringArrayLiteral(IrTextEncoding.Utf8, "é"u8.ToArray(), [0, 1, 2], []);
-        Assert.Equal(IrDiagnosticCode.InvalidProgram, Assert.Throws<IrValidationException>(() => new IrProgram([], [new IrData("strings", packed)], textEncoding: IrTextEncoding.Utf8)).Code);
+        Assert.Equal(IrDiagnosticCode.InvalidProgram, Assert.Throws<IrValidationException>(() => new IrPackedStringArrayLiteral(IrTextEncoding.Utf8, "é"u8.ToArray(), [0, 1, 2], [])).Code);
     }
 }

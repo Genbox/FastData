@@ -33,7 +33,7 @@ internal sealed class ExpressionTranslator(FastDataProgramBuilder builder, Func<
         if (assignment.NodeType == ExpressionType.Assign)
             return Assign(variable, value);
 
-        return Assign(variable, Operator(assignment.NodeType, null, Read(variable), target.Type, value));
+        return Assign(variable, Operator(assignment.NodeType, null, Read(variable), value));
     }
 
     public IrExpression Value(Expression expression) => expression switch
@@ -41,14 +41,14 @@ internal sealed class ExpressionTranslator(FastDataProgramBuilder builder, Func<
         ParameterExpression parameter => Read(Variable(parameter)),
         ConstantExpression constant => IrClrConverter.FromValue(constant.Value, IrClrConverter.FromClrType(constant.Type), builder.Program.Text.Encoding),
         DefaultExpression defaultValue => Default(IrClrConverter.FromClrType(defaultValue.Type)),
-        UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } convert => Convert(IrClrConverter.FromClrType(convert.Type), Value(convert.Operand), IrClrConverter.FromClrType(convert.Operand.Type)),
+        UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } convert => Convert(IrClrConverter.FromClrType(convert.Type), Value(convert.Operand)),
         UnaryExpression { NodeType: ExpressionType.Not } not => not.Type == typeof(bool)
             ? Not(Value(not.Operand))
-            : Complement(IrClrConverter.FromClrType(not.Type), Value(not.Operand)),
+            : Complement(Value(not.Operand)),
         BinaryExpression { NodeType: ExpressionType.AndAlso } binary => AndAlso(Value(binary.Left), Value(binary.Right)),
         BinaryExpression { NodeType: ExpressionType.OrElse } binary => OrElse(Value(binary.Left), Value(binary.Right)),
         BinaryExpression { NodeType: ExpressionType.ArrayIndex } index => Index(Value(index.Left), Value(index.Right)),
-        BinaryExpression binary => Operator(binary.NodeType, binary.Left, Value(binary.Left), binary.Left.Type, Value(binary.Right)),
+        BinaryExpression binary => Operator(binary.NodeType, binary.Left, Value(binary.Left), Value(binary.Right)),
         MemberExpression { Expression: ConstantExpression closure } member => Read(data.Get(member, closure)),
         MethodCallExpression call => GeneratorCall(call),
         _ => throw new NotSupportedException($"Expression '{expression.NodeType}' is not supported by the IR lowering.")
@@ -113,9 +113,9 @@ internal sealed class ExpressionTranslator(FastDataProgramBuilder builder, Func<
         return id;
     }
 
-    private static IrExpression Operator(ExpressionType operation, Expression? leftSource, IrExpression left, Type leftClr, IrExpression right)
+    private static IrExpression Operator(ExpressionType operation, Expression? leftSource, IrExpression left, IrExpression right)
     {
-        IrType leftType = IrClrConverter.FromClrType(leftClr);
+        IrType leftType = left.Type;
         BinaryOperation binary = operation switch
         {
             ExpressionType.Add or ExpressionType.AddChecked or ExpressionType.AddAssign or ExpressionType.AddAssignChecked => BinaryOperation.Add,
@@ -153,7 +153,7 @@ internal sealed class ExpressionTranslator(FastDataProgramBuilder builder, Func<
             // CLR shifts promote narrow integers and mask counts to five or six bits.
             if (leftType.BitWidth < 32)
             {
-                left = Convert(IrType.I32, left, leftType);
+                left = Convert(IrType.I32, left);
                 leftType = IrType.I32;
             }
 
@@ -167,12 +167,12 @@ internal sealed class ExpressionTranslator(FastDataProgramBuilder builder, Func<
             else if (binary == BinaryOperation.ShiftLeft)
             {
                 IrType unsigned = IrType.UnsignedOf(leftType);
-                shifted = Convert(leftType, Binary(binary, Convert(unsigned, left, leftType), right), unsigned);
+                shifted = Convert(leftType, Binary(binary, Convert(unsigned, left), right));
             }
             else
-                shifted = leftSource != null && IsNonNegative(leftSource) ? ShiftRightNonNegative(left, leftType, right) : ShiftRightArithmetic(left, leftType, right);
+                shifted = leftSource != null && IsNonNegative(leftSource) ? ShiftRightNonNegative(left, right) : ShiftRightArithmetic(left, right);
 
-            return Convert(resultType, shifted, leftType);
+            return Convert(resultType, shifted);
         }
 
         if (leftType.IsSignedIntegral && binary is BinaryOperation.Divide or BinaryOperation.Modulo)
@@ -182,27 +182,29 @@ internal sealed class ExpressionTranslator(FastDataProgramBuilder builder, Func<
         if (leftType.IsSignedIntegral && binary is BinaryOperation.Add or BinaryOperation.Subtract or BinaryOperation.Multiply)
         {
             IrType unsigned = IrType.UnsignedOf(leftType);
-            return Convert(leftType, Binary(binary, Convert(unsigned, left, leftType), Convert(unsigned, right, leftType)), unsigned);
+            return Convert(leftType, Binary(binary, Convert(unsigned, left), Convert(unsigned, right)));
         }
 
         return Binary(binary, left, right);
     }
 
     // A nonnegative signed value has the same bits as its unsigned counterpart, so a logical shift is exact.
-    private static IrExpression ShiftRightNonNegative(IrExpression value, IrType type, IrExpression count)
+    private static IrExpression ShiftRightNonNegative(IrExpression value, IrExpression count)
     {
+        IrType type = value.Type;
         IrType unsigned = IrType.UnsignedOf(type);
-        return Convert(type, Binary(BinaryOperation.ShiftRight, Convert(unsigned, value, type), count), unsigned);
+        return Convert(type, Binary(BinaryOperation.ShiftRight, Convert(unsigned, value), count));
     }
 
     // C# shifts signed values arithmetically: with s = 0 or -1 holding the sign, x >> n == ((x ^ s) >>> n) ^ s.
-    private static IrBinaryExpression ShiftRightArithmetic(IrExpression value, IrType type, IrExpression count)
+    private static IrBinaryExpression ShiftRightArithmetic(IrExpression value, IrExpression count)
     {
+        IrType type = value.Type;
         IrType unsigned = IrType.UnsignedOf(type);
-        IrExpression signBit = Convert(type, Binary(BinaryOperation.ShiftRight, Convert(unsigned, value, type), I32(type.BitWidth - 1)), unsigned);
+        IrExpression signBit = Convert(type, Binary(BinaryOperation.ShiftRight, Convert(unsigned, value), I32(type.BitWidth - 1)));
         IrExpression sign = Subtract(Default(type), signBit);
-        IrExpression magnitude = ShiftRightNonNegative(Binary(BinaryOperation.ExclusiveOr, value, sign), type, count);
-        return Binary(BinaryOperation.ExclusiveOr, magnitude, sign);
+        IrExpression magnitude = ShiftRightNonNegative(Xor(value, sign), count);
+        return Xor(magnitude, sign);
     }
 
     /// <summary>Recognizes values that are nonnegative by construction: constants, masks, and zero-extended unsigned values.</summary>
@@ -263,7 +265,7 @@ internal sealed class ExpressionTranslator(FastDataProgramBuilder builder, Func<
             {
                 IrFunctionId? fold = call.Method.Name == nameof(GeneratorFunctions.UnitAtAsciiLower) ? data.AsciiFold : null;
                 IrExpression unit = text.UnitAt(Argument(0), Offset(call.Arguments[0], call.Arguments[1]), fold);
-                return Convert(IrType.U32, unit, builder.Program.Text.CodeUnitType);
+                return Convert(IrType.U32, unit);
             }
             case nameof(GeneratorFunctions.EqualsAt):
             case nameof(GeneratorFunctions.EqualsAtAsciiLower):

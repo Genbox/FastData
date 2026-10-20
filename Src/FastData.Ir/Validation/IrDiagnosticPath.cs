@@ -29,6 +29,7 @@ internal readonly struct IrDiagnosticPath
     }
 
     public static IrDiagnosticPath operator +(IrDiagnosticPath path, string suffix) => path.IsEmpty ? default : new IrDiagnosticPath(new Segment(path._path, suffix));
+
     public override string ToString()
     {
         if (_path == null)

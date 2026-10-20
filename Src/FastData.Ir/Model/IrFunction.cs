@@ -11,18 +11,19 @@ namespace Genbox.FastData.Ir.Model;
 /// </remarks>
 public sealed class IrFunction : IrCallable
 {
+    /// <summary>Creates a function, taking ownership of the parameter and local collections without copying them.</summary>
+    /// <remarks>Callers must not modify the collections through any alias after construction. The body and its nodes may be shared as immutable objects.</remarks>
     public IrFunction(string name, IrType returnType, IReadOnlyList<IrVariable> parameters, IReadOnlyList<IrVariable> locals, IrBlock body)
     {
-        Name = name;
-        ReturnType = returnType;
+        Name = name ?? throw Fail("A declaration name is required.");
         Parameters = parameters;
         Locals = locals;
         Body = body;
-        Signature = new IrFunctionSignature(ReturnType, Parameters.Select(static parameter => parameter.Type).ToArray());
+        Signature = new IrFunctionSignature(returnType, Parameters.Select(static parameter => parameter.Type).ToArray());
     }
 
     public string Name { get; }
-    public IrType ReturnType { get; }
+    public IrType ReturnType => Signature.ReturnType;
     public IReadOnlyList<IrVariable> Parameters { get; }
     public IReadOnlyList<IrVariable> Locals { get; }
     public IrBlock Body { get; }

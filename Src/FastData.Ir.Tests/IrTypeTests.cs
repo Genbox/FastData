@@ -1,7 +1,5 @@
 using Genbox.FastData.Ir.Building;
-using Genbox.FastData.Ir.Helpers;
 using Genbox.FastData.Ir.Model;
-using Genbox.FastData.Ir.Model.Abstracts;
 using Genbox.FastData.Ir.Model.Enums;
 using static Genbox.FastData.Ir.Building.IrFactory;
 
@@ -51,14 +49,25 @@ public class IrTypeTests
         IrDataId data = program.AddData("values", new IrPackedArrayLiteral<ushort>([1, 2]));
         IrFunctionBuilder function = program.Function("F", IrType.Bool);
         IrVariableId x = function.Parameter("x", IrType.I32);
-        IrExpression element = Index(Read(data), Read(x));
+        IrIndexExpression element = Index(Read(data), Read(x));
+        IrRecordId entry = program.DeclareRecord("Entry");
+        IrFieldId field = program.AddField(entry, "text", IrType.String);
+        IrVariableId record = function.Parameter("entry", IrType.Record(entry));
+        IrFunctionBuilder helper = program.Function("Text", IrType.String);
+        IrFunctionCallExpression call = Call(helper.Id);
+        IrFieldExpression text = Field(Read(record), field);
         function.Define(Block(Return(Bool(true))));
-        IrProgram built = program.Build();
-        IrFunction resolved = built.Resolve(function.Id);
+        helper.Define(Block(Return(new IrStringLiteral("hello"))));
+        program.Build();
 
-        Assert.Equal(IrType.U16, IrExpressionTypes.Of(built, resolved, element));
-        Assert.Equal(IrType.U16, IrExpressionTypes.Of(built, resolved, Add(element, element)));
-        Assert.Equal(IrType.Bool, IrExpressionTypes.Of(built, resolved, Less(element, element)));
-        Assert.Equal(IrType.I64, IrExpressionTypes.Of(built, resolved, Convert(IrType.I64, Read(x))));
+        Assert.Equal(IrType.I32, Read(x).Type);
+        Assert.Equal(IrType.ArrayOf(IrType.U16), Read(data).Type);
+        Assert.Equal(IrType.String, text.Type);
+        Assert.Equal(IrType.String, call.Type);
+        Assert.Equal(IrType.Bool, AndAlso(Equal(text, call), Bool(true)).Type);
+        Assert.Equal(IrType.U16, element.Type);
+        Assert.Equal(IrType.U16, Add(element, element).Type);
+        Assert.Equal(IrType.Bool, Less(element, element).Type);
+        Assert.Equal(IrType.I64, Convert(IrType.I64, Read(x)).Type);
     }
 }

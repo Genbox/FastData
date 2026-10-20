@@ -26,8 +26,7 @@ public class IrLoopTests
         };
 
         IrStatement[] loopBody = body.Append(Increment(index)).ToArray();
-        function.Define(Block(
-            Assign(index, Constant(0)),
+        function.Define(Block(Assign(index, Constant(0)),
             While(Less(Read(index), Constant(3)), loopBody),
             Return(Read(index))));
 
@@ -44,8 +43,7 @@ public class IrLoopTests
         IrVariableId count = function.Local("count", IrType.I32);
         IrIfStatement nestedLoop = If(Equal(Read(iteration), Constant(4)),
             While(Constant(true), new IrBreakStatement()));
-        function.Define(Block(
-            Assign(iteration, Constant(1)),
+        function.Define(Block(Assign(iteration, Constant(1)),
             Assign(count, Constant(0)),
             While(LessOrEqual(Read(iteration), Constant(5)),
                 nestedLoop,

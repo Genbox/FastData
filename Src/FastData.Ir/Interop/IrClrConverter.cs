@@ -14,7 +14,10 @@ public static class IrClrConverter
     public static IrType FromClrType(Type type) => IrPrimitiveTypes.TryGet(type, out IrType? result) ? result : throw new NotSupportedException($"CLR type '{type}' has no built-in IR mapping.");
 
     /// <summary>Captures a CLR value as an immutable literal. Supply the reference type for null values and the program encoding for string arrays.</summary>
-    /// <remarks>Primitive arrays transfer ownership of their buffers; callers must stop modifying them. String arrays are encoded into new storage.</remarks>
+    /// <remarks>
+    /// Primitive arrays transfer ownership of their buffers without copying; callers must not modify them through any alias afterward. String arrays are encoded into new storage and are not retained. Aggregate conversions create new element collections; any nested primitive arrays still transfer
+    /// ownership of their buffers.
+    /// </remarks>
     public static IrLiteral FromValue(object? value, IrType? type = null, IrTextEncoding encoding = IrTextEncoding.Utf16)
     {
         if (value == null)

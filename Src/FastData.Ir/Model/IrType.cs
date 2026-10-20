@@ -109,7 +109,7 @@ public sealed record IrType
         _ => throw new ArgumentException($"'{type}' is not an integral type.", nameof(type))
     };
 
-    public static IrType ArrayOf(IrType elementType) => new IrType(IrTypeKind.Array, elementType);
+    public static IrType ArrayOf(IrType elementType) => new IrType(IrTypeKind.Array, elementType ?? throw Fail("An array element type is required."));
 
     public static IrType Record(IrRecordId id) => new IrType(IrTypeKind.Record, recordId: id);
 

@@ -7,6 +7,7 @@ namespace Genbox.FastData.Generator.Ir.Model;
 public sealed class LookupContract
 {
     /// <summary>Binds lookup functions, value storage, and exported constants to a program.</summary>
+    /// <remarks>Takes ownership of the constants collection without copying it. Callers must not modify it through any alias after construction, following the core IR ownership contract.</remarks>
     public LookupContract(IrFunctionId findFunctionId, LookupValues? values = null, LookupEnumeration? enumeration = null, IReadOnlyList<IrDataId>? constants = null)
     {
         FindFunctionId = findFunctionId;

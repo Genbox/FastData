@@ -3,27 +3,15 @@ using Genbox.FastData.Ir.Building;
 using Genbox.FastData.Ir.Interop;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
-using Genbox.FastData.Ir.Model.Enums;
 
 namespace Genbox.FastData.Generator.Ir.Building;
 
 internal sealed class IntegerStorageBuilder(IrProgramBuilder program, bool reduce)
 {
-    public (IrDataId Data, IrType Type) Unsigned(string name, ulong[] values, IrType fullType) => Unsigned(name, values, fullType, static x => x);
-    public (IrDataId Data, IrType Type) Unsigned(string name, uint[] values, IrType fullType) => Unsigned(name, values, fullType, static x => x);
-    public (IrDataId Data, IrType Type) Unsigned(string name, ushort[] values, IrType fullType) => Unsigned(name, values, fullType, static x => x);
-    public (IrDataId Data, IrType Type) Unsigned(string name, int[] values, IrType fullType) => Unsigned(name, values, fullType, static x => checked((ulong)x));
-
-    private (IrDataId Data, IrType Type) Unsigned<T>(string name, T[] values, IrType fullType, Func<T, ulong> select)
-    {
-        Type fullStorage = fullType.Kind switch
-        {
-            IrTypeKind.U32 => typeof(uint),
-            IrTypeKind.U16 => typeof(ushort),
-            _ => typeof(ulong)
-        };
-        return AddUnsigned(name, values, select, UnsignedType(values, select, fullStorage));
-    }
+    public IrDataId Unsigned(string name, ulong[] values) => Unsigned(name, values, typeof(ulong), static x => x);
+    public IrDataId Unsigned(string name, uint[] values) => Unsigned(name, values, typeof(uint), static x => x);
+    public IrDataId Unsigned(string name, ushort[] values) => Unsigned(name, values, typeof(ushort), static x => x);
+    public IrDataId Unsigned(string name, int[] values) => Unsigned(name, values, typeof(uint), static x => checked((ulong)x));
 
     public Type UnsignedType<T>(T[] values, Func<T, ulong> select, Type fullType)
     {
@@ -33,6 +21,7 @@ internal sealed class IntegerStorageBuilder(IrProgramBuilder program, bool reduc
         ulong maximum = 0;
         foreach (T value in values)
             maximum = Math.Max(maximum, select(value));
+
         return IntegralTypeReducer.GetSmallestUnsignedStorageType(maximum);
     }
 
@@ -54,8 +43,9 @@ internal sealed class IntegerStorageBuilder(IrProgramBuilder program, bool reduc
         return IntegralTypeReducer.GetSmallestSignedStorageType(minimum, maximum);
     }
 
-    private (IrDataId Data, IrType Type) AddUnsigned<T>(string name, T[] values, Func<T, ulong> select, Type storage)
+    private IrDataId Unsigned<T>(string name, T[] values, Type fullStorage, Func<T, ulong> select)
     {
+        Type storage = UnsignedType(values, select, fullStorage);
         IrLiteral literal = Type.GetTypeCode(storage) switch
         {
             TypeCode.Byte => IrClrConverter.FromValue(values as byte[] ?? values.Select(x => checked((byte)select(x))).ToArray()),
@@ -64,16 +54,12 @@ internal sealed class IntegerStorageBuilder(IrProgramBuilder program, bool reduc
             TypeCode.Int32 => IrClrConverter.FromValue(values as int[] ?? values.Select(x => checked((int)select(x))).ToArray()),
             _ => IrClrConverter.FromValue(values as ulong[] ?? values.Select(select).ToArray())
         };
-        return (program.AddData(name, literal), IrClrConverter.FromClrType(storage));
+        return program.AddData(name, literal);
     }
 
-    public (IrDataId Data, IrType Type) NonNegative(string name, int[] values)
-    {
-        Type storage = UnsignedType(values, static x => checked((ulong)x), typeof(int));
-        return AddUnsigned(name, values, static x => checked((ulong)x), storage);
-    }
+    public IrDataId NonNegative(string name, int[] values) => Unsigned(name, values, typeof(int), static x => checked((ulong)x));
 
-    public (IrDataId Data, IrType Type) Signed<T>(string name, T[] values, Func<T, int> select)
+    public IrDataId Signed<T>(string name, T[] values, Func<T, int> select)
     {
         Type storage = SignedType(values, select);
         IrLiteral literal = Type.GetTypeCode(storage) switch
@@ -82,6 +68,6 @@ internal sealed class IntegerStorageBuilder(IrProgramBuilder program, bool reduc
             TypeCode.Int16 => IrClrConverter.FromValue(values.Select(x => checked((short)select(x))).ToArray()),
             _ => IrClrConverter.FromValue(values.Select(select).ToArray())
         };
-        return (program.AddData(name, literal), IrClrConverter.FromClrType(storage));
+        return program.AddData(name, literal);
     }
 }

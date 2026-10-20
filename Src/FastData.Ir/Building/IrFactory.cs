@@ -5,13 +5,14 @@ using Genbox.FastData.Ir.Model.Enums;
 namespace Genbox.FastData.Ir.Building;
 
 /// <summary>Short factories for hand-built IR. Import with <c>using static</c>.</summary>
+/// <remarks>Factories transfer ownership of supplied argument and statement arrays to the resulting nodes without copying. Callers must not modify them through any alias; immutable nodes may be shared.</remarks>
 public static class IrFactory
 {
     /// <summary>Reads a variable.</summary>
-    public static IrVariableExpression Read(IrVariableId id) => new IrVariableExpression(id);
+    public static IrVariableExpression Read(IrVariableId variable) => new IrVariableExpression(variable);
 
     /// <summary>Reads a data declaration.</summary>
-    public static IrDataExpression Read(IrDataId id) => new IrDataExpression(id);
+    public static IrDataExpression Read(IrDataId data) => new IrDataExpression(data);
 
     /// <summary>A Bool literal.</summary>
     public static IrBoolLiteral Bool(bool value) => new IrBoolLiteral(value);
@@ -34,18 +35,13 @@ public static class IrFactory
         if (type.AcceptsNull)
             return new IrNullLiteral(type);
 
+        if (type.IsIntegral)
+            return IntegerBits(type, 0);
+
         return type.Kind switch
         {
             IrTypeKind.Bool => new IrBoolLiteral(false),
             IrTypeKind.Char => new IrCharLiteral(type.CharacterKind!.Value, 0),
-            IrTypeKind.I8 => new IrI8Literal(0),
-            IrTypeKind.U8 => new IrU8Literal(0),
-            IrTypeKind.I16 => new IrI16Literal(0),
-            IrTypeKind.U16 => new IrU16Literal(0),
-            IrTypeKind.I32 => new IrI32Literal(0),
-            IrTypeKind.U32 => new IrU32Literal(0),
-            IrTypeKind.I64 => new IrI64Literal(0),
-            IrTypeKind.U64 => new IrU64Literal(0),
             IrTypeKind.F32 => new IrF32Literal(0),
             IrTypeKind.F64 => new IrF64Literal(0),
             _ => throw new ArgumentException("The type has no default value.", nameof(type))
@@ -63,6 +59,15 @@ public static class IrFactory
 
     /// <summary><paramref name="left" /> * <paramref name="right" />.</summary>
     public static IrBinaryExpression Multiply(IrExpression left, IrExpression right) => Binary(BinaryOperation.Multiply, left, right);
+
+    /// <summary>Bitwise exclusive disjunction.</summary>
+    public static IrBinaryExpression Xor(IrExpression left, IrExpression right) => Binary(BinaryOperation.ExclusiveOr, left, right);
+
+    /// <summary>Unsigned integral division.</summary>
+    public static IrBinaryExpression Divide(IrExpression value, IrExpression divisor) => Binary(BinaryOperation.Divide, value, divisor);
+
+    /// <summary>Unsigned integral remainder.</summary>
+    public static IrBinaryExpression Mod(IrExpression value, IrExpression divisor) => Binary(BinaryOperation.Modulo, value, divisor);
 
     /// <summary>Bitwise conjunction.</summary>
     public static IrBinaryExpression And(IrExpression left, IrExpression right) => Binary(BinaryOperation.And, left, right);
@@ -98,22 +103,21 @@ public static class IrFactory
     public static IrBinaryExpression Not(IrExpression operand) => Equal(operand, Bool(false));
 
     /// <summary>Integral complement as XOR against a typed all-ones literal. The operand is evaluated once.</summary>
-    public static IrBinaryExpression Complement(IrType type, IrExpression operand)
+    public static IrBinaryExpression Complement(IrExpression operand) => Xor(operand, IntegerBits(operand.Type, ulong.MaxValue));
+
+    /// <summary>Creates an integral literal from the low bits of a bit pattern at the requested width.</summary>
+    public static IrLiteral IntegerBits(IrType type, ulong bits) => unchecked(type.Kind switch
     {
-        IrLiteral mask = type.Kind switch
-        {
-            IrTypeKind.I8 => new IrI8Literal(-1),
-            IrTypeKind.U8 => new IrU8Literal(byte.MaxValue),
-            IrTypeKind.I16 => new IrI16Literal(-1),
-            IrTypeKind.U16 => new IrU16Literal(ushort.MaxValue),
-            IrTypeKind.I32 => I32(-1),
-            IrTypeKind.U32 => U32(uint.MaxValue),
-            IrTypeKind.I64 => I64(-1),
-            IrTypeKind.U64 => U64(ulong.MaxValue),
-            _ => throw new ArgumentException("Complement requires an integral type.", nameof(type))
-        };
-        return Binary(BinaryOperation.ExclusiveOr, operand, mask);
-    }
+        IrTypeKind.I8 => new IrI8Literal((sbyte)bits),
+        IrTypeKind.U8 => new IrU8Literal((byte)bits),
+        IrTypeKind.I16 => new IrI16Literal((short)bits),
+        IrTypeKind.U16 => new IrU16Literal((ushort)bits),
+        IrTypeKind.I32 => I32((int)bits),
+        IrTypeKind.U32 => U32((uint)bits),
+        IrTypeKind.I64 => I64((long)bits),
+        IrTypeKind.U64 => U64(bits),
+        _ => throw new ArgumentException("Expected an integral type.", nameof(type))
+    });
 
     /// <summary>Short-circuit conjunction.</summary>
     public static IrLogicalExpression AndAlso(IrExpression left, IrExpression right) => new IrLogicalExpression(LogicalOperation.AndAlso, left, right);
@@ -130,25 +134,23 @@ public static class IrFactory
     /// <summary>Calls a function with argument values.</summary>
     public static IrFunctionCallExpression Call(IrFunctionId function, params IrExpression[] arguments) => new IrFunctionCallExpression(function, arguments);
 
-    /// <summary>A numeric conversion.</summary>
-    public static IrConversionExpression Convert(IrType target, IrExpression value) => new IrConversionExpression(target, ConversionKind.Numeric, value);
-
-    /// <summary>A numeric conversion from <paramref name="source" /> that passes characters through their unit type, or <paramref name="value" /> itself when the types match.</summary>
-    public static IrExpression Convert(IrType target, IrExpression value, IrType source)
+    /// <summary>A numeric conversion that passes characters through their unit type, or the value itself when the types match.</summary>
+    public static IrExpression Convert(IrType target, IrExpression value)
     {
+        IrType source = value.Type;
         if (source == target)
             return value;
 
         if (source.CharacterKind is {} sourceSet)
         {
             source = IrType.UnitOf(sourceSet);
-            value = Convert(source, value);
+            value = new IrConversionExpression(source, ConversionKind.Numeric, value);
         }
 
         IrType unitTarget = target.CharacterKind is {} targetSet ? IrType.UnitOf(targetSet) : target;
         if (source != unitTarget)
-            value = Convert(unitTarget, value);
-        return target == unitTarget ? value : Convert(target, value);
+            value = new IrConversionExpression(unitTarget, ConversionKind.Numeric, value);
+        return target == unitTarget ? value : new IrConversionExpression(target, ConversionKind.Numeric, value);
     }
 
     /// <summary>A block of statements.</summary>

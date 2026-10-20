@@ -12,6 +12,6 @@ namespace Genbox.FastData.Ir.Model;
 /// </remarks>
 public sealed class IrExternalFunction(string symbol, IrFunctionSignature signature) : IrCallable
 {
-    public string Symbol { get; } = symbol;
+    public string Symbol { get; } = symbol ?? throw Fail("A declaration name is required.");
     public IrFunctionSignature Signature { get; } = signature;
 }

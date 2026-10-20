@@ -10,11 +10,11 @@ public sealed class PreparedEnumeration
     {
         Name = name;
         Type = type;
-        IrVariableExpression position = Read(new IrVariableId(0));
-        Start = new PreparedFunctionCall(next, [InitialPosition]);
-        Advance = new PreparedFunctionCall(next, [position]);
+        IrVariableExpression position = Read(new IrVariableId(0, IrType.I64));
+        Start = new PreparedFunctionCall(next, [InitialPosition], IrType.I64);
+        Advance = new PreparedFunctionCall(next, [position], IrType.I64);
         HasCurrent = GreaterOrEqual(position, I64(0));
-        Current = new PreparedFunctionCall(element, [position]);
+        Current = new PreparedFunctionCall(element, [position], type);
     }
 
     public string Name { get; }
