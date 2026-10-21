@@ -31,14 +31,8 @@ public class PerfectHashBenchmarks
     }
 
     [Benchmark]
-    public uint TimeToConstruct()
-    {
-        return PerfectHashHelper.Generate(_hashCodes, (obj, seed) => Mixers.Murmur_64(obj) ^ seed, 1, (uint)(_hashCodes.Length * 2));
-    }
+    public uint TimeToConstruct() => PerfectHashHelper.Generate(_hashCodes, (obj, seed) => Mixers.Murmur_64(obj) ^ seed, 1, (uint)(_hashCodes.Length * 2));
 
     [Benchmark]
-    public uint TimeToConstructMinimal()
-    {
-        return PerfectHashHelper.Generate(_hashCodes, (obj, seed) => Mixers.Murmur_64(obj) ^ seed, 1);
-    }
+    public uint TimeToConstructMinimal() => PerfectHashHelper.Generate(_hashCodes, (obj, seed) => Mixers.Murmur_64(obj) ^ seed, 1);
 }

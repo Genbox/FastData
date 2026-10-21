@@ -54,6 +54,7 @@ public sealed record ValueInRangeEarlyExit<T>(T Min, T Max) : IEarlyExit
         {
             // Rejected keyspace is the size of the exclusive range.
             TypeCode code = Type.GetTypeCode(typeof(T));
+
             if (code.IsIntegral())
             {
                 // Convert into unsigned space for ordering; exclusive range subtracts one.

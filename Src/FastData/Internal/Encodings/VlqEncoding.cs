@@ -138,6 +138,7 @@ internal sealed class VlqEncoding : IIntegerEncoding
             return TryDecodeFull(source, out value, out bytesRead);
 
         byte b = source[0];
+
         if (b < 0x80)
         {
             value = b;
@@ -203,6 +204,7 @@ internal sealed class VlqEncoding : IIntegerEncoding
     private static bool TryDecodeFull(ReadOnlySpan<byte> source, out ulong value, out int bytesRead)
     {
         byte b = source[0];
+
         if (b < 0x80)
         {
             value = b;
@@ -252,6 +254,7 @@ internal sealed class VlqEncoding : IIntegerEncoding
         }
 
         b = source[9];
+
         if (b >= 0x80)
         {
             value = 0;

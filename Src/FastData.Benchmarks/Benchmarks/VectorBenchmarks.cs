@@ -147,6 +147,7 @@ public class VectorBenchmarks
                 return false;
 
             ulong window = _upperBits[currWord] & (ulong.MaxValue << (int)(position & 63));
+
             while (true)
             {
                 while (window == 0)

@@ -50,8 +50,7 @@ public class ExpressionCompilerTests
     public void MethodCallRendersMemberInvocation()
     {
         TestCompiler compiler = CreateCompiler();
-        MethodInfo method = typeof(string).GetMethod(
-            nameof(string.StartsWith),
+        MethodInfo method = typeof(string).GetMethod(nameof(string.StartsWith),
             BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly,
             null,
             [typeof(string)],
@@ -68,8 +67,7 @@ public class ExpressionCompilerTests
     {
         TestCompiler compiler = CreateCompiler();
         ParameterExpression local = Expression.Variable(typeof(int), "local");
-        MethodInfo method = typeof(ExpressionCompilerTests).GetMethod(
-            nameof(TryAssign),
+        MethodInfo method = typeof(ExpressionCompilerTests).GetMethod(nameof(TryAssign),
             BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly,
             null,
             [typeof(int).MakeByRefType()],
@@ -87,15 +85,13 @@ public class ExpressionCompilerTests
         TestCompiler compiler = CreateCompiler();
         ParameterExpression first = Expression.Variable(typeof(int), "first");
         ParameterExpression second = Expression.Variable(typeof(int), "second");
-        BlockExpression expression = Expression.Block(
-            [first, second],
+        BlockExpression expression = Expression.Block([first, second],
             Expression.Assign(first, Expression.Constant(1)),
             Expression.Assign(second, first));
 
         string output = compiler.GetStatements(expression);
 
-        Assert.Equal(
-            ["int first;", "int second;", "first = 1;", "second = first;"],
+        Assert.Equal(["int first;", "int second;", "first = 1;", "second = first;"],
             output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries));
     }
 
@@ -105,15 +101,13 @@ public class ExpressionCompilerTests
         TestCompiler compiler = CreateCompiler();
         ParameterExpression first = Expression.Variable(typeof(int), "first");
         ParameterExpression second = Expression.Variable(typeof(int), "second");
-        BlockExpression expression = Expression.Block(
-            [first, second],
+        BlockExpression expression = Expression.Block([first, second],
             Expression.Assign(first, second),
             Expression.Assign(second, Expression.Constant(2)));
 
         string output = compiler.GetStatements(expression);
 
-        Assert.Equal(
-            ["int first;", "int second = 0;", "first = second;", "second = 2;"],
+        Assert.Equal(["int first;", "int second = 0;", "first = second;", "second = 2;"],
             output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries));
     }
 
@@ -123,15 +117,13 @@ public class ExpressionCompilerTests
         TestCompiler compiler = CreateCompiler();
         ParameterExpression first = Expression.Variable(typeof(int), "first");
         ParameterExpression second = Expression.Variable(typeof(int), "second");
-        BlockExpression expression = Expression.Block(
-            [first, second],
+        BlockExpression expression = Expression.Block([first, second],
             Expression.Assign(second, first),
             Expression.Assign(first, Expression.Constant(1)));
 
         string output = compiler.GetStatements(expression);
 
-        Assert.Equal(
-            ["int first = 0;", "int second;", "second = first;", "first = 1;"],
+        Assert.Equal(["int first = 0;", "int second;", "second = first;", "first = 1;"],
             output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries));
     }
 
@@ -153,8 +145,7 @@ public class ExpressionCompilerTests
         TestCompiler compiler = CreateCompiler();
         ParameterExpression condition = Expression.Parameter(typeof(bool), "condition");
         ParameterExpression local = Expression.Variable(typeof(int), "local");
-        ConditionalExpression conditional = Expression.IfThenElse(
-            condition,
+        ConditionalExpression conditional = Expression.IfThenElse(condition,
             CreateVoidAssignment(local, 1),
             CreateVoidAssignment(local, 2));
         LambdaExpression expression = Expression.Lambda<Func<bool, int>>(Expression.Block([local], conditional, local), condition);
@@ -186,8 +177,7 @@ public class ExpressionCompilerTests
         ParameterExpression condition = Expression.Parameter(typeof(bool), "condition");
         ParameterExpression local = Expression.Variable(typeof(int), "local");
         LabelTarget returnTarget = Expression.Label(typeof(int));
-        ConditionalExpression conditional = Expression.IfThenElse(
-            condition,
+        ConditionalExpression conditional = Expression.IfThenElse(condition,
             Expression.Return(returnTarget, Expression.Constant(0)),
             CreateVoidAssignment(local, 1));
         LambdaExpression expression = Expression.Lambda<Func<bool, int>>(Expression.Block([local], conditional, local), condition);
@@ -220,8 +210,7 @@ public class ExpressionCompilerTests
         TestCompiler compiler = CreateCompiler();
         ParameterExpression outer = Expression.Variable(typeof(int), "outer");
         ParameterExpression inner = Expression.Variable(typeof(int), "inner");
-        BlockExpression scope = Expression.Block(
-            [inner],
+        BlockExpression scope = Expression.Block([inner],
             Expression.Assign(inner, Expression.Constant(1)),
             Expression.Assign(outer, inner));
         LambdaExpression expression = Expression.Lambda<Func<int>>(Expression.Block([outer], scope, outer));
@@ -238,8 +227,7 @@ public class ExpressionCompilerTests
         TestCompiler compiler = CreateCompiler();
         ParameterExpression input = Expression.Parameter(typeof(int), "input");
         ParameterExpression local = Expression.Variable(typeof(int), "local");
-        LambdaExpression expression = Expression.Lambda<Func<int, int>>(
-            Expression.Block([local], Expression.AddAssign(local, input), local),
+        LambdaExpression expression = Expression.Lambda<Func<int, int>>(Expression.Block([local], Expression.AddAssign(local, input), local),
             input);
 
         string output = compiler.GetLambdaBody(expression);
@@ -314,15 +302,13 @@ public class ExpressionCompilerTests
         ParameterExpression input = Expression.Parameter(typeof(int), "input");
         ParameterExpression result = Expression.Variable(typeof(int), "result");
         BinaryExpression assignment = Expression.Assign(result, input);
-        LambdaExpression expression = Expression.Lambda<Func<int, int>>(
-            Expression.Block([result], assignment),
+        LambdaExpression expression = Expression.Lambda<Func<int, int>>(Expression.Block([result], assignment),
             input);
 
         LoweredProgram program = ExpressionProgramLowerer.LowerLambda(expression, nameof(TestCompiler));
 
         Assert.Same(result, Assert.Single(program.Body.Locals));
-        Assert.Collection(
-            program.Body.Statements,
+        Assert.Collection(program.Body.Statements,
             statement =>
             {
                 LoweredAssignmentStatement loweredAssignment = Assert.IsType<LoweredAssignmentStatement>(statement);
@@ -344,8 +330,7 @@ public class ExpressionCompilerTests
     {
         ParameterExpression local = Expression.Variable(typeof(int), "local");
         BinaryExpression sum = Expression.Add(local, local);
-        LambdaExpression expression = Expression.Lambda<Func<int>>(
-            Expression.Block([local], Expression.Assign(local, Expression.Constant(1)), sum));
+        LambdaExpression expression = Expression.Lambda<Func<int>>(Expression.Block([local], Expression.Assign(local, Expression.Constant(1)), sum));
 
         LoweredProgram program = ExpressionProgramLowerer.LowerLambda(expression, nameof(TestCompiler));
 
@@ -362,19 +347,15 @@ public class ExpressionCompilerTests
         ParameterExpression nestedRead = Expression.Variable(typeof(int), "nestedRead");
         ParameterExpression loopRead = Expression.Variable(typeof(int), "loopRead");
         ParameterExpression inner = Expression.Variable(typeof(int), "inner");
-        BlockExpression nestedScope = Expression.Block(
-            [inner],
+        BlockExpression nestedScope = Expression.Block([inner],
             Expression.Assign(inner, nestedRead),
             Expression.Assign(nestedRead, Expression.Constant(1)));
         LabelTarget breakTarget = Expression.Label();
-        BlockExpression loopBody = Expression.Block(
-            Expression.Assign(loopRead, Expression.Add(loopRead, Expression.Constant(1))),
+        BlockExpression loopBody = Expression.Block(Expression.Assign(loopRead, Expression.Add(loopRead, Expression.Constant(1))),
             Expression.Empty());
-        LoopExpression loop = Expression.Loop(
-            Expression.IfThenElse(condition, loopBody, Expression.Break(breakTarget)),
+        LoopExpression loop = Expression.Loop(Expression.IfThenElse(condition, loopBody, Expression.Break(breakTarget)),
             breakTarget);
-        LambdaExpression expression = Expression.Lambda<Func<bool, int>>(
-            Expression.Block([nestedRead, loopRead], nestedScope, loop, Expression.Constant(0)),
+        LambdaExpression expression = Expression.Lambda<Func<bool, int>>(Expression.Block([nestedRead, loopRead], nestedScope, loop, Expression.Constant(0)),
             condition);
 
         LoweredProgram program = ExpressionProgramLowerer.LowerLambda(expression, nameof(TestCompiler));
@@ -394,15 +375,13 @@ public class ExpressionCompilerTests
         BinaryExpression initialAssignment = Expression.Assign(result, Expression.Constant(0));
         BinaryExpression terminalAssignment = Expression.Assign(result, input);
         BlockExpression terminal = Expression.Block(terminalAssignment, result);
-        LambdaExpression expression = Expression.Lambda<Func<int, int>>(
-            Expression.Block([result], initialAssignment, terminal),
+        LambdaExpression expression = Expression.Lambda<Func<int, int>>(Expression.Block([result], initialAssignment, terminal),
             input);
 
         LoweredProgram program = ExpressionProgramLowerer.LowerLambda(expression, nameof(TestCompiler));
 
         Assert.DoesNotContain(program.Body.Statements, statement => statement is LoweredBlock);
-        Assert.Collection(
-            program.Body.Statements,
+        Assert.Collection(program.Body.Statements,
             statement => Assert.Same(initialAssignment, Assert.IsType<LoweredAssignmentStatement>(statement).Operation.Source),
             statement => Assert.Same(terminalAssignment, Assert.IsType<LoweredAssignmentStatement>(statement).Operation.Source),
             statement => Assert.IsType<LoweredReturnStatement>(statement));
@@ -437,8 +416,7 @@ public class ExpressionCompilerTests
     {
         TestCompiler compiler = CreateCompiler();
         LabelTarget breakTarget = Expression.Label(typeof(int));
-        ConditionalExpression body = Expression.IfThenElse(
-            Expression.Constant(false),
+        ConditionalExpression body = Expression.IfThenElse(Expression.Constant(false),
             Expression.Empty(),
             Expression.Break(breakTarget, Expression.Constant(0)));
         LoopExpression expression = Expression.Loop(body, breakTarget);
@@ -455,8 +433,7 @@ public class ExpressionCompilerTests
         TestCompiler compiler = CreateCompiler();
         LabelTarget loopBreak = Expression.Label();
         LabelTarget otherBreak = Expression.Label();
-        ConditionalExpression body = Expression.IfThenElse(
-            Expression.Constant(false),
+        ConditionalExpression body = Expression.IfThenElse(Expression.Constant(false),
             Expression.Empty(),
             Expression.Break(otherBreak));
         LoopExpression expression = Expression.Loop(body, loopBreak);
@@ -472,8 +449,7 @@ public class ExpressionCompilerTests
     {
         TestCompiler compiler = CreateCompiler();
         ParameterExpression local = Expression.Variable(typeof(int), "local");
-        BlockExpression expression = Expression.Block(
-            Expression.Block([local], Expression.Assign(local, Expression.Constant(1))),
+        BlockExpression expression = Expression.Block(Expression.Block([local], Expression.Assign(local, Expression.Constant(1))),
             Expression.Assign(local, Expression.Constant(2)));
 
         NotSupportedException exception = Assert.Throws<NotSupportedException>(() => compiler.GetStatements(expression));
@@ -486,8 +462,7 @@ public class ExpressionCompilerTests
     {
         TestCompiler compiler = CreateCompiler();
         ParameterExpression local = Expression.Variable(typeof(int), "local");
-        BlockExpression expression = Expression.Block(
-            Expression.Assign(local, Expression.Constant(1)),
+        BlockExpression expression = Expression.Block(Expression.Assign(local, Expression.Constant(1)),
             Expression.Block([local], Expression.Assign(local, Expression.Constant(2))));
 
         NotSupportedException exception = Assert.Throws<NotSupportedException>(() => compiler.GetStatements(expression));
@@ -513,8 +488,7 @@ public class ExpressionCompilerTests
         TestCompiler compiler = CreateCompiler();
         ParameterExpression first = Expression.Variable(typeof(int), "difference");
         ParameterExpression second = Expression.Variable(typeof(int), "difference");
-        BlockExpression expression = Expression.Block(
-            Expression.IfThen(Expression.Constant(true), Expression.Block([first], Expression.Assign(first, Expression.Constant(1)))),
+        BlockExpression expression = Expression.Block(Expression.IfThen(Expression.Constant(true), Expression.Block([first], Expression.Assign(first, Expression.Constant(1)))),
             Expression.IfThen(Expression.Constant(false), Expression.Block([second], Expression.Assign(second, Expression.Constant(2)))));
 
         string output = compiler.GetStatements(expression);
@@ -527,8 +501,7 @@ public class ExpressionCompilerTests
     {
         TestCompiler compiler = CreateCompiler();
         ParameterExpression local = Expression.Variable(typeof(int), "local");
-        BlockExpression expression = Expression.Block(
-            Expression.Block([local], Expression.Assign(local, Expression.Constant(1))),
+        BlockExpression expression = Expression.Block(Expression.Block([local], Expression.Assign(local, Expression.Constant(1))),
             Expression.Block([local], Expression.Assign(local, Expression.Constant(2))));
 
         NotSupportedException exception = Assert.Throws<NotSupportedException>(() => compiler.GetStatements(expression));
@@ -629,8 +602,7 @@ public class ExpressionCompilerTests
     {
         TestCompiler compiler = CreateCompiler();
         ParameterExpression local = Expression.Variable(typeof(TestNumber), "local");
-        BlockExpression expression = Expression.Block(
-            [local],
+        BlockExpression expression = Expression.Block([local],
             Expression.AddAssign(local, Expression.Default(typeof(TestNumber))));
 
         NotSupportedException exception = Assert.Throws<NotSupportedException>(() => compiler.GetStatements(expression));
@@ -645,8 +617,7 @@ public class ExpressionCompilerTests
         ParameterExpression local = Expression.Variable(typeof(TestNumber), "local");
         ParameterExpression conversionValue = Expression.Parameter(typeof(long), "value");
         LambdaExpression conversion = Expression.Lambda<Func<long, TestNumber>>(Expression.Default(typeof(TestNumber)), conversionValue);
-        BlockExpression expression = Expression.Block(
-            [local],
+        BlockExpression expression = Expression.Block([local],
             Expression.AddAssign(local, Expression.Constant(1), null, conversion));
 
         NotSupportedException exception = Assert.Throws<NotSupportedException>(() => compiler.GetStatements(expression));
@@ -696,7 +667,9 @@ public class ExpressionCompilerTests
         // Test operators intentionally ignore an operand.
         // ReSharper disable UnusedParameter.Local
         public static TestNumber operator +(TestNumber left, TestNumber _) => left;
+
         public static long operator +(TestNumber _, int right) => right;
+
         // ReSharper restore UnusedParameter.Local
         public static TestNumber operator ~(TestNumber value) => value;
     }

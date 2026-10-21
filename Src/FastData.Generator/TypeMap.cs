@@ -21,6 +21,7 @@ public sealed class TypeMap : ITypeMap
             throw new ArgumentNullException(nameof(typeSpecs), "The type definitions cannot be null.");
 
         _encoding = encoding;
+
         for (int i = 0; i < typeSpecs.Count; i++)
         {
             ITypeDef spec = typeSpecs[i];

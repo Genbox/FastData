@@ -32,6 +32,7 @@ public sealed class HybleStructureTests
         for (int i = 0; i < keys.Length; i++)
         {
             ulong expectedHash;
+
             unchecked { expectedHash = SplitMix64.Next((uint)i) * context.Seed; }
 
             Assert.Contains((i, expectedHash), entries);
@@ -55,6 +56,7 @@ public sealed class HybleStructureTests
         for (int i = 0; i < keys.Length; i++)
         {
             ulong expectedHash;
+
             unchecked { expectedHash = baseHashes[i] * context.Seed; }
 
             expectedHashes.Add(expectedHash);

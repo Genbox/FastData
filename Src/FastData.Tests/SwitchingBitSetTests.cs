@@ -5,10 +5,7 @@ namespace Genbox.FastData.Tests;
 public class SwitchingBitSetTests
 {
     [Fact]
-    public void Constructor_LengthMustBeGreaterThanZero()
-    {
-        Assert.Throws<InvalidOperationException>(() => new SwitchingBitSet(0, false));
-    }
+    public void Constructor_LengthMustBeGreaterThanZero() => Assert.Throws<InvalidOperationException>(() => new SwitchingBitSet(0, false));
 
     [Fact]
     public void AddAndContains_WorkInBitsetMode()

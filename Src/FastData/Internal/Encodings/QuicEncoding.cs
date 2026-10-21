@@ -70,6 +70,7 @@ internal sealed class QuicEncoding : IIntegerEncoding
             return false;
 
         byte first = source[0];
+
         if (first < 0x40)
         {
             value = first;

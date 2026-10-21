@@ -7,6 +7,7 @@ public sealed class LoweredAssignmentStatement(ValidatedExpression operation, Pa
 {
     /// <summary>Gets the validated assignment operation.</summary>
     public ValidatedExpression Operation { get; } = operation;
+
     /// <summary>Gets the assigned local, or <see langword="null" /> for other assignment targets.</summary>
     public ParameterExpression? AssignedLocal { get; } = assignedLocal;
 }

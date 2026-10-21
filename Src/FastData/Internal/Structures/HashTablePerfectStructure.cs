@@ -74,6 +74,7 @@ internal sealed class HashTablePerfectStructure<TKey, TValue> : IStructure<TKey,
             return hashData.MinHashCode - 1;
 
         ulong candidate = 1;
+
         while (true)
         {
             bool found = false;

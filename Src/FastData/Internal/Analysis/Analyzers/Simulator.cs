@@ -33,6 +33,7 @@ internal sealed class Simulator
         _set.SetHash(expression.Compile());
 
         int collisions = 0;
+
         foreach (byte[] bytes in EncodedData)
         {
             if (!_set.Add(bytes))

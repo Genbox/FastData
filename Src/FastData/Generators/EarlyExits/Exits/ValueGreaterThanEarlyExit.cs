@@ -20,6 +20,7 @@ public sealed record ValueGreaterThanEarlyExit<T>(T Value) : ValueComparisonEarl
         {
             // Rejected keyspace is all values greater than the threshold.
             TypeCode code = Type.GetTypeCode(typeof(T));
+
             if (code.IsIntegral())
             {
                 // Convert into unsigned space; subtract values <= threshold from domain size.

@@ -112,13 +112,13 @@ internal static class BoolAlgebraReduction
 
         if (TryGetValueBool(be.Left, out bool leftValue))
         {
-            bool negateRight = (expr.NodeType == ExpressionType.Equal) != leftValue;
+            bool negateRight = expr.NodeType == ExpressionType.Equal != leftValue;
             return negateRight ? Not(be.Right) : be.Right;
         }
 
         if (TryGetValueBool(be.Right, out bool rightValue))
         {
-            bool negateLeft = (expr.NodeType == ExpressionType.Equal) != rightValue;
+            bool negateLeft = expr.NodeType == ExpressionType.Equal != rightValue;
             return negateLeft ? Not(be.Left) : be.Left;
         }
 

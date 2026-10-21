@@ -99,6 +99,7 @@ internal sealed class Varu64Encoding : IIntegerEncoding
             return false;
 
         byte tag = source[0];
+
         if ((tag | 0b0000_0111) != 0b1111_1111)
         {
             value = tag;
@@ -111,6 +112,7 @@ internal sealed class Varu64Encoding : IIntegerEncoding
             return false;
 
         value = IntegerEncodingHelpers.ReadUInt64BE(source.Slice(1, payloadLength), payloadLength);
+
         if (GetEncodedLength(value) != 1 + payloadLength)
         {
             value = 0;

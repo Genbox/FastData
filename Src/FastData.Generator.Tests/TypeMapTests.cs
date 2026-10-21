@@ -48,8 +48,7 @@ public class TypeMapTests
     [Fact]
     public void DynamicStringTypeDefResolvesByEncoding()
     {
-        DynamicStringTypeDef dynamic = new DynamicStringTypeDef(
-            new StringType(GeneratorEncoding.AsciiBytes, "ascii", Identity),
+        DynamicStringTypeDef dynamic = new DynamicStringTypeDef(new StringType(GeneratorEncoding.AsciiBytes, "ascii", Identity),
             new StringType(GeneratorEncoding.Utf8Bytes, "utf8", Identity));
 
         ITypeDef[] defs = [dynamic];

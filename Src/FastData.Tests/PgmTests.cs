@@ -66,6 +66,7 @@ public class PgmTests
 
         int seg = 0;
         int segHi = segments.Length - 1;
+
         while (seg < segHi)
         {
             int mid = seg + ((segHi - seg) >> 1);

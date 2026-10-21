@@ -103,6 +103,7 @@ internal static partial class CpuSelector
             return false;
 
         IntPtr buffer = Marshal.AllocHGlobal(checked((int)bufferSize));
+
         try
         {
             if (!GetLogicalProcessorInformation(buffer, ref bufferSize))

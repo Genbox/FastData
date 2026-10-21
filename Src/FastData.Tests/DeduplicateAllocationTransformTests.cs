@@ -113,8 +113,8 @@ public class DeduplicateAllocationTransformTests
         ];
 
         AnnotatedExpr[] transformed = ExpressionHelper
-            .Transform(expressions, [new AllocationGatherTransform(), new DeduplicateAllocationTransform()])
-            .ToArray();
+                                      .Transform(expressions, [new AllocationGatherTransform(), new DeduplicateAllocationTransform()])
+                                      .ToArray();
 
         Assert.Equal(4, transformed.Length);
         BinaryExpression refreshedAllocation = Assert.IsAssignableFrom<BinaryExpression>(transformed[2].Expression);
@@ -137,16 +137,15 @@ public class DeduplicateAllocationTransformTests
         ];
 
         AnnotatedExpr[] transformed = ExpressionHelper
-            .Transform(expressions, [new AllocationGatherTransform(), new DeduplicateAllocationTransform()])
-            .ToArray();
+                                      .Transform(expressions, [new AllocationGatherTransform(), new DeduplicateAllocationTransform()])
+                                      .ToArray();
 
         Assert.Equal(5, transformed.Length);
         BinaryExpression firstCondition = Assert.IsAssignableFrom<BinaryExpression>(transformed[1].Expression);
         BinaryExpression refreshedAllocation = Assert.IsAssignableFrom<BinaryExpression>(transformed[3].Expression);
         BinaryExpression secondCondition = Assert.IsAssignableFrom<BinaryExpression>(transformed[4].Expression);
         Assert.NotSame(firstCondition.Left, refreshedAllocation.Left);
-        Assert.NotEqual(
-            Assert.IsAssignableFrom<ParameterExpression>(firstCondition.Left).Name,
+        Assert.NotEqual(Assert.IsAssignableFrom<ParameterExpression>(firstCondition.Left).Name,
             Assert.IsAssignableFrom<ParameterExpression>(refreshedAllocation.Left).Name,
             StringComparer.Ordinal);
         Assert.Same(refreshedAllocation.Left, secondCondition.Left);

@@ -119,6 +119,7 @@ internal static class ComparisonReduction
                         if (ExprHelpers.PropertyMatch(leftVal, rightVal))
                             return MakeBinary(ExpressionType.GreaterThan, leftVar, leftVal);
                     }
+
                     return expression;
                 case (ExpressionType.GreaterThanOrEqual, ExpressionType.GreaterThanOrEqual):
                     if (TryCompareConstants(leftVal, rightVal, out int cmpGte))
@@ -130,6 +131,7 @@ internal static class ComparisonReduction
                         if (ExprHelpers.PropertyMatch(leftVal, rightVal))
                             return MakeBinary(ExpressionType.GreaterThanOrEqual, leftVar, leftVal);
                     }
+
                     return expression;
                 case (ExpressionType.LessThan, ExpressionType.LessThan):
                     if (TryCompareConstants(leftVal, rightVal, out int cmpLt))
@@ -141,6 +143,7 @@ internal static class ComparisonReduction
                         if (ExprHelpers.PropertyMatch(leftVal, rightVal))
                             return MakeBinary(ExpressionType.LessThan, leftVar, leftVal);
                     }
+
                     return expression;
                 case (ExpressionType.LessThanOrEqual, ExpressionType.LessThanOrEqual):
                     if (TryCompareConstants(leftVal, rightVal, out int cmpLte))
@@ -152,6 +155,7 @@ internal static class ComparisonReduction
                         if (ExprHelpers.PropertyMatch(leftVal, rightVal))
                             return MakeBinary(ExpressionType.LessThanOrEqual, leftVar, leftVal);
                     }
+
                     return expression;
                 case (ExpressionType.GreaterThanOrEqual, ExpressionType.LessThanOrEqual):
                 case (ExpressionType.LessThanOrEqual, ExpressionType.GreaterThanOrEqual):
@@ -192,6 +196,7 @@ internal static class ComparisonReduction
                         if (ExprHelpers.PropertyMatch(leftValOr, rightValOr))
                             return MakeBinary(ExpressionType.GreaterThan, leftVarOr, leftValOr);
                     }
+
                     return expression;
                 case (ExpressionType.GreaterThanOrEqual, ExpressionType.GreaterThanOrEqual):
                     if (TryCompareConstants(leftValOr, rightValOr, out int cmpGte))
@@ -203,6 +208,7 @@ internal static class ComparisonReduction
                         if (ExprHelpers.PropertyMatch(leftValOr, rightValOr))
                             return MakeBinary(ExpressionType.GreaterThanOrEqual, leftVarOr, leftValOr);
                     }
+
                     return expression;
                 case (ExpressionType.LessThan, ExpressionType.LessThan):
                     if (TryCompareConstants(leftValOr, rightValOr, out int cmpLt))
@@ -214,6 +220,7 @@ internal static class ComparisonReduction
                         if (ExprHelpers.PropertyMatch(leftValOr, rightValOr))
                             return MakeBinary(ExpressionType.LessThan, leftVarOr, leftValOr);
                     }
+
                     return expression;
                 case (ExpressionType.LessThanOrEqual, ExpressionType.LessThanOrEqual):
                     if (TryCompareConstants(leftValOr, rightValOr, out int cmpLte))
@@ -225,6 +232,7 @@ internal static class ComparisonReduction
                         if (ExprHelpers.PropertyMatch(leftValOr, rightValOr))
                             return MakeBinary(ExpressionType.LessThanOrEqual, leftVarOr, leftValOr);
                     }
+
                     return expression;
                 case (ExpressionType.GreaterThanOrEqual, ExpressionType.LessThanOrEqual):
                 case (ExpressionType.LessThanOrEqual, ExpressionType.GreaterThanOrEqual):
@@ -311,6 +319,7 @@ internal static class ComparisonReduction
     private static bool TryCompareConstants(Expression left, Expression right, out int comparison)
     {
         comparison = 0;
+
         if (left is ConstantExpression lCe && right is ConstantExpression rCe)
         {
             if (lCe.Type != rCe.Type || lCe.Value == null || rCe.Value == null)
@@ -339,6 +348,7 @@ internal static class ComparisonReduction
 
         List<Expression> reduced = new List<Expression>(expressions.Count);
         bool removedDuplicate = false;
+
         foreach (Expression child in expressions)
         {
             if (TryGetComparisonExpression(child, out ExpressionType op, out Expression? left, out Expression? right) && ContainsMatchingComparison(reduced, op, left, right))
@@ -391,13 +401,12 @@ internal static class ComparisonReduction
         return result;
     }
 
-    private static bool ContainsOpposingComparison(
-        Expression expression,
-        ExpressionType leftOp,
-        Expression leftA,
-        Expression leftB,
-        TryGetBinary tryGetBinary,
-        int depth)
+    private static bool ContainsOpposingComparison(Expression expression,
+                                                   ExpressionType leftOp,
+                                                   Expression leftA,
+                                                   Expression leftB,
+                                                   TryGetBinary tryGetBinary,
+                                                   int depth)
     {
         if (TryGetComparisonExpression(expression, out ExpressionType rightOp, out Expression? rightA, out Expression? rightB)
             && CheckMatch(leftOp, leftA, leftB, rightOp, rightA, rightB))

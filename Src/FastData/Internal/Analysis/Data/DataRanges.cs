@@ -16,8 +16,5 @@ internal sealed class DataRanges<T>
     internal T Min => Ranges[0].Start;
     internal T Max => Ranges[Ranges.Count - 1].End;
 
-    public void Add(T start, T end)
-    {
-        Ranges.Add((start, end));
-    }
+    public void Add(T start, T end) => Ranges.Add((start, end));
 }

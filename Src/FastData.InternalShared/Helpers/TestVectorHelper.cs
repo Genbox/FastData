@@ -358,10 +358,7 @@ internal static class TestVectorHelper
         }
     }
 
-    private static IEnumerable<ITestVector> GenerateTestVectors<TKey>(IEnumerable<TKey[]> keySets, string? postfix = null, params StructureType[] dataStructs)
-    {
-        return GenerateTestVectors(keySets.Select(x => new DataPair(x.Cast<object>().ToArray(), [])), postfix, dataStructs);
-    }
+    private static IEnumerable<ITestVector> GenerateTestVectors<TKey>(IEnumerable<TKey[]> keySets, string? postfix = null, params StructureType[] dataStructs) => GenerateTestVectors(keySets.Select(x => new DataPair(x.Cast<object>().ToArray(), [])), postfix, dataStructs);
 
     private static IEnumerable<ITestVector> GenerateTestVectors<TKey, TValue>(TKey[][] keySets, TValue[][] valueSets, string? postFix = null, params StructureType[] dataStructs)
     {

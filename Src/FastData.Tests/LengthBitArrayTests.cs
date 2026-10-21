@@ -5,10 +5,7 @@ namespace Genbox.FastData.Tests;
 public class LengthBitArrayTests
 {
     [Fact]
-    public void Constructor_ZeroLength_Throws()
-    {
-        Assert.Throws<InvalidOperationException>(() => new LengthBitArray(0));
-    }
+    public void Constructor_ZeroLength_Throws() => Assert.Throws<InvalidOperationException>(() => new LengthBitArray(0));
 
     [Fact]
     public void DefaultBitsAreFalse()

@@ -390,6 +390,7 @@ public class IntegerEncodingTests(ITestOutputHelper output)
         foreach (IIntegerEncoding encoding in Encodings)
         {
             Span<byte> buffer = new byte[encoding.MaxEncodedLength];
+
             foreach (ulong value in RoundTripValues)
             {
                 if (encoding == QuicEncoding.Instance && value > QuicEncoding.MaxValue)
@@ -499,6 +500,7 @@ public class IntegerEncodingTests(ITestOutputHelper output)
 
                 double percent = values.Average(x => (encoding.GetEncodedLength(x) / 8.0) * 100.0);
                 cells.Add(percent.ToString("0.#", CultureInfo.InvariantCulture) + "%");
+
                 if (percent < bestPercent)
                 {
                     bestPercent = percent;

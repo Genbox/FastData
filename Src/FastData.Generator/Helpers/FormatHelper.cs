@@ -15,10 +15,7 @@ public static class FormatHelper
     /// <param name="indent">The number of spaces at the start of each line.</param>
     /// <param name="columns">The maximum number of items per line.</param>
     /// <returns>The formatted columns.</returns>
-    public static string FormatColumns<T>(T[] items, Func<T, string> Render, int indent = 4, int columns = 10)
-    {
-        return FormatColumns(items.AsReadOnlySpan(), (_, y) => Render(y), indent, columns);
-    }
+    public static string FormatColumns<T>(T[] items, Func<T, string> Render, int indent = 4, int columns = 10) => FormatColumns(items.AsReadOnlySpan(), (_, y) => Render(y), indent, columns);
 
     /// <summary>Formats an array into columns with an index-aware renderer.</summary>
     /// <typeparam name="T">The item type.</typeparam>
@@ -36,10 +33,7 @@ public static class FormatHelper
     /// <param name="indent">The number of spaces at the start of each line.</param>
     /// <param name="columns">The maximum number of items per line.</param>
     /// <returns>The formatted columns.</returns>
-    public static string FormatColumns<T>(ReadOnlySpan<T> items, Func<T, string> Render, int indent = 4, int columns = 10)
-    {
-        return FormatColumns(items, (_, y) => Render(y), indent, columns);
-    }
+    public static string FormatColumns<T>(ReadOnlySpan<T> items, Func<T, string> Render, int indent = 4, int columns = 10) => FormatColumns(items, (_, y) => Render(y), indent, columns);
 
     /// <summary>Formats a read-only span into columns with an index-aware renderer.</summary>
     /// <typeparam name="T">The item type.</typeparam>
@@ -85,19 +79,16 @@ public static class FormatHelper
 
     /// <summary>Formats a known number of enumerable items into columns.</summary>
     /// <param name="items">The items to format.</param>
-    /// <param name="itemCount">The number of items in <paramref name="items"/>.</param>
+    /// <param name="itemCount">The number of items in <paramref name="items" />.</param>
     /// <param name="Render">The function used to render each item.</param>
     /// <param name="indent">The number of spaces at the start of each line.</param>
     /// <param name="columns">The maximum number of items per line.</param>
     /// <returns>The formatted columns.</returns>
-    public static string FormatColumns(IEnumerable<object> items, int itemCount, Func<object?, string> Render, int indent = 4, int columns = 10)
-    {
-        return FormatColumns(items, itemCount, (_, item) => Render(item), indent, columns);
-    }
+    public static string FormatColumns(IEnumerable<object> items, int itemCount, Func<object?, string> Render, int indent = 4, int columns = 10) => FormatColumns(items, itemCount, (_, item) => Render(item), indent, columns);
 
     /// <summary>Formats a known number of enumerable items into columns with an index-aware renderer.</summary>
     /// <param name="items">The items to format.</param>
-    /// <param name="itemCount">The number of items in <paramref name="items"/>.</param>
+    /// <param name="itemCount">The number of items in <paramref name="items" />.</param>
     /// <param name="Render">The function used to render each indexed item.</param>
     /// <param name="indent">The number of spaces at the start of each line.</param>
     /// <param name="columns">The maximum number of items per line.</param>

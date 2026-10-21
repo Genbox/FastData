@@ -21,6 +21,7 @@ internal sealed class RouletteWheelSelection(IRandom random) : ISelection
             _wheel = new double[count];
 
         double cumulative = 0.0;
+
         for (int i = 0; i < population.Count; i++)
         {
             cumulative += GeneHelper.GetSelectionWeight(population[i].Fitness);

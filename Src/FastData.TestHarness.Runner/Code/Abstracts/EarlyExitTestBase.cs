@@ -8,8 +8,8 @@ namespace Genbox.FastData.TestHarness.Runner.Code.Abstracts;
 
 public abstract class EarlyExitTestBase
 {
-    private readonly TestBase _testBase;
     private readonly ExpressionCompiler _compiler;
+    private readonly TestBase _testBase;
 
     private protected EarlyExitTestBase(TestBase testBase, ExpressionCompiler compiler)
     {

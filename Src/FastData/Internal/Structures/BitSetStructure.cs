@@ -63,6 +63,7 @@ internal sealed class BitSetStructure<TKey, TValue> : IStructure<TKey, TValue, B
         void SetEntry(ulong offset, TValue value)
         {
             Debug.Assert(offset <= _props.Range, "BitSetStructure requires every key to be within the analyzed numeric range.");
+
             if (hasOccupancy)
             {
                 int word = (int)(offset >> 6);

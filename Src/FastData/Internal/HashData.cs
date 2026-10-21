@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 namespace Genbox.FastData.Internal;
 
 /// <summary>Used internally in FastData to store hash codes and their properties.</summary>
+
 // InspectCode misses the MinHashCode reads in HashTablePerfectStructure.GetSentinel.
 internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize, bool RoundModuloToPowerOfTwo, float RoundModuloToPowerOfTwoThreshold, bool HashCodesPerfect, int CollisionCount, [property: UsedImplicitly]ulong MinHashCode, ulong MaxHashCode)
 {
@@ -109,6 +110,7 @@ internal record HashData(ulong[] HashCodes, float CapacityFactor, int TableSize,
         }
 
         double overhead = (double)(rounded - current) / rounded;
+
         if (overhead > roundingThreshold)
         {
             collisions = knownCollisions >= 0 ? knownCollisions : CountBucketCollisions(hashCodes, length);

@@ -16,7 +16,7 @@ public static class SpanExtensions
     /// <typeparam name="T">The element type.</typeparam>
     /// <param name="arr">The source array.</param>
     /// <param name="start">The zero-based starting index.</param>
-    /// <returns>A read-only view from <paramref name="start"/> to the end of the array.</returns>
+    /// <returns>A read-only view from <paramref name="start" /> to the end of the array.</returns>
     public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[] arr, int start)
     {
         if (arr == null)

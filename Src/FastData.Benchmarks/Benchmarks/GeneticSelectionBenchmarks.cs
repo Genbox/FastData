@@ -10,16 +10,16 @@ namespace Genbox.FastData.Benchmarks.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class GeneticSelectionBenchmarks
 {
-    private StaticArray<Entity> _population = null!;
-    private List<int> _parents = null!;
     private ISelection _boltzmann = null!;
     private ISelection _elite = null!;
+    private List<int> _parents = null!;
+    private StaticArray<Entity> _population = null!;
     private ISelection _random = null!;
-    private ISelection _uniqueRandom = null!;
     private ISelection _rank = null!;
     private ISelection _roulette = null!;
     private ISelection _sus = null!;
     private ISelection _tournament = null!;
+    private ISelection _uniqueRandom = null!;
 
     [Params(32, 256, 4096)]
     public int PopulationSize { get; set; }

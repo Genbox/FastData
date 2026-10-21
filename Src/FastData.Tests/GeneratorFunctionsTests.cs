@@ -7,35 +7,23 @@ public class GeneratorFunctionsTests
     [Theory]
     [InlineData("abc", 0, 'a')]
     [InlineData("abc", -1, 'c')]
-    public void UnitAt_ReturnsUnitWhenOffsetIsValid(string value, int offset, char expected)
-    {
-        Assert.Equal(expected, GeneratorFunctions.UnitAt(value, offset));
-    }
+    public void UnitAt_ReturnsUnitWhenOffsetIsValid(string value, int offset, char expected) => Assert.Equal(expected, GeneratorFunctions.UnitAt(value, offset));
 
     [Theory]
     [InlineData("1", 0, '1')]
     [InlineData("AbC", 1, 'b')]
-    public void UnitAtAsciiLower_ReturnsExpectedUnit(string value, int offset, char expected)
-    {
-        Assert.Equal(expected, GeneratorFunctions.UnitAtAsciiLower(value, offset));
-    }
+    public void UnitAtAsciiLower_ReturnsExpectedUnit(string value, int offset, char expected) => Assert.Equal(expected, GeneratorFunctions.UnitAtAsciiLower(value, offset));
 
     [Theory]
     [InlineData("prefix", 0, "pre")]
     [InlineData("prefix", -1, "fix")]
-    public void EqualsAt_ReturnsTrueWhenFragmentFitsAtOffset(string value, int offset, string fragment)
-    {
-        Assert.True(GeneratorFunctions.EqualsAt(value, offset, fragment));
-    }
+    public void EqualsAt_ReturnsTrueWhenFragmentFitsAtOffset(string value, int offset, string fragment) => Assert.True(GeneratorFunctions.EqualsAt(value, offset, fragment));
 
     [Theory]
     [InlineData("prefix", 0, "PRE")]
     [InlineData("prefix", -1, "FIX")]
     [InlineData("AbC123", 0, "abc123")]
-    public void EqualsAtAsciiLower_ReturnsTrueWhenFragmentFitsAtOffset(string value, int offset, string fragment)
-    {
-        Assert.True(GeneratorFunctions.EqualsAtAsciiLower(value, offset, fragment));
-    }
+    public void EqualsAtAsciiLower_ReturnsTrueWhenFragmentFitsAtOffset(string value, int offset, string fragment) => Assert.True(GeneratorFunctions.EqualsAtAsciiLower(value, offset, fragment));
 
     [Theory]
     [InlineData("", true)]
@@ -46,10 +34,7 @@ public class GeneratorFunctionsTests
     [InlineData("abc\u0080", false)]
     [InlineData("\u00e9", false)]
     [InlineData("abc\u00e9", false)]
-    public void IsAsciiOnly_ReturnsExpectedResult(string value, bool expected)
-    {
-        Assert.Equal(expected, GeneratorFunctions.IsAsciiOnly(value));
-    }
+    public void IsAsciiOnly_ReturnsExpectedResult(string value, bool expected) => Assert.Equal(expected, GeneratorFunctions.IsAsciiOnly(value));
 
     [Fact]
     public void IntegerReadsUseLittleEndianByteOrder()

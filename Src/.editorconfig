@@ -28,6 +28,16 @@ resharper_unused_auto_property_accessor_global_highlighting = none
 # CA1861: Avoid constant arrays as arguments
 dotnet_diagnostic.CA1861.severity = none
 
+[FastData.TestHarness.Runner/Tests/**.cs]
+# xUnit requires public test and fixture types for discovery.
+# CA1515: Consider making public types internal
+dotnet_diagnostic.CA1515.severity = none
+
+[FastData.TestHarness.Runner/Code/Theory/**.cs]
+# xUnit class data must remain public for discovery by public theory methods.
+# CA1515: Consider making public types internal
+dotnet_diagnostic.CA1515.severity = none
+
 [FastData.Demo/wwwroot/index.html]
 # InspectCode fails to resolve IDs declared in this same document.
 resharper_html_id_not_resolved_highlighting = none

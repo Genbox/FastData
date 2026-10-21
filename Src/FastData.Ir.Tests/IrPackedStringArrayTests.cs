@@ -49,14 +49,8 @@ public class IrPackedStringArrayTests
     }
 
     [Fact]
-    public void StringArraysRequirePackedStorage()
-    {
-        Assert.Equal(IrDiagnosticCode.InvalidProgram, Assert.Throws<IrValidationException>(() => new IrArrayLiteral(IrType.String, [new IrStringLiteral("value")])).Code);
-    }
+    public void StringArraysRequirePackedStorage() => Assert.Equal(IrDiagnosticCode.InvalidProgram, Assert.Throws<IrValidationException>(() => new IrArrayLiteral(IrType.String, [new IrStringLiteral("value")])).Code);
 
     [Fact]
-    public void Utf8StringBoundariesMustContainCompleteSequences()
-    {
-        Assert.Equal(IrDiagnosticCode.InvalidProgram, Assert.Throws<IrValidationException>(() => new IrPackedStringArrayLiteral(IrTextEncoding.Utf8, "é"u8.ToArray(), [0, 1, 2], [])).Code);
-    }
+    public void Utf8StringBoundariesMustContainCompleteSequences() => Assert.Equal(IrDiagnosticCode.InvalidProgram, Assert.Throws<IrValidationException>(() => new IrPackedStringArrayLiteral(IrTextEncoding.Utf8, "é"u8.ToArray(), [0, 1, 2], [])).Code);
 }

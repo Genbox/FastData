@@ -174,11 +174,11 @@ internal static class ConstantReduction
         }
 
         if (nodeType == ExpressionType.Add && be.Right.NodeType == ExpressionType.Constant
-                                            && be.Left is BinaryExpression beLeft
-                                            && beLeft.NodeType == ExpressionType.Add
-                                            && be.Right is ConstantExpression right
-                                            && beLeft.Method == null
-                                            && be.Method == null)
+                                           && be.Left is BinaryExpression beLeft
+                                           && beLeft.NodeType == ExpressionType.Add
+                                           && be.Right is ConstantExpression right
+                                           && beLeft.Method == null
+                                           && be.Method == null)
         {
             if (beLeft.Left.NodeType == ExpressionType.Constant && beLeft.Left is ConstantExpression addLeftConstant && addLeftConstant.Type == right.Type)
                 return AddConstants(beLeft.Right, addLeftConstant, right) ?? expr;
@@ -188,14 +188,14 @@ internal static class ConstantReduction
         }
 
         if (nodeType == ExpressionType.Subtract && be.Right.NodeType == ExpressionType.Constant
-                                                 && be.Left is BinaryExpression beLeft2
-                                                 && beLeft2.NodeType == ExpressionType.Subtract
-                                                 && be.Right is ConstantExpression rightSub
-                                                 && beLeft2.Method == null
-                                                 && be.Method == null
-                                                 && beLeft2.Right.NodeType == ExpressionType.Constant
-                                                 && beLeft2.Right is ConstantExpression subtractRightConstant
-                                                 && subtractRightConstant.Type == rightSub.Type)
+                                                && be.Left is BinaryExpression beLeft2
+                                                && beLeft2.NodeType == ExpressionType.Subtract
+                                                && be.Right is ConstantExpression rightSub
+                                                && beLeft2.Method == null
+                                                && be.Method == null
+                                                && beLeft2.Right.NodeType == ExpressionType.Constant
+                                                && beLeft2.Right is ConstantExpression subtractRightConstant
+                                                && subtractRightConstant.Type == rightSub.Type)
             return SubtractConstants(beLeft2.Left, subtractRightConstant, rightSub) ?? expr;
 
         if (nodeType == ExpressionType.Multiply && be.Right.NodeType == ExpressionType.Constant

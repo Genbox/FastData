@@ -74,6 +74,7 @@ internal static partial class Deduplication
 
             // Compact by recreating sorted keys from the seen map.
             int writeIndex = 0;
+
             for (int i = 0; i < 256; i++)
             {
                 if (Unsafe.Add(ref seenRef, i) == 0)

@@ -33,6 +33,7 @@ internal sealed class GitPackEncoding : IIntegerEncoding
         unchecked
         {
             int length = GetEncodedLength(value);
+
             for (int i = length - 1; i >= 0; i--)
             {
                 destination[i] = (byte)(value & 0x7f);

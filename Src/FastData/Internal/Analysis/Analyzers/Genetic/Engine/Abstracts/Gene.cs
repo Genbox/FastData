@@ -1,5 +1,6 @@
 using System.Globalization;
 using Genbox.FastData.Internal.Abstracts;
+using Convert = System.Convert;
 
 namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Engine.Abstracts;
 
@@ -12,5 +13,5 @@ internal abstract class Gene<T>(string name, T value) : IGene
 
     public bool HasSameValue(IGene other) => other is Gene<T> gene && string.Equals(Name, gene.Name, StringComparison.Ordinal) && EqualityComparer<T>.Default.Equals(Value, gene.Value);
 
-    public override string ToString() => Name + ": " + System.Convert.ToString(Value, CultureInfo.InvariantCulture);
+    public override string ToString() => Name + ": " + Convert.ToString(Value, CultureInfo.InvariantCulture);
 }

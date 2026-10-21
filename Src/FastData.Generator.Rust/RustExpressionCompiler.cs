@@ -60,6 +60,7 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
         {
             Visit(node.Object);
             Output.Append(".as_bytes()[");
+
             for (int i = 0; i < node.Arguments.Count; i++)
             {
                 Output.Append("(");
@@ -68,6 +69,7 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
                 if (i < node.Arguments.Count - 1)
                     Output.Append(", ");
             }
+
             Output.Append("] as char");
             return node;
         }
@@ -94,6 +96,7 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
         if (node.Method.DeclaringType == typeof(GeneratorFunctions) && node.Method.Name.StartsWith("Read", StringComparison.Ordinal))
         {
             Output.Append(node.Method.Name).Append("(");
+
             for (int i = 0; i < node.Arguments.Count; i++)
             {
                 if (i > 0)
@@ -105,6 +108,7 @@ public sealed class RustExpressionCompiler(TypeMap map) : ExpressionCompiler(map
                 if (i == 1)
                     Output.Append(" as usize");
             }
+
             Output.Append(")");
             return node;
         }

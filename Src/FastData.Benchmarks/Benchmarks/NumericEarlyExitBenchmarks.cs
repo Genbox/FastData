@@ -14,7 +14,7 @@ public class NumericEarlyExitBenchmarks
     private readonly sbyte _sbyteMax = 20;
     private readonly sbyte _sbyteMin = -10;
     private readonly sbyte _sbyteValue = -11;
-    private Vector256<int> _simdSet = Vector256.Create(3, 5, 7, 11, 13, 17, 19, 23);
+    private readonly Vector256<int> _simdSet = Vector256.Create(3, 5, 7, 11, 13, 17, 19, 23);
     private readonly int _value = 7;
 
     [Benchmark]public bool ValueRange() => _value < _min || _value > _max;

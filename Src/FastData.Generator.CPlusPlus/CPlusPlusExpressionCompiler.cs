@@ -69,6 +69,7 @@ public sealed class CPlusPlusExpressionCompiler(TypeMap map) : ExpressionCompile
             int length = Map.GetStringLength(literal);
 
             Visit(node.Object);
+
             if (isPrefix)
             {
                 Output.Append(".compare(0, ")

@@ -130,6 +130,7 @@ internal sealed class OptimalPiecewiseLinearModel<T>
             {
                 Slope min = _lower[_lowerStart] - p1;
                 int minIndex = _lowerStart;
+
                 for (int i = _lowerStart + 1; i < _lower.Count; i++)
                 {
                     Slope val = _lower[i] - p1;
@@ -155,6 +156,7 @@ internal sealed class OptimalPiecewiseLinearModel<T>
             {
                 Slope max = _upper[_upperStart] - p2;
                 int maxIndex = _upperStart;
+
                 for (int i = _upperStart + 1; i < _upper.Count; i++)
                 {
                     Slope val = _upper[i] - p2;
@@ -371,6 +373,7 @@ internal sealed class OptimalPiecewiseLinearModel<T>
             {
                 Slope min = _lower[_lowerStart] - p1;
                 int minIndex = _lowerStart;
+
                 for (int i = _lowerStart + 1; i < _lower.Count; i++)
                 {
                     Slope val = _lower[i] - p1;
@@ -396,6 +399,7 @@ internal sealed class OptimalPiecewiseLinearModel<T>
             {
                 Slope max = _upper[_upperStart] - p2;
                 int maxIndex = _upperStart;
+
                 for (int i = _upperStart + 1; i < _upper.Count; i++)
                 {
                     Slope val = _upper[i] - p2;

@@ -139,13 +139,11 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
 
     private void Simulation(ReadOnlySpan<string> data, ref Entity entity)
     {
-        GeneticSimulationKey key = new GeneticSimulationKey(
-            ((ArraySegmentGene)entity.Genes[0]).Value,
+        GeneticSimulationKey key = new GeneticSimulationKey(((ArraySegmentGene)entity.Genes[0]).Value,
             ((IntGene)entity.Genes[1]).Value,
             ((IntGene)entity.Genes[2]).Value,
             ((IntGene)entity.Genes[3]).Value,
-            ((IntGene)entity.Genes[4]).Value
-        );
+            ((IntGene)entity.Genes[4]).Value);
 
         if (_simulationCache.TryGetValue(key, out (double Fitness, int Collisions) cached))
         {
@@ -154,15 +152,13 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
             return;
         }
 
-        GeneticStringHash spec = new GeneticStringHash(
-            key.Segment,
+        GeneticStringHash spec = new GeneticStringHash(key.Segment,
             key.MixerSeed,
             key.MixerIterations,
             key.AvalancheSeed,
             key.AvalancheIterations,
             ignoreCase,
-            sim.UnitSize
-        );
+            sim.UnitSize);
 
         //Run the simulation
         Candidate candidate = sim.Run(spec, expression => FitnessHelper.CalculateFitness(props, spec.Segment, expression));
@@ -173,15 +169,13 @@ internal sealed partial class GeneticAnalyzer(StringKeyProperties props, Genetic
         entity.Tag = candidate.Collisions; //We cache collisions here and pull it out later
     }
 
-    private GeneticStringHash CopyGenes(ref Entity entity) => new GeneticStringHash(
-        ((ArraySegmentGene)entity.Genes[0]).Value,
+    private GeneticStringHash CopyGenes(ref Entity entity) => new GeneticStringHash(((ArraySegmentGene)entity.Genes[0]).Value,
         ((IntGene)entity.Genes[1]).Value,
         ((IntGene)entity.Genes[2]).Value,
         ((IntGene)entity.Genes[3]).Value,
         ((IntGene)entity.Genes[4]).Value,
         ignoreCase,
-        sim.UnitSize
-    );
+        sim.UnitSize);
 
     [StructLayout(LayoutKind.Auto)]
     private readonly record struct GeneticSimulationKey(ArraySegment Segment, int MixerSeed, int MixerIterations, int AvalancheSeed, int AvalancheIterations);

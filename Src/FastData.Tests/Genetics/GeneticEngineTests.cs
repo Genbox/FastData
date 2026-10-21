@@ -22,8 +22,7 @@ public class GeneticEngineTests
         DefaultRandom random = new DefaultRandom(42);
         int simulations = 0;
 
-        engine.Evolve(
-            ReadOnlySpan<string>.Empty,
+        engine.Evolve(ReadOnlySpan<string>.Empty,
             (_, ref entity) =>
             {
                 simulations++;
@@ -83,8 +82,7 @@ public class GeneticEngineTests
         GeneticEngine engine = new GeneticEngine(config, [gene], NullLogger.Instance);
         DefaultRandom random = new DefaultRandom(42);
 
-        return engine.Evolve(
-            ReadOnlySpan<string>.Empty,
+        return engine.Evolve(ReadOnlySpan<string>.Empty,
             static (_, ref entity) => entity.Fitness = ((IntGene)entity.Genes[0]).Value,
             new TournamentSelection(4, random),
             new OnePointCrossOver(random),

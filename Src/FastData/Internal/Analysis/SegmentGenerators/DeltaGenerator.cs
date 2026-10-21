@@ -119,6 +119,7 @@ internal sealed class DeltaGenerator(DeltaGeneratorConfig config) : ISegmentGene
     private static IEnumerable<(uint start, uint offset)> GetSegments(int[] arr)
     {
         uint offset = 0;
+
         while (offset < arr.Length)
         {
             while (offset < arr.Length && arr[offset] == 0)

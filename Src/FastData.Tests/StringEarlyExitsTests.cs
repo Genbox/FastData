@@ -112,6 +112,7 @@ public class StringEarlyExitsTests
         Assert.DoesNotContain(exits, static x => x is UnitAtLessThanEarlyExit or UnitAtGreaterThanEarlyExit);
 
         ParameterExpression parameter = Expression.Parameter(typeof(string), "key");
+
         foreach (IEarlyExit exit in exits)
         {
             Func<string, bool> func = Expression.Lambda<Func<string, bool>>(exit.GetExpression(parameter), parameter).Compile();

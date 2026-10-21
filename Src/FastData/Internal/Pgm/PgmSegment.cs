@@ -52,6 +52,7 @@ public readonly struct PgmSegment<T>
         unchecked
         {
             double diff;
+
             if (typeof(T) == typeof(int))
             {
                 uint k = (uint)(int)(object)key!;

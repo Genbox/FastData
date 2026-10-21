@@ -7,6 +7,7 @@ public sealed class LoweredBlock(IReadOnlyList<ParameterExpression> locals, IRea
 {
     /// <summary>Gets the local variables declared in this scope.</summary>
     public IReadOnlyList<ParameterExpression> Locals { get; } = locals;
+
     /// <summary>Gets the statements in execution order.</summary>
     public IReadOnlyList<LoweredStatement> Statements { get; } = statements;
 }

@@ -5,8 +5,10 @@ public sealed class LoweredIfStatement(ValidatedExpression test, LoweredBlock if
 {
     /// <summary>Gets the validated condition.</summary>
     public ValidatedExpression Test { get; } = test;
+
     /// <summary>Gets the branch executed when the condition is true.</summary>
     public LoweredBlock IfTrue { get; } = ifTrue;
+
     /// <summary>Gets the optional branch executed when the condition is false.</summary>
     public LoweredBlock? IfFalse { get; } = ifFalse;
 }

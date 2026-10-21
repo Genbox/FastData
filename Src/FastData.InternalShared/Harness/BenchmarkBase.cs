@@ -108,6 +108,7 @@ internal abstract class BenchmarkBase(BootstrapBase bootstrap, DockerManager doc
             timeoutSource.CancelAfter(TimeoutPerSample);
 
             MeasurementSample[] samples;
+
             try
             {
                 ProcessResult res = await RunProgramAsync(data.Identifier, FormatArguments(invocations, 1, 1), timeoutSource.Token);

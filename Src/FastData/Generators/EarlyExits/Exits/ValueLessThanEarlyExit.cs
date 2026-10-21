@@ -20,6 +20,7 @@ public sealed record ValueLessThanEarlyExit<T>(T Value) : ValueComparisonEarlyEx
         {
             // Rejected keyspace is all values less than the threshold.
             TypeCode code = Type.GetTypeCode(typeof(T));
+
             if (code.IsIntegral())
             {
                 // Convert into unsigned space for ordering; difference from min gives count.

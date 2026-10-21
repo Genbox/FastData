@@ -85,6 +85,7 @@ internal sealed class Bijou64Encoding : IIntegerEncoding
             return false;
 
         byte tag = source[0];
+
         if (tag < TagThreshold)
         {
             value = tag;

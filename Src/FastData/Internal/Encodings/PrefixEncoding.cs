@@ -121,6 +121,7 @@ internal sealed class PrefixEncoding : IIntegerEncoding
             return false;
 
         byte first = source[0];
+
         if (first < 0x80)
         {
             value = first;

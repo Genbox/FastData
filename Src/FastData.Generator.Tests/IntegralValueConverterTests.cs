@@ -16,38 +16,23 @@ public class IntegralValueConverterTests
 
     [Theory]
     [MemberData(nameof(GetOverflowConversions))]
-    public void ConvertCheckedThrowsOnOverflow(object value, Type targetType)
-    {
-        Assert.Throws<OverflowException>(() => IntegralValueConverter.ConvertChecked(value, targetType));
-    }
+    public void ConvertCheckedThrowsOnOverflow(object value, Type targetType) => Assert.Throws<OverflowException>(() => IntegralValueConverter.ConvertChecked(value, targetType));
 
     [Theory]
     [InlineData(typeof(byte))]
     [InlineData(typeof(uint))]
     [InlineData(typeof(ulong))]
-    public void ConvertCheckedRejectsNegativeValuesForUnsignedTargets(Type targetType)
-    {
-        Assert.Throws<OverflowException>(() => IntegralValueConverter.ConvertChecked(-1, targetType));
-    }
+    public void ConvertCheckedRejectsNegativeValuesForUnsignedTargets(Type targetType) => Assert.Throws<OverflowException>(() => IntegralValueConverter.ConvertChecked(-1, targetType));
 
     [Theory]
     [MemberData(nameof(GetUnsupportedSourceValues))]
-    public void ConvertCheckedRejectsUnsupportedSource(object value)
-    {
-        Assert.Throws<ArgumentException>(() => IntegralValueConverter.ConvertChecked(value, typeof(int)));
-    }
+    public void ConvertCheckedRejectsUnsupportedSource(object value) => Assert.Throws<ArgumentException>(() => IntegralValueConverter.ConvertChecked(value, typeof(int)));
 
     [Fact]
-    public void ConvertCheckedRejectsNullValue()
-    {
-        Assert.Throws<ArgumentNullException>(() => IntegralValueConverter.ConvertChecked(null!, typeof(int)));
-    }
+    public void ConvertCheckedRejectsNullValue() => Assert.Throws<ArgumentNullException>(() => IntegralValueConverter.ConvertChecked(null!, typeof(int)));
 
     [Fact]
-    public void ConvertCheckedRejectsNullTargetType()
-    {
-        Assert.Throws<ArgumentNullException>(() => IntegralValueConverter.ConvertChecked(1, null!));
-    }
+    public void ConvertCheckedRejectsNullTargetType() => Assert.Throws<ArgumentNullException>(() => IntegralValueConverter.ConvertChecked(1, null!));
 
     public static TheoryData<object, Type, object> GetSuccessfulConversions() => new TheoryData<object, Type, object>
     {

@@ -65,6 +65,7 @@ internal static class ExprHelpers
             return true;
 
         object? myVal;
+
         if (parentExpr.NodeType == ExpressionType.MemberAccess && parentExpr is MemberExpression mainNode)
         {
             myVal = mainNode.Member switch

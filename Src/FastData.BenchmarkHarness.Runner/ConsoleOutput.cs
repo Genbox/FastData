@@ -39,8 +39,7 @@ internal static class ConsoleOutput
         table.AddColumn(new TableColumn(string.Empty).NoWrap().Width(14));
         table.AddColumn(new TableColumn(string.Empty).NoWrap());
 
-        table.AddRow(
-            Markup.Escape(result.HarnessName),
+        table.AddRow(Markup.Escape(result.HarnessName),
             Markup.Escape(result.DataIdentifier),
             FormatMetric("min", result.Min),
             FormatMetric("max", result.Max),

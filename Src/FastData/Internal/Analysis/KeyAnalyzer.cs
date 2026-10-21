@@ -145,6 +145,7 @@ internal static class KeyAnalyzer
             if (keys.Length % 2 != 0)
             {
                 byte[] maxBytes = encodedKeys[0];
+
                 for (int i = 1; i < encodedKeys.Length; i++)
                 {
                     if (encodedKeys[i].Length > maxBytes.Length)

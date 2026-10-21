@@ -6,10 +6,7 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic;
 
 internal sealed class ArraySegmentGene(string name, ArraySegment[] segments) : Gene<ArraySegment>(name, segments[0])
 {
-    public override void Mutate(IRandom rng)
-    {
-        Value = segments[rng.Next(segments.Length)];
-    }
+    public override void Mutate(IRandom rng) => Value = segments[rng.Next(segments.Length)];
 
     public override IGene Clone()
     {

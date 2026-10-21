@@ -84,10 +84,7 @@ internal sealed class MinHeap<T>(int capacity)
         }
     }
 
-    private void Swap(int i, int j)
-    {
-        (_items[i], _items[j]) = (_items[j], _items[i]);
-    }
+    private void Swap(int i, int j) => (_items[i], _items[j]) = (_items[j], _items[i]);
 
     public void Clear()
     {

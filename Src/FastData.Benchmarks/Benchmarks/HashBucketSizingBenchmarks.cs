@@ -24,6 +24,7 @@ public class HashBucketSizingBenchmarks
             state ^= state >> 12;
             state ^= state << 25;
             state ^= state >> 27;
+
             unchecked { _hashCodes[i] = state * 0x2545f4914f6cdd1dUL; }
         }
 

@@ -152,6 +152,7 @@ internal static class NumericEarlyExits<TKey>
 
                 // Iterate by length instead of an inclusive unsigned upper bound; ranges ending at zero can wrap to the maximum value.
                 ulong gapValueCount = unchecked(gapLast - gapFirst) + 1;
+
                 for (ulong offset = 0; offset < gapValueCount; offset++)
                 {
                     ulong v = unchecked(gapFirst + offset);

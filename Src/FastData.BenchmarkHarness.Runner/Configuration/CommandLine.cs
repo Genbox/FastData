@@ -104,6 +104,7 @@ internal sealed class CommandLine(string[] languageNames)
             languages.AddRange(parseResult.GetValue(_languageOption) ?? []);
 
         string[] patterns = parseResult.GetValue(_patternsArgument) ?? [];
+
         foreach (string pattern in patterns)
         {
             if (IsLanguageName(pattern))

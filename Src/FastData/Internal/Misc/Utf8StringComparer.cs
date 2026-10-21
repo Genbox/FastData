@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Genbox.FastData.Internal.Misc;
 
 internal sealed class Utf8StringComparer(bool ignoreCase) : IComparer<string>

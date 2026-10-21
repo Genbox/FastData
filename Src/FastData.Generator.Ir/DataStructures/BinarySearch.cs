@@ -48,11 +48,13 @@ internal static class BinarySearch<TKey, TValue>
     private static string FoldAscii(string value)
     {
         char[] characters = value.ToCharArray();
+
         for (int i = 0; i < characters.Length; i++)
         {
             if (characters[i] is >= 'A' and <= 'Z')
                 characters[i] = (char)(characters[i] + ('a' - 'A'));
         }
+
         return new string(characters);
     }
 }

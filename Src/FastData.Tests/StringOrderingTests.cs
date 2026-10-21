@@ -1,4 +1,3 @@
-using System;
 using Genbox.FastData.Config;
 using Genbox.FastData.Enums;
 using Genbox.FastData.Generators;
@@ -47,8 +46,9 @@ public class StringOrderingTests
 
     private sealed class CaptureGenerator(GeneratorEncoding encoding) : ICodeGenerator
     {
-        public GeneratorEncoding Encoding => encoding;
         public BinarySearchContext<string, int> Context { get; private set; } = null!;
+        public GeneratorEncoding Encoding => encoding;
+
         public string Generate<TKey, TValue>(GeneratorConfigBase genCfg, IContext context)
         {
             Context = (BinarySearchContext<string, int>)context;

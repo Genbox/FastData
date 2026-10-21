@@ -33,17 +33,12 @@ internal static class ExpressionHashBuilder
 
         // while (length > 0)
         LabelTarget breakLabel = Label();
-        LoopExpression loop = Loop(
-            IfThenElse(
-                GreaterThan(length, Constant(0)),
-                Block(
-                    Assign(hash, mixer(hash, GetReadFunc(input, offset, size, ignoreCase))),
+        LoopExpression loop = Loop(IfThenElse(GreaterThan(length, Constant(0)),
+                Block(Assign(hash, mixer(hash, GetReadFunc(input, offset, size, ignoreCase))),
                     AddAssign(offset, Constant(size)),
                     SubtractAssign(length, Constant(size))),
-                Break(breakLabel)
-            ),
-            breakLabel
-        );
+                Break(breakLabel)),
+            breakLabel);
         ex.Add(loop);
 
         // hash = avalanche(hash);
@@ -84,6 +79,7 @@ internal static class ExpressionHashBuilder
 
                 int rem = seg.Length;
                 int consumed = 0;
+
                 while (rem > 0)
                 {
                     int chunk = rem switch
@@ -125,10 +121,8 @@ internal static class ExpressionHashBuilder
         ex.Add(SubtractAssign(length, offset));
 
         // Use independent lanes for large inputs so the generated code exposes instruction-level parallelism.
-        ex.Add(IfThen(
-            GreaterThanOrEqual(length, Constant(32)),
-            Block(
-                [v1, v2, v3, v4],
+        ex.Add(IfThen(GreaterThanOrEqual(length, Constant(32)),
+            Block([v1, v2, v3, v4],
                 Assign(v1, Constant(initialSeed)),
                 Assign(v2, Constant(initialSeed)),
                 Assign(v3, Constant(initialSeed)),
@@ -137,8 +131,7 @@ internal static class ExpressionHashBuilder
                 Assign(hash, mixer(hash, v1)),
                 Assign(hash, mixer(hash, v2)),
                 Assign(hash, mixer(hash, v3)),
-                Assign(hash, mixer(hash, v4))
-            )));
+                Assign(hash, mixer(hash, v4)))));
 
         ex.Add(BuildChunkLoop(8, input, offset, length, hash, mixer, ignoreCase));
         ex.Add(IfThen(GreaterThanOrEqual(length, Constant(4)), DynamicChunk(4, input, offset, length, hash, mixer, ignoreCase)));
@@ -150,33 +143,24 @@ internal static class ExpressionHashBuilder
     private static LoopExpression BuildParallelLaneLoop(Expression data, Expression offset, Expression length, Mixer mixer, bool ignoreCase, Expression v1, Expression v2, Expression v3, Expression v4)
     {
         LabelTarget breakLabel = Label();
-        return Loop(
-            IfThenElse(
-                GreaterThanOrEqual(length, Constant(32)),
-                Block(
-                    DynamicChunk(8, data, offset, length, v1, mixer, ignoreCase, false),
+        return Loop(IfThenElse(GreaterThanOrEqual(length, Constant(32)),
+                Block(DynamicChunk(8, data, offset, length, v1, mixer, ignoreCase, false),
                     DynamicChunk(8, data, offset, length, v2, mixer, ignoreCase, false),
                     DynamicChunk(8, data, offset, length, v3, mixer, ignoreCase, false),
                     DynamicChunk(8, data, offset, length, v4, mixer, ignoreCase, false),
                     SubtractAssign(length, Constant(32))),
-                Break(breakLabel)
-            ),
-            breakLabel
-        );
+                Break(breakLabel)),
+            breakLabel);
     }
 
     /// <summary>Builds a loop that consumes all remaining complete chunks of the specified size.</summary>
     private static LoopExpression BuildChunkLoop(int chunk, Expression data, Expression offset, Expression length, Expression hash, Mixer mixer, bool ignoreCase)
     {
         LabelTarget breakLabel = Label();
-        return Loop(
-            IfThenElse(
-                GreaterThanOrEqual(length, Constant(chunk)),
+        return Loop(IfThenElse(GreaterThanOrEqual(length, Constant(chunk)),
                 DynamicChunk(chunk, data, offset, length, hash, mixer, ignoreCase),
-                Break(breakLabel)
-            ),
-            breakLabel
-        );
+                Break(breakLabel)),
+            breakLabel);
     }
 
     /// <summary>Builds one read/mix step for a 1, 2, 4, or 8 byte chunk.</summary>
@@ -188,15 +172,11 @@ internal static class ExpressionHashBuilder
         // offset += chunk
         // length -= chunk
         return subtractLength
-            ? Block(
-                Assign(hash, mixer(hash, readCall)),
+            ? Block(Assign(hash, mixer(hash, readCall)),
                 AddAssign(offset, Constant(chunk)),
-                SubtractAssign(length, Constant(chunk))
-            )
-            : Block(
-                Assign(hash, mixer(hash, readCall)),
-                AddAssign(offset, Constant(chunk))
-            );
+                SubtractAssign(length, Constant(chunk)))
+            : Block(Assign(hash, mixer(hash, readCall)),
+                AddAssign(offset, Constant(chunk)));
     }
 
     /// <summary>Builds a call to the generated unaligned read helper for a 1, 2, 4, or 8 byte chunk.</summary>

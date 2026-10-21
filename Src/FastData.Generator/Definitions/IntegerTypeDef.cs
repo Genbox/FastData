@@ -8,8 +8,8 @@ namespace Genbox.FastData.Generator.Definitions;
 /// <param name="name">The target-language type name.</param>
 /// <param name="minValue">The minimum value of the CLR type.</param>
 /// <param name="maxValue">The maximum value of the CLR type.</param>
-/// <param name="minValueStr">The target-language literal for <paramref name="minValue"/>.</param>
-/// <param name="maxValueStr">The target-language literal for <paramref name="maxValue"/>.</param>
+/// <param name="minValueStr">The target-language literal for <paramref name="minValue" />.</param>
+/// <param name="maxValueStr">The target-language literal for <paramref name="maxValue" />.</param>
 /// <param name="print">An optional function that formats other values.</param>
 public class IntegerTypeDef<T>(string name, T minValue, T maxValue, string minValueStr, string maxValueStr, Func<T, string>? print = null) : ITypeDef<T>
 {

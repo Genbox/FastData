@@ -25,7 +25,7 @@ public class TemplateManager
     private readonly string _classNamespace;
     private readonly bool _release;
 
-    /// <summary>Initializes a new instance of the <see cref="TemplateManager"/> class.</summary>
+    /// <summary>Initializes a new instance of the <see cref="TemplateManager" /> class.</summary>
     /// <param name="language">The target language name used to isolate compiled template types.</param>
     /// <param name="release">Whether templates should be compiled with release optimizations.</param>
     public TemplateManager(string language, bool release)
@@ -113,8 +113,7 @@ public class TemplateManager
 
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(template.Preprocessed, new CSharpParseOptions(LanguageVersion.Latest), cancellationToken: CancellationToken.None);
 
-        CSharpCompilation compilation = CSharpCompilation.Create(
-            template.AssemblyName,
+        CSharpCompilation compilation = CSharpCompilation.Create(template.AssemblyName,
             [syntaxTree],
             template.ReferencePaths.Select(path => MetadataReference.CreateFromFile(path)),
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, optimizationLevel: _release ? OptimizationLevel.Release : OptimizationLevel.Debug));
@@ -255,6 +254,7 @@ public class TemplateManager
     private static string FormatErrors(IEnumerable errors)
     {
         StringBuilder sb = new StringBuilder();
+
         foreach (object error in errors)
         {
             if (sb.Length > 0)
@@ -269,6 +269,7 @@ public class TemplateManager
     private static string FormatDiagnostics(IEnumerable<Diagnostic> diagnostics)
     {
         StringBuilder sb = new StringBuilder();
+
         foreach (Diagnostic diagnostic in diagnostics)
         {
             if (diagnostic.Severity != DiagnosticSeverity.Error)

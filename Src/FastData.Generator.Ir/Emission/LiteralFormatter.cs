@@ -53,12 +53,14 @@ public abstract class LiteralFormatter(Func<IrLiteral, string?>? reference = nul
             else
             {
                 int scalar = c;
+
                 if (unicodeScalars && char.IsSurrogate(c))
                 {
                     if (!char.IsHighSurrogate(c) || i + 1 >= value.Length || !char.IsLowSurrogate(value[i + 1]))
                         throw new EncoderFallbackException("Text contains an unpaired UTF-16 surrogate.");
                     scalar = char.ConvertToUtf32(c, value[++i]);
                 }
+
                 appendEscape(text, scalar);
             }
         }

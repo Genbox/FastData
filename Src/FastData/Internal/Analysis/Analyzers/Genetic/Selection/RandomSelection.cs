@@ -23,6 +23,7 @@ internal sealed class RandomSelection(bool avoidDuplicates, IRandom random) : IS
                 _indices[i] = i;
 
             int number = Math.Min(count, maxParents);
+
             for (int i = 0; i < number; i++)
             {
                 // Partial Fisher-Yates shuffle: choose each remaining parent uniformly.

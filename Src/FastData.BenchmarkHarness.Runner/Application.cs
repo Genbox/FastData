@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using Genbox.FastData.BenchmarkHarness.Runner.Catalog;
 using Genbox.FastData.BenchmarkHarness.Runner.Configuration;
 using Genbox.FastData.BenchmarkHarness.Runner.Environment;
@@ -15,8 +14,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
 {
     public async Task<int> RunAsync(Settings settings, CancellationToken cancellationToken)
     {
-        ITestData[] structureBenchmarks = TestVectorHelper.GetBenchmarkData(
-            settings.WarmupCount,
+        ITestData[] structureBenchmarks = TestVectorHelper.GetBenchmarkData(settings.WarmupCount,
             settings.MinSampleCount,
             settings.MaxSampleCount,
             settings.TargetIterationTimeMs,
@@ -25,8 +23,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
             settings.Workload,
             settings.MaxError).ToArray();
 
-        ITestData[] earlyExitBenchmarks = TestVectorHelper.GetEarlyExitBenchmarkData(
-            settings.WarmupCount,
+        ITestData[] earlyExitBenchmarks = TestVectorHelper.GetEarlyExitBenchmarkData(settings.WarmupCount,
             settings.MinSampleCount,
             settings.MaxSampleCount,
             settings.TargetIterationTimeMs,
@@ -88,6 +85,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
             return WriteNoBenchmarksMatched(settings);
 
         string? dockerAvailabilityError = await DockerManager.GetAvailabilityErrorAsync(cancellationToken);
+
         if (dockerAvailabilityError != null)
         {
             ConsoleOutput.WriteWarning(dockerAvailabilityError + " Start Docker and rerun the benchmark.");
@@ -116,8 +114,7 @@ internal sealed class Application(BenchmarkCatalog catalog)
                 {
                     ResultEntry? previousResult = await resultStore.ReadPreviousResultAsync(benchmarkName, cancellationToken);
                     BenchmarkResult result = await harness.RunAsync(data, cancellationToken);
-                    ResultLine resultLine = new ResultLine(
-                        harness.Name,
+                    ResultLine resultLine = new ResultLine(harness.Name,
                         data.Identifier,
                         result.Min,
                         result.Max,

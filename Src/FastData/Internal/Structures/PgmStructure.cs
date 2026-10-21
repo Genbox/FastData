@@ -6,6 +6,7 @@ using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Generators.Helpers;
 using Genbox.FastData.Internal.Abstracts;
 using Genbox.FastData.Internal.Pgm;
+using Convert = System.Convert;
 
 namespace Genbox.FastData.Internal.Structures;
 
@@ -34,7 +35,7 @@ internal sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmC
         Debug.Assert(values.IsEmpty || values.Length == keys.Length, "PgmStructure requires value count to match key count when values are present.");
 
         if (Comparer<TKey>.Default.Compare(keys.Span[keys.Length - 1], PgmTypeTraits<TKey>.MaxValue) == 0)
-            throw new ArgumentException("The value " + System.Convert.ToString(_sentinel, CultureInfo.InvariantCulture) + " is reserved as a sentinel.", nameof(keys));
+            throw new ArgumentException("The value " + Convert.ToString(_sentinel, CultureInfo.InvariantCulture) + " is reserved as a sentinel.", nameof(keys));
 
         if (PgmTypeTraits<TKey>.IsFloatingPoint)
         {
@@ -43,12 +44,14 @@ internal sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmC
                 coordinates[i] = NumericPrediction.Coordinate(keys.Span[i]!);
             PgmContext<ulong, TValue> integer = new PgmStructure<ulong, TValue>(_epsilon, _epsilonRecursive).Create(coordinates, values);
             PgmSegment<TKey>[] mapped = new PgmSegment<TKey>[integer.Segments.Length];
+
             for (int i = 0; i < mapped.Length; i++)
             {
                 PgmSegment<ulong> segment = integer.Segments[i];
                 TKey key = segment.Key == ulong.MaxValue ? _sentinel : NumericPrediction.FloatingKey<TKey>(segment.Key);
                 mapped[i] = new PgmSegment<TKey>(key, segment.Slope, segment.Intercept);
             }
+
             return new PgmContext<TKey, TValue>(keys, values, mapped, integer.LevelsOffsets, _epsilon, _epsilonRecursive, integer.SegmentCount);
         }
 
@@ -75,6 +78,7 @@ internal sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmC
         int BuildLevel(int eps, Func<int, TKey> input, Action<OptimalPiecewiseLinearModel<TKey>.CanonicalSegment> output, int lastN)
         {
             int nSegments = MakeSegmentationPar(lastN, eps, input, output);
+
             if (segments.Count > 0 && Comparer<TKey>.Default.Compare(segments[segments.Count - 1].Key, _sentinel) == 0)
                 nSegments--;
             else
@@ -125,6 +129,7 @@ internal sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmC
         }
 
         AddPoint(input(start), start);
+
         for (int i = start + 1; i < end - 1; i++)
         {
             if (Comparer<TKey>.Default.Compare(input(i), input(i - 1)) == 0)
@@ -180,6 +185,7 @@ internal sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmC
         {
             int first = i * chunkSize;
             int last = i == parallelism - 1 ? n : first + chunkSize;
+
             if (first > 0)
             {
                 for (; first < last; ++first)
@@ -198,6 +204,7 @@ internal sealed class PgmStructure<TKey, TValue> : IStructure<TKey, TValue, PgmC
         });
 
         int total = 0;
+
         for (int i = 0; i < parallelism; i++)
         {
             total += counts[i];

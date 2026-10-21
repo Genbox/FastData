@@ -11,10 +11,7 @@ namespace Genbox.FastData.InternalShared.Helpers;
 [SuppressMessage("Usage", "MA0040:Forward the CancellationToken parameter to methods that take one")]
 internal static class CompilationHelper
 {
-    public static T GetDelegate<T>(string source, bool release) where T : Delegate
-    {
-        return GetDelegate<T>(source, static types => types[0], infos => infos[0], release);
-    }
+    public static T GetDelegate<T>(string source, bool release) where T : Delegate => GetDelegate<T>(source, static types => types[0], infos => infos[0], release);
 
     /// <summary>Compiles C# source and returns a delegate for the method chosen by the type and method filters.</summary>
     public static T GetDelegate<T>(string source, Func<Type[], Type> typeFilter, Func<MethodInfo[], MethodInfo> methodFilter, bool release) where T : Delegate

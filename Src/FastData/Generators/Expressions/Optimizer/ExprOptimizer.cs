@@ -58,6 +58,7 @@ internal static class ExprOptimizer
     private static Expression DoReduction(Expression exp)
     {
         Expression current = exp;
+
         while (true)
         {
             Expression optimized = current;
@@ -87,6 +88,7 @@ internal static class ExprOptimizer
             int count = memberBinding.Bindings.Count;
             MemberBinding[] visitedBindings = new MemberBinding[count];
             bool changed = false;
+
             for (int i = 0; i < count; i++)
             {
                 MemberBinding child = memberBinding.Bindings[i];
@@ -107,6 +109,7 @@ internal static class ExprOptimizer
             int count = listBinding.Initializers.Count;
             ElementInit[] visitedInitializers = new ElementInit[count];
             bool changed = false;
+
             for (int i = 0; i < count; i++)
             {
                 ElementInit initializer = listBinding.Initializers[i];
@@ -130,6 +133,7 @@ internal static class ExprOptimizer
         int count = initializer.Arguments.Count;
         Expression[] visitedArguments = new Expression[count];
         bool changed = false;
+
         for (int i = 0; i < count; i++)
         {
             Expression argument = initializer.Arguments[i];
@@ -182,6 +186,7 @@ internal static class ExprOptimizer
                 MethodCallExpression call = (MethodCallExpression)expression;
                 Expression? obj = call.Object == null ? null : Visit(call.Object);
                 Expression[]? visitedArgs = null;
+
                 for (int i = 0; i < call.Arguments.Count; i++)
                 {
                     Expression argument = call.Arguments[i];
@@ -261,6 +266,7 @@ internal static class ExprOptimizer
                 int count = memberInit.Bindings.Count;
                 MemberBinding[] visitedBindings = new MemberBinding[count];
                 bool changed = visitedNew != memberInit.NewExpression;
+
                 for (int i = 0; i < count; i++)
                 {
                     MemberBinding binding = memberInit.Bindings[i];
@@ -282,6 +288,7 @@ internal static class ExprOptimizer
                 int count = listInit.Initializers.Count;
                 ElementInit[] visitedInitializers = new ElementInit[count];
                 bool changed = visitedNew != listInit.NewExpression;
+
                 for (int i = 0; i < count; i++)
                 {
                     ElementInit initializer = listInit.Initializers[i];

@@ -21,10 +21,8 @@ internal static class AnalysisTest
 {
     private static readonly Logger _logConf = new LoggerConfiguration()
                                               .MinimumLevel.Debug()
-                                              .WriteTo.File(
-                                                  new ExpressionTemplate("[{@t:HH:mm:ss} {@l:u3}] [{substring(@p['SourceContext'], lastIndexOf(@p['SourceContext'], '.') + 1)}] {@m}\n"),
-                                                  @"C:\Temp\FastData.log"
-                                              )
+                                              .WriteTo.File(new ExpressionTemplate("[{@t:HH:mm:ss} {@l:u3}] [{substring(@p['SourceContext'], lastIndexOf(@p['SourceContext'], '.') + 1)}] {@m}\n"),
+                                                  @"C:\Temp\FastData.log")
                                               .CreateLogger();
 
     // private static readonly char[] LoEntropy = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
@@ -77,33 +75,21 @@ internal static class AnalysisTest
         PrintCandidate(sim.Run(DefaultStringHash.UTF16Instance));
     }
 
-    public static void TestBruteForceAnalyzer()
-    {
-        RunBruteForce(RunFunc(Data, 5.0, PrependString));
+    public static void TestBruteForceAnalyzer() => RunBruteForce(RunFunc(Data, 5.0, PrependString));
 
-        // RunBruteForce(RunFunc(Data, 1.0, PermuteString));
-        // RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
-        // RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
-    }
+    // RunBruteForce(RunFunc(Data, 1.0, PermuteString));
+    // RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
+    // RunBruteForce(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
+    public static void TestGeneticAnalyzer() => RunGeneticAnalysis(RunFunc(Data, 5.0, PrependString));
 
-    public static void TestGeneticAnalyzer()
-    {
-        RunGeneticAnalysis(RunFunc(Data, 5.0, PrependString));
+    // RunGeneticAnalysis(RunFunc(Data, 1.0, PermuteString));
+    // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
+    // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
+    public static void TestGPerfAnalyzer() => RunGPerfAnalysis(RunFunc(Data, 5.0, PrependString));
 
-        // RunGeneticAnalysis(RunFunc(Data, 1.0, PermuteString));
-        // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
-        // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
-    }
-
-    public static void TestGPerfAnalyzer()
-    {
-        RunGPerfAnalysis(RunFunc(Data, 5.0, PrependString));
-
-        // RunGeneticAnalysis(RunFunc(Data, 1.0, PermuteString));
-        // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
-        // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
-    }
-
+    // RunGeneticAnalysis(RunFunc(Data, 1.0, PermuteString));
+    // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, LoEntropy)));
+    // RunGeneticAnalysis(RunFunc(Data, 1.0, (x, y) => MutateString(x, y, HiEntropy)));
     private static void RunBruteForce(string[] data, [CallerArgumentExpression(nameof(data))]string? source = null)
     {
         Print(data, source);

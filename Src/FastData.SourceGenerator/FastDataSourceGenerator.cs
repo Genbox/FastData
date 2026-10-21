@@ -30,8 +30,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
     private static readonly string FastDataAttr = typeof(FastDataAttribute<>).FullName!;
     private static readonly string FastDataKeyValueAttr = typeof(FastDataKeyValueAttribute<,>).FullName!;
 
-    private static readonly SymbolDisplayFormat Format = new SymbolDisplayFormat(
-        SymbolDisplayGlobalNamespaceStyle.Omitted,
+    private static readonly SymbolDisplayFormat Format = new SymbolDisplayFormat(SymbolDisplayGlobalNamespaceStyle.Omitted,
         SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
         miscellaneousOptions:
         SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
@@ -83,9 +82,11 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             Type genType = typeof(FastDataGenerator);
 
             string source;
+
             if (values == null)
             {
                 Type keyType = keys.GetType().GetElementType() ?? throw new InvalidOperationException("Key array element type is missing.");
+
                 if (keyType == typeof(string))
                     source = FastDataGenerator.Generate((string[])keys, (StringDataConfig)fdCfg, generator).Source;
                 else
@@ -102,6 +103,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             {
                 Type keyType = keys.GetType().GetElementType() ?? throw new InvalidOperationException("Key array element type is missing.");
                 Type valueType = values.GetType().GetElementType() ?? throw new InvalidOperationException("Value array element type is missing.");
+
                 if (keyType == typeof(string))
                 {
                     MethodInfo mi = GetGenerateMethod(genType, nameof(FastDataGenerator.GenerateKeyed), 1, 5, 0)
@@ -201,6 +203,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             return CreateConfigurationDiagnostic(location, $"Unable to map '{genericArg0.Name}' to a runtime type.");
 
         HashSet<object> uniqueKeys = new HashSet<object>();
+
         foreach (TypedConstant value in keys)
         {
             if (value.Value == null)
@@ -219,6 +222,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             keysArr.SetValue(keys[i].Value, i);
 
         Array? valueArr = null;
+
         if (ad.ConstructorArguments.Length == 3)
         {
             ImmutableArray<TypedConstant> values = ad.ConstructorArguments[2].Values;
@@ -232,6 +236,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
                 return CreateConfigurationDiagnostic(location, $"The number of values does not match the number of keys for '{name}'.");
 
             valueArr = Array.CreateInstance(runtimeValueType, values.Length);
+
             for (int i = 0; i < valueArr.Length; i++)
             {
                 if (values[i].Value == null)
@@ -255,6 +260,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             fdCfg.RequiredCapability = (Config.StructureCapability)(int)(StructureCapability)requiredFunctionsArg;
 
         object? ignoreCaseArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.IgnoreCase)).Value.Value;
+
         if (ignoreCaseArg is true)
         {
             if (fdCfg is not StringDataConfig stringCfg)
@@ -275,6 +281,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
             csCfg.ClassType = MapClassType((AttributeClassType)classTypeArg);
 
         object? alArg = ad.NamedArguments.FirstOrDefault(x => x.Key == nameof(FastDataAttribute<int>.AnalysisLevel)).Value.Value;
+
         if (alArg != null)
         {
             AnalysisLevel al = (AnalysisLevel)alArg;
@@ -303,7 +310,7 @@ internal class FastDataSourceGenerator : IIncrementalGenerator
         }
 
         // Source generation must not depend on benchmark timing or process-random seeds.
-        if (fdCfg is StringDataConfig { StringAnalyzerConfig: { } analyzerConfig })
+        if (fdCfg is StringDataConfig { StringAnalyzerConfig: {} analyzerConfig })
         {
             analyzerConfig.BenchmarkIterations = 0;
 

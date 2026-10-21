@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Linq.Expressions;
 using Genbox.FastData.Generator;
 using Genbox.FastData.Generator.CPlusPlus.TestHarness;
@@ -79,8 +77,7 @@ public sealed class LoweredProgramRenderingTests
         ParameterExpression input = Expression.Parameter(typeof(int), "input");
         ParameterExpression first = Expression.Variable(typeof(int), "first");
         ParameterExpression second = Expression.Variable(typeof(int), "second");
-        BlockExpression body = Expression.Block(
-            [first, second],
+        BlockExpression body = Expression.Block([first, second],
             Expression.Assign(second, first),
             Expression.Assign(first, input),
             second);
@@ -91,8 +88,7 @@ public sealed class LoweredProgramRenderingTests
     {
         ParameterExpression input = Expression.Parameter(typeof(int), "input");
         ParameterExpression inner = Expression.Variable(typeof(int), "inner");
-        BlockExpression tail = Expression.Block(
-            [inner],
+        BlockExpression tail = Expression.Block([inner],
             Expression.Assign(inner, input),
             inner);
         return Expression.Lambda<Func<int, int>>(Expression.Block(tail), input);
@@ -112,6 +108,7 @@ public sealed class LoweredProgramRenderingTests
     private static int CountLine(string[] lines, string expected)
     {
         int count = 0;
+
         foreach (string line in lines)
         {
             if (string.Equals(line, expected, StringComparison.Ordinal))

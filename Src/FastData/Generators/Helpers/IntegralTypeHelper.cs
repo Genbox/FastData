@@ -5,9 +5,9 @@ public static class IntegralTypeHelper
 {
     /// <summary>Reports whether the type is a supported signed integer type.</summary>
     public static bool IsSigned(Type type) => type == typeof(sbyte)
-                                                || type == typeof(short)
-                                                || type == typeof(int)
-                                                || type == typeof(long);
+                                              || type == typeof(short)
+                                              || type == typeof(int)
+                                              || type == typeof(long);
 
     internal static bool IsUnsigned(Type type) => type == typeof(byte)
                                                   || type == typeof(ushort)

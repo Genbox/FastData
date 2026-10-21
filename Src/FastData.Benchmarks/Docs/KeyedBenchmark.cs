@@ -13,23 +13,6 @@ public class KeyedBenchmark
     private static readonly Dictionary<string, byte> _dict = new Dictionary<string, byte>(_array.Select(x => new KeyValuePair<string, byte>(x.Item1, x.Item2)), StringComparer.Ordinal);
     private static readonly FrozenDictionary<string, byte> _frozen = _dict.ToFrozenDictionary();
 
-#pragma warning disable MA0160 // These benchmarks compare APIs that return both lookup status and the associated value.
-    [BenchmarkCategory("InSet")][Benchmark(Baseline = true)]
-    public bool Dictionary() => _dict.TryGetValue("German Shepherd", out _);
-
-    [BenchmarkCategory("InSet")][Benchmark]
-    public bool FrozenDictionary() => _frozen.TryGetValue("German Shepherd", out _);
-
-    [BenchmarkCategory("InSet")][Benchmark]
-    public bool FastData() => Dogs.TryLookup("German Shepherd", out _);
-
-    [BenchmarkCategory("NotInSet")][Benchmark(Baseline = true)]
-    public bool DictionaryNF() => _dict.TryGetValue("Beagle", out _);
-
-    [BenchmarkCategory("NotInSet")][Benchmark]
-    public bool FrozenDictionaryNF() => _frozen.TryGetValue("Beagle", out _);
-#pragma warning restore MA0160
-
     [BenchmarkCategory("NotInSet")][Benchmark]
     public bool FastDataNF() => Dogs.TryLookup("Beagle", out _);
 
@@ -72,6 +55,7 @@ public class KeyedBenchmark
             }
 
             int idx = key.Length - 8;
+
             if (StringComparer.Ordinal.Equals(key, _keys[idx]))
             {
                 value = _values[_offsets[idx]];
@@ -82,4 +66,21 @@ public class KeyedBenchmark
             return false;
         }
     }
+
+#pragma warning disable MA0160 // These benchmarks compare APIs that return both lookup status and the associated value.
+    [BenchmarkCategory("InSet")][Benchmark(Baseline = true)]
+    public bool Dictionary() => _dict.TryGetValue("German Shepherd", out _);
+
+    [BenchmarkCategory("InSet")][Benchmark]
+    public bool FrozenDictionary() => _frozen.TryGetValue("German Shepherd", out _);
+
+    [BenchmarkCategory("InSet")][Benchmark]
+    public bool FastData() => Dogs.TryLookup("German Shepherd", out _);
+
+    [BenchmarkCategory("NotInSet")][Benchmark(Baseline = true)]
+    public bool DictionaryNF() => _dict.TryGetValue("Beagle", out _);
+
+    [BenchmarkCategory("NotInSet")][Benchmark]
+    public bool FrozenDictionaryNF() => _frozen.TryGetValue("Beagle", out _);
+#pragma warning restore MA0160
 }

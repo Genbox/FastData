@@ -11,8 +11,8 @@ namespace Genbox.FastData.Internal.Analysis.Analyzers.Genetic.Selection;
 /// </summary>
 internal sealed class BoltzmannSelection : ISelection
 {
-    private readonly double _temperature;
     private readonly IRandom _random;
+    private readonly double _temperature;
     private double[] _cumulative = [];
 
     /// <summary>Selects parents with probabilities that follow the Boltzmann distribution of their fitness.</summary>
@@ -38,6 +38,7 @@ internal sealed class BoltzmannSelection : ISelection
             maxFitness = Math.Max(maxFitness, population[i].Fitness);
 
         double sum = 0;
+
         for (int i = 0; i < count; i++)
         {
             sum += Math.Exp((population[i].Fitness - maxFitness) / _temperature);

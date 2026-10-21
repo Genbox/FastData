@@ -18,7 +18,7 @@ public abstract class TemplatedCodeGenerator : ICodeGenerator
     private readonly TemplateManager _manager;
     private readonly TypeMap _map;
 
-    /// <summary>Initializes a new instance of the <see cref="TemplatedCodeGenerator"/> class.</summary>
+    /// <summary>Initializes a new instance of the <see cref="TemplatedCodeGenerator" /> class.</summary>
     /// <param name="languageDef">The target language definition.</param>
     /// <param name="encoding">The encoding model used by the target language.</param>
 #if NET10_0_OR_GREATER

@@ -59,11 +59,13 @@ internal static class FunctionPreparation
 
         // Bind functions only after all native and fallback targets have been resolved.
         List<PreparedFunction> functions = new List<PreparedFunction>(callables.Count + fallbackFunctions.Count);
+
         for (int i = 0; i < callables.Count; i++)
         {
             if (callables[i] is IrFunction function)
                 functions.Add(new PreparedFunction(calls[i].Name, function, calls));
         }
+
         functions.AddRange(fallbackFunctions);
 
         return (functions, calls, requiredBuiltins);

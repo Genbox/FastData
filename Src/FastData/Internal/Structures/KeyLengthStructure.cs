@@ -40,6 +40,7 @@ internal sealed class KeyLengthStructure<TKey, TValue> : IStructure<TKey, TValue
         ReadOnlySpan<TKey> keySpan = keys.Span;
 
         Func<string, int> getLength = StringHelper.GetLengthFunc(_encoding);
+
         for (int i = 0; i < keySpan.Length; i++)
         {
             string str = (string)(object)keySpan[i]!;

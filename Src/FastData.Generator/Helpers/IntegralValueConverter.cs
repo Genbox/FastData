@@ -11,7 +11,7 @@ public static class IntegralValueConverter
     /// <param name="value">The boxed integral value to convert.</param>
     /// <param name="targetType">The destination CLR integral type.</param>
     /// <returns>The converted boxed value.</returns>
-    /// <exception cref="OverflowException">The value cannot be represented by <paramref name="targetType"/>.</exception>
+    /// <exception cref="OverflowException">The value cannot be represented by <paramref name="targetType" />.</exception>
     public static object ConvertChecked(object value, Type targetType)
     {
         if (value == null)
@@ -25,6 +25,7 @@ public static class IntegralValueConverter
         if (IntegralTypeHelper.IsSigned(sourceType))
         {
             long signedValue = IntegralTypeHelper.GetSignedValue(value);
+
             checked
             {
                 if (targetType == typeof(char))
@@ -50,6 +51,7 @@ public static class IntegralValueConverter
         else
         {
             ulong unsignedValue = IntegralTypeHelper.GetUnsignedValue(value);
+
             checked
             {
                 if (targetType == typeof(char))

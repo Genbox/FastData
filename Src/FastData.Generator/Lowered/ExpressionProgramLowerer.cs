@@ -7,10 +7,10 @@ namespace Genbox.FastData.Generator.Lowered;
 /// <summary>Validates expression trees and lowers control flow to structured statements.</summary>
 public sealed class ExpressionProgramLowerer
 {
-    private readonly string _compilerName;
-    private readonly Type? _lambdaReturnType;
     private readonly HashSet<ParameterExpression> _activeLocals = new HashSet<ParameterExpression>();
     private readonly Stack<LoopLabels> _activeLoops = new Stack<LoopLabels>();
+    private readonly string _compilerName;
+    private readonly Type? _lambdaReturnType;
 
     private ExpressionProgramLowerer(string compilerName, Type? lambdaReturnType)
     {
@@ -101,6 +101,7 @@ public sealed class ExpressionProgramLowerer
     private void LowerReturnExpression(Expression expression, List<LoweredStatement> statements)
     {
         Type returnType = _lambdaReturnType!;
+
         if (expression is BlockExpression block)
         {
             LoweredBlock loweredBlock = LowerBlock(block, BlockTailPolicy.ReturnLastValue);
@@ -210,6 +211,7 @@ public sealed class ExpressionProgramLowerer
 
         _activeLoops.Push(new LoopLabels(breakExpression.Target, loop.ContinueLabel));
         LoweredBlock body;
+
         try
         {
             body = LowerStatementAsBlock(conditional.IfTrue);
@@ -431,6 +433,7 @@ public sealed class ExpressionProgramLowerer
     private void ValidateCall(MethodCallExpression call)
     {
         ParameterInfo[] parameters = call.Method.GetParameters();
+
         foreach (ParameterInfo parameter in parameters)
         {
             if (parameter.ParameterType.IsByRef)

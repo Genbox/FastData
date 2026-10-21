@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -24,6 +22,7 @@ internal sealed class ExpressionSymbolValidator(
         inventory.Visit(expression);
         Dictionary<string, ParameterExpression> externalSymbols = inventory.GetExternalSymbols(allowExternalSymbols);
         HashSet<string> externalDataNames = inventory.GetExternalDataNames();
+
         foreach (string name in externalSymbols.Keys)
         {
             if (externalDataNames.Contains(name))
@@ -42,6 +41,7 @@ internal sealed class ExpressionSymbolValidator(
     protected override Expression VisitBlock(BlockExpression node)
     {
         EnterScope(node.Variables);
+
         try
         {
             foreach (Expression expression in node.Expressions)
@@ -51,6 +51,7 @@ internal sealed class ExpressionSymbolValidator(
         {
             ExitScope(node.Variables);
         }
+
         return node;
     }
 
@@ -72,6 +73,7 @@ internal sealed class ExpressionSymbolValidator(
     private void VisitScope(IReadOnlyList<ParameterExpression> symbols, Expression body)
     {
         EnterScope(symbols);
+
         try
         {
             Visit(body);
@@ -88,6 +90,7 @@ internal sealed class ExpressionSymbolValidator(
         {
             if (externalDataNames.Contains(symbol.Name!))
                 throw new NotSupportedException($"Expression symbol name '{symbol.Name}' collides with captured external data and cannot be emitted safely by {compilerName}.");
+
             if (_activeSymbols.TryGetValue(symbol.Name!, out ParameterExpression? existing))
             {
                 if (!ReferenceEquals(existing, symbol))
@@ -107,8 +110,8 @@ internal sealed class ExpressionSymbolValidator(
 
     private sealed class ExpressionSymbolInventory(string compilerName) : ExpressionVisitor
     {
-        private readonly List<ParameterExpression> _references = new List<ParameterExpression>();
         private readonly List<CapturedBinding> _capturedBindings = new List<CapturedBinding>();
+        private readonly List<ParameterExpression> _references = new List<ParameterExpression>();
 
         internal HashSet<ParameterExpression> Declarations { get; } = new HashSet<ParameterExpression>();
 
@@ -116,6 +119,7 @@ internal sealed class ExpressionSymbolValidator(
         internal Dictionary<string, ParameterExpression> GetExternalSymbols(bool allowExternalSymbols)
         {
             Dictionary<string, ParameterExpression> symbols = new Dictionary<string, ParameterExpression>(StringComparer.Ordinal);
+
             foreach (ParameterExpression symbol in _references)
             {
                 ValidateName(symbol, compilerName);
@@ -130,12 +134,14 @@ internal sealed class ExpressionSymbolValidator(
 
                 symbols[symbol.Name!] = symbol;
             }
+
             return symbols;
         }
 
         internal HashSet<string> GetExternalDataNames()
         {
             Dictionary<string, CapturedBinding> bindings = new Dictionary<string, CapturedBinding>(StringComparer.Ordinal);
+
             foreach (CapturedBinding binding in _capturedBindings)
             {
                 string name = binding.Member.Name;
@@ -144,6 +150,7 @@ internal sealed class ExpressionSymbolValidator(
 
                 bindings[name] = binding;
             }
+
             return new HashSet<string>(bindings.Keys, StringComparer.Ordinal);
         }
 

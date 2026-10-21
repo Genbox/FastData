@@ -298,6 +298,7 @@ public class CaseInsensitiveComparerBenchmarks
             b += 4;
 
             DiffOffset0:
+
             if (*(int*)a == *(int*)b)
             {
                 a += 2;

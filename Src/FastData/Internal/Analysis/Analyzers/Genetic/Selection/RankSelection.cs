@@ -22,6 +22,7 @@ internal sealed class RankSelection(IRandom random) : ISelection
             _rankWheel = new double[count];
 
         double totalRank = 0;
+
         for (int i = 0; i < count; i++)
         {
             totalRank += count - i;

@@ -15,10 +15,7 @@ public class IntegralTypeReducerTests
     [InlineData(int.MinValue - 1L, int.MaxValue, typeof(long))]
     [InlineData(int.MinValue, int.MaxValue + 1L, typeof(long))]
     [InlineData(long.MinValue, long.MaxValue, typeof(long))]
-    public void GetSmallestSignedStorageTypeRespectsExactBoundaries(long minValue, long maxValue, Type expected)
-    {
-        Assert.Equal(expected, IntegralTypeReducer.GetSmallestSignedStorageType(minValue, maxValue));
-    }
+    public void GetSmallestSignedStorageTypeRespectsExactBoundaries(long minValue, long maxValue, Type expected) => Assert.Equal(expected, IntegralTypeReducer.GetSmallestSignedStorageType(minValue, maxValue));
 
     [Theory]
     [InlineData(0UL, typeof(byte))]
@@ -29,10 +26,7 @@ public class IntegralTypeReducerTests
     [InlineData(uint.MaxValue, typeof(uint))]
     [InlineData(uint.MaxValue + 1UL, typeof(ulong))]
     [InlineData(ulong.MaxValue, typeof(ulong))]
-    public void GetSmallestUnsignedStorageTypeRespectsExactBoundaries(ulong maxValue, Type expected)
-    {
-        Assert.Equal(expected, IntegralTypeReducer.GetSmallestUnsignedStorageType(maxValue));
-    }
+    public void GetSmallestUnsignedStorageTypeRespectsExactBoundaries(ulong maxValue, Type expected) => Assert.Equal(expected, IntegralTypeReducer.GetSmallestUnsignedStorageType(maxValue));
 
     [Fact]
     public void StorageTypeMethodsRejectReversedIntervals()
@@ -43,10 +37,7 @@ public class IntegralTypeReducerTests
 
     [Theory]
     [MemberData(nameof(GetCompositeCases))]
-    public void GetSmallestStorageTypePreservesSignedness(Type sourceType, object minValue, object maxValue, Type expected)
-    {
-        Assert.Equal(expected, IntegralTypeReducer.GetSmallestStorageType(sourceType, minValue, maxValue));
-    }
+    public void GetSmallestStorageTypePreservesSignedness(Type sourceType, object minValue, object maxValue, Type expected) => Assert.Equal(expected, IntegralTypeReducer.GetSmallestStorageType(sourceType, minValue, maxValue));
 
     [Fact]
     public void GetSmallestStorageTypeRequiresExactBoxedTypes()
@@ -61,10 +52,7 @@ public class IntegralTypeReducerTests
     [InlineData(typeof(bool))]
     [InlineData(typeof(SampleEnum))]
     [InlineData(typeof(nint))]
-    public void GetSmallestStorageTypeRejectsUnsupportedSource(Type sourceType)
-    {
-        Assert.Throws<ArgumentException>(() => IntegralTypeReducer.GetSmallestStorageType(sourceType, 0, 1));
-    }
+    public void GetSmallestStorageTypeRejectsUnsupportedSource(Type sourceType) => Assert.Throws<ArgumentException>(() => IntegralTypeReducer.GetSmallestStorageType(sourceType, 0, 1));
 
     [Fact]
     public void NonNegativeSignedArrayReducesToUnsignedType()
@@ -75,10 +63,7 @@ public class IntegralTypeReducerTests
     }
 
     [Fact]
-    public void NegativeSignedArrayPreservesSourceType()
-    {
-        Assert.Equal(typeof(int), IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(int), new[] { 0, -1 }));
-    }
+    public void NegativeSignedArrayPreservesSourceType() => Assert.Equal(typeof(int), IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(int), new[] { 0, -1 }));
 
     [Fact]
     public void UnsignedArraysReduceToUnsignedTypes()
@@ -89,22 +74,13 @@ public class IntegralTypeReducerTests
     }
 
     [Fact]
-    public void EmptyArrayPreservesSourceType()
-    {
-        Assert.Equal(typeof(long), IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(long), Array.Empty<long>()));
-    }
+    public void EmptyArrayPreservesSourceType() => Assert.Equal(typeof(long), IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(long), Array.Empty<long>()));
 
     [Fact]
-    public void ArrayElementTypeMustExactlyMatchSourceType()
-    {
-        Assert.Throws<ArgumentException>(() => IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(int), new long[] { 0, 1 }));
-    }
+    public void ArrayElementTypeMustExactlyMatchSourceType() => Assert.Throws<ArgumentException>(() => IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(int), new long[] { 0, 1 }));
 
     [Fact]
-    public void NullArrayIsRejected()
-    {
-        Assert.Throws<ArgumentNullException>(() => IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(int), null!));
-    }
+    public void NullArrayIsRejected() => Assert.Throws<ArgumentNullException>(() => IntegralTypeReducer.GetSmallestNonNegativeStorageType(typeof(int), null!));
 
     public static TheoryData<Type, object, object, Type> GetCompositeCases() => new TheoryData<Type, object, object, Type>
     {

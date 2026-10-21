@@ -7,13 +7,12 @@ namespace Genbox.FastData.Generator;
 /// <summary>Converts expression trees used by FastData into target-language source fragments.</summary>
 public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 {
-    /// <summary>The output buffer used by derived expression compilers.</summary>
-    [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "This protected field is part of the established derived-compiler API.")]
-    protected readonly IndentedStringBuilder Output = new IndentedStringBuilder();
-
     /// <summary>The target-language type map.</summary>
     [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "This protected field is part of the established derived-compiler API.")]
     protected readonly TypeMap Map = map;
+    /// <summary>The output buffer used by derived expression compilers.</summary>
+    [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "This protected field is part of the established derived-compiler API.")]
+    protected readonly IndentedStringBuilder Output = new IndentedStringBuilder();
 
     /// <summary>Renders a lambda as a complete returning method body.</summary>
     public string GetLambdaBody(LambdaExpression expression, int indent = 0)
@@ -94,6 +93,7 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
                     Output.DecrementIndent();
                     Output.AppendLine("}");
                 }
+
                 return;
 
             case LoweredWhileStatement loop:
@@ -117,11 +117,13 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
 
             case LoweredReturnStatement returnStatement:
                 Output.Append("return");
+
                 if (returnStatement.Value != null)
                 {
                     Output.Append(" ");
                     RenderValue(returnStatement.Value);
                 }
+
                 Output.AppendLine(";");
                 return;
 
@@ -178,12 +180,14 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
         }
 
         Output.Append("[");
+
         for (int i = 0; i < node.Arguments.Count; i++)
         {
             Visit(node.Arguments[i]);
             if (i < node.Arguments.Count - 1)
                 Output.Append(", ");
         }
+
         Output.Append("]");
 
         return node;
@@ -199,12 +203,15 @@ public abstract class ExpressionCompiler(TypeMap map) : ExpressionVisitor
             Visit(node.Object);
             Output.Append(".");
         }
+
         Output.Append(node.Method.Name).Append("(");
+
         for (int i = 0; i < node.Arguments.Count; i++)
         {
             Visit(node.Arguments[i]);
             if (i < node.Arguments.Count - 1) Output.Append(", ");
         }
+
         Output.Append(")");
         return node;
     }

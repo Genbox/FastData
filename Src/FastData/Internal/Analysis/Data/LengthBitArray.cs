@@ -38,7 +38,6 @@ internal sealed class LengthBitArray(int length = 64)
             BitCount++;
             Min = Math.Min(Min, index);
             Max = Math.Max(Max, index);
-
         }
 
         return !added;

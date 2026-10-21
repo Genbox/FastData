@@ -30,6 +30,7 @@ public class IntegerEncodingBenchmarks
         _values = CreateValues(Distribution, _encoding);
 
         int offset = 0;
+
         for (int i = 0; i < _values.Length; i++)
         {
             _offsets[i] = offset;
@@ -54,6 +55,7 @@ public class IntegerEncodingBenchmarks
     public ulong Decode()
     {
         ulong total = 0;
+
         for (int i = 0; i < _values.Length; i++)
         {
             ReadOnlySpan<byte> source = _encoded.AsSpan(_offsets[i], _lengths[i]);

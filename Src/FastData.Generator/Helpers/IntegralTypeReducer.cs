@@ -65,9 +65,9 @@ public static class IntegralTypeReducer
     }
 
     /// <summary>Gets the smallest unsigned type that contains all values, or the source type when a value is negative.</summary>
-    /// <param name="sourceType">The CLR element type of <paramref name="values"/>.</param>
+    /// <param name="sourceType">The CLR element type of <paramref name="values" />.</param>
     /// <param name="values">The integral values to inspect.</param>
-    /// <returns>The reduced unsigned storage type, or <paramref name="sourceType"/> when reduction is unsafe.</returns>
+    /// <returns>The reduced unsigned storage type, or <paramref name="sourceType" /> when reduction is unsafe.</returns>
     public static Type GetSmallestNonNegativeStorageType(Type sourceType, Array values)
     {
         if (sourceType == null)
@@ -89,6 +89,7 @@ public static class IntegralTypeReducer
             ValidateValueType(value, sourceType, nameof(values));
 
             ulong unsignedValue;
+
             if (IntegralTypeHelper.IsSigned(sourceType))
             {
                 long signedValue = IntegralTypeHelper.GetSignedValue(value);

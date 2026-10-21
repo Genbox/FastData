@@ -8,6 +8,7 @@ public class PriorityStructureBenchmarks
     private readonly RingBuffer _buffer = new RingBuffer(10);
     private readonly FixedSet _fixedSet = new FixedSet(10);
     private readonly MinHeap<bool> _heap = new MinHeap<bool>(10);
+
     // Measures insertion only; reading the collection would add unrelated work.
     // ReSharper disable once CollectionNeverQueried.Local
     private readonly SortedSet<double> _sorted = new SortedSet<double>();
@@ -103,6 +104,7 @@ public class PriorityStructureBenchmarks
                 _buffer[_minIndex] = value;
                 int mi = 0;
                 double mv = _buffer[0];
+
                 for (int i = 1; i < _buffer.Length; i++)
                 {
                     if (_buffer[i] < mv)
@@ -111,6 +113,7 @@ public class PriorityStructureBenchmarks
                         mi = i;
                     }
                 }
+
                 _minIndex = mi;
             }
         }

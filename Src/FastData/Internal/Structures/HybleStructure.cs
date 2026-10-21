@@ -56,6 +56,7 @@ internal sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hy
         ref ulong seededHashesRef = ref MemoryMarshal.GetReference(workspace.Hashes.AsSpan());
 
         ulong seed = InitialSeed;
+
         for (uint attempt = 0; attempt < MaxSeedAttempts; attempt++)
         {
             // seed is always odd (InitialSeed is odd, SeedMult is odd, odd*odd=odd always),
@@ -105,6 +106,7 @@ internal sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hy
 
         // Step 2: Build prefix-sum index for bucket membership
         bucketStarts[0] = 0;
+
         for (int i = 0; i < bucketCounts.Length; i++)
         {
             bucketStarts[i + 1] = bucketStarts[i] + bucketCounts[i];
@@ -158,6 +160,7 @@ internal sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hy
         // Step 6: Compute total table capacity. This must cover every possible lookup key, not
         // just the occupied indexes, because absent keys can produce any approx in [0, approxRange).
         ushort maxDisplacement = 0;
+
         for (int i = 0; i < displacements.Length; i++)
         {
             if (displacements[i] > maxDisplacement)
@@ -388,6 +391,7 @@ internal sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hy
         Debug.Assert(hashCodes.Length >= count, "Hyble sentinel selection requires hashCodes to contain count entries.");
 
         bool found = false;
+
         for (int i = 0; i < count; i++)
         {
             if (hashCodes[i] == ulong.MaxValue)
@@ -418,6 +422,7 @@ internal sealed class HybleStructure<TKey, TValue> : IStructure<TKey, TValue, Hy
 
         // Exhaustive search (extremely rare — all 64-bit values are used).
         ulong candidate = 1;
+
         while (true)
         {
             bool collision = false;

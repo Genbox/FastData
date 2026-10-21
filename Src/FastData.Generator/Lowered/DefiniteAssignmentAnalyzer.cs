@@ -12,12 +12,10 @@ internal static class DefiniteAssignmentAnalyzer
         return requiredDefaults;
     }
 
-    private static HashSet<ParameterExpression>? AnalyzeBlock(
-        LoweredBlock block,
-        HashSet<ParameterExpression> assigned,
-        HashSet<ParameterExpression> requiredDefaults)
+    private static HashSet<ParameterExpression>? AnalyzeBlock(LoweredBlock block, HashSet<ParameterExpression> assigned, HashSet<ParameterExpression> requiredDefaults)
     {
         HashSet<ParameterExpression>? fallthrough = assigned;
+
         foreach (LoweredStatement statement in block.Statements)
         {
             if (fallthrough == null)
@@ -30,10 +28,7 @@ internal static class DefiniteAssignmentAnalyzer
     }
 
     [SuppressMessage("Correctness", "SS004:Implement Equals() and GetHashcode() methods for a type used in a collection.", Justification = "ParameterExpression instances are scoped symbols whose reference identity defines assignment.")]
-    private static HashSet<ParameterExpression>? AnalyzeStatement(
-        LoweredStatement statement,
-        HashSet<ParameterExpression> assigned,
-        HashSet<ParameterExpression> requiredDefaults)
+    private static HashSet<ParameterExpression>? AnalyzeStatement(LoweredStatement statement, HashSet<ParameterExpression> assigned, HashSet<ParameterExpression> requiredDefaults)
     {
         switch (statement)
         {
@@ -84,10 +79,7 @@ internal static class DefiniteAssignmentAnalyzer
     }
 
     [SuppressMessage("Correctness", "SS004:Implement Equals() and GetHashcode() methods for a type used in a collection.", Justification = "ParameterExpression instances are scoped symbols whose reference identity defines assignment.")]
-    private static void AnalyzeExpression(
-        ValidatedExpression expression,
-        HashSet<ParameterExpression> assigned,
-        HashSet<ParameterExpression> requiredDefaults)
+    private static void AnalyzeExpression(ValidatedExpression expression, HashSet<ParameterExpression> assigned, HashSet<ParameterExpression> requiredDefaults)
     {
         foreach (ParameterExpression local in expression.LocalReads)
         {

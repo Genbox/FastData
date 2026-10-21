@@ -16,10 +16,7 @@ public class StringHashBenchmarks
     public int Size { get; set; }
 
     [GlobalSetup]
-    public void Setup()
-    {
-        _array = Enumerable.Range(0, Size).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).ToArray();
-    }
+    public void Setup() => _array = Enumerable.Range(0, Size).Select(x => x.ToString(NumberFormatInfo.InvariantInfo)).ToArray();
 
     [Benchmark]
     public ulong DJB2HashTest()
@@ -64,6 +61,7 @@ public class StringHashBenchmarks
             ulong hash1 = seed + (ulong)length;
 
             ref ulong ptr64 = ref Unsafe.As<char, ulong>(ref ptr);
+
             while (length >= 4)
             {
                 hash1 ^= Round(0, ptr64);
@@ -73,6 +71,7 @@ public class StringHashBenchmarks
             }
 
             ref ushort ptr16 = ref Unsafe.As<ulong, ushort>(ref ptr64);
+
             while (length-- > 0)
             {
                 hash1 ^= ptr16 * PRIME64_5;

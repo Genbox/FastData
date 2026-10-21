@@ -62,12 +62,10 @@ internal sealed record XxHash64StringHash : IStringHash
             IfThenElse(GreaterThanOrEqual(remaining, Constant(32)), largeInput, Assign(hash, Constant(Prime5))),
             AddAssign(hash, Convert(length, typeof(ulong))),
             BuildEightByteLoop(input, offset, remaining, hash, round),
-            IfThen(GreaterThanOrEqual(remaining, Constant(4)), Block(
-                Assign(hash, ExclusiveOr(hash, Multiply(ExpressionHashBuilder.GetReadFunc(input, offset, 4, _ignoreCase), Constant(Prime1)))),
+            IfThen(GreaterThanOrEqual(remaining, Constant(4)), Block(Assign(hash, ExclusiveOr(hash, Multiply(ExpressionHashBuilder.GetReadFunc(input, offset, 4, _ignoreCase), Constant(Prime1)))),
                 Assign(hash, Add(Multiply(RotateLeft(hash, 23), Constant(Prime2)), Constant(Prime3))),
                 AddAssign(offset, Constant(4)),
-                SubtractAssign(remaining, Constant(4))
-            )),
+                SubtractAssign(remaining, Constant(4)))),
             BuildByteLoop(input, offset, remaining, hash),
             Assign(hash, ExclusiveOr(hash, RightShift(hash, Constant(33)))),
             Assign(hash, Multiply(hash, Constant(Prime2))),
@@ -101,14 +99,10 @@ internal sealed record XxHash64StringHash : IStringHash
             SubtractAssign(remaining, Constant(32))
         ];
 
-        return Loop(
-            IfThenElse(
-                GreaterThanOrEqual(remaining, Constant(32)),
+        return Loop(IfThenElse(GreaterThanOrEqual(remaining, Constant(32)),
                 Block(stripeExpressions),
-                Break(breakLabel)
-            ),
-            breakLabel
-        );
+                Break(breakLabel)),
+            breakLabel);
     }
 
     private LoopExpression BuildEightByteLoop(Expression input, Expression offset, Expression remaining, Expression hash, Expression round)
@@ -123,32 +117,22 @@ internal sealed record XxHash64StringHash : IStringHash
             SubtractAssign(remaining, Constant(8))
         ];
 
-        return Loop(
-            IfThenElse(
-                GreaterThanOrEqual(remaining, Constant(8)),
+        return Loop(IfThenElse(GreaterThanOrEqual(remaining, Constant(8)),
                 Block(roundExpressions),
-                Break(breakLabel)
-            ),
-            breakLabel
-        );
+                Break(breakLabel)),
+            breakLabel);
     }
 
     private LoopExpression BuildByteLoop(Expression input, Expression offset, Expression remaining, Expression hash)
     {
         LabelTarget breakLabel = Label();
-        return Loop(
-            IfThenElse(
-                GreaterThan(remaining, Constant(0)),
-                Block(
-                    Assign(hash, ExclusiveOr(hash, Multiply(ExpressionHashBuilder.GetReadFunc(input, offset, 1, _ignoreCase), Constant(Prime5)))),
+        return Loop(IfThenElse(GreaterThan(remaining, Constant(0)),
+                Block(Assign(hash, ExclusiveOr(hash, Multiply(ExpressionHashBuilder.GetReadFunc(input, offset, 1, _ignoreCase), Constant(Prime5)))),
                     Assign(hash, Multiply(RotateLeft(hash, 11), Constant(Prime1))),
                     AddAssign(offset, Constant(1)),
-                    SubtractAssign(remaining, Constant(1))
-                ),
-                Break(breakLabel)
-            ),
-            breakLabel
-        );
+                    SubtractAssign(remaining, Constant(1))),
+                Break(breakLabel)),
+            breakLabel);
     }
 
     private static Expression[] BuildRound(Expression accumulator, Expression input, Expression result) =>

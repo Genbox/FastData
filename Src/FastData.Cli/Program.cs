@@ -43,8 +43,7 @@ internal static class Program
         Option<ClassType> classTypeOpt = new Option<ClassType>("--class-type", "-ct") { Description = "The type of the generated class.", DefaultValueFactory = _ => ClassType.Static, HelpName = "instance|static|struct" };
 
         // Helper to read common options from a ParseResult
-        CommonOptions ReadCommon(ParseResult pr) => new CommonOptions(
-            pr.GetValue(keysFileArg) ?? throw new InvalidOperationException("The keys file is required."),
+        CommonOptions ReadCommon(ParseResult pr) => new CommonOptions(pr.GetValue(keysFileArg) ?? throw new InvalidOperationException("The keys file is required."),
             pr.GetValue(outputFileOpt),
             pr.GetValue(valuesFileOpt),
             pr.GetValue(keyTypeOpt),
@@ -244,6 +243,7 @@ internal static class Program
                 return false;
 
             int memoryParams = 0;
+
             for (int i = 0; i < parms.Length; i++)
             {
                 Type type = parms[i].ParameterType;
@@ -403,6 +403,7 @@ internal static class Program
                 ArrayPool<T>.Shared.Return(_buffer, true);
                 _buffer = newBuf;
             }
+
             _buffer[_count++] = item;
         }
 

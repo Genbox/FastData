@@ -156,6 +156,7 @@ internal sealed class SqliteEncoding : IIntegerEncoding
         uint a = (uint)source[0] << 14;
         uint b = source[1];
         a |= source[2];
+
         if ((a & 0x80) == 0)
         {
             a &= Slot20;
@@ -170,6 +171,7 @@ internal sealed class SqliteEncoding : IIntegerEncoding
 
         a &= Slot20;
         b = (b << 14) | source[3];
+
         if ((b & 0x80) == 0)
         {
             b &= Slot20;
@@ -186,6 +188,7 @@ internal sealed class SqliteEncoding : IIntegerEncoding
             return Fail(out value, out bytesRead);
 
         a = (a << 14) | source[4];
+
         if ((a & 0x80) == 0)
         {
             b <<= 7;
@@ -202,6 +205,7 @@ internal sealed class SqliteEncoding : IIntegerEncoding
             return Fail(out value, out bytesRead);
 
         b = (b << 14) | source[5];
+
         if ((b & 0x80) == 0)
         {
             a &= Slot20;
@@ -216,6 +220,7 @@ internal sealed class SqliteEncoding : IIntegerEncoding
             return Fail(out value, out bytesRead);
 
         a = (a << 14) | source[6];
+
         if ((a & 0x80) == 0)
         {
             a &= Slot420;
@@ -234,6 +239,7 @@ internal sealed class SqliteEncoding : IIntegerEncoding
             return Fail(out value, out bytesRead);
 
         b = (b << 14) | source[7];
+
         if ((b & 0x80) == 0)
         {
             b &= Slot420;

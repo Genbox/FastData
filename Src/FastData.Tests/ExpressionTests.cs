@@ -19,10 +19,7 @@ public class ExpressionTests
     ];
 
     [Fact]
-    public async Task NoTransformsAsync()
-    {
-        await VerifyAsync(ExpressionHelper.Transform(_expressions, []), nameof(NoTransformsAsync));
-    }
+    public async Task NoTransformsAsync() => await VerifyAsync(ExpressionHelper.Transform(_expressions, []), nameof(NoTransformsAsync));
 
     [Fact]
     public async Task AllocationGatherTransformAsync()
@@ -32,8 +29,8 @@ public class ExpressionTests
     }
 
     private static async Task VerifyAsync(object obj, string name) =>
-        await Verifier.Verify(obj)
-                      .UseDirectory("Verify/EarlyExits")
-                      .UseFileName(name)
-                       .DisableDiff();
+        await Verify(obj)
+              .UseDirectory("Verify/EarlyExits")
+              .UseFileName(name)
+              .DisableDiff();
 }

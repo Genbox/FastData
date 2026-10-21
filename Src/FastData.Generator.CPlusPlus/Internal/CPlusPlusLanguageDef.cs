@@ -25,8 +25,7 @@ internal class CPlusPlusLanguageDef : ILanguageDef
 
         new ObjectTypeDef(PrintDeclaration, PrintValue),
 
-        new DynamicStringTypeDef(
-            new StringType(GeneratorEncoding.Utf16CodeUnits, "std::u16string_view", static x => QuoteString(x, "u")),
+        new DynamicStringTypeDef(new StringType(GeneratorEncoding.Utf16CodeUnits, "std::u16string_view", static x => QuoteString(x, "u")),
             new StringType(GeneratorEncoding.Utf8Bytes, "std::string_view", static x => QuoteString(x, "u8")),
             new StringType(GeneratorEncoding.AsciiBytes, "std::string_view", static x => QuoteString(x, string.Empty)))
     };

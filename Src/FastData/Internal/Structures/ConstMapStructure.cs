@@ -133,6 +133,7 @@ internal sealed class ConstMapStructure<TKey, TValue> : IStructure<TKey, TValue,
             if (!attemptInvalid)
             {
                 int queueSize = 0;
+
                 for (uint i = 0; i < (uint)arrayLength; i++)
                 {
                     if (t2Count[i] >> 2 == 1)
@@ -140,6 +141,7 @@ internal sealed class ConstMapStructure<TKey, TValue> : IStructure<TKey, TValue,
                 }
 
                 uint stackSize = 0;
+
                 while (queueSize > 0)
                 {
                     uint index = alone[--queueSize];
@@ -255,6 +257,7 @@ internal sealed class ConstMapStructure<TKey, TValue> : IStructure<TKey, TValue,
         segmentLength = exponent >= 18 ? MaxSegmentLength : 1u << exponent;
 
         double capacityValue = size > 1 ? Math.Round(size * CalculateSizeFactor(size), MidpointRounding.AwayFromZero) : 0;
+
         if (capacityValue > uint.MaxValue)
         {
             segmentCount = 0;
@@ -269,6 +272,7 @@ internal sealed class ConstMapStructure<TKey, TValue> : IStructure<TKey, TValue,
             totalSegmentCount = 3;
 
         ulong arrayLengthValue = totalSegmentCount * segmentLength;
+
         if (arrayLengthValue > int.MaxValue)
         {
             segmentCount = 0;

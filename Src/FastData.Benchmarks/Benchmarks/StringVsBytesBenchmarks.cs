@@ -107,6 +107,7 @@ public class StringVsBytesBenchmarks
 
                 int offset = 0;
                 int count = length >> 3;
+
                 for (int i = 0; i < count; i++, offset += 8)
                 {
                     ulong v = Unsafe.ReadUnaligned<ulong>(ref Unsafe.Add(ref p, offset));
@@ -115,6 +116,7 @@ public class StringVsBytesBenchmarks
                 }
 
                 int rem = length & 7;
+
                 for (int i = 0; i < rem; i++)
                 {
                     byte b = Unsafe.Add(ref p, offset + i);

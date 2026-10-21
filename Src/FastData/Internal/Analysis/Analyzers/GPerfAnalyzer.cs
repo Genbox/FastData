@@ -122,6 +122,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 
         // Make one final check, just to make sure nothing weird happened
         table.CollisionDetector.Clear();
+
         foreach (Keyword keyword in keywords)
         {
             int hashcode = ComputeHash(keyword, table.Values, _hashIncludesLength);
@@ -231,6 +232,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             return new SelectedPositions(CreateAllDatasetPositions(maxLen));
 
         int[]? configuredPositions = _options.KeyPositions;
+
         if (configuredPositions != null)
         {
             ValidateConfiguredPositions(configuredPositions, maxLen);
@@ -293,6 +295,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 if (keyword1.Length == keyword2.Length) // Same length
                 {
                     int i;
+
                     for (i = 0; i < keyword1.Length - 1; i++)
                     {
                         if (!CharsEqual(keyword1.ByteAt(i), keyword2.ByteAt(i), ignoreCase))
@@ -303,6 +306,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                     if (i < keyword1.Length - 1)
                     {
                         int j;
+
                         for (j = i + 1; j < keyword1.Length; j++)
                         {
                             if (!CharsEqual(keyword1.ByteAt(j), keyword2.ByteAt(j), ignoreCase))
@@ -459,10 +463,12 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
         sb.AppendFormat(CultureInfo.InvariantCulture, "{0} ({1}): ", stage, CountPositionDuplicates(data, map));
         bool lastChar = false;
         bool first = true;
+
         foreach (int i in map.Positions)
         {
             if (!first)
                 sb.Append(", ");
+
             if (i == -1)
                 lastChar = true;
             else
@@ -478,6 +484,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 sb.Append(", ");
             sb.Append('$');
         }
+
         sb.AppendLine();
 
         LogGPerfDebug(_logger, sb.ToString());
@@ -565,6 +572,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 bool first = true;
 
                 StringBuilder sb = new StringBuilder();
+
                 for (int j = indices.Count; j-- > 0;)
                 {
                     if (alphaInc[indices[j]] != 0)
@@ -707,11 +715,13 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
     private int ComputeAlphaSize(int[] alphaInc)
     {
         int maxAlphaInc = 0;
+
         for (int i = 0; i < alphaInc.Length; i++)
         {
             if (maxAlphaInc < alphaInc[i])
                 maxAlphaInc = alphaInc[i];
         }
+
         return GetAlphabetSize() + maxAlphaInc;
     }
 
@@ -812,6 +822,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             get
             {
                 int max = -1;
+
                 for (int i = 0; i < Ascending.Length; i++)
                 {
                     if (Ascending[i] > max)
@@ -947,8 +958,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             if (logger.IsEnabled(LogLevel.Trace))
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat(
-                      CultureInfo.InvariantCulture,
+                sb.AppendFormat(CultureInfo.InvariantCulture,
                       "total non-linked keys = {0}\nmaximum associated value is {1}\nmaximum size of generated hash table is {2}",
                       keywords.Count,
                       assoValueMax,
@@ -996,6 +1006,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 int collisions = 0;
                 int maxHash = int.MinValue;
                 CollisionDetector.Clear();
+
                 foreach (Keyword keyword in keywords)
                 {
                     int hashcode = ComputeHash(keyword, Values, hashIncludesLength);
@@ -1111,11 +1122,13 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 uint bestC = 0;
                 uint bestPossibleCollisions = uint.MaxValue;
                 uint[] splitCardinalities = new uint[maxSelCharsLength + 1];
+
                 for (uint c = 0; c < alphaSize; c++)
                 {
                     if (Occurrences[c] > 0 && determined[c])
                     {
                         uint possible_collisions = CountPossibleCollisions(partition, c, maxSelCharsLength, splitCardinalities);
+
                         if (possible_collisions < bestPossibleCollisions)
                         {
                             bestC = c;
@@ -1160,6 +1173,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 
                 // Now the set of changing characters of this step.
                 int changing_count = 0;
+
                 for (uint c = 0; c < alphaSize; c++)
                 {
                     if (undetermined[c] && !step.Undetermined[c])
@@ -1168,6 +1182,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 
                 uint[] changing = new uint[changing_count];
                 changing_count = 0;
+
                 for (uint c = 0; c < alphaSize; c++)
                 {
                     if (undetermined[c] && !step.Undetermined[c])
@@ -1192,11 +1207,11 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             {
                 StringBuilder sb = new StringBuilder();
                 uint stepNum = 0;
+
                 for (Step? step = steps; step != null; step = step._next)
                 {
                     stepNum++;
-                    sb.AppendFormat(
-                          CultureInfo.InvariantCulture,
+                    sb.AppendFormat(CultureInfo.InvariantCulture,
                           "Step {0} chooses _asso_values[{1}], expected number of iterations between {2:F6} and {3:F6}.",
                           stepNum,
                           string.Join(",", step.Changing.Select(x => "'" + (char)x + "'")),
@@ -1204,11 +1219,13 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                           step.ExpectedUpper)
                       .AppendLine();
                     sb.AppendLine("Keyword equivalence classes:");
+
                     for (EquivalenceClass? cls = step.Partition; cls != null; cls = cls.Next)
                     {
                         foreach (Keyword keyword in cls.Keywords)
                             sb.AppendLine("  " + keyword.AllChars);
                     }
+
                     sb.AppendLine();
                 }
 
@@ -1217,6 +1234,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 #endif
 
             uint stepNo = 0;
+
             for (Step? step = steps; step != null; step = step._next)
             {
                 stepNo++;
@@ -1239,6 +1257,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 {
                     // Test whether these asso_values[] lead to collisions among the equivalence classes that should be collision-free.
                     bool hasCollision = false;
+
                     for (EquivalenceClass? cls = step.Partition; cls != null; cls = cls.Next)
                     {
                         // Iteration Number array is a win, O(1) initialization time!
@@ -1250,6 +1269,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                             int sum = hashIncludesLength ? keyword.Length : 0;
                             int len = keyword.SelCharsLength;
                             int offset = 0;
+
                             for (; len > 0; offset++, len--)
                             {
                                 uint p = keyword.SelChars[offset];
@@ -1291,31 +1311,38 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                          */
                         int bound = iter[ii];
                         int i = 0;
+
                         while (i < ii)
                         {
                             uint c = step.Changing[i];
                             iter[i]++;
                             int nextValue = unchecked(Values[c] + jump) & (step.AssoValueMax - 1);
+
                             if (iter[i] <= bound)
                             {
                                 Values[c] = nextValue;
                                 goto foundNext;
                             }
+
                             Values[c] = unchecked(nextValue - (iter[i] * jump)) & (step.AssoValueMax - 1);
                             iter[i] = 0;
                             i++;
                         }
+
                         i = ii + 1;
+
                         while (i < k)
                         {
                             uint c = step.Changing[i];
                             iter[i]++;
                             int nextValue = unchecked(Values[c] + jump) & (step.AssoValueMax - 1);
+
                             if (iter[i] < bound)
                             {
                                 Values[c] = nextValue;
                                 goto foundNext;
                             }
+
                             Values[c] = unchecked(nextValue - (iter[i] * jump)) & (step.AssoValueMax - 1);
                             iter[i] = 0;
                             i++;
@@ -1330,15 +1357,18 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 
                         // Here all iter[i] == 0.
                         ii++;
+
                         if (ii == k)
                         {
                             ii = 0;
                             bound++;
+
                             if (bound == step.AssoValueMax)
                             {
                                 /* Out of search space!  We can either backtrack, or increase the available search space of this step.
                                    It seems simpler to choose the latter solution.  */
                                 step.AssoValueMax = ExpandAssociationValueMax(step.AssoValueMax);
+
                                 if (step.AssoValueMax > assoValueMax)
                                 {
                                     assoValueMax = step.AssoValueMax;
@@ -1348,6 +1378,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                                 }
                             }
                         }
+
                         {
                             uint c = step.Changing[ii];
                             iter[ii] = bound;
@@ -1384,6 +1415,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             }
 
             uint[] scratch = ArrayPool<uint>.Shared.Rent(maxSelectedChars);
+
             try
             {
                 foreach (Keyword keyword in keywords)
@@ -1399,6 +1431,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 
                     // Look up the equivalence class to which this keyword belongs.
                     EquivalenceClass? equClass;
+
                     for (equClass = partition; equClass != null; equClass = equClass.Next)
                     {
                         if (equClass.UndeterminedCharsLength == undeterminedCharsLength && Equals(equClass.UndeterminedChars, scratch, undeterminedCharsLength))
@@ -1464,6 +1497,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                Return the sum of this expression over all equivalence classes.  */
 
             uint sum = 0;
+
             for (EquivalenceClass? cls = partition; cls != null; cls = cls.Next)
             {
                 for (int i = 0; i <= maxSelCharsLength; i++)
@@ -1472,6 +1506,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 foreach (Keyword keyword in cls.Keywords)
                 {
                     int count = 0;
+
                     for (int i = 0; i < keyword.SelCharsLength; i++)
                     {
                         if (keyword.SelChars[i] == c)
@@ -1485,6 +1520,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 for (int i = 0; i <= maxSelCharsLength; i++)
                     sum -= splitCardinalities[i] * splitCardinalities[i];
             }
+
             return sum;
         }
 
@@ -1499,6 +1535,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                     Keyword keyword = cls.Keywords[idx];
 
                     uint count = 0;
+
                     for (int i = 0; i < keyword.SelCharsLength; i++)
                     {
                         if (keyword.SelChars[i] == c)
@@ -1511,6 +1548,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                         return false; // c would split this equivalence class.
                 }
             }
+
             return true;
         }
     }
@@ -1542,6 +1580,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                occurs once about every 2^8 iterations, so it does not take much time on
                average. */
             _iterationNumber = unchecked((byte)(_iterationNumber + 1));
+
             if (_iterationNumber == 0)
             {
                 _iterationNumber = 1;
@@ -1605,10 +1644,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             Array.Sort(SelChars, 0, length);
         }
 
-        internal void InitSelCharsTuple(SelectedPositions positions, uint[]? alphaUnify)
-        {
-            InitSelCharsLow(positions, null, alphaUnify);
-        }
+        internal void InitSelCharsTuple(SelectedPositions positions, uint[]? alphaUnify) => InitSelCharsLow(positions, null, alphaUnify);
 
         internal bool TryGetSelectedChar(int position, out uint c)
         {
@@ -1637,6 +1673,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
 
             int ptr = 0;
             int[] ascending = positions.Ascending;
+
             for (int p = 0; p < ascending.Length; p++)
             {
                 int i = ascending[p];
@@ -1737,6 +1774,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
             //This hash function is PJW hash
 
             uint h = hashIncludesLength ? (uint)keyword.Length : 0;
+
             foreach (int pos in positions)
             {
                 if (!keyword.TryGetSelectedChar(pos, out uint c))
@@ -1752,6 +1790,7 @@ internal sealed partial class GPerfAnalyzer : IStringHashAnalyzer
                 if (high != 0)
                     h = h ^ (high >> 24) ^ high;
             }
+
             return h;
         }
 

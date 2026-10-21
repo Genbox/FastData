@@ -5,6 +5,7 @@ public sealed class LoweredWhileStatement(ValidatedExpression test, LoweredBlock
 {
     /// <summary>Gets the validated condition.</summary>
     public ValidatedExpression Test { get; } = test;
+
     /// <summary>Gets the statement body.</summary>
     public LoweredBlock Body { get; } = body;
 }

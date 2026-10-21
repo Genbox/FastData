@@ -27,6 +27,7 @@ internal static class Utf8LastLineReader
             await stream.ReadExactlyAsync(buffer.AsMemory(0, readLength), cancellationToken);
 
             ReadOnlySpan<byte> span = buffer.AsSpan(0, readLength);
+
             if (lineEnd == null)
             {
                 span = TrimTrailingLineBreaks(span, remaining, out lineEnd);

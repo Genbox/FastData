@@ -95,7 +95,10 @@ public class AllocationGatherTransform : IExprTransform
     {
         private readonly HashSet<string> _variableNames = new HashSet<string>(StringComparer.Ordinal);
 
-        internal AllocationGatherState() => Visitor = new AllocationGatherVisitor(this);
+        internal AllocationGatherState()
+        {
+            Visitor = new AllocationGatherVisitor(this);
+        }
 
         public Dictionary<MethodCallSignature, GatheredAllocation> Variables { get; } = new Dictionary<MethodCallSignature, GatheredAllocation>();
         internal AllocationGatherVisitor Visitor { get; }

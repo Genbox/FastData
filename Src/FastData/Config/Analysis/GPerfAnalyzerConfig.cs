@@ -48,8 +48,7 @@ public sealed class GPerfAnalyzerConfig : IAnalyzerConfig
     internal GPerfAnalyzerOptions CreateOptions()
     {
         (int[]? Positions, bool UseAll) keyPositions = ParseKeyPositions(KeyPositions);
-        return new GPerfAnalyzerOptions(
-            SevenBit,
+        return new GPerfAnalyzerOptions(SevenBit,
             NoLength,
             GetMaxConfiguredPosition(MaxPositions),
             keyPositions.Positions,
@@ -105,6 +104,7 @@ public sealed class GPerfAnalyzerConfig : IAnalyzerConfig
     private static void AddKeyPositionItem(List<int> positions, bool[] seen, string item)
     {
         int rangeSeparator = item.IndexOf('-');
+
         if (rangeSeparator < 0)
         {
             AddKeyPosition(positions, seen, ParseKeyPosition(item));
