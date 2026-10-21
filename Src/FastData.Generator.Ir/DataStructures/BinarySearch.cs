@@ -16,9 +16,9 @@ internal static class BinarySearch<TKey, TValue>
         {
             // Only Utf8Bytes frontends sort with the lowercase ASCII fold. The others use OrdinalIgnoreCase, which orders uppercase ASCII
             // and places punctuation differently, so the keys are re-sorted to match the IR fold.
-            string[] folded = keys.Select(key => ((string)(object)key!).ToLowerInvariant()).ToArray();
+            string[] folded = keys.Select(key => FoldAscii((string)(object)key!)).ToArray();
             int[] order = Enumerable.Range(0, keys.Length).ToArray();
-            Array.Sort(order, (a, b) => string.CompareOrdinal(folded[a], folded[b]));
+            Array.Sort(folded, order, StringComparer.Ordinal);
             keys = order.Select(index => keys[index]).ToArray();
 
             if (!valueMemory.IsEmpty)
@@ -43,5 +43,16 @@ internal static class BinarySearch<TKey, TValue>
         statements.Add(If(AndAlso(Less(Read(low), I32(keys.Length)), lowering.Builder.Keys.Equal(KeyAt(Read(low)), lowering.Key)), Return(Read(low))));
         statements.Add(Return(I32(-1)));
         return statements;
+    }
+
+    private static string FoldAscii(string value)
+    {
+        char[] characters = value.ToCharArray();
+        for (int i = 0; i < characters.Length; i++)
+        {
+            if (characters[i] is >= 'A' and <= 'Z')
+                characters[i] = (char)(characters[i] + ('a' - 'A'));
+        }
+        return new string(characters);
     }
 }
