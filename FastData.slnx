@@ -13,6 +13,7 @@
         <File Path="Misc/PowerShell/FastData.psm1" />
     </Folder>
     <Folder Name="/Generators/">
+        <Project Path="Src/FastData.Generator.Ir.CPlusPlus/FastData.Generator.Ir.CPlusPlus.csproj" />
         <Project Path="Src/FastData.Generator.CPlusPlus.TestHarness/FastData.Generator.CPlusPlus.TestHarness.csproj" />
         <Project Path="Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj" />
         <Project Path="Src/FastData.Generator.CSharp.TestHarness/FastData.Generator.CSharp.TestHarness.csproj" />
