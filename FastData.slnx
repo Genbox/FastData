@@ -13,16 +13,20 @@
         <File Path="Misc/PowerShell/FastData.psm1" />
     </Folder>
     <Folder Name="/Generators/">
+        <Project Path="Src/FastData.Generator.Ir.CPlusPlus.TestHarness/FastData.Generator.Ir.CPlusPlus.TestHarness.csproj" />
         <Project Path="Src/FastData.Generator.Ir.CPlusPlus/FastData.Generator.Ir.CPlusPlus.csproj" />
         <Project Path="Src/FastData.Generator.CPlusPlus.TestHarness/FastData.Generator.CPlusPlus.TestHarness.csproj" />
         <Project Path="Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj" />
         <Project Path="Src/FastData.Generator.CSharp.TestHarness/FastData.Generator.CSharp.TestHarness.csproj" />
         <Project Path="Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj" />
+        <Project Path="Src/FastData.Generator.Ir.CSharp.TestHarness/FastData.Generator.Ir.CSharp.TestHarness.csproj" />
         <Project Path="Src/FastData.Generator.Ir.CSharp/FastData.Generator.Ir.CSharp.csproj" />
         <Project Path="Src/FastData.Generator.Ir.Tests/FastData.Generator.Ir.Tests.csproj" />
         <Project Path="Src/FastData.Generator.Ir/FastData.Generator.Ir.csproj" />
         <Project Path="Src/FastData.Generator.Rust.TestHarness/FastData.Generator.Rust.TestHarness.csproj" />
         <Project Path="Src/FastData.Generator.Rust/FastData.Generator.Rust.csproj" />
+        <Project Path="Src/FastData.Generator.Ir.Harness/FastData.Generator.Ir.Harness.csproj" />
+        <Project Path="Src/FastData.Generator.Ir.Rust.TestHarness/FastData.Generator.Ir.Rust.TestHarness.csproj" />
         <Project Path="Src/FastData.Generator.Ir.Rust/FastData.Generator.Ir.Rust.csproj" />
         <Project Path="Src/FastData.Generator.Template/FastData.Generator.Template.csproj" />
         <Project Path="Src/FastData.Generator.Tests/FastData.Generator.Tests.csproj" />
@@ -107,6 +111,9 @@
     <Project Path="Src/FastData.Demo/FastData.Demo.csproj" />
     <Project Path="Src/FastData.Examples/FastData.Examples.csproj" />
     <Project Path="Src/FastData.InternalShared/FastData.InternalShared.csproj" />
+    <Project Path="Src/FastData.Ir.BenchmarkHarness.Runner/FastData.Ir.BenchmarkHarness.Runner.csproj" />
+    <Project Path="Src/FastData.Ir.Harness.Runner/FastData.Ir.Harness.Runner.csproj" />
+    <Project Path="Src/FastData.Ir.TestHarness.Runner/FastData.Ir.TestHarness.Runner.csproj" />
     <Project Path="Src/FastData.Ir.Tests/FastData.Ir.Tests.csproj" />
     <Project Path="Src/FastData.Ir/FastData.Ir.csproj" />
     <Project Path="Src/FastData.Testbed/FastData.Testbed.csproj" />

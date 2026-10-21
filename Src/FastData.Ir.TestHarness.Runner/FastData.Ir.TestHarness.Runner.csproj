@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../Imports/Console.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../FastData.Ir.Harness.Runner/FastData.Ir.Harness.Runner.csproj" />
+    <ProjectReference Include="../FastData.Generator.Ir.CSharp.TestHarness/FastData.Generator.Ir.CSharp.TestHarness.csproj" />
+    <ProjectReference Include="../FastData.Generator.Ir.Rust.TestHarness/FastData.Generator.Ir.Rust.TestHarness.csproj" />
+    <ProjectReference Include="../FastData.Generator.Ir.CPlusPlus.TestHarness/FastData.Generator.Ir.CPlusPlus.TestHarness.csproj" />
+  </ItemGroup>
+</Project>

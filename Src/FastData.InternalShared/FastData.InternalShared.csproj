@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.BenchmarkHarness.Runner" />
+    <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Ir.Harness.Runner" />
     <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Benchmarks" />
     <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator.CPlusPlus.TestHarness" />
     <InternalsVisibleTo Include="$(AssemblyNamePrefix)FastData.Generator.CSharp.TestHarness" />
