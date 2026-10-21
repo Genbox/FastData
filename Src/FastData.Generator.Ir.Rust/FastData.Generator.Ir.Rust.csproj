@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../Imports/Library.props" />
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net10.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compat Include="BitConverterCompat" />
+    <ProjectReference Include="..\FastData.Generator.Ir\FastData.Generator.Ir.csproj" />
+  </ItemGroup>
+
+</Project>

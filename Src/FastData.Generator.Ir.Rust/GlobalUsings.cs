@@ -1,0 +1,1 @@
+global using static Genbox.FastData.Generator.Ir.Emission.LiteralFormatter;
