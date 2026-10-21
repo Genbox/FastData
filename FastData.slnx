@@ -17,6 +17,7 @@
         <Project Path="Src/FastData.Generator.CPlusPlus/FastData.Generator.CPlusPlus.csproj" />
         <Project Path="Src/FastData.Generator.CSharp.TestHarness/FastData.Generator.CSharp.TestHarness.csproj" />
         <Project Path="Src/FastData.Generator.CSharp/FastData.Generator.CSharp.csproj" />
+        <Project Path="Src/FastData.Generator.Ir.CSharp/FastData.Generator.Ir.CSharp.csproj" />
         <Project Path="Src/FastData.Generator.Ir.Tests/FastData.Generator.Ir.Tests.csproj" />
         <Project Path="Src/FastData.Generator.Ir/FastData.Generator.Ir.csproj" />
         <Project Path="Src/FastData.Generator.Rust.TestHarness/FastData.Generator.Rust.TestHarness.csproj" />
