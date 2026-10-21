@@ -8,11 +8,14 @@ public sealed class PreparedRecord
     internal PreparedRecord(string name, IrRecord record)
     {
         Name = name;
-        Fields = record.Fields.Select((field, i) => new PreparedDeclaration(PreparedNames.Name("fdField", i), field.Type)).ToArray();
+        Record = record;
+        FieldNames = PreparedNames.Create("fdField", record.Fields.Count);
     }
 
     public string Name { get; }
 
-    /// <summary>Fields in original declaration order, indexed by field ID.</summary>
-    public IReadOnlyList<PreparedDeclaration> Fields { get; }
+    public IrRecord Record { get; }
+
+    /// <summary>Generated names in original field order, indexed by field ID.</summary>
+    public IReadOnlyList<string> FieldNames { get; }
 }

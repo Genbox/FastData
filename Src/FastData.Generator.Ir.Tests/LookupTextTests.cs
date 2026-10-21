@@ -22,7 +22,6 @@ public class LookupTextTests
 
         Assert.Equal(Constant(length), Run(IrType.I32, x => x.Text.Length(Constant("éA"))));
         Assert.Equal(Unit(firstUnit), Run(unitType, x => x.Text.UnitAt(Constant("éA"), Constant(0))));
-        Assert.Equal(Unit('a'), Run(unitType, x => x.Text.UnitFromEnd(Constant("éA"), Constant(1), x.Keys.FoldFunctionId)));
         Assert.Equal(Constant(true), Run(IrType.Bool, x => x.Text.EqualsAt(Constant("éA"), Constant(length - 1), Constant("a"), x.Keys.FoldFunctionId)));
     }
 

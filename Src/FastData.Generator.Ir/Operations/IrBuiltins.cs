@@ -11,20 +11,15 @@ public static class IrBuiltins
     /// <summary>The text primitives every generator must implement natively.</summary>
     public const IrBuiltinOperation Required = IrBuiltinOperation.TextUnitAt | IrBuiltinOperation.TextLength;
 
+    /// <summary>Byte reads over encoded text.</summary>
+    public const IrBuiltinOperation ByteReads = IrBuiltinOperation.ReadU8 | IrBuiltinOperation.ReadU16LittleEndian | IrBuiltinOperation.ReadU32LittleEndian | IrBuiltinOperation.ReadU64LittleEndian;
+
     /// <summary>Every builtin operation.</summary>
     public const IrBuiltinOperation All = IrBuiltinOperation.TextUnitAt | IrBuiltinOperation.TextLength | IrBuiltinOperation.TextEqualsAt | IrBuiltinOperation.TextIsAscii |
-                                          IrBuiltinOperation.ReadU8 | IrBuiltinOperation.ReadU16LittleEndian | IrBuiltinOperation.ReadU32LittleEndian | IrBuiltinOperation.ReadU64LittleEndian |
+                                          ByteReads |
                                           IrBuiltinOperation.MultiplyHigh | IrBuiltinOperation.PopCount | IrBuiltinOperation.TrailingZeroCount;
 
-    private static readonly Dictionary<IrBuiltinOperation, (string Symbol, IrFunctionSignature? Signature)> _definitions = CreateDefinitions();
-    private static readonly Dictionary<string, IrBuiltinOperation> _operations = CreateOperations();
-    private static readonly IrFunctionSignature _utf8UnitAt = new IrFunctionSignature(IrType.U8, [IrType.String, IrType.I32]);
-    private static readonly IrFunctionSignature _utf16UnitAt = new IrFunctionSignature(IrType.U16, [IrType.String, IrType.I32]);
-
-    /// <summary>The stable external linkage symbol.</summary>
-    public static string GetSymbol(IrBuiltinOperation operation) => GetDefinition(operation).Symbol;
-
-    private static Dictionary<IrBuiltinOperation, (string Symbol, IrFunctionSignature? Signature)> CreateDefinitions() => new Dictionary<IrBuiltinOperation, (string, IrFunctionSignature?)>(11)
+    private static readonly Dictionary<IrBuiltinOperation, (string Symbol, IrFunctionSignature? Signature)> _definitions = new Dictionary<IrBuiltinOperation, (string, IrFunctionSignature?)>(11)
     {
         [IrBuiltinOperation.TextUnitAt] = ("fastdata.lookup.text.unitAt", null),
         [IrBuiltinOperation.TextLength] = ("fastdata.lookup.text.length", new IrFunctionSignature(IrType.I32, [IrType.String])),
@@ -38,6 +33,21 @@ public static class IrBuiltins
         [IrBuiltinOperation.PopCount] = ("fastdata.lookup.popCount", new IrFunctionSignature(IrType.I32, [IrType.U64])),
         [IrBuiltinOperation.TrailingZeroCount] = ("fastdata.lookup.trailingZeroCount", new IrFunctionSignature(IrType.I32, [IrType.U64]))
     };
+    private static readonly Dictionary<string, IrBuiltinOperation> _operations = _definitions.ToDictionary(static definition => definition.Value.Symbol, static definition => definition.Key, StringComparer.Ordinal);
+    private static readonly IrFunctionSignature _utf8UnitAt = new IrFunctionSignature(IrType.U8, [IrType.String, IrType.I32]);
+    private static readonly IrFunctionSignature _utf16UnitAt = new IrFunctionSignature(IrType.U16, [IrType.String, IrType.I32]);
+
+    internal static void ValidateSupport(IrBuiltinOperation supported)
+    {
+        if (!All.HasFlag(supported))
+            throw new ArgumentException("The supported builtins contain undefined operations.", nameof(supported));
+
+        if (!supported.HasFlag(Required))
+            throw new ArgumentException("The supported builtins must include TextUnitAt and TextLength.", nameof(supported));
+    }
+
+    /// <summary>The stable external linkage symbol.</summary>
+    public static string GetSymbol(IrBuiltinOperation operation) => GetDefinition(operation).Symbol;
 
     private static (string Symbol, IrFunctionSignature? Signature) GetDefinition(IrBuiltinOperation operation)
     {
@@ -86,15 +96,5 @@ public static class IrBuiltins
         // Parameter types must match the catalog signature exactly.
         for (int i = 0; i < expected.Parameters.Count; i++)
             Require(declared.Parameters[i] == expected.Parameters[i], "Builtin parameter type does not match its catalog signature.", signature.Index("Parameters", i), IrDiagnosticCode.TypeMismatch);
-    }
-
-    private static Dictionary<string, IrBuiltinOperation> CreateOperations()
-    {
-        Dictionary<string, IrBuiltinOperation> ops = new Dictionary<string, IrBuiltinOperation>(_definitions.Count, StringComparer.Ordinal);
-
-        foreach (KeyValuePair<IrBuiltinOperation, (string Symbol, IrFunctionSignature? Signature)> definition in _definitions)
-            ops.Add(definition.Value.Symbol, definition.Key);
-
-        return ops;
     }
 }

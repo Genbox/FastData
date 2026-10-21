@@ -1,151 +1,71 @@
+using Genbox.FastData.Generator.Ir.Building;
 using Genbox.FastData.Generator.Ir.Operations;
 using Genbox.FastData.Generator.Ir.Prepared;
+using Genbox.FastData.Ir.Building;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
-using Genbox.FastData.Ir.Model.Enums;
 
 namespace Genbox.FastData.Generator.Ir.Preparation;
 
-internal sealed class FunctionPreparation(IrProgram program, IrBackendCapabilities capabilities, string namePrefix)
+internal static class FunctionPreparation
 {
-    public PreparedFunctionGroup Run(IReadOnlyDictionary<IrBuiltinOperation, IrFunctionId>? entryPoints = null)
+    public static (IReadOnlyList<PreparedFunction> Functions, IReadOnlyList<PreparedCall> Calls, IrBuiltinOperation RequiredBuiltins) Run(IrProgram program, string namePrefix, IrBuiltinOperation supportedBuiltins)
     {
+        IrBuiltins.ValidateSupport(supportedBuiltins);
         IReadOnlyList<IrCallable> callables = program.Callables;
-        IReadOnlyList<string> names = PreparedNames.Create(namePrefix, callables.Count);
-        List<PreparedFunction> functions = new List<PreparedFunction>(callables.Count);
+        PreparedCall[] calls = new PreparedCall[callables.Count];
+        IReadOnlyList<PreparedFunction> fallbackFunctions = [];
         IrBuiltinOperation requiredBuiltins = IrBuiltinOperation.None;
+
+        IrProgramBuilder? fallbackProgram = null;
+        IrBuiltinBuilder? fallbackBuilder = null;
+        List<(int OriginalId, IrFunctionId FunctionId)> fallbacks = [];
 
         for (int i = 0; i < callables.Count; i++)
         {
-            if (callables[i] is IrFunction function)
+            IrBuiltinOperation operation = IrBuiltinOperation.None;
+
+            if (callables[i] is IrExternalFunction external)
             {
-                ExpressionPreparation expressions = new ExpressionPreparation(program, function, capabilities, names);
-                IrBlock body = PrepareBlock(function.Body, expressions);
-                functions.Add(new PreparedFunction(names[i], function, body));
-            }
-            else if (callables[i] is IrExternalFunction external)
-            {
-                // Lowering declares builtins on demand, including dependencies of fallback functions.
-                if (!IrBuiltins.TryGetOperation(external.Symbol, out IrBuiltinOperation operation))
+                // Resolve each external once, before binding any calls to it.
+                if (!IrBuiltins.TryGetOperation(external.Symbol, out operation))
                     throw new NotSupportedException($"Unknown external function '{external.Symbol}'.");
-                requiredBuiltins |= operation;
+
+                if (supportedBuiltins.HasFlag(operation))
+                    requiredBuiltins |= operation;
+                else
+                {
+                    fallbackProgram ??= new IrProgramBuilder(program.TextEncoding);
+                    fallbackBuilder ??= new IrBuiltinBuilder(fallbackProgram, supportedBuiltins);
+                    fallbacks.Add((i, fallbackBuilder.Declare(operation)));
+                    operation = IrBuiltinOperation.None;
+                }
             }
+
+            calls[i] = new PreparedCall(PreparedNames.Name(namePrefix, i), operation);
         }
 
-        return new PreparedFunctionGroup(functions.ToArray(), names, requiredBuiltins, entryPoints);
-    }
-
-    private IrBlock PrepareBlock(IrBlock block, ExpressionPreparation expressions)
-    {
-        List<IrStatement>? statements = null;
-
-        for (int i = 0; i < block.Statements.Count; i++)
+        if (fallbackProgram != null)
         {
-            PreparedSwitch? dispatch = CreateSwitch(block.Statements, i, expressions);
-            IrStatement statement = dispatch ?? PrepareStatement(block.Statements[i], expressions);
+            (IReadOnlyList<PreparedFunction> prepared, IReadOnlyList<PreparedCall> fallbackCalls, IrBuiltinOperation required) = Run(fallbackProgram.Build(), namePrefix + "Builtin", supportedBuiltins);
+            requiredBuiltins |= required;
 
-            if (statements == null && !ReferenceEquals(statement, block.Statements[i]))
-            {
-                statements = new List<IrStatement>(block.Statements.Count);
-                for (int j = 0; j < i; j++)
-                    statements.Add(block.Statements[j]);
-            }
+            // Fallbacks have their own callable IDs; bind each original external to its prepared target.
+            foreach ((int originalId, IrFunctionId functionId) in fallbacks)
+                calls[originalId] = fallbackCalls[functionId.Value];
 
-            statements?.Add(statement);
-            if (dispatch != null)
-                i += dispatch.Cases.Count - 1;
+            fallbackFunctions = prepared;
         }
 
-        return statements == null ? block : new IrBlock(statements);
-    }
-
-    private IrStatement PrepareStatement(IrStatement statement, ExpressionPreparation expressions)
-    {
-        switch (statement)
+        // Bind functions only after all native and fallback targets have been resolved.
+        List<PreparedFunction> functions = new List<PreparedFunction>(callables.Count + fallbackFunctions.Count);
+        for (int i = 0; i < callables.Count; i++)
         {
-            case IrIfStatement conditional:
-            {
-                IrExpression condition = expressions.Prepare(conditional.Condition);
-                IrBlock ifTrue = PrepareBlock(conditional.IfTrue, expressions);
-                IrBlock? ifFalse = conditional.IfFalse == null ? null : PrepareBlock(conditional.IfFalse, expressions);
-                return ReferenceEquals(condition, conditional.Condition) && ReferenceEquals(ifTrue, conditional.IfTrue) && ReferenceEquals(ifFalse, conditional.IfFalse)
-                    ? conditional
-                    : new IrIfStatement(condition, ifTrue, ifFalse);
-            }
-            case IrLoopStatement loop:
-            {
-                IrExpression condition = expressions.Prepare(loop.Condition);
-                IrBlock body = PrepareBlock(loop.Body, expressions);
-                return ReferenceEquals(condition, loop.Condition) && ReferenceEquals(body, loop.Body) ? loop : new IrLoopStatement(condition, body);
-            }
-            case IrAssignmentStatement assignment:
-            {
-                IrExpression value = expressions.Prepare(assignment.Value);
-                return ReferenceEquals(value, assignment.Value) ? assignment : new IrAssignmentStatement(assignment.VariableId, value);
-            }
-            case IrReturnStatement result:
-            {
-                IrExpression value = expressions.Prepare(result.Value);
-                return ReferenceEquals(value, result.Value) ? result : new IrReturnStatement(value);
-            }
-            default:
-                return statement;
+            if (callables[i] is IrFunction function)
+                functions.Add(new PreparedFunction(calls[i].Name, function, calls));
         }
-    }
+        functions.AddRange(fallbackFunctions);
 
-    private PreparedSwitch? CreateSwitch(IReadOnlyList<IrStatement> statements, int start, ExpressionPreparation expressions)
-    {
-        if (capabilities.SwitchKinds == IrSwitchKinds.None || statements.Count - start < 3 || MatchCase(statements[start]) is not {} first)
-            return null;
-
-        List<PreparedSwitchCase> cases = [new PreparedSwitchCase(first.Label, first.Result)];
-        HashSet<IrLiteral> labels = [first.Label];
-
-        for (int i = start + 1; i < statements.Count; i++)
-        {
-            if (MatchCase(statements[i]) is not {} next || next.Variable.VariableId != first.Variable.VariableId || !labels.Add(next.Label))
-                break;
-            cases.Add(new PreparedSwitchCase(next.Label, next.Result));
-        }
-
-        if (cases.Count < 3)
-            return null;
-
-        for (int i = 0; i < cases.Count; i++)
-            cases[i] = new PreparedSwitchCase(cases[i].Label, expressions.Prepare(cases[i].Result));
-        return new PreparedSwitch(first.Variable, cases.ToArray());
-    }
-
-    private (IrVariableExpression Variable, IrLiteral Label, IrExpression Result)? MatchCase(IrStatement statement)
-    {
-        if (statement is not IrIfStatement { IfFalse: null } conditional || conditional.IfTrue.Statements.Count != 1)
-            return null;
-
-        if (conditional.Condition is not IrBinaryExpression
-            {
-                Operation: BinaryOperation.Equal,
-                Left: IrVariableExpression variable,
-                Right: IrLiteral label
-            } || label is IrNullLiteral)
-            return null;
-
-        if (conditional.IfTrue.Statements[0] is not IrReturnStatement result)
-            return null;
-
-        IrSwitchKinds kind;
-
-        if (label.Type.IsIntegral)
-            kind = IrSwitchKinds.Integral;
-        else
-        {
-            kind = label.Type.Kind switch
-            {
-                IrTypeKind.Char => IrSwitchKinds.Character,
-                IrTypeKind.String => IrSwitchKinds.String,
-                _ => IrSwitchKinds.None
-            };
-        }
-
-        return kind != IrSwitchKinds.None && capabilities.SwitchKinds.HasFlag(kind) ? (variable, label, result.Value) : null;
+        return (functions, calls, requiredBuiltins);
     }
 }

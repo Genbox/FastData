@@ -1,23 +1,23 @@
 using Genbox.FastData.Generator.Ir.Building;
 using Genbox.FastData.Generator.Ir.Model;
 using Genbox.FastData.Generator.Ir.Operations;
-using Genbox.FastData.Generator.Ir.Preparation;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Enums;
 using Genbox.FastData.Ir.Interop;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
+using Genbox.FastData.Ir.Model.Enums;
 
 namespace Genbox.FastData.Generator.Ir.Lowering;
 
 internal sealed class LoweringContext<TKey, TValue>
 {
-    public LoweringContext(GeneratorConfigBase config, IrBackendCapabilities capabilities)
+    public LoweringContext(GeneratorConfigBase config, IrTextEncoding textEncoding)
     {
         Config = config;
         IrType keyType = IrClrConverter.FromClrType(typeof(TKey));
         bool ignoreCase = config is StringGeneratorConfig { IgnoreCase: true };
-        Builder = new FastDataProgramBuilder(keyType, capabilities.TextEncoding, ignoreCase ? LookupText.CreateAsciiFold : null, capabilities.SupportedBuiltins);
+        Builder = new FastDataProgramBuilder(keyType, textEncoding, ignoreCase ? LookupText.CreateAsciiFold : null);
         Expressions = new FrontendExpressions(config, Builder, typeof(TKey));
         Enumeration = new LookupEnumerationBuilder(Builder);
         Storage = new IntegerStorageBuilder(Builder.Program, config.TypeReductionEnabled);

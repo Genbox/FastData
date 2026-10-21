@@ -20,11 +20,7 @@ public sealed class IrBuiltinBuilder
     /// <exception cref="ArgumentException"><paramref name="supported" /> omits a required primitive or contains undefined bits.</exception>
     public IrBuiltinBuilder(IrProgramBuilder program, IrBuiltinOperation supported = IrBuiltins.All)
     {
-        if (!IrBuiltins.All.HasFlag(supported))
-            throw new ArgumentException("The supported builtins contain undefined operations.", nameof(supported));
-
-        if (!supported.HasFlag(IrBuiltins.Required))
-            throw new ArgumentException("The supported builtins must include TextUnitAt and TextLength.", nameof(supported));
+        IrBuiltins.ValidateSupport(supported);
 
         _program = program;
         Supported = supported;

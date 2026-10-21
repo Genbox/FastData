@@ -14,7 +14,6 @@ public sealed class LookupText
     private readonly Dictionary<IrFunctionId, IrFunctionId> _equalsAtFolded = new Dictionary<IrFunctionId, IrFunctionId>();
     private readonly IrProgramBuilder _program;
     private IrFunctionId? _endsWith;
-    private IrFunctionId? _unitFromEnd;
 
     internal LookupText(IrProgramBuilder program, IrBuiltinBuilder builtins)
     {
@@ -52,13 +51,6 @@ public sealed class LookupText
 
     /// <summary>Tests whether every encoded unit is below 128.</summary>
     public IrFunctionCallExpression IsAscii(IrExpression text) => _builtins.Call(IrBuiltinOperation.TextIsAscii, text);
-
-    /// <summary>Reads a unit counted from the end. Distance 1 means the last unit; distance must be between 1 and the text length.</summary>
-    public IrFunctionCallExpression UnitFromEnd(IrExpression text, IrExpression distance, IrFunctionId? foldFunctionId = null)
-    {
-        IrFunctionCallExpression call = Call(_unitFromEnd ??= AddUnitFromEnd(), text, distance);
-        return foldFunctionId is {} fold ? Call(fold, call) : call;
-    }
 
     /// <summary>Tests an encoded-unit suffix. An empty fragment matches; a fragment longer than the input does not.</summary>
     public IrFunctionCallExpression EndsWith(IrExpression text, IrExpression fragment, IrFunctionId? foldFunctionId = null)
@@ -105,16 +97,6 @@ public sealed class LookupText
                 If(NotEqual(left, right), Return(Bool(false))),
                 Increment(index)),
             Return(Bool(true))));
-        return function.Id;
-    }
-
-    private IrFunctionId AddUnitFromEnd()
-    {
-        IrFunctionBuilder function = _program.Function("UnitFromEnd", _program.Text.CodeUnitType);
-        IrVariableId text = function.Parameter("text", IrType.String);
-        IrVariableId distance = function.Parameter("distance", IrType.I32);
-        IrExpression offset = Subtract(Length(Read(text)), Read(distance));
-        function.Define(Block(Return(UnitAt(Read(text), offset))));
         return function.Id;
     }
 

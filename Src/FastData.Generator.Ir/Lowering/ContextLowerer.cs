@@ -1,19 +1,19 @@
 using Genbox.FastData.Generator.Ir.DataStructures;
-using Genbox.FastData.Generator.Ir.Preparation;
 using Genbox.FastData.Generators;
 using Genbox.FastData.Generators.Abstracts;
 using Genbox.FastData.Generators.Contexts;
 using Genbox.FastData.Ir.Model;
 using Genbox.FastData.Ir.Model.Abstracts;
+using Genbox.FastData.Ir.Model.Enums;
 
 namespace Genbox.FastData.Generator.Ir.Lowering;
 
 /// <summary>Lowers frontend structure contexts into portable IR lookup programs.</summary>
 internal static class ContextLowerer
 {
-    public static LoweredLookup Lower<TKey, TValue>(GeneratorConfigBase config, IContext context, IrBackendCapabilities capabilities)
+    public static LoweredLookup Lower<TKey, TValue>(GeneratorConfigBase config, IContext context, IrTextEncoding textEncoding)
     {
-        LoweringContext<TKey, TValue> lowering = new LoweringContext<TKey, TValue>(config, capabilities);
+        LoweringContext<TKey, TValue> lowering = new LoweringContext<TKey, TValue>(config, textEncoding);
         List<IrStatement> body = lowering.Expressions.EarlyExits();
         body.AddRange(context switch
         {
