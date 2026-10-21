@@ -87,3 +87,7 @@ IrProgram program = builder.Build();
 IrLiteral result = new IrInterpreter(program).Invoke(square.Id, new IrU64Literal(3));
 // result is an IrU64Literal with Value == 9.
 ```
+
+## Visiting
+
+`IrWalker` supplies typed visits, dispatch, and default structural traversal for core expressions, statements, blocks, and functions without adding methods to model nodes. It visits operands and bodies in source order, including both conditional branches and a loop's body once. Packed literal storage remains opaque; a pass can explicitly inspect it by overriding `VisitLiteral`. Library-defined expressions implement `IrExtensionExpression` to expose operands in source order; `VisitExtension` traverses them automatically. This structural contract does not make extension nodes valid core operations or define their interpreter semantics.
