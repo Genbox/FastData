@@ -1,6 +1,4 @@
 [*.cs]
 # IR model declarations use self-describing members; document behavior where it needs context.
 # CS1591: Missing XML comment for publicly visible type or member
-dotnet_diagnostic.CS1591.severity = none
-# CS1591: Missing XML comment for publicly visible type or member
 resharper_c_sharp_warnings_cs1591_highlighting = none

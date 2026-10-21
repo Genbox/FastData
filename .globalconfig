@@ -281,6 +281,7 @@ dotnet_diagnostic.SYSLIB1045.severity = none # Use source-generated regular expr
 # Meziantou.Analyzer
 dotnet_diagnostic.MA0003.severity = none # Add parameter name to improve readability
 dotnet_diagnostic.MA0006.severity = none # Use String.Equals instead of equality operator
+dotnet_diagnostic.MA0007.severity = none # Add a comma after the last value
 dotnet_diagnostic.MA0026.severity = none # Project policy does not enforce TODO comments
 dotnet_diagnostic.MA0046.severity = none # The delegate must have 2 parameters
 dotnet_diagnostic.MA0051.severity = none # Method is too long
